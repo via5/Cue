@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 
 namespace Cue
 {
@@ -30,10 +31,16 @@ namespace Cue
 	}
 
 
-	class SitSlot
+	class Slot
 	{
 		public Vector3 positionOffset;
 		public float bearingOffset;
+
+		public Slot(Vector3 positionOffset, float bearingOffset)
+		{
+			this.positionOffset = positionOffset;
+			this.bearingOffset = bearingOffset;
+		}
 	}
 
 
@@ -49,18 +56,20 @@ namespace Cue
 		bool Animating { get; }
 		void PlayAnimation(int i, bool loop);
 
-		SitSlot SitSlot { get; }
+		Slot SitSlot { get; }
+		Slot SleepSlot { get; }
+		Slot ToiletSlot { get; }
 	}
 
 
-	abstract class BasicObject : IObject
+	class BasicObject : IObject
 	{
 		private readonly W.IAtom atom_;
 
 		private float maxMoveSpeed_ = 1;
 		private float moveSpeedRampTime_ = 1;
-		private float maxTurnSpeed_ = 200;
-		private float turnSpeedRampTime_ = 1;
+		private float maxTurnSpeed_ = 300;
+		private float turnSpeedRampTime_ = 0;
 		private float moveDistanceThreshold_ = 0.01f;
 		private float turnAngleThreshold_ = 0.1f;
 
@@ -70,6 +79,10 @@ namespace Cue
 		private Vector3 target_ = Vector3.Zero;
 		private bool hasTarget_ = false;
 		private bool canMove_ = false;
+
+		private Slot sitSlot_ = null;
+		private Slot sleepSlot_ = null;
+		private Slot toiletSlot_ = null;
 
 		public BasicObject(W.IAtom atom)
 		{
@@ -106,9 +119,22 @@ namespace Cue
 			get { return hasTarget_; }
 		}
 
-		public virtual SitSlot SitSlot
+		public Slot SitSlot
 		{
-			get { return null; }
+			get { return sitSlot_; }
+			set { sitSlot_ = value; }
+		}
+
+		public Slot SleepSlot
+		{
+			get { return sleepSlot_; }
+			set { sleepSlot_ = value; }
+		}
+
+		public Slot ToiletSlot
+		{
+			get { return toiletSlot_; }
+			set { toiletSlot_ = value; }
 		}
 
 		public virtual void Update(float s)
@@ -144,7 +170,7 @@ namespace Cue
 			var currentBearing = Bearing;
 			var a = AngleBetweenBearings(bearingToTarget, currentBearing);
 
-			if (Math.Abs(a) < turnAngleThreshold_)
+			if (Math.Abs(a) < turnAngleThreshold_ || turnSpeedRampTime_ == 0)
 			{
 				atom_.Direction = dirToTarget;
 				turnElapsed_ = Math.Max(0, turnElapsed_ - s);
@@ -201,56 +227,6 @@ namespace Cue
 		{
 			// no-op
 			return true;
-		}
-	}
-
-
-	class Bed : BasicObject
-	{
-		public Bed(W.IAtom atom)
-			: base(atom)
-		{
-		}
-
-		public override SitSlot SitSlot
-		{
-			get
-			{
-				var ss = new SitSlot();
-				ss.positionOffset = new Vector3(0, 0, -1.3f);
-				ss.bearingOffset = 180;
-
-				return ss;
-			}
-		}
-	}
-
-
-	class Chair : BasicObject
-	{
-		public Chair(W.IAtom atom)
-			: base(atom)
-		{
-		}
-
-		public override SitSlot SitSlot
-		{
-			get
-			{
-				var ss = new SitSlot();
-				ss.positionOffset = new Vector3(0, 0, 0.3f);
-
-				return ss;
-			}
-		}
-	}
-
-
-	class Table : BasicObject
-	{
-		public Table(W.IAtom atom)
-			: base(atom)
-		{
 		}
 	}
 }

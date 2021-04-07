@@ -81,6 +81,8 @@ namespace Cue
 	class MoveAction : BasicAction
 	{
 		private Vector3 to_;
+		private readonly List<Vector3> wps_ = new List<Vector3>();
+		private int i_ = 0;
 
 		public MoveAction(Vector3 to)
 		{
@@ -89,13 +91,51 @@ namespace Cue
 
 		public override bool Start(IObject o, float s)
 		{
-			o.MoveTo(to_);
-			return o.HasTarget;
+			var path = new UnityEngine.AI.NavMeshPath();
+			bool b = UnityEngine.AI.NavMesh.CalculatePath(
+				Vector3.ToUnity(o.Position),
+				Vector3.ToUnity(to_),
+				UnityEngine.AI.NavMesh.AllAreas, path);
+
+			if (!b)
+			{
+				SuperController.LogError(o.ToString() + " cannot reach " + to_.ToString());
+				return false;
+			}
+
+			foreach (var c in path.corners)
+				wps_.Add(Vector3.FromUnity(c));
+
+			SuperController.LogError(
+				o.ToString() + " to " + to_.ToString() + ", " +
+				wps_.Count.ToString() + " waypoints");
+
+			o.MoveTo(wps_[0]);
+
+			if (o.HasTarget)
+				return true;
+			else if (wps_.Count > 1)
+				return true;
+			else
+				return false;
 		}
 
 		public override bool Tick(IObject o, float s)
 		{
-			return o.HasTarget;
+			if (!o.HasTarget)
+			{
+				++i_;
+				if (i_ >= wps_.Count)
+				{
+					Cue.LogError(o.ToString() + " has reached " + to_.ToString());
+					return false;
+				}
+
+				Cue.LogError(o.ToString() + " next waypoint " + wps_[i_].ToString());
+				o.MoveTo(wps_[i_]);
+			}
+
+			return true;
 		}
 
 		public override string ToString()

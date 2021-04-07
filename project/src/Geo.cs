@@ -65,12 +65,17 @@ namespace Cue
 			return new Vector3(v.X * f, v.Y * f, v.Z * f);
 		}
 
-		private static UnityEngine.Vector3 ToUnity(Vector3 v)
+		public static Vector3 operator *(Vector3 a, Vector3 b)
+		{
+			return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
+		}
+
+		public static UnityEngine.Vector3 ToUnity(Vector3 v)
 		{
 			return new UnityEngine.Vector3(v.X, v.Y, v.Z);
 		}
 
-		private static Vector3 FromUnity(UnityEngine.Vector3 v)
+		public static Vector3 FromUnity(UnityEngine.Vector3 v)
 		{
 			return new Vector3(v.x, v.y, v.z);
 		}
@@ -90,6 +95,11 @@ namespace Cue
 			return FromUnity(
 				UnityEngine.Quaternion.Euler(x, y, z) *
 				UnityEngine.Vector3.forward);
+		}
+
+		public static Vector3 Rotate(Vector3 v, float bearing)
+		{
+			return FromUnity(UnityEngine.Quaternion.Euler(0, bearing, 0) * ToUnity(v));
 		}
 	}
 

@@ -1,5 +1,4 @@
-﻿using Battlehub.RTSaveLoad;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
@@ -14,9 +13,13 @@ namespace Cue
 
 		public PersonAI()
 		{
-			events_.Add(new SitEvent(Cue.Instance.Objects[0]));
-			events_.Add(new SitEvent(Cue.Instance.Objects[1]));
-			//events_.Add(new SleepEvent());
+			foreach (var o in Cue.Instance.Objects)
+			{
+				if (o.SitSlot != null)
+					events_.Add(new SitEvent(o));
+				if (o.SleepSlot != null)
+					events_.Add(new SleepEvent(o));
+			}
 		}
 
 		public void Tick(Person p, float s)
@@ -72,7 +75,7 @@ namespace Cue
 				return false;
 			}
 
-			var pos = o_.Position + ss.positionOffset;
+			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
 
 			switch (state_)
 			{
@@ -120,8 +123,14 @@ namespace Cue
 		const int Moving = 1;
 		const int Sleeping = 2;
 
+		private IObject o_;
 		private int state_ = NoState;
 		private float elapsed_ = 0;
+
+		public SleepEvent(IObject o)
+		{
+			o_ = o;
+		}
 
 		public override bool Tick(Person p, float s)
 		{
@@ -130,7 +139,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to sleep");
-					p.PushAction(new MoveAction(Cue.Instance.Objects[0].Position));
+					p.PushAction(new MoveAction(o_.Position));
 					state_ = Moving;
 					elapsed_ = 0;
 					break;
