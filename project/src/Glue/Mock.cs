@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue.W
 {
@@ -7,6 +8,7 @@ namespace Cue.W
 		private static MockSys instance_ = null;
 		private readonly MockTime time_ = new MockTime();
 		private readonly MockLog log_ = new MockLog();
+		private readonly MockNav nav_ = new MockNav();
 
 		public MockSys()
 		{
@@ -33,6 +35,11 @@ namespace Cue.W
 			get { return log_; }
 		}
 
+		public INav Nav
+		{
+			get { return nav_; }
+		}
+
 		public IAtom ContainingAtom
 		{
 			get { return null; }
@@ -46,6 +53,11 @@ namespace Cue.W
 		public bool Paused
 		{
 			get { return false; }
+		}
+
+		public void OnPluginState(bool b)
+		{
+			// no-op
 		}
 	}
 
@@ -117,6 +129,18 @@ namespace Cue.W
 		{
 			get { return Vector3.Zero; }
 			set { }
+		}
+	}
+
+	class MockNav : INav
+	{
+		public void AddBox(float x, float z, float w, float h)
+		{
+		}
+
+		public List<Vector3> Calculate(Vector3 from, Vector3 to)
+		{
+			return new List<Vector3>();
 		}
 	}
 }

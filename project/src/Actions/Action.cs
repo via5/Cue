@@ -81,7 +81,7 @@ namespace Cue
 	class MoveAction : BasicAction
 	{
 		private Vector3 to_;
-		private readonly List<Vector3> wps_ = new List<Vector3>();
+		private List<Vector3> wps_ = new List<Vector3>();
 		private int i_ = 0;
 
 		public MoveAction(Vector3 to)
@@ -91,20 +91,14 @@ namespace Cue
 
 		public override bool Start(IObject o, float s)
 		{
-			var path = new UnityEngine.AI.NavMeshPath();
-			bool b = UnityEngine.AI.NavMesh.CalculatePath(
-				Vector3.ToUnity(o.Position),
-				Vector3.ToUnity(to_),
-				UnityEngine.AI.NavMesh.AllAreas, path);
+			wps_ = Cue.Instance.Sys.Nav.Calculate(o.Position, to_);
 
-			if (!b)
+			if (wps_.Count == 0)
 			{
-				SuperController.LogError(o.ToString() + " cannot reach " + to_.ToString());
+				SuperController.LogError(
+					o.ToString() + " cannot reach " + to_.ToString());
 				return false;
 			}
-
-			foreach (var c in path.corners)
-				wps_.Add(Vector3.FromUnity(c));
 
 			SuperController.LogError(
 				o.ToString() + " to " + to_.ToString() + ", " +
