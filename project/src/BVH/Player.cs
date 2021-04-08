@@ -6,7 +6,8 @@ namespace Cue.BVH
 {
     using Vector3 = UnityEngine.Vector3;
 
-    public class Animation
+
+    public class Animation : IAnimation
     {
         public BVH.File file = null;
         public bool loop = false;
@@ -24,8 +25,18 @@ namespace Cue.BVH
             file = new File(path);
         }
 
+        public Animation(string path, bool loop, bool rootXZ, bool rootY, int start, int end)
+        {
+            this.file = new File(path);
+            this.loop = loop;
+            this.rootXZ = rootXZ;
+            this.rootY = rootY;
+            this.start = start;
+            this.end = end;
+        }
+
         public override string ToString()
-		{
+        {
             string s =
                 file.Name + " " +
                 start.ToString() + "-" +
@@ -35,8 +46,8 @@ namespace Cue.BVH
                 s += " loop";
 
             return s;
-		}
-	}
+        }
+    }
 
 
     // Original script by ElkVR
@@ -280,7 +291,7 @@ namespace Cue.BVH
             containingAtom.mainController.transform.Translate(rootMotion2D);
         }
 
-        public void FixedUpdate()
+        public void FixedUpdate(float s)
         {
             try
             {
@@ -289,7 +300,7 @@ namespace Cue.BVH
 
                 rootMotion = new Vector3();
 
-                FrameAdvance();
+                FrameAdvance(s);
 
                 foreach (var item in cnameToBname)
                 {
@@ -307,6 +318,8 @@ namespace Cue.BVH
                         controllerMap[item.Key].transform.localEulerAngles += new Vector3(-heelAngle, 0, 0);
                     }
                 }
+
+                ApplyRootMotion();
             }
             catch (Exception e)
             {
@@ -314,11 +327,11 @@ namespace Cue.BVH
             }
         }
 
-        public void FrameAdvance()
+        public void FrameAdvance(float s)
         {
             if (playing)
             {
-                elapsed += Time.fixedDeltaTime;
+                elapsed += s;
                 if (elapsed >= frameTime)
                 {
                     elapsed = 0;

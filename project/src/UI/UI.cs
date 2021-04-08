@@ -71,7 +71,7 @@ namespace Cue.UI
 			var p = Cue.Instance.Person;
 
 			action_.Text = "Action: " + p.Action.ToString();
-			anim_.Text = "Anim: " + p.Animation.ToString();
+			anim_.Text = "Anim: " + p.Animator.ToString();
 			state_.Text = "State: " + p.StateString;
 
 			root_.DoLayoutIfNeeded();
@@ -87,7 +87,7 @@ namespace Cue.UI
 			a.file = new BVH.File(f);
 			a.rootXZ = true;
 			a.rootY = true;
-			Cue.Instance.Person.Animation.Play(a);
+			Cue.Instance.Person.Animator.Play(a);
 		}
 	}
 }

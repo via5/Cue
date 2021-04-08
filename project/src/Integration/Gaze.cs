@@ -3,13 +3,7 @@ using UnityEngine;
 
 namespace Cue
 {
-	interface IEyes
-	{
-		int LookAt { get; set; }
-		Vector3 Target { get; set; }
-	}
-
-	class VamEyes : IEyes
+	class VamEyes
 	{
 		private Person person_ = null;
 		private Rigidbody eyes_ = null;
@@ -153,10 +147,12 @@ namespace Cue
 		private int lookat_ = GazeSettings.LookAtDisabled;
 		private JSONStorableBool toggle_ = null;
 		private JSONStorableBool lookatTarget_ = null;
+		private VamEyes eyes_ = null;
 
 		public MacGruberGaze(Person p)
 		{
 			person_ = p;
+			eyes_ = new VamEyes(p);
 		}
 
 		public int LookAt
@@ -169,15 +165,15 @@ namespace Cue
 			set
 			{
 				lookat_ = value;
+				eyes_.LookAt = value;
 				Set();
 			}
 		}
 
-		// no-op
 		public Vector3 Target
 		{
-			get { return Vector3.Zero; }
-			set { }
+			get { return eyes_.Target; }
+			set { eyes_.Target = value; }
 		}
 
 		private void Set()

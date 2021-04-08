@@ -123,7 +123,7 @@ namespace Cue
 
 						//cc.Push(new LookAroundAction());
 
-						cc.Push(new RandomAnimationAction(new List<BVH.Animation>()
+						cc.Push(new RandomAnimationAction(new List<IAnimation>()
 						{
 						//	new BVH.Animation("Custom/Animations/Cassandra AO/Cassandra sit.bvh"),
 							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_1.bvh"),

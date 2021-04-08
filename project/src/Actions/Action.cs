@@ -197,12 +197,12 @@ namespace Cue
 			var p = o as Person;
 			p.Bearing = chair_.Bearing + chair_.SitSlot.bearingOffset;
 			p.Sit();
-			return o.Animating;
+			return p.Animator.Playing;
 		}
 
 		protected override bool DoTick(IObject o, float s)
 		{
-			return o.Animating;
+			return ((Person)o).Animator.Playing;
 		}
 
 		public override string ToString()
@@ -251,10 +251,6 @@ namespace Cue
 				e_ = 0;
 			}
 
-			if (!p.Animating)
-			{
-			}
-
 			return true;
 		}
 
@@ -267,13 +263,13 @@ namespace Cue
 
 	class RandomAnimationAction : BasicAction
 	{
-		private List<BVH.Animation> anims_;
+		private List<IAnimation> anims_;
 		private float e_ = 0;
 		private int i_ = -1;
 
-		public RandomAnimationAction(List<BVH.Animation> anims)
+		public RandomAnimationAction(List<IAnimation> anims)
 		{
-			anims_ = new List<BVH.Animation>(anims);
+			anims_ = new List<IAnimation>(anims);
 		}
 
 		protected override bool DoStart(IObject o, float s)
@@ -290,7 +286,7 @@ namespace Cue
 
 			if (i_ == -1)
 			{
-				if (!p.Animating)
+				if (!p.Animator.Playing)
 				{
 					i_ = 0;
 					PlayNext(p);
@@ -298,7 +294,7 @@ namespace Cue
 			}
 			else
 			{
-				if (!p.Animating)
+				if (!p.Animator.Playing)
 				{
 					e_ += s;
 					if (e_ >= 3)
@@ -314,7 +310,7 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			p.Animation.Play(anims_[i_]);
+			p.Animator.Play(anims_[i_]);
 
 			++i_;
 			if (i_ >= anims_.Count)

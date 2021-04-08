@@ -1,83 +1,49 @@
 ﻿namespace Cue
 {
-	class Breathing
+	interface IAnimation
 	{
-		private IBreather breather_ = null;
-
-		public Breathing(Person p)
-		{
-			breather_ = new MacGruberBreather(p);
-		}
-
-		public float Intensity
-		{
-			get { return breather_.Intensity; }
-			set { breather_.Intensity = value; }
-		}
-
-		public float Speed
-		{
-			get { return breather_.Speed; }
-			set { breather_.Speed = value; }
-		}
 	}
 
 
-	class Speech
+	class Animator
 	{
-		private ISpeaker speaker_ = null;
+		private readonly BVH.Player bvh_;
+		private bool playing_ = false;
 
-		public Speech(Person o)
+		public Animator(Person p)
 		{
-			speaker_ = new VamSpeaker(o);
+			bvh_ = new BVH.Player(((W.VamAtom)p.Atom).Atom);
 		}
 
-		public void Say(string s)
+		public bool Playing
 		{
-			speaker_.Say(s);
-		}
-	}
-
-
-	class Gaze
-	{
-		private IEyes eyes_ = null;
-		private IGazer gazer_ = null;
-		private int lookAt_ = GazeSettings.LookAtDisabled;
-
-		public Gaze(Person p)
-		{
-			eyes_ = new VamEyes(p);
-			gazer_ = new MacGruberGaze(p);
+			get { return playing_; }
 		}
 
-		public int LookAt
+		public void Play(IAnimation a, bool reverse=false)
 		{
-			get
+			if (a is BVH.Animation)
 			{
-				return lookAt_;
-			}
-
-			set
-			{
-				lookAt_ = value;
-				eyes_.LookAt = value;
-				gazer_.LookAt = value;
+				bvh_.Play((BVH.Animation)a, reverse);
+				playing_ = bvh_.playing;
 			}
 		}
 
-		public Vector3 Target
+		public void FixedUpdate(float s)
 		{
-			get
+			if (playing_ || bvh_.playing)
 			{
-				return eyes_.Target;
+				bvh_.FixedUpdate(s);
+				playing_ = bvh_.playing;
 			}
+		}
 
-			set
-			{
-				eyes_.Target = value;
-				gazer_.Target = value;
-			}
+		public override string ToString()
+		{
+			if (playing_)
+				return bvh_.ToString();
+			else
+				return "(none)";
 		}
 	}
 
@@ -92,36 +58,30 @@
 
 		private readonly RootAction actions_ = new RootAction();
 		private readonly PersonAI ai_ = new PersonAI();
-		private readonly BVH.Player player_;
-		private readonly BVH.Animation walk_ = new BVH.Animation();
-		private readonly BVH.Animation sit_ = new BVH.Animation();
-		private bool animating_ = false;
+		private readonly IAnimation walk_ = null;
+		private readonly IAnimation sit_ = null;
 		private int state_ = StandingState;
 
-		private Breathing breathing_;
-		private Speech speech_;
-		private Gaze gaze_;
+		private Animator animator_;
+		private IBreather breathing_;
+		private ISpeaker speech_;
+		private IGazer gaze_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-			player_ = new BVH.Player(((W.VamAtom)atom).Atom);
+			walk_ = new BVH.Animation(
+				"Custom\\Scripts\\VAMDeluxe\\Synthia Movement System\\Animations\\StandToWalk.bvh",
+				true, false, false, 67, 150);
 
-			walk_.file = new BVH.File(
-				"Custom\\Scripts\\VAMDeluxe\\Synthia Movement System\\Animations\\StandToWalk.bvh");
-			walk_.loop = true;
-			walk_.start = 67;
-			walk_.end = 150;
+			sit_ = new BVH.Animation(
+				"Custom\\Animations\\bvh_files\\avatar_sit_female.bvh",
+				false, true, true, 0, 30);
 
-			sit_.file = new BVH.File(
-				"Custom\\Animations\\bvh_files\\avatar_sit_female.bvh");
-			sit_.end = 30;
-			sit_.rootXZ = true;
-			sit_.rootY = true;
-
-			breathing_ = new Breathing(this);
-			speech_ = new Speech(this);
-			gaze_ = new Gaze(this);
+			animator_ = new Animator(this);
+			breathing_ = new MacGruberBreather(this);
+			speech_ = new VamSpeaker(this);
+			gaze_ = new MacGruberGaze(this);
 		}
 
 		public bool Idle
@@ -134,9 +94,9 @@
 			get { return actions_; }
 		}
 
-		public BVH.Player Animation
+		public Animator Animator
 		{
-			get { return player_; }
+			get { return animator_; }
 		}
 
 		public string StateString
@@ -153,17 +113,17 @@
 			}
 		}
 
-		public Breathing Breathing
+		public IBreather Breathing
 		{
 			get { return breathing_; }
 		}
 
-		public Speech Speech
+		public ISpeaker Speech
 		{
 			get { return speech_; }
 		}
 
-		public Gaze Gaze
+		public IGazer Gaze
 		{
 			get { return gaze_; }
 		}
@@ -187,41 +147,21 @@
 
 		public override void FixedUpdate(float s)
 		{
-			if (animating_ || player_.playing)
+			animator_.FixedUpdate(s);
+
+			if (!animator_.Playing)
 			{
-				player_.FixedUpdate();
-				player_.ApplyRootMotion();
-
-				animating_ = player_.playing;
-
-				if (!animating_)
-				{
-					if (state_ == SittingDownState)
-					{
-						state_ = SitState;
-					}
-					else if (state_ == StandingUpState)
-					{
-						state_ = StandingState;
-					}
-				}
+				if (state_ == SittingDownState)
+					state_ = SitState;
+				else if (state_ == StandingUpState)
+					state_ = StandingState;
 			}
-		}
-
-		public override bool Animating
-		{
-			get { return animating_; }
 		}
 
 		public void Sit()
 		{
-			player_.Play(sit_, false);
-			animating_ = true;
+			animator_.Play(sit_, false);
 			state_ = SittingDownState;
-		}
-
-		public override void PlayAnimation(int i, bool loop)
-		{
 		}
 
 		public virtual void Say(string s)
@@ -236,15 +176,13 @@
 				if (state_ == SitState)
 				{
 					state_ = StandingUpState;
-					player_.Play(sit_, true);
-					animating_ = true;
+					animator_.Play(sit_, true);
 					return false;
 				}
 				else if (state_ == StandingState)
 				{
 					state_ = WalkingState;
-					player_.Play(walk_);
-					animating_ = true;
+					animator_.Play(walk_);
 					return true;
 				}
 				else
@@ -255,7 +193,6 @@
 			else
 			{
 				state_ = StandingState;
-				animating_ = false;
 				return true;
 			}
 		}

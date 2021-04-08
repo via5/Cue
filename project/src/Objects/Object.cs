@@ -54,8 +54,6 @@ namespace Cue
 		void FixedUpdate(float s);
 		void MoveTo(Vector3 to);
 		bool HasTarget { get; }
-		bool Animating { get; }
-		void PlayAnimation(int i, bool loop);
 
 		Slot SitSlot { get; }
 		Slot SleepSlot { get; }
@@ -217,16 +215,6 @@ namespace Cue
 				hasTarget_ = true;
 				canMove_ = SetMoving(true);
 			}
-		}
-
-		public virtual bool Animating
-		{
-			get { return false; }
-		}
-
-		public virtual void PlayAnimation(int i, bool loop)
-		{
-			// no-op
 		}
 
 		protected virtual bool SetMoving(bool b)
