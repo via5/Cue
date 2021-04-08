@@ -15,7 +15,16 @@ namespace Cue.BVH
         public int start = 0;
         public int end = -1;
 
-		public override string ToString()
+        public Animation()
+        {
+        }
+
+        public Animation(string path)
+        {
+            file = new File(path);
+        }
+
+        public override string ToString()
 		{
             string s =
                 file.Name + " " +

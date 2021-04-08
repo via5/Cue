@@ -1,5 +1,87 @@
 ﻿namespace Cue
 {
+	class Breathing
+	{
+		private IBreather breather_ = null;
+
+		public Breathing(Person p)
+		{
+			breather_ = new MacGruberBreather(p);
+		}
+
+		public float Intensity
+		{
+			get { return breather_.Intensity; }
+			set { breather_.Intensity = value; }
+		}
+
+		public float Speed
+		{
+			get { return breather_.Speed; }
+			set { breather_.Speed = value; }
+		}
+	}
+
+
+	class Speech
+	{
+		private ISpeaker speaker_ = null;
+
+		public Speech(Person o)
+		{
+			speaker_ = new VamSpeaker(o);
+		}
+
+		public void Say(string s)
+		{
+			speaker_.Say(s);
+		}
+	}
+
+
+	class Gaze
+	{
+		private IEyes eyes_ = null;
+		private IGazer gazer_ = null;
+		private int lookAt_ = GazeSettings.LookAtDisabled;
+
+		public Gaze(Person p)
+		{
+			eyes_ = new VamEyes(p);
+			gazer_ = new MacGruberGaze(p);
+		}
+
+		public int LookAt
+		{
+			get
+			{
+				return lookAt_;
+			}
+
+			set
+			{
+				lookAt_ = value;
+				eyes_.LookAt = value;
+				gazer_.LookAt = value;
+			}
+		}
+
+		public Vector3 Target
+		{
+			get
+			{
+				return eyes_.Target;
+			}
+
+			set
+			{
+				eyes_.Target = value;
+				gazer_.Target = value;
+			}
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		public const int StandingState = 0;
@@ -15,6 +97,10 @@
 		private readonly BVH.Animation sit_ = new BVH.Animation();
 		private bool animating_ = false;
 		private int state_ = StandingState;
+
+		private Breathing breathing_;
+		private Speech speech_;
+		private Gaze gaze_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
@@ -32,14 +118,15 @@
 			sit_.end = 30;
 			sit_.rootXZ = true;
 			sit_.rootY = true;
+
+			breathing_ = new Breathing(this);
+			speech_ = new Speech(this);
+			gaze_ = new Gaze(this);
 		}
 
 		public bool Idle
 		{
-			get
-			{
-				return actions_.IsIdle;
-			}
+			get { return actions_.IsIdle; }
 		}
 
 		public IAction Action
@@ -66,9 +153,29 @@
 			}
 		}
 
+		public Breathing Breathing
+		{
+			get { return breathing_; }
+		}
+
+		public Speech Speech
+		{
+			get { return speech_; }
+		}
+
+		public Gaze Gaze
+		{
+			get { return gaze_; }
+		}
+
 		public void PushAction(IAction a)
 		{
-			actions_.Add(a);
+			actions_.Push(a);
+		}
+
+		public void PopAction()
+		{
+			actions_.Pop();
 		}
 
 		public override void Update(float s)
@@ -80,7 +187,7 @@
 
 		public override void FixedUpdate(float s)
 		{
-			if (animating_)
+			if (animating_ || player_.playing)
 			{
 				player_.FixedUpdate();
 				player_.ApplyRootMotion();
@@ -115,6 +222,11 @@
 
 		public override void PlayAnimation(int i, bool loop)
 		{
+		}
+
+		public virtual void Say(string s)
+		{
+			speech_.Say(s);
 		}
 
 		protected override bool SetMoving(bool b)

@@ -36,5 +36,6 @@ namespace Cue.W
 	{
 		void AddBox(float x, float z, float w, float h);
 		List<Vector3> Calculate(Vector3 from, Vector3 to);
+		bool Render { get; set; }
 	}
 }

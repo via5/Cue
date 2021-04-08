@@ -46,6 +46,7 @@ namespace Cue
 
 	interface IObject
 	{
+		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 		float Bearing { get; }
@@ -87,6 +88,11 @@ namespace Cue
 		public BasicObject(W.IAtom atom)
 		{
 			atom_ = atom;
+		}
+
+		public W.IAtom Atom
+		{
+			get { return atom_; }
 		}
 
 		public Vector3 Position

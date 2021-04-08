@@ -66,12 +66,14 @@ namespace Cue
 				ui_ = new UI.VamUI();
 			}
 
-			var o = new BasicObject(sys_.GetAtom("Bed1"));
-			o.SitSlot = new Slot(new Vector3(0, 0, -1.3f), 180);
-			objects_.Add(o);
+			BasicObject o = null;
 
 			o = new BasicObject(sys_.GetAtom("Chair1"));
 			o.SitSlot = new Slot(new Vector3(0, 0, 0.3f), 0);
+			objects_.Add(o);
+			/*
+			o = new BasicObject(sys_.GetAtom("Bed1"));
+			o.SitSlot = new Slot(new Vector3(0, 0, -1.3f), 180);
 			objects_.Add(o);
 
 			o = new BasicObject(sys_.GetAtom("Empty"));
@@ -80,7 +82,7 @@ namespace Cue
 
 			o = new BasicObject(sys_.GetAtom("Table1"));
 			objects_.Add(o);
-
+			*/
 			person_ = new Person(sys_.GetAtom("Person"));
 
 			ui_.Init();
@@ -118,6 +120,7 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
+				sys_.OnPluginState(true);
 			});
 		}
 

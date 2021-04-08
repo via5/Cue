@@ -135,6 +135,96 @@ namespace Cue.W
 		{
 			nav_.OnPluginState(b);
 		}
+
+		public JSONStorableFloat GetFloatParameter(
+			IObject o, string storable, string param)
+		{
+			var a = ((W.VamAtom)o.Atom).Atom;
+
+			foreach (var id in a.GetStorableIDs())
+			{
+				if (id.Contains(storable))
+				{
+					var st = a.GetStorableByID(id);
+					if (st == null)
+					{
+						Cue.LogError("can't find storable " + id);
+						continue;
+					}
+
+					var p = st.GetFloatJSONParam(param);
+					if (p == null)
+					{
+						Cue.LogError("no '" + param + "' param");
+						continue;
+					}
+
+					return p;
+				}
+			}
+
+			return null;
+		}
+
+		public JSONStorableBool GetBoolParameter(
+			IObject o, string storable, string param)
+		{
+			var a = ((W.VamAtom)o.Atom).Atom;
+
+			foreach (var id in a.GetStorableIDs())
+			{
+				if (id.Contains(storable))
+				{
+					var st = a.GetStorableByID(id);
+					if (st == null)
+					{
+						Cue.LogError("can't find storable " + id);
+						continue;
+					}
+
+					var p = st.GetBoolJSONParam(param);
+					if (p == null)
+					{
+						Cue.LogError("no '" + param + "' param");
+						continue;
+					}
+
+					return p;
+				}
+			}
+
+			return null;
+		}
+
+		public JSONStorableString GetStringParameter(
+			IObject o, string storable, string param)
+		{
+			var a = ((W.VamAtom)o.Atom).Atom;
+
+			foreach (var id in a.GetStorableIDs())
+			{
+				if (id.Contains(storable))
+				{
+					var st = a.GetStorableByID(id);
+					if (st == null)
+					{
+						Cue.LogError("can't find storable " + id);
+						continue;
+					}
+
+					var p = st.GetStringJSONParam(param);
+					if (p == null)
+					{
+						Cue.LogError("no '" + param + "' param");
+						continue;
+					}
+
+					return p;
+				}
+			}
+
+			return null;
+		}
 	}
 
 	class VamTime : ITime
@@ -210,6 +300,7 @@ namespace Cue.W
 	class VamNav : INav
 	{
 		private NavMeshRenderer nmr_ = null;
+		private bool render_ = false;
 		private readonly List<NavMeshBuildSource> sources_ = new List<NavMeshBuildSource>();
 
 		public void AddBox(float x, float z, float w, float h)
@@ -238,10 +329,7 @@ namespace Cue.W
 					new UnityEngine.Vector3(0, 0, 0),
 					new UnityEngine.Vector3(100, 0.1f, 100)));
 
-			if (nmr_ == null)
-				nmr_ = Camera.main.gameObject.AddComponent<NavMeshRenderer>();
-
-			nmr_.Update();
+			CheckRender();
 		}
 
 		public List<Vector3> Calculate(Vector3 from, Vector3 to)
@@ -271,8 +359,44 @@ namespace Cue.W
 			}
 			else
 			{
-				Object.Destroy(nmr_);
-				nmr_ = null;
+				if (nmr_ != null)
+				{
+					Object.Destroy(nmr_);
+					nmr_ = null;
+				}
+			}
+		}
+
+		public bool Render
+		{
+			get
+			{
+				return render_;
+			}
+
+			set
+			{
+				render_ = value;
+				CheckRender();
+			}
+		}
+
+		private void CheckRender()
+		{
+			if (render_)
+			{
+				if (nmr_ == null)
+					nmr_ = Camera.main.gameObject.AddComponent<NavMeshRenderer>();
+
+				nmr_.Update();
+			}
+			else
+			{
+				if (nmr_ != null)
+				{
+					Object.Destroy(nmr_);
+					nmr_ = null;
+				}
 			}
 		}
 	}

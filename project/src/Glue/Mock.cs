@@ -130,6 +130,11 @@ namespace Cue.W
 			get { return Vector3.Zero; }
 			set { }
 		}
+
+		public void Say(string s)
+		{
+			Cue.LogError(id_ + " says '" + s + "'");
+		}
 	}
 
 	class MockNav : INav
@@ -141,6 +146,12 @@ namespace Cue.W
 		public List<Vector3> Calculate(Vector3 from, Vector3 to)
 		{
 			return new List<Vector3>();
+		}
+
+		public bool Render
+		{
+			get { return false; }
+			set { }
 		}
 	}
 }

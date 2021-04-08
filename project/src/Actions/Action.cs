@@ -1,60 +1,67 @@
-﻿using System.Collections.Generic;
+﻿using Leap.Unity;
+using System.Collections.Generic;
 
 namespace Cue
 {
 	interface IAction
 	{
 		bool IsIdle { get; }
-		bool Start(IObject o, float s);
 		bool Tick(IObject o, float s);
 	}
 
 	abstract class BasicAction : IAction
 	{
-		private readonly List<IAction> children_ = new List<IAction>();
-		private IAction current_ = null;
+		protected readonly List<IAction> children_ = new List<IAction>();
+		private bool started_ = false;
 
-		public virtual bool IsIdle
+		public bool IsIdle
 		{
 			get { return children_.Count == 0; }
 		}
 
-		public void Add(IAction a)
+		public void Push(IAction a)
 		{
 			children_.Add(a);
 		}
 
-		public virtual bool Start(IObject o, float s)
+		public void Pop()
 		{
-			// no-op
+			if (children_.Count == 0)
+			{
+				Cue.LogError("no action to pop");
+				return;
+			}
+
+			children_.RemoveAt(children_.Count - 1);
+		}
+
+		public bool Tick(IObject o, float s)
+		{
+			if (!started_)
+			{
+				started_ = true;
+				if (!DoStart(o, s))
+					return false;
+			}
+
+			if (!DoTick(o, s))
+				return false;
+
+			TickChildren(o, s);
 			return true;
 		}
 
-		public virtual bool Tick(IObject o, float s)
+		protected virtual bool TickChildren(IObject o, float s)
 		{
 			while (children_.Count > 0)
 			{
 				var a = children_[children_.Count - 1];
 
-				if (current_ != a)
-				{
-					current_ = a;
-					bool b = current_.Start(o, s);
-					if (b)
-						return true;
+				bool b = a.Tick(o, s);
+				if (b)
+					return true;
 
-					children_.RemoveAt(children_.Count - 1);
-					current_ = null;
-				}
-				else
-				{
-					bool b = current_.Tick(o, s);
-					if (b)
-						return true;
-
-					children_.RemoveAt(children_.Count - 1);
-					current_ = null;
-				}
+				children_.RemoveAt(children_.Count - 1);
 			}
 
 			return false;
@@ -67,13 +74,51 @@ namespace Cue
 			else
 				return children_[children_.Count - 1].ToString();
 		}
+
+		protected virtual bool DoStart(IObject o, float s)
+		{
+			// no-op
+			return true;
+		}
+
+		protected virtual bool DoTick(IObject o, float s)
+		{
+			// no-op
+			return false;
+		}
+	}
+
+	class ConcurrentAction : BasicAction
+	{
+		protected override bool DoTick(IObject o, float s)
+		{
+			// no-op
+			return (children_.Count > 0);
+		}
+
+		protected override bool TickChildren(IObject o, float s)
+		{
+			int i = 0;
+
+			while (i < children_.Count)
+			{
+				var a = children_[i];
+
+				if (a.Tick(o, s))
+					++i;
+				else
+					children_.RemoveAt(i);
+			}
+
+			return (children_.Count > 0);
+		}
 	}
 
 	class RootAction : BasicAction
 	{
-		public override bool Tick(IObject o, float s)
+		protected override bool DoTick(IObject o, float s)
 		{
-			base.Tick(o, s);
+			// no-op
 			return true;
 		}
 	}
@@ -89,7 +134,7 @@ namespace Cue
 			to_ = to;
 		}
 
-		public override bool Start(IObject o, float s)
+		protected override bool DoStart(IObject o, float s)
 		{
 			wps_ = Cue.Instance.Sys.Nav.Calculate(o.Position, to_);
 
@@ -114,7 +159,7 @@ namespace Cue
 				return false;
 		}
 
-		public override bool Tick(IObject o, float s)
+		protected override bool DoTick(IObject o, float s)
 		{
 			if (!o.HasTarget)
 			{
@@ -147,7 +192,7 @@ namespace Cue
 			chair_ = chair;
 		}
 
-		public override bool Start(IObject o, float s)
+		protected override bool DoStart(IObject o, float s)
 		{
 			var p = o as Person;
 			p.Bearing = chair_.Bearing + chair_.SitSlot.bearingOffset;
@@ -155,7 +200,7 @@ namespace Cue
 			return o.Animating;
 		}
 
-		public override bool Tick(IObject o, float s)
+		protected override bool DoTick(IObject o, float s)
 		{
 			return o.Animating;
 		}
@@ -163,6 +208,186 @@ namespace Cue
 		public override string ToString()
 		{
 			return "SitAction on " + chair_.ToString();
+		}
+	}
+
+
+	class RandomDialogAction : BasicAction
+	{
+		private List<string> phrases_;
+		private float e_ = 0;
+		private int i_ = 0;
+
+		public RandomDialogAction(List<string> phrases)
+		{
+			phrases_ = new List<string>(phrases);
+		}
+
+		protected override bool DoStart(IObject o, float s)
+		{
+			e_ = 0;
+			i_ = 0;
+			phrases_.Shuffle();
+			return true;
+		}
+
+		protected override bool DoTick(IObject o, float s)
+		{
+			var p = ((Person)o);
+
+			e_ += s;
+
+			if (e_ > 1)
+			{
+				p.Say(phrases_[i_]);
+
+				++i_;
+				if (i_ >= phrases_.Count)
+				{
+					i_ = 0;
+					phrases_.Shuffle();
+				}
+
+				e_ = 0;
+			}
+
+			if (!p.Animating)
+			{
+			}
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			return "RandomDialogAction";
+		}
+	}
+
+
+	class RandomAnimationAction : BasicAction
+	{
+		private List<BVH.Animation> anims_;
+		private float e_ = 0;
+		private int i_ = -1;
+
+		public RandomAnimationAction(List<BVH.Animation> anims)
+		{
+			anims_ = new List<BVH.Animation>(anims);
+		}
+
+		protected override bool DoStart(IObject o, float s)
+		{
+			e_ = 0;
+			i_ = -1;
+			anims_.Shuffle();
+			return true;
+		}
+
+		protected override bool DoTick(IObject o, float s)
+		{
+			var p = ((Person)o);
+
+			if (i_ == -1)
+			{
+				if (!p.Animating)
+				{
+					i_ = 0;
+					PlayNext(p);
+				}
+			}
+			else
+			{
+				if (!p.Animating)
+				{
+					e_ += s;
+					if (e_ >= 3)
+					{
+						PlayNext(p);
+						e_ = 0;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		private void PlayNext(Person p)
+		{
+			p.Animation.Play(anims_[i_]);
+
+			++i_;
+			if (i_ >= anims_.Count)
+			{
+				i_ = 0;
+				anims_.Shuffle();
+			}
+		}
+
+		public override string ToString()
+		{
+			return "RandomAnimationAction";
+		}
+	}
+
+
+	class LookAroundAction : BasicAction
+	{
+		private float e_ = 0;
+		private int i_ = 0;
+
+		public LookAroundAction()
+		{
+		}
+
+		protected override bool DoStart(IObject o, float s)
+		{
+			e_ = 0;
+			i_ = 0;
+
+			var p = ((Person)o);
+			p.Gaze.LookAt = GazeSettings.LookAtTarget;
+
+			return true;
+		}
+
+		protected override bool DoTick(IObject o, float s)
+		{
+			var p = ((Person)o);
+
+			e_ += s;
+
+			if (e_ > 2)
+			{
+				++i_;
+
+				if (i_ >= 2)
+				{
+					i_ = 0;
+					p.Gaze.LookAt = GazeSettings.LookAtPlayer;
+				}
+				else
+				{
+					var t = new Vector3(
+						UnityEngine.Random.Range(-2, 2),
+						UnityEngine.Random.Range(-2, 2),
+						UnityEngine.Random.Range(-2, 2));
+
+					t += p.Position;
+
+					p.Gaze.LookAt = GazeSettings.LookAtTarget;
+					p.Gaze.Target = t;
+				}
+
+				e_ = 0;
+			}
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			return "LookAroundAction";
 		}
 	}
 }

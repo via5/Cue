@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Battlehub.RTSaveLoad;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -16,7 +17,7 @@ namespace Cue
 			foreach (var o in Cue.Instance.Objects)
 			{
 				if (o.SitSlot != null)
-					events_.Add(new SitEvent(o));
+					events_.Add(new SitAndThinkEvent(o));
 				if (o.SleepSlot != null)
 					events_.Add(new SleepEvent(o));
 			}
@@ -52,16 +53,20 @@ namespace Cue
 	}
 
 
-	class SitEvent : BasicEvent
+	class SitAndThinkEvent : BasicEvent
 	{
 		const int NoState = 0;
 		const int Moving = 1;
 		const int Sitting = 2;
+		const int Thinking = 3;
+
+		const float ThinkTime = 5;
 
 		private IObject o_;
 		private int state_ = NoState;
+		private float thunk_ = 0;
 
-		public SitEvent(IObject o)
+		public SitAndThinkEvent(IObject o)
 		{
 			o_ = o;
 		}
@@ -84,6 +89,7 @@ namespace Cue
 					Cue.LogError("going to sit");
 					p.PushAction(new MoveAction(pos));
 					state_ = Moving;
+					thunk_ = 0;
 					break;
 				}
 
@@ -103,7 +109,45 @@ namespace Cue
 				{
 					if (p.Idle)
 					{
+						Cue.LogError("thinking");
+
+						var cc = new ConcurrentAction();
+
+						cc.Push(new RandomDialogAction(new List<string>()
+						{
+							"I'm thinking.",
+							"I'm still thinking.",
+							"Hmm...",
+							"I think..."
+						}));
+
+						//cc.Push(new LookAroundAction());
+
+						cc.Push(new RandomAnimationAction(new List<BVH.Animation>()
+						{
+						//	new BVH.Animation("Custom/Animations/Cassandra AO/Cassandra sit.bvh"),
+							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_1.bvh"),
+							//new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_2.bvh"),
+							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_3.bvh"),
+							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_4.bvh"),
+							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_5.bvh")
+						}));
+
+						p.PushAction(cc);
+
+						state_ = Thinking;
+					}
+
+					break;
+				}
+
+				case Thinking:
+				{
+					//thunk_ += s;
+					if (thunk_ >= ThinkTime)
+					{
 						Cue.LogError("done");
+						p.PopAction();
 						state_ = NoState;
 						return false;
 					}
