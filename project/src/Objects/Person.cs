@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	interface IBreather
 	{
@@ -28,44 +30,55 @@
 	{
 	}
 
+	interface IPlayer
+	{
+		bool Playing { get; }
+		bool Play(IAnimation a, bool reverse);
+		void FixedUpdate(float s);
+	}
 
 	class Animator
 	{
-		private readonly BVH.Player bvh_;
-		private bool playing_ = false;
+		private readonly List<IPlayer> players_ = new List<IPlayer>();
+		private IPlayer active_ = null;
 
 		public Animator(Person p)
 		{
-			bvh_ = new BVH.Player(((W.VamAtom)p.Atom).Atom);
+			players_.Add(new BVH.Player(((W.VamAtom)p.Atom).Atom));
+			players_.Add(new TimelinePlayer(p));
 		}
 
 		public bool Playing
 		{
-			get { return playing_; }
+			get { return (active_ != null); }
 		}
 
 		public void Play(IAnimation a, bool reverse=false)
 		{
-			if (a is BVH.Animation)
+			foreach (var p in players_)
 			{
-				bvh_.Play((BVH.Animation)a, reverse);
-				playing_ = bvh_.playing;
+				if (p.Play(a, reverse))
+				{
+					active_ = p;
+					break;
+				}
 			}
 		}
 
 		public void FixedUpdate(float s)
 		{
-			if (playing_ || bvh_.playing)
+			if (active_ != null)
 			{
-				bvh_.FixedUpdate(s);
-				playing_ = bvh_.playing;
+				active_.FixedUpdate(s);
+				if (!active_.Playing)
+					active_ = null;
 			}
 		}
 
 		public override string ToString()
 		{
-			if (playing_)
-				return bvh_.ToString();
+			if (active_ != null)
+				return active_.ToString();
 			else
 				return "(none)";
 		}

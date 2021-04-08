@@ -7,7 +7,7 @@ namespace Cue.BVH
     using Vector3 = UnityEngine.Vector3;
 
 
-    public class Animation : IAnimation
+    class Animation : IAnimation
     {
         public BVH.File file = null;
         public bool loop = false;
@@ -52,7 +52,7 @@ namespace Cue.BVH
 
     // Original script by ElkVR
     // Adapted in Synthia by VAMDeluxe
-    public class Player
+    class Player : IPlayer
     {
         Atom containingAtom;
 
@@ -91,8 +91,8 @@ namespace Cue.BVH
         bool reverse = false;
         float elapsed = 0;
 
-        public int frame = 0;
-        public bool playing = false;
+        int frame = 0;
+        bool playing = false;
 
         float frameTime;
 
@@ -102,10 +102,10 @@ namespace Cue.BVH
         const int translationModeInitialPlusFrameMinusOffset = 2;
         const int translationModeInitialPlusFrameMinusZero = 3;
 
-        public Vector3 rootMotion;
+        Vector3 rootMotion;
 
-        public float heelHeight = 0;
-        public float heelAngle = 0;
+        float heelHeight = 0;
+        float heelAngle = 0;
 
         public Player(Atom atom)
         {
@@ -115,6 +115,11 @@ namespace Cue.BVH
             CreateShadowSkeleton();
             RecordOffsets();
             CreateControllerMap();
+        }
+
+        public bool Playing
+        {
+            get { return playing; }
         }
 
         public override string ToString()
@@ -136,11 +141,15 @@ namespace Cue.BVH
             return s;
 		}
 
-		public void Play(Animation a, bool reverse=false)
+		public bool Play(IAnimation a, bool reverse)
         {
+            var ba = a as Animation;
+            if (ba == null)
+                return false;
+
             //SuperController.LogMessage("restarting");
 
-            anim = a;
+            anim = ba;
             this.reverse = reverse;
             frameTime = anim.file.frameTime;
 
@@ -156,6 +165,8 @@ namespace Cue.BVH
 
             rootMotion = new Vector3();
             playing = true;
+
+            return true;
         }
 
         void CreateControllerMap()

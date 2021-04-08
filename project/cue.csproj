@@ -103,6 +103,7 @@
     <Compile Include="src\Geo.cs" />
     <Compile Include="src\Glue\Vam.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
+    <Compile Include="src\Integration\Timeline.cs" />
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Objects\Object.cs" />
     <Compile Include="src\Objects\Person.cs" />

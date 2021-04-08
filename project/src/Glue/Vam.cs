@@ -225,6 +225,36 @@ namespace Cue.W
 
 			return null;
 		}
+
+		public JSONStorableAction GetActionParameter(
+			IObject o, string storable, string param)
+		{
+			var a = ((W.VamAtom)o.Atom).Atom;
+
+			foreach (var id in a.GetStorableIDs())
+			{
+				if (id.Contains(storable))
+				{
+					var st = a.GetStorableByID(id);
+					if (st == null)
+					{
+						Cue.LogError("can't find storable " + id);
+						continue;
+					}
+
+					var p = st.GetAction(param);
+					if (p == null)
+					{
+						Cue.LogError("no '" + param + "' action param");
+						continue;
+					}
+
+					return p;
+				}
+			}
+
+			return null;
+		}
 	}
 
 	class VamTime : ITime
