@@ -1,5 +1,29 @@
 ﻿namespace Cue
 {
+	interface IBreather
+	{
+		float Intensity { get; set; }
+		float Speed { get; set; }
+	}
+
+	class GazeSettings
+	{
+		public const int LookAtDisabled = 0;
+		public const int LookAtTarget = 1;
+		public const int LookAtPlayer = 2;
+	}
+
+	interface IGazer
+	{
+		int LookAt { get; set; }
+		Vector3 Target { get; set; }
+	}
+
+	interface ISpeaker
+	{
+		void Say(string s);
+	}
+
 	interface IAnimation
 	{
 	}

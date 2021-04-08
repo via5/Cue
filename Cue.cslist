@@ -8,9 +8,8 @@ project\src\BVH\Player.cs
 project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs
-project\src\Integration\Breathing.cs
-project\src\Integration\Gaze.cs
-project\src\Integration\Speech.cs
+project\src\Integration\MacGruber.cs
+project\src\Integration\Vam.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
 project\src\UI\UI.cs

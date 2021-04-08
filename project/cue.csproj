@@ -102,9 +102,8 @@
     <Compile Include="src\DummyMain.cs" />
     <Compile Include="src\Geo.cs" />
     <Compile Include="src\Glue\Vam.cs" />
-    <Compile Include="src\Integration\Breathing.cs" />
-    <Compile Include="src\Integration\Gaze.cs" />
-    <Compile Include="src\Integration\Speech.cs" />
+    <Compile Include="src\Integration\MacGruber.cs" />
+    <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Objects\Object.cs" />
     <Compile Include="src\Objects\Person.cs" />
     <Compile Include="src\Glue\Interfaces.cs" />
