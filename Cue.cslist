@@ -1,10 +1,9 @@
 project\src\AI.cs
+project\src\BVH.cs
 project\src\Cue.cs
 project\src\Geo.cs
 project\src\Utilities.cs
 project\src\Actions\Action.cs
-project\src\BVH\File.cs
-project\src\BVH\Player.cs
 project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs

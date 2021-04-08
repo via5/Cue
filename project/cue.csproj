@@ -96,8 +96,7 @@
   <ItemGroup>
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI.cs" />
-    <Compile Include="src\BVH\File.cs" />
-    <Compile Include="src\BVH\Player.cs" />
+    <Compile Include="src\BVH.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\DummyMain.cs" />
     <Compile Include="src\Geo.cs" />
