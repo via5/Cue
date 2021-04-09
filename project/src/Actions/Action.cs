@@ -123,6 +123,7 @@ namespace Cue
 		}
 	}
 
+
 	class MoveAction : BasicAction
 	{
 		private Vector3 to_;
@@ -136,6 +137,14 @@ namespace Cue
 
 		protected override bool DoStart(IObject o, float s)
 		{
+			Cue.LogError("MoveAction: from " + o.Position.ToString() + " to " + to_.ToString());
+
+			if (Vector3.Distance(o.Position, to_) < 0.1f)
+			{
+				o.Position = to_;
+				return false;
+			}
+
 			wps_ = Cue.Instance.Sys.Nav.Calculate(o.Position, to_);
 
 			if (wps_.Count == 0)

@@ -20,11 +20,16 @@ namespace Cue
 					events_.Add(new SitAndThinkEvent(o));
 				if (o.SleepSlot != null)
 					events_.Add(new SleepEvent(o));
+				if (o.StandSlot != null)
+					events_.Add(new StandAndThinkEvent(o));
 			}
 		}
 
 		public void Tick(Person p, float s)
 		{
+			if (events_.Count == 0)
+				return;
+
 			if (i_ == -1)
 			{
 				i_ = 0;
@@ -60,7 +65,7 @@ namespace Cue
 		const int Sitting = 2;
 		const int Thinking = 3;
 
-		const float ThinkTime = 5;
+		const float ThinkTime = 1;
 
 		private IObject o_;
 		private int state_ = NoState;
@@ -142,7 +147,103 @@ namespace Cue
 
 				case Thinking:
 				{
-					//thunk_ += s;
+					thunk_ += s;
+					if (thunk_ >= ThinkTime)
+					{
+						Cue.LogError("done");
+						p.PopAction();
+						state_ = NoState;
+						return false;
+					}
+
+					break;
+				}
+			}
+
+			return true;
+		}
+	}
+
+
+	class StandAndThinkEvent : BasicEvent
+	{
+		const int NoState = 0;
+		const int Moving = 1;
+		const int Thinking = 2;
+
+		const float ThinkTime = 1;
+
+		private IObject o_;
+		private int state_ = NoState;
+		private float thunk_ = 0;
+
+		public StandAndThinkEvent(IObject o)
+		{
+			o_ = o;
+		}
+
+		public override bool Tick(Person p, float s)
+		{
+			var ss = o_.StandSlot;
+			if (ss == null)
+			{
+				Cue.LogError("can't stand on object " + o_.ToString());
+				return false;
+			}
+
+			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
+
+			switch (state_)
+			{
+				case NoState:
+				{
+					Cue.LogError("going to stand");
+					p.PushAction(new MoveAction(pos));
+					state_ = Moving;
+					thunk_ = 0;
+					break;
+				}
+
+				case Moving:
+				{
+					if (p.Idle)
+					{
+						p.Bearing = o_.Bearing + ss.bearingOffset;
+
+						Cue.LogError("thinking");
+
+						var cc = new ConcurrentAction();
+
+						cc.Push(new RandomDialogAction(new List<string>()
+						{
+							"I'm thinking.",
+							"I'm still thinking.",
+							"Hmm...",
+							"I think..."
+						}));
+
+						//cc.Push(new LookAroundAction());
+
+						cc.Push(new RandomAnimationAction(new List<IAnimation>()
+						{
+							//new BVH.Animation("Custom/Animations/Ashley AO/05.bvh", false, true, true),
+							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_1.bvh", false, true, true),
+							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_2.bvh", false, true, true),
+							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_3.bvh", false, true, true),
+							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_4.bvh", false, true, true)
+						}));
+
+						p.PushAction(cc);
+
+						state_ = Thinking;
+					}
+
+					break;
+				}
+
+				case Thinking:
+				{
+					thunk_ += s;
 					if (thunk_ >= ThinkTime)
 					{
 						Cue.LogError("done");

@@ -34,6 +34,7 @@ namespace Cue
 	{
 		bool Playing { get; }
 		bool Play(IAnimation a, bool reverse);
+		void Stop();
 		void FixedUpdate(float s);
 	}
 
@@ -63,6 +64,12 @@ namespace Cue
 					break;
 				}
 			}
+		}
+
+		public void Stop()
+		{
+			if (active_ != null)
+				active_.Stop();
 		}
 
 		public void FixedUpdate(float s)
@@ -143,7 +150,7 @@ namespace Cue
 				string[] names = new string[]
 				{
 					"standing", "walking", "sitting-down",
-					"sitting", "standing up"
+					"sitting", "standing-up"
 				};
 
 				return names[state_];
@@ -230,6 +237,7 @@ namespace Cue
 			else
 			{
 				state_ = StandingState;
+				animator_.Stop();
 				return true;
 			}
 		}

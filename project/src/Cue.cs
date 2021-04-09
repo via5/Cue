@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace Cue
@@ -56,6 +57,14 @@ namespace Cue
 		{
 			yield return new WaitForEndOfFrame();
 
+			U.Safe(() =>
+			{
+				DoInit();
+			});
+		}
+
+		private void DoInit()
+		{
 			if (W.MockSys.Instance != null)
 			{
 				sys_ = W.MockSys.Instance;
@@ -66,32 +75,55 @@ namespace Cue
 				ui_ = new UI.VamUI();
 			}
 
-			BasicObject o = null;
 
-			o = new BasicObject(sys_.GetAtom("Chair1"));
-			o.SitSlot = new Slot(new Vector3(0, 0, 0.3f), 0);
-			objects_.Add(o);
-			/*
-			o = new BasicObject(sys_.GetAtom("Bed1"));
-			o.SitSlot = new Slot(new Vector3(0, 0, -1.3f), 180);
-			objects_.Add(o);
+			var fp = @"[+-]?(?:[0-9]*[.])?[0-9]+";
 
-			o = new BasicObject(sys_.GetAtom("Empty"));
-			o.SitSlot = new Slot(new Vector3(0, 0, 0.3f), 0);
-			objects_.Add(o);
+			var re = new Regex(@"cue!([a-zA-Z]+)!(" + fp + ")!(" + fp + ")!(" + fp + ")!(" + fp + ")");
 
-			o = new BasicObject(sys_.GetAtom("Table1"));
-			objects_.Add(o);
-			*/
+			foreach (var a in SuperController.singleton.GetAtoms())
+			{
+				if (!a.on)
+					continue;
+
+				var m = re.Match(a.uid);
+
+				if (m != null && m.Success)
+				{
+					LogError("found " + a.uid);
+
+					string type = m.Groups[1].Value;
+					float poX, poY, poZ, bo;
+
+					if (!float.TryParse(m.Groups[2].Value, out poX))
+						LogError("bad poX '" + m.Groups[2].Value + "'");
+
+					if (!float.TryParse(m.Groups[3].Value, out poY))
+						LogError("bad poY '" + m.Groups[3].Value + "'");
+
+					if (!float.TryParse(m.Groups[4].Value, out poZ))
+						LogError("bad poZ '" + m.Groups[4].Value + "'");
+
+					if (!float.TryParse(m.Groups[5].Value, out bo))
+						LogError("bad bo '" + m.Groups[5].Value + "'");
+
+					LogError($"type='{type}' pox={poX} poy={poY} poz={poZ} bo={bo}");
+
+					BasicObject o = new BasicObject(new W.VamAtom(a));
+					var s = new Slot(new Vector3(poX, poY, poZ), bo);
+
+					if (type == "sit")
+						o.SitSlot = s;
+					if (type == "stand")
+						o.StandSlot = s;
+
+					objects_.Add(o);
+				}
+			}
+
 			person_ = new Person(sys_.GetAtom("Person"));
 
 			ui_.Init();
-
-			sys_.Nav.AddBox(-1.5f, 0, 1.5f, 7);
-			sys_.Nav.AddBox(-3, 2.5f, 6, 1);
-			sys_.Nav.AddBox(0, 0, 1.5f, 0.8f);
-			sys_.Nav.AddBox(3, 2.2f, 10, 2.0f);
-			sys_.Nav.AddBox(3.7f, 6f, 4.5f, 6);
+			sys_.Nav.Update();
 		}
 
 		public void Update()

@@ -139,7 +139,7 @@ namespace Cue.W
 
 	class MockNav : INav
 	{
-		public void AddBox(float x, float z, float w, float h)
+		public void Update()
 		{
 		}
 

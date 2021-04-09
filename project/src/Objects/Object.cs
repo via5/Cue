@@ -55,6 +55,7 @@ namespace Cue
 		void MoveTo(Vector3 to);
 		bool HasTarget { get; }
 
+		Slot StandSlot { get; }
 		Slot SitSlot { get; }
 		Slot SleepSlot { get; }
 		Slot ToiletSlot { get; }
@@ -79,6 +80,7 @@ namespace Cue
 		private bool hasTarget_ = false;
 		private bool canMove_ = false;
 
+		private Slot standSlot_ = null;
 		private Slot sitSlot_ = null;
 		private Slot sleepSlot_ = null;
 		private Slot toiletSlot_ = null;
@@ -121,6 +123,12 @@ namespace Cue
 		public bool HasTarget
 		{
 			get { return hasTarget_; }
+		}
+
+		public Slot StandSlot
+		{
+			get { return standSlot_; }
+			set { standSlot_ = value; }
 		}
 
 		public Slot SitSlot
@@ -169,6 +177,17 @@ namespace Cue
 
 		private void MoveToTarget(float s)
 		{
+			// todo: if the target is slightly above the current position, the
+			// direction can go entirely vertical, which rotates the object
+			// completely
+			//
+			// always set the Y position first, assume it's not too far away;
+			// this will need to change to support vertical movement
+			atom_.Position = new Vector3(
+				atom_.Position.X,
+				target_.Y,
+				atom_.Position.Z);
+
 			var dirToTarget = (target_ - Position).Normalized;
 			var bearingToTarget = Vector3.Angle(Vector3.Zero, dirToTarget);
 			var currentBearing = Bearing;

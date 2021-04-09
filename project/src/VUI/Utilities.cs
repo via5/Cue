@@ -248,7 +248,12 @@ namespace VUI
 		public static void DumpComponents(GameObject o, int indent = 0)
 		{
 			foreach (var c in o.GetComponents(typeof(Component)))
-				Glue.LogError(new string(' ', indent * 2) + c.ToString());
+			{
+				if (c == null)
+					Glue.LogError(new string(' ', indent * 2) + "null?");
+				else
+					Glue.LogError(new string(' ', indent * 2) + c.ToString());
+			}
 		}
 
 		public static void DumpComponentsAndUp(Component c)

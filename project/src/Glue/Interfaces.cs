@@ -34,7 +34,7 @@ namespace Cue.W
 
 	interface INav
 	{
-		void AddBox(float x, float z, float w, float h);
+		void Update();
 		List<Vector3> Calculate(Vector3 from, Vector3 to);
 		bool Render { get; set; }
 	}

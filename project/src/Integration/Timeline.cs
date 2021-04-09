@@ -21,6 +21,7 @@ namespace Cue
 	{
 		private readonly Person person_;
 		private JSONStorableAction play_ = null;
+		private JSONStorableAction stop_ = null;
 		private JSONStorableBool playing_ = null;
 
 		public TimelinePlayer(Person p)
@@ -71,6 +72,13 @@ namespace Cue
 			return true;
 		}
 
+		public void Stop()
+		{
+			GetParameters();
+			stop_?.actionCallback?.Invoke();
+			play_ = null;
+		}
+
 		public void FixedUpdate(float s)
 		{
 			// no-op
@@ -85,6 +93,9 @@ namespace Cue
 
 			playing_ = vsys.GetBoolParameter(
 				person_, "VamTimeline.AtomPlugin", "Is Playing");
+
+			stop_ = vsys.GetActionParameter(
+				person_, "VamTimeline.AtomPlugin", "Stop");
 		}
 	}
 }

@@ -26,7 +26,7 @@ namespace Cue.BVH
             file = new File(path);
         }
 
-        public Animation(string path, bool loop, bool rootXZ, bool rootY, int start, int end)
+        public Animation(string path, bool loop, bool rootXZ, bool rootY, int start=0, int end=-1)
         {
             this.file = new File(path);
             this.loop = loop;
@@ -51,8 +51,6 @@ namespace Cue.BVH
     }
 
 
-    // Original script by ElkVR
-    // Adapted in Synthia by VAMDeluxe
     class Player : IPlayer
     {
         Atom containingAtom;
@@ -168,6 +166,12 @@ namespace Cue.BVH
             playing = true;
 
             return true;
+        }
+
+        public void Stop()
+        {
+            playing = false;
+            anim = null;
         }
 
         void CreateControllerMap()
