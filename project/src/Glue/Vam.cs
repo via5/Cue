@@ -400,8 +400,8 @@ namespace Cue.W
 			s.agentTypeID = 1;
 			s.agentRadius = 0;
 			s.agentHeight = 2;
-			s.agentClimb = 0;
-			s.agentSlope = 0;
+			s.agentClimb = 0.1f;
+			s.agentSlope = 60;
 
 			NavMesh.AddNavMeshData(d);
 
@@ -427,6 +427,17 @@ namespace Cue.W
 					m.ignoreFromBuild = true;
 					markups.Add(m);
 				}
+
+				foreach (var sc in a.GetComponentsInChildren<SphereCollider>())
+				{
+					if (sc.name == "control")
+					{
+						var m = new NavMeshBuildMarkup();
+						m.root = sc.transform;
+						m.ignoreFromBuild = true;
+						markups.Add(m);
+					}
+				}
 			}
 
 			NavMeshBuilder.CollectSources(
@@ -435,6 +446,16 @@ namespace Cue.W
 					new UnityEngine.Vector3(100, 0.2f, 100)),
 				~0, NavMeshCollectGeometry.PhysicsColliders, 0,
 				markups, srcs);
+
+			//foreach (var ss in srcs)
+			//{
+			//	if (ss.sourceObject != null)
+			//		Cue.LogError(ss.sourceObject.ToString());
+			//	else if (ss.component != null)
+			//		Cue.LogError(ss.component.ToString());
+			//	else
+			//		Cue.LogError("?");
+			//}
 
 			Cue.LogError(srcs.Count.ToString());
 
