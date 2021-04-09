@@ -65,7 +65,7 @@ namespace Cue
 		const int Sitting = 2;
 		const int Thinking = 3;
 
-		const float ThinkTime = 1;
+		const float ThinkTime = 5;
 
 		private IObject o_;
 		private int state_ = NoState;
@@ -92,7 +92,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to sit");
-					p.PushAction(new MoveAction(pos));
+					p.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
 					thunk_ = 0;
 					break;
@@ -164,7 +164,7 @@ namespace Cue
 		const int Moving = 1;
 		const int Thinking = 2;
 
-		const float ThinkTime = 1;
+		const float ThinkTime = 5;
 
 		private IObject o_;
 		private int state_ = NoState;
@@ -191,7 +191,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to stand");
-					p.PushAction(new MoveAction(pos));
+					p.PushAction(new MoveAction(pos, o_.Bearing + ss.bearingOffset));
 					state_ = Moving;
 					thunk_ = 0;
 					break;
@@ -201,8 +201,6 @@ namespace Cue
 				{
 					if (p.Idle)
 					{
-						p.Bearing = o_.Bearing + ss.bearingOffset;
-
 						Cue.LogError("thinking");
 
 						var cc = new ConcurrentAction();
@@ -268,7 +266,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to sleep");
-					p.PushAction(new MoveAction(o_.Position));
+					p.PushAction(new MoveAction(o_.Position, BasicObject.NoBearing));
 					state_ = Moving;
 					elapsed_ = 0;
 					break;

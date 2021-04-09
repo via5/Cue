@@ -57,7 +57,7 @@ namespace Cue
 		float Bearing { get; }
 		void Update(float s);
 		void FixedUpdate(float s);
-		void MoveTo(Vector3 to, float finalBearing = float.MaxValue);
+		void MoveTo(Vector3 to, float bearing, bool last);
 		bool HasTarget { get; }
 
 		Slot StandSlot { get; }
@@ -96,8 +96,11 @@ namespace Cue
 
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
+		private bool lastTarget_ = false;
 		private int moveState_ = NoMoveState;
 		private bool canMove_ = false;
+		private bool canSkipTurn_ = false;
+		private bool moving_ = false;
 
 		private Slot standSlot_ = null;
 		private Slot sitSlot_ = null;
@@ -202,10 +205,10 @@ namespace Cue
 			//
 			// always set the Y position first, assume it's not too far away;
 			// this will need to change to support vertical movement
-			atom_.Position = new Vector3(
-				atom_.Position.X,
+			Position = new Vector3(
+				Position.X,
 				targetPos_.Y,
-				atom_.Position.Z);
+				Position.Z);
 
 			switch (moveState_)
 			{
@@ -213,6 +216,7 @@ namespace Cue
 				{
 					if (TurnTowardsTarget(s))
 					{
+						moving_ = true;
 						moveState_ = MoveTowardsTargetState;
 						return;
 					}
@@ -235,8 +239,13 @@ namespace Cue
 				{
 					if (TurnTowardsFinal(s))
 					{
+						if (lastTarget_)
+						{
+							SetMoving(MoveNone);
+							moving_ = false;
+						}
+
 						moveState_ = NoMoveState;
-						SetMoving(MoveNone);
 					}
 
 					break;
@@ -251,6 +260,14 @@ namespace Cue
 
 			var dirToTarget = (targetPos_ - Position).Normalized;
 			var bearingToTarget = Vector3.Angle(Vector3.Zero, dirToTarget);
+
+			if (canSkipTurn_)
+			{
+				canSkipTurn_ = false;
+				return true;
+			}
+
+			canSkipTurn_ = false;
 			return TurnTowards(s, bearingToTarget);
 		}
 
@@ -258,7 +275,7 @@ namespace Cue
 		{
 			if (Vector3.Distance(Position, targetPos_) < moveDistanceThreshold_)
 			{
-				atom_.Position = targetPos_;
+				Position = targetPos_;
 				return true;
 			}
 			else
@@ -268,7 +285,31 @@ namespace Cue
 				moveElapsed_ += s;
 				var moveSpeed = Math.Min(moveElapsed_ / moveSpeedRampTime_, 1) * maxMoveSpeed_;
 
-				atom_.Position += (Direction * s * moveSpeed);
+				var dirToTarget = (targetPos_ - Position).Normalized;
+				var bearingToTarget = Vector3.Angle(Vector3.Zero, dirToTarget);
+				var a = AngleBetweenBearings(bearingToTarget, Bearing);
+
+				float bearingDiff;
+
+				if (a < 0)
+					bearingDiff = Math.Max(a, -s * maxTurnSpeed_);
+				else
+					bearingDiff = Math.Min(a, s * maxTurnSpeed_);
+
+
+				Bearing -= bearingDiff;
+				Position += (dirToTarget * s * moveSpeed);
+
+				if (Vector3.Distance(Position, targetPos_) < moveDistanceThreshold_)
+				{
+					Position = targetPos_;
+
+					if (lastTarget_)
+						Bearing = bearingToTarget;
+
+					return true;
+				}
+
 				SetMoving(MoveWalk);
 
 				return false;
@@ -304,12 +345,12 @@ namespace Cue
 				if (a < 0)
 				{
 					bearingDiff = Math.Max(a, -s * turnSpeed);
-					SetMoving(MoveTurnLeft);
+					SetMoving(MoveTurnRight);
 				}
 				else
 				{
 					bearingDiff = Math.Min(a, s * turnSpeed);
-					SetMoving(MoveTurnRight);
+					SetMoving(MoveTurnLeft);
 				}
 
 				Bearing -= bearingDiff;
@@ -318,10 +359,17 @@ namespace Cue
 			}
 		}
 
-		public void MoveTo(Vector3 to, float bearing = NoBearing)
+		public void MoveTo(Vector3 to, float bearing, bool last)
 		{
 			targetPos_ = to;
 			targetBearing_ = bearing;
+			lastTarget_ = last;
+
+			var dirToTarget = (targetPos_ - Position).Normalized;
+			var bearingToTarget = Vector3.Angle(Vector3.Zero, dirToTarget);
+			var a = AngleBetweenBearings(bearingToTarget, Bearing);
+			canSkipTurn_ = (moving_ && Math.Abs(a) < 60);
+
 			moveState_ = TurnTowardsTargetState;
 			canMove_ = SetMoving(MoveTentative);
 		}

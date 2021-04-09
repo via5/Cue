@@ -191,6 +191,7 @@ namespace Cue
 
 		public override void FixedUpdate(float s)
 		{
+			base.FixedUpdate(s);
 			animator_.FixedUpdate(s);
 
 			if (!animator_.Playing)
@@ -229,10 +230,9 @@ namespace Cue
 
 				case MoveTentative:
 				{
-					if (state_ == StandingState)
+					if (state_ == StandingState || state_ == WalkingState)
 					{
-						state_ = WalkingState;
-						break;
+						return true;
 					}
 
 					if (state_ == SitState)
@@ -246,6 +246,8 @@ namespace Cue
 
 				case MoveWalk:
 				{
+					state_ = WalkingState;
+
 					if (lastMoveState_ != MoveWalk)
 						animator_.Play(Resources.Animations.Walk());
 

@@ -127,12 +127,14 @@ namespace Cue
 	class MoveAction : BasicAction
 	{
 		private Vector3 to_;
+		private float finalBearing_;
 		private List<Vector3> wps_ = new List<Vector3>();
 		private int i_ = 0;
 
-		public MoveAction(Vector3 to)
+		public MoveAction(Vector3 to, float finalBearing)
 		{
 			to_ = to;
+			finalBearing_ = finalBearing;
 		}
 
 		protected override bool DoStart(IObject o, float s)
@@ -159,7 +161,10 @@ namespace Cue
 				o.ToString() + " to " + to_.ToString() + ", " +
 				wps_.Count.ToString() + " waypoints");
 
-			o.MoveTo(wps_[0]);
+			if (wps_.Count == 1)
+				o.MoveTo(wps_[0], finalBearing_, true);
+			else
+				o.MoveTo(wps_[0], BasicObject.NoBearing, false);
 
 			if (o.HasTarget)
 				return true;
@@ -180,8 +185,12 @@ namespace Cue
 					return false;
 				}
 
-				Cue.LogError(o.ToString() + " next waypoint " + wps_[i_].ToString());
-				o.MoveTo(wps_[i_]);
+			//	Cue.LogError(o.ToString() + " next waypoint " + wps_[i_].ToString());
+
+				if (i_ == (wps_.Count - 1))
+					o.MoveTo(wps_[i_], finalBearing_, true);
+				else
+					o.MoveTo(wps_[i_], BasicObject.NoBearing, false);
 			}
 
 			return true;
@@ -206,7 +215,7 @@ namespace Cue
 		protected override bool DoStart(IObject o, float s)
 		{
 			var p = o as Person;
-			p.MoveTo(chair_.Position, chair_.Bearing);
+			p.MoveTo(chair_.Position, chair_.Bearing, true);
 			moving_ = true;
 			return true;// p.Animator.Playing;
 		}
