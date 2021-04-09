@@ -73,21 +73,43 @@ namespace Cue
 	}
 
 
-	class MacGruberGaze : IGazer
+	abstract class BasicGazer : IGazer
 	{
-		private Person person_ = null;
+		protected Person person_ = null;
+
+		public abstract int LookAt { get; set; }
+		public abstract Vector3 Target { get; set; }
+
+		protected BasicGazer(Person p)
+		{
+			person_ = p;
+		}
+
+		public void LookInFront()
+		{
+			LookAt = GazeSettings.LookAtTarget;
+
+			Target =
+				person_.HeadPosition +
+				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing);
+		}
+	}
+
+
+	class MacGruberGaze : BasicGazer
+	{
 		private int lookat_ = GazeSettings.LookAtDisabled;
 		private JSONStorableBool toggle_ = null;
 		private JSONStorableBool lookatTarget_ = null;
 		private VamEyes eyes_ = null;
 
 		public MacGruberGaze(Person p)
+			: base(p)
 		{
-			person_ = p;
 			eyes_ = new VamEyes(p);
 		}
 
-		public int LookAt
+		public override int LookAt
 		{
 			get
 			{
@@ -102,11 +124,12 @@ namespace Cue
 			}
 		}
 
-		public Vector3 Target
+		public override Vector3 Target
 		{
 			get { return eyes_.Target; }
 			set { eyes_.Target = value; }
 		}
+
 
 		private void Set()
 		{

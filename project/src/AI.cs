@@ -92,6 +92,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to sit");
+					p.Gaze.LookInFront();
 					p.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
 					thunk_ = 0;
@@ -126,9 +127,9 @@ namespace Cue
 							"I think..."
 						}));
 
-						//cc.Push(new LookAroundAction());
-
 						cc.Push(new RandomAnimationAction(Resources.Animations.SitIdles()));
+
+						cc.Push(new LookAroundAction());
 
 						p.PushAction(cc);
 
@@ -191,6 +192,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to stand");
+					p.Gaze.LookInFront();
 					p.PushAction(new MoveAction(pos, o_.Bearing + ss.bearingOffset));
 					state_ = Moving;
 					thunk_ = 0;
@@ -213,9 +215,9 @@ namespace Cue
 							"I think..."
 						}));
 
-						//cc.Push(new LookAroundAction());
-
 						cc.Push(new RandomAnimationAction(Resources.Animations.StandIdles()));
+
+						cc.Push(new LookAroundAction());
 						p.PushAction(cc);
 
 						state_ = Thinking;

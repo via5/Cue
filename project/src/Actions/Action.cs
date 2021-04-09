@@ -304,6 +304,7 @@ namespace Cue
 		private List<IAnimation> anims_;
 		private float e_ = 0;
 		private int i_ = -1;
+		private const float Delay = 0;
 
 		public RandomAnimationAction(List<IAnimation> anims)
 		{
@@ -320,6 +321,9 @@ namespace Cue
 
 		protected override bool DoTick(IObject o, float s)
 		{
+			if (anims_.Count == 0)
+				return true;
+
 			var p = ((Person)o);
 
 			if (i_ == -1)
@@ -335,7 +339,7 @@ namespace Cue
 				if (!p.Animator.Playing)
 				{
 					e_ += s;
-					if (e_ >= 3)
+					if (e_ >= Delay)
 					{
 						PlayNext(p);
 						e_ = 0;
@@ -368,7 +372,7 @@ namespace Cue
 	class LookAroundAction : BasicAction
 	{
 		private float e_ = 0;
-		private int i_ = 0;
+		private const float Delay = 1;
 
 		public LookAroundAction()
 		{
@@ -377,7 +381,6 @@ namespace Cue
 		protected override bool DoStart(IObject o, float s)
 		{
 			e_ = 0;
-			i_ = 0;
 
 			var p = ((Person)o);
 			p.Gaze.LookAt = GazeSettings.LookAtTarget;
@@ -391,27 +394,20 @@ namespace Cue
 
 			e_ += s;
 
-			if (e_ > 2)
+			if (e_ >= Delay)
 			{
-				++i_;
+				var t = new Vector3(
+					UnityEngine.Random.Range(-1.0f, 1.0f),
+					UnityEngine.Random.Range(-1.0f, 1.0f),
+					1);
 
-				if (i_ >= 2)
-				{
-					i_ = 0;
-					p.Gaze.LookAt = GazeSettings.LookAtPlayer;
-				}
-				else
-				{
-					var t = new Vector3(
-						UnityEngine.Random.Range(-2, 2),
-						UnityEngine.Random.Range(-2, 2),
-						UnityEngine.Random.Range(-2, 2));
+				Cue.LogError(p.Direction.ToString() + " " + t.ToString());
 
-					t += p.Position;
+				p.Gaze.LookAt = GazeSettings.LookAtTarget;
 
-					p.Gaze.LookAt = GazeSettings.LookAtTarget;
-					p.Gaze.Target = t;
-				}
+				p.Gaze.Target =
+					p.HeadPosition +
+					Vector3.Rotate(t, p.Bearing);
 
 				e_ = 0;
 			}

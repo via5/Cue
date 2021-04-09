@@ -19,6 +19,7 @@ namespace Cue
 	{
 		int LookAt { get; set; }
 		Vector3 Target { get; set; }
+		void LookInFront();
 	}
 
 	interface ISpeaker
@@ -116,11 +117,12 @@ namespace Cue
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-
 			animator_ = new Animator(this);
 			breathing_ = new MacGruberBreather(this);
 			speech_ = new VamSpeaker(this);
 			gaze_ = new MacGruberGaze(this);
+
+			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
 
 		public bool Idle
@@ -141,6 +143,11 @@ namespace Cue
 		public Vector3 StandingPosition
 		{
 			get { return standingPos_; }
+		}
+
+		public Vector3 HeadPosition
+		{
+			get { return Atom.HeadPosition; }
 		}
 
 		public string StateString

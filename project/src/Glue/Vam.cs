@@ -286,6 +286,22 @@ namespace Cue.W
 
 			return null;
 		}
+
+		public Rigidbody FindRigidbody(IObject o, string name)
+		{
+			return FindRigidbody(((W.VamAtom)o.Atom).Atom, name);
+		}
+
+		public Rigidbody FindRigidbody(Atom a, string name)
+		{
+			foreach (var rb in a.rigidbodies)
+			{
+				if (rb.name == name)
+					return rb.GetComponent<Rigidbody>();
+			}
+
+			return null;
+		}
 	}
 
 	class VamTime : ITime
@@ -317,6 +333,7 @@ namespace Cue.W
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
+		private Rigidbody head_ = null;
 
 		public VamAtom(Atom atom)
 		{
@@ -357,9 +374,30 @@ namespace Cue.W
 			}
 		}
 
+		public Vector3 HeadPosition
+		{
+			get
+			{
+				GetHead();
+				if (head_ == null)
+					return Vector3.Zero;
+
+				return Vector3.FromUnity(head_.position);
+			}
+		}
+
 		public Atom Atom
 		{
 			get { return atom_; }
+		}
+
+		private void GetHead()
+		{
+			if (head_ != null)
+				return;
+
+			var vsys = ((W.VamSys)Cue.Instance.Sys);
+			head_ = vsys.FindRigidbody(atom_, "headControl");
 		}
 	}
 

@@ -47,7 +47,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return X.ToString() + "," + Y.ToString() + "," + Z.ToString();
+			return X.ToString("0.00") + "," + Y.ToString("0.00") + "," + Z.ToString("0.00");
 		}
 
 		public static Vector3 operator +(Vector3 a, Vector3 b)
@@ -175,7 +175,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return Width.ToString() + "*" + Height.ToString();
+			return Width.ToString("0.00") + "*" + Height.ToString("0.00");
 		}
 	}
 
@@ -332,8 +332,8 @@ namespace Cue
 		public override string ToString()
 		{
 			return
-				"(" + Left.ToString() + "," + Top.ToString() + ")-" +
-				"(" + Right.ToString() + "," + Bottom.ToString() + ")";
+				"(" + Left.ToString("0.00") + "," + Top.ToString("0.00") + ")-" +
+				"(" + Right.ToString("0.00") + "," + Bottom.ToString("0.00") + ")";
 		}
 	}
 
@@ -384,8 +384,8 @@ namespace Cue
 		public override string ToString()
 		{
 			return
-				Left.ToString() + "," + Top.ToString() + "," +
-				Right.ToString() + "," + Bottom.ToString();
+				Left.ToString("0.00") + "," + Top.ToString("0.00") + "," +
+				Right.ToString("0.00") + "," + Bottom.ToString("0.00");
 		}
 	}
 }

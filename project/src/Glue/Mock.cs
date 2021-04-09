@@ -152,6 +152,11 @@ namespace Cue.W
 			set { }
 		}
 
+		public Vector3 HeadPosition
+		{
+			get { return Vector3.Zero; }
+		}
+
 		public void Say(string s)
 		{
 			Cue.LogError(id_ + " says '" + s + "'");

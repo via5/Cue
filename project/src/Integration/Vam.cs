@@ -85,11 +85,12 @@ namespace Cue
 
 		private void Get()
 		{
+			var vsys = ((W.VamSys)Cue.Instance.Sys);
 			var a = ((W.VamAtom)person_.Atom).Atom;
 
 			if (eyes_ == null)
 			{
-				eyes_ = FindRigidbody("eyeTargetControl");
+				eyes_ = vsys.FindRigidbody(person_, "eyeTargetControl");
 				if (eyes_ == null)
 					Cue.LogError("atom " + a.uid + " has no eyeTargetControl");
 			}
@@ -109,19 +110,6 @@ namespace Cue
 				if (upDownAngle_ == null)
 					Cue.LogError("atom " + a.uid + " has no upDownAngleAdjust");
 			}
-		}
-
-		private Rigidbody FindRigidbody(string name)
-		{
-			var a = ((W.VamAtom)person_.Atom).Atom;
-
-			foreach (var rb in a.rigidbodies)
-			{
-				if (rb.name == name)
-					return rb.GetComponent<Rigidbody>();
-			}
-
-			return null;
 		}
 	}
 
