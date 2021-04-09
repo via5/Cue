@@ -6,6 +6,8 @@ namespace Cue.Resources
 	{
 		private static IAnimation walk_ = null;
 		private static IAnimation sit_ = null;
+		private static IAnimation turnLeft_ = null;
+		private static IAnimation turnRight_ = null;
 		private static List<IAnimation> sitIdle_ = new List<IAnimation>();
 		private static List<IAnimation> standIdle_ = new List<IAnimation>();
 
@@ -19,6 +21,30 @@ namespace Cue.Resources
 			}
 
 			return walk_;
+		}
+
+		public static IAnimation TurnLeft()
+		{
+			if (turnLeft_ == null)
+			{
+				turnLeft_ = new BVH.Animation(
+					"Custom\\Animations\\bvh_files\\avatar_turnleft.bvh",
+					true, true, true);
+			}
+
+			return turnLeft_;
+		}
+
+		public static IAnimation TurnRight()
+		{
+			if (turnRight_ == null)
+			{
+				turnRight_ = new BVH.Animation(
+					"Custom\\Animations\\bvh_files\\avatar_turnright.bvh",
+					true, true, true);
+			}
+
+			return turnRight_;
 		}
 
 		public static IAnimation Sit()

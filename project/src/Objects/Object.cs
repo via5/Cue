@@ -76,6 +76,12 @@ namespace Cue
 		private const int MoveTowardsTargetState = 2;
 		private const int TurnTowardsFinalState = 3;
 
+		protected const int MoveNone = 0;
+		protected const int MoveTentative = 1;
+		protected const int MoveWalk = 2;
+		protected const int MoveTurnLeft = 3;
+		protected const int MoveTurnRight = 4;
+
 		private readonly W.IAtom atom_;
 
 		private float maxMoveSpeed_ = 1;
@@ -167,7 +173,7 @@ namespace Cue
 			if (moveState_ != NoMoveState)
 			{
 				if (!canMove_)
-					canMove_ = SetMoving(true);
+					canMove_ = SetMoving(MoveTentative);
 
 				if (canMove_)
 					MoveToTarget(s);
@@ -230,7 +236,7 @@ namespace Cue
 					if (TurnTowardsFinal(s))
 					{
 						moveState_ = NoMoveState;
-						SetMoving(false);
+						SetMoving(MoveNone);
 					}
 
 					break;
@@ -263,6 +269,8 @@ namespace Cue
 				var moveSpeed = Math.Min(moveElapsed_ / moveSpeedRampTime_, 1) * maxMoveSpeed_;
 
 				atom_.Position += (Direction * s * moveSpeed);
+				SetMoving(MoveWalk);
+
 				return false;
 			}
 		}
@@ -294,9 +302,15 @@ namespace Cue
 				float bearingDiff;
 
 				if (a < 0)
+				{
 					bearingDiff = Math.Max(a, -s * turnSpeed);
+					SetMoving(MoveTurnLeft);
+				}
 				else
+				{
 					bearingDiff = Math.Min(a, s * turnSpeed);
+					SetMoving(MoveTurnRight);
+				}
 
 				Bearing -= bearingDiff;
 
@@ -309,10 +323,10 @@ namespace Cue
 			targetPos_ = to;
 			targetBearing_ = bearing;
 			moveState_ = TurnTowardsTargetState;
-			canMove_ = SetMoving(true);
+			canMove_ = SetMoving(MoveTentative);
 		}
 
-		protected virtual bool SetMoving(bool b)
+		protected virtual bool SetMoving(int i)
 		{
 			// no-op
 			return true;

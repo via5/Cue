@@ -105,6 +105,7 @@ namespace Cue
 		private readonly RootAction actions_ = new RootAction();
 		private readonly PersonAI ai_ = new PersonAI();
 		private int state_ = StandingState;
+		private int lastMoveState_ = MoveNone;
 		private Vector3 standingPos_ = new Vector3();
 
 		private Animator animator_;
@@ -215,33 +216,61 @@ namespace Cue
 			speech_.Say(s);
 		}
 
-		protected override bool SetMoving(bool b)
+		protected override bool SetMoving(int i)
 		{
-			if (b)
+			switch (i)
 			{
-				if (state_ == SitState)
+				case MoveNone:
 				{
-					state_ = StandingUpState;
-					animator_.Play(Resources.Animations.Sit(), true);
+					state_ = StandingState;
+					animator_.Stop();
+					break;
+				}
+
+				case MoveTentative:
+				{
+					if (state_ == StandingState)
+					{
+						state_ = WalkingState;
+						break;
+					}
+
+					if (state_ == SitState)
+					{
+						state_ = StandingUpState;
+						animator_.Play(Resources.Animations.Sit(), true);
+					}
+
 					return false;
 				}
-				else if (state_ == StandingState)
+
+				case MoveWalk:
 				{
-					state_ = WalkingState;
-					animator_.Play(Resources.Animations.Walk());
-					return true;
+					if (lastMoveState_ != MoveWalk)
+						animator_.Play(Resources.Animations.Walk());
+
+					break;
 				}
-				else
+
+				case MoveTurnLeft:
 				{
-					return false;
+					if (lastMoveState_ != MoveTurnLeft)
+						animator_.Play(Resources.Animations.TurnLeft());
+
+					break;
+				}
+
+				case MoveTurnRight:
+				{
+					if (lastMoveState_ != MoveTurnRight)
+						animator_.Play(Resources.Animations.TurnRight());
+
+					break;
 				}
 			}
-			else
-			{
-				state_ = StandingState;
-				animator_.Stop();
-				return true;
-			}
+
+			lastMoveState_ = i;
+			return true;
 		}
 	}
 }
