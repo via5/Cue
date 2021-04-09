@@ -137,15 +137,16 @@ namespace Cue
 
 		protected override bool DoStart(IObject o, float s)
 		{
-			Cue.LogError("MoveAction: from " + o.Position.ToString() + " to " + to_.ToString());
+			Vector3 pos;
 
-			if (Vector3.Distance(o.Position, to_) < 0.1f)
-			{
-				o.Position = to_;
-				return false;
-			}
+			if (o is Person)
+				pos = ((Person)o).StandingPosition;
+			else
+				pos = o.Position;
 
-			wps_ = Cue.Instance.Sys.Nav.Calculate(o.Position, to_);
+
+			Cue.LogError("MoveAction: from " + pos.ToString() + " to " + to_.ToString());
+			wps_ = Cue.Instance.Sys.Nav.Calculate(pos, to_);
 
 			if (wps_.Count == 0)
 			{

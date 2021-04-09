@@ -40,11 +40,13 @@ namespace Cue
 
 	class Animator
 	{
+		private Person person_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private IPlayer active_ = null;
 
 		public Animator(Person p)
 		{
+			person_ = p;
 			players_.Add(new BVH.Player(p));
 			players_.Add(new TimelinePlayer(p));
 		}
@@ -103,6 +105,7 @@ namespace Cue
 		private readonly RootAction actions_ = new RootAction();
 		private readonly PersonAI ai_ = new PersonAI();
 		private int state_ = StandingState;
+		private Vector3 standingPos_ = new Vector3();
 
 		private Animator animator_;
 		private IBreather breathing_;
@@ -132,6 +135,11 @@ namespace Cue
 		public Animator Animator
 		{
 			get { return animator_; }
+		}
+
+		public Vector3 StandingPosition
+		{
+			get { return standingPos_; }
 		}
 
 		public string StateString
@@ -191,6 +199,9 @@ namespace Cue
 				else if (state_ == StandingUpState)
 					state_ = StandingState;
 			}
+
+			if (state_ == StandingState)
+				standingPos_ = Position;
 		}
 
 		public void Sit()
