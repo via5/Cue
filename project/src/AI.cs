@@ -128,14 +128,7 @@ namespace Cue
 
 						//cc.Push(new LookAroundAction());
 
-						cc.Push(new RandomAnimationAction(new List<IAnimation>()
-						{
-							new BVH.Animation("Custom/Animations/Cassandra AO/Cassandra sit.bvh"),
-							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_1.bvh"),
-							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_3.bvh"),
-							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_4.bvh"),
-							new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_5.bvh")
-						}));
+						cc.Push(new RandomAnimationAction(Resources.Animations.SitIdles()));
 
 						p.PushAction(cc);
 
@@ -224,15 +217,7 @@ namespace Cue
 
 						//cc.Push(new LookAroundAction());
 
-						cc.Push(new RandomAnimationAction(new List<IAnimation>()
-						{
-							//new BVH.Animation("Custom/Animations/Ashley AO/05.bvh", false, true, true),
-							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_1.bvh", false, true, true),
-							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_2.bvh", false, true, true),
-							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_3.bvh", false, true, true),
-							new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_4.bvh", false, true, true)
-						}));
-
+						cc.Push(new RandomAnimationAction(Resources.Animations.StandIdles()));
 						p.PushAction(cc);
 
 						state_ = Thinking;

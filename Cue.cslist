@@ -2,6 +2,7 @@ project\src\AI.cs
 project\src\BVH.cs
 project\src\Cue.cs
 project\src\Geo.cs
+project\src\Resources.cs
 project\src\Utilities.cs
 project\src\Actions\Action.cs
 project\src\Glue\Interfaces.cs

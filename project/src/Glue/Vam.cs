@@ -133,7 +133,7 @@ namespace Cue.W
 					list.Add(new VamAtom(a));
 			}
 
-			return new List<IAtom>();
+			return list;
 		}
 
 		public IAtom ContainingAtom

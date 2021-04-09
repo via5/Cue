@@ -102,8 +102,6 @@ namespace Cue
 
 		private readonly RootAction actions_ = new RootAction();
 		private readonly PersonAI ai_ = new PersonAI();
-		private readonly IAnimation walk_ = null;
-		private readonly IAnimation sit_ = null;
 		private int state_ = StandingState;
 
 		private Animator animator_;
@@ -114,13 +112,6 @@ namespace Cue
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-			walk_ = new BVH.Animation(
-				"Custom\\Scripts\\VAMDeluxe\\Synthia Movement System\\Animations\\StandToWalk.bvh",
-				true, false, false, 67, 150);
-
-			sit_ = new BVH.Animation(
-				"Custom\\Animations\\bvh_files\\avatar_sit_female.bvh",
-				false, true, true, 0, 30);
 
 			animator_ = new Animator(this);
 			breathing_ = new MacGruberBreather(this);
@@ -204,7 +195,7 @@ namespace Cue
 
 		public void Sit()
 		{
-			animator_.Play(sit_, false);
+			animator_.Play(Resources.Animations.Sit(), false);
 			state_ = SittingDownState;
 		}
 
@@ -220,13 +211,13 @@ namespace Cue
 				if (state_ == SitState)
 				{
 					state_ = StandingUpState;
-					animator_.Play(sit_, true);
+					animator_.Play(Resources.Animations.Sit(), true);
 					return false;
 				}
 				else if (state_ == StandingState)
 				{
 					state_ = WalkingState;
-					animator_.Play(walk_);
+					animator_.Play(Resources.Animations.Walk());
 					return true;
 				}
 				else
