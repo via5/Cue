@@ -39,7 +39,6 @@ namespace Cue.Resources
 			{
 				sitIdle_ = new List<IAnimation>()
 				{
-					new BVH.Animation("Custom/Animations/Cassandra AO/Cassandra sit.bvh"),
 					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_1.bvh"),
 					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_3.bvh"),
 					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_4.bvh"),

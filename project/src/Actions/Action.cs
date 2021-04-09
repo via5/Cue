@@ -196,6 +196,7 @@ namespace Cue
 	class SitAction : BasicAction
 	{
 		private IObject chair_;
+		private bool moving_ = false;
 
 		public SitAction(IObject chair)
 		{
@@ -205,14 +206,32 @@ namespace Cue
 		protected override bool DoStart(IObject o, float s)
 		{
 			var p = o as Person;
-			p.Bearing = chair_.Bearing + chair_.SitSlot.bearingOffset;
-			p.Sit();
-			return p.Animator.Playing;
+			p.MoveTo(chair_.Position, chair_.Bearing);
+			moving_ = true;
+			return true;// p.Animator.Playing;
 		}
 
 		protected override bool DoTick(IObject o, float s)
 		{
-			return ((Person)o).Animator.Playing;
+			var p = o as Person;
+
+			if (moving_)
+			{
+				if (p.HasTarget)
+				{
+					return true;
+				}
+				else
+				{
+					moving_ = false;
+					p.Sit();
+					return true;
+				}
+			}
+			else
+			{
+				return p.Animator.Playing;
+			}
 		}
 
 		public override string ToString()

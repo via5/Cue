@@ -68,9 +68,7 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				var fp = @"[+-]?(?:[0-9]*[.])?[0-9]+";
-
-				var re = new Regex(@"cue!([a-zA-Z]+)!(" + fp + ")!(" + fp + ")!(" + fp + ")!(" + fp + ")");
+				var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
 
 				foreach (var a in sys_.GetAtoms())
 				{
@@ -78,27 +76,11 @@ namespace Cue
 
 					if (m != null && m.Success)
 					{
-						LogError("found " + a.ID);
-
 						string type = m.Groups[1].Value;
-						float poX, poY, poZ, bo;
-
-						if (!float.TryParse(m.Groups[2].Value, out poX))
-							LogError("bad poX '" + m.Groups[2].Value + "'");
-
-						if (!float.TryParse(m.Groups[3].Value, out poY))
-							LogError("bad poY '" + m.Groups[3].Value + "'");
-
-						if (!float.TryParse(m.Groups[4].Value, out poZ))
-							LogError("bad poZ '" + m.Groups[4].Value + "'");
-
-						if (!float.TryParse(m.Groups[5].Value, out bo))
-							LogError("bad bo '" + m.Groups[5].Value + "'");
-
-						LogError($"type='{type}' pox={poX} poy={poY} poz={poZ} bo={bo}");
+						LogError("found " + a.ID + " " + type);
 
 						BasicObject o = new BasicObject(a);
-						var s = new Slot(new Vector3(poX, poY, poZ), bo);
+						var s = new Slot();
 
 						if (type == "sit")
 							o.SitSlot = s;
