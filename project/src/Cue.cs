@@ -45,85 +45,75 @@ namespace Cue
 
 			try
 			{
-				SuperController.singleton.StartCoroutine(DeferredInit());
+				if (W.MockSys.Instance != null)
+				{
+					sys_ = W.MockSys.Instance;
+					ui_ = new UI.MockUI();
+				}
+				else
+				{
+					sys_ = new W.VamSys(this);
+					ui_ = new UI.VamUI();
+				}
+
+				sys_.OnReady(DoInit);
 			}
 			catch (Exception e)
 			{
-				SuperController.LogError(e.Message);
+				LogError(e.Message);
 			}
-		}
-
-		private IEnumerator DeferredInit()
-		{
-			yield return new WaitForEndOfFrame();
-
-			U.Safe(() =>
-			{
-				DoInit();
-			});
 		}
 
 		private void DoInit()
 		{
-			if (W.MockSys.Instance != null)
+			U.Safe(() =>
 			{
-				sys_ = W.MockSys.Instance;
-			}
-			else
-			{
-				sys_ = new W.VamSys(this);
-				ui_ = new UI.VamUI();
-			}
+				var fp = @"[+-]?(?:[0-9]*[.])?[0-9]+";
 
+				var re = new Regex(@"cue!([a-zA-Z]+)!(" + fp + ")!(" + fp + ")!(" + fp + ")!(" + fp + ")");
 
-			var fp = @"[+-]?(?:[0-9]*[.])?[0-9]+";
-
-			var re = new Regex(@"cue!([a-zA-Z]+)!(" + fp + ")!(" + fp + ")!(" + fp + ")!(" + fp + ")");
-
-			foreach (var a in SuperController.singleton.GetAtoms())
-			{
-				if (!a.on)
-					continue;
-
-				var m = re.Match(a.uid);
-
-				if (m != null && m.Success)
+				foreach (var a in sys_.GetAtoms())
 				{
-					LogError("found " + a.uid);
+					var m = re.Match(a.ID);
 
-					string type = m.Groups[1].Value;
-					float poX, poY, poZ, bo;
+					if (m != null && m.Success)
+					{
+						LogError("found " + a.ID);
 
-					if (!float.TryParse(m.Groups[2].Value, out poX))
-						LogError("bad poX '" + m.Groups[2].Value + "'");
+						string type = m.Groups[1].Value;
+						float poX, poY, poZ, bo;
 
-					if (!float.TryParse(m.Groups[3].Value, out poY))
-						LogError("bad poY '" + m.Groups[3].Value + "'");
+						if (!float.TryParse(m.Groups[2].Value, out poX))
+							LogError("bad poX '" + m.Groups[2].Value + "'");
 
-					if (!float.TryParse(m.Groups[4].Value, out poZ))
-						LogError("bad poZ '" + m.Groups[4].Value + "'");
+						if (!float.TryParse(m.Groups[3].Value, out poY))
+							LogError("bad poY '" + m.Groups[3].Value + "'");
 
-					if (!float.TryParse(m.Groups[5].Value, out bo))
-						LogError("bad bo '" + m.Groups[5].Value + "'");
+						if (!float.TryParse(m.Groups[4].Value, out poZ))
+							LogError("bad poZ '" + m.Groups[4].Value + "'");
 
-					LogError($"type='{type}' pox={poX} poy={poY} poz={poZ} bo={bo}");
+						if (!float.TryParse(m.Groups[5].Value, out bo))
+							LogError("bad bo '" + m.Groups[5].Value + "'");
 
-					BasicObject o = new BasicObject(new W.VamAtom(a));
-					var s = new Slot(new Vector3(poX, poY, poZ), bo);
+						LogError($"type='{type}' pox={poX} poy={poY} poz={poZ} bo={bo}");
 
-					if (type == "sit")
-						o.SitSlot = s;
-					if (type == "stand")
-						o.StandSlot = s;
+						BasicObject o = new BasicObject(a);
+						var s = new Slot(new Vector3(poX, poY, poZ), bo);
 
-					objects_.Add(o);
+						if (type == "sit")
+							o.SitSlot = s;
+						if (type == "stand")
+							o.StandSlot = s;
+
+						objects_.Add(o);
+					}
 				}
-			}
 
-			person_ = new Person(sys_.GetAtom("Person"));
+				person_ = new Person(sys_.GetAtom("Person"));
 
-			ui_.Init();
-			sys_.Nav.Update();
+				ui_.Init();
+				sys_.Nav.Update();
+			});
 		}
 
 		public void Update()

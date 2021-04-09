@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -50,6 +51,11 @@ namespace Cue.W
 			return new MockAtom(id);
 		}
 
+		public List<IAtom> GetAtoms(bool alsoOff)
+		{
+			return new List<IAtom>();
+		}
+
 		public bool Paused
 		{
 			get { return false; }
@@ -58,6 +64,16 @@ namespace Cue.W
 		public void OnPluginState(bool b)
 		{
 			// no-op
+		}
+
+		public void OnReady(Action f)
+		{
+			f?.Invoke();
+		}
+
+		public string ReadFileIntoString(string path)
+		{
+			return "";
 		}
 	}
 
@@ -112,6 +128,11 @@ namespace Cue.W
 		public MockAtom(string id)
 		{
 			id_ = id;
+		}
+
+		public string ID
+		{
+			get { return id_; }
 		}
 
 		public bool IsPerson

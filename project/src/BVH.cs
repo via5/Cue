@@ -106,14 +106,18 @@ namespace Cue.BVH
         float heelHeight = 0;
         float heelAngle = 0;
 
-        public Player(Atom atom)
+        public Player(Person p)
         {
-            containingAtom = atom;
-            containingAtom.ResetPhysical();
-            //containingAtom.ResetRigidbodies();
-            CreateShadowSkeleton();
-            RecordOffsets();
-            CreateControllerMap();
+            if (p.Atom is W.VamAtom)
+            {
+                containingAtom = ((W.VamAtom)p.Atom).Atom;
+                containingAtom.ResetPhysical();
+
+                //containingAtom.ResetRigidbodies();
+                CreateShadowSkeleton();
+                RecordOffsets();
+                CreateControllerMap();
+            }
         }
 
         public bool Playing
@@ -145,8 +149,6 @@ namespace Cue.BVH
             var ba = a as Animation;
             if (ba == null)
                 return false;
-
-            //SuperController.LogMessage("restarting");
 
             anim = ba;
             this.reverse = reverse;
@@ -249,8 +251,6 @@ namespace Cue.BVH
         {
             foreach (var parent in containingAtom.gameObject.GetComponentsInChildren<DAZBones>())
             {
-                // SuperController.LogMessage(string.Format("{0}", parent.gameObject.name));
-                // SuperController.LogMessage(parent.gameObject.name);
                 if (shadow != null)
                     GameObject.Destroy(shadow.gameObject);
                 bones = new Dictionary<string, Transform>();
@@ -309,6 +309,9 @@ namespace Cue.BVH
 
         public void FixedUpdate(float s)
         {
+            if (containingAtom == null)
+                return;
+
             try
             {
                 if (anim == null || anim.file.nFrames == 0)
@@ -339,7 +342,7 @@ namespace Cue.BVH
             }
             catch (Exception e)
             {
-                SuperController.LogError("Fixed Update: " + e);
+                Cue.LogError("Fixed Update: " + e);
             }
         }
 
@@ -399,8 +402,6 @@ namespace Cue.BVH
                     }
                 }
             }
-
-            //SuperController.LogMessage(frame + " / " + bvh.nFrames);
 
             if (reverse)
             {
@@ -517,7 +518,7 @@ namespace Cue.BVH
                 name = path;
 
             char[] delims = { '\r', '\n' };
-            var raw = SuperController.singleton.ReadFileIntoString(path).Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
+            var raw = Cue.Instance.Sys.ReadFileIntoString(path).Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
             bones = ReadHierarchy(raw);
             frames = ReadMotion(raw);
             frameTime = ReadFrameTime(raw);
@@ -636,7 +637,9 @@ namespace Cue.BVH
                         current.rotationOrder = GetRotationOrder(parts[5], parts[6], parts[7]);
                     }
                     else
-                        SuperController.LogError(string.Format("Unexpect number of channels in BVH Hierarchy {1} {0}", nChannels, current.name));
+                    {
+                        Cue.LogError(string.Format("Unexpect number of channels in BVH Hierarchy {1} {0}", nChannels, current.name));
+                    }
                 }
                 if (parts.Length >= 2 && parts[0] == "End" && parts[1] == "Site")
                     current = null;

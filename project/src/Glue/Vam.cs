@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -121,6 +123,19 @@ namespace Cue.W
 			return new VamAtom(a);
 		}
 
+		public List<IAtom> GetAtoms(bool alsoOff=false)
+		{
+			var list = new List<IAtom>();
+
+			foreach (var a in SuperController.singleton.GetAtoms())
+			{
+				if (a.on || alsoOff)
+					list.Add(new VamAtom(a));
+			}
+
+			return new List<IAtom>();
+		}
+
 		public IAtom ContainingAtom
 		{
 			get { return new VamAtom(script_.containingAtom); }
@@ -134,6 +149,22 @@ namespace Cue.W
 		public void OnPluginState(bool b)
 		{
 			nav_.OnPluginState(b);
+		}
+
+		public void OnReady(Action f)
+		{
+			SuperController.singleton.StartCoroutine(DeferredInit(f));
+		}
+
+		public string ReadFileIntoString(string path)
+		{
+			return SuperController.singleton.ReadFileIntoString(path);
+		}
+
+		private IEnumerator DeferredInit(Action f)
+		{
+			yield return new WaitForEndOfFrame();
+			f?.Invoke();
 		}
 
 		public JSONStorableFloat GetFloatParameter(
@@ -292,6 +323,11 @@ namespace Cue.W
 			atom_ = atom;
 		}
 
+		public string ID
+		{
+			get { return atom_.uid; }
+		}
+
 		public bool IsPerson
 		{
 			get { return atom_.type == "Person"; }
@@ -444,7 +480,7 @@ namespace Cue.W
 			{
 				if (nmr_ != null)
 				{
-					Object.Destroy(nmr_);
+					UnityEngine.Object.Destroy(nmr_);
 					nmr_ = null;
 				}
 			}
@@ -477,7 +513,7 @@ namespace Cue.W
 			{
 				if (nmr_ != null)
 				{
-					Object.Destroy(nmr_);
+					UnityEngine.Object.Destroy(nmr_);
 					nmr_ = null;
 				}
 			}

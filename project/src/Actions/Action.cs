@@ -149,12 +149,12 @@ namespace Cue
 
 			if (wps_.Count == 0)
 			{
-				SuperController.LogError(
+				Cue.LogError(
 					o.ToString() + " cannot reach " + to_.ToString());
 				return false;
 			}
 
-			SuperController.LogError(
+			Cue.LogError(
 				o.ToString() + " to " + to_.ToString() + ", " +
 				wps_.Count.ToString() + " waypoints");
 

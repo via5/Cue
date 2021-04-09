@@ -1,5 +1,4 @@
-﻿using MVR.FileManagementSecure;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue.UI
 {
@@ -9,6 +8,16 @@ namespace Cue.UI
 		void Update();
 	}
 
+	class MockUI : IUI
+	{
+		public void Init()
+		{
+		}
+
+		public void Update()
+		{
+		}
+	}
 
 	class VamUI : IUI
 	{
@@ -59,11 +68,11 @@ namespace Cue.UI
 
 		private void AddAnims(List<string> items, string path)
 		{
-			foreach (var f in SuperController.singleton.GetFilesAtPath(path, "*.bvh"))
-				items.Add(f);
-
-			foreach (var d in SuperController.singleton.GetDirectoriesAtPath(path))
-				AddAnims(items, d);
+			//foreach (var f in SuperController.singleton.GetFilesAtPath(path, "*.bvh"))
+			//	items.Add(f);
+			//
+			//foreach (var d in SuperController.singleton.GetDirectoriesAtPath(path))
+			//	AddAnims(items, d);
 		}
 
 		public void Update()

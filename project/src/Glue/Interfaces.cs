@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Cue.W
 {
@@ -7,10 +9,13 @@ namespace Cue.W
 		ITime Time { get; }
 		ILog Log { get; }
 		IAtom GetAtom(string id);
+		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
 		INav Nav { get; }
 		bool Paused { get; }
 		void OnPluginState(bool b);
+		void OnReady(Action f);
+		string ReadFileIntoString(string path);
 	}
 
 	interface ITime
@@ -27,6 +32,7 @@ namespace Cue.W
 
 	interface IAtom
 	{
+		string ID { get; }
 		bool IsPerson { get; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }

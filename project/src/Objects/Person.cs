@@ -45,7 +45,7 @@ namespace Cue
 
 		public Animator(Person p)
 		{
-			players_.Add(new BVH.Player(((W.VamAtom)p.Atom).Atom));
+			players_.Add(new BVH.Player(p));
 			players_.Add(new TimelinePlayer(p));
 		}
 
