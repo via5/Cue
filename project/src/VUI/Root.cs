@@ -92,38 +92,11 @@ namespace VUI
 		public const int FocusDefault = 0x0;
 		public const int FocusKeepPopup = 0x01;
 
-		private Transform rootTransform_ = null;
 
+		private Transform rootTransform_ = null;
 		private RectTransform scrollViewRT_ = null;
 		static private TextGenerator tg_ = new TextGenerator();
 		static private TextGenerationSettings ts_ = new TextGenerationSettings();
-
-		private UIPopup openedPopup_ = null;
-		private Widget focused_ = null;
-
-		public void SetOpenedPopup(UIPopup p)
-		{
-			openedPopup_ = p;
-		}
-
-		public void SetFocus(Widget w, int flags=FocusDefault)
-		{
-			if (focused_ == w)
-				return;
-
-			focused_ = w;
-
-			// used by the filter textbox in the combobox so clicking it doesn't
-			// close the combobox
-			if (!Bits.IsSet(flags, FocusKeepPopup) && openedPopup_ != null)
-			{
-				if (openedPopup_.visible)
-					openedPopup_.Toggle();
-
-				openedPopup_ = null;
-			}
-		}
-
 
 		private Rectangle bounds_;
 		private Insets margins_ = new Insets(5);
@@ -136,6 +109,11 @@ namespace VUI
 		private bool ready_ = false;
 		private Canvas canvas_;
 
+		private UIPopup openedPopup_ = null;
+		private Widget focused_ = null;
+
+		private TimerManager ownTm_ = null;
+
 		public static Point NoMousePos
 		{
 			get
@@ -146,6 +124,9 @@ namespace VUI
 
 		public Root(Transform rootTransform)
 		{
+			if (TimerManager.Instance == null)
+				ownTm_ = new TimerManager();
+
 			content_ = new RootPanel(this);
 			floating_ = new RootPanel(this);
 			tooltips_ = new TooltipManager(this);
@@ -185,20 +166,50 @@ namespace VUI
 			return true;
 		}
 
-		public void AttachTo(Transform rootTransform)
+		public void SetOpenedPopup(UIPopup p)
 		{
-			rootTransform_ = rootTransform;
+			openedPopup_ = p;
+		}
 
+		public void SetFocus(Widget w, int flags = FocusDefault)
+		{
+			if (focused_ == w)
+				return;
+
+			focused_ = w;
+
+			// used by the filter textbox in the combobox so clicking it doesn't
+			// close the combobox
+			if (!Bits.IsSet(flags, FocusKeepPopup) && openedPopup_ != null)
+			{
+				if (openedPopup_.visible)
+					openedPopup_.Toggle();
+
+				openedPopup_ = null;
+			}
+		}
+
+		private MVRScriptUI GetScriptUI()
+		{
 			MVRScriptUI scriptui = null;
 			var t = rootTransform_;
 			while (t != null)
 			{
 				scriptui = t.GetComponent<MVRScriptUI>();
 				if (scriptui != null)
-					break;
+					return scriptui;
 
 				t = t.parent;
 			}
+
+			return null;
+		}
+
+		public void AttachTo(Transform rootTransform)
+		{
+			rootTransform_ = rootTransform;
+
+			MVRScriptUI scriptui = GetScriptUI();
 
 			if (scriptui == null)
 			{
@@ -237,24 +248,11 @@ namespace VUI
 				tg_ = text.cachedTextGenerator;
 				ts_ = text.GetGenerationSettings(new Vector2());
 			}
-
-			//if (ready_)
-			//	Style.SetupRoot(rootTransform_);
 		}
 
 		public void Destroy()
 		{
-			MVRScriptUI scriptui = null;
-			var t = rootTransform_;
-			while (t != null)
-			{
-				scriptui = t.GetComponent<MVRScriptUI>();
-				if (scriptui != null)
-					break;
-
-				t = t.parent;
-			}
-
+			MVRScriptUI scriptui = GetScriptUI();
 			if (scriptui != null)
 				Style.RevertRoot(scriptui);
 
@@ -287,9 +285,15 @@ namespace VUI
 			get { return bounds_; }
 		}
 
-		public void DoLayoutIfNeeded(bool force=false)
+		public void Update(bool forceLayout=false)
 		{
-			if (dirty_ || force)
+			if (ownTm_ != null)
+			{
+				ownTm_.TickTimers(Time.deltaTime);
+				ownTm_.CheckTimers();
+			}
+
+			if (dirty_ || forceLayout)
 			{
 				var start = Time.realtimeSinceStartup;
 
@@ -358,7 +362,7 @@ namespace VUI
 
 		private void FindCanvas()
 		{
-			var image = rootTransform_.parent.GetComponentInChildren<Image>();
+			var image = rootTransform_.GetComponentInChildren<Image>();
 			if (image == null)
 				Glue.LogError("no image in attach");
 			else

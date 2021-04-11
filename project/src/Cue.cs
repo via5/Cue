@@ -83,11 +83,9 @@ namespace Cue
 		}
 
 		private bool enabled_ = true;
+		private Hud hud_ = new Hud();
 		private List<ObjectControls> controls_ = new List<ObjectControls>();
 		private Transform root_ = null;
-		private GameObject fullPanel_ = null;
-		private GameObject rootPanel_ = null;
-		private VUI.Root vroot_ = null;
 
 		public bool Enabled
 		{
@@ -105,31 +103,24 @@ namespace Cue
 			Check();
 		}
 
-		int i = 0;
-
 		public void Update()
 		{
 			if (!enabled_)
 				return;
 
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			RaycastHit hit;
+			CheckHovered();
+			hud_.Update();
+		}
 
+		private void CheckHovered()
+		{
+			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+			RaycastHit hit;
 			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 1 << Layer);
 
 			for (int i = 0; i < controls_.Count; ++i)
 				controls_[i].Hovered = (b && controls_[i].Is(hit.transform));
-
-			++i;
-			if (i == 10)
-			{
-				vroot_ = new VUI.Root(rootPanel_.transform);
-				vroot_.ContentPanel.Layout = new VUI.BorderLayout();
-				vroot_.ContentPanel.Add(new VUI.Label("tesT"), VUI.BorderLayout.Top);
-			}
-
-			if (vroot_ != null)
-				vroot_.DoLayoutIfNeeded();
 		}
 
 		private void Check()
@@ -143,51 +134,9 @@ namespace Cue
 			}
 
 			if (enabled_)
-			{
-				fullPanel_ = new GameObject();
-				fullPanel_.transform.SetParent(root_, false);
-				var canvas = fullPanel_.AddComponent<Canvas>();
-				var cr = fullPanel_.AddComponent<CanvasRenderer>();
-				var bg = fullPanel_.AddComponent<Image>();
-				var rt = fullPanel_.AddComponent<RectTransform>();
-				if (rt == null)
-					rt = fullPanel_.GetComponent<RectTransform>();
-
-				canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-				//VUI.Utilities.SetRectTransform(rt, new VUI.Rectangle(
-				//	-1f, -0.5f, new VUI.Size(0.5f, 0.1f)));
-
-				rt.offsetMin = new Vector2(2000, 2000);
-				rt.offsetMax = new Vector2(2000f, 2000);
-				rt.anchorMin = new Vector2(0, 0);
-				rt.anchorMax = new Vector2(1, 1);
-				rt.anchoredPosition = new Vector2(0.5f, -0.5f);
-				bg.color = new Color(1, 1, 1, 0);
-
-
-				rootPanel_ = new GameObject();
-				rootPanel_.transform.SetParent(fullPanel_.transform, false);
-				bg = rootPanel_.AddComponent<Image>();
-				rt = rootPanel_.AddComponent<RectTransform>();
-				if (rt == null)
-					rt = rootPanel_.GetComponent<RectTransform>();
-
-				bg.color = new Color(1, 0, 0, 0.5f);
-
-				rt.offsetMin = new Vector2(-100, 0f);
-				rt.offsetMax = new Vector2(100, 100);
-				rt.anchorMin = new Vector2(0.5f, 1);
-				rt.anchorMax = new Vector2(0.5f, 1);
-				rt.anchoredPosition = new Vector2(
-					(rt.offsetMax.x - rt.offsetMin.x) / 2,
-					-(rt.offsetMax.y - rt.offsetMin.y) / 2);
-			}
+				hud_.Create(root_);
 			else
-			{
-				UnityEngine.Object.Destroy(fullPanel_);
-				fullPanel_ = null;
-			}
+				hud_.Destroy();
 		}
 	}
 
@@ -200,7 +149,7 @@ namespace Cue
 		private BasicObject player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
-		private UI.IUI ui_ = null;
+		private UI.ScriptUI sui_ = null;
 		private Controls controls_ = new Controls();
 
 		public Cue()
@@ -237,12 +186,11 @@ namespace Cue
 				if (W.MockSys.Instance != null)
 				{
 					sys_ = W.MockSys.Instance;
-					ui_ = new UI.MockUI();
 				}
 				else
 				{
 					sys_ = new W.VamSys(this);
-					ui_ = new UI.VamUI();
+					sui_ = new UI.ScriptUI();
 				}
 
 				sys_.OnReady(DoInit);
@@ -280,7 +228,9 @@ namespace Cue
 					}
 				}
 
-				ui_.Init();
+				if (sui_ != null)
+					sui_.Init();
+
 				sys_.Nav.Update();
 
 				persons_.Add(new Person(sys_.GetAtom("Person")));
@@ -312,7 +262,9 @@ namespace Cue
 				}
 
 				controls_.Update();
-				ui_.Update();
+
+				if (sui_ != null)
+					sui_.Update();
 			});
 		}
 

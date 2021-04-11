@@ -2,24 +2,7 @@
 
 namespace Cue.UI
 {
-	interface IUI
-	{
-		void Init();
-		void Update();
-	}
-
-	class MockUI : IUI
-	{
-		public void Init()
-		{
-		}
-
-		public void Update()
-		{
-		}
-	}
-
-	class VamUI : IUI
+	class ScriptUI
 	{
 		private VUI.Root root_ = null;
 
@@ -58,6 +41,8 @@ namespace Cue.UI
 			top.Add(navmeshes_);
 			top.Add(play_);
 
+			navmeshes_.Tooltip.Text = "12#";
+
 			panel_.Add(top, VUI.BorderLayout.Top);
 			panel_.Add(anims_, VUI.BorderLayout.Center);
 
@@ -90,7 +75,7 @@ namespace Cue.UI
 			anim_.Text = "Anim: " + p.Animator.ToString();
 			state_.Text = "State: " + p.StateString;
 
-			root_.DoLayoutIfNeeded();
+			root_.Update();
 		}
 
 		private void OnPlay()
