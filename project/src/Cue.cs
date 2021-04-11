@@ -1,9 +1,12 @@
-﻿using JetBrains.Annotations;
+﻿using GPUTools.Physics.Scripts.Behaviours;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace Cue
 {
@@ -110,6 +113,24 @@ namespace Cue
 				return;
 
 			CheckHovered();
+
+			if (Input.GetMouseButtonUp(0))
+			{
+				Cue.Instance.Select(Cue.Instance.Hovered);
+			}
+
+			if (Input.GetMouseButtonUp(1))
+			{
+				var p = Cue.Instance.Selected as Person;
+				if (p == null)
+					return;
+
+				var o = Cue.Instance.Hovered;
+				if (o == null)
+					return;
+
+				p.InteractWith(o);
+			}
 		}
 
 		private void CheckHovered()
@@ -120,7 +141,7 @@ namespace Cue
 			if (sel == null)
 				sel = HitPerson(ray);
 
-			Cue.Instance.Select(sel);
+			Cue.Instance.Hover(sel);
 
 			for (int i=0; i<controls_.Count; ++i)
 				controls_[i].Hovered = (controls_[i].Object == sel);
@@ -213,10 +234,11 @@ namespace Cue
 	{
 		public delegate void ObjectHandler(IObject o);
 		public event ObjectHandler SelectionChanged;
+		public event ObjectHandler HoveredChanged;
 
 		private static Cue instance_ = null;
 		private W.ISys sys_ = null;
-		private BasicObject player_ = null;
+		private Person player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
@@ -224,6 +246,7 @@ namespace Cue
 		private Hud hud_ = new Hud();
 		private Controls controls_ = new Controls();
 
+		private IObject hovered_ = null;
 		private IObject sel_ = null;
 
 		public Cue()
@@ -261,12 +284,31 @@ namespace Cue
 			get { return player_; }
 		}
 
+		public IObject Selected
+		{
+			get { return sel_; }
+		}
+
+		public IObject Hovered
+		{
+			get { return hovered_; }
+		}
+
 		public void Select(IObject o)
 		{
 			if (sel_ != o)
 			{
 				sel_ = o;
 				SelectionChanged?.Invoke(sel_);
+			}
+		}
+
+		public void Hover(IObject o)
+		{
+			if (hovered_ != o)
+			{
+				hovered_ = o;
+				HoveredChanged?.Invoke(hovered_);
 			}
 		}
 
@@ -326,8 +368,11 @@ namespace Cue
 
 				sys_.Nav.Update();
 
+				player_ = new Person(sys_.GetAtom("Player"));
+				player_.Position = new Vector3(1.7f, 0, 0);
+
 				persons_.Add(new Person(sys_.GetAtom("Person")));
-				player_ = new BasicObject(sys_.GetAtom("Player"));
+				persons_[0].AI = new PersonAI();
 
 
 				allObjects_.AddRange(objects_);
@@ -338,6 +383,7 @@ namespace Cue
 				allObjects_.Add(player_);
 
 				//VUI.Utilities.DumpComponentsAndUp(SuperController.singleton.errorLogPanel);
+
 
 				//for (int i = 0; i < persons_.Count; ++i)
 				//	persons_[i].OnPluginState(true);
@@ -365,8 +411,8 @@ namespace Cue
 			{
 				if (!sys_.Paused)
 				{
-					for (int i = 0; i < persons_.Count; ++i)
-						persons_[i].Update(sys_.Time.deltaTime);
+					for (int i = 0; i < allObjects_.Count; ++i)
+						allObjects_[i].Update(sys_.Time.deltaTime);
 				}
 
 				controls_.Update();
@@ -384,8 +430,8 @@ namespace Cue
 				if (sys_.Paused)
 					return;
 
-				for (int i = 0; i < persons_.Count; ++i)
-					persons_[i].FixedUpdate(sys_.Time.deltaTime);
+				for (int i = 0; i < allObjects_.Count; ++i)
+					allObjects_[i].FixedUpdate(sys_.Time.deltaTime);
 			});
 		}
 
@@ -397,13 +443,8 @@ namespace Cue
 				controls_.Enabled = true;
 				hud_.Create(SuperController.singleton.mainMenuUI.root);
 
-				for (int i = 0; i < objects_.Count; ++i)
-					objects_[i].OnPluginState(true);
-
-				for (int i = 0; i < persons_.Count; ++i)
-					persons_[i].OnPluginState(true);
-
-				player_.OnPluginState(true);
+				for (int i = 0; i < allObjects_.Count; ++i)
+					allObjects_[i].OnPluginState(true);
 			});
 		}
 
@@ -415,13 +456,8 @@ namespace Cue
 				controls_.Enabled = false;
 				hud_.Destroy();
 
-				for (int i = 0; i < objects_.Count; ++i)
-					objects_[i].OnPluginState(false);
-
-				for (int i = 0; i < persons_.Count; ++i)
-					persons_[i].OnPluginState(false);
-
-				player_.OnPluginState(false);
+				for (int i = 0; i < allObjects_.Count; ++i)
+					allObjects_[i].OnPluginState(false);
 			});
 		}
 

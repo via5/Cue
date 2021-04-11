@@ -5,6 +5,7 @@ namespace Cue
 {
 	interface IAI
 	{
+		void Tick(Person p, float s);
 	}
 
 	class PersonAI : IAI

@@ -35,6 +35,11 @@ namespace Cue
 			children_.RemoveAt(children_.Count - 1);
 		}
 
+		public void Clear()
+		{
+			children_.Clear();
+		}
+
 		public bool Tick(IObject o, float s)
 		{
 			if (!started_)

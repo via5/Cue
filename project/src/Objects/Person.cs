@@ -104,7 +104,7 @@ namespace Cue
 		public const int StandingUpState = 4;
 
 		private readonly RootAction actions_ = new RootAction();
-		private readonly PersonAI ai_ = new PersonAI();
+		private IAI ai_ = null;
 		private int state_ = StandingState;
 		private int lastMoveState_ = MoveNone;
 		private Vector3 standingPos_ = new Vector3();
@@ -123,6 +123,12 @@ namespace Cue
 			gaze_ = new MacGruberGaze(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
+		}
+
+		public IAI AI
+		{
+			get { return ai_; }
+			set { ai_ = value; }
 		}
 
 		public bool Idle
@@ -189,10 +195,28 @@ namespace Cue
 			actions_.Pop();
 		}
 
+		public void InteractWith(IObject o)
+		{
+			actions_.Clear();
+
+			if (o.SitSlot != null)
+			{
+				PushAction(new SitAction(o));
+				PushAction(new MoveAction(o.Position, NoBearing));
+			}
+			else if (o.StandSlot != null)
+			{
+				PushAction(new MoveAction(o.Position, NoBearing));
+			}
+		}
+
 		public override void Update(float s)
 		{
 			base.Update(s);
-			ai_.Tick(this, s);
+
+			if (ai_ != null)
+				ai_.Tick(this, s);
+
 			actions_.Tick(this, s);
 		}
 
@@ -209,7 +233,7 @@ namespace Cue
 					state_ = StandingState;
 			}
 
-			if (state_ == StandingState)
+			if (state_ == StandingState || state_ == WalkingState)
 				standingPos_ = Position;
 		}
 

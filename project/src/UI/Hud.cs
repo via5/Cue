@@ -9,19 +9,28 @@ namespace Cue
 		private GameObject fullscreenPanel_ = null;
 		private GameObject hudPanel_ = null;
 		private VUI.Root root_ = null;
-		private VUI.Label label_ = null;
+		private VUI.Label sel_ = null;
+		private VUI.Label hovered_ = null;
 
 		public void Create(Transform parent)
 		{
 			Cue.Instance.SelectionChanged += OnSelectionChanged;
+			Cue.Instance.HoveredChanged += OnHoveredChanged;
 
 			CreateFullscreenPanel(parent);
 			CreateHudPanel();
 
 			root_ = new VUI.Root(hudPanel_.transform);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
-			label_ = root_.ContentPanel.Add(new VUI.Label(), VUI.BorderLayout.Center);
-			root_.ContentPanel.Add(new VUI.Button("Reload", OnReload), VUI.BorderLayout.Bottom);
+
+			var p = new VUI.Panel(new VUI.VerticalFlow());
+			sel_ = p.Add(new VUI.Label());
+			hovered_ = p.Add(new VUI.Label());
+			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
+
+			p = new VUI.Panel(new VUI.HorizontalFlow());
+			p.Add(new VUI.Button("Reload", OnReload));
+			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
 		}
 
 		public void Destroy()
@@ -37,7 +46,12 @@ namespace Cue
 
 		private void OnSelectionChanged(IObject o)
 		{
-			label_.Text = (o == null ? "" : o.ToString());
+			sel_.Text = "Sel: " + (o == null ? "" : o.ToString());
+		}
+
+		private void OnHoveredChanged(IObject o)
+		{
+			hovered_.Text = "Hovered: " + (o == null ? "" : o.ToString());
 		}
 
 		private void OnReload()
@@ -52,12 +66,30 @@ namespace Cue
 
 			var canvas = fullscreenPanel_.AddComponent<Canvas>();
 			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
+			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
 			var rt = fullscreenPanel_.AddComponent<RectTransform>();
 			if (rt == null)
 				rt = fullscreenPanel_.GetComponent<RectTransform>();
 
 			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas.gameObject.AddComponent<GraphicRaycaster>();
+
+
+			var cs2 = SuperController.singleton.errorLogPanel.GetComponent<CanvasScaler>();
+			cs.uiScaleMode = cs2.uiScaleMode;
+			cs.referenceResolution = cs2.referenceResolution;
+			cs.screenMatchMode = cs2.screenMatchMode;
+			cs.matchWidthOrHeight = cs2.matchWidthOrHeight;
+			cs.defaultSpriteDPI = cs2.defaultSpriteDPI;
+			cs.fallbackScreenDPI = cs2.fallbackScreenDPI;
+			cs.referencePixelsPerUnit = cs2.referencePixelsPerUnit;
+			cs.dynamicPixelsPerUnit = cs2.dynamicPixelsPerUnit;
+			cs.physicalUnit = cs2.physicalUnit;
+			cs.scaleFactor = cs2.scaleFactor;
+
+			var c2 = SuperController.singleton.errorLogPanel.GetComponent<Canvas>();
+			Cue.LogError(canvas.renderMode.ToString() + " " + c2.renderMode.ToString());
+			canvas.scaleFactor = 0.5f;
 
 			rt.offsetMin = new Vector2(2000, 2000);
 			rt.offsetMax = new Vector2(2000f, 2000);
@@ -79,12 +111,12 @@ namespace Cue
 			bg.color = new Color(0, 0, 0, 0.5f);
 			bg.raycastTarget = true;
 
-			rt.offsetMin = new Vector2(-300, 0);
-			rt.offsetMax = new Vector2(300, 100);
+			rt.offsetMin = new Vector2(-500, 0);
+			rt.offsetMax = new Vector2(500, 200);
 			rt.anchorMin = new Vector2(0.5f, 1);
 			rt.anchorMax = new Vector2(0.5f, 1);
 			rt.anchoredPosition = new Vector2(
-				(rt.offsetMax.x - rt.offsetMin.x) / 4,
+				(rt.offsetMax.x /2),//- rt.offsetMin.x) / 4,
 				-(rt.offsetMax.y - rt.offsetMin.y) / 2);
 		}
 	}
