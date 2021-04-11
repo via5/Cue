@@ -7,9 +7,6 @@ namespace VUI
 		public delegate MVRPluginManager PluginManagerDelegate();
 		private static PluginManagerDelegate getPluginManager_;
 
-		public delegate MVRScriptUI ScriptUIDelegate();
-		private static ScriptUIDelegate getScriptUI_;
-
 		public delegate string StringDelegate(string s, params object[] ps);
 		private static StringDelegate getString_;
 
@@ -18,13 +15,11 @@ namespace VUI
 
 		public static void Set(
 			PluginManagerDelegate getPluginManager,
-			ScriptUIDelegate getScriptUI,
 			StringDelegate getString,
 			LogDelegate logVerbose, LogDelegate logInfo,
 			LogDelegate logWarning, LogDelegate logError)
 		{
 			getPluginManager_ = getPluginManager;
-			getScriptUI_ = getScriptUI;
 			getString_ = getString;
 			logVerbose_ = logVerbose;
 			logInfo_ = logInfo;
@@ -35,11 +30,6 @@ namespace VUI
 		public static MVRPluginManager PluginManager
 		{
 			get { return getPluginManager_(); }
-		}
-
-		public static MVRScriptUI ScriptUI
-		{
-			get { return getScriptUI_(); }
 		}
 
 		public static string GetString(string s, params object[] ps)

@@ -401,8 +401,6 @@ namespace Cue
 					UnityEngine.Random.Range(-1.0f, 1.0f),
 					1);
 
-				Cue.LogError(p.Direction.ToString() + " " + t.ToString());
-
 				p.Gaze.LookAt = GazeSettings.LookAtTarget;
 
 				p.Gaze.Target =

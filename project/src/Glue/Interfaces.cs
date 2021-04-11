@@ -37,6 +37,7 @@ namespace Cue.W
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 		Vector3 HeadPosition { get; }
+		void OnPluginState(bool b);
 	}
 
 	interface INav

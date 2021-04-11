@@ -161,6 +161,10 @@ namespace Cue.W
 		{
 			Cue.LogError(id_ + " says '" + s + "'");
 		}
+
+		public void OnPluginState(bool b)
+		{
+		}
 	}
 
 	class MockNav : INav

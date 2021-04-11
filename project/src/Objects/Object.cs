@@ -59,6 +59,7 @@ namespace Cue
 		void FixedUpdate(float s);
 		void MoveTo(Vector3 to, float bearing, bool last);
 		bool HasTarget { get; }
+		void OnPluginState(bool b);
 
 		Slot StandSlot { get; }
 		Slot SitSlot { get; }
@@ -190,6 +191,11 @@ namespace Cue
 
 		public virtual void FixedUpdate(float s)
 		{
+		}
+
+		public virtual void OnPluginState(bool b)
+		{
+			atom_.OnPluginState(b);
 		}
 
 		private float AngleBetweenBearings(float bearing1, float bearing2)

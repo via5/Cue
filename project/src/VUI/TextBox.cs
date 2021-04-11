@@ -304,7 +304,7 @@ namespace VUI
 		{
 			Utilities.Handler(() =>
 			{
-				Root.SetFocus(this, focusflags_);
+				GetRoot().SetFocus(this, focusflags_);
 			});
 		}
 

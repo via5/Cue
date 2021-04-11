@@ -33,16 +33,19 @@ namespace Cue.UI
 
 		public void Init()
 		{
+			var scriptui =
+				Cue.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
+
+
 			VUI.Glue.Set(
 				() => Cue.Instance.manager,
-				() => Cue.Instance.UITransform.GetComponentInChildren<MVRScriptUI>(),
 				(s, ps) => Strings.Get(s, ps),
 				(s) => Cue.LogVerbose(s),
 				(s) => Cue.LogInfo(s),
 				(s) => Cue.LogWarning(s),
 				(s) => Cue.LogError(s));
 
-			root_ = new VUI.Root();
+			root_ = new VUI.Root(scriptui.fullWidthUIContent);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 
@@ -77,7 +80,11 @@ namespace Cue.UI
 
 		public void Update()
 		{
-			var p = Cue.Instance.Person;
+			var ps = Cue.Instance.Persons;
+			if (ps.Count == 0)
+				return;
+
+			var p = ps[0];
 
 			action_.Text = "Action: " + p.Action.ToString();
 			anim_.Text = "Anim: " + p.Animator.ToString();
@@ -96,7 +103,7 @@ namespace Cue.UI
 			a.file = new BVH.File(f);
 			a.rootXZ = true;
 			a.rootY = true;
-			Cue.Instance.Person.Animator.Play(a);
+			//Cue.Instance.Person.Animator.Play(a);
 		}
 	}
 }

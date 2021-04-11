@@ -101,7 +101,7 @@ namespace VUI
 		{
 			Utilities.Handler(() =>
 			{
-				Root.SetFocus(this);
+				GetRoot().SetFocus(this);
 				checked_ = b;
 				Changed?.Invoke(b);
 			});

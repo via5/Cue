@@ -197,7 +197,7 @@ namespace VUI
 		{
 			Utilities.Handler(() =>
 			{
-				Root.SetFocus(this);
+				GetRoot().SetFocus(this);
 				Clicked?.Invoke();
 				button_.button.OnDeselect(new UnityEngine.EventSystems.BaseEventData(null));
 			});

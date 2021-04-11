@@ -89,24 +89,24 @@ namespace VUI
 
 	class Root
 	{
-		static public Transform PluginParent = null;
-
-		static private RectTransform scrollViewRT_ = null;
-		static private TextGenerator tg_ = new TextGenerator();
-		static private TextGenerationSettings ts_ = new TextGenerationSettings();
-
-		static public UIPopup openedPopup_ = null;
-		static private Widget focused_ = null;
-
 		public const int FocusDefault = 0x0;
 		public const int FocusKeepPopup = 0x01;
 
-		static public void SetOpenedPopup(UIPopup p)
+		private Transform rootTransform_ = null;
+
+		private RectTransform scrollViewRT_ = null;
+		static private TextGenerator tg_ = new TextGenerator();
+		static private TextGenerationSettings ts_ = new TextGenerationSettings();
+
+		private UIPopup openedPopup_ = null;
+		private Widget focused_ = null;
+
+		public void SetOpenedPopup(UIPopup p)
 		{
 			openedPopup_ = p;
 		}
 
-		static public void SetFocus(Widget w, int flags=FocusDefault)
+		public void SetFocus(Widget w, int flags=FocusDefault)
 		{
 			if (focused_ == w)
 				return;
@@ -133,6 +133,7 @@ namespace VUI
 		private readonly TooltipManager tooltips_;
 		private float topOffset_ = 0;
 		private bool dirty_ = true;
+		private bool ready_ = false;
 		private Canvas canvas_;
 
 		public static Point NoMousePos
@@ -143,28 +144,31 @@ namespace VUI
 			}
 		}
 
-		public Root()
+		public Root(Transform rootTransform)
 		{
 			content_ = new RootPanel(this);
 			floating_ = new RootPanel(this);
 			tooltips_ = new TooltipManager(this);
 
-			var scriptUI = Glue.ScriptUI;
-
-			AttachTo(scriptUI);
-			Style.SetupRoot(scriptUI);
+			AttachTo(rootTransform);
 		}
 
-		public static bool IsReady()
+		public Transform RootTransform
 		{
+			get { return rootTransform_; }
+		}
+
+		public bool IsReady()
+		{
+			if (ready_)
+				return true;
+
 			if (scrollViewRT_ == null)
 			{
-				var scriptUI = Glue.ScriptUI;
-
-				if (scriptUI == null)
+				if (rootTransform_ == null)
 					return false;
 
-				var scrollView = scriptUI.GetComponentInChildren<ScrollRect>();
+				var scrollView = rootTransform_.GetComponentInChildren<ScrollRect>();
 				if (scrollView == null)
 					return false;
 
@@ -173,32 +177,57 @@ namespace VUI
 					return false;
 			}
 
-			return
-				scrollViewRT_.rect.width > 0 &&
-				scrollViewRT_.rect.height > 0;
+			if (scrollViewRT_.rect.width <= 0 || scrollViewRT_.rect.height <= 0)
+				return false;
+
+			ready_ = true;
+
+			return true;
 		}
 
-		public void AttachTo(MVRScriptUI scriptUI)
+		public void AttachTo(Transform rootTransform)
 		{
-			var scrollView = scriptUI.GetComponentInChildren<ScrollRect>();
-			if (scrollView == null)
+			rootTransform_ = rootTransform;
+
+			MVRScriptUI scriptui = null;
+			var t = rootTransform_;
+			while (t != null)
 			{
-				Glue.LogError("no scrollrect in attach");
-				return;
+				scriptui = t.GetComponent<MVRScriptUI>();
+				if (scriptui != null)
+					break;
+
+				t = t.parent;
 			}
 
-			var scrollViewRT = scrollView.GetComponent<RectTransform>();
-			topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
+			if (scriptui == null)
+			{
+				var rt = rootTransform_.GetComponent<RectTransform>();
 
-			bounds_ = Rectangle.FromPoints(
-				1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
+				topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
+				bounds_ = Rectangle.FromPoints(
+					0, 0, rt.rect.width, rt.rect.height);
+
+				ready_ = true;
+			}
+			else
+			{
+				var scrollView = scriptui.GetComponentInChildren<ScrollRect>();
+				var scrollViewRT = scrollView.GetComponent<RectTransform>();
+				topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
+
+				bounds_ = Rectangle.FromPoints(
+					1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
+
+				ready_ = false;
+				Style.SetupRoot(scriptui);
+			}
+
 			content_.Bounds = new Rectangle(bounds_);
 			floating_.Bounds = new Rectangle(bounds_);
 
-			PluginParent = scriptUI.fullWidthUIContent;
 
-
-			var text = scriptUI.GetComponentInChildren<Text>();
+			var text = rootTransform_.root.GetComponentInChildren<Text>();
 			if (text == null)
 			{
 				Glue.LogError("no text in attach");
@@ -208,12 +237,26 @@ namespace VUI
 				tg_ = text.cachedTextGenerator;
 				ts_ = text.GetGenerationSettings(new Vector2());
 			}
+
+			//if (ready_)
+			//	Style.SetupRoot(rootTransform_);
 		}
 
 		public void Destroy()
 		{
-			var scriptUI = Glue.ScriptUI;
-			Style.RevertRoot(scriptUI);
+			MVRScriptUI scriptui = null;
+			var t = rootTransform_;
+			while (t != null)
+			{
+				scriptui = t.GetComponent<MVRScriptUI>();
+				if (scriptui != null)
+					break;
+
+				t = t.parent;
+			}
+
+			if (scriptui != null)
+				Style.RevertRoot(scriptui);
 
 			content_?.Destroy();
 			floating_?.Destroy();
@@ -315,7 +358,7 @@ namespace VUI
 
 		private void FindCanvas()
 		{
-			var image = Glue.ScriptUI.GetComponentInChildren<Image>();
+			var image = rootTransform_.parent.GetComponentInChildren<Image>();
 			if (image == null)
 				Glue.LogError("no image in attach");
 			else

@@ -391,6 +391,18 @@ namespace Cue.W
 			get { return atom_; }
 		}
 
+		public void OnPluginState(bool b)
+		{
+			foreach (var rb in atom_.rigidbodies)
+			{
+				var fc = rb.GetComponent<FreeControllerV3>();
+				if (fc != null)
+					fc.interactableInPlayMode = !b;
+			}
+
+			atom_.mainController.interactableInPlayMode = !b;
+		}
+
 		private void GetHead()
 		{
 			if (head_ != null)
@@ -495,7 +507,7 @@ namespace Cue.W
 			//		Cue.LogError("?");
 			//}
 
-			Cue.LogError(srcs.Count.ToString());
+			//Cue.LogError(srcs.Count.ToString());
 
 			NavMeshBuilder.UpdateNavMeshData(
 				d, s, srcs,

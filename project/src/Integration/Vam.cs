@@ -3,10 +3,33 @@ using UnityEngine;
 
 namespace Cue
 {
+	class VamEyesBehaviour : MonoBehaviour
+	{
+		private Vector3 pos_ = new Vector3();
+		private bool hasPos_ = false;
+
+		public void SetPosition(Vector3 v)
+		{
+			pos_ = v;
+			hasPos_ = true;
+			transform.position = Vector3.ToUnity(v);
+		}
+
+		public void Update()
+		{
+			if (hasPos_)
+			{
+				transform.position = Vector3.ToUnity(pos_);
+				hasPos_ = false;
+			}
+		}
+	}
+
 	class VamEyes
 	{
 		private Person person_ = null;
 		private Rigidbody eyes_ = null;
+		private VamEyesBehaviour eyesImpl_ = null;
 		private JSONStorableStringChooser lookMode_ = null;
 		private JSONStorableFloat leftRightAngle_ = null;
 		private JSONStorableFloat upDownAngle_ = null;
@@ -79,7 +102,7 @@ namespace Cue
 				if (eyes_ == null)
 					return;
 
-				eyes_.position = Vector3.ToUnity(value);
+				eyesImpl_.SetPosition(value);
 			}
 		}
 
@@ -92,7 +115,19 @@ namespace Cue
 			{
 				eyes_ = vsys.FindRigidbody(person_, "eyeTargetControl");
 				if (eyes_ == null)
+				{
 					Cue.LogError("atom " + a.uid + " has no eyeTargetControl");
+				}
+				else
+				{
+					foreach (var c in eyes_.gameObject.GetComponents<Component>())
+					{
+						if (c != null && c.ToString().Contains("Cue.VamEyesBehaviour"))
+							UnityEngine.Object.Destroy(c);
+					}
+
+					eyesImpl_ = eyes_.gameObject.AddComponent<VamEyesBehaviour>();
+				}
 			}
 
 			var eyesStorable = a.GetStorableByID("Eyes");
