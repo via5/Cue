@@ -198,6 +198,11 @@ namespace Cue
 			atom_.OnPluginState(b);
 		}
 
+		public override string ToString()
+		{
+			return atom_.ID;
+		}
+
 		private float AngleBetweenBearings(float bearing1, float bearing2)
 		{
 			return ((((bearing2 - bearing1) % 360) + 540) % 360) - 180;

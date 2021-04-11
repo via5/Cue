@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Cue
 {
@@ -21,6 +21,11 @@ namespace Cue
 			public ObjectControls(IObject o)
 			{
 				object_ = o;
+			}
+
+			public IObject Object
+			{
+				get { return object_; }
 			}
 
 			public void Create()
@@ -83,9 +88,7 @@ namespace Cue
 		}
 
 		private bool enabled_ = true;
-		private Hud hud_ = new Hud();
 		private List<ObjectControls> controls_ = new List<ObjectControls>();
-		private Transform root_ = null;
 
 		public bool Enabled
 		{
@@ -93,10 +96,8 @@ namespace Cue
 			set { enabled_ = value; Check();  }
 		}
 
-		public void Create(Transform r, List<IObject> objects)
+		public void Create(List<IObject> objects)
 		{
-			root_ = r;
-
 			foreach (var o in objects)
 				controls_.Add(new ObjectControls(o));
 
@@ -109,18 +110,89 @@ namespace Cue
 				return;
 
 			CheckHovered();
-			hud_.Update();
 		}
 
 		private void CheckHovered()
 		{
 			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
+			IObject sel = HitObject(ray);
+			if (sel == null)
+				sel = HitPerson(ray);
+
+			Cue.Instance.Select(sel);
+
+			for (int i=0; i<controls_.Count; ++i)
+				controls_[i].Hovered = (controls_[i].Object == sel);
+		}
+
+		private IObject HitObject(Ray ray)
+		{
 			RaycastHit hit;
 			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 1 << Layer);
 
+			if (!b)
+				return null;
+
 			for (int i = 0; i < controls_.Count; ++i)
-				controls_[i].Hovered = (b && controls_[i].Is(hit.transform));
+			{
+				if (controls_[i].Is(hit.transform))
+					return controls_[i].Object;
+			}
+
+			return null;
+		}
+
+		private IObject HitPerson(Ray ray)
+		{
+			var a = HitAtom(ray);
+			if (a == null)
+				return null;
+
+			var ps = Cue.Instance.Persons;
+
+			for (int i = 0; i < ps.Count; ++i)
+			{
+				if (((W.VamAtom)ps[i].Atom).Atom == a)
+					return ps[i];
+			}
+
+			if (((W.VamAtom)Cue.Instance.Player.Atom).Atom == a)
+				return Cue.Instance.Player;
+
+			return null;
+		}
+
+		private Atom HitAtom(Ray ray)
+		{
+			RaycastHit hit;
+			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 0x24000100);
+
+			if (!b)
+				return null;
+
+			var fc = hit.transform.GetComponent<FreeControllerV3>();
+
+			if (fc != null)
+				return fc.containingAtom;
+
+			var bone = hit.transform.GetComponent<DAZBone>();
+			if (bone != null)
+				return bone.containingAtom;
+
+			var rb = hit.transform.GetComponent<Rigidbody>();
+			var p = rb.transform;
+
+			while (p != null)
+			{
+				var a = p.GetComponent<Atom>();
+				if (a != null)
+					return a;
+
+				p = p.parent;
+			}
+
+			return null;
 		}
 
 		private void Check()
@@ -132,11 +204,6 @@ namespace Cue
 				else
 					c.Destroy();
 			}
-
-			if (enabled_)
-				hud_.Create(root_);
-			else
-				hud_.Destroy();
 		}
 	}
 
@@ -144,13 +211,20 @@ namespace Cue
 
 	class Cue : MVRScript
 	{
+		public delegate void ObjectHandler(IObject o);
+		public event ObjectHandler SelectionChanged;
+
 		private static Cue instance_ = null;
 		private W.ISys sys_ = null;
 		private BasicObject player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
+		private readonly List<IObject> allObjects_ = new List<IObject>();
 		private UI.ScriptUI sui_ = null;
+		private Hud hud_ = new Hud();
 		private Controls controls_ = new Controls();
+
+		private IObject sel_ = null;
 
 		public Cue()
 		{
@@ -167,6 +241,11 @@ namespace Cue
 			get { return sys_; }
 		}
 
+		public List<IObject> AllObjects
+		{
+			get { return allObjects_; }
+		}
+
 		public List<IObject> Objects
 		{
 			get { return objects_; }
@@ -175,6 +254,20 @@ namespace Cue
 		public List<Person> Persons
 		{
 			get { return persons_; }
+		}
+
+		public BasicObject Player
+		{
+			get { return player_; }
+		}
+
+		public void Select(IObject o)
+		{
+			if (sel_ != o)
+			{
+				sel_ = o;
+				SelectionChanged?.Invoke(sel_);
+			}
 		}
 
 		public override void Init()
@@ -236,23 +329,38 @@ namespace Cue
 				persons_.Add(new Person(sys_.GetAtom("Person")));
 				player_ = new BasicObject(sys_.GetAtom("Player"));
 
-				for (int i = 0; i < persons_.Count; ++i)
-					persons_[i].OnPluginState(true);
 
-				player_.OnPluginState(true);
+				allObjects_.AddRange(objects_);
 
-				controls_.Create(SuperController.singleton.mainMenuUI.root, objects_);
+				foreach (var p in persons_)
+					allObjects_.Add(p);
+
+				allObjects_.Add(player_);
+
+				//VUI.Utilities.DumpComponentsAndUp(SuperController.singleton.errorLogPanel);
+
+				//for (int i = 0; i < persons_.Count; ++i)
+				//	persons_[i].OnPluginState(true);
+				//
+				controls_.Create(objects_);
+				OnEnable();
 			});
 		}
 
-		//float ss = 0;
+		public void ReloadPlugin()
+		{
+			foreach (var pui in UITransform.parent.GetComponentsInChildren<MVRPluginUI>())
+			{
+				if (pui.urlText.text.Contains("Cue.cslist"))
+				{
+					LogError("reloading");
+					pui.reloadButton.onClick.Invoke();
+				}
+			}
+		}
 
 		public void Update()
 		{
-			//ss += Time.deltaTime;
-			//if (ss > 2)
-			//	controls_.Enabled = false;
-
 			U.Safe(() =>
 			{
 				if (!sys_.Paused)
@@ -262,6 +370,7 @@ namespace Cue
 				}
 
 				controls_.Update();
+				hud_.Update();
 
 				if (sui_ != null)
 					sui_.Update();
@@ -286,9 +395,15 @@ namespace Cue
 			{
 				sys_.OnPluginState(true);
 				controls_.Enabled = true;
+				hud_.Create(SuperController.singleton.mainMenuUI.root);
+
+				for (int i = 0; i < objects_.Count; ++i)
+					objects_[i].OnPluginState(true);
 
 				for (int i = 0; i < persons_.Count; ++i)
 					persons_[i].OnPluginState(true);
+
+				player_.OnPluginState(true);
 			});
 		}
 
@@ -298,9 +413,15 @@ namespace Cue
 			{
 				sys_.OnPluginState(false);
 				controls_.Enabled = false;
+				hud_.Destroy();
+
+				for (int i = 0; i < objects_.Count; ++i)
+					objects_[i].OnPluginState(false);
 
 				for (int i = 0; i < persons_.Count; ++i)
 					persons_[i].OnPluginState(false);
+
+				player_.OnPluginState(false);
 			});
 		}
 
