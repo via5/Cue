@@ -245,6 +245,7 @@ namespace Cue
 		private UI.ScriptUI sui_ = null;
 		private Hud hud_ = new Hud();
 		private Controls controls_ = new Controls();
+		private bool paused_ = false;
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
@@ -409,6 +410,13 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
+				if (sys_.Paused != paused_)
+				{
+					paused_ = sys_.Paused;
+					for (int i = 0; i < allObjects_.Count; ++i)
+						allObjects_[i].SetPaused(sys_.Paused);
+				}
+
 				if (!sys_.Paused)
 				{
 					for (int i = 0; i < allObjects_.Count; ++i)

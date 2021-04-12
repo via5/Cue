@@ -38,6 +38,12 @@ namespace Cue.W
 		Vector3 Direction { get; set; }
 		Vector3 HeadPosition { get; }
 		void OnPluginState(bool b);
+
+		bool NavEnabled { get; set; }
+		bool NavPaused { get; set; }
+		bool NavActive { get; }
+		void NavTo(Vector3 v);
+		void NavStop();
 	}
 
 	interface INav

@@ -165,6 +165,31 @@ namespace Cue.W
 		public void OnPluginState(bool b)
 		{
 		}
+
+		public bool NavEnabled
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool NavPaused
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool NavActive
+		{
+			get { return false; }
+		}
+
+		public void NavTo(Vector3 v)
+		{
+		}
+
+		public void NavStop()
+		{
+		}
 	}
 
 	class MockNav : INav

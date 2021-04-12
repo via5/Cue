@@ -133,8 +133,6 @@ namespace Cue
 	{
 		private Vector3 to_;
 		private float finalBearing_;
-		private List<Vector3> wps_ = new List<Vector3>();
-		private int i_ = 0;
 
 		public MoveAction(Vector3 to, float finalBearing)
 		{
@@ -144,61 +142,13 @@ namespace Cue
 
 		protected override bool DoStart(IObject o, float s)
 		{
-			Vector3 pos;
-
-			if (o is Person)
-				pos = ((Person)o).StandingPosition;
-			else
-				pos = o.Position;
-
-
-			Cue.LogError("MoveAction: from " + pos.ToString() + " to " + to_.ToString());
-			wps_ = Cue.Instance.Sys.Nav.Calculate(pos, to_);
-
-			if (wps_.Count == 0)
-			{
-				Cue.LogError(
-					o.ToString() + " cannot reach " + to_.ToString());
-				return false;
-			}
-
-			Cue.LogError(
-				o.ToString() + " to " + to_.ToString() + ", " +
-				wps_.Count.ToString() + " waypoints");
-
-			if (wps_.Count == 1)
-				o.MoveTo(wps_[0], finalBearing_, true);
-			else
-				o.MoveTo(wps_[0], BasicObject.NoBearing, false);
-
-			if (o.HasTarget)
-				return true;
-			else if (wps_.Count > 1)
-				return true;
-			else
-				return false;
+			o.MoveTo(to_, finalBearing_);
+			return o.HasTarget;
 		}
 
 		protected override bool DoTick(IObject o, float s)
 		{
-			if (!o.HasTarget)
-			{
-				++i_;
-				if (i_ >= wps_.Count)
-				{
-					Cue.LogError(o.ToString() + " has reached " + to_.ToString());
-					return false;
-				}
-
-			//	Cue.LogError(o.ToString() + " next waypoint " + wps_[i_].ToString());
-
-				if (i_ == (wps_.Count - 1))
-					o.MoveTo(wps_[i_], finalBearing_, true);
-				else
-					o.MoveTo(wps_[i_], BasicObject.NoBearing, false);
-			}
-
-			return true;
+			return o.HasTarget;
 		}
 
 		public override string ToString()
@@ -220,9 +170,9 @@ namespace Cue
 		protected override bool DoStart(IObject o, float s)
 		{
 			var p = o as Person;
-			p.MoveTo(chair_.Position, chair_.Bearing, true);
+			p.MoveTo(chair_.Position, chair_.Bearing);
 			moving_ = true;
-			return true;// p.Animator.Playing;
+			return true;
 		}
 
 		protected override bool DoTick(IObject o, float s)

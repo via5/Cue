@@ -73,7 +73,7 @@ namespace Cue.UI
 
 			action_.Text = "Action: " + p.Action.ToString();
 			anim_.Text = "Anim: " + p.Animator.ToString();
-			state_.Text = "State: " + p.StateString;
+			state_.Text = "PF: " + p.Atom.NavActive.ToString();
 
 			root_.Update();
 		}

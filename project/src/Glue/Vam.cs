@@ -403,6 +403,98 @@ namespace Cue.W
 			atom_.mainController.interactableInPlayMode = !b;
 		}
 
+		public bool NavEnabled
+		{
+			get
+			{
+				return (atom_.mainController.GetComponent<NavMeshAgent>() != null);
+			}
+
+			set
+			{
+				var c = atom_.mainController.GetComponent<NavMeshAgent>();
+
+				if (value)
+				{
+					if (c == null)
+					{
+						c = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
+						c.agentTypeID = 1;
+						c.height = 2.0f;
+						c.radius = 0.1f;
+						c.speed = 1;
+						c.angularSpeed = 120;
+						c.stoppingDistance = 0;
+						c.autoBraking = true;
+						c.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+						c.avoidancePriority = 50;
+						c.autoTraverseOffMeshLink = true;
+						c.autoRepath = true;
+						c.areaMask = ~0;
+					}
+				}
+				else
+				{
+					if (c != null)
+						UnityEngine.Object.Destroy(c);
+				}
+			}
+		}
+
+		public bool NavPaused
+		{
+			get
+			{
+				var c = atom_.mainController.GetComponent<NavMeshAgent>();
+				if (c == null)
+					return true;
+
+				return c.isStopped;
+			}
+
+			set
+			{
+				var c = atom_.mainController.GetComponent<NavMeshAgent>();
+				if (c != null)
+					c.isStopped = value;
+			}
+		}
+
+		public void NavTo(Vector3 v)
+		{
+			var c = atom_.mainController.GetComponent<NavMeshAgent>();
+			if (c == null)
+				return;
+
+			c.destination = Vector3.ToUnity(v);
+			c.updatePosition = true;
+			c.updateRotation = true;
+			c.updateUpAxis = true;
+		}
+
+		public void NavStop()
+		{
+			var c = atom_.mainController.GetComponent<NavMeshAgent>();
+			if (c == null)
+				return;
+
+			c.updatePosition = false;
+			c.updateRotation = false;
+			c.updateUpAxis = false;
+		}
+
+		public bool NavActive
+		{
+			get
+			{
+				var c = atom_.mainController.GetComponent<NavMeshAgent>();
+				if (c == null)
+					return false;
+
+				return c.pathPending || (c.hasPath && c.remainingDistance > 0);
+			}
+		}
+
 		private void GetHead()
 		{
 			if (head_ != null)

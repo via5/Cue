@@ -220,6 +220,18 @@ namespace Cue
 			actions_.Tick(this, s);
 		}
 
+		public override void OnPluginState(bool b)
+		{
+			base.OnPluginState(b);
+			Atom.NavEnabled = b;
+		}
+
+		public override void SetPaused(bool b)
+		{
+			base.SetPaused(b);
+			Atom.NavPaused = b;
+		}
+
 		public override void FixedUpdate(float s)
 		{
 			base.FixedUpdate(s);
