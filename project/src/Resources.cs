@@ -1,94 +1,97 @@
 ﻿using System.Collections.Generic;
+using SimpleJSON;
 
 namespace Cue.Resources
 {
 	class Animations
 	{
-		private static IAnimation walk_ = null;
-		private static IAnimation sit_ = null;
-		private static IAnimation turnLeft_ = null;
-		private static IAnimation turnRight_ = null;
-		private static List<IAnimation> sitIdle_ = new List<IAnimation>();
-		private static List<IAnimation> standIdle_ = new List<IAnimation>();
+		public const int NoType = 0;
+		public const int Walk = 1;
+		public const int TurnLeft = 2;
+		public const int TurnRight = 3;
+		public const int SitIdle = 4;
+		public const int StandIdle = 5;
+		public const int SitFromStanding = 6;
+		public const int StandFromSitting = 7;
 
-		public static IAnimation Walk()
+		private static Dictionary<int, List<IAnimation>> anims_ =
+			new Dictionary<int, List<IAnimation>>();
+
+		private static int TypeFromString(string os)
 		{
-			if (walk_ == null)
-			{
-				walk_ = new BVH.Animation(
-					"Custom\\Scripts\\VAMDeluxe\\Synthia Movement System\\Animations\\StandToWalk.bvh",
-					true, false, false, 67, 150);
-			}
+			var s = os.ToLower();
 
-			return walk_;
+			if (s == "walk")
+				return Walk;
+			else if (s == "turnleft")
+				return TurnLeft;
+			else if (s == "turnright")
+				return TurnRight;
+			else if (s == "sitidle")
+				return SitIdle;
+			else if (s == "standidle")
+				return StandIdle;
+			else if (s == "sitfromstanding")
+				return SitFromStanding;
+			else if (s == "standfromsitting")
+				return StandFromSitting;
+
+			Cue.LogError("unknown anim type '" + os + "'");
+			return NoType;
 		}
 
-		public static IAnimation TurnLeft()
+		public static void Load()
 		{
-			if (turnLeft_ == null)
+			var meta = Cue.Instance.Sys.GetResourcePath("animations/meta.json");
+			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
+
+			foreach (var an in doc.AsObject["animations"].AsArray.Childs)
 			{
-				turnLeft_ = new BVH.Animation(
-					"Custom\\Animations\\bvh_files\\avatar_turnleft.bvh",
-					true, true, true);
-			}
+				var a = an.AsObject;
+				var t = TypeFromString(a["type"]);
+				if (t == NoType)
+					continue;
 
-			return turnLeft_;
-		}
+				var w = new BVH.Animation(
+					Cue.Instance.Sys.GetResourcePath("animations/" + a["file"]),
+					(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
+					(a.HasKey("rootY") ? a["rootY"].AsBool : true),
+					(a.HasKey("reverse") ? a["reverse"].AsBool : false),
+					(a.HasKey("start") ? a["start"].AsInt : 0),
+					(a.HasKey("end") ? a["end"].AsInt : -1));
 
-		public static IAnimation TurnRight()
-		{
-			if (turnRight_ == null)
-			{
-				turnRight_ = new BVH.Animation(
-					"Custom\\Animations\\bvh_files\\avatar_turnright.bvh",
-					true, true, true);
-			}
+				Cue.LogError(a["type"] + " anim: " + w.ToString());
 
-			return turnRight_;
-		}
-
-		public static IAnimation Sit()
-		{
-			if (sit_ == null)
-			{
-				sit_ = new BVH.Animation(
-					"Custom\\Animations\\bvh_files\\avatar_sit_female.bvh",
-					false, true, true, 0, 30);
-			}
-
-			return sit_;
-		}
-
-		public static List<IAnimation> SitIdles()
-		{
-			if (sitIdle_.Count == 0)
-			{
-				sitIdle_ = new List<IAnimation>()
+				List<IAnimation> list;
+				if (!anims_.TryGetValue(t, out list))
 				{
-					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_1.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_3.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_4.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/V3_BVH_Ambient_Motions/sitting_gesturing_ambient_5.bvh", false, true, true)
-				};
-			}
+					list = new List<IAnimation>();
+					anims_.Add(t, list);
+				}
 
-			return sitIdle_;
+				list.Add(w);
+			}
 		}
 
-		public static List<IAnimation> StandIdles()
+		public static IAnimation GetAny(int type)
 		{
-			if (standIdle_.Count == 0)
-			{
-				standIdle_ = new List<IAnimation>()
-				{
-					new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_1.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_2.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_3.bvh", false, true, true),
-					new BVH.Animation("Custom/Animations/bvh_files/avatar_stand_4.bvh", false, true, true)
-				};
-			}
+			List<IAnimation> list;
+			if (!anims_.TryGetValue(type, out list))
+				return null;
 
-			return standIdle_;
+			if (list.Count == 0)
+				return null;
+
+			return list[0];
+		}
+
+		public static List<IAnimation> GetAll(int type)
+		{
+			List<IAnimation> list;
+			if (!anims_.TryGetValue(type, out list))
+				return new List<IAnimation>();
+
+			return list;
 		}
 	}
 }

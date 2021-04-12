@@ -50,7 +50,7 @@ namespace Cue
 			}
 		}
 
-		public bool Play(IAnimation a, bool reverse)
+		public bool Play(IAnimation a, int flags)
 		{
 			var ta = (a as TimelineAnimation);
 			if (ta == null)

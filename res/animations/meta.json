@@ -1,0 +1,78 @@
+{
+	"animations":
+	[
+		{
+			"type": "walk",
+			"file": "walk.bvh",
+			"start": 67,
+			"end": 150,
+			"rootXZ": false,
+			"rootY": false
+		},
+
+
+		{
+			"type": "turnLeft",
+			"file": "turn_left.bvh"
+		},
+
+		{
+			"type": "turnRight",
+			"file": "turn_right.bvh"
+		},
+
+
+		{
+			"type": "sitFromStanding",
+			"file": "sit.bvh"
+		},
+
+		{
+			"type": "standFromSitting",
+			"file": "sit.bvh",
+			"reverse": true
+		},
+
+
+		{
+			"type": "sitIdle",
+			"file": "sit_idle_1.bvh"
+		},
+
+		{
+			"type": "sitIdle",
+			"file": "sit_idle_2.bvh"
+		},
+
+		{
+			"type": "sitIdle",
+			"file": "sit_idle_3.bvh"
+		},
+
+		{
+			"type": "sitIdle",
+			"file": "sit_idle_4.bvh"
+		},
+
+
+		{
+			"type": "standIdle",
+			"file": "stand_idle_1.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"file": "stand_idle_2.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"file": "stand_idle_3.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"file": "stand_idle_4.bvh"
+		}
+	]
+}

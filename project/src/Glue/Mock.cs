@@ -75,6 +75,11 @@ namespace Cue.W
 		{
 			return "";
 		}
+
+		public string GetResourcePath(string path)
+		{
+			return path;
+		}
 	}
 
 	class MockTime : ITime

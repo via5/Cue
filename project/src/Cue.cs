@@ -393,6 +393,8 @@ namespace Cue
 
 				allObjects_.Add(player_);
 
+				Resources.Animations.Load();
+
 				//VUI.Utilities.DumpComponentsAndUp(SuperController.singleton.errorLogPanel);
 
 

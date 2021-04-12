@@ -311,13 +311,13 @@ namespace Cue
 		{
 			if (!reverse_)
 			{
-				p.Animator.Play(anims_[i_], false);
+				p.Animator.Play(anims_[i_]);
 				reverse_ = true;
 			}
 			else
 			{
 				reverse_ = false;
-				p.Animator.Play(anims_[i_], true);
+				p.Animator.Play(anims_[i_], Animator.Reverse);
 
 				++i_;
 				if (i_ >= anims_.Count)

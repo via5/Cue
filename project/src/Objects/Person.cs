@@ -35,13 +35,16 @@ namespace Cue
 	interface IPlayer
 	{
 		bool Playing { get; }
-		bool Play(IAnimation a, bool reverse);
+		bool Play(IAnimation a, int flags);
 		void Stop();
 		void FixedUpdate(float s);
 	}
 
 	class Animator
 	{
+		public const int Loop = 0x01;
+		public const int Reverse = 0x02;
+
 		private Person person_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private IPlayer active_ = null;
@@ -58,11 +61,11 @@ namespace Cue
 			get { return (active_ != null); }
 		}
 
-		public void Play(IAnimation a, bool reverse=false)
+		public void Play(IAnimation a, int flags=0)
 		{
 			foreach (var p in players_)
 			{
-				if (p.Play(a, reverse))
+				if (p.Play(a, flags))
 				{
 					active_ = p;
 					break;
@@ -279,7 +282,10 @@ namespace Cue
 
 		public void Sit()
 		{
-			animator_.Play(Resources.Animations.Sit(), false);
+			animator_.Play(
+				Resources.Animations.GetAny(
+					Resources.Animations.SitFromStanding));
+
 			state_ = SittingDownState;
 		}
 
@@ -309,7 +315,9 @@ namespace Cue
 					if (state_ == SitState)
 					{
 						state_ = StandingUpState;
-						animator_.Play(Resources.Animations.Sit(), true);
+						animator_.Play(
+							Resources.Animations.GetAny(
+								Resources.Animations.StandFromSitting));
 					}
 
 					return false;
@@ -320,7 +328,11 @@ namespace Cue
 					state_ = WalkingState;
 
 					if (lastMoveState_ != MoveWalk)
-						animator_.Play(Resources.Animations.Walk());
+					{
+						animator_.Play(
+							Resources.Animations.GetAny(Resources.Animations.Walk),
+							Animator.Loop);
+					}
 
 					break;
 				}
@@ -328,7 +340,7 @@ namespace Cue
 				case MoveTurnLeft:
 				{
 					if (lastMoveState_ != MoveTurnLeft)
-						animator_.Play(Resources.Animations.TurnLeft());
+						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnLeft));
 
 					break;
 				}
@@ -336,7 +348,7 @@ namespace Cue
 				case MoveTurnRight:
 				{
 					if (lastMoveState_ != MoveTurnRight)
-						animator_.Play(Resources.Animations.TurnRight());
+						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnRight));
 
 					break;
 				}

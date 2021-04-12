@@ -11,9 +11,9 @@ namespace Cue.BVH
     class Animation : IAnimation
     {
         public BVH.File file = null;
-        public bool loop = false;
         public bool rootXZ = false;
         public bool rootY = false;
+        public bool reverse = false;
         public int start = 0;
         public int end = -1;
 
@@ -26,12 +26,12 @@ namespace Cue.BVH
             file = new File(path);
         }
 
-        public Animation(string path, bool loop, bool rootXZ, bool rootY, int start=0, int end=-1)
+        public Animation(string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
         {
             this.file = new File(path);
-            this.loop = loop;
             this.rootXZ = rootXZ;
             this.rootY = rootY;
+            this.reverse = reverse;
             this.start = start;
             this.end = end;
         }
@@ -41,10 +41,15 @@ namespace Cue.BVH
             string s =
                 file.Name + " " +
                 start.ToString() + "-" +
-                end.ToString();
+                end.ToString() + " " +
+                (reverse ? "rev " : "");
 
-            if (loop)
-                s += " loop";
+            if (rootXZ && rootY)
+                s += "rootAll";
+            else if (rootXZ)
+                s += "rootXZ";
+            else if (rootY)
+                s += "rootY";
 
             return s;
         }
@@ -87,7 +92,7 @@ namespace Cue.BVH
         Transform shadow = null;
 
         Animation anim = null;
-        bool reverse = false;
+        int flags = 0;
         float elapsed = 0;
 
         int frame = 0;
@@ -137,27 +142,38 @@ namespace Cue.BVH
             {
                 s += anim.ToString() + " " + frame.ToString();
 
-                if (reverse)
+                if ((flags & Animator.Reverse) != 0)
                     s += " rev";
+
+                if ((flags & Animator.Loop) != 0)
+                    s += " loop";
             }
 
             return s;
         }
 
-        public bool Play(IAnimation a, bool reverse)
+        public bool Play(IAnimation a, int flags)
         {
             var ba = a as Animation;
             if (ba == null)
                 return false;
 
+            if (ba.reverse)
+            {
+                if ((flags & Animator.Reverse) == 0)
+                    flags |= Animator.Reverse;
+                else
+                    flags &= ~Animator.Reverse;
+            }
+
             anim = ba;
-            this.reverse = reverse;
+            this.flags = flags;
             frameTime = anim.file.frameTime;
 
             if (anim.end < 0)
                 anim.end = anim.file.nFrames - 1;
 
-            if (reverse)
+            if ((flags & Animator.Reverse) != 0)
                 frame = anim.end;
             else
                 frame = anim.start;
@@ -355,14 +371,14 @@ namespace Cue.BVH
                 {
                     elapsed = 0;
 
-                    if (reverse)
+                    if ((flags & Animator.Reverse) != 0)
                         --frame;
                     else
                         frame++;
                 }
             }
 
-            if (reverse)
+            if ((flags & Animator.Reverse) != 0)
             {
                 if (frame > anim.end)
                 {
@@ -371,7 +387,7 @@ namespace Cue.BVH
 
                 if (frame <= anim.start)
                 {
-                    if (anim.loop == false)
+                    if ((flags & Animator.Loop) == 0)
                     {
                         playing = false;
                         return;
@@ -391,7 +407,7 @@ namespace Cue.BVH
 
                 if (frame >= anim.end)
                 {
-                    if (anim.loop == false)
+                    if ((flags & Animator.Loop) == 0)
                     {
                         playing = false;
                         return;
@@ -403,7 +419,7 @@ namespace Cue.BVH
                 }
             }
 
-            if (reverse)
+            if ((flags & Animator.Reverse) != 0)
             {
                 if (frame <= anim.start + 1)
                 {

@@ -217,7 +217,9 @@ namespace Cue
 							"I think..."
 						}));
 
-						cc.Push(new RandomAnimationAction(Resources.Animations.SitIdles()));
+						cc.Push(new RandomAnimationAction(
+							Resources.Animations.GetAll(
+								Resources.Animations.SitIdle)));
 
 						cc.Push(new LookAroundAction());
 
@@ -309,7 +311,9 @@ namespace Cue
 							"I think..."
 						}));
 
-						cc.Push(new RandomAnimationAction(Resources.Animations.StandIdles()));
+						cc.Push(new RandomAnimationAction(
+							Resources.Animations.GetAll(
+								Resources.Animations.StandIdle)));
 
 						cc.Push(new LookAroundAction());
 						p.PushAction(cc);
@@ -435,7 +439,10 @@ namespace Cue
 				{
 					if (!callee.HasTarget)
 					{
-						callee.PushAction(new RandomAnimationAction(Resources.Animations.StandIdles()));
+						callee.PushAction(new RandomAnimationAction(
+							Resources.Animations.GetAll(
+								Resources.Animations.StandIdle)));
+
 						state_ = IdlingState;
 					}
 

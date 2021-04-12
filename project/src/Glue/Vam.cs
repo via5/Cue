@@ -87,6 +87,7 @@ namespace Cue.W
 		private readonly VamTime time_ = new VamTime();
 		private readonly VamLog log_ = new VamLog();
 		private readonly VamNav nav_ = new VamNav();
+		private string pluginPath_ = "";
 
 		public VamSys(MVRScript s)
 		{
@@ -159,6 +160,33 @@ namespace Cue.W
 		public string ReadFileIntoString(string path)
 		{
 			return SuperController.singleton.ReadFileIntoString(path);
+		}
+
+		public string GetResourcePath(string path)
+		{
+			// based on MacGruber, which was based on VAMDeluxe, which was
+			// in turn based on Alazi
+
+			if (pluginPath_ == "")
+			{
+				var self = Cue.Instance;
+				string id = self.name.Substring(0, self.name.IndexOf('_'));
+				string filename = self.manager.GetJSON()["plugins"][id].Value;
+
+				pluginPath_ = filename.Substring(
+					0, filename.LastIndexOfAny(new char[] { '/', '\\' }));
+
+				pluginPath_ = pluginPath_.Replace('/', '\\');
+				if (pluginPath_.EndsWith("\\"))
+					pluginPath_ = pluginPath_.Substring(0, pluginPath_.Length - 1);
+			}
+
+			path = path.Replace('/', '\\');
+
+			if (path.StartsWith("\\"))
+				return pluginPath_ + "\\res" + path;
+			else
+				return pluginPath_ + "\\res\\" + path;
 		}
 
 		private IEnumerator DeferredInit(Action f)
