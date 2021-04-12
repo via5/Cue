@@ -20,6 +20,7 @@ namespace Cue
 		int LookAt { get; set; }
 		Vector3 Target { get; set; }
 		void LookInFront();
+		void Update(float s);
 	}
 
 	interface ISpeaker
@@ -196,6 +197,18 @@ namespace Cue
 			actions_.Pop();
 		}
 
+		public void MakeIdle()
+		{
+			actions_.Clear();
+			animator_.Stop();
+		}
+
+		public void Call(Person caller)
+		{
+			AI.Enabled = false;
+			AI.RunEvent(new CallEvent(caller));
+		}
+
 		public bool InteractWith(IObject o)
 		{
 			if (locked_ != o)
@@ -232,6 +245,7 @@ namespace Cue
 				ai_.Tick(this, s);
 
 			actions_.Tick(this, s);
+			gaze_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)

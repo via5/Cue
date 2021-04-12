@@ -5,13 +5,18 @@ namespace Cue
 {
 	interface IAI
 	{
+		void RunEvent(IEvent e);
 		void Tick(Person p, float s);
+		bool Enabled { get; set; }
 	}
 
 	class PersonAI : IAI
 	{
 		private int i_ = -1;
 		private readonly List<IEvent> events_ = new List<IEvent>();
+		private bool enabled_ = true;
+		private Person person_ = null;
+		private IEvent forced_ = null;
 
 		public PersonAI()
 		{
@@ -26,8 +31,48 @@ namespace Cue
 			}
 		}
 
+		public bool Enabled
+		{
+			get
+			{
+				return enabled_;
+			}
+
+			set
+			{
+				enabled_ = value;
+				if (!enabled_)
+					Stop();
+			}
+		}
+
+		public void RunEvent(IEvent e)
+		{
+			if (forced_ != null)
+				forced_.Stop(person_);
+
+			forced_ = e;
+
+			if (forced_ != null)
+			{
+				Stop();
+				person_.MakeIdle();
+			}
+		}
+
 		public void Tick(Person p, float s)
 		{
+			person_ = p;
+
+			if (forced_ != null)
+			{
+				forced_.Tick(p, s);
+				return;
+			}
+
+			if (!enabled_)
+				return;
+
 			if (events_.Count == 0)
 				return;
 
@@ -45,17 +90,58 @@ namespace Cue
 				}
 			}
 		}
+
+		private void Stop()
+		{
+			if (i_ >= 0 && i_ < events_.Count)
+			{
+				events_[i_].Stop(person_);
+				i_ = -1;
+			}
+		}
 	}
 
 
 	interface IEvent
 	{
+		void Stop(Person p);
 		bool Tick(Person p, float s);
 	}
 
 	abstract class BasicEvent : IEvent
 	{
+		private IObject lock_ = null;
+
+		public virtual void Stop(Person p)
+		{
+			Unlock(p);
+		}
+
 		public abstract bool Tick(Person p, float s);
+
+		protected bool Lock(Person p, IObject o)
+		{
+			if (lock_ == null && !o.Lock(p))
+			{
+				Cue.LogError("can't lock object " + o.ToString());
+				return false;
+			}
+
+			lock_ = o;
+			return true;
+		}
+
+		protected bool Unlock(Person p)
+		{
+			if (lock_ != null)
+			{
+				bool b = lock_.Unlock(p);
+				lock_ = null;
+				return b;
+			}
+
+			return false;
+		}
 	}
 
 
@@ -71,7 +157,6 @@ namespace Cue
 		private IObject o_;
 		private int state_ = NoState;
 		private float thunk_ = 0;
-		private bool locked_ = false;
 
 		public SitAndThinkEvent(IObject o)
 		{
@@ -87,13 +172,9 @@ namespace Cue
 				return false;
 			}
 
-			if (!locked_ && !o_.Lock(p))
-			{
-				Cue.LogError("can't lock object " + o_.ToString());
+			if (!Lock(p, o_))
 				return false;
-			}
 
-			locked_ = true;
 			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
 
 			switch (state_)
@@ -155,9 +236,8 @@ namespace Cue
 					{
 						Cue.LogError("done");
 						p.PopAction();
+						Unlock(p);
 						state_ = NoState;
-						o_.Unlock(p);
-						locked_ = false;
 						return false;
 					}
 
@@ -181,7 +261,6 @@ namespace Cue
 		private IObject o_;
 		private int state_ = NoState;
 		private float thunk_ = 0;
-		private bool locked_ = false;
 
 		public StandAndThinkEvent(IObject o)
 		{
@@ -197,13 +276,9 @@ namespace Cue
 				return false;
 			}
 
-			if (!locked_ && !o_.Lock(p))
-			{
-				Cue.LogError("can't lock object " + o_.ToString());
+			if (!Lock(p, o_))
 				return false;
-			}
 
-			locked_ = true;
 			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
 
 			switch (state_)
@@ -252,9 +327,8 @@ namespace Cue
 					{
 						Cue.LogError("done");
 						p.PopAction();
-						o_.Unlock(p);
+						Unlock(p);
 						state_ = NoState;
-						locked_ = false;
 						return false;
 					}
 
@@ -321,6 +395,65 @@ namespace Cue
 			}
 
 			return true;
+		}
+	}
+
+
+	class CallEvent : BasicEvent
+	{
+		private const int NoState = 0;
+		private const int MovingState = 1;
+		private const int IdlingState = 2;
+
+		private Person caller_;
+		private int state_ = NoState;
+
+		public CallEvent(Person caller)
+		{
+			caller_ = caller;
+		}
+
+		public override bool Tick(Person callee, float s)
+		{
+			switch (state_)
+			{
+				case NoState:
+				{
+					var target =
+						caller_.Position +
+						Vector3.Rotate(new Vector3(0, 0, 1), caller_.Bearing);
+
+					callee.MoveTo(target, 360 - caller_.Bearing);
+					callee.Gaze.LookAt = GazeSettings.LookAtTarget;
+					callee.Gaze.Target = caller_.Atom.HeadPosition;
+					state_ = MovingState;
+
+					break;
+				}
+
+				case MovingState:
+				{
+					if (!callee.HasTarget)
+					{
+						callee.PushAction(new RandomAnimationAction(Resources.Animations.StandIdles()));
+						state_ = IdlingState;
+					}
+
+					break;
+				}
+
+				case IdlingState:
+				{
+					break;
+				}
+			}
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			return "CallEvent";
 		}
 	}
 }

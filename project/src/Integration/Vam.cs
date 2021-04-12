@@ -15,7 +15,7 @@ namespace Cue
 			transform.position = Vector3.ToUnity(v);
 		}
 
-		public void Update()
+		public void LateUpdate()
 		{
 			if (hasPos_)
 			{
@@ -33,6 +33,8 @@ namespace Cue
 		private JSONStorableStringChooser lookMode_ = null;
 		private JSONStorableFloat leftRightAngle_ = null;
 		private JSONStorableFloat upDownAngle_ = null;
+		private Vector3 target_ = Vector3.Zero;
+		private int lookAt_ = GazeSettings.LookAtDisabled;
 
 		public VamEyes(Person p)
 		{
@@ -62,6 +64,8 @@ namespace Cue
 				Get();
 				if (lookMode_ == null)
 					return;
+
+				lookAt_ = value;
 
 				switch (value)
 				{
@@ -102,8 +106,15 @@ namespace Cue
 				if (eyes_ == null)
 					return;
 
+				target_ = value;
 				eyesImpl_.SetPosition(value);
 			}
+		}
+
+		public void Update(float s)
+		{
+			if (lookAt_ == GazeSettings.LookAtTarget)
+				eyesImpl_.SetPosition(target_);
 		}
 
 		private void Get()

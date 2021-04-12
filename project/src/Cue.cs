@@ -290,7 +290,7 @@ namespace Cue
 			get { return persons_; }
 		}
 
-		public BasicObject Player
+		public Person Player
 		{
 			get { return player_; }
 		}

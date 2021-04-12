@@ -29,6 +29,7 @@ namespace Cue
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 
 			p = new VUI.Panel(new VUI.HorizontalFlow());
+			p.Add(new VUI.Button("Call", OnCall));
 			p.Add(new VUI.Button("Reload", OnReload));
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
 		}
@@ -52,6 +53,11 @@ namespace Cue
 		private void OnHoveredChanged(IObject o)
 		{
 			hovered_.Text = "Hovered: " + (o == null ? "" : o.ToString());
+		}
+
+		private void OnCall()
+		{
+			Cue.Instance.Persons[0].Call(Cue.Instance.Player);
 		}
 
 		private void OnReload()
@@ -108,7 +114,7 @@ namespace Cue
 			if (rt == null)
 				rt = hudPanel_.GetComponent<RectTransform>();
 
-			bg.color = new Color(0, 0, 0, 0.5f);
+			bg.color = new Color(0, 0, 0, 0.8f);
 			bg.raycastTarget = true;
 
 			rt.offsetMin = new Vector2(-500, 0);

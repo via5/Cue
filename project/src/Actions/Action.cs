@@ -260,6 +260,7 @@ namespace Cue
 		private float e_ = 0;
 		private int i_ = -1;
 		private const float Delay = 0;
+		private bool reverse_ = true;
 
 		public RandomAnimationAction(List<IAnimation> anims)
 		{
@@ -271,6 +272,7 @@ namespace Cue
 			e_ = 0;
 			i_ = -1;
 			anims_.Shuffle();
+			reverse_ = false;
 			return true;
 		}
 
@@ -307,13 +309,22 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			p.Animator.Play(anims_[i_]);
-
-			++i_;
-			if (i_ >= anims_.Count)
+			if (!reverse_)
 			{
-				i_ = 0;
-				anims_.Shuffle();
+				p.Animator.Play(anims_[i_], false);
+				reverse_ = true;
+			}
+			else
+			{
+				reverse_ = false;
+				p.Animator.Play(anims_[i_], true);
+
+				++i_;
+				if (i_ >= anims_.Count)
+				{
+					i_ = 0;
+					anims_.Shuffle();
+				}
 			}
 		}
 

@@ -79,6 +79,7 @@ namespace Cue
 
 		public abstract int LookAt { get; set; }
 		public abstract Vector3 Target { get; set; }
+		public abstract void Update(float s);
 
 		protected BasicGazer(Person p)
 		{
@@ -130,6 +131,10 @@ namespace Cue
 			set { eyes_.Target = value; }
 		}
 
+		public override void Update(float s)
+		{
+			eyes_.Update(s);
+		}
 
 		private void Set()
 		{
