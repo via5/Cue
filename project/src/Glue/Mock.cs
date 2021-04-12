@@ -166,6 +166,10 @@ namespace Cue.W
 		{
 		}
 
+		public void Update(float s)
+		{
+		}
+
 		public bool NavEnabled
 		{
 			get { return false; }
@@ -183,7 +187,7 @@ namespace Cue.W
 			get { return false; }
 		}
 
-		public void NavTo(Vector3 v)
+		public void NavTo(Vector3 v, float bearing)
 		{
 		}
 

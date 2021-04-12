@@ -334,6 +334,12 @@ namespace Cue.W
 	{
 		private readonly Atom atom_;
 		private Rigidbody head_ = null;
+		private float finalBearing_ = BasicObject.NoBearing;
+		private bool turning_ = false;
+		private NavMeshAgent agent_ = null;
+		private float turningElapsed_ = 0;
+		private Quaternion turningStart_ = Quaternion.identity;
+		private const float turnSpeed_ = 360;
 
 		public VamAtom(Atom atom)
 		{
@@ -403,40 +409,85 @@ namespace Cue.W
 			atom_.mainController.interactableInPlayMode = !b;
 		}
 
+		public void Update(float s)
+		{
+			if (!turning_ && finalBearing_ != BasicObject.NoBearing)
+			{
+				if (!IsPathing())
+				{
+					turningStart_ = atom_.mainController.transform.rotation;
+					turning_ = true;
+				}
+			}
+
+			if (turning_)
+			{
+				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
+				var direction = Vector3.Rotate(new Vector3(0, 0, 1), finalBearing_);
+
+				if (Math.Abs(currentBearing - finalBearing_) < 5)
+				{
+					atom_.mainController.transform.rotation =
+						Quaternion.LookRotation(Vector3.ToUnity(direction));
+
+					turning_ = false;
+					finalBearing_ = BasicObject.NoBearing;
+				}
+				else
+				{
+					turningElapsed_ += s;
+
+					var newDir = UnityEngine.Vector3.RotateTowards(
+						atom_.mainController.transform.forward,
+						Vector3.ToUnity(direction),
+						50 * s, 0.0f);
+
+					var newRot = Quaternion.LookRotation(newDir);
+
+					atom_.mainController.transform.rotation = Quaternion.Slerp(
+						turningStart_,
+						newRot,
+						turningElapsed_ / (360 / turnSpeed_));
+						//Time.deltaTime * 2f);
+				}
+			}
+		}
+
 		public bool NavEnabled
 		{
 			get
 			{
-				return (atom_.mainController.GetComponent<NavMeshAgent>() != null);
+				return (agent_ != null);
 			}
 
 			set
 			{
-				var c = atom_.mainController.GetComponent<NavMeshAgent>();
-
 				if (value)
 				{
-					if (c == null)
+					if (agent_ == null)
 					{
-						c = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
-						c.agentTypeID = 1;
-						c.height = 2.0f;
-						c.radius = 0.1f;
-						c.speed = 1;
-						c.angularSpeed = 120;
-						c.stoppingDistance = 0;
-						c.autoBraking = true;
-						c.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
-						c.avoidancePriority = 50;
-						c.autoTraverseOffMeshLink = true;
-						c.autoRepath = true;
-						c.areaMask = ~0;
+						agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
+						agent_.agentTypeID = 1;
+						agent_.height = 2.0f;
+						agent_.radius = 0.1f;
+						agent_.speed = 1;
+						agent_.angularSpeed = 120;
+						agent_.stoppingDistance = 0;
+						agent_.autoBraking = true;
+						agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+						agent_.avoidancePriority = 50;
+						agent_.autoTraverseOffMeshLink = true;
+						agent_.autoRepath = true;
+						agent_.areaMask = ~0;
 					}
 				}
 				else
 				{
-					if (c != null)
-						UnityEngine.Object.Destroy(c);
+					if (agent_ != null)
+					{
+						UnityEngine.Object.Destroy(agent_);
+						agent_ = null;
+					}
 				}
 			}
 		}
@@ -445,54 +496,68 @@ namespace Cue.W
 		{
 			get
 			{
-				var c = atom_.mainController.GetComponent<NavMeshAgent>();
-				if (c == null)
+				if (agent_ == null)
 					return true;
 
-				return c.isStopped;
+				return agent_.isStopped;
 			}
 
 			set
 			{
-				var c = atom_.mainController.GetComponent<NavMeshAgent>();
-				if (c != null)
-					c.isStopped = value;
+				if (agent_ != null)
+					agent_.isStopped = value;
 			}
 		}
 
-		public void NavTo(Vector3 v)
+		public void NavTo(Vector3 v, float bearing)
 		{
-			var c = atom_.mainController.GetComponent<NavMeshAgent>();
-			if (c == null)
+			if (agent_ == null)
 				return;
 
-			c.destination = Vector3.ToUnity(v);
-			c.updatePosition = true;
-			c.updateRotation = true;
-			c.updateUpAxis = true;
+			agent_.destination = Vector3.ToUnity(v);
+			agent_.updatePosition = true;
+			agent_.updateRotation = true;
+			agent_.updateUpAxis = true;
+			finalBearing_ = bearing;
+			turningElapsed_ = 0;
 		}
 
 		public void NavStop()
 		{
-			var c = atom_.mainController.GetComponent<NavMeshAgent>();
-			if (c == null)
+			if (agent_ == null)
 				return;
 
-			c.updatePosition = false;
-			c.updateRotation = false;
-			c.updateUpAxis = false;
+			agent_.updatePosition = false;
+			agent_.updateRotation = false;
+			agent_.updateUpAxis = false;
 		}
 
 		public bool NavActive
 		{
 			get
 			{
-				var c = atom_.mainController.GetComponent<NavMeshAgent>();
-				if (c == null)
-					return false;
+				if (IsPathing())
+					return true;
 
-				return c.pathPending || (c.hasPath && c.remainingDistance > 0);
+				if (finalBearing_ != BasicObject.NoBearing)
+					return true;
+
+				return false;
 			}
+		}
+
+		private bool IsPathing()
+		{
+			if (agent_ == null)
+				return false;
+
+			if (agent_.pathPending)
+				return true;
+
+			if (agent_.hasPath && agent_.remainingDistance > 0)
+				return true;
+
+			return false;
 		}
 
 		private void GetHead()

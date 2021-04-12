@@ -39,10 +39,12 @@ namespace Cue.W
 		Vector3 HeadPosition { get; }
 		void OnPluginState(bool b);
 
+		void Update(float s);
+
 		bool NavEnabled { get; set; }
 		bool NavPaused { get; set; }
 		bool NavActive { get; }
-		void NavTo(Vector3 v);
+		void NavTo(Vector3 v, float bearing);
 		void NavStop();
 	}
 

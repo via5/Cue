@@ -90,6 +90,7 @@ namespace Cue
 		private float targetBearing_ = NoBearing;
 		private int moveState_ = NoMoveState;
 		private bool canMove_ = false;
+		private bool moving_ = false;
 
 		private Slot standSlot_ = null;
 		private Slot sitSlot_ = null;
@@ -162,6 +163,8 @@ namespace Cue
 
 		public virtual void Update(float s)
 		{
+			Atom.Update(s);
+
 			if (moveState_ != NoMoveState)
 			{
 				if (!canMove_)
@@ -170,7 +173,12 @@ namespace Cue
 				if (canMove_)
 				{
 					moveState_ = MoveTowardsTargetState;
-					Atom.NavTo(targetPos_);
+
+					if (!moving_)
+					{
+						Atom.NavTo(targetPos_, targetBearing_);
+						moving_ = true;
+					}
 
 					if (Atom.NavActive)
 					{
@@ -180,11 +188,8 @@ namespace Cue
 					{
 						moveState_ = NoMoveState;
 						Atom.NavStop();
-
-						if (targetBearing_ != NoBearing)
-							Bearing = targetBearing_;
-
 						SetMoving(MoveNone);
+						moving_ = false;
 					}
 				}
 			}
@@ -213,17 +218,13 @@ namespace Cue
 			return atom_.ID;
 		}
 
-		private float AngleBetweenBearings(float bearing1, float bearing2)
-		{
-			return ((((bearing2 - bearing1) % 360) + 540) % 360) - 180;
-		}
-
 		public void MoveTo(Vector3 to, float bearing)
 		{
 			targetPos_ = to;
 			targetBearing_ = bearing;
 			moveState_ = MoveTowardsTargetState;
 			canMove_ = SetMoving(MoveTentative);
+			moving_ = false;
 		}
 
 		protected virtual bool SetMoving(int i)
