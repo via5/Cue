@@ -71,6 +71,7 @@ namespace Cue
 		private IObject o_;
 		private int state_ = NoState;
 		private float thunk_ = 0;
+		private bool locked_ = false;
 
 		public SitAndThinkEvent(IObject o)
 		{
@@ -86,6 +87,13 @@ namespace Cue
 				return false;
 			}
 
+			if (!locked_ && !o_.Lock(p))
+			{
+				Cue.LogError("can't lock object " + o_.ToString());
+				return false;
+			}
+
+			locked_ = true;
 			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
 
 			switch (state_)
@@ -148,6 +156,8 @@ namespace Cue
 						Cue.LogError("done");
 						p.PopAction();
 						state_ = NoState;
+						o_.Unlock(p);
+						locked_ = false;
 						return false;
 					}
 
@@ -171,6 +181,7 @@ namespace Cue
 		private IObject o_;
 		private int state_ = NoState;
 		private float thunk_ = 0;
+		private bool locked_ = false;
 
 		public StandAndThinkEvent(IObject o)
 		{
@@ -186,6 +197,13 @@ namespace Cue
 				return false;
 			}
 
+			if (!locked_ && !o_.Lock(p))
+			{
+				Cue.LogError("can't lock object " + o_.ToString());
+				return false;
+			}
+
+			locked_ = true;
 			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
 
 			switch (state_)
@@ -234,7 +252,9 @@ namespace Cue
 					{
 						Cue.LogError("done");
 						p.PopAction();
+						o_.Unlock(p);
 						state_ = NoState;
+						locked_ = false;
 						return false;
 					}
 

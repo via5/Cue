@@ -69,7 +69,12 @@ namespace Cue
 			public bool Hovered
 			{
 				get { return hovered_; }
-				set { hovered_ = value; UpdateColor(); }
+				set { hovered_ = value; }
+			}
+
+			public void Update()
+			{
+				UpdateColor();
 			}
 
 			public void Destroy()
@@ -85,6 +90,8 @@ namespace Cue
 			{
 				if (hovered_)
 					material_.color = new Color(0, 1, 0, 0.5f);
+				else if (object_.LockedBy != null)
+					material_.color = new Color(1, 0, 0, 0.5f);
 				else
 					material_.color = new Color(0, 0, 1, 0.5f);
 			}
@@ -111,6 +118,9 @@ namespace Cue
 		{
 			if (!enabled_)
 				return;
+
+			for (int i = 0; i < controls_.Count; ++i)
+				controls_[i].Update();
 
 			CheckHovered();
 

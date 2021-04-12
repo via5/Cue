@@ -108,6 +108,7 @@ namespace Cue
 		private int state_ = StandingState;
 		private int lastMoveState_ = MoveNone;
 		private Vector3 standingPos_ = new Vector3();
+		private IObject locked_ = null;
 
 		private Animator animator_;
 		private IBreather breathing_;
@@ -195,8 +196,19 @@ namespace Cue
 			actions_.Pop();
 		}
 
-		public void InteractWith(IObject o)
+		public bool InteractWith(IObject o)
 		{
+			if (locked_ != o)
+			{
+				if (!o.Lock(this))
+					return false;
+
+				if (locked_ != null)
+					locked_.Unlock(o);
+
+				locked_ = o;
+			}
+
 			actions_.Clear();
 
 			if (o.SitSlot != null)
@@ -208,6 +220,8 @@ namespace Cue
 			{
 				PushAction(new MoveAction(o.Position, NoBearing));
 			}
+
+			return true;
 		}
 
 		public override void Update(float s)

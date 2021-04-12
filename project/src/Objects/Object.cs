@@ -61,6 +61,10 @@ namespace Cue
 		void OnPluginState(bool b);
 		void SetPaused(bool b);
 
+		bool Lock(IObject by);
+		bool Unlock(IObject by);
+		IObject LockedBy { get; }
+
 		Slot StandSlot { get; }
 		Slot SitSlot { get; }
 		Slot SleepSlot { get; }
@@ -96,6 +100,8 @@ namespace Cue
 		private Slot sitSlot_ = null;
 		private Slot sleepSlot_ = null;
 		private Slot toiletSlot_ = null;
+
+		private IObject lock_ = null;
 
 		public BasicObject(W.IAtom atom)
 		{
@@ -159,6 +165,33 @@ namespace Cue
 		{
 			get { return toiletSlot_; }
 			set { toiletSlot_ = value; }
+		}
+
+		public bool Lock(IObject by)
+		{
+			if (lock_ == null)
+			{
+				lock_ = by;
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool Unlock(IObject by)
+		{
+			if (lock_ == by)
+			{
+				lock_ = null;
+				return true;
+			}
+
+			return false;
+		}
+
+		public IObject LockedBy
+		{
+			get { return lock_; }
 		}
 
 		public virtual void Update(float s)
