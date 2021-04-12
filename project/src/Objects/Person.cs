@@ -220,7 +220,7 @@ namespace Cue
 					return false;
 
 				if (locked_ != null)
-					locked_.Unlock(o);
+					locked_.Unlock(this);
 
 				locked_ = o;
 			}
