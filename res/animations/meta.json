@@ -3,7 +3,7 @@
 	[
 		{
 			"type": "walk",
-			"file": "walk.bvh",
+			"bvh": "walk.bvh",
 			"start": 67,
 			"end": 150,
 			"rootXZ": false,
@@ -13,66 +13,72 @@
 
 		{
 			"type": "turnLeft",
-			"file": "turn_left.bvh"
+			"bvh": "turn_left.bvh"
 		},
 
 		{
 			"type": "turnRight",
-			"file": "turn_right.bvh"
+			"bvh": "turn_right.bvh"
 		},
 
 
 		{
 			"type": "sitFromStanding",
-			"file": "sit.bvh"
+			"bvh": "sit.bvh"
 		},
 
 		{
 			"type": "standFromSitting",
-			"file": "sit.bvh",
+			"bvh": "sit.bvh",
 			"reverse": true
 		},
 
 
 		{
 			"type": "sitIdle",
-			"file": "sit_idle_1.bvh"
+			"bvh": "sit_idle_1.bvh"
 		},
 
 		{
 			"type": "sitIdle",
-			"file": "sit_idle_2.bvh"
+			"bvh": "sit_idle_2.bvh"
 		},
 
 		{
 			"type": "sitIdle",
-			"file": "sit_idle_3.bvh"
+			"bvh": "sit_idle_3.bvh"
 		},
 
 		{
 			"type": "sitIdle",
-			"file": "sit_idle_4.bvh"
+			"bvh": "sit_idle_4.bvh"
 		},
 
 
 		{
 			"type": "standIdle",
-			"file": "stand_idle_1.bvh"
+			"bvh": "stand_idle_1.bvh"
 		},
 
 		{
 			"type": "standIdle",
-			"file": "stand_idle_2.bvh"
+			"bvh": "stand_idle_2.bvh"
 		},
 
 		{
 			"type": "standIdle",
-			"file": "stand_idle_3.bvh"
+			"bvh": "stand_idle_3.bvh"
 		},
 
 		{
 			"type": "standIdle",
-			"file": "stand_idle_4.bvh"
+			"bvh": "stand_idle_4.bvh"
+		},
+
+
+		{
+			"type": "sitOnSitting",
+			"timeline": "SitOnSitting1"
 		}
 	]
 }

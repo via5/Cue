@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -56,6 +57,8 @@ namespace Cue
 			if (ta == null)
 				return false;
 
+			SetControllers();
+
 			var vsys = ((W.VamSys)Cue.Instance.Sys);
 
 			play_ = vsys.GetActionParameter(
@@ -96,6 +99,60 @@ namespace Cue
 
 			stop_ = vsys.GetActionParameter(
 				person_, "VamTimeline.AtomPlugin", "Stop");
+		}
+
+		private void SetControllers()
+		{
+			var cs = new Dictionary<string, bool>() {
+				{ "headControl", true },
+				{ "hipControl", true },
+				{ "chestControl", true },
+				{ "lHandControl", true },
+				{ "rHandControl", true },
+				{ "lFootControl", true },
+				{ "rFootControl", true },
+				{ "lKneeControl", false },
+				{ "rKneeControl", false },
+				{ "lElbowControl", false },
+				{ "rElbowControl", false },
+				{ "lArmControl", false },
+				{ "rArmControl", false },
+				{ "lShoulderControl", false },
+				{ "rShoulderControl", false },
+				{ "abdomenControl", false },
+				{ "abdomen2Control", false },
+				{ "pelvisControl", false },
+				{ "lThighControl", false },
+				{ "rThighControl", false },
+			};
+
+			var notFound = new List<string>();
+
+			foreach (var c in cs)
+				notFound.Add(c.Key);
+
+			foreach (var c in ((W.VamAtom)person_.Atom).Atom.freeControllers)
+			{
+				bool b;
+				if (cs.TryGetValue(c.name, out b))
+				{
+					if (b)
+					{
+						c.currentRotationState = FreeControllerV3.RotationState.On;
+						c.currentPositionState = FreeControllerV3.PositionState.On;
+					}
+					else
+					{
+						c.currentRotationState = FreeControllerV3.RotationState.Off;
+						c.currentPositionState = FreeControllerV3.PositionState.Off;
+					}
+
+					notFound.Remove(c.name);
+				}
+			}
+
+			foreach (var c in notFound)
+				Cue.LogError("timeline: controller '" + c + "' not found");
 		}
 	}
 }

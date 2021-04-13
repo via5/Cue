@@ -13,6 +13,7 @@ namespace Cue.Resources
 		public const int StandIdle = 5;
 		public const int SitFromStanding = 6;
 		public const int StandFromSitting = 7;
+		public const int SitOnSitting = 8;
 
 		private static Dictionary<int, List<IAnimation>> anims_ =
 			new Dictionary<int, List<IAnimation>>();
@@ -35,6 +36,8 @@ namespace Cue.Resources
 				return SitFromStanding;
 			else if (s == "standfromsitting")
 				return StandFromSitting;
+			else if (s == "sitonsitting")
+				return SitOnSitting;
 
 			Cue.LogError("unknown anim type '" + os + "'");
 			return NoType;
@@ -52,15 +55,24 @@ namespace Cue.Resources
 				if (t == NoType)
 					continue;
 
-				var w = new BVH.Animation(
-					Cue.Instance.Sys.GetResourcePath("animations/" + a["file"]),
-					(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
-					(a.HasKey("rootY") ? a["rootY"].AsBool : true),
-					(a.HasKey("reverse") ? a["reverse"].AsBool : false),
-					(a.HasKey("start") ? a["start"].AsInt : 0),
-					(a.HasKey("end") ? a["end"].AsInt : -1));
+				IAnimation anim = null;
 
-				Cue.LogError(a["type"] + " anim: " + w.ToString());
+				if (a.HasKey("bvh"))
+				{
+					anim = new BVH.Animation(
+						Cue.Instance.Sys.GetResourcePath("animations/" + a["bvh"]),
+						(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
+						(a.HasKey("rootY") ? a["rootY"].AsBool : true),
+						(a.HasKey("reverse") ? a["reverse"].AsBool : false),
+						(a.HasKey("start") ? a["start"].AsInt : 0),
+						(a.HasKey("end") ? a["end"].AsInt : -1));
+				}
+				else if (a.HasKey("timeline"))
+				{
+					anim = new TimelineAnimation(a["timeline"]);
+				}
+
+				Cue.LogError(a["type"] + " anim: " + anim.ToString());
 
 				List<IAnimation> list;
 				if (!anims_.TryGetValue(t, out list))
@@ -69,7 +81,7 @@ namespace Cue.Resources
 					anims_.Add(t, list);
 				}
 
-				list.Add(w);
+				list.Add(anim);
 			}
 		}
 

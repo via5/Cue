@@ -30,6 +30,7 @@ namespace Cue
 
 			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Call", OnCall));
+			p.Add(new VUI.Button("Sit", OnSit));
 			p.Add(new VUI.Button("Reload", OnReload));
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
 		}
@@ -58,6 +59,15 @@ namespace Cue
 		private void OnCall()
 		{
 			Cue.Instance.Persons[0].Call(Cue.Instance.Player);
+		}
+
+		private void OnSit()
+		{
+			//Cue.Instance.Persons[0].Call(Cue.Instance.Player);
+			Cue.Instance.Persons[0].AI.Enabled = false;
+			Cue.Instance.Persons[0].MakeIdle();
+			Cue.Instance.Persons[0].Animator.Play(
+				Resources.Animations.GetAny(Resources.Animations.SitOnSitting));
 		}
 
 		private void OnReload()

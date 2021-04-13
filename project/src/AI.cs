@@ -425,7 +425,7 @@ namespace Cue
 				{
 					var target =
 						caller_.Position +
-						Vector3.Rotate(new Vector3(0, 0, 1), caller_.Bearing);
+						Vector3.Rotate(new Vector3(0, 0, 0.8f), caller_.Bearing);
 
 					callee.MoveTo(target, 360 - caller_.Bearing);
 					callee.Gaze.LookAt = GazeSettings.LookAtTarget;

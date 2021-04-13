@@ -188,6 +188,34 @@ namespace Cue.BVH
 
         public void Stop()
         {
+            if ((flags & Animator.Reverse) == 0)
+                flags |= Animator.Reverse;
+            else
+                flags &= ~Animator.Reverse;
+
+            flags &= ~Animator.Loop;
+
+            int fs = 0;
+            int max = anim.file.nFrames * 2;
+            while (playing)
+            {
+                FixedUpdate(anim.file.frameTime);
+                ++fs;
+
+                if (fs >= max)
+                {
+                    Cue.LogError(
+                        "bvh: failed to rewind, " +
+                        "fs=" + fs.ToString() + " " +
+                        "n=" + anim.file.nFrames.ToString() + " " +
+                        "ft=" + anim.file.frameTime.ToString() + " " +
+                        "max=" + max.ToString() + " " +
+                        "f=" + frame.ToString());
+
+                    break;
+                }
+            }
+
             playing = false;
             anim = null;
         }
