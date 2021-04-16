@@ -58,7 +58,7 @@ namespace Cue
 
 		private void OnCall()
 		{
-			Cue.Instance.Persons[0].Call(Cue.Instance.Player);
+			//Cue.Instance.Persons[0].Call(Cue.Instance.Player);
 		}
 
 		private void OnSit()

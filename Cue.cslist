@@ -8,6 +8,7 @@ project\src\Actions\Action.cs
 project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs
+project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs

@@ -99,6 +99,12 @@ namespace Cue
 	}
 
 
+	interface IKisser
+	{
+		void Update(float s);
+	}
+
+
 	class Person : BasicObject
 	{
 		public const int StandingState = 0;
@@ -118,6 +124,7 @@ namespace Cue
 		private IBreather breathing_;
 		private ISpeaker speech_;
 		private IGazer gaze_;
+		private IKisser kisser_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
@@ -126,6 +133,7 @@ namespace Cue
 			breathing_ = new MacGruberBreather(this);
 			speech_ = new VamSpeaker(this);
 			gaze_ = new MacGruberGaze(this);
+			kisser_ = new ClockwiseSilverKiss(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
@@ -249,6 +257,7 @@ namespace Cue
 
 			actions_.Tick(this, s);
 			gaze_.Update(s);
+			kisser_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)

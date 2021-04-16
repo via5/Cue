@@ -122,24 +122,27 @@ namespace Cue
 			for (int i = 0; i < controls_.Count; ++i)
 				controls_[i].Update();
 
-			CheckHovered();
-
-			if (Input.GetMouseButtonUp(0))
+			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
 			{
-				Cue.Instance.Select(Cue.Instance.Hovered);
-			}
+				CheckHovered();
 
-			if (Input.GetMouseButtonUp(1))
-			{
-				var p = Cue.Instance.Selected as Person;
-				if (p == null)
-					return;
+				if (Input.GetMouseButtonUp(0))
+				{
+					Cue.Instance.Select(Cue.Instance.Hovered);
+				}
 
-				var o = Cue.Instance.Hovered;
-				if (o == null)
-					return;
+				if (Input.GetMouseButtonUp(1))
+				{
+					var p = Cue.Instance.Selected as Person;
+					if (p == null)
+						return;
 
-				p.InteractWith(o);
+					var o = Cue.Instance.Hovered;
+					if (o == null)
+						return;
+
+					p.InteractWith(o);
+				}
 			}
 		}
 
@@ -188,8 +191,8 @@ namespace Cue
 					return ps[i];
 			}
 
-			if (((W.VamAtom)Cue.Instance.Player.Atom).Atom == a)
-				return Cue.Instance.Player;
+			//if (((W.VamAtom)Cue.Instance.Player.Atom).Atom == a)
+			//	return Cue.Instance.Player;
 
 			return null;
 		}
@@ -248,7 +251,7 @@ namespace Cue
 
 		private static Cue instance_ = null;
 		private W.ISys sys_ = null;
-		private Person player_ = null;
+		//private Person player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
@@ -259,6 +262,7 @@ namespace Cue
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
+		private int frame_ = 0;
 
 		public Cue()
 		{
@@ -290,10 +294,10 @@ namespace Cue
 			get { return persons_; }
 		}
 
-		public Person Player
-		{
-			get { return player_; }
-		}
+		//public Person Player
+		//{
+		//	get { return player_; }
+		//}
 
 		public IObject Selected
 		{
@@ -311,6 +315,19 @@ namespace Cue
 			{
 				sel_ = o;
 				SelectionChanged?.Invoke(sel_);
+
+				foreach (var p in persons_)
+				{
+					if (p == o)
+					{
+						p.Gaze.LookAt = GazeSettings.LookAtDisabled;
+					}
+					else if (o is Person)
+					{
+						p.Gaze.LookAt = GazeSettings.LookAtTarget;
+						p.Gaze.Target = ((Person)o).HeadPosition;
+					}
+				}
 			}
 		}
 
@@ -351,26 +368,36 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
+				frame_ = 0;
+
 				var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
 
 				foreach (var a in sys_.GetAtoms())
 				{
-					var m = re.Match(a.ID);
-
-					if (m != null && m.Success)
+					if (a.IsPerson)
 					{
-						string type = m.Groups[1].Value;
-						//LogError("found " + a.ID + " " + type);
+						persons_.Add(new Person(a));
+						((W.VamAtom)a).Atom.collisionEnabled = false;
+					}
+					else
+					{
+						var m = re.Match(a.ID);
 
-						BasicObject o = new BasicObject(a);
-						var s = new Slot();
+						if (m != null && m.Success)
+						{
+							string type = m.Groups[1].Value;
+							//LogError("found " + a.ID + " " + type);
 
-						if (type == "sit")
-							o.SitSlot = s;
-						if (type == "stand")
-							o.StandSlot = s;
+							BasicObject o = new BasicObject(a);
+							var s = new Slot();
 
-						objects_.Add(o);
+							if (type == "sit")
+								o.SitSlot = s;
+							if (type == "stand")
+								o.StandSlot = s;
+
+							objects_.Add(o);
+						}
 					}
 				}
 
@@ -379,19 +406,18 @@ namespace Cue
 
 				sys_.Nav.Update();
 
-				player_ = new Person(sys_.GetAtom("Player"));
-				player_.Position = new Vector3(1.7f, 0, 0);
-
-				persons_.Add(new Person(sys_.GetAtom("Person")));
-				persons_[0].AI = new PersonAI();
-
+				//player_ = new Person(sys_.GetAtom("Player"));
+				((W.VamAtom)persons_[0].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(0, 0, 0));
+				((W.VamAtom)persons_[1].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(1.7f, 0, 0));
+				((W.VamAtom)persons_[2].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(0, 0, 1.7f));
+				//persons_[0].AI = new PersonAI();
 
 				allObjects_.AddRange(objects_);
 
 				foreach (var p in persons_)
 					allObjects_.Add(p);
 
-				allObjects_.Add(player_);
+				//allObjects_.Add(player_);
 
 				Resources.Animations.Load();
 
@@ -422,6 +448,14 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
+				++frame_;
+
+				if (frame_ == 5)
+				{
+					foreach (var p in persons_)
+						((W.VamAtom)p.Atom).Atom.collisionEnabled = true;
+				}
+
 				if (sys_.Paused != paused_)
 				{
 					paused_ = sys_.Paused;
