@@ -14,6 +14,8 @@ namespace Cue.Resources
 		public const int SitFromStanding = 6;
 		public const int StandFromSitting = 7;
 		public const int SitOnSitting = 8;
+		public const int KneelFromStanding = 9;
+		public const int StandFromKneeling = 10;
 
 		private static Dictionary<int, List<IAnimation>> anims_ =
 			new Dictionary<int, List<IAnimation>>();
@@ -38,6 +40,10 @@ namespace Cue.Resources
 				return StandFromSitting;
 			else if (s == "sitonsitting")
 				return SitOnSitting;
+			else if (s == "kneelfromstanding")
+				return KneelFromStanding;
+			else if (s == "standfromkneeling")
+				return StandFromKneeling;
 
 			Cue.LogError("unknown anim type '" + os + "'");
 			return NoType;

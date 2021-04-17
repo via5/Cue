@@ -180,9 +180,15 @@ namespace Cue
 	{
 		public const int StandingState = 0;
 		public const int WalkingState = 1;
+
 		public const int SittingDownState = 2;
 		public const int SitState = 3;
-		public const int StandingUpState = 4;
+		public const int StandingFromSittingState = 4;
+
+		public const int KneelingDownState = 5;
+		public const int KneelState = 6;
+		public const int StandingFromKneelingState = 7;
+
 
 		private readonly RootAction actions_ = new RootAction();
 		private IAI ai_ = null;
@@ -243,6 +249,11 @@ namespace Cue
 			get { return Atom.HeadPosition; }
 		}
 
+		public int State
+		{
+			get { return state_; }
+		}
+
 		public string StateString
 		{
 			get
@@ -299,6 +310,7 @@ namespace Cue
 
 		public void MakeIdle()
 		{
+			handjob_.Active = false;
 			actions_.Clear();
 			animator_.Stop();
 			Atom.SetDefaultControls();
@@ -323,7 +335,7 @@ namespace Cue
 				locked_ = o;
 			}
 
-			actions_.Clear();
+			MakeIdle();
 
 			if (o.SitSlot != null)
 			{
@@ -372,7 +384,11 @@ namespace Cue
 			{
 				if (state_ == SittingDownState)
 					state_ = SitState;
-				else if (state_ == StandingUpState)
+				else if (state_ == StandingFromSittingState)
+					state_ = StandingState;
+				else if (state_ == KneelingDownState)
+					state_ = KneelState;
+				else if (state_ == StandingFromKneelingState)
 					state_ = StandingState;
 			}
 
@@ -387,6 +403,33 @@ namespace Cue
 					Resources.Animations.SitFromStanding, Sex));
 
 			state_ = SittingDownState;
+		}
+
+		public void Kneel()
+		{
+			animator_.Play(
+				Resources.Animations.GetAny(
+					Resources.Animations.KneelFromStanding, Sex));
+
+			state_ = KneelingDownState;
+		}
+
+		public void Stand()
+		{
+			if (state_ == SitState)
+			{
+				state_ = StandingFromSittingState;
+				animator_.Play(
+					Resources.Animations.GetAny(
+						Resources.Animations.StandFromSitting, Sex));
+			}
+			else if (state_ == KneelState)
+			{
+				state_ = StandingFromKneelingState;
+				animator_.Play(
+					Resources.Animations.GetAny(
+						Resources.Animations.StandFromKneeling, Sex));
+			}
 		}
 
 		public virtual void Say(string s)
@@ -419,10 +462,17 @@ namespace Cue
 
 					if (state_ == SitState)
 					{
-						state_ = StandingUpState;
+						state_ = StandingFromSittingState;
 						animator_.Play(
 							Resources.Animations.GetAny(
 								Resources.Animations.StandFromSitting, Sex));
+					}
+					else if (state_ == KneelState)
+					{
+						state_ = StandingFromKneelingState;
+						animator_.Play(
+							Resources.Animations.GetAny(
+								Resources.Animations.StandFromKneeling, Sex));
 					}
 
 					return false;

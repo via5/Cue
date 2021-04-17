@@ -159,7 +159,15 @@ namespace Cue.W
 
 		public string ReadFileIntoString(string path)
 		{
-			return SuperController.singleton.ReadFileIntoString(path);
+			try
+			{
+				return SuperController.singleton.ReadFileIntoString(path);
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("failed to read '" + path + "', " + e.Message);
+				return "";
+			}
 		}
 
 		public string GetResourcePath(string path)
@@ -403,6 +411,9 @@ namespace Cue.W
 		private Quaternion turningStart_ = Quaternion.identity;
 		private const float turnSpeed_ = 360;
 		private DAZCharacter char_ = null;
+		private float pathStuckCheckElapsed_ = 0;
+		private Vector3 pathStuckLastPos_ = Vector3.Zero;
+		private int stuckCount_ = 0;
 
 		public VamAtom(Atom atom)
 		{
@@ -509,8 +520,9 @@ namespace Cue.W
 			{
 				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
 				var direction = Vector3.Rotate(new Vector3(0, 0, 1), finalBearing_);
+				var d = Math.Abs(currentBearing - finalBearing_);
 
-				if (Math.Abs(currentBearing - finalBearing_) < 5)
+				if (d < 5 || d >= 355)
 				{
 					atom_.mainController.transform.rotation =
 						Quaternion.LookRotation(Vector3.ToUnity(direction));
@@ -533,7 +545,33 @@ namespace Cue.W
 						turningStart_,
 						newRot,
 						turningElapsed_ / (360 / turnSpeed_));
-						//Time.deltaTime * 2f);
+					//Time.deltaTime * 2f);
+				}
+			}
+			else if (IsPathing())
+			{
+				pathStuckCheckElapsed_ += s;
+
+				if (pathStuckCheckElapsed_ >= 1)
+				{
+					var d = Vector3.Distance(Position, pathStuckLastPos_);
+
+					if (d < 0.05f)
+					{
+						++stuckCount_;
+
+						if (stuckCount_ >= 3)
+						{
+							Cue.LogError(atom_.uid + " seems stuck, stopping nav");
+							NavStop();
+						}
+					}
+					else
+					{
+						pathStuckLastPos_ = Position;
+					}
+
+					pathStuckCheckElapsed_ = 0;
 				}
 			}
 		}
@@ -605,6 +643,9 @@ namespace Cue.W
 			agent_.updateUpAxis = true;
 			finalBearing_ = bearing;
 			turningElapsed_ = 0;
+			pathStuckCheckElapsed_ = 0;
+			pathStuckLastPos_ = Position;
+			stuckCount_ = 0;
 		}
 
 		public void NavStop()
@@ -615,6 +656,7 @@ namespace Cue.W
 			agent_.updatePosition = false;
 			agent_.updateRotation = false;
 			agent_.updateUpAxis = false;
+			agent_.ResetPath();
 		}
 
 		public bool NavActive
@@ -690,7 +732,7 @@ namespace Cue.W
 			var d = new NavMeshData(1);
 			var s = new NavMeshBuildSettings();
 			s.agentTypeID = 1;
-			s.agentRadius = 0;
+			s.agentRadius = 0.1f;
 			s.agentHeight = 2;
 			s.agentClimb = 0.1f;
 			s.agentSlope = 60;

@@ -464,4 +464,80 @@ namespace Cue
 			return "CallEvent";
 		}
 	}
+
+
+	class HandjobEvent : BasicEvent
+	{
+		private const int NoState = 0;
+		private const int MovingState = 1;
+		private const int PositioningState = 2;
+		private const int ActiveState = 3;
+
+		private Person receiver_;
+		private int state_ = NoState;
+
+		public HandjobEvent(Person receiver)
+		{
+			receiver_ = receiver;
+		}
+
+		public override bool Tick(Person p, float s)
+		{
+			switch (state_)
+			{
+				case NoState:
+				{
+					var target =
+						receiver_.Position +
+						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
+
+					p.MoveTo(target, receiver_.Bearing + 180);
+					p.Gaze.LookAt = GazeSettings.LookAtTarget;
+					p.Gaze.Target = receiver_.Atom.HeadPosition;
+					state_ = MovingState;
+
+					break;
+				}
+
+				case MovingState:
+				{
+					if (!p.HasTarget)
+					{
+						if (receiver_.State == Person.SitState || receiver_.State == Person.SittingDownState)
+						{
+							p.Kneel();
+							state_ = PositioningState;
+						}
+						else
+						{
+							p.Handjob.Target = Cue.Instance.Player;
+							p.Handjob.Active = true;
+							state_ = ActiveState;
+						}
+					}
+
+					break;
+				}
+
+				case PositioningState:
+				{
+					if (!p.Animator.Playing)
+					{
+						p.Handjob.Target = Cue.Instance.Player;
+						p.Handjob.Active = true;
+						state_ = ActiveState;
+					}
+
+					break;
+				}
+
+				case ActiveState:
+				{
+					break;
+				}
+			}
+
+			return true;
+		}
+	}
 }

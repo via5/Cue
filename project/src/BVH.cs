@@ -39,7 +39,7 @@ namespace Cue.BVH
         public override string ToString()
         {
             string s =
-                file.Path + " " +
+                file.Name + " " +
                 start.ToString() + "-" +
                 (end == -1 ? file.nFrames.ToString() : end.ToString()) + " " +
                 (reverse ? "rev " : "");

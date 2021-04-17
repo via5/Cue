@@ -63,6 +63,7 @@ namespace Cue
 		public ClockwiseSilverHandjob(Person p)
 		{
 			person_ = p;
+			Active = false;
 		}
 
 		public bool Active

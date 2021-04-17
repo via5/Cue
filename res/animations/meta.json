@@ -48,6 +48,19 @@
 			"reverse": true
 		},
 
+		{
+			"type": "kneelFromStanding",
+			"bvh": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+			"end": 89
+		},
+
+
+		{
+			"type": "standFromKneeling",
+			"bvh": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+			"start": 89
+		},
+
 
 		{
 			"type": "sitIdle",
