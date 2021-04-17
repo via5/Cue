@@ -285,11 +285,45 @@ namespace Cue.W
 			return null;
 		}
 
-		public JSONStorableAction GetActionParameter(
+		public JSONStorableStringChooser GetStringChooserParameter(
 			IObject o, string storable, string param)
 		{
 			var a = ((W.VamAtom)o.Atom).Atom;
 
+			foreach (var id in a.GetStorableIDs())
+			{
+				if (id.Contains(storable))
+				{
+					var st = a.GetStorableByID(id);
+					if (st == null)
+					{
+						Cue.LogError("can't find storable " + id);
+						continue;
+					}
+
+					var p = st.GetStringChooserJSONParam(param);
+					if (p == null)
+					{
+						Cue.LogError("no '" + param + "' param");
+						continue;
+					}
+
+					return p;
+				}
+			}
+
+			return null;
+		}
+
+		public JSONStorableAction GetActionParameter(
+			IObject o, string storable, string param)
+		{
+			return GetActionParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+		}
+
+		public JSONStorableAction GetActionParameter(
+			Atom a, string storable, string param)
+		{
 			foreach (var id in a.GetStorableIDs())
 			{
 				if (id.Contains(storable))
@@ -368,6 +402,7 @@ namespace Cue.W
 		private float turningElapsed_ = 0;
 		private Quaternion turningStart_ = Quaternion.identity;
 		private const float turnSpeed_ = 360;
+		private DAZCharacter char_ = null;
 
 		public VamAtom(Atom atom)
 		{
@@ -382,6 +417,20 @@ namespace Cue.W
 		public bool IsPerson
 		{
 			get { return atom_.type == "Person"; }
+		}
+
+		public int Sex
+		{
+			get
+			{
+				if (char_ == null)
+					char_ = atom_.GetComponentInChildren<DAZCharacter>();
+
+				if (char_.name.Contains("female"))
+					return Sexes.Female;
+				else
+					return Sexes.Male;
+			}
 		}
 
 		public Vector3 Position
@@ -423,6 +472,14 @@ namespace Cue.W
 		public Atom Atom
 		{
 			get { return atom_; }
+		}
+
+		public void SetDefaultControls()
+		{
+			var a = ((W.VamSys)Cue.Instance.Sys).GetActionParameter(
+				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
+
+			a?.actionCallback?.Invoke();
 		}
 
 		public void OnPluginState(bool b)
@@ -498,7 +555,7 @@ namespace Cue.W
 						agent_.agentTypeID = 1;
 						agent_.height = 2.0f;
 						agent_.radius = 0.1f;
-						agent_.speed = 1;
+						agent_.speed = 2;
 						agent_.angularSpeed = 120;
 						agent_.stoppingDistance = 0;
 						agent_.autoBraking = true;

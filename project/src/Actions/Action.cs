@@ -66,7 +66,7 @@ namespace Cue
 				if (b)
 					return true;
 
-				children_.RemoveAt(children_.Count - 1);
+				children_.Remove(a);
 			}
 
 			return false;
@@ -125,6 +125,17 @@ namespace Cue
 		{
 			// no-op
 			return true;
+		}
+	}
+
+
+	class MakeIdleAction : BasicAction
+	{
+		protected override bool DoStart(IObject o, float s)
+		{
+			if (o is Person)
+				((Person)o).MakeIdle();
+			return false;
 		}
 	}
 

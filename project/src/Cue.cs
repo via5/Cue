@@ -111,6 +111,9 @@ namespace Cue
 			foreach (var o in objects)
 				controls_.Add(new ObjectControls(o));
 
+			for (int i = 0; i < 32; ++i)
+				Physics.IgnoreLayerCollision(i, Layer);
+
 			Check();
 		}
 
@@ -124,6 +127,9 @@ namespace Cue
 
 			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
 			{
+				if (Cue.Instance.Hud.IsHovered(Input.mousePosition))
+					return;
+
 				CheckHovered();
 
 				if (Input.GetMouseButtonUp(0))
@@ -251,7 +257,7 @@ namespace Cue
 
 		private static Cue instance_ = null;
 		private W.ISys sys_ = null;
-		//private Person player_ = null;
+		private Person player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
@@ -294,10 +300,10 @@ namespace Cue
 			get { return persons_; }
 		}
 
-		//public Person Player
-		//{
-		//	get { return player_; }
-		//}
+		public Person Player
+		{
+			get { return player_; }
+		}
 
 		public IObject Selected
 		{
@@ -307,6 +313,11 @@ namespace Cue
 		public IObject Hovered
 		{
 			get { return hovered_; }
+		}
+
+		public Hud Hud
+		{
+			get { return hud_; }
 		}
 
 		public void Select(IObject o)
@@ -376,8 +387,12 @@ namespace Cue
 				{
 					if (a.IsPerson)
 					{
-						persons_.Add(new Person(a));
+						var p = new Person(a);
+						persons_.Add(p);
 						((W.VamAtom)a).Atom.collisionEnabled = false;
+
+						if (a.ID == "C")
+							player_ = p;
 					}
 					else
 					{
@@ -429,6 +444,8 @@ namespace Cue
 				//
 				controls_.Create(objects_);
 				OnEnable();
+
+				Select(Player);
 			});
 		}
 

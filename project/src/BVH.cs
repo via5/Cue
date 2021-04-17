@@ -8,7 +8,7 @@ namespace Cue.BVH
 {
     using Vector3 = UnityEngine.Vector3;
 
-    class Animation : IAnimation
+    class Animation : BasicAnimation
     {
         public BVH.File file = null;
         public bool rootXZ = false;
@@ -39,9 +39,9 @@ namespace Cue.BVH
         public override string ToString()
         {
             string s =
-                file.Name + " " +
+                file.Path + " " +
                 start.ToString() + "-" +
-                end.ToString() + " " +
+                (end == -1 ? file.nFrames.ToString() : end.ToString()) + " " +
                 (reverse ? "rev " : "");
 
             if (rootXZ && rootY)
@@ -188,6 +188,9 @@ namespace Cue.BVH
 
         public void Stop()
         {
+            if (anim == null)
+                return;
+
             if ((flags & Animator.Reverse) == 0)
                 flags |= Animator.Reverse;
             else
@@ -544,6 +547,11 @@ namespace Cue.BVH
             get { return name; }
         }
 
+        public string Path
+        {
+            get { return path; }
+        }
+
         public void Load(string path)
         {
             int i = path.Length - 1;
@@ -562,7 +570,12 @@ namespace Cue.BVH
                 name = path;
 
             char[] delims = { '\r', '\n' };
-            var raw = Cue.Instance.Sys.ReadFileIntoString(path).Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
+            var rawText = Cue.Instance.Sys.ReadFileIntoString(path);
+            if (rawText.Length == 0)
+                Cue.LogError("bvh: empty file " + path);
+
+            var raw = rawText.Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
+
             bones = ReadHierarchy(raw);
             frames = ReadMotion(raw);
             frameTime = ReadFrameTime(raw);

@@ -59,8 +59,18 @@ namespace Cue.Resources
 
 				if (a.HasKey("bvh"))
 				{
+					var path = a["bvh"].Value;
+					if (path.StartsWith("/") || path.StartsWith("\\"))
+					{
+						path = path.Substring(1);
+					}
+					else
+					{
+						path = Cue.Instance.Sys.GetResourcePath("animations/" + path);
+					}
+
 					anim = new BVH.Animation(
-						Cue.Instance.Sys.GetResourcePath("animations/" + a["bvh"]),
+						path,
 						(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
 						(a.HasKey("rootY") ? a["rootY"].AsBool : true),
 						(a.HasKey("reverse") ? a["reverse"].AsBool : false),
@@ -71,6 +81,9 @@ namespace Cue.Resources
 				{
 					anim = new TimelineAnimation(a["timeline"]);
 				}
+
+				if (a.HasKey("sex"))
+					anim.Sex = Sexes.FromString(a["sex"]);
 
 				Cue.LogError(a["type"] + " anim: " + anim.ToString());
 
@@ -85,25 +98,35 @@ namespace Cue.Resources
 			}
 		}
 
-		public static IAnimation GetAny(int type)
+		public static IAnimation GetAny(int type, int sex)
 		{
 			List<IAnimation> list;
 			if (!anims_.TryGetValue(type, out list))
 				return null;
 
-			if (list.Count == 0)
-				return null;
+			foreach (var a in list)
+			{
+				if (Sexes.Match(a.Sex, sex))
+					return a;
+			}
 
-			return list[0];
+			return null;
 		}
 
-		public static List<IAnimation> GetAll(int type)
+		public static List<IAnimation> GetAll(int type, int sex)
 		{
 			List<IAnimation> list;
 			if (!anims_.TryGetValue(type, out list))
 				return new List<IAnimation>();
 
-			return list;
+			var matched = new List<IAnimation>();
+			foreach (var a in list)
+			{
+				if (Sexes.Match(a.Sex, sex))
+					matched.Add(a);
+			}
+
+			return matched;
 		}
 	}
 }

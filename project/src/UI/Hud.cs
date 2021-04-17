@@ -32,7 +32,15 @@ namespace Cue
 			p.Add(new VUI.Button("Call", OnCall));
 			p.Add(new VUI.Button("Sit", OnSit));
 			p.Add(new VUI.Button("Reload", OnReload));
+			p.Add(new VUI.CheckBox("Handjob", OnHandjob));
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
+		}
+
+		public bool IsHovered(Vector2 p)
+		{
+			var rt = hudPanel_.GetComponent<RectTransform>();
+			Vector2 local = rt.InverseTransformPoint(p);
+			return rt.rect.Contains(local);
 		}
 
 		public void Destroy()
@@ -58,7 +66,8 @@ namespace Cue
 
 		private void OnCall()
 		{
-			//Cue.Instance.Persons[0].Call(Cue.Instance.Player);
+			if (Cue.Instance.Selected is Person)
+				((Person)Cue.Instance.Selected).Call(Cue.Instance.Player);
 		}
 
 		private void OnSit()
@@ -67,12 +76,26 @@ namespace Cue
 			Cue.Instance.Persons[0].AI.Enabled = false;
 			Cue.Instance.Persons[0].MakeIdle();
 			Cue.Instance.Persons[0].Animator.Play(
-				Resources.Animations.GetAny(Resources.Animations.SitOnSitting));
+				Resources.Animations.GetAny(
+					Resources.Animations.SitOnSitting,
+					Cue.Instance.Persons[0].Sex));
 		}
 
 		private void OnReload()
 		{
 			Cue.Instance.ReloadPlugin();
+		}
+
+		private void OnHandjob(bool b)
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+
+				p.MakeIdle();
+				p.Handjob.Target = Cue.Instance.Player;
+				p.Handjob.Active = b;
+			}
 		}
 
 		private void CreateFullscreenPanel(Transform parent)

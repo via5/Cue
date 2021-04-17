@@ -1,5 +1,4 @@
-﻿using Battlehub.RTSaveLoad;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
@@ -14,7 +13,7 @@ namespace Cue
 	{
 		private int i_ = -1;
 		private readonly List<IEvent> events_ = new List<IEvent>();
-		private bool enabled_ = true;
+		private bool enabled_ = false;
 		private Person person_ = null;
 		private IEvent forced_ = null;
 
@@ -66,7 +65,9 @@ namespace Cue
 
 			if (forced_ != null)
 			{
-				forced_.Tick(p, s);
+				if (!forced_.Tick(p, s))
+					forced_ = null;
+
 				return;
 			}
 
@@ -219,7 +220,7 @@ namespace Cue
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.SitIdle)));
+								Resources.Animations.SitIdle, p.Sex)));
 
 						cc.Push(new LookAroundAction());
 
@@ -313,7 +314,7 @@ namespace Cue
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.StandIdle)));
+								Resources.Animations.StandIdle, p.Sex)));
 
 						cc.Push(new LookAroundAction());
 						p.PushAction(cc);
@@ -425,9 +426,9 @@ namespace Cue
 				{
 					var target =
 						caller_.Position +
-						Vector3.Rotate(new Vector3(0, 0, 0.8f), caller_.Bearing);
+						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
-					callee.MoveTo(target, 360 - caller_.Bearing);
+					callee.MoveTo(target, caller_.Bearing + 180);
 					callee.Gaze.LookAt = GazeSettings.LookAtTarget;
 					callee.Gaze.Target = caller_.Atom.HeadPosition;
 					state_ = MovingState;
@@ -441,7 +442,7 @@ namespace Cue
 					{
 						callee.PushAction(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.StandIdle)));
+								Resources.Animations.StandIdle, callee.Sex)));
 
 						state_ = IdlingState;
 					}
@@ -451,7 +452,7 @@ namespace Cue
 
 				case IdlingState:
 				{
-					break;
+					return false;
 				}
 			}
 

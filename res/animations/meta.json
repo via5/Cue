@@ -7,9 +7,17 @@
 			"start": 67,
 			"end": 150,
 			"rootXZ": false,
-			"rootY": false
+			"rootY": false,
+			"sex": "female"
 		},
 
+		{
+			"type": "walk",
+			"bvh": "walkm.bvh",
+			"rootXZ": false,
+			"rootY": false,
+			"sex": "male"
+		},
 
 		{
 			"type": "turnLeft",
@@ -24,7 +32,14 @@
 
 		{
 			"type": "sitFromStanding",
-			"bvh": "sit.bvh"
+			"bvh": "sit.bvh",
+			"sex": "female"
+		},
+
+		{
+			"type": "sitFromStanding",
+			"timeline": "SitFromStanding",
+			"sex": "male"
 		},
 
 		{

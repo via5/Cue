@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class TimelineAnimation : IAnimation
+	class TimelineAnimation : BasicAnimation
 	{
 		private string name_;
 

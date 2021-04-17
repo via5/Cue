@@ -35,9 +35,14 @@ namespace Cue.W
 	{
 		string ID { get; }
 		bool IsPerson { get; }
+		int Sex { get; }
+
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 		Vector3 HeadPosition { get; }
+
+		void SetDefaultControls();
+
 		void OnPluginState(bool b);
 
 		void Update(float s);

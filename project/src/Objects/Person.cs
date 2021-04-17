@@ -28,8 +28,72 @@ namespace Cue
 		void Say(string s);
 	}
 
+	class Sexes
+	{
+		public const int Any = 0;
+		public const int Male = 1;
+		public const int Female = 2;
+
+		public static int FromString(string os)
+		{
+			var s = os.ToLower();
+
+			if (s == "male")
+				return Male;
+			else if (s == "female")
+				return Female;
+			else if (s == "")
+				return Any;
+
+			Cue.LogError("bad sex value '" + os + "'");
+			return Any;
+		}
+
+		public static string ToString(int i)
+		{
+			switch (i)
+			{
+				case Male:
+					return "male";
+
+				case Female:
+					return "female";
+
+				default:
+					return "any";
+			}
+		}
+
+		public static bool Match(int a, int b)
+		{
+			if (a == Any || b == Any)
+				return true;
+
+			return (a == b);
+		}
+	}
+
 	interface IAnimation
 	{
+		int Sex { get; set; }
+	}
+
+	abstract class BasicAnimation : IAnimation
+	{
+		private int sex_ = Sexes.Any;
+
+		public int Sex
+		{
+			get
+			{
+				return sex_;
+			}
+
+			set
+			{
+				sex_ = value;
+			}
+		}
 	}
 
 	interface IPlayer
@@ -105,6 +169,13 @@ namespace Cue
 	}
 
 
+	interface IHandjob
+	{
+		bool Active { get; set; }
+		Person Target { get; set; }
+	}
+
+
 	class Person : BasicObject
 	{
 		public const int StandingState = 0;
@@ -125,15 +196,18 @@ namespace Cue
 		private ISpeaker speech_;
 		private IGazer gaze_;
 		private IKisser kisser_;
+		private IHandjob handjob_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
+			ai_ = new PersonAI();
 			animator_ = new Animator(this);
 			breathing_ = new MacGruberBreather(this);
 			speech_ = new VamSpeaker(this);
 			gaze_ = new MacGruberGaze(this);
 			kisser_ = new ClockwiseSilverKiss(this);
+			handjob_ = new ClockwiseSilverHandjob(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
@@ -198,6 +272,21 @@ namespace Cue
 			get { return gaze_; }
 		}
 
+		public IKisser Kisser
+		{
+			get { return kisser_; }
+		}
+
+		public IHandjob Handjob
+		{
+			get { return handjob_; }
+		}
+
+		public int Sex
+		{
+			get { return Atom.Sex; }
+		}
+
 		public void PushAction(IAction a)
 		{
 			actions_.Push(a);
@@ -212,6 +301,7 @@ namespace Cue
 		{
 			actions_.Clear();
 			animator_.Stop();
+			Atom.SetDefaultControls();
 		}
 
 		public void Call(Person caller)
@@ -242,7 +332,8 @@ namespace Cue
 			}
 			else if (o.StandSlot != null)
 			{
-				PushAction(new MoveAction(o.Position, NoBearing));
+				PushAction(new MakeIdleAction());
+				PushAction(new MoveAction(o.Position, o.Bearing));
 			}
 
 			return true;
@@ -293,7 +384,7 @@ namespace Cue
 		{
 			animator_.Play(
 				Resources.Animations.GetAny(
-					Resources.Animations.SitFromStanding));
+					Resources.Animations.SitFromStanding, Sex));
 
 			state_ = SittingDownState;
 		}
@@ -301,6 +392,11 @@ namespace Cue
 		public virtual void Say(string s)
 		{
 			speech_.Say(s);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + " (" + Sexes.ToString(Sex) + ")";
 		}
 
 		protected override bool SetMoving(int i)
@@ -326,7 +422,7 @@ namespace Cue
 						state_ = StandingUpState;
 						animator_.Play(
 							Resources.Animations.GetAny(
-								Resources.Animations.StandFromSitting));
+								Resources.Animations.StandFromSitting, Sex));
 					}
 
 					return false;
@@ -339,7 +435,7 @@ namespace Cue
 					if (lastMoveState_ != MoveWalk)
 					{
 						animator_.Play(
-							Resources.Animations.GetAny(Resources.Animations.Walk),
+							Resources.Animations.GetAny(Resources.Animations.Walk, Sex),
 							Animator.Loop);
 					}
 
@@ -349,7 +445,7 @@ namespace Cue
 				case MoveTurnLeft:
 				{
 					if (lastMoveState_ != MoveTurnLeft)
-						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnLeft));
+						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnLeft, Sex));
 
 					break;
 				}
@@ -357,7 +453,7 @@ namespace Cue
 				case MoveTurnRight:
 				{
 					if (lastMoveState_ != MoveTurnRight)
-						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnRight));
+						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnRight, Sex));
 
 					break;
 				}

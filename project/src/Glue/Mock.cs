@@ -145,6 +145,11 @@ namespace Cue.W
 			get { return true; }
 		}
 
+		public int Sex
+		{
+			get { return Sexes.Any; }
+		}
+
 		public Vector3 Position
 		{
 			get { return Vector3.Zero; }
@@ -165,6 +170,10 @@ namespace Cue.W
 		public void Say(string s)
 		{
 			Cue.LogError(id_ + " says '" + s + "'");
+		}
+
+		public void SetDefaultControls()
+		{
 		}
 
 		public void OnPluginState(bool b)
