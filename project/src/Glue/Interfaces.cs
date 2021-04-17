@@ -17,6 +17,7 @@ namespace Cue.W
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
+		void ReloadPlugin();
 	}
 
 	interface ITime

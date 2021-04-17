@@ -66,6 +66,10 @@ namespace Cue.W
 			// no-op
 		}
 
+		public void ReloadPlugin()
+		{
+		}
+
 		public void OnReady(Action f)
 		{
 			f?.Invoke();

@@ -2,6 +2,7 @@ project\src\AI.cs
 project\src\BVH.cs
 project\src\Cue.cs
 project\src\Geo.cs
+project\src\Main.cs
 project\src\Resources.cs
 project\src\Utilities.cs
 project\src\Actions\Action.cs
@@ -14,6 +15,7 @@ project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
+project\src\UI\Controls.cs
 project\src\UI\Hud.cs
 project\src\UI\ScriptUI.cs
 project\src\VUI\BorderLayout.cs

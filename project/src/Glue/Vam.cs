@@ -157,6 +157,20 @@ namespace Cue.W
 			SuperController.singleton.StartCoroutine(DeferredInit(f));
 		}
 
+		public void ReloadPlugin()
+		{
+#if (VAM_GT_1_20)
+			foreach (var pui in CueMain.Instance.UITransform.parent.GetComponentsInChildren<MVRPluginUI>())
+			{
+				if (pui.urlText.text.Contains("Cue.cslist"))
+				{
+					Cue.LogError("reloading");
+					pui.reloadButton.onClick.Invoke();
+				}
+			}
+#endif
+		}
+
 		public string ReadFileIntoString(string path)
 		{
 			try
@@ -172,12 +186,13 @@ namespace Cue.W
 
 		public string GetResourcePath(string path)
 		{
+#if (VAM_GT_1_20)
 			// based on MacGruber, which was based on VAMDeluxe, which was
 			// in turn based on Alazi
 
 			if (pluginPath_ == "")
 			{
-				var self = Cue.Instance;
+				var self = CueMain.Instance;
 				string id = self.name.Substring(0, self.name.IndexOf('_'));
 				string filename = self.manager.GetJSON()["plugins"][id].Value;
 
@@ -195,6 +210,9 @@ namespace Cue.W
 				return pluginPath_ + "\\res" + path;
 			else
 				return pluginPath_ + "\\res\\" + path;
+#else
+			return pluginPath_;
+#endif
 		}
 
 		private IEnumerator DeferredInit(Action f)

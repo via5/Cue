@@ -2,6 +2,7 @@
 
 namespace Cue.UI
 {
+#if (VAM_GT_1_20)
 	class ScriptUI
 	{
 		private VUI.Root root_ = null;
@@ -17,11 +18,11 @@ namespace Cue.UI
 		public void Init()
 		{
 			var scriptui =
-				Cue.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
+				CueMain.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
 
 
 			VUI.Glue.Set(
-				() => Cue.Instance.manager,
+				() => CueMain.Instance.manager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => Cue.LogVerbose(s),
 				(s) => Cue.LogInfo(s),
@@ -91,4 +92,5 @@ namespace Cue.UI
 			//Cue.Instance.Person.Animator.Play(a);
 		}
 	}
+#endif
 }
