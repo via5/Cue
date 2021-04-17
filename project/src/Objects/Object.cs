@@ -113,6 +113,11 @@ namespace Cue
 			get { return atom_; }
 		}
 
+		public string ID
+		{
+			get { return atom_.ID; }
+		}
+
 		public Vector3 Position
 		{
 			get { return atom_.Position; }
@@ -258,6 +263,11 @@ namespace Cue
 			moveState_ = MoveTowardsTargetState;
 			canMove_ = SetMoving(MoveTentative);
 			moving_ = false;
+		}
+
+		public void TeleportTo(Vector3 to)
+		{
+			Atom.TeleportTo(to);
 		}
 
 		protected virtual bool SetMoving(int i)

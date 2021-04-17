@@ -46,8 +46,8 @@ namespace Cue
 			if (kissing_ != null)
 				return;
 
-			kissing_ = ((W.VamSys)Cue.Instance.Sys)
-				.GetBoolParameter(person_, "ClockwiseSilver.Kiss", "Is Kissing");
+			kissing_ = Cue.Instance.VamSys?.GetBoolParameter(
+				person_, "ClockwiseSilver.Kiss", "Is Kissing");
 		}
 	}
 
@@ -150,19 +150,19 @@ namespace Cue
 		{
 			if (active_ == null)
 			{
-				active_ = ((W.VamSys)Cue.Instance.Sys).GetBoolParameter(
+				active_ = Cue.Instance.VamSys?.GetBoolParameter(
 					person_, "ClockwiseSilver.HJ", "isActive");
 			}
 
 			if (male_ == null)
 			{
-				male_ = ((W.VamSys)Cue.Instance.Sys).GetStringChooserParameter(
+				male_ = Cue.Instance.VamSys?.GetStringChooserParameter(
 					person_, "ClockwiseSilver.HJ", "Atom");
 			}
 
 			if (hand_ == null)
 			{
-				hand_ = ((W.VamSys)Cue.Instance.Sys).GetStringChooserParameter(
+				hand_ = Cue.Instance.VamSys?.GetStringChooserParameter(
 					person_, "ClockwiseSilver.HJ", "handedness");
 			}
 		}

@@ -59,9 +59,7 @@ namespace Cue
 
 			SetControllers();
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-
-			play_ = vsys.GetActionParameter(
+			play_ = Cue.Instance.VamSys?.GetActionParameter(
 				person_, "VamTimeline.AtomPlugin", "Play " + ta.Name);
 
 			if (play_ == null)
@@ -92,12 +90,10 @@ namespace Cue
 			if (playing_ != null)
 				return;
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-
-			playing_ = vsys.GetBoolParameter(
+			playing_ = Cue.Instance.VamSys?.GetBoolParameter(
 				person_, "VamTimeline.AtomPlugin", "Is Playing");
 
-			stop_ = vsys.GetActionParameter(
+			stop_ = Cue.Instance.VamSys?.GetActionParameter(
 				person_, "VamTimeline.AtomPlugin", "Stop");
 		}
 
@@ -131,7 +127,9 @@ namespace Cue
 			foreach (var c in cs)
 				notFound.Add(c.Key);
 
-			foreach (var c in ((W.VamAtom)person_.Atom).Atom.freeControllers)
+			var atom = ((W.VamAtom)person_.Atom).Atom;
+
+			foreach (var c in atom.freeControllers)
 			{
 				bool b;
 				if (cs.TryGetValue(c.name, out b))

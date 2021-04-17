@@ -65,9 +65,7 @@ namespace Cue
 			if (intensity_ != null)
 				return;
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-
-			intensity_ = vsys.GetFloatParameter(
+			intensity_ = Cue.Instance.VamSys?.GetFloatParameter(
 				person_, "MacGruber.Gaze", "enabled");
 		}
 	}
@@ -180,12 +178,10 @@ namespace Cue
 			if (toggle_ != null && lookatTarget_ != null)
 				return;
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-
-			toggle_ = vsys.GetBoolParameter(
+			toggle_ = Cue.Instance.VamSys?.GetBoolParameter(
 				person_, "MacGruber.Gaze", "enabled");
 
-			lookatTarget_ = vsys.GetBoolParameter(
+			lookatTarget_ = Cue.Instance.VamSys?.GetBoolParameter(
 				person_, "MacGruber.Gaze", "LookAt EyeTarget");
 		}
 	}

@@ -47,6 +47,7 @@ namespace Cue.W
 		void OnPluginState(bool b);
 
 		void Update(float s);
+		void TeleportTo(Vector3 p);
 
 		bool NavEnabled { get; set; }
 		bool NavPaused { get; set; }

@@ -23,7 +23,6 @@ namespace Cue
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
-		private int frame_ = 0;
 
 		public Cue(CueMain main)
 		{
@@ -39,6 +38,11 @@ namespace Cue
 		public W.ISys Sys
 		{
 			get { return main_.Sys; }
+		}
+
+		public W.VamSys VamSys
+		{
+			get { return main_.Sys as W.VamSys; }
 		}
 
 		public List<IObject> AllObjects
@@ -109,70 +113,73 @@ namespace Cue
 
 		public void Init()
 		{
-			frame_ = 0;
+			Resources.Animations.Load();
 
+			FindObjects();
+			FindPlayer();
+			Sys.Nav.Update();
+
+			// todo
+			persons_[0].TeleportTo(new Vector3(0, 0, 0));
+			persons_[1].TeleportTo(new Vector3(1.7f, 0, 0));
+			persons_[2].TeleportTo(new Vector3(0, 0, 1.7f));
+
+			controls_.Create(objects_);
+			OnPluginState(true);
+
+			Select(Player);
+		}
+
+		private void FindObjects()
+		{
 			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
 
 			foreach (var a in Sys.GetAtoms())
 			{
 				if (a.IsPerson)
 				{
-					var p = new Person(a);
-					persons_.Add(p);
-					((W.VamAtom)a).Atom.collisionEnabled = false;
-
-					if (a.ID == "C")
-						player_ = p;
+					AddPerson(a);
 				}
 				else
 				{
 					var m = re.Match(a.ID);
-
 					if (m != null && m.Success)
-					{
-						string type = m.Groups[1].Value;
-						//LogError("found " + a.ID + " " + type);
-
-						BasicObject o = new BasicObject(a);
-						var s = new Slot();
-
-						if (type == "sit")
-							o.SitSlot = s;
-						if (type == "stand")
-							o.StandSlot = s;
-
-						objects_.Add(o);
-					}
+						AddObject(a, m.Groups[1].Value);
 				}
 			}
+		}
 
-			Sys.Nav.Update();
-
-			//player_ = new Person(sys_.GetAtom("Player"));
-			((W.VamAtom)persons_[0].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(0, 0, 0));
-			((W.VamAtom)persons_[1].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(1.7f, 0, 0));
-			((W.VamAtom)persons_[2].Atom).Atom.mainController.MoveControl(new UnityEngine.Vector3(0, 0, 1.7f));
-			//persons_[0].AI = new PersonAI();
-
-			allObjects_.AddRange(objects_);
-
+		private void FindPlayer()
+		{
 			foreach (var p in persons_)
-				allObjects_.Add(p);
+			{
+				if (p.ID == "Player")
+					player_ = p;
+			}
 
-			//allObjects_.Add(player_);
+			if (player_ == null)
+				LogError("no atom 'Player' found");
+		}
 
-			Resources.Animations.Load();
+		private void AddPerson(W.IAtom a)
+		{
+			var p = new Person(a);
+			persons_.Add(p);
+			allObjects_.Add(p);
+		}
 
-			//VUI.Utilities.DumpComponentsAndUp(SuperController.singleton.errorLogPanel);
+		private void AddObject(W.IAtom a, string type)
+		{
+			BasicObject o = new BasicObject(a);
+			var s = new Slot();
 
+			if (type == "sit")
+				o.SitSlot = s;
+			if (type == "stand")
+				o.StandSlot = s;
 
-			//for (int i = 0; i < persons_.Count; ++i)
-			//	persons_[i].OnPluginState(true);
-			//
-			controls_.Create(objects_);
-			OnPluginState(true);
-
-			Select(Player);
+			objects_.Add(o);
+			allObjects_.Add(o);
 		}
 
 		public void ReloadPlugin()
@@ -182,14 +189,6 @@ namespace Cue
 
 		public void Update()
 		{
-			++frame_;
-
-			if (frame_ == 5)
-			{
-				foreach (var p in persons_)
-					((W.VamAtom)p.Atom).Atom.collisionEnabled = true;
-			}
-
 			if (Sys.Paused != paused_)
 			{
 				paused_ = Sys.Paused;
@@ -222,7 +221,7 @@ namespace Cue
 			controls_.Enabled = b;
 
 			if (b)
-				hud_.Create(SuperController.singleton.mainMenuUI.root);
+				hud_.Create();
 			else
 				hud_.Destroy();
 

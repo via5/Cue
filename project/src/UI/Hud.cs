@@ -12,6 +12,11 @@ namespace Cue
 		private VUI.Label sel_ = null;
 		private VUI.Label hovered_ = null;
 
+		public void Create()
+		{
+			Create(SuperController.singleton.mainMenuUI.root);
+		}
+
 		public void Create(Transform parent)
 		{
 			Cue.Instance.SelectionChanged += OnSelectionChanged;

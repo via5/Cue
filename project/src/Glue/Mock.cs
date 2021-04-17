@@ -188,6 +188,10 @@ namespace Cue.W
 		{
 		}
 
+		public void TeleportTo(Vector3 v)
+		{
+		}
+
 		public bool NavEnabled
 		{
 			get { return false; }

@@ -119,12 +119,11 @@ namespace Cue
 
 		private void Get()
 		{
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
 			var a = ((W.VamAtom)person_.Atom).Atom;
 
 			if (eyes_ == null)
 			{
-				eyes_ = vsys.FindRigidbody(person_, "eyeTargetControl");
+				eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
 				if (eyes_ == null)
 				{
 					Cue.LogError("atom " + a.uid + " has no eyeTargetControl");
@@ -193,9 +192,7 @@ namespace Cue
 			if (text_ != null)
 				return;
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-
-			text_ = vsys.GetStringParameter(
+			text_ = Cue.Instance.VamSys?.GetStringParameter(
 				person_, "SpeechBubble", "bubbleText");
 		}
 	}

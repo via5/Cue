@@ -28,14 +28,7 @@ namespace Cue
 			control_ = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			control_.layer = Controls.Layer;
 
-			foreach (var collider in control_.GetComponents<Collider>())
-			{
-				//collider.enabled = false;
-				//UnityEngine.Object.Destroy(collider);
-			}
-
 			material_ = new Material(Shader.Find("Battlehub/RTGizmos/Handles"));
-
 			material_.color = new Color(0, 0, 1, 0.5f);
 			material_.SetFloat("_Offset", 1f);
 			material_.SetFloat("_MinAlpha", 1f);
@@ -189,9 +182,6 @@ namespace Cue
 				if (((W.VamAtom)ps[i].Atom).Atom == a)
 					return ps[i];
 			}
-
-			//if (((W.VamAtom)Cue.Instance.Player.Atom).Atom == a)
-			//	return Cue.Instance.Player;
 
 			return null;
 		}

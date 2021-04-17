@@ -432,6 +432,7 @@ namespace Cue.W
 		private float pathStuckCheckElapsed_ = 0;
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
+		private int enableCollisionsCountdown_ = -1;
 
 		public VamAtom(Atom atom)
 		{
@@ -525,6 +526,14 @@ namespace Cue.W
 
 		public void Update(float s)
 		{
+			if (enableCollisionsCountdown_ >= 0)
+			{
+				if (enableCollisionsCountdown_ == 0)
+					atom_.collisionEnabled = true;
+
+				--enableCollisionsCountdown_;
+			}
+
 			if (!turning_ && finalBearing_ != BasicObject.NoBearing)
 			{
 				if (!IsPathing())
@@ -592,6 +601,13 @@ namespace Cue.W
 					pathStuckCheckElapsed_ = 0;
 				}
 			}
+		}
+
+		public void TeleportTo(Vector3 v)
+		{
+			atom_.collisionEnabled = false;
+			atom_.mainController.MoveControl(Vector3.ToUnity(v));
+			enableCollisionsCountdown_ = 5;
 		}
 
 		public bool NavEnabled
