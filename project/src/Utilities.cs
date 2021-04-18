@@ -49,6 +49,13 @@ namespace Cue
 				return val;
 		}
 
+		// [begin, end[
+		//
+		public static int RandomInt(int begin, int end)
+		{
+			return UnityEngine.Random.Range(begin, end);
+		}
+
 		public static void DumpComponents(GameObject o, int indent = 0)
 		{
 			foreach (var c in o.GetComponents(typeof(Component)))

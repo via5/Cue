@@ -15,6 +15,7 @@ project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
+project\src\Objects\Slots.cs
 project\src\UI\Controls.cs
 project\src\UI\Hud.cs
 project\src\UI\ScriptUI.cs

@@ -109,6 +109,7 @@
     <Compile Include="src\Objects\Person.cs" />
     <Compile Include="src\Glue\Interfaces.cs" />
     <Compile Include="src\Glue\Mock.cs" />
+    <Compile Include="src\Objects\Slots.cs" />
     <Compile Include="src\Resources.cs" />
     <Compile Include="src\UI\Controls.cs" />
     <Compile Include="src\UI\Hud.cs" />
