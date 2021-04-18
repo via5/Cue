@@ -54,20 +54,20 @@ namespace Cue
 			});
 		}
 
+		public void FixedUpdate()
+		{
+			U.Safe(() =>
+			{
+				cue_.FixedUpdate();
+			});
+		}
+
 		public void Update()
 		{
 			U.Safe(() =>
 			{
 				cue_.Update();
 				sui_.Update();
-			});
-		}
-
-		public void FixedUpdate()
-		{
-			U.Safe(() =>
-			{
-				cue_.FixedUpdate();
 			});
 		}
 

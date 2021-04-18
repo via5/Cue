@@ -503,7 +503,7 @@ namespace Cue
 				{
 					if (!p.HasTarget)
 					{
-						if (receiver_.State == Person.SitState || receiver_.State == Person.SittingDownState)
+						if (receiver_.State.Is(PersonState.Sitting))
 						{
 							p.Kneel();
 							state_ = PositioningState;

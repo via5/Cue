@@ -393,6 +393,11 @@ namespace Cue.BVH
             }
         }
 
+        public void Update(float s)
+        {
+            // no-op
+        }
+
         public void FrameAdvance(float s)
         {
             if (playing)

@@ -23,12 +23,18 @@ namespace Cue
 			get { return (active_ != null); }
 		}
 
+		public void Play(int type, int flags = 0)
+		{
+			Play(Resources.Animations.GetAny(type, person_.Sex), flags);
+		}
+
 		public void Play(IAnimation a, int flags = 0)
 		{
 			foreach (var p in players_)
 			{
 				if (p.Play(a, flags))
 				{
+					Cue.LogError(person_.ID + ": " + p.ToString());
 					active_ = p;
 					break;
 				}
@@ -46,6 +52,16 @@ namespace Cue
 			if (active_ != null)
 			{
 				active_.FixedUpdate(s);
+				if (!active_.Playing)
+					active_ = null;
+			}
+		}
+
+		public void Update(float s)
+		{
+			if (active_ != null)
+			{
+				active_.Update(s);
 				if (!active_.Playing)
 					active_ = null;
 			}

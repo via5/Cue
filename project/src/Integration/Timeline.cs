@@ -16,11 +16,18 @@ namespace Cue
 		{
 			get { return name_; }
 		}
+
+		public override string ToString()
+		{
+			return name_;
+		}
 	}
 
 	class TimelinePlayer : IPlayer
 	{
 		private readonly Person person_;
+		private TimelineAnimation current_ = null;
+		private int flags_ = 0;
 		private JSONStorableAction play_ = null;
 		private JSONStorableAction stop_ = null;
 		private JSONStorableBool playing_ = null;
@@ -53,18 +60,20 @@ namespace Cue
 
 		public bool Play(IAnimation a, int flags)
 		{
-			var ta = (a as TimelineAnimation);
-			if (ta == null)
+			current_ = (a as TimelineAnimation);
+			flags_ = flags;
+
+			if (current_ == null)
 				return false;
 
 			SetControllers();
 
 			play_ = Cue.Instance.VamSys?.GetActionParameter(
-				person_, "VamTimeline.AtomPlugin", "Play " + ta.Name);
+				person_, "VamTimeline.AtomPlugin", "Play " + current_.Name);
 
 			if (play_ == null)
 			{
-				Cue.LogError("timeline animation '" + ta.Name + "' not found");
+				Cue.LogError("timeline animation '" + current_.Name + "' not found");
 				return true;
 			}
 
@@ -83,6 +92,34 @@ namespace Cue
 		public void FixedUpdate(float s)
 		{
 			// no-op
+		}
+
+		public void Update(float s)
+		{
+			if (current_ != null && !Playing)
+				current_ = null;
+		}
+
+		public override string ToString()
+		{
+			string s = "Timeline: ";
+
+			if (current_ != null)
+			{
+				s += current_.ToString();
+
+				if ((flags_ & Animator.Reverse) != 0)
+					s += " rev";
+
+				if ((flags_ & Animator.Loop) != 0)
+					s += " loop";
+			}
+			else
+			{
+				s += "(none)";
+			}
+
+			return s;
 		}
 
 		private void GetParameters()

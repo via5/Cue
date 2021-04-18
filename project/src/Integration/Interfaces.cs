@@ -14,6 +14,7 @@
 		bool Play(IAnimation a, int flags);
 		void Stop();
 		void FixedUpdate(float s);
+		void Update(float s);
 	}
 
 	interface IAnimation

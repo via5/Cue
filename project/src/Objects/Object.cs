@@ -7,8 +7,8 @@
 		Vector3 Direction { get; set; }
 		float Bearing { get; }
 
-		void Update(float s);
 		void FixedUpdate(float s);
+		void Update(float s);
 		void OnPluginState(bool b);
 		void SetPaused(bool b);
 

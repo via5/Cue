@@ -188,6 +188,15 @@ namespace Cue
 			Sys.ReloadPlugin();
 		}
 
+		public void FixedUpdate()
+		{
+			if (Sys.Paused)
+				return;
+
+			for (int i = 0; i < allObjects_.Count; ++i)
+				allObjects_[i].FixedUpdate(Sys.Time.deltaTime);
+		}
+
 		public void Update()
 		{
 			if (Sys.Paused != paused_)
@@ -205,15 +214,6 @@ namespace Cue
 
 			controls_.Update();
 			hud_.Update();
-		}
-
-		public void FixedUpdate()
-		{
-			if (Sys.Paused)
-				return;
-
-			for (int i = 0; i < allObjects_.Count; ++i)
-				allObjects_[i].FixedUpdate(Sys.Time.deltaTime);
 		}
 
 		public void OnPluginState(bool b)

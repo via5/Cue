@@ -2,25 +2,121 @@
 {
 	using NavStates = W.NavStates;
 
+	class PersonState
+	{
+		public const int None = 0;
+		public const int Standing = 1;
+		public const int Walking = 2;
+		public const int Sitting = 3;
+		public const int Kneeling = 4;
+
+		private Person self_;
+		private int current_ = Standing;
+		private int next_ = None;
+
+		public PersonState(Person self)
+		{
+			self_ = self;
+		}
+
+		public bool IsUpright
+		{
+			get
+			{
+				return current_ == Standing || current_ == Walking;
+			}
+		}
+
+		public bool Is(int type)
+		{
+			return current_ == type || next_ == type;
+		}
+
+		public bool IsCurrently(int type)
+		{
+			return current_ == type;
+		}
+
+		public bool Transitioning
+		{
+			get { return next_ != None; }
+		}
+
+		public void Set(int state)
+		{
+			if (current_ == state)
+				return;
+
+			string before = ToString();
+
+			current_ = state;
+			next_ = None;
+
+			string after = ToString();
+
+			Cue.LogError(
+				self_.ID + ": " +
+				"state changed from " + before + " to " + after);
+		}
+
+		public void StartTransition(int next)
+		{
+			if (next_ == next)
+				return;
+
+			next_ = next;
+			Cue.LogError(self_.ID + ": new transition, " + ToString());
+		}
+
+		public void FinishTransition()
+		{
+			if (next_ == None)
+				return;
+
+			string before = StateToString(current_);
+
+			current_ = next_;
+			next_ = None;
+
+			string after = StateToString(current_);
+
+			Cue.LogError(
+				self_.ID + ": " +
+				"transition finished from " + before + " to " + after);
+		}
+
+		public override string ToString()
+		{
+			string s = StateToString(current_);
+
+			if (next_ != None)
+				s += "->" + StateToString(next_);
+
+			return s;
+		}
+
+		public static string StateToString(int state)
+		{
+			string[] names = new string[]
+			{
+				"none", "standing", "walking", "sitting", "kneeling"
+			};
+
+			if (state < 0 || state >= names.Length)
+				return "?" + state.ToString();
+
+			return names[state];
+		}
+	}
+
+
 	class Person : BasicObject
 	{
-		public const int StandingState = 0;
-		public const int WalkingState = 1;
-
-		public const int SittingDownState = 2;
-		public const int SitState = 3;
-		public const int StandingFromSittingState = 4;
-
-		public const int KneelingDownState = 5;
-		public const int KneelState = 6;
-		public const int StandingFromKneelingState = 7;
-
-
 		private readonly RootAction actions_ = new RootAction();
 		private IAI ai_ = null;
-		private int state_ = StandingState;
+		private PersonState state_;
 		private int lastNavState_ = NavStates.None;
-		private Vector3 standingPos_ = new Vector3();
+		private Vector3 uprightPos_ = new Vector3();
 		private Slot locked_ = null;
 
 		private Animator animator_;
@@ -34,6 +130,7 @@
 			: base(atom)
 		{
 			ai_ = new PersonAI();
+			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			breathing_ = new MacGruberBreather(this);
 			speech_ = new VamSpeaker(this);
@@ -65,9 +162,9 @@
 			get { return animator_; }
 		}
 
-		public Vector3 StandingPosition
+		public Vector3 UprightPosition
 		{
-			get { return standingPos_; }
+			get { return uprightPos_; }
 		}
 
 		public Vector3 HeadPosition
@@ -75,23 +172,9 @@
 			get { return Atom.HeadPosition; }
 		}
 
-		public int State
+		public PersonState State
 		{
 			get { return state_; }
-		}
-
-		public string StateString
-		{
-			get
-			{
-				string[] names = new string[]
-				{
-					"standing", "walking", "sitting-down",
-					"sitting", "standing-up"
-				};
-
-				return names[state_];
-			}
 		}
 
 		public IBreather Breathing
@@ -201,6 +284,18 @@
 			return true;
 		}
 
+		public override void FixedUpdate(float s)
+		{
+			base.FixedUpdate(s);
+			animator_.FixedUpdate(s);
+
+			if (!animator_.Playing)
+				state_.FinishTransition();
+
+			if (State.IsUpright)
+				uprightPos_ = Position;
+		}
+
 		public override void Update(float s)
 		{
 			base.Update(s);
@@ -209,6 +304,7 @@
 			if (ai_ != null)
 				ai_.Tick(this, s);
 
+			animator_.Update(s);
 			actions_.Tick(this, s);
 			gaze_.Update(s);
 			kisser_.Update(s);
@@ -226,60 +322,30 @@
 			Atom.NavPaused = b;
 		}
 
-		public override void FixedUpdate(float s)
-		{
-			base.FixedUpdate(s);
-			animator_.FixedUpdate(s);
-
-			if (!animator_.Playing)
-			{
-				if (state_ == SittingDownState)
-					state_ = SitState;
-				else if (state_ == StandingFromSittingState)
-					state_ = StandingState;
-				else if (state_ == KneelingDownState)
-					state_ = KneelState;
-				else if (state_ == StandingFromKneelingState)
-					state_ = StandingState;
-			}
-
-			if (state_ == StandingState || state_ == WalkingState)
-				standingPos_ = Position;
-		}
-
 		public void Sit()
 		{
-			animator_.Play(
-				Resources.Animations.GetAny(
-					Resources.Animations.SitFromStanding, Sex));
-
-			state_ = SittingDownState;
+			animator_.Play(Resources.Animations.SitFromStanding);
+			state_.StartTransition(PersonState.Sitting);
 		}
 
 		public void Kneel()
 		{
-			animator_.Play(
-				Resources.Animations.GetAny(
-					Resources.Animations.KneelFromStanding, Sex));
-
-			state_ = KneelingDownState;
+			animator_.Play(Resources.Animations.KneelFromStanding);
+			state_.StartTransition(PersonState.Kneeling);
 		}
 
 		public void Stand()
 		{
-			if (state_ == SitState)
+			// todo: let current animation finish first
+			if (state_.Is(PersonState.Sitting) && !state_.Transitioning)
 			{
-				state_ = StandingFromSittingState;
-				animator_.Play(
-					Resources.Animations.GetAny(
-						Resources.Animations.StandFromSitting, Sex));
+				state_.StartTransition(PersonState.Standing);
+				animator_.Play(Resources.Animations.StandFromSitting);
 			}
-			else if (state_ == KneelState)
+			else if (state_.Is(PersonState.Kneeling) && !state_.Transitioning)
 			{
-				state_ = StandingFromKneelingState;
-				animator_.Play(
-					Resources.Animations.GetAny(
-						Resources.Animations.StandFromKneeling, Sex));
+				state_.StartTransition(PersonState.Standing);
+				animator_.Play(Resources.Animations.StandFromKneeling);
 			}
 		}
 
@@ -290,29 +356,18 @@
 
 		public override string ToString()
 		{
-			return base.ToString() + " (" + Sexes.ToString(Sex) + ")";
+			return
+				base.ToString() + ", " +
+				Sexes.ToString(Sex) + ", " +
+				state_.ToString();
 		}
 
 		protected override bool StartMove()
 		{
-			if (state_ == StandingState || state_ == WalkingState)
+			if (State.IsUpright)
 				return true;
 
-			if (state_ == SitState)
-			{
-				state_ = StandingFromSittingState;
-				animator_.Play(
-					Resources.Animations.GetAny(
-						Resources.Animations.StandFromSitting, Sex));
-			}
-			else if (state_ == KneelState)
-			{
-				state_ = StandingFromKneelingState;
-				animator_.Play(
-					Resources.Animations.GetAny(
-						Resources.Animations.StandFromKneeling, Sex));
-			}
-
+			Stand();
 			return false;
 		}
 
@@ -324,7 +379,8 @@
 			{
 				case NavStates.None:
 				{
-					state_ = StandingState;
+					if (state_.IsCurrently(PersonState.Walking))
+						state_.Set(PersonState.Standing);
 
 					if (lastNavState_ != NavStates.None)
 						animator_.Stop();
@@ -334,14 +390,10 @@
 
 				case NavStates.Moving:
 				{
-					state_ = WalkingState;
+					state_.Set(PersonState.Walking);
 
 					if (lastNavState_ != NavStates.Moving || !animator_.Playing)
-					{
-						animator_.Play(
-							Resources.Animations.GetAny(Resources.Animations.Walk, Sex),
-							Animator.Loop);
-					}
+						animator_.Play(Resources.Animations.Walk, Animator.Loop);
 
 					break;
 				}
@@ -349,7 +401,7 @@
 				case NavStates.TurningLeft:
 				{
 					if (lastNavState_ != NavStates.TurningLeft || !animator_.Playing)
-						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnLeft, Sex));
+						animator_.Play(Resources.Animations.TurnLeft);
 
 					break;
 				}
@@ -357,7 +409,7 @@
 				case NavStates.TurningRight:
 				{
 					if (lastNavState_ != NavStates.TurningRight || !animator_.Playing)
-						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnRight, Sex));
+						animator_.Play(Resources.Animations.TurnRight);
 
 					break;
 				}
