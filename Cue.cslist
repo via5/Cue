@@ -10,9 +10,11 @@ project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs
 project\src\Integration\ClockwiseSilver.cs
+project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs
+project\src\Objects\Animator.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
 project\src\Objects\Slots.cs

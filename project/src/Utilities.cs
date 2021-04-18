@@ -24,6 +24,52 @@ namespace Cue
 	}
 
 
+	class Sexes
+	{
+		public const int Any = 0;
+		public const int Male = 1;
+		public const int Female = 2;
+
+		public static int FromString(string os)
+		{
+			var s = os.ToLower();
+
+			if (s == "male")
+				return Male;
+			else if (s == "female")
+				return Female;
+			else if (s == "")
+				return Any;
+
+			Cue.LogError("bad sex value '" + os + "'");
+			return Any;
+		}
+
+		public static string ToString(int i)
+		{
+			switch (i)
+			{
+				case Male:
+					return "male";
+
+				case Female:
+					return "female";
+
+				default:
+					return "any";
+			}
+		}
+
+		public static bool Match(int a, int b)
+		{
+			if (a == Any || b == Any)
+				return true;
+
+			return (a == b);
+		}
+	}
+
+
 	class U
 	{
 		static public void Safe(Action a)
