@@ -72,7 +72,7 @@ namespace Cue
 		{
 			if (hovered_)
 				material_.color = new Color(0, 1, 0, 0.3f);
-			else if (object_.LockedBy != null)
+			else if (object_.Slots.AnyLocked)
 				material_.color = new Color(1, 0, 0, 0.1f);
 			else
 				material_.color = new Color(0, 0, 1, 0.1f);

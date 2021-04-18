@@ -603,10 +603,14 @@ namespace Cue.W
 			}
 		}
 
-		public void TeleportTo(Vector3 v)
+		public void TeleportTo(Vector3 v, float bearing)
 		{
 			atom_.collisionEnabled = false;
 			atom_.mainController.MoveControl(Vector3.ToUnity(v));
+
+			if (bearing != BasicObject.NoBearing)
+				atom_.mainController.RotateTo(Quaternion.Euler(0, bearing, 0));
+
 			enableCollisionsCountdown_ = 5;
 		}
 

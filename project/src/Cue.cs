@@ -120,9 +120,9 @@ namespace Cue
 			Sys.Nav.Update();
 
 			// todo
-			persons_[0].TeleportTo(new Vector3(0, 0, 0));
-			persons_[1].TeleportTo(new Vector3(1.7f, 0, 0));
-			persons_[2].TeleportTo(new Vector3(0, 0, 1.7f));
+			persons_[0].TeleportTo(new Vector3(0, 0, 0), BasicObject.NoBearing);
+			persons_[1].TeleportTo(new Vector3(1.7f, 0, 0), BasicObject.NoBearing);
+			persons_[2].TeleportTo(new Vector3(0, 0, 1.7f), BasicObject.NoBearing);
 
 			controls_.Create(objects_);
 			OnPluginState(true);
@@ -144,7 +144,13 @@ namespace Cue
 				{
 					var m = re.Match(a.ID);
 					if (m != null && m.Success)
-						AddObject(a, m.Groups[1].Value);
+					{
+						var type = Slot.TypeFromString(m.Groups[1].Value);
+						if (type == Slot.NoType)
+							LogError("bad object type '" + m.Groups[1].Value + "'");
+						else
+							AddObject(a, type);
+					}
 				}
 			}
 		}
@@ -168,15 +174,10 @@ namespace Cue
 			allObjects_.Add(p);
 		}
 
-		private void AddObject(W.IAtom a, string type)
+		private void AddObject(W.IAtom a, int type)
 		{
 			BasicObject o = new BasicObject(a);
-			var s = new Slot();
-
-			if (type == "sit")
-				o.SitSlot = s;
-			if (type == "stand")
-				o.StandSlot = s;
+			o.Slots.Add(type);
 
 			objects_.Add(o);
 			allObjects_.Add(o);

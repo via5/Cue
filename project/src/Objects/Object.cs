@@ -1,49 +1,182 @@
-﻿using System;
+﻿using Leap.Unity;
+using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
-	class Optional<T>
+	class Slot
 	{
-		private T value_;
-		private bool hasValue_;
+		public const int NoType = 0;
+		public const int Stand = 1;
+		public const int Sit = 2;
+		public const int Lie = 3;
+		public const int Toilet = 4;
 
-		public Optional()
+		private IObject self_;
+		private int type_;
+		private IObject lockedBy_ = null;
+
+		public Slot(IObject self, int type)
 		{
-			hasValue_ = false;
+			self_ = self;
+			type_ = type;
 		}
 
-		public Optional(T t)
+		public int Type
 		{
-			value_ = t;
-			hasValue_ = true;
+			get { return type_; }
 		}
 
-		public bool HasValue
+		public bool Lock(IObject by)
 		{
-			get { return hasValue_; }
+			if (lockedBy_ == null)
+			{
+				lockedBy_ = by;
+				return true;
+			}
+
+			return false;
 		}
 
-		public T Value
+		public bool Unlock(IObject by)
 		{
-			get { return value_; }
+			if (lockedBy_ == by)
+			{
+				lockedBy_ = null;
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool Locked
+		{
+			get { return (lockedBy_ != null); }
+		}
+
+		public IObject LockedBy
+		{
+			get { return lockedBy_; }
+		}
+
+		public Vector3 Position
+		{
+			get { return self_.Position; }
+		}
+
+		public float Bearing
+		{
+			get { return self_.Bearing; }
+		}
+
+		private static string[] GetTypes()
+		{
+			return new string[]
+			{
+				"none", "stand", "sit", "lie", "toilet"
+			};
+		}
+
+		public static string TypeToString(int t)
+		{
+			var types = GetTypes();
+			if (t >= 0 && t < types.Length)
+				return types[t];
+			else
+				return "?" + t.ToString();
+		}
+
+		public static int TypeFromString(string s)
+		{
+			var types = GetTypes();
+
+			for (int i = 0; i < types.Length; ++i)
+			{
+				if (types[i] == s)
+					return i;
+			}
+
+			return NoType;
+		}
+
+		public override string ToString()
+		{
+			return self_.ToString() + " slot " + TypeToString(type_);
 		}
 	}
 
 
-	class Slot
+	class Slots
 	{
-		public Vector3 positionOffset;
-		public float bearingOffset;
+		private IObject self_;
+		private List<Slot> slots_ = new List<Slot>();
 
-		public Slot()
-			: this(Vector3.Zero, 0)
+		public Slots(IObject self)
 		{
+			self_ = self;
 		}
 
-		public Slot(Vector3 positionOffset, float bearingOffset)
+		public void Add(int type)
 		{
-			this.positionOffset = positionOffset;
-			this.bearingOffset = bearingOffset;
+			slots_.Add(new Slot(self_, type));
+		}
+
+		public Slot Get(int type)
+		{
+			for (int i = 0; i < slots_.Count; ++i)
+			{
+				if (slots_[i].Type == type)
+					return slots_[i];
+			}
+
+			return null;
+		}
+
+		public bool Has(int type)
+		{
+			return (Get(type) != null);
+		}
+
+		public bool AnyLocked
+		{
+			get
+			{
+				for (int i = 0; i < slots_.Count; ++i)
+				{
+					if (slots_[i].Locked)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		public Slot GetLockedBy(IObject o)
+		{
+			for (int i = 0; i < slots_.Count; ++i)
+			{
+				if (slots_[i].LockedBy == o)
+					return slots_[i];
+			}
+
+			return null;
+		}
+
+		public Slot RandomUnlocked()
+		{
+			var unlocked = new List<int>();
+
+			for (int i = 0; i < slots_.Count; ++i)
+			{
+				if (!slots_[i].Locked)
+					unlocked.Add(i);
+			}
+
+			if (unlocked.Count == 0)
+				return null;
+
+			unlocked.Shuffle();
+			return slots_[unlocked[0]];
 		}
 	}
 
@@ -54,21 +187,17 @@ namespace Cue
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 		float Bearing { get; }
+
 		void Update(float s);
 		void FixedUpdate(float s);
-		void MoveTo(Vector3 to, float bearing);
-		bool HasTarget { get; }
 		void OnPluginState(bool b);
 		void SetPaused(bool b);
 
-		bool Lock(IObject by);
-		bool Unlock(IObject by);
-		IObject LockedBy { get; }
+		void MoveTo(Vector3 to, float bearing);
+		void TeleportTo(Vector3 to, float bearing);
+		bool HasTarget { get; }
 
-		Slot StandSlot { get; }
-		Slot SitSlot { get; }
-		Slot SleepSlot { get; }
-		Slot ToiletSlot { get; }
+		Slots Slots { get; }
 	}
 
 
@@ -87,25 +216,18 @@ namespace Cue
 
 		private readonly W.IAtom atom_;
 
-		private float moveElapsed_ = 0;
-		private float turnElapsed_ = 0;
-
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
 		private int moveState_ = NoMoveState;
 		private bool canMove_ = false;
 		private bool moving_ = false;
 
-		private Slot standSlot_ = null;
-		private Slot sitSlot_ = null;
-		private Slot sleepSlot_ = null;
-		private Slot toiletSlot_ = null;
-
-		private IObject lock_ = null;
+		private Slots slots_;
 
 		public BasicObject(W.IAtom atom)
 		{
 			atom_ = atom;
+			slots_ = new Slots(this);
 		}
 
 		public W.IAtom Atom
@@ -132,71 +254,13 @@ namespace Cue
 
 		public float Bearing
 		{
-			get
-			{
-				return Vector3.Angle(Vector3.Zero, Direction);
-			}
-
-			set
-			{
-				Direction = Vector3.Rotate(0, value, 0);
-			}
+			get { return Vector3.Angle(Vector3.Zero, Direction); }
+			set { Direction = Vector3.Rotate(0, value, 0); }
 		}
 
-		public bool HasTarget
+		public Slots Slots
 		{
-			get { return (moveState_ != NoMoveState); }
-		}
-
-		public Slot StandSlot
-		{
-			get { return standSlot_; }
-			set { standSlot_ = value; }
-		}
-
-		public Slot SitSlot
-		{
-			get { return sitSlot_; }
-			set { sitSlot_ = value; }
-		}
-
-		public Slot SleepSlot
-		{
-			get { return sleepSlot_; }
-			set { sleepSlot_ = value; }
-		}
-
-		public Slot ToiletSlot
-		{
-			get { return toiletSlot_; }
-			set { toiletSlot_ = value; }
-		}
-
-		public bool Lock(IObject by)
-		{
-			if (lock_ == null)
-			{
-				lock_ = by;
-				return true;
-			}
-
-			return false;
-		}
-
-		public bool Unlock(IObject by)
-		{
-			if (lock_ == by)
-			{
-				lock_ = null;
-				return true;
-			}
-
-			return false;
-		}
-
-		public IObject LockedBy
-		{
-			get { return lock_; }
+			get { return slots_; }
 		}
 
 		public virtual void Update(float s)
@@ -231,11 +295,6 @@ namespace Cue
 					}
 				}
 			}
-			else
-			{
-				moveElapsed_ = Math.Max(0, moveElapsed_ - s);
-				turnElapsed_ = Math.Max(0, turnElapsed_ - s);
-			}
 		}
 
 		public virtual void FixedUpdate(float s)
@@ -265,9 +324,14 @@ namespace Cue
 			moving_ = false;
 		}
 
-		public void TeleportTo(Vector3 to)
+		public void TeleportTo(Vector3 to, float bearing)
 		{
-			Atom.TeleportTo(to);
+			Atom.TeleportTo(to, bearing);
+		}
+
+		public bool HasTarget
+		{
+			get { return (moveState_ != NoMoveState); }
 		}
 
 		protected virtual bool SetMoving(int i)

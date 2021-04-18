@@ -45,7 +45,14 @@
 		{
 			"type": "standFromSitting",
 			"bvh": "sit.bvh",
-			"reverse": true
+			"reverse": true,
+			"sex": "female"
+		},
+
+		{
+			"type": "standFromSitting",
+			"timeline": "StandFromSitting",
+			"sex": "male"
 		},
 
 		{

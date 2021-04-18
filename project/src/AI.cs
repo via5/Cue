@@ -21,11 +21,11 @@ namespace Cue
 		{
 			foreach (var o in Cue.Instance.Objects)
 			{
-				if (o.SitSlot != null)
+				if (o.Slots.Has(Slot.Sit))
 					events_.Add(new SitAndThinkEvent(o));
-				if (o.SleepSlot != null)
-					events_.Add(new SleepEvent(o));
-				if (o.StandSlot != null)
+				if (o.Slots.Has(Slot.Lie))
+					events_.Add(new LieDownEvent(o));
+				if (o.Slots.Has(Slot.Stand))
 					events_.Add(new StandAndThinkEvent(o));
 			}
 		}
@@ -111,7 +111,7 @@ namespace Cue
 
 	abstract class BasicEvent : IEvent
 	{
-		private IObject lock_ = null;
+		private Slot lockedSlot_ = null;
 
 		public virtual void Stop(Person p)
 		{
@@ -120,24 +120,24 @@ namespace Cue
 
 		public abstract bool Tick(Person p, float s);
 
-		protected bool Lock(Person p, IObject o)
+		protected bool Lock(Person p, Slot s)
 		{
-			if (lock_ == null && !o.Lock(p))
+			if (lockedSlot_ == null && !s.Lock(p))
 			{
-				Cue.LogError("can't lock object " + o.ToString());
+				Cue.LogError("can't lock slot " + s.ToString());
 				return false;
 			}
 
-			lock_ = o;
+			lockedSlot_ = s;
 			return true;
 		}
 
 		protected bool Unlock(Person p)
 		{
-			if (lock_ != null)
+			if (lockedSlot_ != null)
 			{
-				bool b = lock_.Unlock(p);
-				lock_ = null;
+				bool b = lockedSlot_.Unlock(p);
+				lockedSlot_ = null;
 				return b;
 			}
 
@@ -166,17 +166,17 @@ namespace Cue
 
 		public override bool Tick(Person p, float s)
 		{
-			var ss = o_.SitSlot;
+			var ss = o_.Slots.Get(Slot.Sit);
 			if (ss == null)
 			{
 				Cue.LogError("can't sit on object " + o_.ToString());
 				return false;
 			}
 
-			if (!Lock(p, o_))
+			if (!Lock(p, ss))
 				return false;
 
-			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
+			var pos = o_.Position;
 
 			switch (state_)
 			{
@@ -194,7 +194,7 @@ namespace Cue
 				{
 					if (p.Idle)
 					{
-						p.PushAction(new SitAction(o_));
+						p.PushAction(new SitAction(ss));
 						Cue.LogError("sitting");
 						state_ = Sitting;
 					}
@@ -272,17 +272,17 @@ namespace Cue
 
 		public override bool Tick(Person p, float s)
 		{
-			var ss = o_.StandSlot;
+			var ss = o_.Slots.Get(Slot.Stand);
 			if (ss == null)
 			{
 				Cue.LogError("can't stand on object " + o_.ToString());
 				return false;
 			}
 
-			if (!Lock(p, o_))
+			if (!Lock(p, ss))
 				return false;
 
-			var pos = o_.Position + Vector3.Rotate(ss.positionOffset, o_.Bearing);
+			var pos = o_.Position;
 
 			switch (state_)
 			{
@@ -290,7 +290,7 @@ namespace Cue
 				{
 					Cue.LogError("going to stand");
 					p.Gaze.LookInFront();
-					p.PushAction(new MoveAction(pos, o_.Bearing + ss.bearingOffset));
+					p.PushAction(new MoveAction(pos, o_.Bearing));
 					state_ = Moving;
 					thunk_ = 0;
 					break;
@@ -346,7 +346,7 @@ namespace Cue
 	}
 
 
-	class SleepEvent : BasicEvent
+	class LieDownEvent : BasicEvent
 	{
 		const int NoState = 0;
 		const int Moving = 1;
@@ -356,7 +356,7 @@ namespace Cue
 		private int state_ = NoState;
 		private float elapsed_ = 0;
 
-		public SleepEvent(IObject o)
+		public LieDownEvent(IObject o)
 		{
 			o_ = o;
 		}

@@ -170,10 +170,10 @@ namespace Cue
 
 	class SitAction : BasicAction
 	{
-		private IObject chair_;
+		private Slot chair_;
 		private bool moving_ = false;
 
-		public SitAction(IObject chair)
+		public SitAction(Slot chair)
 		{
 			chair_ = chair;
 		}

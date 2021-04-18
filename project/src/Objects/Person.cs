@@ -195,7 +195,7 @@ namespace Cue
 		private int state_ = StandingState;
 		private int lastMoveState_ = MoveNone;
 		private Vector3 standingPos_ = new Vector3();
-		private IObject locked_ = null;
+		private Slot locked_ = null;
 
 		private Animator animator_;
 		private IBreather breathing_;
@@ -324,28 +324,52 @@ namespace Cue
 
 		public bool InteractWith(IObject o)
 		{
-			if (locked_ != o)
-			{
-				if (!o.Lock(this))
-					return false;
+			Slot s = o.Slots.GetLockedBy(this);
 
+			if (s == null)
+			{
+				// object is not currently locked by this object
+
+				if (o.Slots.AnyLocked)
+				{
+					// a slot is already locked, fail
+					return false;
+				}
+
+				// take a random slot
+				s = o.Slots.RandomUnlocked();
+
+				if (s == null)
+				{
+					// no free slots
+					return false;
+				}
+
+				if (!s.Lock(this))
+				{
+					// this object can't lock this slot
+					return false;
+				}
+
+				// slot has been locked successfully, unlock the current slot,
+				// if any
 				if (locked_ != null)
 					locked_.Unlock(this);
 
-				locked_ = o;
+				locked_ = s;
 			}
 
 			MakeIdle();
 
-			if (o.SitSlot != null)
+			if (s.Type == Slot.Sit)
 			{
-				PushAction(new SitAction(o));
-				PushAction(new MoveAction(o.Position, NoBearing));
+				PushAction(new SitAction(s));
+				PushAction(new MoveAction(s.Position, NoBearing));
 			}
-			else if (o.StandSlot != null)
+			else if (s.Type == Slot.Stand)
 			{
 				PushAction(new MakeIdleAction());
-				PushAction(new MoveAction(o.Position, o.Bearing));
+				PushAction(new MoveAction(s.Position, s.Bearing));
 			}
 
 			return true;

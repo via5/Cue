@@ -188,7 +188,7 @@ namespace Cue.W
 		{
 		}
 
-		public void TeleportTo(Vector3 v)
+		public void TeleportTo(Vector3 v, float bearing)
 		{
 		}
 
