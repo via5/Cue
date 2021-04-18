@@ -113,13 +113,13 @@
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_ = new RootAction();
-		private IAI ai_ = null;
 		private PersonState state_;
 		private int lastNavState_ = NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
 		private Slot locked_ = null;
-
 		private Animator animator_;
+
+		private IAI ai_ = null;
 		private IBreather breathing_;
 		private IGazer gaze_;
 		private ISpeaker speech_;
@@ -129,7 +129,7 @@
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-			ai_ = new PersonAI();
+			ai_ = new PersonAI(this);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			breathing_ = new MacGruberBreather(this);
@@ -141,25 +141,9 @@
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
 
-		public IAI AI
-		{
-			get { return ai_; }
-			set { ai_ = value; }
-		}
-
 		public bool Idle
 		{
 			get { return actions_.IsIdle; }
-		}
-
-		public IAction Action
-		{
-			get { return actions_; }
-		}
-
-		public Animator Animator
-		{
-			get { return animator_; }
 		}
 
 		public Vector3 UprightPosition
@@ -172,35 +156,22 @@
 			get { return Atom.HeadPosition; }
 		}
 
-		public PersonState State
+		public Slot LockedSlot
 		{
-			get { return state_; }
+			get { return locked_; }
+			set { locked_ = value; }
 		}
 
-		public IBreather Breathing
-		{
-			get { return breathing_; }
-		}
+		public IAI AI { get { return ai_; } }
+		public IBreather Breathing { get { return breathing_; } }
+		public IGazer Gaze { get { return gaze_; } }
+		public ISpeaker Speech { get { return speech_; } }
+		public IKisser Kisser { get { return kisser_; } }
+		public IHandjob Handjob { get { return handjob_; } }
+		public IAction Actions { get { return actions_; } }
 
-		public ISpeaker Speech
-		{
-			get { return speech_; }
-		}
-
-		public IGazer Gaze
-		{
-			get { return gaze_; }
-		}
-
-		public IKisser Kisser
-		{
-			get { return kisser_; }
-		}
-
-		public IHandjob Handjob
-		{
-			get { return handjob_; }
-		}
+		public Animator Animator { get { return animator_; } }
+		public PersonState State { get { return state_; } }
 
 		public int Sex
 		{
@@ -225,61 +196,54 @@
 			Atom.SetDefaultControls();
 		}
 
-		public void Call(Person caller)
+		public bool InteractWith(IObject o)
 		{
-			AI.Enabled = false;
-			AI.RunEvent(new CallEvent(caller));
+			if (ai_ == null)
+				return false;
+
+			return ai_.InteractWith(o);
 		}
 
-		public bool InteractWith(IObject o)
+		public bool TryLockSlot(IObject o)
 		{
 			Slot s = o.Slots.GetLockedBy(this);
 
+			// object is already locked by this person, reuse it
+			if (s != null)
+				return true;
+
+			if (o.Slots.AnyLocked)
+			{
+				// a slot is already locked, fail
+				return false;
+			}
+
+			// take a random slot
+			s = o.Slots.RandomUnlocked();
+
 			if (s == null)
 			{
-				// object is not currently locked by this object
-
-				if (o.Slots.AnyLocked)
-				{
-					// a slot is already locked, fail
-					return false;
-				}
-
-				// take a random slot
-				s = o.Slots.RandomUnlocked();
-
-				if (s == null)
-				{
-					// no free slots
-					return false;
-				}
-
-				if (!s.Lock(this))
-				{
-					// this object can't lock this slot
-					return false;
-				}
-
-				// slot has been locked successfully, unlock the current slot,
-				// if any
-				if (locked_ != null)
-					locked_.Unlock(this);
-
-				locked_ = s;
+				// no free slots
+				return false;
 			}
 
-			MakeIdle();
+			return TryLockSlot(s);
+		}
 
-			if (s.Type == Slot.Sit)
+		public bool TryLockSlot(Slot s)
+		{
+			if (!s.Lock(this))
 			{
-				PushAction(new SitAction(s));
-				PushAction(new MoveAction(s.Position, NoBearing));
+				// this object can't lock this slot
+				return false;
 			}
-			else if (s.Type == Slot.Stand)
-			{
-				PushAction(new MakeIdleAction());
-				PushAction(new MoveAction(s.Position, s.Bearing));
-			}
+
+			// slot has been locked successfully, unlock the current slot,
+			// if any
+			if (locked_ != null)
+				locked_.Unlock(this);
+
+			locked_ = s;
 
 			return true;
 		}
@@ -302,7 +266,7 @@
 			CheckNavState();
 
 			if (ai_ != null)
-				ai_.Tick(this, s);
+				ai_.Update(s);
 
 			animator_.Update(s);
 			actions_.Tick(this, s);

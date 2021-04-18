@@ -4,29 +4,32 @@ namespace Cue
 {
 	interface IAI
 	{
+		bool InteractWith(IObject o);
 		void RunEvent(IEvent e);
-		void Tick(Person p, float s);
+		void Update(float s);
 		bool Enabled { get; set; }
 	}
 
 	class PersonAI : IAI
 	{
+		private Person person_ = null;
 		private int i_ = -1;
 		private readonly List<IEvent> events_ = new List<IEvent>();
 		private bool enabled_ = false;
-		private Person person_ = null;
 		private IEvent forced_ = null;
 
-		public PersonAI()
+		public PersonAI(Person person)
 		{
+			person_ = person;
+
 			foreach (var o in Cue.Instance.Objects)
 			{
 				if (o.Slots.Has(Slot.Sit))
-					events_.Add(new SitAndThinkEvent(o));
+					events_.Add(new SitAndThinkEvent(person_, o));
 				if (o.Slots.Has(Slot.Lie))
-					events_.Add(new LieDownEvent(o));
+					events_.Add(new LieDownEvent(person_, o));
 				if (o.Slots.Has(Slot.Stand))
-					events_.Add(new StandAndThinkEvent(o));
+					events_.Add(new StandAndThinkEvent(person_, o));
 			}
 		}
 
@@ -45,10 +48,36 @@ namespace Cue
 			}
 		}
 
+		public bool InteractWith(IObject o)
+		{
+			if (!person_.TryLockSlot(o))
+			{
+				// can't lock the given object
+				return false;
+			}
+
+			person_.MakeIdle();
+
+			var slot = person_.LockedSlot;
+
+			if (slot.Type == Slot.Sit)
+			{
+				person_.PushAction(new SitAction(slot));
+				person_.PushAction(new MoveAction(slot.Position, BasicObject.NoBearing));
+			}
+			else if (slot.Type == Slot.Stand)
+			{
+				person_.PushAction(new MakeIdleAction());
+				person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
+			}
+
+			return true;
+		}
+
 		public void RunEvent(IEvent e)
 		{
 			if (forced_ != null)
-				forced_.Stop(person_);
+				forced_.Stop();
 
 			forced_ = e;
 
@@ -59,13 +88,11 @@ namespace Cue
 			}
 		}
 
-		public void Tick(Person p, float s)
+		public void Update(float s)
 		{
-			person_ = p;
-
 			if (forced_ != null)
 			{
-				if (!forced_.Tick(p, s))
+				if (!forced_.Update(s))
 					forced_ = null;
 
 				return;
@@ -83,7 +110,7 @@ namespace Cue
 			}
 			else
 			{
-				if (!events_[i_].Tick(p, s))
+				if (!events_[i_].Update(s))
 				{
 					++i_;
 					if (i_ >= events_.Count)
@@ -96,7 +123,7 @@ namespace Cue
 		{
 			if (i_ >= 0 && i_ < events_.Count)
 			{
-				events_[i_].Stop(person_);
+				events_[i_].Stop();
 				i_ = -1;
 			}
 		}
@@ -105,44 +132,33 @@ namespace Cue
 
 	interface IEvent
 	{
-		void Stop(Person p);
-		bool Tick(Person p, float s);
+		void Stop();
+		bool Update(float s);
 	}
 
 	abstract class BasicEvent : IEvent
 	{
-		private Slot lockedSlot_ = null;
+		protected Person person_;
+		//private Slot lockedSlot_ = null;
 
-		public virtual void Stop(Person p)
+		protected BasicEvent(Person p)
 		{
-			Unlock(p);
+			person_ = p;
 		}
 
-		public abstract bool Tick(Person p, float s);
-
-		protected bool Lock(Person p, Slot s)
+		public virtual void Stop()
 		{
-			if (lockedSlot_ == null && !s.Lock(p))
-			{
-				Cue.LogError("can't lock slot " + s.ToString());
-				return false;
-			}
-
-			lockedSlot_ = s;
-			return true;
+			Unlock();
 		}
 
-		protected bool Unlock(Person p)
+		protected void Unlock()
 		{
-			if (lockedSlot_ != null)
-			{
-				bool b = lockedSlot_.Unlock(p);
-				lockedSlot_ = null;
-				return b;
-			}
-
-			return false;
+			// todo, this event didn't necessarily lock that slot
+			if (person_.LockedSlot != null)
+				person_.LockedSlot.Unlock(person_);
 		}
+
+		public abstract bool Update(float s);
 	}
 
 
@@ -156,25 +172,37 @@ namespace Cue
 		const float ThinkTime = 5;
 
 		private IObject o_;
+		private Slot slot_ = null;
 		private int state_ = NoState;
 		private float thunk_ = 0;
 
-		public SitAndThinkEvent(IObject o)
+		public SitAndThinkEvent(Person p, IObject o)
+			: base(p)
 		{
 			o_ = o;
 		}
 
-		public override bool Tick(Person p, float s)
+		public SitAndThinkEvent(Person p, Slot s)
+			: base(p)
 		{
-			var ss = o_.Slots.Get(Slot.Sit);
-			if (ss == null)
-			{
-				Cue.LogError("can't sit on object " + o_.ToString());
-				return false;
-			}
+			o_ = s.ParentObject;
+			slot_ = s;
+		}
 
-			if (!Lock(p, ss))
-				return false;
+		public override bool Update(float s)
+		{
+			if (slot_ == null)
+			{
+				slot_ = o_.Slots.Get(Slot.Sit);
+				if (slot_ == null)
+				{
+					Cue.LogError("can't sit on object " + o_.ToString());
+					return false;
+				}
+
+				if (!person_.TryLockSlot(slot_))
+					return false;
+			}
 
 			var pos = o_.Position;
 
@@ -183,8 +211,8 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to sit");
-					p.Gaze.LookInFront();
-					p.PushAction(new MoveAction(pos, BasicObject.NoBearing));
+					person_.Gaze.LookInFront();
+					person_.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
 					thunk_ = 0;
 					break;
@@ -192,9 +220,9 @@ namespace Cue
 
 				case Moving:
 				{
-					if (p.Idle)
+					if (person_.Idle)
 					{
-						p.PushAction(new SitAction(ss));
+						person_.PushAction(new SitAction(slot_));
 						Cue.LogError("sitting");
 						state_ = Sitting;
 					}
@@ -204,7 +232,7 @@ namespace Cue
 
 				case Sitting:
 				{
-					if (p.Idle)
+					if (person_.Idle)
 					{
 						Cue.LogError("thinking");
 
@@ -220,11 +248,11 @@ namespace Cue
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.SitIdle, p.Sex)));
+								Resources.Animations.SitIdle, person_.Sex)));
 
 						cc.Push(new LookAroundAction());
 
-						p.PushAction(cc);
+						person_.PushAction(cc);
 
 						state_ = Thinking;
 					}
@@ -238,8 +266,8 @@ namespace Cue
 					if (thunk_ >= ThinkTime)
 					{
 						Cue.LogError("done");
-						p.PopAction();
-						Unlock(p);
+						person_.PopAction();
+						Unlock();
 						state_ = NoState;
 						return false;
 					}
@@ -262,25 +290,37 @@ namespace Cue
 		const float ThinkTime = 5;
 
 		private IObject o_;
+		private Slot slot_ = null;
 		private int state_ = NoState;
 		private float thunk_ = 0;
 
-		public StandAndThinkEvent(IObject o)
+		public StandAndThinkEvent(Person p, IObject o)
+			: base(p)
 		{
 			o_ = o;
 		}
 
-		public override bool Tick(Person p, float s)
+		public StandAndThinkEvent(Person p, Slot s)
+			: base(p)
 		{
-			var ss = o_.Slots.Get(Slot.Stand);
-			if (ss == null)
-			{
-				Cue.LogError("can't stand on object " + o_.ToString());
-				return false;
-			}
+			o_ = s.ParentObject;
+			slot_ = s;
+		}
 
-			if (!Lock(p, ss))
-				return false;
+		public override bool Update(float s)
+		{
+			if (slot_ == null)
+			{
+				slot_ = o_.Slots.Get(Slot.Stand);
+				if (slot_ == null)
+				{
+					Cue.LogError("can't stand on object " + o_.ToString());
+					return false;
+				}
+
+				if (!person_.TryLockSlot(slot_))
+					return false;
+			}
 
 			var pos = o_.Position;
 
@@ -289,8 +329,8 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogError("going to stand");
-					p.Gaze.LookInFront();
-					p.PushAction(new MoveAction(pos, o_.Bearing));
+					person_.Gaze.LookInFront();
+					person_.PushAction(new MoveAction(pos, o_.Bearing));
 					state_ = Moving;
 					thunk_ = 0;
 					break;
@@ -298,7 +338,7 @@ namespace Cue
 
 				case Moving:
 				{
-					if (p.Idle)
+					if (person_.Idle)
 					{
 						Cue.LogError("thinking");
 
@@ -314,10 +354,10 @@ namespace Cue
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.StandIdle, p.Sex)));
+								Resources.Animations.StandIdle, person_.Sex)));
 
 						cc.Push(new LookAroundAction());
-						p.PushAction(cc);
+						person_.PushAction(cc);
 
 						state_ = Thinking;
 					}
@@ -331,8 +371,8 @@ namespace Cue
 					if (thunk_ >= ThinkTime)
 					{
 						Cue.LogError("done");
-						p.PopAction();
-						Unlock(p);
+						person_.PopAction();
+						Unlock();
 						state_ = NoState;
 						return false;
 					}
@@ -356,19 +396,20 @@ namespace Cue
 		private int state_ = NoState;
 		private float elapsed_ = 0;
 
-		public LieDownEvent(IObject o)
+		public LieDownEvent(Person p, IObject o)
+			: base(p)
 		{
 			o_ = o;
 		}
 
-		public override bool Tick(Person p, float s)
+		public override bool Update(float s)
 		{
 			switch (state_)
 			{
 				case NoState:
 				{
 					Cue.LogError("going to sleep");
-					p.PushAction(new MoveAction(o_.Position, BasicObject.NoBearing));
+					person_.PushAction(new MoveAction(o_.Position, BasicObject.NoBearing));
 					state_ = Moving;
 					elapsed_ = 0;
 					break;
@@ -376,7 +417,7 @@ namespace Cue
 
 				case Moving:
 				{
-					if (p.Idle)
+					if (person_.Idle)
 					{
 						Cue.LogError("reached bed, sleeping");
 						state_ = Sleeping;
@@ -413,12 +454,13 @@ namespace Cue
 		private Person caller_;
 		private int state_ = NoState;
 
-		public CallEvent(Person caller)
+		public CallEvent(Person p, Person caller)
+			: base(p)
 		{
 			caller_ = caller;
 		}
 
-		public override bool Tick(Person callee, float s)
+		public override bool Update(float s)
 		{
 			switch (state_)
 			{
@@ -428,9 +470,9 @@ namespace Cue
 						caller_.Position +
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
-					callee.MoveTo(target, caller_.Bearing + 180);
-					callee.Gaze.LookAt = GazeSettings.LookAtTarget;
-					callee.Gaze.Target = caller_.Atom.HeadPosition;
+					person_.MoveTo(target, caller_.Bearing + 180);
+					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
+					person_.Gaze.Target = caller_.Atom.HeadPosition;
 					state_ = MovingState;
 
 					break;
@@ -438,11 +480,11 @@ namespace Cue
 
 				case MovingState:
 				{
-					if (!callee.HasTarget)
+					if (!person_.HasTarget)
 					{
-						callee.PushAction(new RandomAnimationAction(
+						person_.PushAction(new RandomAnimationAction(
 							Resources.Animations.GetAll(
-								Resources.Animations.StandIdle, callee.Sex)));
+								Resources.Animations.StandIdle, person_.Sex)));
 
 						state_ = IdlingState;
 					}
@@ -476,12 +518,13 @@ namespace Cue
 		private Person receiver_;
 		private int state_ = NoState;
 
-		public HandjobEvent(Person receiver)
+		public HandjobEvent(Person p, Person receiver)
+			: base(p)
 		{
 			receiver_ = receiver;
 		}
 
-		public override bool Tick(Person p, float s)
+		public override bool Update(float s)
 		{
 			switch (state_)
 			{
@@ -491,9 +534,9 @@ namespace Cue
 						receiver_.Position +
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
 
-					p.MoveTo(target, receiver_.Bearing + 180);
-					p.Gaze.LookAt = GazeSettings.LookAtTarget;
-					p.Gaze.Target = receiver_.Atom.HeadPosition;
+					person_.MoveTo(target, receiver_.Bearing + 180);
+					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
+					person_.Gaze.Target = receiver_.Atom.HeadPosition;
 					state_ = MovingState;
 
 					break;
@@ -501,17 +544,17 @@ namespace Cue
 
 				case MovingState:
 				{
-					if (!p.HasTarget)
+					if (!person_.HasTarget)
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							p.Kneel();
+							person_.Kneel();
 							state_ = PositioningState;
 						}
 						else
 						{
-							p.Handjob.Target = Cue.Instance.Player;
-							p.Handjob.Active = true;
+							person_.Handjob.Target = Cue.Instance.Player;
+							person_.Handjob.Active = true;
 							state_ = ActiveState;
 						}
 					}
@@ -521,10 +564,10 @@ namespace Cue
 
 				case PositioningState:
 				{
-					if (!p.Animator.Playing)
+					if (!person_.Animator.Playing)
 					{
-						p.Handjob.Target = Cue.Instance.Player;
-						p.Handjob.Active = true;
+						person_.Handjob.Target = Cue.Instance.Player;
+						person_.Handjob.Active = true;
 						state_ = ActiveState;
 					}
 

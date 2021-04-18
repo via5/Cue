@@ -20,6 +20,11 @@ namespace Cue
 			type_ = type;
 		}
 
+		public IObject ParentObject
+		{
+			get { return self_; }
+		}
+
 		public int Type
 		{
 			get { return type_; }

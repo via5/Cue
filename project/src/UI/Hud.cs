@@ -75,7 +75,12 @@ namespace Cue
 		private void OnCall()
 		{
 			if (Cue.Instance.Selected is Person)
-				((Person)Cue.Instance.Selected).Call(Cue.Instance.Player);
+			{
+				var p = ((Person)Cue.Instance.Selected);
+
+				p.MakeIdle();
+				p.AI.RunEvent(new CallEvent(p, Cue.Instance.Player));
+			}
 		}
 
 		private void OnSit()
@@ -118,7 +123,7 @@ namespace Cue
 				var p = ((Person)Cue.Instance.Selected);
 
 				p.MakeIdle();
-				p.AI.RunEvent(new HandjobEvent(Cue.Instance.Player));
+				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
 			}
 		}
 

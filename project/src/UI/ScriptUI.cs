@@ -76,7 +76,7 @@ namespace Cue.UI
 
 			var p = ps[0];
 
-			action_.Text = "Action: " + p.Action.ToString();
+			action_.Text = "Action: " + p.Actions.ToString();
 			anim_.Text = "Anim: " + p.Animator.ToString();
 			state_.Text = "PF: " + p.Atom.NavState.ToString();
 
