@@ -32,6 +32,14 @@ namespace Cue.W
 		void Error(string s);
 	}
 
+	class NavStates
+	{
+		public const int None = 0;
+		public const int Moving = 1;
+		public const int TurningLeft = 2;
+		public const int TurningRight = 3;
+	}
+
 	interface IAtom
 	{
 		string ID { get; }
@@ -51,7 +59,7 @@ namespace Cue.W
 
 		bool NavEnabled { get; set; }
 		bool NavPaused { get; set; }
-		bool NavActive { get; }
+		int NavState { get; }
 		void NavTo(Vector3 v, float bearing);
 		void NavStop();
 	}

@@ -206,21 +206,14 @@ namespace Cue
 		public const float NoBearing = float.MaxValue;
 
 		private const int NoMoveState = 0;
-		private const int MoveTowardsTargetState = 2;
-
-		protected const int MoveNone = 0;
-		protected const int MoveTentative = 1;
-		protected const int MoveWalk = 2;
-		protected const int MoveTurnLeft = 3;
-		protected const int MoveTurnRight = 4;
+		private const int TentativeMoveState = 1;
+		private const int MovingState = 2;
 
 		private readonly W.IAtom atom_;
 
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
 		private int moveState_ = NoMoveState;
-		private bool canMove_ = false;
-		private bool moving_ = false;
 
 		private Slots slots_;
 
@@ -267,32 +260,21 @@ namespace Cue
 		{
 			Atom.Update(s);
 
-			if (moveState_ != NoMoveState)
+			if (moveState_ == TentativeMoveState)
 			{
-				if (!canMove_)
-					canMove_ = SetMoving(MoveTentative);
-
-				if (canMove_)
+				if (StartMove())
 				{
-					moveState_ = MoveTowardsTargetState;
+					Atom.NavTo(targetPos_, targetBearing_);
+					moveState_ = MovingState;
+				}
+			}
 
-					if (!moving_)
-					{
-						Atom.NavTo(targetPos_, targetBearing_);
-						moving_ = true;
-					}
-
-					if (Atom.NavActive)
-					{
-						SetMoving(MoveWalk);
-					}
-					else
-					{
-						moveState_ = NoMoveState;
-						Atom.NavStop();
-						SetMoving(MoveNone);
-						moving_ = false;
-					}
+			if (moveState_ == MovingState)
+			{
+				if (Atom.NavState == W.NavStates.None)
+				{
+					moveState_ = NoMoveState;
+					Atom.NavStop();
 				}
 			}
 		}
@@ -319,9 +301,7 @@ namespace Cue
 		{
 			targetPos_ = to;
 			targetBearing_ = bearing;
-			moveState_ = MoveTowardsTargetState;
-			canMove_ = SetMoving(MoveTentative);
-			moving_ = false;
+			moveState_ = TentativeMoveState;
 		}
 
 		public void TeleportTo(Vector3 to, float bearing)
@@ -334,7 +314,7 @@ namespace Cue
 			get { return (moveState_ != NoMoveState); }
 		}
 
-		protected virtual bool SetMoving(int i)
+		protected virtual bool StartMove()
 		{
 			// no-op
 			return true;

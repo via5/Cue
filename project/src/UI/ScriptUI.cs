@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue.UI
 {
-#if (VAM_GT_1_20)
 	class ScriptUI
 	{
 		private VUI.Root root_ = null;
@@ -17,12 +17,16 @@ namespace Cue.UI
 
 		public void Init()
 		{
-			var scriptui =
-				CueMain.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
+			MVRScriptUI scriptui = null;
+			VUI.Glue.PluginManagerDelegate getManager = null;
 
+#if (VAM_GT_1_20)
+			scriptui = CueMain.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
+			getManager = () => CueMain.Instance.manager;
+#endif
 
 			VUI.Glue.Set(
-				() => CueMain.Instance.manager,
+				getManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => Cue.LogVerbose(s),
 				(s) => Cue.LogInfo(s),
@@ -74,7 +78,7 @@ namespace Cue.UI
 
 			action_.Text = "Action: " + p.Action.ToString();
 			anim_.Text = "Anim: " + p.Animator.ToString();
-			state_.Text = "PF: " + p.Atom.NavActive.ToString();
+			state_.Text = "PF: " + p.Atom.NavState.ToString();
 
 			root_.Update();
 		}
@@ -92,5 +96,4 @@ namespace Cue.UI
 			//Cue.Instance.Person.Animator.Play(a);
 		}
 	}
-#endif
 }

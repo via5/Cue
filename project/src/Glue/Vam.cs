@@ -697,17 +697,20 @@ namespace Cue.W
 			agent_.ResetPath();
 		}
 
-		public bool NavActive
+		public int NavState
 		{
 			get
 			{
 				if (IsPathing())
-					return true;
+					return NavStates.Moving;
 
 				if (finalBearing_ != BasicObject.NoBearing)
-					return true;
+				{
+					// todo
+					return NavStates.TurningLeft;
+				}
 
-				return false;
+				return NavStates.None;
 			}
 		}
 

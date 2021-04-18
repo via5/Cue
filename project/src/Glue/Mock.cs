@@ -204,9 +204,9 @@ namespace Cue.W
 			set { }
 		}
 
-		public bool NavActive
+		public int NavState
 		{
-			get { return false; }
+			get { return NavStates.None; }
 		}
 
 		public void NavTo(Vector3 v, float bearing)

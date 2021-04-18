@@ -2,6 +2,8 @@
 
 namespace Cue
 {
+	using NavStates = W.NavStates;
+
 	interface IBreather
 	{
 		float Intensity { get; set; }
@@ -193,7 +195,7 @@ namespace Cue
 		private readonly RootAction actions_ = new RootAction();
 		private IAI ai_ = null;
 		private int state_ = StandingState;
-		private int lastMoveState_ = MoveNone;
+		private int lastNavState_ = NavStates.None;
 		private Vector3 standingPos_ = new Vector3();
 		private Slot locked_ = null;
 
@@ -378,6 +380,7 @@ namespace Cue
 		public override void Update(float s)
 		{
 			base.Update(s);
+			CheckNavState();
 
 			if (ai_ != null)
 				ai_.Tick(this, s);
@@ -466,47 +469,50 @@ namespace Cue
 			return base.ToString() + " (" + Sexes.ToString(Sex) + ")";
 		}
 
-		protected override bool SetMoving(int i)
+		protected override bool StartMove()
 		{
-			switch (i)
+			if (state_ == StandingState || state_ == WalkingState)
+				return true;
+
+			if (state_ == SitState)
 			{
-				case MoveNone:
+				state_ = StandingFromSittingState;
+				animator_.Play(
+					Resources.Animations.GetAny(
+						Resources.Animations.StandFromSitting, Sex));
+			}
+			else if (state_ == KneelState)
+			{
+				state_ = StandingFromKneelingState;
+				animator_.Play(
+					Resources.Animations.GetAny(
+						Resources.Animations.StandFromKneeling, Sex));
+			}
+
+			return false;
+		}
+
+		private void CheckNavState()
+		{
+			var navState = Atom.NavState;
+
+			switch (navState)
+			{
+				case NavStates.None:
 				{
 					state_ = StandingState;
-					animator_.Stop();
+
+					if (lastNavState_ != NavStates.None)
+						animator_.Stop();
+
 					break;
 				}
 
-				case MoveTentative:
-				{
-					if (state_ == StandingState || state_ == WalkingState)
-					{
-						return true;
-					}
-
-					if (state_ == SitState)
-					{
-						state_ = StandingFromSittingState;
-						animator_.Play(
-							Resources.Animations.GetAny(
-								Resources.Animations.StandFromSitting, Sex));
-					}
-					else if (state_ == KneelState)
-					{
-						state_ = StandingFromKneelingState;
-						animator_.Play(
-							Resources.Animations.GetAny(
-								Resources.Animations.StandFromKneeling, Sex));
-					}
-
-					return false;
-				}
-
-				case MoveWalk:
+				case NavStates.Moving:
 				{
 					state_ = WalkingState;
 
-					if (lastMoveState_ != MoveWalk)
+					if (lastNavState_ != NavStates.Moving || !animator_.Playing)
 					{
 						animator_.Play(
 							Resources.Animations.GetAny(Resources.Animations.Walk, Sex),
@@ -516,25 +522,24 @@ namespace Cue
 					break;
 				}
 
-				case MoveTurnLeft:
+				case NavStates.TurningLeft:
 				{
-					if (lastMoveState_ != MoveTurnLeft)
+					if (lastNavState_ != NavStates.TurningLeft || !animator_.Playing)
 						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnLeft, Sex));
 
 					break;
 				}
 
-				case MoveTurnRight:
+				case NavStates.TurningRight:
 				{
-					if (lastMoveState_ != MoveTurnRight)
+					if (lastNavState_ != NavStates.TurningRight || !animator_.Playing)
 						animator_.Play(Resources.Animations.GetAny(Resources.Animations.TurnRight, Sex));
 
 					break;
 				}
 			}
 
-			lastMoveState_ = i;
-			return true;
+			lastNavState_ = navState;
 		}
 	}
 }
