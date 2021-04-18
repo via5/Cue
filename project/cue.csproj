@@ -97,6 +97,11 @@
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI.cs" />
     <Compile Include="src\Cue.cs" />
+    <Compile Include="src\Events\Event.cs" />
+    <Compile Include="src\Events\Lying.cs" />
+    <Compile Include="src\Events\Sex.cs" />
+    <Compile Include="src\Events\Sitting.cs" />
+    <Compile Include="src\Events\Standing.cs" />
     <Compile Include="src\Geo.cs" />
     <Compile Include="src\Glue\Vam.cs" />
     <Compile Include="src\Integration\BVH.cs" />

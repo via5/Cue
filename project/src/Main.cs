@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Cue
 {
-#if (VAM_GT_1_20)
+#if VAM_GT_1_20
 	class CueMain : MVRScript
 	{
 		static private CueMain instance_ = null;

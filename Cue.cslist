@@ -5,6 +5,11 @@ project\src\Main.cs
 project\src\Resources.cs
 project\src\Utilities.cs
 project\src\Actions\Action.cs
+project\src\Events\Event.cs
+project\src\Events\Lying.cs
+project\src\Events\Sex.cs
+project\src\Events\Sitting.cs
+project\src\Events\Standing.cs
 project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs
