@@ -1,5 +1,4 @@
 project\src\AI.cs
-project\src\BVH.cs
 project\src\Cue.cs
 project\src\Geo.cs
 project\src\Main.cs
@@ -9,6 +8,7 @@ project\src\Actions\Action.cs
 project\src\Glue\Interfaces.cs
 project\src\Glue\Mock.cs
 project\src\Glue\Vam.cs
+project\src\Integration\BVH.cs
 project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
