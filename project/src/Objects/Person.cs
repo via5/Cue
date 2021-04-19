@@ -256,7 +256,7 @@
 			if (!animator_.Playing)
 				state_.FinishTransition();
 
-			if (State.IsUpright)
+			if (State.IsUpright && !State.Transitioning)
 				uprightPos_ = Position;
 		}
 

@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	interface IObject
 	{

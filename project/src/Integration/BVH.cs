@@ -186,36 +186,39 @@ namespace Cue.BVH
             return true;
         }
 
-        public void Stop()
+        public void Stop(bool rewind)
         {
             if (anim == null)
                 return;
 
-            if ((flags & Animator.Reverse) == 0)
-                flags |= Animator.Reverse;
-            else
-                flags &= ~Animator.Reverse;
-
-            flags &= ~Animator.Loop;
-
-            int fs = 0;
-            int max = anim.file.nFrames * 2;
-            while (playing)
+            if (rewind)
             {
-                FixedUpdate(anim.file.frameTime);
-                ++fs;
+                if ((flags & Animator.Reverse) == 0)
+                    flags |= Animator.Reverse;
+                else
+                    flags &= ~Animator.Reverse;
 
-                if (fs >= max)
+                flags &= ~Animator.Loop;
+
+                int fs = 0;
+                int max = anim.file.nFrames * 2;
+                while (playing)
                 {
-                    Cue.LogError(
-                        "bvh: failed to rewind, " +
-                        "fs=" + fs.ToString() + " " +
-                        "n=" + anim.file.nFrames.ToString() + " " +
-                        "ft=" + anim.file.frameTime.ToString() + " " +
-                        "max=" + max.ToString() + " " +
-                        "f=" + frame.ToString());
+                    FixedUpdate(anim.file.frameTime);
+                    ++fs;
 
-                    break;
+                    if (fs >= max)
+                    {
+                        Cue.LogError(
+                            "bvh: failed to rewind, " +
+                            "fs=" + fs.ToString() + " " +
+                            "n=" + anim.file.nFrames.ToString() + " " +
+                            "ft=" + anim.file.frameTime.ToString() + " " +
+                            "max=" + max.ToString() + " " +
+                            "f=" + frame.ToString());
+
+                        break;
+                    }
                 }
             }
 

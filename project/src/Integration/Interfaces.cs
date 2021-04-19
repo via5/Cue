@@ -12,7 +12,7 @@
 	{
 		bool Playing { get; }
 		bool Play(IAnimation a, int flags);
-		void Stop();
+		void Stop(bool rewind);
 		void FixedUpdate(float s);
 		void Update(float s);
 	}

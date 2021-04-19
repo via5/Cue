@@ -10,10 +10,15 @@ namespace Cue
 
 		const float ThinkTime = 5;
 
-		private IObject o_;
+		private IObject o_ = null;
 		private Slot slot_ = null;
 		private int state_ = NoState;
 		private float thunk_ = 0;
+
+		public StandAndThinkEvent(Person p)
+			: base(p)
+		{
+		}
 
 		public StandAndThinkEvent(Person p, IObject o)
 			: base(p)
@@ -30,7 +35,7 @@ namespace Cue
 
 		public override bool Update(float s)
 		{
-			if (slot_ == null)
+			if (slot_ == null && o_ != null)
 			{
 				slot_ = o_.Slots.Get(Slot.Stand);
 				if (slot_ == null)
@@ -43,7 +48,18 @@ namespace Cue
 					return false;
 			}
 
-			var pos = o_.Position;
+			Vector3 pos;
+			float bearing = BasicObject.NoBearing;
+
+			if (o_ == null)
+			{
+				pos = person_.UprightPosition;
+			}
+			else
+			{
+				pos = o_.Position;
+				bearing = o_.Bearing;
+			}
 
 			switch (state_)
 			{
@@ -51,7 +67,7 @@ namespace Cue
 				{
 					Cue.LogError("going to stand");
 					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(pos, o_.Bearing));
+					person_.PushAction(new MoveAction(pos, bearing));
 					state_ = Moving;
 					thunk_ = 0;
 					break;

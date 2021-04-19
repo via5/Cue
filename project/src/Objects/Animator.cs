@@ -6,10 +6,12 @@ namespace Cue
 	{
 		public const int Loop = 0x01;
 		public const int Reverse = 0x02;
+		public const int Rewind = 0x04;
 
 		private Person person_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private IPlayer active_ = null;
+		private int activeFlags_ = 0;
 
 		public Animator(Person p)
 		{
@@ -36,6 +38,7 @@ namespace Cue
 				{
 					Cue.LogError(person_.ID + ": " + p.ToString());
 					active_ = p;
+					activeFlags_ = flags;
 					break;
 				}
 			}
@@ -44,7 +47,7 @@ namespace Cue
 		public void Stop()
 		{
 			if (active_ != null)
-				active_.Stop();
+				active_.Stop(Bits.IsSet(activeFlags_, Rewind));
 		}
 
 		public void FixedUpdate(float s)

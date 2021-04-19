@@ -640,6 +640,7 @@ namespace Cue.W
 						agent_.autoTraverseOffMeshLink = true;
 						agent_.autoRepath = true;
 						agent_.areaMask = ~0;
+						NavStop();
 					}
 				}
 				else
@@ -675,15 +676,36 @@ namespace Cue.W
 			if (agent_ == null)
 				return;
 
-			agent_.destination = Vector3.ToUnity(v);
-			agent_.updatePosition = true;
-			agent_.updateRotation = true;
-			agent_.updateUpAxis = true;
-			finalBearing_ = bearing;
-			turningElapsed_ = 0;
-			pathStuckCheckElapsed_ = 0;
-			pathStuckLastPos_ = Position;
-			stuckCount_ = 0;
+			if (AlmostThere(v, bearing))
+			{
+				Position = v;
+				Direction = Vector3.Rotate(new Vector3(0, 0, 1), bearing);
+			}
+			else
+			{
+				agent_.destination = Vector3.ToUnity(v);
+				agent_.updatePosition = true;
+				agent_.updateRotation = true;
+				agent_.updateUpAxis = true;
+				finalBearing_ = bearing;
+				turningElapsed_ = 0;
+				pathStuckCheckElapsed_ = 0;
+				pathStuckLastPos_ = Position;
+				stuckCount_ = 0;
+			}
+		}
+
+		private bool AlmostThere(Vector3 to, float bearing)
+		{
+			if (Vector3.Distance(Position, to) < 0.01f)
+			{
+				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
+				var d = Math.Abs(currentBearing - bearing);
+				if (d < 5 || d >= 355)
+					return true;
+			}
+
+			return false;
 		}
 
 		public void NavStop()

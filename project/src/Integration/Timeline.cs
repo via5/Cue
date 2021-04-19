@@ -82,7 +82,7 @@ namespace Cue
 			return true;
 		}
 
-		public void Stop()
+		public void Stop(bool rewind)
 		{
 			GetParameters();
 			stop_?.actionCallback?.Invoke();

@@ -62,13 +62,27 @@ namespace Cue
 
 			if (slot.Type == Slot.Sit)
 			{
-				person_.PushAction(new SitAction(slot));
-				person_.PushAction(new MoveAction(slot.Position, BasicObject.NoBearing));
+				if (person_ == Cue.Instance.Player)
+				{
+					person_.PushAction(new SitAction(slot));
+					person_.PushAction(new MoveAction(slot.Position, BasicObject.NoBearing));
+				}
+				else
+				{
+					RunEvent(new SitAndThinkEvent(person_, slot));
+				}
 			}
 			else if (slot.Type == Slot.Stand)
 			{
-				person_.PushAction(new MakeIdleAction());
-				person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
+				if (person_ == Cue.Instance.Player)
+				{
+					person_.PushAction(new MakeIdleAction());
+					person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
+				}
+				else
+				{
+					RunEvent(new StandAndThinkEvent(person_, slot));
+				}
 			}
 
 			return true;
@@ -98,23 +112,32 @@ namespace Cue
 				return;
 			}
 
-			if (!enabled_)
-				return;
-
-			if (events_.Count == 0)
-				return;
+			if (enabled_)
+			{
+				if (events_.Count > 0)
+				{
+					if (i_ == -1)
+					{
+						i_ = 0;
+					}
+					else
+					{
+						if (!events_[i_].Update(s))
+						{
+							++i_;
+							if (i_ >= events_.Count)
+								i_ = 0;
+						}
+					}
+				}
+			}
 
 			if (i_ == -1)
 			{
-				i_ = 0;
-			}
-			else
-			{
-				if (!events_[i_].Update(s))
+				if (person_ != Cue.Instance.Player)
 				{
-					++i_;
-					if (i_ >= events_.Count)
-						i_ = 0;
+					person_.Gaze.Target = Cue.Instance.Player.HeadPosition;
+					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
 				}
 			}
 		}

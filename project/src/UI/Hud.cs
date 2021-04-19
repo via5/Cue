@@ -134,7 +134,7 @@ namespace Cue
 				var p = ((Person)Cue.Instance.Selected);
 
 				p.MakeIdle();
-				p.Stand();
+				p.AI.RunEvent(new StandAndThinkEvent(p));
 			}
 		}
 

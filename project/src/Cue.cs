@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Cue
@@ -248,6 +249,12 @@ namespace Cue
 		static public void LogError(string s)
 		{
 			Instance.Sys.Log.Error(s);
+		}
+
+		static public void LogErrorST(string s)
+		{
+			Instance.Sys.Log.Error(
+				s + "\n" + new StackTrace(1).ToString());
 		}
 	}
 }
