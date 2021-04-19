@@ -60,6 +60,7 @@
 					{
 						person_.Handjob.Target = Cue.Instance.Player;
 						person_.Handjob.Active = true;
+						Cue.Instance.Player.Clothing.GenitalsVisible = true;
 						state_ = ActiveState;
 					}
 

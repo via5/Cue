@@ -70,4 +70,11 @@
 		bool Active { get; set; }
 		Person Target { get; set; }
 	}
+
+	interface IClothing
+	{
+		bool GenitalsVisible { get; set; }
+		void OnPluginState(bool b);
+		void Dump();
+	}
 }

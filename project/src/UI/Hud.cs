@@ -63,6 +63,8 @@ namespace Cue
 			hovered_ = p.Add(new VUI.Label());
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 
+			var bottom = new VUI.Panel(new VUI.VerticalFlow());
+
 			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Call", OnCall));
 			p.Add(new VUI.Button("Sit", OnSit));
@@ -70,8 +72,14 @@ namespace Cue
 			p.Add(new VUI.Button("Reload", OnReload));
 			p.Add(new VUI.Button("Handjob", OnHandjob));
 			p.Add(new VUI.Button("Stand", OnStand));
+			bottom.Add(p);
 
-			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
+			p = new VUI.Panel(new VUI.HorizontalFlow());
+			p.Add(new VUI.Button("Toggle genitals", OnToggleGenitals));
+			p.Add(new VUI.Button("Dump clothes", OnDumpClothes));
+			bottom.Add(p);
+
+			root_.ContentPanel.Add(bottom, VUI.BorderLayout.Bottom);
 		}
 
 		public bool IsHovered(float x, float y)
@@ -168,6 +176,24 @@ namespace Cue
 			}
 		}
 
+		private void OnToggleGenitals()
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+				p.Clothing.GenitalsVisible = !p.Clothing.GenitalsVisible;
+			}
+		}
+
+		private void OnDumpClothes()
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+				p.Clothing.Dump();
+			}
+		}
+
 		private void CreateFullscreenPanel(Transform parent)
 		{
 			fullscreenPanel_ = new GameObject();
@@ -196,8 +222,6 @@ namespace Cue
 			cs.physicalUnit = cs2.physicalUnit;
 			cs.scaleFactor = cs2.scaleFactor;
 
-			var c2 = SuperController.singleton.errorLogPanel.GetComponent<Canvas>();
-			Cue.LogError(canvas.renderMode.ToString() + " " + c2.renderMode.ToString());
 			canvas.scaleFactor = 0.5f;
 
 			rt.offsetMin = new Vector2(2000, 2000);

@@ -72,7 +72,10 @@ namespace Cue
 
 	class U
 	{
-		static public void Safe(Action a)
+		private static float lastErrorTime_ = 0;
+		private static int errorCount_ = 0;
+
+		public static void Safe(Action a)
 		{
 			try
 			{
@@ -81,6 +84,27 @@ namespace Cue
 			catch (Exception e)
 			{
 				Cue.LogError(e.ToString());
+
+				var now = Time.realtimeSinceStartup;
+
+				if (now - lastErrorTime_ < 1)
+				{
+					++errorCount_;
+					if (errorCount_ > 5)
+					{
+						Cue.LogError(
+							"more than 5 errors in the last second, " +
+							"disabling plugin");
+
+						Cue.Instance.DisablePlugin();
+					}
+				}
+				else
+				{
+					errorCount_ = 0;
+				}
+
+				lastErrorTime_ = now;
 			}
 		}
 
@@ -105,7 +129,7 @@ namespace Cue
 		public static void DumpComponents(GameObject o, int indent = 0)
 		{
 			foreach (var c in o.GetComponents(typeof(Component)))
-				Cue.LogError(new string(' ', indent * 2) + c.ToString());
+				Cue.LogInfo(new string(' ', indent * 2) + c.ToString());
 		}
 
 		public static void DumpComponentsAndUp(Component c)
@@ -115,21 +139,21 @@ namespace Cue
 
 		public static void DumpComponentsAndUp(GameObject o)
 		{
-			Cue.LogError(o.name);
+			Cue.LogInfo(o.name);
 
 			var rt = o.GetComponent<RectTransform>();
 			if (rt != null)
 			{
-				Cue.LogError("  rect: " + rt.rect.ToString());
-				Cue.LogError("  offsetMin: " + rt.offsetMin.ToString());
-				Cue.LogError("  offsetMax: " + rt.offsetMax.ToString());
-				Cue.LogError("  anchorMin: " + rt.anchorMin.ToString());
-				Cue.LogError("  anchorMax: " + rt.anchorMax.ToString());
-				Cue.LogError("  anchorPos: " + rt.anchoredPosition.ToString());
+				Cue.LogInfo("  rect: " + rt.rect.ToString());
+				Cue.LogInfo("  offsetMin: " + rt.offsetMin.ToString());
+				Cue.LogInfo("  offsetMax: " + rt.offsetMax.ToString());
+				Cue.LogInfo("  anchorMin: " + rt.anchorMin.ToString());
+				Cue.LogInfo("  anchorMax: " + rt.anchorMax.ToString());
+				Cue.LogInfo("  anchorPos: " + rt.anchoredPosition.ToString());
 			}
 
 			DumpComponents(o);
-			Cue.LogError("---");
+			Cue.LogInfo("---");
 
 			var parent = o?.transform?.parent?.gameObject;
 			if (parent != null)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SimpleJSON;
 
 namespace Cue.Resources
@@ -49,9 +50,23 @@ namespace Cue.Resources
 			return NoType;
 		}
 
-		public static void Load()
+		public static bool Load()
 		{
-			var meta = Cue.Instance.Sys.GetResourcePath("animations/meta.json");
+			try
+			{
+				DoLoad();
+				return true;
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("failed to load animations, " + e.Message);
+				return false;
+			}
+		}
+
+		private static void DoLoad()
+		{
+			var meta = Cue.Instance.Sys.GetResourcePath("animations.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
 
 			if (doc == null)
@@ -97,7 +112,7 @@ namespace Cue.Resources
 				if (a.HasKey("sex"))
 					anim.Sex = Sexes.FromString(a["sex"]);
 
-				Cue.LogError(a["type"] + " anim: " + anim.ToString());
+				Cue.LogInfo(a["type"] + " anim: " + anim.ToString());
 
 				List<IAnimation> list;
 				if (!anims_.TryGetValue(t, out list))
@@ -141,4 +156,127 @@ namespace Cue.Resources
 			return matched;
 		}
 	}
+
+
+	class Clothing
+	{
+		public class Item
+		{
+			public string what;
+			public int sex;
+			public bool showsGenitalsBool = false;
+			public bool hidesGenitalsBool = false;
+			public string showsGenitalsState = "";
+			public string hidesGenitalsState = "";
+
+			public Item(string what, int sex)
+			{
+				this.what = what;
+				this.sex = sex;
+			}
+
+			public override string ToString()
+			{
+				string s = what + " sex=" + Sexes.ToString(sex);
+
+				if (showsGenitalsState == "")
+					s += $"showsGenitals={showsGenitalsBool} ";
+				else
+					s += $"showsGenitals={showsGenitalsState} ";
+
+				if (hidesGenitalsState == "")
+					s += $"hidesGenitals={hidesGenitalsBool} ";
+				else
+					s += $"hidesGenitals={hidesGenitalsState} ";
+
+				return s;
+			}
+		}
+
+		private static Dictionary<string, Item> ids_ =
+			new Dictionary<string, Item>();
+
+		private static Dictionary<string, Item> tags_ =
+			new Dictionary<string, Item>();
+
+		public static bool Load()
+		{
+			try
+			{
+				DoLoad();
+				return true;
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("failed to load clothing, " + e.Message);
+				return false;
+			}
+		}
+
+		private static void DoLoad()
+		{
+			var meta = Cue.Instance.Sys.GetResourcePath("clothing.json");
+			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
+
+			foreach (var an in doc.AsObject["clothing"].AsArray.Childs)
+			{
+				var a = an.AsObject;
+				int sex = Sexes.Any;
+				string id = "", tag = "";
+
+				if (a.HasKey("id"))
+					id = a["id"].Value;
+				else
+					tag = a["tag"].Value;
+
+				if (a.HasKey("sex"))
+					sex = Sexes.FromString(a["sex"].Value);
+
+				var item = new Item(id != "" ? id : tag, sex);
+
+				if (a.HasKey("showsGenitals"))
+					item.showsGenitalsBool = a["showsGenitals"].AsBool;
+				else if (a.HasKey("showsGenitalsState"))
+					item.showsGenitalsState = a["showsGenitalsState"];
+
+				if (a.HasKey("hidesGenitals"))
+					item.hidesGenitalsBool = a["hidesGenitals"].AsBool;
+				else if (a.HasKey("hidesGenitalsState"))
+					item.hidesGenitalsState = a["hidesGenitalsState"];
+
+				Cue.LogInfo("clothing item: " + item.ToString());
+
+				if (id != "")
+					ids_.Add(id, item);
+				else
+					tags_.Add(tag, item);
+			}
+		}
+
+		public static Item FindItem(int sex, string id, string[] tags)
+		{
+			Item item;
+
+			if (ids_.TryGetValue(id, out item))
+			{
+				if (Sexes.Match(sex, item.sex))
+					return item;
+			}
+
+			if (tags != null)
+			{
+				for (int i = 0; i < tags.Length; ++i)
+				{
+					if (tags_.TryGetValue(tags[i], out item))
+					{
+						if (Sexes.Match(item.sex, sex))
+							return item;
+					}
+				}
+			}
+
+			return null;
+		}
+	}
 }
+

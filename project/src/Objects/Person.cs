@@ -54,7 +54,7 @@
 
 			string after = ToString();
 
-			Cue.LogError(
+			Cue.LogInfo(
 				self_.ID + ": " +
 				"state changed from " + before + " to " + after);
 		}
@@ -65,7 +65,7 @@
 				return;
 
 			next_ = next;
-			Cue.LogError(self_.ID + ": new transition, " + ToString());
+			Cue.LogInfo(self_.ID + ": new transition, " + ToString());
 		}
 
 		public void FinishTransition()
@@ -80,7 +80,7 @@
 
 			string after = StateToString(current_);
 
-			Cue.LogError(
+			Cue.LogInfo(
 				self_.ID + ": " +
 				"transition finished from " + before + " to " + after);
 		}
@@ -125,6 +125,7 @@
 		private ISpeaker speech_;
 		private IKisser kisser_;
 		private IHandjob handjob_;
+		private IClothing clothing_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
@@ -137,6 +138,7 @@
 			gaze_ = new MacGruberGaze(this);
 			kisser_ = new ClockwiseSilverKiss(this);
 			handjob_ = new ClockwiseSilverHandjob(this);
+			clothing_ = new VamClothing(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
@@ -168,6 +170,7 @@
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
+		public IClothing Clothing { get { return clothing_; } }
 		public IAction Actions { get { return actions_; } }
 
 		public Animator Animator { get { return animator_; } }
@@ -278,6 +281,7 @@
 		{
 			base.OnPluginState(b);
 			Atom.NavEnabled = b;
+			clothing_.OnPluginState(b);
 		}
 
 		public override void SetPaused(bool b)

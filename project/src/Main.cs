@@ -75,6 +75,10 @@ namespace Cue
 		{
 			get { return sys_; }
 		}
+
+		public void DisablePlugin()
+		{
+		}
 	}
 #else
 	class CueMain : MVRScript
@@ -109,17 +113,18 @@ namespace Cue
 		{
 			base.Init();
 
-			cue_ = new Cue(this);
-
 			try
 			{
 				sys_ = new W.VamSys(this);
+				cue_ = new Cue(this);
 				sui_ = new UI.ScriptUI();
 				sys_.OnReady(DoInit);
 			}
 			catch (Exception e)
 			{
-				SuperController.LogError(e.Message);
+				SuperController.LogError(e.ToString());
+				SuperController.LogError("failed to init plugin, disabling");
+				DisablePlugin();
 			}
 		}
 
@@ -159,6 +164,9 @@ namespace Cue
 
 		public void OnDisable()
 		{
+			if (cue_ == null)
+				return;
+
 			U.Safe(() =>
 			{
 				cue_.OnPluginState(false);
@@ -197,6 +205,11 @@ namespace Cue
 
 				return path;
 			}
+		}
+
+		public void DisablePlugin()
+		{
+			enabledJSON.val = false;
 		}
 	}
 #endif

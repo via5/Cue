@@ -392,7 +392,7 @@ namespace Cue.BVH
             }
             catch (Exception e)
             {
-                Cue.LogError("Fixed Update: " + e);
+                Cue.LogError("bvh fixed update: " + e);
             }
         }
 

@@ -50,7 +50,7 @@ namespace Cue
 			{
 				case NoState:
 				{
-					Cue.LogError("going to sit");
+					Cue.LogInfo("going to sit");
 					person_.Gaze.LookInFront();
 					person_.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
@@ -63,7 +63,7 @@ namespace Cue
 					if (person_.Idle)
 					{
 						person_.PushAction(new SitAction(slot_));
-						Cue.LogError("sitting");
+						Cue.LogInfo("sitting");
 						state_ = Sitting;
 					}
 
@@ -74,7 +74,7 @@ namespace Cue
 				{
 					if (person_.Idle)
 					{
-						Cue.LogError("thinking");
+						Cue.LogInfo("thinking");
 
 						var cc = new ConcurrentAction();
 
@@ -105,7 +105,7 @@ namespace Cue
 					thunk_ += s;
 					if (thunk_ >= ThinkTime)
 					{
-						Cue.LogError("done");
+						Cue.LogInfo("done");
 						person_.PopAction();
 						Unlock();
 						state_ = NoState;

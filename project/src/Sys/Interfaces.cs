@@ -21,6 +21,7 @@ namespace Cue.W
 
 	interface ILog
 	{
+		void Clear();
 		void Verbose(string s);
 		void Info(string s);
 		void Error(string s);

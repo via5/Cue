@@ -30,6 +30,8 @@ namespace Cue
 			instance_ = this;
 			main_ = main;
 
+			Sys.Log.Clear();
+
 			if (Sys is W.MockSys)
 			{
 				hud_ = new MockHud();
@@ -126,6 +128,7 @@ namespace Cue
 		public void Init()
 		{
 			Resources.Animations.Load();
+			Resources.Clothing.Load();
 
 			FindObjects();
 			FindPlayer();
@@ -201,6 +204,11 @@ namespace Cue
 		public void ReloadPlugin()
 		{
 			Sys.ReloadPlugin();
+		}
+
+		public void DisablePlugin()
+		{
+			CueMain.Instance.DisablePlugin();
 		}
 
 		public void FixedUpdate(float s)

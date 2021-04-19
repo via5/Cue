@@ -56,7 +56,6 @@ namespace Cue.W
 
 		public void OnPluginState(bool b)
 		{
-			// no-op
 		}
 
 		public void ReloadPlugin()
@@ -81,6 +80,10 @@ namespace Cue.W
 
 	class MockLog : ILog
 	{
+		public void Clear()
+		{
+		}
+
 		public void Verbose(string s)
 		{
 			Write("V", s);
@@ -145,7 +148,7 @@ namespace Cue.W
 
 		public void Say(string s)
 		{
-			Cue.LogError(id_ + " says '" + s + "'");
+			Cue.LogInfo(id_ + " says '" + s + "'");
 		}
 
 		public void SetDefaultControls()

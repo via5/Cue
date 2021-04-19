@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Battlehub.UIControls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Cue
@@ -194,6 +197,199 @@ namespace Cue
 
 			text_ = Cue.Instance.VamSys?.GetStringParameter(
 				person_, "SpeechBubble", "bubbleText");
+		}
+	}
+
+
+	class VamClothing : IClothing
+	{
+		class Item
+		{
+			private Person person_;
+			private DAZClothingItem ci_;
+			private DAZSkinWrapSwitcher wrap_ = null;
+
+			public Item(Person p, DAZClothingItem ci)
+			{
+				person_ = p;
+				ci_ = ci;
+			}
+
+			public bool Enabled
+			{
+				set
+				{
+					if (value != ci_.isActiveAndEnabled)
+					{
+						Cue.LogInfo(
+							ToString() + ": " + (value ? "enabled" : "disabled"));
+
+						ci_.characterSelector.SetActiveClothingItem(ci_, value);
+					}
+				}
+			}
+
+			public string State
+			{
+				set
+				{
+					if (wrap_ == null)
+					{
+						wrap_ = ci_.GetComponentInChildren<DAZSkinWrapSwitcher>();
+						if (wrap_ == null)
+						{
+							Cue.LogError("clothing " + ci_.name + " has no wrap switcher");
+							return;
+						}
+					}
+
+					if (value != wrap_.currentWrapName)
+					{
+						Cue.LogInfo(
+							ToString() + ": state " +
+							wrap_.currentWrapName + "->" + value);
+
+						wrap_.currentWrapName = value;
+					}
+				}
+			}
+
+			public void SetToShowGenitals()
+			{
+				if (ci_.disableAnatomy)
+				{
+					Enabled = false;
+				}
+				else
+				{
+					var item = Resources.Clothing.FindItem(
+						person_.Sex, ci_.name, ci_.tagsArray);
+
+					if (item == null)
+						return;
+
+					if (item.hidesGenitalsBool)
+					{
+						Enabled = false;
+					}
+					else if (item.showsGenitalsBool)
+					{
+						Enabled = true;
+					}
+					else if (item.showsGenitalsState != "")
+					{
+						Enabled = true;
+						State = item.showsGenitalsState;
+					}
+				}
+			}
+
+			public void SetToHideGenitals()
+			{
+				if (ci_.disableAnatomy)
+				{
+					Enabled = true;
+				}
+				else
+				{
+					var item = Resources.Clothing.FindItem(
+						person_.Sex, ci_.name, ci_.tagsArray);
+
+					if (item == null)
+						return;
+
+					if (item.showsGenitalsBool)
+					{
+						Enabled = false;
+					}
+					else if (item.hidesGenitalsBool)
+					{
+						Enabled = true;
+					}
+					else if (item.hidesGenitalsState != "")
+					{
+						Enabled = true;
+						State = item.hidesGenitalsState;
+					}
+				}
+			}
+
+			public override string ToString()
+			{
+				return ci_.name;
+			}
+		}
+
+		private Person person_;
+		private DAZCharacterSelector char_;
+		private List<Item> items_ = new List<Item>();
+		private bool genitalsVisible_ = false;
+
+		public VamClothing(Person p)
+		{
+			person_ = p;
+			char_ = ((W.VamAtom)person_.Atom).Atom
+				.GetComponentInChildren<DAZCharacterSelector>();
+
+			foreach (var c in char_.clothingItems)
+			{
+				if (c.isActiveAndEnabled)
+					items_.Add(new Item(person_, c));
+			}
+
+			GenitalsVisible = false;
+		}
+
+		public bool GenitalsVisible
+		{
+			get
+			{
+				return genitalsVisible_;
+			}
+
+			set
+			{
+				if (value)
+					ShowGenitals();
+				else
+					HideGenitals();
+			}
+		}
+
+		private void ShowGenitals()
+		{
+			Cue.LogInfo(person_.ID + ": showing genitals");
+			genitalsVisible_ = true;
+
+			foreach (var i in items_)
+				i.SetToShowGenitals();
+		}
+
+		private void HideGenitals()
+		{
+			Cue.LogInfo(person_.ID + ": hiding genitals");
+			genitalsVisible_ = false;
+
+			foreach (var i in items_)
+				i.SetToHideGenitals();
+		}
+
+		public void OnPluginState(bool b)
+		{
+			if (!b)
+			{
+				foreach (var i in items_)
+					i.Enabled = true;
+			}
+		}
+
+		public void Dump()
+		{
+			foreach (var c in char_.clothingItems)
+			{
+				if (c.isActiveAndEnabled)
+					Cue.LogInfo(c.name);
+			}
 		}
 	}
 }

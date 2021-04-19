@@ -1,0 +1,10 @@
+{
+	"clothing":
+	[
+		{"id": "AIPantsDown", "showsGenitals": true},
+		{"id": "HeatUpPanty", "hidesGenitalsState": "Normal", "showsGenitalsState": "Access"}
+		{"id": "SweetShorts", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"tag": "pants", "hidesGenitals": true, "sex": "female"},
+		{"tag": "shorts", "hidesGenitals": true, "sex": "female"}
+	]
+}

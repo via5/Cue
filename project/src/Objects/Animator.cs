@@ -36,7 +36,7 @@ namespace Cue
 			{
 				if (p.Play(a, flags))
 				{
-					Cue.LogError(person_.ID + ": " + p.ToString());
+					Cue.LogInfo(person_.ID + ": " + p.ToString());
 					active_ = p;
 					activeFlags_ = flags;
 					break;
