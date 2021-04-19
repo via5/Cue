@@ -76,6 +76,7 @@ namespace Cue
 
 			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Toggle genitals", OnToggleGenitals));
+			p.Add(new VUI.Button("Toggle breasts", OnToggleBreasts));
 			p.Add(new VUI.Button("Dump clothes", OnDumpClothes));
 			bottom.Add(p);
 
@@ -182,6 +183,15 @@ namespace Cue
 			{
 				var p = ((Person)Cue.Instance.Selected);
 				p.Clothing.GenitalsVisible = !p.Clothing.GenitalsVisible;
+			}
+		}
+
+		private void OnToggleBreasts()
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+				p.Clothing.BreastsVisible = !p.Clothing.BreastsVisible;
 			}
 		}
 

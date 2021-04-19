@@ -74,6 +74,7 @@
 	interface IClothing
 	{
 		bool GenitalsVisible { get; set; }
+		bool BreastsVisible { get; set; }
 		void OnPluginState(bool b);
 		void Dump();
 	}

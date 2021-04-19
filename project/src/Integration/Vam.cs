@@ -314,6 +314,52 @@ namespace Cue
 				}
 			}
 
+			public void SetToShowBreasts()
+			{
+				var item = Resources.Clothing.FindItem(
+					person_.Sex, ci_.name, ci_.tagsArray);
+
+				if (item == null)
+					return;
+
+				if (item.hidesBreastsBool)
+				{
+					Enabled = false;
+				}
+				else if (item.showsBreastsBool)
+				{
+					Enabled = true;
+				}
+				else if (item.showsBreastsState != "")
+				{
+					Enabled = true;
+					State = item.showsBreastsState;
+				}
+			}
+
+			public void SetToHideBreasts()
+			{
+				var item = Resources.Clothing.FindItem(
+					person_.Sex, ci_.name, ci_.tagsArray);
+
+				if (item == null)
+					return;
+
+				if (item.showsBreastsBool)
+				{
+					Enabled = false;
+				}
+				else if (item.hidesBreastsBool)
+				{
+					Enabled = true;
+				}
+				else if (item.hidesBreastsState != "")
+				{
+					Enabled = true;
+					State = item.hidesBreastsState;
+				}
+			}
+
 			public override string ToString()
 			{
 				return ci_.name;
@@ -324,6 +370,7 @@ namespace Cue
 		private DAZCharacterSelector char_;
 		private List<Item> items_ = new List<Item>();
 		private bool genitalsVisible_ = false;
+		private bool breastsVisible_ = false;
 
 		public VamClothing(Person p)
 		{
@@ -338,6 +385,7 @@ namespace Cue
 			}
 
 			GenitalsVisible = false;
+			BreastsVisible = false;
 		}
 
 		public bool GenitalsVisible
@@ -349,29 +397,51 @@ namespace Cue
 
 			set
 			{
+				genitalsVisible_ = value;
+
 				if (value)
-					ShowGenitals();
+				{
+					Cue.LogInfo(person_.ID + ": showing genitals");
+
+					foreach (var i in items_)
+						i.SetToShowGenitals();
+				}
 				else
-					HideGenitals();
+				{
+					Cue.LogInfo(person_.ID + ": hiding genitals");
+
+					foreach (var i in items_)
+						i.SetToHideGenitals();
+				}
 			}
 		}
 
-		private void ShowGenitals()
+		public bool BreastsVisible
 		{
-			Cue.LogInfo(person_.ID + ": showing genitals");
-			genitalsVisible_ = true;
+			get
+			{
+				return breastsVisible_;
+			}
 
-			foreach (var i in items_)
-				i.SetToShowGenitals();
-		}
+			set
+			{
+				breastsVisible_ = value;
 
-		private void HideGenitals()
-		{
-			Cue.LogInfo(person_.ID + ": hiding genitals");
-			genitalsVisible_ = false;
+				if (value)
+				{
+					Cue.LogInfo(person_.ID + ": showing breasts");
 
-			foreach (var i in items_)
-				i.SetToHideGenitals();
+					foreach (var i in items_)
+						i.SetToShowBreasts();
+				}
+				else
+				{
+					Cue.LogInfo(person_.ID + ": hiding breasts");
+
+					foreach (var i in items_)
+						i.SetToHideBreasts();
+				}
+			}
 		}
 
 		public void OnPluginState(bool b)
