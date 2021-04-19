@@ -270,7 +270,7 @@ namespace Cue
 		private List<IAnimation> anims_;
 		private float e_ = 0;
 		private int i_ = -1;
-		private const float Delay = 0;
+		private const float Delay = 10;
 		private bool reverse_ = true;
 
 		public RandomAnimationAction(List<IAnimation> anims)

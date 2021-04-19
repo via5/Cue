@@ -132,6 +132,31 @@
 		},
 
 		{
+			"type": "standIdle",
+			"bvh": "stand_idle_9.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_10.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_11.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_12.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_13.bvh"
+		},
+
+		{
 			"type": "sitOnSitting",
 			"timeline": "SitOnSitting1"
 		}
