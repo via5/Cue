@@ -13,12 +13,12 @@ namespace Cue.W
 		private NavMeshAgent agent_ = null;
 		private float turningElapsed_ = 0;
 		private Quaternion turningStart_ = Quaternion.identity;
-		private const float turnSpeed_ = 360;
 		private DAZCharacter char_ = null;
 		private float pathStuckCheckElapsed_ = 0;
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
+		private JSONStorableAction setOnlyKeyJointsOn_ = null;
 
 		public VamAtom(Atom atom)
 		{
@@ -51,8 +51,16 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get { return Vector3.FromUnity(atom_.mainController.transform.position); }
-			set { atom_.mainController.MoveControl(Vector3.ToUnity(value)); }
+			get
+			{
+				return Vector3.FromUnity(
+					atom_.mainController.transform.position);
+			}
+
+			set
+			{
+				atom_.mainController.MoveControl(Vector3.ToUnity(value));
+			}
 		}
 
 		public Vector3 Direction
@@ -92,10 +100,14 @@ namespace Cue.W
 
 		public void SetDefaultControls()
 		{
-			var a = ((W.VamSys)Cue.Instance.Sys).GetActionParameter(
-				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
+			if (setOnlyKeyJointsOn_ == null)
+			{
+				setOnlyKeyJointsOn_ = ((W.VamSys)Cue.Instance.Sys)
+					.GetActionParameter(
+						atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
+			}
 
-			a?.actionCallback?.Invoke();
+			setOnlyKeyJointsOn_?.actionCallback?.Invoke();
 		}
 
 		public void OnPluginState(bool b)
@@ -120,6 +132,11 @@ namespace Cue.W
 				--enableCollisionsCountdown_;
 			}
 
+			UpdateMovement(s);
+		}
+
+		private void UpdateMovement(float s)
+		{
 			if (!turning_ && finalBearing_ != BasicObject.NoBearing)
 			{
 				if (!IsPathing())
@@ -130,62 +147,67 @@ namespace Cue.W
 			}
 
 			if (turning_)
+				DoTurn(s);
+			else if (IsPathing())
+				CheckStuck(s);
+		}
+
+		private void DoTurn(float s)
+		{
+			var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
+			var direction = Vector3.Rotate(new Vector3(0, 0, 1), finalBearing_);
+			var d = Math.Abs(currentBearing - finalBearing_);
+
+			if (d < 5 || d >= 355)
 			{
-				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
-				var direction = Vector3.Rotate(new Vector3(0, 0, 1), finalBearing_);
-				var d = Math.Abs(currentBearing - finalBearing_);
+				atom_.mainController.transform.rotation =
+					Quaternion.LookRotation(Vector3.ToUnity(direction));
 
-				if (d < 5 || d >= 355)
+				turning_ = false;
+				finalBearing_ = BasicObject.NoBearing;
+			}
+			else
+			{
+				turningElapsed_ += s;
+
+				var newDir = UnityEngine.Vector3.RotateTowards(
+					atom_.mainController.transform.forward,
+					Vector3.ToUnity(direction),
+					360 * s, 0.0f);
+
+				var newRot = Quaternion.LookRotation(newDir);
+
+				atom_.mainController.transform.rotation = Quaternion.Slerp(
+					turningStart_,
+					newRot,
+					turningElapsed_ / (360 / VamNav.AgentTurnSpeed));
+			}
+		}
+
+		private void CheckStuck(float s)
+		{
+			pathStuckCheckElapsed_ += s;
+
+			if (pathStuckCheckElapsed_ >= 1)
+			{
+				var d = Vector3.Distance(Position, pathStuckLastPos_);
+
+				if (d < 0.05f)
 				{
-					atom_.mainController.transform.rotation =
-						Quaternion.LookRotation(Vector3.ToUnity(direction));
+					++stuckCount_;
 
-					turning_ = false;
-					finalBearing_ = BasicObject.NoBearing;
+					if (stuckCount_ >= 3)
+					{
+						Cue.LogError(atom_.uid + " seems stuck, stopping nav");
+						NavStop();
+					}
 				}
 				else
 				{
-					turningElapsed_ += s;
-
-					var newDir = UnityEngine.Vector3.RotateTowards(
-						atom_.mainController.transform.forward,
-						Vector3.ToUnity(direction),
-						50 * s, 0.0f);
-
-					var newRot = Quaternion.LookRotation(newDir);
-
-					atom_.mainController.transform.rotation = Quaternion.Slerp(
-						turningStart_,
-						newRot,
-						turningElapsed_ / (360 / turnSpeed_));
-					//Time.deltaTime * 2f);
+					pathStuckLastPos_ = Position;
 				}
-			}
-			else if (IsPathing())
-			{
-				pathStuckCheckElapsed_ += s;
 
-				if (pathStuckCheckElapsed_ >= 1)
-				{
-					var d = Vector3.Distance(Position, pathStuckLastPos_);
-
-					if (d < 0.05f)
-					{
-						++stuckCount_;
-
-						if (stuckCount_ >= 3)
-						{
-							Cue.LogError(atom_.uid + " seems stuck, stopping nav");
-							NavStop();
-						}
-					}
-					else
-					{
-						pathStuckLastPos_ = Position;
-					}
-
-					pathStuckCheckElapsed_ = 0;
-				}
+				pathStuckCheckElapsed_ = 0;
 			}
 		}
 
@@ -212,22 +234,7 @@ namespace Cue.W
 				if (value)
 				{
 					if (agent_ == null)
-					{
-						agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
-						agent_.agentTypeID = 1;
-						agent_.height = 2.0f;
-						agent_.radius = 0.1f;
-						agent_.speed = 2;
-						agent_.angularSpeed = 120;
-						agent_.stoppingDistance = 0;
-						agent_.autoBraking = true;
-						agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
-						agent_.avoidancePriority = 50;
-						agent_.autoTraverseOffMeshLink = true;
-						agent_.autoRepath = true;
-						agent_.areaMask = ~0;
-						NavStop();
-					}
+						CreateAgent();
 				}
 				else
 				{
@@ -269,29 +276,8 @@ namespace Cue.W
 			}
 			else
 			{
-				agent_.destination = Vector3.ToUnity(v);
-				agent_.updatePosition = true;
-				agent_.updateRotation = true;
-				agent_.updateUpAxis = true;
-				finalBearing_ = bearing;
-				turningElapsed_ = 0;
-				pathStuckCheckElapsed_ = 0;
-				pathStuckLastPos_ = Position;
-				stuckCount_ = 0;
+				DoStartNav(v, bearing);
 			}
-		}
-
-		private bool AlmostThere(Vector3 to, float bearing)
-		{
-			if (Vector3.Distance(Position, to) < 0.01f)
-			{
-				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
-				var d = Math.Abs(currentBearing - bearing);
-				if (d < 5 || d >= 355)
-					return true;
-			}
-
-			return false;
 		}
 
 		public void NavStop()
@@ -299,10 +285,7 @@ namespace Cue.W
 			if (agent_ == null)
 				return;
 
-			agent_.updatePosition = false;
-			agent_.updateRotation = false;
-			agent_.updateUpAxis = false;
-			agent_.ResetPath();
+			DoStopNav();
 		}
 
 		public int NavState
@@ -320,6 +303,62 @@ namespace Cue.W
 
 				return NavStates.None;
 			}
+		}
+
+		private void CreateAgent()
+		{
+			agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
+
+			agent_.agentTypeID = VamNav.AgentTypeID;
+			agent_.height = VamNav.AgentHeight;
+			agent_.radius = VamNav.AgentRadius;
+			agent_.speed = VamNav.AgentMoveSpeed;
+			agent_.angularSpeed = VamNav.AgentTurnSpeed;
+
+			agent_.stoppingDistance = 0;
+			agent_.autoBraking = true;
+			agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+			agent_.avoidancePriority = 50;
+			agent_.autoTraverseOffMeshLink = true;
+			agent_.autoRepath = true;
+			agent_.areaMask = ~0;
+
+			NavStop();
+		}
+
+		private void DoStartNav(Vector3 v, float bearing)
+		{
+			agent_.destination = Vector3.ToUnity(v);
+			agent_.updatePosition = true;
+			agent_.updateRotation = true;
+			agent_.updateUpAxis = true;
+
+			finalBearing_ = bearing;
+			turningElapsed_ = 0;
+			pathStuckCheckElapsed_ = 0;
+			pathStuckLastPos_ = Position;
+			stuckCount_ = 0;
+		}
+
+		private void DoStopNav()
+		{
+			agent_.updatePosition = false;
+			agent_.updateRotation = false;
+			agent_.updateUpAxis = false;
+			agent_.ResetPath();
+		}
+
+		private bool AlmostThere(Vector3 to, float bearing)
+		{
+			if (Vector3.Distance(Position, to) < 0.01f)
+			{
+				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
+				var d = Math.Abs(currentBearing - bearing);
+				if (d < 5 || d >= 355)
+					return true;
+			}
+
+			return false;
 		}
 
 		private bool IsPathing()

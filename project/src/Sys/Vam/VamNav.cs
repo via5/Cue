@@ -11,7 +11,7 @@ namespace Cue.W
 
 		public void Update()
 		{
-			tris_ = UnityEngine.AI.NavMesh.CalculateTriangulation();
+			tris_ = NavMesh.CalculateTriangulation();
 		}
 
 		public void OnPostRender()
@@ -31,7 +31,6 @@ namespace Cue.W
 			GL.PushMatrix();
 
 			mat_.SetPass(0);
-			//GL.wireframe = true;
 			GL.Begin(GL.TRIANGLES);
 			for (int i = 0; i < tris_.indices.Length; i += 3)
 			{
@@ -59,7 +58,6 @@ namespace Cue.W
 				GL.Vertex(p3);
 			}
 			GL.End();
-			//	GL.wireframe = false;
 
 			GL.PopMatrix();
 		}
@@ -68,107 +66,83 @@ namespace Cue.W
 
 	class VamNav : INav
 	{
+		public const int AgentTypeID = 1;
+		public const float AgentHeight = 2.0f;
+		public const float AgentRadius = 0.1f;
+		public const float AgentMoveSpeed = 1.0f;
+		public const float AgentTurnSpeed = 360.0f;
+
 		private NavMeshRenderer nmr_ = null;
 		private bool render_ = false;
-		private readonly List<NavMeshBuildSource> sources_ = new List<NavMeshBuildSource>();
-
-		//public void AddBox(float x, float z, float w, float h)
-		//{
-		//	var src = new NavMeshBuildSource();
-		//	src.transform = Matrix4x4.Translate(new UnityEngine.Vector3(x, 0, z));
-		//	src.shape = NavMeshBuildSourceShape.Box;
-		//	src.size = new UnityEngine.Vector3(w, 0, h);
-		//
-		//	sources_.Add(src);
-		//	Rebuild();
-		//}
-		//
-		//public void AddBox(Vector3 center, Vector3 size)
-		//{
-		//	var src = new NavMeshBuildSource();
-		//	src.transform = Matrix4x4.Translate(Vector3.ToUnity(center));
-		//	src.shape = NavMeshBuildSourceShape.Box;
-		//	src.size = Vector3.ToUnity(size);
-		//
-		//	sources_.Add(src);
-		//	Rebuild();
-		//}
 
 		public void Update()
 		{
 			NavMesh.RemoveAllNavMeshData();
 
-			var d = new NavMeshData(1);
-			var s = new NavMeshBuildSettings();
-			s.agentTypeID = 1;
-			s.agentRadius = 0.1f;
-			s.agentHeight = 2;
-			s.agentClimb = 0.1f;
-			s.agentSlope = 60;
-
-			NavMesh.AddNavMeshData(d);
-
-			//NavMeshBuilder.UpdateNavMeshData(
-			//	d, s, sources_,
-			//	new Bounds(
-			//		new UnityEngine.Vector3(0, 0, 0),
-			//		new UnityEngine.Vector3(100, 0.1f, 100)));
-			//
-
+			var d = new NavMeshData(AgentTypeID);
 			var srcs = new List<NavMeshBuildSource>();
-			var markups = new List<NavMeshBuildMarkup>();
-
-			foreach (var a in SuperController.singleton.GetAtoms())
-			{
-				if (a.type == "Person" ||
-					a.type == "Empty" ||
-					a.type == "PlayerNavigationPanel" ||
-					a.type == "WindowCamera")
-				{
-					var m = new NavMeshBuildMarkup();
-					m.root = a.transform;
-					m.ignoreFromBuild = true;
-					markups.Add(m);
-				}
-
-				foreach (var sc in a.GetComponentsInChildren<SphereCollider>())
-				{
-					if (sc.name == "control")
-					{
-						var m = new NavMeshBuildMarkup();
-						m.root = sc.transform;
-						m.ignoreFromBuild = true;
-						markups.Add(m);
-					}
-				}
-			}
 
 			NavMeshBuilder.CollectSources(
 				new Bounds(
 					new UnityEngine.Vector3(0, 0, 0),
 					new UnityEngine.Vector3(100, 0.2f, 100)),
 				~0, NavMeshCollectGeometry.PhysicsColliders, 0,
-				markups, srcs);
+				CreateMarkups(), srcs);
 
-			//foreach (var ss in srcs)
-			//{
-			//	if (ss.sourceObject != null)
-			//		Cue.LogError(ss.sourceObject.ToString());
-			//	else if (ss.component != null)
-			//		Cue.LogError(ss.component.ToString());
-			//	else
-			//		Cue.LogError("?");
-			//}
-
-			//Cue.LogError(srcs.Count.ToString());
+			var s = new NavMeshBuildSettings();
+			s.agentTypeID = AgentTypeID;
+			s.agentRadius = AgentRadius;
+			s.agentHeight = AgentHeight;
+			s.agentClimb = 0.1f;
+			s.agentSlope = 60;
 
 			NavMeshBuilder.UpdateNavMeshData(
 				d, s, srcs,
 				new Bounds(
 					new UnityEngine.Vector3(0, 0, 0),
-					new UnityEngine.Vector3(100, 0.2f, 100)));
+					new UnityEngine.Vector3(1000, 1000, 1000)));
 
+			NavMesh.AddNavMeshData(d);
 			CheckRender();
+		}
+
+		private List<NavMeshBuildMarkup> CreateMarkups()
+		{
+			var ignore = new Dictionary<string, int>()
+			{
+				{ "Person", 0 },
+				{ "Empty", 0 },
+				{ "PlayerNavigationPanel", 0},
+				{ "WindowCamera", 0}
+			};
+
+			var markups = new List<NavMeshBuildMarkup>();
+
+			foreach (var a in SuperController.singleton.GetAtoms())
+			{
+				if (ignore.ContainsKey(a.type))
+				{
+					var m = new NavMeshBuildMarkup();
+					m.root = a.transform;
+					m.ignoreFromBuild = true;
+					markups.Add(m);
+				}
+				else
+				{
+					foreach (var sc in a.GetComponentsInChildren<SphereCollider>())
+					{
+						if (sc.name == "control")
+						{
+							var m = new NavMeshBuildMarkup();
+							m.root = sc.transform;
+							m.ignoreFromBuild = true;
+							markups.Add(m);
+						}
+					}
+				}
+			}
+
+			return markups;
 		}
 
 		public List<Vector3> Calculate(Vector3 from, Vector3 to)
@@ -178,7 +152,7 @@ namespace Cue.W
 			var path = new NavMeshPath();
 			var f = new NavMeshQueryFilter();
 			f.areaMask = NavMesh.AllAreas;
-			f.agentTypeID = 1;
+			f.agentTypeID = AgentTypeID;
 
 			bool b = NavMesh.CalculatePath(
 				Vector3.ToUnity(from),
@@ -204,7 +178,7 @@ namespace Cue.W
 			{
 				if (nmr_ != null)
 				{
-					UnityEngine.Object.Destroy(nmr_);
+					Object.Destroy(nmr_);
 					nmr_ = null;
 				}
 			}
@@ -237,7 +211,7 @@ namespace Cue.W
 			{
 				if (nmr_ != null)
 				{
-					UnityEngine.Object.Destroy(nmr_);
+					Object.Destroy(nmr_);
 					nmr_ = null;
 				}
 			}
