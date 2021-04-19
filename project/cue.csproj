@@ -103,7 +103,6 @@
     <Compile Include="src\Events\Sitting.cs" />
     <Compile Include="src\Events\Standing.cs" />
     <Compile Include="src\Geo.cs" />
-    <Compile Include="src\Glue\Vam.cs" />
     <Compile Include="src\Integration\BVH.cs" />
     <Compile Include="src\Integration\ClockwiseSilver.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
@@ -114,10 +113,14 @@
     <Compile Include="src\Objects\Animator.cs" />
     <Compile Include="src\Objects\Object.cs" />
     <Compile Include="src\Objects\Person.cs" />
-    <Compile Include="src\Glue\Interfaces.cs" />
-    <Compile Include="src\Glue\Mock.cs" />
     <Compile Include="src\Objects\Slots.cs" />
     <Compile Include="src\Resources.cs" />
+    <Compile Include="src\Sys\Interfaces.cs" />
+    <Compile Include="src\Sys\Mock.cs" />
+    <Compile Include="src\Sys\Vam.cs" />
+    <Compile Include="src\Sys\Vam\VamAtom.cs" />
+    <Compile Include="src\Sys\Vam\VamNav.cs" />
+    <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />
     <Compile Include="src\UI\Hud.cs" />
     <Compile Include="src\UI\ScriptUI.cs" />

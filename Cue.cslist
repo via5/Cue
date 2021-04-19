@@ -10,9 +10,6 @@ project\src\Events\Lying.cs
 project\src\Events\Sex.cs
 project\src\Events\Sitting.cs
 project\src\Events\Standing.cs
-project\src\Glue\Interfaces.cs
-project\src\Glue\Mock.cs
-project\src\Glue\Vam.cs
 project\src\Integration\BVH.cs
 project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\Interfaces.cs
@@ -23,6 +20,12 @@ project\src\Objects\Animator.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
 project\src\Objects\Slots.cs
+project\src\Sys\Interfaces.cs
+project\src\Sys\Mock.cs
+project\src\Sys\Vam.cs
+project\src\Sys\Vam\VamAtom.cs
+project\src\Sys\Vam\VamNav.cs
+project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
 project\src\UI\Hud.cs
 project\src\UI\ScriptUI.cs
