@@ -84,11 +84,9 @@ namespace Cue.W
 
 		public void ReloadPlugin()
 		{
-			Transform uit = null;
-
-#if (VAM_GT_1_20)
-			uit = CueMain.Instance.UITransform;
-#endif
+			Transform uit = CueMain.Instance.UITransform;
+			if (uit == null)
+				return;
 
 			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
 			{
@@ -115,23 +113,8 @@ namespace Cue.W
 
 		public string GetResourcePath(string path)
 		{
-#if (VAM_GT_1_20)
-			// based on MacGruber, which was based on VAMDeluxe, which was
-			// in turn based on Alazi
-
 			if (pluginPath_ == "")
-			{
-				var self = CueMain.Instance;
-				string id = self.name.Substring(0, self.name.IndexOf('_'));
-				string filename = self.manager.GetJSON()["plugins"][id].Value;
-
-				pluginPath_ = filename.Substring(
-					0, filename.LastIndexOfAny(new char[] { '/', '\\' }));
-
-				pluginPath_ = pluginPath_.Replace('/', '\\');
-				if (pluginPath_.EndsWith("\\"))
-					pluginPath_ = pluginPath_.Substring(0, pluginPath_.Length - 1);
-			}
+				pluginPath_ = CueMain.Instance.PluginPath;
 
 			path = path.Replace('/', '\\');
 
@@ -139,9 +122,6 @@ namespace Cue.W
 				return pluginPath_ + "\\res" + path;
 			else
 				return pluginPath_ + "\\res\\" + path;
-#else
-			return pluginPath_;
-#endif
 		}
 
 		private IEnumerator DeferredInit(Action f)

@@ -3,7 +3,67 @@ using System.Threading;
 
 namespace Cue
 {
-#if VAM_GT_1_20
+#if MOCK
+	class CueMain
+	{
+		static private CueMain instance_ = null;
+
+		private W.MockSys sys_ = null;
+		private Cue cue_ = null;
+
+		public CueMain()
+		{
+			instance_ = this;
+
+			sys_ = new W.MockSys();
+			cue_ = new Cue(this);
+			cue_.Init();
+
+			for (; ; )
+			{
+				cue_.FixedUpdate();
+				cue_.Update();
+				Thread.Sleep(1);
+				sys_.Tick();
+			}
+		}
+
+		public static void Main()
+		{
+			new CueMain();
+		}
+
+		static public CueMain Instance
+		{
+			get { return instance_; }
+		}
+
+		public UnityEngine.Transform UITransform
+		{
+			get { return null; }
+		}
+
+		public MVRScriptUI MVRScriptUI
+		{
+			get { return null; }
+		}
+
+		public MVRPluginManager MVRPluginManager
+		{
+			get { return null; }
+		}
+
+		public string PluginPath
+		{
+			get { return ""; }
+		}
+
+		public W.ISys Sys
+		{
+			get { return sys_; }
+		}
+	}
+#else
 	class CueMain : MVRScript
 	{
 		static private CueMain instance_ = null;
@@ -25,6 +85,11 @@ namespace Cue
 		public W.ISys Sys
 		{
 			get { return sys_; }
+		}
+
+		public string PluginID
+		{
+			get { return name; }
 		}
 
 		public override void Init()
@@ -86,48 +151,40 @@ namespace Cue
 				cue_.OnPluginState(false);
 			});
 		}
-	}
 
-#else
-	class CueMain
-	{
-		static private CueMain instance_ = null;
-
-		private W.MockSys sys_ = null;
-		private Cue cue_ = null;
-
-		public CueMain()
+		public MVRScriptUI MVRScriptUI
 		{
-			instance_ = this;
-
-			sys_ = new W.MockSys();
-			cue_ = new Cue(this);
-			cue_.Init();
-
-			for (; ; )
+			get
 			{
-				cue_.FixedUpdate();
-				cue_.Update();
-				Thread.Sleep(1);
-				sys_.Tick();
+				return UITransform.GetComponentInChildren<MVRScriptUI>();
 			}
 		}
 
-		public static void Main()
+		public MVRPluginManager MVRPluginManager
 		{
-			new CueMain();
+			get { return manager; }
 		}
 
-		static public CueMain Instance
+		public string PluginPath
 		{
-			get { return instance_; }
-		}
+			get
+			{
+				// based on MacGruber, which was based on VAMDeluxe, which was
+				// in turn based on Alazi
 
-		public W.ISys Sys
-		{
-			get { return sys_; }
-		}
+				string id = name.Substring(0, name.IndexOf('_'));
+				string filename = manager.GetJSON()["plugins"][id].Value;
 
+				var path = filename.Substring(
+					0, filename.LastIndexOfAny(new char[] { '/', '\\' }));
+
+				path = path.Replace('/', '\\');
+				if (path.EndsWith("\\"))
+					path = path.Substring(0, path.Length - 1);
+
+				return path;
+			}
+		}
 	}
 #endif
 }

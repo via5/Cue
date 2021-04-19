@@ -17,23 +17,15 @@ namespace Cue.UI
 
 		public void Init()
 		{
-			MVRScriptUI scriptui = null;
-			VUI.Glue.PluginManagerDelegate getManager = null;
-
-#if (VAM_GT_1_20)
-			scriptui = CueMain.Instance.UITransform.GetComponentInChildren<MVRScriptUI>();
-			getManager = () => CueMain.Instance.manager;
-#endif
-
 			VUI.Glue.Set(
-				getManager,
+				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => Cue.LogVerbose(s),
 				(s) => Cue.LogInfo(s),
 				(s) => Cue.LogWarning(s),
 				(s) => Cue.LogError(s));
 
-			root_ = new VUI.Root(scriptui.fullWidthUIContent);
+			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI.fullWidthUIContent);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 
