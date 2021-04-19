@@ -90,6 +90,15 @@ namespace Cue
 			return UnityEngine.Quaternion.LookRotation(ToUnity(b - a)).eulerAngles.y;
 		}
 
+		public static float NormalizeAngle(float degrees)
+		{
+			degrees = degrees % 360;
+			if (degrees < 0)
+				degrees += 360;
+
+			return degrees;
+		}
+
 		public static Vector3 Rotate(float x, float y, float z)
 		{
 			return FromUnity(

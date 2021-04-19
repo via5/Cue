@@ -132,8 +132,8 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				sui_.Init();
 				cue_.Init();
+				sui_.Init();
 			});
 		}
 

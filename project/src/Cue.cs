@@ -127,6 +127,14 @@ namespace Cue
 
 		public void Init()
 		{
+			VUI.Glue.Set(
+				() => CueMain.Instance.MVRPluginManager,
+				(s, ps) => Strings.Get(s, ps),
+				(s) => LogVerbose(s),
+				(s) => LogInfo(s),
+				(s) => LogWarning(s),
+				(s) => LogError(s));
+
 			Resources.Animations.Load();
 			Resources.Clothing.Load();
 

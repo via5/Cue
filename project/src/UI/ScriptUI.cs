@@ -13,18 +13,10 @@ namespace Cue.UI
 		private VUI.Label state_ = new VUI.Label();
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button play_ = new VUI.Button("Play");
-		private VUI.ListView<string> anims_ = new VUI.ListView<string>();
+		private VUI.ListView<IAnimation> anims_ = new VUI.ListView<IAnimation>();
 
 		public void Init()
 		{
-			VUI.Glue.Set(
-				() => CueMain.Instance.MVRPluginManager,
-				(s, ps) => Strings.Get(s, ps),
-				(s) => Cue.LogVerbose(s),
-				(s) => Cue.LogInfo(s),
-				(s) => Cue.LogWarning(s),
-				(s) => Cue.LogError(s));
-
 			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI.fullWidthUIContent);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
@@ -46,18 +38,11 @@ namespace Cue.UI
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
 			play_.Clicked += OnPlay;
 
-			//var items = new List<string>();
-			//AddAnims(items, "Custom\\Animations\\V3_BVH_Ambient_Motions");
-			//anims_.SetItems(items);
-		}
+			var items = new List<IAnimation>();
+			foreach (var a in Resources.Animations.GetAll(Resources.Animations.NoType, Sexes.Female))
+				items.Add(a);
 
-		private void AddAnims(List<string> items, string path)
-		{
-			//foreach (var f in SuperController.singleton.GetFilesAtPath(path, "*.bvh"))
-			//	items.Add(f);
-			//
-			//foreach (var d in SuperController.singleton.GetDirectoriesAtPath(path))
-			//	AddAnims(items, d);
+			anims_.SetItems(items);
 		}
 
 		public void Update()
@@ -77,15 +62,12 @@ namespace Cue.UI
 
 		private void OnPlay()
 		{
-			var f = anims_.Selected;
-			if (string.IsNullOrEmpty(f))
+			var a = anims_.Selected;
+			if (a == null)
 				return;
 
-			var a = new BVH.Animation();
-			a.file = new BVH.File(f);
-			a.rootXZ = true;
-			a.rootY = true;
-			//Cue.Instance.Person.Animator.Play(a);
+			if (Cue.Instance.Selected is Person)
+				((Person)Cue.Instance.Selected).Animator.Play(a);
 		}
 	}
 }

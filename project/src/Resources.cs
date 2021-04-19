@@ -143,8 +143,18 @@ namespace Cue.Resources
 		public static List<IAnimation> GetAll(int type, int sex)
 		{
 			List<IAnimation> list;
-			if (!anims_.TryGetValue(type, out list))
-				return new List<IAnimation>();
+
+			if (type == NoType)
+			{
+				list = new List<IAnimation>();
+				foreach (var kv in anims_)
+					list.AddRange(kv.Value);
+			}
+			else
+			{
+				if (!anims_.TryGetValue(type, out list))
+					return new List<IAnimation>();
+			}
 
 			var matched = new List<IAnimation>();
 			foreach (var a in list)
@@ -233,6 +243,12 @@ namespace Cue.Resources
 		{
 			var meta = Cue.Instance.Sys.GetResourcePath("clothing.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
+
+			if (doc == null)
+			{
+				Cue.LogError("failed to parse clothing");
+				return;
+			}
 
 			foreach (var an in doc.AsObject["clothing"].AsArray.Childs)
 			{

@@ -121,7 +121,7 @@ namespace Cue
 		public void MoveTo(Vector3 to, float bearing)
 		{
 			targetPos_ = to;
-			targetBearing_ = bearing;
+			targetBearing_ = Vector3.NormalizeAngle(bearing);
 			moveState_ = TentativeMoveState;
 		}
 

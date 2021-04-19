@@ -269,8 +269,14 @@ namespace Cue.W
 			if (agent_ == null)
 				return;
 
+			Cue.LogInfo(
+				ID + ": nav to " +
+				v.ToString() + " " +
+				(bearing == BasicObject.NoBearing ? "nobearing" : bearing.ToString()));
+
 			if (AlmostThere(v, bearing))
 			{
+				Cue.LogInfo(ID + ": close enough, teleporting");
 				Position = v;
 				Direction = Vector3.Rotate(new Vector3(0, 0, 1), bearing);
 			}

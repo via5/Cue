@@ -110,6 +110,26 @@
 			"bvh": "stand_idle_4.bvh"
 		},
 
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_5.bvh",
+			"start": 180
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_6.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_7.bvh"
+		},
+
+		{
+			"type": "standIdle",
+			"bvh": "stand_idle_8.bvh"
+		},
 
 		{
 			"type": "sitOnSitting",
