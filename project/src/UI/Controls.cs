@@ -80,7 +80,33 @@ namespace Cue
 	}
 
 
-	class Controls
+	interface IControls
+	{
+		void Create(List<IObject> objects);
+		void Update();
+		bool Enabled { get; set; }
+	}
+
+
+	class MockControls : IControls
+	{
+		public void Create(List<IObject> objects)
+		{
+		}
+
+		public void Update()
+		{
+		}
+
+		public bool Enabled
+		{
+			get { return false; }
+			set { }
+		}
+	}
+
+
+	class Controls : IControls
 	{
 		public const int Layer = 21;
 		private bool enabled_ = true;
@@ -113,7 +139,8 @@ namespace Cue
 
 			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
 			{
-				if (Cue.Instance.Hud.IsHovered(Input.mousePosition))
+				var mp = Input.mousePosition;
+				if (Cue.Instance.Hud.IsHovered(mp.x, mp.y))
 					return;
 
 				CheckHovered();

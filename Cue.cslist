@@ -22,7 +22,6 @@ project\src\Objects\Person.cs
 project\src\Objects\Slots.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
-project\src\Sys\Vam.cs
 project\src\Sys\Vam\VamAtom.cs
 project\src\Sys\Vam\VamNav.cs
 project\src\Sys\Vam\VamSys.cs

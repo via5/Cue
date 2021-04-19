@@ -18,8 +18,8 @@ namespace Cue
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
-		private Hud hud_ = new Hud();
-		private Controls controls_ = new Controls();
+		private IHud hud_;
+		private IControls controls_;
 		private bool paused_ = false;
 
 		private IObject hovered_ = null;
@@ -29,6 +29,17 @@ namespace Cue
 		{
 			instance_ = this;
 			main_ = main;
+
+			if (Sys is W.MockSys)
+			{
+				hud_ = new MockHud();
+				controls_ = new MockControls();
+			}
+			else
+			{
+				hud_ = new Hud();
+				controls_ = new Controls();
+			}
 		}
 
 		public static Cue Instance
@@ -76,7 +87,7 @@ namespace Cue
 			get { return hovered_; }
 		}
 
-		public Hud Hud
+		public IHud Hud
 		{
 			get { return hud_; }
 		}
@@ -121,9 +132,12 @@ namespace Cue
 			Sys.Nav.Update();
 
 			// todo
-			persons_[0].TeleportTo(new Vector3(0, 0, 0), BasicObject.NoBearing);
-			persons_[1].TeleportTo(new Vector3(1.7f, 0, 0), BasicObject.NoBearing);
-			persons_[2].TeleportTo(new Vector3(0, 0, 1.7f), BasicObject.NoBearing);
+			if (persons_.Count == 3)
+			{
+				persons_[0].TeleportTo(new Vector3(0, 0, 0), BasicObject.NoBearing);
+				persons_[1].TeleportTo(new Vector3(1.7f, 0, 0), BasicObject.NoBearing);
+				persons_[2].TeleportTo(new Vector3(0, 0, 1.7f), BasicObject.NoBearing);
+			}
 
 			controls_.Create(objects_);
 			OnPluginState(true);

@@ -54,6 +54,12 @@ namespace Cue.Resources
 			var meta = Cue.Instance.Sys.GetResourcePath("animations/meta.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
 
+			if (doc == null)
+			{
+				Cue.LogError("failed to parse animations");
+				return;
+			}
+
 			foreach (var an in doc.AsObject["animations"].AsArray.Childs)
 			{
 				var a = an.AsObject;

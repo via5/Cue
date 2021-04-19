@@ -84,8 +84,13 @@ namespace Cue.W
 
 		public void ReloadPlugin()
 		{
+			Transform uit = null;
+
 #if (VAM_GT_1_20)
-			foreach (var pui in CueMain.Instance.UITransform.parent.GetComponentsInChildren<MVRPluginUI>())
+			uit = CueMain.Instance.UITransform;
+#endif
+
+			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
 			{
 				if (pui.urlText.text.Contains("Cue.cslist"))
 				{
@@ -93,7 +98,6 @@ namespace Cue.W
 					pui.reloadButton.onClick.Invoke();
 				}
 			}
-#endif
 		}
 
 		public string ReadFileIntoString(string path)

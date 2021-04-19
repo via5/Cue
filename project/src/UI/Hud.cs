@@ -4,7 +4,37 @@ using UnityEngine.UI;
 
 namespace Cue
 {
-	class Hud
+	interface IHud
+	{
+		void Create();
+		void Destroy();
+		void Update();
+		bool IsHovered(float x, float y);
+	}
+
+
+	class MockHud : IHud
+	{
+		public void Create()
+		{
+		}
+
+		public void Destroy()
+		{
+		}
+
+		public void Update()
+		{
+		}
+
+		public bool IsHovered(float x, float y)
+		{
+			return false;
+		}
+	}
+
+
+	class Hud : IHud
 	{
 		private GameObject fullscreenPanel_ = null;
 		private GameObject hudPanel_ = null;
@@ -44,10 +74,10 @@ namespace Cue
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
 		}
 
-		public bool IsHovered(Vector2 p)
+		public bool IsHovered(float x, float y)
 		{
 			var rt = hudPanel_.GetComponent<RectTransform>();
-			Vector2 local = rt.InverseTransformPoint(p);
+			Vector2 local = rt.InverseTransformPoint(new Vector2(x, y));
 			return rt.rect.Contains(local);
 		}
 

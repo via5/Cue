@@ -93,22 +93,23 @@ namespace Cue
 	{
 		static private CueMain instance_ = null;
 
-		private W.ISys sys_ = null;
+		private W.MockSys sys_ = null;
 		private Cue cue_ = null;
 
 		public CueMain()
 		{
 			instance_ = this;
 
-			var sys = new W.MockSys();
+			sys_ = new W.MockSys();
 			cue_ = new Cue(this);
 			cue_.Init();
 
 			for (; ; )
 			{
+				cue_.FixedUpdate();
 				cue_.Update();
 				Thread.Sleep(1);
-				sys.Tick();
+				sys_.Tick();
 			}
 		}
 
