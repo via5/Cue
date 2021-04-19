@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using UnityEngine;
 
 namespace Cue
 {
@@ -19,12 +20,24 @@ namespace Cue
 			cue_ = new Cue(this);
 			cue_.Init();
 
+			float deltaTime = 0;
+			long last = 0;
+
 			for (; ; )
 			{
-				cue_.FixedUpdate();
-				cue_.Update();
+				var now = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+				if (last > 0)
+				{
+					deltaTime = (float)((now - deltaTime) / 1000.0);
+
+					cue_.FixedUpdate(deltaTime);
+					cue_.Update(deltaTime);
+				}
+
 				Thread.Sleep(1);
 				sys_.Tick();
+				last = now;
 			}
 		}
 
@@ -123,7 +136,7 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				cue_.FixedUpdate();
+				cue_.FixedUpdate(Time.deltaTime);
 			});
 		}
 
@@ -131,7 +144,7 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				cue_.Update();
+				cue_.Update(Time.deltaTime);
 				sui_.Update();
 			});
 		}

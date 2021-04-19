@@ -9,7 +9,6 @@ namespace Cue.W
 	{
 		private static VamSys instance_ = null;
 		private readonly MVRScript script_ = null;
-		private readonly VamTime time_ = new VamTime();
 		private readonly VamLog log_ = new VamLog();
 		private readonly VamNav nav_ = new VamNav();
 		private string pluginPath_ = "";
@@ -23,11 +22,6 @@ namespace Cue.W
 		static public VamSys Instance
 		{
 			get { return instance_; }
-		}
-
-		public ITime Time
-		{
-			get { return time_; }
 		}
 
 		public ILog Log
@@ -301,14 +295,6 @@ namespace Cue.W
 		}
 	}
 
-
-	class VamTime : ITime
-	{
-		public float deltaTime
-		{
-			get { return Time.deltaTime; }
-		}
-	}
 
 	class VamLog : ILog
 	{

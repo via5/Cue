@@ -203,16 +203,16 @@ namespace Cue
 			Sys.ReloadPlugin();
 		}
 
-		public void FixedUpdate()
+		public void FixedUpdate(float s)
 		{
 			if (Sys.Paused)
 				return;
 
 			for (int i = 0; i < allObjects_.Count; ++i)
-				allObjects_[i].FixedUpdate(Sys.Time.deltaTime);
+				allObjects_[i].FixedUpdate(s);
 		}
 
-		public void Update()
+		public void Update(float s)
 		{
 			if (Sys.Paused != paused_)
 			{
@@ -224,7 +224,7 @@ namespace Cue
 			if (!Sys.Paused)
 			{
 				for (int i = 0; i < allObjects_.Count; ++i)
-					allObjects_[i].Update(Sys.Time.deltaTime);
+					allObjects_[i].Update(s);
 			}
 
 			controls_.Update();

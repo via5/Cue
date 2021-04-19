@@ -6,7 +6,6 @@ namespace Cue.W
 {
 	interface ISys
 	{
-		ITime Time { get; }
 		ILog Log { get; }
 		IAtom GetAtom(string id);
 		List<IAtom> GetAtoms(bool alsoOff=false);
@@ -18,11 +17,6 @@ namespace Cue.W
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
 		void ReloadPlugin();
-	}
-
-	interface ITime
-	{
-		float deltaTime { get; }
 	}
 
 	interface ILog

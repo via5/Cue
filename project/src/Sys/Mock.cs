@@ -7,7 +7,6 @@ namespace Cue.W
 	class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
-		private readonly MockTime time_ = new MockTime();
 		private readonly MockLog log_ = new MockLog();
 		private readonly MockNav nav_ = new MockNav();
 
@@ -23,12 +22,6 @@ namespace Cue.W
 
 		public void Tick()
 		{
-			time_.Tick();
-		}
-
-		public ITime Time
-		{
-			get { return time_; }
 		}
 
 		public ILog Log
@@ -83,27 +76,6 @@ namespace Cue.W
 		public string GetResourcePath(string path)
 		{
 			return path;
-		}
-	}
-
-	class MockTime : ITime
-	{
-		private float dt_ = 0;
-		private long last_ = 0;
-
-		public void Tick()
-		{
-			var now = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-			if (last_ > 0)
-				dt_ = (float)((now - last_) / 1000.0);
-
-			last_ = now;
-		}
-
-		public float deltaTime
-		{
-			get { return dt_; }
 		}
 	}
 
