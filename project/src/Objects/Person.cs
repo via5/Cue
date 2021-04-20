@@ -9,6 +9,7 @@
 		public const int Walking = 2;
 		public const int Sitting = 3;
 		public const int Kneeling = 4;
+		public const int SittingStraddling = 5;
 
 		private Person self_;
 		private int current_ = Standing;
@@ -99,7 +100,8 @@
 		{
 			string[] names = new string[]
 			{
-				"none", "standing", "walking", "sitting", "kneeling"
+				"none", "standing", "walking", "sitting", "kneeling",
+				"sitting-straddling"
 			};
 
 			if (state < 0 || state >= names.Length)
@@ -288,6 +290,12 @@
 		{
 			base.SetPaused(b);
 			Atom.NavPaused = b;
+		}
+
+		public void Straddle()
+		{
+			animator_.Play(Resources.Animations.StraddleSitFromStanding);
+			state_.StartTransition(PersonState.SittingStraddling);
 		}
 
 		public void Sit()

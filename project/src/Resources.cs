@@ -14,7 +14,7 @@ namespace Cue.Resources
 		public const int StandIdle = 5;
 		public const int SitFromStanding = 6;
 		public const int StandFromSitting = 7;
-		public const int SitOnSitting = 8;
+		public const int StraddleSitFromStanding = 8;
 		public const int KneelFromStanding = 9;
 		public const int StandFromKneeling = 10;
 
@@ -39,8 +39,8 @@ namespace Cue.Resources
 				return SitFromStanding;
 			else if (s == "standfromsitting")
 				return StandFromSitting;
-			else if (s == "sitonsitting")
-				return SitOnSitting;
+			else if (s == "straddlesitfromstanding")
+				return StraddleSitFromStanding;
 			else if (s == "kneelfromstanding")
 				return KneelFromStanding;
 			else if (s == "standfromkneeling")

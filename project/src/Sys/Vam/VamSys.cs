@@ -66,6 +66,25 @@ namespace Cue.W
 			get { return SuperController.singleton.freezeAnimation; }
 		}
 
+		public bool IsVR
+		{
+			get
+			{
+				return !SuperController.singleton.MonitorCenterCamera.isActiveAndEnabled;
+			}
+		}
+
+		public bool Update(float s)
+		{
+			if (Input.GetKeyDown(KeyCode.F5))
+			{
+				ReloadPlugin();
+				return false;
+			}
+
+			return true;
+		}
+
 		public void OnPluginState(bool b)
 		{
 			nav_.OnPluginState(b);

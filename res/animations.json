@@ -157,8 +157,8 @@
 		},
 
 		{
-			"type": "sitOnSitting",
-			"timeline": "SitOnSitting1"
+			"type": "straddleSitFromStanding",
+			"timeline": "StraddleSitFromStanding"
 		}
 	]
 }

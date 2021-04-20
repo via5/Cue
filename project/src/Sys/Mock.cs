@@ -54,6 +54,16 @@ namespace Cue.W
 			get { return false; }
 		}
 
+		public bool IsVR
+		{
+			get { return false; }
+		}
+
+		public bool Update(float s)
+		{
+			return true;
+		}
+
 		public void OnPluginState(bool b)
 		{
 		}

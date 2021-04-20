@@ -17,6 +17,8 @@ namespace Cue.W
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
 		void ReloadPlugin();
+		bool Update(float s);
+		bool IsVR { get; }
 	}
 
 	interface ILog

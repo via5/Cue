@@ -21,6 +21,7 @@ namespace Cue
 		private IHud hud_;
 		private IControls controls_;
 		private bool paused_ = false;
+		private bool vr_ = false;
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
@@ -29,6 +30,7 @@ namespace Cue
 		{
 			instance_ = this;
 			main_ = main;
+			vr_ = Sys.IsVR;
 
 			Sys.Log.Clear();
 
@@ -243,6 +245,14 @@ namespace Cue
 					allObjects_[i].Update(s);
 			}
 
+			var vr = Sys.IsVR;
+			if (vr_ != vr)
+			{
+				vr_ = vr;
+				hud_.Destroy();
+				hud_.Create(vr_);
+			}
+
 			controls_.Update();
 			hud_.Update();
 		}
@@ -253,7 +263,7 @@ namespace Cue
 			controls_.Enabled = b;
 
 			if (b)
-				hud_.Create();
+				hud_.Create(Sys.IsVR);
 			else
 				hud_.Destroy();
 
