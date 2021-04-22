@@ -19,6 +19,7 @@ namespace Cue
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
 		private IHud hud_;
+		private IMenu menu_;
 		private IControls controls_;
 		private bool paused_ = false;
 		private bool vr_ = false;
@@ -42,6 +43,7 @@ namespace Cue
 			else
 			{
 				hud_ = new Hud();
+				menu_ = new Menu();
 				controls_ = new Controls();
 			}
 		}
@@ -251,10 +253,21 @@ namespace Cue
 				vr_ = vr;
 				hud_.Destroy();
 				hud_.Create(vr_);
+
+				menu_.Destroy();
+				menu_.Create(vr_);
 			}
 
 			controls_.Update();
 			hud_.Update();
+			menu_.Update();
+
+
+			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
+			{
+				if (SuperController.singleton.GetLeftSelect())
+					menu_.Toggle();
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -263,9 +276,15 @@ namespace Cue
 			controls_.Enabled = b;
 
 			if (b)
+			{
 				hud_.Create(Sys.IsVR);
+				menu_.Create(Sys.IsVR);
+			}
 			else
+			{
 				hud_.Destroy();
+				menu_.Destroy();
+			}
 
 			for (int i = 0; i < allObjects_.Count; ++i)
 				allObjects_[i].OnPluginState(b);

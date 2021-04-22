@@ -99,8 +99,11 @@ namespace Cue.W
 		public void ReloadPlugin()
 		{
 			Transform uit = CueMain.Instance.UITransform;
-			if (uit == null)
+			if (uit?.parent == null)
+			{
+				SuperController.LogError("can't reload, open main UI once");
 				return;
+			}
 
 			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
 			{
