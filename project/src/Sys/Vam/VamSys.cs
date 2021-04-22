@@ -327,6 +327,7 @@ namespace Cue.W
 	{
 		private VamSys sys_;
 		private Ray ray_ = new Ray();
+		private bool controlsToggle_ = false;
 
 		public VamInput(VamSys sys)
 		{
@@ -371,6 +372,26 @@ namespace Cue.W
 					return SuperController.singleton.GetRightGrab();
 				else
 					return Input.GetMouseButtonUp(1);
+			}
+		}
+
+		public bool ShowControls
+		{
+			get
+			{
+				if (sys_.IsVR)
+				{
+					return
+						SuperController.singleton.GetLeftUIPointerShow() ||
+						SuperController.singleton.GetRightUIPointerShow();
+				}
+				else
+				{
+					if (Input.GetMouseButtonDown(2))
+						controlsToggle_ = !controlsToggle_;
+
+					return controlsToggle_;
+				}
 			}
 		}
 

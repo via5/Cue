@@ -27,6 +27,7 @@ namespace Cue.W
 		bool MenuToggle { get; }
 		bool Select { get; }
 		bool Action { get; }
+		bool ShowControls { get; }
 
 		IObject GetHovered();
 	}

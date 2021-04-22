@@ -100,6 +100,7 @@ namespace Cue.W
 		public bool MenuToggle { get { return false; } }
 		public bool Select { get { return false; } }
 		public bool Action { get { return false; } }
+		public bool ShowControls { get { return false; } }
 
 		public IObject GetHovered()
 		{

@@ -5,28 +5,19 @@ namespace Cue
 {
 	class ObjectControls
 	{
-		private IObject object_ = null;
+		private IObject object_;
 		private GameObject control_ = null;
 		private Material material_ = null;
 		private bool hovered_ = false;
 
-		public ObjectControls(IObject o)
+		public ObjectControls(Transform parent, IObject o)
 		{
 			object_ = o;
-		}
-
-		public IObject Object
-		{
-			get { return object_; }
-		}
-
-		public void Create()
-		{
-			if (control_ != null)
-				return;
 
 			control_ = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			control_.transform.SetParent(parent, false);
 			control_.layer = Controls.Layer;
+			control_.GetComponent<Renderer>().enabled = false;
 
 			material_ = new Material(Shader.Find("Battlehub/RTGizmos/Handles"));
 			material_.color = new Color(0, 0, 1, 0.5f);
@@ -43,6 +34,11 @@ namespace Cue
 			UpdateColor();
 		}
 
+		public IObject Object
+		{
+			get { return object_; }
+		}
+
 		public bool Is(Transform t)
 		{
 			return (control_.transform == t);
@@ -52,6 +48,14 @@ namespace Cue
 		{
 			get { return hovered_; }
 			set { hovered_ = value; }
+		}
+
+		public bool Visible
+		{
+			set
+			{
+				control_.GetComponent<Renderer>().enabled = value;
+			}
 		}
 
 		public void Update()
@@ -82,16 +86,21 @@ namespace Cue
 
 	interface IControls
 	{
-		void Create(List<IObject> objects);
+		void Create();
+		void Destroy();
 		void Update();
 		IObject Find(Transform t);
-		bool Enabled { get; set; }
+		bool Visible { get; set; }
 	}
 
 
 	class MockControls : IControls
 	{
-		public void Create(List<IObject> objects)
+		public void Create()
+		{
+		}
+
+		public void Destroy()
 		{
 		}
 
@@ -104,7 +113,7 @@ namespace Cue
 			return null;
 		}
 
-		public bool Enabled
+		public bool Visible
 		{
 			get { return false; }
 			set { }
@@ -115,31 +124,57 @@ namespace Cue
 	class Controls : IControls
 	{
 		public const int Layer = 21;
-		private bool enabled_ = true;
+		private bool visible_ = false;
+		private GameObject root_ = null;
 		private List<ObjectControls> controls_ = new List<ObjectControls>();
 
-		public bool Enabled
-		{
-			get { return enabled_; }
-			set { enabled_ = value; Check(); }
-		}
-
-		public void Create(List<IObject> objects)
+		public Controls()
 		{
 			Cue.Instance.HoveredChanged += OnHoveredChanged;
 
-			foreach (var o in objects)
-				controls_.Add(new ObjectControls(o));
+			root_ = new GameObject();
+			root_.transform.SetParent(SuperController.singleton.transform.root, false);
 
 			for (int i = 0; i < 32; ++i)
 				Physics.IgnoreLayerCollision(i, Layer);
+		}
 
-			Check();
+		public bool Visible
+		{
+			get
+			{
+				return visible_;
+			}
+
+			set
+			{
+				if (visible_ != value)
+				{
+					visible_ = value;
+
+					foreach (var c in controls_)
+						c.Visible = value;
+				}
+			}
+		}
+
+		public void Create()
+		{
+			foreach (var o in Cue.Instance.Objects)
+				controls_.Add(new ObjectControls(root_.transform, o));
+		}
+
+		public void Destroy()
+		{
+			foreach (var c in controls_)
+				c.Destroy();
+
+			controls_.Clear();
 		}
 
 		public void Update()
 		{
-			if (!enabled_)
+			if (!visible_)
 				return;
 
 			for (int i = 0; i < controls_.Count; ++i)
@@ -161,17 +196,6 @@ namespace Cue
 		{
 			for (int i = 0; i < controls_.Count; ++i)
 				controls_[i].Hovered = (controls_[i].Object == o);
-		}
-
-		private void Check()
-		{
-			foreach (var c in controls_)
-			{
-				if (enabled_)
-					c.Create();
-				else
-					c.Destroy();
-			}
 		}
 	}
 }

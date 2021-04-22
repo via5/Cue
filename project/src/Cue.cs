@@ -159,7 +159,6 @@ namespace Cue
 				persons_[2].TeleportTo(new Vector3(0, 0, 1.7f), BasicObject.NoBearing);
 			}
 
-			controls_.Create(objects_);
 			OnPluginState(true);
 
 			Select(Player);
@@ -302,22 +301,25 @@ namespace Cue
 
 				p.InteractWith(o);
 			}
+
+			controls_.Visible = Sys.Input.ShowControls;
 		}
 
 		public void OnPluginState(bool b)
 		{
 			Sys.OnPluginState(b);
-			controls_.Enabled = b;
 
 			if (b)
 			{
 				hud_.Create(Sys.IsVR);
 				menu_.Create(Sys.IsVR);
+				controls_.Create();
 			}
 			else
 			{
 				hud_.Destroy();
 				menu_.Destroy();
+				controls_.Destroy();
 			}
 
 			for (int i = 0; i < allObjects_.Count; ++i)
