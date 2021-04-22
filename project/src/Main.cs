@@ -149,9 +149,6 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				if (!sys_.Update(Time.deltaTime))
-					return;
-
 				cue_.Update(Time.deltaTime);
 				sui_.Update();
 			});

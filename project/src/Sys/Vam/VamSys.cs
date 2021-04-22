@@ -11,12 +11,14 @@ namespace Cue.W
 		private readonly MVRScript script_ = null;
 		private readonly VamLog log_ = new VamLog();
 		private readonly VamNav nav_ = new VamNav();
+		private readonly VamInput input_;
 		private string pluginPath_ = "";
 
 		public VamSys(MVRScript s)
 		{
 			instance_ = this;
 			script_ = s;
+			input_ = new VamInput(this);
 		}
 
 		static public VamSys Instance
@@ -32,6 +34,11 @@ namespace Cue.W
 		public INav Nav
 		{
 			get { return nav_; }
+		}
+
+		public IInput Input
+		{
+			get { return input_; }
 		}
 
 		public IAtom GetAtom(string id)
@@ -74,15 +81,12 @@ namespace Cue.W
 			}
 		}
 
-		public bool Update(float s)
+		public bool IsPlayMode
 		{
-			if (Input.GetKeyDown(KeyCode.F5))
+			get
 			{
-				ReloadPlugin();
-				return false;
+				return (SuperController.singleton.gameMode == SuperController.GameMode.Play);
 			}
-
-			return true;
 		}
 
 		public void OnPluginState(bool b)
@@ -312,6 +316,183 @@ namespace Cue.W
 			{
 				if (rb.name == name)
 					return rb.GetComponent<Rigidbody>();
+			}
+
+			return null;
+		}
+	}
+
+
+	class VamInput : IInput
+	{
+		private VamSys sys_;
+		private Ray ray_ = new Ray();
+
+		public VamInput(VamSys sys)
+		{
+			sys_ = sys;
+		}
+
+		public bool ReloadPlugin
+		{
+			get
+			{
+				return Input.GetKeyDown(KeyCode.F5);
+			}
+		}
+
+		public bool MenuToggle
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetLeftSelect();
+				else
+					return false;
+			}
+		}
+
+		public bool Select
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetRightSelect();
+				else
+					return Input.GetMouseButtonUp(0);
+			}
+		}
+
+		public bool Action
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetRightGrab();
+				else
+					return Input.GetMouseButtonUp(1);
+			}
+		}
+
+		public IObject GetHovered()
+		{
+			if (sys_.IsVR)
+			{
+				if (!GetVRRay())
+					return null;
+			}
+			else
+			{
+				if (!GetMouseRay())
+					return null;
+			}
+
+			if (HitUI())
+				return null;
+
+			var o = HitObject();
+			if (o != null)
+				return o;
+
+			o = HitPerson();
+			if (o != null)
+				return o;
+
+			return null;
+		}
+
+		private bool GetMouseRay()
+		{
+			ray_ = SuperController.singleton.MonitorCenterCamera
+				.ScreenPointToRay(Input.mousePosition);
+
+			return true;
+		}
+
+		private bool GetVRRay()
+		{
+			if (SuperController.singleton.GetLeftUIPointerShow())
+			{
+				ray_.origin = SuperController.singleton.viveObjectLeft.position;
+				ray_.direction = SuperController.singleton.viveObjectLeft.forward;
+				return true;
+			}
+			else if (SuperController.singleton.GetRightUIPointerShow())
+			{
+				ray_.origin = SuperController.singleton.viveObjectRight.position;
+				ray_.direction = SuperController.singleton.viveObjectRight.forward;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		private bool HitUI()
+		{
+			// todo
+			return false;
+		}
+
+		private IObject HitObject()
+		{
+			RaycastHit hit;
+
+			bool b = Physics.Raycast(
+				ray_, out hit, float.MaxValue, 1 << Controls.Layer);
+
+			if (!b)
+				return null;
+
+			return Cue.Instance.Controls.Find(hit.transform);
+		}
+
+		private IObject HitPerson()
+		{
+			var a = HitAtom();
+			if (a == null)
+				return null;
+
+			var ps = Cue.Instance.Persons;
+
+			for (int i = 0; i < ps.Count; ++i)
+			{
+				if (((W.VamAtom)ps[i].Atom).Atom == a)
+					return ps[i];
+			}
+
+			return null;
+		}
+
+		private Atom HitAtom()
+		{
+			RaycastHit hit;
+			bool b = Physics.Raycast(
+				ray_, out hit, float.MaxValue, 0x24000100);
+
+			if (!b)
+				return null;
+
+			var fc = hit.transform.GetComponent<FreeControllerV3>();
+
+			if (fc != null)
+				return fc.containingAtom;
+
+			var bone = hit.transform.GetComponent<DAZBone>();
+			if (bone != null)
+				return bone.containingAtom;
+
+			var rb = hit.transform.GetComponent<Rigidbody>();
+			var p = rb.transform;
+
+			while (p != null)
+			{
+				var a = p.GetComponent<Atom>();
+				if (a != null)
+					return a;
+
+				p = p.parent;
 			}
 
 			return null;

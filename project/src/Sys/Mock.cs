@@ -9,6 +9,7 @@ namespace Cue.W
 		private static MockSys instance_ = null;
 		private readonly MockLog log_ = new MockLog();
 		private readonly MockNav nav_ = new MockNav();
+		private readonly MockInput input_ = new MockInput();
 
 		public MockSys()
 		{
@@ -32,6 +33,11 @@ namespace Cue.W
 		public INav Nav
 		{
 			get { return nav_; }
+		}
+
+		public IInput Input
+		{
+			get { return input_; }
 		}
 
 		public IAtom ContainingAtom
@@ -59,9 +65,9 @@ namespace Cue.W
 			get { return false; }
 		}
 
-		public bool Update(float s)
+		public bool IsPlayMode
 		{
-			return true;
+			get { return true; }
 		}
 
 		public void OnPluginState(bool b)
@@ -85,6 +91,19 @@ namespace Cue.W
 		public string GetResourcePath(string path)
 		{
 			return path;
+		}
+	}
+
+	class MockInput : IInput
+	{
+		public bool ReloadPlugin { get { return false; } }
+		public bool MenuToggle { get { return false; } }
+		public bool Select { get { return false; } }
+		public bool Action { get { return false; } }
+
+		public IObject GetHovered()
+		{
+			return null;
 		}
 	}
 

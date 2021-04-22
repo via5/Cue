@@ -84,6 +84,7 @@ namespace Cue
 	{
 		void Create(List<IObject> objects);
 		void Update();
+		IObject Find(Transform t);
 		bool Enabled { get; set; }
 	}
 
@@ -96,6 +97,11 @@ namespace Cue
 
 		public void Update()
 		{
+		}
+
+		public IObject Find(Transform t)
+		{
+			return null;
 		}
 
 		public bool Enabled
@@ -120,6 +126,8 @@ namespace Cue
 
 		public void Create(List<IObject> objects)
 		{
+			Cue.Instance.HoveredChanged += OnHoveredChanged;
+
 			foreach (var o in objects)
 				controls_.Add(new ObjectControls(o));
 
@@ -136,206 +144,23 @@ namespace Cue
 
 			for (int i = 0; i < controls_.Count; ++i)
 				controls_[i].Update();
-
-			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
-			{
-				if (!Cue.Instance.Sys.IsVR)
-				{
-					var mp = Input.mousePosition;
-					if (Cue.Instance.Hud.IsHovered(mp.x, mp.y))
-						return;
-				}
-
-				CheckHovered();
-
-				if (Cue.Instance.Sys.IsVR)
-				{
-					if (SuperController.singleton.GetRightSelect())
-					{
-						Cue.Instance.Select(Cue.Instance.Hovered);
-					}
-
-					if (SuperController.singleton.GetRightGrab())
-					{
-						var p = Cue.Instance.Selected as Person;
-						if (p == null)
-							return;
-
-						var o = Cue.Instance.Hovered;
-						if (o == null)
-							return;
-
-						p.InteractWith(o);
-					}
-				}
-				else
-				{
-					if (Input.GetMouseButtonUp(0))
-					{
-						Cue.Instance.Select(Cue.Instance.Hovered);
-					}
-
-					if (Input.GetMouseButtonUp(1))
-					{
-						var p = Cue.Instance.Selected as Person;
-						if (p == null)
-							return;
-
-						var o = Cue.Instance.Hovered;
-						if (o == null)
-							return;
-
-						p.InteractWith(o);
-					}
-				}
-			}
 		}
 
-		private void CheckHovered()
+		public IObject Find(Transform t)
 		{
-			var hit = new List<IObject>();
-
-			if (Cue.Instance.Sys.IsVR)
-			{
-				if (SuperController.singleton.GetLeftUIPointerShow())
-				{
-					var ray = new Ray(
-						SuperController.singleton.viveObjectLeft.position,
-						SuperController.singleton.viveObjectLeft.forward);
-
-					HitObject(ray, hit);
-				}
-				else if (SuperController.singleton.GetRightUIPointerShow())
-				{
-					var ray = new Ray(
-						SuperController.singleton.viveObjectRight.position,
-						SuperController.singleton.viveObjectRight.forward);
-
-					HitObject(ray, hit);
-				}
-			}
-			else
-			{
-				var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-				HitObject(ray, hit);
-			}
-
-
-			IObject sel = null;
-
-			if (hit.Count > 0)
-			{
-				sel = hit[0];
-			}
-			else
-			{
-				if (Cue.Instance.Sys.IsVR)
-				{
-					if (SuperController.singleton.GetLeftUIPointerShow())
-					{
-						var ray = new Ray(
-							SuperController.singleton.viveObjectLeft.position,
-							SuperController.singleton.viveObjectLeft.forward);
-
-						HitPerson(ray, hit);
-					}
-					else if (SuperController.singleton.GetRightUIPointerShow())
-					{
-						var ray = new Ray(
-							SuperController.singleton.viveObjectRight.position,
-							SuperController.singleton.viveObjectRight.forward);
-
-						HitPerson(ray, hit);
-					}
-				}
-				else
-				{
-					var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-					HitPerson(ray, hit);
-				}
-
-				if (hit.Count > 0)
-				{
-					sel = hit[0];
-				}
-			}
-
-			Cue.Instance.Hover(sel);
-
-			for (int i = 0; i < controls_.Count; ++i)
-				controls_[i].Hovered = (controls_[i].Object == sel);
-		}
-
-		private bool HitObject(Ray ray, List<IObject> list)
-		{
-			RaycastHit hit;
-			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 1 << Layer);
-
-			if (!b)
-				return false;
-
 			for (int i = 0; i < controls_.Count; ++i)
 			{
-				if (controls_[i].Is(hit.transform))
-				{
-					list.Add(controls_[i].Object);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private bool HitPerson(Ray ray, List<IObject> list)
-		{
-			var a = HitAtom(ray);
-			if (a == null)
-				return false;
-
-			var ps = Cue.Instance.Persons;
-
-			for (int i = 0; i < ps.Count; ++i)
-			{
-				if (((W.VamAtom)ps[i].Atom).Atom == a)
-				{
-					list.Add(ps[i]);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private Atom HitAtom(Ray ray)
-		{
-			RaycastHit hit;
-			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 0x24000100);
-
-			if (!b)
-				return null;
-
-			var fc = hit.transform.GetComponent<FreeControllerV3>();
-
-			if (fc != null)
-				return fc.containingAtom;
-
-			var bone = hit.transform.GetComponent<DAZBone>();
-			if (bone != null)
-				return bone.containingAtom;
-
-			var rb = hit.transform.GetComponent<Rigidbody>();
-			var p = rb.transform;
-
-			while (p != null)
-			{
-				var a = p.GetComponent<Atom>();
-				if (a != null)
-					return a;
-
-				p = p.parent;
+				if (controls_[i].Is(t))
+					return controls_[i].Object;
 			}
 
 			return null;
+		}
+
+		private void OnHoveredChanged(IObject o)
+		{
+			for (int i = 0; i < controls_.Count; ++i)
+				controls_[i].Hovered = (controls_[i].Object == o);
 		}
 
 		private void Check()

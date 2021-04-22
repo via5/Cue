@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -11,14 +10,25 @@ namespace Cue.W
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
 		INav Nav { get; }
+		IInput Input { get; }
 		bool Paused { get; }
 		void OnPluginState(bool b);
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
 		void ReloadPlugin();
-		bool Update(float s);
+		bool IsPlayMode { get; }
 		bool IsVR { get; }
+	}
+
+	interface IInput
+	{
+		bool ReloadPlugin { get; }
+		bool MenuToggle { get; }
+		bool Select { get; }
+		bool Action { get; }
+
+		IObject GetHovered();
 	}
 
 	interface ILog

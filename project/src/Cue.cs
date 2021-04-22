@@ -98,6 +98,11 @@ namespace Cue
 			get { return hud_; }
 		}
 
+		public IControls Controls
+		{
+			get { return controls_; }
+		}
+
 		public void Select(IObject o)
 		{
 			if (sel_ != o)
@@ -234,6 +239,13 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (Sys.Input.ReloadPlugin)
+			{
+				ReloadPlugin();
+				return;
+			}
+
+
 			if (Sys.Paused != paused_)
 			{
 				paused_ = Sys.Paused;
@@ -258,15 +270,37 @@ namespace Cue
 				menu_.Create(vr_);
 			}
 
+			CheckInput();
+
 			controls_.Update();
 			hud_.Update();
 			menu_.Update();
+		}
 
+		private void CheckInput()
+		{
+			if (!Sys.IsPlayMode)
+				return;
 
-			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
+			if (Sys.Input.MenuToggle)
+				menu_.Toggle();
+
+			Hover(Sys.Input.GetHovered());
+
+			if (Sys.Input.Select)
+				Select(Hovered);
+
+			if (Sys.Input.Action)
 			{
-				if (SuperController.singleton.GetLeftSelect())
-					menu_.Toggle();
+				var p = Selected as Person;
+				if (p == null)
+					return;
+
+				var o = Hovered;
+				if (o == null)
+					return;
+
+				p.InteractWith(o);
 			}
 		}
 
