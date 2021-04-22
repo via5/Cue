@@ -56,15 +56,18 @@ namespace Cue
 
 	// vr, moves with the head
 	//
-	class WorldSpaceCanvas : IHudCanvas
+	class WorldSpaceAttachedCanvas : IHudCanvas
 	{
 		private Vector3 offset_;
+		private Vector2 pos_, size_;
 		private GameObject fullscreenPanel_ = null;
 		private GameObject hudPanel_ = null;
 
-		public WorldSpaceCanvas(Vector3 offset)
+		public WorldSpaceAttachedCanvas(Vector3 offset, Vector2 pos, Vector2 size)
 		{
 			offset_ = offset;
+			pos_ = pos;
+			size_ = size;
 		}
 
 		public void Create(Transform parent)
@@ -122,14 +125,13 @@ namespace Cue
 			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
 			rc.ignoreReversedGraphics = false;
 
-			rt.offsetMin = new Vector2(0, 0);
-			rt.offsetMax = new Vector2(1300, 100);
+			rt.offsetMin = pos_;
+			rt.offsetMax = size_;
 			rt.anchoredPosition = new Vector2(0, 0);
 			rt.anchorMin = new Vector2(0, 1);
 			rt.anchorMax = new Vector2(0, 1);
 			rt.pivot = new Vector2(0.5f, 0);
 			rt.localScale = new UnityEngine.Vector3(0.0005f, 0.0005f, 0.0005f);
-			rt.localPosition = new UnityEngine.Vector3(0, 0.1f, 0);
 
 			SuperController.singleton.AddCanvas(canvas);
 		}
@@ -144,14 +146,117 @@ namespace Cue
 			if (rt == null)
 				rt = hudPanel_.GetComponent<RectTransform>();
 
-			bg.color = new Color(0, 0, 0, 0.8f);
+			bg.color = new Color(0, 1, 0, 0.8f);
 			bg.raycastTarget = true;
 
-			rt.offsetMin = new Vector2(0.1f, 0.1f);
-			rt.offsetMax = new Vector2(0.0f, 0.0f);
+			rt.offsetMin = new Vector2(10, 10);
+			rt.offsetMax = new Vector2(0, 0);
+			rt.anchoredPosition = new Vector2(0, 0);
 			rt.anchorMin = new Vector2(0, 0);
 			rt.anchorMax = new Vector2(1, 1);
+			rt.pivot = new Vector2(0.5f, 0);
+		}
+	}
+
+
+	// vr, moves with the head
+	//
+	class WorldSpaceCameraCanvas : IHudCanvas
+	{
+		private Vector3 offset_;
+		private Vector2 pos_, size_;
+		private GameObject fullscreenPanel_ = null;
+		private GameObject hudPanel_ = null;
+
+		public WorldSpaceCameraCanvas(Vector3 offset, Vector2 pos, Vector2 size)
+		{
+			offset_ = offset;
+			pos_ = pos;
+			size_ = size;
+		}
+
+		public void Create(Transform parent)
+		{
+			CreateFullscreenPanel(parent);
+			CreateHudPanel();
+		}
+
+		public void Destroy()
+		{
+			SuperController.singleton.RemoveCanvas(
+				fullscreenPanel_.GetComponent<Canvas>());
+
+			Object.Destroy(fullscreenPanel_);
+			fullscreenPanel_ = null;
+		}
+
+		public void Toggle()
+		{
+			fullscreenPanel_.SetActive(!fullscreenPanel_.activeSelf);
+		}
+
+		public bool IsHovered(float x, float y)
+		{
+			return false;
+		}
+
+		public Transform Transform
+		{
+			get { return hudPanel_.transform; }
+		}
+
+		private void CreateFullscreenPanel(Transform parent)
+		{
+			fullscreenPanel_ = new GameObject();
+			fullscreenPanel_.transform.SetParent(parent, false);
+
+			var canvas = fullscreenPanel_.AddComponent<Canvas>();
+			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
+			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
+			var rt = fullscreenPanel_.AddComponent<RectTransform>();
+			if (rt == null)
+				rt = fullscreenPanel_.GetComponent<RectTransform>();
+
+			canvas.renderMode = RenderMode.WorldSpace;
+			canvas.worldCamera = Camera.main;
+			fullscreenPanel_.transform.position =
+				parent.position + Vector3.ToUnity(offset_);
+
+
+			var bg = fullscreenPanel_.AddComponent<Image>();
+			bg.color = new Color(1, 0, 0, 0.2f);
+			bg.raycastTarget = false;
+
+			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
+			rc.ignoreReversedGraphics = false;
+
+			rt.offsetMin = new Vector2(-2000, -200);
+			rt.offsetMax = new Vector2(10, 100);
+			rt.anchoredPosition = new Vector2(0.5f, 0.5f);
+			rt.localScale = new UnityEngine.Vector3(0.0005f, 0.0005f, 0.0005f);
+
+			SuperController.singleton.AddCanvas(canvas);
+		}
+
+		private void CreateHudPanel()
+		{
+			hudPanel_ = new GameObject();
+			hudPanel_.transform.SetParent(fullscreenPanel_.transform, false);
+
+			var bg = hudPanel_.AddComponent<Image>();
+			var rt = hudPanel_.AddComponent<RectTransform>();
+			if (rt == null)
+				rt = hudPanel_.GetComponent<RectTransform>();
+
+			bg.color = new Color(0, 1, 0, 0.8f);
+			bg.raycastTarget = true;
+
+			rt.offsetMin = new Vector2(10, 10);
+			rt.offsetMax = new Vector2(0, 0);
 			rt.anchoredPosition = new Vector2(0, 0);
+			rt.anchorMin = new Vector2(0, 0);
+			rt.anchorMax = new Vector2(1, 1);
+			rt.pivot = new Vector2(0.5f, 0);
 		}
 	}
 
@@ -262,9 +367,10 @@ namespace Cue
 		{
 			if (vr)
 			{
-				canvas_ = new WorldSpaceCanvas(
-					Vector3.FromUnity(
-						new UnityEngine.Vector3(0, 0, 0)));
+				canvas_ = new WorldSpaceAttachedCanvas(
+					new Vector3(0, 0.1f, 0),
+					new Vector2(0, 0),
+					new Vector2(1300, 100));
 
 				canvas_.Create(SuperController.singleton.leftHand);
 			}
@@ -451,7 +557,11 @@ namespace Cue
 
 			if (vr)
 			{
-				canvas_ = new WorldSpaceCanvas(new Vector3(0, 0, 1));
+				canvas_ = new WorldSpaceCameraCanvas(
+					new Vector3(0, 0, 3),
+					new Vector2(-1000, 200),
+					new Vector2(3000, 1000));
+
 				canvas_.Create(Camera.main.transform);
 			}
 			else
