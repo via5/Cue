@@ -139,39 +139,126 @@ namespace Cue
 
 			if (SuperController.singleton.gameMode == SuperController.GameMode.Play)
 			{
-				var mp = Input.mousePosition;
-				if (Cue.Instance.Hud.IsHovered(mp.x, mp.y))
-					return;
+				if (!Cue.Instance.Sys.IsVR)
+				{
+					var mp = Input.mousePosition;
+					if (Cue.Instance.Hud.IsHovered(mp.x, mp.y))
+						return;
+				}
 
 				CheckHovered();
 
-				if (Input.GetMouseButtonUp(0))
+				if (Cue.Instance.Sys.IsVR)
 				{
-					Cue.Instance.Select(Cue.Instance.Hovered);
+					if (SuperController.singleton.GetRightSelect())
+					{
+						Cue.Instance.Select(Cue.Instance.Hovered);
+					}
+
+					if (SuperController.singleton.GetRightGrab())
+					{
+						var p = Cue.Instance.Selected as Person;
+						if (p == null)
+							return;
+
+						var o = Cue.Instance.Hovered;
+						if (o == null)
+							return;
+
+						p.InteractWith(o);
+					}
 				}
-
-				if (Input.GetMouseButtonUp(1))
+				else
 				{
-					var p = Cue.Instance.Selected as Person;
-					if (p == null)
-						return;
+					if (Input.GetMouseButtonUp(0))
+					{
+						Cue.Instance.Select(Cue.Instance.Hovered);
+					}
 
-					var o = Cue.Instance.Hovered;
-					if (o == null)
-						return;
+					if (Input.GetMouseButtonUp(1))
+					{
+						var p = Cue.Instance.Selected as Person;
+						if (p == null)
+							return;
 
-					p.InteractWith(o);
+						var o = Cue.Instance.Hovered;
+						if (o == null)
+							return;
+
+						p.InteractWith(o);
+					}
 				}
 			}
 		}
 
 		private void CheckHovered()
 		{
-			var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			var hit = new List<IObject>();
 
-			IObject sel = HitObject(ray);
-			if (sel == null)
-				sel = HitPerson(ray);
+			if (Cue.Instance.Sys.IsVR)
+			{
+				if (SuperController.singleton.GetLeftUIPointerShow())
+				{
+					var ray = new Ray(
+						SuperController.singleton.viveObjectLeft.position,
+						SuperController.singleton.viveObjectLeft.forward);
+
+					HitObject(ray, hit);
+				}
+				else if (SuperController.singleton.GetRightUIPointerShow())
+				{
+					var ray = new Ray(
+						SuperController.singleton.viveObjectRight.position,
+						SuperController.singleton.viveObjectRight.forward);
+
+					HitObject(ray, hit);
+				}
+			}
+			else
+			{
+				var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				HitObject(ray, hit);
+			}
+
+
+			IObject sel = null;
+
+			if (hit.Count > 0)
+			{
+				sel = hit[0];
+			}
+			else
+			{
+				if (Cue.Instance.Sys.IsVR)
+				{
+					if (SuperController.singleton.GetLeftUIPointerShow())
+					{
+						var ray = new Ray(
+							SuperController.singleton.viveObjectLeft.position,
+							SuperController.singleton.viveObjectLeft.forward);
+
+						HitPerson(ray, hit);
+					}
+					else if (SuperController.singleton.GetRightUIPointerShow())
+					{
+						var ray = new Ray(
+							SuperController.singleton.viveObjectRight.position,
+							SuperController.singleton.viveObjectRight.forward);
+
+						HitPerson(ray, hit);
+					}
+				}
+				else
+				{
+					var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+					HitPerson(ray, hit);
+				}
+
+				if (hit.Count > 0)
+				{
+					sel = hit[0];
+				}
+			}
 
 			Cue.Instance.Hover(sel);
 
@@ -179,38 +266,44 @@ namespace Cue
 				controls_[i].Hovered = (controls_[i].Object == sel);
 		}
 
-		private IObject HitObject(Ray ray)
+		private bool HitObject(Ray ray, List<IObject> list)
 		{
 			RaycastHit hit;
 			bool b = Physics.Raycast(ray, out hit, float.MaxValue, 1 << Layer);
 
 			if (!b)
-				return null;
+				return false;
 
 			for (int i = 0; i < controls_.Count; ++i)
 			{
 				if (controls_[i].Is(hit.transform))
-					return controls_[i].Object;
+				{
+					list.Add(controls_[i].Object);
+					return true;
+				}
 			}
 
-			return null;
+			return false;
 		}
 
-		private IObject HitPerson(Ray ray)
+		private bool HitPerson(Ray ray, List<IObject> list)
 		{
 			var a = HitAtom(ray);
 			if (a == null)
-				return null;
+				return false;
 
 			var ps = Cue.Instance.Persons;
 
 			for (int i = 0; i < ps.Count; ++i)
 			{
 				if (((W.VamAtom)ps[i].Atom).Atom == a)
-					return ps[i];
+				{
+					list.Add(ps[i]);
+					return true;
+				}
 			}
 
-			return null;
+			return false;
 		}
 
 		private Atom HitAtom(Ray ray)

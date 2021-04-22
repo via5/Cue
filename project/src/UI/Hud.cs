@@ -119,7 +119,7 @@ namespace Cue
 
 
 			var bg = fullscreenPanel_.AddComponent<Image>();
-			bg.color = new Color(1, 0, 0, 0.2f);
+			bg.color = new Color(0, 0, 0, 0);
 			bg.raycastTarget = false;
 
 			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
@@ -146,7 +146,7 @@ namespace Cue
 			if (rt == null)
 				rt = hudPanel_.GetComponent<RectTransform>();
 
-			bg.color = new Color(0, 1, 0, 0.8f);
+			bg.color = new Color(0, 0, 0, 0.8f);
 			bg.raycastTarget = true;
 
 			rt.offsetMin = new Vector2(10, 10);
@@ -224,7 +224,7 @@ namespace Cue
 
 
 			var bg = fullscreenPanel_.AddComponent<Image>();
-			bg.color = new Color(1, 0, 0, 0.2f);
+			bg.color = new Color(0, 0, 0, 0);
 			bg.raycastTarget = false;
 
 			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
@@ -248,7 +248,7 @@ namespace Cue
 			if (rt == null)
 				rt = hudPanel_.GetComponent<RectTransform>();
 
-			bg.color = new Color(0, 1, 0, 0.8f);
+			bg.color = new Color(0, 0, 0, 0.8f);
 			bg.raycastTarget = true;
 
 			rt.offsetMin = new Vector2(10, 10);
@@ -558,7 +558,7 @@ namespace Cue
 			if (vr)
 			{
 				canvas_ = new WorldSpaceCameraCanvas(
-					new Vector3(0, 0, 3),
+					new Vector3(0, 0, 2),
 					new Vector2(-1000, 200),
 					new Vector2(3000, 1000));
 
