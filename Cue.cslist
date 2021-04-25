@@ -14,13 +14,13 @@ project\src\Integration\BVH.cs
 project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
-project\src\Integration\Procedural.cs
 project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs
 project\src\Objects\Animator.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
 project\src\Objects\Slots.cs
+project\src\Procedural\Procedural.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs

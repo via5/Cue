@@ -107,7 +107,6 @@
     <Compile Include="src\Integration\ClockwiseSilver.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
-    <Compile Include="src\Integration\Procedural.cs" />
     <Compile Include="src\Integration\Timeline.cs" />
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Main.cs" />
@@ -115,6 +114,7 @@
     <Compile Include="src\Objects\Object.cs" />
     <Compile Include="src\Objects\Person.cs" />
     <Compile Include="src\Objects\Slots.cs" />
+    <Compile Include="src\Procedural\Procedural.cs" />
     <Compile Include="src\Resources.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
@@ -147,6 +147,7 @@
     <Compile Include="src\VUI\Utilities.cs" />
     <Compile Include="src\VUI\Widget.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
