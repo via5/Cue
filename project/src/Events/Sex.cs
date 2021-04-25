@@ -80,18 +80,24 @@
 
 	class SexEvent : BasicEvent
 	{
-		private const int NoState = 0;
-		private const int MovingState = 1;
-		private const int PositioningState = 2;
-		private const int ActiveState = 3;
+		public const int NoState = 0;
+		public const int MovingState = 1;
+		public const int PositioningState = 2;
+		public const int ActiveState = 3;
+		public const int ActiveState2 = 4;
 
 		private Person receiver_;
 		private int state_ = NoState;
+		private ProceduralAnimation sex_;
 
-		public SexEvent(Person p, Person receiver)
+		public SexEvent(Person p, Person receiver, int forceState=NoState)
 			: base(p)
 		{
 			receiver_ = receiver;
+			state_ = forceState;
+
+			sex_ = new ProceduralAnimation(p, "sex");
+			sex_.Add("hip", new Vector3(0, -200, 0), 1);
 		}
 
 		public override bool Update(float s)
@@ -126,8 +132,6 @@
 						}
 						else
 						{
-							//person_.Handjob.Target = Cue.Instance.Player;
-							//person_.Handjob.Active = true;
 							state_ = ActiveState;
 						}
 					}
@@ -148,6 +152,13 @@
 				}
 
 				case ActiveState:
+				{
+					person_.Animator.Play(sex_);
+					state_ = ActiveState2;
+					break;
+				}
+
+				case ActiveState2:
 				{
 					break;
 				}

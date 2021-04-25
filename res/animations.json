@@ -159,6 +159,11 @@
 		{
 			"type": "straddleSitFromStanding",
 			"timeline": "StraddleSitFromStanding"
+		},
+
+		{
+			"type": "standFromStraddleSit",
+			"timeline": "StandFromStraddleSit"
 		}
 	]
 }

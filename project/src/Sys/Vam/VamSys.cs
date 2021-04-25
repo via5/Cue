@@ -113,6 +113,7 @@ namespace Cue.W
 			{
 				if (pui.urlText.text.Contains("Cue.cslist"))
 				{
+					Log.Clear();
 					Cue.LogInfo("reloading");
 					pui.reloadButton.onClick.Invoke();
 				}
@@ -328,6 +329,8 @@ namespace Cue.W
 		private VamSys sys_;
 		private Ray ray_ = new Ray();
 		private bool controlsToggle_ = false;
+		private Vector3 middlePos_ = Vector3.Zero;
+		private bool middleDown_ = false;
 
 		public VamInput(VamSys sys)
 		{
@@ -387,8 +390,33 @@ namespace Cue.W
 				}
 				else
 				{
-					if (Input.GetMouseButtonDown(2))
-						controlsToggle_ = !controlsToggle_;
+					if (middleDown_)
+					{
+						if (Input.GetMouseButtonUp(2))
+						{
+							var cp = Vector3.FromUnity(
+								SuperController.singleton.MonitorCenterCamera
+									.transform.position);
+
+							var d = Vector3.Distance(middlePos_, cp);
+							if (d < 0.02f)
+								controlsToggle_ = !controlsToggle_;
+
+							middleDown_ = false;
+						}
+					}
+					else
+					{
+						if (Input.GetMouseButtonDown(2))
+						{
+							var cp = Vector3.FromUnity(
+								SuperController.singleton.MonitorCenterCamera
+									.transform.position);
+
+							middleDown_ = true;
+							middlePos_ = cp;
+						}
+					}
 
 					return controlsToggle_;
 				}

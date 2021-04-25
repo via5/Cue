@@ -18,6 +18,7 @@ namespace Cue
 			person_ = p;
 			players_.Add(new BVH.Player(p));
 			players_.Add(new TimelinePlayer(p));
+			players_.Add(new ProceduralPlayer());
 		}
 
 		public bool Playing
@@ -39,9 +40,11 @@ namespace Cue
 					Cue.LogInfo(person_.ID + ": " + p.ToString());
 					active_ = p;
 					activeFlags_ = flags;
-					break;
+					return;
 				}
 			}
+
+			Cue.LogError("no player can play " + a.ToString());
 		}
 
 		public void Stop()

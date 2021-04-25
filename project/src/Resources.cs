@@ -17,37 +17,73 @@ namespace Cue.Resources
 		public const int StraddleSitFromStanding = 8;
 		public const int KneelFromStanding = 9;
 		public const int StandFromKneeling = 10;
+		public const int StandFromStraddleSit = 11;
 
 		private static Dictionary<int, List<IAnimation>> anims_ =
 			new Dictionary<int, List<IAnimation>>();
 
-		private static int TypeFromString(string os)
+		private static Dictionary<string, int> typeMap_ = null;
+		private static Dictionary<int, string> typeMapRev_ = null;
+
+		public static Dictionary<string, int> TypeMap
 		{
-			var s = os.ToLower();
+			get
+			{
+				if (typeMap_ == null)
+				{
+					typeMap_ = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+					{
+						{ "Walk",                    Walk},
+						{ "TurnLeft",                TurnLeft },
+						{ "TurnRight",               TurnRight },
+						{ "SitIdle",                 SitIdle },
+						{ "StandIdle",               StandIdle },
+						{ "SitFromStanding",         SitFromStanding },
+						{ "StandFromSitting",        StandFromSitting },
+						{ "StraddleSitFromStanding", StraddleSitFromStanding },
+						{ "KneelFromStanding",       KneelFromStanding },
+						{ "StandFromKneeling",       StandFromKneeling },
+						{ "StandFromStraddleSit",    StandFromStraddleSit }
+					};
+				}
 
-			if (s == "walk")
-				return Walk;
-			else if (s == "turnleft")
-				return TurnLeft;
-			else if (s == "turnright")
-				return TurnRight;
-			else if (s == "sitidle")
-				return SitIdle;
-			else if (s == "standidle")
-				return StandIdle;
-			else if (s == "sitfromstanding")
-				return SitFromStanding;
-			else if (s == "standfromsitting")
-				return StandFromSitting;
-			else if (s == "straddlesitfromstanding")
-				return StraddleSitFromStanding;
-			else if (s == "kneelfromstanding")
-				return KneelFromStanding;
-			else if (s == "standfromkneeling")
-				return StandFromKneeling;
+				return typeMap_;
+			}
+		}
 
-			Cue.LogError("unknown anim type '" + os + "'");
+		public static Dictionary<int, string> ReverseTypeMap
+		{
+			get
+			{
+				if (typeMapRev_ == null)
+				{
+					typeMapRev_ = new Dictionary<int, string>();
+					foreach (var kv in typeMap_)
+						typeMapRev_.Add(kv.Value, kv.Key);
+				}
+
+				return typeMapRev_;
+			}
+		}
+
+		public static int TypeFromString(string s)
+		{
+			int t;
+			if (TypeMap.TryGetValue(s, out t))
+				return t;
+
+			Cue.LogError("unknown anim type '" + s + "'");
 			return NoType;
+		}
+
+		private static string TypeToString(int t)
+		{
+			string s;
+			if (ReverseTypeMap.TryGetValue(t, out s))
+				return s;
+
+			Cue.LogError("unknown anim type " + t.ToString());
+			return "none";
 		}
 
 		public static bool Load()

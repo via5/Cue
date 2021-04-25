@@ -323,6 +323,11 @@
 				state_.StartTransition(PersonState.Standing);
 				animator_.Play(Resources.Animations.StandFromKneeling);
 			}
+			else if (state_.Is(PersonState.SittingStraddling) && !state_.Transitioning)
+			{
+				state_.StartTransition(PersonState.Standing);
+				animator_.Play(Resources.Animations.StandFromStraddleSit);
+			}
 		}
 
 		public virtual void Say(string s)

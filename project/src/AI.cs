@@ -8,6 +8,7 @@ namespace Cue
 		void RunEvent(IEvent e);
 		void Update(float s);
 		bool Enabled { get; set; }
+		IEvent Event { get; }
 	}
 
 	class PersonAI : IAI
@@ -45,6 +46,19 @@ namespace Cue
 				enabled_ = value;
 				if (!enabled_)
 					Stop();
+			}
+		}
+
+		public IEvent Event
+		{
+			get
+			{
+				if (forced_ != null)
+					return forced_;
+				else if (i_ >= 0 && i_ < events_.Count)
+					return events_[i_];
+				else
+					return null;
 			}
 		}
 

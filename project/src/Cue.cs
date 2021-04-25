@@ -33,8 +33,6 @@ namespace Cue
 			main_ = main;
 			vr_ = Sys.IsVR;
 
-			Sys.Log.Clear();
-
 			if (Sys is W.MockSys)
 			{
 				hud_ = new MockHud();
@@ -160,8 +158,27 @@ namespace Cue
 			}
 
 			OnPluginState(true);
-
 			Select(Player);
+
+			foreach (var a in Sys.GetAtoms())
+			{
+				var va = ((W.VamAtom)a).Atom;
+				if (va.type == "Person")
+					va.GetStorableByID("PosePresets").GetAction("LoadPreset").actionCallback.Invoke();
+			}
+
+			Player.State.Set(PersonState.Sitting);
+			Player.Clothing.GenitalsVisible = true;
+
+			foreach (var p in persons_)
+			{
+				if (p.ID == "A")
+				{
+					p.State.Set(PersonState.SittingStraddling);
+					p.Clothing.GenitalsVisible = true;
+					p.AI.RunEvent(new SexEvent(p, Player, SexEvent.ActiveState));
+				}
+			}
 		}
 
 		private void FindObjects()

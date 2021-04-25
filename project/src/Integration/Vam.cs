@@ -374,18 +374,25 @@ namespace Cue
 
 		public VamClothing(Person p)
 		{
-			person_ = p;
-			char_ = ((W.VamAtom)person_.Atom).Atom
-				.GetComponentInChildren<DAZCharacterSelector>();
-
-			foreach (var c in char_.clothingItems)
+			try
 			{
-				if (c.isActiveAndEnabled)
-					items_.Add(new Item(person_, c));
-			}
+				person_ = p;
+				char_ = ((W.VamAtom)person_.Atom).Atom
+					.GetComponentInChildren<DAZCharacterSelector>();
 
-			GenitalsVisible = false;
-			BreastsVisible = false;
+				foreach (var c in char_.clothingItems)
+				{
+					if (c.isActiveAndEnabled)
+						items_.Add(new Item(person_, c));
+				}
+
+				GenitalsVisible = false;
+				BreastsVisible = false;
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("VamClothing: ctor failed, " + e.ToString());
+			}
 		}
 
 		public bool GenitalsVisible
