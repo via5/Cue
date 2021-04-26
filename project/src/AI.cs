@@ -20,11 +20,11 @@ namespace Cue
 	}
 
 
-	class DefaultPersonality : IPersonality
+	class NeutralPersonality : IPersonality
 	{
 		private readonly Person person_;
 
-		public DefaultPersonality(Person p)
+		public NeutralPersonality(Person p)
 		{
 			person_ = p;
 		}
@@ -37,7 +37,42 @@ namespace Cue
 			{
 				case Mood.Idle:
 				{
-					person_.Expression.Set(Expressions.Happy, 0.5f);
+					person_.Expression.Set(new Pair<int, float>[]
+					{
+						new Pair<int, float>(Expressions.Happy, 0.5f),
+						new Pair<int, float>(Expressions.Mischievous, 0.4f)
+					});
+
+					break;
+				}
+			}
+		}
+	}
+
+
+	class QuirkyPersonality : IPersonality
+	{
+		private readonly Person person_;
+
+		public QuirkyPersonality(Person p)
+		{
+			person_ = p;
+		}
+
+		public void SetMood(int state)
+		{
+			person_.Expression.MakeNeutral();
+
+			switch (state)
+			{
+				case Mood.Idle:
+				{
+					person_.Expression.Set(new Pair<int, float>[]
+					{
+						new Pair<int, float>(Expressions.Happy, 0.2f),
+						new Pair<int, float>(Expressions.Mischievous, 0.4f)
+					});
+
 					break;
 				}
 			}

@@ -119,15 +119,30 @@
 	}
 
 
+	struct Pair<First, Second>
+	{
+		public First first;
+		public Second second;
+
+		public Pair(First f, Second s)
+		{
+			first = f;
+			second = s;
+		}
+	}
+
+
 	class Expressions
 	{
-		public const int Happy = 1;
+		public const int Common = 1;
+		public const int Happy = 2;
+		public const int Mischievous = 3;
 	}
 
 	interface IExpression
 	{
 		void MakeNeutral();
-		void Set(int type, float f);
+		void Set(Pair<int, float>[] intensities, bool resetOthers = false);
 		bool Enabled { get; set; }
 		void Update(float s);
 		void OnPluginState(bool b);

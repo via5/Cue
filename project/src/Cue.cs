@@ -183,7 +183,11 @@ namespace Cue
 
 		private void TestStuff()
 		{
-			FindPerson("A").AI.Mood.State = Mood.Idle;
+			var a = FindPerson("A");
+
+			a.Personality = new QuirkyPersonality(a);
+			a.AI.Mood.State = Mood.Idle;
+
 			//foreach (var a in Sys.GetAtoms())
 			//{
 			//	var va = ((W.VamAtom)a).Atom;

@@ -144,7 +144,7 @@
 			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
 			clothing_ = Integration.CreateClothing(this);
-			personality_ = new DefaultPersonality(this);
+			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
@@ -178,7 +178,6 @@
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
 		public IClothing Clothing { get { return clothing_; } }
-		public IPersonality Personality { get { return personality_; } }
 		public IExpression Expression { get { return expression_; } }
 		public IAction Actions { get { return actions_; } }
 
@@ -188,6 +187,12 @@
 		public int Sex
 		{
 			get { return Atom.Sex; }
+		}
+
+		public IPersonality Personality
+		{
+			get { return personality_; }
+			set { personality_ = value; }
 		}
 
 		public void PushAction(IAction a)

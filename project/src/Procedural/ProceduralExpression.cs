@@ -19,6 +19,7 @@ namespace Cue
 		private float r_ = 0;
 		private float mag_ = 0;
 		private IEasing easing_;
+		private bool finished_ = false;
 
 		public ProceduralMorph(
 			Person p, string id, float start, float end, float minTime, float maxTime,
@@ -39,9 +40,22 @@ namespace Cue
 			Reset();
 		}
 
+		public IEasing Easing
+		{
+			get { return easing_; }
+			set { easing_ = value; }
+		}
+
+		public bool Finished
+		{
+			get { return finished_; }
+		}
+
 		public void Reset()
 		{
 			state_ = NoState;
+			finished_ = false;
+
 			forward_.Reset();
 			backward_.Reset();
 			delayOff_.Reset();
@@ -54,7 +68,12 @@ namespace Cue
 		public float Update(float s, float max)
 		{
 			if (morph_ == null)
+			{
+				finished_ = true;
 				return 0;
+			}
+
+			finished_ = false;
 
 			switch (state_)
 			{
@@ -107,9 +126,14 @@ namespace Cue
 						Next(max);
 
 						if (delayOff_.Enabled)
+						{
 							state_ = DelayOffState;
+						}
 						else
+						{
 							state_ = ForwardState;
+							finished_ = true;
+						}
 					}
 					else
 					{
@@ -124,7 +148,10 @@ namespace Cue
 					delayOff_.Update(s);
 
 					if (delayOff_.Finished)
+					{
 						state_ = ForwardState;
+						finished_ = true;
+					}
 
 					break;
 				}
@@ -145,6 +172,9 @@ namespace Cue
 
 		public void Set(float intensity)
 		{
+			if (morph_ == null)
+				return;
+
 			morph_.morphValue =
 				morph_.startValue +
 				easing_.Magnitude(mag_) * r_ * intensity;
@@ -163,7 +193,15 @@ namespace Cue
 	}
 
 
-	class ProceduralMorphGroup
+	interface IProceduralMorphGroup
+	{
+		void Reset();
+		void Update(float s);
+		void Set(float intensity);
+	}
+
+
+	class ConcurrentProceduralMorphGroup : IProceduralMorphGroup
 	{
 		private readonly List<ProceduralMorph> morphs_ = new List<ProceduralMorph>();
 		private float maxMorphs_ = 1.0f;
@@ -195,11 +233,91 @@ namespace Cue
 	}
 
 
+	class SequentialProceduralMorphGroup : IProceduralMorphGroup
+	{
+		private const int ActiveState = 1;
+		private const int DelayState = 2;
+
+		private readonly List<ProceduralMorph> morphs_ = new List<ProceduralMorph>();
+		private int i_ = 0;
+		private Duration delay_;
+		private int state_ = ActiveState;
+
+		public SequentialProceduralMorphGroup(Duration delay = null)
+		{
+			delay_ = delay ?? new Duration(0, 0);
+		}
+
+		public void Add(ProceduralMorph m)
+		{
+			morphs_.Add(m);
+		}
+
+		public void Reset()
+		{
+			i_ = 0;
+			state_ = ActiveState;
+
+			for (int i = 0; i < morphs_.Count; ++i)
+				morphs_[i].Reset();
+		}
+
+		public void Update(float s)
+		{
+			if (morphs_.Count == 0)
+				return;
+
+			switch (state_)
+			{
+				case ActiveState:
+				{
+					morphs_[i_].Update(s, float.MaxValue);
+
+					if (morphs_[i_].Finished)
+					{
+						++i_;
+						if (i_ >= morphs_.Count)
+						{
+							i_ = 0;
+							if (delay_.Enabled)
+								state_ = DelayState;
+						}
+
+						if (state_ == ActiveState)
+							morphs_[i_].Update(s, float.MaxValue);
+					}
+
+					break;
+				}
+
+				case DelayState:
+				{
+					delay_.Update(s);
+
+					if (delay_.Finished)
+						state_ = ActiveState;
+
+					break;
+				}
+			}
+		}
+
+		public void Set(float intensity)
+		{
+			if (morphs_.Count == 0)
+				return;
+
+			morphs_[i_].Set(intensity);
+		}
+	}
+
+
 	class ProceduralExpressionType
 	{
 		private readonly int type_;
 		private float intensity_ = 0;
-		private readonly List<ProceduralMorphGroup> groups_ = new List<ProceduralMorphGroup>();
+		private readonly List<IProceduralMorphGroup> groups_ =
+			new List<IProceduralMorphGroup>();
 
 		public ProceduralExpressionType(Person p, int type)
 		{
@@ -217,7 +335,7 @@ namespace Cue
 			set { intensity_ = value; }
 		}
 
-		public List<ProceduralMorphGroup> Groups
+		public List<IProceduralMorphGroup> Groups
 		{
 			get { return groups_; }
 		}
@@ -235,7 +353,52 @@ namespace Cue
 
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].Set(intensity_);
+		}
+	}
 
+
+	class PE
+	{
+		public static IProceduralMorphGroup Smile(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ProceduralMorph(p, "Smile Open Full Face", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup CornerSmile(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ProceduralMorph(p, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Swallow(Person p)
+		{
+			var g = new SequentialProceduralMorphGroup(
+				new Duration(40, 60));
+
+
+			var m = new ProceduralMorph(p, "Mouth Open",
+				-0.1f, -0.1f, 0.3f, 0.3f, 0, 0);
+			m.Easing = new SineOutEasing();
+
+			g.Add(m);
+
+
+			m = new ProceduralMorph(p, "deepthroat",
+				0.1f, 0.1f, 0.2f, 0.2f, 0, 0);
+
+			g.Add(m);
+
+
+			m = new ProceduralMorph(p, "Mouth Open",
+				0.0f, 0.1f, 0.3f, 0.3f, 0, 0);
+			m.Easing = new SineOutEasing();
+
+			g.Add(m);
+
+			return g;
 		}
 	}
 
@@ -243,26 +406,65 @@ namespace Cue
 	class ProceduralExpression : IExpression
 	{
 		private bool enabled_ = true;
+
 		private readonly List<ProceduralExpressionType> expressions_ =
 			new List<ProceduralExpressionType>();
 
+
 		public ProceduralExpression(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Happy);
-			var g = new ProceduralMorphGroup();
-			g.Add(new ProceduralMorph(p, "Smile Open Full Face", 0, 1, 1, 5, 2, 2));
-			e.Groups.Add(g);
-
-			expressions_.Add(e);
+			expressions_.Add(CreateCommon(p));
+			expressions_.Add(CreateHappy(p));
+			expressions_.Add(CreateMischievous(p));
 		}
 
-		public void Set(int type, float f)
+		private ProceduralExpressionType CreateCommon(Person p)
 		{
+			var e = new ProceduralExpressionType(p, Expressions.Common);
+			e.Intensity = 1;
+
+			e.Groups.Add(PE.Swallow(p));
+
+			return e;
+		}
+
+		private ProceduralExpressionType CreateHappy(Person p)
+		{
+			var e = new ProceduralExpressionType(p, Expressions.Happy);
+
+			e.Groups.Add(PE.Smile(p));
+
+			return e;
+		}
+
+		private ProceduralExpressionType CreateMischievous(Person p)
+		{
+			var e = new ProceduralExpressionType(p, Expressions.Mischievous);
+
+			e.Groups.Add(PE.CornerSmile(p));
+
+			return e;
+		}
+
+		public void Set(Pair<int, float>[] intensities, bool resetOthers = false)
+		{
+			// todo: let morphs go back to normal
+
 			for (int i = 0; i < expressions_.Count; ++i)
 			{
-				if (expressions_[i].Type == type)
-					expressions_[i].Intensity = f;
-				else
+				bool found = false;
+
+				for (int j = 0; j < intensities.Length; ++j)
+				{
+					if (intensities[j].first == expressions_[i].Type)
+					{
+						expressions_[i].Intensity = intensities[j].second;
+						found = true;
+						break;
+					}
+				}
+
+				if (!found && resetOthers)
 					expressions_[i].Intensity = 0;
 			}
 		}

@@ -357,6 +357,11 @@ namespace Cue.W
 			if (m != null)
 				return m;
 
+			// try display name
+			m = mui.GetMorphByDisplayName(morphUID);
+			if (m != null)
+				return m;
+
 			return null;
 		}
 
