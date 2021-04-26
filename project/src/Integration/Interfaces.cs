@@ -41,6 +41,45 @@
 	}
 
 
+	class Integration
+	{
+		public static IBreather CreateBreather(Person p)
+		{
+			return new MacGruberBreather(p);
+		}
+
+		public static ISpeaker CreateSpeaker(Person p)
+		{
+			return new VamSpeaker(p);
+		}
+
+		public static IGazer CreateGazer(Person p)
+		{
+			return new MacGruberGaze(p);
+		}
+
+		public static IKisser CreateKisser(Person p)
+		{
+			return new ClockwiseSilverKiss(p);
+		}
+
+		public static IHandjob CreateHandjob(Person p)
+		{
+			return new ClockwiseSilverHandjob(p);
+		}
+
+		public static IClothing CreateClothing(Person p)
+		{
+			return new VamClothing(p);
+		}
+
+		public static IExpression CreateExpression(Person p)
+		{
+			return new ProceduralExpression(p);
+		}
+	}
+
+
 	interface IBreather
 	{
 		float Intensity { get; set; }
@@ -77,5 +116,20 @@
 		bool BreastsVisible { get; set; }
 		void OnPluginState(bool b);
 		void Dump();
+	}
+
+
+	class Expressions
+	{
+		public const int Happy = 1;
+	}
+
+	interface IExpression
+	{
+		void MakeNeutral();
+		void Set(int type, float f);
+		bool Enabled { get; set; }
+		void Update(float s);
+		void OnPluginState(bool b);
 	}
 }

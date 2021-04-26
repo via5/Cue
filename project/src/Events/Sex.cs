@@ -83,21 +83,22 @@
 		public const int NoState = 0;
 		public const int MovingState = 1;
 		public const int PositioningState = 2;
-		public const int ActiveState = 3;
-		public const int ActiveState2 = 4;
+		public const int PlayState = 3;
+		public const int ActiveState = 4;
 
 		private Person receiver_;
 		private int state_ = NoState;
-		private ProceduralAnimation sex_;
 
 		public SexEvent(Person p, Person receiver, int forceState=NoState)
 			: base(p)
 		{
 			receiver_ = receiver;
 			state_ = forceState;
+		}
 
-			sex_ = new ProceduralAnimation(p, "sex");
-			sex_.Add("hip", new Vector3(0, -200, 0), 1);
+		public void ForceState(int s)
+		{
+			state_ = s;
 		}
 
 		public override bool Update(float s)
@@ -145,20 +146,20 @@
 					{
 						person_.Clothing.GenitalsVisible = true;
 						receiver_.Clothing.GenitalsVisible = true;
-						state_ = ActiveState;
+						state_ = PlayState;
 					}
 
 					break;
 				}
 
-				case ActiveState:
+				case PlayState:
 				{
-					person_.Animator.Play(sex_);
-					state_ = ActiveState2;
+					person_.Animator.Play(Resources.Animations.StraddleSitSex);
+					state_ = ActiveState;
 					break;
 				}
 
-				case ActiveState2:
+				case ActiveState:
 				{
 					break;
 				}

@@ -321,6 +321,56 @@ namespace Cue.W
 
 			return null;
 		}
+
+		public DAZMorph FindMorph(
+			Atom atom, GenerateDAZMorphsControlUI mui, DAZMorph m)
+		{
+			var nm = mui.GetMorphByUid(m.uid);
+			if (nm != null)
+				return nm;
+
+			nm = mui.GetMorphByDisplayName(m.displayName);
+			if (nm != null)
+				return nm;
+
+			Cue.LogWarning(
+				"morph '" + m.displayName + "' doesn't " +
+				"exist in " + atom.uid);
+
+			return null;
+		}
+
+		public DAZMorph FindMorph(Atom atom, string morphUID)
+		{
+			var mui = GetMUI(atom);
+			if (mui == null)
+				return null;
+
+			var m = mui.GetMorphByUid(morphUID);
+			if (m != null)
+				return m;
+
+			// try normalized, will convert .latest to .version for packaged
+			// morphs
+			string normalized = SuperController.singleton.NormalizeLoadPath(morphUID);
+			m = mui.GetMorphByUid(normalized);
+			if (m != null)
+				return m;
+
+			return null;
+		}
+
+		private GenerateDAZMorphsControlUI GetMUI(Atom atom)
+		{
+			if (atom == null)
+				return null;
+
+			var cs = atom.GetComponentInChildren<DAZCharacterSelector>();
+			if (cs == null)
+				return null;
+
+			return cs.morphsControlUI;
+		}
 	}
 
 

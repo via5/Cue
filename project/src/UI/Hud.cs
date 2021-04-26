@@ -497,9 +497,17 @@ namespace Cue
 			if (Cue.Instance.Selected is Person)
 			{
 				var p = ((Person)Cue.Instance.Selected);
+				var s = p.AI.Event as SexEvent;
 
-				p.MakeIdle();
-				p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
+				if (s == null)
+				{
+					p.MakeIdle();
+					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
+				}
+				else
+				{
+					s.ForceState(SexEvent.PlayState);
+				}
 			}
 		}
 
@@ -510,7 +518,7 @@ namespace Cue
 				var p = ((Person)Cue.Instance.Selected);
 
 				p.MakeIdle();
-				p.AI.RunEvent(new StandAndThinkEvent(p));
+				p.AI.RunEvent(new StandEvent(p));
 			}
 		}
 

@@ -9,6 +9,7 @@ namespace Cue
 		public const int Sit = 2;
 		public const int Lie = 3;
 		public const int Toilet = 4;
+		public const int Spawn = 5;
 
 		private IObject self_;
 		private int type_;
@@ -76,7 +77,7 @@ namespace Cue
 		{
 			return new string[]
 			{
-				"none", "stand", "sit", "lie", "toilet"
+				"none", "stand", "sit", "lie", "toilet", "spawn"
 			};
 		}
 
@@ -124,7 +125,7 @@ namespace Cue
 			slots_.Add(new Slot(self_, type));
 		}
 
-		public Slot Get(int type)
+		public Slot GetAny(int type)
 		{
 			for (int i = 0; i < slots_.Count; ++i)
 			{
@@ -135,9 +136,22 @@ namespace Cue
 			return null;
 		}
 
+		public List<Slot> GetAll(int type)
+		{
+			var list = new List<Slot>();
+
+			for (int i = 0; i < slots_.Count; ++i)
+			{
+				if (slots_[i].Type == type)
+					list.Add(slots_[i]);
+			}
+
+			return list;
+		}
+
 		public bool Has(int type)
 		{
-			return (Get(type) != null);
+			return (GetAny(type) != null);
 		}
 
 		public bool AnyLocked
@@ -178,7 +192,7 @@ namespace Cue
 			if (unlocked.Count == 0)
 				return null;
 
-			int ri = U.RandomInt(0, unlocked.Count);
+			int ri = U.RandomInt(0, unlocked.Count - 1);
 			if (ri < 0 || ri >= unlocked.Count)
 			{
 				Cue.LogError(
@@ -192,5 +206,4 @@ namespace Cue
 			return slots_[unlocked[ri]];
 		}
 	}
-
 }

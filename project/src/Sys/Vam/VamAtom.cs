@@ -42,10 +42,10 @@ namespace Cue.W
 				if (char_ == null)
 					char_ = atom_.GetComponentInChildren<DAZCharacter>();
 
-				if (char_.name.Contains("female"))
-					return Sexes.Female;
-				else
+				if (char_.isMale)
 					return Sexes.Male;
+				else
+					return Sexes.Female;
 			}
 		}
 
@@ -110,16 +110,25 @@ namespace Cue.W
 			setOnlyKeyJointsOn_?.actionCallback?.Invoke();
 		}
 
+		public DAZMorph FindMorph(string id)
+		{
+			return Cue.Instance.VamSys.FindMorph(atom_, id);
+		}
+
 		public void OnPluginState(bool b)
 		{
-			foreach (var rb in atom_.rigidbodies)
-			{
-				var fc = rb.GetComponent<FreeControllerV3>();
-				if (fc != null)
-					fc.interactableInPlayMode = !b;
-			}
-
-			atom_.mainController.interactableInPlayMode = !b;
+			// this would prevent both grabbing with a possessed hand and
+			// grabbing	from a distance with the pointer, there doesn't seem to
+			// be a way to only disable the latter
+			//
+			//foreach (var rb in atom_.rigidbodies)
+			//{
+			//	var fc = rb.GetComponent<FreeControllerV3>();
+			//	if (fc != null)
+			//		fc.interactableInPlayMode = !b;
+			//}
+			//
+			//atom_.mainController.interactableInPlayMode = !b;
 		}
 
 		public void Update(float s)

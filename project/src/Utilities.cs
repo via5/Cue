@@ -119,11 +119,18 @@ namespace Cue
 				return val;
 		}
 
-		// [begin, end[
+		// [begin, end]
 		//
-		public static int RandomInt(int begin, int end)
+		public static int RandomInt(int first, int last)
 		{
-			return UnityEngine.Random.Range(begin, end);
+			return UnityEngine.Random.Range(first, last + 1);
+		}
+
+		// [begin, end]
+		//
+		public static float RandomFloat(float first, float last)
+		{
+			return UnityEngine.Random.Range(first, last);
 		}
 
 		public static void DumpComponents(GameObject o, int indent = 0)
@@ -158,6 +165,36 @@ namespace Cue
 			var parent = o?.transform?.parent?.gameObject;
 			if (parent != null)
 				DumpComponentsAndUp(parent);
+		}
+
+		public static void DumpComponentsAndDown(Component c, bool dumpRt = false)
+		{
+			DumpComponentsAndDown(c.gameObject, dumpRt);
+		}
+
+		public static void DumpComponentsAndDown(
+			GameObject o, bool dumpRt = false, int indent = 0)
+		{
+			Cue.LogError(new string(' ', indent * 2) + o.name);
+
+			if (dumpRt)
+			{
+				var rt = o.GetComponent<RectTransform>();
+				if (rt != null)
+				{
+					Cue.LogError(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
+					Cue.LogError(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
+					Cue.LogError(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
+					Cue.LogError(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
+					Cue.LogError(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
+					Cue.LogError(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
+				}
+			}
+
+			DumpComponents(o, indent);
+
+			foreach (Transform c in o.transform)
+				DumpComponentsAndDown(c.gameObject, dumpRt, indent + 1);
 		}
 	}
 }

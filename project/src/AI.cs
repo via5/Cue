@@ -9,7 +9,78 @@ namespace Cue
 		void Update(float s);
 		bool Enabled { get; set; }
 		IEvent Event { get; }
+		void OnPluginState(bool b);
+		Mood Mood { get; }
 	}
+
+
+	interface IPersonality
+	{
+		void SetMood(int state);
+	}
+
+
+	class DefaultPersonality : IPersonality
+	{
+		private readonly Person person_;
+
+		public DefaultPersonality(Person p)
+		{
+			person_ = p;
+		}
+
+		public void SetMood(int state)
+		{
+			person_.Expression.MakeNeutral();
+
+			switch (state)
+			{
+				case Mood.Idle:
+				{
+					person_.Expression.Set(Expressions.Happy, 0.5f);
+					break;
+				}
+			}
+		}
+	}
+
+
+	class Mood
+	{
+		public const int None = 0;
+		public const int Idle = 1;
+
+		private Person person_;
+		private int state_ = None;
+
+		public Mood(Person p)
+		{
+			person_ = p;
+		}
+
+		public int State
+		{
+			get
+			{
+				return state_;
+			}
+
+			set
+			{
+				state_ = value;
+				person_.Personality.SetMood(state_);
+			}
+		}
+
+		public void Update(float s)
+		{
+		}
+
+		public void OnPluginState(bool b)
+		{
+		}
+	}
+
 
 	class PersonAI : IAI
 	{
@@ -18,19 +89,21 @@ namespace Cue
 		private readonly List<IEvent> events_ = new List<IEvent>();
 		private bool enabled_ = false;
 		private IEvent forced_ = null;
+		private Mood mood_;
 
-		public PersonAI(Person person)
+		public PersonAI(Person p)
 		{
-			person_ = person;
+			person_ = p;
+			mood_ = new Mood(person_);
 
 			foreach (var o in Cue.Instance.Objects)
 			{
 				if (o.Slots.Has(Slot.Sit))
-					events_.Add(new SitAndThinkEvent(person_, o));
+					events_.Add(new SitEvent(person_, o));
 				if (o.Slots.Has(Slot.Lie))
 					events_.Add(new LieDownEvent(person_, o));
 				if (o.Slots.Has(Slot.Stand))
-					events_.Add(new StandAndThinkEvent(person_, o));
+					events_.Add(new StandEvent(person_, o));
 			}
 		}
 
@@ -62,6 +135,11 @@ namespace Cue
 			}
 		}
 
+		public Mood Mood
+		{
+			get { return mood_; }
+		}
+
 		public bool InteractWith(IObject o)
 		{
 			if (!person_.TryLockSlot(o))
@@ -83,7 +161,7 @@ namespace Cue
 				}
 				else
 				{
-					RunEvent(new SitAndThinkEvent(person_, slot));
+					RunEvent(new SitEvent(person_, slot));
 				}
 			}
 			else if (slot.Type == Slot.Stand)
@@ -95,7 +173,7 @@ namespace Cue
 				}
 				else
 				{
-					RunEvent(new StandAndThinkEvent(person_, slot));
+					RunEvent(new StandEvent(person_, slot));
 				}
 			}
 
@@ -121,12 +199,12 @@ namespace Cue
 			if (forced_ != null)
 			{
 				if (!forced_.Update(s))
+				{
+					forced_.Stop();
 					forced_ = null;
-
-				return;
+				}
 			}
-
-			if (enabled_)
+			else if (enabled_)
 			{
 				if (events_.Count > 0)
 				{
@@ -138,6 +216,8 @@ namespace Cue
 					{
 						if (!events_[i_].Update(s))
 						{
+							events_[i_].Stop();
+
 							++i_;
 							if (i_ >= events_.Count)
 								i_ = 0;
@@ -154,6 +234,13 @@ namespace Cue
 					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
 				}
 			}
+
+			mood_.Update(s);
+		}
+
+		public void OnPluginState(bool b)
+		{
+			mood_.OnPluginState(b);
 		}
 
 		private void Stop()

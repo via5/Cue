@@ -149,36 +149,60 @@ namespace Cue
 			FindPlayer();
 			Sys.Nav.Update();
 
-			// todo
-			if (persons_.Count == 3)
+
+			var spawnPoints = new List<Slot>();
+
+			foreach (var o in objects_)
+				spawnPoints.AddRange(o.Slots.GetAll(Slot.Spawn));
+
+			for (int i = 0; i < persons_.Count; ++i)
 			{
-				persons_[0].TeleportTo(new Vector3(0, 0, 0), BasicObject.NoBearing);
-				persons_[1].TeleportTo(new Vector3(1.7f, 0, 0), BasicObject.NoBearing);
-				persons_[2].TeleportTo(new Vector3(0, 0, 1.7f), BasicObject.NoBearing);
+				if (i >= spawnPoints.Count)
+					break;
+
+				persons_[i].TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 			}
 
 			OnPluginState(true);
 			Select(Player);
 
-			foreach (var a in Sys.GetAtoms())
+			if (Sys.GetAtom("cuetest") != null)
+				TestStuff();
+		}
+
+		public Person FindPerson(string id)
+		{
+			for (int i = 0; i < persons_.Count; ++i)
 			{
-				var va = ((W.VamAtom)a).Atom;
-				if (va.type == "Person")
-					va.GetStorableByID("PosePresets").GetAction("LoadPreset").actionCallback.Invoke();
+				if (persons_[i].ID == id)
+					return persons_[i];
 			}
 
-			Player.State.Set(PersonState.Sitting);
-			Player.Clothing.GenitalsVisible = true;
+			return null;
+		}
 
-			foreach (var p in persons_)
-			{
-				if (p.ID == "A")
-				{
-					p.State.Set(PersonState.SittingStraddling);
-					p.Clothing.GenitalsVisible = true;
-					p.AI.RunEvent(new SexEvent(p, Player, SexEvent.ActiveState));
-				}
-			}
+		private void TestStuff()
+		{
+			FindPerson("A").AI.Mood.State = Mood.Idle;
+			//foreach (var a in Sys.GetAtoms())
+			//{
+			//	var va = ((W.VamAtom)a).Atom;
+			//	if (va.type == "Person")
+			//		va.GetStorableByID("PosePresets").GetAction("LoadPreset").actionCallback.Invoke();
+			//}
+			//
+			//Player.State.Set(PersonState.Sitting);
+			//Player.Clothing.GenitalsVisible = true;
+			//
+			//foreach (var p in persons_)
+			//{
+			//	if (p.ID == "A")
+			//	{
+			//		p.State.Set(PersonState.SittingStraddling);
+			//		p.Clothing.GenitalsVisible = true;
+			//		p.AI.RunEvent(new SexEvent(p, Player, SexEvent.ActiveState));
+			//	}
+			//}
 		}
 
 		private void FindObjects()
@@ -196,9 +220,11 @@ namespace Cue
 					var m = re.Match(a.ID);
 					if (m != null && m.Success)
 					{
-						var type = Slot.TypeFromString(m.Groups[1].Value);
+						var typeName = m.Groups[1].Value;
+
+						var type = Slot.TypeFromString(typeName);
 						if (type == Slot.NoType)
-							LogError("bad object type '" + m.Groups[1].Value + "'");
+							LogError("bad object type '" + typeName + "'");
 						else
 							AddObject(a, type);
 					}
@@ -260,7 +286,6 @@ namespace Cue
 				ReloadPlugin();
 				return;
 			}
-
 
 			if (Sys.Paused != paused_)
 			{

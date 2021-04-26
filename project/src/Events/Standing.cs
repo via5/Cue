@@ -2,31 +2,28 @@
 
 namespace Cue
 {
-	class StandAndThinkEvent : BasicEvent
+	class StandEvent : BasicEvent
 	{
 		const int NoState = 0;
 		const int Moving = 1;
-		const int Thinking = 2;
-
-		const float ThinkTime = 5;
+		const int Idling = 2;
 
 		private IObject o_ = null;
 		private Slot slot_ = null;
 		private int state_ = NoState;
-		private float thunk_ = 0;
 
-		public StandAndThinkEvent(Person p)
+		public StandEvent(Person p)
 			: base(p)
 		{
 		}
 
-		public StandAndThinkEvent(Person p, IObject o)
+		public StandEvent(Person p, IObject o)
 			: base(p)
 		{
 			o_ = o;
 		}
 
-		public StandAndThinkEvent(Person p, Slot s)
+		public StandEvent(Person p, Slot s)
 			: base(p)
 		{
 			o_ = s.ParentObject;
@@ -37,7 +34,7 @@ namespace Cue
 		{
 			if (slot_ == null && o_ != null)
 			{
-				slot_ = o_.Slots.Get(Slot.Stand);
+				slot_ = o_.Slots.GetAny(Slot.Stand);
 				if (slot_ == null)
 				{
 					Cue.LogError("can't stand on object " + o_.ToString());
@@ -69,7 +66,6 @@ namespace Cue
 					person_.Gaze.LookInFront();
 					person_.PushAction(new MoveAction(pos, bearing));
 					state_ = Moving;
-					thunk_ = 0;
 					break;
 				}
 
@@ -81,13 +77,13 @@ namespace Cue
 
 						var cc = new ConcurrentAction();
 
-						cc.Push(new RandomDialogAction(new List<string>()
-						{
-							"I'm thinking.",
-							"I'm still thinking.",
-							"Hmm...",
-							"I think..."
-						}));
+						//cc.Push(new RandomDialogAction(new List<string>()
+						//{
+						//	"I'm thinking.",
+						//	"I'm still thinking.",
+						//	"Hmm...",
+						//	"I think..."
+						//}));
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
@@ -96,24 +92,14 @@ namespace Cue
 						cc.Push(new LookAroundAction());
 						person_.PushAction(cc);
 
-						state_ = Thinking;
+						state_ = Idling;
 					}
 
 					break;
 				}
 
-				case Thinking:
+				case Idling:
 				{
-					thunk_ += s;
-					if (thunk_ >= ThinkTime)
-					{
-						Cue.LogInfo("done");
-						person_.PopAction();
-						Unlock();
-						state_ = NoState;
-						return false;
-					}
-
 					break;
 				}
 			}

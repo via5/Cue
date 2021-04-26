@@ -2,27 +2,24 @@
 
 namespace Cue
 {
-	class SitAndThinkEvent : BasicEvent
+	class SitEvent : BasicEvent
 	{
 		const int NoState = 0;
 		const int Moving = 1;
 		const int Sitting = 2;
-		const int Thinking = 3;
-
-		const float ThinkTime = 5;
+		const int Idling = 3;
 
 		private IObject o_;
 		private Slot slot_ = null;
 		private int state_ = NoState;
-		private float thunk_ = 0;
 
-		public SitAndThinkEvent(Person p, IObject o)
+		public SitEvent(Person p, IObject o)
 			: base(p)
 		{
 			o_ = o;
 		}
 
-		public SitAndThinkEvent(Person p, Slot s)
+		public SitEvent(Person p, Slot s)
 			: base(p)
 		{
 			o_ = s.ParentObject;
@@ -33,7 +30,7 @@ namespace Cue
 		{
 			if (slot_ == null)
 			{
-				slot_ = o_.Slots.Get(Slot.Sit);
+				slot_ = o_.Slots.GetAny(Slot.Sit);
 				if (slot_ == null)
 				{
 					Cue.LogError("can't sit on object " + o_.ToString());
@@ -54,7 +51,6 @@ namespace Cue
 					person_.Gaze.LookInFront();
 					person_.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
-					thunk_ = 0;
 					break;
 				}
 
@@ -78,13 +74,13 @@ namespace Cue
 
 						var cc = new ConcurrentAction();
 
-						cc.Push(new RandomDialogAction(new List<string>()
-						{
-							"I'm thinking.",
-							"I'm still thinking.",
-							"Hmm...",
-							"I think..."
-						}));
+						//cc.Push(new RandomDialogAction(new List<string>()
+						//{
+						//	"I'm thinking.",
+						//	"I'm still thinking.",
+						//	"Hmm...",
+						//	"I think..."
+						//}));
 
 						cc.Push(new RandomAnimationAction(
 							Resources.Animations.GetAll(
@@ -94,24 +90,14 @@ namespace Cue
 
 						person_.PushAction(cc);
 
-						state_ = Thinking;
+						state_ = Idling;
 					}
 
 					break;
 				}
 
-				case Thinking:
+				case Idling:
 				{
-					thunk_ += s;
-					if (thunk_ >= ThinkTime)
-					{
-						Cue.LogInfo("done");
-						person_.PopAction();
-						Unlock();
-						state_ = NoState;
-						return false;
-					}
-
 					break;
 				}
 			}

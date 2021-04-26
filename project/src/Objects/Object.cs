@@ -44,6 +44,11 @@ namespace Cue
 			slots_ = new Slots(this);
 		}
 
+		public W.VamAtom VamAtom
+		{
+			get { return (W.VamAtom)atom_; }
+		}
+
 		public W.IAtom Atom
 		{
 			get { return atom_; }

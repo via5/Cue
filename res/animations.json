@@ -164,6 +164,11 @@
 		{
 			"type": "standFromStraddleSit",
 			"timeline": "StandFromStraddleSit"
+		},
+
+		{
+			"type": "straddleSitSex",
+			"synergy": "StraddleSitSex"
 		}
 	]
 }

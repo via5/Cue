@@ -19,6 +19,7 @@ namespace Cue
 			players_.Add(new BVH.Player(p));
 			players_.Add(new TimelinePlayer(p));
 			players_.Add(new ProceduralPlayer());
+			players_.Add(new SynergyPlayer(p));
 		}
 
 		public bool Playing

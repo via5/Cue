@@ -128,6 +128,8 @@
 		private IKisser kisser_;
 		private IHandjob handjob_;
 		private IClothing clothing_;
+		private IPersonality personality_;
+		private IExpression expression_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
@@ -135,12 +137,15 @@
 			ai_ = new PersonAI(this);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
-			breathing_ = new MacGruberBreather(this);
-			speech_ = new VamSpeaker(this);
-			gaze_ = new MacGruberGaze(this);
-			kisser_ = new ClockwiseSilverKiss(this);
-			handjob_ = new ClockwiseSilverHandjob(this);
-			clothing_ = new VamClothing(this);
+
+			breathing_ = Integration.CreateBreather(this);
+			speech_ = Integration.CreateSpeaker(this);
+			gaze_ = Integration.CreateGazer(this);
+			kisser_ = Integration.CreateKisser(this);
+			handjob_ = Integration.CreateHandjob(this);
+			clothing_ = Integration.CreateClothing(this);
+			personality_ = new DefaultPersonality(this);
+			expression_ = Integration.CreateExpression(this);
 
 			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
@@ -173,6 +178,8 @@
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
 		public IClothing Clothing { get { return clothing_; } }
+		public IPersonality Personality { get { return personality_; } }
+		public IExpression Expression { get { return expression_; } }
 		public IAction Actions { get { return actions_; } }
 
 		public Animator Animator { get { return animator_; } }
@@ -277,6 +284,7 @@
 			actions_.Tick(this, s);
 			gaze_.Update(s);
 			kisser_.Update(s);
+			expression_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)
@@ -284,6 +292,8 @@
 			base.OnPluginState(b);
 			Atom.NavEnabled = b;
 			clothing_.OnPluginState(b);
+			ai_.OnPluginState(b);
+			expression_.OnPluginState(b);
 		}
 
 		public override void SetPaused(bool b)

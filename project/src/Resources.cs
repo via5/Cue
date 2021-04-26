@@ -18,6 +18,7 @@ namespace Cue.Resources
 		public const int KneelFromStanding = 9;
 		public const int StandFromKneeling = 10;
 		public const int StandFromStraddleSit = 11;
+		public const int StraddleSitSex = 12;
 
 		private static Dictionary<int, List<IAnimation>> anims_ =
 			new Dictionary<int, List<IAnimation>>();
@@ -43,7 +44,8 @@ namespace Cue.Resources
 						{ "StraddleSitFromStanding", StraddleSitFromStanding },
 						{ "KneelFromStanding",       KneelFromStanding },
 						{ "StandFromKneeling",       StandFromKneeling },
-						{ "StandFromStraddleSit",    StandFromStraddleSit }
+						{ "StandFromStraddleSit",    StandFromStraddleSit },
+						{ "StraddleSitSex",          StraddleSitSex }
 					};
 				}
 
@@ -143,6 +145,15 @@ namespace Cue.Resources
 				else if (a.HasKey("timeline"))
 				{
 					anim = new TimelineAnimation(a["timeline"]);
+				}
+				else if (a.HasKey("synergy"))
+				{
+					anim = new SynergyAnimation(a["synergy"]);
+				}
+				else
+				{
+					Cue.LogError("unknown animation key");
+					continue;
 				}
 
 				if (a.HasKey("sex"))

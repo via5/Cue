@@ -107,6 +107,7 @@
     <Compile Include="src\Integration\ClockwiseSilver.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
+    <Compile Include="src\Integration\Synergy.cs" />
     <Compile Include="src\Integration\Timeline.cs" />
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Main.cs" />
