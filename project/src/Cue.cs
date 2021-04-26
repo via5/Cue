@@ -164,7 +164,7 @@ namespace Cue
 			}
 
 			OnPluginState(true);
-			Select(Player);
+			Select(FindPerson("A"));
 
 			if (Sys.GetAtom("cuetest") != null)
 				TestStuff();
@@ -186,7 +186,9 @@ namespace Cue
 			var a = FindPerson("A");
 
 			a.Personality = new QuirkyPersonality(a);
-			a.AI.Mood.State = Mood.Idle;
+			a.AI.Mood.State = Mood.Happy;
+
+			//U.DumpComponentsAndDown(t);
 
 			//foreach (var a in Sys.GetAtoms())
 			//{
@@ -207,6 +209,8 @@ namespace Cue
 			//		p.AI.RunEvent(new SexEvent(p, Player, SexEvent.ActiveState));
 			//	}
 			//}
+
+			FindPerson("A").Clothing.GenitalsVisible = true;
 		}
 
 		private void FindObjects()

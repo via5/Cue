@@ -4,6 +4,77 @@ using UnityEngine.AI;
 
 namespace Cue.W
 {
+	class VamTriggers : ITriggers
+	{
+		private Atom atom_;
+		private CollisionTriggerEventHandler lip_, mouth_, lNipple_, rNipple_;
+		private CollisionTriggerEventHandler labia_, vagina_, deep_, deeper_;
+
+		public VamTriggers(Atom a)
+		{
+			atom_ = a;
+			lip_ = Get("LipTrigger");
+			mouth_ = Get("MouthTrigger");
+			lNipple_ = Get("lNippleTrigger");
+			rNipple_ = Get("rNippleTrigger");
+			labia_ = Get("LabiaTrigger");
+			vagina_ = Get("VaginaTrigger");
+			deep_ = Get("DeepVaginaTrigger");
+			deeper_ = Get("DeeperVaginaTrigger");
+		}
+
+		private bool IsActive(CollisionTriggerEventHandler t)
+		{
+			return t?.collisionTrigger?.trigger?.active ?? false;
+		}
+
+		public bool Lip { get { return IsActive(lip_); } }
+		public bool Mouth { get { return IsActive(mouth_); } }
+		public bool LeftBreast { get { return IsActive(lNipple_); } }
+		public bool RightBreast { get { return IsActive(rNipple_); } }
+		public bool Labia { get { return IsActive(labia_); } }
+		public bool Vagina { get { return IsActive(vagina_); } }
+		public bool DeepVagina { get { return IsActive(deep_); } }
+		public bool DeeperVagina { get { return IsActive(deeper_); } }
+
+		public override string ToString()
+		{
+			string s =
+				(Lip ? "M|" : "") +
+				(Mouth ? "MM|" : "") +
+				(LeftBreast ? "LB|" : "") +
+				(RightBreast ? "RB|" : "") +
+				(Labia ? "L|" : "") +
+				(Vagina ? "V|" : "") +
+				(DeepVagina ? "VV|" : "") +
+				(DeeperVagina ? "VVV|" : "");
+
+			if (s.EndsWith("|"))
+				return s.Substring(0, s.Length - 1);
+			else
+				return s;
+		}
+
+		private CollisionTriggerEventHandler Get(string name)
+		{
+			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
+			if (o == null)
+			{
+				Cue.LogError($"VamTriggers: {name} not found");
+				return null;
+			}
+
+			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
+			if (t == null)
+			{
+				Cue.LogError($"VamTriggers: {name} has no CollisionTriggerEventHandler");
+				return null;
+			}
+
+			return t;
+		}
+	}
+
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
@@ -19,10 +90,12 @@ namespace Cue.W
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
 		private JSONStorableAction setOnlyKeyJointsOn_ = null;
+		private VamTriggers triggers_;
 
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
+			triggers_ = new VamTriggers(atom);
 		}
 
 		public string ID
@@ -47,6 +120,11 @@ namespace Cue.W
 				else
 					return Sexes.Female;
 			}
+		}
+
+		public ITriggers Triggers
+		{
+			get { return triggers_; }
 		}
 
 		public Vector3 Position

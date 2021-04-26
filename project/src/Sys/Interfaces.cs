@@ -48,11 +48,24 @@ namespace Cue.W
 		public const int TurningRight = 3;
 	}
 
+	interface ITriggers
+	{
+		bool Lip { get; }
+		bool Mouth { get; }
+		bool LeftBreast { get; }
+		bool RightBreast { get; }
+		bool Labia { get; }
+		bool Vagina { get; }
+		bool DeepVagina { get; }
+		bool DeeperVagina { get; }
+	}
+
 	interface IAtom
 	{
 		string ID { get; }
 		bool IsPerson { get; }
 		int Sex { get; }
+		ITriggers Triggers { get; }
 
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }

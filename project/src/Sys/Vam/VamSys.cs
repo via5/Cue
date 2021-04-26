@@ -152,6 +152,29 @@ namespace Cue.W
 			f?.Invoke();
 		}
 
+		public GameObject FindChildRecursive(Component c, string name)
+		{
+			return FindChildRecursive(c.gameObject, name);
+		}
+
+		public GameObject FindChildRecursive(GameObject o, string name)
+		{
+			if (o == null)
+				return null;
+
+			if (o.name == name)
+				return o;
+
+			foreach (Transform c in o.transform)
+			{
+				var r = FindChildRecursive(c.gameObject, name);
+				if (r != null)
+					return r;
+			}
+
+			return null;
+		}
+
 		public JSONStorableFloat GetFloatParameter(
 			IObject o, string storable, string param)
 		{

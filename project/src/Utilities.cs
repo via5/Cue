@@ -175,19 +175,19 @@ namespace Cue
 		public static void DumpComponentsAndDown(
 			GameObject o, bool dumpRt = false, int indent = 0)
 		{
-			Cue.LogError(new string(' ', indent * 2) + o.name);
+			Cue.LogInfo(new string(' ', indent * 2) + o.name);
 
 			if (dumpRt)
 			{
 				var rt = o.GetComponent<RectTransform>();
 				if (rt != null)
 				{
-					Cue.LogError(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
-					Cue.LogError(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
-					Cue.LogError(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
-					Cue.LogError(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
-					Cue.LogError(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
-					Cue.LogError(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
 				}
 			}
 

@@ -48,6 +48,11 @@
 			return new MacGruberBreather(p);
 		}
 
+		public static IOrgasmer CreateOrgasmer(Person p)
+		{
+			return new MacGruberOrgasmer(p);
+		}
+
 		public static ISpeaker CreateSpeaker(Person p)
 		{
 			return new VamSpeaker(p);
@@ -79,6 +84,10 @@
 		}
 	}
 
+	interface IOrgasmer
+	{
+		void Orgasm();
+	}
 
 	interface IBreather
 	{
@@ -117,7 +126,6 @@
 		void OnPluginState(bool b);
 		void Dump();
 	}
-
 
 	struct Pair<First, Second>
 	{

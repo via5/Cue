@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -40,7 +41,18 @@ namespace Cue
 					person_.Expression.Set(new Pair<int, float>[]
 					{
 						new Pair<int, float>(Expressions.Happy, 0.5f),
-						new Pair<int, float>(Expressions.Mischievous, 0.4f)
+						new Pair<int, float>(Expressions.Mischievous, 0.0f)
+					});
+
+					break;
+				}
+
+				case Mood.Happy:
+				{
+					person_.Expression.Set(new Pair<int, float>[]
+					{
+						new Pair<int, float>(Expressions.Happy, 1.0f),
+						new Pair<int, float>(Expressions.Mischievous, 0.0f)
 					});
 
 					break;
@@ -75,6 +87,17 @@ namespace Cue
 
 					break;
 				}
+
+				case Mood.Happy:
+				{
+					person_.Expression.Set(new Pair<int, float>[]
+					{
+						new Pair<int, float>(Expressions.Happy, 0.4f),
+						new Pair<int, float>(Expressions.Mischievous, 1.0f)
+					});
+
+					break;
+				}
 			}
 		}
 	}
@@ -84,9 +107,18 @@ namespace Cue
 	{
 		public const int None = 0;
 		public const int Idle = 1;
+		public const int Happy = 2;
 
 		private Person person_;
 		private int state_ = None;
+		private float excitement_ = 0;
+		private float lastRate_ = 0;
+
+		private float mouthRate_ = 0.001f;
+		private float breastsRate_ = 0.01f;
+		private float genitalsRate_ = 0.1f;
+		private float decayRate_ = -0.01f;
+		private float orgasm_ = 10;
 
 		public Mood(Person p)
 		{
@@ -107,12 +139,52 @@ namespace Cue
 			}
 		}
 
+		public float Excitement
+		{
+			get { return excitement_; }
+		}
+
 		public void Update(float s)
 		{
+			float rate = 0;
+
+			rate += person_.Excitement.Genitals * genitalsRate_;
+			rate += person_.Excitement.Mouth * mouthRate_;
+			rate += person_.Excitement.Breasts * breastsRate_;
+
+			if (rate == 0)
+				rate = decayRate_;
+
+			excitement_ += rate * s;
+
+			if (excitement_ >= orgasm_)
+			{
+				person_.Orgasmer.Orgasm();
+				excitement_ = 0;
+			}
+
+			lastRate_ = rate;
 		}
 
 		public void OnPluginState(bool b)
 		{
+		}
+
+		public override string ToString()
+		{
+			string s = "";
+
+			//s += $"state={state_} ";
+			s += $"ex={excitement_:0.##}";
+
+			if (lastRate_ < 0)
+				s += "-";
+			else
+				s += "+";
+
+			s += $"({lastRate_:0.###})";
+
+			return s;
 		}
 	}
 

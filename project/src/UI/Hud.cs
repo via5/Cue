@@ -347,8 +347,8 @@ namespace Cue
 			bg.color = new Color(0, 0, 0, 0.8f);
 			bg.raycastTarget = true;
 
-			rt.offsetMin = new Vector2(-500, 0);
-			rt.offsetMax = new Vector2(500, 200);
+			rt.offsetMin = new Vector2(-800, 0);
+			rt.offsetMax = new Vector2(800, 200);
 			rt.anchorMin = new Vector2(0.5f, 1);
 			rt.anchorMax = new Vector2(0.5f, 1);
 			rt.anchoredPosition = new Vector2(
@@ -612,17 +612,18 @@ namespace Cue
 
 		public void Update()
 		{
+			sel_.Text = "Sel: " + (Cue.Instance.Selected == null ? "" : Cue.Instance.Selected.ToString());
+			hovered_.Text = "Hovered: " + (Cue.Instance.Hovered == null ? "" : Cue.Instance.Hovered.ToString());
+
 			root_.Update();
 		}
 
 		private void OnSelectionChanged(IObject o)
 		{
-			sel_.Text = "Sel: " + (o == null ? "" : o.ToString());
 		}
 
 		private void OnHoveredChanged(IObject o)
 		{
-			hovered_.Text = "Hovered: " + (o == null ? "" : o.ToString());
 		}
 	}
 }

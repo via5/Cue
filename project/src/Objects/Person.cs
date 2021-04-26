@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	using NavStates = W.NavStates;
 
@@ -112,6 +114,88 @@
 	}
 
 
+	class Excitement
+	{
+		private Person person_;
+		private float lip_ = 0;
+		private float mouth_ = 0;
+		private float lBreast_ = 0;
+		private float rBreast_ = 0;
+		private float labia_ = 0;
+		private float vagina_ = 0;
+		private float deep_ = 0;
+		private float deeper_ = 0;
+
+		private float decay_ = 1;
+
+		public Excitement(Person p)
+		{
+			person_ = p;
+		}
+
+		public void Update(float s)
+		{
+			lip_ = Check(s, person_.Atom.Triggers.Lip, lip_);
+			mouth_ = Check(s, person_.Atom.Triggers.Mouth, mouth_);
+			lBreast_ = Check(s, person_.Atom.Triggers.LeftBreast, lBreast_);
+			rBreast_ = Check(s, person_.Atom.Triggers.RightBreast, rBreast_);
+			labia_ = Check(s, person_.Atom.Triggers.Labia, labia_);
+			vagina_ = Check(s, person_.Atom.Triggers.Vagina, vagina_);
+			deep_ = Check(s, person_.Atom.Triggers.DeepVagina, deep_);
+			deeper_ = Check(s, person_.Atom.Triggers.DeeperVagina, deeper_);
+		}
+
+		private float Check(float s, bool trigger, float v)
+		{
+			if (trigger)
+				return 1;
+			else
+				return Math.Max(v - s * decay_, 0);
+		}
+
+		public float Genitals
+		{
+			get
+			{
+				return Math.Min(1,
+					labia_ * 0.005f +
+					vagina_ * 0.01f +
+					deep_ * 0.2f +
+					deeper_ * 1);
+			}
+		}
+
+		public float Mouth
+		{
+			get
+			{
+				return
+					lip_ * 0.1f +
+					mouth_ * 0.9f;
+			}
+		}
+
+		public float Breasts
+		{
+			get
+			{
+				return
+					lBreast_ * 0.5f +
+					rBreast_ * 0.5f;
+			}
+		}
+
+		public override string ToString()
+		{
+			return
+				$"l={lip_:0.00} m={mouth_:0.00} " +
+				$"lb={lBreast_:0.00} rb={rBreast_:0.00} " +
+				$"L={labia_:0.00} V={vagina_:0.00} " +
+				$"VV={deep_:0.00} VVV={deeper_:0.00}";
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_ = new RootAction();
@@ -120,9 +204,11 @@
 		private Vector3 uprightPos_ = new Vector3();
 		private Slot locked_ = null;
 		private Animator animator_;
+		private Excitement excitement_;
 
 		private IAI ai_ = null;
 		private IBreather breathing_;
+		private IOrgasmer orgasmer_;
 		private IGazer gaze_;
 		private ISpeaker speech_;
 		private IKisser kisser_;
@@ -137,8 +223,10 @@
 			ai_ = new PersonAI(this);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
+			excitement_ = new Excitement(this);
 
 			breathing_ = Integration.CreateBreather(this);
+			orgasmer_ = Integration.CreateOrgasmer(this);
 			speech_ = Integration.CreateSpeaker(this);
 			gaze_ = Integration.CreateGazer(this);
 			kisser_ = Integration.CreateKisser(this);
@@ -173,6 +261,7 @@
 
 		public IAI AI { get { return ai_; } }
 		public IBreather Breathing { get { return breathing_; } }
+		public IOrgasmer Orgasmer { get { return orgasmer_; } }
 		public IGazer Gaze { get { return gaze_; } }
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
@@ -183,6 +272,7 @@
 
 		public Animator Animator { get { return animator_; } }
 		public PersonState State { get { return state_; } }
+		public Excitement Excitement { get { return excitement_; } }
 
 		public int Sex
 		{
@@ -282,14 +372,15 @@
 			base.Update(s);
 			CheckNavState();
 
-			if (ai_ != null)
-				ai_.Update(s);
-
 			animator_.Update(s);
 			actions_.Tick(this, s);
 			gaze_.Update(s);
 			kisser_.Update(s);
 			expression_.Update(s);
+			excitement_.Update(s);
+
+			if (ai_ != null)
+				ai_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)
@@ -354,8 +445,10 @@
 		{
 			return
 				base.ToString() + ", " +
-				Sexes.ToString(Sex) + ", " +
-				state_.ToString();
+			//	Sexes.ToString(Sex) + ", " +
+			//	state_.ToString() + ", " +
+				excitement_.ToString() + ", " +
+				ai_.Mood.ToString();
 		}
 
 		protected override bool StartMove()

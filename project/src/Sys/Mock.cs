@@ -135,9 +135,22 @@ namespace Cue.W
 		}
 	}
 
+	class MockTriggers : ITriggers
+	{
+		public bool Lip { get { return false; } }
+		public bool Mouth { get { return false; } }
+		public bool LeftBreast { get { return false; } }
+		public bool RightBreast { get { return false; } }
+		public bool Labia { get { return false; } }
+		public bool Vagina { get { return false; } }
+		public bool DeepVagina { get { return false; } }
+		public bool DeeperVagina { get { return false; } }
+	}
+
 	class MockAtom : IAtom
 	{
 		private string id_;
+		private MockTriggers triggers_ = new MockTriggers();
 
 		public MockAtom(string id)
 		{
@@ -157,6 +170,11 @@ namespace Cue.W
 		public int Sex
 		{
 			get { return Sexes.Any; }
+		}
+
+		public ITriggers Triggers
+		{
+			get { return triggers_; }
 		}
 
 		public Vector3 Position

@@ -71,6 +71,36 @@ namespace Cue
 	}
 
 
+	class MacGruberOrgasmer : IOrgasmer
+	{
+		private Person person_ = null;
+		private JSONStorableAction action_ = null;
+
+		public MacGruberOrgasmer(Person p)
+		{
+			person_ = p;
+		}
+
+		public void Orgasm()
+		{
+			GetParameters();
+			if (action_ == null)
+				return;
+
+			action_.actionCallback?.Invoke();
+		}
+
+		private void GetParameters()
+		{
+			if (action_ != null)
+				return;
+
+			action_ = Cue.Instance.VamSys.GetActionParameter(
+				person_, "MacGruber.Breathing", "QueueOrgasm");
+		}
+	}
+
+
 	abstract class BasicGazer : IGazer
 	{
 		protected Person person_ = null;
