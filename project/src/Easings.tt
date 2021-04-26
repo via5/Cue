@@ -1,0 +1,170 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Globalization" #>
+<#@ output extension=".cs" #>
+<#
+
+// https://github.com/ai/easings.net/blob/master/src/easings/easingsFunctions.ts#L127
+
+var easings = new[]
+{
+	("Linear",       "x"),
+	("Sinusoidal",   "-(Cos(PI * x) - 1) / 2"),
+
+	("Quad in",      "x * x"),
+	("Quad out",     "1 - (1 - x) * (1 - x)"),
+	("Quad in/out",  "x < 0.5 ? 2 * x * x : 1 - Pow(-2 * x + 2, 2) / 2"),
+
+	("Cubic in",     "x * x * x"),
+	("Cubic out",    "1 - Pow(1 - x, 3)"),
+	("Cubic in/out", "x < 0.5 ? 4 * x * x * x : 1 - Pow(-2 * x + 2, 3) / 2"),
+
+	("Quart in",     "x * x * x * x"),
+	("Quart out",    "1 - Pow(1 - x, 4)"),
+	("Quart in/out", "x < 0.5 ? 8 * x * x * x * x : 1 - Pow(-2 * x + 2, 4) / 2"),
+
+	("Quint in",     "x * x * x * x * x"),
+	("Quint out",    "1 - Pow(1 - x, 5)"),
+	("Quint in/out", "x < 0.5 ? 16 * x * x * x * x * x : 1 - Pow(-2 * x + 2, 5) / 2"),
+
+	("Sine in",       "1 - Cos((x * PI) / 2)"),
+	("Sine out",      "Sin((x * PI) / 2)"),
+	("Sine in/out",   "-(Cos(PI * x) - 1) / 2"),
+
+	("Expo in",       "x == 0 ? 0 : Pow(2, 10 * x - 10)"),
+	("Expo out",      "x == 1 ? 1 : 1 - Pow(2, -10 * x)"),
+	("Expo in/out",   "x == 0 ? 0 " +
+					  ": x == 1 ? 1 " +
+					  ": x < 0.5 ? Pow(2, 20 * x - 10) / 2 " +
+					  ": (2 - Pow(2, -20 * x + 10)) / 2"),
+
+	("Circ in",       "1 - Sqrt(1 - Pow(x, 2))"),
+	("Circ out",      "Sqrt(1 - Pow(x - 1, 2))"),
+	("Circ in/out",   "x < 0.5 ? (1 - Sqrt(1 - Pow(2 * x, 2))) / 2 " +
+					  ": (Sqrt(1 - Pow(-2 * x + 2, 2)) + 1) / 2"),
+
+	("Back in",       "2.70158f * x * x * x - 1.70158f * x * x"),
+	("Back out",      "1 + 2.70158f * Pow(x - 1, 3) + 1.70158f * Pow(x - 1, 2)"),
+	("Back in/out",   "x < 0.5 ? (Pow(2 * x, 2) * ((2.5949f + 1) * 2 * x - 2.5949f)) / 2 " +
+					  ": (Pow(2 * x - 2, 2) * ((2.5949f + 1) * (x * 2 - 2) + 2.5949f) + 2) / 2"),
+
+	("Elastic in",    "x == 0 ? 0 " +
+					  ": x == 1 ? 1 " +
+					  ": -Pow(2, 10 * x - 10) * Sin((x * 10 - 10.75) * 2.0944f)"),
+	("Elastic out",   "x == 0 ? 0 " +
+					  ": x == 1 ? 1 " +
+					  ": Pow(2, -10 * x) * Sin((x * 10 - 0.75) * 2.0944f) + 1"),
+	("Elastic in/out", "x == 0 ? 0 " +
+					   ": x == 1 ? 1 " +
+					   ": x < 0.5 ? -(Pow(2, 20 * x - 10) * Sin((20 * x - 11.125) * 1.3963f)) / 2 " +
+					   ": (Pow(2, -20 * x + 10) * Sin((20 * x - 11.125) * 1.3963f)) / 2 + 1"),
+
+	("Bounce in",      "1 - BounceOut(1 - x)"),
+	("Bounce out",     "BounceOut(x)"),
+	("Bounce in/out",  "x < 0.5 ? (1 - BounceOut(1 - 2 * x)) / 2 "+
+					   ": (1 + BounceOut(2 * x - 1)) / 2")
+};
+
+#>
+using System.Collections.Generic;
+using static System.Math;
+
+// auto generated from Easings.tt
+
+namespace Cue
+{
+	public interface IEasing
+	{
+		IEasing Clone(int cloneFlags = 0);
+		float Magnitude(float f);
+	}
+
+
+	public abstract class BasicEasing : IEasing
+	{
+		public abstract float Magnitude(float f);
+		public abstract IEasing Clone(int cloneFlags = 0);
+
+		protected float BounceOut(float x)
+		{
+			float n1 = 7.5625f;
+			float d1 = 2.75f;
+
+			if (x < 1 / d1) {
+				return n1 * x * x;
+			} else if (x < 2 / d1) {
+				return n1 * (x -= 1.5f / d1) * x + 0.75f;
+			} else if (x < 2.5 / d1) {
+				return n1 * (x -= 2.25f / d1) * x + 0.9375f;
+			} else {
+				return n1 * (x -= 2.625f / d1) * x + 0.984375f;
+			}
+		}
+	}
+
+<#
+foreach (var e in easings)
+{
+	var className = ClassName(e.Item1);
+	var factoryTypeName = FactoryTypeName(e.Item1);
+	var displayName = e.Item1;
+	var equation = e.Item2;
+#>
+
+	public class <#= className #> : BasicEasing
+	{
+		public static string DisplayName
+		{
+			get
+			{
+				return "<#= displayName #>";
+			}
+		}
+
+		public string GetDisplayName()
+		{
+			return DisplayName;
+		}
+
+
+		public override IEasing Clone(int cloneFlags = 0)
+		{
+			return new <#= className #>();
+		}
+
+		public override float Magnitude(float x)
+		{
+			return (float)(<#= equation #>);
+		}
+	}
+<#
+}
+#>
+}
+
+<#+
+public string SanitizeName(string s)
+{
+	TextInfo ti = new CultureInfo("").TextInfo;
+
+	var sanitizedName = ti.ToTitleCase(s);
+	sanitizedName = sanitizedName.Replace(" ", "");
+	sanitizedName = sanitizedName.Replace("/", "");
+
+	return sanitizedName;
+}
+
+public string ClassName(string s)
+{
+	return SanitizeName(s) + "Easing";
+}
+
+public string FactoryTypeName(string s)
+{
+	var sn = SanitizeName(s);
+	return Char.ToLower(sn[0]) + sn.Substring(1);
+}
+#>

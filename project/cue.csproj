@@ -97,6 +97,11 @@
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI.cs" />
     <Compile Include="src\Cue.cs" />
+    <Compile Include="src\Easings.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Easings.tt</DependentUpon>
+    </Compile>
     <Compile Include="src\Events\Event.cs" />
     <Compile Include="src\Events\Lying.cs" />
     <Compile Include="src\Events\Sex.cs" />
@@ -116,6 +121,7 @@
     <Compile Include="src\Objects\Person.cs" />
     <Compile Include="src\Objects\Slots.cs" />
     <Compile Include="src\Procedural\Procedural.cs" />
+    <Compile Include="src\Procedural\ProceduralExpression.cs" />
     <Compile Include="src\Resources.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
@@ -148,7 +154,15 @@
     <Compile Include="src\VUI\Utilities.cs" />
     <Compile Include="src\VUI\Widget.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="src\Easings.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Easings.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
