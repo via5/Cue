@@ -1,9 +1,5 @@
 project\src\Cue.cs
-project\src\Easings.cs
-project\src\Geo.cs
 project\src\Main.cs
-project\src\Resources.cs
-project\src\Utilities.cs
 project\src\Actions\Action.cs
 project\src\AI\AI.cs
 project\src\AI\Mood.cs
@@ -25,6 +21,7 @@ project\src\Objects\Person.cs
 project\src\Objects\Slots.cs
 project\src\Procedural\Procedural.cs
 project\src\Procedural\ProceduralExpression.cs
+project\src\Resources\Resources.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
@@ -38,6 +35,9 @@ project\src\UI\Controls.cs
 project\src\UI\Hud.cs
 project\src\UI\Menu.cs
 project\src\UI\ScriptUI.cs
+project\src\Utilities\Easings.cs
+project\src\Utilities\Geo.cs
+project\src\Utilities\Utilities.cs
 project\src\VUI\BorderLayout.cs
 project\src\VUI\Button.cs
 project\src\VUI\CheckBox.cs
