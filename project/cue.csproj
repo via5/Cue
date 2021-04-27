@@ -127,6 +127,7 @@
     <Compile Include="src\Sys\Mock.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
     <Compile Include="src\Sys\Vam\VamCanvas.cs" />
+    <Compile Include="src\Sys\Vam\VamGraphic.cs" />
     <Compile Include="src\Sys\Vam\VamInput.cs" />
     <Compile Include="src\Sys\Vam\VamLog.cs" />
     <Compile Include="src\Sys\Vam\VamNav.cs" />

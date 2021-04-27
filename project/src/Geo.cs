@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Cue
 {
@@ -142,9 +141,9 @@ namespace Cue
 			return new Point(-p.X, -p.Y);
 		}
 
-		public static Vector2 ToUnity(Point p)
+		public static UnityEngine.Vector2 ToUnity(Point p)
 		{
-			return new Vector2(p.X, p.Y);
+			return new UnityEngine.Vector2(p.X, p.Y);
 		}
 	}
 
@@ -193,9 +192,9 @@ namespace Cue
 			return Width.ToString("0.00") + "*" + Height.ToString("0.00");
 		}
 
-		public static Vector2 ToUnity(Size s)
+		public static UnityEngine.Vector2 ToUnity(Size s)
 		{
-			return new Vector2(s.Width, s.Height);
+			return new UnityEngine.Vector2(s.Width, s.Height);
 		}
 	}
 

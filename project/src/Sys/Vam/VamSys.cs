@@ -110,10 +110,18 @@ namespace Cue.W
 			return new OverlayCanvas();
 		}
 
+		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
+		{
+			return new VamBoxGraphic(Vector3.ToUnity(pos));
+		}
+
 		public void OnPluginState(bool b)
 		{
 			nav_.OnPluginState(b);
 			log_.OnPluginState(b);
+
+			for (int i = 0; i < 32; ++i)
+				Physics.IgnoreLayerCollision(i, VamBoxGraphic.Layer, b);
 		}
 
 		public void OnReady(Action f)

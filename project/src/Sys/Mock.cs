@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -104,6 +103,11 @@ namespace Cue.W
 		}
 
 		public ICanvas Create2D()
+		{
+			return null;
+		}
+
+		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
 		{
 			return null;
 		}

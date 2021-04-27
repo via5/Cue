@@ -20,7 +20,7 @@ namespace Cue
 		private readonly List<IObject> allObjects_ = new List<IObject>();
 		private Hud hud_;
 		private Menu menu_;
-		private IControls controls_;
+		private Controls controls_;
 		private bool paused_ = false;
 		private bool vr_ = false;
 
@@ -33,11 +33,7 @@ namespace Cue
 			main_ = main;
 			vr_ = Sys.IsVR;
 
-			if (Sys is W.MockSys)
-				controls_ = new MockControls();
-			else
-				controls_ = new Controls();
-
+			controls_ = new Controls();
 			hud_ = new Hud();
 			menu_ = new Menu();
 		}
@@ -92,7 +88,7 @@ namespace Cue
 			get { return hud_; }
 		}
 
-		public IControls Controls
+		public Controls Controls
 		{
 			get { return controls_; }
 		}

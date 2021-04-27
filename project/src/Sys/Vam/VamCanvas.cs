@@ -5,7 +5,6 @@ namespace Cue.W
 {
 	using Vector3 = UnityEngine.Vector3;
 
-
 	// vr, moves with the head
 	//
 	class WorldSpaceAttachedCanvas : ICanvas

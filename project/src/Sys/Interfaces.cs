@@ -22,6 +22,7 @@ namespace Cue.W
 		ICanvas CreateHud(Vector3 offset, Point pos, Size size);
 		ICanvas CreateAttached(Vector3 offset, Point pos, Size size);
 		ICanvas Create2D();
+		IBoxGraphic CreateBoxGraphic(Vector3 pos);
 	}
 
 	interface IInput
@@ -100,8 +101,15 @@ namespace Cue.W
 		void Create();
 		void Destroy();
 		bool IsHovered(float x, float y);
-		//Transform Transform { get; }
 		void Toggle();
 		VUI.Root CreateRoot();
+	}
+
+	interface IBoxGraphic
+	{
+		bool Visible { get; set; }
+		Vector3 Position { get; set; }
+		UnityEngine.Color Color { get; set; }
+		void Destroy();
 	}
 }

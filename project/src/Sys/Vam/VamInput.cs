@@ -167,12 +167,21 @@ namespace Cue.W
 			RaycastHit hit;
 
 			bool b = Physics.Raycast(
-				ray_, out hit, float.MaxValue, 1 << Controls.Layer);
+				ray_, out hit, float.MaxValue, 1 << VamBoxGraphic.Layer);
 
 			if (!b)
 				return null;
 
-			return Cue.Instance.Controls.Find(hit.transform);
+			// todo
+			var cs = Cue.Instance.Controls.All;
+			for (int i = 0; i < cs.Count; ++i)
+			{
+				var g = cs[i].Graphic as VamBoxGraphic;
+				if (g.Transform == hit.transform)
+					return cs[i].Object;
+			}
+
+			return null;
 		}
 
 		private IObject HitPerson()
