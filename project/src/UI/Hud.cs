@@ -36,14 +36,6 @@
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 		}
 
-		public bool IsHovered(float x, float y)
-		{
-			if (canvas_ == null)
-				return false;
-
-			return canvas_.IsHovered(x, y);
-		}
-
 		public void Destroy()
 		{
 			if (root_ != null)
