@@ -27,10 +27,14 @@ project\src\Procedural\ProceduralExpression.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
+project\src\Sys\Vam\VamCanvas.cs
+project\src\Sys\Vam\VamInput.cs
+project\src\Sys\Vam\VamLog.cs
 project\src\Sys\Vam\VamNav.cs
 project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
 project\src\UI\Hud.cs
+project\src\UI\Menu.cs
 project\src\UI\ScriptUI.cs
 project\src\VUI\BorderLayout.cs
 project\src\VUI\Button.cs

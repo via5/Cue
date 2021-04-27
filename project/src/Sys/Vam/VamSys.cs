@@ -89,6 +89,27 @@ namespace Cue.W
 			}
 		}
 
+		public ICanvas CreateHud(Vector3 offset, Point pos, Size size)
+		{
+			return new WorldSpaceAttachedCanvas(
+				Vector3.ToUnity(offset),
+				Point.ToUnity(pos),
+				Size.ToUnity(size));
+		}
+
+		public ICanvas CreateAttached(Vector3 offset, Point pos, Size size)
+		{
+			return new WorldSpaceCameraCanvas(
+				Vector3.ToUnity(offset),
+				Point.ToUnity(pos),
+				Size.ToUnity(size));
+		}
+
+		public ICanvas Create2D()
+		{
+			return new OverlayCanvas();
+		}
+
 		public void OnPluginState(bool b)
 		{
 			nav_.OnPluginState(b);

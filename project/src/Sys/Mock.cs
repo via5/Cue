@@ -92,6 +92,21 @@ namespace Cue.W
 		{
 			return path;
 		}
+
+		public ICanvas CreateHud(Vector3 offset, Point pos, Size size)
+		{
+			return null;
+		}
+
+		public ICanvas CreateAttached(Vector3 offset, Point pos, Size size)
+		{
+			return null;
+		}
+
+		public ICanvas Create2D()
+		{
+			return null;
+		}
 	}
 
 	class MockInput : IInput

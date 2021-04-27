@@ -19,6 +19,9 @@ namespace Cue.W
 		void ReloadPlugin();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
+		ICanvas CreateHud(Vector3 offset, Point pos, Size size);
+		ICanvas CreateAttached(Vector3 offset, Point pos, Size size);
+		ICanvas Create2D();
 	}
 
 	interface IInput
@@ -90,5 +93,15 @@ namespace Cue.W
 		void Update();
 		List<Vector3> Calculate(Vector3 from, Vector3 to);
 		bool Render { get; set; }
+	}
+
+	interface ICanvas
+	{
+		void Create();
+		void Destroy();
+		bool IsHovered(float x, float y);
+		//Transform Transform { get; }
+		void Toggle();
+		VUI.Root CreateRoot();
 	}
 }

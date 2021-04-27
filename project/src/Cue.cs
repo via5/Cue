@@ -18,8 +18,8 @@ namespace Cue
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
-		private IHud hud_;
-		private IMenu menu_;
+		private Hud hud_;
+		private Menu menu_;
 		private IControls controls_;
 		private bool paused_ = false;
 		private bool vr_ = false;
@@ -34,16 +34,12 @@ namespace Cue
 			vr_ = Sys.IsVR;
 
 			if (Sys is W.MockSys)
-			{
-				hud_ = new MockHud();
 				controls_ = new MockControls();
-			}
 			else
-			{
-				hud_ = new Hud();
-				menu_ = new Menu();
 				controls_ = new Controls();
-			}
+
+			hud_ = new Hud();
+			menu_ = new Menu();
 		}
 
 		public static Cue Instance
@@ -91,7 +87,7 @@ namespace Cue
 			get { return hovered_; }
 		}
 
-		public IHud Hud
+		public Hud Hud
 		{
 			get { return hud_; }
 		}
