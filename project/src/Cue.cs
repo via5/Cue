@@ -15,9 +15,9 @@ namespace Cue
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
-		private Hud hud_ = new Hud();
-		private Menu menu_ = new Menu();
-		private Controls controls_ = new Controls();
+		private Hud hud_ = null;
+		private Menu menu_ = null;
+		private Controls controls_ = null;
 		private bool paused_ = false;
 		private bool vr_ = false;
 
@@ -28,6 +28,9 @@ namespace Cue
 		{
 			instance_ = this;
 			vr_ = Sys.IsVR;
+			hud_ = new Hud();
+			menu_ = new Menu();
+			controls_ = new Controls();
 		}
 
 		public static Cue Instance
@@ -73,11 +76,6 @@ namespace Cue
 		public IObject Hovered
 		{
 			get { return hovered_; }
-		}
-
-		public Hud Hud
-		{
-			get { return hud_; }
 		}
 
 		public Controls Controls
@@ -261,6 +259,14 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			Sys.Input.Update();
+
+			if (Sys.Input.HardReset)
+			{
+				Sys.HardReset();
+				return;
+			}
+
 			if (Sys.Input.ReloadPlugin)
 			{
 				ReloadPlugin();
@@ -284,18 +290,17 @@ namespace Cue
 			if (vr_ != vr)
 			{
 				vr_ = vr;
-				hud_.Destroy();
-				hud_.Create(vr_);
-
-				menu_.Destroy();
-				menu_.Create(vr_);
+				hud_?.Destroy();
+				hud_?.Create(vr_);
+				menu_?.Destroy();
+				menu_?.Create(vr_);
 			}
 
 			CheckInput();
 
-			controls_.Update();
-			hud_.Update();
-			menu_.Update();
+			controls_?.Update();
+			hud_?.Update();
+			menu_?.Update();
 		}
 
 		private void CheckInput()
@@ -303,8 +308,8 @@ namespace Cue
 			if (!Sys.IsPlayMode)
 				return;
 
-			if (Sys.Input.MenuToggle)
-				menu_.Toggle();
+			if (Sys.Input.ToggleMenu)
+				menu_?.Toggle();
 
 			Hover(Sys.Input.GetHovered());
 
@@ -324,7 +329,8 @@ namespace Cue
 				p.InteractWith(o);
 			}
 
-			controls_.Visible = Sys.Input.ShowControls;
+			if (Sys.Input.ToggleControls)
+				controls_.Visible = !controls_.Visible;
 		}
 
 		public void OnPluginState(bool b)
@@ -333,14 +339,14 @@ namespace Cue
 
 			if (b)
 			{
-				hud_.Create(Sys.IsVR);
-				menu_.Create(Sys.IsVR);
+				hud_?.Create(Sys.IsVR);
+				menu_?.Create(Sys.IsVR);
 				controls_.Create();
 			}
 			else
 			{
-				hud_.Destroy();
-				menu_.Destroy();
+				hud_?.Destroy();
+				menu_?.Destroy();
 				controls_.Destroy();
 			}
 

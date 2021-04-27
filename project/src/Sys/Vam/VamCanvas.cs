@@ -8,48 +8,46 @@ namespace Cue.W
 
 	// vr, moves with the head
 	//
-	class WorldSpaceAttachedCanvas : ICanvas
+	class VRTopHudRootSupport : VUI.IRootSupport
 	{
 		private Vector3 offset_;
 		private Vector2 pos_, size_;
 		private GameObject fullscreenPanel_ = null;
 		private GameObject hudPanel_ = null;
+		private Canvas canvas_ = null;
 
-		public WorldSpaceAttachedCanvas(Vector3 offset, Vector2 pos, Vector2 size)
+		public VRTopHudRootSupport(Vector3 offset, Vector2 pos, Vector2 size)
 		{
 			offset_ = offset;
 			pos_ = pos;
 			size_ = size;
-		}
 
-		public void Create()
-		{
 			CreateFullscreenPanel(Camera.main.transform);
 			CreateHudPanel();
 		}
 
+		public MVRScriptUI ScriptUI
+		{
+			get { return null; }
+		}
+
+		public Canvas Canvas
+		{
+			get { return canvas_; }
+		}
+
+		public Transform RootParent
+		{
+			get { return hudPanel_.transform; }
+		}
+
 		public void Destroy()
 		{
-			SuperController.singleton.RemoveCanvas(
-				fullscreenPanel_.GetComponent<Canvas>());
+			if (canvas_ != null)
+				SuperController.singleton.RemoveCanvas(canvas_);
 
 			Object.Destroy(fullscreenPanel_);
 			fullscreenPanel_ = null;
-		}
-
-		public void Toggle()
-		{
-			fullscreenPanel_.SetActive(!fullscreenPanel_.activeSelf);
-		}
-
-		public bool IsHovered(float x, float y)
-		{
-			return false;
-		}
-
-		public VUI.Root CreateRoot()
-		{
-			return new VUI.Root(hudPanel_.transform);
 		}
 
 		private void CreateFullscreenPanel(Transform parent)
@@ -57,15 +55,15 @@ namespace Cue.W
 			fullscreenPanel_ = new GameObject();
 			fullscreenPanel_.transform.SetParent(parent, false);
 
-			var canvas = fullscreenPanel_.AddComponent<Canvas>();
+			canvas_ = fullscreenPanel_.AddComponent<Canvas>();
 			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
 			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
 			var rt = fullscreenPanel_.AddComponent<RectTransform>();
 			if (rt == null)
 				rt = fullscreenPanel_.GetComponent<RectTransform>();
 
-			canvas.renderMode = RenderMode.WorldSpace;
-			canvas.worldCamera = Camera.main;
+			canvas_.renderMode = RenderMode.WorldSpace;
+			canvas_.worldCamera = Camera.main;
 			fullscreenPanel_.transform.position = parent.position + offset_;
 
 
@@ -84,7 +82,7 @@ namespace Cue.W
 			rt.pivot = new Vector2(0.5f, 0);
 			rt.localScale = new Vector3(0.0005f, 0.0005f, 0.0005f);
 
-			SuperController.singleton.AddCanvas(canvas);
+			SuperController.singleton.AddCanvas(canvas_);
 		}
 
 		private void CreateHudPanel()
@@ -112,48 +110,46 @@ namespace Cue.W
 
 	// vr, moves with the head
 	//
-	class WorldSpaceCameraCanvas : ICanvas
+	class VRHandRootSupport : VUI.IRootSupport
 	{
 		private Vector3 offset_;
 		private Vector2 pos_, size_;
 		private GameObject fullscreenPanel_ = null;
 		private GameObject hudPanel_ = null;
+		private Canvas canvas_ = null;
 
-		public WorldSpaceCameraCanvas(UnityEngine.Vector3 offset, Vector2 pos, Vector2 size)
+		public VRHandRootSupport(UnityEngine.Vector3 offset, Vector2 pos, Vector2 size)
 		{
 			offset_ = offset;
 			pos_ = pos;
 			size_ = size;
-		}
 
-		public void Create()
-		{
 			CreateFullscreenPanel(SuperController.singleton.leftHand);
 			CreateHudPanel();
 		}
 
+		public MVRScriptUI ScriptUI
+		{
+			get { return null; }
+		}
+
+		public Canvas Canvas
+		{
+			get { return canvas_; }
+		}
+
+		public Transform RootParent
+		{
+			get { return hudPanel_.transform; }
+		}
+
 		public void Destroy()
 		{
-			SuperController.singleton.RemoveCanvas(
-				fullscreenPanel_.GetComponent<Canvas>());
+			if (canvas_ != null)
+				SuperController.singleton.RemoveCanvas(canvas_);
 
 			Object.Destroy(fullscreenPanel_);
 			fullscreenPanel_ = null;
-		}
-
-		public void Toggle()
-		{
-			fullscreenPanel_.SetActive(!fullscreenPanel_.activeSelf);
-		}
-
-		public bool IsHovered(float x, float y)
-		{
-			return false;
-		}
-
-		public VUI.Root CreateRoot()
-		{
-			return new VUI.Root(hudPanel_.transform);
 		}
 
 		private void CreateFullscreenPanel(Transform parent)
@@ -161,15 +157,15 @@ namespace Cue.W
 			fullscreenPanel_ = new GameObject();
 			fullscreenPanel_.transform.SetParent(parent, false);
 
-			var canvas = fullscreenPanel_.AddComponent<Canvas>();
+			canvas_ = fullscreenPanel_.AddComponent<Canvas>();
 			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
 			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
 			var rt = fullscreenPanel_.AddComponent<RectTransform>();
 			if (rt == null)
 				rt = fullscreenPanel_.GetComponent<RectTransform>();
 
-			canvas.renderMode = RenderMode.WorldSpace;
-			canvas.worldCamera = Camera.main;
+			canvas_.renderMode = RenderMode.WorldSpace;
+			canvas_.worldCamera = Camera.main;
 			fullscreenPanel_.transform.position = parent.position + offset_;
 
 
@@ -185,7 +181,7 @@ namespace Cue.W
 			rt.anchoredPosition = new Vector2(0.5f, 0.5f);
 			rt.localScale = new Vector3(0.0005f, 0.0005f, 0.0005f);
 
-			SuperController.singleton.AddCanvas(canvas);
+			SuperController.singleton.AddCanvas(canvas_);
 		}
 
 		private void CreateHudPanel()
@@ -213,97 +209,94 @@ namespace Cue.W
 
 	// desktop
 	//
-	class OverlayCanvas : ICanvas
+	class OverlayRootSupport : VUI.IRootSupport
 	{
-		private GameObject fullscreenPanel_ = null;
-		private GameObject hudPanel_ = null;
+		private GameObject panel_ = null;
+		private GameObject ui_ = null;
+		private Canvas canvas_ = null;
 
-		public void Create()
+		public OverlayRootSupport(float topOffset, float width, float height)
 		{
-			CreateFullscreenPanel(SuperController.singleton.mainMenuUI.root);
-			CreateHudPanel();
+			panel_ = new GameObject();
+			panel_.transform.SetParent(SuperController.singleton.transform.root, false);
+
+			canvas_ = panel_.AddComponent<Canvas>();
+			panel_.AddComponent<CanvasRenderer>();
+			panel_.AddComponent<CanvasScaler>();
+			panel_.AddComponent<RectTransform>();
+
+			canvas_.renderMode = RenderMode.ScreenSpaceOverlay;
+			canvas_.gameObject.AddComponent<GraphicRaycaster>();
+			canvas_.scaleFactor = 0.5f;
+
+			ui_ = new GameObject();
+			ui_.transform.SetParent(panel_.transform, false);
+			var rt = ui_.AddComponent<RectTransform>();
+			rt.anchorMin = new Vector2(0.5f, 1);
+			rt.anchorMax = new Vector2(0.5f, 1);
+			rt.offsetMin = new Vector2(-width/2, -(height + topOffset));
+			rt.offsetMax = new Vector2(width/2, -topOffset);
+
+			var bg = ui_.AddComponent<Image>();
+			bg.color = new Color(0, 0, 0, 0.8f);
+			bg.raycastTarget = false;
+		}
+
+		public MVRScriptUI ScriptUI
+		{
+			get { return null; }
+		}
+
+		public Canvas Canvas
+		{
+			get { return canvas_; }
+		}
+
+		public Transform RootParent
+		{
+			get { return ui_.transform; }
 		}
 
 		public void Destroy()
 		{
-			Object.Destroy(fullscreenPanel_);
-			fullscreenPanel_ = null;
+			Object.Destroy(panel_);
+		}
+	}
+
+
+	class ScriptUIRootSupport : VUI.IRootSupport
+	{
+		private MVRScriptUI sui_;
+
+		public ScriptUIRootSupport(MVRScriptUI sui)
+		{
+			sui_ = sui;
 		}
 
-		public bool IsHovered(float x, float y)
+		public MVRScriptUI ScriptUI
 		{
-			var rt = hudPanel_.GetComponent<RectTransform>();
-			Vector2 local = rt.InverseTransformPoint(new Vector2(x, y));
-			return rt.rect.Contains(local);
+			get { return sui_; }
 		}
 
-		public void Toggle()
+		public Canvas Canvas
 		{
-			fullscreenPanel_.SetActive(!fullscreenPanel_.activeSelf);
+			get
+			{
+				return sui_.GetComponentInChildren<Image>()?.canvas;
+			}
 		}
 
-		public VUI.Root CreateRoot()
+		public Transform RootParent
 		{
-			return new VUI.Root(hudPanel_.transform);
+			get
+			{
+				return sui_.fullWidthUIContent;
+			}
 		}
 
-		private void CreateFullscreenPanel(Transform parent)
+		public void Destroy()
 		{
-			fullscreenPanel_ = new GameObject();
-			fullscreenPanel_.transform.SetParent(parent, false);
-
-			var canvas = fullscreenPanel_.AddComponent<Canvas>();
-			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
-			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
-			var rt = fullscreenPanel_.AddComponent<RectTransform>();
-			if (rt == null)
-				rt = fullscreenPanel_.GetComponent<RectTransform>();
-
-			canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-			canvas.gameObject.AddComponent<GraphicRaycaster>();
-
-
-			var cs2 = SuperController.singleton.errorLogPanel.GetComponent<CanvasScaler>();
-			cs.uiScaleMode = cs2.uiScaleMode;
-			cs.referenceResolution = cs2.referenceResolution;
-			cs.screenMatchMode = cs2.screenMatchMode;
-			cs.matchWidthOrHeight = cs2.matchWidthOrHeight;
-			cs.defaultSpriteDPI = cs2.defaultSpriteDPI;
-			cs.fallbackScreenDPI = cs2.fallbackScreenDPI;
-			cs.referencePixelsPerUnit = cs2.referencePixelsPerUnit;
-			cs.dynamicPixelsPerUnit = cs2.dynamicPixelsPerUnit;
-			cs.physicalUnit = cs2.physicalUnit;
-			cs.scaleFactor = cs2.scaleFactor;
-
-			canvas.scaleFactor = 0.5f;
-
-			rt.offsetMin = new Vector2(2000, 2000);
-			rt.offsetMax = new Vector2(2000f, 2000);
-			rt.anchorMin = new Vector2(0, 0);
-			rt.anchorMax = new Vector2(1, 1);
-			rt.anchoredPosition = new Vector2(0.5f, -0.5f);
-		}
-
-		private void CreateHudPanel()
-		{
-			hudPanel_ = new GameObject();
-			hudPanel_.transform.SetParent(fullscreenPanel_.transform, false);
-
-			var bg = hudPanel_.AddComponent<Image>();
-			var rt = hudPanel_.AddComponent<RectTransform>();
-			if (rt == null)
-				rt = hudPanel_.GetComponent<RectTransform>();
-
-			bg.color = new Color(0, 0, 0, 0.8f);
-			bg.raycastTarget = true;
-
-			rt.offsetMin = new Vector2(-800, 0);
-			rt.offsetMax = new Vector2(800, 200);
-			rt.anchorMin = new Vector2(0.5f, 1);
-			rt.anchorMax = new Vector2(0.5f, 1);
-			rt.anchoredPosition = new Vector2(
-				(rt.offsetMax.x / 2),//- rt.offsetMin.x) / 4,
-				-(rt.offsetMax.y - rt.offsetMin.y) / 2);
+			// no-op
 		}
 	}
 }

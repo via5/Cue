@@ -2,7 +2,6 @@
 {
 	class Hud
 	{
-		private W.ICanvas canvas_ = null;
 		private VUI.Root root_ = null;
 		private VUI.Label sel_ = null;
 		private VUI.Label hovered_ = null;
@@ -14,20 +13,16 @@
 
 			if (vr)
 			{
-				canvas_ = Cue.Instance.Sys.CreateHud(
+				root_ = Cue.Instance.Sys.CreateHud(
 					new Vector3(0, 0, 2),
 					new Point(-1000, 200),
 					new Size(3000, 1000));
-
-				canvas_.Create();
 			}
 			else
 			{
-				canvas_ = Cue.Instance.Sys.Create2D();
-				canvas_.Create();
+				root_ = Cue.Instance.Sys.Create2D(20, new Size(1000, 100));
 			}
 
-			root_ = canvas_.CreateRoot();
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 
 			var p = new VUI.Panel(new VUI.VerticalFlow());
@@ -42,12 +37,6 @@
 			{
 				root_.Destroy();
 				root_ = null;
-			}
-
-			if (canvas_ != null)
-			{
-				canvas_.Destroy();
-				canvas_ = null;
 			}
 		}
 

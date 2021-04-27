@@ -704,7 +704,7 @@ namespace VUI
 				mainObject_.SetActive(visible_);
 
 				if (parent_?.MainObject == null)
-					mainObject_.transform.SetParent(GetRoot().RootTransform, false);
+					mainObject_.transform.SetParent(GetRoot().WidgetParentTransform, false);
 				else
 					mainObject_.transform.SetParent(parent_.MainObject.transform, false);
 

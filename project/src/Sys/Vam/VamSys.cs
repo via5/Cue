@@ -108,25 +108,34 @@ namespace Cue.W
 			return UnityEngine.Random.Range(first, last);
 		}
 
-		public ICanvas CreateHud(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
 		{
-			return new WorldSpaceAttachedCanvas(
-				VamU.ToUnity(offset),
-				VamU.ToUnity(pos),
-				VamU.ToUnity(size));
+			return new VUI.Root(
+				new VRTopHudRootSupport(
+					VamU.ToUnity(offset),
+					VamU.ToUnity(pos),
+					VamU.ToUnity(size)));
 		}
 
-		public ICanvas CreateAttached(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateAttached(Vector3 offset, Point pos, Size size)
 		{
-			return new WorldSpaceCameraCanvas(
-				VamU.ToUnity(offset),
-				VamU.ToUnity(pos),
-				VamU.ToUnity(size));
+			return new VUI.Root(
+				new VRHandRootSupport(
+					VamU.ToUnity(offset),
+					VamU.ToUnity(pos),
+					VamU.ToUnity(size)));
 		}
 
-		public ICanvas Create2D()
+		public VUI.Root Create2D(float topOffset, Size size)
 		{
-			return new OverlayCanvas();
+			return new VUI.Root(
+				new OverlayRootSupport(topOffset, size.Width, size.Height));
+		}
+
+		public VUI.Root CreateScriptUI()
+		{
+			return new VUI.Root(
+				new ScriptUIRootSupport(CueMain.Instance.MVRScriptUI));
 		}
 
 		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
@@ -148,13 +157,26 @@ namespace Cue.W
 			SuperController.singleton.StartCoroutine(DeferredInit(f));
 		}
 
+		public void HardReset()
+		{
+			SuperController.singleton.HardReset();
+		}
+
 		public void ReloadPlugin()
 		{
 			Transform uit = CueMain.Instance.UITransform;
 			if (uit?.parent == null)
 			{
-				SuperController.LogError("can't reload, open main UI once");
-				return;
+				SuperController.LogError("no main ui, selecting atom");
+				SuperController.singleton.SelectController(
+					script_.containingAtom.mainController);
+
+				uit = CueMain.Instance.UITransform;
+				if (uit?.parent == null)
+				{
+					SuperController.LogError("sill no main ui, can't reload, open main UI once");
+					return;
+				}
 			}
 
 			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
@@ -516,6 +538,17 @@ namespace Cue.W
 
 	class VamU
 	{
+		public static string ToString(RectTransform rt)
+		{
+			return
+				"rect: " + rt.rect.ToString() + "\n" +
+				"offsetMin: " + rt.offsetMin.ToString() + "\n" +
+				"offsetMax: " + rt.offsetMax.ToString() + "\n" +
+				"anchorMin: " + rt.anchorMin.ToString() + "\n" +
+				"anchorMax: " + rt.anchorMax.ToString() + "\n" +
+				"anchorPos: " + rt.anchoredPosition.ToString();
+		}
+
 		public static UnityEngine.Vector3 ToUnity(Vector3 v)
 		{
 			return new UnityEngine.Vector3(v.X, v.Y, v.Z);

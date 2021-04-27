@@ -17,7 +17,7 @@ namespace Cue.UI
 
 		public void Init()
 		{
-			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI.fullWidthUIContent);
+			root_ = Cue.Instance.Sys.CreateScriptUI();
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 

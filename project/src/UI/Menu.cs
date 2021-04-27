@@ -2,56 +2,43 @@
 {
 	class Menu
 	{
-		private W.ICanvas canvas_ = null;
 		private VUI.Root root_ = null;
 
 		public void Create(bool vr)
 		{
 			if (vr)
 			{
-				canvas_ = Cue.Instance.Sys.CreateAttached(
+				root_ = Cue.Instance.Sys.CreateAttached(
 					new Vector3(0, 0.1f, 0),
 					new Point(0, 0),
 					new Size(1300, 100));
-
-				canvas_.Create();
 			}
 			else
 			{
-				canvas_ = Cue.Instance.Sys.Create2D();
-				canvas_.Create();
+				root_ = Cue.Instance.Sys.Create2D(130, new Size(1000, 100));
 			}
 
-			root_ = canvas_.CreateRoot();
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 
 			var bottom = new VUI.Panel(new VUI.VerticalFlow());
 
-			var p = new VUI.Panel(new VUI.HorizontalFlow());
-			p.Add(new VUI.Button("Call", OnCall));
-			p.Add(new VUI.Button("Sit", OnSit));
-			p.Add(new VUI.Button("Kneel", OnKneel));
-			p.Add(new VUI.Button("Reload", OnReload));
-			p.Add(new VUI.Button("Handjob", OnHandjob));
-			p.Add(new VUI.Button("Sex", OnSex));
-			p.Add(new VUI.Button("Stand", OnStand));
+			var p = new VUI.Panel(new VUI.HorizontalFlow(5));
+			p.Add(new VUI.ToolButton("Call", OnCall));
+			p.Add(new VUI.ToolButton("Sit", OnSit));
+			p.Add(new VUI.ToolButton("Kneel", OnKneel));
+			p.Add(new VUI.ToolButton("Reload", OnReload));
+			p.Add(new VUI.ToolButton("Handjob", OnHandjob));
+			p.Add(new VUI.ToolButton("Sex", OnSex));
+			p.Add(new VUI.ToolButton("Stand", OnStand));
 			bottom.Add(p);
 
-			p = new VUI.Panel(new VUI.HorizontalFlow());
-			p.Add(new VUI.Button("Toggle genitals", OnToggleGenitals));
-			p.Add(new VUI.Button("Toggle breasts", OnToggleBreasts));
-			p.Add(new VUI.Button("Dump clothes", OnDumpClothes));
+			p = new VUI.Panel(new VUI.HorizontalFlow(5));
+			p.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
+			p.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
+			p.Add(new VUI.ToolButton("Dump clothes", OnDumpClothes));
 			bottom.Add(p);
 
 			root_.ContentPanel.Add(bottom, VUI.BorderLayout.Bottom);
-		}
-
-		public bool IsHovered(float x, float y)
-		{
-			if (canvas_ == null)
-				return false;
-
-			return canvas_.IsHovered(x, y);
 		}
 
 		public void Destroy()
@@ -60,12 +47,6 @@
 			{
 				root_.Destroy();
 				root_ = null;
-			}
-
-			if (canvas_ != null)
-			{
-				canvas_.Destroy();
-				canvas_ = null;
 			}
 		}
 
@@ -76,7 +57,7 @@
 
 		public void Toggle()
 		{
-			canvas_.Toggle();
+			root_.Visible = !root_.Visible;
 		}
 
 		private void OnCall()

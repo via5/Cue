@@ -88,6 +88,10 @@ namespace Cue.W
 		{
 		}
 
+		public void HardReset()
+		{
+		}
+
 		public void ReloadPlugin()
 		{
 		}
@@ -107,17 +111,22 @@ namespace Cue.W
 			return path;
 		}
 
-		public ICanvas CreateHud(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
 		{
 			return null;
 		}
 
-		public ICanvas CreateAttached(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateAttached(Vector3 offset, Point pos, Size size)
 		{
 			return null;
 		}
 
-		public ICanvas Create2D()
+		public VUI.Root Create2D(float topOffset, Size size)
+		{
+			return null;
+		}
+
+		public VUI.Root CreateScriptUI()
 		{
 			return null;
 		}
@@ -130,11 +139,16 @@ namespace Cue.W
 
 	class MockInput : IInput
 	{
+		public bool HardReset { get { return false; } }
 		public bool ReloadPlugin { get { return false; } }
-		public bool MenuToggle { get { return false; } }
+		public bool ToggleMenu { get { return false; } }
+		public bool ToggleControls { get { return false; } }
 		public bool Select { get { return false; } }
 		public bool Action { get { return false; } }
-		public bool ShowControls { get { return false; } }
+
+		public void Update()
+		{
+		}
 
 		public IObject GetHovered()
 		{

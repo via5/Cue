@@ -87,14 +87,22 @@ namespace VUI
 	}
 
 
+	interface IRootSupport
+	{
+		MVRScriptUI ScriptUI { get; }
+		Canvas Canvas { get; }
+		Transform RootParent { get; }
+		void Destroy();
+	}
+
+
 	class Root
 	{
 		public const int FocusDefault = 0x0;
 		public const int FocusKeepPopup = 0x01;
 
 
-		private Transform rootTransform_ = null;
-		private RectTransform scrollViewRT_ = null;
+		private IRootSupport support_ = null;
 		static private TextGenerator tg_ = new TextGenerator();
 		static private TextGenerationSettings ts_ = new TextGenerationSettings();
 
@@ -106,7 +114,6 @@ namespace VUI
 		private readonly TooltipManager tooltips_;
 		private float topOffset_ = 0;
 		private bool dirty_ = true;
-		private bool ready_ = false;
 		private Canvas canvas_;
 
 		private UIPopup openedPopup_ = null;
@@ -122,7 +129,7 @@ namespace VUI
 			}
 		}
 
-		public Root(Transform rootTransform)
+		public Root(IRootSupport support)
 		{
 			if (TimerManager.Instance == null)
 				ownTm_ = new TimerManager();
@@ -131,39 +138,17 @@ namespace VUI
 			floating_ = new RootPanel(this);
 			tooltips_ = new TooltipManager(this);
 
-			AttachTo(rootTransform);
+			AttachTo(support);
 		}
 
-		public Transform RootTransform
+		public IRootSupport RootParent
 		{
-			get { return rootTransform_; }
+			get { return support_; }
 		}
 
-		public bool IsReady()
+		public Transform WidgetParentTransform
 		{
-			if (ready_)
-				return true;
-
-			if (scrollViewRT_ == null)
-			{
-				if (rootTransform_ == null)
-					return false;
-
-				var scrollView = rootTransform_.GetComponentInChildren<ScrollRect>();
-				if (scrollView == null)
-					return false;
-
-				scrollViewRT_ = scrollView.GetComponent<RectTransform>();
-				if (scrollViewRT_ == null)
-					return false;
-			}
-
-			if (scrollViewRT_.rect.width <= 0 || scrollViewRT_.rect.height <= 0)
-				return false;
-
-			ready_ = true;
-
-			return true;
+			get { return support_.RootParent; }
 		}
 
 		public void SetOpenedPopup(UIPopup p)
@@ -189,56 +174,35 @@ namespace VUI
 			}
 		}
 
-		private MVRScriptUI GetScriptUI()
+		public void AttachTo(IRootSupport support)
 		{
-			MVRScriptUI scriptui = null;
-			var t = rootTransform_;
-			while (t != null)
+			support_ = support;
+
+			if (support_.ScriptUI == null)
 			{
-				scriptui = t.GetComponent<MVRScriptUI>();
-				if (scriptui != null)
-					return scriptui;
-
-				t = t.parent;
-			}
-
-			return null;
-		}
-
-		public void AttachTo(Transform rootTransform)
-		{
-			rootTransform_ = rootTransform;
-
-			MVRScriptUI scriptui = GetScriptUI();
-
-			if (scriptui == null)
-			{
-				var rt = rootTransform_.GetComponent<RectTransform>();
+				var rt = support_.RootParent.GetComponent<RectTransform>();
 
 				topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
 				bounds_ = Rectangle.FromPoints(
 					0, 0, rt.rect.width, rt.rect.height);
-
-				ready_ = true;
 			}
 			else
 			{
-				var scrollView = scriptui.GetComponentInChildren<ScrollRect>();
+				var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
 				var scrollViewRT = scrollView.GetComponent<RectTransform>();
 				topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
 
 				bounds_ = Rectangle.FromPoints(
 					1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
 
-				ready_ = false;
-				Style.SetupRoot(scriptui);
+				Style.SetupRoot(support_.ScriptUI);
 			}
 
 			content_.Bounds = new Rectangle(bounds_);
 			floating_.Bounds = new Rectangle(bounds_);
 
 
-			var text = rootTransform_.root.GetComponentInChildren<Text>();
+			var text = support_.RootParent.root.GetComponentInChildren<Text>();
 			if (text == null)
 			{
 				Glue.LogError("no text in attach");
@@ -252,14 +216,14 @@ namespace VUI
 
 		public void Destroy()
 		{
-			MVRScriptUI scriptui = GetScriptUI();
-			if (scriptui != null)
-				Style.RevertRoot(scriptui);
+			if (support_.ScriptUI != null)
+				Style.RevertRoot(support_.ScriptUI);
 
 			content_?.Destroy();
 			floating_?.Destroy();
 			overlay_?.Destroy();
 			tooltips_?.Destroy();
+			support_?.Destroy();
 
 			openedPopup_ = null;
 			focused_ = null;
@@ -283,6 +247,12 @@ namespace VUI
 		public Rectangle Bounds
 		{
 			get { return bounds_; }
+		}
+
+		public bool Visible
+		{
+			get { return support_.RootParent.gameObject.activeInHierarchy; }
+			set { support_.RootParent.gameObject.SetActive(value); }
 		}
 
 		public void Update(bool forceLayout=false)
@@ -339,8 +309,7 @@ namespace VUI
 			{
 				if (canvas_ == null)
 				{
-					FindCanvas();
-
+					canvas_ = support_.Canvas;
 					if (canvas_ == null)
 						return NoMousePos;
 				}
@@ -358,18 +327,6 @@ namespace VUI
 
 				return new Point(pp.x, pp.y);
 			}
-		}
-
-		private void FindCanvas()
-		{
-			var image = rootTransform_.GetComponentInChildren<Image>();
-			if (image == null)
-				Glue.LogError("no image in attach");
-			else
-				canvas_ = image.canvas;
-
-			if (canvas_ == null)
-				Glue.LogError("canvas is null");
 		}
 
 		private void ShowOverlay()

@@ -16,26 +16,30 @@ namespace Cue.W
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
+		void HardReset();
 		void ReloadPlugin();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
 		float RealtimeSinceStartup { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
-		ICanvas CreateHud(Vector3 offset, Point pos, Size size);
-		ICanvas CreateAttached(Vector3 offset, Point pos, Size size);
-		ICanvas Create2D();
+		VUI.Root CreateHud(Vector3 offset, Point pos, Size size);
+		VUI.Root CreateAttached(Vector3 offset, Point pos, Size size);
+		VUI.Root Create2D(float topOffset, Size size);
+		VUI.Root CreateScriptUI();
 		IBoxGraphic CreateBoxGraphic(Vector3 pos);
 	}
 
 	interface IInput
 	{
+		bool HardReset { get; }
 		bool ReloadPlugin { get; }
-		bool MenuToggle { get; }
+		bool ToggleMenu { get; }
+		bool ToggleControls { get; }
 		bool Select { get; }
 		bool Action { get; }
-		bool ShowControls { get; }
 
+		void Update();
 		IObject GetHovered();
 	}
 
@@ -97,15 +101,6 @@ namespace Cue.W
 		void Update();
 		List<Vector3> Calculate(Vector3 from, Vector3 to);
 		bool Render { get; set; }
-	}
-
-	interface ICanvas
-	{
-		void Create();
-		void Destroy();
-		bool IsHovered(float x, float y);
-		void Toggle();
-		VUI.Root CreateRoot();
 	}
 
 	interface IBoxGraphic

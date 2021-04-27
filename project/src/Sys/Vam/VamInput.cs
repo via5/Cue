@@ -6,13 +6,58 @@ namespace Cue.W
 	{
 		private VamSys sys_;
 		private Ray ray_ = new Ray();
-		private bool controlsToggle_ = false;
 		private Vector3 middlePos_ = Vector3.Zero;
 		private bool middleDown_ = false;
+		private bool middleClicked_ = false;
 
 		public VamInput(VamSys sys)
 		{
 			sys_ = sys;
+		}
+
+		public void Update()
+		{
+			middleClicked_ = false;
+
+			if (middleDown_)
+			{
+				if (Input.GetMouseButtonUp(2))
+				{
+					var cp = W.VamU.FromUnity(
+						SuperController.singleton.MonitorCenterCamera
+							.transform.position);
+
+					var d = Vector3.Distance(middlePos_, cp);
+					if (d < 0.02f)
+						middleClicked_ = true;
+
+					middleDown_ = false;
+				}
+			}
+			else
+			{
+				if (Input.GetMouseButtonDown(2))
+				{
+					var cp = W.VamU.FromUnity(
+						SuperController.singleton.MonitorCenterCamera
+							.transform.position);
+
+					middleDown_ = true;
+					middlePos_ = cp;
+				}
+			}
+		}
+
+		public bool HardReset
+		{
+			get
+			{
+				var shift =
+					Input.GetKey(KeyCode.LeftShift) ||
+					Input.GetKey(KeyCode.RightShift);
+
+				return shift && Input.GetKeyDown(KeyCode.F5);
+			}
 		}
 
 		public bool ReloadPlugin
@@ -23,7 +68,7 @@ namespace Cue.W
 			}
 		}
 
-		public bool MenuToggle
+		public bool ToggleMenu
 		{
 			get
 			{
@@ -56,7 +101,7 @@ namespace Cue.W
 			}
 		}
 
-		public bool ShowControls
+		public bool ToggleControls
 		{
 			get
 			{
@@ -68,36 +113,18 @@ namespace Cue.W
 				}
 				else
 				{
-					if (middleDown_)
-					{
-						if (Input.GetMouseButtonUp(2))
-						{
-							var cp = W.VamU.FromUnity(
-								SuperController.singleton.MonitorCenterCamera
-									.transform.position);
-
-							var d = Vector3.Distance(middlePos_, cp);
-							if (d < 0.02f)
-								controlsToggle_ = !controlsToggle_;
-
-							middleDown_ = false;
-						}
-					}
-					else
-					{
-						if (Input.GetMouseButtonDown(2))
-						{
-							var cp = W.VamU.FromUnity(
-								SuperController.singleton.MonitorCenterCamera
-									.transform.position);
-
-							middleDown_ = true;
-							middlePos_ = cp;
-						}
-					}
-
-					return controlsToggle_;
+					return middleClicked_;
 				}
+			}
+		}
+
+		private Vector3 CameraPosition
+		{
+			get
+			{
+				return W.VamU.FromUnity(
+					SuperController.singleton.MonitorCenterCamera
+						.transform.position);
 			}
 		}
 
