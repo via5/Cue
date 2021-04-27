@@ -117,7 +117,8 @@
     <Compile Include="src\Objects\Slots.cs" />
     <Compile Include="src\Procedural\Procedural.cs" />
     <Compile Include="src\Procedural\ProceduralExpression.cs" />
-    <Compile Include="src\Resources\Resources.cs" />
+    <Compile Include="src\Resources\Animations.cs" />
+    <Compile Include="src\Resources\Clothing.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
