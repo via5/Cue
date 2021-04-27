@@ -150,7 +150,7 @@ namespace Cue
 			U.Safe(() =>
 			{
 				cue_.Update(Time.deltaTime);
-				sui_.Update();
+				sui_.Update(Time.deltaTime);
 			});
 		}
 

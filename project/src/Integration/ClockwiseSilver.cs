@@ -36,6 +36,11 @@
 
 			wasKissing_ = b;
 		}
+
+		public override string ToString()
+		{
+			return $"Clockwise: active={wasKissing_}";
+		}
 	}
 
 
@@ -46,6 +51,7 @@
 		private W.VamStringChooserParameter male_ = null;
 		private W.VamStringChooserParameter hand_ = null;
 		private Person target_ = null;
+		private bool wasActive_ = false;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -58,8 +64,17 @@
 
 		public bool Active
 		{
-			get { return active_.GetValue(); }
-			set { active_.SetValue(value); }
+			get
+			{
+				wasActive_ = active_.GetValue();
+				return wasActive_;
+			}
+
+			set
+			{
+				wasActive_ = value;
+				active_.SetValue(value);
+			}
 		}
 
 		public Person Target
@@ -74,6 +89,18 @@
 				target_ = value;
 				SetTarget();
 			}
+		}
+
+		public override string ToString()
+		{
+			string s = $"Clockwise: active={wasActive_} target=";
+
+			if (target_ == null)
+				s += "(none)";
+			else
+				s += target_.ID;
+
+			return s;
 		}
 
 		private void SetTarget()

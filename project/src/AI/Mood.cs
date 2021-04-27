@@ -14,7 +14,7 @@
 		private float mouthRate_ = 0.001f;
 		private float breastsRate_ = 0.01f;
 		private float genitalsRate_ = 0.1f;
-		private float decayRate_ = -0.01f;
+		private float decayRate_ = -0.1f;
 		private float rateAdjust_ = 0.1f;
 
 		public Mood(Person p)
@@ -76,7 +76,7 @@
 			if (rate == 0)
 				rate = decayRate_;
 
-			excitement_ += rate * s * rateAdjust_;
+			excitement_ = U.Clamp(excitement_ + rate * s * rateAdjust_, 0, 1);
 
 			if (excitement_ >= 1)
 			{
@@ -155,6 +155,11 @@
 				}
 			}
 		}
+
+		public override string ToString()
+		{
+			return "neutral";
+		}
 	}
 
 
@@ -195,6 +200,11 @@
 					break;
 				}
 			}
+		}
+
+		public override string ToString()
+		{
+			return "quirky";
 		}
 	}
 }

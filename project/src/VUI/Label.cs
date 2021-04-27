@@ -38,8 +38,11 @@ namespace VUI
 				{
 					text_ = value;
 
-					if (Root.TextLength(Font, FontSize, text_) > Bounds.Width)
-						NeedsLayout("text changed");
+					if (IsVisibleOnScreen())
+					{
+						if (Root.TextLength(Font, FontSize, text_) > Bounds.Width)
+							NeedsLayout($"text changed");
+					}
 
 					if (textObject_ != null)
 						textObject_.text = value;
@@ -85,6 +88,7 @@ namespace VUI
 			textObject_.horizontalOverflow =
 				(wrap_ ? HorizontalWrapMode.Wrap : HorizontalWrapMode.Overflow);
 			textObject_.maskable = true;
+			textObject_.raycastTarget = false;
 
 			Style.Setup(this);
 		}

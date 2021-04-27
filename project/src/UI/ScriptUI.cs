@@ -10,6 +10,7 @@ namespace Cue.UI
 		private VUI.Panel panel_ = new VUI.Panel();
 		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
 		private List<Tab> tabs_ = new List<Tab>();
+		private float updateElapsed_ = 1000;
 
 		public void Init()
 		{
@@ -29,10 +30,16 @@ namespace Cue.UI
 				tabsWidget_.AddTab(t.Title, t);
 		}
 
-		public void Update()
+		public void Update(float s)
 		{
-			//for (int i = 0; i < tabs_.Count; ++i)
-			//	tabs_[i].Update();
+			updateElapsed_ += s;
+			if (updateElapsed_ > 0.2f)
+			{
+				for (int i = 0; i < tabs_.Count; ++i)
+					tabs_[i].Update();
+
+				updateElapsed_ = 0;
+			}
 
 			root_.Update();
 		}
@@ -115,6 +122,13 @@ namespace Cue.UI
 		private VUI.Label nav_ = new VUI.Label();
 		private VUI.Label state_ = new VUI.Label();
 
+		private VUI.Label breath_ = new VUI.Label();
+		private VUI.Label gaze_ = new VUI.Label();
+		private VUI.Label speech_ = new VUI.Label();
+		private VUI.Label kiss_ = new VUI.Label();
+		private VUI.Label handjob_ = new VUI.Label();
+		private VUI.Label clothing_ = new VUI.Label();
+
 		public PersonStateTab(Person p)
 		{
 			person_ = p;
@@ -148,6 +162,27 @@ namespace Cue.UI
 			state.Add(new VUI.Label("State"));
 			state.Add(state_);
 
+			state.Add(new VUI.Spacer(20));
+			state.Add(new VUI.Spacer(20));
+
+
+			state.Add(new VUI.Label("Breath"));
+			state.Add(breath_);
+
+			state.Add(new VUI.Label("Gaze"));
+			state.Add(gaze_);
+
+			state.Add(new VUI.Label("Speech"));
+			state.Add(speech_);
+
+			state.Add(new VUI.Label("Kiss"));
+			state.Add(kiss_);
+
+			state.Add(new VUI.Label("Handjob"));
+			state.Add(handjob_);
+
+			state.Add(new VUI.Label("Clothing"));
+			state.Add(clothing_);
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
@@ -168,6 +203,13 @@ namespace Cue.UI
 			anim_.Text = person_.Animator.ToString();
 			nav_.Text = W.NavStates.ToString(person_.Atom.NavState);
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
+
+			breath_.Text = person_.Breathing.ToString();
+			gaze_.Text = person_.Gaze.ToString();
+			speech_.Text = person_.Speech.ToString();
+			kiss_.Text = person_.Kisser.ToString();
+			handjob_.Text = person_.Handjob.ToString();
+			clothing_.Text = person_.Clothing.ToString();
 		}
 	}
 
@@ -176,8 +218,11 @@ namespace Cue.UI
 	{
 		private Person person_;
 		private PersonAI ai_;
+
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label event_ = new VUI.Label();
+		private VUI.Label personality_ = new VUI.Label();
+
 		private VUI.Label moodState_ = new VUI.Label();
 		private VUI.Label moodExcitement_ = new VUI.Label();
 		private VUI.Label moodLastRate_ = new VUI.Label();
@@ -203,6 +248,9 @@ namespace Cue.UI
 			state.Add(new VUI.Label("Event"));
 			state.Add(event_);
 
+			state.Add(new VUI.Label("Personality"));
+			state.Add(personality_);
+
 			state.Add(new VUI.Spacer(30));
 			state.Add(new VUI.Spacer(30));
 
@@ -215,7 +263,7 @@ namespace Cue.UI
 			state.Add(new VUI.Label("Excitement"));
 			state.Add(moodExcitement_);
 
-			state.Add(new VUI.Label("Last rate"));
+			state.Add(new VUI.Label("Rate"));
 			state.Add(moodLastRate_);
 
 			state.Add(new VUI.Label("Mouth"));
@@ -246,9 +294,11 @@ namespace Cue.UI
 		{
 			enabled_.Text = ai_.Enabled.ToString();
 			event_.Text = (ai_.Event == null ? "(none)" : ai_.Event.ToString());
+			personality_.Text = person_.Personality.ToString();
+
 			moodState_.Text = ai_.Mood.StateString;
-			moodExcitement_.Text = ai_.Mood.Excitement.ToString();
-			moodLastRate_.Text = ai_.Mood.LastRate.ToString();
+			moodExcitement_.Text = ai_.Mood.Excitement.ToString("0.00000");
+			moodLastRate_.Text = ai_.Mood.LastRate.ToString("0.00000");
 			moodMouthRate_.Text = ai_.Mood.MouthRate.ToString();
 			moodBreastsRate_.Text = ai_.Mood.BreastsRate.ToString();
 			moodGenitalsRate_.Text = ai_.Mood.GenitalsRate.ToString();

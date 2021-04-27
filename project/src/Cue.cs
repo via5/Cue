@@ -354,7 +354,7 @@ namespace Cue
 
 		static public void LogVerbose(string s)
 		{
-			//Instance.sys_.Log.Verbose(s);
+			//Instance.Sys.Log.Verbose(s);
 		}
 
 		static public void LogInfo(string s)

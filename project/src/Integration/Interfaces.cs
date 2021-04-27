@@ -5,6 +5,24 @@
 		public const int LookAtDisabled = 0;
 		public const int LookAtTarget = 1;
 		public const int LookAtPlayer = 2;
+
+		public static string ToString(int i)
+		{
+			switch (i)
+			{
+				case LookAtDisabled:
+					return "disabled";
+
+				case LookAtTarget:
+					return "target";
+
+				case LookAtPlayer:
+					return "player";
+
+				default:
+					return $"?{i}";
+			}
+		}
 	}
 
 

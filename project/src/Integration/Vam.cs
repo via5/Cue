@@ -134,6 +134,7 @@ namespace Cue
 	{
 		private Person person_;
 		private W.VamStringParameter text_;
+		private string lastText_ = "";
 
 		public VamSpeaker(Person p)
 		{
@@ -144,6 +145,19 @@ namespace Cue
 		public void Say(string s)
 		{
 			text_.SetValue(s);
+			lastText_ = s;
+		}
+
+		public override string ToString()
+		{
+			string s = "Vam: lastText=";
+
+			if (lastText_ == "")
+				s += "(none)";
+			else
+				s += lastText_;
+
+			return s;
 		}
 	}
 
@@ -414,6 +428,11 @@ namespace Cue
 				if (c.isActiveAndEnabled)
 					Cue.LogInfo(c.name);
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"Vam: genitals={genitalsVisible_} breasts={breastsVisible_}";
 		}
 	}
 }

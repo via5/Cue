@@ -6,6 +6,7 @@ namespace Cue
 	{
 		private Person person_;
 		private W.VamFloatParameter intensity_;
+		private float lastIntensity_ = 0;
 
 		public MacGruberBreather(Person p)
 		{
@@ -15,8 +16,17 @@ namespace Cue
 
 		public float Intensity
 		{
-			get { return intensity_.GetValue(); }
-			set { intensity_.SetValue(value); }
+			get
+			{
+				lastIntensity_ = intensity_.GetValue();
+				return lastIntensity_;
+			}
+
+			set
+			{
+				intensity_.SetValue(value);
+				lastIntensity_ = value;
+			}
 		}
 
 		// not supported
@@ -24,6 +34,11 @@ namespace Cue
 		{
 			get { return 0; }
 			set { }
+		}
+
+		public override string ToString()
+		{
+			return $"MacGruber: intensity={lastIntensity_:0.000} speed=n/a";
 		}
 	}
 
@@ -135,6 +150,14 @@ namespace Cue
 					break;
 				}
 			}
+		}
+
+		public override string ToString()
+		{
+			return
+				$"MacGruber: " +
+				$"lookat={GazeSettings.ToString(lookat_)} " +
+				$"target={Target}";
 		}
 	}
 }
