@@ -17,7 +17,7 @@ namespace Cue
 			instance_ = this;
 
 			sys_ = new W.MockSys();
-			cue_ = new Cue(this);
+			cue_ = new Cue();
 			cue_.Init();
 
 			float deltaTime = 0;
@@ -116,7 +116,7 @@ namespace Cue
 			try
 			{
 				sys_ = new W.VamSys(this);
-				cue_ = new Cue(this);
+				cue_ = new Cue();
 				sui_ = new UI.ScriptUI();
 				sys_.OnReady(DoInit);
 			}

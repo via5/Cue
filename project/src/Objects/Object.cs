@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text.RegularExpressions;
 
 namespace Cue
 {
@@ -43,6 +43,29 @@ namespace Cue
 		{
 			atom_ = atom;
 			slots_ = new Slots(this);
+		}
+
+		public static BasicObject TryCreateFromSlot(W.IAtom a)
+		{
+			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
+			var m = re.Match(a.ID);
+
+			if (m == null || !m.Success)
+				return null;
+
+			var typeName = m.Groups[1].Value;
+
+			var type = Slot.TypeFromString(typeName);
+			if (type == Slot.NoType)
+			{
+				Cue.LogError("bad object type '" + typeName + "'");
+				return null;
+			}
+
+			BasicObject o = new BasicObject(a);
+			o.Slots.Add(type);
+
+			return o;
 		}
 
 		public W.VamAtom VamAtom

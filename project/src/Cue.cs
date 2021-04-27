@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace Cue
 {
@@ -13,29 +11,23 @@ namespace Cue
 
 		private static Cue instance_ = null;
 
-		private CueMain main_;
 		private Person player_ = null;
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
-		private Hud hud_;
-		private Menu menu_;
-		private Controls controls_;
+		private Hud hud_ = new Hud();
+		private Menu menu_ = new Menu();
+		private Controls controls_ = new Controls();
 		private bool paused_ = false;
 		private bool vr_ = false;
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
 
-		public Cue(CueMain main)
+		public Cue()
 		{
 			instance_ = this;
-			main_ = main;
 			vr_ = Sys.IsVR;
-
-			controls_ = new Controls();
-			hud_ = new Hud();
-			menu_ = new Menu();
 		}
 
 		public static Cue Instance
@@ -45,12 +37,12 @@ namespace Cue
 
 		public W.ISys Sys
 		{
-			get { return main_.Sys; }
+			get { return CueMain.Instance.Sys; }
 		}
 
 		public W.VamSys VamSys
 		{
-			get { return main_.Sys as W.VamSys; }
+			get { return CueMain.Instance.Sys as W.VamSys; }
 		}
 
 		public List<IObject> AllObjects
@@ -140,10 +132,16 @@ namespace Cue
 			FindObjects();
 			FindPlayer();
 			Sys.Nav.Update();
+			MoveToSpawnPoints();
+			OnPluginState(true);
 
+			if (Sys.GetAtom("cuetest") != null)
+				TestStuff();
+		}
 
+		private void MoveToSpawnPoints()
+		{
 			var spawnPoints = new List<Slot>();
-
 			foreach (var o in objects_)
 				spawnPoints.AddRange(o.Slots.GetAll(Slot.Spawn));
 
@@ -152,14 +150,9 @@ namespace Cue
 				if (i >= spawnPoints.Count)
 					break;
 
-				persons_[i].TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
+				persons_[i].TeleportTo(
+					spawnPoints[i].Position, spawnPoints[i].Bearing);
 			}
-
-			OnPluginState(true);
-			Select(FindPerson("A"));
-
-			if (Sys.GetAtom("cuetest") != null)
-				TestStuff();
 		}
 
 		public Person FindPerson(string id)
@@ -179,6 +172,8 @@ namespace Cue
 
 			a.Personality = new QuirkyPersonality(a);
 			a.AI.Mood.State = Mood.Happy;
+			a.Clothing.GenitalsVisible = true;
+			Select(a);
 
 			//U.DumpComponentsAndDown(t);
 
@@ -201,14 +196,10 @@ namespace Cue
 			//		p.AI.RunEvent(new SexEvent(p, Player, SexEvent.ActiveState));
 			//	}
 			//}
-
-			FindPerson("A").Clothing.GenitalsVisible = true;
 		}
 
 		private void FindObjects()
 		{
-			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
-
 			foreach (var a in Sys.GetAtoms())
 			{
 				if (a.IsPerson)
@@ -217,17 +208,9 @@ namespace Cue
 				}
 				else
 				{
-					var m = re.Match(a.ID);
-					if (m != null && m.Success)
-					{
-						var typeName = m.Groups[1].Value;
-
-						var type = Slot.TypeFromString(typeName);
-						if (type == Slot.NoType)
-							LogError("bad object type '" + typeName + "'");
-						else
-							AddObject(a, type);
-					}
+					var o = BasicObject.TryCreateFromSlot(a);
+					if (o != null)
+						AddObject(o);
 				}
 			}
 		}
@@ -251,11 +234,8 @@ namespace Cue
 			allObjects_.Add(p);
 		}
 
-		private void AddObject(W.IAtom a, int type)
+		private void AddObject(IObject o)
 		{
-			BasicObject o = new BasicObject(a);
-			o.Slots.Add(type);
-
 			objects_.Add(o);
 			allObjects_.Add(o);
 		}
