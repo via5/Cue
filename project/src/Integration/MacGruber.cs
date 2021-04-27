@@ -66,7 +66,7 @@ namespace Cue
 				return;
 
 			intensity_ = Cue.Instance.VamSys?.GetFloatParameter(
-				person_, "MacGruber.Gaze", "enabled");
+				person_, "MacGruber.Breathing", "Intensity");
 		}
 	}
 

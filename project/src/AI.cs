@@ -118,7 +118,7 @@ namespace Cue
 		private float breastsRate_ = 0.01f;
 		private float genitalsRate_ = 0.1f;
 		private float decayRate_ = -0.01f;
-		private float orgasm_ = 10;
+		private float rateAdjust_ = 0.1f;
 
 		public Mood(Person p)
 		{
@@ -155,14 +155,15 @@ namespace Cue
 			if (rate == 0)
 				rate = decayRate_;
 
-			excitement_ += rate * s;
+			excitement_ += rate * s * rateAdjust_;
 
-			if (excitement_ >= orgasm_)
+			if (excitement_ >= 1)
 			{
 				person_.Orgasmer.Orgasm();
 				excitement_ = 0;
 			}
 
+			person_.Breathing.Intensity = excitement_;
 			lastRate_ = rate;
 		}
 
@@ -175,14 +176,14 @@ namespace Cue
 			string s = "";
 
 			//s += $"state={state_} ";
-			s += $"ex={excitement_:0.##}";
+			s += $"ex={excitement_:0.00}";
 
 			if (lastRate_ < 0)
 				s += "-";
 			else
 				s += "+";
 
-			s += $"({lastRate_:0.###})";
+			s += $"({lastRate_:0.000})";
 
 			return s;
 		}

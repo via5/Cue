@@ -4,6 +4,7 @@ namespace Cue
 {
 	interface IObject
 	{
+		string ID { get; }
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }

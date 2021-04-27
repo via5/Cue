@@ -13,14 +13,19 @@ namespace Cue.W
 		public VamTriggers(Atom a)
 		{
 			atom_ = a;
-			lip_ = Get("LipTrigger");
-			mouth_ = Get("MouthTrigger");
-			lNipple_ = Get("lNippleTrigger");
-			rNipple_ = Get("rNippleTrigger");
-			labia_ = Get("LabiaTrigger");
-			vagina_ = Get("VaginaTrigger");
-			deep_ = Get("DeepVaginaTrigger");
-			deeper_ = Get("DeeperVaginaTrigger");
+
+			var c = a.GetComponentInChildren<DAZCharacter>();
+			if (c != null && !c.isMale)
+			{
+				lip_ = Get("LipTrigger");
+				mouth_ = Get("MouthTrigger");
+				lNipple_ = Get("lNippleTrigger");
+				rNipple_ = Get("rNippleTrigger");
+				labia_ = Get("LabiaTrigger");
+				vagina_ = Get("VaginaTrigger");
+				deep_ = Get("DeepVaginaTrigger");
+				deeper_ = Get("DeeperVaginaTrigger");
+			}
 		}
 
 		private bool IsActive(CollisionTriggerEventHandler t)

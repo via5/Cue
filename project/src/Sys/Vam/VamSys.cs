@@ -187,14 +187,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError("can't find storable " + id);
+						Cue.LogError($"{o.ID}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetFloatJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError("no '" + param + "' param");
+						Cue.LogError($"{o.ID}: storable {id} has no float param '{param}'");
 						continue;
 					}
 
@@ -217,14 +217,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError("can't find storable " + id);
+						Cue.LogError($"{o.ID}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetBoolJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError("no '" + param + "' param");
+						Cue.LogError($"{o.ID}: storable {id} has no bool param '{param}'");
 						continue;
 					}
 
@@ -247,14 +247,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError("can't find storable " + id);
+						Cue.LogError($"{o.ID}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetStringJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError("no '" + param + "' param");
+						Cue.LogError($"{o.ID}: storable {id} has no string param '{param}'");
 						continue;
 					}
 
@@ -277,14 +277,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError("can't find storable " + id);
+						Cue.LogError($"{o.ID}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetStringChooserJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError("no '" + param + "' param");
+						Cue.LogError($"{o.ID}: storable {id} has no stringchooser param '{param}'");
 						continue;
 					}
 
@@ -311,14 +311,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError("can't find storable " + id);
+						Cue.LogError($"{a.uid}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetAction(param);
 					if (p == null)
 					{
-						Cue.LogError("no '" + param + "' action param");
+						Cue.LogError($"{a.uid}: storable {id} has no action param '{param}'");
 						continue;
 					}
 
