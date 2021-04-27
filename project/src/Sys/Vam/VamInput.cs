@@ -72,7 +72,7 @@ namespace Cue.W
 					{
 						if (Input.GetMouseButtonUp(2))
 						{
-							var cp = Vector3.FromUnity(
+							var cp = W.VamU.FromUnity(
 								SuperController.singleton.MonitorCenterCamera
 									.transform.position);
 
@@ -87,7 +87,7 @@ namespace Cue.W
 					{
 						if (Input.GetMouseButtonDown(2))
 						{
-							var cp = Vector3.FromUnity(
+							var cp = W.VamU.FromUnity(
 								SuperController.singleton.MonitorCenterCamera
 									.transform.position);
 

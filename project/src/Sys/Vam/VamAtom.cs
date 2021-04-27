@@ -136,13 +136,13 @@ namespace Cue.W
 		{
 			get
 			{
-				return Vector3.FromUnity(
+				return W.VamU.FromUnity(
 					atom_.mainController.transform.position);
 			}
 
 			set
 			{
-				atom_.mainController.MoveControl(Vector3.ToUnity(value));
+				atom_.mainController.MoveControl(W.VamU.ToUnity(value));
 			}
 		}
 
@@ -154,12 +154,12 @@ namespace Cue.W
 					atom_.mainController.transform.rotation *
 					UnityEngine.Vector3.forward;
 
-				return Vector3.FromUnity(v);
+				return W.VamU.FromUnity(v);
 			}
 
 			set
 			{
-				var r = Quaternion.LookRotation(Vector3.ToUnity(value));
+				var r = Quaternion.LookRotation(W.VamU.ToUnity(value));
 				atom_.mainController.RotateTo(r);
 			}
 		}
@@ -172,7 +172,7 @@ namespace Cue.W
 				if (head_ == null)
 					return Vector3.Zero;
 
-				return Vector3.FromUnity(head_.position);
+				return W.VamU.FromUnity(head_.position);
 			}
 		}
 
@@ -253,7 +253,7 @@ namespace Cue.W
 			if (d < 5 || d >= 355)
 			{
 				atom_.mainController.transform.rotation =
-					Quaternion.LookRotation(Vector3.ToUnity(direction));
+					Quaternion.LookRotation(W.VamU.ToUnity(direction));
 
 				turning_ = false;
 				finalBearing_ = BasicObject.NoBearing;
@@ -264,7 +264,7 @@ namespace Cue.W
 
 				var newDir = UnityEngine.Vector3.RotateTowards(
 					atom_.mainController.transform.forward,
-					Vector3.ToUnity(direction),
+					W.VamU.ToUnity(direction),
 					360 * s, 0.0f);
 
 				var newRot = Quaternion.LookRotation(newDir);
@@ -306,7 +306,7 @@ namespace Cue.W
 		public void TeleportTo(Vector3 v, float bearing)
 		{
 			atom_.collisionEnabled = false;
-			atom_.mainController.MoveControl(Vector3.ToUnity(v));
+			atom_.mainController.MoveControl(W.VamU.ToUnity(v));
 
 			if (bearing != BasicObject.NoBearing)
 				atom_.mainController.RotateTo(Quaternion.Euler(0, bearing, 0));
@@ -426,7 +426,7 @@ namespace Cue.W
 
 		private void DoStartNav(Vector3 v, float bearing)
 		{
-			agent_.destination = Vector3.ToUnity(v);
+			agent_.destination = W.VamU.ToUnity(v);
 			agent_.updatePosition = true;
 			agent_.updateRotation = true;
 			agent_.updateUpAxis = true;

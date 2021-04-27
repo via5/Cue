@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 namespace Cue
 {
@@ -85,7 +84,7 @@ namespace Cue
 			{
 				Cue.LogError(e.ToString());
 
-				var now = Time.realtimeSinceStartup;
+				var now = Cue.Instance.Sys.RealtimeSinceStartup;
 
 				if (now - lastErrorTime_ < 1)
 				{
@@ -123,78 +122,14 @@ namespace Cue
 		//
 		public static int RandomInt(int first, int last)
 		{
-			return UnityEngine.Random.Range(first, last + 1);
+			return Cue.Instance.Sys.RandomInt(first, last + 1);
 		}
 
 		// [begin, end]
 		//
 		public static float RandomFloat(float first, float last)
 		{
-			return UnityEngine.Random.Range(first, last);
-		}
-
-		public static void DumpComponents(GameObject o, int indent = 0)
-		{
-			foreach (var c in o.GetComponents(typeof(Component)))
-				Cue.LogInfo(new string(' ', indent * 2) + c.ToString());
-		}
-
-		public static void DumpComponentsAndUp(Component c)
-		{
-			DumpComponentsAndUp(c.gameObject);
-		}
-
-		public static void DumpComponentsAndUp(GameObject o)
-		{
-			Cue.LogInfo(o.name);
-
-			var rt = o.GetComponent<RectTransform>();
-			if (rt != null)
-			{
-				Cue.LogInfo("  rect: " + rt.rect.ToString());
-				Cue.LogInfo("  offsetMin: " + rt.offsetMin.ToString());
-				Cue.LogInfo("  offsetMax: " + rt.offsetMax.ToString());
-				Cue.LogInfo("  anchorMin: " + rt.anchorMin.ToString());
-				Cue.LogInfo("  anchorMax: " + rt.anchorMax.ToString());
-				Cue.LogInfo("  anchorPos: " + rt.anchoredPosition.ToString());
-			}
-
-			DumpComponents(o);
-			Cue.LogInfo("---");
-
-			var parent = o?.transform?.parent?.gameObject;
-			if (parent != null)
-				DumpComponentsAndUp(parent);
-		}
-
-		public static void DumpComponentsAndDown(Component c, bool dumpRt = false)
-		{
-			DumpComponentsAndDown(c.gameObject, dumpRt);
-		}
-
-		public static void DumpComponentsAndDown(
-			GameObject o, bool dumpRt = false, int indent = 0)
-		{
-			Cue.LogInfo(new string(' ', indent * 2) + o.name);
-
-			if (dumpRt)
-			{
-				var rt = o.GetComponent<RectTransform>();
-				if (rt != null)
-				{
-					Cue.LogInfo(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
-				}
-			}
-
-			DumpComponents(o, indent);
-
-			foreach (Transform c in o.transform)
-				DumpComponentsAndDown(c.gameObject, dumpRt, indent + 1);
+			return Cue.Instance.Sys.RandomFloat(first, last);
 		}
 	}
 }

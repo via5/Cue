@@ -4,6 +4,8 @@ using UnityEngine.AI;
 
 namespace Cue.W
 {
+	using Color = UnityEngine.Color;
+
 	class NavMeshRenderer : MonoBehaviour
 	{
 		private Material mat_ = null;
@@ -155,14 +157,14 @@ namespace Cue.W
 			f.agentTypeID = AgentTypeID;
 
 			bool b = NavMesh.CalculatePath(
-				Vector3.ToUnity(from),
-				Vector3.ToUnity(to),
+				VamU.ToUnity(from),
+				VamU.ToUnity(to),
 				f, path);
 
 			if (b)
 			{
 				for (int i = 0; i < path.corners.Length; ++i)
-					list.Add(Vector3.FromUnity(path.corners[i]));
+					list.Add(VamU.FromUnity(path.corners[i]));
 			}
 
 			return list;

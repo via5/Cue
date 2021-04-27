@@ -4,6 +4,7 @@ using UnityEngine.UI;
 namespace Cue.W
 {
 	using Vector3 = UnityEngine.Vector3;
+	using Color = UnityEngine.Color;
 
 	// vr, moves with the head
 	//
@@ -81,7 +82,7 @@ namespace Cue.W
 			rt.anchorMin = new Vector2(0, 1);
 			rt.anchorMax = new Vector2(0, 1);
 			rt.pivot = new Vector2(0.5f, 0);
-			rt.localScale = new UnityEngine.Vector3(0.0005f, 0.0005f, 0.0005f);
+			rt.localScale = new Vector3(0.0005f, 0.0005f, 0.0005f);
 
 			SuperController.singleton.AddCanvas(canvas);
 		}
@@ -182,7 +183,7 @@ namespace Cue.W
 			rt.offsetMin = new Vector2(-2000, -200);
 			rt.offsetMax = new Vector2(10, 100);
 			rt.anchoredPosition = new Vector2(0.5f, 0.5f);
-			rt.localScale = new UnityEngine.Vector3(0.0005f, 0.0005f, 0.0005f);
+			rt.localScale = new Vector3(0.0005f, 0.0005f, 0.0005f);
 
 			SuperController.singleton.AddCanvas(canvas);
 		}

@@ -69,6 +69,21 @@ namespace Cue.W
 			get { return true; }
 		}
 
+		public float RealtimeSinceStartup
+		{
+			get { return 0; }
+		}
+
+		public int RandomInt(int first, int last)
+		{
+			return 0;
+		}
+
+		public float RandomFloat(float first, float last)
+		{
+			return 0;
+		}
+
 		public void OnPluginState(bool b)
 		{
 		}

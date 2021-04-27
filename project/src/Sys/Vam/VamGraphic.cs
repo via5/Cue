@@ -18,7 +18,7 @@ namespace Cue.W
 			object_.GetComponent<Renderer>().enabled = false;
 
 			material_ = new Material(Shader.Find("Battlehub/RTGizmos/Handles"));
-			material_.color = new Color(0, 0, 1, 0.5f);
+			material_.color = new UnityEngine.Color(0, 0, 1, 0.5f);
 			material_.SetFloat("_Offset", 1f);
 			material_.SetFloat("_MinAlpha", 1f);
 
@@ -35,12 +35,12 @@ namespace Cue.W
 		{
 			get
 			{
-				return Vector3.FromUnity(object_.transform.position);
+				return W.VamU.FromUnity(object_.transform.position);
 			}
 
 			set
 			{
-				object_.transform.position = Vector3.ToUnity(value);
+				object_.transform.position = W.VamU.ToUnity(value);
 			}
 		}
 
@@ -52,8 +52,8 @@ namespace Cue.W
 
 		public Color Color
 		{
-			get { return material_.color; }
-			set { material_.color = value; }
+			get { return W.VamU.FromUnity(material_.color); }
+			set { material_.color = W.VamU.ToUnity(value); }
 		}
 
 		public Transform Transform

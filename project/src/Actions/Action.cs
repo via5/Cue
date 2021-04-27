@@ -374,8 +374,8 @@ namespace Cue
 			if (e_ >= Delay)
 			{
 				var t = new Vector3(
-					UnityEngine.Random.Range(-1.0f, 1.0f),
-					UnityEngine.Random.Range(-1.0f, 1.0f),
+					U.RandomFloat(-1.0f, 1.0f),
+					U.RandomFloat(-1.0f, 1.0f),
 					1);
 
 				p.Gaze.LookAt = GazeSettings.LookAtTarget;

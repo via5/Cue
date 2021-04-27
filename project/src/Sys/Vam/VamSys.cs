@@ -89,20 +89,39 @@ namespace Cue.W
 			}
 		}
 
+		public float RealtimeSinceStartup
+		{
+			get { return Time.realtimeSinceStartup; }
+		}
+
+		// [begin, end]
+		//
+		public int RandomInt(int first, int last)
+		{
+			return UnityEngine.Random.Range(first, last + 1);
+		}
+
+		// [begin, end]
+		//
+		public float RandomFloat(float first, float last)
+		{
+			return UnityEngine.Random.Range(first, last);
+		}
+
 		public ICanvas CreateHud(Vector3 offset, Point pos, Size size)
 		{
 			return new WorldSpaceAttachedCanvas(
-				Vector3.ToUnity(offset),
-				Point.ToUnity(pos),
-				Size.ToUnity(size));
+				VamU.ToUnity(offset),
+				VamU.ToUnity(pos),
+				VamU.ToUnity(size));
 		}
 
 		public ICanvas CreateAttached(Vector3 offset, Point pos, Size size)
 		{
 			return new WorldSpaceCameraCanvas(
-				Vector3.ToUnity(offset),
-				Point.ToUnity(pos),
-				Size.ToUnity(size));
+				VamU.ToUnity(offset),
+				VamU.ToUnity(pos),
+				VamU.ToUnity(size));
 		}
 
 		public ICanvas Create2D()
@@ -112,7 +131,7 @@ namespace Cue.W
 
 		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
 		{
-			return new VamBoxGraphic(Vector3.ToUnity(pos));
+			return new VamBoxGraphic(VamU.ToUnity(pos));
 		}
 
 		public void OnPluginState(bool b)
@@ -417,6 +436,70 @@ namespace Cue.W
 			return null;
 		}
 
+		public void DumpComponents(GameObject o, int indent = 0)
+		{
+			foreach (var c in o.GetComponents(typeof(Component)))
+				Cue.LogInfo(new string(' ', indent * 2) + c.ToString());
+		}
+
+		public void DumpComponentsAndUp(Component c)
+		{
+			DumpComponentsAndUp(c.gameObject);
+		}
+
+		public void DumpComponentsAndUp(GameObject o)
+		{
+			Cue.LogInfo(o.name);
+
+			var rt = o.GetComponent<RectTransform>();
+			if (rt != null)
+			{
+				Cue.LogInfo("  rect: " + rt.rect.ToString());
+				Cue.LogInfo("  offsetMin: " + rt.offsetMin.ToString());
+				Cue.LogInfo("  offsetMax: " + rt.offsetMax.ToString());
+				Cue.LogInfo("  anchorMin: " + rt.anchorMin.ToString());
+				Cue.LogInfo("  anchorMax: " + rt.anchorMax.ToString());
+				Cue.LogInfo("  anchorPos: " + rt.anchoredPosition.ToString());
+			}
+
+			DumpComponents(o);
+			Cue.LogInfo("---");
+
+			var parent = o?.transform?.parent?.gameObject;
+			if (parent != null)
+				DumpComponentsAndUp(parent);
+		}
+
+		public void DumpComponentsAndDown(Component c, bool dumpRt = false)
+		{
+			DumpComponentsAndDown(c.gameObject, dumpRt);
+		}
+
+		public void DumpComponentsAndDown(
+			GameObject o, bool dumpRt = false, int indent = 0)
+		{
+			Cue.LogInfo(new string(' ', indent * 2) + o.name);
+
+			if (dumpRt)
+			{
+				var rt = o.GetComponent<RectTransform>();
+				if (rt != null)
+				{
+					Cue.LogInfo(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
+					Cue.LogInfo(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
+				}
+			}
+
+			DumpComponents(o, indent);
+
+			foreach (Transform c in o.transform)
+				DumpComponentsAndDown(c.gameObject, dumpRt, indent + 1);
+		}
+
 		private GenerateDAZMorphsControlUI GetMUI(Atom atom)
 		{
 			if (atom == null)
@@ -427,6 +510,64 @@ namespace Cue.W
 				return null;
 
 			return cs.morphsControlUI;
+		}
+	}
+
+
+	class VamU
+	{
+		public static UnityEngine.Vector3 ToUnity(Vector3 v)
+		{
+			return new UnityEngine.Vector3(v.X, v.Y, v.Z);
+		}
+
+		public static UnityEngine.Vector2 ToUnity(Size s)
+		{
+			return new UnityEngine.Vector2(s.Width, s.Height);
+		}
+
+		public static UnityEngine.Vector2 ToUnity(Point p)
+		{
+			return new UnityEngine.Vector2(p.X, p.Y);
+		}
+
+		public static UnityEngine.Color ToUnity(Color c)
+		{
+			return new UnityEngine.Color(c.r, c.g, c.b, c.a);
+		}
+
+
+		public static Vector3 FromUnity(UnityEngine.Vector3 v)
+		{
+			return new Vector3(v.x, v.y, v.z);
+		}
+
+		public static Color FromUnity(UnityEngine.Color c)
+		{
+			return new Color(c.r, c.g, c.b, c.a);
+		}
+
+
+		public static float Distance(Vector3 a, Vector3 b)
+		{
+			return UnityEngine.Vector3.Distance(ToUnity(a), ToUnity(b));
+		}
+
+		public static float Angle(Vector3 a, Vector3 b)
+		{
+			return UnityEngine.Quaternion.LookRotation(ToUnity(b - a)).eulerAngles.y;
+		}
+
+		public static Vector3 Rotate(float x, float y, float z)
+		{
+			return FromUnity(
+				UnityEngine.Quaternion.Euler(x, y, z) *
+				UnityEngine.Vector3.forward);
+		}
+
+		public static Vector3 Rotate(Vector3 v, float bearing)
+		{
+			return FromUnity(UnityEngine.Quaternion.Euler(0, bearing, 0) * ToUnity(v));
 		}
 	}
 }

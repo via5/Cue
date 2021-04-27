@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Cue
+﻿namespace Cue
 {
 	class Menu
 	{

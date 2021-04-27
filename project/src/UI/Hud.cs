@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
-
-namespace Cue
+﻿namespace Cue
 {
 	class Hud
 	{

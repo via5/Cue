@@ -1,7 +1,5 @@
-﻿using Battlehub.UIControls;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Cue
@@ -15,14 +13,14 @@ namespace Cue
 		{
 			pos_ = v;
 			hasPos_ = true;
-			transform.position = Vector3.ToUnity(v);
+			transform.position = W.VamU.ToUnity(v);
 		}
 
 		public void LateUpdate()
 		{
 			if (hasPos_)
 			{
-				transform.position = Vector3.ToUnity(pos_);
+				transform.position = W.VamU.ToUnity(pos_);
 				hasPos_ = false;
 			}
 		}
@@ -100,7 +98,7 @@ namespace Cue
 				if (eyes_ == null)
 					return Vector3.Zero;
 
-				return Vector3.FromUnity(eyes_.position);
+				return W.VamU.FromUnity(eyes_.position);
 			}
 
 			set

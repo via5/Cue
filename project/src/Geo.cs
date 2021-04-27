@@ -70,24 +70,28 @@ namespace Cue
 			return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
 		}
 
-		public static UnityEngine.Vector3 ToUnity(Vector3 v)
-		{
-			return new UnityEngine.Vector3(v.X, v.Y, v.Z);
-		}
-
-		public static Vector3 FromUnity(UnityEngine.Vector3 v)
-		{
-			return new Vector3(v.x, v.y, v.z);
-		}
-
 		public static float Distance(Vector3 a, Vector3 b)
 		{
-			return UnityEngine.Vector3.Distance(ToUnity(a), ToUnity(b));
+			// todo
+			return W.VamU.Distance(a, b);
 		}
 
 		public static float Angle(Vector3 a, Vector3 b)
 		{
-			return UnityEngine.Quaternion.LookRotation(ToUnity(b - a)).eulerAngles.y;
+			// todo
+			return W.VamU.Angle(a, b);
+		}
+
+		public static Vector3 Rotate(float x, float y, float z)
+		{
+			// todo
+			return W.VamU.Rotate(x, y, z);
+		}
+
+		public static Vector3 Rotate(Vector3 v, float bearing)
+		{
+			// todo
+			return W.VamU.Rotate(v, bearing);
 		}
 
 		public static float NormalizeAngle(float degrees)
@@ -97,18 +101,6 @@ namespace Cue
 				degrees += 360;
 
 			return degrees;
-		}
-
-		public static Vector3 Rotate(float x, float y, float z)
-		{
-			return FromUnity(
-				UnityEngine.Quaternion.Euler(x, y, z) *
-				UnityEngine.Vector3.forward);
-		}
-
-		public static Vector3 Rotate(Vector3 v, float bearing)
-		{
-			return FromUnity(UnityEngine.Quaternion.Euler(0, bearing, 0) * ToUnity(v));
 		}
 	}
 
@@ -139,11 +131,6 @@ namespace Cue
 		public static Point operator -(Point p)
 		{
 			return new Point(-p.X, -p.Y);
-		}
-
-		public static UnityEngine.Vector2 ToUnity(Point p)
-		{
-			return new UnityEngine.Vector2(p.X, p.Y);
 		}
 	}
 
@@ -190,11 +177,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return Width.ToString("0.00") + "*" + Height.ToString("0.00");
-		}
-
-		public static UnityEngine.Vector2 ToUnity(Size s)
-		{
-			return new UnityEngine.Vector2(s.Width, s.Height);
 		}
 	}
 
@@ -405,6 +387,25 @@ namespace Cue
 			return
 				Left.ToString("0.00") + "," + Top.ToString("0.00") + "," +
 				Right.ToString("0.00") + "," + Bottom.ToString("0.00");
+		}
+	}
+
+
+	struct Color
+	{
+		public float r, g, b, a;
+
+		public Color(float r, float g, float b, float a)
+		{
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
+		}
+
+		public static Color Zero
+		{
+			get { return new Color(0, 0, 0, 0); }
 		}
 	}
 }

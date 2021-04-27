@@ -19,6 +19,9 @@ namespace Cue.W
 		void ReloadPlugin();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
+		float RealtimeSinceStartup { get; }
+		int RandomInt(int first, int last);
+		float RandomFloat(float first, float last);
 		ICanvas CreateHud(Vector3 offset, Point pos, Size size);
 		ICanvas CreateAttached(Vector3 offset, Point pos, Size size);
 		ICanvas Create2D();
@@ -109,7 +112,7 @@ namespace Cue.W
 	{
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }
-		UnityEngine.Color Color { get; set; }
+		Color Color { get; set; }
 		void Destroy();
 	}
 }

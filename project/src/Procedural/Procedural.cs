@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue
@@ -88,7 +87,7 @@ namespace Cue
 				float p = (fwd_ ? (elapsed_ / time_) : ((time_ - elapsed_) / time_));
 				var f = force_ * p;
 
-				rb_.AddForce(Vector3.ToUnity(f));
+				rb_.AddForce(W.VamU.ToUnity(f));
 			}
 
 			public override string ToString()
