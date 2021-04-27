@@ -95,7 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Actions\Action.cs" />
-    <Compile Include="src\AI.cs" />
+    <Compile Include="src\AI\AI.cs" />
+    <Compile Include="src\AI\Mood.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Easings.cs">
       <AutoGen>True</AutoGen>
