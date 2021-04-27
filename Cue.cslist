@@ -31,6 +31,7 @@ project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamInput.cs
 project\src\Sys\Vam\VamLog.cs
 project\src\Sys\Vam\VamNav.cs
+project\src\Sys\Vam\VamParameter.cs
 project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
 project\src\UI\Hud.cs

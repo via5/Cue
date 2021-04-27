@@ -23,11 +23,9 @@ namespace Cue.W
 			{
 				if (Input.GetMouseButtonUp(2))
 				{
-					var cp = W.VamU.FromUnity(
-						SuperController.singleton.MonitorCenterCamera
-							.transform.position);
-
+					var cp = CameraPosition;
 					var d = Vector3.Distance(middlePos_, cp);
+
 					if (d < 0.02f)
 						middleClicked_ = true;
 
@@ -38,12 +36,8 @@ namespace Cue.W
 			{
 				if (Input.GetMouseButtonDown(2))
 				{
-					var cp = W.VamU.FromUnity(
-						SuperController.singleton.MonitorCenterCamera
-							.transform.position);
-
 					middleDown_ = true;
-					middlePos_ = cp;
+					middlePos_ = CameraPosition;
 				}
 			}
 		}

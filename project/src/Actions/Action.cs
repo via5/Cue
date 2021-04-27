@@ -75,7 +75,7 @@ namespace Cue
 		public override string ToString()
 		{
 			if (children_.Count == 0)
-				return "none";
+				return "(none)";
 			else
 				return children_[children_.Count - 1].ToString();
 		}

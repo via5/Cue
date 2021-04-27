@@ -305,28 +305,26 @@ namespace Cue
 
 		private void CheckInput()
 		{
-			if (!Sys.IsPlayMode)
-				return;
-
-			if (Sys.Input.ToggleMenu)
-				menu_?.Toggle();
-
-			Hover(Sys.Input.GetHovered());
-
-			if (Sys.Input.Select)
-				Select(Hovered);
-
-			if (Sys.Input.Action)
+			if (Sys.IsPlayMode)
 			{
-				var p = Selected as Person;
-				if (p == null)
-					return;
+				if (Sys.Input.ToggleMenu)
+					menu_?.Toggle();
 
-				var o = Hovered;
-				if (o == null)
-					return;
+				Hover(Sys.Input.GetHovered());
 
-				p.InteractWith(o);
+				if (Sys.Input.Select)
+					Select(Hovered);
+
+				if (Sys.Input.Action)
+				{
+					var p = Selected as Person;
+					if (p != null)
+					{
+						var o = Hovered;
+						if (o != null)
+							p.InteractWith(o);
+					}
+				}
 			}
 
 			if (Sys.Input.ToggleControls)

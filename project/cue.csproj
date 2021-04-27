@@ -127,6 +127,7 @@
     <Compile Include="src\Sys\Vam\VamInput.cs" />
     <Compile Include="src\Sys\Vam\VamLog.cs" />
     <Compile Include="src\Sys\Vam\VamNav.cs" />
+    <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />
     <Compile Include="src\UI\Hud.cs" />

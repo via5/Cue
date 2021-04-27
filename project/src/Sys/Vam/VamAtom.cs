@@ -83,6 +83,9 @@ namespace Cue.W
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
+		private VamTriggers triggers_;
+		private VamActionParameter setOnlyKeyJointsOn_;
+
 		private Rigidbody head_ = null;
 		private float finalBearing_ = BasicObject.NoBearing;
 		private bool turning_ = false;
@@ -94,13 +97,13 @@ namespace Cue.W
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
-		private JSONStorableAction setOnlyKeyJointsOn_ = null;
-		private VamTriggers triggers_;
 
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
 			triggers_ = new VamTriggers(atom);
+			setOnlyKeyJointsOn_ = new VamActionParameter(
+				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 		}
 
 		public string ID
@@ -183,14 +186,7 @@ namespace Cue.W
 
 		public void SetDefaultControls()
 		{
-			if (setOnlyKeyJointsOn_ == null)
-			{
-				setOnlyKeyJointsOn_ = ((W.VamSys)Cue.Instance.Sys)
-					.GetActionParameter(
-						atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
-			}
-
-			setOnlyKeyJointsOn_?.actionCallback?.Invoke();
+			setOnlyKeyJointsOn_.Fire();
 		}
 
 		public DAZMorph FindMorph(string id)

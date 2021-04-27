@@ -4,53 +4,19 @@ namespace Cue
 {
 	class MacGruberBreather : IBreather
 	{
-		private Person person_ = null;
-		private JSONStorableFloat intensity_ = null;
+		private Person person_;
+		private W.VamFloatParameter intensity_;
 
 		public MacGruberBreather(Person p)
 		{
 			person_ = p;
+			intensity_ = new W.VamFloatParameter(p, "MacGruber.Breathing", "Intensity");
 		}
 
 		public float Intensity
 		{
-			get
-			{
-				GetParameters();
-				if (intensity_ == null)
-					return 0;
-
-				try
-				{
-					return intensity_.val;
-				}
-				catch (Exception e)
-				{
-					intensity_ = null;
-					Cue.LogError("MacGruberBreather: can't get, " + e.Message);
-					return 0;
-				}
-			}
-
-			set
-			{
-				GetParameters();
-				if (intensity_ == null)
-					return;
-
-				try
-				{
-					intensity_.val = value;
-				}
-				catch (Exception e)
-				{
-					intensity_ = null;
-
-					Cue.LogError(
-						"MacGruberBreather: " +
-						"can't set to " + value.ToString() + ", " + e.Message);
-				}
-			}
+			get { return intensity_.GetValue(); }
+			set { intensity_.SetValue(value); }
 		}
 
 		// not supported
@@ -59,44 +25,23 @@ namespace Cue
 			get { return 0; }
 			set { }
 		}
-
-		private void GetParameters()
-		{
-			if (intensity_ != null)
-				return;
-
-			intensity_ = Cue.Instance.VamSys?.GetFloatParameter(
-				person_, "MacGruber.Breathing", "Intensity");
-		}
 	}
 
 
 	class MacGruberOrgasmer : IOrgasmer
 	{
 		private Person person_ = null;
-		private JSONStorableAction action_ = null;
+		private W.VamActionParameter action_;
 
 		public MacGruberOrgasmer(Person p)
 		{
 			person_ = p;
+			action_ = new W.VamActionParameter(p, "MacGruber.Breathing", "QueueOrgasm");
 		}
 
 		public void Orgasm()
 		{
-			GetParameters();
-			if (action_ == null)
-				return;
-
-			action_.actionCallback?.Invoke();
-		}
-
-		private void GetParameters()
-		{
-			if (action_ != null)
-				return;
-
-			action_ = Cue.Instance.VamSys.GetActionParameter(
-				person_, "MacGruber.Breathing", "QueueOrgasm");
+			action_.Fire();
 		}
 	}
 
@@ -128,14 +73,16 @@ namespace Cue
 	class MacGruberGaze : BasicGazer
 	{
 		private int lookat_ = GazeSettings.LookAtDisabled;
-		private JSONStorableBool toggle_ = null;
-		private JSONStorableBool lookatTarget_ = null;
+		private W.VamBoolParameter toggle_;
+		private W.VamBoolParameter lookatTarget_;
 		private VamEyes eyes_ = null;
 
 		public MacGruberGaze(Person p)
 			: base(p)
 		{
 			eyes_ = new VamEyes(p);
+			toggle_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
+			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 		}
 
 		public override int LookAt
@@ -166,53 +113,28 @@ namespace Cue
 
 		private void Set()
 		{
-			GetParameters();
-			if (toggle_ == null || lookatTarget_ == null)
-				return;
-
-			try
+			switch (lookat_)
 			{
-				switch (lookat_)
+				case GazeSettings.LookAtDisabled:
 				{
-					case GazeSettings.LookAtDisabled:
-					{
-						toggle_.val = false;
-						break;
-					}
+					toggle_.SetValue(false);
+					break;
+				}
 
-					case GazeSettings.LookAtTarget:
-					{
-						toggle_.val = true;
-						lookatTarget_.val = true;
-						break;
-					}
+				case GazeSettings.LookAtTarget:
+				{
+					toggle_.SetValue(true);
+					lookatTarget_.SetValue(true);
+					break;
+				}
 
-					case GazeSettings.LookAtPlayer:
-					{
-						toggle_.val = true;
-						lookatTarget_.val = false;
-						break;
-					}
+				case GazeSettings.LookAtPlayer:
+				{
+					toggle_.SetValue(true);
+					lookatTarget_.SetValue(false);
+					break;
 				}
 			}
-			catch (Exception e)
-			{
-				toggle_ = null;
-				lookatTarget_ = null;
-				Cue.LogError("MacGruberGaze: can't set, " + e.Message);
-			}
-		}
-
-		private void GetParameters()
-		{
-			if (toggle_ != null && lookatTarget_ != null)
-				return;
-
-			toggle_ = Cue.Instance.VamSys?.GetBoolParameter(
-				person_, "MacGruber.Gaze", "enabled");
-
-			lookatTarget_ = Cue.Instance.VamSys?.GetBoolParameter(
-				person_, "MacGruber.Gaze", "LookAt EyeTarget");
 		}
 	}
 }

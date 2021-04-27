@@ -69,6 +69,11 @@ namespace Cue.W
 			get { return true; }
 		}
 
+		public float DeltaTime
+		{
+			get { return 0; }
+		}
+
 		public float RealtimeSinceStartup
 		{
 			get { return 0; }

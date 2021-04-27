@@ -20,6 +20,7 @@ namespace Cue.W
 		void ReloadPlugin();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
+		float DeltaTime { get; }
 		float RealtimeSinceStartup { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
@@ -57,6 +58,27 @@ namespace Cue.W
 		public const int Moving = 1;
 		public const int TurningLeft = 2;
 		public const int TurningRight = 3;
+
+		public static string ToString(int state)
+		{
+			switch (state)
+			{
+				case None:
+					return "(none)";
+
+				case Moving:
+					return "moving";
+
+				case TurningLeft:
+					return "turning-left";
+
+				case TurningRight:
+					return "turning-right";
+
+				default:
+					return $"?{state}";
+			}
+		}
 	}
 
 	interface ITriggers

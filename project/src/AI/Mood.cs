@@ -36,10 +36,34 @@
 			}
 		}
 
-		public float Excitement
+		public string StateString
 		{
-			get { return excitement_; }
+			get
+			{
+				switch (state_)
+				{
+					case None:
+						return "(none)";
+
+					case Idle:
+						return "idle";
+
+					case Happy:
+						return "happy";
+
+					default:
+						return $"?{state_}";
+				}
+			}
 		}
+
+		public float Excitement { get { return excitement_; } }
+		public float LastRate { get { return lastRate_; } }
+		public float MouthRate { get { return mouthRate_; } }
+		public float BreastsRate { get { return breastsRate_; } }
+		public float GenitalsRate { get { return genitalsRate_; } }
+		public float DecayRate { get { return decayRate_; } }
+		public float RateAdjust { get { return rateAdjust_; } }
 
 		public void Update(float s)
 		{

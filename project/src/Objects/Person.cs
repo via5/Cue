@@ -445,10 +445,8 @@ namespace Cue
 		{
 			return
 				base.ToString() + ", " +
-			//	Sexes.ToString(Sex) + ", " +
-			//	state_.ToString() + ", " +
-				excitement_.ToString() + ", " +
-				ai_.Mood.ToString();
+				Sexes.ToString(Sex) + ", " +
+				state_.ToString();
 		}
 
 		protected override bool StartMove()

@@ -1,26 +1,22 @@
-﻿using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	class ClockwiseSilverKiss : IKisser
 	{
 		private Person person_;
-		private JSONStorableBool kissing_ = null;
+		private W.VamBoolParameter kissing_ = null;
 		private bool wasKissing_ = false;
 		private int oldGaze_ = -1;
 
 		public ClockwiseSilverKiss(Person p)
 		{
 			person_ = p;
+			kissing_ = new W.VamBoolParameter(
+				p, "ClockwiseSilver.Kiss", "Is Kissing");
 		}
 
 		public void Update(float s)
 		{
-			GetParameters();
-			if (kissing_ == null)
-				return;
-
-			var k = kissing_.val;
+			var k = kissing_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
 		}
@@ -40,68 +36,30 @@ namespace Cue
 
 			wasKissing_ = b;
 		}
-
-		private void GetParameters()
-		{
-			if (kissing_ != null)
-				return;
-
-			kissing_ = Cue.Instance.VamSys?.GetBoolParameter(
-				person_, "ClockwiseSilver.Kiss", "Is Kissing");
-		}
 	}
 
 
 	class ClockwiseSilverHandjob : IHandjob
 	{
 		private Person person_;
-		private JSONStorableBool active_ = null;
-		private JSONStorableStringChooser male_ = null;
-		private JSONStorableStringChooser hand_ = null;
+		private W.VamBoolParameter active_ = null;
+		private W.VamStringChooserParameter male_ = null;
+		private W.VamStringChooserParameter hand_ = null;
 		private Person target_ = null;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
 			person_ = p;
+			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
+			hand_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
 			Active = false;
 		}
 
 		public bool Active
 		{
-			get
-			{
-				GetParameters();
-				if (active_ == null)
-					return false;
-
-				try
-				{
-					return active_.val;
-				}
-				catch (Exception e)
-				{
-					active_ = null;
-					Cue.LogError("ClockwiseSilverHandjob: can't get active, " + e.Message);
-					return false;
-				}
-			}
-
-			set
-			{
-				GetParameters();
-				if (active_ == null)
-					return;
-
-				try
-				{
-					active_.val = value;
-				}
-				catch (Exception e)
-				{
-					active_ = null;
-					Cue.LogError("ClockwiseSilverHandjob: can't set active, " + e.Message);
-				}
-			}
+			get { return active_.GetValue(); }
+			set { active_.SetValue(value); }
 		}
 
 		public Person Target
@@ -120,51 +78,11 @@ namespace Cue
 
 		private void SetTarget()
 		{
-			GetParameters();
+			if (target_ != null)
+				male_.SetValue(target_.ID);
 
-			try
-			{
-				if (male_ != null && target_ != null)
-					male_.val = target_.Atom.ID;
-			}
-			catch (Exception e)
-			{
-				male_ = null;
-				Cue.LogError("ClockwiseSilverHandjob: can't set male, " + e.Message);
-			}
-
-			try
-			{
-				// todo
-				if (hand_ != null)
-					hand_.val = "Right";
-			}
-			catch (Exception e)
-			{
-				hand_ = null;
-				Cue.LogError("ClockwiseSilverHandjob: can't set hand, " + e.Message);
-			}
-		}
-
-		private void GetParameters()
-		{
-			if (active_ == null)
-			{
-				active_ = Cue.Instance.VamSys?.GetBoolParameter(
-					person_, "ClockwiseSilver.HJ", "isActive");
-			}
-
-			if (male_ == null)
-			{
-				male_ = Cue.Instance.VamSys?.GetStringChooserParameter(
-					person_, "ClockwiseSilver.HJ", "Atom");
-			}
-
-			if (hand_ == null)
-			{
-				hand_ = Cue.Instance.VamSys?.GetStringChooserParameter(
-					person_, "ClockwiseSilver.HJ", "handedness");
-			}
+			// todo
+			hand_.SetValue("Right");
 		}
 	}
 }

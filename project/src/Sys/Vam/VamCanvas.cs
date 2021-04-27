@@ -228,6 +228,7 @@ namespace Cue.W
 			canvas_.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas_.gameObject.AddComponent<GraphicRaycaster>();
 			canvas_.scaleFactor = 0.5f;
+			canvas_.pixelPerfect = true;
 
 			ui_ = new GameObject();
 			ui_.transform.SetParent(panel_.transform, false);

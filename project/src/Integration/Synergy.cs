@@ -5,34 +5,20 @@ namespace Cue
 	class SynergyPlayer : IPlayer
 	{
 		private readonly Person person_;
+		private W.VamBoolParameter playing_;
+		private W.VamStringParameter step_;
 		private SynergyAnimation anim_ = null;
-		private JSONStorableBool playing_ = null;
-		private JSONStorableString step_ = null;
 
 		public SynergyPlayer(Person p)
 		{
 			person_ = p;
+			playing_ = new W.VamBoolParameter(p, "Synergy.Synergy", "Is Playing");
+			step_ = new W.VamStringParameter(p, "Synergy.Synergy", "Force Play Step");
 		}
 
 		public bool Playing
 		{
-			get
-			{
-				GetParameters();
-				if (playing_ == null)
-					return false;
-
-				try
-				{
-					return playing_.val;
-				}
-				catch (Exception e)
-				{
-					Cue.LogError("SynergyPlayer: can't get playing status, " + e.Message);
-					playing_ = null;
-					return false;
-				}
-			}
+			get { return playing_.GetValue(); }
 		}
 
 		public bool Play(IAnimation a, int flags)
@@ -41,22 +27,13 @@ namespace Cue
 			if (anim_ == null)
 				return false;
 
-			GetParameters();
-			if (step_ == null)
-				return true;
-
-			step_.val = anim_.Name;
-
+			step_.SetValue(anim_.Name);
 			return true;
 		}
 
 		public void Stop(bool rewind)
 		{
-			GetParameters();
-			if (step_ == null)
-				return;
-
-			step_.val = "";
+			step_.SetValue("");
 			anim_ = null;
 		}
 
@@ -71,21 +48,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return "Synergy: " + (anim_ == null ? "(none)" : anim_.ToString());
-		}
-
-		private void GetParameters()
-		{
-			if (playing_ == null)
-			{
-				playing_ = Cue.Instance.VamSys.GetBoolParameter(
-					person_, "Synergy.Synergy", "Is Playing");
-			}
-
-			if (step_ == null)
-			{
-				step_ = Cue.Instance.VamSys.GetStringParameter(
-					person_, "Synergy.Synergy", "Force Play Step");
-			}
 		}
 	}
 

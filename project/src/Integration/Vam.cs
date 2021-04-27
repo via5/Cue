@@ -28,29 +28,45 @@ namespace Cue
 
 	class VamEyes
 	{
-		private Person person_ = null;
-		private Rigidbody eyes_ = null;
+		private Person person_;
+		private W.VamStringChooserParameter lookMode_;
+		private W.VamFloatParameter leftRightAngle_;
+		private W.VamFloatParameter upDownAngle_;
+		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
-		private JSONStorableStringChooser lookMode_ = null;
-		private JSONStorableFloat leftRightAngle_ = null;
-		private JSONStorableFloat upDownAngle_ = null;
 		private Vector3 target_ = Vector3.Zero;
 		private int lookAt_ = GazeSettings.LookAtDisabled;
 
 		public VamEyes(Person p)
 		{
 			person_ = p;
+			lookMode_ = new W.VamStringChooserParameter(p, "Eyes", "lookMode");
+			leftRightAngle_ = new W.VamFloatParameter(p, "Eyes", "leftRightAngleAdjust");
+			upDownAngle_ = new W.VamFloatParameter(p, "Eyes", "upDownAngleAdjust");
+
+			eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
+
+			if (eyes_ == null)
+			{
+				Cue.LogError("atom " + p.ID + " has no eyeTargetControl");
+			}
+			else
+			{
+				foreach (var c in eyes_.gameObject.GetComponents<Component>())
+				{
+					if (c != null && c.ToString().Contains("Cue.VamEyesBehaviour"))
+						UnityEngine.Object.Destroy(c);
+				}
+
+				eyesImpl_ = eyes_.gameObject.AddComponent<VamEyesBehaviour>();
+			}
 		}
 
 		public int LookAt
 		{
 			get
 			{
-				Get();
-				if (lookMode_ == null)
-					return GazeSettings.LookAtDisabled;
-
-				string s = lookMode_.val;
+				string s = lookMode_.GetValue();
 
 				if (s == "Player")
 					return GazeSettings.LookAtPlayer;
@@ -62,28 +78,24 @@ namespace Cue
 
 			set
 			{
-				Get();
-				if (lookMode_ == null)
-					return;
-
 				lookAt_ = value;
 
 				switch (value)
 				{
 					case GazeSettings.LookAtDisabled:
 					{
-						lookMode_.val = "None";
+						lookMode_.SetValue("None");
 						break;
 					}
 
 					case GazeSettings.LookAtTarget:
 					{
-						lookMode_.val = "Target";
+						lookMode_.SetValue("Target");
 						break;
 					}
 					case GazeSettings.LookAtPlayer:
 					{
-						lookMode_.val = "Player";
+						lookMode_.SetValue("Player");
 						break;
 					}
 				}
@@ -94,7 +106,6 @@ namespace Cue
 		{
 			get
 			{
-				Get();
 				if (eyes_ == null)
 					return Vector3.Zero;
 
@@ -103,7 +114,6 @@ namespace Cue
 
 			set
 			{
-				Get();
 				if (eyes_ == null)
 					return;
 
@@ -117,84 +127,23 @@ namespace Cue
 			if (lookAt_ == GazeSettings.LookAtTarget)
 				eyesImpl_.SetPosition(target_);
 		}
-
-		private void Get()
-		{
-			var a = ((W.VamAtom)person_.Atom).Atom;
-
-			if (eyes_ == null)
-			{
-				eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
-				if (eyes_ == null)
-				{
-					Cue.LogError("atom " + a.uid + " has no eyeTargetControl");
-				}
-				else
-				{
-					foreach (var c in eyes_.gameObject.GetComponents<Component>())
-					{
-						if (c != null && c.ToString().Contains("Cue.VamEyesBehaviour"))
-							UnityEngine.Object.Destroy(c);
-					}
-
-					eyesImpl_ = eyes_.gameObject.AddComponent<VamEyesBehaviour>();
-				}
-			}
-
-			var eyesStorable = a.GetStorableByID("Eyes");
-			if (eyesStorable != null)
-			{
-				lookMode_ = eyesStorable.GetStringChooserJSONParam("lookMode");
-				if (lookMode_ == null)
-					Cue.LogError("atom " + a.uid + " has no lookMode");
-
-				leftRightAngle_ = eyesStorable.GetFloatJSONParam("leftRightAngleAdjust");
-				if (leftRightAngle_ == null)
-					Cue.LogError("atom " + a.uid + " has no leftRightAngleAdjust");
-
-				upDownAngle_ = eyesStorable.GetFloatJSONParam("upDownAngleAdjust");
-				if (upDownAngle_ == null)
-					Cue.LogError("atom " + a.uid + " has no upDownAngleAdjust");
-			}
-		}
 	}
 
 
 	class VamSpeaker : ISpeaker
 	{
-		private Person person_ = null;
-		private JSONStorableString text_ = null;
+		private Person person_;
+		private W.VamStringParameter text_;
 
 		public VamSpeaker(Person p)
 		{
 			person_ = p;
+			text_ = new W.VamStringParameter(p, "SpeechBubble", "bubbleText");
 		}
 
 		public void Say(string s)
 		{
-			GetParameters();
-			if (text_ == null)
-				return;
-
-			try
-			{
-				text_.val = s;
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(
-					person_.ToString() + " can't speak, " + e.Message + " " +
-					"(while trying to say '" + s + "'");
-			}
-		}
-
-		private void GetParameters()
-		{
-			if (text_ != null)
-				return;
-
-			text_ = Cue.Instance.VamSys?.GetStringParameter(
-				person_, "SpeechBubble", "bubbleText");
+			text_.SetValue(s);
 		}
 	}
 

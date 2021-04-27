@@ -26,36 +26,22 @@ namespace Cue
 	class TimelinePlayer : IPlayer
 	{
 		private readonly Person person_;
+		private W.VamActionParameter stop_;
+		private W.VamBoolParameter playing_;
 		private TimelineAnimation current_ = null;
+		private W.VamActionParameter play_ = null;
 		private int flags_ = 0;
-		private JSONStorableAction play_ = null;
-		private JSONStorableAction stop_ = null;
-		private JSONStorableBool playing_ = null;
 
 		public TimelinePlayer(Person p)
 		{
 			person_ = p;
+			stop_ = new W.VamActionParameter(p, "VamTimeline.AtomPlugin", "Stop");
+			playing_ = new W.VamBoolParameter(p, "VamTimeline.AtomPlugin", "Is Playing");
 		}
 
 		public bool Playing
 		{
-			get
-			{
-				GetParameters();
-				if (playing_ == null)
-					return false;
-
-				try
-				{
-					return playing_.val;
-				}
-				catch (Exception e)
-				{
-					Cue.LogError("TimelinePlayer: can't get playing status, " + e.Message);
-					playing_ = null;
-					return false;
-				}
-			}
+			get { return playing_.GetValue(); }
 		}
 
 		public bool Play(IAnimation a, int flags)
@@ -67,25 +53,23 @@ namespace Cue
 				return false;
 
 			SetControllers();
-
-			play_ = Cue.Instance.VamSys?.GetActionParameter(
+			play_ = new W.VamActionParameter(
 				person_, "VamTimeline.AtomPlugin", "Play " + current_.Name);
 
-			if (play_ == null)
+			if (!play_.Check(true))
 			{
 				Cue.LogError("timeline animation '" + current_.Name + "' not found");
+				play_ = null;
 				return true;
 			}
 
-			play_.actionCallback?.Invoke();
-
+			play_.Fire();
 			return true;
 		}
 
 		public void Stop(bool rewind)
 		{
-			GetParameters();
-			stop_?.actionCallback?.Invoke();
+			stop_.Fire();
 			play_ = null;
 		}
 
@@ -120,18 +104,6 @@ namespace Cue
 			}
 
 			return s;
-		}
-
-		private void GetParameters()
-		{
-			if (playing_ != null)
-				return;
-
-			playing_ = Cue.Instance.VamSys?.GetBoolParameter(
-				person_, "VamTimeline.AtomPlugin", "Is Playing");
-
-			stop_ = Cue.Instance.VamSys?.GetActionParameter(
-				person_, "VamTimeline.AtomPlugin", "Stop");
 		}
 
 		private void SetControllers()

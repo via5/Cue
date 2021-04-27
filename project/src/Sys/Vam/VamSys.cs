@@ -89,6 +89,11 @@ namespace Cue.W
 			}
 		}
 
+		public float DeltaTime
+		{
+			get { return Time.deltaTime; }
+		}
+
 		public float RealtimeSinceStartup
 		{
 			get { return Time.realtimeSinceStartup; }
@@ -245,11 +250,16 @@ namespace Cue.W
 			return null;
 		}
 
+
 		public JSONStorableFloat GetFloatParameter(
 			IObject o, string storable, string param)
 		{
-			var a = ((W.VamAtom)o.Atom).Atom;
+			return GetFloatParameter(((W.VamAtom)o).Atom, storable, param);
+		}
 
+		public JSONStorableFloat GetFloatParameter(
+			Atom a, string storable, string param)
+		{
 			foreach (var id in a.GetStorableIDs())
 			{
 				if (id.Contains(storable))
@@ -257,14 +267,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError($"{o.ID}: no storable {id}");
+						Cue.LogError($"{a.uid}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetFloatJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError($"{o.ID}: storable {id} has no float param '{param}'");
+						Cue.LogError($"{a.uid}: storable {id} has no float param '{param}'");
 						continue;
 					}
 
@@ -278,8 +288,12 @@ namespace Cue.W
 		public JSONStorableBool GetBoolParameter(
 			IObject o, string storable, string param)
 		{
-			var a = ((W.VamAtom)o.Atom).Atom;
+			return GetBoolParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+		}
 
+		public JSONStorableBool GetBoolParameter(
+			Atom a, string storable, string param)
+		{
 			foreach (var id in a.GetStorableIDs())
 			{
 				if (id.Contains(storable))
@@ -287,14 +301,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError($"{o.ID}: no storable {id}");
+						Cue.LogError($"{a.uid}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetBoolJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError($"{o.ID}: storable {id} has no bool param '{param}'");
+						Cue.LogError($"{a.uid}: storable {id} has no bool param '{param}'");
 						continue;
 					}
 
@@ -308,8 +322,12 @@ namespace Cue.W
 		public JSONStorableString GetStringParameter(
 			IObject o, string storable, string param)
 		{
-			var a = ((W.VamAtom)o.Atom).Atom;
+			return GetStringParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+		}
 
+		public JSONStorableString GetStringParameter(
+			Atom a, string storable, string param)
+		{
 			foreach (var id in a.GetStorableIDs())
 			{
 				if (id.Contains(storable))
@@ -317,14 +335,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError($"{o.ID}: no storable {id}");
+						Cue.LogError($"{a.uid}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetStringJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError($"{o.ID}: storable {id} has no string param '{param}'");
+						Cue.LogError($"{a.uid}: storable {id} has no string param '{param}'");
 						continue;
 					}
 
@@ -335,11 +353,16 @@ namespace Cue.W
 			return null;
 		}
 
+
 		public JSONStorableStringChooser GetStringChooserParameter(
 			IObject o, string storable, string param)
 		{
-			var a = ((W.VamAtom)o.Atom).Atom;
+			return GetStringChooserParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+		}
 
+		public JSONStorableStringChooser GetStringChooserParameter(
+			Atom a, string storable, string param)
+		{
 			foreach (var id in a.GetStorableIDs())
 			{
 				if (id.Contains(storable))
@@ -347,14 +370,14 @@ namespace Cue.W
 					var st = a.GetStorableByID(id);
 					if (st == null)
 					{
-						Cue.LogError($"{o.ID}: no storable {id}");
+						Cue.LogError($"{a.uid}: no storable {id}");
 						continue;
 					}
 
 					var p = st.GetStringChooserJSONParam(param);
 					if (p == null)
 					{
-						Cue.LogError($"{o.ID}: storable {id} has no stringchooser param '{param}'");
+						Cue.LogError($"{a.uid}: storable {id} has no stringchooser param '{param}'");
 						continue;
 					}
 
@@ -364,6 +387,7 @@ namespace Cue.W
 
 			return null;
 		}
+
 
 		public JSONStorableAction GetActionParameter(
 			IObject o, string storable, string param)
