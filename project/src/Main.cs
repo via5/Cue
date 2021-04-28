@@ -158,7 +158,8 @@ namespace Cue
 		{
 			U.Safe(() =>
 			{
-				cue_.OnPluginState(true);
+				if (cue_ != null)
+					cue_.OnPluginState(true);
 			});
 		}
 

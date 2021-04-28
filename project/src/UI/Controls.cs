@@ -6,13 +6,14 @@ namespace Cue
 	class ObjectControls
 	{
 		private IObject object_;
-		private IBoxGraphic graphic_;
+		private IGraphic graphic_;
 		private bool hovered_ = false;
 
 		public ObjectControls(IObject o)
 		{
 			object_ = o;
-			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(object_.Position);
+			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(
+				object_.Position, new Color(0, 0, 1, 0.1f));
 			UpdateColor();
 		}
 
@@ -32,7 +33,7 @@ namespace Cue
 			set { graphic_.Visible = value; }
 		}
 
-		public IBoxGraphic Graphic
+		public IGraphic Graphic
 		{
 			get { return graphic_; }
 		}
@@ -64,15 +65,35 @@ namespace Cue
 	{
 		private bool visible_ = false;
 		private List<ObjectControls> controls_ = new List<ObjectControls>();
+		private IGraphic moveTarget_ = null;
 
 		public Controls()
 		{
 			Cue.Instance.HoveredChanged += OnHoveredChanged;
+			moveTarget_ = Cue.Instance.Sys.CreateSphereGraphic(
+				Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
+			moveTarget_.Collision = false;
 		}
 
 		public List<ObjectControls> All
 		{
 			get { return controls_; }
+		}
+
+		public Vector3 HoverTargetPosition
+		{
+			set
+			{
+				moveTarget_.Position = value;
+			}
+		}
+
+		public bool HoverTargetVisible
+		{
+			set
+			{
+				moveTarget_.Visible = value;
+			}
 		}
 
 		public bool Visible
@@ -102,6 +123,8 @@ namespace Cue
 
 		public void Destroy()
 		{
+			moveTarget_.Destroy();
+
 			foreach (var c in controls_)
 				c.Destroy();
 

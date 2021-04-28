@@ -110,19 +110,32 @@ namespace Cue.W
 
 		private List<NavMeshBuildMarkup> CreateMarkups()
 		{
-			var ignore = new Dictionary<string, int>()
+			// ghetto sets
+			var ignoreTypes = new Dictionary<string, int>()
 			{
-				{ "Person", 0 },
+				{ "InvisibleLight", 0 },
 				{ "Empty", 0 },
-				{ "PlayerNavigationPanel", 0},
-				{ "WindowCamera", 0}
+				{ "PlayerNavigationPanel", 0}
 			};
+
+			var ignoreCategories = new Dictionary<string, int>()
+			{
+				{ "Animation", 0},
+				{ "Force", 0},
+				{ "People", 0 },
+				{ "Sound", 0 },
+				{ "Triggers", 0},
+				{ "View", 0 },
+				{ "Core", 0 }
+			};
+
 
 			var markups = new List<NavMeshBuildMarkup>();
 
 			foreach (var a in SuperController.singleton.GetAtoms())
 			{
-				if (ignore.ContainsKey(a.type))
+				if (ignoreCategories.ContainsKey(a.category) ||
+					ignoreTypes.ContainsKey(a.type))
 				{
 					var m = new NavMeshBuildMarkup();
 					m.root = a.transform;

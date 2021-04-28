@@ -56,13 +56,16 @@ namespace Cue.UI
 	class MiscTab : Tab
 	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
+		private VUI.Button renav_ = new VUI.Button("Update nav");
 
 		public MiscTab()
 		{
 			Layout = new VUI.VerticalFlow();
 			Add(navmeshes_);
+			Add(renav_);
 
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
+			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
 		}
 
 		public override string Title

@@ -97,6 +97,7 @@ namespace Cue.W
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
+		private bool calculatingPath_ = false;
 
 		public VamAtom(Atom atom)
 		{
@@ -212,6 +213,33 @@ namespace Cue.W
 
 		public void Update(float s)
 		{
+			if (calculatingPath_ && !agent_.pathPending)
+			{
+				calculatingPath_ = false;
+
+				switch (agent_.pathStatus)
+				{
+					case NavMeshPathStatus.PathComplete:
+					{
+						// ok
+						Cue.LogInfo("nav: complete path");
+						break;
+					}
+
+					case NavMeshPathStatus.PathPartial:
+					{
+						Cue.LogInfo("nav: partial path");
+						break;
+					}
+
+					case NavMeshPathStatus.PathInvalid:
+					{
+						Cue.LogError("nav: no path");
+						break;
+					}
+				}
+			}
+
 			if (enableCollisionsCountdown_ >= 0)
 			{
 				if (enableCollisionsCountdown_ == 0)
@@ -432,6 +460,7 @@ namespace Cue.W
 			pathStuckCheckElapsed_ = 0;
 			pathStuckLastPos_ = Position;
 			stuckCount_ = 0;
+			calculatingPath_ = true;
 		}
 
 		private void DoStopNav()

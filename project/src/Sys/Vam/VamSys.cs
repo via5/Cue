@@ -143,9 +143,14 @@ namespace Cue.W
 				new ScriptUIRootSupport(CueMain.Instance.MVRScriptUI));
 		}
 
-		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
+		public IGraphic CreateBoxGraphic(Vector3 pos, Color c)
 		{
-			return new VamBoxGraphic(VamU.ToUnity(pos));
+			return new VamBoxGraphic(pos, c);
+		}
+
+		public IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c)
+		{
+			return new VamSphereGraphic(pos, radius, c);
 		}
 
 		public void OnPluginState(bool b)
@@ -562,6 +567,33 @@ namespace Cue.W
 
 	class VamU
 	{
+		public static string FullName(Transform t)
+		{
+			string s = "";
+
+			while (t != null)
+			{
+				if (s != "")
+					s = "." + s;
+
+				s = t.name + s;
+				t = t.parent;
+			}
+
+			return s;
+		}
+
+		public static string FullName(UnityEngine.Object o)
+		{
+			if (o is Component)
+				return FullName(((Component)o).transform);
+			else if (o is GameObject)
+				return FullName(((GameObject)o).transform);
+			else
+				return o.ToString();
+		}
+
+
 		public static string ToString(RectTransform rt)
 		{
 			return

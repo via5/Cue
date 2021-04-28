@@ -170,7 +170,7 @@ namespace Cue
 
 			a.Personality = new QuirkyPersonality(a);
 			a.AI.Mood.State = Mood.Happy;
-			a.Clothing.GenitalsVisible = true;
+			//a.Clothing.GenitalsVisible = true;
 			Select(a);
 
 			//U.DumpComponentsAndDown(t);
@@ -310,10 +310,22 @@ namespace Cue
 				if (Sys.Input.ToggleMenu)
 					menu_?.Toggle();
 
-				Hover(Sys.Input.GetHovered());
+				var h = Sys.Input.GetHovered();
+
+				Hover(h.o);
 
 				if (Sys.Input.Select)
 					Select(Hovered);
+
+				if (h.hit)
+				{
+					controls_.HoverTargetVisible = true;
+					controls_.HoverTargetPosition = h.pos;
+				}
+				else
+				{
+					controls_.HoverTargetVisible = false;
+				}
 
 				if (Sys.Input.Action)
 				{
@@ -323,6 +335,8 @@ namespace Cue
 						var o = Hovered;
 						if (o != null)
 							p.InteractWith(o);
+						else if (h.hit)
+							p.MoveTo(h.pos, BasicObject.NoBearing);
 					}
 				}
 			}
@@ -369,7 +383,10 @@ namespace Cue
 
 		static public void LogError(string s)
 		{
-			Instance.Sys.Log.Error(s);
+			if (Instance?.Sys?.Log == null)
+				SuperController.LogError(s);
+			else
+				Instance.Sys.Log.Error(s);
 		}
 
 		static public void LogErrorST(string s)

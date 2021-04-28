@@ -28,7 +28,30 @@ namespace Cue.W
 		VUI.Root CreateAttached(Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
 		VUI.Root CreateScriptUI();
-		IBoxGraphic CreateBoxGraphic(Vector3 pos);
+		IGraphic CreateBoxGraphic(Vector3 pos, Color c);
+		IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c);
+	}
+
+	struct HoveredInfo
+	{
+		public IObject o;
+		public Vector3 pos;
+		public bool hit;
+
+		public HoveredInfo(IObject o, Vector3 pos, bool hit)
+		{
+			this.o = o;
+			this.pos = pos;
+			this.hit = hit;
+		}
+
+		public static HoveredInfo None
+		{
+			get
+			{
+				return new HoveredInfo(null, Vector3.Zero, false);
+			}
+		}
 	}
 
 	interface IInput
@@ -41,7 +64,7 @@ namespace Cue.W
 		bool Action { get; }
 
 		void Update();
-		IObject GetHovered();
+		HoveredInfo GetHovered();
 	}
 
 	interface ILog
@@ -125,11 +148,12 @@ namespace Cue.W
 		bool Render { get; set; }
 	}
 
-	interface IBoxGraphic
+	interface IGraphic
 	{
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }
 		Color Color { get; set; }
+		bool Collision { get; set; }
 		void Destroy();
 	}
 }

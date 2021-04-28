@@ -159,7 +159,7 @@ namespace Cue.Resources
 				if (a.HasKey("sex"))
 					anim.Sex = Sexes.FromString(a["sex"]);
 
-				Cue.LogInfo(a["type"] + " anim: " + anim.ToString());
+				Cue.LogVerbose(a["type"] + " anim: " + anim.ToString());
 
 				List<IAnimation> list;
 				if (!anims_.TryGetValue(t, out list))

@@ -8,6 +8,11 @@ namespace Cue
 		{
 			return ((flag & bits) == bits);
 		}
+
+		public static int Bit(int pos)
+		{
+			return (1 << pos);
+		}
 	}
 
 

@@ -132,7 +132,7 @@ namespace Cue.Resources
 				else if (a.HasKey("hidesBreastsState"))
 					item.hidesBreastsState = a["hidesBreastsState"];
 
-				Cue.LogInfo("clothing item: " + item.ToString());
+				Cue.LogVerbose("clothing item: " + item.ToString());
 
 				if (id != "")
 					ids_.Add(id, item);

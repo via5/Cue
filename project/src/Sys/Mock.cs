@@ -136,7 +136,12 @@ namespace Cue.W
 			return null;
 		}
 
-		public IBoxGraphic CreateBoxGraphic(Vector3 pos)
+		public IGraphic CreateBoxGraphic(Vector3 pos, Color c)
+		{
+			return null;
+		}
+
+		public IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c)
 		{
 			return null;
 		}
@@ -155,9 +160,9 @@ namespace Cue.W
 		{
 		}
 
-		public IObject GetHovered()
+		public HoveredInfo GetHovered()
 		{
-			return null;
+			return HoveredInfo.None;
 		}
 	}
 
