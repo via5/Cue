@@ -27,7 +27,6 @@ namespace Cue.W
 			{
 				if (t.name == "CueRoot")
 				{
-					SuperController.LogError("Destroying " + t.name);
 					var temp = new GameObject().transform;
 					t.transform.SetParent(temp);
 					UnityEngine.Object.Destroy(temp.gameObject);

@@ -14,7 +14,7 @@ namespace Cue
 			object_ = o;
 			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(
 				"Control (" + object_.ID + ")",
-				object_.Position, new Color(0, 0, 1, 0.1f));
+				object_.Position, new Color(0, 0, 1, 0.05f));
 			UpdateColor();
 		}
 
@@ -146,7 +146,18 @@ namespace Cue
 		private void OnHoveredChanged(IObject o)
 		{
 			for (int i = 0; i < controls_.Count; ++i)
-				controls_[i].Hovered = (controls_[i].Object == o);
+			{
+				if (controls_[i].Object == o)
+				{
+					controls_[i].Hovered = true;
+					controls_[i].Visible = true;
+				}
+				else
+				{
+					controls_[i].Hovered = false;
+					controls_[i].Visible = visible_;
+				}
+			}
 		}
 	}
 }

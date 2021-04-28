@@ -129,7 +129,7 @@ namespace Cue
 		//
 		public static int RandomInt(int first, int last)
 		{
-			return Cue.Instance.Sys.RandomInt(first, last + 1);
+			return Cue.Instance.Sys.RandomInt(first, last);
 		}
 
 		// [begin, end]
