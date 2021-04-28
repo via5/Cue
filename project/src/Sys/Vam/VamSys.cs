@@ -13,12 +13,29 @@ namespace Cue.W
 		private readonly VamNav nav_ = new VamNav();
 		private readonly VamInput input_;
 		private string pluginPath_ = "";
+		private GameObject root_;
 
 		public VamSys(MVRScript s)
 		{
 			instance_ = this;
 			script_ = s;
 			input_ = new VamInput(this);
+
+			var vamroot = SuperController.singleton.transform.root;
+
+			foreach (Transform t in vamroot)
+			{
+				if (t.name == "CueRoot")
+				{
+					SuperController.LogError("Destroying " + t.name);
+					var temp = new GameObject().transform;
+					t.transform.SetParent(temp);
+					UnityEngine.Object.Destroy(temp.gameObject);
+				}
+			}
+
+			root_ = new GameObject("CueRoot");
+			root_.transform.SetParent(vamroot, false);
 		}
 
 		static public VamSys Instance
@@ -61,6 +78,11 @@ namespace Cue.W
 			}
 
 			return list;
+		}
+
+		public Transform RootTransform
+		{
+			get { return root_.transform; }
 		}
 
 		public IAtom ContainingAtom
@@ -143,14 +165,15 @@ namespace Cue.W
 				new ScriptUIRootSupport(CueMain.Instance.MVRScriptUI));
 		}
 
-		public IGraphic CreateBoxGraphic(Vector3 pos, Color c)
+		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c)
 		{
-			return new VamBoxGraphic(pos, c);
+			return new VamBoxGraphic(name, pos, c);
 		}
 
-		public IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c)
+		public IGraphic CreateSphereGraphic(
+			string name, Vector3 pos, float radius, Color c)
 		{
-			return new VamSphereGraphic(pos, radius, c);
+			return new VamSphereGraphic(name, pos, radius, c);
 		}
 
 		public void OnPluginState(bool b)

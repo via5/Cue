@@ -54,6 +54,7 @@ namespace VUI
 		public override string TypeName { get { return "ListView"; } }
 
 		public event ItemCallback ItemActivated;
+		public event IndexCallback ItemIndexActivated;
 
 		public ListView(List<ItemType> items = null)
 			: this(items, null)
@@ -153,9 +154,14 @@ namespace VUI
 		{
 			var s = Selected;
 			if (s == null)
+			{
 				Glue.LogError("selected null");
+			}
 			else
+			{
 				ItemActivated?.Invoke(s);
+				ItemIndexActivated?.Invoke(SelectedIndex);
+			}
 		}
 	}
 }

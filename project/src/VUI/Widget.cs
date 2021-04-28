@@ -697,7 +697,7 @@ namespace VUI
 		{
 			if (mainObject_ == null)
 			{
-				mainObject_ = new GameObject();
+				mainObject_ = new GameObject(ToString());
 				mainObject_.AddComponent<RectTransform>();
 				mainObject_.AddComponent<LayoutElement>();
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
@@ -715,7 +715,7 @@ namespace VUI
 				DoCreate();
 				DoSetEnabled(enabled_);
 
-				graphicsObject_ = new GameObject();
+				graphicsObject_ = new GameObject("WidgetBorders");
 				graphicsObject_.transform.SetParent(mainObject_.transform, false);
 
 				borderGraphics_ = graphicsObject_.AddComponent<BorderGraphics>();
@@ -842,7 +842,7 @@ namespace VUI
 
 		protected virtual GameObject CreateGameObject()
 		{
-			var o = new GameObject();
+			var o = new GameObject("Widget");
 			o.AddComponent<RectTransform>();
 			o.AddComponent<LayoutElement>();
 			return o;
@@ -967,7 +967,7 @@ namespace VUI
 
 			if (bgObject_ == null && bgColor_.a > 0)
 			{
-				bgObject_ = new GameObject();
+				bgObject_ = new GameObject("WidgetBackground");
 				bgObject_.transform.SetParent(MainObject.transform, false);
 				bgObject_.AddComponent<Image>();
 			}

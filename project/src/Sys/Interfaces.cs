@@ -28,8 +28,8 @@ namespace Cue.W
 		VUI.Root CreateAttached(Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
 		VUI.Root CreateScriptUI();
-		IGraphic CreateBoxGraphic(Vector3 pos, Color c);
-		IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c);
+		IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c);
+		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
 	}
 
 	struct HoveredInfo

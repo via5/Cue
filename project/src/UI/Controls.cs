@@ -13,6 +13,7 @@ namespace Cue
 		{
 			object_ = o;
 			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(
+				"Control (" + object_.ID + ")",
 				object_.Position, new Color(0, 0, 1, 0.1f));
 			UpdateColor();
 		}
@@ -70,8 +71,10 @@ namespace Cue
 		public Controls()
 		{
 			Cue.Instance.HoveredChanged += OnHoveredChanged;
+
 			moveTarget_ = Cue.Instance.Sys.CreateSphereGraphic(
-				Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
+				"MoveTarget", Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
+
 			moveTarget_.Collision = false;
 		}
 

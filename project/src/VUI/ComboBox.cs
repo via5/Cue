@@ -149,7 +149,7 @@ namespace VUI
 				});
 			};
 
-			arrowObject_ = new GameObject();
+			arrowObject_ = new GameObject("ComboBoxArrow");
 			arrowObject_.transform.SetParent(WidgetObject.transform, false);
 			arrowObject_.AddComponent<RectTransform>();
 			arrowObject_.AddComponent<LayoutElement>();
@@ -159,7 +159,7 @@ namespace VUI
 			arrowText.raycastTarget = false;
 			arrowText.text = Utilities.DownArrow;
 
-			var go = new GameObject();
+			var go = new GameObject("ComboBoxBorders");
 			go.transform.SetParent(Popup.popup.popupPanel.transform, false);
 
 			borders_ = go.AddComponent<BorderGraphics>();

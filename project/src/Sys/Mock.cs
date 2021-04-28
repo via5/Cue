@@ -136,12 +136,12 @@ namespace Cue.W
 			return null;
 		}
 
-		public IGraphic CreateBoxGraphic(Vector3 pos, Color c)
+		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c)
 		{
 			return null;
 		}
 
-		public IGraphic CreateSphereGraphic(Vector3 pos, float radius, Color c)
+		public IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c)
 		{
 			return null;
 		}

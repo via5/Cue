@@ -11,12 +11,13 @@ namespace Cue.W
 		protected Renderer renderer_ = null;
 		private Color color_;
 
-		protected VamGraphic(PrimitiveType type, Color c)
+		protected VamGraphic(string name, PrimitiveType type, Color c)
 		{
 			color_ = c;
 
 			object_ = GameObject.CreatePrimitive(type);
-			object_.transform.SetParent(SuperController.singleton.transform.root, false);
+			object_.name = name;
+			object_.transform.SetParent(Cue.Instance.VamSys.RootTransform, false);
 			object_.layer = Layer;
 
 			renderer_ = object_.GetComponent<Renderer>();
@@ -127,8 +128,8 @@ namespace Cue.W
 
 	class VamBoxGraphic : VamGraphic
 	{
-		public VamBoxGraphic(Vector3 pos, Color c)
-			: base(PrimitiveType.Cube, c)
+		public VamBoxGraphic(string name, Vector3 pos, Color c)
+			: base(name, PrimitiveType.Cube, c)
 		{
 			object_.transform.localScale =
 				new UnityEngine.Vector3(0.5f, 0.05f, 0.5f);
@@ -140,8 +141,8 @@ namespace Cue.W
 
 	class VamSphereGraphic : VamGraphic
 	{
-		public VamSphereGraphic(Vector3 pos, float radius, Color c)
-			: base(PrimitiveType.Sphere, c)
+		public VamSphereGraphic(string name, Vector3 pos, float radius, Color c)
+			: base(name, PrimitiveType.Sphere, c)
 		{
 			object_.transform.localScale =
 				new UnityEngine.Vector3(radius, radius, radius);

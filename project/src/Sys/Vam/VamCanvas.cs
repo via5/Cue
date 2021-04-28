@@ -217,8 +217,8 @@ namespace Cue.W
 
 		public OverlayRootSupport(float topOffset, float width, float height)
 		{
-			panel_ = new GameObject();
-			panel_.transform.SetParent(SuperController.singleton.transform.root, false);
+			panel_ = new GameObject("OverlayRootSupport");
+			panel_.transform.SetParent(Cue.Instance.VamSys.RootTransform, false);
 
 			canvas_ = panel_.AddComponent<Canvas>();
 			panel_.AddComponent<CanvasRenderer>();
@@ -230,7 +230,7 @@ namespace Cue.W
 			canvas_.scaleFactor = 0.5f;
 			canvas_.pixelPerfect = true;
 
-			ui_ = new GameObject();
+			ui_ = new GameObject("OverlayRootSupportUI");
 			ui_.transform.SetParent(panel_.transform, false);
 			var rt = ui_.AddComponent<RectTransform>();
 			rt.anchorMin = new Vector2(0.5f, 1);

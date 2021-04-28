@@ -227,7 +227,7 @@ namespace VUI
 
 		protected override void DoCreate()
 		{
-			var field = new GameObject();
+			var field = new GameObject("TextBoxInputField");
 			field.transform.SetParent(WidgetObject.transform, false);
 
 			var rt = field.AddComponent<RectTransform>();
@@ -258,7 +258,7 @@ namespace VUI
 			image.raycastTarget = false;
 
 			// placeholder
-			var go = new GameObject();
+			var go = new GameObject("TextBoxPlaceholder");
 			go.transform.SetParent(input_.transform.parent, false);
 
 			text = go.AddComponent<Text>();
