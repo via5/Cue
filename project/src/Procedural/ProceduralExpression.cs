@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue
 {
 	class ProceduralMorph
 	{
+		public const float NoDisableBlink = 10000;
+
 		private const int NoState = 0;
 		private const int ForwardState = 1;
 		private const int DelayOnState = 2;
 		private const int BackwardState = 3;
 		private const int DelayOffState = 4;
 
+		private Person person_;
+		private string id_;
 		private DAZMorph morph_ = null;
-		private float start_, end_;
+		private float start_, end_, mid_;
 		private Duration forward_, backward_;
 		private Duration delayOff_, delayOn_;
 		private int state_ = NoState;
@@ -20,24 +25,53 @@ namespace Cue
 		private float mag_ = 0;
 		private IEasing easing_;
 		private bool finished_ = false;
+		private bool resetBetween_;
+		private float last_;
+
+		private float disableBlinkAbove_ = NoDisableBlink;
 
 		public ProceduralMorph(
 			Person p, string id, float start, float end, float minTime, float maxTime,
-			float delayOff, float delayOn)
+			float delayOff, float delayOn, bool resetBetween=false)
 		{
+			person_ = p;
+			id_ = id;
+
 			morph_ = p.VamAtom.FindMorph(id);
 			if (morph_ == null)
 				Cue.LogError($"{p.ID}: morph '{id}' not found");
 
 			start_ = start;
 			end_ = end;
+			mid_ = Mid();
+			last_ = mid_;
 			forward_ = new Duration(minTime, maxTime);
 			backward_ = new Duration(minTime, maxTime);
 			delayOff_ = new Duration(0, delayOff);
 			delayOn_ = new Duration(0, delayOn);
 			easing_ = new SinusoidalEasing();
+			resetBetween_ = resetBetween;
 
 			Reset();
+		}
+
+		public string Name
+		{
+			get
+			{
+				if (morph_ == null)
+					return $"{id_} (not found)";
+				else
+					return morph_.morphName;
+			}
+		}
+
+		public override string ToString()
+		{
+			return
+				$"start={start_:0.##} end={end_:0.##} mid={mid_} last={last_}\n" +
+				$"fwd={forward_} bwd={backward_} dOff={delayOff_} dOn={delayOn_}\n" +
+				$"state={state_} r={r_:0.##} mag={mag_:0.##} f={finished_} morphValue={morph_?.morphValue ?? -1}";
 		}
 
 		public IEasing Easing
@@ -49,6 +83,12 @@ namespace Cue
 		public bool Finished
 		{
 			get { return finished_; }
+		}
+
+		public float DisableBlinkAbove
+		{
+			get { return disableBlinkAbove_; }
+			set { disableBlinkAbove_ = value; }
 		}
 
 		public void Reset()
@@ -65,12 +105,12 @@ namespace Cue
 				morph_.morphValue = morph_.startValue;
 		}
 
-		public float Update(float s, float max)
+		public void Update(float s)
 		{
 			if (morph_ == null)
 			{
 				finished_ = true;
-				return 0;
+				return;
 			}
 
 			finished_ = false;
@@ -81,7 +121,7 @@ namespace Cue
 				{
 					mag_ = 0;
 					state_ = ForwardState;
-					Next(max);
+					Next();
 					break;
 				}
 
@@ -92,6 +132,7 @@ namespace Cue
 					if (forward_.Finished)
 					{
 						mag_ = 1;
+						last_ = r_;
 
 						if (delayOn_.Enabled)
 							state_ = DelayOnState;
@@ -118,12 +159,24 @@ namespace Cue
 
 				case BackwardState:
 				{
+					if (!resetBetween_)
+					{
+						Next();
+						mag_ = 0;
+						state_ = ForwardState;
+						break;
+					}
+
 					backward_.Update(s);
 
 					if (backward_.Finished)
 					{
-						mag_ = 0;
-						Next(max);
+						if (start_ == end_)
+							mag_ = 1;
+						else
+							mag_ = 0;
+
+						Next();
 
 						if (delayOff_.Enabled)
 						{
@@ -156,8 +209,6 @@ namespace Cue
 					break;
 				}
 			}
-
-			return Math.Abs(Mid() - r_);
 		}
 
 		private float Mid()
@@ -170,25 +221,28 @@ namespace Cue
 				return start_ + (end_ - start_) / 2;
 		}
 
-		public void Set(float intensity)
+		public float Set(float intensity, float max)
 		{
 			if (morph_ == null)
-				return;
+				return 0;
 
-			morph_.morphValue =
-				morph_.startValue +
-				easing_.Magnitude(mag_) * r_ * intensity;
+			var v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_)) * intensity;
+			if (Math.Abs(v - mid_) > max)
+				v = mid_ + Math.Sign(v) * max;
+
+			var d = v - mid_;
+
+			morph_.morphValue = v;
+
+			if (disableBlinkAbove_ != NoDisableBlink)
+				person_.Gaze.Blink = (d < disableBlinkAbove_);
+
+			return Math.Abs(d);
 		}
 
-		private void Next(float max)
+		private void Next()
 		{
 			r_ = U.RandomFloat(start_, end_);
-
-			float mid = Mid();
-			var d = Math.Abs(mid - r_);
-
-			if (d > max)
-				r_ = mid + Math.Sign(r_) * max;
 		}
 	}
 
@@ -198,6 +252,7 @@ namespace Cue
 		void Reset();
 		void Update(float s);
 		void Set(float intensity);
+		List<ProceduralMorph> Morphs { get; }
 	}
 
 
@@ -205,6 +260,16 @@ namespace Cue
 	{
 		private readonly List<ProceduralMorph> morphs_ = new List<ProceduralMorph>();
 		private float maxMorphs_ = 1.0f;
+
+		public List<ProceduralMorph> Morphs
+		{
+			get { return morphs_; }
+		}
+
+		public float Max
+		{
+			get { return maxMorphs_; }
+		}
 
 		public void Add(ProceduralMorph m)
 		{
@@ -219,16 +284,41 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			float remaining = maxMorphs_;
-
 			for (int i = 0; i < morphs_.Count; ++i)
-				remaining -= morphs_[i].Update(s, remaining);
+				morphs_[i].Update(s);
+
+			// move finished morphs to the end so they don't always have prio
+			// for max morph
+			{
+				int i = 0;
+				int count = morphs_.Count;
+				while (i < count)
+				{
+					if (morphs_[i].Finished)
+					{
+						var m = morphs_[i];
+						morphs_.RemoveAt(i);
+						morphs_.Add(m);
+						--count;
+					}
+					else
+					{
+						++i;
+					}
+				}
+			}
 		}
 
 		public void Set(float intensity)
 		{
+			float remaining = maxMorphs_;
 			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Set(intensity);
+				remaining -= morphs_[i].Set(intensity, remaining);
+		}
+
+		public override string ToString()
+		{
+			return $"concurrent max={maxMorphs_}";
 		}
 	}
 
@@ -246,6 +336,26 @@ namespace Cue
 		public SequentialProceduralMorphGroup(Duration delay = null)
 		{
 			delay_ = delay ?? new Duration(0, 0);
+		}
+
+		public List<ProceduralMorph> Morphs
+		{
+			get { return morphs_; }
+		}
+
+		public int Current
+		{
+			get { return i_; }
+		}
+
+		public Duration Delay
+		{
+			get { return delay_; }
+		}
+
+		public int State
+		{
+			get { return state_; }
 		}
 
 		public void Add(ProceduralMorph m)
@@ -271,7 +381,7 @@ namespace Cue
 			{
 				case ActiveState:
 				{
-					morphs_[i_].Update(s, float.MaxValue);
+					morphs_[i_].Update(s);
 
 					if (morphs_[i_].Finished)
 					{
@@ -284,7 +394,7 @@ namespace Cue
 						}
 
 						if (state_ == ActiveState)
-							morphs_[i_].Update(s, float.MaxValue);
+							morphs_[i_].Update(s);
 					}
 
 					break;
@@ -307,7 +417,12 @@ namespace Cue
 			if (morphs_.Count == 0)
 				return;
 
-			morphs_[i_].Set(intensity);
+			morphs_[i_].Set(intensity, float.MaxValue);
+		}
+
+		public override string ToString()
+		{
+			return $"sequential i={i_} delay={delay_} state={state_}";
 		}
 	}
 
@@ -354,6 +469,13 @@ namespace Cue
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].Set(intensity_);
 		}
+
+		public override string ToString()
+		{
+			return
+				Expressions.ToString(type_) + " " +
+				"intensity=" + intensity_.ToString();
+		}
 	}
 
 
@@ -370,6 +492,42 @@ namespace Cue
 		{
 			var g = new ConcurrentProceduralMorphGroup();
 			g.Add(new ProceduralMorph(p, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Pleasure(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+
+			g.Add(new ProceduralMorph(p, "07-Extreme Pleasure", 0, 1, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Webcam", 0, 0.2f, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Pain", 0, 0.5f, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Taking It", 0, 0.3f, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Shock", 0, 1, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Scream", 0, 1, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Angry", 0, 0.3f, 1, 5, 2, 2));
+
+			return g;
+		}
+
+		public static IProceduralMorphGroup EyesRollBack(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+
+			if (p.Sex == Sexes.Female)
+				g.Add(new ProceduralMorph(p, "Eye Roll Back_DD", 0, 0.5f, 1, 5, 2, 2));
+
+			return g;
+		}
+
+		public static IProceduralMorphGroup EyesClosed(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+
+			var eyesClosed = new ProceduralMorph(p, "Eyes Closed", 0, 1, 0.5f, 5, 2, 2);
+			eyesClosed.DisableBlinkAbove = 0.5f;
+			g.Add(eyesClosed);
+
 			return g;
 		}
 
@@ -405,6 +563,7 @@ namespace Cue
 
 	class ProceduralExpression : IExpression
 	{
+		private Person person_;
 		private bool enabled_ = true;
 
 		private readonly List<ProceduralExpressionType> expressions_ =
@@ -413,9 +572,16 @@ namespace Cue
 
 		public ProceduralExpression(Person p)
 		{
+			person_ = p;
 			expressions_.Add(CreateCommon(p));
 			expressions_.Add(CreateHappy(p));
 			expressions_.Add(CreateMischievous(p));
+			expressions_.Add(CreatePleasure(p));
+		}
+
+		public List<ProceduralExpressionType> All
+		{
+			get { return expressions_; }
 		}
 
 		private ProceduralExpressionType CreateCommon(Person p)
@@ -442,6 +608,15 @@ namespace Cue
 			var e = new ProceduralExpressionType(p, Expressions.Mischievous);
 
 			e.Groups.Add(PE.CornerSmile(p));
+
+			return e;
+		}
+
+		private ProceduralExpressionType CreatePleasure(Person p)
+		{
+			var e = new ProceduralExpressionType(p, Expressions.Pleasure);
+
+			e.Groups.Add(PE.Pleasure(p));
 
 			return e;
 		}
@@ -505,6 +680,17 @@ namespace Cue
 		public void OnPluginState(bool b)
 		{
 			Reset();
+		}
+
+		public void DumpActive()
+		{
+			var mui = Cue.Instance.VamSys.GetMUI(person_.VamAtom.Atom);
+
+			foreach (var m in mui.GetMorphs())
+			{
+				if (m.morphValue != m.startValue)
+					Cue.LogInfo($"name='{m.morphName}' dname='{m.displayName}'");
+			}
 		}
 	}
 }

@@ -65,6 +65,7 @@ namespace Cue.W
 		private VamButton left_ = new VamButton(0);
 		private VamButton right_ = new VamButton(1);
 		private VamButton middle_ = new VamButton(2);
+		private bool uiPointerShow_ = false;
 
 		public VamInput(VamSys sys)
 		{
@@ -137,9 +138,21 @@ namespace Cue.W
 			{
 				if (sys_.IsVR)
 				{
-					return
+					var d =
 						SuperController.singleton.GetLeftUIPointerShow() ||
 						SuperController.singleton.GetRightUIPointerShow();
+
+					if (!uiPointerShow_ && d)
+					{
+						uiPointerShow_ = true;
+						return true;
+					}
+					else
+					{
+						uiPointerShow_ = false;
+					}
+
+					return false;
 				}
 				else
 				{

@@ -418,8 +418,8 @@ namespace Cue.UI
 
 		private void OnForceExcitement(float f)
 		{
-			if (forceExcitement_.Checked)
-				person_.AI.Mood.ForceExcitement = f;
+			forceExcitement_.Checked = true;
+			person_.AI.Mood.ForceExcitement = f;
 		}
 	}
 

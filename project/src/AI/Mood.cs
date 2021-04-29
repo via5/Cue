@@ -10,6 +10,7 @@
 		private int state_ = None;
 		private float excitement_ = 0;
 		private float lastRate_ = 0;
+		private bool updateExcitement_ = true;
 
 		private float mouthRate_ = 0.001f;
 		private float breastsRate_ = 0.01f;
@@ -57,6 +58,22 @@
 			}
 		}
 
+		public float ForceExcitement
+		{
+			set
+			{
+				if (value < 0)
+				{
+					updateExcitement_ = true;
+				}
+				else
+				{
+					updateExcitement_ = false;
+					excitement_ = value;
+				}
+			}
+		}
+
 		public float Excitement { get { return excitement_; } }
 		public float LastRate { get { return lastRate_; } }
 		public float MouthRate { get { return mouthRate_; } }
@@ -76,15 +93,18 @@
 			if (rate == 0)
 				rate = decayRate_;
 
-			excitement_ = U.Clamp(excitement_ + rate * s * rateAdjust_, 0, 1);
-
-			if (excitement_ >= 1)
+			if (updateExcitement_)
 			{
-				person_.Orgasmer.Orgasm();
-				excitement_ = 0;
+				excitement_ = U.Clamp(excitement_ + rate * s * rateAdjust_, 0, 1);
+
+				if (excitement_ >= 1)
+				{
+					person_.Orgasmer.Orgasm();
+					excitement_ = 0;
+				}
 			}
 
-			person_.Breathing.Intensity = excitement_;
+			person_.Personality.SetExcitement(excitement_);
 			lastRate_ = rate;
 		}
 
@@ -96,7 +116,6 @@
 		{
 			string s = "";
 
-			//s += $"state={state_} ";
 			s += $"ex={excitement_:0.00}";
 
 			if (lastRate_ < 0)
@@ -114,19 +133,40 @@
 	interface IPersonality
 	{
 		void SetMood(int state);
+		void SetExcitement(float f);
 	}
 
 
-	class NeutralPersonality : IPersonality
+	abstract class BasicPersonality : IPersonality
 	{
-		private readonly Person person_;
+		protected readonly Person person_;
 
-		public NeutralPersonality(Person p)
+		public BasicPersonality(Person p)
 		{
 			person_ = p;
 		}
 
-		public void SetMood(int state)
+		public void SetExcitement(float f)
+		{
+			person_.Breathing.Intensity = f;
+			person_.Expression.Set(new Pair<int, float>[]
+			{
+				new Pair<int, float>(Expressions.Pleasure, f)
+			});
+		}
+
+		public abstract void SetMood(int state);
+	}
+
+
+	class NeutralPersonality : BasicPersonality
+	{
+		public NeutralPersonality(Person p)
+			: base(p)
+		{
+		}
+
+		public override void SetMood(int state)
 		{
 			person_.Expression.MakeNeutral();
 
@@ -163,16 +203,14 @@
 	}
 
 
-	class QuirkyPersonality : IPersonality
+	class QuirkyPersonality : BasicPersonality
 	{
-		private readonly Person person_;
-
 		public QuirkyPersonality(Person p)
+			: base(p)
 		{
-			person_ = p;
 		}
 
-		public void SetMood(int state)
+		public override void SetMood(int state)
 		{
 			person_.Expression.MakeNeutral();
 
