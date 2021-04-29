@@ -7,6 +7,7 @@ namespace Cue.W
 		private readonly float interval_;
 		private float elapsed_ = 0;
 		private bool stale_ = true;
+		private int backoff_ = 0;
 
 		public VamParameterChecker(float interval = -1)
 		{
@@ -27,10 +28,17 @@ namespace Cue.W
 			if (stale_)
 			{
 				elapsed_ += Cue.Instance.Sys.DeltaTime;
-				if (elapsed_ > interval_ || force)
+				if (elapsed_ > (interval_ + backoff_) || force)
 				{
 					if (DoCheck())
+					{
 						stale_ = false;
+						backoff_ = 0;
+					}
+					else
+					{
+						backoff_ = Math.Min(backoff_ + 1, 5);
+					}
 
 					elapsed_ = 0;
 				}
@@ -105,6 +113,9 @@ namespace Cue.W
 		protected override bool DoCheck()
 		{
 			param_ = DoGetParameter();
+			if (param_ != null)
+				Cue.LogVerbose($"{atom_.uid}: found {storableID_} {paramName_}");
+
 			return (param_ != null);
 		}
 

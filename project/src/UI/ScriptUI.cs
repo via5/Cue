@@ -10,13 +10,16 @@ namespace Cue.UI
 		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
 		private List<Tab> tabs_ = new List<Tab>();
 		private float updateElapsed_ = 1000;
+		private MiscTab misc_;
 
 		public void Init()
 		{
+			misc_ = new MiscTab();
+
 			foreach (var p in Cue.Instance.Persons)
 				tabs_.Add(new PersonTab(p));
 
-			tabs_.Add(new MiscTab());
+			tabs_.Add(misc_);
 			tabs_.Add(new UnityTab());
 
 			root_ = Cue.Instance.Sys.CreateScriptUI();
@@ -30,7 +33,7 @@ namespace Cue.UI
 				tabsWidget_.AddTab(t.Title, t);
 		}
 
-		public void Update(float s)
+		public void Update(float s, Tickers tickers)
 		{
 			updateElapsed_ += s;
 			if (updateElapsed_ > 0.2f)
@@ -40,6 +43,9 @@ namespace Cue.UI
 
 				updateElapsed_ = 0;
 			}
+
+			if (tickers.update.Updated)
+				misc_.UpdateTickers(tickers);
 
 			root_.Update();
 		}
@@ -57,12 +63,36 @@ namespace Cue.UI
 	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button renav_ = new VUI.Button("Update nav");
+		private VUI.Label update_ = new VUI.Label();
+		private VUI.Label fixedUpdate_ = new VUI.Label();
+		private VUI.Label input_ = new VUI.Label();
+		private VUI.Label objects_ = new VUI.Label();
+		private VUI.Label ui_ = new VUI.Label();
 
 		public MiscTab()
 		{
 			Layout = new VUI.VerticalFlow();
 			Add(navmeshes_);
 			Add(renav_);
+
+			var p = new VUI.Panel(new VUI.GridLayout(2));
+
+			p.Add(new VUI.Label("Update"));
+			p.Add(update_);
+
+			p.Add(new VUI.Label("  Input"));
+			p.Add(input_);
+
+			p.Add(new VUI.Label("  Objects"));
+			p.Add(objects_);
+
+			p.Add(new VUI.Label("  UI"));
+			p.Add(ui_);
+
+			p.Add(new VUI.Label("Fixed Update"));
+			p.Add(fixedUpdate_);
+
+			Add(p);
 
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
 			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
@@ -75,6 +105,15 @@ namespace Cue.UI
 
 		public override void Update()
 		{
+		}
+
+		public void UpdateTickers(Tickers tickers)
+		{
+			update_.Text = tickers.update.ToString();
+			input_.Text = tickers.input.ToString();
+			objects_.Text = tickers.objects.ToString();
+			ui_.Text = tickers.ui.ToString();
+			fixedUpdate_.Text = tickers.fixedUpdate.ToString();
 		}
 	}
 

@@ -4,6 +4,20 @@ using System.Diagnostics;
 
 namespace Cue
 {
+	class PluginGone : Exception
+	{
+	}
+
+	class Tickers
+	{
+		public Ticker update = new Ticker();
+		public Ticker fixedUpdate = new Ticker();
+		public Ticker input = new Ticker();
+		public Ticker objects = new Ticker();
+		public Ticker ui = new Ticker();
+	}
+
+
 	class Cue
 	{
 		public delegate void ObjectHandler(IObject o);
@@ -21,6 +35,7 @@ namespace Cue
 		private Controls controls_ = null;
 		private bool paused_ = false;
 		private bool vr_ = false;
+		private Tickers tickers_ = new Tickers();
 
 		private IObject hovered_ = null;
 		private IObject sel_ = null;
@@ -39,6 +54,11 @@ namespace Cue
 		public static Cue Instance
 		{
 			get { return instance_; }
+		}
+
+		public Tickers Tickers
+		{
+			get { return tickers_; }
 		}
 
 		public W.ISys Sys
@@ -284,48 +304,60 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			Sys.Input.Update();
-
-			if (Sys.Input.HardReset)
+			tickers_.update.Do(s, () =>
 			{
-				Sys.HardReset();
-				return;
-			}
+				tickers_.input.Do(s, () =>
+				{
+					Sys.Input.Update();
 
-			if (Sys.Input.ReloadPlugin)
-			{
-				ReloadPlugin();
-				return;
-			}
+					if (Sys.Input.HardReset)
+					{
+						Sys.HardReset();
+						throw new PluginGone();
+					}
 
-			if (Sys.Paused != paused_)
-			{
-				paused_ = Sys.Paused;
-				for (int i = 0; i < allObjects_.Count; ++i)
-					allObjects_[i].SetPaused(Sys.Paused);
-			}
+					if (Sys.Input.ReloadPlugin)
+					{
+						ReloadPlugin();
+						throw new PluginGone();
+					}
 
-			if (!Sys.Paused)
-			{
-				for (int i = 0; i < allObjects_.Count; ++i)
-					allObjects_[i].Update(s);
-			}
+					var vr = Sys.IsVR;
+					if (vr_ != vr)
+					{
+						vr_ = vr;
+						hud_?.Destroy();
+						hud_?.Create(vr_);
+						menu_?.Destroy();
+						menu_?.Create(vr_);
+					}
 
-			var vr = Sys.IsVR;
-			if (vr_ != vr)
-			{
-				vr_ = vr;
-				hud_?.Destroy();
-				hud_?.Create(vr_);
-				menu_?.Destroy();
-				menu_?.Create(vr_);
-			}
+					CheckInput();
+				});
 
-			CheckInput();
+				tickers_.objects.Do(s, () =>
+				{
+					if (Sys.Paused != paused_)
+					{
+						paused_ = Sys.Paused;
+						for (int i = 0; i < allObjects_.Count; ++i)
+							allObjects_[i].SetPaused(Sys.Paused);
+					}
 
-			controls_?.Update();
-			hud_?.Update();
-			menu_?.Update();
+					if (!Sys.Paused)
+					{
+						for (int i = 0; i < allObjects_.Count; ++i)
+							allObjects_[i].Update(s);
+					}
+				});
+
+				tickers_.ui.Do(s, () =>
+				{
+					controls_?.Update();
+					hud_?.Update();
+					menu_?.Update();
+				});
+			});
 		}
 
 		private void CheckInput()

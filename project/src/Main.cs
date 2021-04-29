@@ -163,8 +163,14 @@ namespace Cue
 
 			U.Safe(() =>
 			{
-				cue_.Update(Time.deltaTime);
-				sui_.Update(Time.deltaTime);
+				try
+				{
+					cue_.Update(Time.deltaTime);
+					sui_.Update(Time.deltaTime, cue_.Tickers);
+				}
+				catch(PluginGone e)
+				{
+				}
 			});
 		}
 

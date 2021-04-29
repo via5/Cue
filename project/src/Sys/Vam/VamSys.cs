@@ -311,6 +311,23 @@ namespace Cue.W
 			return null;
 		}
 
+		private JSONStorable FindStorable(Atom a, string name)
+		{
+			var s = a.GetStorableByID(name);
+			if (s != null)
+				return s;
+
+			string p = "";
+			for (int i = 0; i < 20; ++i)
+			{
+				p = $"plugin#{i}_{name}";
+				s = a.GetStorableByID(p);
+				if (s != null)
+					return s;
+			}
+
+			return null;
+		}
 
 		public JSONStorableFloat GetFloatParameter(
 			IObject o, string storable, string param)
@@ -321,29 +338,21 @@ namespace Cue.W
 		public JSONStorableFloat GetFloatParameter(
 			Atom a, string storable, string param)
 		{
-			foreach (var id in a.GetStorableIDs())
+			var st = FindStorable(a, storable);
+			if (st == null)
 			{
-				if (id.Contains(storable))
-				{
-					var st = a.GetStorableByID(id);
-					if (st == null)
-					{
-						Cue.LogError($"{a.uid}: no storable {id}");
-						continue;
-					}
-
-					var p = st.GetFloatJSONParam(param);
-					if (p == null)
-					{
-						Cue.LogError($"{a.uid}: storable {id} has no float param '{param}'");
-						continue;
-					}
-
-					return p;
-				}
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
 			}
 
-			return null;
+			var p = st.GetFloatJSONParam(param);
+			if (p == null)
+			{
+				Cue.LogError($"{a.uid}: storable {st.name} has no float param '{param}'");
+				return null;
+			}
+
+			return p;
 		}
 
 		public JSONStorableBool GetBoolParameter(
@@ -355,29 +364,21 @@ namespace Cue.W
 		public JSONStorableBool GetBoolParameter(
 			Atom a, string storable, string param)
 		{
-			foreach (var id in a.GetStorableIDs())
+			var st = FindStorable(a, storable);
+			if (st == null)
 			{
-				if (id.Contains(storable))
-				{
-					var st = a.GetStorableByID(id);
-					if (st == null)
-					{
-						Cue.LogError($"{a.uid}: no storable {id}");
-						continue;
-					}
-
-					var p = st.GetBoolJSONParam(param);
-					if (p == null)
-					{
-						Cue.LogError($"{a.uid}: storable {id} has no bool param '{param}'");
-						continue;
-					}
-
-					return p;
-				}
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
 			}
 
-			return null;
+			var p = st.GetBoolJSONParam(param);
+			if (p == null)
+			{
+				Cue.LogError($"{a.uid}: storable {st.name} has no bool param '{param}'");
+				return null;
+			}
+
+			return p;
 		}
 
 		public JSONStorableString GetStringParameter(
@@ -389,29 +390,21 @@ namespace Cue.W
 		public JSONStorableString GetStringParameter(
 			Atom a, string storable, string param)
 		{
-			foreach (var id in a.GetStorableIDs())
+			var st = FindStorable(a, storable);
+			if (st == null)
 			{
-				if (id.Contains(storable))
-				{
-					var st = a.GetStorableByID(id);
-					if (st == null)
-					{
-						Cue.LogError($"{a.uid}: no storable {id}");
-						continue;
-					}
-
-					var p = st.GetStringJSONParam(param);
-					if (p == null)
-					{
-						Cue.LogError($"{a.uid}: storable {id} has no string param '{param}'");
-						continue;
-					}
-
-					return p;
-				}
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
 			}
 
-			return null;
+			var p = st.GetStringJSONParam(param);
+			if (p == null)
+			{
+				Cue.LogError($"{a.uid}: storable {st.name} has no string param '{param}'");
+				return null;
+			}
+
+			return p;
 		}
 
 
@@ -424,29 +417,21 @@ namespace Cue.W
 		public JSONStorableStringChooser GetStringChooserParameter(
 			Atom a, string storable, string param)
 		{
-			foreach (var id in a.GetStorableIDs())
+			var st = FindStorable(a, storable);
+			if (st == null)
 			{
-				if (id.Contains(storable))
-				{
-					var st = a.GetStorableByID(id);
-					if (st == null)
-					{
-						Cue.LogError($"{a.uid}: no storable {id}");
-						continue;
-					}
-
-					var p = st.GetStringChooserJSONParam(param);
-					if (p == null)
-					{
-						Cue.LogError($"{a.uid}: storable {id} has no stringchooser param '{param}'");
-						continue;
-					}
-
-					return p;
-				}
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
 			}
 
-			return null;
+			var p = st.GetStringChooserJSONParam(param);
+			if (p == null)
+			{
+				Cue.LogError($"{a.uid}: storable {st.name} has no string chooser param '{param}'");
+				return null;
+			}
+
+			return p;
 		}
 
 
@@ -459,29 +444,21 @@ namespace Cue.W
 		public JSONStorableAction GetActionParameter(
 			Atom a, string storable, string param)
 		{
-			foreach (var id in a.GetStorableIDs())
+			var st = FindStorable(a, storable);
+			if (st == null)
 			{
-				if (id.Contains(storable))
-				{
-					var st = a.GetStorableByID(id);
-					if (st == null)
-					{
-						Cue.LogError($"{a.uid}: no storable {id}");
-						continue;
-					}
-
-					var p = st.GetAction(param);
-					if (p == null)
-					{
-						Cue.LogError($"{a.uid}: storable {id} has no action param '{param}'");
-						continue;
-					}
-
-					return p;
-				}
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
 			}
 
-			return null;
+			var p = st.GetAction(param);
+			if (p == null)
+			{
+				Cue.LogError($"{a.uid}: storable {st.name} has no action param '{param}'");
+				return null;
+			}
+
+			return p;
 		}
 
 		public Rigidbody FindRigidbody(IObject o, string name)
