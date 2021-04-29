@@ -58,8 +58,7 @@
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
 					person_.MoveTo(target, caller_.Bearing + 180);
-					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
-					person_.Gaze.Target = caller_.Atom.HeadPosition;
+					person_.Gaze.LookAt(caller_);
 					state_ = MovingState;
 
 					break;

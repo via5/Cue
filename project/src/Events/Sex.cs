@@ -27,8 +27,7 @@
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
 
 					person_.MoveTo(target, receiver_.Bearing + 180);
-					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
-					person_.Gaze.Target = receiver_.Atom.HeadPosition;
+					person_.Gaze.LookAt(receiver_);
 					state_ = MovingState;
 
 					break;
@@ -112,8 +111,7 @@
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
 
 					person_.MoveTo(target, receiver_.Bearing + 180);
-					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
-					person_.Gaze.Target = receiver_.Atom.HeadPosition;
+					person_.Gaze.LookAt(receiver_);
 					state_ = MovingState;
 
 					break;

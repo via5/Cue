@@ -65,34 +65,28 @@ namespace Cue
 	{
 		protected Person person_ = null;
 
-		public abstract int LookAt { get; set; }
-		public abstract Vector3 Target { get; set; }
-		public abstract void Update(float s);
+		public abstract bool Blink { get; set; }
 
 		protected BasicGazer(Person p)
 		{
 			person_ = p;
 		}
 
-		public abstract bool Blink { get; set; }
+		public abstract void LookAt(IObject o);
+		public abstract void LookAt(Vector3 p);
+		public abstract void LookInFront();
+		public abstract void LookAtNothing();
 
-		public void LookInFront()
-		{
-			LookAt = GazeSettings.LookAtTarget;
-
-			Target =
-				person_.HeadPosition +
-				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing);
-		}
+		public abstract void Update(float s);
 	}
 
 
 	class MacGruberGaze : BasicGazer
 	{
-		private int lookat_ = GazeSettings.LookAtDisabled;
 		private W.VamBoolParameter toggle_;
 		private W.VamBoolParameter lookatTarget_;
 		private VamEyes eyes_ = null;
+		private IObject object_ = null;
 
 		public MacGruberGaze(Person p)
 			: base(p)
@@ -108,64 +102,58 @@ namespace Cue
 			set { eyes_.Blink = value; }
 		}
 
-		public override int LookAt
+		public override void LookAt(IObject o)
 		{
-			get
-			{
-				return lookat_;
-			}
-
-			set
-			{
-				lookat_ = value;
-				eyes_.LookAt = value;
-				Set();
-			}
+			object_ = o;
+			toggle_.SetValue(true);
+			lookatTarget_.SetValue(true);
+			eyes_.LookAt = GazeSettings.LookAtTarget;
+			eyes_.Target = object_.Atom.HeadPosition;
 		}
 
-		public override Vector3 Target
+		public override void LookAt(Vector3 p)
 		{
-			get { return eyes_.Target; }
-			set { eyes_.Target = value; }
+			object_ = null;
+			toggle_.SetValue(true);
+			lookatTarget_.SetValue(true);
+			eyes_.LookAt = GazeSettings.LookAtTarget;
+			eyes_.Target = p;
+		}
+
+		public override void LookInFront()
+		{
+			object_ = null;
+			toggle_.SetValue(false);
+			lookatTarget_.SetValue(false);
+			eyes_.LookAt = GazeSettings.LookAtDisabled;
+			eyes_.Target =
+				person_.HeadPosition +
+				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing);
+		}
+
+		public override void LookAtNothing()
+		{
+			object_ = null;
+			toggle_.SetValue(false);
+			lookatTarget_.SetValue(false);
+			eyes_.LookAt = GazeSettings.LookAtDisabled;
 		}
 
 		public override void Update(float s)
 		{
+			if (object_ != null)
+				eyes_.Target = object_.Atom.HeadPosition;
+
 			eyes_.Update(s);
-		}
-
-		private void Set()
-		{
-			switch (lookat_)
-			{
-				case GazeSettings.LookAtDisabled:
-				{
-					toggle_.SetValue(false);
-					break;
-				}
-
-				case GazeSettings.LookAtTarget:
-				{
-					toggle_.SetValue(true);
-					lookatTarget_.SetValue(true);
-					break;
-				}
-
-				case GazeSettings.LookAtPlayer:
-				{
-					toggle_.SetValue(true);
-					lookatTarget_.SetValue(false);
-					break;
-				}
-			}
 		}
 
 		public override string ToString()
 		{
 			return
 				$"MacGruber: " +
-				$"lookat={GazeSettings.ToString(lookat_)} " +
-				$"target={Target}";
+				$"o={object_} gaze={toggle_.GetValue()} " +
+				$"gazeTarget={lookatTarget_.GetValue()}" +
+				$"eyes=${eyes_}";
 		}
 	}
 }

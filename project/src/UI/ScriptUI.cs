@@ -63,6 +63,7 @@ namespace Cue.UI
 	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button renav_ = new VUI.Button("Update nav");
+		private VUI.CheckBox timings_ = new VUI.CheckBox("Show timings");
 		private VUI.Label update_ = new VUI.Label();
 		private VUI.Label fixedUpdate_ = new VUI.Label();
 		private VUI.Label input_ = new VUI.Label();
@@ -74,6 +75,7 @@ namespace Cue.UI
 			Layout = new VUI.VerticalFlow();
 			Add(navmeshes_);
 			Add(renav_);
+			Add(timings_);
 
 			var p = new VUI.Panel(new VUI.GridLayout(2));
 
@@ -109,11 +111,14 @@ namespace Cue.UI
 
 		public void UpdateTickers(Tickers tickers)
 		{
-			update_.Text = tickers.update.ToString();
-			input_.Text = tickers.input.ToString();
-			objects_.Text = tickers.objects.ToString();
-			ui_.Text = tickers.ui.ToString();
-			fixedUpdate_.Text = tickers.fixedUpdate.ToString();
+			if (timings_.Checked)
+			{
+				update_.Text = tickers.update.ToString();
+				input_.Text = tickers.input.ToString();
+				objects_.Text = tickers.objects.ToString();
+				ui_.Text = tickers.ui.ToString();
+				fixedUpdate_.Text = tickers.fixedUpdate.ToString();
+			}
 		}
 	}
 

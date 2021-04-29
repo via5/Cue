@@ -116,9 +116,12 @@
 	interface IGazer
 	{
 		bool Blink { get; set; }
-		int LookAt { get; set; }
-		Vector3 Target { get; set; }
+
+		void LookAt(IObject o);
+		void LookAt(Vector3 p);
 		void LookInFront();
+		void LookAtNothing();
+
 		void Update(float s);
 	}
 
@@ -130,6 +133,7 @@
 	interface IKisser
 	{
 		void Update(float s);
+		void Kiss(Person p);
 	}
 
 	interface IHandjob

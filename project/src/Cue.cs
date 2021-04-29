@@ -117,12 +117,11 @@ namespace Cue
 				{
 					if (p == o)
 					{
-						p.Gaze.LookAt = GazeSettings.LookAtDisabled;
+						p.Gaze.LookAtNothing();
 					}
 					else if (o is Person)
 					{
-						p.Gaze.LookAt = GazeSettings.LookAtTarget;
-						p.Gaze.Target = ((Person)o).HeadPosition;
+						p.Gaze.LookAt(o);
 					}
 				}
 			}

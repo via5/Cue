@@ -158,15 +158,6 @@ namespace Cue
 				}
 			}
 
-			if (i_ == -1)
-			{
-				if (person_ != Cue.Instance.Player)
-				{
-					person_.Gaze.Target = Cue.Instance.Player.HeadPosition;
-					person_.Gaze.LookAt = GazeSettings.LookAtTarget;
-				}
-			}
-
 			mood_.Update(s);
 		}
 

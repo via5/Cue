@@ -135,6 +135,11 @@ namespace Cue
 			if (lookAt_ == GazeSettings.LookAtTarget)
 				eyesImpl_.SetPosition(target_);
 		}
+
+		public override string ToString()
+		{
+			return $"vam: blink={blink_.GetValue()} mode={lookMode_.GetValue()}";
+		}
 	}
 
 

@@ -30,6 +30,7 @@
 			p.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			p.Add(new VUI.ToolButton("Sex", OnSex));
 			p.Add(new VUI.ToolButton("Stand", OnStand));
+			p.Add(new VUI.ToolButton("Kiss", OnKiss));
 			bottom.Add(p);
 
 			p = new VUI.Panel(new VUI.HorizontalFlow(5));
@@ -143,6 +144,15 @@
 
 				p.MakeIdle();
 				p.AI.RunEvent(new StandEvent(p));
+			}
+		}
+
+		private void OnKiss()
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+				p.Kisser.Kiss(Cue.Instance.Player);
 			}
 		}
 

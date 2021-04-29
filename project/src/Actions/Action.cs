@@ -357,11 +357,7 @@ namespace Cue
 
 		protected override bool DoStart(IObject o, float s)
 		{
-			e_ = 0;
-
-			var p = ((Person)o);
-			p.Gaze.LookAt = GazeSettings.LookAtTarget;
-
+			e_ = Delay + 1;
 			return true;
 		}
 
@@ -378,11 +374,7 @@ namespace Cue
 					U.RandomFloat(-1.0f, 1.0f),
 					1);
 
-				p.Gaze.LookAt = GazeSettings.LookAtTarget;
-
-				p.Gaze.Target =
-					p.HeadPosition +
-					Vector3.Rotate(t, p.Bearing);
+				p.Gaze.LookAt(p.HeadPosition + Vector3.Rotate(t, p.Bearing));
 
 				e_ = 0;
 			}

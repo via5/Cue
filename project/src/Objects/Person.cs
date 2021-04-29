@@ -234,8 +234,6 @@ namespace Cue
 			clothing_ = Integration.CreateClothing(this);
 			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
-
-			Gaze.LookAt = GazeSettings.LookAtDisabled;
 		}
 
 		public bool Idle
