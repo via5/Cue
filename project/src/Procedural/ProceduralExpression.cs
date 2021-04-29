@@ -27,6 +27,9 @@ namespace Cue
 		private bool finished_ = false;
 		private bool resetBetween_;
 		private float last_;
+		private bool closeToMid_ = false;
+		private bool awayFromMid_ = false;
+		private float timeActive_ = 0;
 
 		private float disableBlinkAbove_ = NoDisableBlink;
 
@@ -85,6 +88,11 @@ namespace Cue
 			get { return finished_; }
 		}
 
+		public bool CloseToMid
+		{
+			get { return closeToMid_; }
+		}
+
 		public float DisableBlinkAbove
 		{
 			get { return disableBlinkAbove_; }
@@ -105,7 +113,7 @@ namespace Cue
 				morph_.morphValue = morph_.startValue;
 		}
 
-		public void Update(float s)
+		public void Update(float s, bool limitHit)
 		{
 			if (morph_ == null)
 			{
@@ -114,6 +122,7 @@ namespace Cue
 			}
 
 			finished_ = false;
+			timeActive_ += s;
 
 			switch (state_)
 			{
@@ -121,7 +130,7 @@ namespace Cue
 				{
 					mag_ = 0;
 					state_ = ForwardState;
-					Next();
+					Next(limitHit);
 					break;
 				}
 
@@ -161,9 +170,10 @@ namespace Cue
 				{
 					if (!resetBetween_)
 					{
-						Next();
+						Next(limitHit);
 						mag_ = 0;
 						state_ = ForwardState;
+						finished_ = true;
 						break;
 					}
 
@@ -176,7 +186,7 @@ namespace Cue
 						else
 							mag_ = 0;
 
-						Next();
+						Next(limitHit);
 
 						if (delayOff_.Enabled)
 						{
@@ -223,6 +233,8 @@ namespace Cue
 
 		public float Set(float intensity, float max)
 		{
+			closeToMid_ = false;
+
 			if (morph_ == null)
 				return 0;
 
@@ -237,12 +249,40 @@ namespace Cue
 			if (disableBlinkAbove_ != NoDisableBlink)
 				person_.Gaze.Blink = (d < disableBlinkAbove_);
 
-			return Math.Abs(d);
+			d = Math.Abs(d);
+
+			if (d < 0.01f)
+				timeActive_ = 0;
+
+			if (awayFromMid_ && d < 0.01f)
+			{
+				closeToMid_ = true;
+				awayFromMid_ = false;
+			}
+			else if (d > 0.01f)
+			{
+				awayFromMid_ = true;
+			}
+
+			return d;
 		}
 
-		private void Next()
+		private void Next(bool limitHit)
 		{
-			r_ = U.RandomFloat(start_, end_);
+			if (limitHit && timeActive_ >= 10)
+			{
+				Cue.LogVerbose(
+					$"{person_.ID} {Name}: active for {timeActive_:0.00}, " +
+					$"too long, forcing to 0");
+
+				// force a reset to allow other morphs to take over the prio
+				r_ = mid_;
+				timeActive_ = 0;
+			}
+			else
+			{
+				r_ = U.RandomFloat(start_, end_);
+			}
 		}
 	}
 
@@ -260,6 +300,7 @@ namespace Cue
 	{
 		private readonly List<ProceduralMorph> morphs_ = new List<ProceduralMorph>();
 		private float maxMorphs_ = 1.0f;
+		private bool limited_ = false;
 
 		public List<ProceduralMorph> Morphs
 		{
@@ -284,27 +325,27 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Update(s);
+			int i = 0;
+			int count = morphs_.Count;
 
-			// move finished morphs to the end so they don't always have prio
-			// for max morph
+			while (i < count)
 			{
-				int i = 0;
-				int count = morphs_.Count;
-				while (i < count)
+				var m = morphs_[i];
+
+				m.Update(s, limited_);
+
+				// move morphs that are close to the start value to the end of
+				// the list so they don't always have prio for max morph
+				if (limited_ && (i < (count - 1)) && m.CloseToMid)
 				{
-					if (morphs_[i].Finished)
-					{
-						var m = morphs_[i];
-						morphs_.RemoveAt(i);
-						morphs_.Add(m);
-						--count;
-					}
-					else
-					{
-						++i;
-					}
+					Cue.LogVerbose($"moving {m.Name} to end");
+					morphs_.RemoveAt(i);
+					morphs_.Add(m);
+					--count;
+				}
+				else
+				{
+					++i;
 				}
 			}
 		}
@@ -314,6 +355,8 @@ namespace Cue
 			float remaining = maxMorphs_;
 			for (int i = 0; i < morphs_.Count; ++i)
 				remaining -= morphs_[i].Set(intensity, remaining);
+
+			limited_ = (remaining <= 0);
 		}
 
 		public override string ToString()
@@ -381,7 +424,7 @@ namespace Cue
 			{
 				case ActiveState:
 				{
-					morphs_[i_].Update(s);
+					morphs_[i_].Update(s, false);
 
 					if (morphs_[i_].Finished)
 					{
@@ -394,7 +437,7 @@ namespace Cue
 						}
 
 						if (state_ == ActiveState)
-							morphs_[i_].Update(s);
+							morphs_[i_].Update(s, false);
 					}
 
 					break;
