@@ -115,6 +115,7 @@
 
 	interface IGazer
 	{
+		bool Blink { get; set; }
 		int LookAt { get; set; }
 		Vector3 Target { get; set; }
 		void LookInFront();
@@ -163,6 +164,19 @@
 		public const int Common = 1;
 		public const int Happy = 2;
 		public const int Mischievous = 3;
+		public const int Pleasure = 4;
+
+		public static string ToString(int i)
+		{
+			switch (i)
+			{
+				case Common: return "common";
+				case Happy: return "happy";
+				case Mischievous: return "mischievous";
+				case Pleasure: return "pleasure";
+				default: return $"?{i}";
+			}
+		}
 	}
 
 	interface IExpression
@@ -172,5 +186,6 @@
 		bool Enabled { get; set; }
 		void Update(float s);
 		void OnPluginState(bool b);
+		void DumpActive();
 	}
 }

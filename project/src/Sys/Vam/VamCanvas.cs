@@ -223,7 +223,6 @@ namespace Cue.W
 			canvas_ = panel_.AddComponent<Canvas>();
 			panel_.AddComponent<CanvasRenderer>();
 			panel_.AddComponent<CanvasScaler>();
-			panel_.AddComponent<RectTransform>();
 
 			canvas_.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas_.gameObject.AddComponent<GraphicRaycaster>();

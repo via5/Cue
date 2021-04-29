@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Cue
@@ -27,6 +28,8 @@ namespace Cue
 		public Cue()
 		{
 			instance_ = this;
+			LogInfo("cue: ctor");
+
 			vr_ = Sys.IsVR;
 			hud_ = new Hud();
 			menu_ = new Menu();
@@ -116,6 +119,8 @@ namespace Cue
 
 		public void Init()
 		{
+			LogInfo("cue: init");
+
 			VUI.Glue.Set(
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
@@ -124,17 +129,37 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
+			LogInfo("cue: loading resources");
 			Resources.Animations.Load();
 			Resources.Clothing.Load();
 
+			LogInfo("cue: updating nav");
+			Sys.Nav.Update();
+
+			LogInfo("cue: finding objects");
 			FindObjects();
 			FindPlayer();
-			Sys.Nav.Update();
+
+			LogInfo("cue: moving objects to spawn points");
 			MoveToSpawnPoints();
+
+			LogInfo("cue: enabling plugin state");
 			OnPluginState(true);
 
 			if (Sys.GetAtom("cuetest") != null)
-				TestStuff();
+			{
+				try
+				{
+					LogInfo("cue: test stuff");
+					TestStuff();
+				}
+				catch (Exception e)
+				{
+					LogError("cue: test stuff failed, " + e.ToString());
+				}
+			}
+
+			LogInfo("cue: init finished");
 		}
 
 		private void MoveToSpawnPoints()
@@ -341,12 +366,13 @@ namespace Cue
 				}
 			}
 
-			if (Sys.Input.ToggleControls)
-				controls_.Visible = !controls_.Visible;
+			//if (Sys.Input.ToggleControls)
+			//	controls_.Visible = !controls_.Visible;
 		}
 
 		public void OnPluginState(bool b)
 		{
+			LogInfo($"cue: plugin state {b}");
 			Sys.OnPluginState(b);
 
 			if (b)
@@ -364,35 +390,33 @@ namespace Cue
 
 			for (int i = 0; i < allObjects_.Count; ++i)
 				allObjects_[i].OnPluginState(b);
+
+			LogInfo($"cue: plugin state {b} finished");
 		}
 
 		static public void LogVerbose(string s)
 		{
-			//Instance.Sys.Log.Verbose(s);
+			//Instance.Sys.Log(s, LogLevels.Verbose);
 		}
 
 		static public void LogInfo(string s)
 		{
-			Instance.Sys.Log.Info(s);
+			Instance.Sys.Log(s, W.LogLevels.Info);
 		}
 
 		static public void LogWarning(string s)
 		{
-			Instance.Sys.Log.Error(s);
+			Instance.Sys.Log(s, W.LogLevels.Warning);
 		}
 
 		static public void LogError(string s)
 		{
-			if (Instance?.Sys?.Log == null)
-				SuperController.LogError(s);
-			else
-				Instance.Sys.Log.Error(s);
+			Instance.Sys.Log(s, W.LogLevels.Error);
 		}
 
 		static public void LogErrorST(string s)
 		{
-			Instance.Sys.Log.Error(
-				s + "\n" + new StackTrace(1).ToString());
+			Instance.Sys.Log(s + "\n" + new StackTrace(1).ToString(), W.LogLevels.Error);
 		}
 	}
 }

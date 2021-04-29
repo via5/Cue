@@ -74,6 +74,8 @@ namespace Cue
 			person_ = p;
 		}
 
+		public abstract bool Blink { get; set; }
+
 		public void LookInFront()
 		{
 			LookAt = GazeSettings.LookAtTarget;
@@ -98,6 +100,12 @@ namespace Cue
 			eyes_ = new VamEyes(p);
 			toggle_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
 			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
+		}
+
+		public override bool Blink
+		{
+			get { return eyes_.Blink; }
+			set { eyes_.Blink = value; }
 		}
 
 		public override int LookAt

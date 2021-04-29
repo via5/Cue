@@ -82,9 +82,9 @@ namespace Cue
 						//	"I think..."
 						//}));
 
-						cc.Push(new RandomAnimationAction(
-							Resources.Animations.GetAll(
-								Resources.Animations.SitIdle, person_.Sex)));
+						//cc.Push(new RandomAnimationAction(
+						//	Resources.Animations.GetAll(
+						//		Resources.Animations.SitIdle, person_.Sex)));
 
 						cc.Push(new LookAroundAction());
 

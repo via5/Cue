@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Cue.W
 {
-	class VamLog : ILog
+	class VamLog
 	{
 		private UnityEngine.UI.Button clear_ = null;
 		private UnityEngine.UI.Text logText_ = null;
@@ -27,19 +28,21 @@ namespace Cue.W
 			clear_?.onClick?.Invoke();
 		}
 
-		public void Verbose(string s)
+		public void Log(string s, int level)
 		{
-			SuperController.LogError("  [V] " + s);
+			foreach (var line in s.Split('\n'))
+				LogLine(line, level);
 		}
 
-		public void Info(string s)
+		private void LogLine(string line, int level)
 		{
-			SuperController.LogError("  [I] " + s);
-		}
+			var t = DateTime.Now.ToString("hh:mm:ss");
+			string p = LogLevels.ToShortString(level);
 
-		public void Error(string s)
-		{
-			SuperController.LogError("!![E] " + s);
+			if (level == LogLevels.Error)
+				SuperController.LogError($"{t} !![{p}] {line}");
+			else
+				SuperController.LogError($"{t}   [{p}] {line}");
 		}
 
 		public void OnPluginState(bool b)

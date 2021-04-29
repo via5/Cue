@@ -1,6 +1,4 @@
-﻿using Leap.Unity.Attributes;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue.UI
 {
@@ -179,6 +177,7 @@ namespace Cue.UI
 			tabs_.Add(new PersonStateTab(person_));
 			tabs_.Add(new PersonAITab(person_));
 			tabs_.Add(new PersonAnimationTab(person_));
+			tabs_.Add(new PersonExpressionTab(person_));
 
 			foreach (var t in tabs_)
 				tabsWidget_.AddTab(t.Title, t);
@@ -322,6 +321,9 @@ namespace Cue.UI
 		private VUI.Label moodDecayRate_ = new VUI.Label();
 		private VUI.Label moodRateAdjust_ = new VUI.Label();
 
+		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Force excitement");
+		private VUI.TextSlider forceExcitementValue_ = new VUI.TextSlider();
+
 		public PersonAITab(Person p)
 		{
 			person_ = p;
@@ -371,8 +373,18 @@ namespace Cue.UI
 			state.Add(new VUI.Label("Rate adjust"));
 			state.Add(moodRateAdjust_);
 
+			state.Add(new VUI.Spacer(30));
+			state.Add(new VUI.Spacer(30));
+
+			state.Add(forceExcitement_);
+			state.Add(forceExcitementValue_);
+
+
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
+
+			forceExcitement_.Changed += OnForceExcitementCheck;
+			forceExcitementValue_.ValueChanged += OnForceExcitement;
 		}
 
 		public override string Title
@@ -394,6 +406,83 @@ namespace Cue.UI
 			moodGenitalsRate_.Text = ai_.Mood.GenitalsRate.ToString();
 			moodDecayRate_.Text = ai_.Mood.DecayRate.ToString();
 			moodRateAdjust_.Text = ai_.Mood.RateAdjust.ToString();
+		}
+
+		private void OnForceExcitementCheck(bool b)
+		{
+			if (b)
+				person_.AI.Mood.ForceExcitement = forceExcitementValue_.Value;
+			else
+				person_.AI.Mood.ForceExcitement = -1;
+		}
+
+		private void OnForceExcitement(float f)
+		{
+			if (forceExcitement_.Checked)
+				person_.AI.Mood.ForceExcitement = f;
+		}
+	}
+
+
+	class PersonExpressionTab : Tab
+	{
+		private Person person_;
+		private ProceduralExpression pex_;
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+
+		public PersonExpressionTab(Person p)
+		{
+			person_ = p;
+
+			Layout = new VUI.BorderLayout();
+
+			pex_ = p.Expression as ProceduralExpression;
+			if (pex_ == null)
+			{
+				Add(new VUI.Label("Not procedural"));
+				return;
+			}
+
+			Add(new VUI.Button("Refresh", Refresh), VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
+		}
+
+		public override string Title
+		{
+			get { return "Expression"; }
+		}
+
+		public override void Update()
+		{
+		}
+
+		private string I(int i)
+		{
+			return new string(' ', i * 4);
+		}
+
+		private void Refresh()
+		{
+			var items = new List<string>();
+
+			foreach (var e in pex_.All)
+			{
+				items.Add(I(1) + e.ToString());
+
+				foreach (var g in e.Groups)
+				{
+					items.Add(I(2) + g.ToString());
+
+					foreach (var m in g.Morphs)
+					{
+						items.Add(I(3) + m.Name);
+						foreach (var line in m.ToString().Split('\n'))
+							items.Add(I(4) + line);
+					}
+				}
+			}
+
+			list_.SetItems(items);
 		}
 	}
 

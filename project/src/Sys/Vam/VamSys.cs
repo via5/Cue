@@ -42,9 +42,14 @@ namespace Cue.W
 			get { return instance_; }
 		}
 
-		public ILog Log
+		public void ClearLog()
 		{
-			get { return log_; }
+			log_.Clear();
+		}
+
+		public void Log(string s, int level)
+		{
+			log_.Log(s, level);
 		}
 
 		public INav Nav
@@ -184,9 +189,39 @@ namespace Cue.W
 				Physics.IgnoreLayerCollision(i, VamBoxGraphic.Layer, b);
 		}
 
+		private Action deferredInit_ = null;
+
 		public void OnReady(Action f)
 		{
-			SuperController.singleton.StartCoroutine(DeferredInit(f));
+			SuperController.singleton.onSceneLoadedHandlers += OnSceneLoaded;
+			deferredInit_ = f;
+
+			if (SuperController.singleton.isLoading)
+			{
+				Cue.LogVerbose("scene loading, waiting to init");
+				return;
+			}
+			else
+			{
+				Cue.LogVerbose("scene already loaded, running deferred init on next frame");
+				SuperController.singleton.onSceneLoadedHandlers -= OnSceneLoaded;
+				SuperController.singleton.StartCoroutine(DeferredInit());
+			}
+		}
+
+		private IEnumerator DeferredInit()
+		{
+			yield return new WaitForEndOfFrame();
+			Cue.LogVerbose("running deferred init");
+			deferredInit_?.Invoke();
+			deferredInit_ = null;
+		}
+
+		private void OnSceneLoaded()
+		{
+			Cue.LogVerbose("scene loaded, running deferred init on next frame");
+			SuperController.singleton.onSceneLoadedHandlers -= OnSceneLoaded;
+			SuperController.singleton.StartCoroutine(DeferredInit());
 		}
 
 		public void HardReset()
@@ -196,10 +231,15 @@ namespace Cue.W
 
 		public void ReloadPlugin()
 		{
+			// don't use cue for logging in case something went wrong when
+			// loading
+
 			Transform uit = CueMain.Instance.UITransform;
 			if (uit?.parent == null)
 			{
 				SuperController.LogError("no main ui, selecting atom");
+
+				SuperController.singleton.gameMode = SuperController.GameMode.Edit;
 				SuperController.singleton.SelectController(
 					script_.containingAtom.mainController);
 
@@ -215,8 +255,8 @@ namespace Cue.W
 			{
 				if (pui.urlText.text.Contains("Cue.cslist"))
 				{
-					Log.Clear();
-					Cue.LogInfo("reloading");
+					ClearLog();
+					SuperController.LogError("reloading");
 					pui.reloadButton.onClick.Invoke();
 				}
 			}
@@ -246,12 +286,6 @@ namespace Cue.W
 				return pluginPath_ + "\\res" + path;
 			else
 				return pluginPath_ + "\\res\\" + path;
-		}
-
-		private IEnumerator DeferredInit(Action f)
-		{
-			yield return new WaitForEndOfFrame();
-			f?.Invoke();
 		}
 
 		public GameObject FindChildRecursive(Component c, string name)
@@ -573,7 +607,7 @@ namespace Cue.W
 				DumpComponentsAndDown(c.gameObject, dumpRt, indent + 1);
 		}
 
-		private GenerateDAZMorphsControlUI GetMUI(Atom atom)
+		public GenerateDAZMorphsControlUI GetMUI(Atom atom)
 		{
 			if (atom == null)
 				return null;

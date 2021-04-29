@@ -36,6 +36,7 @@
 			p.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
 			p.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
 			p.Add(new VUI.ToolButton("Dump clothes", OnDumpClothes));
+			p.Add(new VUI.ToolButton("Dump morphs", OnDumpMorphs));
 			bottom.Add(p);
 
 			root_.ContentPanel.Add(bottom, VUI.BorderLayout.Bottom);
@@ -169,6 +170,15 @@
 			{
 				var p = ((Person)Cue.Instance.Selected);
 				p.Clothing.Dump();
+			}
+		}
+
+		private void OnDumpMorphs()
+		{
+			if (Cue.Instance.Selected is Person)
+			{
+				var p = ((Person)Cue.Instance.Selected);
+				p.Expression.DumpActive();
 			}
 		}
 	}

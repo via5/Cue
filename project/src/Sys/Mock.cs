@@ -6,7 +6,6 @@ namespace Cue.W
 	class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
-		private readonly MockLog log_ = new MockLog();
 		private readonly MockNav nav_ = new MockNav();
 		private readonly MockInput input_ = new MockInput();
 
@@ -24,9 +23,14 @@ namespace Cue.W
 		{
 		}
 
-		public ILog Log
+		public void ClearLog()
 		{
-			get { return log_; }
+		}
+
+		public void Log(string s, int level)
+		{
+			foreach (var line in s.Split('\n'))
+				Console.WriteLine("[" + LogLevels.ToShortString(level) + "] " + s);
 		}
 
 		public INav Nav
@@ -163,33 +167,6 @@ namespace Cue.W
 		public HoveredInfo GetHovered()
 		{
 			return HoveredInfo.None;
-		}
-	}
-
-	class MockLog : ILog
-	{
-		public void Clear()
-		{
-		}
-
-		public void Verbose(string s)
-		{
-			Write("V", s);
-		}
-
-		public void Info(string s)
-		{
-			Write("I", s);
-		}
-
-		public void Error(string s)
-		{
-			Write("E", s);
-		}
-
-		private void Write(string p, string s)
-		{
-			Console.WriteLine("[" + p + "] " + s);
 		}
 	}
 

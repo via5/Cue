@@ -3,9 +3,30 @@ using System.Collections.Generic;
 
 namespace Cue.W
 {
+	class LogLevels
+	{
+		public const int Error = 0;
+		public const int Warning = 1;
+		public const int Info = 2;
+		public const int Verbose = 3;
+
+		public static string ToShortString(int i)
+		{
+			switch (i)
+			{
+				case Error: return "E";
+				case Warning: return "W";
+				case Info: return "I";
+				case Verbose: return "V";
+				default: return $"?{i}";
+			}
+		}
+	}
+
 	interface ISys
 	{
-		ILog Log { get; }
+		void ClearLog();
+		void Log(string s, int level);
 		IAtom GetAtom(string id);
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
@@ -65,14 +86,6 @@ namespace Cue.W
 
 		void Update();
 		HoveredInfo GetHovered();
-	}
-
-	interface ILog
-	{
-		void Clear();
-		void Verbose(string s);
-		void Info(string s);
-		void Error(string s);
 	}
 
 	class NavStates

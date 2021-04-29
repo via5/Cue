@@ -98,6 +98,7 @@ namespace Cue.W
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
 		private bool calculatingPath_ = false;
+		private bool navEnabled_ = false;
 
 		public VamAtom(Atom atom)
 		{
@@ -243,7 +244,10 @@ namespace Cue.W
 			if (enableCollisionsCountdown_ >= 0)
 			{
 				if (enableCollisionsCountdown_ == 0)
+				{
 					atom_.collisionEnabled = true;
+					NavEnabled = navEnabled_;
+				}
 
 				--enableCollisionsCountdown_;
 			}
@@ -347,6 +351,8 @@ namespace Cue.W
 
 			set
 			{
+				navEnabled_ = value;
+
 				if (value)
 				{
 					if (agent_ == null)
@@ -429,7 +435,32 @@ namespace Cue.W
 
 		private void CreateAgent()
 		{
+			if (enableCollisionsCountdown_ > 0)
+			{
+				Cue.LogVerbose($"{atom_.uid}: not creating agent, collisions still disabled");
+				return;
+			}
+
+			Cue.LogVerbose($"{atom_.uid}: creating agent");
+
+			NavMeshHit hit;
+			if (NavMesh.SamplePosition(atom_.mainController.transform.position, out hit, 2, NavMesh.AllAreas))
+			{
+				Cue.LogVerbose(
+					$"{atom_.uid}: " +
+					$"current={atom_.mainController.transform.position} " +
+					$"sampled={hit.position}");
+
+				atom_.mainController.transform.position = hit.position;
+			}
+			else
+			{
+				Cue.LogError($"{atom_.uid}: can't move to navmesh");
+			}
+
 			agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
+
+			Cue.LogVerbose($"{atom_.uid}: agent created");
 
 			agent_.agentTypeID = VamNav.AgentTypeID;
 			agent_.height = VamNav.AgentHeight;

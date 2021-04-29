@@ -88,6 +88,7 @@ namespace Cue
 		private W.ISys sys_ = null;
 		private Cue cue_ = null;
 		private UI.ScriptUI sui_ = null;
+		private bool inited_ = false;
 
 		public CueMain()
 		{
@@ -123,22 +124,32 @@ namespace Cue
 			catch (Exception e)
 			{
 				SuperController.LogError(e.ToString());
-				SuperController.LogError("failed to init plugin, disabling");
+				SuperController.LogError("cue: Init failed, disabling");
 				DisablePlugin();
 			}
 		}
 
 		private void DoInit()
 		{
-			U.Safe(() =>
+			try
 			{
 				cue_.Init();
 				sui_.Init();
-			});
+				inited_ = true;
+			}
+			catch (Exception e)
+			{
+				SuperController.LogError(e.ToString());
+				SuperController.LogError("cue: DoInit failed, disabling");
+				DisablePlugin();
+			}
 		}
 
 		public void FixedUpdate()
 		{
+			if (!inited_)
+				return;
+
 			U.Safe(() =>
 			{
 				cue_.FixedUpdate(Time.deltaTime);
@@ -147,6 +158,9 @@ namespace Cue
 
 		public void Update()
 		{
+			if (!inited_)
+				return;
+
 			U.Safe(() =>
 			{
 				cue_.Update(Time.deltaTime);
@@ -156,6 +170,9 @@ namespace Cue
 
 		public void OnEnable()
 		{
+			if (!inited_)
+				return;
+
 			U.Safe(() =>
 			{
 				if (cue_ != null)
@@ -165,7 +182,7 @@ namespace Cue
 
 		public void OnDisable()
 		{
-			if (cue_ == null)
+			if (!inited_)
 				return;
 
 			U.Safe(() =>

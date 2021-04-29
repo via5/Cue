@@ -120,6 +120,7 @@ namespace VUI
 		private Widget focused_ = null;
 
 		private TimerManager ownTm_ = null;
+		private Timer checkReadyTimer_ = null;
 
 		public static Point NoMousePos
 		{
@@ -178,29 +179,7 @@ namespace VUI
 		{
 			support_ = support;
 
-			if (support_.ScriptUI == null)
-			{
-				var rt = support_.RootParent.GetComponent<RectTransform>();
-
-				topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
-				bounds_ = Rectangle.FromPoints(
-					0, 0, rt.rect.width, rt.rect.height);
-			}
-			else
-			{
-				var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
-				var scrollViewRT = scrollView.GetComponent<RectTransform>();
-				topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
-
-				bounds_ = Rectangle.FromPoints(
-					1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
-
-				Style.SetupRoot(support_.ScriptUI);
-			}
-
-			content_.Bounds = new Rectangle(bounds_);
-			floating_.Bounds = new Rectangle(bounds_);
-
+			CheckSupportBounds();
 
 			var text = support_.RootParent.root.GetComponentInChildren<Text>();
 			if (text == null)
@@ -212,6 +191,61 @@ namespace VUI
 				tg_ = text.cachedTextGenerator;
 				ts_ = text.GetGenerationSettings(new Vector2());
 			}
+		}
+
+		private void CheckSupportBounds()
+		{
+			if (support_.ScriptUI == null)
+			{
+				var rt = support_.RootParent.GetComponent<RectTransform>();
+
+				topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
+
+				bounds_ = Rectangle.FromPoints(
+					0, 0, rt.rect.width, rt.rect.height);
+			}
+			else
+			{
+				var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
+				var scrollViewRT = scrollView.GetComponent<RectTransform>();
+
+				if (scrollViewRT.rect.width <= 0 || scrollViewRT.rect.height <= 0)
+				{
+					Glue.LogVerbose("vui: scriptui not ready, starting timer");
+
+					checkReadyTimer_ = TimerManager.Instance.CreateTimer(
+						0.5f, CheckScriptUIReady, Timer.Repeat);
+				}
+
+				topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
+
+				bounds_ = Rectangle.FromPoints(
+					1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
+
+				Style.SetupRoot(support_.ScriptUI);
+			}
+
+			content_.Bounds = new Rectangle(bounds_);
+			floating_.Bounds = new Rectangle(bounds_);
+		}
+
+		private void CheckScriptUIReady()
+		{
+			var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
+			var scrollViewRT = scrollView.GetComponent<RectTransform>();
+
+			if (scrollViewRT.rect.width <= 0 || scrollViewRT.rect.height <= 0)
+			{
+				// still not ready
+				return;
+			}
+
+			checkReadyTimer_?.Destroy();
+			checkReadyTimer_ = null;
+
+			Glue.LogVerbose("vui: scriptui ready, relayout");
+			CheckSupportBounds();
+			Update(true);
 		}
 
 		public void Destroy()

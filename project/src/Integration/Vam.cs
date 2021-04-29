@@ -32,6 +32,7 @@ namespace Cue
 		private W.VamStringChooserParameter lookMode_;
 		private W.VamFloatParameter leftRightAngle_;
 		private W.VamFloatParameter upDownAngle_;
+		private W.VamBoolParameter blink_;
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
 		private Vector3 target_ = Vector3.Zero;
@@ -43,6 +44,7 @@ namespace Cue
 			lookMode_ = new W.VamStringChooserParameter(p, "Eyes", "lookMode");
 			leftRightAngle_ = new W.VamFloatParameter(p, "Eyes", "leftRightAngleAdjust");
 			upDownAngle_ = new W.VamFloatParameter(p, "Eyes", "upDownAngleAdjust");
+			blink_ = new W.VamBoolParameter(p, "EyelidControl", "blinkEnabled");
 
 			eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
 
@@ -120,6 +122,12 @@ namespace Cue
 				target_ = value;
 				eyesImpl_.SetPosition(value);
 			}
+		}
+
+		public bool Blink
+		{
+			get { return blink_.GetValue(); }
+			set { blink_.SetValue(value); }
 		}
 
 		public void Update(float s)

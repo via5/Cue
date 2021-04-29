@@ -194,6 +194,11 @@ namespace Cue
 			}
 		}
 
+		public override string ToString()
+		{
+			return $"{current_:0.##}/({min_:0.##},{max_:0.##})";
+		}
+
 		private void Next()
 		{
 			current_ = U.RandomFloat(min_, max_);
