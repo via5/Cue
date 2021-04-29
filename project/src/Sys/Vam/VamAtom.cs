@@ -4,11 +4,51 @@ using UnityEngine.AI;
 
 namespace Cue.W
 {
+	class VamTrigger : ITrigger
+	{
+		public CollisionTriggerEventHandler h;
+
+		public VamTrigger(CollisionTriggerEventHandler h=null)
+		{
+			this.h = h;
+		}
+
+		public bool Active
+		{
+			get
+			{
+				return h?.collisionTrigger?.trigger?.active ?? false;
+			}
+		}
+
+		public Vector3 Position
+		{
+			get
+			{
+				if (h?.thisRigidbody == null)
+					return Vector3.Zero;
+
+				return W.VamU.FromUnity(h.thisRigidbody.position);
+			}
+		}
+
+		public Vector3 Direction
+		{
+			get
+			{
+				if (h?.thisRigidbody == null)
+					return Vector3.Zero;
+
+				return W.VamU.FromUnity(h.thisRigidbody.rotation.eulerAngles);
+			}
+		}
+	}
+
 	class VamTriggers : ITriggers
 	{
 		private Atom atom_;
-		private CollisionTriggerEventHandler lip_, mouth_, lNipple_, rNipple_;
-		private CollisionTriggerEventHandler labia_, vagina_, deep_, deeper_;
+		private VamTrigger lip_, mouth_, lNipple_, rNipple_;
+		private VamTrigger labia_, vagina_, deep_, deeper_;
 
 		public VamTriggers(Atom a)
 		{
@@ -28,31 +68,26 @@ namespace Cue.W
 			}
 		}
 
-		private bool IsActive(CollisionTriggerEventHandler t)
-		{
-			return t?.collisionTrigger?.trigger?.active ?? false;
-		}
-
-		public bool Lip { get { return IsActive(lip_); } }
-		public bool Mouth { get { return IsActive(mouth_); } }
-		public bool LeftBreast { get { return IsActive(lNipple_); } }
-		public bool RightBreast { get { return IsActive(rNipple_); } }
-		public bool Labia { get { return IsActive(labia_); } }
-		public bool Vagina { get { return IsActive(vagina_); } }
-		public bool DeepVagina { get { return IsActive(deep_); } }
-		public bool DeeperVagina { get { return IsActive(deeper_); } }
+		public ITrigger Lip { get { return lip_; } }
+		public ITrigger Mouth { get { return mouth_; } }
+		public ITrigger LeftBreast { get { return lNipple_; } }
+		public ITrigger RightBreast { get { return rNipple_; } }
+		public ITrigger Labia { get { return labia_; } }
+		public ITrigger Vagina { get { return vagina_; } }
+		public ITrigger DeepVagina { get { return deep_; } }
+		public ITrigger DeeperVagina { get { return deeper_; } }
 
 		public override string ToString()
 		{
 			string s =
-				(Lip ? "M|" : "") +
-				(Mouth ? "MM|" : "") +
-				(LeftBreast ? "LB|" : "") +
-				(RightBreast ? "RB|" : "") +
-				(Labia ? "L|" : "") +
-				(Vagina ? "V|" : "") +
-				(DeepVagina ? "VV|" : "") +
-				(DeeperVagina ? "VVV|" : "");
+				(Lip.Active ? "M|" : "") +
+				(Mouth.Active ? "MM|" : "") +
+				(LeftBreast.Active ? "LB|" : "") +
+				(RightBreast.Active ? "RB|" : "") +
+				(Labia.Active ? "L|" : "") +
+				(Vagina.Active ? "V|" : "") +
+				(DeepVagina.Active ? "VV|" : "") +
+				(DeeperVagina.Active ? "VVV|" : "");
 
 			if (s.EndsWith("|"))
 				return s.Substring(0, s.Length - 1);
@@ -60,23 +95,23 @@ namespace Cue.W
 				return s;
 		}
 
-		private CollisionTriggerEventHandler Get(string name)
+		private VamTrigger Get(string name)
 		{
 			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
 			if (o == null)
 			{
 				Cue.LogError($"VamTriggers: {name} not found");
-				return null;
+				return new VamTrigger();
 			}
 
 			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (t == null)
 			{
 				Cue.LogError($"VamTriggers: {name} has no CollisionTriggerEventHandler");
-				return null;
+				return new VamTrigger();
 			}
 
-			return t;
+			return new VamTrigger(t);
 		}
 	}
 
@@ -137,6 +172,11 @@ namespace Cue.W
 			get { return triggers_; }
 		}
 
+		public bool Teleporting
+		{
+			get { return enableCollisionsCountdown_ > 0; }
+		}
+
 		public Vector3 Position
 		{
 			get
@@ -178,6 +218,18 @@ namespace Cue.W
 					return Vector3.Zero;
 
 				return W.VamU.FromUnity(head_.position);
+			}
+		}
+
+		public Vector3 HeadDirection
+		{
+			get
+			{
+				GetHead();
+				if (head_ == null)
+					return Vector3.Zero;
+
+				return W.VamU.FromUnity(head_.rotation.eulerAngles);
 			}
 		}
 
@@ -535,7 +587,7 @@ namespace Cue.W
 				return;
 
 			var vsys = ((W.VamSys)Cue.Instance.Sys);
-			head_ = vsys.FindRigidbody(atom_, "headControl");
+			head_ = vsys.FindRigidbody(atom_, "head");
 		}
 	}
 }

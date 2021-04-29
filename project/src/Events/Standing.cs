@@ -63,7 +63,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogInfo("going to stand");
-					person_.Gaze.LookInFront();
+					person_.LookInFront();
 					person_.PushAction(new MoveAction(pos, bearing));
 					state_ = Moving;
 					break;

@@ -172,14 +172,14 @@ namespace Cue.W
 
 	class MockTriggers : ITriggers
 	{
-		public bool Lip { get { return false; } }
-		public bool Mouth { get { return false; } }
-		public bool LeftBreast { get { return false; } }
-		public bool RightBreast { get { return false; } }
-		public bool Labia { get { return false; } }
-		public bool Vagina { get { return false; } }
-		public bool DeepVagina { get { return false; } }
-		public bool DeeperVagina { get { return false; } }
+		public ITrigger Lip { get { return null; } }
+		public ITrigger Mouth { get { return null; } }
+		public ITrigger LeftBreast { get { return null; } }
+		public ITrigger RightBreast { get { return null; } }
+		public ITrigger Labia { get { return null; } }
+		public ITrigger Vagina { get { return null; } }
+		public ITrigger DeepVagina { get { return null; } }
+		public ITrigger DeeperVagina { get { return null; } }
 	}
 
 	class MockAtom : IAtom
@@ -212,6 +212,11 @@ namespace Cue.W
 			get { return triggers_; }
 		}
 
+		public bool Teleporting
+		{
+			get { return false; }
+		}
+
 		public Vector3 Position
 		{
 			get { return Vector3.Zero; }
@@ -225,6 +230,11 @@ namespace Cue.W
 		}
 
 		public Vector3 HeadPosition
+		{
+			get { return Vector3.Zero; }
+		}
+
+		public Vector3 HeadDirection
 		{
 			get { return Vector3.Zero; }
 		}

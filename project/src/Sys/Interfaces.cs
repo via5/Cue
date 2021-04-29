@@ -117,16 +117,23 @@ namespace Cue.W
 		}
 	}
 
+	interface ITrigger
+	{
+		bool Active { get; }
+		Vector3 Position { get; }
+		Vector3 Direction { get; }
+	}
+
 	interface ITriggers
 	{
-		bool Lip { get; }
-		bool Mouth { get; }
-		bool LeftBreast { get; }
-		bool RightBreast { get; }
-		bool Labia { get; }
-		bool Vagina { get; }
-		bool DeepVagina { get; }
-		bool DeeperVagina { get; }
+		ITrigger Lip { get; }
+		ITrigger Mouth { get; }
+		ITrigger LeftBreast { get; }
+		ITrigger RightBreast { get; }
+		ITrigger Labia { get; }
+		ITrigger Vagina { get; }
+		ITrigger DeepVagina { get; }
+		ITrigger DeeperVagina { get; }
 	}
 
 	interface IAtom
@@ -135,10 +142,12 @@ namespace Cue.W
 		bool IsPerson { get; }
 		int Sex { get; }
 		ITriggers Triggers { get; }
+		bool Teleporting { get; }
 
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 		Vector3 HeadPosition { get; }
+		Vector3 HeadDirection { get; }
 
 		void SetDefaultControls();
 

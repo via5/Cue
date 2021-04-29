@@ -145,9 +145,9 @@ namespace Cue
 			deeper_ = Check(s, person_.Atom.Triggers.DeeperVagina, deeper_);
 		}
 
-		private float Check(float s, bool trigger, float v)
+		private float Check(float s, W.ITrigger trigger, float v)
 		{
-			if (trigger)
+			if (trigger?.Active ?? false)
 				return 1;
 			else
 				return Math.Max(v - s * decay_, 0);
@@ -209,6 +209,7 @@ namespace Cue
 		private IAI ai_ = null;
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
+		private IEyes eyes_;
 		private IGazer gaze_;
 		private ISpeaker speech_;
 		private IKisser kisser_;
@@ -227,6 +228,7 @@ namespace Cue
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
+			eyes_ = Integration.CreateEyes(this);
 			speech_ = Integration.CreateSpeaker(this);
 			gaze_ = Integration.CreateGazer(this);
 			kisser_ = Integration.CreateKisser(this);
@@ -234,6 +236,8 @@ namespace Cue
 			clothing_ = Integration.CreateClothing(this);
 			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
+
+			Atom.SetDefaultControls();
 		}
 
 		public bool Idle
@@ -260,6 +264,7 @@ namespace Cue
 		public IAI AI { get { return ai_; } }
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
+		public IEyes Eyes { get { return eyes_; } }
 		public IGazer Gaze { get { return gaze_; } }
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
@@ -299,6 +304,30 @@ namespace Cue
 			actions_.Clear();
 			animator_.Stop();
 			Atom.SetDefaultControls();
+		}
+
+		public void LookAt(IObject o, bool gaze = true)
+		{
+			eyes_.LookAt(o);
+			gaze_.Enabled = gaze;
+		}
+
+		public void LookAt(Vector3 p, bool gaze = true)
+		{
+			eyes_.LookAt(p);
+			gaze_.Enabled = gaze;
+		}
+
+		public void LookAtNothing()
+		{
+			eyes_.LookAtNothing();
+			gaze_.Enabled = false;
+		}
+
+		public void LookInFront()
+		{
+			eyes_.LookInFront();
+			gaze_.Enabled = false;
 		}
 
 		public bool InteractWith(IObject o)
@@ -372,12 +401,13 @@ namespace Cue
 
 			animator_.Update(s);
 			actions_.Tick(this, s);
+			eyes_.Update(s);
 			gaze_.Update(s);
 			kisser_.Update(s);
 			expression_.Update(s);
 			excitement_.Update(s);
 
-			if (ai_ != null)
+			if (ai_ != null && !Atom.Teleporting)
 				ai_.Update(s);
 		}
 

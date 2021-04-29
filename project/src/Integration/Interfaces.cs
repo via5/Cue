@@ -76,6 +76,11 @@
 			return new VamSpeaker(p);
 		}
 
+		public static IEyes CreateEyes(Person p)
+		{
+			return new VamEyes(p);
+		}
+
 		public static IGazer CreateGazer(Person p)
 		{
 			return new MacGruberGaze(p);
@@ -115,14 +120,19 @@
 
 	interface IGazer
 	{
+		bool Enabled { get; set; }
+		void Update(float s);
+	}
+
+	interface IEyes
+	{
 		bool Blink { get; set; }
 
+		void Update(float s);
 		void LookAt(IObject o);
 		void LookAt(Vector3 p);
 		void LookInFront();
 		void LookAtNothing();
-
-		void Update(float s);
 	}
 
 	interface ISpeaker
@@ -132,8 +142,10 @@
 
 	interface IKisser
 	{
+		bool Active { get; }
 		void Update(float s);
 		void Kiss(Person p);
+		void KissReciprocal(Person p);
 	}
 
 	interface IHandjob

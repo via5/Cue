@@ -4,9 +4,14 @@
 	{
 		private Person person_;
 		private W.VamBoolParameter kissingRunning_ = null;
-		private W.VamBoolParameter active_ = null;
+		private W.VamBoolParameter activate_ = null;
 		private W.VamStringChooserParameter atom_ = null;
 		private W.VamStringChooserParameter target_ = null;
+		private W.VamBoolParameter trackPos_ = null;
+		private W.VamBoolParameter trackRot_ = null;
+		private W.VamFloatParameter headAngleX_ = null;
+		private W.VamFloatParameter headAngleY_ = null;
+		private W.VamFloatParameter headAngleZ_ = null;
 		private bool wasKissing_ = false;
 
 		public ClockwiseSilverKiss(Person p)
@@ -16,7 +21,7 @@
 			kissingRunning_ = new W.VamBoolParameter(
 				p, "ClockwiseSilver.Kiss", "Is Kissing");
 
-			active_ = new W.VamBoolParameter(
+			activate_ = new W.VamBoolParameter(
 				p, "ClockwiseSilver.Kiss", "isActive");
 
 			atom_ = new W.VamStringChooserParameter(
@@ -24,6 +29,28 @@
 
 			target_ = new W.VamStringChooserParameter(
 				p, "ClockwiseSilver.Kiss", "kissTargetJSON");
+
+			trackPos_ = new W.VamBoolParameter(
+				p, "ClockwiseSilver.Kiss", "trackPosition");
+
+			trackRot_ = new W.VamBoolParameter(
+				p, "ClockwiseSilver.Kiss", "trackRotation");
+
+			headAngleX_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Head Angle X");
+
+			headAngleY_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Head Angle Y");
+
+			headAngleZ_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Head Angle Z");
+
+			activate_.SetValue(false);
+		}
+
+		public bool Active
+		{
+			get { return kissingRunning_.GetValue(); }
 		}
 
 		public void Update(float s)
@@ -31,15 +58,65 @@
 			var k = kissingRunning_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
+
+			if (wasKissing_)
+			{
+				var tid = atom_.GetValue();
+				if (tid != "")
+				{
+					var t = Cue.Instance.FindPerson(tid);
+					if (t != null && t.Atom.Triggers.Lip != null)
+					{
+						var tp = t.Atom.Triggers.Lip.Position;
+						if (Vector3.Distance(person_.Atom.Triggers.Lip.Position, tp) >= 0.05f)
+						{
+							Stop();
+
+							var tk = t.Kisser as ClockwiseSilverKiss;
+							if (tk != null)
+								tk.Stop();
+						}
+					}
+				}
+			}
+		}
+
+		public void Stop()
+		{
+			activate_.SetValue(false);
 		}
 
 		public void Kiss(Person target)
 		{
+			DoKiss(target, true);
+		}
+
+		public void KissReciprocal(Person target)
+		{
+			var t = target.Kisser as ClockwiseSilverKiss;
+			if (t == null)
+			{
+				Cue.LogError("Clockwise: can't kiss, target is not using clockwise");
+				return;
+			}
+
+			DoKiss(target, true);
+			t.DoKiss(person_, false);
+		}
+
+		private void DoKiss(Person target, bool pos)
+		{
 			atom_.SetValue(target.ID);
 			target_.SetValue("LipTrigger");
-			active_.SetValue(true);
-			person_.Gaze.LookAt(target);
-			target.Gaze.LookAt(person_);
+			activate_.SetValue(true);
+			person_.LookAt(target, false);
+			target.LookAt(person_, false);
+			trackPos_.SetValue(pos);
+			trackRot_.SetValue(true);
+			wasKissing_ = true;
+
+			headAngleX_.SetValue(-10);
+			headAngleZ_.SetValue(-40);
 		}
 
 		private void SetActive(bool b)
@@ -61,14 +138,14 @@
 					else
 					{
 						Cue.LogInfo($"Clockwise: now kissing {target}");
-						person_.Gaze.LookAt(target);
+						person_.LookAt(target, false);
 					}
 				}
 			}
 			else
 			{
 				Cue.LogInfo("Clockwise: kiss stopped");
-				person_.Gaze.LookAt(Cue.Instance.Player);
+				person_.LookAt(Cue.Instance.Player);
 			}
 
 			wasKissing_ = b;

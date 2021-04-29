@@ -247,7 +247,7 @@ namespace Cue
 			morph_.morphValue = v;
 
 			if (disableBlinkAbove_ != NoDisableBlink)
-				person_.Gaze.Blink = (d < disableBlinkAbove_);
+				person_.Eyes.Blink = (d < disableBlinkAbove_);
 
 			d = Math.Abs(d);
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -159,6 +160,33 @@ namespace Cue
 			}
 
 			mood_.Update(s);
+
+
+			if (person_.Atom.Triggers.Lip != null)
+			{
+				var p = person_.Atom.Triggers.Lip.Position;
+
+				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+				{
+					var target = Cue.Instance.Persons[i];
+					if (target == person_)
+						continue;
+
+					if (target.Atom.Triggers.Lip == null)
+						continue;
+
+					// todo: check rotations
+
+					var tp = target.Atom.Triggers.Lip.Position;
+					if (Vector3.Distance(p, tp) < 0.2f)
+					{
+						if (!person_.Kisser.Active && !target.Kisser.Active)
+						{
+							person_.Kisser.KissReciprocal(target);
+						}
+					}
+				}
+			}
 		}
 
 		public void OnPluginState(bool b)

@@ -48,7 +48,7 @@ namespace Cue
 				case NoState:
 				{
 					Cue.LogInfo("going to sit");
-					person_.Gaze.LookInFront();
+					person_.LookInFront();
 					person_.PushAction(new MoveAction(pos, BasicObject.NoBearing));
 					state_ = Moving;
 					break;

@@ -26,7 +26,7 @@ namespace Cue
 		}
 	}
 
-	class VamEyes
+	class VamEyes : IEyes
 	{
 		private Person person_;
 		private W.VamStringChooserParameter lookMode_;
@@ -35,8 +35,7 @@ namespace Cue
 		private W.VamBoolParameter blink_;
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
-		private Vector3 target_ = Vector3.Zero;
-		private int lookAt_ = GazeSettings.LookAtDisabled;
+		private IObject object_ = null;
 
 		public VamEyes(Person p)
 		{
@@ -64,76 +63,47 @@ namespace Cue
 			}
 		}
 
-		public int LookAt
-		{
-			get
-			{
-				string s = lookMode_.GetValue();
-
-				if (s == "Player")
-					return GazeSettings.LookAtPlayer;
-				else if (s == "Target")
-					return GazeSettings.LookAtTarget;
-				else
-					return GazeSettings.LookAtDisabled;
-			}
-
-			set
-			{
-				lookAt_ = value;
-
-				switch (value)
-				{
-					case GazeSettings.LookAtDisabled:
-					{
-						lookMode_.SetValue("None");
-						break;
-					}
-
-					case GazeSettings.LookAtTarget:
-					{
-						lookMode_.SetValue("Target");
-						break;
-					}
-					case GazeSettings.LookAtPlayer:
-					{
-						lookMode_.SetValue("Player");
-						break;
-					}
-				}
-			}
-		}
-
-		public Vector3 Target
-		{
-			get
-			{
-				if (eyes_ == null)
-					return Vector3.Zero;
-
-				return W.VamU.FromUnity(eyes_.position);
-			}
-
-			set
-			{
-				if (eyes_ == null)
-					return;
-
-				target_ = value;
-				eyesImpl_.SetPosition(value);
-			}
-		}
-
 		public bool Blink
 		{
 			get { return blink_.GetValue(); }
 			set { blink_.SetValue(value); }
 		}
 
+		public void LookAt(IObject o)
+		{
+			object_ = o;
+			lookMode_.SetValue("Target");
+			eyesImpl_.SetPosition(object_.Atom.HeadPosition);
+		}
+
+		public void LookAt(Vector3 p)
+		{
+			object_ = null;
+			lookMode_.SetValue("Target");
+			eyesImpl_.SetPosition(p);
+		}
+
+		public void LookInFront()
+		{
+			object_ = null;
+
+			eyesImpl_.SetPosition(
+				person_.HeadPosition +
+				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
+
+			lookMode_.SetValue("None");
+		}
+
+		public void LookAtNothing()
+		{
+			object_ = null;
+			lookMode_.SetValue("None");
+		}
+
 		public void Update(float s)
 		{
-			if (lookAt_ == GazeSettings.LookAtTarget)
-				eyesImpl_.SetPosition(target_);
+			if (object_ != null)
+				eyesImpl_.SetPosition(object_.Atom.HeadPosition);
 		}
 
 		public override string ToString()

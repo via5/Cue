@@ -116,13 +116,9 @@ namespace Cue
 				foreach (var p in persons_)
 				{
 					if (p == o)
-					{
-						p.Gaze.LookAtNothing();
-					}
+						p.LookAtNothing();
 					else if (o is Person)
-					{
-						p.Gaze.LookAt(o);
-					}
+						p.LookAt(o);
 				}
 			}
 		}
