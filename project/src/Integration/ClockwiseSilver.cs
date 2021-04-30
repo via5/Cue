@@ -53,32 +53,26 @@
 			get { return kissingRunning_.GetValue(); }
 		}
 
+		public Person Target
+		{
+			get
+			{
+				if (!Active)
+					return null;
+
+				var tid = atom_.GetValue();
+				if (tid == "")
+					return null;
+
+				return Cue.Instance.FindPerson(tid);
+			}
+		}
+
 		public void Update(float s)
 		{
 			var k = kissingRunning_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
-
-			if (wasKissing_)
-			{
-				var tid = atom_.GetValue();
-				if (tid != "")
-				{
-					var t = Cue.Instance.FindPerson(tid);
-					if (t != null && t.Atom.Triggers.Lip != null)
-					{
-						var tp = t.Atom.Triggers.Lip.Position;
-						if (Vector3.Distance(person_.Atom.Triggers.Lip.Position, tp) >= 0.05f)
-						{
-							Stop();
-
-							var tk = t.Kisser as ClockwiseSilverKiss;
-							if (tk != null)
-								tk.Stop();
-						}
-					}
-				}
-			}
 		}
 
 		public void Stop()
@@ -86,17 +80,17 @@
 			activate_.SetValue(false);
 		}
 
-		public void Kiss(Person target)
+		public void Start(Person target)
 		{
 			DoKiss(target, true);
 		}
 
-		public void KissReciprocal(Person target)
+		public void StartReciprocal(Person target)
 		{
 			var t = target.Kisser as ClockwiseSilverKiss;
 			if (t == null)
 			{
-				Cue.LogError("Clockwise: can't kiss, target is not using clockwise");
+				Cue.LogError($"Clockwise {person_}: can't kiss, {target} is not using clockwise");
 				return;
 			}
 
@@ -123,28 +117,28 @@
 		{
 			if (b)
 			{
-				Cue.LogInfo("Clockwise: kiss got activated");
+				Cue.LogInfo($"Clockwise {person_}: kiss got activated");
 
 				var atom = atom_.GetValue();
-				Cue.LogInfo($"Clockwise: atom is '{atom}'");
+				Cue.LogInfo($"Clockwise {person_}: target is '{atom}'");
 
 				if (atom != "")
 				{
 					var target = Cue.Instance.FindPerson(atom);
 					if (target == null)
 					{
-						Cue.LogInfo($"Clockwise: person '{atom}' not found");
+						Cue.LogInfo($"Clockwise {person_}: person '{atom}' not found");
 					}
 					else
 					{
-						Cue.LogInfo($"Clockwise: now kissing {target}");
+						Cue.LogInfo($"Clockwise {person_}: now kissing {target}");
 						person_.LookAt(target, false);
 					}
 				}
 			}
 			else
 			{
-				Cue.LogInfo("Clockwise: kiss stopped");
+				Cue.LogInfo($"Clockwise {person_}: kiss stopped");
 				person_.LookAt(Cue.Instance.Player);
 			}
 

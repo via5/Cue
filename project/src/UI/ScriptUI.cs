@@ -256,6 +256,7 @@ namespace Cue.UI
 		private VUI.Label state_ = new VUI.Label();
 
 		private VUI.Label breath_ = new VUI.Label();
+		private VUI.Label eyes_ = new VUI.Label();
 		private VUI.Label gaze_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
 		private VUI.Label kiss_ = new VUI.Label();
@@ -302,6 +303,9 @@ namespace Cue.UI
 			state.Add(new VUI.Label("Breath"));
 			state.Add(breath_);
 
+			state.Add(new VUI.Label("Eyes"));
+			state.Add(eyes_);
+
 			state.Add(new VUI.Label("Gaze"));
 			state.Add(gaze_);
 
@@ -338,6 +342,7 @@ namespace Cue.UI
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
 
 			breath_.Text = person_.Breathing.ToString();
+			eyes_.Text = person_.Eyes.ToString();
 			gaze_.Text = person_.Gaze.ToString();
 			speech_.Text = person_.Speech.ToString();
 			kiss_.Text = person_.Kisser.ToString();

@@ -152,7 +152,7 @@
 			if (Cue.Instance.Selected is Person)
 			{
 				var p = ((Person)Cue.Instance.Selected);
-				p.Kisser.Kiss(Cue.Instance.Player);
+				p.Kisser.Start(Cue.Instance.Player);
 			}
 		}
 

@@ -15,6 +15,96 @@ namespace Cue
 	}
 
 
+	interface IInteraction
+	{
+		void Update(float s);
+	}
+
+	class KissingInteraction : IInteraction
+	{
+		public const float StartDistance = 0.2f;
+		public const float StopDistance = 0.05f;
+		public const float MinimumTime = 5;
+
+		private Person person_;
+		private float elapsed_ = 0;
+
+		public KissingInteraction(Person p)
+		{
+			person_ = p;
+		}
+
+		public void Update(float s)
+		{
+			if (person_.Atom.Triggers.Lip == null)
+				return;
+
+			if (person_.Kisser.Active)
+			{
+				elapsed_ += s;
+
+				if (elapsed_ >= MinimumTime)
+					TryStop();
+			}
+			else
+			{
+				TryStart();
+			}
+		}
+
+		private bool TryStart()
+		{
+			var srcLips = person_.Atom.Triggers.Lip.Position;
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				var target = Cue.Instance.Persons[i];
+				if (target == person_)
+					continue;
+
+				if (target.Atom.Triggers.Lip == null || target.Kisser.Active)
+					continue;
+
+				// todo: check rotations
+				var targetLips = target.Atom.Triggers.Lip.Position;
+
+				if (Vector3.Distance(srcLips, targetLips) < StartDistance)
+				{
+					Cue.LogInfo($"starting kiss for {person_} and {target}");
+					person_.Kisser.StartReciprocal(target);
+					elapsed_ = 0;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private bool TryStop()
+		{
+			var target = person_.Kisser.Target;
+			if (target == null)
+				return false;
+
+			if (target.Atom.Triggers.Lip == null)
+				return false;
+
+			var srcLips = person_.Atom.Triggers.Lip.Position;
+			var targetLips = target.Atom.Triggers.Lip.Position;
+
+			if (Vector3.Distance(srcLips, targetLips) >= StopDistance)
+			{
+				Cue.LogInfo($"stopping kiss for {person_} and {target}");
+				person_.Kisser.Stop();
+				target.Kisser.Stop();
+				return true;
+			}
+
+			return false;
+		}
+	}
+
+
 	class PersonAI : IAI
 	{
 		private Person person_ = null;
@@ -22,6 +112,7 @@ namespace Cue
 		private readonly List<IEvent> events_ = new List<IEvent>();
 		private bool enabled_ = false;
 		private IEvent forced_ = null;
+		private readonly List<IInteraction> interactions_ = new List<IInteraction>();
 		private Mood mood_;
 
 		public PersonAI(Person p)
@@ -38,6 +129,8 @@ namespace Cue
 				if (o.Slots.Has(Slot.Stand))
 					events_.Add(new StandEvent(person_, o));
 			}
+
+			interactions_.Add(new KissingInteraction(person_));
 		}
 
 		public bool Enabled
@@ -161,32 +254,8 @@ namespace Cue
 
 			mood_.Update(s);
 
-
-			if (person_.Atom.Triggers.Lip != null)
-			{
-				var p = person_.Atom.Triggers.Lip.Position;
-
-				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
-				{
-					var target = Cue.Instance.Persons[i];
-					if (target == person_)
-						continue;
-
-					if (target.Atom.Triggers.Lip == null)
-						continue;
-
-					// todo: check rotations
-
-					var tp = target.Atom.Triggers.Lip.Position;
-					if (Vector3.Distance(p, tp) < 0.2f)
-					{
-						if (!person_.Kisser.Active && !target.Kisser.Active)
-						{
-							person_.Kisser.KissReciprocal(target);
-						}
-					}
-				}
-			}
+			for (int i = 0; i < interactions_.Count; ++i)
+				interactions_[i].Update(s);
 		}
 
 		public void OnPluginState(bool b)

@@ -143,9 +143,12 @@
 	interface IKisser
 	{
 		bool Active { get; }
+		Person Target { get; }
+
 		void Update(float s);
-		void Kiss(Person p);
-		void KissReciprocal(Person p);
+		void Start(Person p);
+		void StartReciprocal(Person p);
+		void Stop();
 	}
 
 	interface IHandjob

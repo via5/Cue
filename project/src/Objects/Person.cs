@@ -469,14 +469,6 @@ namespace Cue
 			speech_.Say(s);
 		}
 
-		public override string ToString()
-		{
-			return
-				base.ToString() + ", " +
-				Sexes.ToString(Sex) + ", " +
-				state_.ToString();
-		}
-
 		protected override bool StartMove()
 		{
 			if (State.IsUpright)

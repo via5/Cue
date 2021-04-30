@@ -4,9 +4,8 @@ using System.Diagnostics;
 
 namespace Cue
 {
-	class PluginGone : Exception
-	{
-	}
+	class PluginGone : Exception { }
+
 
 	class Tickers
 	{
@@ -206,12 +205,8 @@ namespace Cue
 
 		private void TestStuff()
 		{
-			var a = FindPerson("A");
-
-			a.Personality = new QuirkyPersonality(a);
-			a.AI.Mood.State = Mood.Happy;
 			//a.Clothing.GenitalsVisible = true;
-			Select(a);
+			//Select(a);
 
 			//U.DumpComponentsAndDown(t);
 
