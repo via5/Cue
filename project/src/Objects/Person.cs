@@ -450,7 +450,17 @@ namespace Cue
 
 		public override Vector3 EyeInterest
 		{
-			get { return body_.Head?.Position ?? base.EyeInterest; }
+			get
+			{
+				if (this == Cue.Instance.Player)
+				{
+					return Cue.Instance.Sys.Camera;
+				}
+				else
+				{
+					return body_.Head?.Position ?? base.EyeInterest;
+				}
+			}
 		}
 
 		public IPersonality Personality
@@ -475,6 +485,14 @@ namespace Cue
 			actions_.Clear();
 			animator_.Stop();
 			Atom.SetDefaultControls();
+		}
+
+		public void LookAtDefault()
+		{
+			if (this == Cue.Instance.Player)
+				LookAtNothing();
+			else
+				LookAt(Cue.Instance.Player);
 		}
 
 		public void LookAt(IObject o, bool gaze = true)

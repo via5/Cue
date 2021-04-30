@@ -32,6 +32,7 @@ namespace Cue.W
 		IAtom ContainingAtom { get; }
 		INav Nav { get; }
 		IInput Input { get; }
+		Vector3 Camera { get; }
 		bool Paused { get; }
 		void OnPluginState(bool b);
 		void OnReady(Action f);

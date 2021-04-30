@@ -154,8 +154,8 @@ namespace Cue
 			FindObjects();
 			FindPlayer();
 
-			LogInfo("cue: moving objects to spawn points");
-			MoveToSpawnPoints();
+			LogInfo("cue: initializing persons");
+			InitPersons();
 
 			LogInfo("cue: enabling plugin state");
 			OnPluginState(true);
@@ -176,7 +176,7 @@ namespace Cue
 			LogInfo("cue: init finished");
 		}
 
-		private void MoveToSpawnPoints()
+		private void InitPersons()
 		{
 			var spawnPoints = new List<Slot>();
 			foreach (var o in objects_)
@@ -184,11 +184,12 @@ namespace Cue
 
 			for (int i = 0; i < persons_.Count; ++i)
 			{
-				if (i >= spawnPoints.Count)
-					break;
+				var p = persons_[i];
 
-				persons_[i].TeleportTo(
-					spawnPoints[i].Position, spawnPoints[i].Bearing);
+				if (i < spawnPoints.Count)
+					p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
+
+				p.LookAtDefault();
 			}
 		}
 

@@ -13,6 +13,7 @@
 		private W.VamFloatParameter headAngleY_ = null;
 		private W.VamFloatParameter headAngleZ_ = null;
 		private bool wasKissing_ = false;
+		private float elapsed_ = 0;
 
 		public ClockwiseSilverKiss(Person p)
 		{
@@ -53,6 +54,11 @@
 			get { return kissingRunning_.GetValue(); }
 		}
 
+		public float Elapsed
+		{
+			get { return elapsed_; }
+		}
+
 		public Person Target
 		{
 			get
@@ -70,6 +76,8 @@
 
 		public void Update(float s)
 		{
+			elapsed_ += s;
+
 			var k = kissingRunning_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
@@ -78,6 +86,7 @@
 		public void Stop()
 		{
 			activate_.SetValue(false);
+			elapsed_ = 0;
 		}
 
 		public void Start(Person target)
@@ -111,10 +120,14 @@
 
 			headAngleX_.SetValue(-10);
 			headAngleZ_.SetValue(-40);
+
+			elapsed_ = 0;
 		}
 
 		private void SetActive(bool b)
 		{
+			elapsed_ = 0;
+
 			if (b)
 			{
 				Cue.LogInfo($"Clockwise {person_}: kiss got activated");
@@ -139,7 +152,7 @@
 			else
 			{
 				Cue.LogInfo($"Clockwise {person_}: kiss stopped");
-				person_.LookAt(Cue.Instance.Player);
+				person_.LookAtDefault();
 			}
 
 			wasKissing_ = b;

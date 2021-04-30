@@ -94,6 +94,11 @@ namespace Cue.W
 			get { return new VamAtom(script_.containingAtom); }
 		}
 
+		public Vector3 Camera
+		{
+			get { return VamU.FromUnity(SuperController.singleton.lookCamera.transform.position); }
+		}
+
 		public bool Paused
 		{
 			get { return SuperController.singleton.freezeAnimation; }

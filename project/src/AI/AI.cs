@@ -24,10 +24,10 @@ namespace Cue
 	{
 		public const float StartDistance = 0.2f;
 		public const float StopDistance = 0.05f;
-		public const float MinimumTime = 5;
+		public const float MinimumActiveTime = 5;
+		public const float MinimumStoppedTime = 5;
 
 		private Person person_;
-		private float elapsed_ = 0;
 
 		public KissingInteraction(Person p)
 		{
@@ -41,14 +41,13 @@ namespace Cue
 
 			if (person_.Kisser.Active)
 			{
-				elapsed_ += s;
-
-				if (elapsed_ >= MinimumTime)
+				if (person_.Kisser.Elapsed >= MinimumActiveTime)
 					TryStop();
 			}
 			else
 			{
-				TryStart();
+				if (person_.Kisser.Elapsed >= MinimumStoppedTime)
+					TryStart();
 			}
 		}
 
@@ -72,7 +71,6 @@ namespace Cue
 				{
 					Cue.LogInfo($"starting kiss for {person_} and {target}");
 					person_.Kisser.StartReciprocal(target);
-					elapsed_ = 0;
 					return true;
 				}
 			}

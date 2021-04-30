@@ -48,6 +48,11 @@ namespace Cue.W
 			get { return null; }
 		}
 
+		public Vector3 Camera
+		{
+			get { return Vector3.Zero; }
+		}
+
 		public IAtom GetAtom(string id)
 		{
 			return new MockAtom(id);

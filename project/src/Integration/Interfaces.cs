@@ -144,6 +144,7 @@
 	{
 		bool Active { get; }
 		Person Target { get; }
+		float Elapsed { get; }
 
 		void Update(float s);
 		void Start(Person p);
