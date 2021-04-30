@@ -196,19 +196,26 @@ namespace VUI
 			private bool setFont_ = true;
 			private bool enabled_ = true;
 			private Font font_ = null;
+			private FontStyle fontStyle_ = FontStyle.Normal;
 			private int fontSize_ = -1;
+			private Color textColor_ = Theme.TextColor;
 
 			public Info(Widget w, bool setFont = true)
-				: this(setFont, w.Enabled, w.Font, w.FontSize)
+				: this(setFont, w.Enabled, w.Font, w.FontStyle, w.FontSize, w.TextColor)
 			{
 			}
 
-			public Info(bool setFont, bool enabled, Font font, int fontSize)
+			public Info(
+				bool setFont, bool enabled,
+				Font font, FontStyle fontStyle, int fontSize,
+				Color textColor)
 			{
 				setFont_ = setFont;
 				enabled_ = enabled;
 				font_ = font;
+				fontStyle_ = fontStyle;
 				fontSize_ = fontSize;
+				textColor_ = textColor;
 			}
 
 			public bool SetFont
@@ -226,19 +233,29 @@ namespace VUI
 				get { return font_ ?? theme_.DefaultFont; }
 			}
 
+			public FontStyle FontStyle
+			{
+				get { return fontStyle_; }
+			}
+
 			public int FontSize
 			{
 				get { return fontSize_ < 0 ? theme_.DefaultFontSize : fontSize_; }
 			}
 
+			public Color TextColor
+			{
+				get { return textColor_; }
+			}
+
 			public Info WithFontSize(int size)
 			{
-				return new Info(setFont_, enabled_, font_, size);
+				return new Info(setFont_, enabled_, font_, fontStyle_, size, textColor_);
 			}
 
 			public Info WithSetFont(bool b)
 			{
-				return new Info(b, enabled_, font_, fontSize_);
+				return new Info(b, enabled_, font_, fontStyle_, fontSize_, textColor_);
 			}
 		}
 
@@ -566,11 +583,12 @@ namespace VUI
 			ForComponent<Text>(cb.Arrow, (text) =>
 			{
 				if (cb.Enabled)
-					text.color = theme_.TextColor;
+					text.color = cb.TextColor;
 				else
 					text.color = theme_.DisabledTextColor;
 
 				text.fontSize = (cb.FontSize > 0 ? cb.FontSize :theme_.DefaultFontSize);
+				text.fontStyle = cb.FontStyle;
 				text.font = cb.Font ? cb.Font : theme_.DefaultFont;
 			});
 		}
@@ -694,7 +712,7 @@ namespace VUI
 			if (info.Enabled)
 			{
 				// color of the text on the toggle
-				e.textColor = theme_.TextColor;
+				e.textColor = info.TextColor;
 			}
 			else
 			{
@@ -720,12 +738,15 @@ namespace VUI
 			ForComponentInChildren<UIStyleText>(e, (st) =>
 			{
 				if (info.Enabled)
-					st.color = p.textColor;
+					st.color = info.TextColor;
 				else
 					st.color = p.disabledTextColor;
 
 				if (info.SetFont)
+				{
 					st.fontSize = info.FontSize;
+					st.fontStyle = info.FontStyle;
+				}
 
 				st.UpdateStyle();
 			});
@@ -758,6 +779,7 @@ namespace VUI
 			{
 				e.buttonText.font = info.Font;
 				e.buttonText.fontSize = info.FontSize;
+				e.buttonText.fontStyle = info.FontStyle;
 			}
 		}
 
@@ -799,11 +821,12 @@ namespace VUI
 
 		private static void Polish(Text e, Info info)
 		{
-			e.color = theme_.TextColor;
+			e.color = info.TextColor;
 
 			if (info.SetFont)
 			{
 				e.fontSize = info.FontSize;
+				e.fontStyle = info.FontStyle;
 				e.font = info.Font;
 			}
 		}
@@ -833,6 +856,7 @@ namespace VUI
 				if (info.SetFont)
 				{
 					text.fontSize = info.FontSize;
+					text.fontStyle = info.FontStyle;
 					text.font = info.Font;
 				}
 			}
@@ -1005,7 +1029,7 @@ namespace VUI
 					ForComponentInChildren<UIStyleText>(item, (st) =>
 					{
 						if (info.Enabled)
-							st.color = itemPolish.textColor;
+							st.color = info.TextColor;
 						else
 							st.color = itemPolish.disabledTextColor;
 
@@ -1062,7 +1086,7 @@ namespace VUI
 			}
 			else
 			{
-				picker.labelText.color = theme_.TextColor;
+				picker.labelText.color = info.TextColor;
 				picker.labelText.alignment = TextAnchor.MiddleLeft;
 			}
 
@@ -1222,8 +1246,8 @@ namespace VUI
 						ForComponent<Text>(textObject, (text) =>
 						{
 							Polish(text, new Info(
-								false, info.Enabled, info.Font,
-								theme_.SliderTextSize));
+								false, info.Enabled, info.Font, info.FontStyle,
+								theme_.SliderTextSize, info.TextColor));
 						});
 					});
 
@@ -1242,7 +1266,7 @@ namespace VUI
 							}
 							else
 							{
-								field.textComponent.color = theme_.TextColor;
+								field.textComponent.color = info.TextColor;
 								field.textComponent.fontSize = theme_.SliderTextSize;
 							}
 						});

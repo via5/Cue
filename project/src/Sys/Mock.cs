@@ -170,22 +170,10 @@ namespace Cue.W
 		}
 	}
 
-	class MockTriggers : ITriggers
-	{
-		public ITrigger Lip { get { return null; } }
-		public ITrigger Mouth { get { return null; } }
-		public ITrigger LeftBreast { get { return null; } }
-		public ITrigger RightBreast { get { return null; } }
-		public ITrigger Labia { get { return null; } }
-		public ITrigger Vagina { get { return null; } }
-		public ITrigger DeepVagina { get { return null; } }
-		public ITrigger DeeperVagina { get { return null; } }
-	}
 
 	class MockAtom : IAtom
 	{
 		private string id_;
-		private MockTriggers triggers_ = new MockTriggers();
 
 		public MockAtom(string id)
 		{
@@ -207,11 +195,6 @@ namespace Cue.W
 			get { return Sexes.Any; }
 		}
 
-		public ITriggers Triggers
-		{
-			get { return triggers_; }
-		}
-
 		public bool Teleporting
 		{
 			get { return false; }
@@ -229,19 +212,14 @@ namespace Cue.W
 			set { }
 		}
 
-		public Vector3 HeadPosition
-		{
-			get { return Vector3.Zero; }
-		}
-
-		public Vector3 HeadDirection
-		{
-			get { return Vector3.Zero; }
-		}
-
 		public void Say(string s)
 		{
 			Cue.LogInfo(id_ + " says '" + s + "'");
+		}
+
+		public List<IBodyPart> GetBodyParts()
+		{
+			return new List<IBodyPart>();
 		}
 
 		public void SetDefaultControls()

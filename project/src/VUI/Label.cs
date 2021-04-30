@@ -25,6 +25,12 @@ namespace VUI
 			align_ = align;
 		}
 
+		public Label(string t, FontStyle fs)
+			: this(t)
+		{
+			FontStyle = fs;
+		}
+
 		public string Text
 		{
 			get
@@ -91,6 +97,12 @@ namespace VUI
 			textObject_.raycastTarget = false;
 
 			Style.Setup(this);
+		}
+
+		protected override void DoPolish()
+		{
+			base.DoPolish();
+			Style.Polish(this);
 		}
 
 		public override void UpdateBounds()

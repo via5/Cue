@@ -1,34 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Cue.W
 {
-	class VamTrigger : ITrigger
+	class TriggerBodyPart : IBodyPart
 	{
-		public CollisionTriggerEventHandler h;
+		private VamAtom atom_;
+		private int type_;
+		private CollisionTriggerEventHandler h_;
+		private Trigger trigger_;
+		private Rigidbody rb_;
 
-		public VamTrigger(CollisionTriggerEventHandler h=null)
+		public TriggerBodyPart(VamAtom a, int type, CollisionTriggerEventHandler h)
 		{
-			this.h = h;
+			atom_ = a;
+			type_ = type;
+			h_ = h;
+			trigger_ = h.collisionTrigger.trigger;
+			rb_ = h.thisRigidbody;
 		}
 
-		public bool Active
+		public int Type
 		{
-			get
-			{
-				return h?.collisionTrigger?.trigger?.active ?? false;
-			}
+			get { return type_; }
+		}
+
+		public bool Triggering
+		{
+			get { return trigger_.active; }
 		}
 
 		public Vector3 Position
 		{
 			get
 			{
-				if (h?.thisRigidbody == null)
+				if (rb_ == null)
 					return Vector3.Zero;
-
-				return W.VamU.FromUnity(h.thisRigidbody.position);
+				else
+					return W.VamU.FromUnity(rb_.position);
 			}
 		}
 
@@ -36,89 +47,18 @@ namespace Cue.W
 		{
 			get
 			{
-				if (h?.thisRigidbody == null)
+				if (rb_ == null)
 					return Vector3.Zero;
-
-				return W.VamU.FromUnity(h.thisRigidbody.rotation.eulerAngles);
+				else
+					return W.VamU.FromUnity(rb_.rotation.eulerAngles);
 			}
 		}
 	}
 
-	class VamTriggers : ITriggers
-	{
-		private Atom atom_;
-		private VamTrigger lip_, mouth_, lNipple_, rNipple_;
-		private VamTrigger labia_, vagina_, deep_, deeper_;
-
-		public VamTriggers(Atom a)
-		{
-			atom_ = a;
-
-			var c = a.GetComponentInChildren<DAZCharacter>();
-			if (c != null && !c.isMale)
-			{
-				lip_ = Get("LipTrigger");
-				mouth_ = Get("MouthTrigger");
-				lNipple_ = Get("lNippleTrigger");
-				rNipple_ = Get("rNippleTrigger");
-				labia_ = Get("LabiaTrigger");
-				vagina_ = Get("VaginaTrigger");
-				deep_ = Get("DeepVaginaTrigger");
-				deeper_ = Get("DeeperVaginaTrigger");
-			}
-		}
-
-		public ITrigger Lip { get { return lip_; } }
-		public ITrigger Mouth { get { return mouth_; } }
-		public ITrigger LeftBreast { get { return lNipple_; } }
-		public ITrigger RightBreast { get { return rNipple_; } }
-		public ITrigger Labia { get { return labia_; } }
-		public ITrigger Vagina { get { return vagina_; } }
-		public ITrigger DeepVagina { get { return deep_; } }
-		public ITrigger DeeperVagina { get { return deeper_; } }
-
-		public override string ToString()
-		{
-			string s =
-				(Lip.Active ? "M|" : "") +
-				(Mouth.Active ? "MM|" : "") +
-				(LeftBreast.Active ? "LB|" : "") +
-				(RightBreast.Active ? "RB|" : "") +
-				(Labia.Active ? "L|" : "") +
-				(Vagina.Active ? "V|" : "") +
-				(DeepVagina.Active ? "VV|" : "") +
-				(DeeperVagina.Active ? "VVV|" : "");
-
-			if (s.EndsWith("|"))
-				return s.Substring(0, s.Length - 1);
-			else
-				return s;
-		}
-
-		private VamTrigger Get(string name)
-		{
-			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
-			if (o == null)
-			{
-				Cue.LogError($"VamTriggers: {name} not found");
-				return new VamTrigger();
-			}
-
-			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
-			if (t == null)
-			{
-				Cue.LogError($"VamTriggers: {name} has no CollisionTriggerEventHandler");
-				return new VamTrigger();
-			}
-
-			return new VamTrigger(t);
-		}
-	}
 
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
-		private VamTriggers triggers_;
 		private VamActionParameter setOnlyKeyJointsOn_;
 
 		private Rigidbody head_ = null;
@@ -138,7 +78,6 @@ namespace Cue.W
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
-			triggers_ = new VamTriggers(atom);
 			setOnlyKeyJointsOn_ = new VamActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 		}
@@ -165,11 +104,6 @@ namespace Cue.W
 				else
 					return Sexes.Female;
 			}
-		}
-
-		public ITriggers Triggers
-		{
-			get { return triggers_; }
 		}
 
 		public bool Teleporting
@@ -236,6 +170,35 @@ namespace Cue.W
 		public Atom Atom
 		{
 			get { return atom_; }
+		}
+
+		public List<IBodyPart> GetBodyParts()
+		{
+			var list = new List<IBodyPart>();
+
+			GetTrigger(list, BodyPartTypes.Lips, "LipTrigger");
+			GetTrigger(list, BodyPartTypes.Mouth, "MouthTrigger");
+			GetTrigger(list, BodyPartTypes.LeftBreast, "lNippleTrigger");
+			GetTrigger(list, BodyPartTypes.RightBreast, "rNippleTrigger");
+			GetTrigger(list, BodyPartTypes.Labia, "LabiaTrigger");
+			GetTrigger(list, BodyPartTypes.Vagina, "VaginaTrigger");
+			GetTrigger(list, BodyPartTypes.DeepVagina, "DeepVaginaTrigger");
+			GetTrigger(list, BodyPartTypes.DeeperVagina, "DeeperVaginaTrigger");
+
+			return list;
+		}
+
+		private void GetTrigger(List<IBodyPart> list, int id, string name)
+		{
+			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
+			if (o == null)
+				return;
+
+			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
+			if (t == null)
+				return;
+
+			list.Add(new TriggerBodyPart(this, id, t));
 		}
 
 		public void SetDefaultControls()

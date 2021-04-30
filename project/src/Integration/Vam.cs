@@ -73,7 +73,7 @@ namespace Cue
 		{
 			object_ = o;
 			lookMode_.SetValue("Target");
-			eyesImpl_.SetPosition(object_.Atom.HeadPosition);
+			eyesImpl_.SetPosition(object_.EyeInterest);
 		}
 
 		public void LookAt(Vector3 p)
@@ -88,7 +88,7 @@ namespace Cue
 			object_ = null;
 
 			eyesImpl_.SetPosition(
-				person_.HeadPosition +
+				object_.EyeInterest +
 				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
 
 			lookMode_.SetValue("None");
@@ -103,7 +103,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (object_ != null)
-				eyesImpl_.SetPosition(object_.Atom.HeadPosition);
+				eyesImpl_.SetPosition(object_.EyeInterest);
 		}
 
 		public override string ToString()

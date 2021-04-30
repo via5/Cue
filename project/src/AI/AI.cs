@@ -36,7 +36,7 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (person_.Atom.Triggers.Lip == null)
+			if (person_.Body.Lips == null)
 				return;
 
 			if (person_.Kisser.Active)
@@ -54,7 +54,7 @@ namespace Cue
 
 		private bool TryStart()
 		{
-			var srcLips = person_.Atom.Triggers.Lip.Position;
+			var srcLips = person_.Body.Lips.Position;
 
 			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
 			{
@@ -62,11 +62,11 @@ namespace Cue
 				if (target == person_)
 					continue;
 
-				if (target.Atom.Triggers.Lip == null || target.Kisser.Active)
+				if (target.Body.Lips == null || target.Kisser.Active)
 					continue;
 
 				// todo: check rotations
-				var targetLips = target.Atom.Triggers.Lip.Position;
+				var targetLips = target.Body.Lips.Position;
 
 				if (Vector3.Distance(srcLips, targetLips) < StartDistance)
 				{
@@ -86,11 +86,11 @@ namespace Cue
 			if (target == null)
 				return false;
 
-			if (target.Atom.Triggers.Lip == null)
+			if (target.Body.Lips == null)
 				return false;
 
-			var srcLips = person_.Atom.Triggers.Lip.Position;
-			var targetLips = target.Atom.Triggers.Lip.Position;
+			var srcLips = person_.Body.Lips.Position;
+			var targetLips = target.Body.Lips.Position;
 
 			if (Vector3.Distance(srcLips, targetLips) >= StopDistance)
 			{

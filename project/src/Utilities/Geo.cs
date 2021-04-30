@@ -412,5 +412,10 @@ namespace Cue
 		{
 			get { return new Color(0, 0, 0, 0); }
 		}
+
+		public static Color Green
+		{
+			get { return new Color(0, 1, 0, 1); }
+		}
 	}
 }

@@ -39,7 +39,7 @@ namespace Cue.UI
 			if (updateElapsed_ > 0.2f)
 			{
 				for (int i = 0; i < tabs_.Count; ++i)
-					tabs_[i].Update();
+					tabs_[i].Update(s);
 
 				updateElapsed_ = 0;
 			}
@@ -55,7 +55,7 @@ namespace Cue.UI
 	abstract class Tab : VUI.Panel
 	{
 		public abstract string Title { get; }
-		public abstract void Update();
+		public abstract void Update(float s);
 	}
 
 
@@ -63,7 +63,6 @@ namespace Cue.UI
 	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button renav_ = new VUI.Button("Update nav");
-		private VUI.CheckBox timings_ = new VUI.CheckBox("Show timings");
 		private VUI.Label update_ = new VUI.Label();
 		private VUI.Label fixedUpdate_ = new VUI.Label();
 		private VUI.Label input_ = new VUI.Label();
@@ -75,9 +74,12 @@ namespace Cue.UI
 			Layout = new VUI.VerticalFlow();
 			Add(navmeshes_);
 			Add(renav_);
-			Add(timings_);
 
-			var p = new VUI.Panel(new VUI.GridLayout(2));
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalStretch = new List<bool>() { false, true };
+			gl.HorizontalSpacing = 40;
+
+			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Update"));
 			p.Add(update_);
@@ -105,13 +107,13 @@ namespace Cue.UI
 			get { return "Stuff"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 		}
 
 		public void UpdateTickers(Tickers tickers)
 		{
-			if (timings_.Checked)
+			if (IsVisibleOnScreen())
 			{
 				update_.Text = tickers.update.ToString();
 				input_.Text = tickers.input.ToString();
@@ -173,7 +175,7 @@ namespace Cue.UI
 			get { return "Unity"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 		}
 
@@ -220,8 +222,9 @@ namespace Cue.UI
 
 			tabs_.Add(new PersonStateTab(person_));
 			tabs_.Add(new PersonAITab(person_));
-			tabs_.Add(new PersonAnimationTab(person_));
 			tabs_.Add(new PersonExpressionTab(person_));
+			tabs_.Add(new PersonBodyTab(person_));
+			tabs_.Add(new PersonAnimationTab(person_));
 
 			foreach (var t in tabs_)
 				tabsWidget_.AddTab(t.Title, t);
@@ -235,10 +238,10 @@ namespace Cue.UI
 			get { return person_.ID; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 			for (int i = 0; i < tabs_.Count; ++i)
-				tabs_[i].Update();
+				tabs_[i].Update(s);
 		}
 	}
 
@@ -330,7 +333,7 @@ namespace Cue.UI
 			get { return "State"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 			id_.Text = person_.ID;
 			pos_.Text = person_.Position.ToString();
@@ -441,7 +444,7 @@ namespace Cue.UI
 			get { return "AI"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 			enabled_.Text = ai_.Enabled.ToString();
 			event_.Text = (ai_.Event == null ? "(none)" : ai_.Event.ToString());
@@ -501,7 +504,7 @@ namespace Cue.UI
 			get { return "Expression"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 		}
 
@@ -536,6 +539,81 @@ namespace Cue.UI
 	}
 
 
+	class PersonBodyTab : Tab
+	{
+		struct PartWidgets
+		{
+			public BodyPart part;
+			public VUI.Label name, triggering, position, direction;
+		}
+
+
+		private readonly Person person_;
+		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
+
+		public PersonBodyTab(Person ps)
+		{
+			person_ = ps;
+
+			var gl = new VUI.GridLayout(4);
+			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Triggering", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
+
+			for (int i = 0; i < person_.Body.Parts.Count; ++i)
+			{
+				var bp = person_.Body.Parts[i];
+
+				var w = new PartWidgets();
+				w.part = bp;
+				w.name = new VUI.Label(bp.Name);
+				w.triggering = new VUI.Label();
+				w.position = new VUI.Label();
+				w.direction = new VUI.Label();
+
+				p.Add(w.name);
+				p.Add(w.triggering);
+				p.Add(w.position);
+				p.Add(w.direction);
+
+				widgets_.Add(w);
+			}
+
+			Layout = new VUI.BorderLayout();
+			Add(p, VUI.BorderLayout.Top);
+		}
+
+		public override string Title
+		{
+			get { return "Body"; }
+		}
+
+		public override void Update(float s)
+		{
+			if (IsVisibleOnScreen())
+			{
+				for (int i = 0; i < widgets_.Count; ++i)
+				{
+					var w = widgets_[i];
+
+					w.triggering.Text = w.part.Triggering.ToString();
+
+					w.triggering.TextColor = (
+						w.part.Triggering ?
+						W.VamU.ToUnity(Color.Green) :
+						VUI.Style.Theme.TextColor);
+
+					w.position.Text = w.part.Position.ToString();
+					w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");
+				}
+			}
+		}
+	}
+
+
 	class PersonAnimationTab : Tab
 	{
 		private Person person_;
@@ -564,7 +642,7 @@ namespace Cue.UI
 			get { return "Animation"; }
 		}
 
-		public override void Update()
+		public override void Update(float s)
 		{
 		}
 

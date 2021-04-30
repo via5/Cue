@@ -8,7 +8,7 @@ namespace VUI
 
 		public struct Polishing
 		{
-			public Color textColor, disabledTextColor;
+			public Color disabledTextColor;
 			public Color backgroundColor, disabledBackgroundColor;
 			public Color highlightBackgroundColor;
 
@@ -18,7 +18,6 @@ namespace VUI
 				{
 					var p = new Polishing();
 
-					p.textColor = Style.Theme.TextColor;
 					p.disabledTextColor = Style.Theme.DisabledTextColor;
 					p.backgroundColor = Style.Theme.ButtonBackgroundColor;
 					p.disabledBackgroundColor = Style.Theme.DisabledButtonBackgroundColor;
@@ -80,20 +79,6 @@ namespace VUI
 
 				if (button_ != null)
 					button_.buttonText.alignment = Label.ToTextAnchor(align_);
-			}
-		}
-
-		public Color TextColor
-		{
-			get
-			{
-				return polishing_.textColor;
-			}
-
-			set
-			{
-				polishing_.textColor = value;
-				Polish();
 			}
 		}
 

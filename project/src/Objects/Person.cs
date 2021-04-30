@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -114,6 +115,160 @@ namespace Cue
 	}
 
 
+	class BodyPartTypes
+	{
+		public const int Head = 1;
+		public const int Lips = 2;
+		public const int Mouth = 3;
+		public const int LeftBreast = 4;
+		public const int RightBreast = 5;
+		public const int Labia = 6;
+		public const int Vagina = 7;
+		public const int DeepVagina = 8;
+		public const int DeeperVagina = 9;
+
+		private static string[] names_ = new string[]
+		{
+			"", "head", "lips", "mouth", "leftbreast", "rightbreast",
+			"labia", "vagina", "deepvagina", "deepervagina"
+		};
+
+		public static string ToString(int t)
+		{
+			if (t >= 0 && t < names_.Length)
+				return names_[t];
+
+			return $"?{t}";
+		}
+	}
+
+
+	class BodyPart
+	{
+		private Person person_;
+		private W.IBodyPart part_;
+
+		public BodyPart(Person p, W.IBodyPart part)
+		{
+			person_ = p;
+			part_ = part;
+		}
+
+		public Person Person
+		{
+			get { return person_; }
+		}
+
+		public W.IBodyPart Sys
+		{
+			get { return part_; }
+		}
+
+		public string Name
+		{
+			get { return BodyPartTypes.ToString(Type); }
+		}
+
+		public int Type
+		{
+			get { return part_.Type; }
+		}
+
+		public bool Triggering
+		{
+			get { return part_.Triggering; }
+		}
+
+		public Vector3 Position
+		{
+			get { return part_.Position; }
+		}
+
+		public Vector3 Direction
+		{
+			get { return part_.Direction; }
+		}
+	}
+
+
+	class Body
+	{
+		private Person person_;
+		private readonly List<BodyPart> all_ = new List<BodyPart>();
+		private BodyPart head_;
+		private BodyPart lips_;
+		private BodyPart mouth_;
+		private BodyPart leftBreast_;
+		private BodyPart rightBreast_;
+		private BodyPart labia_;
+		private BodyPart vagina_;
+		private BodyPart deepVagina_;
+		private BodyPart deeperVagina_;
+
+		public Body(Person p)
+		{
+			person_ = p;
+
+			var parts = p.Atom.GetBodyParts();
+
+			head_ = GetPart(parts, BodyPartTypes.Head);
+			lips_ = GetPart(parts, BodyPartTypes.Lips);
+			mouth_ = GetPart(parts, BodyPartTypes.Mouth);
+			leftBreast_ = GetPart(parts, BodyPartTypes.LeftBreast);
+			rightBreast_ = GetPart(parts, BodyPartTypes.RightBreast);
+			labia_ = GetPart(parts, BodyPartTypes.Labia);
+			vagina_ = GetPart(parts, BodyPartTypes.Vagina);
+			deepVagina_ = GetPart(parts, BodyPartTypes.DeepVagina);
+			deeperVagina_ = GetPart(parts, BodyPartTypes.DeeperVagina);
+		}
+
+		public List<BodyPart> Parts { get { return all_; } }
+
+		public BodyPart Head { get { return head_; } }
+		public BodyPart Lips { get { return lips_; } }
+		public BodyPart Mouth { get { return mouth_; } }
+		public BodyPart LeftBreast { get { return leftBreast_; } }
+		public BodyPart RightBreast { get { return rightBreast_; } }
+		public BodyPart Labia { get { return labia_; } }
+		public BodyPart Vagina { get { return vagina_; } }
+		public BodyPart DeepVagina { get { return deepVagina_; } }
+		public BodyPart DeeperVagina { get { return deeperVagina_; } }
+
+		public override string ToString()
+		{
+			string s =
+				(Lips.Triggering ? "M|" : "") +
+				(Mouth.Triggering ? "MM|" : "") +
+				(LeftBreast.Triggering ? "LB|" : "") +
+				(RightBreast.Triggering ? "RB|" : "") +
+				(Labia.Triggering ? "L|" : "") +
+				(Vagina.Triggering ? "V|" : "") +
+				(DeepVagina.Triggering ? "VV|" : "") +
+				(DeeperVagina.Triggering ? "VVV|" : "");
+
+			if (s.EndsWith("|"))
+				return s.Substring(0, s.Length - 1);
+			else
+				return s;
+		}
+
+		private BodyPart GetPart(List<W.IBodyPart> list, int type)
+		{
+			for (int i = 0; i < list.Count; ++i)
+			{
+				if (list[i].Type == type)
+				{
+					var p = new BodyPart(person_, list[i]);
+					all_.Add(p);
+					return p;
+				}
+			}
+
+			return null;
+		}
+	}
+
+
 	class Excitement
 	{
 		private Person person_;
@@ -135,19 +290,19 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			lip_ = Check(s, person_.Atom.Triggers.Lip, lip_);
-			mouth_ = Check(s, person_.Atom.Triggers.Mouth, mouth_);
-			lBreast_ = Check(s, person_.Atom.Triggers.LeftBreast, lBreast_);
-			rBreast_ = Check(s, person_.Atom.Triggers.RightBreast, rBreast_);
-			labia_ = Check(s, person_.Atom.Triggers.Labia, labia_);
-			vagina_ = Check(s, person_.Atom.Triggers.Vagina, vagina_);
-			deep_ = Check(s, person_.Atom.Triggers.DeepVagina, deep_);
-			deeper_ = Check(s, person_.Atom.Triggers.DeeperVagina, deeper_);
+			lip_ = Check(s, person_.Body.Lips, lip_);
+			mouth_ = Check(s, person_.Body.Mouth, mouth_);
+			lBreast_ = Check(s, person_.Body.LeftBreast, lBreast_);
+			rBreast_ = Check(s, person_.Body.RightBreast, rBreast_);
+			labia_ = Check(s, person_.Body.Labia, labia_);
+			vagina_ = Check(s, person_.Body.Vagina, vagina_);
+			deep_ = Check(s, person_.Body.DeepVagina, deep_);
+			deeper_ = Check(s, person_.Body.DeeperVagina, deeper_);
 		}
 
-		private float Check(float s, W.ITrigger trigger, float v)
+		private float Check(float s, BodyPart p, float v)
 		{
-			if (trigger?.Active ?? false)
+			if (p?.Triggering ?? false)
 				return 1;
 			else
 				return Math.Max(v - s * decay_, 0);
@@ -205,6 +360,7 @@ namespace Cue
 		private Slot locked_ = null;
 		private Animator animator_;
 		private Excitement excitement_;
+		private Body body_;
 
 		private IAI ai_ = null;
 		private IBreather breathing_;
@@ -225,6 +381,7 @@ namespace Cue
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
+			body_ = new Body(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -250,16 +407,16 @@ namespace Cue
 			get { return uprightPos_; }
 		}
 
-		public Vector3 HeadPosition
-		{
-			get { return Atom.HeadPosition; }
-		}
-
 		public Slot LockedSlot
 		{
 			get { return locked_; }
 			set { locked_ = value; }
 		}
+
+		public Animator Animator { get { return animator_; } }
+		public PersonState State { get { return state_; } }
+		public Excitement Excitement { get { return excitement_; } }
+		public Body Body { get { return body_; } }
 
 		public IAI AI { get { return ai_; } }
 		public IBreather Breathing { get { return breathing_; } }
@@ -273,13 +430,14 @@ namespace Cue
 		public IExpression Expression { get { return expression_; } }
 		public IAction Actions { get { return actions_; } }
 
-		public Animator Animator { get { return animator_; } }
-		public PersonState State { get { return state_; } }
-		public Excitement Excitement { get { return excitement_; } }
-
 		public int Sex
 		{
 			get { return Atom.Sex; }
+		}
+
+		public override Vector3 EyeInterest
+		{
+			get { return body_.Head?.Position ?? base.EyeInterest; }
 		}
 
 		public IPersonality Personality

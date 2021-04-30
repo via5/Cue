@@ -166,7 +166,9 @@ namespace VUI
 		private Insets padding_ = new Insets();
 		private Color borderColor_ = Style.Theme.BorderColor;
 		private Font font_ = null;
+		private FontStyle fontStyle_ = FontStyle.Normal;
 		private int fontSize_ = -1;
+		private Color textColor_ = Style.Theme.TextColor;
 		private readonly Tooltip tooltip_;
 
 		private bool dirty_ = true;
@@ -238,6 +240,23 @@ namespace VUI
 			}
 		}
 
+		public FontStyle FontStyle
+		{
+			get
+			{
+				return fontStyle_;
+			}
+
+			set
+			{
+				if (fontStyle_ != value)
+				{
+					fontStyle_ = value;
+					NeedsLayout("font style changed");
+				}
+			}
+		}
+
 		public int FontSize
 		{
 			get
@@ -251,6 +270,23 @@ namespace VUI
 				{
 					fontSize_ = value;
 					NeedsLayout("font size changed");
+				}
+			}
+		}
+
+		public Color TextColor
+		{
+			get
+			{
+				return textColor_;
+			}
+
+			set
+			{
+				if (textColor_ != value)
+				{
+					textColor_ = value;
+					Polish();
 				}
 			}
 		}

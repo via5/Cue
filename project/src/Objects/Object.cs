@@ -8,6 +8,7 @@ namespace Cue
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
+		Vector3 EyeInterest { get; }
 		float Bearing { get; }
 
 		void FixedUpdate(float s);
@@ -93,6 +94,11 @@ namespace Cue
 		{
 			get { return atom_.Direction; }
 			set { atom_.Direction = value; }
+		}
+
+		public virtual Vector3 EyeInterest
+		{
+			get { return Position; }
 		}
 
 		public float Bearing
