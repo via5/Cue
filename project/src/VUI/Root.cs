@@ -96,6 +96,48 @@ namespace VUI
 	}
 
 
+	class ScriptUIRootSupport : IRootSupport
+	{
+		private MVRScriptUI sui_;
+
+		public ScriptUIRootSupport(MVRScript s)
+			: this(s.UITransform.GetComponentInChildren<MVRScriptUI>())
+		{
+		}
+
+		public ScriptUIRootSupport(MVRScriptUI sui)
+		{
+			sui_ = sui;
+		}
+
+		public MVRScriptUI ScriptUI
+		{
+			get { return sui_; }
+		}
+
+		public Canvas Canvas
+		{
+			get
+			{
+				return sui_.GetComponentInChildren<Image>()?.canvas;
+			}
+		}
+
+		public Transform RootParent
+		{
+			get
+			{
+				return sui_.fullWidthUIContent;
+			}
+		}
+
+		public void Destroy()
+		{
+			// no-op
+		}
+	}
+
+
 	class Root
 	{
 		public const int FocusDefault = 0x0;
@@ -128,6 +170,16 @@ namespace VUI
 			{
 				return new Point(float.MaxValue, float.MaxValue);
 			}
+		}
+
+		public Root(MVRScript s)
+			: this(new ScriptUIRootSupport(s))
+		{
+		}
+
+		public Root(MVRScriptUI sui)
+			: this(new ScriptUIRootSupport(sui))
+		{
 		}
 
 		public Root(IRootSupport support)

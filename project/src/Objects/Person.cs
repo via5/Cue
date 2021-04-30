@@ -146,11 +146,13 @@ namespace Cue
 	class BodyPart
 	{
 		private Person person_;
+		private int type_;
 		private W.IBodyPart part_;
 
-		public BodyPart(Person p, W.IBodyPart part)
+		public BodyPart(Person p, int type, W.IBodyPart part)
 		{
 			person_ = p;
+			type_ = type;
 			part_ = part;
 		}
 
@@ -164,29 +166,34 @@ namespace Cue
 			get { return part_; }
 		}
 
+		public bool Exists
+		{
+			get { return (part_ != null); }
+		}
+
 		public string Name
 		{
-			get { return BodyPartTypes.ToString(Type); }
+			get { return BodyPartTypes.ToString(type_); }
 		}
 
 		public int Type
 		{
-			get { return part_.Type; }
+			get { return type_; }
 		}
 
 		public bool Triggering
 		{
-			get { return part_.Triggering; }
+			get { return part_?.Triggering ?? false; }
 		}
 
 		public Vector3 Position
 		{
-			get { return part_.Position; }
+			get { return part_?.Position ?? Vector3.Zero; }
 		}
 
 		public Vector3 Direction
 		{
-			get { return part_.Direction; }
+			get { return part_?.Direction ?? Vector3.Zero; }
 		}
 	}
 
@@ -254,17 +261,23 @@ namespace Cue
 
 		private BodyPart GetPart(List<W.IBodyPart> list, int type)
 		{
+			BodyPart p = null;
+
 			for (int i = 0; i < list.Count; ++i)
 			{
 				if (list[i].Type == type)
 				{
-					var p = new BodyPart(person_, list[i]);
-					all_.Add(p);
-					return p;
+					p = new BodyPart(person_, type, list[i]);
+					break;
 				}
 			}
 
-			return null;
+			if (p == null)
+				p = new BodyPart(person_, type, null);
+
+			all_.Add(p);
+
+			return p;
 		}
 	}
 

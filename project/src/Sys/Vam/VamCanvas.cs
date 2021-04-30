@@ -262,41 +262,4 @@ namespace Cue.W
 			Object.Destroy(panel_);
 		}
 	}
-
-
-	class ScriptUIRootSupport : VUI.IRootSupport
-	{
-		private MVRScriptUI sui_;
-
-		public ScriptUIRootSupport(MVRScriptUI sui)
-		{
-			sui_ = sui;
-		}
-
-		public MVRScriptUI ScriptUI
-		{
-			get { return sui_; }
-		}
-
-		public Canvas Canvas
-		{
-			get
-			{
-				return sui_.GetComponentInChildren<Image>()?.canvas;
-			}
-		}
-
-		public Transform RootParent
-		{
-			get
-			{
-				return sui_.fullWidthUIContent;
-			}
-		}
-
-		public void Destroy()
-		{
-			// no-op
-		}
-	}
 }

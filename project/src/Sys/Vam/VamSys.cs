@@ -165,8 +165,7 @@ namespace Cue.W
 
 		public VUI.Root CreateScriptUI()
 		{
-			return new VUI.Root(
-				new ScriptUIRootSupport(CueMain.Instance.MVRScriptUI));
+			return new VUI.Root(CueMain.Instance.MVRScriptUI);
 		}
 
 		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c)

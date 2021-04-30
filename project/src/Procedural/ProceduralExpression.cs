@@ -48,6 +48,7 @@ namespace Cue
 			end_ = end;
 			mid_ = Mid();
 			last_ = mid_;
+			r_ = mid_;
 			forward_ = new Duration(minTime, maxTime);
 			backward_ = new Duration(minTime, maxTime);
 			delayOff_ = new Duration(0, delayOff);
@@ -141,7 +142,6 @@ namespace Cue
 					if (forward_.Finished)
 					{
 						mag_ = 1;
-						last_ = r_;
 
 						if (delayOn_.Enabled)
 							state_ = DelayOnState;
@@ -178,14 +178,10 @@ namespace Cue
 					}
 
 					backward_.Update(s);
+					mag_ = 1 - backward_.Progress;
 
 					if (backward_.Finished)
 					{
-						if (start_ == end_)
-							mag_ = 1;
-						else
-							mag_ = 0;
-
 						Next(limitHit);
 
 						if (delayOff_.Enabled)
@@ -197,10 +193,6 @@ namespace Cue
 							state_ = ForwardState;
 							finished_ = true;
 						}
-					}
-					else
-					{
-						mag_ = 1 - backward_.Progress;
 					}
 
 					break;
@@ -223,12 +215,7 @@ namespace Cue
 
 		private float Mid()
 		{
-			float sv = morph_.startValue;
-
-			if (sv >= start_ && sv <= end_)
-				return sv;
-			else
-				return start_ + (end_ - start_) / 2;
+			return morph_.startValue;
 		}
 
 		public float Set(float intensity, float max)
@@ -269,6 +256,11 @@ namespace Cue
 
 		private void Next(bool limitHit)
 		{
+			if (resetBetween_)
+				last_ = mid_;
+			else
+				last_ = r_;
+
 			if (limitHit && timeActive_ >= 10)
 			{
 				Cue.LogVerbose(
@@ -424,8 +416,6 @@ namespace Cue
 			{
 				case ActiveState:
 				{
-					morphs_[i_].Update(s, false);
-
 					if (morphs_[i_].Finished)
 					{
 						++i_;
@@ -438,6 +428,10 @@ namespace Cue
 
 						if (state_ == ActiveState)
 							morphs_[i_].Update(s, false);
+					}
+					else
+					{
+						morphs_[i_].Update(s, false);
 					}
 
 					break;
@@ -581,20 +575,20 @@ namespace Cue
 
 
 			var m = new ProceduralMorph(p, "Mouth Open",
-				-0.1f, -0.1f, 0.3f, 0.3f, 0, 0);
+				-0.1f, -0.1f, 0.3f, 0.3f, 0, 0, true);
 			m.Easing = new SineOutEasing();
 
 			g.Add(m);
 
 
 			m = new ProceduralMorph(p, "deepthroat",
-				0.1f, 0.1f, 0.2f, 0.2f, 0, 0);
+				0.1f, 0.1f, 0.2f, 0.2f, 0, 0, true);
 
 			g.Add(m);
 
 
 			m = new ProceduralMorph(p, "Mouth Open",
-				0.0f, 0.1f, 0.3f, 0.3f, 0, 0);
+				0.1f, 0.2f, 0.3f, 0.3f, 0, 0, true);
 			m.Easing = new SineOutEasing();
 
 			g.Add(m);

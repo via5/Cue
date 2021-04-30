@@ -599,15 +599,18 @@ namespace Cue.UI
 				{
 					var w = widgets_[i];
 
-					w.triggering.Text = w.part.Triggering.ToString();
+					if (w.part.Exists)
+					{
+						w.triggering.Text = w.part.Triggering.ToString();
 
-					w.triggering.TextColor = (
-						w.part.Triggering ?
-						W.VamU.ToUnity(Color.Green) :
-						VUI.Style.Theme.TextColor);
+						w.triggering.TextColor = (
+							w.part.Triggering ?
+							W.VamU.ToUnity(Color.Green) :
+							VUI.Style.Theme.TextColor);
 
-					w.position.Text = w.part.Position.ToString();
-					w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");
+						w.position.Text = w.part.Position.ToString();
+						w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");
+					}
 				}
 			}
 		}

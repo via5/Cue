@@ -166,7 +166,7 @@ namespace Cue
 
 		public bool Enabled
 		{
-			get { return min_ != max_; }
+			get { return min_ > 0 && max_ > 0; }
 		}
 
 		public float Progress
@@ -183,12 +183,15 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			finished_ = false;
+			if (finished_)
+			{
+				finished_ = false;
+				elapsed_ = 0;
+			}
 
 			elapsed_ += s;
 			if (elapsed_ > current_)
 			{
-				elapsed_ = 0;
 				finished_ = true;
 				Next();
 			}

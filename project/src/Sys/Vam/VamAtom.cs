@@ -5,6 +5,41 @@ using UnityEngine.AI;
 
 namespace Cue.W
 {
+	class RigidbodyBodyPart : IBodyPart
+	{
+		private VamAtom atom_;
+		private int type_;
+		private Rigidbody rb_;
+
+		public RigidbodyBodyPart(VamAtom a, int type, Rigidbody rb)
+		{
+			atom_ = a;
+			type_ = type;
+			rb_ = rb;
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
+		public bool Triggering
+		{
+			get { return false; }
+		}
+
+		public Vector3 Position
+		{
+			get { return W.VamU.FromUnity(rb_.position); }
+		}
+
+		public Vector3 Direction
+		{
+			get { return W.VamU.FromUnity(rb_.rotation.eulerAngles); }
+		}
+	}
+
+
 	class TriggerBodyPart : IBodyPart
 	{
 		private VamAtom atom_;
@@ -176,6 +211,7 @@ namespace Cue.W
 		{
 			var list = new List<IBodyPart>();
 
+			GetRigidbody(list, BodyPartTypes.Head, "head");
 			GetTrigger(list, BodyPartTypes.Lips, "LipTrigger");
 			GetTrigger(list, BodyPartTypes.Mouth, "MouthTrigger");
 			GetTrigger(list, BodyPartTypes.LeftBreast, "lNippleTrigger");
@@ -188,6 +224,15 @@ namespace Cue.W
 			return list;
 		}
 
+		private void GetRigidbody(List<IBodyPart> list, int id, string name)
+		{
+			var rb = Cue.Instance.VamSys.FindRigidbody(atom_, name);
+			if (rb == null)
+				return;
+
+			list.Add(new RigidbodyBodyPart(this, id, rb));
+		}
+
 		private void GetTrigger(List<IBodyPart> list, int id, string name)
 		{
 			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
@@ -196,6 +241,9 @@ namespace Cue.W
 
 			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (t == null)
+				return;
+
+			if (t.thisRigidbody == null)
 				return;
 
 			list.Add(new TriggerBodyPart(this, id, t));
