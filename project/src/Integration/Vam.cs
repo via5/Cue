@@ -88,7 +88,7 @@ namespace Cue
 			object_ = null;
 
 			eyesImpl_.SetPosition(
-				object_.EyeInterest +
+				person_.Body.Head?.Position ?? Vector3.Zero +
 				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
 
 			lookMode_.SetValue("None");
@@ -152,19 +152,38 @@ namespace Cue
 			private Person person_;
 			private DAZClothingItem ci_;
 			private DAZSkinWrapSwitcher wrap_ = null;
+			private bool enabled_ = true;
 
 			public Item(Person p, DAZClothingItem ci)
 			{
 				person_ = p;
 				ci_ = ci;
+
+				if (ci_.driveXAngleTarget != 0 || ci_.drive2XAngleTarget != 0)
+				{
+					ci_.enabled = false;
+					ci_.enabled = true;
+				}
+			}
+
+			public DAZClothingItem Daz
+			{
+				get { return ci_; }
 			}
 
 			public bool Enabled
 			{
+				get
+				{
+					return enabled_;
+				}
+
 				set
 				{
 					if (value != ci_.isActiveAndEnabled)
 					{
+						enabled_ = value;
+
 						Cue.LogInfo(
 							ToString() + ": " + (value ? "enabled" : "disabled"));
 
@@ -315,6 +334,7 @@ namespace Cue
 		private List<Item> items_ = new List<Item>();
 		private bool genitalsVisible_ = false;
 		private bool breastsVisible_ = false;
+		private Item heels_ = null;
 
 		public VamClothing(Person p)
 		{
@@ -336,6 +356,34 @@ namespace Cue
 			catch (Exception e)
 			{
 				Cue.LogError("VamClothing: ctor failed, " + e.ToString());
+			}
+		}
+
+		public float HeelsAngle
+		{
+			get
+			{
+				if (heels_ == null)
+					heels_ = FindHeels();
+
+				if (heels_ == null)
+					return 0;
+				else
+					return heels_.Daz.driveXAngleTarget;
+			}
+		}
+
+		public float HeelsHeight
+		{
+			get
+			{
+				if (heels_ == null)
+					heels_ = FindHeels();
+
+				if (heels_?.Daz?.colliderLeft == null)
+					return 0;
+
+				return heels_.Daz.colliderLeft.bounds.size.y/2;
 			}
 		}
 
@@ -399,6 +447,12 @@ namespace Cue
 		{
 			if (!b)
 			{
+				if (ClothingChanged())
+				{
+					Cue.LogInfo("clothing changed, not resetting");
+					return;
+				}
+
 				foreach (var i in items_)
 					i.Enabled = true;
 			}
@@ -411,6 +465,61 @@ namespace Cue
 				if (c.isActiveAndEnabled)
 					Cue.LogInfo(c.name);
 			}
+		}
+
+		private Item FindHeels()
+		{
+			for (int i = 0; i < items_.Count; ++i)
+			{
+				var c = items_[i].Daz;
+				if (c.tagsArray != null)
+				{
+					for (int t = 0; t < c.tagsArray.Length; ++t)
+					{
+						if (c.tagsArray[t] == "heels")
+							return items_[i];
+					}
+				}
+			}
+
+			return null;
+		}
+
+		private bool ClothingChanged()
+		{
+			foreach (var i in items_)
+			{
+				if (i.Daz.isActiveAndEnabled != i.Enabled)
+				{
+					// enabled state was changed manually
+					return true;
+				}
+			}
+
+			foreach (var c in char_.clothingItems)
+			{
+				if (c.isActiveAndEnabled)
+				{
+					bool found = false;
+
+					foreach (var i in items_)
+					{
+						if (c == i.Daz)
+						{
+							found = true;
+							break;
+						}
+					}
+
+					if (!found)
+					{
+						// item was not enabled on startup
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
 		public override string ToString()

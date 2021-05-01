@@ -71,11 +71,6 @@ namespace Cue
 		public Controls()
 		{
 			Cue.Instance.HoveredChanged += OnHoveredChanged;
-
-			moveTarget_ = Cue.Instance.Sys.CreateSphereGraphic(
-				"MoveTarget", Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
-
-			moveTarget_.Collision = false;
 		}
 
 		public List<ObjectControls> All
@@ -120,6 +115,11 @@ namespace Cue
 
 		public void Create()
 		{
+			moveTarget_ = Cue.Instance.Sys.CreateSphereGraphic(
+				"MoveTarget", Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
+
+			moveTarget_.Collision = false;
+
 			foreach (var o in Cue.Instance.Objects)
 				controls_.Add(new ObjectControls(o));
 		}

@@ -51,7 +51,7 @@
 
 		public bool Active
 		{
-			get { return kissingRunning_.GetValue(); }
+			get { return wasKissing_; }
 		}
 
 		public float Elapsed
@@ -76,21 +76,27 @@
 
 		public void Update(float s)
 		{
-			elapsed_ += s;
-
 			var k = kissingRunning_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
+
+			if (k)
+				elapsed_ += s;
 		}
 
 		public void Stop()
 		{
 			activate_.SetValue(false);
-			elapsed_ = 0;
 		}
 
 		public void Start(Person target)
 		{
+			if (Active)
+			{
+				Cue.LogError($"Clockwise {person_}: can't start, already active");
+				return;
+			}
+
 			DoKiss(target, true);
 		}
 
@@ -103,14 +109,32 @@
 				return;
 			}
 
+			if (Active)
+			{
+				Cue.LogError($"Clockwise {person_}: can't start reciprocal, already active");
+				return;
+			}
+
+			if (t.Active)
+			{
+				Cue.LogError($"Clockwise {t.person_}: can't start reciprocal, already active");
+				return;
+			}
+
+			Cue.LogInfo($"Clockwise {person_}: starting reciprocal with {target}");
+
 			DoKiss(target, true);
 			t.DoKiss(person_, false);
 		}
 
 		private void DoKiss(Person target, bool pos)
 		{
+			// force reset
+			atom_.SetValue("");
+			target_.SetValue("");
 			atom_.SetValue(target.ID);
 			target_.SetValue("LipTrigger");
+
 			activate_.SetValue(true);
 			person_.LookAt(target, false);
 			target.LookAt(person_, false);
@@ -126,8 +150,6 @@
 
 		private void SetActive(bool b)
 		{
-			elapsed_ = 0;
-
 			if (b)
 			{
 				Cue.LogInfo($"Clockwise {person_}: kiss got activated");
@@ -160,7 +182,10 @@
 
 		public override string ToString()
 		{
-			return $"Clockwise: active={wasKissing_}";
+			return
+				$"Clockwise: " +
+				$"running={kissingRunning_.GetValue()} " +
+				$"active={activate_.GetValue()}";
 		}
 	}
 

@@ -382,9 +382,15 @@ namespace Cue
 					{
 						var o = Hovered;
 						if (o != null)
+						{
 							p.InteractWith(o);
+						}
 						else if (h.hit)
-							p.MoveTo(h.pos, BasicObject.NoBearing);
+						{
+							p.MoveTo(
+								h.pos,
+								Vector3.Bearing(h.pos - p.Position));
+						}
 					}
 				}
 			}

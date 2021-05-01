@@ -36,7 +36,7 @@ namespace Cue.W
 
 		private void LogLine(string line, int level)
 		{
-			var t = DateTime.Now.ToString("hh:mm:ss");
+			var t = DateTime.Now.ToString("hh:mm:ss.fff");
 			string p = LogLevels.ToShortString(level);
 
 			if (level == LogLevels.Error)

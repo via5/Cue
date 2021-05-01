@@ -251,6 +251,7 @@ namespace Cue.W
 
 		public void SetDefaultControls()
 		{
+			Cue.LogInfo($"{ID}: setting default controls");
 			setOnlyKeyJointsOn_.Fire();
 		}
 
@@ -320,9 +321,9 @@ namespace Cue.W
 
 		private void UpdateMovement(float s)
 		{
-			if (!turning_ && finalBearing_ != BasicObject.NoBearing)
+			if (!IsPathing())
 			{
-				if (!IsPathing())
+				if (!turning_ && finalBearing_ != BasicObject.NoBearing)
 				{
 					turningStart_ = atom_.mainController.transform.rotation;
 					turning_ = true;
@@ -569,6 +570,9 @@ namespace Cue.W
 		{
 			if (Vector3.Distance(Position, to) < 0.01f)
 			{
+				if (bearing == BasicObject.NoBearing)
+					return true;
+
 				var currentBearing = Vector3.Angle(Vector3.Zero, Direction);
 				var d = Math.Abs(currentBearing - bearing);
 				if (d < 5 || d >= 355)
@@ -583,7 +587,7 @@ namespace Cue.W
 			if (agent_ == null)
 				return false;
 
-			if (agent_.pathPending)
+			if (agent_.pathPending || calculatingPath_)
 				return true;
 
 			if (agent_.hasPath && agent_.remainingDistance > 0)

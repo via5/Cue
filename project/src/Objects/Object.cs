@@ -123,6 +123,10 @@ namespace Cue
 					Atom.NavTo(targetPos_, targetBearing_);
 					moveState_ = MovingState;
 				}
+				else
+				{
+					Cue.LogInfo($"{ID}: waiting to start move");
+				}
 			}
 
 			if (moveState_ == MovingState)
@@ -156,7 +160,12 @@ namespace Cue
 		public void MoveTo(Vector3 to, float bearing)
 		{
 			targetPos_ = to;
-			targetBearing_ = Vector3.NormalizeAngle(bearing);
+
+			if (bearing == NoBearing)
+				targetBearing_ = NoBearing;
+			else
+				targetBearing_ = Vector3.NormalizeAngle(bearing);
+
 			moveState_ = TentativeMoveState;
 		}
 

@@ -660,11 +660,19 @@ namespace Cue
 
 		protected override bool StartMove()
 		{
-			if (State.IsUpright)
-				return true;
+			if (kisser_.Active)
+			{
+				kisser_.Stop();
+				return false;
+			}
 
-			Stand();
-			return false;
+			if (!State.IsUpright)
+			{
+				Stand();
+				return false;
+			}
+
+			return true;
 		}
 
 		private void CheckNavState()

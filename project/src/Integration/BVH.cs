@@ -111,8 +111,12 @@ namespace Cue.BVH
         float heelHeight = 0;
         float heelAngle = 0;
 
+        private Person person_;
+
         public Player(Person p)
         {
+            person_ = p;
+
             if (p.Atom is W.VamAtom)
             {
                 containingAtom = ((W.VamAtom)p.Atom).Atom;
@@ -183,6 +187,9 @@ namespace Cue.BVH
             rootMotion = new Vector3();
             playing = true;
 
+            heelAngle = person_.Clothing.HeelsAngle;
+            heelHeight = person_.Clothing.HeelsHeight;
+
             return true;
         }
 
@@ -222,6 +229,7 @@ namespace Cue.BVH
                 }
             }
 
+            person_.Atom.SetDefaultControls();
             playing = false;
             anim = null;
         }
@@ -428,6 +436,7 @@ namespace Cue.BVH
                 {
                     if ((flags & Animator.Loop) == 0)
                     {
+                        person_.Atom.SetDefaultControls();
                         playing = false;
                         return;
                     }
@@ -448,6 +457,7 @@ namespace Cue.BVH
                 {
                     if ((flags & Animator.Loop) == 0)
                     {
+                        person_.Atom.SetDefaultControls();
                         playing = false;
                         return;
                     }

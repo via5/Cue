@@ -160,6 +160,8 @@
 
 	interface IClothing
 	{
+		float HeelsAngle { get; }
+		float HeelsHeight { get; }
 		bool GenitalsVisible { get; set; }
 		bool BreastsVisible { get; set; }
 		void OnPluginState(bool b);

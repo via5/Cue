@@ -537,9 +537,7 @@ namespace Cue
 			var g = new ConcurrentProceduralMorphGroup();
 
 			g.Add(new ProceduralMorph(p, "07-Extreme Pleasure", 0, 1, 1, 5, 2, 2));
-			g.Add(new ProceduralMorph(p, "Webcam", 0, 0.2f, 1, 5, 2, 2));
 			g.Add(new ProceduralMorph(p, "Pain", 0, 0.5f, 1, 5, 2, 2));
-			g.Add(new ProceduralMorph(p, "Taking It", 0, 0.3f, 1, 5, 2, 2));
 			g.Add(new ProceduralMorph(p, "Shock", 0, 1, 1, 5, 2, 2));
 			g.Add(new ProceduralMorph(p, "Scream", 0, 1, 1, 5, 2, 2));
 			g.Add(new ProceduralMorph(p, "Angry", 0, 0.3f, 1, 5, 2, 2));
