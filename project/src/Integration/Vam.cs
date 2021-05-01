@@ -383,7 +383,7 @@ namespace Cue
 				if (heels_?.Daz?.colliderLeft == null)
 					return 0;
 
-				return heels_.Daz.colliderLeft.bounds.size.y/2;
+				return heels_.Daz.colliderLeft.bounds.size.y / 2;
 			}
 		}
 

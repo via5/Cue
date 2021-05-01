@@ -403,7 +403,7 @@ namespace Cue.W
 			if (bearing != BasicObject.NoBearing)
 				atom_.mainController.RotateTo(Quaternion.Euler(0, bearing, 0));
 
-			enableCollisionsCountdown_ = 20;
+			enableCollisionsCountdown_ = 100;
 		}
 
 		public bool NavEnabled

@@ -98,7 +98,6 @@ namespace Cue
 
 			if (d >= StopDistance)
 			{
-				Cue.LogInfo($"stopping kiss for {person_} and {target}, d={d}");
 				person_.Kisser.Stop();
 				target.Kisser.Stop();
 				return true;

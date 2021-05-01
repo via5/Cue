@@ -123,10 +123,6 @@ namespace Cue
 					Atom.NavTo(targetPos_, targetBearing_);
 					moveState_ = MovingState;
 				}
-				else
-				{
-					Cue.LogInfo($"{ID}: waiting to start move");
-				}
 			}
 
 			if (moveState_ == MovingState)

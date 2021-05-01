@@ -86,7 +86,7 @@ namespace Cue
 						//	Resources.Animations.GetAll(
 						//		Resources.Animations.SitIdle, person_.Sex)));
 
-						cc.Push(new LookAroundAction());
+						//cc.Push(new LookAroundAction());
 
 						person_.PushAction(cc);
 

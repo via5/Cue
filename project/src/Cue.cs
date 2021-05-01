@@ -111,14 +111,6 @@ namespace Cue
 			{
 				sel_ = o;
 				SelectionChanged?.Invoke(sel_);
-
-				foreach (var p in persons_)
-				{
-					if (p == o)
-						p.LookAtNothing();
-					else if (o is Person)
-						p.LookAt(o);
-				}
 			}
 		}
 
