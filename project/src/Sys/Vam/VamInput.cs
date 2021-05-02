@@ -283,71 +283,84 @@ namespace Cue.W
 
 		private bool HitAtom(out HoveredInfo hi, out Atom a)
 		{
-			// todo: ignore stuff like eye targets, there's a couple ways:
-			//
-			//  1) check the transform name after hitting, but this will ignore
-			//     atoms that are behind the eye target, because it'll always be
-			//     hit first, and HitAtom() will immediately return
-			//
-			//  2) use RaycastAll to fix the above, but they need to be sorted
-			//     manually, unity doesn't do it, and it's more expensive
-			//
-			//  3) temporarily change the layer of all these objects to one
-			//     that's ignored and restore after; not sure about the cost of
-			//     changing layers on the fly, it changes internal vam stuff,
-			//     and it would need to keep a list of transforms somewhere,
-			//     but it sounds like the best way
-
 			int layer =
 				Bits.Bit(8) |
 				Bits.Bit(26) |
 				Bits.Bit(29);
 
-			RaycastHit hit;
-			bool b = Physics.Raycast(ray_, out hit, float.MaxValue, layer);
+			var hits = Physics.RaycastAll(ray_, float.MaxValue, layer);
 
-			if (!b)
+			if (hits.Length == 0)
 			{
 				hi = HoveredInfo.None;
 				a = null;
 				return false;
 			}
 
-			var fc = hit.transform.GetComponent<FreeControllerV3>();
-			if (fc != null)
-			{
-				hi = new HoveredInfo(null, W.VamU.FromUnity(hit.point), true);
-				a = fc.containingAtom;
-				return true;
-			}
+			UnityEngine.Vector3 closestPoint = UnityEngine.Vector3.zero;
+			float closestDistance = float.MaxValue;
+			a = null;
 
-			var bone = hit.transform.GetComponent<DAZBone>();
-			if (bone != null)
+			for (int i = 0; i < hits.Length; ++i)
 			{
-				hi = new HoveredInfo(null, W.VamU.FromUnity(hit.point), true);
-				a = bone.containingAtom;
-				return true;
-			}
+				var hit = hits[i];
 
-			var rb = hit.transform.GetComponent<Rigidbody>();
-			var p = rb.transform;
-
-			while (p != null)
-			{
-				var ra = p.GetComponent<Atom>();
-				if (ra != null)
+				var fc = hit.transform.GetComponent<FreeControllerV3>();
+				if (fc != null)
 				{
-					hi = new HoveredInfo(null, W.VamU.FromUnity(hit.point), true);
-					a = ra;
-					return true;
+					if (fc.name != "eyeTargetControl")
+					{
+						if (hit.distance < closestDistance)
+						{
+							closestPoint = hit.point;
+							closestDistance = hit.distance;
+							a = fc.containingAtom;
+						}
+					}
+
+					continue;
 				}
 
-				p = p.parent;
+				var bone = hit.transform.GetComponent<DAZBone>();
+				if (bone != null)
+				{
+					if (hit.distance < closestDistance)
+					{
+						closestPoint = hit.point;
+						closestDistance = hit.distance;
+						a = bone.containingAtom;
+					}
+
+					continue;
+				}
+
+				var p = hit.transform;
+				while (p != null)
+				{
+					var ra = p.GetComponent<Atom>();
+					if (ra != null)
+					{
+						if (hit.distance < closestDistance)
+						{
+							closestPoint = hit.point;
+							closestDistance = hit.distance;
+							a = ra;
+						}
+
+						break;
+					}
+
+					p = p.parent;
+				}
+			}
+
+			if (a != null)
+			{
+				hi = new HoveredInfo(null, W.VamU.FromUnity(closestPoint), true);
+				return true;
 			}
 
 			hi = HoveredInfo.None;
-			a = null;
-
 			return false;
 		}
 	}
