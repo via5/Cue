@@ -27,7 +27,9 @@ namespace Cue
 		{
 			get
 			{
-				return current_ == Standing || current_ == Walking;
+				return
+					(current_ == Standing || current_ == Walking) &&
+					 (next_ == None);
 			}
 		}
 
@@ -70,6 +72,15 @@ namespace Cue
 
 			next_ = next;
 			Cue.LogInfo(self_.ID + ": new transition, " + ToString());
+		}
+
+		public void CancelTransition()
+		{
+			if (next_ != None)
+			{
+				Cue.LogInfo($"{self_.ID}: cancelling transition {StateToString(next_)}");
+				next_ = None;
+			}
 		}
 
 		public void FinishTransition()
@@ -479,11 +490,22 @@ namespace Cue
 			actions_.Pop();
 		}
 
-		public void MakeIdle()
+		public override void MakeIdle()
 		{
 			handjob_.Active = false;
 			actions_.Clear();
 			animator_.Stop();
+			Atom.SetDefaultControls();
+		}
+
+		public override void MakeIdleForMove()
+		{
+			if (state_.IsCurrently(PersonState.Walking))
+				state_.CancelTransition();
+
+			handjob_.Active = false;
+			actions_.Clear();
+			ai_.RunEvent(null);
 			Atom.SetDefaultControls();
 		}
 
@@ -579,7 +601,7 @@ namespace Cue
 			if (!animator_.Playing)
 				state_.FinishTransition();
 
-			if (State.IsUpright && !State.Transitioning)
+			if (State.IsUpright)
 				uprightPos_ = Position;
 		}
 

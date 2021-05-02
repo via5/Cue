@@ -21,23 +21,30 @@
 			}
 			else
 			{
-				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 150));
+				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 170));
 			}
 
 
-			root_.ContentPanel.Layout = new VUI.BorderLayout();
+			var p = new VUI.Panel(new VUI.VerticalFlow());
 
 			label_ = new VUI.Label();
-			label_.Alignment = VUI.Label.AlignLeft | VUI.Label.AlignTop;
+			p.Add(label_);
 
 			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
 			buttons_.Visible = false;
+			p.Add(buttons_);
+
+			if (!Cue.Instance.Sys.IsVR)
+			{
+				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
+				tools.Add(new VUI.ToolButton("Reload", OnReload));
+				p.Add(tools);
+			}
 
 			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			//p.Add(new VUI.ToolButton("Call", OnCall));
 			//p.Add(new VUI.ToolButton("Sit", OnSit));
 			//p.Add(new VUI.ToolButton("Kneel", OnKneel));
-			//p.Add(new VUI.ToolButton("Reload", OnReload));
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			//p.Add(new VUI.ToolButton("Sex", OnSex));
 			//p.Add(new VUI.ToolButton("Stand", OnStand));
@@ -51,11 +58,8 @@
 			row.Add(new VUI.ToolButton("Dump morphs", OnDumpMorphs));
 			buttons_.Add(row);
 
-			var p = new VUI.Panel(new VUI.BorderLayout());
-			p.Add(label_, VUI.BorderLayout.Top);
-			p.Add(buttons_, VUI.BorderLayout.Center);
-
-			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
+			root_.ContentPanel.Layout = new VUI.BorderLayout();
+			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			root_.Visible = visible_;
 		}
 

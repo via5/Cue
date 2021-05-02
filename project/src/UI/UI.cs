@@ -116,7 +116,7 @@
 					else if (rh.hit)
 					{
 						Cue.LogInfo($"hit for {lh.o} on {rh.pos}");
-						lh.o.MoveTo(
+						lh.o.MoveToManual(
 							rh.pos,
 							Vector3.Bearing(rh.pos - lh.o.Position));
 					}
@@ -146,7 +146,7 @@
 					else if (lh.hit)
 					{
 						Cue.LogInfo($"hit for {rh.o} on {lh.pos}");
-						rh.o.MoveTo(
+						rh.o.MoveToManual(
 							lh.pos,
 							Vector3.Bearing(lh.pos - rh.o.Position));
 					}
@@ -199,7 +199,7 @@
 				}
 				else if (h.hit)
 				{
-					src.MoveTo(
+					src.MoveToManual(
 						h.pos,
 						Vector3.Bearing(h.pos - src.Position));
 				}

@@ -18,6 +18,10 @@ namespace Cue
 
 		bool InteractWith(IObject o);
 		void MoveTo(Vector3 to, float bearing);
+		void MoveToManual(Vector3 to, float bearing);
+		void MakeIdle();
+		void MakeIdleForMove();
+
 		void TeleportTo(Vector3 to, float bearing);
 		bool HasTarget { get; }
 
@@ -170,6 +174,22 @@ namespace Cue
 				targetBearing_ = Vector3.NormalizeAngle(bearing);
 
 			moveState_ = TentativeMoveState;
+		}
+
+		public void MoveToManual(Vector3 to, float bearing)
+		{
+			MakeIdleForMove();
+			MoveTo(to, bearing);
+		}
+
+		public virtual void MakeIdle()
+		{
+			// no-op
+		}
+
+		public virtual void MakeIdleForMove()
+		{
+			// no-op
 		}
 
 		public void TeleportTo(Vector3 to, float bearing)
