@@ -153,10 +153,11 @@ namespace Cue.W
 					VamU.ToUnity(size)));
 		}
 
-		public VUI.Root CreateAttached(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size)
 		{
 			return new VUI.Root(
 				new VRHandRootSupport(
+					left,
 					VamU.ToUnity(offset),
 					VamU.ToUnity(pos),
 					VamU.ToUnity(size)));
@@ -634,12 +635,16 @@ namespace Cue.W
 		public static string ToString(RectTransform rt)
 		{
 			return
-				"rect: " + rt.rect.ToString() + "\n" +
-				"offsetMin: " + rt.offsetMin.ToString() + "\n" +
-				"offsetMax: " + rt.offsetMax.ToString() + "\n" +
-				"anchorMin: " + rt.anchorMin.ToString() + "\n" +
-				"anchorMax: " + rt.anchorMax.ToString() + "\n" +
-				"anchorPos: " + rt.anchoredPosition.ToString();
+				$"offsetMax {rt.offsetMax}\n" +
+				$"offsetMin {rt.offsetMin}\n" +
+				$"pivot {rt.pivot}\n" +
+				$"sizeDelta {rt.sizeDelta}\n" +
+				$"anchorPos {rt.anchoredPosition}\n" +
+				$"anchorMin {rt.anchorMin}\n" +
+				$"anchorMax {rt.anchorMax}\n" +
+				$"anchorPos3D {rt.anchoredPosition3D}\n" +
+				$"rect {rt.rect}";
+
 		}
 
 		public static UnityEngine.Vector3 ToUnity(Vector3 v)

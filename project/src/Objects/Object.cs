@@ -16,6 +16,7 @@ namespace Cue
 		void OnPluginState(bool b);
 		void SetPaused(bool b);
 
+		bool InteractWith(IObject o);
 		void MoveTo(Vector3 to, float bearing);
 		void TeleportTo(Vector3 to, float bearing);
 		bool HasTarget { get; }
@@ -110,6 +111,12 @@ namespace Cue
 		public Slots Slots
 		{
 			get { return slots_; }
+		}
+
+		public virtual bool InteractWith(IObject o)
+		{
+			// no-op
+			return false;
 		}
 
 		public virtual void Update(float s)

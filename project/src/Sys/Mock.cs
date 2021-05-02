@@ -130,7 +130,7 @@ namespace Cue.W
 			return null;
 		}
 
-		public VUI.Root CreateAttached(Vector3 offset, Point pos, Size size)
+		public VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size)
 		{
 			return null;
 		}
@@ -161,15 +161,23 @@ namespace Cue.W
 		public bool HardReset { get { return false; } }
 		public bool ReloadPlugin { get { return false; } }
 		public bool ToggleMenu { get { return false; } }
+		public bool ShowLeftMenu { get { return true; } }
+		public bool ShowRightMenu { get { return true; } }
 		public bool ToggleControls { get { return false; } }
 		public bool Select { get { return false; } }
-		public bool Action { get { return false; } }
+		public bool LeftAction { get { return false; } }
+		public bool RightAction { get { return false; } }
 
 		public void Update()
 		{
 		}
 
-		public HoveredInfo GetHovered()
+		public HoveredInfo GetLeftHovered()
+		{
+			return HoveredInfo.None;
+		}
+
+		public HoveredInfo GetRightHovered()
 		{
 			return HoveredInfo.None;
 		}

@@ -47,7 +47,7 @@ namespace Cue.W
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
 		VUI.Root CreateHud(Vector3 offset, Point pos, Size size);
-		VUI.Root CreateAttached(Vector3 offset, Point pos, Size size);
+		VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
 		VUI.Root CreateScriptUI();
 		IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c);
@@ -82,11 +82,15 @@ namespace Cue.W
 		bool ReloadPlugin { get; }
 		bool ToggleMenu { get; }
 		bool ToggleControls { get; }
+		bool ShowLeftMenu { get; }
+		bool ShowRightMenu { get; }
 		bool Select { get; }
-		bool Action { get; }
+		bool LeftAction { get; }
+		bool RightAction { get; }
 
 		void Update();
-		HoveredInfo GetHovered();
+		HoveredInfo GetLeftHovered();
+		HoveredInfo GetRightHovered();
 	}
 
 	class NavStates

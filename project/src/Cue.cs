@@ -19,9 +19,9 @@ namespace Cue
 
 	class Cue
 	{
-		public delegate void ObjectHandler(IObject o);
-		public event ObjectHandler SelectionChanged;
-		public event ObjectHandler HoveredChanged;
+		//public delegate void ObjectHandler(IObject o);
+		//public event ObjectHandler SelectionChanged;
+		//public event ObjectHandler HoveredChanged;
 
 		private static Cue instance_ = null;
 
@@ -30,14 +30,13 @@ namespace Cue
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
 		private Hud hud_ = null;
-		private Menu menu_ = null;
+		private Menu leftMenu_ = null;
+		private Menu rightMenu_ = null;
+		private Menu desktopMenu_ = null;
 		private Controls controls_ = null;
 		private bool paused_ = false;
 		private bool vr_ = false;
 		private Tickers tickers_ = new Tickers();
-
-		private IObject hovered_ = null;
-		private IObject sel_ = null;
 
 		public Cue()
 		{
@@ -46,7 +45,9 @@ namespace Cue
 
 			vr_ = Sys.IsVR;
 			hud_ = new Hud();
-			menu_ = new Menu();
+			leftMenu_ = new Menu();
+			rightMenu_ = new Menu();
+			desktopMenu_ = new Menu();
 			controls_ = new Controls();
 		}
 
@@ -90,37 +91,9 @@ namespace Cue
 			get { return player_; }
 		}
 
-		public IObject Selected
-		{
-			get { return sel_; }
-		}
-
-		public IObject Hovered
-		{
-			get { return hovered_; }
-		}
-
 		public Controls Controls
 		{
 			get { return controls_; }
-		}
-
-		public void Select(IObject o)
-		{
-			if (sel_ != o)
-			{
-				sel_ = o;
-				SelectionChanged?.Invoke(sel_);
-			}
-		}
-
-		public void Hover(IObject o)
-		{
-			if (hovered_ != o)
-			{
-				hovered_ = o;
-				HoveredChanged?.Invoke(hovered_);
-			}
 		}
 
 		public void Init()
@@ -309,10 +282,8 @@ namespace Cue
 					if (vr_ != vr)
 					{
 						vr_ = vr;
-						hud_?.Destroy();
-						hud_?.Create(vr_);
-						menu_?.Destroy();
-						menu_?.Create(vr_);
+						DestroyUI();
+						CreateUI();
 					}
 
 					CheckInput();
@@ -338,7 +309,9 @@ namespace Cue
 				{
 					controls_?.Update();
 					hud_?.Update();
-					menu_?.Update();
+					leftMenu_?.Update();
+					rightMenu_?.Update();
+					desktopMenu_?.Update();
 				});
 			});
 		}
@@ -347,48 +320,143 @@ namespace Cue
 		{
 			if (Sys.IsPlayMode)
 			{
-				if (Sys.Input.ToggleMenu)
-					menu_?.Toggle();
+				//if (Sys.Input.ToggleMenu)
+				//	menu_?.Toggle();
 
-				var h = Sys.Input.GetHovered();
-
-				Hover(h.o);
-
-				if (Sys.Input.Select)
-					Select(Hovered);
-
-				if (h.hit)
-				{
-					controls_.HoverTargetVisible = true;
-					controls_.HoverTargetPosition = h.pos;
-				}
+				if (Sys.IsVR)
+					CheckVRInput();
 				else
-				{
-					controls_.HoverTargetVisible = false;
-				}
+					CheckDesktopInput();
+			}
+		}
 
-				if (Sys.Input.Action)
+		private void CheckVRInput()
+		{
+			var lh = Sys.Input.GetLeftHovered();
+			var rh = Sys.Input.GetRightHovered();
+
+			if (Sys.Input.ShowLeftMenu)
+			{
+				controls_.HoverTargetVisible = true;
+				controls_.HoverTargetPosition = rh.pos;
+			}
+			else if (Sys.Input.ShowRightMenu)
+			{
+				controls_.HoverTargetVisible = true;
+				controls_.HoverTargetPosition = lh.pos;
+			}
+
+
+			if (lh.o != null)
+			{
+				leftMenu_.Visible = Sys.Input.ShowLeftMenu;
+				leftMenu_.Object = lh.o as Person;
+
+				rightMenu_.Visible = false;
+				rightMenu_.Object = null;
+
+				if (Sys.Input.RightAction)
 				{
-					var p = Selected as Person;
-					if (p != null)
+					LogInfo($"right action {lh.o} {rh.o}");
+
+					if (rh.o != null)
 					{
-						var o = Hovered;
-						if (o != null)
-						{
-							p.InteractWith(o);
-						}
-						else if (h.hit)
-						{
-							p.MoveTo(
-								h.pos,
-								Vector3.Bearing(h.pos - p.Position));
-						}
+						LogInfo($"interacting {lh.o} with {rh.o}");
+						lh.o.InteractWith(rh.o);
+					}
+					else if (rh.hit)
+					{
+						LogInfo($"hit for {lh.o} on {rh.pos}");
+						lh.o.MoveTo(
+							rh.pos,
+							Vector3.Bearing(rh.pos - lh.o.Position));
+					}
+					else
+					{
+						LogInfo($"nothing");
 					}
 				}
 			}
+			else if (rh.o != null)
+			{
+				leftMenu_.Visible = false;
+				leftMenu_.Object = null;
 
-			//if (Sys.Input.ToggleControls)
-			//	controls_.Visible = !controls_.Visible;
+				rightMenu_.Visible = Sys.Input.ShowRightMenu;
+				rightMenu_.Object = rh.o as Person;
+
+				if (Sys.Input.LeftAction)
+				{
+					LogInfo($"left action {lh.o} {rh.o}");
+
+					controls_.HoverTargetVisible = true;
+					controls_.HoverTargetPosition = lh.pos;
+
+					if (lh.o != null)
+					{
+						LogInfo($"interacting {rh.o} with {lh.o}");
+						rh.o.InteractWith(lh.o);
+					}
+					else if (lh.hit)
+					{
+						LogInfo($"hit for {rh.o} on {lh.pos}");
+						rh.o.MoveTo(
+							lh.pos,
+							Vector3.Bearing(lh.pos - rh.o.Position));
+					}
+					else
+					{
+						LogInfo($"nothing");
+					}
+				}
+			}
+			else
+			{
+				leftMenu_.Visible = false;
+				leftMenu_.Object = null;
+
+				rightMenu_.Visible = false;
+				rightMenu_.Object = null;
+			}
+		}
+
+		private void CheckDesktopInput()
+		{
+			var h = Sys.Input.GetLeftHovered();
+
+			if (h.hit)
+			{
+				controls_.HoverTargetVisible = true;
+				controls_.HoverTargetPosition = h.pos;
+			}
+			else
+			{
+				controls_.HoverTargetVisible = false;
+			}
+
+			if (Sys.Input.LeftAction)
+			{
+				LogInfo("Action");
+
+				//var p = Selected as Person;
+				//if (p != null)
+				//{
+				//	var o = Hovered;
+				//	if (o != null)
+				//	{
+				//		p.InteractWith(o);
+				//	}
+				//	else if (h.hit)
+				//	{
+				//		p.MoveTo(
+				//			h.pos,
+				//			Vector3.Bearing(h.pos - p.Position));
+				//	}
+				//}
+			}
+
+			if (Sys.Input.ToggleControls)
+				controls_.Visible = !controls_.Visible;
 		}
 
 		public void OnPluginState(bool b)
@@ -397,22 +465,40 @@ namespace Cue
 			Sys.OnPluginState(b);
 
 			if (b)
-			{
-				hud_?.Create(Sys.IsVR);
-				menu_?.Create(Sys.IsVR);
-				controls_.Create();
-			}
+				CreateUI();
 			else
-			{
-				hud_?.Destroy();
-				menu_?.Destroy();
-				controls_.Destroy();
-			}
+				DestroyUI();
 
 			for (int i = 0; i < allObjects_.Count; ++i)
 				allObjects_[i].OnPluginState(b);
 
 			LogInfo($"cue: plugin state {b} finished");
+		}
+
+		private void DestroyUI()
+		{
+			controls_?.Destroy();
+			hud_?.Destroy();
+			leftMenu_?.Destroy();
+			rightMenu_?.Destroy();
+			desktopMenu_?.Destroy();
+		}
+
+		private void CreateUI()
+		{
+			controls_.Create();
+			hud_?.Create(vr_);
+
+			if (vr_)
+			{
+				leftMenu_?.Create(vr_, true);
+				rightMenu_?.Create(vr_, false);
+			}
+			else
+			{
+				desktopMenu_?.Create(false, false);
+				desktopMenu_.Visible = true;
+			}
 		}
 
 		static public void LogVerbose(string s)

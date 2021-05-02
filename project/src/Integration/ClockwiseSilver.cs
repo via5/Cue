@@ -123,8 +123,17 @@
 
 			Cue.LogInfo($"Clockwise {person_}: starting reciprocal with {target}");
 
-			DoKiss(target, true);
-			t.DoKiss(person_, false);
+			bool thisPos = true;
+			bool targetPos = false;
+
+			if (person_ == Cue.Instance.Player)
+			{
+				thisPos = false;
+				targetPos = true;
+			}
+
+			DoKiss(target, thisPos);
+			t.DoKiss(person_, targetPos);
 		}
 
 		private void DoKiss(Person target, bool pos)

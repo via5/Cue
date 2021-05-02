@@ -519,7 +519,7 @@ namespace Cue
 			gaze_.Enabled = false;
 		}
 
-		public bool InteractWith(IObject o)
+		public override bool InteractWith(IObject o)
 		{
 			if (ai_ == null)
 				return false;

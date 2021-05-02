@@ -108,6 +108,16 @@ namespace Cue.W
 	}
 
 
+	class FaceCamera : MonoBehaviour
+	{
+		public void LateUpdate()
+		{
+			var c = Camera.main.transform;
+			transform.LookAt(c.position + c.forward);
+		}
+	}
+
+
 	// vr, moves with the head
 	//
 	class VRHandRootSupport : VUI.IRootSupport
@@ -118,13 +128,16 @@ namespace Cue.W
 		private GameObject hudPanel_ = null;
 		private Canvas canvas_ = null;
 
-		public VRHandRootSupport(UnityEngine.Vector3 offset, Vector2 pos, Vector2 size)
+		public VRHandRootSupport(bool left, UnityEngine.Vector3 offset, Vector2 pos, Vector2 size)
 		{
 			offset_ = offset;
 			pos_ = pos;
 			size_ = size;
 
-			CreateFullscreenPanel(SuperController.singleton.leftHand);
+			CreateFullscreenPanel(left ?
+				SuperController.singleton.leftHand :
+				SuperController.singleton.rightHand);
+
 			CreateHudPanel();
 		}
 
@@ -174,12 +187,22 @@ namespace Cue.W
 			bg.raycastTarget = false;
 
 			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
-			rc.ignoreReversedGraphics = false;
+			var fc = fullscreenPanel_.AddComponent<FaceCamera>();
 
-			rt.offsetMin = new Vector2(-2000, -200);
-			rt.offsetMax = new Vector2(10, 100);
-			rt.anchoredPosition = new Vector2(0.5f, 0.5f);
-			rt.localScale = new Vector3(0.0005f, 0.0005f, 0.0005f);
+			float w = 1000;
+			float h = 150;
+			float yoffset = 0;
+			float s = 0.3f;
+
+			rt.anchorMin = new Vector2(0.5f, 1);
+			rt.anchorMax = new Vector2(0.5f, 1);
+			rt.offsetMin = new Vector2(-w/2, -(h + yoffset));
+			rt.offsetMax = new Vector2(w/2, -yoffset);
+			rt.anchoredPosition3D = new Vector3(0, 0, 0);
+
+			//rt.anchoredPosition = new Vector2(0.5f, 0.5f);
+			rt.localPosition = new Vector3(0, 0.08f, -0.05f);
+			rt.localScale = new Vector3(s / w, s / w, s / w);
 
 			SuperController.singleton.AddCanvas(canvas_);
 		}

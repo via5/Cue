@@ -70,7 +70,6 @@ namespace Cue
 
 		public Controls()
 		{
-			Cue.Instance.HoveredChanged += OnHoveredChanged;
 		}
 
 		public List<ObjectControls> All
@@ -119,6 +118,7 @@ namespace Cue
 				"MoveTarget", Vector3.Zero, 0.1f, new Color(1, 1, 1, 1));
 
 			moveTarget_.Collision = false;
+			moveTarget_.Visible = false;
 
 			foreach (var o in Cue.Instance.Objects)
 				controls_.Add(new ObjectControls(o));

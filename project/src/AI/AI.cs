@@ -22,13 +22,16 @@ namespace Cue
 
 	class KissingInteraction : IInteraction
 	{
-		public const float StartDistance = 0.2f;
+		public const float StartDistance = 0.15f;
 		public const float StopDistance = 0.1f;
+		public const float PlayerStopDistance = 0.2f;
 		public const float MinimumActiveTime = 3;
 		public const float MinimumStoppedTime = 2;
+		public const float Cooldown = 10;
 
 		private Person person_;
 		private float elapsed_ = 0;
+		private float cooldownRemaining_ = 0;
 
 		public KissingInteraction(Person p)
 		{
@@ -40,12 +43,14 @@ namespace Cue
 			if (person_.Body.Lips == null)
 				return;
 
+			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
+
 			if (person_.Kisser.Active)
 			{
 				if (person_.Kisser.Elapsed >= MinimumActiveTime)
 					TryStop();
 			}
-			else
+			else if (cooldownRemaining_ == 0)
 			{
 				elapsed_ += s;
 				if (elapsed_ > 1)
@@ -96,10 +101,18 @@ namespace Cue
 			var targetLips = target.Body.Lips.Position;
 			var d = Vector3.Distance(srcLips, targetLips);
 
-			if (d >= StopDistance)
+			var hasPlayer = (
+				person_ == Cue.Instance.Player ||
+				target == Cue.Instance.Player);
+
+			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
+
+			if (d >= sd)
 			{
+				Cue.LogInfo($"{person_}: stopping kiss, {d}>={sd}");
 				person_.Kisser.Stop();
 				target.Kisser.Stop();
+				cooldownRemaining_ = Cooldown;
 				return true;
 			}
 

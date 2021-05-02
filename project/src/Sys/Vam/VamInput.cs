@@ -121,7 +121,18 @@ namespace Cue.W
 			}
 		}
 
-		public bool Action
+		public bool LeftAction
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetLeftGrab();
+				else
+					return right_.Clicked;
+			}
+		}
+
+		public bool RightAction
 		{
 			get
 			{
@@ -161,11 +172,33 @@ namespace Cue.W
 			}
 		}
 
-		public HoveredInfo GetHovered()
+		public bool ShowLeftMenu
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetLeftUIPointerShow();
+				else
+					return true;
+			}
+		}
+
+		public bool ShowRightMenu
+		{
+			get
+			{
+				if (sys_.IsVR)
+					return SuperController.singleton.GetRightUIPointerShow();
+				else
+					return true;
+			}
+		}
+
+		public HoveredInfo GetLeftHovered()
 		{
 			if (sys_.IsVR)
 			{
-				if (!GetVRRay())
+				if (!GetLeftVRRay())
 					return HoveredInfo.None;
 			}
 			else
@@ -174,6 +207,27 @@ namespace Cue.W
 					return HoveredInfo.None;
 			}
 
+			return GetHovered();
+		}
+
+		public HoveredInfo GetRightHovered()
+		{
+			if (sys_.IsVR)
+			{
+				if (!GetRightVRRay())
+					return HoveredInfo.None;
+			}
+			else
+			{
+				if (!GetMouseRay())
+					return HoveredInfo.None;
+			}
+
+			return GetHovered();
+		}
+
+		private HoveredInfo GetHovered()
+		{
 			if (HitUI())
 				return HoveredInfo.None;
 
@@ -212,24 +266,18 @@ namespace Cue.W
 			return true;
 		}
 
-		private bool GetVRRay()
+		private bool GetLeftVRRay()
 		{
-			if (SuperController.singleton.GetLeftUIPointerShow())
-			{
-				ray_.origin = SuperController.singleton.viveObjectLeft.position;
-				ray_.direction = SuperController.singleton.viveObjectLeft.forward;
-				return true;
-			}
-			else if (SuperController.singleton.GetRightUIPointerShow())
-			{
-				ray_.origin = SuperController.singleton.viveObjectRight.position;
-				ray_.direction = SuperController.singleton.viveObjectRight.forward;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			ray_.origin = SuperController.singleton.viveObjectLeft.position;
+			ray_.direction = SuperController.singleton.viveObjectLeft.forward;
+			return true;
+		}
+
+		private bool GetRightVRRay()
+		{
+			ray_.origin = SuperController.singleton.viveObjectRight.position;
+			ray_.direction = SuperController.singleton.viveObjectRight.forward;
+			return true;
 		}
 
 		private bool HitUI()
