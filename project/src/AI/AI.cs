@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
@@ -12,112 +11,6 @@ namespace Cue
 		IEvent Event { get; }
 		void OnPluginState(bool b);
 		Mood Mood { get; }
-	}
-
-
-	interface IInteraction
-	{
-		void Update(float s);
-	}
-
-	class KissingInteraction : IInteraction
-	{
-		public const float StartDistance = 0.15f;
-		public const float StopDistance = 0.1f;
-		public const float PlayerStopDistance = 0.2f;
-		public const float MinimumActiveTime = 3;
-		public const float MinimumStoppedTime = 2;
-		public const float Cooldown = 10;
-
-		private Person person_;
-		private float elapsed_ = 0;
-		private float cooldownRemaining_ = 0;
-
-		public KissingInteraction(Person p)
-		{
-			person_ = p;
-		}
-
-		public void Update(float s)
-		{
-			if (person_.Body.Lips == null)
-				return;
-
-			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
-
-			if (person_.Kisser.Active)
-			{
-				if (person_.Kisser.Elapsed >= MinimumActiveTime)
-					TryStop();
-			}
-			else if (cooldownRemaining_ == 0)
-			{
-				elapsed_ += s;
-				if (elapsed_ > 1)
-				{
-					TryStart();
-					elapsed_ = 0;
-				}
-			}
-		}
-
-		private bool TryStart()
-		{
-			var srcLips = person_.Body.Lips.Position;
-
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
-			{
-				var target = Cue.Instance.Persons[i];
-				if (target == person_)
-					continue;
-
-				if (target.Body.Lips == null || target.Kisser.Active)
-					continue;
-
-				// todo: check rotations
-				var targetLips = target.Body.Lips.Position;
-
-				if (Vector3.Distance(srcLips, targetLips) < StartDistance)
-				{
-					Cue.LogInfo($"starting kiss for {person_} and {target}");
-					person_.Kisser.StartReciprocal(target);
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private bool TryStop()
-		{
-			var target = person_.Kisser.Target;
-			if (target == null)
-				return false;
-
-			if (target.Body.Lips == null)
-				return false;
-
-			var srcLips = person_.Body.Lips.Position;
-			var targetLips = target.Body.Lips.Position;
-			var d = Vector3.Distance(srcLips, targetLips);
-
-			var hasPlayer = (
-				person_ == Cue.Instance.Player ||
-				target == Cue.Instance.Player);
-
-			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
-
-			if (d >= sd)
-			{
-				Cue.LogInfo($"{person_}: stopping kiss, {d}>={sd}");
-				person_.Kisser.Stop();
-				target.Kisser.Stop();
-				cooldownRemaining_ = Cooldown;
-				return true;
-			}
-
-			return false;
-		}
 	}
 
 

@@ -2,7 +2,9 @@ project\src\Cue.cs
 project\src\Main.cs
 project\src\Actions\Action.cs
 project\src\AI\AI.cs
+project\src\AI\Interactions.cs
 project\src\AI\Mood.cs
+project\src\AI\Personality.cs
 project\src\Events\Event.cs
 project\src\Events\Lying.cs
 project\src\Events\Sex.cs
