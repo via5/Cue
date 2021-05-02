@@ -139,6 +139,7 @@ namespace Cue.W
 		bool IsPerson { get; }
 		int Sex { get; }
 		bool Teleporting { get; }
+		bool Possessed { get; }
 
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }

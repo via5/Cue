@@ -482,6 +482,17 @@ namespace Cue.W
 			return null;
 		}
 
+		public FreeControllerV3 FindController(Atom a, string name)
+		{
+			for (int i = 0; i < a.freeControllers.Length; ++i)
+			{
+				if (a.freeControllers[i].name == name)
+					return a.freeControllers[i];
+			}
+
+			return null;
+		}
+
 		public DAZMorph FindMorph(
 			Atom atom, GenerateDAZMorphsControlUI mui, DAZMorph m)
 		{

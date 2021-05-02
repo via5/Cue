@@ -133,6 +133,7 @@
 		void LookAt(Vector3 p);
 		void LookInFront();
 		void LookAtNothing();
+		void LookAtCamera();
 	}
 
 	interface ISpeaker

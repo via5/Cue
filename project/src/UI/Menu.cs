@@ -153,7 +153,7 @@
 		private void OnCall()
 		{
 			var p = Selected as Person;
-			if (p != null)
+			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
 				p.AI.RunEvent(new CallEvent(p, Cue.Instance.Player));
@@ -196,7 +196,7 @@
 		private void OnHandjob()
 		{
 			var p = Selected as Person;
-			if (p != null)
+			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
 				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
@@ -210,7 +210,7 @@
 			{
 				var s = p.AI.Event as SexEvent;
 
-				if (s == null)
+				if (s == null && Cue.Instance.Player != null)
 				{
 					p.MakeIdle();
 					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));

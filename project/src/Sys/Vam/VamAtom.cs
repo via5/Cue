@@ -96,7 +96,7 @@ namespace Cue.W
 		private readonly Atom atom_;
 		private VamActionParameter setOnlyKeyJointsOn_;
 
-		private Rigidbody head_ = null;
+		private FreeControllerV3 head_ = null;
 		private float finalBearing_ = BasicObject.NoBearing;
 		private bool turning_ = false;
 		private NavMeshAgent agent_ = null;
@@ -178,34 +178,20 @@ namespace Cue.W
 			}
 		}
 
-		public Vector3 HeadPosition
-		{
-			get
-			{
-				GetHead();
-				if (head_ == null)
-					return Vector3.Zero;
-
-				return W.VamU.FromUnity(head_.position);
-			}
-		}
-
-		public Vector3 HeadDirection
-		{
-			get
-			{
-				GetHead();
-				if (head_ == null)
-					return Vector3.Zero;
-
-				return W.VamU.FromUnity(head_.rotation.eulerAngles);
-			}
-		}
-
 		public Atom Atom
 		{
 			get { return atom_; }
 		}
+
+		public bool Possessed
+		{
+			get
+			{
+				GetHead();
+				return head_.possessed;
+			}
+		}
+
 
 		public List<IBodyPart> GetBodyParts()
 		{
@@ -602,7 +588,7 @@ namespace Cue.W
 				return;
 
 			var vsys = ((W.VamSys)Cue.Instance.Sys);
-			head_ = vsys.FindRigidbody(atom_, "head");
+			head_ = vsys.FindController(atom_, "headControl");
 		}
 	}
 }

@@ -36,6 +36,7 @@ namespace Cue
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
 		private IObject object_ = null;
+		private bool camera_ = false;
 
 		public VamEyes(Person p)
 		{
@@ -72,6 +73,7 @@ namespace Cue
 		public void LookAt(IObject o)
 		{
 			object_ = o;
+			camera_ = false;
 			lookMode_.SetValue("Target");
 			eyesImpl_.SetPosition(object_.EyeInterest);
 		}
@@ -79,6 +81,7 @@ namespace Cue
 		public void LookAt(Vector3 p)
 		{
 			object_ = null;
+			camera_ = false;
 			lookMode_.SetValue("Target");
 			eyesImpl_.SetPosition(p);
 		}
@@ -86,6 +89,7 @@ namespace Cue
 		public void LookInFront()
 		{
 			object_ = null;
+			camera_ = false;
 
 			eyesImpl_.SetPosition(
 				person_.Body.Head?.Position ?? Vector3.Zero +
@@ -97,13 +101,22 @@ namespace Cue
 		public void LookAtNothing()
 		{
 			object_ = null;
+			camera_ = false;
 			lookMode_.SetValue("None");
+		}
+
+		public void LookAtCamera()
+		{
+			LookAt(Cue.Instance.Sys.Camera);
+			camera_ = true;
 		}
 
 		public void Update(float s)
 		{
 			if (object_ != null)
 				eyesImpl_.SetPosition(object_.EyeInterest);
+			else if (camera_)
+				eyesImpl_.SetPosition(Cue.Instance.Sys.Camera);
 		}
 
 		public override string ToString()

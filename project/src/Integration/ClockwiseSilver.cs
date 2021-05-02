@@ -145,8 +145,8 @@
 			target_.SetValue("LipTrigger");
 
 			activate_.SetValue(true);
-			person_.LookAt(target, false);
-			target.LookAt(person_, false);
+			person_.Gaze.LookAt(target, false);
+			target.Gaze.LookAt(person_, false);
 			trackPos_.SetValue(pos);
 			trackRot_.SetValue(true);
 			wasKissing_ = true;
@@ -176,14 +176,14 @@
 					else
 					{
 						Cue.LogInfo($"Clockwise {person_}: now kissing {target}");
-						person_.LookAt(target, false);
+						person_.Gaze.LookAt(target, false);
 					}
 				}
 			}
 			else
 			{
 				Cue.LogInfo($"Clockwise {person_}: kiss stopped");
-				person_.LookAtDefault();
+				person_.Gaze.LookAtDefault();
 			}
 
 			wasKissing_ = b;

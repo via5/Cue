@@ -345,8 +345,8 @@ namespace Cue
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
 
 			breath_.Text = person_.Breathing.ToString();
-			eyes_.Text = person_.Eyes.ToString();
-			gaze_.Text = person_.Gaze.ToString();
+			eyes_.Text = person_.Gaze.Eyes.ToString();
+			gaze_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();
 			kiss_.Text = person_.Kisser.ToString();
 			handjob_.Text = person_.Handjob.ToString();

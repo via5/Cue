@@ -374,7 +374,7 @@ namespace Cue
 					U.RandomFloat(-1.0f, 1.0f),
 					1);
 
-				p.LookAt(p.Body.Head.Position + Vector3.Rotate(t, p.Bearing));
+				p.Gaze.LookAt(p.Body.Head.Position + Vector3.Rotate(t, p.Bearing));
 
 				e_ = 0;
 			}

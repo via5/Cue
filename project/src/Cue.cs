@@ -80,7 +80,6 @@ namespace Cue
 
 			LogInfo("cue: finding objects");
 			FindObjects();
-			FindPlayer();
 
 			LogInfo("cue: initializing persons");
 			InitPersons();
@@ -121,18 +120,6 @@ namespace Cue
 			}
 		}
 
-		private void FindPlayer()
-		{
-			foreach (var p in persons_)
-			{
-				if (p.ID == "Player")
-					player_ = p;
-			}
-
-			if (player_ == null)
-				LogError("no atom 'Player' found");
-		}
-
 		private void InitPersons()
 		{
 			var spawnPoints = new List<Slot>();
@@ -146,7 +133,7 @@ namespace Cue
 				if (i < spawnPoints.Count)
 					p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 
-				p.LookAtDefault();
+				p.Gaze.LookAtDefault();
 			}
 		}
 
@@ -229,8 +216,43 @@ namespace Cue
 
 			if (!Sys.Paused)
 			{
+				CheckPossess(s);
+
 				for (int i = 0; i < allObjects_.Count; ++i)
 					allObjects_[i].Update(s);
+			}
+		}
+
+		private void CheckPossess(float s)
+		{
+			if (player_ != null && !player_.Possessed)
+			{
+				LogInfo($"{player_} no longer possessed");
+				SetPlayer(null);
+			}
+
+			if (player_ == null)
+			{
+				for (int i = 0; i < persons_.Count; ++i)
+				{
+					if (persons_[i].Possessed)
+					{
+						LogInfo($"{persons_[i]} now possessed");
+						SetPlayer(persons_[i]);
+						break;
+					}
+				}
+			}
+		}
+
+		private void SetPlayer(Person p)
+		{
+			player_ = p;
+
+			for (int i = 0; i < persons_.Count; ++i)
+			{
+				if (!persons_[i].Gaze.HasInterestingTarget)
+					persons_[i].Gaze.LookAtDefault();
 			}
 		}
 

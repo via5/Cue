@@ -221,6 +221,11 @@ namespace Cue.W
 			get { return false; }
 		}
 
+		public bool Possessed
+		{
+			get { return false; }
+		}
+
 		public Vector3 Position
 		{
 			get { return Vector3.Zero; }

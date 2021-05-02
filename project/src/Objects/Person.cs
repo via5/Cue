@@ -375,6 +375,82 @@ namespace Cue
 	}
 
 
+	class Gaze
+	{
+		private Person person_;
+		private IEyes eyes_;
+		private IGazer gazer_;
+		private bool interested_ = false;
+
+		public Gaze(Person p)
+		{
+			person_ = p;
+			eyes_ = Integration.CreateEyes(p);
+			gazer_ = Integration.CreateGazer(p);
+		}
+
+		public IEyes Eyes { get { return eyes_; } }
+		public IGazer Gazer { get { return gazer_; } }
+
+		public bool HasInterestingTarget
+		{
+			get { return interested_; }
+		}
+
+		public void Update(float s)
+		{
+			eyes_.Update(s);
+			gazer_.Update(s);
+		}
+
+		public void LookAtDefault()
+		{
+			if (person_ == Cue.Instance.Player)
+				LookAtNothing();
+			else if (Cue.Instance.Player == null)
+				LookAtCamera();
+			else
+				LookAt(Cue.Instance.Player);
+
+			interested_ = false;
+		}
+
+		public void LookAtCamera()
+		{
+			eyes_.LookAtCamera();
+			interested_ = false;
+		}
+
+		public void LookAt(IObject o, bool gaze = true)
+		{
+			eyes_.LookAt(o);
+			gazer_.Enabled = gaze;
+			interested_ = true;
+		}
+
+		public void LookAt(Vector3 p, bool gaze = true)
+		{
+			eyes_.LookAt(p);
+			gazer_.Enabled = gaze;
+			interested_ = false;
+		}
+
+		public void LookAtNothing()
+		{
+			eyes_.LookAtNothing();
+			gazer_.Enabled = false;
+			interested_ = false;
+		}
+
+		public void LookInFront()
+		{
+			eyes_.LookInFront();
+			gazer_.Enabled = false;
+			interested_ = false;
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_ = new RootAction();
@@ -385,12 +461,11 @@ namespace Cue
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
+		private Gaze gaze_;
 
 		private IAI ai_ = null;
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
-		private IEyes eyes_;
-		private IGazer gaze_;
 		private ISpeaker speech_;
 		private IKisser kisser_;
 		private IHandjob handjob_;
@@ -406,12 +481,11 @@ namespace Cue
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
+			gaze_ = new Gaze(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
-			eyes_ = Integration.CreateEyes(this);
 			speech_ = Integration.CreateSpeaker(this);
-			gaze_ = Integration.CreateGazer(this);
 			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
 			clothing_ = Integration.CreateClothing(this);
@@ -424,6 +498,11 @@ namespace Cue
 		public bool Idle
 		{
 			get { return actions_.IsIdle; }
+		}
+
+		public bool Possessed
+		{
+			get { return Atom.Possessed; }
 		}
 
 		public Vector3 UprightPosition
@@ -441,12 +520,11 @@ namespace Cue
 		public PersonState State { get { return state_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
+		public Gaze Gaze { get { return gaze_; } }
 
 		public IAI AI { get { return ai_; } }
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
-		public IEyes Eyes { get { return eyes_; } }
-		public IGazer Gaze { get { return gaze_; } }
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
@@ -463,14 +541,7 @@ namespace Cue
 		{
 			get
 			{
-				if (this == Cue.Instance.Player)
-				{
-					return Cue.Instance.Sys.Camera;
-				}
-				else
-				{
-					return body_.Head?.Position ?? base.EyeInterest;
-				}
+				return body_.Head?.Position ?? base.EyeInterest;
 			}
 		}
 
@@ -507,38 +578,6 @@ namespace Cue
 			actions_.Clear();
 			ai_.RunEvent(null);
 			Atom.SetDefaultControls();
-		}
-
-		public void LookAtDefault()
-		{
-			if (this == Cue.Instance.Player)
-				LookAtNothing();
-			else
-				LookAt(Cue.Instance.Player);
-		}
-
-		public void LookAt(IObject o, bool gaze = true)
-		{
-			eyes_.LookAt(o);
-			gaze_.Enabled = gaze;
-		}
-
-		public void LookAt(Vector3 p, bool gaze = true)
-		{
-			eyes_.LookAt(p);
-			gaze_.Enabled = gaze;
-		}
-
-		public void LookAtNothing()
-		{
-			eyes_.LookAtNothing();
-			gaze_.Enabled = false;
-		}
-
-		public void LookInFront()
-		{
-			eyes_.LookInFront();
-			gaze_.Enabled = false;
 		}
 
 		public override bool InteractWith(IObject o)
@@ -612,7 +651,6 @@ namespace Cue
 
 			animator_.Update(s);
 			actions_.Tick(this, s);
-			eyes_.Update(s);
 			gaze_.Update(s);
 			kisser_.Update(s);
 			expression_.Update(s);
