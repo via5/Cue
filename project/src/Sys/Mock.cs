@@ -160,13 +160,16 @@ namespace Cue.W
 	{
 		public bool HardReset { get { return false; } }
 		public bool ReloadPlugin { get { return false; } }
-		public bool ToggleMenu { get { return false; } }
+
 		public bool ShowLeftMenu { get { return true; } }
-		public bool ShowRightMenu { get { return true; } }
-		public bool ToggleControls { get { return false; } }
-		public bool Select { get { return false; } }
 		public bool LeftAction { get { return false; } }
+
+		public bool ShowRightMenu { get { return true; } }
 		public bool RightAction { get { return false; } }
+
+		public bool Select { get { return false; } }
+		public bool Action { get { return false; } }
+		public bool ToggleControls { get { return false; } }
 
 		public void Update()
 		{
@@ -178,6 +181,11 @@ namespace Cue.W
 		}
 
 		public HoveredInfo GetRightHovered()
+		{
+			return HoveredInfo.None;
+		}
+
+		public HoveredInfo GetMouseHovered()
 		{
 			return HoveredInfo.None;
 		}

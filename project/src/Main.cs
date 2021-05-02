@@ -87,7 +87,7 @@ namespace Cue
 
 		private W.ISys sys_ = null;
 		private Cue cue_ = null;
-		private UI.ScriptUI sui_ = null;
+		private ScriptUI sui_ = null;
 		private bool inited_ = false;
 
 		public CueMain()
@@ -118,7 +118,7 @@ namespace Cue
 			{
 				sys_ = new W.VamSys(this);
 				cue_ = new Cue();
-				sui_ = new UI.ScriptUI();
+				sui_ = new ScriptUI();
 				sys_.OnReady(DoInit);
 			}
 			catch (Exception e)

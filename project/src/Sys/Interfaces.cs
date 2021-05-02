@@ -80,17 +80,20 @@ namespace Cue.W
 	{
 		bool HardReset { get; }
 		bool ReloadPlugin { get; }
-		bool ToggleMenu { get; }
-		bool ToggleControls { get; }
+
 		bool ShowLeftMenu { get; }
-		bool ShowRightMenu { get; }
-		bool Select { get; }
 		bool LeftAction { get; }
+		bool ShowRightMenu { get; }
 		bool RightAction { get; }
+
+		bool Select { get; }
+		bool Action { get; }
+		bool ToggleControls { get; }
 
 		void Update();
 		HoveredInfo GetLeftHovered();
 		HoveredInfo GetRightHovered();
+		HoveredInfo GetMouseHovered();
 	}
 
 	class NavStates

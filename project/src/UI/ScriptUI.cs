@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Cue.UI
+namespace Cue
 {
 	class ScriptUI
 	{

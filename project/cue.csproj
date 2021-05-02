@@ -130,9 +130,9 @@
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />
-    <Compile Include="src\UI\Hud.cs" />
     <Compile Include="src\UI\Menu.cs" />
     <Compile Include="src\UI\ScriptUI.cs" />
+    <Compile Include="src\UI\UI.cs" />
     <Compile Include="src\Utilities\Easings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

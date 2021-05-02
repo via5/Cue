@@ -65,7 +65,6 @@ namespace Cue.W
 		private VamButton left_ = new VamButton(0);
 		private VamButton right_ = new VamButton(1);
 		private VamButton middle_ = new VamButton(2);
-		private bool uiPointerShow_ = false;
 
 		public VamInput(VamSys sys)
 		{
@@ -99,25 +98,11 @@ namespace Cue.W
 			}
 		}
 
-		public bool ToggleMenu
+		public bool ShowLeftMenu
 		{
 			get
 			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetLeftSelect();
-				else
-					return false;
-			}
-		}
-
-		public bool Select
-		{
-			get
-			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetRightSelect();
-				else
-					return left_.Clicked;
+				return SuperController.singleton.GetLeftUIPointerShow();
 			}
 		}
 
@@ -125,61 +110,7 @@ namespace Cue.W
 		{
 			get
 			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetLeftGrab();
-				else
-					return right_.Clicked;
-			}
-		}
-
-		public bool RightAction
-		{
-			get
-			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetRightGrab();
-				else
-					return right_.Clicked;
-			}
-		}
-
-		public bool ToggleControls
-		{
-			get
-			{
-				if (sys_.IsVR)
-				{
-					var d =
-						SuperController.singleton.GetLeftUIPointerShow() ||
-						SuperController.singleton.GetRightUIPointerShow();
-
-					if (!uiPointerShow_ && d)
-					{
-						uiPointerShow_ = true;
-						return true;
-					}
-					else
-					{
-						uiPointerShow_ = false;
-					}
-
-					return false;
-				}
-				else
-				{
-					return middle_.Clicked;
-				}
-			}
-		}
-
-		public bool ShowLeftMenu
-		{
-			get
-			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetLeftUIPointerShow();
-				else
-					return true;
+				return SuperController.singleton.GetLeftGrab();
 			}
 		}
 
@@ -187,41 +118,62 @@ namespace Cue.W
 		{
 			get
 			{
-				if (sys_.IsVR)
-					return SuperController.singleton.GetRightUIPointerShow();
-				else
-					return true;
+				return SuperController.singleton.GetRightUIPointerShow();
+			}
+		}
+
+		public bool RightAction
+		{
+			get
+			{
+				return SuperController.singleton.GetRightGrab();
+			}
+		}
+
+		public bool Select
+		{
+			get
+			{
+				return left_.Clicked;
+			}
+		}
+
+		public bool Action
+		{
+			get
+			{
+				return right_.Clicked;
+			}
+		}
+
+		public bool ToggleControls
+		{
+			get
+			{
+				return middle_.Clicked;
 			}
 		}
 
 		public HoveredInfo GetLeftHovered()
 		{
-			if (sys_.IsVR)
-			{
-				if (!GetLeftVRRay())
-					return HoveredInfo.None;
-			}
-			else
-			{
-				if (!GetMouseRay())
-					return HoveredInfo.None;
-			}
+			if (!GetLeftVRRay())
+				return HoveredInfo.None;
 
 			return GetHovered();
 		}
 
 		public HoveredInfo GetRightHovered()
 		{
-			if (sys_.IsVR)
-			{
-				if (!GetRightVRRay())
-					return HoveredInfo.None;
-			}
-			else
-			{
-				if (!GetMouseRay())
-					return HoveredInfo.None;
-			}
+			if (!GetRightVRRay())
+				return HoveredInfo.None;
+
+			return GetHovered();
+		}
+
+		public HoveredInfo GetMouseHovered()
+		{
+			if (!GetMouseRay())
+				return HoveredInfo.None;
 
 			return GetHovered();
 		}
@@ -297,7 +249,7 @@ namespace Cue.W
 				return HoveredInfo.None;
 
 			// todo
-			var cs = Cue.Instance.Controls.All;
+			var cs = Cue.Instance.UI.Controls.All;
 			for (int i = 0; i < cs.Count; ++i)
 			{
 				var g = cs[i].Graphic as VamBoxGraphic;

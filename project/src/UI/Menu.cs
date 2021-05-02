@@ -4,9 +4,60 @@
 	{
 		private bool visible_ = false;
 		private VUI.Root root_ = null;
-		private VUI.Stack stack_ = null;
 		private VUI.Label label_ = null;
-		private Person sel_ = null;
+		private VUI.Panel buttons_ = null;
+		private IObject sel_ = null;
+		private IObject hov_ = null;
+
+		public void Create(bool vr, bool left)
+		{
+			if (vr)
+			{
+				root_ = Cue.Instance.Sys.CreateAttached(
+					left,
+					new Vector3(0, 0.1f, 0),
+					new Point(0, 0),
+					new Size(1300, 100));
+			}
+			else
+			{
+				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 150));
+			}
+
+
+			root_.ContentPanel.Layout = new VUI.BorderLayout();
+
+			label_ = new VUI.Label();
+			label_.Alignment = VUI.Label.AlignLeft | VUI.Label.AlignTop;
+
+			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
+			buttons_.Visible = false;
+
+			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
+			//p.Add(new VUI.ToolButton("Call", OnCall));
+			//p.Add(new VUI.ToolButton("Sit", OnSit));
+			//p.Add(new VUI.ToolButton("Kneel", OnKneel));
+			//p.Add(new VUI.ToolButton("Reload", OnReload));
+			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
+			//p.Add(new VUI.ToolButton("Sex", OnSex));
+			//p.Add(new VUI.ToolButton("Stand", OnStand));
+			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
+			buttons_.Add(row);
+
+			row = new VUI.Panel(new VUI.HorizontalFlow(5));
+			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
+			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
+			row.Add(new VUI.ToolButton("Dump clothes", OnDumpClothes));
+			row.Add(new VUI.ToolButton("Dump morphs", OnDumpMorphs));
+			buttons_.Add(row);
+
+			var p = new VUI.Panel(new VUI.BorderLayout());
+			p.Add(label_, VUI.BorderLayout.Top);
+			p.Add(buttons_, VUI.BorderLayout.Center);
+
+			root_.ContentPanel.Add(p, VUI.BorderLayout.Bottom);
+			root_.Visible = visible_;
+		}
 
 		public bool Visible
 		{
@@ -23,7 +74,7 @@
 			}
 		}
 
-		public Person Object
+		public IObject Selected
 		{
 			get
 			{
@@ -33,58 +84,22 @@
 			set
 			{
 				sel_ = value;
-				OnHovered(value);
+				OnSelected(value);
 			}
 		}
 
-		public void Create(bool vr, bool left)
+		public IObject Hovered
 		{
-			if (vr)
+			get
 			{
-				root_ = Cue.Instance.Sys.CreateAttached(
-					left,
-					new Vector3(0, 0.1f, 0),
-					new Point(0, 0),
-					new Size(1300, 100));
-			}
-			else
-			{
-				root_ = Cue.Instance.Sys.Create2D(130, new Size(1000, 100));
+				return hov_;
 			}
 
-			root_.ContentPanel.Layout = new VUI.BorderLayout();
-
-			stack_ = new VUI.Stack();
-
-			stack_.AddToStack(new VUI.Panel());
-
-			var bottom = new VUI.Panel(new VUI.VerticalFlow());
-
-			label_ = new VUI.Label();
-			bottom.Add(label_);
-
-			var p = new VUI.Panel(new VUI.HorizontalFlow(5));
-			//p.Add(new VUI.ToolButton("Call", OnCall));
-			//p.Add(new VUI.ToolButton("Sit", OnSit));
-			//p.Add(new VUI.ToolButton("Kneel", OnKneel));
-			//p.Add(new VUI.ToolButton("Reload", OnReload));
-			p.Add(new VUI.ToolButton("Handjob", OnHandjob));
-			//p.Add(new VUI.ToolButton("Sex", OnSex));
-			//p.Add(new VUI.ToolButton("Stand", OnStand));
-			p.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
-			bottom.Add(p);
-
-			p = new VUI.Panel(new VUI.HorizontalFlow(5));
-			p.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
-			p.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
-			p.Add(new VUI.ToolButton("Dump clothes", OnDumpClothes));
-			p.Add(new VUI.ToolButton("Dump morphs", OnDumpMorphs));
-			bottom.Add(p);
-
-			stack_.AddToStack(bottom);
-
-			root_.ContentPanel.Add(stack_, VUI.BorderLayout.Bottom);
-			root_.Visible = visible_;
+			set
+			{
+				hov_ = value;
+				OnHovered(value);
+			}
 		}
 
 		public void Destroy()
@@ -100,10 +115,15 @@
 		{
 			if (label_ != null)
 			{
-				if (sel_ == null)
-					label_.Text = "";
-				else
-					label_.Text = sel_.ID;
+				string s = "";
+
+				if (sel_ != null)
+					s += sel_.ID;
+
+				if (hov_ != null)
+					s += " (" + hov_.ID + ")";
+
+				label_.Text = s;
 			}
 
 			root_?.Update();
@@ -117,25 +137,22 @@
 				root_.Visible = visible_;
 		}
 
-		private void OnHovered(IObject o)
+		private void OnSelected(IObject p)
 		{
-			var p = o as Person;
-			if (p == null)
-			{
-				stack_.Select(0);
-			}
-			else
-			{
-				stack_.Select(1);
-			}
+			buttons_.Visible = (p as Person != null);
+		}
+
+		private void OnHovered(IObject p)
+		{
 		}
 
 		private void OnCall()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.MakeIdle();
-				sel_.AI.RunEvent(new CallEvent(sel_, Cue.Instance.Player));
+				p.MakeIdle();
+				p.AI.RunEvent(new CallEvent(p, Cue.Instance.Player));
 			}
 		}
 
@@ -149,19 +166,21 @@
 			//		Resources.Animations.SitOnSitting,
 			//		Cue.Instance.Persons[0].Sex));
 
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.MakeIdle();
-				sel_.Sit();
+				p.MakeIdle();
+				p.Sit();
 			}
 		}
 
 		private void OnKneel()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.MakeIdle();
-				sel_.Kneel();
+				p.MakeIdle();
+				p.Kneel();
 			}
 		}
 
@@ -172,23 +191,25 @@
 
 		private void OnHandjob()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.MakeIdle();
-				sel_.AI.RunEvent(new HandjobEvent(sel_, Cue.Instance.Player));
+				p.MakeIdle();
+				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
 			}
 		}
 
 		private void OnSex()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				var s = sel_.AI.Event as SexEvent;
+				var s = p.AI.Event as SexEvent;
 
 				if (s == null)
 				{
-					sel_.MakeIdle();
-					sel_.AI.RunEvent(new SexEvent(sel_, Cue.Instance.Player));
+					p.MakeIdle();
+					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
 				}
 				else
 				{
@@ -199,51 +220,57 @@
 
 		private void OnStand()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.MakeIdle();
-				sel_.AI.RunEvent(new StandEvent(sel_));
+				p.MakeIdle();
+				p.AI.RunEvent(new StandEvent(p));
 			}
 		}
 
 		private void OnStopKiss()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
 				//sel_.Kisser.Start(Cue.Instance.Player);
-				sel_.Kisser.Stop();
+				p.Kisser.Stop();
 			}
 		}
 
 		private void OnToggleGenitals()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.Clothing.GenitalsVisible = !sel_.Clothing.GenitalsVisible;
+				p.Clothing.GenitalsVisible = !p.Clothing.GenitalsVisible;
 			}
 		}
 
 		private void OnToggleBreasts()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.Clothing.BreastsVisible = !sel_.Clothing.BreastsVisible;
+				p.Clothing.BreastsVisible = !p.Clothing.BreastsVisible;
 			}
 		}
 
 		private void OnDumpClothes()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.Clothing.Dump();
+				p.Clothing.Dump();
 			}
 		}
 
 		private void OnDumpMorphs()
 		{
-			if (sel_ != null)
+			var p = Selected as Person;
+			if (p != null)
 			{
-				sel_.Expression.DumpActive();
+				p.Expression.DumpActive();
 			}
 		}
 	}

@@ -112,6 +112,14 @@ namespace Cue
 			}
 		}
 
+		public IObject Hovered
+		{
+			set
+			{
+				OnHoveredChanged(value);
+			}
+		}
+
 		public void Create()
 		{
 			moveTarget_ = Cue.Instance.Sys.CreateSphereGraphic(
