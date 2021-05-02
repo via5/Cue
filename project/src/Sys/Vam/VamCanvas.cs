@@ -262,7 +262,9 @@ namespace Cue.W
 
 			var bg = ui_.AddComponent<Image>();
 			bg.color = new Color(0, 0, 0, 0.8f);
-			bg.raycastTarget = false;
+			bg.raycastTarget = true;
+
+			SuperController.singleton.AddCanvas(canvas_);
 		}
 
 		public MVRScriptUI ScriptUI
@@ -282,7 +284,14 @@ namespace Cue.W
 
 		public void Destroy()
 		{
-			Object.Destroy(panel_);
+			if (canvas_ != null)
+				SuperController.singleton.RemoveCanvas(canvas_);
+
+			if (panel_ != null)
+			{
+				Object.Destroy(panel_);
+				panel_ = null;
+			}
 		}
 	}
 }

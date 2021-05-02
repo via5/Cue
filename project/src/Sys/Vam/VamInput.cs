@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Cue.W
 {
@@ -134,7 +135,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return left_.Clicked;
+				return left_.Clicked && !MouseOnUI();
 			}
 		}
 
@@ -142,7 +143,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return right_.Clicked;
+				return right_.Clicked && !MouseOnUI();
 			}
 		}
 
@@ -152,6 +153,11 @@ namespace Cue.W
 			{
 				return middle_.Clicked;
 			}
+		}
+
+		private bool MouseOnUI()
+		{
+			return EventSystem.current.IsPointerOverGameObject();
 		}
 
 		public HoveredInfo GetLeftHovered()
