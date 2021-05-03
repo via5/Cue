@@ -107,8 +107,12 @@ namespace Cue
 
 		public void StopSelf()
 		{
-			activate_.SetValue(false);
-			cooldownRemaining_ = Cooldown;
+			if (activate_.GetValue())
+			{
+				Cue.LogError($"Clockwise {person_}: stopping");
+				activate_.SetValue(false);
+				cooldownRemaining_ = Cooldown;
+			}
 		}
 
 		public void Start(Person target)
@@ -167,11 +171,8 @@ namespace Cue
 			target_.SetValue("LipTrigger");
 
 			activate_.SetValue(true);
-			person_.Gaze.LookAt(target, false);
-			target.Gaze.LookAt(person_, false);
 			trackPos_.SetValue(pos);
 			trackRot_.SetValue(true);
-			wasKissing_ = true;
 
 			headAngleX_.SetValue(-10);
 			headAngleZ_.SetValue(-40);

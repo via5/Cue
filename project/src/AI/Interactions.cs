@@ -34,7 +34,7 @@ namespace Cue
 				if (person_.Kisser.Elapsed >= MinimumActiveTime)
 					TryStop();
 			}
-			else if (!person_.Kisser.OnCooldown)
+			else
 			{
 				elapsed_ += s;
 				if (elapsed_ > 1)
@@ -47,6 +47,9 @@ namespace Cue
 
 		private bool TryStart()
 		{
+			if (!CanStart(person_))
+				return false;
+
 			var srcLips = person_.Body.Lips.Position;
 
 			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
@@ -58,7 +61,7 @@ namespace Cue
 				if (target.Body.Lips == null || target.Kisser.Active)
 					continue;
 
-				if (target.Kisser.OnCooldown)
+				if (!CanStart(target))
 					continue;
 
 				// todo: check rotations
@@ -73,6 +76,20 @@ namespace Cue
 			}
 
 			return false;
+		}
+
+		private bool CanStart(Person p)
+		{
+			if (p.Kisser.OnCooldown)
+				return false;
+
+			if (p.State.Is(PersonState.Walking))
+				return false;
+
+			if (p.State.Transitioning)
+				return false;
+
+			return true;
 		}
 
 		private bool TryStop()

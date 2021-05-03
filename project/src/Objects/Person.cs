@@ -41,7 +41,7 @@
 			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
 
-			Atom.SetDefaultControls();
+			Atom.SetDefaultControls("init");
 		}
 
 		public bool Idle
@@ -115,7 +115,7 @@
 			handjob_.Active = false;
 			actions_.Clear();
 			animator_.Stop();
-			Atom.SetDefaultControls();
+			Atom.SetDefaultControls("make idle");
 		}
 
 		public override void MakeIdleForMove()
@@ -126,7 +126,7 @@
 			handjob_.Active = false;
 			actions_.Clear();
 			ai_.RunEvent(null);
-			Atom.SetDefaultControls();
+			Atom.SetDefaultControls("make idle for move");
 		}
 
 		public override bool InteractWith(IObject o)

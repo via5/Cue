@@ -235,9 +235,9 @@ namespace Cue.W
 			list.Add(new TriggerBodyPart(this, id, t));
 		}
 
-		public void SetDefaultControls()
+		public void SetDefaultControls(string why)
 		{
-			Cue.LogInfo($"{ID}: setting default controls");
+			Cue.LogInfo($"{ID}: setting default controls ({why})");
 			setOnlyKeyJointsOn_.Fire();
 		}
 

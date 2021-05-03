@@ -119,6 +119,8 @@ namespace Cue
 				return true;
 			}
 
+			slot.Unlock(person_);
+
 			return false;
 		}
 

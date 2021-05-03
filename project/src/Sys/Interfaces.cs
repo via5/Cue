@@ -145,7 +145,7 @@ namespace Cue.W
 		Vector3 Direction { get; set; }
 
 		List<IBodyPart> GetBodyParts();
-		void SetDefaultControls();
+		void SetDefaultControls(string why);
 
 		void OnPluginState(bool b);
 

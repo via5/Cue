@@ -232,7 +232,7 @@ namespace Cue.BVH
                 }
             }
 
-            person_.Atom.SetDefaultControls();
+            person_.Atom.SetDefaultControls("playing bvh");
             playing = false;
             anim = null;
         }
@@ -439,7 +439,7 @@ namespace Cue.BVH
                 {
                     if ((flags & Animator.Loop) == 0)
                     {
-                        person_.Atom.SetDefaultControls();
+                        person_.Atom.SetDefaultControls("bvh finished");
                         playing = false;
                         return;
                     }
@@ -460,7 +460,7 @@ namespace Cue.BVH
                 {
                     if ((flags & Animator.Loop) == 0)
                     {
-                        person_.Atom.SetDefaultControls();
+                        person_.Atom.SetDefaultControls("bvh finished");
                         playing = false;
                         return;
                     }

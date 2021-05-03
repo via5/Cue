@@ -61,6 +61,8 @@ namespace Cue
 			if (proto_ == null)
 				return false;
 
+			person_.Atom.SetDefaultControls("playing proc anim");
+
 			anim_ = proto_.Clone();
 			anim_.Start(person_);
 
@@ -103,10 +105,12 @@ namespace Cue
 		{
 			private readonly string name_;
 			private readonly UnityEngine.Vector3 pos_;
-			private readonly Quaternion rot_;
+			private readonly UnityEngine.Vector3 rot_;
 			private FreeControllerV3 fc_ = null;
 			private UnityEngine.Vector3 startPos_;
+			private UnityEngine.Vector3 endPos_;
 			private Quaternion startRot_;
+			private Quaternion endRot_;
 			private float elapsed_ = 0;
 			private bool done_ = false;
 
@@ -114,7 +118,7 @@ namespace Cue
 			{
 				name_ = name;
 				pos_ = W.VamU.ToUnity(pos);
-				rot_ = Quaternion.Euler(W.VamU.ToUnity(rot));
+				rot_ = W.VamU.ToUnity(rot);
 			}
 
 			public Controller Clone()
@@ -122,7 +126,7 @@ namespace Cue
 				return new Controller(
 					name_,
 					W.VamU.FromUnity(pos_),
-					W.VamU.FromUnity(rot_.eulerAngles));
+					W.VamU.FromUnity(rot_));
 			}
 
 			public bool Done
@@ -142,12 +146,32 @@ namespace Cue
 				done_ = false;
 				elapsed_ = 0;
 				startPos_ = fc_.transform.localPosition;
+				endPos_ = pos_ + new UnityEngine.Vector3(0, p.Clothing.HeelsHeight, 0);
 				startRot_ = fc_.transform.localRotation;
-				p.Atom.SetDefaultControls();
+
+				if (name_ == "lFootControl" || name_ == "rFootControl")
+				{
+					endRot_ = Quaternion.Euler(
+						rot_ + new UnityEngine.Vector3(p.Clothing.HeelsAngle, 0, 0));
+				}
+				else
+				{
+					endRot_ = Quaternion.Euler(rot_);
+				}
 			}
 
 			public void Reset()
 			{
+			}
+
+			public static UnityEngine.Vector3 Bezier2(
+				UnityEngine.Vector3 s,
+				UnityEngine.Vector3 p,
+				UnityEngine.Vector3 e,
+				float t)
+			{
+				float rt = 1 - t;
+				return rt * rt * s + 2 * rt * t * p + t * t * e;
 			}
 
 			public void Update(float s)
@@ -162,11 +186,21 @@ namespace Cue
 
 				float t = U.Clamp(elapsed_, 0, 1);
 
-				fc_.transform.localPosition =
-					UnityEngine.Vector3.Lerp(startPos_, pos_, t);
+				var mid = startPos_ + (endPos_ - startPos_) / 2 + new UnityEngine.Vector3(0, 0.3f, 0);
+
+				if (name_ == "lFootControl" || name_ == "rFootControl")
+				{
+					fc_.transform.localPosition =
+						Bezier2(startPos_, mid, endPos_, t);
+				}
+				else
+				{
+					fc_.transform.localPosition =
+						UnityEngine.Vector3.Lerp(startPos_, endPos_, t);
+				}
 
 				fc_.transform.localRotation =
-					Quaternion.Lerp(startRot_, rot_, t);
+					Quaternion.Lerp(startRot_, endRot_, t);
 
 				if (t >= 1)
 					done_ = true;

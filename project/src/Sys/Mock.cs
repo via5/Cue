@@ -248,7 +248,7 @@ namespace Cue.W
 			return new List<IBodyPart>();
 		}
 
-		public void SetDefaultControls()
+		public void SetDefaultControls(string why)
 		{
 		}
 
