@@ -54,8 +54,7 @@
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
 			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
-			row.Add(new VUI.ToolButton("Dump clothes", OnDumpClothes));
-			row.Add(new VUI.ToolButton("Dump morphs", OnDumpMorphs));
+			row.Add(new VUI.ToolButton("test", OnTest));
 			buttons_.Add(row);
 
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
@@ -260,21 +259,29 @@
 			}
 		}
 
-		private void OnDumpClothes()
+		private void OnTest()
 		{
 			var p = Selected as Person;
 			if (p != null)
 			{
-				p.Clothing.Dump();
-			}
-		}
+				var a = p.VamAtom.Atom;
+				var s = Cue.Instance.VamSys;
 
-		private void OnDumpMorphs()
-		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				p.Expression.DumpActive();
+				var cs = new string[]{
+					"headControl",
+					"chestControl",
+					"hipControl" ,
+					"lHandControl",
+					"rHandControl",
+					"lFootControl",
+					"rFootControl"
+				};
+
+				foreach (var cn in cs)
+				{
+					var c = s.FindController(a, cn);
+					Cue.LogInfo($"{cn} {c.transform.localPosition} {c.transform.localRotation.eulerAngles}");
+				}
 			}
 		}
 	}

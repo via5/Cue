@@ -87,6 +87,10 @@
 		public void Stop()
 		{
 			activate_.SetValue(false);
+
+			var target = GetTarget()?.Kisser;
+			if (target != null)
+				target.Stop();
 		}
 
 		public void Start(Person target)
@@ -163,21 +167,11 @@
 			{
 				Cue.LogInfo($"Clockwise {person_}: kiss got activated");
 
-				var atom = atom_.GetValue();
-				Cue.LogInfo($"Clockwise {person_}: target is '{atom}'");
-
-				if (atom != "")
+				var target = GetTarget();
+				if (target != null)
 				{
-					var target = Cue.Instance.FindPerson(atom);
-					if (target == null)
-					{
-						Cue.LogInfo($"Clockwise {person_}: person '{atom}' not found");
-					}
-					else
-					{
-						Cue.LogInfo($"Clockwise {person_}: now kissing {target}");
-						person_.Gaze.LookAt(target, false);
-					}
+					Cue.LogInfo($"Clockwise {person_}: now kissing {target}");
+					person_.Gaze.LookAt(target, false);
 				}
 			}
 			else
@@ -187,6 +181,15 @@
 			}
 
 			wasKissing_ = b;
+		}
+
+		private Person GetTarget()
+		{
+			var atom = atom_.GetValue();
+			if (atom != "")
+				return Cue.Instance.FindPerson(atom);
+
+			return null;
 		}
 
 		public override string ToString()

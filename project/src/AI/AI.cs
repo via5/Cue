@@ -83,12 +83,13 @@ namespace Cue
 				return false;
 			}
 
-			person_.MakeIdle();
 
 			var slot = person_.LockedSlot;
 
 			if (slot.Type == Slot.Sit)
 			{
+				person_.MakeIdle();
+
 				if (person_ == Cue.Instance.Player)
 				{
 					person_.PushAction(new SitAction(slot));
@@ -98,9 +99,13 @@ namespace Cue
 				{
 					RunEvent(new SitEvent(person_, slot));
 				}
+
+				return true;
 			}
 			else if (slot.Type == Slot.Stand)
 			{
+				person_.MakeIdle();
+
 				if (person_ == Cue.Instance.Player)
 				{
 					person_.PushAction(new MakeIdleAction());
@@ -110,9 +115,11 @@ namespace Cue
 				{
 					RunEvent(new StandEvent(person_, slot));
 				}
+
+				return true;
 			}
 
-			return true;
+			return false;
 		}
 
 		public void RunEvent(IEvent e)

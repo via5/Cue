@@ -37,24 +37,29 @@
 
 	interface IAnimation
 	{
+		int Type { get; }
 		int Sex { get; set; }
 	}
 
 	abstract class BasicAnimation : IAnimation
 	{
+		private readonly int type_;
 		private int sex_ = Sexes.Any;
+
+		protected BasicAnimation(int type)
+		{
+			type_ = type;
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
 
 		public int Sex
 		{
-			get
-			{
-				return sex_;
-			}
-
-			set
-			{
-				sex_ = value;
-			}
+			get { return sex_; }
+			set { sex_ = value; }
 		}
 	}
 

@@ -19,6 +19,7 @@ namespace Cue.Resources
 		public const int StandFromKneeling = 10;
 		public const int StandFromStraddleSit = 11;
 		public const int StraddleSitSex = 12;
+		public const int Stand = 13;
 
 		private static Dictionary<int, List<IAnimation>> anims_ =
 			new Dictionary<int, List<IAnimation>>();
@@ -45,7 +46,8 @@ namespace Cue.Resources
 						{ "KneelFromStanding",       KneelFromStanding },
 						{ "StandFromKneeling",       StandFromKneeling },
 						{ "StandFromStraddleSit",    StandFromStraddleSit },
-						{ "StraddleSitSex",          StraddleSitSex }
+						{ "StraddleSitSex",          StraddleSitSex },
+						{ "Stand",                   Stand }
 					};
 				}
 
@@ -92,7 +94,14 @@ namespace Cue.Resources
 		{
 			try
 			{
-				DoLoad();
+				LoadFromFile();
+
+				foreach (var a in ProceduralAnimations.Get())
+				{
+					if (a != null)
+						Add(a);
+				}
+
 				return true;
 			}
 			catch (Exception e)
@@ -102,7 +111,7 @@ namespace Cue.Resources
 			}
 		}
 
-		private static void DoLoad()
+		private static void LoadFromFile()
 		{
 			var meta = Cue.Instance.Sys.GetResourcePath("animations.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
@@ -135,7 +144,7 @@ namespace Cue.Resources
 					}
 
 					anim = new BVH.Animation(
-						path,
+						t, path,
 						(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
 						(a.HasKey("rootY") ? a["rootY"].AsBool : true),
 						(a.HasKey("reverse") ? a["reverse"].AsBool : false),
@@ -144,11 +153,11 @@ namespace Cue.Resources
 				}
 				else if (a.HasKey("timeline"))
 				{
-					anim = new TimelineAnimation(a["timeline"]);
+					anim = new TimelineAnimation(t, a["timeline"]);
 				}
 				else if (a.HasKey("synergy"))
 				{
-					anim = new SynergyAnimation(a["synergy"]);
+					anim = new SynergyAnimation(t, a["synergy"]);
 				}
 				else
 				{
@@ -159,17 +168,22 @@ namespace Cue.Resources
 				if (a.HasKey("sex"))
 					anim.Sex = Sexes.FromString(a["sex"]);
 
-				Cue.LogVerbose(a["type"] + " anim: " + anim.ToString());
-
-				List<IAnimation> list;
-				if (!anims_.TryGetValue(t, out list))
-				{
-					list = new List<IAnimation>();
-					anims_.Add(t, list);
-				}
-
-				list.Add(anim);
+				Add(anim);
 			}
+		}
+
+		private static void Add(IAnimation a)
+		{
+			Cue.LogVerbose(TypeToString(a.Type) + ": " + a.ToString());
+
+			List<IAnimation> list;
+			if (!anims_.TryGetValue(a.Type, out list))
+			{
+				list = new List<IAnimation>();
+				anims_.Add(a.Type, list);
+			}
+
+			list.Add(a);
 		}
 
 		public static IAnimation GetAny(int type, int sex)

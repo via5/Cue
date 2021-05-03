@@ -17,16 +17,19 @@ namespace Cue.BVH
         public int start = 0;
         public int end = -1;
 
-        public Animation()
+        public Animation(int type)
+            : base(type)
         {
         }
 
-        public Animation(string path)
+        public Animation(int type, string path)
+            : base(type)
         {
             file = new File(path);
         }
 
-        public Animation(string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
+        public Animation(int type, string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
+            : base(type)
         {
             this.file = new File(path);
             this.rootXZ = rootXZ;

@@ -31,6 +31,22 @@ namespace Cue
 			get { return type_; }
 		}
 
+		public bool Interactable
+		{
+			get
+			{
+				switch (type_)
+				{
+					case NoType:
+					case Spawn:
+						return false;
+
+					default:
+						return true;
+				}
+			}
+		}
+
 		public bool Lock(IObject by)
 		{
 			if (lockedBy_ == null)
@@ -161,6 +177,20 @@ namespace Cue
 				for (int i = 0; i < slots_.Count; ++i)
 				{
 					if (slots_[i].Locked)
+						return true;
+				}
+
+				return false;
+			}
+		}
+
+		public bool AnyInteractable
+		{
+			get
+			{
+				for (int i = 0; i < slots_.Count; ++i)
+				{
+					if (slots_[i].Interactable)
 						return true;
 				}
 

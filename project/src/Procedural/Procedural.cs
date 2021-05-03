@@ -3,9 +3,45 @@ using UnityEngine;
 
 namespace Cue
 {
+	class ProceduralAnimations
+	{
+		public static List<IAnimation> Get()
+		{
+			var list = new List<IAnimation>();
+
+			list.Add(Stand());
+
+			return list;
+		}
+
+		private static IAnimation Stand()
+		{
+			var a = new ProceduralAnimation(Resources.Animations.Stand, "stand");
+
+			var neutral = a.AddStep();
+			neutral.AddController("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0));
+			neutral.AddController("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0));
+			neutral.AddController("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0));
+			neutral.AddController("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90));
+			neutral.AddController("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270));
+			neutral.AddController("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0));
+			neutral.AddController("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0));
+
+			return a;
+		}
+	}
+
+
 	class ProceduralPlayer : IPlayer
 	{
+		private Person person_;
+		private ProceduralAnimation proto_ = null;
 		private ProceduralAnimation anim_ = null;
+
+		public ProceduralPlayer(Person p)
+		{
+			person_ = p;
+		}
 
 		public bool Playing
 		{
@@ -17,20 +53,24 @@ namespace Cue
 
 		public bool Play(IAnimation a, int flags)
 		{
-			if (anim_ == a)
+			if (proto_ == a || anim_ == a)
 				return true;
 
-			anim_ = a as ProceduralAnimation;
-			if (anim_ == null)
+			anim_ = null;
+			proto_ = (a as ProceduralAnimation);
+			if (proto_ == null)
 				return false;
 
-			anim_.Reset();
+			anim_ = proto_.Clone();
+			anim_.Start(person_);
+
 			return true;
 		}
 
 		public void Stop(bool rewind)
 		{
 			anim_ = null;
+			proto_ = null;
 		}
 
 		public void FixedUpdate(float s)
@@ -42,12 +82,141 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (anim_ != null)
+			{
 				anim_.Update(s);
+				if (anim_.Done)
+					Stop(false);
+			}
 		}
 
 		public override string ToString()
 		{
 			return "Procedural: " + (anim_ == null ? "(none)" : anim_.ToString());
+		}
+	}
+
+
+
+	class ProceduralStep
+	{
+		class Controller
+		{
+			private readonly string name_;
+			private readonly UnityEngine.Vector3 pos_;
+			private readonly Quaternion rot_;
+			private FreeControllerV3 fc_ = null;
+			private UnityEngine.Vector3 startPos_;
+			private Quaternion startRot_;
+			private float elapsed_ = 0;
+			private bool done_ = false;
+
+			public Controller(string name, Vector3 pos, Vector3 rot)
+			{
+				name_ = name;
+				pos_ = W.VamU.ToUnity(pos);
+				rot_ = Quaternion.Euler(W.VamU.ToUnity(rot));
+			}
+
+			public Controller Clone()
+			{
+				return new Controller(
+					name_,
+					W.VamU.FromUnity(pos_),
+					W.VamU.FromUnity(rot_.eulerAngles));
+			}
+
+			public bool Done
+			{
+				get { return done_; }
+			}
+
+			public void Start(Person p)
+			{
+				fc_ = Cue.Instance.VamSys.FindController(p.VamAtom.Atom, name_);
+				if (fc_ == null)
+				{
+					Cue.LogError($"ProceduralStep: controller {name_} not found in {p}");
+					return;
+				}
+
+				done_ = false;
+				elapsed_ = 0;
+				startPos_ = fc_.transform.localPosition;
+				startRot_ = fc_.transform.localRotation;
+				p.Atom.SetDefaultControls();
+			}
+
+			public void Reset()
+			{
+			}
+
+			public void Update(float s)
+			{
+				if (fc_ == null)
+				{
+					done_ = true;
+					return;
+				}
+
+				elapsed_ += s;
+
+				float t = U.Clamp(elapsed_, 0, 1);
+
+				fc_.transform.localPosition =
+					UnityEngine.Vector3.Lerp(startPos_, pos_, t);
+
+				fc_.transform.localRotation =
+					Quaternion.Lerp(startRot_, rot_, t);
+
+				if (t >= 1)
+					done_ = true;
+			}
+		}
+
+
+		private readonly List<Controller> cs_ = new List<Controller>();
+		private bool done_ = false;
+
+		public ProceduralStep Clone()
+		{
+			var s = new ProceduralStep();
+
+			foreach (var c in cs_)
+				s.cs_.Add(c.Clone());
+
+			return s;
+		}
+
+		public bool Done
+		{
+			get { return done_; }
+		}
+
+		public void Start(Person p)
+		{
+			done_ = false;
+			for (int i = 0; i < cs_.Count; ++i)
+				cs_[i].Start(p);
+		}
+
+		public void AddController(string name, Vector3 pos, Vector3 rot)
+		{
+			cs_.Add(new Controller(name, pos, rot));
+		}
+
+		public void Reset()
+		{
+			for (int i = 0; i < cs_.Count; ++i)
+				cs_[i].Reset();
+		}
+
+		public void Update(float s)
+		{
+			for (int i = 0; i < cs_.Count; ++i)
+			{
+				cs_[i].Update(s);
+				done_ = done_ || cs_[i].Done;
+			}
 		}
 	}
 
@@ -97,34 +266,68 @@ namespace Cue
 		}
 
 
-		private Person person_;
-		private string name_;
-		private readonly List<Part> parts_ = new List<Part>();
+		//private Person person_ = null;
+		private readonly string name_;
+		private readonly List<ProceduralStep> steps_ = new List<ProceduralStep>();
+		//private readonly List<Part> parts_ = new List<Part>();
 
-		public ProceduralAnimation(Person p, string name)
+		public ProceduralAnimation(int type, string name)
+			: base(type)
 		{
-			person_ = p;
 			name_ = name;
 		}
 
-		public void Add(string rbId, Vector3 f, float time)
+		public ProceduralAnimation Clone()
 		{
-			var rb = Cue.Instance.VamSys.FindRigidbody(
-				((W.VamAtom)person_.Atom).Atom, rbId);
+			var a = new ProceduralAnimation(Type, name_);
 
-			parts_.Add(new Part(rb, f, time));
+			foreach (var s in steps_)
+				a.steps_.Add(s.Clone());
+
+			return a;
 		}
+
+		public bool Done
+		{
+			get { return steps_[0].Done; }
+		}
+
+		public ProceduralStep AddStep()
+		{
+			var s = new ProceduralStep();
+			steps_.Add(s);
+			return s;
+		}
+
+		public void Start(Person p)
+		{
+			for (int i = 0; i < steps_.Count; ++i)
+				steps_[i].Start(p);
+		}
+
+		//public void Add(string rbId, Vector3 f, float time)
+		//{
+		//	var rb = Cue.Instance.VamSys.FindRigidbody(
+		//		((W.VamAtom)person_.Atom).Atom, rbId);
+		//
+		//	parts_.Add(new Part(rb, f, time));
+		//}
 
 		public void Reset()
 		{
-			for (int i = 0; i < parts_.Count; ++i)
-				parts_[i].Reset();
+			for (int i = 0; i < steps_.Count; ++i)
+				steps_[i].Reset();
+
+			//for (int i = 0; i < parts_.Count; ++i)
+			//	parts_[i].Reset();
 		}
 
 		public void Update(float s)
 		{
-			for (int i = 0; i < parts_.Count; ++i)
-				parts_[i].Update(s);
+			steps_[0].Update(s);
+
+			//for (int i = 0; i < parts_.Count; ++i)
+			//	parts_[i].Update(s);
 		}
 
 		public void FixedUpdate(float s)
@@ -135,10 +338,10 @@ namespace Cue
 		{
 			string s = name_;
 
-			if (parts_.Count == 0)
-				s += " (empty)";
-			else
-				s += " (" + parts_[0].ToString() + ")";
+			//if (parts_.Count == 0)
+			//	s += " (empty)";
+			//else
+			//	s += " (" + parts_[0].ToString() + ")";
 
 			return s;
 		}

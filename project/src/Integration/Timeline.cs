@@ -7,7 +7,8 @@ namespace Cue
 	{
 		private string name_;
 
-		public TimelineAnimation(string name)
+		public TimelineAnimation(int type, string name)
+			: base(type)
 		{
 			name_ = name;
 		}

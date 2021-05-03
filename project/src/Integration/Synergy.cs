@@ -56,7 +56,8 @@ namespace Cue
 	{
 		private string name_;
 
-		public SynergyAnimation(string name)
+		public SynergyAnimation(int type, string name)
+			: base(type)
 		{
 			name_ = name;
 		}

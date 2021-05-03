@@ -518,7 +518,7 @@ namespace Cue.W
 			agent_.speed = VamNav.AgentMoveSpeed;
 			agent_.angularSpeed = VamNav.AgentTurnSpeed;
 
-			agent_.stoppingDistance = 0;
+			agent_.stoppingDistance = VamNav.AgentRadius + 0.2f;
 			agent_.autoBraking = true;
 			agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
 			agent_.avoidancePriority = 50;
@@ -576,7 +576,10 @@ namespace Cue.W
 			if (agent_.pathPending || calculatingPath_)
 				return true;
 
-			if (agent_.hasPath && agent_.remainingDistance > 0)
+			if (agent_.remainingDistance > agent_.stoppingDistance)
+				return true;
+
+			if (agent_.hasPath && agent_.velocity.sqrMagnitude > 0)
 				return true;
 
 			return false;

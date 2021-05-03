@@ -155,7 +155,7 @@ namespace Cue
 		{
 			for (int i = 0; i < controls_.Count; ++i)
 			{
-				if (controls_[i].Object == o)
+				if (controls_[i].Object == o && o.Slots.AnyInteractable)
 				{
 					controls_[i].Hovered = true;
 					controls_[i].Visible = true;

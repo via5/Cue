@@ -296,7 +296,7 @@
 						state_.Set(PersonState.Standing);
 
 					if (lastNavState_ != W.NavStates.None)
-						animator_.Stop();
+						animator_.Play(Resources.Animations.Stand);
 
 					break;
 				}

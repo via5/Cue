@@ -107,23 +107,7 @@
 				if (sys_.Input.RightAction)
 				{
 					Cue.LogInfo($"right action {lh.o} {rh.o}");
-
-					if (rh.o != null)
-					{
-						Cue.LogInfo($"interacting {lh.o} with {rh.o}");
-						lh.o.InteractWith(rh.o);
-					}
-					else if (rh.hit)
-					{
-						Cue.LogInfo($"hit for {lh.o} on {rh.pos}");
-						lh.o.MoveToManual(
-							rh.pos,
-							Vector3.Bearing(rh.pos - lh.o.Position));
-					}
-					else
-					{
-						Cue.LogInfo($"nothing");
-					}
+					DoAction(lh.o, rh);
 				}
 			}
 			else if (rh.o != null)
@@ -137,23 +121,7 @@
 				if (sys_.Input.LeftAction)
 				{
 					Cue.LogInfo($"left action {lh.o} {rh.o}");
-
-					if (lh.o != null)
-					{
-						Cue.LogInfo($"interacting {rh.o} with {lh.o}");
-						rh.o.InteractWith(lh.o);
-					}
-					else if (lh.hit)
-					{
-						Cue.LogInfo($"hit for {rh.o} on {lh.pos}");
-						rh.o.MoveToManual(
-							lh.pos,
-							Vector3.Bearing(lh.pos - rh.o.Position));
-					}
-					else
-					{
-						Cue.LogInfo($"nothing");
-					}
+					DoAction(rh.o, lh);
 				}
 			}
 			else
@@ -164,6 +132,26 @@
 				rightMenu_.Visible = false;
 				rightMenu_.Selected = null;
 			}
+		}
+
+		private bool DoAction(IObject src, W.HoveredInfo hit)
+		{
+			if (src != null && hit.o != null && hit.o != src)
+			{
+				Cue.LogInfo($"{src}: interacting with {hit.o}");
+				if (src.InteractWith(hit.o))
+					return true;
+			}
+
+			if (src != null && hit.hit)
+			{
+				Cue.LogInfo($"{src}: hit on {hit.pos}");
+				src.MoveToManual(
+					hit.pos, Vector3.Bearing(hit.pos - src.Position));
+				return true;
+			}
+
+			return false;
 		}
 
 		private void CheckDesktopInput()
@@ -181,29 +169,13 @@
 			}
 
 			if (sys_.Input.Select)
-			{
 				desktopMenu_.Selected = h.o as Person;
-			}
 
 			desktopMenu_.Hovered = h.o;
 			controls_.Hovered = h.o;
 
 			if (sys_.Input.Action)
-			{
-				var src = desktopMenu_.Selected;
-				var dest = desktopMenu_.Hovered;
-
-				if (src != null && dest != null && src != dest)
-				{
-					src.InteractWith(dest);
-				}
-				else if (h.hit)
-				{
-					src.MoveToManual(
-						h.pos,
-						Vector3.Bearing(h.pos - src.Position));
-				}
-			}
+				DoAction(desktopMenu_.Selected, h);
 
 			if (sys_.Input.ToggleControls)
 				controls_.Visible = !controls_.Visible;
