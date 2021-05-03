@@ -151,11 +151,13 @@
 		bool Active { get; }
 		Person Target { get; }
 		float Elapsed { get; }
+		bool OnCooldown { get; }
 
 		void Update(float s);
 		void Start(Person p);
 		void StartReciprocal(Person p);
 		void Stop();
+		void StopSelf();
 	}
 
 	interface IHandjob

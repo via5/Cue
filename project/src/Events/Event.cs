@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	interface IEvent
 	{
@@ -36,15 +38,16 @@
 	{
 		private const int NoState = 0;
 		private const int MovingState = 1;
-		private const int IdlingState = 2;
 
 		private Person caller_;
+		private Action post_ = null;
 		private int state_ = NoState;
 
-		public CallEvent(Person p, Person caller)
+		public CallEvent(Person p, Person caller, Action post=null)
 			: base(p)
 		{
 			caller_ = caller;
+			post_ = post;
 		}
 
 		public override bool Update(float s)
@@ -68,19 +71,11 @@
 				{
 					if (!person_.HasTarget)
 					{
-						person_.PushAction(new RandomAnimationAction(
-							Resources.Animations.GetAll(
-								Resources.Animations.StandIdle, person_.Sex)));
-
-						state_ = IdlingState;
+						post_?.Invoke();
+						return false;
 					}
 
 					break;
-				}
-
-				case IdlingState:
-				{
-					return false;
 				}
 			}
 

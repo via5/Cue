@@ -1,7 +1,11 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class ClockwiseSilverKiss : IKisser
 	{
+		public const float Cooldown = 10;
+
 		private Person person_;
 		private W.VamBoolParameter kissingRunning_ = null;
 		private W.VamBoolParameter activate_ = null;
@@ -14,6 +18,7 @@
 		private W.VamFloatParameter headAngleZ_ = null;
 		private bool wasKissing_ = false;
 		private float elapsed_ = 0;
+		private float cooldownRemaining_ = 0;
 
 		public ClockwiseSilverKiss(Person p)
 		{
@@ -59,6 +64,11 @@
 			get { return elapsed_; }
 		}
 
+		public bool OnCooldown
+		{
+			get { return cooldownRemaining_ > 0; }
+		}
+
 		public Person Target
 		{
 			get
@@ -76,6 +86,8 @@
 
 		public void Update(float s)
 		{
+			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
+
 			var k = kissingRunning_.GetValue();
 			if (wasKissing_ != k)
 				SetActive(k);
@@ -86,11 +98,17 @@
 
 		public void Stop()
 		{
-			activate_.SetValue(false);
+			StopSelf();
 
 			var target = GetTarget()?.Kisser;
 			if (target != null)
-				target.Stop();
+				target.StopSelf();
+		}
+
+		public void StopSelf()
+		{
+			activate_.SetValue(false);
+			cooldownRemaining_ = Cooldown;
 		}
 
 		public void Start(Person target)
