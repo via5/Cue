@@ -22,13 +22,14 @@
 			{
 				case NoState:
 				{
-					var target =
-						receiver_.Position +
-						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
-
-					person_.MoveTo(target, receiver_.Bearing + 180);
-					person_.Gaze.LookAt(receiver_);
-					state_ = MovingState;
+					//var target =
+					//	receiver_.Position +
+					//	Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
+					//
+					//person_.MoveTo(target, receiver_.Bearing + 180);
+					//person_.Gaze.LookAt(receiver_);
+					//state_ = MovingState;
+					state_ = PositioningState;
 
 					break;
 				}
@@ -44,8 +45,7 @@
 						}
 						else
 						{
-							person_.Handjob.Target = receiver_;
-							person_.Handjob.Active = true;
+							person_.Handjob.Start(receiver_);
 							state_ = ActiveState;
 						}
 					}
@@ -57,8 +57,83 @@
 				{
 					if (!person_.Animator.Playing)
 					{
-						person_.Handjob.Target = receiver_;
-						person_.Handjob.Active = true;
+						person_.Handjob.Start(receiver_);
+						receiver_.Clothing.GenitalsVisible = true;
+						state_ = ActiveState;
+					}
+
+					break;
+				}
+
+				case ActiveState:
+				{
+					break;
+				}
+			}
+
+			return true;
+		}
+	}
+
+
+	class BlowjobEvent : BasicEvent
+	{
+		private const int NoState = 0;
+		private const int MovingState = 1;
+		private const int PositioningState = 2;
+		private const int ActiveState = 3;
+
+		private Person receiver_;
+		private int state_ = NoState;
+
+		public BlowjobEvent(Person p, Person receiver)
+			: base(p)
+		{
+			receiver_ = receiver;
+		}
+
+		public override bool Update(float s)
+		{
+			switch (state_)
+			{
+				case NoState:
+				{
+					//var target =
+					//	receiver_.Position +
+					//	Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
+					//
+					//person_.MoveTo(target, receiver_.Bearing + 180);
+					//person_.Gaze.LookAt(receiver_);
+					//state_ = MovingState;
+					state_ = PositioningState;
+
+					break;
+				}
+
+				case MovingState:
+				{
+					if (!person_.HasTarget)
+					{
+						if (receiver_.State.Is(PersonState.Sitting))
+						{
+							person_.Kneel();
+							state_ = PositioningState;
+						}
+						else
+						{
+							person_.Blowjob.Start(receiver_);
+							state_ = ActiveState;
+						}
+					}
+
+					break;
+				}
+
+				case PositioningState:
+				{
+					if (!person_.Animator.Playing)
+					{
+						person_.Blowjob.Start(receiver_);
 						receiver_.Clothing.GenitalsVisible = true;
 						state_ = ActiveState;
 					}

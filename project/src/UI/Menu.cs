@@ -42,13 +42,12 @@
 			}
 
 			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
-			//row.Add(new VUI.ToolButton("Call", OnCall));
+			row.Add(new VUI.ToolButton("Call", OnCall));
 			row.Add(new VUI.ToolButton("Straddle", OnStraddle));
-			//row.Add(new VUI.ToolButton("Kneel", OnKneel));
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
-			//row.Add(new VUI.ToolButton("Sex", OnSex));
-			//row.Add(new VUI.ToolButton("Stand", OnStand));
+			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
+			row.Add(new VUI.ToolButton("Make idle", OnMakeIdle));
 			buttons_.Add(row);
 
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
@@ -195,6 +194,16 @@
 			}
 		}
 
+		private void OnBlowjob()
+		{
+			var p = Selected as Person;
+			if (p != null && Cue.Instance.Player != null)
+			{
+				p.MakeIdle();
+				p.AI.RunEvent(new BlowjobEvent(p, Cue.Instance.Player));
+			}
+		}
+
 		private void OnSex()
 		{
 			var p = Selected as Person;
@@ -214,13 +223,12 @@
 			}
 		}
 
-		private void OnStand()
+		private void OnMakeIdle()
 		{
 			var p = Selected as Person;
 			if (p != null)
 			{
 				p.MakeIdle();
-				p.AI.RunEvent(new StandEvent(p));
 			}
 		}
 
@@ -228,10 +236,7 @@
 		{
 			var p = Selected as Person;
 			if (p != null)
-			{
-				//sel_.Kisser.Start(Cue.Instance.Player);
 				p.Kisser.Stop();
-			}
 		}
 
 		private void OnToggleGenitals()
@@ -254,28 +259,31 @@
 
 		private void OnTest()
 		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				var a = p.VamAtom.Atom;
-				var s = Cue.Instance.VamSys;
+			Cue.Instance.FindPerson("B").Kisser.StartReciprocal(
+				Cue.Instance.FindPerson("A"));
 
-				var cs = new string[]{
-					"headControl",
-					"chestControl",
-					"hipControl" ,
-					"lHandControl",
-					"rHandControl",
-					"lFootControl",
-					"rFootControl"
-				};
-
-				foreach (var cn in cs)
-				{
-					var c = s.FindController(a, cn);
-					Cue.LogInfo($"{cn} {c.transform.localPosition} {c.transform.localRotation.eulerAngles}");
-				}
-			}
+			//var p = Selected as Person;
+			//if (p != null)
+			//{
+			//	var a = p.VamAtom.Atom;
+			//	var s = Cue.Instance.VamSys;
+			//
+			//	var cs = new string[]{
+			//		"headControl",
+			//		"chestControl",
+			//		"hipControl" ,
+			//		"lHandControl",
+			//		"rHandControl",
+			//		"lFootControl",
+			//		"rFootControl"
+			//	};
+			//
+			//	foreach (var cn in cs)
+			//	{
+			//		var c = s.FindController(a, cn);
+			//		Cue.LogInfo($"{cn} {c.transform.localPosition} {c.transform.localRotation.eulerAngles}");
+			//	}
+			//}
 		}
 	}
 }

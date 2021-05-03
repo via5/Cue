@@ -101,6 +101,11 @@
 			return new ClockwiseSilverHandjob(p);
 		}
 
+		public static IBlowjob CreateBlowjob(Person p)
+		{
+			return new ClockwiseSilverBlowjob(p);
+		}
+
 		public static IClothing CreateClothing(Person p)
 		{
 			return new VamClothing(p);
@@ -162,8 +167,20 @@
 
 	interface IHandjob
 	{
-		bool Active { get; set; }
-		Person Target { get; set; }
+		bool Active { get; }
+
+		void Update(float s);
+		void Start(Person target);
+		void Stop();
+	}
+
+	interface IBlowjob
+	{
+		bool Active { get; }
+
+		void Update(float s);
+		void Start(Person target);
+		void Stop();
 	}
 
 	interface IClothing

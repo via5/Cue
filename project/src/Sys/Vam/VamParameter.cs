@@ -25,12 +25,19 @@ namespace Cue.W
 
 		public bool Check(bool force = false)
 		{
+			if (!DeadCheck())
+			{
+				stale_ = true;
+				elapsed_ = interval_ + 1;
+				backoff_ = 0;
+			}
+
 			if (stale_)
 			{
 				elapsed_ += Cue.Instance.Sys.DeltaTime;
 				if (elapsed_ > (interval_ + backoff_) || force)
 				{
-					if (DoCheck())
+					if (StaleCheck())
 					{
 						stale_ = false;
 						backoff_ = 0;
@@ -47,7 +54,8 @@ namespace Cue.W
 			return !stale_;
 		}
 
-		protected abstract bool DoCheck();
+		protected abstract bool DeadCheck();
+		protected abstract bool StaleCheck();
 	}
 
 
@@ -110,7 +118,33 @@ namespace Cue.W
 			}
 		}
 
-		protected override bool DoCheck()
+		protected override bool DeadCheck()
+		{
+			if (param_ != null)
+			{
+				if (param_.storable == null)
+				{
+					if (StaleCheck())
+					{
+						// ok
+						return true;
+					}
+					else
+					{
+						Cue.LogInfo(
+							$"{atom_.uid}: param " +
+							$"{storableID_} {paramName_} is dead");
+
+						param_ = null;
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		protected override bool StaleCheck()
 		{
 			param_ = DoGetParameter();
 			if (param_ != null)
@@ -262,7 +296,6 @@ namespace Cue.W
 			atom_ = a;
 			storableID_ = s;
 			paramName_ = name;
-			DoCheck();
 		}
 
 		public void Fire()
@@ -286,7 +319,33 @@ namespace Cue.W
 			}
 		}
 
-		protected override bool DoCheck()
+		protected override bool DeadCheck()
+		{
+			if (param_ != null)
+			{
+				if (param_.storable == null)
+				{
+					if (StaleCheck())
+					{
+						// ok
+						return true;
+					}
+					else
+					{
+						Cue.LogInfo(
+							$"{atom_.uid}: action param " +
+							$"{storableID_} {paramName_} is dead");
+
+						param_ = null;
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+
+		protected override bool StaleCheck()
 		{
 			param_ = Cue.Instance.VamSys?.GetActionParameter(
 				atom_, storableID_, paramName_);

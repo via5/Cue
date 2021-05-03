@@ -18,6 +18,7 @@
 		private ISpeaker speech_;
 		private IKisser kisser_;
 		private IHandjob handjob_;
+		private IBlowjob blowjob_;
 		private IClothing clothing_;
 		private IPersonality personality_;
 		private IExpression expression_;
@@ -37,6 +38,7 @@
 			speech_ = Integration.CreateSpeaker(this);
 			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
+			blowjob_ = Integration.CreateBlowjob(this);
 			clothing_ = Integration.CreateClothing(this);
 			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
@@ -77,6 +79,7 @@
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
+		public IBlowjob Blowjob { get { return blowjob_; } }
 		public IClothing Clothing { get { return clothing_; } }
 		public IExpression Expression { get { return expression_; } }
 		public IAction Actions { get { return actions_; } }
@@ -112,7 +115,9 @@
 
 		public override void MakeIdle()
 		{
-			handjob_.Active = false;
+			kisser_.Stop();
+			handjob_.Stop();
+			blowjob_.Stop();
 			actions_.Clear();
 			animator_.Stop();
 			Atom.SetDefaultControls("make idle");
@@ -123,7 +128,8 @@
 			if (state_.IsCurrently(PersonState.Walking))
 				state_.CancelTransition();
 
-			handjob_.Active = false;
+			handjob_.Stop();
+			blowjob_.Stop();
 			actions_.Clear();
 			ai_.RunEvent(null);
 			Atom.SetDefaultControls("make idle for move");
@@ -202,6 +208,8 @@
 			actions_.Tick(this, s);
 			gaze_.Update(s);
 			kisser_.Update(s);
+			handjob_.Update(s);
+			blowjob_.Update(s);
 			expression_.Update(s);
 			excitement_.Update(s);
 

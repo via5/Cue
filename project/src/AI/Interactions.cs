@@ -83,6 +83,9 @@ namespace Cue
 			if (p.Kisser.OnCooldown)
 				return false;
 
+			if (p.Blowjob.Active)
+				return false;
+
 			if (p.State.Is(PersonState.Walking))
 				return false;
 

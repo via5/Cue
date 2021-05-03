@@ -26,6 +26,7 @@ namespace Cue
 		private readonly Tickers tickers_ = new Tickers();
 
 		private Person player_ = null;
+		private Person forcedPlayer_ = null;
 		private bool paused_ = false;
 
 		public Cue()
@@ -45,8 +46,18 @@ namespace Cue
 		public List<IObject> AllObjects { get { return allObjects_; } }
 		public List<IObject> Objects { get { return objects_; } }
 		public List<Person> Persons { get { return persons_; } }
-		public Person Player { get { return player_; } }
 		public UI UI { get { return ui_; } }
+
+		public Person Player
+		{
+			get
+			{
+				if (player_ != null)
+					return player_;
+				else
+					return forcedPlayer_;
+			}
+		}
 
 		public Person FindPerson(string id)
 		{
@@ -117,6 +128,12 @@ namespace Cue
 					if (o != null)
 						AddObject(o);
 				}
+			}
+
+			foreach (var p in persons_)
+			{
+				if (p.ID == "Player")
+					forcedPlayer_ = p;
 			}
 		}
 
@@ -228,7 +245,11 @@ namespace Cue
 			if (player_ != null && !player_.Possessed)
 			{
 				LogInfo($"{player_} no longer possessed");
-				SetPlayer(null);
+
+				if (forcedPlayer_ == null)
+					SetPlayer(null);
+				else
+					SetPlayer(forcedPlayer_);
 			}
 
 			if (player_ == null)

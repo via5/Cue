@@ -264,6 +264,7 @@ namespace Cue
 		private VUI.Label speech_ = new VUI.Label();
 		private VUI.Label kiss_ = new VUI.Label();
 		private VUI.Label handjob_ = new VUI.Label();
+		private VUI.Label blowjob_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 
 		public PersonStateTab(Person p)
@@ -321,6 +322,9 @@ namespace Cue
 			state.Add(new VUI.Label("Handjob"));
 			state.Add(handjob_);
 
+			state.Add(new VUI.Label("Blowjob"));
+			state.Add(blowjob_);
+
 			state.Add(new VUI.Label("Clothing"));
 			state.Add(clothing_);
 
@@ -350,6 +354,7 @@ namespace Cue
 			speech_.Text = person_.Speech.ToString();
 			kiss_.Text = person_.Kisser.ToString();
 			handjob_.Text = person_.Handjob.ToString();
+			blowjob_.Text = person_.Blowjob.ToString();
 			clothing_.Text = person_.Clothing.ToString();
 		}
 	}

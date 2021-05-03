@@ -7,6 +7,7 @@ namespace Cue
 		public const float Cooldown = 10;
 
 		private Person person_;
+		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter kissingRunning_ = null;
 		private W.VamBoolParameter activate_ = null;
 		private W.VamStringChooserParameter atom_ = null;
@@ -23,6 +24,9 @@ namespace Cue
 		public ClockwiseSilverKiss(Person p)
 		{
 			person_ = p;
+
+			enabled_ = new W.VamBoolParameter(
+				p, "ClockwiseSilver.Kiss", "enabled");
 
 			kissingRunning_ = new W.VamBoolParameter(
 				p, "ClockwiseSilver.Kiss", "Is Kissing");
@@ -164,18 +168,21 @@ namespace Cue
 
 		private void DoKiss(Person target, bool pos)
 		{
+			enabled_.SetValue(true);
+
 			// force reset
 			atom_.SetValue("");
 			target_.SetValue("");
 			atom_.SetValue(target.ID);
 			target_.SetValue("LipTrigger");
 
-			activate_.SetValue(true);
+			headAngleX_.SetValue(-10);
+			headAngleZ_.SetValue(-40);
+
 			trackPos_.SetValue(pos);
 			trackRot_.SetValue(true);
 
-			headAngleX_.SetValue(-10);
-			headAngleZ_.SetValue(-40);
+			activate_.SetValue(true);
 
 			elapsed_ = 0;
 		}
@@ -224,69 +231,124 @@ namespace Cue
 	class ClockwiseSilverHandjob : IHandjob
 	{
 		private Person person_;
+		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter active_ = null;
 		private W.VamStringChooserParameter male_ = null;
 		private W.VamStringChooserParameter hand_ = null;
-		private Person target_ = null;
-		private bool wasActive_ = false;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
 			person_ = p;
+			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "enabled");
 			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "isActive");
 			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
 			hand_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
-			Active = false;
+
+			active_.SetValue(false);
 		}
 
 		public bool Active
 		{
-			get
-			{
-				wasActive_ = active_.GetValue();
-				return wasActive_;
-			}
-
-			set
-			{
-				wasActive_ = value;
-				active_.SetValue(value);
-			}
+			get { return active_.GetValue(); }
 		}
 
-		public Person Target
+		public void Start(Person target)
 		{
-			get
-			{
-				return target_;
-			}
+			enabled_.SetValue(true);
 
-			set
-			{
-				target_ = value;
-				SetTarget();
-			}
+			if (target != null)
+				male_.SetValue(target.ID);
+
+			// todo
+			hand_.SetValue("Right");
+
+			active_.SetValue(true);
+		}
+
+		public void Stop()
+		{
+			active_.SetValue(false);
+		}
+
+		public void Update(float s)
+		{
 		}
 
 		public override string ToString()
 		{
-			string s = $"Clockwise: active={wasActive_} target=";
+			string s = $"Clockwise: active={active_.GetValue()} target=";
 
-			if (target_ == null)
-				s += "(none)";
-			else
-				s += target_.ID;
+			//if (target_ == null)
+			//	s += "(none)";
+			//else
+			//	s += target_.ID;
 
 			return s;
 		}
+	}
 
-		private void SetTarget()
+
+	class ClockwiseSilverBlowjob : IBlowjob
+	{
+		private Person person_;
+		private W.VamBoolParameter enabled_ = null;
+		private W.VamBoolParameter active_ = null;
+		private W.VamStringChooserParameter male_ = null;
+		private W.VamFloatParameter sfxVolume_ = null;
+		private W.VamFloatParameter moanVolume_ = null;
+		private W.VamFloatParameter volumeScaling_ = null;
+
+		public ClockwiseSilverBlowjob(Person p)
 		{
-			if (target_ != null)
-				male_.SetValue(target_.ID);
+			person_ = p;
 
-			// todo
-			hand_.SetValue("Right");
+			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "enabled");
+			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
+			sfxVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
+			moanVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
+			volumeScaling_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Volume Scaling");
+
+			active_.SetValue(false);
+			sfxVolume_.SetValue(0);
+			moanVolume_.SetValue(0);
+			volumeScaling_.SetValue(0);
+		}
+
+		public bool Active
+		{
+			get { return active_.GetValue(); }
+		}
+
+		public void Start(Person target)
+		{
+			enabled_.SetValue(true);
+
+			if (target != null)
+				male_.SetValue(target.ID);
+
+			active_.SetValue(true);
+		}
+
+		public void Stop()
+		{
+			active_.SetValue(false);
+		}
+
+		public void Update(float s)
+		{
+		}
+
+		public override string ToString()
+		{
+			string s = $"Clockwise: active={active_.GetValue()} target=";
+
+			//if (target_ == null)
+			//	s += "(none)";
+			//else
+			//	s += target_.ID;
+
+			return s;
 		}
 	}
 }
