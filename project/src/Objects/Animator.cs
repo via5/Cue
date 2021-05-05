@@ -135,7 +135,7 @@ namespace Cue
 			get { return currentAnimation_; }
 		}
 
-		public void PlayTransition(int from, int to)
+		public bool PlayTransition(int from, int to)
 		{
 			var a = Resources.Animations.GetAnyTransition(
 				from, to, person_.Sex);
@@ -147,10 +147,11 @@ namespace Cue
 					$"from {PersonState.StateToString(from)} " +
 					$"to {PersonState.StateToString(to)}");
 
-					return;
+				return false;
 			}
 
 			Play(a);
+			return true;
 		}
 
 		public void PlaySex(int state)

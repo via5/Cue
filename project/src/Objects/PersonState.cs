@@ -23,6 +23,11 @@
 			get { return current_; }
 		}
 
+		public int Next
+		{
+			get { return next_; }
+		}
+
 		public bool IsUpright
 		{
 			get

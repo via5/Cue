@@ -43,6 +43,7 @@ namespace Cue
 	{
 		private readonly RootAction actions_ = new RootAction();
 		private PersonState state_;
+		private int deferredState_ = PersonState.None;
 		private int lastNavState_ = W.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
 		private Slot locked_ = null;
@@ -239,7 +240,17 @@ namespace Cue
 			animator_.FixedUpdate(s);
 
 			if (!animator_.Playing)
+			{
 				state_.FinishTransition();
+				if (deferredState_ != PersonState.None)
+				{
+					Cue.LogInfo($"{ID}: animation finished, setting deferred state");
+
+					var ds = deferredState_;
+					deferredState_ = PersonState.None;
+					SetState(ds);
+				}
+			}
 
 			if (State.IsUpright)
 				uprightPos_ = Position;
@@ -286,47 +297,29 @@ namespace Cue
 
 		public void SetState(int s)
 		{
-			if (state_.StartTransition(s))
-				animator_.PlayTransition(state_.Current, s);
-		}
+			if (state_.Next == s || deferredState_ == s)
+			{
+				// already transitioning to that state
+				return;
+			}
 
-		//public void Straddle()
-		//{
-		//	animator_.Play(Resources.Animations.StraddleSitFromStanding);
-		//	state_.StartTransition(PersonState.SittingStraddling);
-		//}
-		//
-		//public void Sit()
-		//{
-		//	animator_.Play(Resources.Animations.SitFromStanding);
-		//	state_.StartTransition(PersonState.Sitting);
-		//}
-		//
-		//public void Kneel()
-		//{
-		//	animator_.Play(Resources.Animations.KneelFromStanding);
-		//	state_.StartTransition(PersonState.Kneeling);
-		//}
-		//
-		//public void Stand()
-		//{
-		//	// todo: let current animation finish first
-		//	if (state_.Is(PersonState.Sitting) && !state_.Transitioning)
-		//	{
-		//		state_.StartTransition(PersonState.Standing);
-		//		animator_.Play(Resources.Animations.StandFromSitting);
-		//	}
-		//	else if (state_.Is(PersonState.Kneeling) && !state_.Transitioning)
-		//	{
-		//		state_.StartTransition(PersonState.Standing);
-		//		animator_.Play(Resources.Animations.StandFromKneeling);
-		//	}
-		//	else if (state_.Is(PersonState.SittingStraddling) && !state_.Transitioning)
-		//	{
-		//		state_.StartTransition(PersonState.Standing);
-		//		animator_.Play(Resources.Animations.StandFromStraddleSit);
-		//	}
-		//}
+			deferredState_ = PersonState.None;
+			state_.StartTransition(s);
+
+			if (!animator_.PlayTransition(state_.Current, s))
+			{
+				// no animation for this transition, stand first
+
+				Cue.LogInfo(
+					$"{ID}: no animation for transition " +
+					$"{PersonState.StateToString(state_.Current)}->" +
+					$"{PersonState.StateToString(s)}, standing first");
+
+				deferredState_ = s;
+				state_.StartTransition(PersonState.Standing);
+				animator_.PlayTransition(state_.Current, PersonState.Standing);
+			}
+		}
 
 		public virtual void Say(string s)
 		{
