@@ -335,12 +335,15 @@ namespace Cue
 			if (target != null)
 				male_.SetValue(target.ID);
 
+			person_.Gaze.LookAt(target, false);
+
 			active_.SetValue(true);
 		}
 
 		public void Stop()
 		{
 			active_.SetValue(false);
+			person_.Gaze.LookAtDefault();
 		}
 
 		public void Update(float s)

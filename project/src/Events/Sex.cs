@@ -40,7 +40,7 @@
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							person_.SetState(PersonState.Kneeling);
+							person_.SetState(PersonState.Crouching);
 							state_ = PositioningState;
 						}
 						else
@@ -116,7 +116,7 @@
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							person_.SetState(PersonState.Kneeling);
+							person_.SetState(PersonState.Crouching);
 							state_ = PositioningState;
 						}
 						else

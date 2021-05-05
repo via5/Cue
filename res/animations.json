@@ -98,11 +98,11 @@
 		{
 			"animation": "transition",
 			"from": "standing",
-			"to": "kneeling",
+			"to": "crouching",
 			"type": "bvh",
 			"options":
 			{
-				"file": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+				"file": "crouch.bvh",
 				"end": 89
 			}
 		},
@@ -110,12 +110,12 @@
 
 		{
 			"animation": "transition",
-			"from": "kneeling",
+			"from": "crouching",
 			"to": "standing",
 			"type": "bvh",
 			"options":
 			{
-				"file": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+				"file": "crouch.bvh",
 				"start": 89
 			}
 		},
@@ -313,16 +313,6 @@
 			"options":
 			{
 				"name": "StandFromStraddleSit"
-			}
-		},
-
-		{
-			"animation": "sex",
-			"state": "sittingStraddling",
-			"type": "synergy",
-			"options":
-			{
-				"step": "StraddleSitSex"
 			}
 		}
 	]

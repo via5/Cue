@@ -44,7 +44,7 @@
 			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Call", OnCall));
 			row.Add(new VUI.ToolButton("Straddle", OnStraddle));
-			row.Add(new VUI.ToolButton("Kneel", OnKneel));
+			row.Add(new VUI.ToolButton("Crouch", OnCrouch));
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stand", OnStand));
@@ -170,6 +170,12 @@
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null)
 			{
+				if (!Cue.Instance.Player.State.Is(PersonState.Sitting))
+				{
+					Cue.LogError("can't straddle, player not sitting");
+					return;
+				}
+
 				p.MakeIdle();
 				p.AI.RunEvent(new CallEvent(
 					p, Cue.Instance.Player,
@@ -177,13 +183,15 @@
 			}
 		}
 
-		private void OnKneel()
+		private void OnCrouch()
 		{
 			var p = Selected as Person;
 			if (p != null)
 			{
 				p.MakeIdle();
-				p.SetState(PersonState.Kneeling);
+				p.AI.RunEvent(new CallEvent(
+					p, Cue.Instance.Player,
+					() => { p.SetState(PersonState.Crouching); }));
 			}
 		}
 

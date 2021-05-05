@@ -6,7 +6,7 @@
 		public const int Standing = 1;
 		public const int Walking = 2;
 		public const int Sitting = 3;
-		public const int Kneeling = 4;
+		public const int Crouching = 4;
 		public const int SittingStraddling = 5;
 
 		private Person self_;
@@ -120,7 +120,7 @@
 		{
 			return new string[]
 			{
-				"none", "standing", "walking", "sitting", "kneeling",
+				"none", "standing", "walking", "sitting", "crouching",
 				"sittingstraddling"
 			};
 		}
