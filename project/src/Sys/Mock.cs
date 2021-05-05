@@ -216,6 +216,16 @@ namespace Cue.W
 			get { return Sexes.Any; }
 		}
 
+		public bool Selected
+		{
+			get { return false; }
+		}
+
+		public IClothing Clothing
+		{
+			get { return null; }
+		}
+
 		public bool Teleporting
 		{
 			get { return false; }

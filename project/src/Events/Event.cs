@@ -60,6 +60,7 @@ namespace Cue
 						caller_.Position +
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
+					Cue.LogInfo($"{person_}: moving to {caller_}");
 					person_.MoveTo(target, caller_.Bearing + 180);
 					person_.Gaze.LookAt(caller_);
 					state_ = MovingState;
@@ -71,6 +72,7 @@ namespace Cue
 				{
 					if (!person_.HasTarget)
 					{
+						Cue.LogInfo($"{person_}: call event finished");
 						post_?.Invoke();
 						return false;
 					}

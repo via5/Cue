@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Cue.Resources
+namespace Cue
 {
-	class Clothing
+	class ClothingResources
 	{
 		public class Item
 		{
@@ -61,7 +61,7 @@ namespace Cue.Resources
 		private static Dictionary<string, Item> tags_ =
 			new Dictionary<string, Item>();
 
-		public static bool Load()
+		public bool Load()
 		{
 			try
 			{
@@ -75,7 +75,7 @@ namespace Cue.Resources
 			}
 		}
 
-		private static void DoLoad()
+		private void DoLoad()
 		{
 			var meta = Cue.Instance.Sys.GetResourcePath("clothing.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
@@ -141,7 +141,7 @@ namespace Cue.Resources
 			}
 		}
 
-		public static Item FindItem(int sex, string id, string[] tags)
+		public Item FindItem(int sex, string id, string[] tags)
 		{
 			Item item;
 

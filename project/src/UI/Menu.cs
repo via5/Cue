@@ -44,13 +44,15 @@
 			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Call", OnCall));
 			row.Add(new VUI.ToolButton("Straddle", OnStraddle));
+			row.Add(new VUI.ToolButton("Kneel", OnKneel));
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
-			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
-			row.Add(new VUI.ToolButton("Make idle", OnMakeIdle));
+			row.Add(new VUI.ToolButton("Stand", OnStand));
 			buttons_.Add(row);
 
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
+			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
+			row.Add(new VUI.ToolButton("Make idle", OnMakeIdle));
 			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
 			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
 			row.Add(new VUI.ToolButton("test", OnTest));
@@ -148,6 +150,11 @@
 		{
 		}
 
+		private void OnReload()
+		{
+			Cue.Instance.ReloadPlugin();
+		}
+
 		private void OnCall()
 		{
 			var p = Selected as Person;
@@ -165,7 +172,8 @@
 			{
 				p.MakeIdle();
 				p.AI.RunEvent(new CallEvent(
-					p, Cue.Instance.Player, () => { p.Straddle(); }));
+					p, Cue.Instance.Player,
+					() => { p.SetState(PersonState.SittingStraddling); }));
 			}
 		}
 
@@ -175,13 +183,8 @@
 			if (p != null)
 			{
 				p.MakeIdle();
-				p.Kneel();
+				p.SetState(PersonState.Kneeling);
 			}
-		}
-
-		private void OnReload()
-		{
-			Cue.Instance.ReloadPlugin();
 		}
 
 		private void OnHandjob()
@@ -190,7 +193,7 @@
 			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
-				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
+				p.Handjob.Start(Cue.Instance.Player);
 			}
 		}
 
@@ -200,7 +203,17 @@
 			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
-				p.AI.RunEvent(new BlowjobEvent(p, Cue.Instance.Player));
+				p.Blowjob.Start(Cue.Instance.Player);
+			}
+		}
+
+		private void OnStand()
+		{
+			var p = Selected as Person;
+			if (p != null)
+			{
+				p.MakeIdle();
+				p.SetState(PersonState.Standing);
 			}
 		}
 

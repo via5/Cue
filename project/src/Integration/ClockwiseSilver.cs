@@ -166,6 +166,10 @@ namespace Cue
 			t.DoKiss(person_, targetPos);
 		}
 
+		public void OnPluginState(bool b)
+		{
+		}
+
 		private void DoKiss(Person target, bool pos)
 		{
 			enabled_.SetValue(true);
@@ -274,6 +278,10 @@ namespace Cue
 		{
 		}
 
+		public void OnPluginState(bool b)
+		{
+		}
+
 		public override string ToString()
 		{
 			string s = $"Clockwise: active={active_.GetValue()} target=";
@@ -336,6 +344,10 @@ namespace Cue
 		}
 
 		public void Update(float s)
+		{
+		}
+
+		public void OnPluginState(bool b)
 		{
 		}
 

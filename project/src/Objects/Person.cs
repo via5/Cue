@@ -1,5 +1,44 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
+	class PersonClothing
+	{
+		private Person person_;
+
+		public PersonClothing(Person p)
+		{
+			person_ = p;
+		}
+
+		public float HeelsAngle
+		{
+			get { return person_.Atom.Clothing.HeelsAngle; }
+		}
+
+		public float HeelsHeight
+		{
+			get { return person_.Atom.Clothing.HeelsHeight; }
+		}
+
+		public bool GenitalsVisible
+		{
+			get { return person_.Atom.Clothing.GenitalsVisible; }
+			set { person_.Atom.Clothing.GenitalsVisible = value; }
+		}
+
+		public bool BreastsVisible
+		{
+			get { return person_.Atom.Clothing.BreastsVisible; }
+			set { person_.Atom.Clothing.BreastsVisible = value; }
+		}
+
+		public void Dump()
+		{
+			person_.Atom.Clothing.Dump();
+		}
+	}
+
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_ = new RootAction();
@@ -7,31 +46,34 @@
 		private int lastNavState_ = W.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
 		private Slot locked_ = null;
+
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
 		private Gaze gaze_;
-
 		private IAI ai_ = null;
+		private PersonClothing clothing_;
+		private IPersonality personality_;
+
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
 		private ISpeaker speech_;
 		private IKisser kisser_;
 		private IHandjob handjob_;
 		private IBlowjob blowjob_;
-		private IClothing clothing_;
-		private IPersonality personality_;
 		private IExpression expression_;
 
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-			ai_ = new PersonAI(this);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
 			gaze_ = new Gaze(this);
+			ai_ = new PersonAI(this);
+			clothing_ = new PersonClothing(this);
+			personality_ = new NeutralPersonality(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -39,8 +81,6 @@
 			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
 			blowjob_ = Integration.CreateBlowjob(this);
-			clothing_ = Integration.CreateClothing(this);
-			personality_ = new NeutralPersonality(this);
 			expression_ = Integration.CreateExpression(this);
 
 			Atom.SetDefaultControls("init");
@@ -72,17 +112,17 @@
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
 		public Gaze Gaze { get { return gaze_; } }
-
 		public IAI AI { get { return ai_; } }
+		public PersonClothing Clothing { get { return clothing_; } }
+		public RootAction Actions { get { return actions_; } }
+
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
 		public ISpeaker Speech { get { return speech_; } }
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
 		public IBlowjob Blowjob { get { return blowjob_; } }
-		public IClothing Clothing { get { return clothing_; } }
 		public IExpression Expression { get { return expression_; } }
-		public IAction Actions { get { return actions_; } }
 
 		public int Sex
 		{
@@ -118,8 +158,10 @@
 			kisser_.Stop();
 			handjob_.Stop();
 			blowjob_.Stop();
+
 			actions_.Clear();
 			animator_.Stop();
+
 			Atom.SetDefaultControls("make idle");
 		}
 
@@ -128,10 +170,13 @@
 			if (state_.IsCurrently(PersonState.Walking))
 				state_.CancelTransition();
 
+			kisser_.Stop();
 			handjob_.Stop();
 			blowjob_.Stop();
+
 			actions_.Clear();
 			ai_.RunEvent(null);
+
 			Atom.SetDefaultControls("make idle for move");
 		}
 
@@ -190,6 +235,7 @@
 		public override void FixedUpdate(float s)
 		{
 			base.FixedUpdate(s);
+
 			animator_.FixedUpdate(s);
 
 			if (!animator_.Playing)
@@ -202,6 +248,7 @@
 		public override void Update(float s)
 		{
 			base.Update(s);
+
 			CheckNavState();
 
 			animator_.Update(s);
@@ -220,10 +267,15 @@
 		public override void OnPluginState(bool b)
 		{
 			base.OnPluginState(b);
+
 			Atom.NavEnabled = b;
-			clothing_.OnPluginState(b);
-			ai_.OnPluginState(b);
+
 			expression_.OnPluginState(b);
+			kisser_.OnPluginState(b);
+			handjob_.OnPluginState(b);
+			blowjob_.OnPluginState(b);
+
+			ai_.OnPluginState(b);
 		}
 
 		public override void SetPaused(bool b)
@@ -232,43 +284,49 @@
 			Atom.NavPaused = b;
 		}
 
-		public void Straddle()
+		public void SetState(int s)
 		{
-			animator_.Play(Resources.Animations.StraddleSitFromStanding);
-			state_.StartTransition(PersonState.SittingStraddling);
+			if (state_.StartTransition(s))
+				animator_.PlayTransition(state_.Current, s);
 		}
 
-		public void Sit()
-		{
-			animator_.Play(Resources.Animations.SitFromStanding);
-			state_.StartTransition(PersonState.Sitting);
-		}
-
-		public void Kneel()
-		{
-			animator_.Play(Resources.Animations.KneelFromStanding);
-			state_.StartTransition(PersonState.Kneeling);
-		}
-
-		public void Stand()
-		{
-			// todo: let current animation finish first
-			if (state_.Is(PersonState.Sitting) && !state_.Transitioning)
-			{
-				state_.StartTransition(PersonState.Standing);
-				animator_.Play(Resources.Animations.StandFromSitting);
-			}
-			else if (state_.Is(PersonState.Kneeling) && !state_.Transitioning)
-			{
-				state_.StartTransition(PersonState.Standing);
-				animator_.Play(Resources.Animations.StandFromKneeling);
-			}
-			else if (state_.Is(PersonState.SittingStraddling) && !state_.Transitioning)
-			{
-				state_.StartTransition(PersonState.Standing);
-				animator_.Play(Resources.Animations.StandFromStraddleSit);
-			}
-		}
+		//public void Straddle()
+		//{
+		//	animator_.Play(Resources.Animations.StraddleSitFromStanding);
+		//	state_.StartTransition(PersonState.SittingStraddling);
+		//}
+		//
+		//public void Sit()
+		//{
+		//	animator_.Play(Resources.Animations.SitFromStanding);
+		//	state_.StartTransition(PersonState.Sitting);
+		//}
+		//
+		//public void Kneel()
+		//{
+		//	animator_.Play(Resources.Animations.KneelFromStanding);
+		//	state_.StartTransition(PersonState.Kneeling);
+		//}
+		//
+		//public void Stand()
+		//{
+		//	// todo: let current animation finish first
+		//	if (state_.Is(PersonState.Sitting) && !state_.Transitioning)
+		//	{
+		//		state_.StartTransition(PersonState.Standing);
+		//		animator_.Play(Resources.Animations.StandFromSitting);
+		//	}
+		//	else if (state_.Is(PersonState.Kneeling) && !state_.Transitioning)
+		//	{
+		//		state_.StartTransition(PersonState.Standing);
+		//		animator_.Play(Resources.Animations.StandFromKneeling);
+		//	}
+		//	else if (state_.Is(PersonState.SittingStraddling) && !state_.Transitioning)
+		//	{
+		//		state_.StartTransition(PersonState.Standing);
+		//		animator_.Play(Resources.Animations.StandFromStraddleSit);
+		//	}
+		//}
 
 		public virtual void Say(string s)
 		{
@@ -277,15 +335,32 @@
 
 		protected override bool StartMove()
 		{
+			bool okay = true;
+
 			if (kisser_.Active)
 			{
 				kisser_.Stop();
-				return false;
+				okay = false;
 			}
+
+			if (handjob_.Active)
+			{
+				handjob_.Stop();
+				okay = false;
+			}
+
+			if (blowjob_.Active)
+			{
+				blowjob_.Stop();
+				okay = false;
+			}
+
+			if (!okay)
+				return false;
 
 			if (!State.IsUpright)
 			{
-				Stand();
+				SetState(PersonState.Standing);
 				return false;
 			}
 
@@ -300,11 +375,14 @@
 			{
 				case W.NavStates.None:
 				{
-					if (state_.IsCurrently(PersonState.Walking))
+					if (lastNavState_ != W.NavStates.None)
+					{
+						// force the state to standing first, there are no
+						// animations for walk->stand
 						state_.Set(PersonState.Standing);
 
-					if (lastNavState_ != W.NavStates.None)
-						animator_.Play(Resources.Animations.Stand);
+						SetState(PersonState.Standing);
+					}
 
 					break;
 				}
@@ -314,7 +392,7 @@
 					state_.Set(PersonState.Walking);
 
 					if (lastNavState_ != W.NavStates.Moving || !animator_.Playing)
-						animator_.Play(Resources.Animations.Walk, Animator.Loop);
+						animator_.PlayType(Animation.WalkType, Animator.Loop);
 
 					break;
 				}
@@ -322,7 +400,7 @@
 				case W.NavStates.TurningLeft:
 				{
 					if (lastNavState_ != W.NavStates.TurningLeft || !animator_.Playing)
-						animator_.Play(Resources.Animations.TurnLeft);
+						animator_.PlayType(Animation.TurnLeftType);
 
 					break;
 				}
@@ -330,7 +408,7 @@
 				case W.NavStates.TurningRight:
 				{
 					if (lastNavState_ != W.NavStates.TurningRight || !animator_.Playing)
-						animator_.Play(Resources.Animations.TurnRight);
+						animator_.PlayType(Animation.TurnRightType);
 
 					break;
 				}

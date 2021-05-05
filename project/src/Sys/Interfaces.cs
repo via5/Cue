@@ -133,6 +133,16 @@ namespace Cue.W
 		Vector3 Direction { get; }
 	}
 
+	interface IClothing
+	{
+		float HeelsAngle { get; }
+		float HeelsHeight { get; }
+		bool GenitalsVisible { get; set; }
+		bool BreastsVisible { get; set; }
+		void OnPluginState(bool b);
+		void Dump();
+	}
+
 	interface IAtom
 	{
 		string ID { get; }
@@ -140,11 +150,13 @@ namespace Cue.W
 		int Sex { get; }
 		bool Teleporting { get; }
 		bool Possessed { get; }
+		bool Selected { get; }
 
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 
 		List<IBodyPart> GetBodyParts();
+		IClothing Clothing { get; }
 		void SetDefaultControls(string why);
 
 		void OnPluginState(bool b);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Cue.BVH
 {
     using Vector3 = UnityEngine.Vector3;
 
-    class Animation : BasicAnimation
+    class Animation : IAnimation
     {
         public BVH.File file = null;
         public bool rootXZ = false;
@@ -17,19 +18,7 @@ namespace Cue.BVH
         public int start = 0;
         public int end = -1;
 
-        public Animation(int type)
-            : base(type)
-        {
-        }
-
-        public Animation(int type, string path)
-            : base(type)
-        {
-            file = new File(path);
-        }
-
-        public Animation(int type, string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
-            : base(type)
+        public Animation(string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
         {
             this.file = new File(path);
             this.rootXZ = rootXZ;
@@ -39,10 +28,28 @@ namespace Cue.BVH
             this.end = end;
         }
 
+        public static Animation Create(JSONClass o)
+        {
+            var path = o["file"].Value;
+
+            if (path.StartsWith("/") || path.StartsWith("\\"))
+                path = path.Substring(1);
+            else
+                path = Cue.Instance.Sys.GetResourcePath("animations/" + path);
+
+            return new BVH.Animation(
+                path,
+                (o.HasKey("rootXZ") ? o["rootXZ"].AsBool : true),
+                (o.HasKey("rootY") ? o["rootY"].AsBool : true),
+                (o.HasKey("reverse") ? o["reverse"].AsBool : false),
+                (o.HasKey("start") ? o["start"].AsInt : 0),
+                (o.HasKey("end") ? o["end"].AsInt : -1));
+        }
+
         public override string ToString()
         {
             string s =
-                file.Name + " " +
+                "bvh " + file.Name + " " +
                 start.ToString() + "-" +
                 (end == -1 ? file.nFrames.ToString() : end.ToString()) + " " +
                 (reverse ? "rev " : "");
@@ -139,7 +146,7 @@ namespace Cue.BVH
 
         public override string ToString()
         {
-            string s = "BVH.Player: ";
+            string s = "bvh ";
 
             if (anim == null)
             {
@@ -147,14 +154,24 @@ namespace Cue.BVH
             }
             else
             {
-                s += anim.ToString() + " " + frame.ToString();
+                s += $"{frame}/";
 
-                if ((flags & Animator.Reverse) != 0)
-                    s += " rev";
-
-                if ((flags & Animator.Loop) != 0)
-                    s += " loop";
+                if (anim.end == -1)
+                    s += $"{anim.file.nFrames}";
+                else
+                    s += $"{anim.end}";
             }
+
+            if ((flags & Animator.Reverse) != 0)
+                s += " rev";
+
+            if ((flags & Animator.Loop) != 0)
+                s += " loop";
+
+            if (playing)
+                s += " playing";
+            else
+                s += " stopped";
 
             return s;
         }

@@ -133,6 +133,7 @@ namespace Cue
 
 			if (forced_ != null)
 			{
+				Cue.LogInfo($"{person_.ID}: running event {e}");
 				Stop();
 				person_.MakeIdle();
 			}

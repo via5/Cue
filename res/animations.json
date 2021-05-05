@@ -2,173 +2,328 @@
 	"animations":
 	[
 		{
-			"type": "walk",
-			"bvh": "walk.bvh",
-			"start": 67,
-			"end": 150,
-			"rootXZ": false,
-			"rootY": false,
-			"sex": "female"
+			"animation": "walk",
+			"sex": "female",
+			"type": "bvh",
+			"options":
+			{
+				"file": "walk.bvh",
+				"start": 67,
+				"end": 150,
+				"rootXZ": false,
+				"rootY": false
+			}
 		},
 
 		{
-			"type": "walk",
-			"bvh": "walkm.bvh",
-			"rootXZ": false,
-			"rootY": false,
-			"sex": "male"
+			"animation": "walk",
+			"sex": "male",
+			"type": "bvh",
+			"options":
+			{
+				"file": "walkm.bvh",
+				"rootXZ": false,
+				"rootY": false,
+			}
 		},
 
 		{
-			"type": "turnLeft",
-			"bvh": "turn_left.bvh"
+			"animation": "turnLeft",
+			"type": "bvh",
+			"options":
+			{
+				"file": "turn_left.bvh"
+			}
 		},
 
 		{
-			"type": "turnRight",
-			"bvh": "turn_right.bvh"
-		},
-
-
-		{
-			"type": "sitFromStanding",
-			"bvh": "sit.bvh",
-			"sex": "female"
-		},
-
-		{
-			"type": "sitFromStanding",
-			"timeline": "SitFromStanding",
-			"sex": "male"
-		},
-
-		{
-			"type": "standFromSitting",
-			"bvh": "sit.bvh",
-			"reverse": true,
-			"sex": "female"
-		},
-
-		{
-			"type": "standFromSitting",
-			"timeline": "StandFromSitting",
-			"sex": "male"
-		},
-
-		{
-			"type": "kneelFromStanding",
-			"bvh": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
-			"end": 89
+			"animation": "turnRight",
+			"type": "bvh",
+			"options":
+			{
+				"file": "turn_right.bvh"
+			}
 		},
 
 
 		{
-			"type": "standFromKneeling",
-			"bvh": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
-			"start": 89
+			"animation": "transition",
+			"from": "standing",
+			"to": "sitting",
+			"sex": "female",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit.bvh"
+			}
+		},
+
+		{
+			"animation": "transition",
+			"from": "standing",
+			"to": "sitting",
+			"sex": "male",
+			"type": "timeline",
+			"options":
+			{
+				"name": "SitFromStanding"
+			}
+		},
+
+		{
+			"animation": "transition",
+			"from": "sitting",
+			"to": "standing",
+			"sex": "female",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit.bvh",
+				"reverse": true
+			}
+		},
+
+		{
+			"animation": "transition",
+			"from": "sitting",
+			"to": "standing",
+			"sex": "male",
+			"type": "timeline",
+			"options":
+			{
+				"name": "StandFromSitting"
+			}
+		},
+
+		{
+			"animation": "transition",
+			"from": "standing",
+			"to": "kneeling",
+			"type": "bvh",
+			"options":
+			{
+				"file": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+				"end": 89
+			}
 		},
 
 
 		{
-			"type": "sitIdle",
-			"bvh": "sit_idle_1.bvh"
-		},
-
-		{
-			"type": "sitIdle",
-			"bvh": "sit_idle_2.bvh"
-		},
-
-		{
-			"type": "sitIdle",
-			"bvh": "sit_idle_3.bvh"
-		},
-
-		{
-			"type": "sitIdle",
-			"bvh": "sit_idle_4.bvh"
+			"animation": "transition",
+			"from": "kneeling",
+			"to": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "/Custom/Animations/RazzMaDaz-Daz3D-BVH/CrawlCrouch/Crouch.bvh",
+				"start": 89
+			}
 		},
 
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_1.bvh"
+			"animation": "idle",
+			"state": "sitting",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit_idle_1.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_2.bvh"
+			"animation": "idle",
+			"state": "sitting",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit_idle_2.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_3.bvh"
+			"animation": "idle",
+			"state": "sitting",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit_idle_3.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_4.bvh"
+			"animation": "idle",
+			"state": "sitting",
+			"type": "bvh",
+			"options":
+			{
+				"file": "sit_idle_4.bvh"
+			}
+		},
+
+
+		{
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_1.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_5.bvh",
-			"start": 180
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_2.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_6.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_3.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_7.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_4.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_8.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_5.bvh",
+				"start": 180
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_9.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_6.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_10.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_7.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_11.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_8.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_12.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_9.bvh"
+			}
 		},
 
 		{
-			"type": "standIdle",
-			"bvh": "stand_idle_13.bvh"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_10.bvh"
+			}
 		},
 
 		{
-			"type": "straddleSitFromStanding",
-			"timeline": "StraddleSitFromStanding"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_11.bvh"
+			}
 		},
 
 		{
-			"type": "standFromStraddleSit",
-			"timeline": "StandFromStraddleSit"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_12.bvh"
+			}
 		},
 
 		{
-			"type": "straddleSitSex",
-			"synergy": "StraddleSitSex"
+			"animation": "idle",
+			"state": "standing",
+			"type": "bvh",
+			"options":
+			{
+				"file": "stand_idle_13.bvh"
+			}
+		},
+
+
+		{
+			"animation": "transition",
+			"from": "standing",
+			"to": "sittingStraddling",
+			"type": "timeline",
+			"options":
+			{
+				"name": "StraddleSitFromStanding"
+			}
+		},
+
+		{
+			"animation": "transition",
+			"from": "sittingStraddling",
+			"to": "standing",
+			"type": "timeline",
+			"options":
+			{
+				"name": "StandFromStraddleSit"
+			}
+		},
+
+		{
+			"animation": "sex",
+			"state": "sittingStraddling",
+			"type": "synergy",
+			"options":
+			{
+				"step": "StraddleSitSex"
+			}
 		}
 	]
 }

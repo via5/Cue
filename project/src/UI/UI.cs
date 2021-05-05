@@ -65,6 +65,15 @@
 				desktopMenu_?.Create(false, false);
 				desktopMenu_.Visible = true;
 			}
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (Cue.Instance.Persons[i].Atom.Selected)
+				{
+					desktopMenu_.Selected = Cue.Instance.Persons[i];
+					break;
+				}
+			}
 		}
 
 		private void DestroyUI()

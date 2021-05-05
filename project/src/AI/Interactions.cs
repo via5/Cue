@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	interface IInteraction
 	{

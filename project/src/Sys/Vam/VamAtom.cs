@@ -109,12 +109,17 @@ namespace Cue.W
 		private int enableCollisionsCountdown_ = -1;
 		private bool calculatingPath_ = false;
 		private bool navEnabled_ = false;
+		private VamClothing clothing_ = null;
 
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
 			setOnlyKeyJointsOn_ = new VamActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
+
+			char_ = atom_.GetComponentInChildren<DAZCharacter>();
+			if (char_ != null)
+				clothing_ = new VamClothing(this);
 		}
 
 		public string ID
@@ -132,13 +137,29 @@ namespace Cue.W
 			get
 			{
 				if (char_ == null)
-					char_ = atom_.GetComponentInChildren<DAZCharacter>();
+				{
+					Cue.LogError($"VamAtom.Sex: atom {ID} is not a person");
+					return Sexes.Male;
+				}
 
 				if (char_.isMale)
 					return Sexes.Male;
 				else
 					return Sexes.Female;
 			}
+		}
+
+		public bool Selected
+		{
+			get
+			{
+				return (SuperController.singleton.GetSelectedAtom() == atom_);
+			}
+		}
+
+		public IClothing Clothing
+		{
+			get { return clothing_; }
 		}
 
 		public bool Teleporting
@@ -260,6 +281,8 @@ namespace Cue.W
 			//}
 			//
 			//atom_.mainController.interactableInPlayMode = !b;
+
+			clothing_?.OnPluginState(b);
 		}
 
 		public void Update(float s)
@@ -485,48 +508,58 @@ namespace Cue.W
 
 		private void CreateAgent()
 		{
-			if (enableCollisionsCountdown_ > 0)
+			try
 			{
-				Cue.LogVerbose($"{atom_.uid}: not creating agent, collisions still disabled");
-				return;
+				if (enableCollisionsCountdown_ > 0)
+				{
+					Cue.LogVerbose($"{atom_.uid}: not creating agent, collisions still disabled");
+					return;
+				}
+
+				Cue.LogVerbose($"{atom_.uid}: creating agent");
+
+				NavMeshHit hit;
+				if (NavMesh.SamplePosition(atom_.mainController.transform.position, out hit, 2, NavMesh.AllAreas))
+				{
+					Cue.LogVerbose(
+						$"{atom_.uid}: " +
+						$"current={atom_.mainController.transform.position} " +
+						$"sampled={hit.position}");
+
+					atom_.mainController.transform.position = hit.position;
+				}
+				else
+				{
+					Cue.LogError($"{atom_.uid}: can't move to navmesh");
+				}
+
+				agent_ = atom_.mainController.gameObject.GetComponent<NavMeshAgent>();
+				if (agent_ == null)
+					agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
+
+				Cue.LogVerbose($"{atom_.uid}: agent created");
+
+				agent_.agentTypeID = VamNav.AgentTypeID;
+				agent_.height = VamNav.AgentHeight;
+				agent_.radius = VamNav.AgentRadius;
+				agent_.speed = VamNav.AgentMoveSpeed;
+				agent_.angularSpeed = VamNav.AgentTurnSpeed;
+
+				agent_.stoppingDistance = 0;
+				agent_.autoBraking = true;
+				agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+				agent_.avoidancePriority = 50;
+				agent_.autoTraverseOffMeshLink = true;
+				agent_.autoRepath = true;
+				agent_.areaMask = ~0;
+
+				NavStop();
 			}
-
-			Cue.LogVerbose($"{atom_.uid}: creating agent");
-
-			NavMeshHit hit;
-			if (NavMesh.SamplePosition(atom_.mainController.transform.position, out hit, 2, NavMesh.AllAreas))
+			catch (Exception e)
 			{
-				Cue.LogVerbose(
-					$"{atom_.uid}: " +
-					$"current={atom_.mainController.transform.position} " +
-					$"sampled={hit.position}");
-
-				atom_.mainController.transform.position = hit.position;
+				Cue.LogError($"CreateAgent failed for {atom_.uid}");
+				Cue.LogError(e.ToString());
 			}
-			else
-			{
-				Cue.LogError($"{atom_.uid}: can't move to navmesh");
-			}
-
-			agent_ = atom_.mainController.gameObject.AddComponent<NavMeshAgent>();
-
-			Cue.LogVerbose($"{atom_.uid}: agent created");
-
-			agent_.agentTypeID = VamNav.AgentTypeID;
-			agent_.height = VamNav.AgentHeight;
-			agent_.radius = VamNav.AgentRadius;
-			agent_.speed = VamNav.AgentMoveSpeed;
-			agent_.angularSpeed = VamNav.AgentTurnSpeed;
-
-			agent_.stoppingDistance = 0;
-			agent_.autoBraking = true;
-			agent_.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
-			agent_.avoidancePriority = 50;
-			agent_.autoTraverseOffMeshLink = true;
-			agent_.autoRepath = true;
-			agent_.areaMask = ~0;
-
-			NavStop();
 		}
 
 		private void DoStartNav(Vector3 v, float bearing)

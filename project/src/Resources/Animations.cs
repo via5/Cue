@@ -2,105 +2,35 @@
 using System;
 using System.Collections.Generic;
 
-namespace Cue.Resources
+namespace Cue
 {
-	class Animations
+	class Resources
 	{
-		public const int NoType = 0;
-		public const int Walk = 1;
-		public const int TurnLeft = 2;
-		public const int TurnRight = 3;
-		public const int SitIdle = 4;
-		public const int StandIdle = 5;
-		public const int SitFromStanding = 6;
-		public const int StandFromSitting = 7;
-		public const int StraddleSitFromStanding = 8;
-		public const int KneelFromStanding = 9;
-		public const int StandFromKneeling = 10;
-		public const int StandFromStraddleSit = 11;
-		public const int StraddleSitSex = 12;
-		public const int Stand = 13;
+		private static AnimationResources animations_ = new AnimationResources();
+		private static ClothingResources clothing_ = new ClothingResources();
 
-		private static Dictionary<int, List<IAnimation>> anims_ =
-			new Dictionary<int, List<IAnimation>>();
-
-		private static Dictionary<string, int> typeMap_ = null;
-		private static Dictionary<int, string> typeMapRev_ = null;
-
-		public static Dictionary<string, int> TypeMap
+		public static AnimationResources Animations
 		{
-			get
-			{
-				if (typeMap_ == null)
-				{
-					typeMap_ = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-					{
-						{ "Walk",                    Walk},
-						{ "TurnLeft",                TurnLeft },
-						{ "TurnRight",               TurnRight },
-						{ "SitIdle",                 SitIdle },
-						{ "StandIdle",               StandIdle },
-						{ "SitFromStanding",         SitFromStanding },
-						{ "StandFromSitting",        StandFromSitting },
-						{ "StraddleSitFromStanding", StraddleSitFromStanding },
-						{ "KneelFromStanding",       KneelFromStanding },
-						{ "StandFromKneeling",       StandFromKneeling },
-						{ "StandFromStraddleSit",    StandFromStraddleSit },
-						{ "StraddleSitSex",          StraddleSitSex },
-						{ "Stand",                   Stand }
-					};
-				}
-
-				return typeMap_;
-			}
+			get { return animations_; }
 		}
 
-		public static Dictionary<int, string> ReverseTypeMap
+		public static ClothingResources Clothing
 		{
-			get
-			{
-				if (typeMapRev_ == null)
-				{
-					typeMapRev_ = new Dictionary<int, string>();
-					foreach (var kv in typeMap_)
-						typeMapRev_.Add(kv.Value, kv.Key);
-				}
-
-				return typeMapRev_;
-			}
+			get { return clothing_; }
 		}
+	}
 
-		public static int TypeFromString(string s)
-		{
-			int t;
-			if (TypeMap.TryGetValue(s, out t))
-				return t;
 
-			Cue.LogError("unknown anim type '" + s + "'");
-			return NoType;
-		}
+	class AnimationResources
+	{
+		private readonly List<Animation> anims_ = new List<Animation>();
 
-		private static string TypeToString(int t)
-		{
-			string s;
-			if (ReverseTypeMap.TryGetValue(t, out s))
-				return s;
-
-			Cue.LogError("unknown anim type " + t.ToString());
-			return "none";
-		}
-
-		public static bool Load()
+		public bool Load()
 		{
 			try
 			{
 				LoadFromFile();
-
-				foreach (var a in ProceduralAnimations.Get())
-				{
-					if (a != null)
-						Add(a);
-				}
+				LoadBuiltin();
 
 				return true;
 			}
@@ -111,7 +41,7 @@ namespace Cue.Resources
 			}
 		}
 
-		private static void LoadFromFile()
+		private void LoadFromFile()
 		{
 			var meta = Cue.Instance.Sys.GetResourcePath("animations.json");
 			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
@@ -124,107 +54,195 @@ namespace Cue.Resources
 
 			foreach (var an in doc.AsObject["animations"].AsArray.Childs)
 			{
-				var a = an.AsObject;
-				var t = TypeFromString(a["type"]);
-				if (t == NoType)
-					continue;
+				var a = ParseAnimation(an.AsObject);
 
-				IAnimation anim = null;
-
-				if (a.HasKey("bvh"))
-				{
-					var path = a["bvh"].Value;
-					if (path.StartsWith("/") || path.StartsWith("\\"))
-					{
-						path = path.Substring(1);
-					}
-					else
-					{
-						path = Cue.Instance.Sys.GetResourcePath("animations/" + path);
-					}
-
-					anim = new BVH.Animation(
-						t, path,
-						(a.HasKey("rootXZ") ? a["rootXZ"].AsBool : true),
-						(a.HasKey("rootY") ? a["rootY"].AsBool : true),
-						(a.HasKey("reverse") ? a["reverse"].AsBool : false),
-						(a.HasKey("start") ? a["start"].AsInt : 0),
-						(a.HasKey("end") ? a["end"].AsInt : -1));
-				}
-				else if (a.HasKey("timeline"))
-				{
-					anim = new TimelineAnimation(t, a["timeline"]);
-				}
-				else if (a.HasKey("synergy"))
-				{
-					anim = new SynergyAnimation(t, a["synergy"]);
-				}
-				else
-				{
-					Cue.LogError("unknown animation key");
-					continue;
-				}
-
-				if (a.HasKey("sex"))
-					anim.Sex = Sexes.FromString(a["sex"]);
-
-				Add(anim);
+				if (a != null)
+					Add(a);
 			}
 		}
 
-		private static void Add(IAnimation a)
+		private Animation ParseAnimation(JSONClass o)
 		{
-			Cue.LogVerbose(TypeToString(a.Type) + ": " + a.ToString());
-
-			List<IAnimation> list;
-			if (!anims_.TryGetValue(a.Type, out list))
-			{
-				list = new List<IAnimation>();
-				anims_.Add(a.Type, list);
-			}
-
-			list.Add(a);
-		}
-
-		public static IAnimation GetAny(int type, int sex)
-		{
-			List<IAnimation> list;
-			if (!anims_.TryGetValue(type, out list))
+			IAnimation a = CreateIntegrationAnimation(o);
+			if (a == null)
 				return null;
 
-			foreach (var a in list)
+			if (!o.HasKey("animation"))
 			{
-				if (Sexes.Match(a.Sex, sex))
-					return a;
+				Cue.LogError("object missing 'animation'");
+				return null;
+			}
+
+			int type = Animation.TypeFromString(o["animation"]);
+			if (type == Animation.NoType)
+				return null;
+
+			int from = PersonState.None;
+			int to = PersonState.None;
+			int state = PersonState.None;
+
+			switch (type)
+			{
+				case Animation.WalkType:
+				case Animation.TurnLeftType:
+				case Animation.TurnRightType:
+				{
+					break;
+				}
+
+				case Animation.TransitionType:
+				{
+					if (!o.HasKey("from"))
+					{
+						Cue.LogError("transition animation missing 'from");
+						return null;
+					}
+
+					if (!o.HasKey("to"))
+					{
+						Cue.LogError("transition animation missing 'from");
+						return null;
+					}
+
+					from = PersonState.StateFromString(o["from"]);
+					to = PersonState.StateFromString(o["to"]);
+
+					break;
+				}
+
+				case Animation.SexType:
+				case Animation.IdleType:
+				{
+					if (!o.HasKey("state"))
+					{
+						Cue.LogError("sex animation missing 'state'");
+						return null;
+					}
+
+					state = PersonState.StateFromString(o["state"]);
+					break;
+				}
+			}
+
+			int sex = Sexes.Any;
+			if (o.HasKey("sex"))
+				sex = Sexes.FromString(o["sex"]);
+
+			return new Animation(type, from, to, state, sex, a);
+		}
+
+		private IAnimation CreateIntegrationAnimation(JSONClass o)
+		{
+			if (!o.HasKey("type"))
+			{
+				Cue.LogError("object missing 'type'");
+				return null;
+			}
+
+			string type = o["type"];
+
+			JSONClass options;
+
+			if (o.HasKey("options"))
+				options = o["options"].AsObject;
+			else
+				options = new JSONClass();
+
+			IAnimation a = null;
+
+			if (type == "bvh")
+				a = BVH.Animation.Create(options);
+			else if (type == "timeline")
+				a = TimelineAnimation.Create(options);
+			else if (type == "synergy")
+				a = SynergyAnimation.Create(options);
+			else
+				Cue.LogError($"unknown animation type '{type}'");
+
+			return a;
+		}
+
+		private void LoadBuiltin()
+		{
+			foreach (var a in ProceduralAnimations.Get())
+			{
+				if (a != null)
+					Add(a);
+			}
+		}
+
+		public Animation GetAny(int type, int sex)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == type)
+				{
+					if (Sexes.Match(anims_[i].Sex, sex))
+						return anims_[i];
+				}
 			}
 
 			return null;
 		}
 
-		public static List<IAnimation> GetAll(int type, int sex)
+		public List<Animation> GetAll(int type, int sex)
 		{
-			List<IAnimation> list;
+			if (type == Animation.NoType)
+				return anims_;
 
-			if (type == NoType)
-			{
-				list = new List<IAnimation>();
-				foreach (var kv in anims_)
-					list.AddRange(kv.Value);
-			}
-			else
-			{
-				if (!anims_.TryGetValue(type, out list))
-					return new List<IAnimation>();
-			}
+			var list = new List<Animation>();
 
-			var matched = new List<IAnimation>();
-			foreach (var a in list)
+			for (int i = 0; i < anims_.Count; ++i)
 			{
-				if (Sexes.Match(a.Sex, sex))
-					matched.Add(a);
+				if (anims_[i].Type == type)
+				{
+					if (Sexes.Match(anims_[i].Sex, sex))
+						list.Add(anims_[i]);
+				}
 			}
 
-			return matched;
+			return list;
+		}
+
+		public Animation GetAnyTransition(int from, int to, int sex)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == Animation.TransitionType)
+				{
+					if (anims_[i].TransitionFrom == from &&
+						anims_[i].TransitionTo == to)
+					{
+						if (Sexes.Match(anims_[i].Sex, sex))
+							return anims_[i];
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public Animation GetAnySex(int state, int sex)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == Animation.SexType)
+				{
+					if (anims_[i].State == state)
+					{
+						if (Sexes.Match(anims_[i].Sex, sex))
+							return anims_[i];
+					}
+				}
+			}
+
+			return null;
+		}
+
+		private void Add(Animation a)
+		{
+			Cue.LogInfo(a.ToString());
+			anims_.Add(a);
 		}
 	}
 }

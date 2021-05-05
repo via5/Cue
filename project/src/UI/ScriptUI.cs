@@ -254,6 +254,7 @@ namespace Cue
 		private VUI.Label dir_ = new VUI.Label();
 		private VUI.Label bearing_ = new VUI.Label();
 		private VUI.Label action_ = new VUI.Label();
+		private VUI.Label player_ = new VUI.Label();
 		private VUI.Label anim_ = new VUI.Label();
 		private VUI.Label nav_ = new VUI.Label();
 		private VUI.Label state_ = new VUI.Label();
@@ -291,7 +292,10 @@ namespace Cue
 			state.Add(new VUI.Label("Action"));
 			state.Add(action_);
 
-			state.Add(new VUI.Label("Anim"));
+			state.Add(new VUI.Label("Player"));
+			state.Add(player_);
+
+			state.Add(new VUI.Label("Animation"));
 			state.Add(anim_);
 
 			state.Add(new VUI.Label("Nav"));
@@ -344,9 +348,18 @@ namespace Cue
 			dir_.Text = person_.Direction.ToString();
 			bearing_.Text = person_.Bearing.ToString();
 			action_.Text = person_.Actions.ToString();
-			anim_.Text = person_.Animator.ToString();
 			nav_.Text = W.NavStates.ToString(person_.Atom.NavState);
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
+
+			if (person_.Animator.CurrentPlayer == null)
+				player_.Text = "(none)";
+			else
+				player_.Text = person_.Animator.CurrentPlayer.ToString();
+
+			if (person_.Animator.CurrentAnimation == null)
+				anim_.Text = "(none)";
+			else
+				anim_.Text = person_.Animator.CurrentAnimation.ToString();
 
 			breath_.Text = person_.Breathing.ToString();
 			eyes_.Text = person_.Gaze.Eyes.ToString();
@@ -625,21 +638,32 @@ namespace Cue
 	class PersonAnimationTab : Tab
 	{
 		private Person person_;
-		private VUI.Button play_ = new VUI.Button("Play");
-		private VUI.ListView<IAnimation> anims_ = new VUI.ListView<IAnimation>();
+		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
 
-		public PersonAnimationTab(Person p)
+		public PersonAnimationTab(Person person)
 		{
-			person_ = p;
+			person_ = person;
 
 			Layout = new VUI.BorderLayout();
-			Add(play_, VUI.BorderLayout.Top);
+
+			var top = new VUI.Panel(new VUI.VerticalFlow());
+
+			var p = new VUI.Panel(new VUI.HorizontalFlow());
+			p.Add(new VUI.Button("Stand", () => person_.SetState(PersonState.Standing)));
+			p.Add(new VUI.Button("Sit", () => person_.SetState(PersonState.Sitting)));
+			p.Add(new VUI.Button("Kneel", () => person_.SetState(PersonState.Kneeling)));
+			p.Add(new VUI.Button("Straddle sit", () => person_.SetState(PersonState.SittingStraddling)));
+			top.Add(p);
+
+			p = new VUI.Panel(new VUI.HorizontalFlow());
+			p.Add(new VUI.Button("Play", OnPlay));
+			top.Add(p);
+
+			Add(top, VUI.BorderLayout.Top);
 			Add(anims_, VUI.BorderLayout.Center);
 
-			play_.Clicked += OnPlay;
-
-			var items = new List<IAnimation>();
-			foreach (var a in Resources.Animations.GetAll(Resources.Animations.NoType, Sexes.Female))
+			var items = new List<Animation>();
+			foreach (var a in Resources.Animations.GetAll(Animation.NoType, Sexes.Female))
 				items.Add(a);
 
 			anims_.SetItems(items);

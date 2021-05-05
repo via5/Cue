@@ -1,16 +1,20 @@
-﻿using System;
+﻿using SimpleJSON;
 using System.Collections.Generic;
 
 namespace Cue
 {
-	class TimelineAnimation : BasicAnimation
+	class TimelineAnimation : IAnimation
 	{
 		private string name_;
 
-		public TimelineAnimation(int type, string name)
-			: base(type)
+		public TimelineAnimation(string name)
 		{
 			name_ = name;
+		}
+
+		public static TimelineAnimation Create(JSONClass o)
+		{
+			return new TimelineAnimation(o["name"]);
 		}
 
 		public string Name
@@ -20,7 +24,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return name_;
+			return "timeline " + name_;
 		}
 	}
 

@@ -31,6 +31,7 @@ project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
 project\src\Sys\Vam\VamCanvas.cs
+project\src\Sys\Vam\VamClothing.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamInput.cs
 project\src\Sys\Vam\VamLog.cs

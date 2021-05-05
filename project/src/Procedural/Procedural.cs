@@ -5,18 +5,19 @@ namespace Cue
 {
 	class ProceduralAnimations
 	{
-		public static List<IAnimation> Get()
+		public static List<Animation> Get()
 		{
-			var list = new List<IAnimation>();
+			var list = new List<Animation>();
 
-			list.Add(Stand());
+			list.Add(Stand(PersonState.Walking));
+			list.Add(Stand(PersonState.Standing));
 
 			return list;
 		}
 
-		private static IAnimation Stand()
+		private static Animation Stand(int from)
 		{
-			var a = new ProceduralAnimation(Resources.Animations.Stand, "stand");
+			var a = new ProceduralAnimation("stand");
 
 			var neutral = a.AddStep();
 			neutral.AddController("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0));
@@ -27,7 +28,10 @@ namespace Cue
 			neutral.AddController("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0));
 			neutral.AddController("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0));
 
-			return a;
+			return new Animation(
+				Animation.TransitionType,
+				from, PersonState.Standing,
+				PersonState.None, Sexes.Any, a);
 		}
 	}
 
@@ -255,7 +259,7 @@ namespace Cue
 	}
 
 
-	class ProceduralAnimation : BasicAnimation
+	class ProceduralAnimation : IAnimation
 	{
 		class Part
 		{
@@ -305,15 +309,14 @@ namespace Cue
 		private readonly List<ProceduralStep> steps_ = new List<ProceduralStep>();
 		//private readonly List<Part> parts_ = new List<Part>();
 
-		public ProceduralAnimation(int type, string name)
-			: base(type)
+		public ProceduralAnimation( string name)
 		{
 			name_ = name;
 		}
 
 		public ProceduralAnimation Clone()
 		{
-			var a = new ProceduralAnimation(Type, name_);
+			var a = new ProceduralAnimation(name_);
 
 			foreach (var s in steps_)
 				a.steps_.Add(s.Clone());

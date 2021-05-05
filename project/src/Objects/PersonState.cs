@@ -18,6 +18,11 @@
 			self_ = self;
 		}
 
+		public int Current
+		{
+			get { return current_; }
+		}
+
 		public bool IsUpright
 		{
 			get
@@ -60,13 +65,14 @@
 				"state changed from " + before + " to " + after);
 		}
 
-		public void StartTransition(int next)
+		public bool StartTransition(int next)
 		{
 			if (next_ == next)
-				return;
+				return false;
 
 			next_ = next;
 			Cue.LogInfo(self_.ID + ": new transition, " + ToString());
+			return true;
 		}
 
 		public void CancelTransition()
@@ -105,18 +111,38 @@
 			return s;
 		}
 
-		public static string StateToString(int state)
+		private static string[] GetNames()
 		{
-			string[] names = new string[]
+			return new string[]
 			{
 				"none", "standing", "walking", "sitting", "kneeling",
-				"sitting-straddling"
+				"sittingstraddling"
 			};
+		}
+
+		public static string StateToString(int state)
+		{
+			var names = GetNames();
 
 			if (state < 0 || state >= names.Length)
 				return "?" + state.ToString();
 
 			return names[state];
+		}
+
+		public static int StateFromString(string os)
+		{
+			var names = GetNames();
+			var s = os.ToLower();
+
+			for (int i = 0; i < names.Length; ++i)
+			{
+				if (names[i] == s)
+					return i;
+			}
+
+			Cue.LogError($"unknown person state '{os}'");
+			return None;
 		}
 	}
 }

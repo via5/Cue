@@ -199,7 +199,7 @@ namespace Cue
 				else
 				{
 					moving_ = false;
-					p.Sit();
+					p.SetState(PersonState.Sitting);
 					return true;
 				}
 			}
@@ -267,15 +267,15 @@ namespace Cue
 
 	class RandomAnimationAction : BasicAction
 	{
-		private List<IAnimation> anims_;
+		private List<Animation> anims_;
 		private float e_ = 0;
 		private int i_ = -1;
 		private const float Delay = 10;
 		private bool reverse_ = true;
 
-		public RandomAnimationAction(List<IAnimation> anims)
+		public RandomAnimationAction(List<Animation> anims)
 		{
-			anims_ = new List<IAnimation>(anims);
+			anims_ = new List<Animation>(anims);
 		}
 
 		protected override bool DoStart(IObject o, float s)

@@ -151,6 +151,7 @@ namespace Cue
 					p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 
 				p.Gaze.LookAtDefault();
+				p.SetState(PersonState.Standing);
 			}
 		}
 

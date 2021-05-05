@@ -1,71 +1,21 @@
-﻿namespace Cue
+﻿using SimpleJSON;
+using System.Collections.Generic;
+
+namespace Cue
 {
-	class GazeSettings
-	{
-		public const int LookAtDisabled = 0;
-		public const int LookAtTarget = 1;
-		public const int LookAtPlayer = 2;
-
-		public static string ToString(int i)
-		{
-			switch (i)
-			{
-				case LookAtDisabled:
-					return "disabled";
-
-				case LookAtTarget:
-					return "target";
-
-				case LookAtPlayer:
-					return "player";
-
-				default:
-					return $"?{i}";
-			}
-		}
-	}
-
-
-	interface IPlayer
-	{
-		bool Playing { get; }
-		bool Play(IAnimation a, int flags);
-		void Stop(bool rewind);
-		void FixedUpdate(float s);
-		void Update(float s);
-	}
-
-	interface IAnimation
-	{
-		int Type { get; }
-		int Sex { get; set; }
-	}
-
-	abstract class BasicAnimation : IAnimation
-	{
-		private readonly int type_;
-		private int sex_ = Sexes.Any;
-
-		protected BasicAnimation(int type)
-		{
-			type_ = type;
-		}
-
-		public int Type
-		{
-			get { return type_; }
-		}
-
-		public int Sex
-		{
-			get { return sex_; }
-			set { sex_ = value; }
-		}
-	}
-
-
 	class Integration
 	{
+		public static List<IPlayer> CreateAnimationPlayers(Person p)
+		{
+			return new List<IPlayer>()
+			{
+				new BVH.Player(p),
+				new TimelinePlayer(p),
+				new ProceduralPlayer(p),
+				new SynergyPlayer(p)
+			};
+		}
+
 		public static IBreather CreateBreather(Person p)
 		{
 			return new MacGruberBreather(p);
@@ -106,15 +56,24 @@
 			return new ClockwiseSilverBlowjob(p);
 		}
 
-		public static IClothing CreateClothing(Person p)
-		{
-			return new VamClothing(p);
-		}
-
 		public static IExpression CreateExpression(Person p)
 		{
 			return new ProceduralExpression(p);
 		}
+	}
+
+
+	interface IPlayer
+	{
+		bool Playing { get; }
+		bool Play(IAnimation a, int flags);
+		void Stop(bool rewind);
+		void FixedUpdate(float s);
+		void Update(float s);
+	}
+
+	interface IAnimation
+	{
 	}
 
 	interface IOrgasmer
@@ -138,12 +97,13 @@
 	{
 		bool Blink { get; set; }
 
-		void Update(float s);
 		void LookAt(IObject o);
 		void LookAt(Vector3 p);
 		void LookInFront();
 		void LookAtNothing();
 		void LookAtCamera();
+
+		void Update(float s);
 	}
 
 	interface ISpeaker
@@ -158,39 +118,31 @@
 		float Elapsed { get; }
 		bool OnCooldown { get; }
 
-		void Update(float s);
 		void Start(Person p);
 		void StartReciprocal(Person p);
-		void Stop();
 		void StopSelf();
+		void Stop();
+
+		void Update(float s);
+		void OnPluginState(bool b);
 	}
 
 	interface IHandjob
 	{
 		bool Active { get; }
-
-		void Update(float s);
 		void Start(Person target);
 		void Stop();
+		void Update(float s);
+		void OnPluginState(bool b);
 	}
 
 	interface IBlowjob
 	{
 		bool Active { get; }
-
-		void Update(float s);
 		void Start(Person target);
 		void Stop();
-	}
-
-	interface IClothing
-	{
-		float HeelsAngle { get; }
-		float HeelsHeight { get; }
-		bool GenitalsVisible { get; set; }
-		bool BreastsVisible { get; set; }
+		void Update(float s);
 		void OnPluginState(bool b);
-		void Dump();
 	}
 
 	struct Pair<First, Second>

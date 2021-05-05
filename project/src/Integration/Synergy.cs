@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
@@ -52,14 +53,18 @@ namespace Cue
 	}
 
 
-	class SynergyAnimation : BasicAnimation
+	class SynergyAnimation : IAnimation
 	{
 		private string name_;
 
-		public SynergyAnimation(int type, string name)
-			: base(type)
+		public SynergyAnimation(string name)
 		{
 			name_ = name;
+		}
+
+		public static SynergyAnimation Create(JSONClass o)
+		{
+			return new SynergyAnimation(o["step"]);
 		}
 
 		public string Name
@@ -69,7 +74,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return name_;
+			return "synergy " + name_;
 		}
 	}
 }

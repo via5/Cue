@@ -40,7 +40,7 @@
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							person_.Kneel();
+							person_.SetState(PersonState.Kneeling);
 							state_ = PositioningState;
 						}
 						else
@@ -116,7 +116,7 @@
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							person_.Kneel();
+							person_.SetState(PersonState.Kneeling);
 							state_ = PositioningState;
 						}
 						else
@@ -201,7 +201,7 @@
 
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
-							person_.Straddle();
+							person_.SetState(PersonState.SittingStraddling);
 							state_ = PositioningState;
 						}
 						else
@@ -227,7 +227,7 @@
 
 				case PlayState:
 				{
-					person_.Animator.Play(Resources.Animations.StraddleSitSex);
+					person_.Animator.PlaySex(PersonState.SittingStraddling);
 					state_ = ActiveState;
 					break;
 				}
