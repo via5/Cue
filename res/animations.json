@@ -50,7 +50,6 @@
 			"animation": "transition",
 			"from": "standing",
 			"to": "sitting",
-			"sex": "female",
 			"type": "bvh",
 			"options":
 			{
@@ -60,38 +59,13 @@
 
 		{
 			"animation": "transition",
-			"from": "standing",
-			"to": "sitting",
-			"sex": "male",
-			"type": "timeline",
-			"options":
-			{
-				"name": "SitFromStanding"
-			}
-		},
-
-		{
-			"animation": "transition",
 			"from": "sitting",
 			"to": "standing",
-			"sex": "female",
 			"type": "bvh",
 			"options":
 			{
 				"file": "sit.bvh",
 				"reverse": true
-			}
-		},
-
-		{
-			"animation": "transition",
-			"from": "sitting",
-			"to": "standing",
-			"sex": "male",
-			"type": "timeline",
-			"options":
-			{
-				"name": "StandFromSitting"
 			}
 		},
 
@@ -298,10 +272,15 @@
 			"animation": "transition",
 			"from": "standing",
 			"to": "sittingStraddling",
-			"type": "timeline",
+			"type": "bvh",
 			"options":
 			{
-				"name": "StraddleSitFromStanding"
+				"file": "straddleSitFromStanding.bvh",
+				"usePosition": true,
+				"localRotations": false,
+				"localPositions": false,
+				"rootXZ": false,
+				"rootY": false
 			}
 		},
 
@@ -309,10 +288,15 @@
 			"animation": "transition",
 			"from": "sittingStraddling",
 			"to": "standing",
-			"type": "timeline",
+			"type": "bvh",
 			"options":
 			{
-				"name": "StandFromStraddleSit"
+				"file": "standFromStraddleSit.bvh",
+				"usePosition": true,
+				"localRotations": false,
+				"localPositions": false,
+				"rootXZ": false,
+				"rootY": false
 			}
 		}
 	]

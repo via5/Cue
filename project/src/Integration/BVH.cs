@@ -17,8 +17,14 @@ namespace Cue.BVH
         public bool reverse = false;
         public int start = 0;
         public int end = -1;
+        public bool usePosition = false;
+        public bool localRotations = true;
+        public bool localPositions = true;
 
-        public Animation(string path, bool rootXZ, bool rootY, bool reverse, int start=0, int end=-1)
+
+        public Animation(
+            string path, bool rootXZ, bool rootY, bool reverse,
+            int start, int end, bool usePosition, bool localRot, bool localPos)
         {
             this.file = new File(path);
             this.rootXZ = rootXZ;
@@ -26,6 +32,21 @@ namespace Cue.BVH
             this.reverse = reverse;
             this.start = start;
             this.end = end;
+            this.usePosition = usePosition;
+            this.localRotations = localRot;
+            this.localPositions = localPos;
+
+            if (this.start > file.nFrames)
+            {
+                Cue.LogError($"bvh {file.Name}: start too big, {this.start} >= {file.nFrames}");
+                this.start = 0;
+            }
+
+            if (this.end > file.nFrames)
+            {
+                Cue.LogError($"bvh {file.Name}: end too big, {this.end} >= {file.nFrames}");
+                this.end = -1;
+            }
         }
 
         public static Animation Create(JSONClass o)
@@ -43,7 +64,10 @@ namespace Cue.BVH
                 (o.HasKey("rootY") ? o["rootY"].AsBool : true),
                 (o.HasKey("reverse") ? o["reverse"].AsBool : false),
                 (o.HasKey("start") ? o["start"].AsInt : 0),
-                (o.HasKey("end") ? o["end"].AsInt : -1));
+                (o.HasKey("end") ? o["end"].AsInt : -1),
+                (o.HasKey("usePosition") ? o["usePosition"].AsBool : false),
+                (o.HasKey("localRotations") ? o["localRotations"].AsBool : true),
+                (o.HasKey("localPositions") ? o["localPositions"].AsBool : true));
         }
 
         public override string ToString()
@@ -51,15 +75,25 @@ namespace Cue.BVH
             string s =
                 "bvh " + file.Name + " " +
                 start.ToString() + "-" +
-                (end == -1 ? file.nFrames.ToString() : end.ToString()) + " " +
-                (reverse ? "rev " : "");
+                (end == -1 ? file.nFrames.ToString() : end.ToString()) +
+                (reverse ? " rev" : "");
 
             if (rootXZ && rootY)
-                s += "rootAll";
+                s += " rootAll";
             else if (rootXZ)
-                s += "rootXZ";
+                s += " rootXZ";
             else if (rootY)
-                s += "rootY";
+                s += " rootY";
+
+            if (localPositions)
+                s += " locPos";
+            else
+                s += " absPos";
+
+            if (localRotations)
+                s += " locRot";
+            else
+                s += " absRot";
 
             return s;
         }
@@ -74,7 +108,7 @@ namespace Cue.BVH
 
         Dictionary<string, string> cnameToBname = new Dictionary<string, string>() {
         { "hipControl", "hip" },
-        //{ "headControl", "head" },
+        { "headControl", "head" },
         { "chestControl", "chest" },
         { "lHandControl", "lHand" },
         { "rHandControl", "rHand" },
@@ -109,6 +143,7 @@ namespace Cue.BVH
         bool playing = false;
 
         float frameTime;
+        bool paused = false;
 
         // Apparently we shouldn't use enums because it causes a compiler crash
         const int translationModeOffsetPlusFrame = 0;
@@ -206,6 +241,7 @@ namespace Cue.BVH
 
             rootMotion = new Vector3();
             playing = true;
+            paused = false;
 
             heelAngle = person_.Clothing.HeelsAngle;
             heelHeight = person_.Clothing.HeelsHeight;
@@ -260,11 +296,25 @@ namespace Cue.BVH
             foreach (FreeControllerV3 controller in containingAtom.freeControllers)
                 controllerMap[controller.name] = controller;
 
-            foreach (var item in cnameToBname)
+            if (anim != null)
             {
-                var c = controllerMap[item.Key];
-                c.currentRotationState = FreeControllerV3.RotationState.On;
-                c.currentPositionState = FreeControllerV3.PositionState.On;
+                foreach (var item in cnameToBname)
+                {
+                    var c = controllerMap[item.Key];
+                    bool found = false;
+
+                    for (int i = 0; i < anim.file.bones.Length; ++i)
+                    {
+                        if (anim.file.bones[i].name == item.Value)
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    c.currentRotationState = found ? FreeControllerV3.RotationState.On : FreeControllerV3.RotationState.Off;
+                    c.currentPositionState = found ? FreeControllerV3.PositionState.On : FreeControllerV3.PositionState.Off;
+                }
             }
         }
 
@@ -361,18 +411,6 @@ namespace Cue.BVH
             return ret;
         }
 
-        void UpdateModel(BvhTransform[] data)
-        {
-            foreach (var item in data)
-            {
-                // Copy on to model
-                if (bones.ContainsKey(item.bone.name))
-                {
-                    bones[item.bone.name].localRotation = item.rotation;
-                }
-            }
-        }
-
         public void ApplyRootMotion()
         {
             float applyYaw = 0;
@@ -385,9 +423,15 @@ namespace Cue.BVH
             containingAtom.mainController.transform.Translate(rootMotion2D);
         }
 
+        public bool Paused
+        {
+            get { return paused; }
+            set { paused = value; }
+        }
+
         public void FixedUpdate(float s)
         {
-            if (containingAtom == null)
+            if (containingAtom == null || paused)
                 return;
 
             try
@@ -398,24 +442,7 @@ namespace Cue.BVH
                 rootMotion = new Vector3();
 
                 FrameAdvance(s);
-
-                foreach (var item in cnameToBname)
-                {
-                    controllerMap[item.Key].transform.localPosition = bones[item.Value].position;
-                    controllerMap[item.Key].transform.localRotation = bones[item.Value].rotation;
-                    controllerMap[item.Key].transform.localPosition += new Vector3(0, heelHeight, 0);
-                    if (item.Key.Contains("Foot"))
-                    {
-                        controllerMap[item.Key].transform.localEulerAngles += new Vector3(heelAngle, 0, 0);
-                    }
-
-                    if (item.Key.Contains("Toe"))
-                    {
-                        //controllerMap[item.Key].jointRotationDriveXTargetAdditional = heelAngle * 0.5f;
-                        controllerMap[item.Key].transform.localEulerAngles += new Vector3(-heelAngle, 0, 0);
-                    }
-                }
-
+                UpdateControllers();
                 ApplyRootMotion();
             }
             catch (Exception e)
@@ -424,9 +451,69 @@ namespace Cue.BVH
             }
         }
 
+        void UpdateModel(BvhTransform[] data)
+        {
+            foreach (var item in data)
+            {
+                // Copy on to model
+                if (bones.ContainsKey(item.bone.name))
+                {
+                    if (anim.localRotations)
+                        bones[item.bone.name].localRotation = item.rotation;
+                    else
+                        bones[item.bone.name].rotation = item.rotation;
+
+                    if (item.bone.hasPosition && anim.usePosition)
+                    {
+                        if (anim.localPositions)
+                            bones[item.bone.name].localPosition = item.position;
+                        else
+                            bones[item.bone.name].position = item.position;
+                    }
+                    else
+                    {
+                        if (anim.localPositions)
+                            bones[item.bone.name].localPosition = tposeBoneOffsets[item.bone.name];
+                    }
+                }
+            }
+        }
+
+        private void UpdateControllers()
+        {
+            foreach (var item in cnameToBname)
+            {
+                controllerMap[item.Key].transform.localPosition = bones[item.Value].position;
+                controllerMap[item.Key].transform.localRotation = bones[item.Value].rotation;
+                controllerMap[item.Key].transform.localPosition += new Vector3(0, heelHeight, 0);
+
+                if (item.Key.Contains("Foot"))
+                {
+                    controllerMap[item.Key].transform.localEulerAngles += new Vector3(heelAngle, 0, 0);
+                }
+
+                if (item.Key.Contains("Toe"))
+                {
+                    //controllerMap[item.Key].jointRotationDriveXTargetAdditional = heelAngle * 0.5f;
+                    controllerMap[item.Key].transform.localEulerAngles += new Vector3(-heelAngle, 0, 0);
+                }
+            }
+        }
+
         public void Update(float s)
         {
             // no-op
+        }
+
+        public void Seek(int f)
+        {
+            frame = f;
+            elapsed = 0;
+            rootMotion = new Vector3();
+
+            UpdateModel(anim.file.ReadFrame(frame));
+            UpdateControllers();
+            ApplyRootMotion();
         }
 
         public void FrameAdvance(float s)
@@ -492,8 +579,20 @@ namespace Cue.BVH
             {
                 if (frame <= anim.start + 1)
                 {
-                    // Last frame
-                    UpdateModel(anim.file.ReadFrame(frame));
+                    if ((flags & Animator.Loop) != 0)
+                    {
+                        // Interpolate
+                        var frm = anim.file.ReadFrame(frame);
+                        var to = anim.file.ReadFrame(anim.end);
+
+                        float t = elapsed / frameTime;
+                        UpdateModel(Interpolate(frm, to, t));
+                    }
+                    else
+                    {
+                        // Last frame
+                        UpdateModel(anim.file.ReadFrame(frame));
+                    }
                 }
                 else
                 {
@@ -509,8 +608,20 @@ namespace Cue.BVH
             {
                 if (frame >= anim.end - 1)
                 {
-                    // Last frame
-                    UpdateModel(anim.file.ReadFrame(frame));
+                    if ((flags & Animator.Loop) != 0)
+                    {
+                        // Interpolate
+                        var frm = anim.file.ReadFrame(frame);
+                        var to = anim.file.ReadFrame(anim.start);
+
+                        float t = elapsed / frameTime;
+                        UpdateModel(Interpolate(frm, to, t));
+                    }
+                    else
+                    {
+                        // Last frame
+                        UpdateModel(anim.file.ReadFrame(frame));
+                    }
                 }
                 else
                 {
@@ -768,66 +879,84 @@ namespace Cue.BVH
 
         public BvhTransform[] ReadFrame(int frame)
         {
-            var data = frames[frame];
-            var ret = new BvhTransform[bones.Length];
-            for (var i = 0; i < bones.Length; i++)
+            if (frame >= frames.Length)
+                Cue.LogError($"bad frame {frame} >= {frames.Length}");
+
+            try
             {
-                var tf = new BvhTransform();
-                var bone = bones[i];
-                tf.bone = bone;
-                var offset = bone.frameOffset;
-                if (bone.hasPosition)
+                var data = frames[frame];
+                var ret = new BvhTransform[bones.Length];
+                for (var i = 0; i < bones.Length; i++)
                 {
-                    // Use -'ve X to convert RH->LH
-                    tf.position = new Vector3(-data[offset], data[offset + 1], data[offset + 2]) * 0.01f;
-                    offset += 3;
-                }
-                float v1 = data[offset], v2 = data[offset + 1], v3 = data[offset + 2];
+                    if (i >= bones.Length)
+                        Cue.LogError($"bad bone {i} >= {bones.Length}");
 
-                Quaternion qx, qy, qz;
-                switch (bone.rotationOrder)
-                {
-                    case RotationOrder.XYZ:
-                        qx = Quaternion.AngleAxis(-v1, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v2, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v3, Vector3.forward);
-                        tf.rotation = qx * qy * qz;
-                        break;
-                    case RotationOrder.XZY:
-                        qx = Quaternion.AngleAxis(-v1, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v3, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v2, Vector3.forward);
-                        tf.rotation = qx * qz * qy;
-                        break;
-                    case RotationOrder.YXZ:
-                        qx = Quaternion.AngleAxis(-v2, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v1, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v3, Vector3.forward);
-                        tf.rotation = qy * qx * qz;
-                        break;
-                    case RotationOrder.YZX:
-                        qx = Quaternion.AngleAxis(-v3, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v1, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v2, Vector3.forward);
-                        tf.rotation = qy * qz * qx;
-                        break;
-                    case RotationOrder.ZXY:
-                        qx = Quaternion.AngleAxis(-v2, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v3, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v1, Vector3.forward);
-                        tf.rotation = qz * qx * qy;
-                        break;
-                    case RotationOrder.ZYX:
-                        qx = Quaternion.AngleAxis(-v3, Vector3.left);
-                        qy = Quaternion.AngleAxis(-v2, Vector3.up);
-                        qz = Quaternion.AngleAxis(-v1, Vector3.forward);
-                        tf.rotation = qz * qy * qx;
-                        break;
-                }
+                    var tf = new BvhTransform();
+                    var bone = bones[i];
+                    tf.bone = bone;
+                    var offset = bone.frameOffset;
 
-                ret[i] = tf;
+                    if ((offset+2) >= data.Length)
+                        Cue.LogError($"bad offset {offset}+2 >= {data.Length}");
+
+                    if (bone.hasPosition)
+                    {
+                        // Use -'ve X to convert RH->LH
+                        tf.position = new Vector3(-data[offset], data[offset + 1], data[offset + 2]) * 0.01f;
+                        offset += 3;
+                    }
+                    float v1 = data[offset], v2 = data[offset + 1], v3 = data[offset + 2];
+
+                    Quaternion qx, qy, qz;
+                    switch (bone.rotationOrder)
+                    {
+                        case RotationOrder.XYZ:
+                            qx = Quaternion.AngleAxis(-v1, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v2, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v3, Vector3.forward);
+                            tf.rotation = qx * qy * qz;
+                            break;
+                        case RotationOrder.XZY:
+                            qx = Quaternion.AngleAxis(-v1, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v3, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v2, Vector3.forward);
+                            tf.rotation = qx * qz * qy;
+                            break;
+                        case RotationOrder.YXZ:
+                            qx = Quaternion.AngleAxis(-v2, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v1, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v3, Vector3.forward);
+                            tf.rotation = qy * qx * qz;
+                            break;
+                        case RotationOrder.YZX:
+                            qx = Quaternion.AngleAxis(-v3, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v1, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v2, Vector3.forward);
+                            tf.rotation = qy * qz * qx;
+                            break;
+                        case RotationOrder.ZXY:
+                            qx = Quaternion.AngleAxis(-v2, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v3, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v1, Vector3.forward);
+                            tf.rotation = qz * qx * qy;
+                            break;
+                        case RotationOrder.ZYX:
+                            qx = Quaternion.AngleAxis(-v3, Vector3.left);
+                            qy = Quaternion.AngleAxis(-v2, Vector3.up);
+                            qz = Quaternion.AngleAxis(-v1, Vector3.forward);
+                            tf.rotation = qz * qy * qx;
+                            break;
+                    }
+
+                    ret[i] = tf;
+                }
+                return ret;
             }
-            return ret;
+            catch (Exception e)
+            {
+                Cue.LogError($"ReadFrame: frame={frame}, {e}");
+                return new BvhTransform[0];
+            }
         }
     }
 }

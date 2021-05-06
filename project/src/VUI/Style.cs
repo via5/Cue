@@ -447,13 +447,13 @@ namespace VUI
 		}
 
 
-		public static void Setup(Slider e)
+		public static void Setup<T>(BasicSlider<T> e)
 		{
 			Adjust(e);
 			Polish(e);
 		}
 
-		public static void Adjust(Slider e)
+		public static void Adjust<T>(BasicSlider<T> e)
 		{
 			ForComponent<UIDynamicSlider>(e.WidgetObject, (slider) =>
 			{
@@ -461,7 +461,7 @@ namespace VUI
 			});
 		}
 
-		public static void Polish(Slider e)
+		public static void Polish<T>(BasicSlider<T> e)
 		{
 			ForComponent<UIDynamicSlider>(e.WidgetObject, (slider) =>
 			{

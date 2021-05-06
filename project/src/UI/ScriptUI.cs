@@ -392,7 +392,7 @@ namespace Cue
 		private VUI.Label moodRateAdjust_ = new VUI.Label();
 
 		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Force excitement");
-		private VUI.TextSlider forceExcitementValue_ = new VUI.TextSlider();
+		private VUI.FloatTextSlider forceExcitementValue_ = new VUI.FloatTextSlider();
 
 		public PersonAITab(Person p)
 		{
@@ -639,6 +639,8 @@ namespace Cue
 	{
 		private Person person_;
 		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
+		private VUI.CheckBox loop_ = new VUI.CheckBox("Loop");
+		private VUI.IntTextSlider seek_ = new VUI.IntTextSlider();
 
 		public PersonAnimationTab(Person person)
 		{
@@ -657,7 +659,15 @@ namespace Cue
 
 			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Play", OnPlay));
+			p.Add(new VUI.Button("Stop", OnStop));
+			p.Add(new VUI.Button("Pause", OnPause));
+			p.Add(loop_);
 			top.Add(p);
+
+			p = new VUI.Panel(new VUI.BorderLayout());
+			p.Add(seek_, VUI.BorderLayout.Center);
+			top.Add(p);
+
 
 			Add(top, VUI.BorderLayout.Top);
 			Add(anims_, VUI.BorderLayout.Center);
@@ -667,6 +677,8 @@ namespace Cue
 				items.Add(a);
 
 			anims_.SetItems(items);
+
+			seek_.ValueChanged += OnSeek;
 		}
 
 		public override string Title
@@ -684,7 +696,33 @@ namespace Cue
 			if (a == null)
 				return;
 
-			person_.Animator.Play(a);
+			var b = (BVH.Animation)a.Real;
+
+			person_.Animator.Play(a, loop_.Checked ? Animator.Loop : 0);
+			seek_.Set(b.start, b.start, b.end < 0 ? b.file.nFrames : b.end);
+		}
+
+		private void OnStop()
+		{
+			var a = anims_.Selected;
+			if (a == null)
+				return;
+
+			person_.Animator.Stop();
+		}
+
+		private void OnPause()
+		{
+			var p = person_.Animator.CurrentPlayer as BVH.Player;
+			if (p != null)
+				p.Paused = true;
+		}
+
+		private void OnSeek(int f)
+		{
+			var p = person_.Animator.CurrentPlayer as BVH.Player;
+			if (p != null)
+				p.Seek(f);
 		}
 	}
 }

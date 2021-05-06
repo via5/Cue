@@ -2,21 +2,21 @@
 
 namespace VUI
 {
-	class Slider : Widget
+	abstract class BasicSlider<T> : Widget
 	{
 		public override string TypeName { get { return "Slider"; } }
 
-		public delegate void ValueCallback(float f);
+		public delegate void ValueCallback(T f);
 		public event ValueCallback ValueChanged;
 
-		private UIDynamicSlider slider_ = null;
+		protected UIDynamicSlider slider_ = null;
 
 		// used before creation
-		private float value_ = 0;
-		private float min_ = 0;
-		private float max_ = 0;
+		private T value_ = default(T);
+		private T min_ = default(T);
+		private T max_ = default(T);
 
-		public Slider(ValueCallback changed = null)
+		public BasicSlider(ValueCallback changed = null)
 		{
 			Borders = new Insets(2);
 
@@ -24,14 +24,14 @@ namespace VUI
 				ValueChanged += changed;
 		}
 
-		public float Value
+		public T Value
 		{
 			get
 			{
 				if (slider_ == null)
 					return value_;
 				else
-					return slider_.slider.value;
+					return GetValue();
 			}
 
 			set
@@ -42,20 +42,20 @@ namespace VUI
 				}
 				else
 				{
-					slider_.slider.value = value;
+					SetValue(value);
 					ValueChanged?.Invoke(value);
 				}
 			}
 		}
 
-		public float Minimum
+		public T Minimum
 		{
 			get
 			{
 				if (slider_ == null)
 					return min_;
 				else
-					return slider_.slider.minValue;
+					return GetMinimum();
 			}
 
 			set
@@ -63,18 +63,18 @@ namespace VUI
 				if (slider_ == null)
 					min_ = value;
 				else
-					slider_.slider.minValue = value;
+					SetMinimum(value);
 			}
 		}
 
-		public float Maximum
+		public T Maximum
 		{
 			get
 			{
 				if (slider_ == null)
 					return max_;
 				else
-					return slider_.slider.maxValue;
+					return GetMaximum();
 			}
 
 			set
@@ -82,21 +82,12 @@ namespace VUI
 				if (slider_ == null)
 					max_ = value;
 				else
-					slider_.slider.maxValue = value;
+					SetMaximum(value);
 			}
 		}
 
-		public void Set(float value, float min, float max)
+		public void Set(T value, T min, T max)
 		{
-			if (min > max)
-			{
-				var temp = min;
-				min = max;
-				max = temp;
-			}
-
-			value = Utilities.Clamp(value, min, max);
-
 			Minimum = min;
 			Maximum = max;
 			Value = value;
@@ -115,9 +106,7 @@ namespace VUI
 			slider_.defaultButtonEnabled = false;
 			slider_.rangeAdjustEnabled = false;
 
-			slider_.slider.minValue = min_;
-			slider_.slider.maxValue = max_;
-			slider_.slider.value = value_;
+			Set(value_, min_, max_);
 
 			slider_.slider.onValueChanged.AddListener(OnChanged);
 
@@ -148,33 +137,123 @@ namespace VUI
 
 		private void OnChanged(float v)
 		{
-			ValueChanged?.Invoke(v);
+			ValueChanged?.Invoke(GetValue());
+		}
+
+		protected abstract T GetValue();
+		protected abstract void SetValue(T v);
+
+		protected abstract T GetMinimum();
+		protected abstract void SetMinimum(T v);
+
+		protected abstract T GetMaximum();
+		protected abstract void SetMaximum(T v);
+	}
+
+
+	class FloatSlider : BasicSlider<float>
+	{
+		public FloatSlider(ValueCallback changed = null)
+			: base(changed)
+		{
+		}
+
+		protected override float GetValue()
+		{
+			return slider_.slider.value;
+		}
+
+		protected override void SetValue(float v)
+		{
+			slider_.slider.value = v;
+		}
+
+		protected override float GetMinimum()
+		{
+			return slider_.slider.minValue;
+		}
+
+		protected override void SetMinimum(float v)
+		{
+			slider_.slider.minValue = v;
+		}
+
+		protected override float GetMaximum()
+		{
+			return slider_.slider.maxValue;
+		}
+
+		protected override void SetMaximum(float v)
+		{
+			slider_.slider.maxValue = v;
 		}
 	}
 
 
-	class TextSlider : Panel
+	class IntSlider : BasicSlider<int>
+	{
+		public IntSlider(ValueCallback changed = null)
+			: base(changed)
+		{
+		}
+
+		protected override int GetValue()
+		{
+			return (int)slider_.slider.value;
+		}
+
+		protected override void SetValue(int v)
+		{
+			slider_.slider.value = v;
+		}
+
+		protected override int GetMinimum()
+		{
+			return (int)slider_.slider.minValue;
+		}
+
+		protected override void SetMinimum(int v)
+		{
+			slider_.slider.minValue = v;
+		}
+
+		protected override int GetMaximum()
+		{
+			return (int)slider_.slider.maxValue;
+		}
+
+		protected override void SetMaximum(int v)
+		{
+			slider_.slider.maxValue = v;
+		}
+
+		protected override void DoCreate()
+		{
+			base.DoCreate();
+			slider_.slider.wholeNumbers = true;
+		}
+	}
+
+
+	abstract class BasicTextSlider<T> : Panel
 	{
 		public override string TypeName { get { return "TextSlider"; } }
 
-		public delegate void ValueCallback(float f);
+		public delegate void ValueCallback(T f);
 		public event ValueCallback ValueChanged;
 
-		private readonly Slider slider_ = new Slider();
+		private readonly BasicSlider<T> slider_;
 		private readonly TextBox text_ = new TextBox();
 
 		private bool changingText_ = false;
 
 
-		public TextSlider(ValueCallback valueChanged = null)
-			: this(0, 0, 1, valueChanged)
-		{
-		}
-
-		public TextSlider(
-			float value, float min, float max,
+		protected BasicTextSlider(
+			BasicSlider<T> s, T value, T min, T max,
 			ValueCallback valueChanged = null)
 		{
+			slider_ = s;
+
 			Layout = new BorderLayout(5);
 			Add(slider_, BorderLayout.Center);
 			Add(text_, BorderLayout.Right);
@@ -190,25 +269,25 @@ namespace VUI
 				ValueChanged += valueChanged;
 		}
 
-		public float Value
+		public T Value
 		{
 			get { return slider_.Value; }
 			set { slider_.Value = value; }
 		}
 
-		public float Minimum
+		public T Minimum
 		{
 			get { return slider_.Minimum; }
 			set { slider_.Minimum = value; }
 		}
 
-		public float Maximum
+		public T Maximum
 		{
 			get { return slider_.Maximum; }
 			set { slider_.Maximum = value; }
 		}
 
-		public void Set(float value, float min, float max)
+		public void Set(T value, T min, T max)
 		{
 			slider_.Set(value, min, max);
 			UpdateText();
@@ -219,19 +298,15 @@ namespace VUI
 			if (changingText_)
 				return;
 
-			float f;
-			if (float.TryParse(s, out f))
-			{
-				f = Utilities.Clamp(f, Minimum, Maximum);
+			T f = FromString(s);
 
-				using (new ScopedFlag((b) => changingText_ = b))
-				{
-					slider_.Value = f;
-				}
+			using (new ScopedFlag((b) => changingText_ = b))
+			{
+				slider_.Value = f;
 			}
 		}
 
-		private void OnValueChanged(float f)
+		private void OnValueChanged(T f)
 		{
 			UpdateText();
 			ValueChanged?.Invoke(f);
@@ -239,7 +314,66 @@ namespace VUI
 
 		private void UpdateText()
 		{
-			text_.Text = slider_.Value.ToString("0.00");
+			text_.Text = ToString(slider_.Value);
+		}
+
+		protected abstract T FromString(string s);
+		protected abstract string ToString(T v);
+	}
+
+
+	class FloatTextSlider : BasicTextSlider<float>
+	{
+		public FloatTextSlider(ValueCallback valueChanged = null)
+			: this(0, 0, 1, valueChanged)
+		{
+		}
+
+		public FloatTextSlider(float value, float min, float max, ValueCallback valueChanged = null)
+			: base(new FloatSlider(), value, min, max, valueChanged)
+		{
+		}
+
+		protected override float FromString(string s)
+		{
+			float f;
+			if (float.TryParse(s, out f))
+				return Utilities.Clamp(f, Minimum, Maximum);
+
+			return 0;
+		}
+
+		protected override string ToString(float v)
+		{
+			return v.ToString("0.00");
+		}
+	}
+
+
+	class IntTextSlider : BasicTextSlider<int>
+	{
+		public IntTextSlider(ValueCallback valueChanged = null)
+			: this(0, 0, 1, valueChanged)
+		{
+		}
+
+		public IntTextSlider(int value, int min, int max, ValueCallback valueChanged = null)
+			: base(new IntSlider(), value, min, max, valueChanged)
+		{
+		}
+
+		protected override int FromString(string s)
+		{
+			int f;
+			if (int.TryParse(s, out f))
+				return Utilities.Clamp(f, Minimum, Maximum);
+
+			return 0;
+		}
+
+		protected override string ToString(int v)
+		{
+			return v.ToString();
 		}
 	}
 }
