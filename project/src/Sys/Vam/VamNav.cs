@@ -87,7 +87,7 @@ namespace Cue.W
 			NavMeshBuilder.CollectSources(
 				new Bounds(
 					new UnityEngine.Vector3(0, 0, 0),
-					new UnityEngine.Vector3(100, 0.2f, 100)),
+					new UnityEngine.Vector3(100, 2, 100)),
 				~0, NavMeshCollectGeometry.PhysicsColliders, 0,
 				CreateMarkups(), srcs);
 

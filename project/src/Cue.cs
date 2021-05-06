@@ -152,6 +152,7 @@ namespace Cue
 
 				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
+				p.Clothing.Init();
 			}
 		}
 

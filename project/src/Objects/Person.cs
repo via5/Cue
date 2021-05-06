@@ -11,6 +11,11 @@ namespace Cue
 			person_ = p;
 		}
 
+		public void Init()
+		{
+			person_.Atom.Clothing.Init();
+		}
+
 		public float HeelsAngle
 		{
 			get { return person_.Atom.Clothing.HeelsAngle; }

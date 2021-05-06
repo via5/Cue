@@ -57,7 +57,7 @@ namespace Cue
 				case NoState:
 				{
 					var target =
-						caller_.Position +
+						caller_.UprightPosition +
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
 					Cue.LogInfo($"{person_}: moving to {caller_}");

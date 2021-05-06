@@ -16,9 +16,13 @@ namespace Cue.W
 			{
 				atom_ = a;
 				ci_ = ci;
+			}
 
+			public void Init()
+			{
 				if (ci_.driveXAngleTarget != 0 || ci_.drive2XAngleTarget != 0)
 				{
+					Cue.LogInfo($"resetting {ci_.name} for drive angles");
 					ci_.enabled = false;
 					ci_.enabled = true;
 				}
@@ -210,7 +214,10 @@ namespace Cue.W
 				foreach (var c in char_.clothingItems)
 				{
 					if (c.isActiveAndEnabled)
+					{
+						Cue.LogInfo($"VamClothing: found {c.name}");
 						items_.Add(new Item(atom_, c));
+					}
 				}
 
 				GenitalsVisible = false;
@@ -220,6 +227,12 @@ namespace Cue.W
 			{
 				Cue.LogError("VamClothing: ctor failed, " + e.ToString());
 			}
+		}
+
+		public void Init()
+		{
+			foreach (var i in items_)
+				i.Init();
 		}
 
 		public float HeelsAngle
