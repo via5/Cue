@@ -57,7 +57,7 @@
 				{
 					person_.Expression.Set(new Pair<int, float>[]
 					{
-						new Pair<int, float>(Expressions.Happy, 1.0f),
+						new Pair<int, float>(Expressions.Happy, 0.7f),
 						new Pair<int, float>(Expressions.Mischievous, 0.0f)
 					});
 

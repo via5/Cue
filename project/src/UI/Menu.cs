@@ -44,7 +44,6 @@
 			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Call", OnCall));
 			row.Add(new VUI.ToolButton("Straddle", OnStraddle));
-			row.Add(new VUI.ToolButton("Crouch", OnCrouch));
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stand", OnStand));
@@ -53,6 +52,7 @@
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
 			row.Add(new VUI.ToolButton("Make idle", OnMakeIdle));
+			row.Add(new VUI.ToolButton("Crouch", OnCrouch));
 			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
 			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
 			row.Add(new VUI.ToolButton("test", OnTest));
@@ -189,9 +189,7 @@
 			if (p != null)
 			{
 				p.MakeIdle();
-				p.AI.RunEvent(new CallEvent(
-					p, Cue.Instance.Player,
-					() => { p.SetState(PersonState.Crouching); }));
+				p.SetState(PersonState.Crouching);
 			}
 		}
 

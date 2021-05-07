@@ -183,6 +183,7 @@ namespace Cue.W
 	{
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }
+		Vector3 Direction { get; set; }
 		Color Color { get; set; }
 		bool Collision { get; set; }
 		void Destroy();

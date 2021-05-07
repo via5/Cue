@@ -59,7 +59,7 @@ namespace Cue
 			}
 			else
 			{
-				if (!person_.Idle)
+				if (person_.Idle)
 				{
 					post_?.Invoke();
 					return false;

@@ -42,6 +42,8 @@ namespace Cue
 		public void Update()
 		{
 			UpdateColor();
+			graphic_.Position = object_.Position;
+			graphic_.Direction = object_.Direction;
 		}
 
 		public void Destroy()

@@ -55,7 +55,7 @@ namespace Cue.W
 				}
 			}
 
-			material_.color = W.VamU.ToUnity(color_);
+			material_.color = VamU.ToUnity(color_);
 			renderer_.material = material_;
 		}
 
@@ -88,15 +88,14 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get
-			{
-				return W.VamU.FromUnity(object_.transform.position);
-			}
+			get { return VamU.FromUnity(object_.transform.position); }
+			set { object_.transform.position = VamU.ToUnity(value); }
+		}
 
-			set
-			{
-				object_.transform.position = W.VamU.ToUnity(value);
-			}
+		public Vector3 Direction
+		{
+			get { return VamU.FromUnity(object_.transform.rotation.eulerAngles); }
+			set { object_.transform.rotation = Quaternion.LookRotation(VamU.ToUnity(value)); }
 		}
 
 		public bool Visible
@@ -134,7 +133,7 @@ namespace Cue.W
 			object_.transform.localScale =
 				new UnityEngine.Vector3(0.5f, 0.05f, 0.5f);
 
-			object_.transform.position = W.VamU.ToUnity(pos);
+			object_.transform.position = VamU.ToUnity(pos);
 		}
 	}
 
@@ -147,7 +146,7 @@ namespace Cue.W
 			object_.transform.localScale =
 				new UnityEngine.Vector3(radius, radius, radius);
 
-			object_.transform.position = W.VamU.ToUnity(pos);
+			object_.transform.position = VamU.ToUnity(pos);
 		}
 	}
 }

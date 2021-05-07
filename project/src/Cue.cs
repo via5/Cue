@@ -153,6 +153,7 @@ namespace Cue
 				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
 				p.Clothing.Init();
+				p.Personality = new QuirkyPersonality(p);
 
 				if (p == Player)
 					p.AI.Mood.State = Mood.None;
@@ -252,11 +253,7 @@ namespace Cue
 			if (player_ != null && !player_.Possessed)
 			{
 				LogInfo($"{player_} no longer possessed");
-
-				if (forcedPlayer_ == null)
-					SetPlayer(null);
-				else
-					SetPlayer(forcedPlayer_);
+				SetPlayer(null);
 			}
 
 			if (player_ == null)
