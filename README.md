@@ -38,7 +38,7 @@
 
 ### Things that have initial support
 - Animations: There's `res/animations.json` that contains the list of animations for different states. They're all BVH files right now.
-- Clothing: There's `res/clothing.json`, it's meta information on clothing items to be able to do minimum undressing. Note that the genitals/breasts buttons in the menu can switch between item states (normal, up, etc.) but also between different items (pants and pants down for male).
+- Clothing: There's `res/clothing.json`, it's meta information on clothing items to be able to do minimum undressing. Note that the genitals/breasts buttons in the menu can switch between item states (normal, up, etc.) but also between different items (pants and pants down for male). Heels are sometimes handled properly, but feet my drag on the ground in some animations.
 - Moods and personalities for facial expressions, as well as detecting triggers for excitement. The excitement stuff changes too slowly right now, but it can be manually set in the script UI, AI tab, Force Excitement slider. Integrates with MG's Breathing.
 
 ### Slots
@@ -51,5 +51,4 @@
 ### Broken things
 - Nav sometimes gets stuck when moving close to another person, should stop after 5s.
 - Navmesh doesn't update automatically when the scene is changed. There's a button in the script UI, Stuff tab.
-- Characters have an ugly up/down animation when they stop, that's for heels, it gets feet unstuck. Working on it.
-- Wait for animations to finish before changing states (if crouching, wait for crouch to finish before standing)
+- Wait for animations to finish before changing states (if crouching, wait for crouch to finish before standing) or the atom's position sometimes jumps around.
