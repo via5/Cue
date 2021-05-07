@@ -140,6 +140,52 @@ namespace Cue
 	}
 
 
+	class CallAction : BasicAction
+	{
+		private Person caller_;
+
+		public CallAction(Person caller)
+		{
+			caller_ = caller;
+		}
+
+		protected override bool DoStart(IObject o, float s)
+		{
+			var p = o as Person;
+			if (p == null)
+			{
+				Cue.LogError("CallAction: called something that's not a person");
+				return false;
+			}
+
+			var target =
+				caller_.UprightPosition +
+				Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
+
+			Cue.LogInfo($"CallAction: {p} moving to {caller_}");
+			p.MoveTo(target, caller_.Bearing + 180);
+			p.Gaze.LookAt(caller_);
+
+			return true;
+		}
+
+		protected override bool DoTick(IObject o, float s)
+		{
+			var p = o as Person;
+			if (p == null)
+				return false;
+
+			if (!p.HasTarget)
+			{
+				Cue.LogInfo($"CallAction: {p} reached {caller_}, event finished");
+				return false;
+			}
+
+			return true;
+		}
+	}
+
+
 	class MoveAction : BasicAction
 	{
 		private Vector3 to_;

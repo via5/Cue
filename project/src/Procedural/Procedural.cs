@@ -192,12 +192,12 @@ namespace Cue
 
 				var mid = startPos_ + (endPos_ - startPos_) / 2 + new UnityEngine.Vector3(0, 0.3f, 0);
 
-				if (name_ == "lFootControl" || name_ == "rFootControl")
-				{
-					fc_.transform.localPosition =
-						Bezier2(startPos_, mid, endPos_, t);
-				}
-				else
+				//if (name_ == "lFootControl" || name_ == "rFootControl")
+				//{
+				//	fc_.transform.localPosition =
+				//		Bezier2(startPos_, mid, endPos_, t);
+				//}
+				//else
 				{
 					fc_.transform.localPosition =
 						UnityEngine.Vector3.Lerp(startPos_, endPos_, t);

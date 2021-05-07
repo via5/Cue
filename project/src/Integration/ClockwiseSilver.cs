@@ -255,6 +255,12 @@ namespace Cue
 		private W.VamBoolParameterRO running_ = null;
 		private W.VamStringChooserParameter male_ = null;
 		private W.VamStringChooserParameter hand_ = null;
+		private W.VamFloatParameter handX_ = null;
+		private W.VamFloatParameter handY_ = null;
+		private W.VamFloatParameter handZ_ = null;
+		private W.VamFloatParameter closeMax_ = null;
+		private float elapsed_ = 0;
+		private bool closedHand_ = false;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -265,6 +271,10 @@ namespace Cue
 			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
 			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
 			hand_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
+			handX_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Side/Side");
+			handY_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Fwd/Bkwd");
+			handZ_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Shift Up/Down");
+			closeMax_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Close Max");
 
 			active_.Value = false;
 		}
@@ -283,6 +293,13 @@ namespace Cue
 
 			// todo
 			hand_.Value = "Right";
+			handX_.Value = 0.01f;
+			handY_.Value = -0.05f;
+			handZ_.Value = 0.03f;
+			closeMax_.Value = 0.5f;
+
+			elapsed_ = 0;
+			closedHand_ = false;
 
 			active_.Value = true;
 		}
@@ -294,6 +311,15 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (!closedHand_)
+			{
+				elapsed_ += s;
+				if (elapsed_ >= 2)
+				{
+					closedHand_ = true;
+					closeMax_.Value = 1;
+				}
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -321,6 +347,9 @@ namespace Cue
 		private W.VamFloatParameter sfxVolume_ = null;
 		private W.VamFloatParameter moanVolume_ = null;
 		private W.VamFloatParameter volumeScaling_ = null;
+		private W.VamFloatParameter headX_ = null;
+		private W.VamFloatParameter headY_ = null;
+		private W.VamFloatParameter headZ_ = null;
 
 		public ClockwiseSilverBlowjob(Person p)
 		{
@@ -334,11 +363,17 @@ namespace Cue
 			sfxVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
 			moanVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
 			volumeScaling_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Volume Scaling");
+			headX_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Side/Side");
+			headY_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Up/Down");
+			headZ_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Fwd/Bkwd");
 
 			active_.Value = false;
 			sfxVolume_.Value = 0;
 			moanVolume_.Value = 0;
 			volumeScaling_.Value = 0;
+			headX_.Value = 0.01f;
+			headY_.Value = 0.12f;
+			headZ_.Value = 0.03f;
 		}
 
 		public bool Active

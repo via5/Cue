@@ -3,12 +3,14 @@
 	class HandjobEvent : BasicEvent
 	{
 		private const int NoState = 0;
-		private const int MovingState = 1;
-		private const int PositioningState = 2;
-		private const int ActiveState = 3;
+		private const int CallingState = 1;
+		private const int CrouchingState = 2;
+		private const int WaitState = 3;
+		private const int ActiveState = 4;
 
 		private Person receiver_;
 		private int state_ = NoState;
+		private float wait_ = 0;
 
 		public HandjobEvent(Person p, Person receiver)
 			: base(p)
@@ -22,40 +24,43 @@
 			{
 				case NoState:
 				{
-					//var target =
-					//	receiver_.Position +
-					//	Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
-					//
-					//person_.MoveTo(target, receiver_.Bearing + 180);
-					//person_.Gaze.LookAt(receiver_);
-					//state_ = MovingState;
-					state_ = PositioningState;
+					person_.PushAction(new CallAction(receiver_));
+					state_ = CallingState;
+					wait_ = 0;
 
 					break;
 				}
 
-				case MovingState:
+				case CallingState:
 				{
-					if (!person_.HasTarget)
+					if (person_.Idle)
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
 							person_.SetState(PersonState.Crouching);
-							state_ = PositioningState;
+							state_ = CrouchingState;
 						}
 						else
 						{
-							person_.Handjob.Start(receiver_);
-							state_ = ActiveState;
+							state_ = WaitState;
 						}
 					}
 
 					break;
 				}
 
-				case PositioningState:
+				case CrouchingState:
 				{
-					if (!person_.Animator.Playing)
+					if (person_.State.IsCurrently(PersonState.Crouching))
+						state_ = WaitState;
+
+					break;
+				}
+
+				case WaitState:
+				{
+					wait_ += s;
+					if (wait_ >= 0.5f)
 					{
 						person_.Handjob.Start(receiver_);
 						receiver_.Clothing.GenitalsVisible = true;
@@ -79,12 +84,14 @@
 	class BlowjobEvent : BasicEvent
 	{
 		private const int NoState = 0;
-		private const int MovingState = 1;
-		private const int PositioningState = 2;
-		private const int ActiveState = 3;
+		private const int CallingState = 1;
+		private const int CrouchingState = 2;
+		private const int WaitState = 3;
+		private const int ActiveState = 4;
 
 		private Person receiver_;
 		private int state_ = NoState;
+		private float wait_ = 0;
 
 		public BlowjobEvent(Person p, Person receiver)
 			: base(p)
@@ -98,40 +105,36 @@
 			{
 				case NoState:
 				{
-					//var target =
-					//	receiver_.Position +
-					//	Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
-					//
-					//person_.MoveTo(target, receiver_.Bearing + 180);
-					//person_.Gaze.LookAt(receiver_);
-					//state_ = MovingState;
-					state_ = PositioningState;
+					person_.PushAction(new CallAction(receiver_));
+					state_ = CallingState;
+					wait_ = 0;
 
 					break;
 				}
 
-				case MovingState:
+				case CallingState:
 				{
-					if (!person_.HasTarget)
+					if (person_.Idle)
 					{
-						if (receiver_.State.Is(PersonState.Sitting))
-						{
-							person_.SetState(PersonState.Crouching);
-							state_ = PositioningState;
-						}
-						else
-						{
-							person_.Blowjob.Start(receiver_);
-							state_ = ActiveState;
-						}
+						person_.SetState(PersonState.Crouching);
+						state_ = CrouchingState;
 					}
 
 					break;
 				}
 
-				case PositioningState:
+				case CrouchingState:
 				{
-					if (!person_.Animator.Playing)
+					if (person_.State.IsCurrently(PersonState.Crouching))
+						state_ = WaitState;
+
+					break;
+				}
+
+				case WaitState:
+				{
+					wait_ += s;
+					if (wait_ >= 0.5f)
 					{
 						person_.Blowjob.Start(receiver_);
 						receiver_.Clothing.GenitalsVisible = true;

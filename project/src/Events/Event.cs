@@ -40,8 +40,8 @@ namespace Cue
 		private const int MovingState = 1;
 
 		private Person caller_;
+		private CallAction call_ = null;
 		private Action post_ = null;
-		private int state_ = NoState;
 
 		public CallEvent(Person p, Person caller, Action post=null)
 			: base(p)
@@ -52,32 +52,17 @@ namespace Cue
 
 		public override bool Update(float s)
 		{
-			switch (state_)
+			if (call_ == null)
 			{
-				case NoState:
+				call_ = new CallAction(caller_);
+				person_.PushAction(call_);
+			}
+			else
+			{
+				if (!person_.Idle)
 				{
-					var target =
-						caller_.UprightPosition +
-						Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
-
-					Cue.LogInfo($"{person_}: moving to {caller_}");
-					person_.MoveTo(target, caller_.Bearing + 180);
-					person_.Gaze.LookAt(caller_);
-					state_ = MovingState;
-
-					break;
-				}
-
-				case MovingState:
-				{
-					if (!person_.HasTarget)
-					{
-						Cue.LogInfo($"{person_}: call event finished");
-						post_?.Invoke();
-						return false;
-					}
-
-					break;
+					post_?.Invoke();
+					return false;
 				}
 			}
 

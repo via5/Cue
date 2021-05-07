@@ -48,6 +48,7 @@ namespace Cue
 	{
 		private readonly RootAction actions_ = new RootAction();
 		private PersonState state_;
+		private bool deferredTransition_ = false;
 		private int deferredState_ = PersonState.None;
 		private int lastNavState_ = W.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
@@ -241,24 +242,7 @@ namespace Cue
 		public override void FixedUpdate(float s)
 		{
 			base.FixedUpdate(s);
-
 			animator_.FixedUpdate(s);
-
-			if (!animator_.Playing)
-			{
-				state_.FinishTransition();
-				if (deferredState_ != PersonState.None)
-				{
-					Cue.LogInfo($"{ID}: animation finished, setting deferred state");
-
-					var ds = deferredState_;
-					deferredState_ = PersonState.None;
-					SetState(ds);
-				}
-			}
-
-			if (State.IsUpright)
-				uprightPos_ = Position;
 		}
 
 		public override void Update(float s)
@@ -266,6 +250,30 @@ namespace Cue
 			base.Update(s);
 
 			CheckNavState();
+
+			if (deferredTransition_)
+			{
+				if (StartTransition())
+					PlayTransition();
+			}
+			else
+			{
+				if (!animator_.Playing)
+				{
+					state_.FinishTransition();
+					if (deferredState_ != PersonState.None)
+					{
+						Cue.LogInfo($"{ID}: animation finished, setting deferred state");
+
+						var ds = deferredState_;
+						deferredState_ = PersonState.None;
+						SetState(ds);
+					}
+				}
+			}
+
+			if (State.IsUpright)
+				uprightPos_ = Position;
 
 			animator_.Update(s);
 			actions_.Tick(this, s);
@@ -311,18 +319,34 @@ namespace Cue
 			deferredState_ = PersonState.None;
 			state_.StartTransition(s);
 
-			if (!animator_.PlayTransition(state_.Current, s))
+			if (!StartTransition())
 			{
-				// no animation for this transition, stand first
+				deferredTransition_ = true;
+				return;
+			}
 
-				Cue.LogInfo(
-					$"{ID}: no animation for transition " +
-					$"{PersonState.StateToString(state_.Current)}->" +
-					$"{PersonState.StateToString(s)}, standing first");
+			PlayTransition();
+		}
 
-				deferredState_ = s;
-				state_.StartTransition(PersonState.Standing);
-				animator_.PlayTransition(state_.Current, PersonState.Standing);
+		private void PlayTransition()
+		{
+			deferredTransition_ = false;
+
+			if (!animator_.PlayTransition(state_.Current, state_.Next))
+			{
+				// no animation for this transition, stand first if not already
+				// trying to stand
+				if (state_.Next != PersonState.Standing)
+				{
+					Cue.LogInfo(
+						$"{ID}: no animation for transition " +
+						$"{PersonState.StateToString(state_.Current)}->" +
+						$"{PersonState.StateToString(state_.Next)}, standing first");
+
+					deferredState_ = state_.Next;
+					state_.StartTransition(PersonState.Standing);
+					animator_.PlayTransition(state_.Current, PersonState.Standing);
+				}
 			}
 		}
 
@@ -331,29 +355,32 @@ namespace Cue
 			speech_.Say(s);
 		}
 
-		protected override bool StartMove()
+		protected bool StartTransition()
 		{
-			bool okay = true;
-
 			if (kisser_.Active)
 			{
 				kisser_.Stop();
-				okay = false;
+				return false;
 			}
 
 			if (handjob_.Active)
 			{
 				handjob_.Stop();
-				okay = false;
+				return false;
 			}
 
 			if (blowjob_.Active)
 			{
 				blowjob_.Stop();
-				okay = false;
+				return false;
 			}
 
-			if (!okay)
+			return true;
+		}
+
+		protected override bool StartMove()
+		{
+			if (!StartTransition())
 				return false;
 
 			if (!State.IsUpright)
