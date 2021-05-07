@@ -201,6 +201,7 @@
 			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
+				Cue.Instance.Player.Clothing.GenitalsVisible = true;
 				p.Handjob.Start(Cue.Instance.Player);
 			}
 		}
@@ -211,6 +212,7 @@
 			if (p != null && Cue.Instance.Player != null)
 			{
 				p.MakeIdle();
+				Cue.Instance.Player.Clothing.GenitalsVisible = true;
 				p.Blowjob.Start(Cue.Instance.Player);
 			}
 		}
@@ -280,31 +282,9 @@
 
 		private void OnTest()
 		{
-			Cue.Instance.FindPerson("B").Kisser.StartReciprocal(
-				Cue.Instance.FindPerson("A"));
-
-			//var p = Selected as Person;
-			//if (p != null)
-			//{
-			//	var a = p.VamAtom.Atom;
-			//	var s = Cue.Instance.VamSys;
-			//
-			//	var cs = new string[]{
-			//		"headControl",
-			//		"chestControl",
-			//		"hipControl" ,
-			//		"lHandControl",
-			//		"rHandControl",
-			//		"lFootControl",
-			//		"rFootControl"
-			//	};
-			//
-			//	foreach (var cn in cs)
-			//	{
-			//		var c = s.FindController(a, cn);
-			//		Cue.LogInfo($"{cn} {c.transform.localPosition} {c.transform.localRotation.eulerAngles}");
-			//	}
-			//}
+			var p = Selected as Person;
+			if (p != null)
+				p.Clothing.Dump();
 		}
 	}
 }
