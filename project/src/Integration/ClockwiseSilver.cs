@@ -293,9 +293,9 @@ namespace Cue
 
 			// todo
 			hand_.Value = "Right";
-			handX_.Value = 0.01f;
-			handY_.Value = -0.05f;
-			handZ_.Value = 0.03f;
+			handX_.Value = 0.03f;
+			handY_.Value = -0.08f;
+			handZ_.Value = 0.00f;
 			closeMax_.Value = 0.5f;
 
 			elapsed_ = 0;
@@ -317,7 +317,7 @@ namespace Cue
 				if (elapsed_ >= 2)
 				{
 					closedHand_ = true;
-					closeMax_.Value = 1;
+					closeMax_.Value = 0.75f;
 				}
 			}
 		}

@@ -15,6 +15,7 @@ namespace Cue
 			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(
 				"Control (" + object_.ID + ")",
 				object_.Position, new Color(0, 0, 1, 0.05f));
+			graphic_.Direction = object_.Direction;
 			UpdateColor();
 		}
 
@@ -146,9 +147,6 @@ namespace Cue
 
 		public void Update()
 		{
-			if (!visible_)
-				return;
-
 			for (int i = 0; i < controls_.Count; ++i)
 				controls_[i].Update();
 		}

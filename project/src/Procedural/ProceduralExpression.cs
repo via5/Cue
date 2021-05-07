@@ -215,6 +215,9 @@ namespace Cue
 
 		private float Mid()
 		{
+			if (morph_ == null)
+				return 0;
+
 			return morph_.startValue;
 		}
 

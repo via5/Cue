@@ -63,7 +63,8 @@ namespace Cue.W
 						wrap_ = ci_.GetComponentInChildren<DAZSkinWrapSwitcher>();
 						if (wrap_ == null)
 						{
-							Cue.LogError("clothing " + ci_.name + " has no wrap switcher");
+							Cue.LogError(
+								$"clothing {ci_.name} has no wrap switcher {ci_.isDynamicRuntimeLoaded}");
 							return;
 						}
 					}
