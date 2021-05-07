@@ -6,10 +6,11 @@ namespace Cue
 	{
 		public const float Cooldown = 10;
 
+		private Logger log_;
 		private Person person_;
 		private W.VamBoolParameter enabled_ = null;
-		private W.VamBoolParameter kissingRunning_ = null;
-		private W.VamBoolParameter activate_ = null;
+		private W.VamBoolParameter active_ = null;
+		private W.VamBoolParameterRO running_ = null;
 		private W.VamStringChooserParameter atom_ = null;
 		private W.VamStringChooserParameter target_ = null;
 		private W.VamBoolParameter trackPos_ = null;
@@ -23,16 +24,18 @@ namespace Cue
 
 		public ClockwiseSilverKiss(Person p)
 		{
+			log_ = new Logger(() => $"cwkiss {person_}");
+
 			person_ = p;
 
 			enabled_ = new W.VamBoolParameter(
 				p, "ClockwiseSilver.Kiss", "enabled");
 
-			kissingRunning_ = new W.VamBoolParameter(
-				p, "ClockwiseSilver.Kiss", "Is Kissing");
-
-			activate_ = new W.VamBoolParameter(
+			active_ = new W.VamBoolParameter(
 				p, "ClockwiseSilver.Kiss", "isActive");
+
+			running_ = new W.VamBoolParameterRO(
+				p, "ClockwiseSilver.Kiss", "Is Kissing");
 
 			atom_ = new W.VamStringChooserParameter(
 				p, "ClockwiseSilver.Kiss", "atom");
@@ -55,12 +58,12 @@ namespace Cue
 			headAngleZ_ = new W.VamFloatParameter(
 				p, "ClockwiseSilver.Kiss", "Head Angle Z");
 
-			activate_.SetValue(false);
+			active_.Value = false;
 		}
 
 		public bool Active
 		{
-			get { return wasKissing_; }
+			get { return running_.Value; }
 		}
 
 		public float Elapsed
@@ -80,7 +83,7 @@ namespace Cue
 				if (!Active)
 					return null;
 
-				var tid = atom_.GetValue();
+				var tid = atom_.Value;
 				if (tid == "")
 					return null;
 
@@ -92,7 +95,7 @@ namespace Cue
 		{
 			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
 
-			var k = kissingRunning_.GetValue();
+			var k = running_.Value;
 			if (wasKissing_ != k)
 				SetActive(k);
 
@@ -111,10 +114,10 @@ namespace Cue
 
 		public void StopSelf()
 		{
-			if (activate_.GetValue())
+			if (active_.Value)
 			{
-				Cue.LogError($"Clockwise {person_}: stopping");
-				activate_.SetValue(false);
+				log_.Error("stopping");
+				active_.Value = false;
 				cooldownRemaining_ = Cooldown;
 			}
 		}
@@ -123,7 +126,7 @@ namespace Cue
 		{
 			if (Active)
 			{
-				Cue.LogError($"Clockwise {person_}: can't start, already active");
+				log_.Error("can't start, already active");
 				return;
 			}
 
@@ -132,26 +135,20 @@ namespace Cue
 
 		public void StartReciprocal(Person target)
 		{
-			var t = target.Kisser as ClockwiseSilverKiss;
-			if (t == null)
-			{
-				Cue.LogError($"Clockwise {person_}: can't kiss, {target} is not using clockwise");
-				return;
-			}
+			log_.Info($"starting reciprocal with {target}");
 
 			if (Active)
 			{
-				Cue.LogError($"Clockwise {person_}: can't start reciprocal, already active");
+				log_.Error($"can't start reciprocal, already active");
 				return;
 			}
 
-			if (t.Active)
+			var t = target.Kisser;
+			if (t != null && t.Active)
 			{
-				Cue.LogError($"Clockwise {t.person_}: can't start reciprocal, already active");
+				log_.Error($"can't start reciprocal, already active on {target}");
 				return;
 			}
-
-			Cue.LogInfo($"Clockwise {person_}: starting reciprocal with {target}");
 
 			bool thisPos = true;
 			bool targetPos = false;
@@ -163,7 +160,24 @@ namespace Cue
 			}
 
 			DoKiss(target, thisPos);
-			t.DoKiss(person_, targetPos);
+
+			if (target.Kisser == null)
+			{
+				log_.Info($"{target} doesn't know how to kiss, won't be reciprocal");
+			}
+			else
+			{
+				var tcw = target.Kisser as ClockwiseSilverKiss;
+				if (tcw == null)
+				{
+					log_.Warning($"{target} is not using CW");
+					target.Kisser.Start(person_);
+				}
+				else
+				{
+					tcw.DoKiss(person_, targetPos);
+				}
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -172,21 +186,21 @@ namespace Cue
 
 		private void DoKiss(Person target, bool pos)
 		{
-			enabled_.SetValue(true);
+			enabled_.Value = true;
 
 			// force reset
-			atom_.SetValue("");
-			target_.SetValue("");
-			atom_.SetValue(target.ID);
-			target_.SetValue("LipTrigger");
+			atom_.Value = "";
+			target_.Value = "";
+			atom_.Value = target.ID;
+			target_.Value = "LipTrigger";
 
-			headAngleX_.SetValue(-10);
-			headAngleZ_.SetValue(-40);
+			headAngleX_.Value = -10;
+			headAngleZ_.Value = -40;
 
-			trackPos_.SetValue(pos);
-			trackRot_.SetValue(true);
+			trackPos_.Value = pos;
+			trackRot_.Value = true;
 
-			activate_.SetValue(true);
+			active_.Value = true;
 
 			elapsed_ = 0;
 		}
@@ -195,18 +209,18 @@ namespace Cue
 		{
 			if (b)
 			{
-				Cue.LogInfo($"Clockwise {person_}: kiss got activated");
+				log_.Info("kiss got activated");
 
 				var target = GetTarget();
 				if (target != null)
 				{
-					Cue.LogInfo($"Clockwise {person_}: now kissing {target}");
+					log_.Info($"now kissing {target}");
 					person_.Gaze.LookAt(target, false);
 				}
 			}
 			else
 			{
-				Cue.LogInfo($"Clockwise {person_}: kiss stopped");
+				log_.Info($"kiss stopped");
 				person_.Gaze.LookAtDefault();
 			}
 
@@ -215,7 +229,7 @@ namespace Cue
 
 		private Person GetTarget()
 		{
-			var atom = atom_.GetValue();
+			var atom = atom_.Value;
 			if (atom != "")
 				return Cue.Instance.FindPerson(atom);
 
@@ -225,53 +239,57 @@ namespace Cue
 		public override string ToString()
 		{
 			return
-				$"Clockwise: " +
-				$"running={kissingRunning_.GetValue()} " +
-				$"active={activate_.GetValue()}";
+				$"ClockwiseKiss: " +
+				$"running={running_} " +
+				$"active={active_}";
 		}
 	}
 
 
 	class ClockwiseSilverHandjob : IHandjob
 	{
+		private Logger log_;
 		private Person person_;
 		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter active_ = null;
+		private W.VamBoolParameterRO running_ = null;
 		private W.VamStringChooserParameter male_ = null;
 		private W.VamStringChooserParameter hand_ = null;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
+			log_ = new Logger(() => $"cwhj {person_}");
 			person_ = p;
 			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "enabled");
 			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
 			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
 			hand_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
 
-			active_.SetValue(false);
+			active_.Value = false;
 		}
 
 		public bool Active
 		{
-			get { return active_.GetValue(); }
+			get { return running_.Value; }
 		}
 
 		public void Start(Person target)
 		{
-			enabled_.SetValue(true);
+			enabled_.Value = true;
 
 			if (target != null)
-				male_.SetValue(target.ID);
+				male_.Value = target.ID;
 
 			// todo
-			hand_.SetValue("Right");
+			hand_.Value = "Right";
 
-			active_.SetValue(true);
+			active_.Value = true;
 		}
 
 		public void Stop()
 		{
-			active_.SetValue(false);
+			active_.Value = false;
 		}
 
 		public void Update(float s)
@@ -284,23 +302,21 @@ namespace Cue
 
 		public override string ToString()
 		{
-			string s = $"Clockwise: active={active_.GetValue()} target=";
-
-			//if (target_ == null)
-			//	s += "(none)";
-			//else
-			//	s += target_.ID;
-
-			return s;
+			return
+				$"ClockwiseHJ: " +
+				$"running={running_} " +
+				$"active={active_}";
 		}
 	}
 
 
 	class ClockwiseSilverBlowjob : IBlowjob
 	{
+		private Logger log_;
 		private Person person_;
 		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter active_ = null;
+		private W.VamBoolParameterRO running_ = null;
 		private W.VamStringChooserParameter male_ = null;
 		private W.VamFloatParameter sfxVolume_ = null;
 		private W.VamFloatParameter moanVolume_ = null;
@@ -308,41 +324,43 @@ namespace Cue
 
 		public ClockwiseSilverBlowjob(Person p)
 		{
+			log_ = new Logger(() => $"cwbj {person_}");
 			person_ = p;
 
 			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "enabled");
 			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
 			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
 			sfxVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
 			moanVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
 			volumeScaling_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Volume Scaling");
 
-			active_.SetValue(false);
-			sfxVolume_.SetValue(0);
-			moanVolume_.SetValue(0);
-			volumeScaling_.SetValue(0);
+			active_.Value = false;
+			sfxVolume_.Value = 0;
+			moanVolume_.Value = 0;
+			volumeScaling_.Value = 0;
 		}
 
 		public bool Active
 		{
-			get { return active_.GetValue(); }
+			get { return running_.Value; }
 		}
 
 		public void Start(Person target)
 		{
-			enabled_.SetValue(true);
+			enabled_.Value = true;
 
 			if (target != null)
-				male_.SetValue(target.ID);
+				male_.Value = target.ID;
 
 			person_.Gaze.LookAt(target, false);
 
-			active_.SetValue(true);
+			active_.Value = true;
 		}
 
 		public void Stop()
 		{
-			active_.SetValue(false);
+			active_.Value = false;
 			person_.Gaze.LookAtDefault();
 		}
 
@@ -356,14 +374,10 @@ namespace Cue
 
 		public override string ToString()
 		{
-			string s = $"Clockwise: active={active_.GetValue()} target=";
-
-			//if (target_ == null)
-			//	s += "(none)";
-			//else
-			//	s += target_.ID;
-
-			return s;
+			return
+				$"ClockwiseBJ: " +
+				$"running={running_} " +
+				$"active={active_}";
 		}
 	}
 }

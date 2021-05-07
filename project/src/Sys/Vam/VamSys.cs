@@ -350,14 +350,7 @@ namespace Cue.W
 				return null;
 			}
 
-			var p = st.GetFloatJSONParam(param);
-			if (p == null)
-			{
-				Cue.LogError($"{a.uid}: storable {st.name} has no float param '{param}'");
-				return null;
-			}
-
-			return p;
+			return st.GetFloatJSONParam(param);
 		}
 
 		public JSONStorableBool GetBoolParameter(
@@ -376,14 +369,7 @@ namespace Cue.W
 				return null;
 			}
 
-			var p = st.GetBoolJSONParam(param);
-			if (p == null)
-			{
-				Cue.LogError($"{a.uid}: storable {st.name} has no bool param '{param}'");
-				return null;
-			}
-
-			return p;
+			return st.GetBoolJSONParam(param);
 		}
 
 		public JSONStorableString GetStringParameter(
@@ -402,14 +388,7 @@ namespace Cue.W
 				return null;
 			}
 
-			var p = st.GetStringJSONParam(param);
-			if (p == null)
-			{
-				Cue.LogError($"{a.uid}: storable {st.name} has no string param '{param}'");
-				return null;
-			}
-
-			return p;
+			return st.GetStringJSONParam(param);
 		}
 
 
@@ -429,14 +408,7 @@ namespace Cue.W
 				return null;
 			}
 
-			var p = st.GetStringChooserJSONParam(param);
-			if (p == null)
-			{
-				Cue.LogError($"{a.uid}: storable {st.name} has no string chooser param '{param}'");
-				return null;
-			}
-
-			return p;
+			return st.GetStringChooserJSONParam(param);
 		}
 
 
@@ -456,14 +428,7 @@ namespace Cue.W
 				return null;
 			}
 
-			var p = st.GetAction(param);
-			if (p == null)
-			{
-				Cue.LogError($"{a.uid}: storable {st.name} has no action param '{param}'");
-				return null;
-			}
-
-			return p;
+			return st.GetAction(param);
 		}
 
 		public Rigidbody FindRigidbody(IObject o, string name)

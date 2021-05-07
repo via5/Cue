@@ -317,4 +317,50 @@ namespace Cue
 			return $"calls={Calls} avg={AverageMs:0.000} peak={PeakMS:0.000}";
 		}
 	}
+
+
+	class Logger
+	{
+		private Func<string> prefix_;
+
+		public Logger(string prefix)
+		{
+			prefix_ = () => prefix;
+		}
+
+		public Logger(Func<string> prefix)
+		{
+			prefix_ = prefix;
+		}
+
+		public string Prefix
+		{
+			get { return prefix_(); }
+		}
+
+		public void Verbose(string s)
+		{
+			Cue.LogVerbose($"{Prefix}: {s}");
+		}
+
+		public void Info(string s)
+		{
+			Cue.LogInfo($"{Prefix}: {s}");
+		}
+
+		public void Warning(string s)
+		{
+			Cue.LogWarning($"{Prefix}: {s}");
+		}
+
+		public void Error(string s)
+		{
+			Cue.LogError($"{Prefix}: {s}");
+		}
+
+		public void ErrorST(string s)
+		{
+			Cue.LogErrorST($"{Prefix}: {s}");
+		}
+	}
 }

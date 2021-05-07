@@ -63,6 +63,12 @@
 
 					break;
 				}
+
+				default:
+				{
+					person_.Expression.Set(new Pair<int, float>[] { }, true);
+					break;
+				}
 			}
 		}
 
@@ -105,6 +111,12 @@
 						new Pair<int, float>(Expressions.Mischievous, 1.0f)
 					});
 
+					break;
+				}
+
+				default:
+				{
+					person_.Expression.Set(new Pair<int, float>[] { }, true);
 					break;
 				}
 			}

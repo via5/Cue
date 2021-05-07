@@ -153,7 +153,11 @@ namespace Cue
 				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
 				p.Clothing.Init();
-				p.AI.Mood.State = Mood.Happy;
+
+				if (p == Player)
+					p.AI.Mood.State = Mood.None;
+				else
+					p.AI.Mood.State = Mood.Happy;
 			}
 		}
 

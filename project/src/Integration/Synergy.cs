@@ -19,7 +19,7 @@ namespace Cue
 
 		public bool Playing
 		{
-			get { return playing_.GetValue(); }
+			get { return playing_.Value; }
 		}
 
 		public bool Play(IAnimation a, int flags)
@@ -28,13 +28,13 @@ namespace Cue
 			if (anim_ == null)
 				return false;
 
-			step_.SetValue(anim_.Name);
+			step_.Value = anim_.Name;
 			return true;
 		}
 
 		public void Stop(bool rewind)
 		{
-			step_.SetValue("");
+			step_.Value = "";
 			anim_ = null;
 		}
 

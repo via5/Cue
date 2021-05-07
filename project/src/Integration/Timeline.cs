@@ -46,7 +46,7 @@ namespace Cue
 
 		public bool Playing
 		{
-			get { return playing_.GetValue(); }
+			get { return playing_.Value; }
 		}
 
 		public bool Play(IAnimation a, int flags)

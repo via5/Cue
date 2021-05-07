@@ -7,6 +7,7 @@ namespace Cue.W
 		private readonly float interval_;
 		private float elapsed_ = 0;
 		private bool stale_ = true;
+		protected bool checkedOnce_ = false;
 		private int backoff_ = 0;
 
 		public VamParameterChecker(float interval = -1)
@@ -25,6 +26,8 @@ namespace Cue.W
 
 		public bool Check(bool force = false)
 		{
+			checkedOnce_ = true;
+
 			if (!DeadCheck())
 			{
 				stale_ = true;
@@ -59,7 +62,7 @@ namespace Cue.W
 	}
 
 
-	abstract class VamBasicParameter<NativeType, StorableType> : VamParameterChecker
+	abstract class VamBasicParameterRO<NativeType, StorableType> : VamParameterChecker
 		where StorableType : JSONStorableParam
 	{
 		protected Atom atom_;
@@ -67,14 +70,19 @@ namespace Cue.W
 		protected string paramName_;
 		protected StorableType param_ = null;
 
-		public VamBasicParameter(IAtom a, string s, string name)
+		public VamBasicParameterRO(IAtom a, string s, string name)
 		{
 			atom_ = ((W.VamAtom)a).Atom;
 			storableID_ = s;
 			paramName_ = name;
 		}
 
-		public NativeType GetValue(NativeType def = default(NativeType))
+		public NativeType Value
+		{
+			get { return GetValue(); }
+		}
+
+		protected NativeType GetValue(NativeType def = default(NativeType))
 		{
 			if (!Check())
 				return def;
@@ -94,27 +102,6 @@ namespace Cue.W
 				MakeStale();
 
 				return def;
-			}
-		}
-
-		public void SetValue(NativeType v)
-		{
-			if (!Check())
-				return;
-
-			try
-			{
-				DoSetValue(v);
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(
-					$"{atom_.uid}: can't set val " +
-					$"for '{storableID_}' '{paramName_}': " +
-					e.ToString());
-
-				param_ = null;
-				MakeStale();
 			}
 		}
 
@@ -153,9 +140,88 @@ namespace Cue.W
 			return (param_ != null);
 		}
 
+		public override string ToString()
+		{
+			if (param_ == null)
+			{
+				if (checkedOnce_)
+					return "(dead)";
+				else
+					return "(?)";
+			}
+			else
+			{
+				return Value.ToString();
+			}
+		}
+
 		protected abstract StorableType DoGetParameter();
 		protected abstract NativeType DoGetValue();
+	}
+
+
+	abstract class VamBasicParameter<NativeType, StorableType>
+		: VamBasicParameterRO<NativeType, StorableType>
+			where StorableType : JSONStorableParam
+	{
+		public VamBasicParameter(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		public new NativeType Value
+		{
+			get { return GetValue(); }
+			set { SetValue(value); }
+		}
+
+		protected void SetValue(NativeType v)
+		{
+			if (!Check())
+				return;
+
+			try
+			{
+				DoSetValue(v);
+			}
+			catch (Exception e)
+			{
+				Cue.LogError(
+					$"{atom_.uid}: can't set val " +
+					$"for '{storableID_}' '{paramName_}': " +
+					e.ToString());
+
+				param_ = null;
+				MakeStale();
+			}
+		}
+
 		protected abstract void DoSetValue(NativeType v);
+	}
+
+
+	class VamBoolParameterRO : VamBasicParameterRO<bool, JSONStorableBool>
+	{
+		public VamBoolParameterRO(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamBoolParameterRO(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableBool DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetBoolParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override bool DoGetValue()
+		{
+			return param_.val;
+		}
 	}
 
 
@@ -185,6 +251,31 @@ namespace Cue.W
 		protected override void DoSetValue(bool b)
 		{
 			param_.val = b;
+		}
+	}
+
+
+	class VamFloatParameterRO : VamBasicParameterRO<float, JSONStorableFloat>
+	{
+		public VamFloatParameterRO(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamFloatParameterRO(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableFloat DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetFloatParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override float DoGetValue()
+		{
+			return param_.val;
 		}
 	}
 
@@ -249,6 +340,31 @@ namespace Cue.W
 	}
 
 
+	class VamStringChooserParameterRO : VamBasicParameterRO<string, JSONStorableStringChooser>
+	{
+		public VamStringChooserParameterRO(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamStringChooserParameterRO(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableStringChooser DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetStringChooserParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override string DoGetValue()
+		{
+			return param_.val;
+		}
+	}
+
+
 	class VamStringParameter : VamBasicParameter<string, JSONStorableString>
 	{
 		public VamStringParameter(IObject o, string s, string name)
@@ -275,6 +391,31 @@ namespace Cue.W
 		protected override void DoSetValue(string b)
 		{
 			param_.val = b;
+		}
+	}
+
+
+	class VamStringParameterRO : VamBasicParameterRO<string, JSONStorableString>
+	{
+		public VamStringParameterRO(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamStringParameterRO(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableString DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetStringParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override string DoGetValue()
+		{
+			return param_.val;
 		}
 	}
 

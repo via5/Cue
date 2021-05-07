@@ -66,15 +66,15 @@ namespace Cue
 
 		public bool Blink
 		{
-			get { return blink_.GetValue(); }
-			set { blink_.SetValue(value); }
+			get { return blink_.Value; }
+			set { blink_.Value = value; }
 		}
 
 		public void LookAt(IObject o)
 		{
 			object_ = o;
 			camera_ = false;
-			lookMode_.SetValue("Target");
+			lookMode_.Value = "Target";
 			eyesImpl_.SetPosition(object_.EyeInterest);
 		}
 
@@ -82,7 +82,7 @@ namespace Cue
 		{
 			object_ = null;
 			camera_ = false;
-			lookMode_.SetValue("Target");
+			lookMode_.Value = "Target";
 			eyesImpl_.SetPosition(p);
 		}
 
@@ -95,14 +95,14 @@ namespace Cue
 				person_.Body.Head?.Position ?? Vector3.Zero +
 				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
 
-			lookMode_.SetValue("None");
+			lookMode_.Value = "None";
 		}
 
 		public void LookAtNothing()
 		{
 			object_ = null;
 			camera_ = false;
-			lookMode_.SetValue("None");
+			lookMode_.Value = "None";
 		}
 
 		public void LookAtCamera()
@@ -121,7 +121,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"vam: blink={blink_.GetValue()} mode={lookMode_.GetValue()}";
+			return $"vam: blink={blink_} mode={lookMode_}";
 		}
 	}
 
@@ -140,7 +140,7 @@ namespace Cue
 
 		public void Say(string s)
 		{
-			text_.SetValue(s);
+			text_.Value = s;
 			lastText_ = s;
 		}
 
