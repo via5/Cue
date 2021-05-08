@@ -84,7 +84,7 @@ namespace Cue
 
 		public static float Bearing(Vector3 dir)
 		{
-			return Angle(Zero, dir);
+			return Angle(Zero, dir.Normalized);
 		}
 
 		public static Vector3 Rotate(float x, float y, float z)

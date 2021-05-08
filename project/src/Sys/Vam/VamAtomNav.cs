@@ -16,7 +16,8 @@ namespace Cue.W
 		private Logger log_;
 		private int state_ = NoMove;
 		private Vector3 finalPosition_ = Vector3.Zero;
-		private float finalBearing_ = BasicObject.NoBearing;
+		private float startTurnBearing_ = BasicObject.NoBearing;
+		private float endTurnBearing_ = BasicObject.NoBearing;
 		private NavMeshAgent agent_ = null;
 		private float turningElapsed_ = 0;
 		private Quaternion turningStart_ = Quaternion.identity;
@@ -111,7 +112,10 @@ namespace Cue.W
 			}
 			else
 			{
-				finalBearing_ = bearing;
+				Stop();
+				turningStart_ = atom_.Atom.mainController.transform.rotation;
+				startTurnBearing_ = Vector3.Bearing(v - atom_.Position);
+				endTurnBearing_ = bearing;
 				finalPosition_ = v;
 				turningElapsed_ = 0;
 				pathStuckCheckElapsed_ = 0;
@@ -205,8 +209,13 @@ namespace Cue.W
 
 		private bool DoStartingTurn(float s)
 		{
-			// todo
-			return true;
+			if (startTurnBearing_ == BasicObject.NoBearing)
+			{
+				log_.Info("no starting turn bearing");
+				return true;
+			}
+
+			return DoTurn(s, startTurnBearing_);
 		}
 
 		private bool DoMove(float s)
@@ -217,13 +226,13 @@ namespace Cue.W
 
 		private bool DoEndingTurn(float s)
 		{
-			if (finalBearing_ == BasicObject.NoBearing)
+			if (endTurnBearing_ == BasicObject.NoBearing)
 			{
 				log_.Info("no ending turn bearing");
 				return true;
 			}
 
-			return DoTurn(s, finalBearing_);
+			return DoTurn(s, endTurnBearing_);
 		}
 
 		private bool DoTurn(float s, float bearing)
