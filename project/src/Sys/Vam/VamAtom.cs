@@ -179,6 +179,12 @@ namespace Cue.W
 			}
 		}
 
+		public float Bearing
+		{
+			get { return Vector3.Angle(Vector3.Zero, Direction); }
+			set { Direction = Vector3.Rotate(0, value, 0); }
+		}
+
 		public Atom Atom
 		{
 			get { return atom_; }
@@ -286,9 +292,9 @@ namespace Cue.W
 			set { nav_.Paused = value; }
 		}
 
-		public void NavTo(Vector3 v, float bearing)
+		public void NavTo(Vector3 v, float bearing, float stoppingDistance)
 		{
-			nav_.MoveTo(v, bearing);
+			nav_.MoveTo(v, bearing, stoppingDistance);
 		}
 
 		public void NavStop()

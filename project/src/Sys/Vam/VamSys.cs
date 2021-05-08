@@ -670,6 +670,17 @@ namespace Cue.W
 		}
 
 
+		public static Vector3 Direction(Quaternion q)
+		{
+			var v = q * UnityEngine.Vector3.forward;
+			return FromUnity(v);
+		}
+
+		public static float Bearing(Quaternion q)
+		{
+			return Vector3.Bearing(Direction(q));
+		}
+
 		public static float Distance(Vector3 a, Vector3 b)
 		{
 			return UnityEngine.Vector3.Distance(ToUnity(a), ToUnity(b));

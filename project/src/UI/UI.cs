@@ -155,8 +155,7 @@
 			if (src != null && hit.hit)
 			{
 				Cue.LogInfo($"{src}: hit on {hit.pos}");
-				src.MoveToManual(
-					hit.pos, Vector3.Bearing(hit.pos - src.Position));
+				src.MoveToManual(hit.pos, Vector3.Bearing(hit.pos - src.Position));
 				return true;
 			}
 

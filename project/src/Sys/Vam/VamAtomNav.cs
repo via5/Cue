@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 
 namespace Cue.W
 {
@@ -18,6 +17,7 @@ namespace Cue.W
 		private Vector3 finalPosition_ = Vector3.Zero;
 		private float startTurnBearing_ = BasicObject.NoBearing;
 		private float endTurnBearing_ = BasicObject.NoBearing;
+		private float stoppingDistance_ = 0;
 		private NavMeshAgent agent_ = null;
 		private float turningElapsed_ = 0;
 		private Quaternion turningStart_ = Quaternion.identity;
@@ -97,7 +97,7 @@ namespace Cue.W
 			}
 		}
 
-		public void MoveTo(Vector3 v, float bearing)
+		public void MoveTo(Vector3 v, float bearing, float stoppingDistance)
 		{
 			if (agent_ == null)
 				return;
@@ -121,7 +121,13 @@ namespace Cue.W
 				pathStuckCheckElapsed_ = 0;
 				pathStuckLastPos_ = atom_.Position;
 				stuckCount_ = 0;
+				stoppingDistance_ = stoppingDistance;
 				state_ = StartingTurn;
+
+				log_.Info(
+					$"will do starting turn from " +
+					$"{VamU.Bearing(turningStart_)} " +
+					$"to {BearingToString(startTurnBearing_)}");
 			}
 		}
 
@@ -145,11 +151,48 @@ namespace Cue.W
 
 				switch (state_)
 				{
-					case NoMove: return NavStates.None;
-					case StartingTurn: return NavStates.TurningLeft;
-					case Moving: return NavStates.Moving;
-					case EndingTurn: return NavStates.TurningLeft;
-					default: return NavStates.None;
+					case NoMove:
+					{
+						return NavStates.None;
+					}
+
+					case Moving:
+					{
+						return NavStates.Moving;
+					}
+
+					case StartingTurn:
+					{
+						var initBearing = Vector3.Bearing(
+							W.VamU.FromUnity(turningStart_.eulerAngles));
+
+						var a = Vector3.AngleBetweenBearings(
+							startTurnBearing_, initBearing);
+
+						if (a < 0)
+							return NavStates.TurningRight;
+						else
+							return NavStates.TurningLeft;
+					}
+
+					case EndingTurn:
+					{
+						var initBearing = Vector3.Bearing(
+							W.VamU.FromUnity(turningStart_.eulerAngles));
+
+						var a = Vector3.AngleBetweenBearings(
+							endTurnBearing_, initBearing);
+
+						if (a < 0)
+							return NavStates.TurningRight;
+						else
+							return NavStates.TurningLeft;
+					}
+
+					default:
+					{
+						return NavStates.None;
+					}
 				}
 			}
 		}
@@ -175,6 +218,7 @@ namespace Cue.W
 						agent_.updatePosition = true;
 						agent_.updateRotation = true;
 						agent_.updateUpAxis = true;
+						agent_.stoppingDistance = stoppingDistance_;
 						calculatingPath_ = true;
 						state_ = Moving;
 					}
@@ -188,6 +232,13 @@ namespace Cue.W
 					{
 						log_.Info("nav finished, starting end turn");
 						turningStart_ = atom_.Atom.mainController.transform.rotation;
+						turningElapsed_ = 0;
+
+						log_.Info(
+							$"will do ending turn from " +
+							$"{VamU.Bearing(turningStart_)} " +
+							$"to {BearingToString(endTurnBearing_)}");
+
 						state_ = EndingTurn;
 					}
 
@@ -235,18 +286,21 @@ namespace Cue.W
 			return DoTurn(s, endTurnBearing_);
 		}
 
-		private bool DoTurn(float s, float bearing)
+		private bool DoTurn(float s, float targetBearing)
 		{
-			var currentBearing = Vector3.Angle(Vector3.Zero, atom_.Direction);
-			var direction = Vector3.Rotate(new Vector3(0, 0, 1), bearing);
-			var d = Math.Abs(currentBearing - bearing);
+			var targetDirection = Vector3.Direction(targetBearing);
+			var currentBearing = atom_.Bearing;
+			var d = Math.Abs(currentBearing - targetBearing);
 
 			if (d < 5 || d >= 355)
 			{
-				log_.Info($"DoTurn: d={d}, done");
+				log_.Info(
+					$"DoTurn: " +
+					$"b={currentBearing} " +
+					$"tb={targetBearing} td={targetDirection} diff={d}, done");
 
 				atom_.Atom.mainController.transform.rotation =
-					Quaternion.LookRotation(W.VamU.ToUnity(direction));
+					Quaternion.LookRotation(W.VamU.ToUnity(targetDirection));
 
 				return true;
 			}
@@ -254,12 +308,7 @@ namespace Cue.W
 			{
 				turningElapsed_ += s;
 
-				var newDir = UnityEngine.Vector3.RotateTowards(
-					atom_.Atom.mainController.transform.forward,
-					W.VamU.ToUnity(direction),
-					360 * s, 0.0f);
-
-				var newRot = Quaternion.LookRotation(newDir);
+				var newRot = Quaternion.LookRotation(VamU.ToUnity(targetDirection));
 
 				atom_.Atom.mainController.transform.rotation = Quaternion.Slerp(
 					turningStart_,
@@ -328,7 +377,12 @@ namespace Cue.W
 
 					if (stuckCount_ >= 3)
 					{
-						Cue.LogError(atom_.ID + " seems stuck, stopping nav");
+						log_.Error("seems stuck, stopping nav");
+						log_.Error(
+							$"pos={atom_.Position} dir={atom_.Direction} " +
+							$"b={atom_.Bearing} " +
+							$"target={finalPosition_} d={d}");
+
 						Stop();
 					}
 				}
@@ -376,11 +430,11 @@ namespace Cue.W
 				if (agent_ == null)
 					agent_ = atom_.Atom.mainController.gameObject.AddComponent<NavMeshAgent>();
 
-				Cue.LogVerbose($"{atom_.ID}: agent created");
+				log_.Info($"{atom_.ID}: agent created");
 
 				agent_.agentTypeID = VamNav.AgentTypeID;
 				agent_.height = VamNav.AgentHeight;
-				agent_.radius = VamNav.AgentRadius;
+				agent_.radius = VamNav.AgentRadius + 0.1f;
 				agent_.speed = VamNav.AgentMoveSpeed;
 				agent_.angularSpeed = VamNav.AgentTurnSpeed;
 
@@ -396,8 +450,8 @@ namespace Cue.W
 			}
 			catch (Exception e)
 			{
-				Cue.LogError($"CreateAgent failed for {atom_.ID}");
-				Cue.LogError(e.ToString());
+				log_.Error($"CreateAgent failed");
+				log_.Error(e.ToString());
 			}
 		}
 

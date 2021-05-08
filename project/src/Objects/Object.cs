@@ -41,6 +41,7 @@ namespace Cue
 
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
+		private float targetStoppingDistance_ = 0;
 		private int moveState_ = NoMoveState;
 
 		private Slots slots_;
@@ -131,7 +132,7 @@ namespace Cue
 			{
 				if (StartMove())
 				{
-					Atom.NavTo(targetPos_, targetBearing_);
+					Atom.NavTo(targetPos_, targetBearing_, targetStoppingDistance_);
 					moveState_ = MovingState;
 				}
 			}
@@ -166,6 +167,7 @@ namespace Cue
 
 		public void MoveTo(Vector3 to, float bearing)
 		{
+			targetStoppingDistance_ = 0;
 			targetPos_ = to;
 
 			if (bearing == NoBearing)
@@ -180,6 +182,9 @@ namespace Cue
 		{
 			MakeIdleForMove();
 			MoveTo(to, bearing);
+
+			// todo
+			targetStoppingDistance_ = 0.1f;
 		}
 
 		public virtual void MakeIdle()

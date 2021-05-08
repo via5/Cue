@@ -82,9 +82,19 @@ namespace Cue
 			return W.VamU.Angle(a, b);
 		}
 
+		public static Vector3 Direction(float bearing)
+		{
+			return Rotate(new Vector3(0, 0, 1), bearing);
+		}
+
 		public static float Bearing(Vector3 dir)
 		{
 			return Angle(Zero, dir.Normalized);
+		}
+
+		public static float AngleBetweenBearings(float bearing1, float bearing2)
+		{
+			return ((((bearing2 - bearing1) % 360) + 540) % 360) - 180;
 		}
 
 		public static Vector3 Rotate(float x, float y, float z)

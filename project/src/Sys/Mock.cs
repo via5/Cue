@@ -291,7 +291,7 @@ namespace Cue.W
 			get { return NavStates.None; }
 		}
 
-		public void NavTo(Vector3 v, float bearing)
+		public void NavTo(Vector3 v, float bearing, float stoppingDistance)
 		{
 		}
 

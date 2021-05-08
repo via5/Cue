@@ -168,7 +168,7 @@ namespace Cue.W
 		bool NavEnabled { get; set; }
 		bool NavPaused { get; set; }
 		int NavState { get; }
-		void NavTo(Vector3 v, float bearing);
+		void NavTo(Vector3 v, float bearing, float stoppingDistance);
 		void NavStop();
 	}
 

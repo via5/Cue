@@ -77,6 +77,13 @@ namespace Cue
 
 		public bool InteractWith(IObject o)
 		{
+			if (o is Person)
+			{
+				person_.MakeIdle();
+				person_.PushAction(new CallAction(o as Person));
+				return true;
+			}
+
 			if (!person_.TryLockSlot(o))
 			{
 				// can't lock the given object

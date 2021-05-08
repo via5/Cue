@@ -183,7 +183,7 @@ namespace Cue
 
 				if (p.Play(a.Real, flags))
 				{
-					Cue.LogVerbose(person_.ID + ": " + p.ToString());
+					Cue.LogInfo(person_.ID + ": " + a.ToString());
 					currentPlayer_ = p;
 					currentAnimation_ = a;
 					activeFlags_ = flags;
