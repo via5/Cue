@@ -30,6 +30,7 @@ project\src\Resources\Clothing.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
+project\src\Sys\Vam\VamAtomNav.cs
 project\src\Sys\Vam\VamCanvas.cs
 project\src\Sys\Vam\VamClothing.cs
 project\src\Sys\Vam\VamGraphic.cs
