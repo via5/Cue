@@ -504,7 +504,22 @@ namespace Cue.W
 		public void DumpComponents(GameObject o, int indent = 0)
 		{
 			foreach (var c in o.GetComponents(typeof(Component)))
-				Cue.LogInfo(new string(' ', indent * 2) + c.ToString());
+			{
+				string s = "";
+
+				var t = c as UnityEngine.UI.Text;
+				if (t != null)
+				{
+					s += " (\"";
+					if (t.text.Length > 20)
+						s += t.text.Substring(0, 20) + "[...]";
+					else
+						s += t.text;
+					s += "\")";
+				}
+
+				Cue.LogInfo(new string(' ', indent * 2) + c.ToString() + s);
+			}
 		}
 
 		public void DumpComponentsAndUp(Component c)

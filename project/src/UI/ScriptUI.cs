@@ -416,7 +416,7 @@ namespace Cue
 			state.Add(new VUI.Spacer(30));
 			state.Add(new VUI.Spacer(30));
 
-			state.Add(new VUI.Label("Mood"));
+			state.Add(new VUI.Label("Mood", UnityEngine.FontStyle.Bold));
 			state.Add(new VUI.Spacer(0));
 
 			state.Add(new VUI.Label("State"));

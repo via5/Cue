@@ -42,6 +42,11 @@ namespace Cue
 		{
 			person_.Atom.Clothing.Dump();
 		}
+
+		public override string ToString()
+		{
+			return person_.Atom.Clothing.ToString();
+		}
 	}
 
 	class Person : BasicObject
