@@ -276,29 +276,29 @@ namespace Cue.W
 
 		public bool NavEnabled
 		{
-			get { return nav_.NavEnabled; }
-			set { nav_.NavEnabled = value; }
+			get { return nav_.Enabled; }
+			set { nav_.Enabled = value; }
 		}
 
 		public bool NavPaused
 		{
-			get { return nav_.NavPaused; }
-			set { nav_.NavPaused = value; }
+			get { return nav_.Paused; }
+			set { nav_.Paused = value; }
 		}
 
 		public void NavTo(Vector3 v, float bearing)
 		{
-			nav_.NavTo(v, bearing);
+			nav_.MoveTo(v, bearing);
 		}
 
 		public void NavStop()
 		{
-			nav_.NavStop();
+			nav_.Stop();
 		}
 
 		public int NavState
 		{
-			get { return nav_.NavState; }
+			get { return nav_.State; }
 		}
 
 		private void GetHead()
