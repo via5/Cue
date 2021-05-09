@@ -26,6 +26,7 @@ namespace Cue.W
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
 		private bool navEnabled_ = false;
+		private float elapsed_ = 0;
 
 		public VamAtomNav(VamAtom a)
 		{
@@ -299,11 +300,16 @@ namespace Cue.W
 			agent_.updateRotation = true;
 			agent_.updateUpAxis = true;
 			agent_.isStopped = false;
+			agent_.speed = 0;
+			elapsed_ = 0;
 			state_ = Moving;
 		}
 
 		private bool DoMove(float s)
 		{
+			elapsed_ += s;
+			agent_.speed = U.Clamp(elapsed_ * VamNav.AgentMoveSpeed, 0, VamNav.AgentMoveSpeed);
+
 			CheckStuck(s);
 			return !IsPathing();
 		}

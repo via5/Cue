@@ -151,7 +151,7 @@ namespace Cue.BVH
 
                 while (playing_)
                 {
-                    FixedUpdate(anim_.File.FrameTime);
+                    FixedUpdate(frameTime_);
                     ++fs;
 
                     if (fs >= max)
@@ -159,7 +159,7 @@ namespace Cue.BVH
                         Cue.LogError(
                             $"bvh: failed to rewind, " +
                             $"fs={fs} n={anim_.File.FrameCount} " +
-                            $"ft={anim_.File.FrameTime} max={max} " +
+                            $"ft={frameTime_} max={max} " +
                             $"f={frame_}");
 
                         break;
