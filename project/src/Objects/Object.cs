@@ -38,6 +38,7 @@ namespace Cue
 		private const int MovingState = 2;
 
 		private readonly W.IAtom atom_;
+		protected readonly Logger log_;
 
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
@@ -45,10 +46,12 @@ namespace Cue
 		private int moveState_ = NoMoveState;
 
 		private Slots slots_;
+		private Slot locked_ = null;
 
 		public BasicObject(W.IAtom atom)
 		{
 			atom_ = atom;
+			log_ = new Logger(() => ID);
 			slots_ = new Slots(this);
 		}
 
@@ -118,6 +121,76 @@ namespace Cue
 			get { return slots_; }
 		}
 
+		public Slot LockedSlot
+		{
+			get { return locked_; }
+			set { locked_ = value; }
+		}
+
+		public bool TryLockSlot(IObject o)
+		{
+			Slot s = o.Slots.GetLockedBy(this);
+
+			// object is already locked by this person, reuse it
+			if (s != null)
+			{
+				log_.Info($"slot {s} already locked by self, reusing it");
+				return true;
+			}
+
+			if (o.Slots.AnyLocked)
+			{
+				// a slot is already locked, fail
+				log_.Info($"can't lock {o}, already has locked slot {o.Slots.AnyLocked}");
+				return false;
+			}
+
+			// take a random slot
+			s = o.Slots.RandomUnlocked();
+
+			if (s == null)
+			{
+				// no free slots
+				log_.Info($"can't lock {o}, no free slots");
+				return false;
+			}
+
+			return TryLockSlot(s);
+		}
+
+		public bool TryLockSlot(Slot s)
+		{
+			if (!s.Lock(this))
+			{
+				// this object can't lock this slot
+				log_.Info($"can't lock {s}");
+				return false;
+			}
+
+			// slot has been locked successfully, unlock the current slot,
+			// if any
+			if (locked_ != null)
+			{
+				log_.Info($"found slot to lock, unlocking current {locked_}");
+				locked_.Unlock(this);
+			}
+
+			log_.Info($"locked {s}");
+			locked_ = s;
+
+			return true;
+		}
+
+		public void UnlockSlot()
+		{
+			if (locked_ != null)
+			{
+				log_.Info($"unlocking {locked_}");
+				locked_.Unlock(this);
+				locked_ = null;
+			}
+		}
+
 		public virtual bool InteractWith(IObject o)
 		{
 			// no-op
@@ -180,6 +253,7 @@ namespace Cue
 
 		public void MoveToManual(Vector3 to, float bearing)
 		{
+			UnlockSlot();
 			MakeIdleForMove();
 			MoveTo(to, bearing);
 

@@ -51,14 +51,12 @@ namespace Cue
 
 	class Person : BasicObject
 	{
-		private Logger log_;
 		private readonly RootAction actions_ = new RootAction();
 		private PersonState state_;
 		private bool deferredTransition_ = false;
 		private int deferredState_ = PersonState.None;
 		private int lastNavState_ = W.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
-		private Slot locked_ = null;
 
 		private Animator animator_;
 		private Excitement excitement_;
@@ -79,7 +77,6 @@ namespace Cue
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
-			log_ = new Logger(() => ID);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
@@ -113,12 +110,6 @@ namespace Cue
 		public Vector3 UprightPosition
 		{
 			get { return uprightPos_; }
-		}
-
-		public Slot LockedSlot
-		{
-			get { return locked_; }
-			set { locked_ = value; }
 		}
 
 		public Animator Animator { get { return animator_; } }
@@ -200,60 +191,6 @@ namespace Cue
 				return false;
 
 			return ai_.InteractWith(o);
-		}
-
-		public bool TryLockSlot(IObject o)
-		{
-			Slot s = o.Slots.GetLockedBy(this);
-
-			// object is already locked by this person, reuse it
-			if (s != null)
-			{
-				log_.Info($"slot {s} already locked by self, reusing it");
-				return true;
-			}
-
-			if (o.Slots.AnyLocked)
-			{
-				// a slot is already locked, fail
-				log_.Info($"can't lock {o}, already has locked slot {o.Slots.AnyLocked}");
-				return false;
-			}
-
-			// take a random slot
-			s = o.Slots.RandomUnlocked();
-
-			if (s == null)
-			{
-				// no free slots
-				log_.Info($"can't lock {o}, no free slots");
-				return false;
-			}
-
-			return TryLockSlot(s);
-		}
-
-		public bool TryLockSlot(Slot s)
-		{
-			if (!s.Lock(this))
-			{
-				// this object can't lock this slot
-				log_.Info($"can't lock {s}");
-				return false;
-			}
-
-			// slot has been locked successfully, unlock the current slot,
-			// if any
-			if (locked_ != null)
-			{
-				log_.Info($"found slot to lock, unlocking current {locked_}");
-				locked_.Unlock(this);
-			}
-
-			log_.Info($"locked {s}");
-			locked_ = s;
-
-			return true;
 		}
 
 		public override void FixedUpdate(float s)

@@ -83,6 +83,7 @@ namespace Cue
 			if (o is Person)
 			{
 				log_.Info("target is person, calling");
+				person_.UnlockSlot();
 				person_.MakeIdle();
 				person_.PushAction(new CallAction(o as Person));
 				return true;
