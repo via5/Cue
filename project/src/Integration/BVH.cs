@@ -34,15 +34,15 @@ namespace Cue.BVH
             this.localRotations = localRot;
             this.localPositions = localPos;
 
-            if (this.start > file.nFrames)
+            if (this.start > file.FrameCount)
             {
-                Cue.LogError($"bvh {file.Name}: start too big, {this.start} >= {file.nFrames}");
+                Cue.LogError($"bvh {file.Name}: start too big, {this.start} >= {file.FrameCount}");
                 this.start = 0;
             }
 
-            if (this.end > file.nFrames)
+            if (this.end > file.FrameCount)
             {
-                Cue.LogError($"bvh {file.Name}: end too big, {this.end} >= {file.nFrames}");
+                Cue.LogError($"bvh {file.Name}: end too big, {this.end} >= {file.FrameCount}");
                 this.end = -1;
             }
         }
@@ -73,7 +73,7 @@ namespace Cue.BVH
             string s =
                 "bvh " + file.Name + " " +
                 start.ToString() + "-" +
-                (end == -1 ? file.nFrames.ToString() : end.ToString()) +
+                (end == -1 ? file.FrameCount.ToString() : end.ToString()) +
                 (reverse ? " rev" : "");
 
             if (rootXZ && rootY)

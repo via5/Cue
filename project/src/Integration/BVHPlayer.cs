@@ -8,70 +8,31 @@ namespace Cue.BVH
 
     class Player : IPlayer
     {
-        Atom containingAtom;
-
-        Dictionary<string, FreeControllerV3> controllerMap;
-
-        Dictionary<string, string> cnameToBname = new Dictionary<string, string>() {
-        { "hipControl", "hip" },
-        { "headControl", "head" },
-        { "chestControl", "chest" },
-        { "lHandControl", "lHand" },
-        { "rHandControl", "rHand" },
-        { "lFootControl", "lFoot" },
-        { "rFootControl", "rFoot" },
-        { "lKneeControl", "lShin" },
-        { "rKneeControl", "rShin" },
-        //{ "neckControl", "neck" },
-        { "lElbowControl", "lForeArm" },
-        { "rElbowControl", "rForeArm" },
-        { "lArmControl", "lShldr" },
-        { "rArmControl", "rShldr" },
-        // Additional bones
-        { "lShoulderControl", "lCollar" },
-        { "rShoulderControl", "rCollar" },
-        { "abdomenControl", "abdomen" },
-        { "abdomen2Control", "abdomen2" },
-        { "pelvisControl", "pelvis" },
-        { "lThighControl", "lThigh" },
-        { "rThighControl", "rThigh" },
-        // { "lToeControl", "lToe" },
-        // { "rToeControl", "rToe" },
-    };
-
-        Transform shadow = null;
-
-        Animation anim = null;
-        int flags = 0;
-        float elapsed = 0;
-
-        int frame = 0;
-        bool playing = false;
-
-        float frameTime;
-        bool paused = false;
-
-        // Apparently we shouldn't use enums because it causes a compiler crash
-        const int translationModeOffsetPlusFrame = 0;
-        const int translationModeFrameOnly = 1;
-        const int translationModeInitialPlusFrameMinusOffset = 2;
-        const int translationModeInitialPlusFrameMinusZero = 3;
-
-        Vector3 rootMotion;
-
-        float heelHeight = 0;
-        float heelAngle = 0;
-
         private Person person_;
+        private Atom containingAtom_;
+        private Dictionary<string, FreeControllerV3> controllerMap_;
+        private Dictionary<string, string> cnameToBname_;
+        private Transform shadow_ = null;
+        private Animation anim_ = null;
+        private int flags_ = 0;
+        private float elapsed_ = 0;
+        private int frame_ = 0;
+        private bool playing_ = false;
+        private float frameTime_;
+        private bool paused_ = false;
+        private Vector3 rootMotion_;
+        private float heelHeight_ = 0;
+        private float heelAngle_ = 0;
 
         public Player(Person p)
         {
             person_ = p;
+            CreateMappings();
 
             if (p.Atom is W.VamAtom)
             {
-                containingAtom = ((W.VamAtom)p.Atom).Atom;
-                containingAtom.ResetPhysical();
+                containingAtom_ = ((W.VamAtom)p.Atom).Atom;
+                containingAtom_.ResetPhysical();
 
                 //containingAtom.ResetRigidbodies();
                 CreateShadowSkeleton();
@@ -80,36 +41,66 @@ namespace Cue.BVH
             }
         }
 
+        private void CreateMappings()
+        {
+            cnameToBname_ = new Dictionary<string, string>() {
+                { "hipControl", "hip" },
+                { "headControl", "head" },
+                { "chestControl", "chest" },
+                { "lHandControl", "lHand" },
+                { "rHandControl", "rHand" },
+                { "lFootControl", "lFoot" },
+                { "rFootControl", "rFoot" },
+                { "lKneeControl", "lShin" },
+                { "rKneeControl", "rShin" },
+                //{ "neckControl", "neck" },
+                { "lElbowControl", "lForeArm" },
+                { "rElbowControl", "rForeArm" },
+                { "lArmControl", "lShldr" },
+                { "rArmControl", "rShldr" },
+                // Additional bones
+                { "lShoulderControl", "lCollar" },
+                { "rShoulderControl", "rCollar" },
+                { "abdomenControl", "abdomen" },
+                { "abdomen2Control", "abdomen2" },
+                { "pelvisControl", "pelvis" },
+                { "lThighControl", "lThigh" },
+                { "rThighControl", "rThigh" },
+                // { "lToeControl", "lToe" },
+                // { "rToeControl", "rToe" },
+        };
+        }
+
         public bool Playing
         {
-            get { return playing; }
+            get { return playing_; }
         }
 
         public override string ToString()
         {
             string s = "bvh ";
 
-            if (anim == null)
+            if (anim_ == null)
             {
                 s += "(none)";
             }
             else
             {
-                s += $"{frame}/";
+                s += $"{frame_}/";
 
-                if (anim.end == -1)
-                    s += $"{anim.file.nFrames}";
+                if (anim_.end == -1)
+                    s += $"{anim_.file.FrameCount}";
                 else
-                    s += $"{anim.end}";
+                    s += $"{anim_.end}";
             }
 
-            if ((flags & Animator.Reverse) != 0)
+            if ((flags_ & Animator.Reverse) != 0)
                 s += " rev";
 
-            if ((flags & Animator.Loop) != 0)
+            if ((flags_ & Animator.Loop) != 0)
                 s += " loop";
 
-            if (playing)
+            if (playing_)
                 s += " playing";
             else
                 s += " stopped";
@@ -131,49 +122,49 @@ namespace Cue.BVH
                     flags &= ~Animator.Reverse;
             }
 
-            anim = ba;
-            this.flags = flags;
-            frameTime = anim.file.frameTime;
+            anim_ = ba;
+            this.flags_ = flags;
+            frameTime_ = anim_.file.FrameTime;
 
-            if (anim.end < 0)
-                anim.end = anim.file.nFrames - 1;
+            if (anim_.end < 0)
+                anim_.end = anim_.file.FrameCount - 1;
 
             if ((flags & Animator.Reverse) != 0)
-                frame = anim.end;
+                frame_ = anim_.end;
             else
-                frame = anim.start;
+                frame_ = anim_.start;
 
             CreateControllerMap();
 
-            rootMotion = new Vector3();
-            playing = true;
-            paused = false;
+            rootMotion_ = new Vector3();
+            playing_ = true;
+            paused_ = false;
 
-            heelAngle = person_.Clothing.HeelsAngle;
-            heelHeight = person_.Clothing.HeelsHeight;
+            heelAngle_ = person_.Clothing.HeelsAngle;
+            heelHeight_ = person_.Clothing.HeelsHeight;
 
             return true;
         }
 
         public void Stop(bool rewind)
         {
-            if (anim == null)
+            if (anim_ == null)
                 return;
 
             if (rewind)
             {
-                if ((flags & Animator.Reverse) == 0)
-                    flags |= Animator.Reverse;
+                if ((flags_ & Animator.Reverse) == 0)
+                    flags_ |= Animator.Reverse;
                 else
-                    flags &= ~Animator.Reverse;
+                    flags_ &= ~Animator.Reverse;
 
-                flags &= ~Animator.Loop;
+                flags_ &= ~Animator.Loop;
 
                 int fs = 0;
-                int max = anim.file.nFrames * 2;
-                while (playing)
+                int max = anim_.file.FrameCount * 2;
+                while (playing_)
                 {
-                    FixedUpdate(anim.file.frameTime);
+                    FixedUpdate(anim_.file.FrameTime);
                     ++fs;
 
                     if (fs >= max)
@@ -181,10 +172,10 @@ namespace Cue.BVH
                         Cue.LogError(
                             "bvh: failed to rewind, " +
                             "fs=" + fs.ToString() + " " +
-                            "n=" + anim.file.nFrames.ToString() + " " +
-                            "ft=" + anim.file.frameTime.ToString() + " " +
+                            "n=" + anim_.file.FrameCount.ToString() + " " +
+                            "ft=" + anim_.file.FrameTime.ToString() + " " +
                             "max=" + max.ToString() + " " +
-                            "f=" + frame.ToString());
+                            "f=" + frame_.ToString());
 
                         break;
                     }
@@ -192,26 +183,26 @@ namespace Cue.BVH
             }
 
             person_.Atom.SetDefaultControls("playing bvh");
-            playing = false;
-            anim = null;
+            playing_ = false;
+            anim_ = null;
         }
 
         void CreateControllerMap()
         {
-            controllerMap = new Dictionary<string, FreeControllerV3>();
-            foreach (FreeControllerV3 controller in containingAtom.freeControllers)
-                controllerMap[controller.name] = controller;
+            controllerMap_ = new Dictionary<string, FreeControllerV3>();
+            foreach (FreeControllerV3 controller in containingAtom_.freeControllers)
+                controllerMap_[controller.name] = controller;
 
-            if (anim != null)
+            if (anim_ != null)
             {
-                foreach (var item in cnameToBname)
+                foreach (var item in cnameToBname_)
                 {
-                    var c = controllerMap[item.Key];
+                    var c = controllerMap_[item.Key];
                     bool found = false;
 
-                    for (int i = 0; i < anim.file.bones.Length; ++i)
+                    for (int i = 0; i < anim_.file.Bones.Length; ++i)
                     {
-                        if (anim.file.bones[i].name == item.Value)
+                        if (anim_.file.Bones[i].name == item.Value)
                         {
                             found = true;
                             break;
@@ -283,14 +274,14 @@ namespace Cue.BVH
 
         void CreateShadowSkeleton()
         {
-            foreach (var parent in containingAtom.gameObject.GetComponentsInChildren<DAZBones>())
+            foreach (var parent in containingAtom_.gameObject.GetComponentsInChildren<DAZBones>())
             {
-                if (shadow != null)
-                    GameObject.Destroy(shadow.gameObject);
+                if (shadow_ != null)
+                    GameObject.Destroy(shadow_.gameObject);
                 bones = new Dictionary<string, Transform>();
-                shadow = new GameObject("Shadow").transform;
-                shadow.position = parent.transform.position;
-                CreateShadow(parent.gameObject.transform, shadow);
+                shadow_ = new GameObject("Shadow").transform;
+                shadow_.position = parent.transform.position;
+                CreateShadow(parent.gameObject.transform, shadow_);
             }
         }
 
@@ -311,7 +302,7 @@ namespace Cue.BVH
 
                 if (res.bone.isHipBone)
                 {
-                    rootMotion = (bt.position - at.position) * t;
+                    rootMotion_ = (bt.position - at.position) * t;
                 }
             }
             return ret;
@@ -321,31 +312,31 @@ namespace Cue.BVH
         {
             float applyYaw = 0;
 
-            int xz = anim.rootXZ ? 1 : 0;
-            int y = anim.rootY ? 1 : 0;
+            int xz = anim_.rootXZ ? 1 : 0;
+            int y = anim_.rootY ? 1 : 0;
 
-            Vector3 rootMotion2D = new Vector3(rootMotion.x * xz, rootMotion.y * y, rootMotion.z * xz);
+            Vector3 rootMotion2D = new Vector3(rootMotion_.x * xz, rootMotion_.y * y, rootMotion_.z * xz);
             rootMotion2D = Quaternion.AngleAxis(applyYaw, Vector3.up) * rootMotion2D;
-            containingAtom.mainController.transform.Translate(rootMotion2D);
+            containingAtom_.mainController.transform.Translate(rootMotion2D);
         }
 
         public bool Paused
         {
-            get { return paused; }
-            set { paused = value; }
+            get { return paused_; }
+            set { paused_ = value; }
         }
 
         public void FixedUpdate(float s)
         {
-            if (containingAtom == null || paused)
+            if (containingAtom_ == null || paused_)
                 return;
 
             try
             {
-                if (anim == null || anim.file.nFrames == 0)
+                if (anim_ == null || anim_.file.FrameCount == 0)
                     return;
 
-                rootMotion = new Vector3();
+                rootMotion_ = new Vector3();
 
                 FrameAdvance(s);
                 UpdateControllers();
@@ -364,21 +355,21 @@ namespace Cue.BVH
                 // Copy on to model
                 if (bones.ContainsKey(item.bone.name))
                 {
-                    if (anim.localRotations)
+                    if (anim_.localRotations)
                         bones[item.bone.name].localRotation = item.rotation;
                     else
                         bones[item.bone.name].rotation = item.rotation;
 
-                    if (item.bone.hasPosition && anim.usePosition)
+                    if (item.bone.hasPosition && anim_.usePosition)
                     {
-                        if (anim.localPositions)
+                        if (anim_.localPositions)
                             bones[item.bone.name].localPosition = item.position;
                         else
                             bones[item.bone.name].position = item.position;
                     }
                     else
                     {
-                        if (anim.localPositions)
+                        if (anim_.localPositions)
                             bones[item.bone.name].localPosition = tposeBoneOffsets[item.bone.name];
                     }
                 }
@@ -387,21 +378,21 @@ namespace Cue.BVH
 
         private void UpdateControllers()
         {
-            foreach (var item in cnameToBname)
+            foreach (var item in cnameToBname_)
             {
-                controllerMap[item.Key].transform.localPosition = bones[item.Value].position;
-                controllerMap[item.Key].transform.localRotation = bones[item.Value].rotation;
-                controllerMap[item.Key].transform.localPosition += new Vector3(0, heelHeight, 0);
+                controllerMap_[item.Key].transform.localPosition = bones[item.Value].position;
+                controllerMap_[item.Key].transform.localRotation = bones[item.Value].rotation;
+                controllerMap_[item.Key].transform.localPosition += new Vector3(0, heelHeight_, 0);
 
                 if (item.Key.Contains("Foot"))
                 {
-                    controllerMap[item.Key].transform.localEulerAngles += new Vector3(heelAngle, 0, 0);
+                    controllerMap_[item.Key].transform.localEulerAngles += new Vector3(heelAngle_, 0, 0);
                 }
 
                 if (item.Key.Contains("Toe"))
                 {
                     //controllerMap[item.Key].jointRotationDriveXTargetAdditional = heelAngle * 0.5f;
-                    controllerMap[item.Key].transform.localEulerAngles += new Vector3(-heelAngle, 0, 0);
+                    controllerMap_[item.Key].transform.localEulerAngles += new Vector3(-heelAngle_, 0, 0);
                 }
             }
         }
@@ -413,129 +404,129 @@ namespace Cue.BVH
 
         public void Seek(int f)
         {
-            frame = f;
-            elapsed = 0;
-            rootMotion = new Vector3();
+            frame_ = f;
+            elapsed_ = 0;
+            rootMotion_ = new Vector3();
 
-            UpdateModel(anim.file.ReadFrame(frame));
+            UpdateModel(anim_.file.ReadFrame(frame_));
             UpdateControllers();
             ApplyRootMotion();
         }
 
         public void FrameAdvance(float s)
         {
-            if (playing)
+            if (playing_)
             {
-                elapsed += s;
-                if (elapsed >= frameTime)
+                elapsed_ += s;
+                if (elapsed_ >= frameTime_)
                 {
-                    elapsed = 0;
+                    elapsed_ = 0;
 
-                    if ((flags & Animator.Reverse) != 0)
-                        --frame;
+                    if ((flags_ & Animator.Reverse) != 0)
+                        --frame_;
                     else
-                        frame++;
+                        frame_++;
                 }
             }
 
-            if ((flags & Animator.Reverse) != 0)
+            if ((flags_ & Animator.Reverse) != 0)
             {
-                if (frame > anim.end)
+                if (frame_ > anim_.end)
                 {
-                    frame = anim.end;
+                    frame_ = anim_.end;
                 }
 
-                if (frame <= anim.start)
+                if (frame_ <= anim_.start)
                 {
-                    if ((flags & Animator.Loop) == 0)
+                    if ((flags_ & Animator.Loop) == 0)
                     {
                         person_.Atom.SetDefaultControls("bvh finished");
-                        playing = false;
+                        playing_ = false;
                         return;
                     }
                     else
                     {
-                        frame = anim.end;
+                        frame_ = anim_.end;
                     }
                 }
             }
             else
             {
-                if (frame < anim.start)
+                if (frame_ < anim_.start)
                 {
-                    frame = anim.start;
+                    frame_ = anim_.start;
                 }
 
-                if (frame >= anim.end)
+                if (frame_ >= anim_.end)
                 {
-                    if ((flags & Animator.Loop) == 0)
+                    if ((flags_ & Animator.Loop) == 0)
                     {
                         person_.Atom.SetDefaultControls("bvh finished");
-                        playing = false;
+                        playing_ = false;
                         return;
                     }
                     else
                     {
-                        frame = anim.start;
+                        frame_ = anim_.start;
                     }
                 }
             }
 
-            if ((flags & Animator.Reverse) != 0)
+            if ((flags_ & Animator.Reverse) != 0)
             {
-                if (frame <= anim.start + 1)
+                if (frame_ <= anim_.start + 1)
                 {
-                    if ((flags & Animator.Loop) != 0)
+                    if ((flags_ & Animator.Loop) != 0)
                     {
                         // Interpolate
-                        var frm = anim.file.ReadFrame(frame);
-                        var to = anim.file.ReadFrame(anim.end);
+                        var frm = anim_.file.ReadFrame(frame_);
+                        var to = anim_.file.ReadFrame(anim_.end);
 
-                        float t = elapsed / frameTime;
+                        float t = elapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));
                     }
                     else
                     {
                         // Last frame
-                        UpdateModel(anim.file.ReadFrame(frame));
+                        UpdateModel(anim_.file.ReadFrame(frame_));
                     }
                 }
                 else
                 {
                     // Interpolate
-                    var frm = anim.file.ReadFrame(frame);
-                    var to = anim.file.ReadFrame(frame - 1);
+                    var frm = anim_.file.ReadFrame(frame_);
+                    var to = anim_.file.ReadFrame(frame_ - 1);
 
-                    float t = elapsed / frameTime;
+                    float t = elapsed_ / frameTime_;
                     UpdateModel(Interpolate(frm, to, t));
                 }
             }
             else
             {
-                if (frame >= anim.end - 1)
+                if (frame_ >= anim_.end - 1)
                 {
-                    if ((flags & Animator.Loop) != 0)
+                    if ((flags_ & Animator.Loop) != 0)
                     {
                         // Interpolate
-                        var frm = anim.file.ReadFrame(frame);
-                        var to = anim.file.ReadFrame(anim.start);
+                        var frm = anim_.file.ReadFrame(frame_);
+                        var to = anim_.file.ReadFrame(anim_.start);
 
-                        float t = elapsed / frameTime;
+                        float t = elapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));
                     }
                     else
                     {
                         // Last frame
-                        UpdateModel(anim.file.ReadFrame(frame));
+                        UpdateModel(anim_.file.ReadFrame(frame_));
                     }
                 }
                 else
                 {
                     // Interpolate
-                    var frm = anim.file.ReadFrame(frame);
-                    var to = anim.file.ReadFrame(frame + 1);
+                    var frm = anim_.file.ReadFrame(frame_);
+                    var to = anim_.file.ReadFrame(frame_ + 1);
 
-                    float t = elapsed / frameTime;
+                    float t = elapsed_ / frameTime_;
                     UpdateModel(Interpolate(frm, to, t));
                 }
             }
@@ -543,9 +534,9 @@ namespace Cue.BVH
 
         public void OnDestroy()
         {
-            if (shadow != null)
+            if (shadow_ != null)
             {
-                GameObject.Destroy(shadow.gameObject);
+                GameObject.Destroy(shadow_.gameObject);
             }
         }
     }

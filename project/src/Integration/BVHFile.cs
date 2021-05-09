@@ -8,28 +8,43 @@ namespace Cue.BVH
 
     public class File
     {
-        public BvhBone[] bones;
-        float[][] frames;
-        public int nFrames;
-        public float frameTime;
-        public string path;
-        public bool isTranslationLocal;
-        string name;
+        private BvhBone[] bones_;
+        private float[][] frames_;
+        private int nFrames_;
+        private float frameTime_;
+        private string path_;
+        private bool isTranslationLocal_;
+        private string name_;
 
         public File(string _path)
         {
-            path = _path;
-            Load(path);
+            path_ = _path;
+            Load(path_);
         }
 
         public string Name
         {
-            get { return name; }
+            get { return name_; }
         }
 
         public string Path
         {
-            get { return path; }
+            get { return path_; }
+        }
+
+        public int FrameCount
+        {
+            get { return nFrames_; }
+        }
+
+        public float FrameTime
+        {
+            get { return frameTime_; }
+        }
+
+        public BvhBone[] Bones
+        {
+            get { return bones_; }
         }
 
         public void Load(string path)
@@ -39,15 +54,15 @@ namespace Cue.BVH
             {
                 if (path[i] == '/' || path[i] == '\\')
                 {
-                    name = path.Substring(i + 1);
+                    name_ = path.Substring(i + 1);
                     break;
                 }
 
                 --i;
             }
 
-            if (name == "")
-                name = path;
+            if (name_ == "")
+                name_ = path;
 
             char[] delims = { '\r', '\n' };
             var rawText = Cue.Instance.Sys.ReadFileIntoString(path);
@@ -56,17 +71,17 @@ namespace Cue.BVH
 
             var raw = rawText.Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
 
-            bones = ReadHierarchy(raw);
-            frames = ReadMotion(raw);
-            frameTime = ReadFrameTime(raw);
-            nFrames = frames.Length;
-            isTranslationLocal = IsEstimatedLocalTranslation();
+            bones_ = ReadHierarchy(raw);
+            frames_ = ReadMotion(raw);
+            frameTime_ = ReadFrameTime(raw);
+            nFrames_ = frames_.Length;
+            isTranslationLocal_ = IsEstimatedLocalTranslation();
             ReadZeroPos();
         }
 
         void ReadZeroPos()
         {
-            if (nFrames > 0)
+            if (nFrames_ > 0)
             {
                 foreach (var tf in ReadFrame(0))
                 {
@@ -79,7 +94,7 @@ namespace Cue.BVH
         bool IsEstimatedLocalTranslation()
         {
             BvhBone hip = null;
-            foreach (var bone in bones)
+            foreach (var bone in bones_)
                 if (bone.isHipBone)
                     hip = bone;
             if (hip == null)
@@ -87,12 +102,12 @@ namespace Cue.BVH
             var index = hip.frameOffset + 1;
             // Use hip 'y' to estimate the translation mode (local or "absolute")
             float sum = 0;
-            for (var i = 0; i < nFrames; i++)
+            for (var i = 0; i < nFrames_; i++)
             {
-                var data = frames[i];
+                var data = frames_[i];
                 sum += data[index];
             }
-            float average = sum / nFrames;
+            float average = sum / nFrames_;
             float absScore = Mathf.Abs(hip.offset.y - average);    // absolute will have average close to offset
             float locScore = Mathf.Abs(average);    // lowest score wins
             return locScore < absScore;
@@ -100,7 +115,7 @@ namespace Cue.BVH
 
         public void LogHierarchy()
         {
-            foreach (var bone in bones)
+            foreach (var bone in bones_)
             {
                 Debug.Log(bone.ToDebugString());
             }
@@ -210,20 +225,20 @@ namespace Cue.BVH
 
         public BvhTransform[] ReadFrame(int frame)
         {
-            if (frame >= frames.Length)
-                Cue.LogError($"bad frame {frame} >= {frames.Length}");
+            if (frame >= frames_.Length)
+                Cue.LogError($"bad frame {frame} >= {frames_.Length}");
 
             try
             {
-                var data = frames[frame];
-                var ret = new BvhTransform[bones.Length];
-                for (var i = 0; i < bones.Length; i++)
+                var data = frames_[frame];
+                var ret = new BvhTransform[bones_.Length];
+                for (var i = 0; i < bones_.Length; i++)
                 {
-                    if (i >= bones.Length)
-                        Cue.LogError($"bad bone {i} >= {bones.Length}");
+                    if (i >= bones_.Length)
+                        Cue.LogError($"bad bone {i} >= {bones_.Length}");
 
                     var tf = new BvhTransform();
-                    var bone = bones[i];
+                    var bone = bones_[i];
                     tf.bone = bone;
                     var offset = bone.frameOffset;
 

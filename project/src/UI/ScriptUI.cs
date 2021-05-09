@@ -699,7 +699,7 @@ namespace Cue
 			var b = (BVH.Animation)a.Real;
 
 			person_.Animator.Play(a, loop_.Checked ? Animator.Loop : 0);
-			seek_.Set(b.start, b.start, b.end < 0 ? b.file.nFrames : b.end);
+			seek_.Set(b.start, b.start, b.end < 0 ? b.file.FrameCount : b.end);
 		}
 
 		private void OnStop()
