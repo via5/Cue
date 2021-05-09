@@ -8,6 +8,7 @@
 			"options":
 			{
 				"file": "walk.bvh",
+				"init": 33,
 				"start": 67,
 				"end": 150,
 				"rootXZ": false,
@@ -53,7 +54,8 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit.bvh"
+				"file": "sit.bvh",
+				"end": 30
 			}
 		},
 
@@ -65,7 +67,8 @@
 			"options":
 			{
 				"file": "sit.bvh",
-				"reverse": true
+				"reverse": true,
+				"end": 30
 			}
 		},
 

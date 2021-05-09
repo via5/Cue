@@ -106,6 +106,8 @@
     <Compile Include="src\Events\Sitting.cs" />
     <Compile Include="src\Events\Standing.cs" />
     <Compile Include="src\Integration\BVH.cs" />
+    <Compile Include="src\Integration\BVHFile.cs" />
+    <Compile Include="src\Integration\BVHPlayer.cs" />
     <Compile Include="src\Integration\ClockwiseSilver.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />

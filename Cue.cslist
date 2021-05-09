@@ -11,6 +11,8 @@ project\src\Events\Sex.cs
 project\src\Events\Sitting.cs
 project\src\Events\Standing.cs
 project\src\Integration\BVH.cs
+project\src\Integration\BVHFile.cs
+project\src\Integration\BVHPlayer.cs
 project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
