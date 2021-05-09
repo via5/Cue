@@ -82,7 +82,7 @@ namespace Cue
 
 		public MacGruberGaze(Person p)
 		{
-			log_ = new Logger(() => $"mggaze {person_}");
+			log_ = new Logger(Logger.Integration, () => $"mggaze {person_}");
 			person_ = p;
 			enabled_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
 			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");

@@ -32,7 +32,7 @@ namespace Cue
 		public Cue()
 		{
 			instance_ = this;
-			LogInfo("cue: ctor");
+			LogVerbose("cue: ctor");
 
 			ui_ = new UI(Sys);
 		}
@@ -72,7 +72,7 @@ namespace Cue
 
 		public void Init()
 		{
-			LogInfo("cue: init");
+			LogVerbose("cue: init");
 
 			VUI.Glue.Set(
 				() => CueMain.Instance.MVRPluginManager,
@@ -82,27 +82,27 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
-			LogInfo("cue: loading resources");
+			LogVerbose("cue: loading resources");
 			Resources.Animations.Load();
 			Resources.Clothing.Load();
 
-			LogInfo("cue: updating nav");
+			LogVerbose("cue: updating nav");
 			Sys.Nav.Update();
 
-			LogInfo("cue: finding objects");
+			LogVerbose("cue: finding objects");
 			FindObjects();
 
-			LogInfo("cue: initializing persons");
+			LogVerbose("cue: initializing persons");
 			InitPersons();
 
-			LogInfo("cue: enabling plugin state");
+			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
 
 			if (Sys.GetAtom("cuetest") != null)
 			{
 				try
 				{
-					LogInfo("cue: test stuff");
+					LogVerbose("cue: test stuff");
 					test();
 				}
 				catch (Exception e)
@@ -111,7 +111,7 @@ namespace Cue
 				}
 			}
 
-			LogInfo("cue: init finished");
+			LogInfo("cue: running");
 		}
 
 		private void FindObjects()
@@ -288,7 +288,7 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			LogInfo($"cue: plugin state {b}");
+			LogVerbose($"cue: plugin state {b}");
 
 			Sys.OnPluginState(b);
 			ui_.OnPluginState(b);
@@ -296,12 +296,12 @@ namespace Cue
 			for (int i = 0; i < allObjects_.Count; ++i)
 				allObjects_[i].OnPluginState(b);
 
-			LogInfo($"cue: plugin state {b} finished");
+			LogVerbose($"cue: plugin state {b} finished");
 		}
 
 		static public void LogVerbose(string s)
 		{
-			//Instance.Sys.Log(s, LogLevels.Verbose);
+			//Instance.Sys.Log(s, W.LogLevels.Verbose);
 		}
 
 		static public void LogInfo(string s)

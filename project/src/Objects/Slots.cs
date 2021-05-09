@@ -12,12 +12,15 @@ namespace Cue
 		public const int Spawn = 5;
 
 		private IObject self_;
+		private Logger log_;
 		private int type_;
 		private IObject lockedBy_ = null;
 
 		public Slot(IObject self, int type)
 		{
 			self_ = self;
+			log_ = new Logger(
+				Logger.Slots, () => self_.ToString() + "." + TypeToString(type_));
 			type_ = type;
 		}
 
@@ -51,7 +54,7 @@ namespace Cue
 		{
 			if (lockedBy_ == null)
 			{
-				Cue.LogInfo($"{self_}.{TypeToString(type_)} locked by {by}");
+				log_.Info($"locked by {by}");
 				lockedBy_ = by;
 				return true;
 			}
@@ -63,7 +66,7 @@ namespace Cue
 		{
 			if (lockedBy_ == by)
 			{
-				Cue.LogInfo($"{self_}.{TypeToString(type_)} unlocked by {by}");
+				log_.Info($"unlocked by {by}");
 				lockedBy_ = null;
 				return true;
 			}

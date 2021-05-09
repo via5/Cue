@@ -28,7 +28,7 @@ namespace Cue
 		public PersonAI(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(() => "ai " + person_.ID);
+			log_ = new Logger(Logger.AI, () => "ai " + person_.ID);
 
 			mood_ = new Mood(person_);
 

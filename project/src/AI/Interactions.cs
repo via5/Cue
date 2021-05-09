@@ -15,11 +15,13 @@
 		public const float MinimumStoppedTime = 2;
 
 		private Person person_;
+		private Logger log_;
 		private float elapsed_ = 0;
 
 		public KissingInteraction(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Interaction, () => "KissInt");
 		}
 
 		public void Update(float s)
@@ -67,7 +69,7 @@
 
 				if (Vector3.Distance(srcLips, targetLips) < StartDistance)
 				{
-					Cue.LogInfo($"starting kiss for {person_} and {target}");
+					log_.Info($"starting for {person_} and {target}");
 					person_.Kisser.StartReciprocal(target);
 					return true;
 				}

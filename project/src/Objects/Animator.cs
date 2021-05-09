@@ -109,6 +109,7 @@ namespace Cue
 		public const int Rewind = 0x04;
 
 		private Person person_;
+		private Logger log_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private IPlayer currentPlayer_ = null;
 		private Animation currentAnimation_ = null;
@@ -117,6 +118,7 @@ namespace Cue
 		public Animator(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Animation, () => person_.ID + " Animator");
 			players_.AddRange(Integration.CreateAnimationPlayers(p));
 		}
 
@@ -142,7 +144,7 @@ namespace Cue
 
 			if (a == null)
 			{
-				Cue.LogError(
+				log_.Error(
 					$"Animator: no transition animation from " +
 					$"from {PersonState.StateToString(from)} " +
 					$"to {PersonState.StateToString(to)}");
@@ -183,7 +185,7 @@ namespace Cue
 
 				if (p.Play(a.Real, flags))
 				{
-					Cue.LogInfo(person_.ID + ": " + a.ToString());
+					log_.Info(person_.ID + ": " + a.ToString());
 					currentPlayer_ = p;
 					currentAnimation_ = a;
 					activeFlags_ = flags;
@@ -191,7 +193,7 @@ namespace Cue
 				}
 			}
 
-			Cue.LogError("no player can play " + a.ToString());
+			log_.Error("no player can play " + a.ToString());
 		}
 
 		public void Stop()

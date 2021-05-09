@@ -33,7 +33,7 @@ namespace Cue
 				slot_ = o_.Slots.GetAny(Slot.Sit);
 				if (slot_ == null)
 				{
-					Cue.LogError("can't sit on object " + o_.ToString());
+					log_.Error("can't sit on object " + o_.ToString());
 					return false;
 				}
 
@@ -47,7 +47,7 @@ namespace Cue
 			{
 				case NoState:
 				{
-					Cue.LogInfo("going to sit");
+					log_.Info("going to sit");
 					person_.Gaze.LookInFront();
 					person_.PushAction(new MoveAction(pos, slot_.Bearing));
 					state_ = Moving;
@@ -59,7 +59,7 @@ namespace Cue
 					if (person_.Idle)
 					{
 						person_.SetState(PersonState.Sitting);
-						Cue.LogInfo("sitting");
+						log_.Info("sitting");
 						state_ = Sitting;
 					}
 
@@ -70,7 +70,7 @@ namespace Cue
 				{
 					if (person_.State.IsCurrently(PersonState.Sitting))
 					{
-						Cue.LogInfo("thinking");
+						log_.Info("thinking");
 
 						var cc = new ConcurrentAction();
 

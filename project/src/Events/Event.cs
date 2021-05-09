@@ -11,11 +11,13 @@ namespace Cue
 	abstract class BasicEvent : IEvent
 	{
 		protected Person person_;
+		protected Logger log_;
 		private Slot lockedSlot_ = null;
 
 		protected BasicEvent(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Event, () => ToString());
 		}
 
 		public Slot LockedSlot
@@ -26,7 +28,7 @@ namespace Cue
 
 		public virtual void Stop()
 		{
-			Cue.LogInfo($"{this}: stopping");
+			log_.Info($"{this}: stopping");
 			Unlock();
 		}
 
@@ -34,7 +36,7 @@ namespace Cue
 		{
 			if (lockedSlot_ != null)
 			{
-				Cue.LogInfo($"{this}: {lockedSlot_} was locked by event, unlocking");
+				log_.Info($"{this}: {lockedSlot_} was locked by event, unlocking");
 				lockedSlot_.Unlock(person_);
 				lockedSlot_ = null;
 			}

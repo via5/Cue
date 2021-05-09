@@ -51,7 +51,7 @@ namespace Cue
 		public BasicObject(W.IAtom atom)
 		{
 			atom_ = atom;
-			log_ = new Logger(() => ID);
+			log_ = new Logger(Logger.Object, () => ID);
 			slots_ = new Slots(this);
 		}
 
@@ -76,6 +76,11 @@ namespace Cue
 			o.Slots.Add(type);
 
 			return o;
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public W.VamAtom VamAtom

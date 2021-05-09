@@ -65,9 +65,7 @@
 
 			string after = ToString();
 
-			Cue.LogInfo(
-				self_.ID + ": " +
-				"state changed from " + before + " to " + after);
+			self_.Log.Info($"state changed from {before} to {after}");
 		}
 
 		public bool StartTransition(int next)
@@ -76,7 +74,7 @@
 				return false;
 
 			next_ = next;
-			Cue.LogInfo(self_.ID + ": new transition, " + ToString());
+			self_.Log.Info($"new transition, {this}");
 			return true;
 		}
 
@@ -84,7 +82,7 @@
 		{
 			if (next_ != None)
 			{
-				Cue.LogInfo($"{self_.ID}: cancelling transition {StateToString(next_)}");
+				self_.Log.Info($"cancelling transition {StateToString(next_)}");
 				next_ = None;
 			}
 		}
@@ -101,9 +99,7 @@
 
 			string after = StateToString(current_);
 
-			Cue.LogInfo(
-				self_.ID + ": " +
-				"transition finished from " + before + " to " + after);
+			self_.Log.Info($"transition finished from {before} to {after}");
 		}
 
 		public override string ToString()

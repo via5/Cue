@@ -61,6 +61,13 @@ namespace Cue
 		private static Dictionary<string, Item> tags_ =
 			new Dictionary<string, Item>();
 
+		private Logger log_;
+
+		public ClothingResources()
+		{
+			log_ = new Logger(Logger.Clothing, () => "ClothingRes");
+		}
+
 		public bool Load()
 		{
 			try
@@ -70,7 +77,7 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				Cue.LogError("failed to load clothing, " + e.Message);
+				log_.Error("failed to load clothing, " + e.Message);
 				return false;
 			}
 		}
@@ -82,7 +89,7 @@ namespace Cue
 
 			if (doc == null)
 			{
-				Cue.LogError("failed to parse clothing");
+				log_.Error("failed to parse json");
 				return;
 			}
 
@@ -102,7 +109,7 @@ namespace Cue
 				}
 				else
 				{
-					Cue.LogError("clothing item missing id or tag");
+					log_.Error("clothing item missing id or tag");
 					continue;
 				}
 
@@ -132,7 +139,7 @@ namespace Cue
 				else if (a.HasKey("hidesBreastsState"))
 					item.hidesBreastsState = a["hidesBreastsState"];
 
-				Cue.LogVerbose("clothing item: " + item.ToString());
+				log_.Info("clothing item: " + item.ToString());
 
 				if (id != "")
 					ids_.Add(id, item);

@@ -37,7 +37,7 @@ namespace Cue
 				slot_ = o_.Slots.GetAny(Slot.Stand);
 				if (slot_ == null)
 				{
-					Cue.LogError("can't stand on object " + o_.ToString());
+					log_.Error("can't stand on object " + o_.ToString());
 					return false;
 				}
 
@@ -62,7 +62,7 @@ namespace Cue
 			{
 				case NoState:
 				{
-					Cue.LogInfo("going to stand");
+					log_.Info("going to stand");
 					person_.Gaze.LookInFront();
 					person_.PushAction(new MoveAction(pos, bearing));
 					state_ = Moving;
@@ -73,7 +73,7 @@ namespace Cue
 				{
 					if (person_.Idle)
 					{
-						Cue.LogInfo("thinking");
+						log_.Info("thinking");
 
 						var cc = new ConcurrentAction();
 

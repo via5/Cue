@@ -92,6 +92,7 @@ namespace Cue.W
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
+		private Logger log_;
 		private VamActionParameter setOnlyKeyJointsOn_;
 		private VamAtomNav nav_;
 		private FreeControllerV3 head_ = null;
@@ -101,6 +102,7 @@ namespace Cue.W
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
+			log_ = new Logger(Logger.Sys, () => atom_.uid);
 			setOnlyKeyJointsOn_ = new VamActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 			nav_ = new VamAtomNav(this);
@@ -126,7 +128,7 @@ namespace Cue.W
 			{
 				if (char_ == null)
 				{
-					Cue.LogError($"VamAtom.Sex: atom {ID} is not a person");
+					log_.Error($"VamAtom.Sex: atom {ID} is not a person");
 					return Sexes.Male;
 				}
 
@@ -243,7 +245,7 @@ namespace Cue.W
 
 		public void SetDefaultControls(string why)
 		{
-			Cue.LogInfo($"{ID}: setting default controls ({why})");
+			log_.Info($"{ID}: setting default controls ({why})");
 			setOnlyKeyJointsOn_.Fire();
 		}
 

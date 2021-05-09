@@ -11,8 +11,14 @@ namespace Cue
 
 	abstract class BasicAction : IAction
 	{
+		protected Logger log_;
 		protected readonly List<IAction> children_ = new List<IAction>();
 		private bool started_ = false;
+
+		protected BasicAction()
+		{
+			log_ = new Logger(Logger.Action, () => ToString());
+		}
 
 		public bool IsIdle
 		{
@@ -28,7 +34,7 @@ namespace Cue
 		{
 			if (children_.Count == 0)
 			{
-				Cue.LogError("no action to pop");
+				log_.Error("no action to pop");
 				return;
 			}
 
@@ -154,7 +160,7 @@ namespace Cue
 			var p = o as Person;
 			if (p == null)
 			{
-				Cue.LogError("CallAction: called something that's not a person");
+				log_.Error("CallAction: called something that's not a person");
 				return false;
 			}
 
@@ -162,7 +168,7 @@ namespace Cue
 				caller_.UprightPosition +
 				Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
-			Cue.LogInfo($"CallAction: {p} moving to {caller_}");
+			log_.Info($"CallAction: {p} moving to {caller_}");
 			p.MoveTo(target, caller_.Bearing + 180);
 			p.Gaze.LookAt(caller_);
 
@@ -177,7 +183,7 @@ namespace Cue
 
 			if (!p.HasTarget)
 			{
-				Cue.LogInfo($"CallAction: {p} reached {caller_}, event finished");
+				log_.Info($"CallAction: {p} reached {caller_}, event finished");
 				return false;
 			}
 

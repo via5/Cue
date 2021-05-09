@@ -321,16 +321,38 @@ namespace Cue
 
 	class Logger
 	{
+		public const int Animation   = 0x001;
+		public const int Action      = 0x002;
+		public const int Interaction = 0x004;
+		public const int AI          = 0x008;
+		public const int Event       = 0x010;
+		public const int Integration = 0x020;
+		public const int Object      = 0x040;
+		public const int Slots       = 0x080;
+		public const int Sys         = 0x100;
+		public const int Clothing    = 0x200;
+
+		private static int enabled_ = 0;
+
+		private int type_;
 		private Func<string> prefix_;
 
-		public Logger(string prefix)
+		public Logger(int type, string prefix)
 		{
+			type_ = type;
 			prefix_ = () => prefix;
 		}
 
-		public Logger(Func<string> prefix)
+		public Logger(int type, Func<string> prefix)
 		{
+			type_ = type;
 			prefix_ = prefix;
+		}
+
+		public static int Enabled
+		{
+			get { return enabled_; }
+			set { enabled_ = value; }
 		}
 
 		public string Prefix
@@ -340,12 +362,14 @@ namespace Cue
 
 		public void Verbose(string s)
 		{
-			Cue.LogVerbose($"{Prefix}: {s}");
+			if (IsEnabled())
+				Cue.LogVerbose($"{Prefix}: {s}");
 		}
 
 		public void Info(string s)
 		{
-			Cue.LogInfo($"{Prefix}: {s}");
+			if (IsEnabled())
+				Cue.LogInfo($"{Prefix}: {s}");
 		}
 
 		public void Warning(string s)
@@ -361,6 +385,11 @@ namespace Cue
 		public void ErrorST(string s)
 		{
 			Cue.LogErrorST($"{Prefix}: {s}");
+		}
+
+		private bool IsEnabled()
+		{
+			return Bits.IsSet(enabled_, type_);
 		}
 	}
 }

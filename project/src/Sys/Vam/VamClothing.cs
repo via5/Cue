@@ -8,6 +8,7 @@ namespace Cue.W
 		class Item
 		{
 			private VamAtom atom_;
+			private Logger log_;
 			private DAZClothingItem ci_;
 			private DAZSkinWrapSwitcher wrap_ = null;
 			private bool enabled_ = true;
@@ -16,13 +17,15 @@ namespace Cue.W
 			{
 				atom_ = a;
 				ci_ = ci;
+				log_ = new Logger(
+					Logger.Clothing, () => a.ID + " VamClothingItem " + ci_.name);
 			}
 
 			public void Init()
 			{
 				if (ci_.driveXAngleTarget != 0 || ci_.drive2XAngleTarget != 0)
 				{
-					Cue.LogInfo($"resetting {ci_.name} for drive angles");
+					log_.Info($"resetting for drive angles");
 					ci_.enabled = false;
 					ci_.enabled = true;
 				}
@@ -45,10 +48,7 @@ namespace Cue.W
 					if (value != ci_.isActiveAndEnabled)
 					{
 						enabled_ = value;
-
-						Cue.LogInfo(
-							ToString() + ": " + (value ? "enabled" : "disabled"));
-
+						log_.Info(value ? "enabled" : "disabled");
 						ci_.characterSelector.SetActiveClothingItem(ci_, value);
 					}
 				}
@@ -63,18 +63,17 @@ namespace Cue.W
 						wrap_ = ci_.GetComponentInChildren<DAZSkinWrapSwitcher>();
 						if (wrap_ == null)
 						{
-							Cue.LogError(
-								$"clothing {ci_.name} has no wrap switcher {ci_.isDynamicRuntimeLoaded}");
+							log_.Error(
+								$"clothing {ci_.name} has no wrap switcher " +
+								$"{ci_.isDynamicRuntimeLoaded}");
+
 							return;
 						}
 					}
 
 					if (value != wrap_.currentWrapName)
 					{
-						Cue.LogInfo(
-							ToString() + ": state " +
-							wrap_.currentWrapName + "->" + value);
-
+						log_.Info($"state {wrap_.currentWrapName}->{value}");
 						wrap_.currentWrapName = value;
 					}
 				}
@@ -193,6 +192,7 @@ namespace Cue.W
 		}
 
 		private VamAtom atom_;
+		private Logger log_;
 		private DAZCharacterSelector char_;
 		private List<Item> items_ = new List<Item>();
 		private bool genitalsVisible_ = false;
@@ -201,14 +201,16 @@ namespace Cue.W
 
 		public VamClothing(VamAtom a)
 		{
+			atom_ = a;
+			log_ = new Logger(Logger.Clothing, () => atom_.ID + " VamClothing");
+
 			try
 			{
-				atom_ = a;
 				char_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
 
 				if (char_ == null)
 				{
-					Cue.LogError($"VamClothing: {atom_.ID} has no DAZCharacterSelector");
+					log_.Error($"no DAZCharacterSelector");
 					return;
 				}
 
@@ -216,7 +218,7 @@ namespace Cue.W
 				{
 					if (c.isActiveAndEnabled)
 					{
-						Cue.LogInfo($"VamClothing: found {c.name}");
+						log_.Info($"found {c.name}");
 						items_.Add(new Item(atom_, c));
 					}
 				}
@@ -226,7 +228,7 @@ namespace Cue.W
 			}
 			catch (Exception e)
 			{
-				Cue.LogError("VamClothing: ctor failed, " + e.ToString());
+				log_.Error("VamClothing: ctor failed, " + e.ToString());
 			}
 		}
 
@@ -277,14 +279,14 @@ namespace Cue.W
 
 				if (value)
 				{
-					Cue.LogInfo(atom_.ID + ": showing genitals");
+					log_.Info("showing genitals");
 
 					foreach (var i in items_)
 						i.SetToShowGenitals();
 				}
 				else
 				{
-					Cue.LogInfo(atom_.ID + ": hiding genitals");
+					log_.Info("hiding genitals");
 
 					foreach (var i in items_)
 						i.SetToHideGenitals();
@@ -305,14 +307,14 @@ namespace Cue.W
 
 				if (value)
 				{
-					Cue.LogInfo(atom_.ID + ": showing breasts");
+					log_.Info("showing breasts");
 
 					foreach (var i in items_)
 						i.SetToShowBreasts();
 				}
 				else
 				{
-					Cue.LogInfo(atom_.ID + ": hiding breasts");
+					log_.Info("hiding breasts");
 
 					foreach (var i in items_)
 						i.SetToHideBreasts();
@@ -326,7 +328,7 @@ namespace Cue.W
 			{
 				if (ClothingChanged())
 				{
-					Cue.LogInfo("clothing changed, not resetting");
+					log_.Info("clothing changed, not resetting");
 					return;
 				}
 
@@ -401,7 +403,9 @@ namespace Cue.W
 
 		public override string ToString()
 		{
-			return $"Vam: genitals={genitalsVisible_} breasts={breastsVisible_}";
+			return
+				$"VamClothing: " +
+				$"genitals={genitalsVisible_} breasts={breastsVisible_}";
 		}
 	}
 }

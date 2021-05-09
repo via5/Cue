@@ -32,7 +32,7 @@ namespace Cue.W
 		{
 			atom_ = a;
 
-			log_ = new Logger(() =>
+			log_ = new Logger(Logger.Sys, () =>
 			{
 				return "VamAtomNav " + atom_.ID;
 			});
@@ -308,7 +308,8 @@ namespace Cue.W
 		private bool DoMove(float s)
 		{
 			elapsed_ += s;
-			agent_.speed = U.Clamp(elapsed_ * VamNav.AgentMoveSpeed, 0, VamNav.AgentMoveSpeed);
+			agent_.speed = U.Clamp(
+				elapsed_ * VamNav.AgentMoveSpeed, 0, VamNav.AgentMoveSpeed);
 
 			CheckStuck(s);
 			return !IsPathing();

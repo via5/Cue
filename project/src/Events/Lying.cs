@@ -22,7 +22,7 @@
 			{
 				case NoState:
 				{
-					Cue.LogInfo("going to sleep");
+					log_.Info("going to sleep");
 					person_.PushAction(new MoveAction(o_.Position, BasicObject.NoBearing));
 					state_ = Moving;
 					elapsed_ = 0;
@@ -33,7 +33,7 @@
 				{
 					if (person_.Idle)
 					{
-						Cue.LogInfo("reached bed, sleeping");
+						log_.Info("reached bed, sleeping");
 						state_ = Sleeping;
 					}
 
@@ -45,7 +45,7 @@
 					elapsed_ += s;
 					if (elapsed_ > 0)
 					{
-						Cue.LogInfo("finished sleeping");
+						log_.Info("finished sleeping");
 						state_ = NoState;
 						return false;
 					}

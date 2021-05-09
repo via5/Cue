@@ -23,7 +23,13 @@ namespace Cue
 
 	class AnimationResources
 	{
+		private Logger log_;
 		private readonly List<Animation> anims_ = new List<Animation>();
+
+		public AnimationResources()
+		{
+			log_ = new Logger(Logger.Animation, () => "AnimRes");
+		}
 
 		public bool Load()
 		{
@@ -36,7 +42,7 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				Cue.LogError("failed to load animations, " + e.Message);
+				log_.Error("failed to load animations, " + e.Message);
 				return false;
 			}
 		}
@@ -48,7 +54,7 @@ namespace Cue
 
 			if (doc == null)
 			{
-				Cue.LogError("failed to parse animations");
+				log_.Error("failed to parse animations");
 				return;
 			}
 
@@ -69,7 +75,7 @@ namespace Cue
 
 			if (!o.HasKey("animation"))
 			{
-				Cue.LogError("object missing 'animation'");
+				log_.Error("object missing 'animation'");
 				return null;
 			}
 
@@ -94,13 +100,13 @@ namespace Cue
 				{
 					if (!o.HasKey("from"))
 					{
-						Cue.LogError("transition animation missing 'from");
+						log_.Error("transition animation missing 'from");
 						return null;
 					}
 
 					if (!o.HasKey("to"))
 					{
-						Cue.LogError("transition animation missing 'from");
+						log_.Error("transition animation missing 'from");
 						return null;
 					}
 
@@ -115,7 +121,7 @@ namespace Cue
 				{
 					if (!o.HasKey("state"))
 					{
-						Cue.LogError("sex animation missing 'state'");
+						log_.Error("sex animation missing 'state'");
 						return null;
 					}
 
@@ -135,7 +141,7 @@ namespace Cue
 		{
 			if (!o.HasKey("type"))
 			{
-				Cue.LogError("object missing 'type'");
+				log_.Error("object missing 'type'");
 				return null;
 			}
 
@@ -157,7 +163,7 @@ namespace Cue
 			else if (type == "synergy")
 				a = SynergyAnimation.Create(options);
 			else
-				Cue.LogError($"unknown animation type '{type}'");
+				log_.Error($"unknown animation type '{type}'");
 
 			return a;
 		}
@@ -241,7 +247,7 @@ namespace Cue
 
 		private void Add(Animation a)
 		{
-			Cue.LogInfo(a.ToString());
+			log_.Info(a.ToString());
 			anims_.Add(a);
 		}
 	}
