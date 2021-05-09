@@ -70,7 +70,8 @@ namespace Cue.W
 	{
 		public const int AgentTypeID = 1;
 		public const float AgentHeight = 2.0f;
-		public const float AgentRadius = 0.1f;
+		public const float AgentRadius = 0;
+		public const float AgentAvoidanceRadius = 0.2f;
 		public const float AgentMoveSpeed = 1.0f;
 		public const float AgentTurnSpeed = 360.0f;
 

@@ -38,6 +38,7 @@
 			{
 				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
 				tools.Add(new VUI.ToolButton("Reload", OnReload));
+				tools.Add(new VUI.CheckBox("Navmesh", (b) => Cue.Instance.Sys.Nav.Render = b));
 				p.Add(tools);
 			}
 

@@ -297,9 +297,9 @@ namespace Cue.W
 			nav_.MoveTo(v, bearing, stoppingDistance);
 		}
 
-		public void NavStop()
+		public void NavStop(string why)
 		{
-			nav_.Stop();
+			nav_.Stop(why);
 		}
 
 		public int NavState

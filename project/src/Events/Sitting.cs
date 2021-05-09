@@ -49,7 +49,7 @@ namespace Cue
 				{
 					Cue.LogInfo("going to sit");
 					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(pos, BasicObject.NoBearing));
+					person_.PushAction(new MoveAction(pos, slot_.Bearing));
 					state_ = Moving;
 					break;
 				}
@@ -58,7 +58,7 @@ namespace Cue
 				{
 					if (person_.Idle)
 					{
-						person_.PushAction(new SitAction(slot_));
+						person_.SetState(PersonState.Sitting);
 						Cue.LogInfo("sitting");
 						state_ = Sitting;
 					}
@@ -68,7 +68,7 @@ namespace Cue
 
 				case Sitting:
 				{
-					if (person_.Idle)
+					if (person_.State.IsCurrently(PersonState.Sitting))
 					{
 						Cue.LogInfo("thinking");
 

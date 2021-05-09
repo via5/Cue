@@ -7,9 +7,10 @@ namespace Cue.W
 	class VamAtomNav
 	{
 		private const int NoMove = 0;
-		private const int StartingTurn = 1;
-		private const int Moving = 2;
-		private const int EndingTurn = 3;
+		private const int CalculatingPath = 1;
+		private const int StartingTurn = 2;
+		private const int Moving = 3;
+		private const int EndingTurn = 4;
 
 		private VamAtom atom_;
 		private Logger log_;
@@ -17,7 +18,6 @@ namespace Cue.W
 		private Vector3 finalPosition_ = Vector3.Zero;
 		private float startTurnBearing_ = BasicObject.NoBearing;
 		private float endTurnBearing_ = BasicObject.NoBearing;
-		private float stoppingDistance_ = 0;
 		private NavMeshAgent agent_ = null;
 		private float turningElapsed_ = 0;
 		private Quaternion turningStart_ = Quaternion.identity;
@@ -25,7 +25,6 @@ namespace Cue.W
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
 		private int enableCollisionsCountdown_ = -1;
-		private bool calculatingPath_ = false;
 		private bool navEnabled_ = false;
 
 		public VamAtomNav(VamAtom a)
@@ -102,7 +101,9 @@ namespace Cue.W
 			if (agent_ == null)
 				return;
 
-			log_.Info($"naving to pos={v} bearing={BearingToString(bearing)}");
+			log_.Info(
+				$"naving to pos={v} bearing={BearingToString(bearing)} " +
+				$"sd={stoppingDistance}");
 
 			if (AlmostThere(v, bearing))
 			{
@@ -112,31 +113,27 @@ namespace Cue.W
 			}
 			else
 			{
-				Stop();
-				turningStart_ = atom_.Atom.mainController.transform.rotation;
-				startTurnBearing_ = Vector3.Bearing(v - atom_.Position);
+				Stop("starting move to");
+
 				endTurnBearing_ = bearing;
 				finalPosition_ = v;
 				turningElapsed_ = 0;
 				pathStuckCheckElapsed_ = 0;
 				pathStuckLastPos_ = atom_.Position;
 				stuckCount_ = 0;
-				stoppingDistance_ = stoppingDistance;
-				state_ = StartingTurn;
-
-				log_.Info(
-					$"will do starting turn from " +
-					$"{VamU.Bearing(turningStart_)} " +
-					$"to {BearingToString(startTurnBearing_)}");
+				agent_.destination = W.VamU.ToUnity(finalPosition_);
+				agent_.stoppingDistance = stoppingDistance;
+				agent_.isStopped = true;
+				state_ = CalculatingPath;
 			}
 		}
 
-		public void Stop()
+		public void Stop(string why)
 		{
 			if (agent_ == null)
 				return;
 
-			log_.Info("stopping");
+			log_.Info("stopping, " + why);
 			agent_.updatePosition = false;
 			agent_.updateRotation = false;
 			agent_.updateUpAxis = false;
@@ -154,6 +151,11 @@ namespace Cue.W
 					case NoMove:
 					{
 						return NavStates.None;
+					}
+
+					case CalculatingPath:
+					{
+						return NavStates.Calculating;
 					}
 
 					case Moving:
@@ -199,7 +201,6 @@ namespace Cue.W
 
 		public void Update(float s)
 		{
-			CheckPathPending();
 			CheckCollisionCountdown();
 
 			switch (state_)
@@ -209,17 +210,37 @@ namespace Cue.W
 					break;
 				}
 
+				case CalculatingPath:
+				{
+					if (IsPathCalculated())
+					{
+						turningStart_ = atom_.Atom.mainController.transform.rotation;
+						var nextPos = VamU.FromUnity(agent_.steeringTarget);
+
+						startTurnBearing_ = Vector3.Bearing(nextPos - atom_.Position);
+
+						log_.Info(
+							$"ready to turn, pos={atom_.Position} " +
+							$"next={nextPos}, " +
+							$"will do starting turn from " +
+							$"{VamU.Bearing(turningStart_)} " +
+							$"to {BearingToString(startTurnBearing_)}") ;
+
+						state_ = StartingTurn;
+					}
+
+					break;
+				}
+
 				case StartingTurn:
 				{
 					if (DoStartingTurn(s))
 					{
 						log_.Info("start turn finished, starting move");
-						agent_.destination = W.VamU.ToUnity(finalPosition_);
 						agent_.updatePosition = true;
 						agent_.updateRotation = true;
 						agent_.updateUpAxis = true;
-						agent_.stoppingDistance = stoppingDistance_;
-						calculatingPath_ = true;
+						agent_.isStopped = false;
 						state_ = Moving;
 					}
 
@@ -231,6 +252,11 @@ namespace Cue.W
 					if (DoMove(s))
 					{
 						log_.Info("nav finished, starting end turn");
+						log_.Info(
+							$"target was {finalPosition_}, " +
+							$"pos is {atom_.Position}, " +
+							$"d={Vector3.Distance(atom_.Position, finalPosition_)}");
+
 						turningStart_ = atom_.Atom.mainController.transform.rotation;
 						turningElapsed_ = 0;
 
@@ -319,33 +345,37 @@ namespace Cue.W
 			}
 		}
 
-		private void CheckPathPending()
+		private bool IsPathCalculated()
 		{
-			if (calculatingPath_ && !agent_.pathPending)
+			if (agent_.pathPending)
+				return false;
+
+			switch (agent_.pathStatus)
 			{
-				calculatingPath_ = false;
-
-				switch (agent_.pathStatus)
+				case NavMeshPathStatus.PathComplete:
 				{
-					case NavMeshPathStatus.PathComplete:
-					{
-						log_.Info("path calculated: complete");
-						break;
-					}
+					log_.Info("path calculated: complete");
+					break;
+				}
 
-					case NavMeshPathStatus.PathPartial:
-					{
-						log_.Info("path calculated: partial");
-						break;
-					}
+				case NavMeshPathStatus.PathPartial:
+				{
+					log_.Info("path calculated: partial");
+					break;
+				}
 
-					case NavMeshPathStatus.PathInvalid:
-					{
-						log_.Error("path calculated: invalid");
-						break;
-					}
+				case NavMeshPathStatus.PathInvalid:
+				{
+					log_.Error("path calculated: invalid");
+					break;
 				}
 			}
+
+			log_.Info($"{agent_.path.corners.Length} corners");
+			for (int i=0; i<agent_.path.corners.Length; ++i)
+				log_.Info($"  - {agent_.path.corners[i]}");
+
+			return true;
 		}
 
 		private void CheckCollisionCountdown()
@@ -383,7 +413,7 @@ namespace Cue.W
 							$"b={atom_.Bearing} " +
 							$"target={finalPosition_} d={d}");
 
-						Stop();
+						Stop("stuck");
 					}
 				}
 				else
@@ -434,7 +464,7 @@ namespace Cue.W
 
 				agent_.agentTypeID = VamNav.AgentTypeID;
 				agent_.height = VamNav.AgentHeight;
-				agent_.radius = VamNav.AgentRadius + 0.1f;
+				agent_.radius = VamNav.AgentAvoidanceRadius;
 				agent_.speed = VamNav.AgentMoveSpeed;
 				agent_.angularSpeed = VamNav.AgentTurnSpeed;
 
@@ -446,7 +476,7 @@ namespace Cue.W
 				agent_.autoRepath = true;
 				agent_.areaMask = ~0;
 
-				Stop();
+				Stop("agent created");
 			}
 			catch (Exception e)
 			{
@@ -492,7 +522,7 @@ namespace Cue.W
 			if (agent_ == null)
 				return false;
 
-			if (agent_.pathPending || calculatingPath_)
+			if (agent_.pathPending || state_ == CalculatingPath)
 				return true;
 
 			if (agent_.remainingDistance > agent_.stoppingDistance)

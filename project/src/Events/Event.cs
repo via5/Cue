@@ -20,14 +20,23 @@ namespace Cue
 
 		public virtual void Stop()
 		{
+			Cue.LogInfo($"{this}: stopping");
 			Unlock();
 		}
 
 		protected void Unlock()
 		{
 			// todo, this event didn't necessarily lock that slot
-			if (person_.LockedSlot != null)
+			if (person_.LockedSlot == null)
+			{
+				Cue.LogInfo($"{this}: nothing to unlock");
+			}
+			else
+			{
+				Cue.LogInfo($"{this}: unlocking {person_.LockedSlot}");
 				person_.LockedSlot.Unlock(person_);
+				person_.LockedSlot = null;
+			}
 		}
 
 		public abstract bool Update(float s);

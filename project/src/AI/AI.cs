@@ -17,6 +17,7 @@ namespace Cue
 	class PersonAI : IAI
 	{
 		private Person person_ = null;
+		private Logger log_;
 		private int i_ = -1;
 		private readonly List<IEvent> events_ = new List<IEvent>();
 		private bool enabled_ = false;
@@ -27,6 +28,8 @@ namespace Cue
 		public PersonAI(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(() => "ai " + person_.ID);
+
 			mood_ = new Mood(person_);
 
 			foreach (var o in Cue.Instance.Objects)
@@ -79,6 +82,7 @@ namespace Cue
 		{
 			if (o is Person)
 			{
+				log_.Info("target is person, calling");
 				person_.MakeIdle();
 				person_.PushAction(new CallAction(o as Person));
 				return true;
@@ -87,20 +91,23 @@ namespace Cue
 			if (!person_.TryLockSlot(o))
 			{
 				// can't lock the given object
+				log_.Info($"can't lock any slot in {person_}");
 				return false;
 			}
 
 
 			var slot = person_.LockedSlot;
+			log_.Info($"locked slot {slot}");
 
 			if (slot.Type == Slot.Sit)
 			{
+				log_.Info($"this is a sit slot");
 				person_.MakeIdle();
 
 				if (person_ == Cue.Instance.Player)
 				{
 					person_.PushAction(new SitAction(slot));
-					person_.PushAction(new MoveAction(slot.Position, BasicObject.NoBearing));
+					person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
 				}
 				else
 				{
@@ -111,6 +118,7 @@ namespace Cue
 			}
 			else if (slot.Type == Slot.Stand)
 			{
+				log_.Info($"this is a stand slot");
 				person_.MakeIdle();
 
 				if (person_ == Cue.Instance.Player)
@@ -125,6 +133,10 @@ namespace Cue
 
 				return true;
 			}
+			else
+			{
+				log_.Info($"can't interact with {slot}, unlocking");
+			}
 
 			slot.Unlock(person_);
 
@@ -133,14 +145,19 @@ namespace Cue
 
 		public void RunEvent(IEvent e)
 		{
+			log_.Info($"force running event {e}");
+
 			if (forced_ != null)
+			{
+				log_.Info($"stopping current forced event {forced_}");
 				forced_.Stop();
+			}
 
 			forced_ = e;
 
 			if (forced_ != null)
 			{
-				Cue.LogInfo($"{person_.ID}: running event {e}");
+				log_.Info($"stop and make idle to run forced event");
 				Stop();
 				person_.MakeIdle();
 			}
@@ -152,6 +169,7 @@ namespace Cue
 			{
 				if (!forced_.Update(s))
 				{
+					log_.Info("forced event finished, stopping");
 					forced_.Stop();
 					forced_ = null;
 				}

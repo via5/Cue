@@ -295,7 +295,7 @@ namespace Cue.W
 		{
 		}
 
-		public void NavStop()
+		public void NavStop(string why)
 		{
 		}
 	}

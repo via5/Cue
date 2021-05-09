@@ -142,7 +142,7 @@ namespace Cue
 				if (Atom.NavState == W.NavStates.None)
 				{
 					moveState_ = NoMoveState;
-					Atom.NavStop();
+					Atom.NavStop("nav state is none");
 				}
 			}
 		}

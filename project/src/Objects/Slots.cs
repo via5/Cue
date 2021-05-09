@@ -51,6 +51,7 @@ namespace Cue
 		{
 			if (lockedBy_ == null)
 			{
+				Cue.LogInfo($"{self_}.{TypeToString(type_)} locked by {by}");
 				lockedBy_ = by;
 				return true;
 			}
@@ -62,6 +63,7 @@ namespace Cue
 		{
 			if (lockedBy_ == by)
 			{
+				Cue.LogInfo($"{self_}.{TypeToString(type_)} unlocked by {by}");
 				lockedBy_ = null;
 				return true;
 			}
@@ -121,7 +123,14 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return self_.ToString() + " slot " + TypeToString(type_);
+			string s = $"{self_}.{TypeToString(type_)}";
+
+			if (lockedBy_ == null)
+				s += "@free";
+			else
+				s += $"@{lockedBy_}";
+
+			return s;
 		}
 	}
 

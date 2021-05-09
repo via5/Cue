@@ -51,6 +51,7 @@ namespace Cue
 
 	class Person : BasicObject
 	{
+		private Logger log_;
 		private readonly RootAction actions_ = new RootAction();
 		private PersonState state_;
 		private bool deferredTransition_ = false;
@@ -78,6 +79,7 @@ namespace Cue
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
+			log_ = new Logger(() => ID);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
@@ -206,11 +208,15 @@ namespace Cue
 
 			// object is already locked by this person, reuse it
 			if (s != null)
+			{
+				log_.Info($"slot {s} already locked by self, reusing it");
 				return true;
+			}
 
 			if (o.Slots.AnyLocked)
 			{
 				// a slot is already locked, fail
+				log_.Info($"can't lock {o}, already has locked slot {o.Slots.AnyLocked}");
 				return false;
 			}
 
@@ -220,6 +226,7 @@ namespace Cue
 			if (s == null)
 			{
 				// no free slots
+				log_.Info($"can't lock {o}, no free slots");
 				return false;
 			}
 
@@ -231,14 +238,19 @@ namespace Cue
 			if (!s.Lock(this))
 			{
 				// this object can't lock this slot
+				log_.Info($"can't lock {s}");
 				return false;
 			}
 
 			// slot has been locked successfully, unlock the current slot,
 			// if any
 			if (locked_ != null)
+			{
+				log_.Info($"found slot to lock, unlocking current {locked_}");
 				locked_.Unlock(this);
+			}
 
+			log_.Info($"locked {s}");
 			locked_ = s;
 
 			return true;
@@ -268,7 +280,7 @@ namespace Cue
 					state_.FinishTransition();
 					if (deferredState_ != PersonState.None)
 					{
-						Cue.LogInfo($"{ID}: animation finished, setting deferred state");
+						log_.Info("animation finished, setting deferred state");
 
 						var ds = deferredState_;
 						deferredState_ = PersonState.None;
@@ -343,8 +355,8 @@ namespace Cue
 				// trying to stand
 				if (state_.Next != PersonState.Standing)
 				{
-					Cue.LogInfo(
-						$"{ID}: no animation for transition " +
+					log_.Info(
+						$"no animation for transition " +
 						$"{PersonState.StateToString(state_.Current)}->" +
 						$"{PersonState.StateToString(state_.Next)}, standing first");
 
@@ -414,6 +426,12 @@ namespace Cue
 						SetState(PersonState.Standing);
 					}
 
+					break;
+				}
+
+				case W.NavStates.Calculating:
+				{
+					// wait
 					break;
 				}
 

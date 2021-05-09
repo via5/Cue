@@ -99,9 +99,10 @@ namespace Cue.W
 	class NavStates
 	{
 		public const int None = 0;
-		public const int Moving = 1;
-		public const int TurningLeft = 2;
-		public const int TurningRight = 3;
+		public const int Calculating = 1;
+		public const int Moving = 2;
+		public const int TurningLeft = 3;
+		public const int TurningRight = 4;
 
 		public static string ToString(int state)
 		{
@@ -109,6 +110,9 @@ namespace Cue.W
 			{
 				case None:
 					return "(none)";
+
+				case Calculating:
+					return "calculating";
 
 				case Moving:
 					return "moving";
@@ -169,7 +173,7 @@ namespace Cue.W
 		bool NavPaused { get; set; }
 		int NavState { get; }
 		void NavTo(Vector3 v, float bearing, float stoppingDistance);
-		void NavStop();
+		void NavStop(string why);
 	}
 
 	interface INav
