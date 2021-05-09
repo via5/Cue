@@ -9,41 +9,43 @@ namespace Cue.BVH
 
     class Animation : IAnimation
     {
-        public BVH.File file = null;
-        public bool rootXZ = false;
-        public bool rootY = false;
-        public bool reverse = false;
-        public int start = 0;
-        public int end = -1;
-        public bool usePosition = false;
-        public bool localRotations = true;
-        public bool localPositions = true;
-
+        private BVH.File file_ = null;
+        private bool rootXZ_ = false;
+        private bool rootY_ = false;
+        private bool reverse_ = false;
+        private int start_ = 0;
+        private int end_ = -1;
+        private bool usePosition_ = false;
+        private bool localRotations_ = true;
+        private bool localPositions_ = true;
 
         public Animation(
             string path, bool rootXZ, bool rootY, bool reverse,
             int start, int end, bool usePosition, bool localRot, bool localPos)
         {
-            this.file = new File(path);
-            this.rootXZ = rootXZ;
-            this.rootY = rootY;
-            this.reverse = reverse;
-            this.start = start;
-            this.end = end;
-            this.usePosition = usePosition;
-            this.localRotations = localRot;
-            this.localPositions = localPos;
+            file_ = new File(path);
+            rootXZ_ = rootXZ;
+            rootY_ = rootY;
+            reverse_ = reverse;
+            start_ = start;
+            end_ = end;
+            usePosition_ = usePosition;
+            localRotations_ = localRot;
+            localPositions_ = localPos;
 
-            if (this.start > file.FrameCount)
+            if (end_ < 0)
+                end_ = file_.FrameCount - 1;
+
+            if (start_ > file_.FrameCount)
             {
-                Cue.LogError($"bvh {file.Name}: start too big, {this.start} >= {file.FrameCount}");
-                this.start = 0;
+                Cue.LogError($"bvh {file_.Name}: start too big, {start_} >= {file_.FrameCount}");
+                start_ = 0;
             }
 
-            if (this.end > file.FrameCount)
+            if (end_ > file_.FrameCount)
             {
-                Cue.LogError($"bvh {file.Name}: end too big, {this.end} >= {file.FrameCount}");
-                this.end = -1;
+                Cue.LogError($"bvh {file_.Name}: end too big, {end_} >= {file_.FrameCount}");
+                end_ = -1;
             }
         }
 
@@ -68,27 +70,72 @@ namespace Cue.BVH
                 (o.HasKey("localPositions") ? o["localPositions"].AsBool : true));
         }
 
+        public File File
+        {
+            get { return file_; }
+        }
+
+        public int FirstFrame
+        {
+            get { return start_; }
+        }
+
+        public int LastFrame
+        {
+            get { return end_; }
+        }
+
+        public bool Reverse
+        {
+            get { return reverse_; }
+        }
+
+        public bool RootXZ
+        {
+            get { return rootXZ_; }
+        }
+
+        public bool RootY
+        {
+            get { return rootY_; }
+        }
+
+        public bool LocalRotations
+        {
+            get { return localRotations_; }
+        }
+
+        public bool LocalPositions
+        {
+            get { return localPositions_; }
+        }
+
+        public bool UsePositions
+        {
+            get { return usePosition_; }
+        }
+
         public override string ToString()
         {
             string s =
-                "bvh " + file.Name + " " +
-                start.ToString() + "-" +
-                (end == -1 ? file.FrameCount.ToString() : end.ToString()) +
-                (reverse ? " rev" : "");
+                "bvh " + file_.Name + " " +
+                start_.ToString() + "-" +
+                (end_ == -1 ? file_.FrameCount.ToString() : end_.ToString()) +
+                (reverse_ ? " rev" : "");
 
-            if (rootXZ && rootY)
+            if (rootXZ_ && rootY_)
                 s += " rootAll";
-            else if (rootXZ)
+            else if (rootXZ_)
                 s += " rootXZ";
-            else if (rootY)
+            else if (rootY_)
                 s += " rootY";
 
-            if (localPositions)
+            if (localPositions_)
                 s += " locPos";
             else
                 s += " absPos";
 
-            if (localRotations)
+            if (localRotations_)
                 s += " locRot";
             else
                 s += " absRot";

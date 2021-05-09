@@ -13,7 +13,6 @@ namespace Cue.BVH
         private int nFrames_;
         private float frameTime_;
         private string path_;
-        private bool isTranslationLocal_;
         private string name_;
 
         public File(string _path)
@@ -75,7 +74,6 @@ namespace Cue.BVH
             frames_ = ReadMotion(raw);
             frameTime_ = ReadFrameTime(raw);
             nFrames_ = frames_.Length;
-            isTranslationLocal_ = IsEstimatedLocalTranslation();
             ReadZeroPos();
         }
 
@@ -88,36 +86,6 @@ namespace Cue.BVH
                     if (tf.bone.hasPosition)
                         tf.bone.posZero = tf.position;
                 }
-            }
-        }
-
-        bool IsEstimatedLocalTranslation()
-        {
-            BvhBone hip = null;
-            foreach (var bone in bones_)
-                if (bone.isHipBone)
-                    hip = bone;
-            if (hip == null)
-                return true;    // best estimate without a hip bone
-            var index = hip.frameOffset + 1;
-            // Use hip 'y' to estimate the translation mode (local or "absolute")
-            float sum = 0;
-            for (var i = 0; i < nFrames_; i++)
-            {
-                var data = frames_[i];
-                sum += data[index];
-            }
-            float average = sum / nFrames_;
-            float absScore = Mathf.Abs(hip.offset.y - average);    // absolute will have average close to offset
-            float locScore = Mathf.Abs(average);    // lowest score wins
-            return locScore < absScore;
-        }
-
-        public void LogHierarchy()
-        {
-            foreach (var bone in bones_)
-            {
-                Debug.Log(bone.ToDebugString());
             }
         }
 
