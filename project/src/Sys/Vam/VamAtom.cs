@@ -280,6 +280,11 @@ namespace Cue.W
 			nav_.TeleportTo(v, bearing);
 		}
 
+		public VamAtomNav VamAtomNav
+		{
+			get { return nav_; }
+		}
+
 		public bool NavEnabled
 		{
 			get { return nav_.Enabled; }

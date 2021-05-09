@@ -20,19 +20,42 @@ namespace Cue.W
 		{
 			if (mat_ == null)
 			{
-				mat_ = new Material(Shader.Find("Battlehub/RTGizmos/Handles"));
-				mat_.color = new Color(1, 1, 1, 0.1f);
-				mat_.SetFloat("_Offset", 1f);
-				mat_.SetFloat("_MinAlpha", 1f);
+				mat_ = new Material(Shader.Find("Hidden/Internal-Colored"));
+				mat_.color = new Color(1, 1, 1, 1);
 			}
 
-			var walkableColor = new Color(0, 1, 0, 1);
-			var nonWalkableColor = new Color(1, 0, 0, 1);
-			var unknownColor = new Color(0, 0, 1, 1);
+			float yOffset = 0.05f;
+
+			var walkableColor = new Color(0, 1, 0, 0.1f);
+			var nonWalkableColor = new Color(1, 0, 0, 0.1f);
+			var unknownColor = new Color(0, 0, 1, 0.1f);
 
 			GL.PushMatrix();
 
 			mat_.SetPass(0);
+
+
+			var pathColor = new Color(1, 1, 1, 1);
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				var a = Cue.Instance.Persons[i].VamAtom.VamAtomNav.Agent;
+				if (!a.hasPath && a.path.corners.Length < 2)
+					continue;
+
+				GL.Begin(GL.LINE_STRIP);
+				GL.Color(pathColor);
+				GL.Vertex(a.path.corners[0]);
+				for (int j = 1; j < a.path.corners.Length; ++j)
+				{
+					GL.Color(pathColor);
+					GL.Vertex(a.path.corners[j]);
+				}
+
+				GL.End();
+			}
+
+
 			GL.Begin(GL.TRIANGLES);
 			for (int i = 0; i < tris_.indices.Length; i += 3)
 			{
@@ -40,9 +63,9 @@ namespace Cue.W
 				var i1 = tris_.indices[i];
 				var i2 = tris_.indices[i + 1];
 				var i3 = tris_.indices[i + 2];
-				var p1 = tris_.vertices[i1];
-				var p2 = tris_.vertices[i2];
-				var p3 = tris_.vertices[i3];
+				var p1 = tris_.vertices[i1] + new UnityEngine.Vector3(0, yOffset, 0);
+				var p2 = tris_.vertices[i2] + new UnityEngine.Vector3(0, yOffset, 0);
+				var p3 = tris_.vertices[i3] + new UnityEngine.Vector3(0, yOffset, 0);
 				var areaIndex = tris_.areas[triangleIndex];
 				Color color;
 				switch (areaIndex)
@@ -60,6 +83,7 @@ namespace Cue.W
 				GL.Vertex(p3);
 			}
 			GL.End();
+
 
 			GL.PopMatrix();
 		}

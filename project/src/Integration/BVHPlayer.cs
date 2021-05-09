@@ -118,11 +118,7 @@ namespace Cue.BVH
             anim_ = ba;
             flags_ = flags;
             frameTime_ = anim_.File.FrameTime;
-
-            if (Bits.IsSet(flags, Animator.Reverse))
-                frame_ = anim_.LastFrame;
-            else
-                frame_ = anim_.FirstFrame;
+            frame_ = anim_.InitFrame;
 
             CreateControllerMap();
 
@@ -406,61 +402,67 @@ namespace Cue.BVH
                 {
                     elapsed_ = 0;
 
-                    if ((flags_ & Animator.Reverse) != 0)
+                    if (Bits.IsSet(flags_, Animator.Reverse))
                         --frame_;
                     else
                         frame_++;
                 }
             }
 
-            if ((flags_ & Animator.Reverse) != 0)
+            if (CheckAtEnd())
             {
-                if (frame_ > anim_.LastFrame)
-                {
-                    frame_ = anim_.LastFrame;
-                }
+                person_.Atom.SetDefaultControls("bvh finished");
+                playing_ = false;
+                return;
+            }
+
+            UpdateModel();
+        }
+
+        private bool CheckAtEnd()
+        {
+            if (Bits.IsSet(flags_, Animator.Reverse))
+            {
+                if (frame_ > anim_.InitFrame)
+                    frame_ = anim_.InitFrame;
 
                 if (frame_ <= anim_.FirstFrame)
                 {
-                    if ((flags_ & Animator.Loop) == 0)
-                    {
-                        person_.Atom.SetDefaultControls("bvh finished");
-                        playing_ = false;
-                        return;
-                    }
-                    else
-                    {
+                    if (Bits.IsSet(flags_, Animator.Loop))
                         frame_ = anim_.LastFrame;
-                    }
+                    else
+                        return true;
                 }
             }
             else
             {
-                if (frame_ < anim_.FirstFrame)
-                {
-                    frame_ = anim_.FirstFrame;
-                }
+                if (frame_ < anim_.InitFrame)
+                    frame_ = anim_.InitFrame;
 
                 if (frame_ >= anim_.LastFrame)
                 {
-                    if ((flags_ & Animator.Loop) == 0)
-                    {
-                        person_.Atom.SetDefaultControls("bvh finished");
-                        playing_ = false;
-                        return;
-                    }
-                    else
-                    {
+                    if (Bits.IsSet(flags_, Animator.Loop))
                         frame_ = anim_.FirstFrame;
-                    }
+                    else
+                        return true;
                 }
             }
 
-            if ((flags_ & Animator.Reverse) != 0)
+            return false;
+        }
+
+        private void UpdateModel()
+        {
+            if (Bits.IsSet(flags_, Animator.Reverse))
             {
                 if (frame_ <= anim_.FirstFrame + 1)
                 {
-                    if ((flags_ & Animator.Loop) != 0)
+                    if (Bits.IsSet(flags_, Animator.Loop))
+                    {
+                        // Last frame
+                        UpdateModel(anim_.File.ReadFrame(frame_));
+                    }
+                    else
                     {
                         // Interpolate
                         var frm = anim_.File.ReadFrame(frame_);
@@ -468,11 +470,6 @@ namespace Cue.BVH
 
                         float t = elapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));
-                    }
-                    else
-                    {
-                        // Last frame
-                        UpdateModel(anim_.File.ReadFrame(frame_));
                     }
                 }
                 else
@@ -489,7 +486,12 @@ namespace Cue.BVH
             {
                 if (frame_ >= anim_.LastFrame - 1)
                 {
-                    if ((flags_ & Animator.Loop) != 0)
+                    if (Bits.IsSet(flags_, Animator.Loop))
+                    {
+                        // Last frame
+                        UpdateModel(anim_.File.ReadFrame(frame_));
+                    }
+                    else
                     {
                         // Interpolate
                         var frm = anim_.File.ReadFrame(frame_);
@@ -497,11 +499,6 @@ namespace Cue.BVH
 
                         float t = elapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));
-                    }
-                    else
-                    {
-                        // Last frame
-                        UpdateModel(anim_.File.ReadFrame(frame_));
                     }
                 }
                 else
@@ -520,7 +517,8 @@ namespace Cue.BVH
         {
             if (shadow_ != null)
             {
-                GameObject.Destroy(shadow_.gameObject);
+                UnityEngine.Object.Destroy(shadow_.gameObject);
+                shadow_ = null;
             }
         }
     }

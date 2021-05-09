@@ -181,8 +181,6 @@ namespace Cue
 
 			actions_.Clear();
 			ai_.RunEvent(null);
-
-			Atom.SetDefaultControls("make idle for move");
 		}
 
 		public override bool InteractWith(IObject o)
@@ -376,8 +374,14 @@ namespace Cue
 				{
 					state_.Set(PersonState.Walking);
 
-					if (lastNavState_ != W.NavStates.Moving || !animator_.Playing)
+					if ((
+							lastNavState_ != W.NavStates.Moving &&
+							lastNavState_ != W.NavStates.Calculating
+						)
+						|| !animator_.Playing)
+					{
 						animator_.PlayType(Animation.WalkType, Animator.Loop);
+					}
 
 					break;
 				}

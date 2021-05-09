@@ -13,6 +13,7 @@ namespace Cue.BVH
         private bool rootXZ_ = false;
         private bool rootY_ = false;
         private bool reverse_ = false;
+        private int init_ = -1;
         private int start_ = 0;
         private int end_ = -1;
         private bool usePosition_ = false;
@@ -21,12 +22,13 @@ namespace Cue.BVH
 
         public Animation(
             string path, bool rootXZ, bool rootY, bool reverse,
-            int start, int end, bool usePosition, bool localRot, bool localPos)
+            int init, int start, int end, bool usePosition, bool localRot, bool localPos)
         {
             file_ = new File(path);
             rootXZ_ = rootXZ;
             rootY_ = rootY;
             reverse_ = reverse;
+            init_ = init;
             start_ = start;
             end_ = end;
             usePosition_ = usePosition;
@@ -38,14 +40,48 @@ namespace Cue.BVH
 
             if (start_ > file_.FrameCount)
             {
-                Cue.LogError($"bvh {file_.Name}: start too big, {start_} >= {file_.FrameCount}");
+                Cue.LogError(
+                    $"bvh {file_.Name}: start too big, " +
+                    "{start_} >= {file_.FrameCount}");
+
                 start_ = 0;
             }
 
             if (end_ > file_.FrameCount)
             {
-                Cue.LogError($"bvh {file_.Name}: end too big, {end_} >= {file_.FrameCount}");
+                Cue.LogError(
+                    $"bvh {file_.Name}: end too big, " +
+                    "{end_} >= {file_.FrameCount}");
+
                 end_ = -1;
+            }
+
+            if (start_ > end_)
+            {
+                Cue.LogError(
+                    $"bvh {file_.Name}: start {start_} " +
+                    "after end {end_}, swapping");
+
+                int temp = start_;
+                start_ = end_;
+                end_ = temp;
+            }
+
+            if (init_ == -1)
+            {
+                if (reverse_)
+                    init_ = end_;
+                else
+                    init_ = start_;
+            }
+
+            if (reverse_ && init_ < end_)
+            {
+                Cue.LogError(
+                    $"bvh {file_.Name}: anim is reverse but " +
+                    $"init {init_} is before {end_}, will be ignored");
+
+                init_ = end_;
             }
         }
 
@@ -58,11 +94,12 @@ namespace Cue.BVH
             else
                 path = Cue.Instance.Sys.GetResourcePath("animations/" + path);
 
-            return new BVH.Animation(
+            return new Animation(
                 path,
                 (o.HasKey("rootXZ") ? o["rootXZ"].AsBool : true),
                 (o.HasKey("rootY") ? o["rootY"].AsBool : true),
                 (o.HasKey("reverse") ? o["reverse"].AsBool : false),
+                (o.HasKey("init") ? o["init"].AsInt : -1),
                 (o.HasKey("start") ? o["start"].AsInt : 0),
                 (o.HasKey("end") ? o["end"].AsInt : -1),
                 (o.HasKey("usePosition") ? o["usePosition"].AsBool : false),
@@ -73,6 +110,11 @@ namespace Cue.BVH
         public File File
         {
             get { return file_; }
+        }
+
+        public int InitFrame
+        {
+            get { return init_; }
         }
 
         public int FirstFrame
@@ -117,11 +159,10 @@ namespace Cue.BVH
 
         public override string ToString()
         {
-            string s =
-                "bvh " + file_.Name + " " +
-                start_.ToString() + "-" +
-                (end_ == -1 ? file_.FrameCount.ToString() : end_.ToString()) +
-                (reverse_ ? " rev" : "");
+            string s = $"bvh {file_.Name} {init_}/{start_}/{end_}";
+
+            if (reverse_)
+                s += " rev";
 
             if (rootXZ_ && rootY_)
                 s += " rootAll";
