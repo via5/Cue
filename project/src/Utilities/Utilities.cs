@@ -126,14 +126,14 @@ namespace Cue
 				return val;
 		}
 
-		// [begin, end]
+		// [first, last]
 		//
 		public static int RandomInt(int first, int last)
 		{
 			return Cue.Instance.Sys.RandomInt(first, last);
 		}
 
-		// [begin, end]
+		// [first, last]
 		//
 		public static float RandomFloat(float first, float last)
 		{

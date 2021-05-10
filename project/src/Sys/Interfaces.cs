@@ -160,6 +160,8 @@ namespace Cue.W
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
 
+		void Init();
+
 		List<IBodyPart> GetBodyParts();
 		IClothing Clothing { get; }
 		void SetDefaultControls(string why);

@@ -112,6 +112,10 @@ namespace Cue.W
 				clothing_ = new VamClothing(this);
 		}
 
+		public void Init()
+		{
+		}
+
 		public string ID
 		{
 			get { return atom_.uid; }

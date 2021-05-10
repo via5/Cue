@@ -159,6 +159,8 @@ namespace Cue
 					p.AI.Mood.State = Mood.None;
 				else
 					p.AI.Mood.State = Mood.Happy;
+
+				p.Atom.Init();
 			}
 		}
 

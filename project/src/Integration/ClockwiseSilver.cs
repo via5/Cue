@@ -116,14 +116,27 @@ namespace Cue
 		private W.VamFloatParameter headAngleX_ = null;
 		private W.VamFloatParameter headAngleY_ = null;
 		private W.VamFloatParameter headAngleZ_ = null;
+		private W.VamFloatParameter lipDepth_ = null;
 		private bool wasKissing_ = false;
-		private bool leader_ = false;
+		private bool random_ = false;
 		private float elapsed_ = 0;
 		private float cooldownRemaining_ = 0;
-		private float startAngleZ_ = 0;
 
+		private float startAngleX_ = 0;
+		private RandomRange randomHeadAngleX_ = new RandomRange(
+			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+
+		private float startAngleY_ = 0;
+		private RandomRange randomHeadAngleY_ = new RandomRange(
+			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+
+		private float startAngleZ_ = 0;
 		private RandomRange randomHeadAngleZ_ = new RandomRange(
 			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+
+		private float startLipDepth_ = 0;
+		private RandomRange randomLipDepth_ = new RandomRange(
+			new Range(0, 0.02f), new Range(0, 5), new Range(1, 3));
 
 		public ClockwiseSilverKiss(Person p)
 		{
@@ -160,6 +173,9 @@ namespace Cue
 
 			headAngleZ_ = new W.VamFloatParameter(
 				p, "ClockwiseSilver.Kiss", "Head Angle Z");
+
+			lipDepth_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Lip Depth");
 
 			active_.Value = false;
 		}
@@ -205,15 +221,29 @@ namespace Cue
 			if (k)
 				elapsed_ += s;
 
-			if (k && leader_ && active_.Value)
+			if (k && random_ && active_.Value)
 			{
-				if (randomHeadAngleZ_.Update(s))
+				bool changed = false;
+
+				changed = changed || randomHeadAngleX_.Update(s);
+				changed = changed || randomHeadAngleY_.Update(s);
+				changed = changed || randomHeadAngleZ_.Update(s);
+				changed = changed || randomLipDepth_.Update(s);
+
+				if (changed)
 				{
+					headAngleX_.Value = startAngleX_ + randomHeadAngleX_.Value;
+					headAngleY_.Value = startAngleY_ + randomHeadAngleY_.Value;
 					headAngleZ_.Value = startAngleZ_ + randomHeadAngleZ_.Value;
+					lipDepth_.Value = startLipDepth_ + randomLipDepth_.Value;
 
 					var t = Target?.Kisser as ClockwiseSilverKiss;
 					if (t != null)
+					{
+						t.headAngleX_.Value = t.startAngleX_ + randomHeadAngleX_.Value;
+						t.headAngleY_.Value = t.startAngleY_ + randomHeadAngleY_.Value;
 						t.headAngleZ_.Value = t.startAngleZ_ + randomHeadAngleZ_.Value;
+					}
 				}
 			}
 		}
@@ -307,25 +337,40 @@ namespace Cue
 			if (target == Cue.Instance.Player)
 			{
 				headAngleX_.Value = 0;
+				headAngleY_.Value = 0;
 				headAngleZ_.Value = 0;
+				lipDepth_.Value = 0;
+
+				random_ = false;
 			}
 			else
 			{
+				startAngleX_ = -10;
+				startAngleY_ = 0;
+
 				if (leader)
 					startAngleZ_ = -30;
 				else
 					startAngleZ_ = -20;
 
-				headAngleX_.Value = -10;
+				startLipDepth_ = 0;
+
+				headAngleX_.Value = startAngleX_;
+				headAngleY_.Value = startAngleY_;
 				headAngleZ_.Value = startAngleZ_;
+				lipDepth_.Value = startLipDepth_;
+
+				randomHeadAngleX_.Reset();
+				randomHeadAngleY_.Reset();
 				randomHeadAngleZ_.Reset();
+				randomLipDepth_.Reset();
+
+				random_ = leader;
 			}
 
 			trackPos_.Value = leader;
 			trackRot_.Value = true;
-
 			active_.Value = true;
-			leader_ = leader;
 
 			elapsed_ = 0;
 		}

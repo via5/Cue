@@ -248,6 +248,10 @@ namespace Cue.W
 			set { }
 		}
 
+		public void Init()
+		{
+		}
+
 		public void Say(string s)
 		{
 			Cue.LogInfo(id_ + " says '" + s + "'");
