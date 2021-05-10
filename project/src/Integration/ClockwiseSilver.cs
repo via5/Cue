@@ -2,6 +2,104 @@
 
 namespace Cue
 {
+	struct Range
+	{
+		public float first, second;
+
+		public Range(float first, float second)
+		{
+			this.first = first;
+			this.second = second;
+		}
+	}
+
+	class RandomRange
+	{
+		private Range valuesRange_;
+		private Range changeIntervalRange_;
+		private Range interpolateTimeRange_;
+
+		private float nextElapsed_ = 0;
+		private float nextInterval_ = 0;
+
+		private float nextValue_ = 0;
+		private float currentValue_ = 0;
+		private float valueElapsed_ = 0;
+		private float valueTime_ = 0;
+		private float lastValue_ = 0;
+
+		private IEasing easing_ = new SinusoidalEasing();
+
+		public RandomRange(Range values, Range changeInterval, Range interpolateTime)
+		{
+			valuesRange_ = values;
+			changeIntervalRange_ = changeInterval;
+			interpolateTimeRange_ = interpolateTime;
+		}
+
+		public float Value
+		{
+			get { return currentValue_; }
+		}
+
+		public void Reset()
+		{
+			nextElapsed_ = 0;
+			nextInterval_ = NextInterval();
+
+			nextValue_ = NextValue();
+			currentValue_ = 0;
+			valueElapsed_ = 0;
+			valueTime_ = ValueTime();
+			lastValue_ = 0;
+		}
+
+		public bool Update(float s)
+		{
+			nextElapsed_ += s;
+
+			if (nextElapsed_ >= nextInterval_)
+			{
+				lastValue_ = currentValue_;
+				nextValue_ = NextValue();
+				nextElapsed_ = 0;
+				valueElapsed_ = 0;
+				nextInterval_ = NextInterval();
+				valueTime_ = ValueTime();
+			}
+			else if (valueElapsed_ < valueTime_)
+			{
+				valueElapsed_ = U.Clamp(valueElapsed_ + s, 0, valueTime_);
+				currentValue_ = Interpolate(lastValue_, nextValue_, valueElapsed_ / valueTime_);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private float NextValue()
+		{
+			return U.RandomFloat(valuesRange_.first, valuesRange_.second);
+		}
+
+		private float NextInterval()
+		{
+			return U.RandomFloat(changeIntervalRange_.first, changeIntervalRange_.second);
+		}
+
+		private float ValueTime()
+		{
+			return U.RandomFloat(interpolateTimeRange_.first, interpolateTimeRange_.second);
+		}
+
+		private float Interpolate(float start, float end, float f)
+		{
+			return start + (end - start) * easing_.Magnitude(f);
+		}
+	}
+
+
 	class ClockwiseSilverKiss : IKisser
 	{
 		public const float Cooldown = 10;
@@ -19,8 +117,13 @@ namespace Cue
 		private W.VamFloatParameter headAngleY_ = null;
 		private W.VamFloatParameter headAngleZ_ = null;
 		private bool wasKissing_ = false;
+		private bool leader_ = false;
 		private float elapsed_ = 0;
 		private float cooldownRemaining_ = 0;
+		private float startAngleZ_ = 0;
+
+		private RandomRange randomHeadAngleZ_ = new RandomRange(
+			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
 
 		public ClockwiseSilverKiss(Person p)
 		{
@@ -101,6 +204,22 @@ namespace Cue
 
 			if (k)
 				elapsed_ += s;
+
+			if (k && leader_ && active_.Value)
+			{
+				if (randomHeadAngleZ_.Update(s))
+				{
+					headAngleZ_.Value = startAngleZ_ + randomHeadAngleZ_.Value;
+
+					var t = Target?.Kisser as ClockwiseSilverKiss;
+					if (t != null)
+						t.headAngleZ_.Value = t.startAngleZ_ + randomHeadAngleZ_.Value;
+				}
+			}
+		}
+
+		public void OnPluginState(bool b)
+		{
 		}
 
 		public void Stop()
@@ -150,16 +269,11 @@ namespace Cue
 				return;
 			}
 
-			bool thisPos = true;
-			bool targetPos = false;
-
+			bool leader = true;
 			if (person_ == Cue.Instance.Player)
-			{
-				thisPos = false;
-				targetPos = true;
-			}
+				leader = false;
 
-			DoKiss(target, thisPos);
+			DoKiss(target, leader);
 
 			if (target.Kisser == null)
 			{
@@ -175,16 +289,12 @@ namespace Cue
 				}
 				else
 				{
-					tcw.DoKiss(person_, targetPos);
+					tcw.DoKiss(person_, !leader);
 				}
 			}
 		}
 
-		public void OnPluginState(bool b)
-		{
-		}
-
-		private void DoKiss(Person target, bool pos)
+		private void DoKiss(Person target, bool leader)
 		{
 			enabled_.Value = true;
 
@@ -194,13 +304,28 @@ namespace Cue
 			atom_.Value = target.ID;
 			target_.Value = "LipTrigger";
 
-			headAngleX_.Value = -10;
-			headAngleZ_.Value = -40;
+			if (target == Cue.Instance.Player)
+			{
+				headAngleX_.Value = 0;
+				headAngleZ_.Value = 0;
+			}
+			else
+			{
+				if (leader)
+					startAngleZ_ = -30;
+				else
+					startAngleZ_ = -20;
 
-			trackPos_.Value = pos;
+				headAngleX_.Value = -10;
+				headAngleZ_.Value = startAngleZ_;
+				randomHeadAngleZ_.Reset();
+			}
+
+			trackPos_.Value = leader;
 			trackRot_.Value = true;
 
 			active_.Value = true;
+			leader_ = leader;
 
 			elapsed_ = 0;
 		}

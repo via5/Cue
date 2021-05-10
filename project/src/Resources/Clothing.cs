@@ -65,7 +65,7 @@ namespace Cue
 
 		public ClothingResources()
 		{
-			log_ = new Logger(Logger.Clothing, "ClothingRes");
+			log_ = new Logger(Logger.Resources, "ClothingRes");
 		}
 
 		public bool Load()

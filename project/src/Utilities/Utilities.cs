@@ -354,10 +354,12 @@ namespace Cue
 		public const int Slots       = 0x080;
 		public const int Sys         = 0x100;
 		public const int Clothing    = 0x200;
+		public const int Resources   = 0x400;
+
 		public const int All         = int.MaxValue;
 
-		private static int enabled_ = All;
-//			Action | Interaction | AI | Event | Integration | Object | Animation;
+		private static int enabled_ =
+			Action | Interaction | AI | Event | Integration | Object | Animation;
 
 		private int type_;
 		private Func<string> prefix_;
@@ -380,7 +382,7 @@ namespace Cue
 			prefix_ = () => o.ID + (prefix == "" ? "" : " " + prefix);
 		}
 
-		public Logger(int type, IAtom a, string prefix)
+		public Logger(int type, W.IAtom a, string prefix)
 		{
 			type_ = type;
 			prefix_ = () => a.ID + (prefix == "" ? "" : " " + prefix);

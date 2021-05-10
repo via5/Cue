@@ -449,6 +449,18 @@ namespace Cue.W
 				{
 					log_.Info("countdown finished, enabling collisions");
 					atom_.Atom.collisionEnabled = true;
+
+					// setting grabFreezePhysics on the atom or
+					// freezeAtomPhysicsWhenGrabbed on controllers doesn't
+					// update the toggle in the ui, the param has to be set
+					// manually
+					foreach (var fc in atom_.Atom.freeControllers)
+					{
+						var b = fc.GetBoolJSONParam("freezeAtomPhysicsWhenGrabbed");
+						if (b != null)
+							b.val = false;
+					}
+
 					Enabled = navEnabled_;
 				}
 
