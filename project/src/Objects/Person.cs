@@ -237,6 +237,9 @@ namespace Cue
 			expression_.Update(s);
 			excitement_.Update(s);
 
+			if (this != Cue.Instance.Player)
+				body_.Update(s);
+
 			if (ai_ != null && !Atom.Teleporting)
 				ai_.Update(s);
 		}

@@ -732,12 +732,19 @@ namespace Cue
 
 					if (w.part.Exists)
 					{
-						w.triggering.Text = w.part.Triggering.ToString();
+						if (w.part.Sys.CanTrigger)
+						{
+							w.triggering.Text = w.part.Triggering.ToString();
 
-						w.triggering.TextColor = (
-							w.part.Triggering ?
-							W.VamU.ToUnity(Color.Green) :
-							VUI.Style.Theme.TextColor);
+							w.triggering.TextColor = (
+								w.part.Triggering ?
+								W.VamU.ToUnity(Color.Green) :
+								VUI.Style.Theme.TextColor);
+						}
+						else
+						{
+							w.triggering.Text = "";
+						}
 
 						w.close.Text = w.part.Close.ToString();
 

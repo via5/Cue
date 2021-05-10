@@ -21,6 +21,11 @@ namespace Cue.W
 			get { return type_; }
 		}
 
+		public bool CanTrigger
+		{
+			get { return false; }
+		}
+
 		public bool Triggering
 		{
 			get { return false; }
@@ -54,6 +59,11 @@ namespace Cue.W
 		public int Type
 		{
 			get { return type_; }
+		}
+
+		public bool CanTrigger
+		{
+			get { return false; }
 		}
 
 		public bool Triggering
@@ -96,6 +106,11 @@ namespace Cue.W
 		public int Type
 		{
 			get { return type_; }
+		}
+
+		public bool CanTrigger
+		{
+			get { return true; }
 		}
 
 		public bool Triggering

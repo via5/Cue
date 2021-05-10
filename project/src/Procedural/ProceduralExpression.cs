@@ -30,6 +30,7 @@ namespace Cue
 		private bool closeToMid_ = false;
 		private bool awayFromMid_ = false;
 		private float timeActive_ = 0;
+		private float intensity_ = 0;
 
 		private float disableBlinkAbove_ = NoDisableBlink;
 
@@ -228,7 +229,9 @@ namespace Cue
 			if (morph_ == null)
 				return 0;
 
-			var v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_)) * intensity;
+			intensity_ = intensity;
+
+			var v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
 			if (Math.Abs(v - mid_) > max)
 				v = mid_ + Math.Sign(v) * max;
 
@@ -276,7 +279,7 @@ namespace Cue
 			}
 			else
 			{
-				r_ = U.RandomFloat(start_, end_);
+				r_ = U.RandomFloat(start_, end_) * intensity_;
 			}
 		}
 	}
@@ -659,7 +662,17 @@ namespace Cue
 			return e;
 		}
 
-		public void Set(Pair<int, float>[] intensities, bool resetOthers = false)
+		public void Set(int type, float intensity, bool resetOthers = false)
+		{
+			Set(
+				new ExpressionIntensity[]
+				{
+					new ExpressionIntensity(type, intensity)
+				},
+				resetOthers);
+		}
+
+		public void Set(ExpressionIntensity[] intensities, bool resetOthers = false)
 		{
 			// todo: let morphs go back to normal
 
@@ -669,9 +682,9 @@ namespace Cue
 
 				for (int j = 0; j < intensities.Length; ++j)
 				{
-					if (intensities[j].first == expressions_[i].Type)
+					if (intensities[j].type == expressions_[i].Type)
 					{
-						expressions_[i].Intensity = intensities[j].second;
+						expressions_[i].Intensity = intensities[j].intensity;
 						found = true;
 						break;
 					}

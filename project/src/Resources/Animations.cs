@@ -210,6 +210,25 @@ namespace Cue
 			return list;
 		}
 
+		public List<Animation> GetAllIdles(int state, int sex)
+		{
+			var list = new List<Animation>();
+
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == Animation.IdleType)
+				{
+					if (anims_[i].State == state)
+					{
+						if (Sexes.Match(anims_[i].Sex, sex))
+							list.Add(anims_[i]);
+					}
+				}
+			}
+
+			return list;
+		}
+
 		public Animation GetAnyTransition(int from, int to, int sex)
 		{
 			for (int i = 0; i < anims_.Count; ++i)

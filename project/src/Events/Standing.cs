@@ -51,6 +51,7 @@ namespace Cue
 			if (o_ == null)
 			{
 				pos = person_.UprightPosition;
+				state_ = Moving;
 			}
 			else
 			{
@@ -85,9 +86,9 @@ namespace Cue
 						//	"I think..."
 						//}));
 
-						//cc.Push(new RandomAnimationAction(
-						//	Resources.Animations.GetAll(
-						//		Resources.Animations.StandIdle, person_.Sex)));
+						cc.Push(new RandomAnimationAction(person_,
+							Resources.Animations.GetAllIdles(
+								PersonState.Standing, person_.Sex)));
 
 						cc.Push(new LookAroundAction(person_));
 						person_.PushAction(cc);

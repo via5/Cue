@@ -36,15 +36,17 @@ namespace Cue
 
 			mood_ = new Mood(person_);
 
-			foreach (var o in Cue.Instance.Objects)
-			{
-				if (o.Slots.Has(Slot.Sit))
-					events_.Add(new SitEvent(person_, o));
-				if (o.Slots.Has(Slot.Lie))
-					events_.Add(new LieDownEvent(person_, o));
-				if (o.Slots.Has(Slot.Stand))
-					events_.Add(new StandEvent(person_, o));
-			}
+			//foreach (var o in Cue.Instance.Objects)
+			//{
+			//	if (o.Slots.Has(Slot.Sit))
+			//		events_.Add(new SitEvent(person_, o));
+			//	if (o.Slots.Has(Slot.Lie))
+			//		events_.Add(new LieDownEvent(person_, o));
+			//	if (o.Slots.Has(Slot.Stand))
+			//		events_.Add(new StandEvent(person_, o));
+			//}
+
+			events_.Add(new StandEvent(p));
 
 			interactions_.Add(new TouchInteraction(person_));
 			interactions_.Add(new KissingInteraction(person_));

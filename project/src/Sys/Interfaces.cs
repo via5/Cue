@@ -134,6 +134,7 @@ namespace Cue.W
 	interface IBodyPart
 	{
 		int Type { get; }
+		bool CanTrigger { get; }
 		bool Triggering { get; }
 		Vector3 Position { get; }
 		Vector3 Direction { get; }

@@ -10,6 +10,7 @@
 	{
 		private Person person_;
 		private Logger log_;
+		private bool wasClose_ = false;
 
 		public TouchInteraction(Person p)
 		{
@@ -19,19 +20,21 @@
 
 		public void Update(float s)
 		{
-			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
-			var rightHand = Cue.Instance.InteractiveRightHandPosition;
+			bool close = person_.Body.PlayerIsClose;
 
-			for (int i = 0; i < person_.Body.Parts.Length; ++i)
+			if (close != wasClose_)
 			{
-				var p = person_.Body.Parts[i];
-				if (p == null)
-					continue;
+				if (close)
+				{
+					person_.Gaze.LookAt(Cue.Instance.Player);
+					person_.AI.Mood.State = Mood.Happy;
+				}
+				else
+				{
+					person_.AI.Mood.State = Mood.Idle;
+				}
 
-				var leftD = Vector3.Distance(p.Position, leftHand);
-				var rightD = Vector3.Distance(p.Position, rightHand);
-
-				p.Close = (leftD < 0.2f) || (rightD < 0.2f);
+				wasClose_ = close;
 			}
 		}
 	}

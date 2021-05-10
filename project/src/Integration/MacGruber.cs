@@ -100,12 +100,15 @@ namespace Cue
 
 			set
 			{
-				if (value)
-					log_.Info("enabling");
-				else
-					log_.Info("disabling");
+				if (value != enabled_.Value)
+				{
+					if (value)
+						log_.Info("enabling");
+					else
+						log_.Info("disabling");
 
-				enabled_.Value = value;
+					enabled_.Value = value;
+				}
 			}
 		}
 

@@ -134,6 +134,8 @@ namespace Cue
 	{
 		private Person person_;
 		private readonly BodyPart[] all_;
+		private bool handsClose_;
+		private float timeSinceClose_ = 0;
 
 		public Body(Person p)
 		{
@@ -153,7 +155,18 @@ namespace Cue
 			all_ = all.ToArray();
 		}
 
-		public BodyPart[] Parts { get { return all_; } }
+		public BodyPart[] Parts
+		{
+			get { return all_; }
+		}
+
+		public bool PlayerIsClose
+		{
+			get
+			{
+				return handsClose_ || (timeSinceClose_ < 2);
+			}
+		}
 
 		public BodyPart Get(int type)
 		{
@@ -164,6 +177,33 @@ namespace Cue
 			}
 
 			return all_[type];
+		}
+
+		public void Update(float s)
+		{
+			var wasClose = handsClose_;
+			handsClose_ = false;
+
+			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
+			var rightHand = Cue.Instance.InteractiveRightHandPosition;
+
+			for (int i = 0; i < all_.Length; ++i)
+			{
+				var p = all_[i];
+				if (p == null)
+					continue;
+
+				var leftD = Vector3.Distance(p.Position, leftHand);
+				var rightD = Vector3.Distance(p.Position, rightHand);
+
+				p.Close = (leftD < 0.2f) || (rightD < 0.2f);
+				handsClose_ = handsClose_ || p.Close;
+			}
+
+			if (wasClose && !handsClose_)
+				timeSinceClose_ = 0;
+			else if (!handsClose_)
+				timeSinceClose_ += s;
 		}
 
 		// convenience

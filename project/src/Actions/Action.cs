@@ -367,8 +367,9 @@ namespace Cue
 		private List<Animation> anims_;
 		private float e_ = 0;
 		private int i_ = -1;
-		private const float Delay = 10;
-		private bool reverse_ = true;
+		private const float Delay = 5;
+		private bool playing_ = false;
+		private bool wasClose_ = false;
 
 		public RandomAnimationAction(IObject o, List<Animation> anims)
 			: base(o, "RandomAnimation")
@@ -381,7 +382,6 @@ namespace Cue
 			e_ = 0;
 			i_ = -1;
 			anims_.Shuffle();
-			reverse_ = false;
 			return true;
 		}
 
@@ -397,6 +397,27 @@ namespace Cue
 				return false;
 			}
 
+
+			bool close = p.Body.PlayerIsClose;
+
+			if (close != wasClose_)
+			{
+				if (close)
+				{
+					if (playing_)
+					{
+						p.Animator.PlayNeutral();
+						playing_ = false;
+					}
+				}
+
+				wasClose_ = close;
+			}
+
+			if (close)
+				return true;
+
+
 			if (i_ == -1)
 			{
 				if (!p.Animator.Playing)
@@ -407,7 +428,15 @@ namespace Cue
 			}
 			else
 			{
-				if (!p.Animator.Playing)
+				if (playing_)
+				{
+					if (!p.Animator.Playing)
+					{
+						p.Animator.PlayNeutral();
+						playing_ = false;
+					}
+				}
+				else
 				{
 					e_ += s;
 					if (e_ >= Delay)
@@ -423,22 +452,14 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			if (!reverse_)
-			{
-				p.Animator.Play(anims_[i_], Animator.Rewind);
-				reverse_ = true;
-			}
-			else
-			{
-				reverse_ = false;
-				p.Animator.Play(anims_[i_], Animator.Rewind | Animator.Reverse);
+			p.Animator.Play(anims_[i_]);
+			playing_ = true;
 
-				++i_;
-				if (i_ >= anims_.Count)
-				{
-					i_ = 0;
-					anims_.Shuffle();
-				}
+			++i_;
+			if (i_ >= anims_.Count)
+			{
+				i_ = 0;
+				anims_.Shuffle();
 			}
 		}
 
@@ -473,6 +494,9 @@ namespace Cue
 				log_.Error("object is not a person");
 				return false;
 			}
+
+			if (p.Body.PlayerIsClose)
+				return true;
 
 			e_ += s;
 

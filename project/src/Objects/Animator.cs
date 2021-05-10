@@ -177,6 +177,15 @@ namespace Cue
 			Play(Resources.Animations.GetAny(type, person_.Sex), flags);
 		}
 
+		public void PlayNeutral()
+		{
+			if (person_.State.IsCurrently(PersonState.Standing))
+			{
+				person_.Animator.PlayTransition(
+					PersonState.Standing, PersonState.Standing);
+			}
+		}
+
 		public void Play(Animation a, int flags = 0)
 		{
 			for (int i=0; i<players_.Count;++i)

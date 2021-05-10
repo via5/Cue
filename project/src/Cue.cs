@@ -181,16 +181,15 @@ namespace Cue
 				p.Clothing.Init();
 				p.Personality = new QuirkyPersonality(p);
 
-				p.AI.EventsEnabled = false;
-
 				if (p == Player)
 				{
+					p.AI.EventsEnabled = false;
 					p.AI.InteractionsEnabled = false;
 					p.AI.MoodEnabled = false;
 				}
 				else
 				{
-					p.AI.Mood.State = Mood.Happy;
+					p.AI.Mood.State = Mood.Idle;
 				}
 
 				p.Atom.Init();

@@ -132,6 +132,7 @@ namespace Cue
 			private Quaternion endRot_;
 			private float elapsed_ = 0;
 			private bool done_ = false;
+			private IEasing easing_ = new SinusoidalEasing();
 
 			public Controller(string name, Vector3 pos, Vector3 rot)
 			{
@@ -203,7 +204,7 @@ namespace Cue
 
 				elapsed_ += s;
 
-				float t = U.Clamp(elapsed_, 0, 1);
+				float t = easing_.Magnitude(U.Clamp(elapsed_, 0, 1));
 
 				var mid = startPos_ + (endPos_ - startPos_) / 2 + new UnityEngine.Vector3(0, 0.3f, 0);
 

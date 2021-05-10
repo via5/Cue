@@ -165,6 +165,18 @@ namespace Cue
 	}
 
 
+	public struct ExpressionIntensity
+	{
+		public int type;
+		public float intensity;
+
+		public ExpressionIntensity(int type, float intensity)
+		{
+			this.type = type;
+			this.intensity = intensity;
+		}
+	}
+
 	class Expressions
 	{
 		public const int Common = 1;
@@ -188,7 +200,8 @@ namespace Cue
 	interface IExpression
 	{
 		void MakeNeutral();
-		void Set(Pair<int, float>[] intensities, bool resetOthers = false);
+		void Set(int type, float intensity, bool resetOthers = false);
+		void Set(ExpressionIntensity[] intensities, bool resetOthers = false);
 		bool Enabled { get; set; }
 		void Update(float s);
 		void OnPluginState(bool b);
