@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VUI
 {
@@ -151,6 +152,68 @@ namespace VUI
 	}
 
 
+	class Slider : BasicSlider<float>
+	{
+		private bool wholeNumbers_ = false;
+
+		public Slider(ValueCallback changed = null)
+			: base(changed)
+		{
+		}
+
+		public bool WholeNumbers
+		{
+			get
+			{
+				return wholeNumbers_;
+			}
+
+			set
+			{
+				wholeNumbers_ = value;
+				if (slider_?.slider != null)
+					slider_.slider.wholeNumbers = value;
+			}
+		}
+
+		protected override void DoCreate()
+		{
+			base.DoCreate();
+			slider_.slider.wholeNumbers = wholeNumbers_;
+		}
+
+		protected override float GetValue()
+		{
+			return slider_.slider.value;
+		}
+
+		protected override void SetValue(float v)
+		{
+			slider_.slider.value = v;
+		}
+
+		protected override float GetMinimum()
+		{
+			return slider_.slider.minValue;
+		}
+
+		protected override void SetMinimum(float v)
+		{
+			slider_.slider.minValue = v;
+		}
+
+		protected override float GetMaximum()
+		{
+			return slider_.slider.maxValue;
+		}
+
+		protected override void SetMaximum(float v)
+		{
+			slider_.slider.maxValue = v;
+		}
+	}
+
+
 	class FloatSlider : BasicSlider<float>
 	{
 		public FloatSlider(ValueCallback changed = null)
@@ -242,8 +305,8 @@ namespace VUI
 		public delegate void ValueCallback(T f);
 		public event ValueCallback ValueChanged;
 
-		private readonly BasicSlider<T> slider_;
-		private readonly TextBox text_ = new TextBox();
+		protected readonly BasicSlider<T> slider_;
+		protected readonly TextBox text_ = new TextBox();
 
 		private bool changingText_ = false;
 
@@ -319,6 +382,43 @@ namespace VUI
 
 		protected abstract T FromString(string s);
 		protected abstract string ToString(T v);
+	}
+
+
+	class TextSlider : BasicTextSlider<float>
+	{
+		public TextSlider(ValueCallback valueChanged = null)
+			: this(0, 0, 1, valueChanged)
+		{
+		}
+
+		public TextSlider(float value, float min, float max, ValueCallback valueChanged = null)
+			: base(new Slider(), value, min, max, valueChanged)
+		{
+		}
+
+		public bool WholeNumbers
+		{
+			get { return ((Slider)slider_).WholeNumbers; }
+			set { ((Slider)slider_).WholeNumbers = value; }
+		}
+
+		protected override float FromString(string s)
+		{
+			float f;
+			if (float.TryParse(s, out f))
+				return Utilities.Clamp(f, Minimum, Maximum);
+
+			return 0;
+		}
+
+		protected override string ToString(float v)
+		{
+			if (WholeNumbers)
+				return ((int)Math.Round(v)).ToString();
+			else
+				return v.ToString("0.00");
+		}
 	}
 
 

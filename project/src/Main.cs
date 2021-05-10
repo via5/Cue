@@ -183,6 +183,9 @@ namespace Cue
 			{
 				if (cue_ != null)
 					cue_.OnPluginState(true);
+
+				if (sui_ != null)
+					sui_.OnPluginState(true);
 			});
 		}
 
@@ -193,7 +196,11 @@ namespace Cue
 
 			U.Safe(() =>
 			{
-				cue_.OnPluginState(false);
+				if (cue_ != null)
+					cue_.OnPluginState(false);
+
+				if (sui_ != null)
+					sui_.OnPluginState(false);
 			});
 		}
 

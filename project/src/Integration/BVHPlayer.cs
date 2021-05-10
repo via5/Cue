@@ -23,6 +23,7 @@ namespace Cue.BVH
         }
 
         private Person person_;
+        private Logger log_;
         private Atom containingAtom_;
         private Dictionary<string, Controller> controllerMap_;
         private Dictionary<string, string> cnameToBname_;
@@ -41,10 +42,13 @@ namespace Cue.BVH
         private List<Transform> markers_ = null;
         private Dictionary<string, Transform> bones_;
         private Dictionary<string, Vector3> tposeBoneOffsets_ = null;
+        private Dictionary<string, Quaternion> tposeBoneRotations_ = null;
 
         public Player(Person p)
         {
             person_ = p;
+            log_ = new Logger(Logger.Animation, () => "bvh");
+
             CreateMappings();
 
             if (p.Atom is W.VamAtom)
@@ -93,6 +97,11 @@ namespace Cue.BVH
             get { return playing_; }
         }
 
+        public bool UsesFrames
+        {
+            get { return true; }
+        }
+
         public override string ToString()
         {
             string s = "bvh ";
@@ -133,7 +142,7 @@ namespace Cue.BVH
             anim_ = ba;
             flags_ = flags;
             frameTime_ = anim_.File.FrameTime;
-            frame_ = anim_.InitFrame;
+            frame_ = (int)anim_.InitFrame;
             elapsed_ = 0;
 
             CreateControllerMap();
@@ -172,7 +181,7 @@ namespace Cue.BVH
 
                     if (fs >= max)
                     {
-                        Cue.LogError(
+                        log_.Error(
                             $"bvh: failed to rewind, " +
                             $"fs={fs} n={anim_.File.FrameCount} " +
                             $"ft={frameTime_} max={max} " +
@@ -210,6 +219,9 @@ namespace Cue.BVH
                         }
                     }
 
+                    bones_[item.Value].localPosition = tposeBoneOffsets_[item.Value];
+                    bones_[item.Value].localRotation = tposeBoneRotations_[item.Value];
+
                     c.fc.currentRotationState = found ?
                         FreeControllerV3.RotationState.On :
                         FreeControllerV3.RotationState.Off;
@@ -225,9 +237,14 @@ namespace Cue.BVH
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
             go.parent = parent;
-            go.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            go.localScale = new Vector3(0.01f, 0.01f, 0.01f);
             go.localPosition = Vector3.zero;
             go.localRotation = Quaternion.identity;
+
+            var r = go.GetComponent<Renderer>();
+            r.material = new Material(Shader.Find("Battlehub/RTGizmos/Handles"));
+            r.material.color = new UnityEngine.Color(0, 0, 1, 0.5f);
+
             GameObject.Destroy(go.GetComponent<BoxCollider>());
             return go;
         }
@@ -243,17 +260,25 @@ namespace Cue.BVH
 
         public void HideSkeleton()
         {
-            foreach (var marker in markers_)
-                GameObject.Destroy(marker.gameObject);
-            markers_ = null;
+            if (markers_ != null)
+            {
+                foreach (var marker in markers_)
+                    GameObject.Destroy(marker.gameObject);
+                markers_ = null;
+            }
         }
 
         void RecordOffsets()
         {
             CreateShadowSkeleton();
+
             tposeBoneOffsets_ = new Dictionary<string, Vector3>();
+            tposeBoneRotations_ = new Dictionary<string, Quaternion>();
             foreach (var item in bones_)
+            {
                 tposeBoneOffsets_[item.Key] = item.Value.localPosition;
+                tposeBoneRotations_[item.Key] = item.Value.localRotation;
+            }
         }
 
         public void CreateShadow(Transform skeleton, Transform shadow)
@@ -327,6 +352,20 @@ namespace Cue.BVH
             set { paused_ = value; }
         }
 
+        public void Seek(float frame)
+        {
+            log_.Info($"seeking to {frame}");
+
+            frame_ = (int)Math.Round(frame);
+            frameTimeElapsed_ = 0;
+            elapsed_ = 100;
+
+            rootMotion_ = new Vector3();
+            UpdateModel(anim_.File.ReadFrame(frame_));
+            UpdateControllers();
+            ApplyRootMotion();
+        }
+
         public void FixedUpdate(float s)
         {
             if (containingAtom_ == null || paused_)
@@ -337,18 +376,20 @@ namespace Cue.BVH
                 if (anim_ == null || anim_.File.FrameCount == 0)
                     return;
 
-                if (playing_ && !paused_)
+                if (playing_)
                     elapsed_ += s;
+
+                FrameAdvance(s);
 
                 rootMotion_ = new Vector3();
 
-                FrameAdvance(s);
+                UpdateModel();
                 UpdateControllers();
                 ApplyRootMotion();
             }
             catch (Exception e)
             {
-                Cue.LogError("bvh fixed update: " + e);
+                log_.Error("bvh fixed update: " + e);
             }
         }
 
@@ -413,17 +454,6 @@ namespace Cue.BVH
             // no-op
         }
 
-        public void Seek(int f)
-        {
-            frame_ = f;
-            frameTimeElapsed_ = 0;
-            rootMotion_ = new Vector3();
-
-            UpdateModel(anim_.File.ReadFrame(frame_));
-            UpdateControllers();
-            ApplyRootMotion();
-        }
-
         public void FrameAdvance(float s)
         {
             if (playing_)
@@ -446,8 +476,6 @@ namespace Cue.BVH
                 playing_ = false;
                 return;
             }
-
-            UpdateModel();
         }
 
         private bool CheckAtEnd()
@@ -455,12 +483,12 @@ namespace Cue.BVH
             if (Bits.IsSet(flags_, Animator.Reverse))
             {
                 if (frame_ > anim_.InitFrame)
-                    frame_ = anim_.InitFrame;
+                    frame_ = (int)anim_.InitFrame;
 
                 if (frame_ <= anim_.FirstFrame)
                 {
                     if (Bits.IsSet(flags_, Animator.Loop))
-                        frame_ = anim_.LastFrame;
+                        frame_ = (int)anim_.LastFrame;
                     else
                         return true;
                 }
@@ -468,12 +496,12 @@ namespace Cue.BVH
             else
             {
                 if (frame_ < anim_.InitFrame)
-                    frame_ = anim_.InitFrame;
+                    frame_ = (int)anim_.InitFrame;
 
                 if (frame_ >= anim_.LastFrame)
                 {
                     if (Bits.IsSet(flags_, Animator.Loop))
-                        frame_ = anim_.FirstFrame;
+                        frame_ = (int)anim_.FirstFrame;
                     else
                         return true;
                 }
@@ -492,7 +520,7 @@ namespace Cue.BVH
                     {
                         // Interpolate
                         var frm = anim_.File.ReadFrame(frame_);
-                        var to = anim_.File.ReadFrame(anim_.LastFrame);
+                        var to = anim_.File.ReadFrame((int)anim_.LastFrame);
 
                         float t = frameTimeElapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));
@@ -521,7 +549,7 @@ namespace Cue.BVH
                     {
                         // Interpolate
                         var frm = anim_.File.ReadFrame(frame_);
-                        var to = anim_.File.ReadFrame(anim_.FirstFrame);
+                        var to = anim_.File.ReadFrame((int)anim_.FirstFrame);
 
                         float t = frameTimeElapsed_ / frameTime_;
                         UpdateModel(Interpolate(frm, to, t));

@@ -22,6 +22,23 @@ namespace Cue
 			get { return playing_.Value; }
 		}
 
+		// todo
+		public bool Paused
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool UsesFrames
+		{
+			get { return false; }
+		}
+
+		public void Seek(float f)
+		{
+			// todo
+		}
+
 		public bool Play(IAnimation a, int flags)
 		{
 			anim_ = a as SynergyAnimation;
@@ -71,6 +88,11 @@ namespace Cue
 		{
 			get { return name_; }
 		}
+
+		// todo
+		public float InitFrame { get { return -1; } }
+		public float FirstFrame { get { return -1; } }
+		public float LastFrame { get { return -1; } }
 
 		public override string ToString()
 		{

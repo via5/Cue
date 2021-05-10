@@ -186,9 +186,11 @@ namespace Cue
 				if (p.Play(a.Real, flags))
 				{
 					log_.Info(person_.ID + ": " + a.ToString());
+
 					currentPlayer_ = p;
 					currentAnimation_ = a;
 					activeFlags_ = flags;
+
 					return;
 				}
 			}
@@ -227,6 +229,19 @@ namespace Cue
 				}
 			}
 		}
+
+		public void OnPluginState(bool b)
+		{
+			if (!b)
+			{
+				foreach (var p in players_)
+				{
+					if (p is BVH.Player)
+						((BVH.Player)p).HideSkeleton();
+				}
+			}
+		}
+
 
 		public override string ToString()
 		{

@@ -49,6 +49,12 @@ namespace Cue
 
 			root_.Update();
 		}
+
+		public void OnPluginState(bool b)
+		{
+			foreach (var t in tabs_)
+				t.OnPluginState(b);
+		}
 	}
 
 
@@ -56,6 +62,11 @@ namespace Cue
 	{
 		public abstract string Title { get; }
 		public abstract void Update(float s);
+
+		public virtual void OnPluginState(bool b)
+		{
+			// no-op
+		}
 	}
 
 
@@ -295,6 +306,13 @@ namespace Cue
 		{
 			for (int i = 0; i < tabs_.Count; ++i)
 				tabs_[i].Update(s);
+		}
+
+		public override void OnPluginState(bool b)
+		{
+			base.OnPluginState(b);
+			foreach (var t in tabs_)
+				t.OnPluginState(b);
 		}
 	}
 
@@ -693,7 +711,10 @@ namespace Cue
 		private Person person_;
 		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
 		private VUI.CheckBox loop_ = new VUI.CheckBox("Loop");
-		private VUI.IntTextSlider seek_ = new VUI.IntTextSlider();
+		private VUI.CheckBox paused_ = new VUI.CheckBox("Paused");
+		private VUI.TextSlider seek_ = new VUI.TextSlider();
+		private IgnoreFlag ignore_ = new IgnoreFlag();
+		private Animation sel_ = null;
 
 		public PersonAnimationTab(Person person)
 		{
@@ -713,7 +734,7 @@ namespace Cue
 			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Play", OnPlay));
 			p.Add(new VUI.Button("Stop", OnStop));
-			p.Add(new VUI.Button("Pause", OnPause));
+			p.Add(paused_);
 			p.Add(loop_);
 			top.Add(p);
 
@@ -726,11 +747,12 @@ namespace Cue
 			Add(anims_, VUI.BorderLayout.Center);
 
 			var items = new List<Animation>();
-			foreach (var a in Resources.Animations.GetAll(Animation.NoType, Sexes.Female))
+			foreach (var a in Resources.Animations.GetAll(Animation.NoType, person_.Sex))
 				items.Add(a);
 
 			anims_.SetItems(items);
 
+			paused_.Changed += OnPaused;
 			seek_.ValueChanged += OnSeek;
 		}
 
@@ -741,41 +763,102 @@ namespace Cue
 
 		public override void Update(float s)
 		{
+			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
+				return;
+
+			var p = person_.Animator.CurrentPlayer;
+
+			if (p != null && !p.Paused)
+			{
+				ignore_.Do(() =>
+				{
+					seek_.WholeNumbers = p.UsesFrames;
+					seek_.Set(
+						sel_.Real.FirstFrame, sel_.Real.FirstFrame,
+						sel_.Real.LastFrame);
+				});
+			}
 		}
 
 		private void OnPlay()
 		{
-			var a = anims_.Selected;
-			if (a == null)
+			sel_ = anims_.Selected;
+			if (sel_ == null)
 				return;
 
-			var b = (BVH.Animation)a.Real;
+			PlaySelection();
+		}
 
-			person_.Animator.Play(a, loop_.Checked ? Animator.Loop : 0);
-			seek_.Set(b.InitFrame, b.FirstFrame, b.LastFrame);
+		private void PlaySelection(float frame = -1)
+		{
+			person_.Animator.Play(sel_, loop_.Checked ? Animator.Loop : 0);
+
+			var p = person_.Animator.CurrentPlayer;
+			if (p == null)
+			{
+				// todo
+				return;
+			}
+
+			p.Paused = paused_.Checked;
+
+			if (paused_.Checked)
+			{
+				((BVH.Player)p).ShowSkeleton();
+				p.Seek(sel_.Real.InitFrame);
+			}
+
+			ignore_.Do(() =>
+			{
+				seek_.WholeNumbers = p.UsesFrames;
+
+				if (frame < 0)
+					frame = sel_.Real.InitFrame;
+
+				seek_.Set(frame, sel_.Real.InitFrame, sel_.Real.LastFrame);
+			});
 		}
 
 		private void OnStop()
 		{
-			var a = anims_.Selected;
-			if (a == null)
+			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
 				return;
 
 			person_.Animator.Stop();
 		}
 
-		private void OnPause()
+		private void OnPaused(bool b)
 		{
-			var p = person_.Animator.CurrentPlayer as BVH.Player;
+			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
+				return;
+
+			var p = person_.Animator.CurrentPlayer;
 			if (p != null)
-				p.Paused = true;
+				p.Paused = b;
 		}
 
-		private void OnSeek(int f)
+		private void OnSeek(float f)
 		{
-			var p = person_.Animator.CurrentPlayer as BVH.Player;
-			if (p != null)
-				p.Seek(f);
+			if (ignore_)
+				return;
+
+			if (sel_ == null)
+			{
+				Cue.LogError("no selection");
+				return;
+			}
+
+			if (person_.Animator.CurrentAnimation != sel_)
+				PlaySelection(f);
+
+			if (person_.Animator.CurrentPlayer == null)
+			{
+				Cue.LogError("no player");
+				return;
+			}
+
+			Cue.LogInfo($"seeking to {f}");
+			person_.Animator.CurrentPlayer.Seek(f);
 		}
 	}
 }

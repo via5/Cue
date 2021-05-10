@@ -294,12 +294,14 @@ namespace Cue
 
 		public void LookAtCamera()
 		{
+			person_.Log.Info("looking at camera");
 			eyes_.LookAtCamera();
 			interested_ = false;
 		}
 
 		public void LookAt(IObject o, bool gaze = true)
 		{
+			person_.Log.Info($"looking at {o} gaze={gaze}");
 			eyes_.LookAt(o);
 			gazer_.Enabled = gaze;
 			interested_ = true;
@@ -307,6 +309,7 @@ namespace Cue
 
 		public void LookAt(Vector3 p, bool gaze = true)
 		{
+			person_.Log.Info($"looking at {p} gaze={gaze}");
 			eyes_.LookAt(p);
 			gazer_.Enabled = gaze;
 			interested_ = false;
@@ -314,6 +317,7 @@ namespace Cue
 
 		public void LookAtNothing()
 		{
+			person_.Log.Info("looking at nothing");
 			eyes_.LookAtNothing();
 			gazer_.Enabled = false;
 			interested_ = false;
@@ -321,6 +325,7 @@ namespace Cue
 
 		public void LookInFront()
 		{
+			person_.Log.Info("looking in front");
 			eyes_.LookInFront();
 			gazer_.Enabled = false;
 			interested_ = false;

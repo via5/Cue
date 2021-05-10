@@ -93,8 +93,20 @@ namespace Cue
 
 		public bool Enabled
 		{
-			get { return enabled_.Value; }
-			set { enabled_.Value = value; }
+			get
+			{
+				return enabled_.Value;
+			}
+
+			set
+			{
+				if (value)
+					log_.Info("enabling");
+				else
+					log_.Info("disabling");
+
+				enabled_.Value = value;
+			}
 		}
 
 		public void Update(float s)

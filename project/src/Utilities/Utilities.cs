@@ -319,6 +319,29 @@ namespace Cue
 	}
 
 
+	public class IgnoreFlag
+	{
+		private bool ignore_ = false;
+
+		public static implicit operator bool(IgnoreFlag f)
+		{
+			return f.ignore_;
+		}
+
+		public void Do(Action a)
+		{
+			try
+			{
+				ignore_ = true;
+				a();
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+	}
+
 	class Logger
 	{
 		public const int Animation   = 0x001;
@@ -332,7 +355,8 @@ namespace Cue
 		public const int Sys         = 0x100;
 		public const int Clothing    = 0x200;
 
-		private static int enabled_ = 0;
+		private static int enabled_ =
+			Action | Interaction | AI | Event | Integration | Object | Animation;
 
 		private int type_;
 		private Func<string> prefix_;

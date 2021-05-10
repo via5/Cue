@@ -112,17 +112,17 @@ namespace Cue.BVH
             get { return file_; }
         }
 
-        public int InitFrame
+        public float InitFrame
         {
             get { return init_; }
         }
 
-        public int FirstFrame
+        public float FirstFrame
         {
             get { return start_; }
         }
 
-        public int LastFrame
+        public float LastFrame
         {
             get { return end_; }
         }

@@ -246,6 +246,7 @@ namespace Cue
 
 			Atom.NavEnabled = b;
 
+			animator_.OnPluginState(b);
 			expression_.OnPluginState(b);
 			kisser_.OnPluginState(b);
 			handjob_.OnPluginState(b);
