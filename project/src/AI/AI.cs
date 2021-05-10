@@ -28,7 +28,7 @@ namespace Cue
 		public PersonAI(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.AI, () => "ai " + person_.ID);
+			log_ = new Logger(Logger.AI, person_, "AI");
 
 			mood_ = new Mood(person_);
 
@@ -85,7 +85,7 @@ namespace Cue
 				log_.Info("target is person, calling");
 				person_.UnlockSlot();
 				person_.MakeIdle();
-				person_.PushAction(new CallAction(o as Person));
+				person_.PushAction(new CallAction(person_, o as Person));
 				return true;
 			}
 
@@ -107,8 +107,8 @@ namespace Cue
 
 				if (person_ == Cue.Instance.Player)
 				{
-					person_.PushAction(new SitAction(slot));
-					person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
+					person_.PushAction(new SitAction(person_, slot));
+					person_.PushAction(new MoveAction(person_, slot.Position, slot.Bearing));
 				}
 				else
 				{
@@ -124,8 +124,8 @@ namespace Cue
 
 				if (person_ == Cue.Instance.Player)
 				{
-					person_.PushAction(new MakeIdleAction());
-					person_.PushAction(new MoveAction(slot.Position, slot.Bearing));
+					person_.PushAction(new MakeIdleAction(person_));
+					person_.PushAction(new MoveAction(person_, slot.Position, slot.Bearing));
 				}
 				else
 				{

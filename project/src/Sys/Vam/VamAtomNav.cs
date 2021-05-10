@@ -31,11 +31,7 @@ namespace Cue.W
 		public VamAtomNav(VamAtom a)
 		{
 			atom_ = a;
-
-			log_ = new Logger(Logger.Sys, () =>
-			{
-				return "VamAtomNav " + atom_.ID;
-			});
+			log_ = new Logger(Logger.Sys, atom_, "VamAtomNav");
 		}
 
 		private string BearingToString(float b)

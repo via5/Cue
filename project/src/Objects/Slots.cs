@@ -19,8 +19,7 @@ namespace Cue
 		public Slot(IObject self, int type)
 		{
 			self_ = self;
-			log_ = new Logger(
-				Logger.Slots, () => self_.ToString() + "." + TypeToString(type_));
+			log_ = new Logger(Logger.Slots, self_, TypeToString(type_));
 			type_ = type;
 		}
 

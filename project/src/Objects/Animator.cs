@@ -118,7 +118,7 @@ namespace Cue
 		public Animator(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Animation, () => person_.ID + " Animator");
+			log_ = new Logger(Logger.Animation, p, "Animator");
 			players_.AddRange(Integration.CreateAnimationPlayers(p));
 		}
 
@@ -145,7 +145,7 @@ namespace Cue
 			if (a == null)
 			{
 				log_.Error(
-					$"Animator: no transition animation from " +
+					$"no transition animation from " +
 					$"from {PersonState.StateToString(from)} " +
 					$"to {PersonState.StateToString(to)}");
 
@@ -162,8 +162,8 @@ namespace Cue
 
 			if (a == null)
 			{
-				Cue.LogError(
-					$"Animator: no sex animation for " +
+				log_.Error(
+					$"no sex animation for " +
 					$"state {PersonState.StateToString(state)}");
 
 				return;
@@ -185,7 +185,7 @@ namespace Cue
 
 				if (p.Play(a.Real, flags))
 				{
-					log_.Info(person_.ID + ": " + a.ToString());
+					log_.Info("playing " + a.ToString());
 
 					currentPlayer_ = p;
 					currentAnimation_ = a;

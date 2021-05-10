@@ -11,7 +11,7 @@
 		private float elapsed_ = 0;
 
 		public LieDownEvent(Person p, IObject o)
-			: base(p)
+			: base(p, "LieDown")
 		{
 			o_ = o;
 		}
@@ -23,7 +23,7 @@
 				case NoState:
 				{
 					log_.Info("going to sleep");
-					person_.PushAction(new MoveAction(o_.Position, BasicObject.NoBearing));
+					person_.PushAction(new MoveAction(person_, o_.Position, BasicObject.NoBearing));
 					state_ = Moving;
 					elapsed_ = 0;
 					break;

@@ -24,7 +24,7 @@ namespace Cue
 
 		public ClockwiseSilverKiss(Person p)
 		{
-			log_ = new Logger(Logger.Integration, () => $"cwkiss {person_}");
+			log_ = new Logger(Logger.Integration, p, "ClockwiseKiss");
 
 			person_ = p;
 
@@ -248,8 +248,8 @@ namespace Cue
 
 	class ClockwiseSilverHandjob : IHandjob
 	{
-		private Logger log_;
 		private Person person_;
+		private Logger log_;
 		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter active_ = null;
 		private W.VamBoolParameterRO running_ = null;
@@ -264,8 +264,8 @@ namespace Cue
 
 		public ClockwiseSilverHandjob(Person p)
 		{
-			log_ = new Logger(Logger.Integration, () => $"cwhj {person_}");
 			person_ = p;
+			log_ = new Logger(Logger.Integration, p, "ClockwiseHJ");
 			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "enabled");
 			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "isActive");
 			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
@@ -338,8 +338,8 @@ namespace Cue
 
 	class ClockwiseSilverBlowjob : IBlowjob
 	{
-		private Logger log_;
 		private Person person_;
+		private Logger log_;
 		private W.VamBoolParameter enabled_ = null;
 		private W.VamBoolParameter active_ = null;
 		private W.VamBoolParameterRO running_ = null;
@@ -353,9 +353,8 @@ namespace Cue
 
 		public ClockwiseSilverBlowjob(Person p)
 		{
-			log_ = new Logger(Logger.Integration, () => $"cwbj {person_}");
 			person_ = p;
-
+			log_ = new Logger(Logger.Integration, p, "ClockwiseBJ");
 			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "enabled");
 			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "isActive");
 			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");

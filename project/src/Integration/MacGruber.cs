@@ -67,8 +67,8 @@ namespace Cue
 		private const int Target = 1;
 		private const int Control = 2;
 
+		private Person person_;
 		private Logger log_;
-		private Person person_ = null;
 		private int version_ = NotFound;
 		private W.VamBoolParameter enabled_;
 
@@ -82,8 +82,8 @@ namespace Cue
 
 		public MacGruberGaze(Person p)
 		{
-			log_ = new Logger(Logger.Integration, () => $"mggaze {person_}");
 			person_ = p;
+			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
 			enabled_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
 			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 			lookatAtom_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");

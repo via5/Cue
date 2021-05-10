@@ -17,8 +17,7 @@ namespace Cue.W
 			{
 				atom_ = a;
 				ci_ = ci;
-				log_ = new Logger(
-					Logger.Clothing, () => a.ID + " VamClothingItem " + ci_.name);
+				log_ = new Logger(Logger.Clothing, a, $"VamClothingItem {ci_.name}");
 			}
 
 			public void Init()
@@ -202,7 +201,7 @@ namespace Cue.W
 		public VamClothing(VamAtom a)
 		{
 			atom_ = a;
-			log_ = new Logger(Logger.Clothing, () => atom_.ID + " VamClothing");
+			log_ = new Logger(Logger.Clothing, atom_, "VamClothing");
 
 			try
 			{

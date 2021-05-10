@@ -13,18 +13,18 @@ namespace Cue
 		private int state_ = NoState;
 
 		public StandEvent(Person p)
-			: base(p)
+			: base(p, "Stand")
 		{
 		}
 
 		public StandEvent(Person p, IObject o)
-			: base(p)
+			: this(p)
 		{
 			o_ = o;
 		}
 
 		public StandEvent(Person p, Slot s)
-			: base(p)
+			: this(p)
 		{
 			o_ = s.ParentObject;
 			slot_ = s;
@@ -64,7 +64,7 @@ namespace Cue
 				{
 					log_.Info("going to stand");
 					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(pos, bearing));
+					person_.PushAction(new MoveAction(person_, pos, bearing));
 					state_ = Moving;
 					break;
 				}
@@ -75,7 +75,7 @@ namespace Cue
 					{
 						log_.Info("thinking");
 
-						var cc = new ConcurrentAction();
+						var cc = new ConcurrentAction(person_);
 
 						//cc.Push(new RandomDialogAction(new List<string>()
 						//{
@@ -89,7 +89,7 @@ namespace Cue
 						//	Resources.Animations.GetAll(
 						//		Resources.Animations.StandIdle, person_.Sex)));
 
-						cc.Push(new LookAroundAction());
+						cc.Push(new LookAroundAction(person_));
 						person_.PushAction(cc);
 
 						state_ = Idling;

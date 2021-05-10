@@ -39,12 +39,14 @@ namespace Cue
 	class ProceduralPlayer : IPlayer
 	{
 		private Person person_;
+		private Logger log_;
 		private ProceduralAnimation proto_ = null;
 		private ProceduralAnimation anim_ = null;
 
 		public ProceduralPlayer(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Animation, person_, "ProcPlayer");
 		}
 
 		public bool Playing
@@ -71,9 +73,6 @@ namespace Cue
 
 		public bool Play(IAnimation a, int flags)
 		{
-			if (proto_ == a || anim_ == a)
-				return true;
-
 			anim_ = null;
 			proto_ = (a as ProceduralAnimation);
 			if (proto_ == null)
@@ -83,6 +82,8 @@ namespace Cue
 
 			anim_ = proto_.Clone();
 			anim_.Start(person_);
+
+			log_.Info($"playing {a}");
 
 			return true;
 		}

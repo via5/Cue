@@ -47,7 +47,7 @@ namespace Cue.BVH
         public Player(Person p)
         {
             person_ = p;
-            log_ = new Logger(Logger.Animation, () => "bvh");
+            log_ = new Logger(Logger.Animation, p, "BVH.Player");
 
             CreateMappings();
 
@@ -153,6 +153,8 @@ namespace Cue.BVH
 
             heelAngle_ = person_.Clothing.HeelsAngle;
             heelHeight_ = person_.Clothing.HeelsHeight;
+
+            log_.Info($"playing {anim_}");
 
             return true;
         }

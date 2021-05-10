@@ -32,24 +32,24 @@ namespace Cue
 				string s = what + " sex=" + Sexes.ToString(sex) + " ";
 
 				if (showsGenitalsState == "")
-					s += $"showsGenitals={showsGenitalsBool} ";
+					s += $"sg={showsGenitalsBool} ";
 				else
-					s += $"showsGenitals={showsGenitalsState} ";
+					s += $"sg={showsGenitalsState} ";
 
 				if (hidesGenitalsState == "")
-					s += $"hidesGenitals={hidesGenitalsBool} ";
+					s += $"hg={hidesGenitalsBool} ";
 				else
-					s += $"hidesGenitals={hidesGenitalsState} ";
+					s += $"hg={hidesGenitalsState} ";
 
 				if (showsBreastsState == "")
-					s += $"showsBreasts={showsBreastsBool} ";
+					s += $"sb={showsBreastsBool} ";
 				else
-					s += $"showsBreasts={showsBreastsState} ";
+					s += $"sb={showsBreastsState} ";
 
 				if (hidesBreastsState == "")
-					s += $"hidesBreasts={hidesBreastsBool} ";
+					s += $"hb={hidesBreastsBool} ";
 				else
-					s += $"hidesBreasts={hidesBreastsState} ";
+					s += $"hb={hidesBreastsState} ";
 
 				return s;
 			}
@@ -65,7 +65,7 @@ namespace Cue
 
 		public ClothingResources()
 		{
-			log_ = new Logger(Logger.Clothing, () => "ClothingRes");
+			log_ = new Logger(Logger.Clothing, "ClothingRes");
 		}
 
 		public bool Load()

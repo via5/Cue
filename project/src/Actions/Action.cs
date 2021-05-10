@@ -1,23 +1,31 @@
 ﻿using Leap.Unity;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Cue
 {
 	interface IAction
 	{
 		bool IsIdle { get; }
-		bool Tick(IObject o, float s);
+		bool Tick(float s);
 	}
 
 	abstract class BasicAction : IAction
 	{
+		protected IObject o_;
 		protected Logger log_;
 		protected readonly List<IAction> children_ = new List<IAction>();
 		private bool started_ = false;
 
-		protected BasicAction()
+		protected BasicAction(IObject o, string name)
 		{
-			log_ = new Logger(Logger.Action, () => ToString());
+			o_ = o;
+			log_ = new Logger(Logger.Action, o, name + "Action");
+		}
+
+		public IObject Object
+		{
+			get { return o_; }
 		}
 
 		public bool IsIdle
@@ -46,29 +54,29 @@ namespace Cue
 			children_.Clear();
 		}
 
-		public bool Tick(IObject o, float s)
+		public bool Tick(float s)
 		{
 			if (!started_)
 			{
 				started_ = true;
-				if (!DoStart(o, s))
+				if (!DoStart(s))
 					return false;
 			}
 
-			if (!DoTick(o, s))
+			if (!DoTick(s))
 				return false;
 
-			TickChildren(o, s);
+			TickChildren(s);
 			return true;
 		}
 
-		protected virtual bool TickChildren(IObject o, float s)
+		protected virtual bool TickChildren(float s)
 		{
 			while (children_.Count > 0)
 			{
 				var a = children_[children_.Count - 1];
 
-				bool b = a.Tick(o, s);
+				bool b = a.Tick(s);
 				if (b)
 					return true;
 
@@ -86,13 +94,13 @@ namespace Cue
 				return children_[children_.Count - 1].ToString();
 		}
 
-		protected virtual bool DoStart(IObject o, float s)
+		protected virtual bool DoStart(float s)
 		{
 			// no-op
 			return true;
 		}
 
-		protected virtual bool DoTick(IObject o, float s)
+		protected virtual bool DoTick(float s)
 		{
 			// no-op
 			return false;
@@ -101,13 +109,18 @@ namespace Cue
 
 	class ConcurrentAction : BasicAction
 	{
-		protected override bool DoTick(IObject o, float s)
+		public ConcurrentAction(IObject o)
+			: base(o, "Concurrent")
+		{
+		}
+
+		protected override bool DoTick(float s)
 		{
 			// no-op
 			return (children_.Count > 0);
 		}
 
-		protected override bool TickChildren(IObject o, float s)
+		protected override bool TickChildren(float s)
 		{
 			int i = 0;
 
@@ -115,7 +128,7 @@ namespace Cue
 			{
 				var a = children_[i];
 
-				if (a.Tick(o, s))
+				if (a.Tick(s))
 					++i;
 				else
 					children_.RemoveAt(i);
@@ -127,7 +140,12 @@ namespace Cue
 
 	class RootAction : BasicAction
 	{
-		protected override bool DoTick(IObject o, float s)
+		public RootAction(IObject o)
+			: base(o, "root")
+		{
+		}
+
+		protected override bool DoTick(float s)
 		{
 			// no-op
 			return true;
@@ -137,10 +155,21 @@ namespace Cue
 
 	class MakeIdleAction : BasicAction
 	{
-		protected override bool DoStart(IObject o, float s)
+		public MakeIdleAction(IObject o)
+			: base(o, "MakeIdle")
 		{
-			if (o is Person)
-				((Person)o).MakeIdle();
+		}
+
+		protected override bool DoStart(float s)
+		{
+			var p = Object as Person;
+			if (p == null)
+			{
+				log_.Error("object is not a person");
+				return false;
+			}
+
+			p.MakeIdle();
 			return false;
 		}
 	}
@@ -150,17 +179,18 @@ namespace Cue
 	{
 		private Person caller_;
 
-		public CallAction(Person caller)
+		public CallAction(IObject o, Person caller)
+			: base(o, "CallAction")
 		{
 			caller_ = caller;
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
-			var p = o as Person;
+			var p = Object as Person;
 			if (p == null)
 			{
-				log_.Error("CallAction: called something that's not a person");
+				log_.Error("object is not a person");
 				return false;
 			}
 
@@ -175,11 +205,14 @@ namespace Cue
 			return true;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
-			var p = o as Person;
+			var p = Object as Person;
 			if (p == null)
+			{
+				log_.Error("object is not a person");
 				return false;
+			}
 
 			if (!p.HasTarget)
 			{
@@ -197,21 +230,22 @@ namespace Cue
 		private Vector3 to_;
 		private float finalBearing_;
 
-		public MoveAction(Vector3 to, float finalBearing)
+		public MoveAction(IObject o, Vector3 to, float finalBearing)
+			: base(o, "Move")
 		{
 			to_ = to;
 			finalBearing_ = finalBearing;
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
-			o.MoveTo(to_, finalBearing_);
-			return o.HasTarget;
+			Object.MoveTo(to_, finalBearing_);
+			return Object.HasTarget;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
-			return o.HasTarget;
+			return Object.HasTarget;
 		}
 
 		public override string ToString()
@@ -225,22 +259,27 @@ namespace Cue
 		private Slot chair_;
 		private bool moving_ = false;
 
-		public SitAction(Slot chair)
+		public SitAction(IObject o, Slot chair)
+			: base(o, "Sit")
 		{
 			chair_ = chair;
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
-			var p = o as Person;
-			p.MoveTo(chair_.Position, chair_.Bearing);
+			Object.MoveTo(chair_.Position, chair_.Bearing);
 			moving_ = true;
 			return true;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
-			var p = o as Person;
+			var p = Object as Person;
+			if (p == null)
+			{
+				log_.Error("object is not a person");
+				return false;
+			}
 
 			if (moving_)
 			{
@@ -274,12 +313,13 @@ namespace Cue
 		private float e_ = 0;
 		private int i_ = 0;
 
-		public RandomDialogAction(List<string> phrases)
+		public RandomDialogAction(IObject o, List<string> phrases)
+			: base(o, "RandomDialog")
 		{
 			phrases_ = new List<string>(phrases);
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
 			e_ = 0;
 			i_ = 0;
@@ -287,9 +327,14 @@ namespace Cue
 			return true;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
-			var p = ((Person)o);
+			var p = Object as Person;
+			if (p == null)
+			{
+				log_.Error("object is not a person");
+				return false;
+			}
 
 			e_ += s;
 
@@ -325,12 +370,13 @@ namespace Cue
 		private const float Delay = 10;
 		private bool reverse_ = true;
 
-		public RandomAnimationAction(List<Animation> anims)
+		public RandomAnimationAction(IObject o, List<Animation> anims)
+			: base(o, "RandomAnimation")
 		{
 			anims_ = new List<Animation>(anims);
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
 			e_ = 0;
 			i_ = -1;
@@ -339,12 +385,17 @@ namespace Cue
 			return true;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
 			if (anims_.Count == 0)
 				return true;
 
-			var p = ((Person)o);
+			var p = Object as Person;
+			if (p == null)
+			{
+				log_.Error("object is not a person");
+				return false;
+			}
 
 			if (i_ == -1)
 			{
@@ -403,19 +454,25 @@ namespace Cue
 		private float e_ = 0;
 		private const float Delay = 1;
 
-		public LookAroundAction()
+		public LookAroundAction(IObject o)
+			: base(o, "LookAround")
 		{
 		}
 
-		protected override bool DoStart(IObject o, float s)
+		protected override bool DoStart(float s)
 		{
 			e_ = Delay + 1;
 			return true;
 		}
 
-		protected override bool DoTick(IObject o, float s)
+		protected override bool DoTick(float s)
 		{
-			var p = ((Person)o);
+			var p = Object as Person;
+			if (p == null)
+			{
+				log_.Error("object is not a person");
+				return false;
+			}
 
 			e_ += s;
 

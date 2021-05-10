@@ -102,7 +102,7 @@ namespace Cue.W
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
-			log_ = new Logger(Logger.Sys, () => atom_.uid);
+			log_ = new Logger(Logger.Sys, this, "VamAtom");
 			setOnlyKeyJointsOn_ = new VamActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 			nav_ = new VamAtomNav(this);

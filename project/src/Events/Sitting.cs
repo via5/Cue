@@ -13,14 +13,19 @@ namespace Cue
 		private Slot slot_ = null;
 		private int state_ = NoState;
 
+		private SitEvent(Person p)
+			: base(p, "Sit")
+		{
+		}
+
 		public SitEvent(Person p, IObject o)
-			: base(p)
+			: this(p)
 		{
 			o_ = o;
 		}
 
 		public SitEvent(Person p, Slot s)
-			: base(p)
+			: this(p)
 		{
 			o_ = s.ParentObject;
 			slot_ = s;
@@ -49,7 +54,7 @@ namespace Cue
 				{
 					log_.Info("going to sit");
 					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(pos, slot_.Bearing));
+					person_.PushAction(new MoveAction(person_, pos, slot_.Bearing));
 					state_ = Moving;
 					break;
 				}
@@ -72,7 +77,7 @@ namespace Cue
 					{
 						log_.Info("thinking");
 
-						var cc = new ConcurrentAction();
+						var cc = new ConcurrentAction(person_);
 
 						//cc.Push(new RandomDialogAction(new List<string>()
 						//{

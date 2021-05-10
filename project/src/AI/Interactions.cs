@@ -21,7 +21,7 @@
 		public KissingInteraction(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Interaction, () => "KissInt");
+			log_ = new Logger(Logger.Interaction, p, "KissInt");
 		}
 
 		public void Update(float s)

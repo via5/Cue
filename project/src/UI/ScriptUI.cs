@@ -839,14 +839,8 @@ namespace Cue
 
 		private void OnSeek(float f)
 		{
-			if (ignore_)
+			if (ignore_ || sel_ == null)
 				return;
-
-			if (sel_ == null)
-			{
-				Cue.LogError("no selection");
-				return;
-			}
 
 			if (person_.Animator.CurrentAnimation != sel_)
 				PlaySelection(f);

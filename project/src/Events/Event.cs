@@ -14,10 +14,10 @@ namespace Cue
 		protected Logger log_;
 		private Slot lockedSlot_ = null;
 
-		protected BasicEvent(Person p)
+		protected BasicEvent(Person p, string name)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Event, () => ToString());
+			log_ = new Logger(Logger.Event, p, name + "Event");
 		}
 
 		public Slot LockedSlot
@@ -56,7 +56,7 @@ namespace Cue
 		private Action post_ = null;
 
 		public CallEvent(Person p, Person caller, Action post=null)
-			: base(p)
+			: base(p, "Call")
 		{
 			caller_ = caller;
 			post_ = post;
@@ -66,7 +66,7 @@ namespace Cue
 		{
 			if (call_ == null)
 			{
-				call_ = new CallAction(caller_);
+				call_ = new CallAction(person_, caller_);
 				person_.PushAction(call_);
 			}
 			else

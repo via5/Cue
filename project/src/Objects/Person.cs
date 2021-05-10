@@ -51,7 +51,7 @@ namespace Cue
 
 	class Person : BasicObject
 	{
-		private readonly RootAction actions_ = new RootAction();
+		private readonly RootAction actions_;
 		private PersonState state_;
 		private bool deferredTransition_ = false;
 		private int deferredState_ = PersonState.None;
@@ -77,6 +77,7 @@ namespace Cue
 		public Person(W.IAtom atom)
 			: base(atom)
 		{
+			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
@@ -228,7 +229,7 @@ namespace Cue
 				uprightPos_ = Position;
 
 			animator_.Update(s);
-			actions_.Tick(this, s);
+			actions_.Tick(s);
 			gaze_.Update(s);
 			kisser_.Update(s);
 			handjob_.Update(s);

@@ -51,7 +51,7 @@ namespace Cue
 		public BasicObject(W.IAtom atom)
 		{
 			atom_ = atom;
-			log_ = new Logger(Logger.Object, () => ID);
+			log_ = new Logger(Logger.Object, this, "");
 			slots_ = new Slots(this);
 		}
 

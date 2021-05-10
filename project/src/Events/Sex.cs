@@ -13,7 +13,7 @@
 		private float wait_ = 0;
 
 		public HandjobEvent(Person p, Person receiver)
-			: base(p)
+			: base(p, "HJ")
 		{
 			receiver_ = receiver;
 		}
@@ -24,7 +24,7 @@
 			{
 				case NoState:
 				{
-					person_.PushAction(new CallAction(receiver_));
+					person_.PushAction(new CallAction(person_, receiver_));
 					state_ = CallingState;
 					wait_ = 0;
 
@@ -94,7 +94,7 @@
 		private float wait_ = 0;
 
 		public BlowjobEvent(Person p, Person receiver)
-			: base(p)
+			: base(p, "BJ")
 		{
 			receiver_ = receiver;
 		}
@@ -105,7 +105,7 @@
 			{
 				case NoState:
 				{
-					person_.PushAction(new CallAction(receiver_));
+					person_.PushAction(new CallAction(person_, receiver_));
 					state_ = CallingState;
 					wait_ = 0;
 
@@ -167,7 +167,7 @@
 		private int state_ = NoState;
 
 		public SexEvent(Person p, Person receiver, int forceState=NoState)
-			: base(p)
+			: base(p, "Sex")
 		{
 			receiver_ = receiver;
 			state_ = forceState;
