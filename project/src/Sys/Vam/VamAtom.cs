@@ -38,6 +38,44 @@ namespace Cue.W
 	}
 
 
+	class ColliderBodyPart : IBodyPart
+	{
+		private VamAtom atom_;
+		private int type_;
+		private Collider c_;
+
+		public ColliderBodyPart(VamAtom a, int type, Collider c)
+		{
+			atom_ = a;
+			type_ = type;
+			c_ = c;
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
+		public bool Triggering
+		{
+			get { return false; }
+		}
+
+		public Vector3 Position
+		{
+			get
+			{
+				return W.VamU.FromUnity(c_.bounds.center);
+			}
+		}
+
+		public Vector3 Direction
+		{
+			get { return W.VamU.FromUnity(c_.transform.rotation.eulerAngles); }
+		}
+	}
+
+
 	class TriggerBodyPart : IBodyPart
 	{
 		private VamAtom atom_;
@@ -209,42 +247,114 @@ namespace Cue.W
 		{
 			var list = new List<IBodyPart>();
 
-			GetRigidbody(list, BodyPartTypes.Head, "head");
-			GetTrigger(list, BodyPartTypes.Lips, "LipTrigger");
-			GetTrigger(list, BodyPartTypes.Mouth, "MouthTrigger");
-			GetTrigger(list, BodyPartTypes.LeftBreast, "lNippleTrigger");
-			GetTrigger(list, BodyPartTypes.RightBreast, "rNippleTrigger");
-			GetTrigger(list, BodyPartTypes.Labia, "LabiaTrigger");
-			GetTrigger(list, BodyPartTypes.Vagina, "VaginaTrigger");
-			GetTrigger(list, BodyPartTypes.DeepVagina, "DeepVaginaTrigger");
-			GetTrigger(list, BodyPartTypes.DeeperVagina, "DeeperVaginaTrigger");
+			list.Add(GetRigidbody(BodyParts.Head, "head"));
+
+			list.Add(GetTrigger(BodyParts.Lips, "LipTrigger"));
+			list.Add(GetTrigger(BodyParts.Mouth, "MouthTrigger"));
+			list.Add(GetTrigger(BodyParts.LeftBreast, "lNippleTrigger", ""));
+			list.Add(GetTrigger(BodyParts.RightBreast, "rNippleTrigger", ""));
+			list.Add(GetTrigger(BodyParts.Labia, "LabiaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.Vagina, "VaginaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.DeepVagina, "DeepVaginaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.DeeperVagina, "DeeperVaginaTrigger", ""));
+			list.Add(null);  // anus
+
+			list.Add(GetRigidbody(BodyParts.Chest, "chest"));
+			list.Add(GetRigidbody(BodyParts.Belly, "abdomen2"));
+			list.Add(GetRigidbody(BodyParts.Hips, "abdomen"));
+			list.Add(GetCollider(BodyParts.LeftGlute, "LGlute1Joint", ""));
+			list.Add(GetCollider(BodyParts.RightGlute, "RGlute1Joint", ""));
+
+			list.Add(GetCollider(BodyParts.LeftShoulder, "lShldr"));
+			list.Add(GetCollider(BodyParts.LeftArm, "StandardColliderslShldr/_Collider1"));
+			list.Add(GetCollider(BodyParts.LeftForearm, "lForeArm/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.LeftHand, "lHand"));
+
+			list.Add(GetCollider(BodyParts.RightShoulder, "rShldr"));
+			list.Add(GetCollider(BodyParts.RightArm, "StandardCollidersrShldr/_Collider1"));
+			list.Add(GetCollider(BodyParts.RightForearm, "rForeArm/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.RightHand, "rHand"));
+
+			list.Add(GetCollider(BodyParts.LeftThigh, "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
+			list.Add(GetCollider(BodyParts.LeftShin, "lShin8Joint", "StandardColliderslShin/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.LeftFoot, "lFoot"));
+
+			list.Add(GetCollider(BodyParts.RightThigh, "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
+			list.Add(GetCollider(BodyParts.RightShin, "rShin8Joint", "StandardCollidersrShin/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.RightFoot, "rFoot"));
 
 			return list;
 		}
 
-		private void GetRigidbody(List<IBodyPart> list, int id, string name)
+		private string MakeName(string nameFemale, string nameMale)
 		{
-			var rb = Cue.Instance.VamSys.FindRigidbody(atom_, name);
-			if (rb == null)
-				return;
+			if (Sex == Sexes.Female)
+				return nameFemale;
 
-			list.Add(new RigidbodyBodyPart(this, id, rb));
+			if (nameMale == "")
+				return "";
+			else if (nameMale == "same")
+				return nameFemale;
+			else
+				return nameMale;
 		}
 
-		private void GetTrigger(List<IBodyPart> list, int id, string name)
+		private IBodyPart GetRigidbody(int id, string nameFemale, string nameMale = "same")
 		{
+			string name = MakeName(nameFemale, nameMale);
+			if (name == "")
+				return null;
+
+			var rb = Cue.Instance.VamSys.FindRigidbody(atom_, name);
+			if (rb == null)
+				Cue.LogError($"rb {name} not found in {atom_.uid}");
+
+			return new RigidbodyBodyPart(this, id, rb);
+		}
+
+		private IBodyPart GetTrigger(int id, string nameFemale, string nameMale = "same")
+		{
+			string name = MakeName(nameFemale, nameMale);
+			if (name == "")
+				return null;
+
 			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.transform, name);
 			if (o == null)
-				return;
+			{
+				Cue.LogError($"trigger {name} not found in {atom_.uid}");
+				return null;
+			}
 
 			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (t == null)
-				return;
+			{
+				Cue.LogError($"trigger {name} has no event handler in {atom_.uid}");
+				return null;
+			}
 
 			if (t.thisRigidbody == null)
-				return;
+			{
+				Cue.LogError($"trigger {name} has no rb in {atom_.uid}");
+				return null;
+			}
 
-			list.Add(new TriggerBodyPart(this, id, t));
+			return new TriggerBodyPart(this, id, t);
+		}
+
+		private IBodyPart GetCollider(int id, string nameFemale, string nameMale = "same")
+		{
+			string name = MakeName(nameFemale, nameMale);
+			if (name == "")
+				return null;
+
+			var c = Cue.Instance.VamSys.FindCollider(atom_, name);
+			if (c == null)
+			{
+				Cue.LogError($"collider {name} not found in {atom_.uid}");
+				return null;
+			}
+
+			return new ColliderBodyPart(this, id, c);
 		}
 
 		public void SetDefaultControls(string why)

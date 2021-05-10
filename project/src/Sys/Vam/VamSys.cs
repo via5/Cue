@@ -130,6 +130,22 @@ namespace Cue.W
 			get { return Time.realtimeSinceStartup; }
 		}
 
+		public Vector3 InteractiveLeftHandPosition
+		{
+			get
+			{
+				return VamU.FromUnity(SuperController.singleton.leftHand.position);
+			}
+		}
+
+		public Vector3 InteractiveRightHandPosition
+		{
+			get
+			{
+				return VamU.FromUnity(SuperController.singleton.rightHand.position);
+			}
+		}
+
 		// [begin, end]
 		//
 		public int RandomInt(int first, int last)
@@ -497,6 +513,65 @@ namespace Cue.W
 			m = mui.GetMorphByDisplayName(morphUID);
 			if (m != null)
 				return m;
+
+			return null;
+		}
+
+		public Collider FindCollider(Atom atom, string pathstring)
+		{
+			var path = pathstring.Split('/');
+			var p = path[path.Length - 1];
+
+			foreach (var c in atom.GetComponentsInChildren<Collider>())
+			{
+				if (c.name == p)
+				{
+					if (path.Length == 1)
+						return c;
+
+					var check = c.transform.parent;
+					if (check == null)
+					{
+						Cue.LogInfo("parent is not a collider");
+						continue;
+					}
+
+					bool okay = true;
+
+					for (int i = 1; i < path.Length; ++i)
+					{
+						if (check.name != path[path.Length - i - 1])
+						{
+							okay = false;
+							break;
+						}
+
+						check = check.parent;
+						if (check == null)
+						{
+							Cue.LogInfo("parent is not a collider");
+							okay = false;
+							break;
+						}
+					}
+
+					if (okay)
+						return c;
+				}
+			}
+
+
+			foreach (var c in atom.GetComponentsInChildren<Collider>())
+			{
+				if (c.name == "AutoColliderFemaleAutoColliders" + pathstring)
+					return c;
+
+				if (c.name == "AutoColliderMaleAutoColliders" + pathstring)
+					return c;
+
+				if (c.name == "AutoCollider" + pathstring)
+					return c;
+			}
 
 			return null;
 		}

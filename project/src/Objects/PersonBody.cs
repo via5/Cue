@@ -3,22 +3,59 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class BodyPartTypes
+	class BodyParts
 	{
-		public const int Head = 1;
-		public const int Lips = 2;
-		public const int Mouth = 3;
-		public const int LeftBreast = 4;
-		public const int RightBreast = 5;
-		public const int Labia = 6;
-		public const int Vagina = 7;
-		public const int DeepVagina = 8;
-		public const int DeeperVagina = 9;
+		public const int Head = 0;
+
+		public const int Lips = 1;
+		public const int Mouth = 2;
+		public const int LeftBreast = 3;
+		public const int RightBreast = 4;
+		public const int Labia = 5;
+		public const int Vagina = 6;
+		public const int DeepVagina = 7;
+		public const int DeeperVagina = 8;
+		public const int Anus = 9;
+
+		public const int Chest = 10;
+		public const int Belly = 11;
+		public const int Hips = 12;
+		public const int LeftGlute = 13;
+		public const int RightGlute = 14;
+
+		public const int LeftShoulder = 15;
+		public const int LeftArm = 16;
+		public const int LeftForearm = 17;
+		public const int LeftHand = 18;
+
+		public const int RightShoulder = 19;
+		public const int RightArm = 20;
+		public const int RightForearm = 21;
+		public const int RightHand = 22;
+
+		public const int LeftThigh = 23;
+		public const int LeftShin = 24;
+		public const int LeftFoot = 25;
+
+		public const int RightThigh = 26;
+		public const int RightShin = 27;
+		public const int RightFoot = 28;
+
+		public const int Count = 29;
+
 
 		private static string[] names_ = new string[]
 		{
-			"", "head", "lips", "mouth", "leftbreast", "rightbreast",
-			"labia", "vagina", "deepvagina", "deepervagina"
+			"head", "lips", "mouth", "leftbreast", "rightbreast",
+			"labia", "vagina", "deepvagina", "deepervagina", "anus",
+
+			"chest", "belly", "hips", "leftglute", "rightglute",
+
+			"leftshoulder", "leftarm", "leftforearm", "lefthand",
+			"rightshoulder", "rightarm", "rightforearm", "righthand",
+
+			"leftthigh", "leftshin", "leftfoot",
+			"rightthigh", "rightshin", "rightfoot"
 		};
 
 		public static string ToString(int t)
@@ -36,6 +73,7 @@ namespace Cue
 		private Person person_;
 		private int type_;
 		private W.IBodyPart part_;
+		private bool close_ = false;
 
 		public BodyPart(Person p, int type, W.IBodyPart part)
 		{
@@ -61,7 +99,7 @@ namespace Cue
 
 		public string Name
 		{
-			get { return BodyPartTypes.ToString(type_); }
+			get { return BodyParts.ToString(type_); }
 		}
 
 		public int Type
@@ -72,6 +110,12 @@ namespace Cue
 		public bool Triggering
 		{
 			get { return part_?.Triggering ?? false; }
+		}
+
+		public bool Close
+		{
+			get { return close_; }
+			set { close_ = value; }
 		}
 
 		public Vector3 Position
@@ -89,99 +133,49 @@ namespace Cue
 	class Body
 	{
 		private Person person_;
-		private readonly List<BodyPart> all_ = new List<BodyPart>();
-		private BodyPart head_;
-		private BodyPart lips_;
-		private BodyPart mouth_;
-		private BodyPart leftBreast_;
-		private BodyPart rightBreast_;
-		private BodyPart labia_;
-		private BodyPart vagina_;
-		private BodyPart deepVagina_;
-		private BodyPart deeperVagina_;
+		private readonly BodyPart[] all_;
 
 		public Body(Person p)
 		{
 			person_ = p;
 
 			var parts = p.Atom.GetBodyParts();
+			var all = new List<BodyPart>();
 
-			head_ = GetPart(parts, BodyPartTypes.Head);
-			lips_ = GetPart(parts, BodyPartTypes.Lips);
-			mouth_ = GetPart(parts, BodyPartTypes.Mouth);
-			leftBreast_ = GetPart(parts, BodyPartTypes.LeftBreast);
-			rightBreast_ = GetPart(parts, BodyPartTypes.RightBreast);
-			labia_ = GetPart(parts, BodyPartTypes.Labia);
-			vagina_ = GetPart(parts, BodyPartTypes.Vagina);
-			deepVagina_ = GetPart(parts, BodyPartTypes.DeepVagina);
-			deeperVagina_ = GetPart(parts, BodyPartTypes.DeeperVagina);
-		}
-
-		public List<BodyPart> Parts { get { return all_; } }
-
-		public BodyPart Head { get { return head_; } }
-		public BodyPart Lips { get { return lips_; } }
-		public BodyPart Mouth { get { return mouth_; } }
-		public BodyPart LeftBreast { get { return leftBreast_; } }
-		public BodyPart RightBreast { get { return rightBreast_; } }
-		public BodyPart Labia { get { return labia_; } }
-		public BodyPart Vagina { get { return vagina_; } }
-		public BodyPart DeepVagina { get { return deepVagina_; } }
-		public BodyPart DeeperVagina { get { return deeperVagina_; } }
-
-		public override string ToString()
-		{
-			string s =
-				(Lips.Triggering ? "M|" : "") +
-				(Mouth.Triggering ? "MM|" : "") +
-				(LeftBreast.Triggering ? "LB|" : "") +
-				(RightBreast.Triggering ? "RB|" : "") +
-				(Labia.Triggering ? "L|" : "") +
-				(Vagina.Triggering ? "V|" : "") +
-				(DeepVagina.Triggering ? "VV|" : "") +
-				(DeeperVagina.Triggering ? "VVV|" : "");
-
-			if (s.EndsWith("|"))
-				return s.Substring(0, s.Length - 1);
-			else
-				return s;
-		}
-
-		private BodyPart GetPart(List<W.IBodyPart> list, int type)
-		{
-			BodyPart p = null;
-
-			for (int i = 0; i < list.Count; ++i)
+			for (int i = 0; i < BodyParts.Count; ++i)
 			{
-				if (list[i].Type == type)
-				{
-					p = new BodyPart(person_, type, list[i]);
-					break;
-				}
+				if (parts[i] != null && parts[i].Type != i)
+					Cue.LogError($"mismatched body part type {parts[i].Type} {i}");
+
+				all.Add(new BodyPart(person_, i, parts[i]));
 			}
 
-			if (p == null)
-				p = new BodyPart(person_, type, null);
-
-			all_.Add(p);
-
-			return p;
+			all_ = all.ToArray();
 		}
+
+		public BodyPart[] Parts { get { return all_; } }
+
+		public BodyPart Get(int type)
+		{
+			if (type < 0 || type >= all_.Length)
+			{
+				Cue.LogError($"bad part type {type}");
+				return null;
+			}
+
+			return all_[type];
+		}
+
+		// convenience
+		public BodyPart Lips { get { return Get(BodyParts.Lips); } }
+		public BodyPart Head { get { return Get(BodyParts.Head); } }
 	}
 
 
 	class Excitement
 	{
 		private Person person_;
-		private float lip_ = 0;
-		private float mouth_ = 0;
-		private float lBreast_ = 0;
-		private float rBreast_ = 0;
-		private float labia_ = 0;
-		private float vagina_ = 0;
-		private float deep_ = 0;
-		private float deeper_ = 0;
-
+		private float[] parts_ = new float[BodyParts.Count];
 		private float decay_ = 1;
 
 		public Excitement(Person p)
@@ -191,14 +185,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			lip_ = Check(s, person_.Body.Lips, lip_);
-			mouth_ = Check(s, person_.Body.Mouth, mouth_);
-			lBreast_ = Check(s, person_.Body.LeftBreast, lBreast_);
-			rBreast_ = Check(s, person_.Body.RightBreast, rBreast_);
-			labia_ = Check(s, person_.Body.Labia, labia_);
-			vagina_ = Check(s, person_.Body.Vagina, vagina_);
-			deep_ = Check(s, person_.Body.DeepVagina, deep_);
-			deeper_ = Check(s, person_.Body.DeeperVagina, deeper_);
+			for (int i=0; i<BodyParts.Count; ++i)
+				parts_[i] = Check(s, person_.Body.Get(i), parts_[i]);
 		}
 
 		private float Check(float s, BodyPart p, float v)
@@ -214,10 +202,10 @@ namespace Cue
 			get
 			{
 				return Math.Min(1,
-					labia_ * 0.005f +
-					vagina_ * 0.01f +
-					deep_ * 0.2f +
-					deeper_ * 1);
+					parts_[BodyParts.Labia] * 0.005f +
+					parts_[BodyParts.Vagina] * 0.01f +
+					parts_[BodyParts.DeepVagina] * 0.2f +
+					parts_[BodyParts.DeeperVagina] * 1);
 			}
 		}
 
@@ -226,8 +214,8 @@ namespace Cue
 			get
 			{
 				return
-					lip_ * 0.1f +
-					mouth_ * 0.9f;
+					parts_[BodyParts.Lips] * 0.1f +
+					parts_[BodyParts.Mouth] * 0.9f;
 			}
 		}
 
@@ -236,18 +224,9 @@ namespace Cue
 			get
 			{
 				return
-					lBreast_ * 0.5f +
-					rBreast_ * 0.5f;
+					parts_[BodyParts.LeftBreast] * 0.5f +
+					parts_[BodyParts.RightBreast] * 0.5f;
 			}
-		}
-
-		public override string ToString()
-		{
-			return
-				$"l={lip_:0.00} m={mouth_:0.00} " +
-				$"lb={lBreast_:0.00} rb={rBreast_:0.00} " +
-				$"L={labia_:0.00} V={vagina_:0.00} " +
-				$"VV={deep_:0.00} VVV={deeper_:0.00}";
 		}
 	}
 

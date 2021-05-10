@@ -33,6 +33,8 @@ namespace Cue.W
 		INav Nav { get; }
 		IInput Input { get; }
 		Vector3 Camera { get; }
+		Vector3 InteractiveLeftHandPosition { get; }
+		Vector3 InteractiveRightHandPosition { get; }
 		bool Paused { get; }
 		void OnPluginState(bool b);
 		void OnReady(Action f);

@@ -88,6 +88,16 @@ namespace Cue.W
 			get { return 0; }
 		}
 
+		public Vector3 InteractiveLeftHandPosition
+		{
+			get { return Vector3.Zero; }
+		}
+
+		public Vector3 InteractiveRightHandPosition
+		{
+			get { return Vector3.Zero; }
+		}
+
 		public int RandomInt(int first, int last)
 		{
 			return 0;

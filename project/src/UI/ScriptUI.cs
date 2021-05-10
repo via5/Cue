@@ -535,7 +535,37 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			enabled_.Text = ai_.Enabled.ToString();
+			string es = "";
+
+			if (ai_.EventsEnabled)
+			{
+				if (es != "")
+					es += "|";
+
+				es += "events";
+			}
+
+			if (ai_.InteractionsEnabled)
+			{
+				if (es != "")
+					es += "|";
+
+				es += "interactions";
+			}
+
+			if (ai_.MoodEnabled)
+			{
+				if (es != "")
+					es += "|";
+
+				es += "mood";
+			}
+
+			if (es == "")
+				es = "nothing";
+
+			enabled_.Text = es;
+
 			event_.Text = (ai_.Event == null ? "(none)" : ai_.Event.ToString());
 			personality_.Text = person_.Personality.ToString();
 
@@ -633,7 +663,7 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, position, direction;
+			public VUI.Label name, triggering, close, position, direction;
 		}
 
 
@@ -644,27 +674,39 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(4);
+			var gl = new VUI.GridLayout(5);
+			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Triggering", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Close", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
 
-			for (int i = 0; i < person_.Body.Parts.Count; ++i)
+			for (int i = 0; i < person_.Body.Parts.Length; ++i)
 			{
 				var bp = person_.Body.Parts[i];
 
 				var w = new PartWidgets();
 				w.part = bp;
+
 				w.name = new VUI.Label(bp.Name);
 				w.triggering = new VUI.Label();
+				w.close = new VUI.Label();
 				w.position = new VUI.Label();
 				w.direction = new VUI.Label();
 
+				int fontSize = 24;
+				w.name.FontSize = fontSize;
+				w.triggering.FontSize = fontSize;
+				w.close.FontSize = fontSize;
+				w.position.FontSize = fontSize;
+				w.direction.FontSize = fontSize;
+
 				p.Add(w.name);
 				p.Add(w.triggering);
+				p.Add(w.close);
 				p.Add(w.position);
 				p.Add(w.direction);
 
@@ -694,6 +736,13 @@ namespace Cue
 
 						w.triggering.TextColor = (
 							w.part.Triggering ?
+							W.VamU.ToUnity(Color.Green) :
+							VUI.Style.Theme.TextColor);
+
+						w.close.Text = w.part.Close.ToString();
+
+						w.close.TextColor = (
+							w.part.Close ?
 							W.VamU.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
 

@@ -6,6 +6,37 @@
 	}
 
 
+	class TouchInteraction : IInteraction
+	{
+		private Person person_;
+		private Logger log_;
+
+		public TouchInteraction(Person p)
+		{
+			person_ = p;
+			log_ = new Logger(Logger.Interaction, p, "KissInt");
+		}
+
+		public void Update(float s)
+		{
+			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
+			var rightHand = Cue.Instance.InteractiveRightHandPosition;
+
+			for (int i = 0; i < person_.Body.Parts.Length; ++i)
+			{
+				var p = person_.Body.Parts[i];
+				if (p == null)
+					continue;
+
+				var leftD = Vector3.Distance(p.Position, leftHand);
+				var rightD = Vector3.Distance(p.Position, rightHand);
+
+				p.Close = (leftD < 0.2f) || (rightD < 0.2f);
+			}
+		}
+	}
+
+
 	class KissingInteraction : IInteraction
 	{
 		public const float StartDistance = 0.15f;

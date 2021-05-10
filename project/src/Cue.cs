@@ -70,6 +70,32 @@ namespace Cue
 			return null;
 		}
 
+		public Vector3 InteractiveLeftHandPosition
+		{
+			get
+			{
+				if (Sys.IsVR)
+					return Sys.InteractiveLeftHandPosition;
+				else if (Player != null)
+					return Player.Body.Get(BodyParts.LeftHand).Position;
+				else
+					return Vector3.Zero;
+			}
+		}
+
+		public Vector3 InteractiveRightHandPosition
+		{
+			get
+			{
+				if (Sys.IsVR)
+					return Sys.InteractiveRightHandPosition;
+				else if (Player != null)
+					return Player.Body.Get(BodyParts.RightHand).Position;
+				else
+					return Vector3.Zero;
+			}
+		}
+
 		public void Init()
 		{
 			LogVerbose("cue: init");
@@ -155,10 +181,17 @@ namespace Cue
 				p.Clothing.Init();
 				p.Personality = new QuirkyPersonality(p);
 
+				p.AI.EventsEnabled = false;
+
 				if (p == Player)
-					p.AI.Mood.State = Mood.None;
+				{
+					p.AI.InteractionsEnabled = false;
+					p.AI.MoodEnabled = false;
+				}
 				else
+				{
 					p.AI.Mood.State = Mood.Happy;
+				}
 
 				p.Atom.Init();
 			}

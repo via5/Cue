@@ -120,7 +120,7 @@ namespace VUI
 
 		protected override Size DoGetMinimumSize()
 		{
-			return new Size(Root.TextLength(Font, FontSize, text_), 40);
+			return Root.TextSize(Font, FontSize, text_) + new Size(0, 5);
 		}
 
 		public static TextAnchor ToTextAnchor(int a)
