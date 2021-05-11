@@ -475,7 +475,7 @@ namespace Cue
 	}
 
 
-	class Frustum
+	struct Frustum
 	{
 		public Vector3 nearTL;
 		public Vector3 nearTR;
@@ -488,16 +488,138 @@ namespace Cue
 		public Vector3 farBR;
 
 		public Plane[] planes;
-		public bool avoid = false;
+
+		// x=width, y=height z=distance
+		//
+		public Frustum(Vector3 near, Vector3 far)
+			: this(near.X, near.Y, near.Z, far.X, far.Y, far.Z)
+		{
+		}
+
+		public Frustum(
+			float nearWidth, float nearHeight, float nearDistance,
+			float farWidth, float farHeight, float farDistance)
+		{
+			var nearOffset = new Vector3(
+				-nearWidth / 2, nearHeight / 2, nearDistance);
+
+			var farOffset = new Vector3(
+				-farWidth / 2, farHeight / 2, farDistance);
+
+			nearTL = nearOffset;
+			nearTR = nearOffset + new Vector3(nearWidth, 0, 0);
+			nearBL = nearOffset + new Vector3(0, -nearHeight, 0);
+			nearBR = nearOffset + new Vector3(nearWidth, -nearHeight, 0);
+
+			farTL = farOffset;
+			farTR = farOffset + new Vector3(farWidth, 0, 0);
+			farBL = farOffset + new Vector3(0, -farHeight, 0);
+			farBR = farOffset + new Vector3(farWidth, -farHeight, 0);
+
+			planes = new Plane[]
+			{
+				new Plane(farTL,  nearTL, nearBL),  // left
+				new Plane(nearTR, farTR,  farBR),   // right
+				new Plane(nearBL, nearBR, farBR),   // down
+				new Plane(nearTL, farTL,  farTR),   // up
+				new Plane(nearTL, nearTR, nearBR),  // near
+				new Plane(farTR,  farTL,  farBL)    // far
+			};
+		}
+
+		public void UpdatePlanes()
+		{
+			planes = new Plane[]
+			{
+				new Plane(farTL,  nearTL, nearBL),  // left
+				new Plane(nearTR, farTR,  farBR),   // right
+				new Plane(nearBL, nearBR, farBR),   // down
+				new Plane(nearTL, farTL,  farTR),   // up
+				new Plane(nearTL, nearTR, nearBR),  // near
+				new Plane(farTR,  farTL,  farBL)    // far
+			};
+		}
+
+		public static Frustum Zero
+		{
+			get { return new Frustum(Vector3.Zero, Vector3.Zero); }
+		}
+
+		public Frustum[] Split(int xcount, int ycount)
+		{
+			var fs = new Frustum[xcount * ycount];
+
+			for (int x = 0; x < xcount; ++x)
+			{
+				for (int y = 0; y < ycount; ++y)
+				{
+					var nearWidth = NearSize().X / xcount;
+					var nearHeight = NearSize().Y / ycount;
+					var nearOffset = new Vector3(
+						-NearSize().X / 2 + x * nearWidth + nearWidth/2,
+						NearSize().Y / 2 - y * nearHeight - nearHeight/2,
+						0);
+
+					var farWidth = FarSize().X / xcount;
+					var farHeight = FarSize().Y / ycount;
+					var farOffset = new Vector3(
+						-FarSize().X / 2 + x * farWidth + farWidth/2,
+						FarSize().Y / 2 - y * farHeight - farHeight/2,
+						0);
+
+					var f = new Frustum(
+						nearWidth, nearHeight, nearTL.Z,
+						farWidth, farHeight, farTL.Z);
+
+					f.nearTL += nearOffset;
+					f.nearTR += nearOffset;
+					f.nearBL += nearOffset;
+					f.nearBR += nearOffset;
+
+					f.farTL += farOffset;
+					f.farTR += farOffset;
+					f.farBL += farOffset;
+					f.farBR += farOffset;
+
+					f.UpdatePlanes();
+
+					fs[y * xcount + x] = f;
+				}
+			}
+
+			return fs;
+		}
 
 		public Vector3 NearCenter()
 		{
-			return nearTL + NearSize() / 2;
+			return new Vector3(
+				nearTL.X + Math.Abs(nearBR.X - nearTL.X) / 2,
+				nearTL.Y - Math.Abs(nearBR.Y - nearTL.Y) / 2,
+				nearTL.Z + Math.Abs(nearBR.Z - nearTL.Z) / 2);
 		}
 
 		public Vector3 NearSize()
 		{
-			return (nearBR - nearTL);
+			return new Vector3(
+				Math.Abs(nearBR.X - nearTL.X),
+				Math.Abs(nearBR.Y - nearTL.Y),
+				Math.Abs(nearBR.Z - nearTL.Z));
+		}
+
+		public Vector3 FarCenter()
+		{
+			return new Vector3(
+				farTL.X + Math.Abs(farBR.X - farTL.X) / 2,
+				farTL.Y - Math.Abs(farBR.Y - farTL.Y) / 2,
+				farTL.Z + Math.Abs(farBR.Z - farTL.Z) / 2);
+		}
+
+		public Vector3 FarSize()
+		{
+			return new Vector3(
+				Math.Abs(farBR.X - farTL.X),
+				Math.Abs(farBR.Y - farTL.Y),
+				Math.Abs(farBR.Z - farTL.Z));
 		}
 
 		public Vector3 Random()
