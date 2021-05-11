@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue
 {
@@ -126,6 +127,11 @@ namespace Cue
 		public Vector3 Direction
 		{
 			get { return part_?.Direction ?? Vector3.Zero; }
+		}
+
+		public float Bearing
+		{
+			get { return Vector3.Bearing(Direction); }
 		}
 	}
 
@@ -302,16 +308,244 @@ namespace Cue
 	}
 
 
+	class RandomLookAt
+	{
+		private const float Delay = 1;
+
+		private Person person_;
+		private float e_ = Delay;
+		private Vector3 pos_ = Vector3.Zero;
+		private IObject avoid_ = null;
+
+		public RandomLookAt(Person p)
+		{
+			person_ = p;
+		}
+
+		public IObject Avoid
+		{
+			get { return avoid_; }
+			set { avoid_ = value; }
+		}
+
+		public Vector3 Position
+		{
+			get { return pos_; }
+		}
+
+		public bool Update(float s)
+		{
+			e_ += s;
+
+			if (e_ >= Delay)
+			{
+				NextPosition();
+				e_ = 0;
+				return true;
+			}
+
+			return false;
+		}
+
+		private UnityEngine.Plane P(Vector3 a, Vector3 b, Vector3 c)
+		{
+			return new UnityEngine.Plane(
+				W.VamU.ToUnity(a), W.VamU.ToUnity(b), W.VamU.ToUnity(c)).flipped;
+		}
+
+
+		class Frustum
+		{
+			public Vector3 nearTL;
+			public Vector3 nearTR;
+			public Vector3 nearBL;
+			public Vector3 nearBR;
+
+			public Vector3 farTL;
+			public Vector3 farTR;
+			public Vector3 farBL;
+			public Vector3 farBR;
+
+			public Plane[] planes;
+			public bool avoid = false;
+
+			public Vector3 Random()
+			{
+				var nearWidth = nearTR.X - nearTL.Y;
+				var nearHeight = nearBL.Y - nearTL.Y;
+				var farWidth = farTR.X - farTL.Y;
+				var farHeight = farBL.Y - farTL.Y;
+
+
+				var nearPoint = new Vector3(
+					U.RandomFloat(0, nearWidth) - nearWidth / 2,
+					U.RandomFloat(0, nearHeight) - nearHeight / 2,
+					nearTL.Z);
+
+				var farPoint = new Vector3(
+					U.RandomFloat(0, farWidth) - farWidth / 2,
+					U.RandomFloat(0, farHeight) - farHeight / 2,
+					farTL.Z);
+
+				var d = Vector3.Distance(nearPoint, farPoint);
+				var rd = U.RandomFloat(0, d);
+
+				return nearPoint + (farPoint - nearPoint).Normalized * rd;
+			}
+		}
+
+		private Frustum MakeFrustum(
+			float totalNearWidth, float totalNearHeight, float nearDistance,
+			float totalFarWidth, float totalFarHeight, float farDistance,
+			int x, int y, int xCount, int yCount)
+		{
+			var nearWidth = totalNearWidth / xCount;
+			var nearHeight = totalNearHeight / yCount;
+			var nearOffset = new Vector3(
+				-totalNearWidth / 2 + x * nearWidth,
+				totalNearHeight / 2 - y * nearHeight,
+				nearDistance);
+
+			var farWidth = totalFarWidth / xCount;
+			var farHeight = totalFarHeight / yCount;
+			var farOffset = new Vector3(
+				-totalFarWidth / 2 + x * farWidth,
+				totalFarHeight / 2 - y * farHeight,
+				farDistance);
+
+			var f = new Frustum();
+
+			f.nearTL = nearOffset;
+			f.nearTR = nearOffset + new Vector3(nearWidth, 0, 0);
+			f.nearBL = nearOffset + new Vector3(0, -nearHeight, 0);
+			f.nearBR = nearOffset + new Vector3(nearWidth, -nearHeight, 0);
+
+			f.farTL = farOffset;
+			f.farTR = farOffset + new Vector3(farWidth, 0, 0);
+			f.farBL = farOffset + new Vector3(0, -farHeight, 0);
+			f.farBR = farOffset + new Vector3(farWidth, -farHeight, 0);
+
+			f.planes = new UnityEngine.Plane[]
+			{
+				P(f.farTL,  f.nearTL, f.nearBL),  // left
+				P(f.nearTR, f.farTR,  f.farBR),   // right
+				P(f.nearBL, f.nearBR, f.farBR),   // down
+				P(f.nearTL, f.farTL,  f.farTR),   // up
+				P(f.nearTL, f.nearTR, f.nearBR),  // near
+				P(f.farTR,  f.farTL,  f.farBL)    // far
+			};
+
+			return f;
+		}
+
+		private void NextPosition()
+		{
+			float nearWidth = 2;
+			float nearHeight = 1;
+			float nearDistance = 0.1f;
+
+			float farWidth = 4;
+			float farHeight = 2;
+			float farDistance = 10;
+
+			var fs = new Frustum[9];
+
+			for (int x = 0; x < 3; ++x)
+			{
+				for (int y = 0; y < 3; ++y)
+				{
+					fs[y * 3 + x] = MakeFrustum(
+						nearWidth, nearHeight, nearDistance,
+						farWidth, farHeight, farDistance,
+						x, y, 3, 3);
+				}
+			}
+
+
+
+			string log = "";
+			int availableCount = 9;
+
+			if (avoid_ != null)
+			{
+				availableCount = 0;
+
+				var selfHead = person_.Body.Head;
+				var avoidPos = avoid_.EyeInterest - selfHead.Position;
+				var avoidBox = new Bounds(
+					W.VamU.ToUnity(avoidPos),
+					new UnityEngine.Vector3(0.15f, 0.15f));
+
+				log += $"av={avoidBox} ";
+
+				for (int i = 0; i < 9; ++i)
+				{
+					//Cue.LogInfo($"{fs[i].nearTL} {fs[i].nearTR} {fs[i].nearBL} {fs[i].nearBR}");
+					//Cue.LogInfo($"{fs[i].farTL} {fs[i].farTR} {fs[i].farBL} {fs[i].farBR}");
+
+					//for (int p = 0; p < 6; ++p)
+					//	Cue.LogInfo(fs[i].planes[p].ToString());
+
+					if (GeometryUtility.TestPlanesAABB(fs[i].planes, avoidBox))
+					{
+						log += $"{i}=N ";
+						fs[i].avoid = true;
+					}
+					else
+					{
+						log += $"{i}=Y ";
+						++availableCount;
+					}
+				}
+			}
+
+			if (availableCount == 0)
+			{
+				//Cue.LogInfo(log);
+				Cue.LogError("nowhere to look");
+				return;
+			}
+
+			log += $"n={availableCount} ";
+
+
+			int fi = U.RandomInt(0, availableCount - 1);
+			log += $"fi={fi} ";
+
+			var f = fs[fi];
+
+			pos_ = f.Random();
+			log += $"p={pos_}";
+
+			//Cue.LogInfo(log);
+
+
+			//var far =
+			//	selfHead.Position +
+			//	Vector3.Rotate(new Vector3(0, 0, 2), selfHead.Bearing);
+
+
+			//pos_ = new Vector3(
+			//	U.RandomFloat(-1.0f, 1.0f),
+			//	U.RandomFloat(-1.0f, 1.0f),
+			//	1);
+		}
+	}
+
+
 	class Gaze
 	{
 		private Person person_;
 		private IEyes eyes_;
 		private IGazer gazer_;
 		private bool interested_ = false;
+		private RandomLookAt random_;
+		private bool randomActive_ = false;
 
 		public Gaze(Person p)
 		{
 			person_ = p;
+			random_ = new RandomLookAt(p);
 			eyes_ = Integration.CreateEyes(p);
 			gazer_ = Integration.CreateGazer(p);
 		}
@@ -326,6 +560,16 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (randomActive_)
+			{
+				if (random_.Update(s))
+				{
+					eyes_.LookAt(
+						person_.Body.Head.Position +
+						Vector3.Rotate(random_.Position, person_.Bearing));
+				}
+			}
+
 			eyes_.Update(s);
 			gazer_.Update(s);
 		}
@@ -340,6 +584,7 @@ namespace Cue
 				LookAt(Cue.Instance.Player);
 
 			interested_ = false;
+			randomActive_ = false;
 		}
 
 		public void LookAtCamera()
@@ -347,6 +592,7 @@ namespace Cue
 			person_.Log.Info("looking at camera");
 			eyes_.LookAtCamera();
 			interested_ = false;
+			randomActive_ = false;
 		}
 
 		public void LookAt(IObject o, bool gaze = true)
@@ -355,6 +601,7 @@ namespace Cue
 			eyes_.LookAt(o);
 			gazer_.Enabled = gaze;
 			interested_ = true;
+			randomActive_ = false;
 		}
 
 		public void LookAt(Vector3 p, bool gaze = true)
@@ -363,11 +610,23 @@ namespace Cue
 			eyes_.LookAt(p);
 			gazer_.Enabled = gaze;
 			interested_ = false;
+			randomActive_ = false;
+		}
+
+		public void LookAtRandom(bool gaze = true)
+		{
+			person_.Log.Info($"looking at random gaze={gaze}");
+			randomActive_ = true;
+			random_.Avoid = null;
+			gazer_.Enabled = gaze;
 		}
 
 		public void Avoid(IObject o, bool gaze = true)
 		{
-			// todo
+			person_.Log.Info($"looking at random, avoiding {o}, gaze={gaze}");
+			randomActive_ = true;
+			random_.Avoid = o;
+			gazer_.Enabled = gaze;
 		}
 
 		public void LookAtNothing()
@@ -376,6 +635,7 @@ namespace Cue
 			eyes_.LookAtNothing();
 			gazer_.Enabled = false;
 			interested_ = false;
+			randomActive_ = false;
 		}
 
 		public void LookInFront()
@@ -384,6 +644,7 @@ namespace Cue
 			eyes_.LookInFront();
 			gazer_.Enabled = false;
 			interested_ = false;
+			randomActive_ = false;
 		}
 	}
 }

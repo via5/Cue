@@ -97,7 +97,6 @@
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Interactions.cs" />
-    <Compile Include="src\AI\Mood.cs" />
     <Compile Include="src\AI\Personality.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Events\Event.cs" />

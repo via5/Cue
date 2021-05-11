@@ -90,8 +90,9 @@ namespace Cue
 							Resources.Animations.GetAllIdles(
 								PersonState.Standing, person_.Sex)));
 
-						cc.Push(new LookAroundAction(person_));
+						//cc.Push(new LookAroundAction(person_));
 						person_.PushAction(cc);
+						person_.Gaze.LookAtRandom();
 
 						state_ = Idling;
 					}
