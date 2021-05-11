@@ -218,15 +218,46 @@ namespace Cue
 		private float[] parts_ = new float[BodyParts.Count];
 		private float decay_ = 1;
 
+		private float excitement_ = 0;
+		private float forcedExcitement_ = -1;
+
 		public Excitement(Person p)
 		{
 			person_ = p;
 		}
 
+		public float Value
+		{
+			get
+			{
+				if (forcedExcitement_ >= 0)
+					return forcedExcitement_;
+				else
+					return excitement_;
+			}
+
+			set
+			{
+				excitement_ = U.Clamp(value, 0, 1);
+			}
+		}
+
+		public void ForceValue(float s)
+		{
+			forcedExcitement_ = s;
+		}
+
+
 		public void Update(float s)
 		{
 			for (int i=0; i<BodyParts.Count; ++i)
 				parts_[i] = Check(s, person_.Body.Get(i), parts_[i]);
+
+			if (excitement_ >= 1)
+			{
+				person_.Orgasmer.Orgasm();
+				excitement_ = 0;
+			}
 		}
 
 		private float Check(float s, BodyPart p, float v)
@@ -332,6 +363,11 @@ namespace Cue
 			eyes_.LookAt(p);
 			gazer_.Enabled = gaze;
 			interested_ = false;
+		}
+
+		public void Avoid(IObject o, bool gaze = true)
+		{
+			// todo
 		}
 
 		public void LookAtNothing()

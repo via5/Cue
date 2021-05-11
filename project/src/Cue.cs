@@ -179,17 +179,12 @@ namespace Cue
 				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
 				p.Clothing.Init();
-				p.Personality = new QuirkyPersonality(p);
+				p.Personality = new TsunderePersonality(p);
 
 				if (p == Player)
 				{
 					p.AI.EventsEnabled = false;
 					p.AI.InteractionsEnabled = false;
-					p.AI.MoodEnabled = false;
-				}
-				else
-				{
-					p.AI.Mood.State = Mood.Idle;
 				}
 
 				p.Atom.Init();

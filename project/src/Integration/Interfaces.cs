@@ -183,6 +183,7 @@ namespace Cue
 		public const int Happy = 2;
 		public const int Mischievous = 3;
 		public const int Pleasure = 4;
+		public const int Angry = 5;
 
 		public static string ToString(int i)
 		{
@@ -192,6 +193,7 @@ namespace Cue
 				case Happy: return "happy";
 				case Mischievous: return "mischievous";
 				case Pleasure: return "pleasure";
+				case Angry: return "angry";
 				default: return $"?{i}";
 			}
 		}

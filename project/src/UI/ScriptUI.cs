@@ -553,14 +553,6 @@ namespace Cue
 				es += "interactions";
 			}
 
-			if (ai_.MoodEnabled)
-			{
-				if (es != "")
-					es += "|";
-
-				es += "mood";
-			}
-
 			if (es == "")
 				es = "nothing";
 
@@ -569,28 +561,30 @@ namespace Cue
 			event_.Text = (ai_.Event == null ? "(none)" : ai_.Event.ToString());
 			personality_.Text = person_.Personality.ToString();
 
-			moodState_.Text = ai_.Mood.StateString;
-			moodExcitement_.Text = ai_.Mood.Excitement.ToString("0.00000");
-			moodLastRate_.Text = ai_.Mood.LastRate.ToString("0.00000");
-			moodMouthRate_.Text = ai_.Mood.MouthRate.ToString();
-			moodBreastsRate_.Text = ai_.Mood.BreastsRate.ToString();
-			moodGenitalsRate_.Text = ai_.Mood.GenitalsRate.ToString();
-			moodDecayRate_.Text = ai_.Mood.DecayRate.ToString();
-			moodRateAdjust_.Text = ai_.Mood.RateAdjust.ToString();
+			var ss = person_.Personality.Sensitivity;
+
+			moodState_.Text = person_.Personality.StateString;
+			moodExcitement_.Text = person_.Excitement.Value.ToString("0.00000");
+			moodLastRate_.Text = ss.Change.ToString("0.00000");
+			moodMouthRate_.Text = ss.MouthRate.ToString();
+			moodBreastsRate_.Text = ss.BreastsRate.ToString();
+			moodGenitalsRate_.Text = ss.GenitalsRate.ToString();
+			moodDecayRate_.Text = ss.DecayRate.ToString();
+			moodRateAdjust_.Text = ss.RateAdjust.ToString();
 		}
 
 		private void OnForceExcitementCheck(bool b)
 		{
 			if (b)
-				person_.AI.Mood.ForceExcitement = forceExcitementValue_.Value;
+				person_.Excitement.ForceValue(forceExcitementValue_.Value);
 			else
-				person_.AI.Mood.ForceExcitement = -1;
+				person_.Excitement.ForceValue(-1);
 		}
 
 		private void OnForceExcitement(float f)
 		{
 			forceExcitement_.Checked = true;
-			person_.AI.Mood.ForceExcitement = f;
+			person_.Excitement.ForceValue(f);
 		}
 	}
 

@@ -9,10 +9,8 @@ namespace Cue
 		void Update(float s);
 		bool EventsEnabled { get; set; }
 		bool InteractionsEnabled { get; set; }
-		bool MoodEnabled { get; set; }
 		IEvent Event { get; }
 		void OnPluginState(bool b);
-		Mood Mood { get; }
 	}
 
 
@@ -24,17 +22,13 @@ namespace Cue
 		private readonly List<IEvent> events_ = new List<IEvent>();
 		private bool eventsEnabled_ = true;
 		private bool interactionsEnabled_ = true;
-		private bool moodEnabled_ = true;
 		private IEvent forced_ = null;
 		private readonly List<IInteraction> interactions_ = new List<IInteraction>();
-		private Mood mood_;
 
 		public PersonAI(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "AI");
-
-			mood_ = new Mood(person_);
 
 			//foreach (var o in Cue.Instance.Objects)
 			//{
@@ -48,7 +42,6 @@ namespace Cue
 
 			events_.Add(new StandEvent(p));
 
-			interactions_.Add(new TouchInteraction(person_));
 			interactions_.Add(new KissingInteraction(person_));
 		}
 
@@ -73,12 +66,6 @@ namespace Cue
 			set { interactionsEnabled_ = value; }
 		}
 
-		public bool MoodEnabled
-		{
-			get { return moodEnabled_; }
-			set { moodEnabled_ = value; }
-		}
-
 		public IEvent Event
 		{
 			get
@@ -90,11 +77,6 @@ namespace Cue
 				else
 					return null;
 			}
-		}
-
-		public Mood Mood
-		{
-			get { return mood_; }
 		}
 
 		public bool InteractWith(IObject o)
@@ -216,9 +198,6 @@ namespace Cue
 				}
 			}
 
-			if (moodEnabled_)
-				mood_.Update(s);
-
 			if (interactionsEnabled_)
 			{
 				for (int i = 0; i < interactions_.Count; ++i)
@@ -228,7 +207,6 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			mood_.OnPluginState(b);
 		}
 
 		private void Stop()

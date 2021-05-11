@@ -599,6 +599,27 @@ namespace Cue
 
 			return g;
 		}
+
+		public static IProceduralMorphGroup Frown(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ProceduralMorph(p, "Brow Down", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Squint(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ProceduralMorph(p, "Eyes Squint", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup MouthFrown(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ProceduralMorph(p, "Mouth Corner Up-Down", 0, -0.5f, 1, 5, 2, 2));
+			return g;
+		}
 	}
 
 
@@ -618,6 +639,7 @@ namespace Cue
 			expressions_.Add(CreateHappy(p));
 			expressions_.Add(CreateMischievous(p));
 			expressions_.Add(CreatePleasure(p));
+			expressions_.Add(CreateAngry(p));
 		}
 
 		public List<ProceduralExpressionType> All
@@ -658,6 +680,17 @@ namespace Cue
 			var e = new ProceduralExpressionType(p, Expressions.Pleasure);
 
 			e.Groups.Add(PE.Pleasure(p));
+
+			return e;
+		}
+
+		private ProceduralExpressionType CreateAngry(Person p)
+		{
+			var e = new ProceduralExpressionType(p, Expressions.Angry);
+
+			e.Groups.Add(PE.Frown(p));
+			e.Groups.Add(PE.Squint(p));
+			e.Groups.Add(PE.MouthFrown(p));
 
 			return e;
 		}

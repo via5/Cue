@@ -236,6 +236,7 @@ namespace Cue
 			blowjob_.Update(s);
 			expression_.Update(s);
 			excitement_.Update(s);
+			personality_.Update(s);
 
 			if (this != Cue.Instance.Player)
 				body_.Update(s);

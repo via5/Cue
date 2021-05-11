@@ -2,117 +2,263 @@
 {
 	interface IPersonality
 	{
-		void SetMood(int state);
-		void SetExcitement(float f);
+		string StateString{ get; }
+		Sensitivity Sensitivity { get; }
+		void Update(float s);
+	}
+
+
+	class Sensitivity
+	{
+		private Person person_;
+
+		private float change_ = 0;
+
+		private float mouthRate_ = 0.001f;
+		private float breastsRate_ = 0.01f;
+		private float genitalsRate_ = 0.1f;
+		private float decayRate_ = -0.1f;
+		private float rateAdjust_ = 0.1f;
+
+
+		public Sensitivity(Person p)
+		{
+			person_ = p;
+		}
+
+		public float Change { get { return change_; } }
+		public float MouthRate { get { return mouthRate_; } }
+		public float BreastsRate { get { return breastsRate_; } }
+		public float GenitalsRate { get { return genitalsRate_; } }
+		public float DecayRate { get { return decayRate_; } }
+		public float RateAdjust { get { return rateAdjust_; } }
+
+		public void Update(float s)
+		{
+			float rate = 0;
+
+			rate += person_.Excitement.Genitals * genitalsRate_;
+			rate += person_.Excitement.Mouth * mouthRate_;
+			rate += person_.Excitement.Breasts * breastsRate_;
+
+			if (rate == 0)
+				rate = decayRate_;
+
+			change_ = rate * s * rateAdjust_;
+		}
+
+		public override string ToString()
+		{
+			string s = "";
+
+			s += "change=";
+
+			if (change_ < 0)
+				s += "-";
+			else
+				s += "+";
+
+			s += change_.ToString("0.000");
+
+			return s;
+		}
 	}
 
 
 	abstract class BasicPersonality : IPersonality
 	{
-		public struct Expression
-		{
-			public int mood;
-			public ExpressionIntensity[] intensities;
-
-			public Expression(int mood, ExpressionIntensity[] intensities)
-			{
-				this.mood = mood;
-				this.intensities = intensities;
-			}
-		}
-
-
 		protected readonly Person person_;
-		private Expression[] expressions_;
+		private readonly string name_;
+		private Sensitivity sensitivity_;
+		private string state_ = "idle";
+		private bool wasClose_ = false;
+		private bool inited_ = false;
 
-		public BasicPersonality(Person p, Expression[] e)
+		public BasicPersonality(Person p, string name)
 		{
 			person_ = p;
-			expressions_ = e;
+			name_ = name;
+			sensitivity_ = new Sensitivity(p);
 		}
 
-		public void SetExcitement(float f)
+		public string Name
 		{
-			person_.Breathing.Intensity = f;
-			person_.Expression.Set(Expressions.Pleasure, f);
+			get { return name_; }
 		}
 
-		public void SetMood(int mood)
+		public string StateString
 		{
-			//person_.Expression.MakeNeutral();
+			get { return state_; }
+			protected set { state_ = value; }
+		}
 
-			for (int i = 0; i < expressions_.Length; ++i)
+		public Sensitivity Sensitivity
+		{
+			get { return sensitivity_; }
+		}
+
+		public virtual void Update(float s)
+		{
+			if (!inited_)
 			{
-				if (expressions_[i].mood == mood)
-				{
-					person_.Expression.Set(expressions_[i].intensities);
-					return;
-				}
+				Init();
+				inited_ = true;
+			}
+
+			sensitivity_.Update(s);
+			person_.Excitement.Value += sensitivity_.Change;
+			person_.Breathing.Intensity = person_.Excitement.Value;
+			person_.Expression.Set(Expressions.Pleasure, person_.Excitement.Value);
+
+			bool close = person_.Body.PlayerIsClose;
+			if (close != wasClose_)
+			{
+				SetClose(close);
+				wasClose_ = close;
 			}
 		}
+
+		public override string ToString()
+		{
+			return $"{Name} {state_}";
+		}
+
+		protected abstract void Init();
+		protected abstract void SetClose(bool b);
 	}
 
 
-	class NeutralPersonality : BasicPersonality
+	abstract class StandardPersonality : BasicPersonality
+	{
+		protected StandardPersonality(Person p, string name)
+			: base(p, name)
+		{
+		}
+
+		protected override void Init()
+		{
+			SetIdle();
+		}
+
+		protected override void SetClose(bool b)
+		{
+			if (b)
+			{
+				person_.Gaze.LookAt(Cue.Instance.Player);
+				StateString = "happy";
+				SetHappy();
+			}
+			else
+			{
+				StateString = "idle";
+				SetIdle();
+			}
+		}
+
+		protected abstract void SetIdle();
+		protected abstract void SetHappy();
+	}
+
+
+	class NeutralPersonality : StandardPersonality
 	{
 		public NeutralPersonality(Person p)
-			: base(p, GetExpressions())
+			: base(p, "neutral")
 		{
 		}
 
-		private static Expression[] GetExpressions()
+		protected override void SetIdle()
 		{
-			return new Expression[]
+			person_.Expression.Set(new ExpressionIntensity[]
 			{
-				new Expression(Mood.Idle, new ExpressionIntensity[]
-				{
-					new ExpressionIntensity(Expressions.Happy, 0.5f),
-					new ExpressionIntensity(Expressions.Mischievous, 0.0f)
-				}),
-
-				new Expression(Mood.Happy, new ExpressionIntensity[]
-				{
-					new ExpressionIntensity(Expressions.Happy, 0.7f),
-					new ExpressionIntensity(Expressions.Mischievous, 0.0f)
-				})
-			};
+				new ExpressionIntensity(Expressions.Happy, 0.5f),
+				new ExpressionIntensity(Expressions.Mischievous, 0.0f)
+			});
 		}
 
-		public override string ToString()
+		protected override void SetHappy()
 		{
-			return "neutral";
+			person_.Expression.Set(new ExpressionIntensity[]
+			{
+				new ExpressionIntensity(Expressions.Happy, 0.5f),
+				new ExpressionIntensity(Expressions.Mischievous, 0.0f)
+			});
 		}
 	}
 
 
-	class QuirkyPersonality : BasicPersonality
+	class QuirkyPersonality : StandardPersonality
 	{
 		public QuirkyPersonality(Person p)
-			: base(p, GetExpressions())
+			: base(p, "quirky")
 		{
 		}
 
-		private static Expression[] GetExpressions()
+		protected override void SetIdle()
 		{
-			return new Expression[]
+			person_.Expression.Set(new ExpressionIntensity[]
 			{
-				new Expression(Mood.Idle, new ExpressionIntensity[]
-				{
 					new ExpressionIntensity(Expressions.Happy, 0.2f),
 					new ExpressionIntensity(Expressions.Mischievous, 0.4f)
-				}),
-
-				new Expression(Mood.Happy, new ExpressionIntensity[]
-				{
-					new ExpressionIntensity(Expressions.Happy, 0.4f),
-					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
-				})
-			};
+			});
 		}
 
-		public override string ToString()
+		protected override void SetHappy()
 		{
-			return "quirky";
+			person_.Expression.Set(new ExpressionIntensity[]
+			{
+					new ExpressionIntensity(Expressions.Happy, 0.4f),
+					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
+			});
+		}
+	}
+
+
+	class TsunderePersonality : BasicPersonality
+	{
+		public TsunderePersonality(Person p)
+			: base(p, "tsundere")
+		{
+		}
+
+		protected override void Init()
+		{
+			SetIdle();
+		}
+
+		protected override void SetClose(bool b)
+		{
+			if (b)
+			{
+				person_.Gaze.Avoid(Cue.Instance.Player);
+				StateString = "angry";
+				SetAngry();
+			}
+			else
+			{
+				StateString = "idle";
+				SetIdle();
+			}
+		}
+
+		private void SetIdle()
+		{
+			person_.Expression.Set(new ExpressionIntensity[]
+			{
+				new ExpressionIntensity(Expressions.Happy, 0.0f),
+				new ExpressionIntensity(Expressions.Mischievous, 0.2f),
+				new ExpressionIntensity(Expressions.Angry, 0.3f)
+			});
+		}
+
+		private void SetAngry()
+		{
+			person_.Expression.Set(new ExpressionIntensity[]
+			{
+				new ExpressionIntensity(Expressions.Happy, 0.0f),
+				new ExpressionIntensity(Expressions.Mischievous, 0.0f),
+				new ExpressionIntensity(Expressions.Angry, 1.0f)
+			});
 		}
 	}
 }

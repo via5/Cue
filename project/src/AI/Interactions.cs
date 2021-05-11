@@ -6,40 +6,6 @@
 	}
 
 
-	class TouchInteraction : IInteraction
-	{
-		private Person person_;
-		private Logger log_;
-		private bool wasClose_ = false;
-
-		public TouchInteraction(Person p)
-		{
-			person_ = p;
-			log_ = new Logger(Logger.Interaction, p, "KissInt");
-		}
-
-		public void Update(float s)
-		{
-			bool close = person_.Body.PlayerIsClose;
-
-			if (close != wasClose_)
-			{
-				if (close)
-				{
-					person_.Gaze.LookAt(Cue.Instance.Player);
-					person_.AI.Mood.State = Mood.Happy;
-				}
-				else
-				{
-					person_.AI.Mood.State = Mood.Idle;
-				}
-
-				wasClose_ = close;
-			}
-		}
-	}
-
-
 	class KissingInteraction : IInteraction
 	{
 		public const float StartDistance = 0.15f;
