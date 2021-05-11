@@ -203,6 +203,8 @@ namespace Cue.W
 
 		public void OnPluginState(bool b)
 		{
+			root_.SetActive(b);
+
 			nav_.OnPluginState(b);
 			log_.OnPluginState(b);
 
@@ -733,6 +735,18 @@ namespace Cue.W
 			return new UnityEngine.Color(c.r, c.g, c.b, c.a);
 		}
 
+		public static UnityEngine.Bounds ToUnity(Box b)
+		{
+			return new UnityEngine.Bounds(
+				ToUnity(b.center), ToUnity(b.size));
+		}
+
+		public static UnityEngine.Plane ToUnity(Plane p)
+		{
+			return new UnityEngine.Plane(
+				ToUnity(p.a), ToUnity(p.b), ToUnity(p.c));
+		}
+
 
 		public static Vector3 FromUnity(UnityEngine.Vector3 v)
 		{
@@ -742,6 +756,11 @@ namespace Cue.W
 		public static Color FromUnity(UnityEngine.Color c)
 		{
 			return new Color(c.r, c.g, c.b, c.a);
+		}
+
+		public static Box FromUnity(UnityEngine.Bounds b)
+		{
+			return new Box(FromUnity(b.center), FromUnity(b.size));
 		}
 
 
@@ -776,6 +795,22 @@ namespace Cue.W
 		public static Vector3 Rotate(Vector3 v, float bearing)
 		{
 			return FromUnity(UnityEngine.Quaternion.Euler(0, bearing, 0) * ToUnity(v));
+		}
+
+
+		public static bool TestPlanesAABB(Plane[] planes, Box box)
+		{
+			var ps = new UnityEngine.Plane[]
+			{
+				ToUnity(planes[0]).flipped,
+				ToUnity(planes[1]).flipped,
+				ToUnity(planes[2]).flipped,
+				ToUnity(planes[3]).flipped,
+				ToUnity(planes[4]).flipped,
+				ToUnity(planes[5]).flipped,
+			};
+
+			return GeometryUtility.TestPlanesAABB(ps, ToUnity(box));
 		}
 	}
 }

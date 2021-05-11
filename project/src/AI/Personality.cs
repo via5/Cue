@@ -228,9 +228,10 @@
 
 		protected override void SetClose(bool b)
 		{
+			person_.Gaze.Avoid(Cue.Instance.Player);
+
 			if (b)
 			{
-				person_.Gaze.Avoid(Cue.Instance.Player);
 				StateString = "angry";
 				SetAngry();
 			}

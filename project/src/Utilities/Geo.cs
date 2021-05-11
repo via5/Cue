@@ -70,6 +70,11 @@ namespace Cue
 			return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
 		}
 
+		public static Vector3 operator /(Vector3 v, float f)
+		{
+			return new Vector3(v.X / f, v.Y / f, v.Z / f);
+		}
+
 		public static float Distance(Vector3 a, Vector3 b)
 		{
 			// todo
@@ -426,6 +431,102 @@ namespace Cue
 		public static Color Green
 		{
 			get { return new Color(0, 1, 0, 1); }
+		}
+	}
+
+
+	struct Box
+	{
+		public Vector3 center, size;
+
+		public Box(Vector3 center, Vector3 size)
+		{
+			this.center = center;
+			this.size = size;
+		}
+
+		public static Box Zero
+		{
+			get { return new Box(Vector3.Zero, Vector3.Zero); }
+		}
+
+		public override string ToString()
+		{
+			return $"{center} {size}";
+		}
+	}
+
+
+	struct Plane
+	{
+		public Vector3 a, b, c;
+
+		public Plane(Vector3 a, Vector3 b, Vector3 c)
+		{
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+
+		public override string ToString()
+		{
+			return $"{a} {b} {c}";
+		}
+	}
+
+
+	class Frustum
+	{
+		public Vector3 nearTL;
+		public Vector3 nearTR;
+		public Vector3 nearBL;
+		public Vector3 nearBR;
+
+		public Vector3 farTL;
+		public Vector3 farTR;
+		public Vector3 farBL;
+		public Vector3 farBR;
+
+		public Plane[] planes;
+		public bool avoid = false;
+
+		public Vector3 NearCenter()
+		{
+			return nearTL + NearSize() / 2;
+		}
+
+		public Vector3 NearSize()
+		{
+			return (nearBR - nearTL);
+		}
+
+		public Vector3 Random()
+		{
+			var nearWidth = nearTR.X - nearTL.Y;
+			var nearHeight = nearBL.Y - nearTL.Y;
+			var farWidth = farTR.X - farTL.Y;
+			var farHeight = farBL.Y - farTL.Y;
+
+			var nearPoint = new Vector3(
+				nearTL.X + U.RandomFloat(0, nearWidth),
+				nearTL.Y - U.RandomFloat(0, nearHeight),
+				nearTL.Z);
+
+			var farPoint = new Vector3(
+				farTL.X + U.RandomFloat(0, farWidth),
+				farTL.Y + U.RandomFloat(0, farHeight),
+				farTL.Z);
+
+			var d = Vector3.Distance(nearPoint, farPoint);
+			var rd = U.RandomFloat(0, d);
+
+			return nearPoint + (farPoint - nearPoint).Normalized * rd;
+		}
+
+		public bool TestPlanesAABB(Box box)
+		{
+			// todo
+			return W.VamU.TestPlanesAABB(planes, box);
 		}
 	}
 }
