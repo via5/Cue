@@ -4,14 +4,14 @@ namespace Cue.Proc
 {
 	using BE = BuiltinExpressions;
 
-	class ProceduralExpressionType
+	class ExpressionType
 	{
 		private readonly int type_;
 		private float intensity_ = 0;
 		private readonly List<IProceduralMorphGroup> groups_ =
 			new List<IProceduralMorphGroup>();
 
-		public ProceduralExpressionType(Person p, int type)
+		public ExpressionType(Person p, int type)
 		{
 			type_ = type;
 		}
@@ -56,16 +56,16 @@ namespace Cue.Proc
 	}
 
 
-	class ProceduralExpression : IExpression
+	class Expression : IExpression
 	{
 		private Person person_;
 		private bool enabled_ = true;
 
-		private readonly List<ProceduralExpressionType> expressions_ =
-			new List<ProceduralExpressionType>();
+		private readonly List<ExpressionType> expressions_ =
+			new List<ExpressionType>();
 
 
-		public ProceduralExpression(Person p)
+		public Expression(Person p)
 		{
 			person_ = p;
 			expressions_.Add(CreateCommon(p));
@@ -75,14 +75,14 @@ namespace Cue.Proc
 			expressions_.Add(CreateAngry(p));
 		}
 
-		public List<ProceduralExpressionType> All
+		public List<ExpressionType> All
 		{
 			get { return expressions_; }
 		}
 
-		private ProceduralExpressionType CreateCommon(Person p)
+		private ExpressionType CreateCommon(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Common);
+			var e = new ExpressionType(p, Expressions.Common);
 			e.Intensity = 1;
 
 			e.Groups.Add(BE.Swallow(p));
@@ -90,36 +90,36 @@ namespace Cue.Proc
 			return e;
 		}
 
-		private ProceduralExpressionType CreateHappy(Person p)
+		private ExpressionType CreateHappy(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Happy);
+			var e = new ExpressionType(p, Expressions.Happy);
 
 			e.Groups.Add(BE.Smile(p));
 
 			return e;
 		}
 
-		private ProceduralExpressionType CreateMischievous(Person p)
+		private ExpressionType CreateMischievous(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Mischievous);
+			var e = new ExpressionType(p, Expressions.Mischievous);
 
 			e.Groups.Add(BE.CornerSmile(p));
 
 			return e;
 		}
 
-		private ProceduralExpressionType CreatePleasure(Person p)
+		private ExpressionType CreatePleasure(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Pleasure);
+			var e = new ExpressionType(p, Expressions.Pleasure);
 
 			e.Groups.Add(BE.Pleasure(p));
 
 			return e;
 		}
 
-		private ProceduralExpressionType CreateAngry(Person p)
+		private ExpressionType CreateAngry(Person p)
 		{
-			var e = new ProceduralExpressionType(p, Expressions.Angry);
+			var e = new ExpressionType(p, Expressions.Angry);
 
 			e.Groups.Add(BE.Frown(p));
 			e.Groups.Add(BE.Squint(p));

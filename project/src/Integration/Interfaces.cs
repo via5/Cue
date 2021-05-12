@@ -58,7 +58,7 @@ namespace Cue
 
 		public static IExpression CreateExpression(Person p)
 		{
-			return new ProceduralExpression(p);
+			return new Proc.Expression(p);
 		}
 	}
 

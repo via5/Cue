@@ -592,7 +592,7 @@ namespace Cue
 	class PersonExpressionTab : Tab
 	{
 		private Person person_;
-		private ProceduralExpression pex_;
+		private Proc.Expression pex_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
 		public PersonExpressionTab(Person p)
@@ -601,7 +601,7 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 
-			pex_ = p.Expression as ProceduralExpression;
+			pex_ = p.Expression as Proc.Expression;
 			if (pex_ == null)
 			{
 				Add(new VUI.Label("Not procedural"));
