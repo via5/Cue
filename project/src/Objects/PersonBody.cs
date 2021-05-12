@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Cue
 {
@@ -318,9 +317,8 @@ namespace Cue
 		private Person person_;
 		private Frustum frustum_;
 		private Color color_ = Color.Zero;
-		private UnityEngine.GameObject near_ = null;
-		private UnityEngine.GameObject far_ = null;
-		private UnityEngine.Material mat_ = null;
+		private W.IGraphic near_ = null;
+		private W.IGraphic far_ = null;
 
 		public FrustumRender(Person p, Frustum f)
 		{
@@ -332,27 +330,22 @@ namespace Cue
 		{
 			if (near_ == null)
 			{
-				near_ = Create();
-				//far_ = Create();
+				near_ = Create(frustum_.NearSize());
+				far_ = Create(frustum_.FarSize());
 			}
 
-			var q = person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation;
+			near_.Position =
+				person_.Body.Head.Position +
+				Vector3.Rotate(frustum_.NearCenter(), person_.Body.Get(BodyParts.Chest).Direction);
 
-			near_.transform.localPosition =
-				W.VamU.ToUnity(person_.Body.Head.Position) +
-				q * W.VamU.ToUnity(frustum_.NearCenter());
+			near_.Direction = person_.Body.Get(BodyParts.Chest).Direction;
 
-			near_.transform.localScale = W.VamU.ToUnity(
-				frustum_.NearSize());
 
-			near_.transform.localRotation = q;
+			far_.Position =
+				person_.Body.Head.Position +
+				Vector3.Rotate(frustum_.FarCenter(), person_.Body.Get(BodyParts.Chest).Direction);
 
-			//far_.transform.position = W.VamU.ToUnity(
-			//	person_.Body.Head.Position +
-			//	frustum_.FarCenter());
-			//
-			//far_.transform.localScale = W.VamU.ToUnity(
-			//	frustum_.FarSize());
+			far_.Direction = person_.Body.Get(BodyParts.Chest).Direction;
 		}
 
 		public Color Color
@@ -360,25 +353,25 @@ namespace Cue
 			set
 			{
 				color_ = value;
-				if (mat_ != null)
-					mat_.color = W.VamU.ToUnity(value);
+
+				if (near_ != null)
+					near_.Color = color_;
+
+				if (far_ != null)
+					far_.Color = color_;
 			}
 		}
 
-		private UnityEngine.GameObject Create()
+		private W.IGraphic Create(Vector3 size)
 		{
-			var o = UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Cube);
-			o.transform.SetParent(Cue.Instance.VamSys.RootTransform);
+			var g = Cue.Instance.Sys.CreateBoxGraphic(
+				"FrustumRender.near", Vector3.Zero, size, Color.Zero);
 
-			foreach (var c in o.GetComponents<UnityEngine.Collider>())
-				UnityEngine.Object.Destroy(c);
+			g.Collision = false;
+			g.Color = color_;
+			g.Visible = true;
 
-			mat_ = new UnityEngine.Material(UnityEngine.Shader.Find("Battlehub/RTGizmos/Handles"));
-			mat_.color = W.VamU.ToUnity(color_);
-
-			o.GetComponent<UnityEngine.Renderer>().material = mat_;
-
-			return o;
+			return g;
 		}
 	}
 
@@ -389,12 +382,14 @@ namespace Cue
 		{
 			public Frustum frustum;
 			public bool avoid;
+			public bool selected;
 			public FrustumRender render;
 
 			public FrustumInfo(Person p, Frustum f)
 			{
 				frustum = f;
 				avoid = false;
+				selected = false;
 				render = new FrustumRender(p, f);
 			}
 		}
@@ -413,7 +408,7 @@ namespace Cue
 		private Vector3 pos_ = Vector3.Zero;
 		private IObject avoid_ = null;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
-		private UnityEngine.GameObject avoidRender_ = null;
+		private W.IGraphic avoidRender_ = null;
 
 		public RandomLookAt(Person p)
 		{
@@ -428,16 +423,12 @@ namespace Cue
 
 		private void CreateAvoidRender()
 		{
-			avoidRender_ = UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Cube);
-			avoidRender_.transform.SetParent(Cue.Instance.VamSys.RootTransform);
+			avoidRender_ = Cue.Instance.Sys.CreateBoxGraphic(
+				"RandomLookAt.AvoidRender",
+				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
 
-			foreach (var c in avoidRender_.GetComponents<UnityEngine.Collider>())
-				UnityEngine.Object.Destroy(c);
-
-			var mat = new UnityEngine.Material(UnityEngine.Shader.Find("Battlehub/RTGizmos/Handles"));
-			mat.color = W.VamU.ToUnity(new Color(0, 0, 1, 0.1f));
-
-			avoidRender_.GetComponent<UnityEngine.Renderer>().material = mat;
+			avoidRender_.Collision = false;
+			avoidRender_.Visible = true;
 		}
 
 		public IObject Avoid
@@ -470,6 +461,12 @@ namespace Cue
 
 		private void NextPosition()
 		{
+			for (int i = 0; i < frustums_.Length; ++i)
+			{
+				frustums_[i].avoid = false;
+				frustums_[i].selected = false;
+			}
+
 			int av = CheckAvoid();
 			if (av == 0)
 			{
@@ -478,12 +475,15 @@ namespace Cue
 			}
 
 			var sel = RandomAvailableFrustum(av);
-			pos_ = sel.Random();
+			frustums_[sel].selected = true;
+			pos_ = frustums_[sel].frustum.Random();
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				if (frustums_[i].avoid)
 					frustums_[i].render.Color = new Color(1, 0, 0, 0.1f);
+				else if (frustums_[i].selected)
+					frustums_[i].render.Color = new Color(1, 1, 1, 0.1f);
 				else
 					frustums_[i].render.Color = new Color(0, 1, 0, 0.1f);
 			}
@@ -492,12 +492,7 @@ namespace Cue
 		private int CheckAvoid()
 		{
 			if (avoid_ == null)
-			{
-				for (int i = 0; i < frustums_.Length; ++i)
-					frustums_[i].avoid = false;
-
 				return frustums_.Length;
-			}
 
 			int av = 0;
 
@@ -508,19 +503,19 @@ namespace Cue
 
 			if (avoidP != null)
 			{
-				var q = person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation;
+				var q = person_.Body.Get(BodyParts.Chest).Direction;
 
-				var avoidHeadU = W.VamU.ToUnity(
+				var avoidHeadU =
 					avoidP.Body.Head.Position -
 					selfHead.Position +
-					new Vector3(0, 0.2f, 0));
+					new Vector3(0, 0.2f, 0);
 
-				var avoidHipU = W.VamU.ToUnity(
+				var avoidHipU =
 					avoidP.Body.Get(BodyParts.Hips).Position -
-					selfHead.Position);
+					selfHead.Position;
 
-				var avoidHead = W.VamU.FromUnity(Quaternion.Inverse(q) * avoidHeadU);
-				var avoidHip = W.VamU.FromUnity(Quaternion.Inverse(q) * avoidHipU);
+				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
+				var avoidHip = Vector3.RotateInv(avoidHipU, q);
 
 				avoidBox = new Box(
 					avoidHip + (avoidHead - avoidHip) / 2,
@@ -536,42 +531,29 @@ namespace Cue
 			if (avoidRender_ == null)
 				CreateAvoidRender();
 
-			avoidRender_.transform.position =
-				W.VamU.ToUnity(selfHead.Position) +
-				person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation * W.VamU.ToUnity(avoidBox.center);
+			avoidRender_.Position =
+				selfHead.Position +
+				Vector3.Rotate(avoidBox.center, person_.Body.Get(BodyParts.Chest).Direction);
 
-			//avoidRender_.transform.position = W.VamU.ToUnity(avoidBox.center);// + new Vector3(0, 0.2f, 0));
-			avoidRender_.transform.localScale = W.VamU.ToUnity(avoidBox.size);
-
-
-
-			string s = $"{avoidBox} ";
+			avoidRender_.Size = avoidBox.size;
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
-
 				if (frustums_[i].frustum.TestPlanesAABB(avoidBox))
 				{
 					frustums_[i].avoid = true;
-					s += "N";
 				}
 				else
 				{
 					frustums_[i].avoid = false;
-					s += "Y";
 					++av;
 				}
-
-				if (i > 0 && ((i + 1) % XCount) == 0)
-					s += " ";
 			}
-
-			//Cue.LogInfo(s);
 
 			return av;
 		}
 
-		private Frustum RandomAvailableFrustum(int av)
+		private int RandomAvailableFrustum(int av)
 		{
 			int fi = U.RandomInt(0, av - 1);
 
@@ -581,13 +563,13 @@ namespace Cue
 					continue;
 
 				if (fi == 0)
-					return frustums_[i].frustum;
+					return i;
 
 				--fi;
 			}
 
 			Cue.LogError($"RandomAvailableFrustum: fi={fi} av={av} l={frustums_.Length}");
-			return Frustum.Zero;
+			return 0;
 		}
 	}
 

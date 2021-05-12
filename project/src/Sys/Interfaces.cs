@@ -52,7 +52,7 @@ namespace Cue.W
 		VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
 		VUI.Root CreateScriptUI();
-		IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c);
+		IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c);
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
 	}
 
@@ -193,6 +193,7 @@ namespace Cue.W
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
+		Vector3 Size { get; set; }
 		Color Color { get; set; }
 		bool Collision { get; set; }
 		void Destroy();

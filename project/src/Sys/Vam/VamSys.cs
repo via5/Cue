@@ -190,9 +190,9 @@ namespace Cue.W
 			return new VUI.Root(CueMain.Instance.MVRScriptUI);
 		}
 
-		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c)
+		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
-			return new VamBoxGraphic(name, pos, c);
+			return new VamBoxGraphic(name, pos, size, c);
 		}
 
 		public IGraphic CreateSphereGraphic(
@@ -767,7 +767,7 @@ namespace Cue.W
 		public static Vector3 Direction(Quaternion q)
 		{
 			var v = q * UnityEngine.Vector3.forward;
-			return FromUnity(v);
+			return FromUnity(v).Normalized;
 		}
 
 		public static float Bearing(Quaternion q)
@@ -795,6 +795,18 @@ namespace Cue.W
 		public static Vector3 Rotate(Vector3 v, float bearing)
 		{
 			return FromUnity(UnityEngine.Quaternion.Euler(0, bearing, 0) * ToUnity(v));
+		}
+
+		public static Vector3 Rotate(Vector3 v, Vector3 dir)
+		{
+			return FromUnity(
+				UnityEngine.Quaternion.LookRotation(ToUnity(dir)) * ToUnity(v));
+		}
+
+		public static Vector3 RotateInv(Vector3 v, Vector3 dir)
+		{
+			var q = UnityEngine.Quaternion.LookRotation(ToUnity(dir));
+			return FromUnity(UnityEngine.Quaternion.Inverse(q) * ToUnity(v));
 		}
 
 

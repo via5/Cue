@@ -94,8 +94,14 @@ namespace Cue.W
 
 		public Vector3 Direction
 		{
-			get { return VamU.FromUnity(object_.transform.rotation.eulerAngles); }
+			get { return VamU.Direction(object_.transform.rotation); }
 			set { object_.transform.rotation = Quaternion.LookRotation(VamU.ToUnity(value)); }
+		}
+
+		public Vector3 Size
+		{
+			get { return VamU.FromUnity(object_.transform.localScale); }
+			set { object_.transform.localScale = VamU.ToUnity(value); }
 		}
 
 		public bool Visible
@@ -127,12 +133,10 @@ namespace Cue.W
 
 	class VamBoxGraphic : VamGraphic
 	{
-		public VamBoxGraphic(string name, Vector3 pos, Color c)
+		public VamBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 			: base(name, PrimitiveType.Cube, c)
 		{
-			object_.transform.localScale =
-				new UnityEngine.Vector3(0.5f, 0.05f, 0.5f);
-
+			object_.transform.localScale = VamU.ToUnity(size);
 			object_.transform.position = VamU.ToUnity(pos);
 		}
 	}

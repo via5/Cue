@@ -75,6 +75,11 @@ namespace Cue
 			return new Vector3(v.X / f, v.Y / f, v.Z / f);
 		}
 
+		public static Vector3 operator -(Vector3 v)
+		{
+			return new Vector3(-v.X, -v.Y, -v.Z);
+		}
+
 		public static float Distance(Vector3 a, Vector3 b)
 		{
 			// todo
@@ -112,6 +117,18 @@ namespace Cue
 		{
 			// todo
 			return W.VamU.Rotate(v, bearing);
+		}
+
+		public static Vector3 Rotate(Vector3 v, Vector3 dir)
+		{
+			// todo
+			return W.VamU.Rotate(v, dir);
+		}
+
+		public static Vector3 RotateInv(Vector3 v, Vector3 dir)
+		{
+			// todo
+			return W.VamU.RotateInv(v, dir);
 		}
 
 		public static float NormalizeAngle(float degrees)

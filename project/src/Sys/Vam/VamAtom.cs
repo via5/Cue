@@ -53,7 +53,7 @@ namespace Cue.W
 
 		public override Vector3 Direction
 		{
-			get { return W.VamU.FromUnity(rb_.rotation.eulerAngles); }
+			get { return W.VamU.Direction(rb_.rotation); }
 		}
 	}
 
@@ -101,7 +101,7 @@ namespace Cue.W
 
 		public override Vector3 Direction
 		{
-			get { return W.VamU.FromUnity(c_.transform.rotation.eulerAngles); }
+			get { return W.VamU.Direction(c_.transform.rotation); }
 		}
 	}
 
@@ -161,7 +161,7 @@ namespace Cue.W
 				if (rb_ == null)
 					return Vector3.Zero;
 				else
-					return W.VamU.FromUnity(rb_.rotation.eulerAngles);
+					return W.VamU.Direction(rb_.rotation);
 			}
 		}
 	}

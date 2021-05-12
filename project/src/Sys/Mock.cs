@@ -155,7 +155,7 @@ namespace Cue.W
 			return null;
 		}
 
-		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Color c)
+		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
 			return null;
 		}
