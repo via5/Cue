@@ -124,6 +124,7 @@
     <Compile Include="src\Procedural\Animation\Animation.cs" />
     <Compile Include="src\Procedural\Animation\Builtin.cs" />
     <Compile Include="src\Procedural\Animation\Controller.cs" />
+    <Compile Include="src\Procedural\Animation\Force.cs" />
     <Compile Include="src\Procedural\Animation\Player.cs" />
     <Compile Include="src\Procedural\Animation\Step.cs" />
     <Compile Include="src\Procedural\Expression\Builtin.cs" />

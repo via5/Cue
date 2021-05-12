@@ -419,7 +419,7 @@ namespace Cue
 			dir_.Text = person_.Direction.ToString();
 			bearing_.Text = person_.Bearing.ToString();
 			action_.Text = person_.Actions.ToString();
-			nav_.Text = W.NavStates.ToString(person_.Atom.NavState);
+			nav_.Text = person_.MoveStateString();
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
 
 			if (person_.Animator.CurrentPlayer == null)
@@ -558,7 +558,10 @@ namespace Cue
 
 			enabled_.Text = es;
 
-			event_.Text = (ai_.Event == null ? "(none)" : ai_.Event.ToString());
+			event_.Text =
+				(ai_.Event == null ? "(none)" : ai_.Event.ToString()) + " " +
+				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
+
 			personality_.Text = person_.Personality.ToString();
 
 			var ss = person_.Personality.Sensitivity;

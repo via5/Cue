@@ -17,16 +17,16 @@ namespace Cue.Proc
 
 		private static Animation Stand(int from)
 		{
-			var a = new ProcAnimation("stand");
+			var a = new ProcAnimation("backToNeutral");
 
-			var neutral = a.AddStep();
-			neutral.AddController("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0));
-			neutral.AddController("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0));
-			neutral.AddController("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0));
-			neutral.AddController("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90));
-			neutral.AddController("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270));
-			neutral.AddController("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0));
-			neutral.AddController("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0));
+			var s = a.AddStep();
+			s.AddController("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0));
+			s.AddController("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0));
+			s.AddController("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0));
+			s.AddController("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90));
+			s.AddController("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270));
+			s.AddController("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0));
+			s.AddController("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0));
 
 			return new Animation(
 				Animation.TransitionType,
@@ -38,15 +38,9 @@ namespace Cue.Proc
 		{
 			var a = new ProcAnimation("standIdle");
 
-			var neutral = a.AddStep();
+			var s = a.AddStep();
 
-			neutral.AddController("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0));
-			neutral.AddController("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0));
-			neutral.AddController("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0));
-			neutral.AddController("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90));
-			neutral.AddController("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270));
-			neutral.AddController("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0));
-			neutral.AddController("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0));
+			s.AddForce("hip", new Vector3(100, 0, 0), 1);
 
 			return new Animation(
 				Animation.IdleType, PersonState.None, PersonState.None,

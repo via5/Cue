@@ -181,7 +181,7 @@ namespace Cue
 			blowjob_.Stop();
 
 			actions_.Clear();
-			ai_.RunEvent(null);
+			ai_.MakeIdle();
 		}
 
 		public override bool InteractWith(IObject o)
@@ -209,26 +209,25 @@ namespace Cue
 				if (StartTransition())
 					PlayTransition();
 			}
-			else
-			{
-				if (!animator_.Playing)
-				{
-					state_.FinishTransition();
-					if (deferredState_ != PersonState.None)
-					{
-						log_.Info("animation finished, setting deferred state");
-
-						var ds = deferredState_;
-						deferredState_ = PersonState.None;
-						SetState(ds);
-					}
-				}
-			}
 
 			if (State.IsUpright)
 				uprightPos_ = Position;
 
 			animator_.Update(s);
+
+			if (!deferredTransition_ && !animator_.Playing)
+			{
+				state_.FinishTransition();
+				if (deferredState_ != PersonState.None)
+				{
+					log_.Info("animation finished, setting deferred state");
+
+					var ds = deferredState_;
+					deferredState_ = PersonState.None;
+					SetState(ds);
+				}
+			}
+
 			actions_.Tick(s);
 			gaze_.Update(s);
 			kisser_.Update(s);
@@ -290,7 +289,7 @@ namespace Cue
 		{
 			deferredTransition_ = false;
 
-			if (!animator_.PlayTransition(state_.Current, state_.Next))
+			if (!animator_.PlayTransition(state_.Current, state_.Next, Animator.Exclusive))
 			{
 				// no animation for this transition, stand first if not already
 				// trying to stand
@@ -303,7 +302,10 @@ namespace Cue
 
 					deferredState_ = state_.Next;
 					state_.StartTransition(PersonState.Standing);
-					animator_.PlayTransition(state_.Current, PersonState.Standing);
+
+					animator_.PlayTransition(
+						state_.Current, PersonState.Standing,
+						Animator.Exclusive);
 				}
 			}
 		}
@@ -386,7 +388,9 @@ namespace Cue
 						)
 						|| !animator_.Playing)
 					{
-						animator_.PlayType(Animation.WalkType, Animator.Loop);
+						animator_.PlayType(
+							Animation.WalkType,
+							Animator.Loop | Animator.Exclusive);
 					}
 
 					break;
@@ -395,7 +399,10 @@ namespace Cue
 				case W.NavStates.TurningLeft:
 				{
 					if (lastNavState_ != W.NavStates.TurningLeft || !animator_.Playing)
-						animator_.PlayType(Animation.TurnLeftType);
+					{
+						animator_.PlayType(
+							Animation.TurnLeftType, Animator.Exclusive);
+					}
 
 					break;
 				}
@@ -403,7 +410,10 @@ namespace Cue
 				case W.NavStates.TurningRight:
 				{
 					if (lastNavState_ != W.NavStates.TurningRight || !animator_.Playing)
-						animator_.PlayType(Animation.TurnRightType);
+					{
+						animator_.PlayType(
+							Animation.TurnRightType, Animator.Exclusive);
+					}
 
 					break;
 				}

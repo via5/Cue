@@ -452,14 +452,17 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			p.Animator.Play(anims_[i_]);
-			playing_ = true;
-
-			++i_;
-			if (i_ >= anims_.Count)
+			if (p.Animator.CanPlay(anims_[i_]))
 			{
-				i_ = 0;
-				anims_.Shuffle();
+				p.Animator.Play(anims_[i_]);
+				playing_ = true;
+
+				++i_;
+				if (i_ >= anims_.Count)
+				{
+					i_ = 0;
+					anims_.Shuffle();
+				}
 			}
 		}
 

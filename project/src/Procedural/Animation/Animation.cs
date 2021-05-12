@@ -5,53 +5,8 @@ namespace Cue.Proc
 {
 	class ProcAnimation : IAnimation
 	{
-		class Part
-		{
-			private Rigidbody rb_ = null;
-			private Vector3 force_;
-			private float time_;
-			private float elapsed_ = 0;
-			private bool fwd_ = true;
-
-			public Part(Rigidbody rb, Vector3 f, float t)
-			{
-				rb_ = rb;
-				force_ = f;
-				time_ = t;
-			}
-
-			public void Reset()
-			{
-				elapsed_ = 0;
-				fwd_ = true;
-			}
-
-			public void Update(float s)
-			{
-				elapsed_ += s;
-				if (elapsed_ >= time_)
-				{
-					elapsed_ = 0;
-					fwd_ = !fwd_;
-				}
-
-				float p = (fwd_ ? (elapsed_ / time_) : ((time_ - elapsed_) / time_));
-				var f = force_ * p;
-
-				rb_.AddForce(W.VamU.ToUnity(f));
-			}
-
-			public override string ToString()
-			{
-				return rb_.name;
-			}
-		}
-
-
-		//private Person person_ = null;
 		private readonly string name_;
 		private readonly List<Step> steps_ = new List<Step>();
-		//private readonly List<Part> parts_ = new List<Part>();
 
 		public ProcAnimation(string name)
 		{
@@ -91,29 +46,15 @@ namespace Cue.Proc
 				steps_[i].Start(p);
 		}
 
-		//public void Add(string rbId, Vector3 f, float time)
-		//{
-		//	var rb = Cue.Instance.VamSys.FindRigidbody(
-		//		((W.VamAtom)person_.Atom).Atom, rbId);
-		//
-		//	parts_.Add(new Part(rb, f, time));
-		//}
-
 		public void Reset()
 		{
 			for (int i = 0; i < steps_.Count; ++i)
 				steps_[i].Reset();
-
-			//for (int i = 0; i < parts_.Count; ++i)
-			//	parts_[i].Reset();
 		}
 
 		public void Update(float s)
 		{
 			steps_[0].Update(s);
-
-			//for (int i = 0; i < parts_.Count; ++i)
-			//	parts_[i].Update(s);
 		}
 
 		public void FixedUpdate(float s)
@@ -122,14 +63,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			string s = name_;
-
-			//if (parts_.Count == 0)
-			//	s += " (empty)";
-			//else
-			//	s += " (" + parts_[0].ToString() + ")";
-
-			return s;
+			return name_;
 		}
 	}
 }

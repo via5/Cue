@@ -149,6 +149,14 @@ namespace Cue
 		{
 			list.Sort(new GenericNaturalStringComparer<T>());
 		}
+
+		public static string BearingToString(float b)
+		{
+			if (b == BasicObject.NoBearing)
+				return "(none)";
+			else
+				return b.ToString("0.0");
+		}
 	}
 
 

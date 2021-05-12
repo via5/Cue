@@ -28,6 +28,7 @@ project\src\Objects\Slots.cs
 project\src\Procedural\Animation\Animation.cs
 project\src\Procedural\Animation\Builtin.cs
 project\src\Procedural\Animation\Controller.cs
+project\src\Procedural\Animation\Force.cs
 project\src\Procedural\Animation\Player.cs
 project\src\Procedural\Animation\Step.cs
 project\src\Procedural\Expression\Builtin.cs

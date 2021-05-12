@@ -34,14 +34,6 @@ namespace Cue.W
 			log_ = new Logger(Logger.Sys, atom_, "VamAtomNav");
 		}
 
-		private string BearingToString(float b)
-		{
-			if (b == BasicObject.NoBearing)
-				return "(none)";
-			else
-				return b.ToString("0.0");
-		}
-
 		public bool Teleporting
 		{
 			get { return enableCollisionsCountdown_ > 0; }
@@ -49,7 +41,7 @@ namespace Cue.W
 
 		public void TeleportTo(Vector3 v, float bearing)
 		{
-			log_.Info($"tping to pos={v} bearing={BearingToString(bearing)}");
+			log_.Info($"tping to pos={v} bearing={U.BearingToString(bearing)}");
 
 			atom_.Atom.collisionEnabled = false;
 			atom_.Atom.mainController.MoveControl(W.VamU.ToUnity(v));
@@ -104,7 +96,7 @@ namespace Cue.W
 				return;
 
 			log_.Info(
-				$"naving to pos={v} bearing={BearingToString(bearing)} " +
+				$"naving to pos={v} bearing={U.BearingToString(bearing)} " +
 				$"sd={stoppingDistance}");
 
 			if (AlmostThere(v, bearing))
@@ -272,7 +264,7 @@ namespace Cue.W
 					$"next={nextPos}, " +
 					$"will do starting turn from " +
 					$"{VamU.Bearing(turningStart_)} " +
-					$"to {BearingToString(startTurnBearing_)}");
+					$"to {U.BearingToString(startTurnBearing_)}");
 
 				state_ = StartingTurn;
 			}
@@ -340,7 +332,7 @@ namespace Cue.W
 				log_.Info(
 					$"will do ending turn from " +
 					$"{VamU.Bearing(turningStart_)} " +
-					$"to {BearingToString(endTurnBearing_)}");
+					$"to {U.BearingToString(endTurnBearing_)}");
 
 
 				state_ = EndingTurn;

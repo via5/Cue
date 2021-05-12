@@ -3,6 +3,16 @@ using UnityEngine;
 
 namespace Cue.Proc
 {
+	interface ITarget
+	{
+		bool Done { get; }
+		ITarget Clone();
+		void Start(Person p);
+		void Reset();
+		void Update(float s);
+	}
+
+
 	class Player : IPlayer
 	{
 		private Person person_;

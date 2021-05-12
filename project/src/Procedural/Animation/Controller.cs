@@ -2,7 +2,7 @@
 
 namespace Cue.Proc
 {
-	class Controller
+	class Controller : ITarget
 	{
 		private readonly string name_;
 		private readonly UnityEngine.Vector3 pos_;
@@ -23,7 +23,7 @@ namespace Cue.Proc
 			rot_ = W.VamU.ToUnity(rot);
 		}
 
-		public Controller Clone()
+		public ITarget Clone()
 		{
 			return new Controller(
 				name_,

@@ -202,6 +202,22 @@ namespace Cue
 			return false;
 		}
 
+		public string MoveStateString()
+		{
+			switch (moveState_)
+			{
+				case TentativeMoveState:
+					return $"tentative to {targetPos_} {U.BearingToString(targetBearing_)}";
+
+				case MovingState:
+					return $"moving, nav {W.NavStates.ToString(Atom.NavState)}";
+
+				case NoMoveState:
+				default:
+					return "(none)";
+			}
+		}
+
 		public virtual void Update(float s)
 		{
 			Atom.Update(s);

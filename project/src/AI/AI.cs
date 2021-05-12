@@ -7,6 +7,7 @@ namespace Cue
 		bool InteractWith(IObject o);
 		void RunEvent(IEvent e);
 		void Update(float s);
+		void MakeIdle();
 		bool EventsEnabled { get; set; }
 		bool InteractionsEnabled { get; set; }
 		IEvent Event { get; }
@@ -66,13 +67,19 @@ namespace Cue
 			set { interactionsEnabled_ = value; }
 		}
 
+		public IEvent ForcedEvent
+		{
+			get
+			{
+				return forced_;
+			}
+		}
+
 		public IEvent Event
 		{
 			get
 			{
-				if (forced_ != null)
-					return forced_;
-				else if (i_ >= 0 && i_ < events_.Count)
+				if (i_ >= 0 && i_ < events_.Count && eventsEnabled_)
 					return events_[i_];
 				else
 					return null;
@@ -145,10 +152,14 @@ namespace Cue
 			return false;
 		}
 
+		public void MakeIdle()
+		{
+			Stop();
+			RunEvent(null);
+		}
+
 		public void RunEvent(IEvent e)
 		{
-			log_.Info($"force running event {e}");
-
 			if (forced_ != null)
 			{
 				log_.Info($"stopping current forced event {forced_}");
@@ -159,7 +170,7 @@ namespace Cue
 
 			if (forced_ != null)
 			{
-				log_.Info($"stop and make idle to run forced event");
+				log_.Info($"stop and make idle to run forced event {forced_}");
 				Stop();
 				person_.MakeIdle();
 			}

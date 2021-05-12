@@ -34,7 +34,7 @@
 			{
 				return
 					(current_ == Standing || current_ == Walking) &&
-					 (next_ == None);
+					(next_ == None);
 			}
 		}
 

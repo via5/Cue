@@ -4,15 +4,15 @@ namespace Cue.Proc
 {
 	class Step
 	{
-		private readonly List<Controller> cs_ = new List<Controller>();
+		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private bool done_ = false;
 
 		public Step Clone()
 		{
 			var s = new Step();
 
-			foreach (var c in cs_)
-				s.cs_.Add(c.Clone());
+			foreach (var c in targets_)
+				s.targets_.Add(c.Clone());
 
 			return s;
 		}
@@ -25,27 +25,32 @@ namespace Cue.Proc
 		public void Start(Person p)
 		{
 			done_ = false;
-			for (int i = 0; i < cs_.Count; ++i)
-				cs_[i].Start(p);
+			for (int i = 0; i < targets_.Count; ++i)
+				targets_[i].Start(p);
 		}
 
 		public void AddController(string name, Vector3 pos, Vector3 rot)
 		{
-			cs_.Add(new Controller(name, pos, rot));
+			targets_.Add(new Controller(name, pos, rot));
+		}
+
+		public void AddForce(string rbId, Vector3 f, float time)
+		{
+			targets_.Add(new Force(rbId, f, time));
 		}
 
 		public void Reset()
 		{
-			for (int i = 0; i < cs_.Count; ++i)
-				cs_[i].Reset();
+			for (int i = 0; i < targets_.Count; ++i)
+				targets_[i].Reset();
 		}
 
 		public void Update(float s)
 		{
-			for (int i = 0; i < cs_.Count; ++i)
+			for (int i = 0; i < targets_.Count; ++i)
 			{
-				cs_[i].Update(s);
-				done_ = done_ || cs_[i].Done;
+				targets_[i].Update(s);
+				done_ = done_ || targets_[i].Done;
 			}
 		}
 	}

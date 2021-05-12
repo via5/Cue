@@ -107,6 +107,7 @@ namespace Cue
 		public const int Loop = 0x01;
 		public const int Reverse = 0x02;
 		public const int Rewind = 0x04;
+		public const int Exclusive = 0x08;
 
 		private Person person_;
 		private Logger log_;
@@ -137,7 +138,7 @@ namespace Cue
 			get { return currentAnimation_; }
 		}
 
-		public bool PlayTransition(int from, int to)
+		public bool PlayTransition(int from, int to, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnyTransition(
 				from, to, person_.Sex);
@@ -152,11 +153,11 @@ namespace Cue
 				return false;
 			}
 
-			Play(a);
+			Play(a, flags);
 			return true;
 		}
 
-		public void PlaySex(int state)
+		public bool PlaySex(int state, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnySex(state, person_.Sex);
 
@@ -166,45 +167,86 @@ namespace Cue
 					$"no sex animation for " +
 					$"state {PersonState.StateToString(state)}");
 
-				return;
+				return false;
 			}
 
-			Play(a);
+			return Play(a, flags);
 		}
 
-		public void PlayType(int type, int flags = 0)
+		public bool PlayType(int type, int flags = 0)
 		{
-			Play(Resources.Animations.GetAny(type, person_.Sex), flags);
+			return Play(Resources.Animations.GetAny(type, person_.Sex), flags);
 		}
 
-		public void PlayNeutral()
+		public bool PlayNeutral()
 		{
 			if (person_.State.IsCurrently(PersonState.Standing))
 			{
-				person_.Animator.PlayTransition(
+				return PlayTransition(
 					PersonState.Standing, PersonState.Standing);
 			}
+
+			return true;
 		}
 
-		public void Play(Animation a, int flags = 0)
+		public bool CanPlay(Animation a, int flags = 0, bool silent = true)
 		{
+			if (currentAnimation_ == null)
+				return true;
+
+			if (Bits.IsSet(activeFlags_, Exclusive))
+			{
+				if (Bits.IsSet(flags, Exclusive))
+				{
+					if (!silent)
+					{
+						log_.Error(
+							$"cannot exclusively play {a}, " +
+							$"current animation {currentAnimation_} is also " +
+							$"exclusive");
+					}
+
+					return false;
+				}
+				else
+				{
+					if (!silent)
+					{
+						log_.Error(
+							$"cannot play {a}, " +
+							$"current animation {currentAnimation_} is exclusive");
+					}
+
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		public bool Play(Animation a, int flags = 0)
+		{
+			log_.Info("playing " + a.ToString());
+
+			if (!CanPlay(a, flags, false))
+				return false;
+
 			for (int i=0; i<players_.Count;++i)
 			{
 				var p = players_[i];
 
 				if (p.Play(a.Real, flags))
 				{
-					log_.Info("playing " + a.ToString());
-
 					currentPlayer_ = p;
 					currentAnimation_ = a;
 					activeFlags_ = flags;
 
-					return;
+					return true;
 				}
 			}
 
 			log_.Error("no player can play " + a.ToString());
+			return true;
 		}
 
 		public void Stop()
@@ -250,7 +292,6 @@ namespace Cue
 				}
 			}
 		}
-
 
 		public override string ToString()
 		{
