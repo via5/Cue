@@ -639,11 +639,11 @@ namespace Cue
 				Math.Abs(farBR.Z - farTL.Z));
 		}
 
-		public Vector3 Random()
+		public Vector3 RandomPoint()
 		{
-			var nearWidth = nearTR.X - nearTL.Y;
+			var nearWidth = nearTR.X - nearTL.X;
 			var nearHeight = nearBL.Y - nearTL.Y;
-			var farWidth = farTR.X - farTL.Y;
+			var farWidth = farTR.X - farTL.X;
 			var farHeight = farBL.Y - farTL.Y;
 
 			var nearPoint = new Vector3(

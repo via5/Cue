@@ -33,7 +33,7 @@
 				{
 					eyes_.LookAt(
 						person_.Body.Head.Position +
-						Vector3.Rotate(random_.Position, person_.Bearing));
+						Vector3.Rotate(random_.Position, RandomLookAt.Ref(person_).Direction));
 				}
 			}
 
@@ -118,37 +118,36 @@
 
 	class RandomLookAt
 	{
-		class FrustumInfo
+		public class FrustumInfo
 		{
 			public Frustum frustum;
 			public bool avoid;
 			public bool selected;
-			public FrustumRender render;
 
 			public FrustumInfo(Person p, Frustum f)
 			{
 				frustum = f;
 				avoid = false;
 				selected = false;
-				render = new FrustumRender(p, f);
 			}
 		}
 
 		private Vector3 Near = new Vector3(2, 1, 0.1f);
-		private Vector3 Far = new Vector3(4, 2, 2);
+		private Vector3 Far = new Vector3(6, 3, 2);
 
-		private const int XCount = 5;
-		private const int YCount = 5;
-		private const int FrustumCount = XCount * YCount;
+		public const int XCount = 5;
+		public const int YCount = 5;
+		public const int FrustumCount = XCount * YCount;
 
-		private const float Delay = 1;
+		public const float Delay = 1;
 
 		private Person person_;
 		private float e_ = Delay;
 		private Vector3 pos_ = Vector3.Zero;
 		private IObject avoid_ = null;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
-		private W.IGraphic avoidRender_ = null;
+		private Box avoidBox_ = Box.Zero;
+		private RandomLookAtRenderer render_ = null;
 
 		public RandomLookAt(Person p)
 		{
@@ -159,16 +158,28 @@
 
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
+
+			//render_ = new RandomLookAtRenderer(this);
 		}
 
-		private void CreateAvoidRender()
+		public static BodyPart Ref(Person p)
 		{
-			avoidRender_ = Cue.Instance.Sys.CreateBoxGraphic(
-				"RandomLookAt.AvoidRender",
-				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
+			return p.Body.Get(BodyParts.Chest);
+		}
 
-			avoidRender_.Collision = false;
-			avoidRender_.Visible = true;
+		public Person Person
+		{
+			get { return person_; }
+		}
+
+		public FrustumInfo GetFrustum(int i)
+		{
+			return frustums_[i];
+		}
+
+		public Box AvoidBox
+		{
+			get { return avoidBox_; }
 		}
 
 		public IObject Avoid
@@ -193,8 +204,7 @@
 				return true;
 			}
 
-			for (int i = 0; i < frustums_.Length; ++i)
-				frustums_[i].render.Update(s);
+			render_?.Update(s);
 
 			return false;
 		}
@@ -216,17 +226,7 @@
 
 			var sel = RandomAvailableFrustum(av);
 			frustums_[sel].selected = true;
-			pos_ = frustums_[sel].frustum.Random();
-
-			for (int i = 0; i < frustums_.Length; ++i)
-			{
-				if (frustums_[i].avoid)
-					frustums_[i].render.Color = new Color(1, 0, 0, 0.1f);
-				else if (frustums_[i].selected)
-					frustums_[i].render.Color = new Color(1, 1, 1, 0.1f);
-				else
-					frustums_[i].render.Color = new Color(0, 1, 0, 0.1f);
-			}
+			pos_ = frustums_[sel].frustum.RandomPoint();
 		}
 
 		private int CheckAvoid()
@@ -234,16 +234,40 @@
 			if (avoid_ == null)
 				return frustums_.Length;
 
+			UpdateAvoidBox();
+
 			int av = 0;
 
-			var selfHead = person_.Body.Head;
-
-			var avoidP = avoid_ as Person;
-			Box avoidBox;
-
-			if (avoidP != null)
+			for (int i = 0; i < frustums_.Length; ++i)
 			{
-				var q = person_.Body.Get(BodyParts.Chest).Direction;
+				if (frustums_[i].frustum.TestPlanesAABB(avoidBox_))
+				{
+					frustums_[i].avoid = true;
+				}
+				else
+				{
+					frustums_[i].avoid = false;
+					++av;
+				}
+			}
+
+			return av;
+		}
+
+		private void UpdateAvoidBox()
+		{
+			var selfHead = person_.Body.Head;
+			var avoidP = avoid_ as Person;
+
+			if (avoidP == null)
+			{
+				avoidBox_ = new Box(
+					avoid_.EyeInterest - selfHead.Position,
+					new Vector3(0.2f, 0.2f, 0.2f));
+			}
+			else
+			{
+				var q = Ref(person_).Direction;
 
 				var avoidHeadU =
 					avoidP.Body.Head.Position -
@@ -257,40 +281,10 @@
 				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
 				var avoidHip = Vector3.RotateInv(avoidHipU, q);
 
-				avoidBox = new Box(
+				avoidBox_ = new Box(
 					avoidHip + (avoidHead - avoidHip) / 2,
 					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
 			}
-			else
-			{
-				avoidBox = new Box(
-					avoid_.EyeInterest - selfHead.Position,
-					new Vector3(0.2f, 0.2f, 0.2f));
-			}
-
-			if (avoidRender_ == null)
-				CreateAvoidRender();
-
-			avoidRender_.Position =
-				selfHead.Position +
-				Vector3.Rotate(avoidBox.center, person_.Body.Get(BodyParts.Chest).Direction);
-
-			avoidRender_.Size = avoidBox.size;
-
-			for (int i = 0; i < frustums_.Length; ++i)
-			{
-				if (frustums_[i].frustum.TestPlanesAABB(avoidBox))
-				{
-					frustums_[i].avoid = true;
-				}
-				else
-				{
-					frustums_[i].avoid = false;
-					++av;
-				}
-			}
-
-			return av;
 		}
 
 		private int RandomAvailableFrustum(int av)
@@ -310,6 +304,61 @@
 
 			Cue.LogError($"RandomAvailableFrustum: fi={fi} av={av} l={frustums_.Length}");
 			return 0;
+		}
+	}
+
+
+	class RandomLookAtRenderer
+	{
+		private RandomLookAt r_;
+		private FrustumRender[] frustums_;
+		private W.IGraphic avoid_ = null;
+
+		public RandomLookAtRenderer(RandomLookAt r)
+		{
+			r_ = r;
+			CreateFrustums();
+			CreateAvoid();
+		}
+
+		public void Update(float s)
+		{
+			for (int i = 0; i < frustums_.Length; ++i)
+			{
+				var fi = r_.GetFrustum(i);
+
+				if (fi.avoid)
+					frustums_[i].Color = new Color(1, 0, 0, 0.1f);
+				else if (fi.selected)
+					frustums_[i].Color = new Color(1, 1, 1, 0.1f);
+				else
+					frustums_[i].Color = new Color(0, 1, 0, 0.1f);
+
+				frustums_[i].Update(s);
+			}
+
+			avoid_.Position =
+				r_.Person.Body.Head.Position +
+				Vector3.Rotate(r_.AvoidBox.center, RandomLookAt.Ref(r_.Person).Direction);
+
+			avoid_.Size = r_.AvoidBox.size;
+		}
+
+		private void CreateFrustums()
+		{
+			frustums_ = new FrustumRender[RandomLookAt.FrustumCount];
+			for (int i=0; i<frustums_.Length; ++i)
+				frustums_[i] = new FrustumRender(r_.Person, r_.GetFrustum(i).frustum);
+		}
+
+		private void CreateAvoid()
+		{
+			avoid_ = Cue.Instance.Sys.CreateBoxGraphic(
+				"RandomLookAt.AvoidRender",
+				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
+
+			avoid_.Collision = false;
+			avoid_.Visible = true;
 		}
 	}
 
@@ -338,16 +387,16 @@
 
 			near_.Position =
 				person_.Body.Head.Position +
-				Vector3.Rotate(frustum_.NearCenter(), person_.Body.Get(BodyParts.Chest).Direction);
+				Vector3.Rotate(frustum_.NearCenter(), RandomLookAt.Ref(person_).Direction);
 
-			near_.Direction = person_.Body.Get(BodyParts.Chest).Direction;
+			near_.Direction = RandomLookAt.Ref(person_).Direction;
 
 
 			far_.Position =
 				person_.Body.Head.Position +
-				Vector3.Rotate(frustum_.FarCenter(), person_.Body.Get(BodyParts.Chest).Direction);
+				Vector3.Rotate(frustum_.FarCenter(), RandomLookAt.Ref(person_).Direction);
 
-			far_.Direction = person_.Body.Get(BodyParts.Chest).Direction;
+			far_.Direction = RandomLookAt.Ref(person_).Direction;
 		}
 
 		public Color Color
