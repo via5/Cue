@@ -22,6 +22,7 @@ project\src\Objects\Animator.cs
 project\src\Objects\Object.cs
 project\src\Objects\Person.cs
 project\src\Objects\PersonBody.cs
+project\src\Objects\PersonGaze.cs
 project\src\Objects\PersonState.cs
 project\src\Objects\Slots.cs
 project\src\Procedural\Procedural.cs

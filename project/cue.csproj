@@ -118,6 +118,7 @@
     <Compile Include="src\Objects\Object.cs" />
     <Compile Include="src\Objects\Person.cs" />
     <Compile Include="src\Objects\PersonBody.cs" />
+    <Compile Include="src\Objects\PersonGaze.cs" />
     <Compile Include="src\Objects\PersonState.cs" />
     <Compile Include="src\Objects\Slots.cs" />
     <Compile Include="src\Procedural\Procedural.cs" />
