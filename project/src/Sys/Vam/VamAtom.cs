@@ -3,7 +3,17 @@ using UnityEngine;
 
 namespace Cue.W
 {
-	class RigidbodyBodyPart : IBodyPart
+	abstract class VamBodyPart : IBodyPart
+	{
+		public abstract Transform Transform { get; }
+		public abstract int Type { get; }
+		public abstract bool CanTrigger { get; }
+		public abstract bool Triggering { get; }
+		public abstract Vector3 Position { get; }
+		public abstract Vector3 Direction { get; }
+	}
+
+	class RigidbodyBodyPart : VamBodyPart
 	{
 		private VamAtom atom_;
 		private int type_;
@@ -16,34 +26,39 @@ namespace Cue.W
 			rb_ = rb;
 		}
 
-		public int Type
+		public override Transform Transform
+		{
+			get { return rb_.transform; }
+		}
+
+		public override int Type
 		{
 			get { return type_; }
 		}
 
-		public bool CanTrigger
+		public override bool CanTrigger
 		{
 			get { return false; }
 		}
 
-		public bool Triggering
+		public override bool Triggering
 		{
 			get { return false; }
 		}
 
-		public Vector3 Position
+		public override Vector3 Position
 		{
 			get { return W.VamU.FromUnity(rb_.position); }
 		}
 
-		public Vector3 Direction
+		public override Vector3 Direction
 		{
 			get { return W.VamU.FromUnity(rb_.rotation.eulerAngles); }
 		}
 	}
 
 
-	class ColliderBodyPart : IBodyPart
+	class ColliderBodyPart : VamBodyPart
 	{
 		private VamAtom atom_;
 		private int type_;
@@ -56,22 +71,27 @@ namespace Cue.W
 			c_ = c;
 		}
 
-		public int Type
+		public override Transform Transform
+		{
+			get { return c_.transform; }
+		}
+
+		public override int Type
 		{
 			get { return type_; }
 		}
 
-		public bool CanTrigger
+		public override bool CanTrigger
 		{
 			get { return false; }
 		}
 
-		public bool Triggering
+		public override bool Triggering
 		{
 			get { return false; }
 		}
 
-		public Vector3 Position
+		public override Vector3 Position
 		{
 			get
 			{
@@ -79,14 +99,14 @@ namespace Cue.W
 			}
 		}
 
-		public Vector3 Direction
+		public override Vector3 Direction
 		{
 			get { return W.VamU.FromUnity(c_.transform.rotation.eulerAngles); }
 		}
 	}
 
 
-	class TriggerBodyPart : IBodyPart
+	class TriggerBodyPart : VamBodyPart
 	{
 		private VamAtom atom_;
 		private int type_;
@@ -103,22 +123,27 @@ namespace Cue.W
 			rb_ = h.thisRigidbody;
 		}
 
-		public int Type
+		public override Transform Transform
+		{
+			get { return rb_.transform; }
+		}
+
+		public override int Type
 		{
 			get { return type_; }
 		}
 
-		public bool CanTrigger
+		public override bool CanTrigger
 		{
 			get { return true; }
 		}
 
-		public bool Triggering
+		public override bool Triggering
 		{
 			get { return trigger_.active; }
 		}
 
-		public Vector3 Position
+		public override Vector3 Position
 		{
 			get
 			{
@@ -129,7 +154,7 @@ namespace Cue.W
 			}
 		}
 
-		public Vector3 Direction
+		public override Vector3 Direction
 		{
 			get
 			{

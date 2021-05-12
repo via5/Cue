@@ -93,6 +93,11 @@ namespace Cue
 			get { return part_; }
 		}
 
+		public W.VamBodyPart VamSys
+		{
+			get { return part_ as W.VamBodyPart; }
+		}
+
 		public bool Exists
 		{
 			get { return (part_ != null); }
@@ -331,12 +336,16 @@ namespace Cue
 				//far_ = Create();
 			}
 
-			near_.transform.position = W.VamU.ToUnity(
-				person_.Body.Head.Position +
-				frustum_.NearCenter());
+			var q = person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation;
+
+			near_.transform.localPosition =
+				W.VamU.ToUnity(person_.Body.Head.Position) +
+				q * W.VamU.ToUnity(frustum_.NearCenter());
 
 			near_.transform.localScale = W.VamU.ToUnity(
 				frustum_.NearSize());
+
+			near_.transform.localRotation = q;
 
 			//far_.transform.position = W.VamU.ToUnity(
 			//	person_.Body.Head.Position +
@@ -499,11 +508,23 @@ namespace Cue
 
 			if (avoidP != null)
 			{
-				var avoidHead = avoidP.Body.Head.Position - selfHead.Position + new Vector3(0, 0.2f, 0);
-				var avoidHip = avoidP.Body.Get(BodyParts.Hips).Position - selfHead.Position;
+				var q = person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation;
+
+				var avoidHeadU = W.VamU.ToUnity(
+					avoidP.Body.Head.Position -
+					selfHead.Position +
+					new Vector3(0, 0.2f, 0));
+
+				var avoidHipU = W.VamU.ToUnity(
+					avoidP.Body.Get(BodyParts.Hips).Position -
+					selfHead.Position);
+
+				var avoidHead = W.VamU.FromUnity(Quaternion.Inverse(q) * avoidHeadU);
+				var avoidHip = W.VamU.FromUnity(Quaternion.Inverse(q) * avoidHipU);
+
 				avoidBox = new Box(
 					avoidHip + (avoidHead - avoidHip) / 2,
-					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.2f));
+					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
 			}
 			else
 			{
@@ -515,20 +536,19 @@ namespace Cue
 			if (avoidRender_ == null)
 				CreateAvoidRender();
 
-			avoidRender_.transform.position = W.VamU.ToUnity(avoidBox.center + selfHead.Position);
+			avoidRender_.transform.position =
+				W.VamU.ToUnity(selfHead.Position) +
+				person_.Body.Get(BodyParts.Chest).VamSys.Transform.rotation * W.VamU.ToUnity(avoidBox.center);
+
+			//avoidRender_.transform.position = W.VamU.ToUnity(avoidBox.center);// + new Vector3(0, 0.2f, 0));
 			avoidRender_.transform.localScale = W.VamU.ToUnity(avoidBox.size);
+
 
 
 			string s = $"{avoidBox} ";
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
-				if (i == 12)
-				{
-					for (int p=0; p< frustums_[i].frustum.planes.Length; ++p)
-						Cue.LogInfo($"{frustums_[i].frustum.planes[p]}");
-				}
-
 
 				if (frustums_[i].frustum.TestPlanesAABB(avoidBox))
 				{
@@ -546,7 +566,7 @@ namespace Cue
 					s += " ";
 			}
 
-			Cue.LogInfo(s);
+			//Cue.LogInfo(s);
 
 			return av;
 		}
