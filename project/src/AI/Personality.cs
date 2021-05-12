@@ -2,6 +2,10 @@
 {
 	interface IPersonality
 	{
+		Pair<float, float> LookAtRandomInterval { get; }
+		Pair<float, float> LookAtRandomGazeDuration { get; }
+		float GazeDuration { get; }
+
 		string StateString{ get; }
 		Sensitivity Sensitivity { get; }
 		void Update(float s);
@@ -95,6 +99,21 @@
 		public Sensitivity Sensitivity
 		{
 			get { return sensitivity_; }
+		}
+
+		public virtual Pair<float, float> LookAtRandomInterval
+		{
+			get { return new Pair<float, float>(4, 10); }
+		}
+
+		public virtual Pair<float, float> LookAtRandomGazeDuration
+		{
+			get { return new Pair<float, float>(1, 3); }
+		}
+
+		public virtual float GazeDuration
+		{
+			get { return 1; }
 		}
 
 		public virtual void Update(float s)
@@ -216,6 +235,8 @@
 
 	class TsunderePersonality : BasicPersonality
 	{
+		private bool angry_ = false;
+
 		public TsunderePersonality(Person p)
 			: base(p, "tsundere")
 		{
@@ -226,19 +247,43 @@
 			SetIdle();
 		}
 
+		public override Pair<float, float> LookAtRandomInterval
+		{
+			get
+			{
+				if (angry_)
+					return new Pair<float, float>(1, 5);
+				else
+					return base.LookAtRandomInterval;
+			}
+		}
+
+		public override Pair<float, float> LookAtRandomGazeDuration
+		{
+			get
+			{
+				if (angry_)
+					return new Pair<float, float>(0.3f, 1.5f);
+				else
+					return new Pair<float, float>(1, 3);
+			}
+		}
+
 		protected override void SetClose(bool b)
 		{
-			person_.Gaze.Avoid(Cue.Instance.Player);
-
 			if (b)
 			{
 				StateString = "angry";
+				person_.Gaze.Avoid(Cue.Instance.Player);
 				SetAngry();
+				angry_ = true;
 			}
 			else
 			{
 				StateString = "idle";
+				person_.Gaze.LookAtRandom();
 				SetIdle();
+				angry_ = false;
 			}
 		}
 

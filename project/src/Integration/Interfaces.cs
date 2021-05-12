@@ -96,19 +96,19 @@ namespace Cue
 
 	interface IGazer
 	{
+		float Duration { get; set; }
 		bool Enabled { get; set; }
+
 		void Update(float s);
 	}
 
 	interface IEyes
 	{
 		bool Blink { get; set; }
+		Vector3 Position { get; }
 
-		void LookAt(IObject o);
 		void LookAt(Vector3 p);
-		void LookInFront();
 		void LookAtNothing();
-		void LookAtCamera();
 
 		void Update(float s);
 	}

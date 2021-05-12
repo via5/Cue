@@ -611,6 +611,7 @@ namespace Cue
 		{
 			var g = new ConcurrentProceduralMorphGroup();
 			g.Add(new ProceduralMorph(p, "Eyes Squint", 0, 1, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Nose Wrinkle", 0, 1, 1, 5, 2, 2));
 			return g;
 		}
 
@@ -618,6 +619,7 @@ namespace Cue
 		{
 			var g = new ConcurrentProceduralMorphGroup();
 			g.Add(new ProceduralMorph(p, "Mouth Corner Up-Down", 0, -0.5f, 1, 5, 2, 2));
+			g.Add(new ProceduralMorph(p, "Lip Top Up", 0, 0.3f, 1, 5, 2, 2));
 			return g;
 		}
 	}

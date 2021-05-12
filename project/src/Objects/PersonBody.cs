@@ -142,10 +142,12 @@ namespace Cue
 
 	class Body
 	{
+		public const int CloseDelay = 2;
+
 		private Person person_;
 		private readonly BodyPart[] all_;
 		private bool handsClose_;
-		private float timeSinceClose_ = 0;
+		private float timeSinceClose_ = CloseDelay + 1;
 
 		public Body(Person p)
 		{
@@ -174,7 +176,7 @@ namespace Cue
 		{
 			get
 			{
-				return handsClose_ || (timeSinceClose_ < 2);
+				return handsClose_ || (timeSinceClose_ < CloseDelay);
 			}
 		}
 
@@ -191,6 +193,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (person_.Atom.Teleporting)
+				return;
+
 			var wasClose = handsClose_;
 			handsClose_ = false;
 

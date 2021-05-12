@@ -2,12 +2,24 @@
 {
 	class Gaze
 	{
+		private const int LookatNothing = 0;
+		private const int LookatFront = 1;
+		private const int LookatCamera = 2;
+		private const int LookatObject = 3;
+		private const int LookatRandom = 4;
+		private const int LookatPosition = 5;
+
+		private const float AfterHeadTouchDuration = 2;
+
 		private Person person_;
 		private IEyes eyes_;
 		private IGazer gazer_;
-		private bool interested_ = false;
 		private RandomLookAt random_;
-		private bool randomActive_ = false;
+		private IObject object_ = null;
+		private int lookat_ = LookatNothing;
+		private RandomRange gazeDuration_ = new RandomRange(0, 0);
+		private float afterHeadTouchElapsed_ = AfterHeadTouchDuration + 1;
+		private bool randomInhibited_ = false;
 
 		public Gaze(Person p)
 		{
@@ -22,20 +34,87 @@
 
 		public bool HasInterestingTarget
 		{
-			get { return interested_; }
+			get { return (lookat_ == LookatObject); }
 		}
 
 		public void Update(float s)
 		{
-			if (randomActive_)
+			switch (lookat_)
 			{
-				if (random_.Update(s))
+				case LookatNothing:
+				case LookatPosition:
+				{
+					// nothing to do
+					break;
+				}
+
+				case LookatFront:
 				{
 					eyes_.LookAt(
-						person_.Body.Head.Position +
-						Vector3.Rotate(random_.Position, RandomLookAt.Ref(person_).Direction));
+						person_.Body.Head?.Position ?? Vector3.Zero +
+						Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
+
+					break;
+				}
+
+				case LookatCamera:
+				{
+					eyes_.LookAt(Cue.Instance.Sys.Camera);
+					break;
+				}
+
+				case LookatObject:
+				{
+					if (object_ != null)
+						eyes_.LookAt(object_.EyeInterest);
+
+					break;
+				}
+
+				case LookatRandom:
+				{
+					if (person_.Body.Head.Close)
+					{
+						if (!randomInhibited_)
+						{
+							afterHeadTouchElapsed_ = 0;
+							person_.Log.Info("head touched, inhibiting random gaze");
+							randomInhibited_ = true;
+						}
+					}
+					else
+					{
+						if (randomInhibited_ && afterHeadTouchElapsed_ <= 0)
+							person_.Log.Info("head cleared, waiting for random gaze");
+
+						afterHeadTouchElapsed_ += s;
+
+						if (afterHeadTouchElapsed_ > AfterHeadTouchDuration)
+						{
+							if (randomInhibited_)
+							{
+								person_.Log.Info("head cleared, resuming random gaze");
+								randomInhibited_ = false;
+							}
+
+							if (random_.Update(s))
+							{
+								gazeDuration_.SetRange(
+									person_.Personality.LookAtRandomGazeDuration);
+
+								gazer_.Duration = gazeDuration_.Next();
+
+								eyes_.LookAt(
+									person_.Body.Head.Position +
+									Vector3.Rotate(random_.Position, RandomLookAt.Ref(person_).Direction));
+							}
+						}
+					}
+
+					break;
 				}
 			}
+
 
 			eyes_.Update(s);
 			gazer_.Update(s);
@@ -49,26 +128,20 @@
 				LookAtCamera();
 			else
 				LookAt(Cue.Instance.Player);
-
-			interested_ = false;
-			randomActive_ = false;
 		}
 
 		public void LookAtCamera()
 		{
 			person_.Log.Info("looking at camera");
-			eyes_.LookAtCamera();
-			interested_ = false;
-			randomActive_ = false;
+			SetLookat(LookatCamera);
 		}
 
 		public void LookAt(IObject o, bool gaze = true)
 		{
 			person_.Log.Info($"looking at {o} gaze={gaze}");
-			eyes_.LookAt(o);
+			object_ = o;
 			gazer_.Enabled = gaze;
-			interested_ = true;
-			randomActive_ = false;
+			SetLookat(LookatObject);
 		}
 
 		public void LookAt(Vector3 p, bool gaze = true)
@@ -76,24 +149,24 @@
 			person_.Log.Info($"looking at {p} gaze={gaze}");
 			eyes_.LookAt(p);
 			gazer_.Enabled = gaze;
-			interested_ = false;
-			randomActive_ = false;
+			SetLookat(LookatPosition);
 		}
 
 		public void LookAtRandom(bool gaze = true)
 		{
 			person_.Log.Info($"looking at random gaze={gaze}");
-			randomActive_ = true;
 			random_.Avoid = null;
 			gazer_.Enabled = gaze;
+			SetLookat(LookatRandom);
 		}
 
 		public void Avoid(IObject o, bool gaze = true)
 		{
 			person_.Log.Info($"looking at random, avoiding {o}, gaze={gaze}");
-			randomActive_ = true;
 			random_.Avoid = o;
+			random_.Reset();
 			gazer_.Enabled = gaze;
+			SetLookat(LookatRandom);
 		}
 
 		public void LookAtNothing()
@@ -101,17 +174,26 @@
 			person_.Log.Info("looking at nothing");
 			eyes_.LookAtNothing();
 			gazer_.Enabled = false;
-			interested_ = false;
-			randomActive_ = false;
+			SetLookat(LookatNothing);
 		}
 
 		public void LookInFront()
 		{
 			person_.Log.Info("looking in front");
-			eyes_.LookInFront();
 			gazer_.Enabled = false;
-			interested_ = false;
-			randomActive_ = false;
+			SetLookat(LookatFront);
+		}
+
+		private void SetLookat(int i)
+		{
+			if (lookat_ != i)
+			{
+				if (lookat_ == LookatRandom)
+					gazer_.Duration = person_.Personality.GazeDuration;
+
+				lookat_ = i;
+				randomInhibited_ = false;
+			}
 		}
 	}
 
@@ -139,15 +221,14 @@
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
 
-		public const float Delay = 1;
-
 		private Person person_;
-		private float e_ = Delay;
 		private Vector3 pos_ = Vector3.Zero;
 		private IObject avoid_ = null;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
 		private Box avoidBox_ = Box.Zero;
 		private RandomLookAtRenderer render_ = null;
+		private Duration delay_ = new Duration(0, 0);
+		private bool forceNext_ = false;
 
 		public RandomLookAt(Person p)
 		{
@@ -193,14 +274,22 @@
 			get { return pos_; }
 		}
 
+		public void Reset()
+		{
+			forceNext_ = true;
+		}
+
 		public bool Update(float s)
 		{
-			e_ += s;
+			var force = forceNext_;
+			forceNext_ = false;
 
-			if (e_ >= Delay)
+			delay_.SetRange(person_.Personality.LookAtRandomInterval);
+			delay_.Update(s);
+
+			if (delay_.Finished || force)
 			{
 				NextPosition();
-				e_ = 0;
 				return true;
 			}
 
@@ -311,14 +400,41 @@
 	class RandomLookAtRenderer
 	{
 		private RandomLookAt r_;
-		private FrustumRender[] frustums_;
+		private FrustumRender[] frustums_ = new FrustumRender[0];
 		private W.IGraphic avoid_ = null;
+		private bool visible_ = false;
 
 		public RandomLookAtRenderer(RandomLookAt r)
 		{
 			r_ = r;
-			CreateFrustums();
-			CreateAvoid();
+		}
+
+		public bool Visible
+		{
+			get
+			{
+				return visible_;
+			}
+
+			set
+			{
+				visible_ = value;
+
+				if (value)
+				{
+					if (frustums_.Length == 0)
+						CreateFrustums();
+
+					if (avoid_ == null)
+						CreateAvoid();
+				}
+
+				for (int i = 0; i < frustums_.Length; ++i)
+					frustums_[i].Visible = value;
+
+				if (avoid_ != null)
+					avoid_.Visible = value;
+			}
 		}
 
 		public void Update(float s)
@@ -347,8 +463,11 @@
 		private void CreateFrustums()
 		{
 			frustums_ = new FrustumRender[RandomLookAt.FrustumCount];
-			for (int i=0; i<frustums_.Length; ++i)
+			for (int i = 0; i < frustums_.Length; ++i)
+			{
 				frustums_[i] = new FrustumRender(r_.Person, r_.GetFrustum(i).frustum);
+				frustums_[i].Visible = visible_;
+			}
 		}
 
 		private void CreateAvoid()
@@ -358,7 +477,7 @@
 				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
 
 			avoid_.Collision = false;
-			avoid_.Visible = true;
+			avoid_.Visible = visible_;
 		}
 	}
 
@@ -375,6 +494,18 @@
 		{
 			person_ = p;
 			frustum_ = f;
+		}
+
+		public bool Visible
+		{
+			set
+			{
+				if (near_ != null)
+					near_.Visible = value;
+
+				if (far_ != null)
+					far_.Visible = value;
+			}
 		}
 
 		public void Update(float s)

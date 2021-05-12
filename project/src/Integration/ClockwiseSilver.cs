@@ -2,104 +2,6 @@
 
 namespace Cue
 {
-	struct Range
-	{
-		public float first, second;
-
-		public Range(float first, float second)
-		{
-			this.first = first;
-			this.second = second;
-		}
-	}
-
-	class RandomRange
-	{
-		private Range valuesRange_;
-		private Range changeIntervalRange_;
-		private Range interpolateTimeRange_;
-
-		private float nextElapsed_ = 0;
-		private float nextInterval_ = 0;
-
-		private float nextValue_ = 0;
-		private float currentValue_ = 0;
-		private float valueElapsed_ = 0;
-		private float valueTime_ = 0;
-		private float lastValue_ = 0;
-
-		private IEasing easing_ = new SinusoidalEasing();
-
-		public RandomRange(Range values, Range changeInterval, Range interpolateTime)
-		{
-			valuesRange_ = values;
-			changeIntervalRange_ = changeInterval;
-			interpolateTimeRange_ = interpolateTime;
-		}
-
-		public float Value
-		{
-			get { return currentValue_; }
-		}
-
-		public void Reset()
-		{
-			nextElapsed_ = 0;
-			nextInterval_ = NextInterval();
-
-			nextValue_ = NextValue();
-			currentValue_ = 0;
-			valueElapsed_ = 0;
-			valueTime_ = ValueTime();
-			lastValue_ = 0;
-		}
-
-		public bool Update(float s)
-		{
-			nextElapsed_ += s;
-
-			if (nextElapsed_ >= nextInterval_)
-			{
-				lastValue_ = currentValue_;
-				nextValue_ = NextValue();
-				nextElapsed_ = 0;
-				valueElapsed_ = 0;
-				nextInterval_ = NextInterval();
-				valueTime_ = ValueTime();
-			}
-			else if (valueElapsed_ < valueTime_)
-			{
-				valueElapsed_ = U.Clamp(valueElapsed_ + s, 0, valueTime_);
-				currentValue_ = Interpolate(lastValue_, nextValue_, valueElapsed_ / valueTime_);
-
-				return true;
-			}
-
-			return false;
-		}
-
-		private float NextValue()
-		{
-			return U.RandomFloat(valuesRange_.first, valuesRange_.second);
-		}
-
-		private float NextInterval()
-		{
-			return U.RandomFloat(changeIntervalRange_.first, changeIntervalRange_.second);
-		}
-
-		private float ValueTime()
-		{
-			return U.RandomFloat(interpolateTimeRange_.first, interpolateTimeRange_.second);
-		}
-
-		private float Interpolate(float start, float end, float f)
-		{
-			return start + (end - start) * easing_.Magnitude(f);
-		}
-	}
-
-
 	class ClockwiseSilverKiss : IKisser
 	{
 		public const float Cooldown = 10;
@@ -123,20 +25,32 @@ namespace Cue
 		private float cooldownRemaining_ = 0;
 
 		private float startAngleX_ = 0;
-		private RandomRange randomHeadAngleX_ = new RandomRange(
-			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+		private InterpolatedRandomRange randomHeadAngleX_ =
+			new InterpolatedRandomRange(
+				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(0, 5),
+				new Pair<float, float>(1, 3));
 
 		private float startAngleY_ = 0;
-		private RandomRange randomHeadAngleY_ = new RandomRange(
-			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+		private InterpolatedRandomRange randomHeadAngleY_ =
+			new InterpolatedRandomRange(
+				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(0, 5),
+				new Pair<float, float>(1, 3));
 
 		private float startAngleZ_ = 0;
-		private RandomRange randomHeadAngleZ_ = new RandomRange(
-			new Range(-10, 10), new Range(0, 5), new Range(1, 3));
+		private InterpolatedRandomRange randomHeadAngleZ_ =
+			new InterpolatedRandomRange(
+				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(0, 5),
+				new Pair<float, float>(1, 3));
 
 		private float startLipDepth_ = 0;
-		private RandomRange randomLipDepth_ = new RandomRange(
-			new Range(0, 0.02f), new Range(0, 5), new Range(1, 3));
+		private InterpolatedRandomRange randomLipDepth_ =
+			new InterpolatedRandomRange(
+				new Pair<float, float>(0, 0.02f),
+				new Pair<float, float>(0, 5),
+				new Pair<float, float>(1, 3));
 
 		public ClockwiseSilverKiss(Person p)
 		{

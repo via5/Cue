@@ -71,6 +71,7 @@ namespace Cue
 		private Logger log_;
 		private int version_ = NotFound;
 		private W.VamBoolParameter enabled_;
+		private W.VamFloatParameter gazeDuration_;
 
 		// 12
 		private W.VamBoolParameter lookatTarget_;
@@ -85,6 +86,7 @@ namespace Cue
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
 			enabled_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
+			gazeDuration_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
 			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 			lookatAtom_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
 			lookatControl_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
@@ -109,6 +111,19 @@ namespace Cue
 
 					enabled_.Value = value;
 				}
+			}
+		}
+
+		public float Duration
+		{
+			get
+			{
+				return gazeDuration_.Value;
+			}
+
+			set
+			{
+				gazeDuration_.Value = value;
 			}
 		}
 

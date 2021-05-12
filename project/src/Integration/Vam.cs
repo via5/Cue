@@ -35,8 +35,8 @@ namespace Cue
 		private W.VamBoolParameter blink_;
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
-		private IObject object_ = null;
-		private bool camera_ = false;
+		private Vector3 pos_ = Vector3.Zero;
+		private bool update_ = false;
 
 		public VamEyes(Person p)
 		{
@@ -70,58 +70,41 @@ namespace Cue
 			set { blink_.Value = value; }
 		}
 
-		public void LookAt(IObject o)
+		public Vector3 Position
 		{
-			object_ = o;
-			camera_ = false;
-			lookMode_.Value = "Target";
-			eyesImpl_.SetPosition(object_.EyeInterest);
+			get { return W.VamU.FromUnity(eyes_.position); }
 		}
 
 		public void LookAt(Vector3 p)
 		{
-			object_ = null;
-			camera_ = false;
+			pos_ = p;
 			lookMode_.Value = "Target";
+			update_ = true;
 			eyesImpl_.SetPosition(p);
-		}
-
-		public void LookInFront()
-		{
-			object_ = null;
-			camera_ = false;
-
-			eyesImpl_.SetPosition(
-				person_.Body.Head?.Position ?? Vector3.Zero +
-				Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
-
-			lookMode_.Value = "None";
 		}
 
 		public void LookAtNothing()
 		{
-			object_ = null;
-			camera_ = false;
 			lookMode_.Value = "None";
-		}
-
-		public void LookAtCamera()
-		{
-			LookAt(Cue.Instance.Sys.Camera);
-			camera_ = true;
+			update_ = false;
 		}
 
 		public void Update(float s)
 		{
-			if (object_ != null)
-				eyesImpl_.SetPosition(object_.EyeInterest);
-			else if (camera_)
-				eyesImpl_.SetPosition(Cue.Instance.Sys.Camera);
+			if (update_)
+				eyesImpl_.SetPosition(pos_);
 		}
 
 		public override string ToString()
 		{
-			return $"vam: blink={blink_} mode={lookMode_}";
+			string s = $"vam: blink={blink_} mode={lookMode_} ";
+
+			if (update_)
+				s += $"pos={pos_}";
+			else
+				s += $"pos=N/A";
+
+			return s;
 		}
 	}
 

@@ -32,41 +32,37 @@ namespace Cue
 
 		public override bool Update(float s)
 		{
-			if (slot_ == null && o_ != null)
-			{
-				slot_ = o_.Slots.GetAny(Slot.Stand);
-				if (slot_ == null)
-				{
-					log_.Error("can't stand on object " + o_.ToString());
-					return false;
-				}
-
-				if (!person_.TryLockSlot(slot_))
-					return false;
-			}
-
-			Vector3 pos;
-			float bearing = BasicObject.NoBearing;
-
-			if (o_ == null)
-			{
-				pos = person_.UprightPosition;
-				state_ = Moving;
-			}
-			else
-			{
-				pos = o_.Position;
-				bearing = o_.Bearing;
-			}
-
 			switch (state_)
 			{
 				case NoState:
 				{
+					if (slot_ == null && o_ == null)
+					{
+						// don't move
+						state_ = Moving;
+						break;
+					}
+
+
 					log_.Info("going to stand");
+
+					if (slot_ == null)
+					{
+						slot_ = o_.Slots.GetAny(Slot.Stand);
+						if (slot_ == null)
+						{
+							log_.Error("can't stand on object " + o_.ToString());
+							return false;
+						}
+
+						if (!person_.TryLockSlot(slot_))
+							return false;
+					}
+
 					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(person_, pos, bearing));
+					person_.PushAction(new MoveAction(person_, slot_.Position, slot_.Bearing));
 					state_ = Moving;
+
 					break;
 				}
 
@@ -86,9 +82,9 @@ namespace Cue
 						//	"I think..."
 						//}));
 
-						cc.Push(new RandomAnimationAction(person_,
-							Resources.Animations.GetAllIdles(
-								PersonState.Standing, person_.Sex)));
+						//cc.Push(new RandomAnimationAction(person_,
+						//	Resources.Animations.GetAllIdles(
+						//		PersonState.Standing, person_.Sex)));
 
 						//cc.Push(new LookAroundAction(person_));
 						person_.PushAction(cc);
