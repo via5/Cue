@@ -11,7 +11,7 @@ namespace Cue
 			{
 				new BVH.Player(p),
 				new TimelinePlayer(p),
-				new ProceduralPlayer(p),
+				new Proc.Player(p),
 				new SynergyPlayer(p)
 			};
 		}

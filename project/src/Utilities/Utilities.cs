@@ -431,4 +431,199 @@ namespace Cue
 			return Bits.IsSet(enabled_, type_);
 		}
 	}
+
+
+	class Duration
+	{
+		private float min_, max_;
+		private float current_ = 0;
+		private float elapsed_ = 0;
+		private bool finished_ = false;
+
+		public Duration(float min, float max)
+		{
+			min_ = min;
+			max_ = max;
+			Next();
+		}
+
+		public float Minimum
+		{
+			get { return min_; }
+			set { min_ = value; }
+		}
+
+		public float Maximum
+		{
+			get { return max_; }
+			set { max_ = value; }
+		}
+
+		public bool Finished
+		{
+			get { return finished_; }
+		}
+
+		public bool Enabled
+		{
+			get { return min_ > 0 && max_ > 0; }
+		}
+
+		public float Progress
+		{
+			get { return U.Clamp(elapsed_ / current_, 0, 1); }
+		}
+
+		public void SetRange(Pair<float, float> p)
+		{
+			Minimum = p.first;
+			Maximum = p.second;
+		}
+
+		public void Reset()
+		{
+			elapsed_ = 0;
+			finished_ = false;
+			Next();
+		}
+
+		public void Update(float s)
+		{
+			if (finished_)
+			{
+				finished_ = false;
+				elapsed_ = 0;
+			}
+
+			elapsed_ += s;
+			if (elapsed_ > current_)
+			{
+				finished_ = true;
+				Next();
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"{current_:0.##}/({min_:0.##},{max_:0.##})";
+		}
+
+		private void Next()
+		{
+			current_ = U.RandomFloat(min_, max_);
+		}
+	}
+
+
+	class RandomRange
+	{
+		private float min_, max_;
+
+		public RandomRange(float min, float max)
+		{
+			min_ = min;
+			max_ = max;
+		}
+
+		public void SetRange(Pair<float, float> r)
+		{
+			min_ = r.first;
+			max_ = r.second;
+		}
+
+		public float Next()
+		{
+			return U.RandomFloat(min_, max_);
+		}
+	}
+
+
+	class InterpolatedRandomRange
+	{
+		private Pair<float, float> valuesRange_;
+		private Pair<float, float> changeIntervalRange_;
+		private Pair<float, float> interpolateTimeRange_;
+
+		private float nextElapsed_ = 0;
+		private float nextInterval_ = 0;
+
+		private float nextValue_ = 0;
+		private float currentValue_ = 0;
+		private float valueElapsed_ = 0;
+		private float valueTime_ = 0;
+		private float lastValue_ = 0;
+
+		private IEasing easing_ = new SinusoidalEasing();
+
+		public InterpolatedRandomRange(
+			Pair<float, float> values,
+			Pair<float, float> changeInterval,
+			Pair<float, float> interpolateTime)
+		{
+			valuesRange_ = values;
+			changeIntervalRange_ = changeInterval;
+			interpolateTimeRange_ = interpolateTime;
+		}
+
+		public float Value
+		{
+			get { return currentValue_; }
+		}
+
+		public void Reset()
+		{
+			nextElapsed_ = 0;
+			nextInterval_ = NextInterval();
+
+			nextValue_ = NextValue();
+			currentValue_ = 0;
+			valueElapsed_ = 0;
+			valueTime_ = ValueTime();
+			lastValue_ = 0;
+		}
+
+		public bool Update(float s)
+		{
+			nextElapsed_ += s;
+
+			if (nextElapsed_ >= nextInterval_)
+			{
+				lastValue_ = currentValue_;
+				nextValue_ = NextValue();
+				nextElapsed_ = 0;
+				valueElapsed_ = 0;
+				nextInterval_ = NextInterval();
+				valueTime_ = ValueTime();
+			}
+			else if (valueElapsed_ < valueTime_)
+			{
+				valueElapsed_ = U.Clamp(valueElapsed_ + s, 0, valueTime_);
+				currentValue_ = Interpolate(lastValue_, nextValue_, valueElapsed_ / valueTime_);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private float NextValue()
+		{
+			return U.RandomFloat(valuesRange_.first, valuesRange_.second);
+		}
+
+		private float NextInterval()
+		{
+			return U.RandomFloat(changeIntervalRange_.first, changeIntervalRange_.second);
+		}
+
+		private float ValueTime()
+		{
+			return U.RandomFloat(interpolateTimeRange_.first, interpolateTimeRange_.second);
+		}
+
+		private float Interpolate(float start, float end, float f)
+		{
+			return start + (end - start) * easing_.Magnitude(f);
+		}
+	}
 }

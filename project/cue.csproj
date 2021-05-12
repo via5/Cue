@@ -121,8 +121,12 @@
     <Compile Include="src\Objects\PersonGaze.cs" />
     <Compile Include="src\Objects\PersonState.cs" />
     <Compile Include="src\Objects\Slots.cs" />
+    <Compile Include="src\Procedural\Animation.cs" />
+    <Compile Include="src\Procedural\Builtin.cs" />
+    <Compile Include="src\Procedural\Controller.cs" />
     <Compile Include="src\Procedural\Procedural.cs" />
     <Compile Include="src\Procedural\ProceduralExpression.cs" />
+    <Compile Include="src\Procedural\Step.cs" />
     <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Clothing.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />

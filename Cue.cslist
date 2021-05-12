@@ -25,8 +25,12 @@ project\src\Objects\PersonBody.cs
 project\src\Objects\PersonGaze.cs
 project\src\Objects\PersonState.cs
 project\src\Objects\Slots.cs
+project\src\Procedural\Animation.cs
+project\src\Procedural\Builtin.cs
+project\src\Procedural\Controller.cs
 project\src\Procedural\Procedural.cs
 project\src\Procedural\ProceduralExpression.cs
+project\src\Procedural\Step.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Clothing.cs
 project\src\Sys\Interfaces.cs
