@@ -170,9 +170,8 @@ namespace Cue
 
 			if (forced_ != null)
 			{
-				log_.Info($"stop and make idle to run forced event {forced_}");
+				log_.Info($"stop to run forced event {forced_}");
 				Stop();
-				person_.MakeIdle();
 			}
 		}
 

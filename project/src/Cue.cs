@@ -245,7 +245,7 @@ namespace Cue
 
 		private void DoUpdateInput(float s)
 		{
-			Sys.Input.Update();
+			Sys.Input.Update(s);
 
 			if (Sys.Input.HardReset)
 			{

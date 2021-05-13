@@ -201,6 +201,7 @@ namespace Cue
 
 			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
 			var rightHand = Cue.Instance.InteractiveRightHandPosition;
+			var head = Cue.Instance.Player?.Body?.Head?.Position ?? Vector3.Zero;
 
 			for (int i = 0; i < all_.Length; ++i)
 			{
@@ -211,7 +212,11 @@ namespace Cue
 				var leftD = Vector3.Distance(p.Position, leftHand);
 				var rightD = Vector3.Distance(p.Position, rightHand);
 
-				p.Close = (leftD < 0.2f) || (rightD < 0.2f);
+				var headD = float.MaxValue;
+				if (Cue.Instance.Player != null)
+					headD = Vector3.Distance(p.Position, head);
+
+				p.Close = (leftD < 0.2f) || (rightD < 0.2f) || (headD < 0.2f);
 				handsClose_ = handsClose_ || p.Close;
 			}
 

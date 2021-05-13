@@ -338,24 +338,14 @@ namespace Cue.BVH
 
         public void ApplyRootMotion()
         {
-            // root motion is disabled
-            //
-            // this makes some animations look better, but it also changes the
-            // character's position and doesn't necessarily restore it when
-            // finished
-            //
-            // so running a bunch of idle animations makes the character drift
-            // in random directions
+            float applyYaw = 0;
 
+            int xz = anim_.RootXZ ? 1 : 0;
+            int y = anim_.RootY ? 1 : 0;
 
-            //float applyYaw = 0;
-            //
-            //int xz = anim_.RootXZ ? 1 : 0;
-            //int y = anim_.RootY ? 1 : 0;
-            //
-            //Vector3 rootMotion2D = new Vector3(rootMotion_.x * xz, rootMotion_.y * y, rootMotion_.z * xz);
-            //rootMotion2D = Quaternion.AngleAxis(applyYaw, Vector3.up) * rootMotion2D;
-            //containingAtom_.mainController.transform.Translate(rootMotion2D);
+            Vector3 rootMotion2D = new Vector3(rootMotion_.x * xz, rootMotion_.y * y, rootMotion_.z * xz);
+            rootMotion2D = Quaternion.AngleAxis(applyYaw, Vector3.up) * rootMotion2D;
+            containingAtom_.mainController.transform.Translate(rootMotion2D);
         }
 
         public bool Paused

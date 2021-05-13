@@ -30,6 +30,12 @@
 			if (vr_ != vr)
 			{
 				vr_ = vr;
+
+				if (vr_)
+					Cue.LogInfo("switched to vr");
+				else
+					Cue.LogInfo("switched to desktop");
+
 				DestroyUI();
 				CreateUI();
 			}
@@ -64,14 +70,14 @@
 			{
 				desktopMenu_?.Create(false, false);
 				desktopMenu_.Visible = true;
-			}
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
-			{
-				if (Cue.Instance.Persons[i].Atom.Selected)
+				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
 				{
-					desktopMenu_.Selected = Cue.Instance.Persons[i];
-					break;
+					if (Cue.Instance.Persons[i].Atom.Selected)
+					{
+						desktopMenu_.Selected = Cue.Instance.Persons[i];
+						break;
+					}
 				}
 			}
 		}
@@ -155,6 +161,13 @@
 			if (src != null && hit.hit)
 			{
 				Cue.LogInfo($"{src}: hit on {hit.pos}");
+
+				if (src == Cue.Instance.Player)
+				{
+					Cue.LogInfo("refusing to move the player");
+					return true;
+				}
+
 				src.MoveToManual(hit.pos, Vector3.Bearing(hit.pos - src.Position));
 				return true;
 			}

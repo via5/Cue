@@ -108,7 +108,9 @@ namespace Cue.W
 		{
 			get
 			{
-				return !SuperController.singleton.MonitorCenterCamera.isActiveAndEnabled;
+				return
+					!SuperController.singleton.MonitorCenterCamera.isActiveAndEnabled &&
+					!SuperController.singleton.IsMonitorRigActive;
 			}
 		}
 

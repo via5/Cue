@@ -181,7 +181,7 @@ namespace Cue.W
 		public bool Action { get { return false; } }
 		public bool ToggleControls { get { return false; } }
 
-		public void Update()
+		public void Update(float s)
 		{
 		}
 

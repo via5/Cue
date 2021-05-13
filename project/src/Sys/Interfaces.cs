@@ -92,7 +92,7 @@ namespace Cue.W
 		bool Action { get; }
 		bool ToggleControls { get; }
 
-		void Update();
+		void Update(float s);
 		HoveredInfo GetLeftHovered();
 		HoveredInfo GetRightHovered();
 		HoveredInfo GetMouseHovered();

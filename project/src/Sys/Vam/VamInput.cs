@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace Cue.W
@@ -59,6 +60,68 @@ namespace Cue.W
 	}
 
 
+	class VamDelayedAction
+	{
+		public const float Delay = 3;
+
+		private Func<bool> getDown_, getUp_;
+		private string name_;
+		private bool down_ = false;
+		private bool trigger_ = false;
+		private bool triggered_ = false;
+		private float elapsed_ = 0;
+
+		public VamDelayedAction(Func<bool> down, Func<bool> up, string name)
+		{
+			getDown_ = down;
+			getUp_ = up;
+			name_ = name;
+		}
+
+		public void Update(float s)
+		{
+			trigger_ = false;
+
+			if (down_)
+			{
+				if (getUp_())
+				{
+					Cue.LogInfo($"{name_} up");
+					down_ = false;
+					trigger_ = false;
+					triggered_ = false;
+					elapsed_ = 0;
+				}
+				else
+				{
+					elapsed_ += s;
+
+					if (elapsed_ > 2 && !triggered_)
+					{
+						Cue.LogInfo($"{name_} triggering");
+						triggered_ = true;
+						trigger_ = true;
+					}
+				}
+			}
+			else
+			{
+				if (getDown_())
+				{
+					Cue.LogInfo($"{name_} down");
+					elapsed_ = 0;
+					down_ = true;
+				}
+			}
+		}
+
+		public bool Trigger
+		{
+			get { return trigger_; }
+		}
+	}
+
+
 	class VamInput : IInput
 	{
 		private VamSys sys_;
@@ -66,17 +129,30 @@ namespace Cue.W
 		private VamButton left_ = new VamButton(0);
 		private VamButton right_ = new VamButton(1);
 		private VamButton middle_ = new VamButton(2);
+		private VamDelayedAction leftAction_, rightAction_;
 
 		public VamInput(VamSys sys)
 		{
 			sys_ = sys;
+
+			leftAction_ = new VamDelayedAction(
+				() => SuperController.singleton.GetLeftGrab(),
+				() => SuperController.singleton.GetLeftGrabRelease(),
+				"leftgrab");
+
+			rightAction_ = new VamDelayedAction(
+				() => SuperController.singleton.GetRightGrab(),
+				() => SuperController.singleton.GetRightGrabRelease(),
+				"rightgrab");
 		}
 
-		public void Update()
+		public void Update(float s)
 		{
 			left_.Update();
 			right_.Update();
 			middle_.Update();
+			leftAction_.Update(s);
+			rightAction_.Update(s);
 		}
 
 		public bool HardReset
@@ -111,7 +187,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return SuperController.singleton.GetLeftGrab();
+				return leftAction_.Trigger;
 			}
 		}
 
@@ -127,7 +203,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return SuperController.singleton.GetRightGrab();
+				return rightAction_.Trigger;
 			}
 		}
 

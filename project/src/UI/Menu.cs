@@ -198,20 +198,14 @@
 		{
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-			{
-				p.MakeIdle();
 				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
-			}
 		}
 
 		private void OnBlowjob()
 		{
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-			{
-				p.MakeIdle();
 				p.AI.RunEvent(new BlowjobEvent(p, Cue.Instance.Player));
-			}
 		}
 
 		private void OnStand()
