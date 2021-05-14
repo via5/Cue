@@ -155,6 +155,11 @@ namespace Cue.W
 			return null;
 		}
 
+		public IGraphic CreateBoxGraphic(string name, Box box, Color c)
+		{
+			return CreateBoxGraphic(name, box.center, box.size, c);
+		}
+
 		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
 			return null;
@@ -180,6 +185,9 @@ namespace Cue.W
 		public bool Select { get { return false; } }
 		public bool Action { get { return false; } }
 		public bool ToggleControls { get { return false; } }
+
+		public bool Move { get { return false; } }
+		public Vector3 MoveDirection { get { return Vector3.Zero; } }
 
 		public void Update(float s)
 		{

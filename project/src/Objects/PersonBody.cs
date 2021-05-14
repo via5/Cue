@@ -5,8 +5,9 @@ namespace Cue
 {
 	class BodyParts
 	{
-		public const int Head = 0;
+		public const int None = -1;
 
+		public const int Head = 0;
 		public const int Lips = 1;
 		public const int Mouth = 2;
 		public const int LeftBreast = 3;
@@ -117,6 +118,11 @@ namespace Cue
 			get { return part_?.Triggering ?? false; }
 		}
 
+		public bool Grabbed
+		{
+			get { return part_?.Grabbed ?? false; }
+		}
+
 		public bool Close
 		{
 			get { return close_; }
@@ -189,6 +195,53 @@ namespace Cue
 			}
 
 			return all_[type];
+		}
+
+		public Box TopBox
+		{
+			get
+			{
+				var q = Get(BodyParts.Chest).Direction;
+
+				var avoidHeadU = Head.Position + new Vector3(0, 0.2f, 0);
+				var avoidHipU = Get(BodyParts.Hips).Position;
+
+				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
+				var avoidHip = Vector3.RotateInv(avoidHipU, q);
+
+				return new Box(
+					avoidHip + (avoidHead - avoidHip) / 2,
+					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
+			}
+		}
+
+		public Box FullBox
+		{
+			get
+			{
+				var q = person_.Direction;
+
+				var avoidHeadU = Head.Position + new Vector3(0, 0.2f, 0);
+				var avoidFeetU = person_.Position;
+
+				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
+				var avoidFeet = Vector3.RotateInv(avoidFeetU, q);
+
+				return new Box(
+					avoidFeet + (avoidHead - avoidFeet) / 2,
+					new Vector3(0.5f, (avoidHead - avoidFeet).Y, 0.35f));
+			}
+		}
+
+		public Frustum ClosenessFrustum
+		{
+			get
+			{
+				var f = new Frustum(
+					new Vector3(1, 2, 0), new Vector3(2, 2, 0.5f));
+
+				return f;
+			}
 		}
 
 		public void Update(float s)

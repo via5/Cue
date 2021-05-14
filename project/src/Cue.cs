@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Cue
 {
@@ -185,10 +186,6 @@ namespace Cue
 					p.AI.EventsEnabled = false;
 					p.AI.InteractionsEnabled = false;
 				}
-				else
-				{
-					p.Personality = new TsunderePersonality(p);
-				}
 
 				p.Atom.Init();
 			}
@@ -197,6 +194,20 @@ namespace Cue
 		private void AddPerson(W.IAtom a)
 		{
 			var p = new Person(a);
+
+			var re = new Regex(@"(.+)#(.+)");
+			var m = re.Match(a.ID);
+
+			if (m != null && m.Success)
+			{
+				var pname = m.Groups[2].Value;
+
+				if (pname == "quirky")
+					p.Personality = new QuirkyPersonality(p);
+				else if (pname == "tsundere")
+					p.Personality = new TsunderePersonality(p);
+			}
+
 			persons_.Add(p);
 			allObjects_.Add(p);
 		}

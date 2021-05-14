@@ -52,6 +52,7 @@ namespace Cue.W
 		VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
 		VUI.Root CreateScriptUI();
+		IGraphic CreateBoxGraphic(string name, Box box, Color c);
 		IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c);
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
 	}
@@ -91,6 +92,9 @@ namespace Cue.W
 		bool Select { get; }
 		bool Action { get; }
 		bool ToggleControls { get; }
+
+		bool Move { get; }
+		Vector3 MoveDirection { get; }
 
 		void Update(float s);
 		HoveredInfo GetLeftHovered();
@@ -136,6 +140,8 @@ namespace Cue.W
 		int Type { get; }
 		bool CanTrigger { get; }
 		bool Triggering { get; }
+		bool CanGrab { get; }
+		bool Grabbed { get; }
 		Vector3 Position { get; }
 		Vector3 Direction { get; }
 	}

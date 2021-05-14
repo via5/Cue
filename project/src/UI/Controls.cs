@@ -15,7 +15,7 @@ namespace Cue
 
 			graphic_ = Cue.Instance.Sys.CreateBoxGraphic(
 				"Control (" + object_.ID + ")",
-				object_.Position, new Vector3(0.05f, 0.05f, 0.05f),
+				object_.Position, new Vector3(0.5f, 0.05f, 0.5f),
 				new Color(0, 0, 1, 0.05f));
 
 			graphic_.Direction = object_.Direction;

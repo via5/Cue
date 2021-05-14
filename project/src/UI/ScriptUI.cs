@@ -660,7 +660,7 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, close, position, direction;
+			public VUI.Label name, triggering, close, grab, position, direction;
 		}
 
 
@@ -671,13 +671,14 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(5);
+			var gl = new VUI.GridLayout(6);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Triggering", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Close", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
 
@@ -691,6 +692,7 @@ namespace Cue
 				w.name = new VUI.Label(bp.Name);
 				w.triggering = new VUI.Label();
 				w.close = new VUI.Label();
+				w.grab = new VUI.Label();
 				w.position = new VUI.Label();
 				w.direction = new VUI.Label();
 
@@ -698,12 +700,14 @@ namespace Cue
 				w.name.FontSize = fontSize;
 				w.triggering.FontSize = fontSize;
 				w.close.FontSize = fontSize;
+				w.grab.FontSize = fontSize;
 				w.position.FontSize = fontSize;
 				w.direction.FontSize = fontSize;
 
 				p.Add(w.name);
 				p.Add(w.triggering);
 				p.Add(w.close);
+				p.Add(w.grab);
 				p.Add(w.position);
 				p.Add(w.direction);
 
@@ -743,12 +747,29 @@ namespace Cue
 							w.triggering.Text = "";
 						}
 
+
 						w.close.Text = w.part.Close.ToString();
 
 						w.close.TextColor = (
 							w.part.Close ?
 							W.VamU.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
+
+
+						if (w.part.Sys.CanGrab)
+						{
+							w.grab.Text = w.part.Grabbed.ToString();
+
+							w.grab.TextColor = (
+								w.part.Grabbed ?
+								W.VamU.ToUnity(Color.Green) :
+								VUI.Style.Theme.TextColor);
+						}
+						else
+						{
+							w.grab.Text = "";
+						}
+
 
 						w.position.Text = w.part.Position.ToString();
 						w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");

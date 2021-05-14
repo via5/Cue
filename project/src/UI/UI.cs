@@ -162,7 +162,7 @@
 			{
 				Cue.LogInfo($"{src}: hit on {hit.pos}");
 
-				if (src == Cue.Instance.Player)
+				if (src == Cue.Instance.Player && src.Possessed)
 				{
 					Cue.LogInfo("refusing to move the player");
 					return true;

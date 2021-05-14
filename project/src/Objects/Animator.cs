@@ -252,7 +252,12 @@ namespace Cue
 		public void Stop()
 		{
 			if (currentPlayer_ != null)
+			{
 				currentPlayer_.Stop(Bits.IsSet(activeFlags_, Rewind));
+				currentPlayer_ = null;
+				currentAnimation_ = null;
+				activeFlags_ = 0;
+			}
 		}
 
 		public void FixedUpdate(float s)
@@ -264,6 +269,7 @@ namespace Cue
 				{
 					currentPlayer_ = null;
 					currentAnimation_ = null;
+					activeFlags_ = 0;
 				}
 			}
 		}
@@ -277,6 +283,7 @@ namespace Cue
 				{
 					currentPlayer_ = null;
 					currentAnimation_ = null;
+					activeFlags_ = 0;
 				}
 			}
 		}

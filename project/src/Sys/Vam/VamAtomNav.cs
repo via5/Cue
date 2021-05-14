@@ -105,6 +105,17 @@ namespace Cue.W
 				atom_.Position = v;
 				atom_.Direction = Vector3.Rotate(new Vector3(0, 0, 1), bearing);
 			}
+			else if (PositionClose(v))
+			{
+				log_.Info("close enough, only rotating");
+				endTurnBearing_ = bearing;
+				turningStart_ = atom_.Atom.mainController.transform.rotation;
+				turningElapsed_ = 0;
+				pathStuckCheckElapsed_ = 0;
+				pathStuckLastPos_ = atom_.Position;
+				stuckCount_ = 0;
+				state_ = EndingTurn;
+			}
 			else
 			{
 				Stop("starting move to");
@@ -138,8 +149,6 @@ namespace Cue.W
 		{
 			get
 			{
-				// todo: incorrect turns
-
 				switch (state_)
 				{
 					case NoMove:
@@ -570,16 +579,23 @@ namespace Cue.W
 
 		private bool AlmostThere(Vector3 to, float bearing)
 		{
-			if (Vector3.Distance(atom_.Position, to) < 0.01f)
-			{
-				if (bearing == BasicObject.NoBearing)
-					return true;
+			return PositionClose(to) && BearingClose(bearing);
+		}
 
-				var currentBearing = Vector3.Angle(Vector3.Zero, atom_.Direction);
-				var d = Math.Abs(currentBearing - bearing);
-				if (d < 5 || d >= 355)
-					return true;
-			}
+		private bool PositionClose(Vector3 to)
+		{
+			return (Vector3.Distance(atom_.Position, to) < 0.01f);
+		}
+
+		private bool BearingClose(float bearing)
+		{
+			if (bearing == BasicObject.NoBearing)
+				return true;
+
+			var currentBearing = Vector3.Angle(Vector3.Zero, atom_.Direction);
+			var d = Math.Abs(currentBearing - bearing);
+			if (d < 5 || d >= 355)
+				return true;
 
 			return false;
 		}

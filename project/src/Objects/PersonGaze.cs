@@ -73,6 +73,12 @@
 
 				case LookatRandom:
 				{
+					if (person_.Body.Head.Grabbed)
+					{
+						if (Cue.Instance.Player != null)
+							eyes_.LookAt(Cue.Instance.Player.EyeInterest);
+					}
+
 					if (person_.Body.Head.Close)
 					{
 						if (!randomInhibited_)
@@ -400,7 +406,7 @@
 	class RandomLookAtRenderer
 	{
 		private RandomLookAt r_;
-		private FrustumRender[] frustums_ = new FrustumRender[0];
+		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
 		private W.IGraphic avoid_ = null;
 		private bool visible_ = false;
 
@@ -462,10 +468,13 @@
 
 		private void CreateFrustums()
 		{
-			frustums_ = new FrustumRender[RandomLookAt.FrustumCount];
+			frustums_ = new FrustumRenderer[RandomLookAt.FrustumCount];
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
-				frustums_[i] = new FrustumRender(r_.Person, r_.GetFrustum(i).frustum);
+				frustums_[i] = new FrustumRenderer(
+					r_.Person, r_.GetFrustum(i).frustum,
+					BodyParts.Head, BodyParts.Chest);
+
 				frustums_[i].Visible = visible_;
 			}
 		}
@@ -482,18 +491,21 @@
 	}
 
 
-	class FrustumRender
+	class FrustumRenderer
 	{
 		private Person person_;
 		private Frustum frustum_;
 		private Color color_ = Color.Zero;
 		private W.IGraphic near_ = null;
 		private W.IGraphic far_ = null;
+		private int offset_, rot_;
 
-		public FrustumRender(Person p, Frustum f)
+		public FrustumRenderer(Person p, Frustum f, int offsetBodyPart, int rotationBodyPart)
 		{
 			person_ = p;
 			frustum_ = f;
+			offset_ = offsetBodyPart;
+			rot_ = rotationBodyPart;
 		}
 
 		public bool Visible
@@ -514,20 +526,21 @@
 			{
 				near_ = Create(frustum_.NearSize());
 				far_ = Create(frustum_.FarSize());
+				Cue.LogInfo($"{frustum_.nearTL} {frustum_.nearTR} {frustum_.nearBL} {frustum_.nearBR}");
 			}
 
 			near_.Position =
-				person_.Body.Head.Position +
-				Vector3.Rotate(frustum_.NearCenter(), RandomLookAt.Ref(person_).Direction);
+				RefOffset +
+				Vector3.Rotate(frustum_.NearCenter(), RefDirection);
 
-			near_.Direction = RandomLookAt.Ref(person_).Direction;
+			near_.Direction = RefDirection;
 
 
 			far_.Position =
-				person_.Body.Head.Position +
-				Vector3.Rotate(frustum_.FarCenter(), RandomLookAt.Ref(person_).Direction);
+				RefOffset +
+				Vector3.Rotate(frustum_.FarCenter(), RefDirection);
 
-			far_.Direction = RandomLookAt.Ref(person_).Direction;
+			far_.Direction = RefDirection;
 		}
 
 		public Color Color
@@ -554,6 +567,28 @@
 			g.Visible = true;
 
 			return g;
+		}
+
+		private Vector3 RefOffset
+		{
+			get
+			{
+				if (offset_ == BodyParts.None)
+					return person_.Position;
+				else
+					return person_.Body.Get(offset_).Position;
+			}
+		}
+
+		private Vector3 RefDirection
+		{
+			get
+			{
+				if (rot_ == BodyParts.None)
+					return person_.Direction;
+				else
+					return person_.Body.Get(rot_).Direction;
+			}
 		}
 	}
 }

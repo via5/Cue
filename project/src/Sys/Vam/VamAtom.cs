@@ -9,6 +9,8 @@ namespace Cue.W
 		public abstract int Type { get; }
 		public abstract bool CanTrigger { get; }
 		public abstract bool Triggering { get; }
+		public abstract bool CanGrab { get; }
+		public abstract bool Grabbed { get; }
 		public abstract Vector3 Position { get; }
 		public abstract Vector3 Direction { get; }
 	}
@@ -18,12 +20,14 @@ namespace Cue.W
 		private VamAtom atom_;
 		private int type_;
 		private Rigidbody rb_;
+		private FreeControllerV3 fc_ = null;
 
-		public RigidbodyBodyPart(VamAtom a, int type, Rigidbody rb)
+		public RigidbodyBodyPart(VamAtom a, int type, Rigidbody rb, FreeControllerV3 fc)
 		{
 			atom_ = a;
 			type_ = type;
 			rb_ = rb;
+			fc_ = fc;
 		}
 
 		public override Transform Transform
@@ -46,6 +50,16 @@ namespace Cue.W
 			get { return false; }
 		}
 
+		public override bool CanGrab
+		{
+			get { return (fc_ != null); }
+		}
+
+		public override bool Grabbed
+		{
+			get { return fc_?.isGrabbing ?? false; }
+		}
+
 		public override Vector3 Position
 		{
 			get { return W.VamU.FromUnity(rb_.position); }
@@ -63,12 +77,14 @@ namespace Cue.W
 		private VamAtom atom_;
 		private int type_;
 		private Collider c_;
+		private FreeControllerV3 fc_;
 
-		public ColliderBodyPart(VamAtom a, int type, Collider c)
+		public ColliderBodyPart(VamAtom a, int type, Collider c, FreeControllerV3 fc)
 		{
 			atom_ = a;
 			type_ = type;
 			c_ = c;
+			fc_ = fc;
 		}
 
 		public override Transform Transform
@@ -89,6 +105,16 @@ namespace Cue.W
 		public override bool Triggering
 		{
 			get { return false; }
+		}
+
+		public override bool CanGrab
+		{
+			get { return (fc_ != null); }
+		}
+
+		public override bool Grabbed
+		{
+			get { return (fc_?.isGrabbing ?? false); }
 		}
 
 		public override Vector3 Position
@@ -113,14 +139,18 @@ namespace Cue.W
 		private CollisionTriggerEventHandler h_;
 		private Trigger trigger_;
 		private Rigidbody rb_;
+		private FreeControllerV3 fc_;
 
-		public TriggerBodyPart(VamAtom a, int type, CollisionTriggerEventHandler h)
+		public TriggerBodyPart(
+			VamAtom a, int type, CollisionTriggerEventHandler h,
+			FreeControllerV3 fc)
 		{
 			atom_ = a;
 			type_ = type;
 			h_ = h;
 			trigger_ = h.collisionTrigger.trigger;
 			rb_ = h.thisRigidbody;
+			fc_ = fc;
 		}
 
 		public override Transform Transform
@@ -141,6 +171,16 @@ namespace Cue.W
 		public override bool Triggering
 		{
 			get { return trigger_.active; }
+		}
+
+		public override bool CanGrab
+		{
+			get { return (fc_ != null); }
+		}
+
+		public override bool Grabbed
+		{
+			get { return fc_?.isGrabbing ?? false; }
 		}
 
 		public override Vector3 Position
@@ -287,41 +327,41 @@ namespace Cue.W
 		{
 			var list = new List<IBodyPart>();
 
-			list.Add(GetRigidbody(BodyParts.Head, "head"));
+			list.Add(GetRigidbody(BodyParts.Head, "headControl", "head"));
 
-			list.Add(GetTrigger(BodyParts.Lips, "LipTrigger"));
-			list.Add(GetTrigger(BodyParts.Mouth, "MouthTrigger"));
-			list.Add(GetTrigger(BodyParts.LeftBreast, "lNippleTrigger", ""));
-			list.Add(GetTrigger(BodyParts.RightBreast, "rNippleTrigger", ""));
-			list.Add(GetTrigger(BodyParts.Labia, "LabiaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.Vagina, "VaginaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.DeepVagina, "DeepVaginaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.DeeperVagina, "DeeperVaginaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.Lips, "", "LipTrigger"));
+			list.Add(GetTrigger(BodyParts.Mouth, "", "MouthTrigger"));
+			list.Add(GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
+			list.Add(GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
+			list.Add(GetTrigger(BodyParts.Labia, "","LabiaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.Vagina, "","VaginaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.DeepVagina, "","DeepVaginaTrigger", ""));
+			list.Add(GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", ""));
 			list.Add(null);  // anus
 
-			list.Add(GetRigidbody(BodyParts.Chest, "chest"));
-			list.Add(GetRigidbody(BodyParts.Belly, "abdomen2"));
-			list.Add(GetRigidbody(BodyParts.Hips, "abdomen"));
-			list.Add(GetCollider(BodyParts.LeftGlute, "LGlute1Joint", ""));
-			list.Add(GetCollider(BodyParts.RightGlute, "RGlute1Joint", ""));
+			list.Add(GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
+			list.Add(GetRigidbody(BodyParts.Belly, "", "abdomen2"));
+			list.Add(GetRigidbody(BodyParts.Hips, "hipControl", "abdomen"));
+			list.Add(GetCollider(BodyParts.LeftGlute, "", "LGlute1Joint", ""));
+			list.Add(GetCollider(BodyParts.RightGlute, "", "RGlute1Joint", ""));
 
-			list.Add(GetCollider(BodyParts.LeftShoulder, "lShldr"));
-			list.Add(GetCollider(BodyParts.LeftArm, "StandardColliderslShldr/_Collider1"));
-			list.Add(GetCollider(BodyParts.LeftForearm, "lForeArm/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.LeftHand, "lHand"));
+			list.Add(GetCollider(BodyParts.LeftShoulder, "lArmControl", "lShldr"));
+			list.Add(GetCollider(BodyParts.LeftArm, "lElbowControl", "StandardColliderslShldr/_Collider1"));
+			list.Add(GetCollider(BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.LeftHand, "lHandControl", "lHand"));
 
-			list.Add(GetCollider(BodyParts.RightShoulder, "rShldr"));
-			list.Add(GetCollider(BodyParts.RightArm, "StandardCollidersrShldr/_Collider1"));
-			list.Add(GetCollider(BodyParts.RightForearm, "rForeArm/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.RightHand, "rHand"));
+			list.Add(GetCollider(BodyParts.RightShoulder, "rArmControl", "rShldr"));
+			list.Add(GetCollider(BodyParts.RightArm, "rElbowControl", "StandardCollidersrShldr/_Collider1"));
+			list.Add(GetCollider(BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.RightHand, "rHandControl", "rHand"));
 
-			list.Add(GetCollider(BodyParts.LeftThigh, "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
-			list.Add(GetCollider(BodyParts.LeftShin, "lShin8Joint", "StandardColliderslShin/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.LeftFoot, "lFoot"));
+			list.Add(GetCollider(BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
+			list.Add(GetCollider(BodyParts.LeftShin, "lKneeControl", "lShin8Joint", "StandardColliderslShin/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.LeftFoot, "lFootControl", "lFoot"));
 
-			list.Add(GetCollider(BodyParts.RightThigh, "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
-			list.Add(GetCollider(BodyParts.RightShin, "rShin8Joint", "StandardCollidersrShin/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.RightFoot, "rFoot"));
+			list.Add(GetCollider(BodyParts.RightThigh, "rKneeControl", "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
+			list.Add(GetCollider(BodyParts.RightShin, "rKneeControl", "rShin8Joint", "StandardCollidersrShin/_Collider2"));
+			list.Add(GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
 
 			return list;
 		}
@@ -339,7 +379,7 @@ namespace Cue.W
 				return nameMale;
 		}
 
-		private IBodyPart GetRigidbody(int id, string nameFemale, string nameMale = "same")
+		private IBodyPart GetRigidbody(int id, string controller, string nameFemale, string nameMale = "same")
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -349,10 +389,18 @@ namespace Cue.W
 			if (rb == null)
 				Cue.LogError($"rb {name} not found in {atom_.uid}");
 
-			return new RigidbodyBodyPart(this, id, rb);
+			FreeControllerV3 fc = null;
+			if (controller != "")
+			{
+				fc = Cue.Instance.VamSys.FindController(atom_, controller);
+				if (fc == null)
+					Cue.LogError($"rb {name} has no controller {controller} in {atom_.uid}");
+			}
+
+			return new RigidbodyBodyPart(this, id, rb, fc);
 		}
 
-		private IBodyPart GetTrigger(int id, string nameFemale, string nameMale = "same")
+		private IBodyPart GetTrigger(int id, string controller, string nameFemale, string nameMale = "same")
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -378,10 +426,18 @@ namespace Cue.W
 				return null;
 			}
 
-			return new TriggerBodyPart(this, id, t);
+			FreeControllerV3 fc = null;
+			if (controller != "")
+			{
+				fc = Cue.Instance.VamSys.FindController(atom_, controller);
+				if (fc == null)
+					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.uid}");
+			}
+
+			return new TriggerBodyPart(this, id, t, fc);
 		}
 
-		private IBodyPart GetCollider(int id, string nameFemale, string nameMale = "same")
+		private IBodyPart GetCollider(int id, string controller, string nameFemale, string nameMale = "same")
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -394,7 +450,15 @@ namespace Cue.W
 				return null;
 			}
 
-			return new ColliderBodyPart(this, id, c);
+			FreeControllerV3 fc = null;
+			if (controller != "")
+			{
+				fc = Cue.Instance.VamSys.FindController(atom_, controller);
+				if (fc == null)
+					Cue.LogError($"collider {name} has no controller {controller} in {atom_.uid}");
+			}
+
+			return new ColliderBodyPart(this, id, c, fc);
 		}
 
 		public void SetDefaultControls(string why)

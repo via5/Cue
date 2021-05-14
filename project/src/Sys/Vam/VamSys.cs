@@ -192,6 +192,11 @@ namespace Cue.W
 			return new VUI.Root(CueMain.Instance.MVRScriptUI);
 		}
 
+		public IGraphic CreateBoxGraphic(string name, Box box, Color c)
+		{
+			return new VamBoxGraphic(name, box.center, box.size, c);
+		}
+
 		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
 			return new VamBoxGraphic(name, pos, size, c);
@@ -578,6 +583,11 @@ namespace Cue.W
 			}
 
 			return null;
+		}
+
+		public void DumpComponents(Transform t, int indent = 0)
+		{
+			DumpComponents(t.gameObject, indent);
 		}
 
 		public void DumpComponents(GameObject o, int indent = 0)
