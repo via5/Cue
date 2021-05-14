@@ -219,17 +219,16 @@ namespace Cue
 		{
 			get
 			{
-				var q = person_.Direction;
+				var avoidHead = Head.Position + new Vector3(0, 0.2f, 0);
+				var avoidFeet = person_.Position;
 
-				var avoidHeadU = Head.Position + new Vector3(0, 0.2f, 0);
-				var avoidFeetU = person_.Position;
-
-				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
-				var avoidFeet = Vector3.RotateInv(avoidFeetU, q);
-
-				return new Box(
+				var b = new Box(
 					avoidFeet + (avoidHead - avoidFeet) / 2,
 					new Vector3(0.5f, (avoidHead - avoidFeet).Y, 0.35f));
+
+				b.center.Y -= b.size.Y / 2;
+
+				return b;
 			}
 		}
 
@@ -238,7 +237,8 @@ namespace Cue
 			get
 			{
 				var f = new Frustum(
-					new Vector3(1, 2, 0), new Vector3(2, 2, 0.5f));
+					new Vector3(0.45f, 2, 0.3f),
+					new Vector3(0.2f, 2, 0.4f));
 
 				return f;
 			}

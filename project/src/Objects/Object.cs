@@ -10,6 +10,7 @@ namespace Cue
 		Vector3 Direction { get; set; }
 		Vector3 EyeInterest { get; }
 		float Bearing { get; }
+		bool Possessed { get; }
 
 		void FixedUpdate(float s);
 		void Update(float s);
@@ -130,6 +131,11 @@ namespace Cue
 		{
 			get { return locked_; }
 			set { locked_ = value; }
+		}
+
+		public bool Possessed
+		{
+			get { return Atom.Possessed; }
 		}
 
 		public bool TryLockSlot(IObject o)

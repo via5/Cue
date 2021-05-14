@@ -185,6 +185,17 @@ namespace Cue
 			caller_ = caller;
 		}
 
+		private bool CloseEnough(Person p)
+		{
+			var b = new Box(
+				caller_.Position - p.Position,
+				p.Body.FullBox.size);
+
+			b.center = Vector3.Rotate(b.center, 180 - caller_.Bearing);
+
+			return caller_.Body.ClosenessFrustum.TestPlanesAABB(b);
+		}
+
 		protected override bool DoStart(float s)
 		{
 			var p = Object as Person;
@@ -194,13 +205,24 @@ namespace Cue
 				return false;
 			}
 
+
 			var target =
 				caller_.UprightPosition +
 				Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
 
-			log_.Info($"CallAction: {p} moving to {caller_}");
-			p.MoveTo(target, caller_.Bearing + 180);
-			p.Gaze.LookAt(caller_);
+			if (CloseEnough(p))
+			{
+				log_.Info($"{p} close enough, rotating only");
+				var bearing = Vector3.Bearing(caller_.Position - p.Position);
+				p.MoveTo(p.Position, bearing);
+				p.Gaze.LookAt(caller_);
+			}
+			else
+			{
+				log_.Info($"{p} moving to {caller_}");
+				p.MoveTo(target, caller_.Bearing + 180);
+				p.Gaze.LookAt(caller_);
+			}
 
 			return true;
 		}
@@ -406,7 +428,7 @@ namespace Cue
 				{
 					if (playing_)
 					{
-						p.Animator.PlayNeutral();
+						//p.Animator.PlayNeutral();
 						playing_ = false;
 					}
 				}
