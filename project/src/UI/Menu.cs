@@ -160,10 +160,7 @@
 		{
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-			{
-				p.MakeIdle();
 				p.AI.RunEvent(new CallEvent(p, Cue.Instance.Player));
-			}
 		}
 
 		private void OnStraddle()
@@ -198,14 +195,24 @@
 		{
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-				p.AI.RunEvent(new HandjobEvent(p, Cue.Instance.Player));
+			{
+				if (p.Handjob.Active)
+					p.Handjob.Stop();
+				else
+					p.Handjob.Start(Cue.Instance.Player);
+			}
 		}
 
 		private void OnBlowjob()
 		{
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-				p.AI.RunEvent(new BlowjobEvent(p, Cue.Instance.Player));
+			{
+				if (p.Blowjob.Active)
+					p.Blowjob.Stop();
+				else
+					p.Blowjob.Start(Cue.Instance.Player);
+			}
 		}
 
 		private void OnStand()

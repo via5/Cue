@@ -33,7 +33,8 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "turn_left.bvh"
+				"file": "turn_left.bvh",
+				"useHead": false
 			}
 		},
 
@@ -42,7 +43,8 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "turn_right.bvh"
+				"file": "turn_right.bvh",
+				"useHead": false
 			}
 		},
 

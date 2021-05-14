@@ -103,11 +103,6 @@ namespace Cue
 			get { return actions_.IsIdle; }
 		}
 
-		public bool Possessed
-		{
-			get { return Atom.Possessed; }
-		}
-
 		public Vector3 UprightPosition
 		{
 			get { return uprightPos_; }
@@ -149,6 +144,22 @@ namespace Cue
 			set { personality_ = value; }
 		}
 
+		public bool CanMoveHead
+		{
+			get
+			{
+				return !Kisser.Active && !Blowjob.Active;
+			}
+		}
+
+		public bool CanMove
+		{
+			get
+			{
+				return !Kisser.Active && !Blowjob.Active && !Handjob.Active;
+			}
+		}
+
 		public void PushAction(IAction a)
 		{
 			actions_.Push(a);
@@ -161,9 +172,9 @@ namespace Cue
 
 		public override void MakeIdle()
 		{
-			kisser_.Stop();
-			handjob_.Stop();
-			blowjob_.Stop();
+			Kisser.Stop();
+			Handjob.Stop();
+			Blowjob.Stop();
 
 			actions_.Clear();
 			animator_.Stop();
@@ -176,9 +187,9 @@ namespace Cue
 			if (state_.IsCurrently(PersonState.Walking))
 				state_.CancelTransition();
 
-			kisser_.Stop();
-			handjob_.Stop();
-			blowjob_.Stop();
+			Kisser.Stop();
+			Handjob.Stop();
+			Blowjob.Stop();
 
 			actions_.Clear();
 			ai_.MakeIdle();
@@ -230,9 +241,9 @@ namespace Cue
 
 			actions_.Tick(s);
 			gaze_.Update(s);
-			kisser_.Update(s);
-			handjob_.Update(s);
-			blowjob_.Update(s);
+			Kisser.Update(s);
+			Handjob.Update(s);
+			Blowjob.Update(s);
 			expression_.Update(s);
 			excitement_.Update(s);
 			personality_.Update(s);
@@ -252,9 +263,9 @@ namespace Cue
 
 			animator_.OnPluginState(b);
 			expression_.OnPluginState(b);
-			kisser_.OnPluginState(b);
-			handjob_.OnPluginState(b);
-			blowjob_.OnPluginState(b);
+			Kisser.OnPluginState(b);
+			Handjob.OnPluginState(b);
+			Blowjob.OnPluginState(b);
 
 			ai_.OnPluginState(b);
 		}
@@ -282,6 +293,7 @@ namespace Cue
 				return;
 			}
 
+			animator_.Stop();
 			PlayTransition();
 		}
 
@@ -317,25 +329,27 @@ namespace Cue
 
 		protected bool StartTransition()
 		{
-			if (kisser_.Active)
+			bool canStart = true;
+
+			if (Kisser.Active)
 			{
-				kisser_.Stop();
-				return false;
+				Kisser.Stop();
+				canStart = false;
 			}
 
-			if (handjob_.Active)
+			if (Handjob.Active)
 			{
-				handjob_.Stop();
-				return false;
+				Handjob.Stop();
+				canStart = false;
 			}
 
-			if (blowjob_.Active)
+			if (Blowjob.Active)
 			{
-				blowjob_.Stop();
-				return false;
+				Blowjob.Stop();
+				canStart = false;
 			}
 
-			return true;
+			return canStart;
 		}
 
 		protected override bool StartMove()
@@ -365,6 +379,9 @@ namespace Cue
 						// force the state to standing first, there are no
 						// animations for walk->stand
 						state_.Set(PersonState.Standing);
+
+						// must stop manually, it's exclusive
+						animator_.Stop();
 
 						SetState(PersonState.Standing);
 					}
@@ -400,8 +417,11 @@ namespace Cue
 				{
 					if (lastNavState_ != W.NavStates.TurningLeft || !animator_.Playing)
 					{
-						animator_.PlayType(
-							Animation.TurnLeftType, Animator.Exclusive);
+						if (CanMove)
+						{
+							animator_.PlayType(
+								Animation.TurnLeftType, Animator.Exclusive);
+						}
 					}
 
 					break;
@@ -411,8 +431,11 @@ namespace Cue
 				{
 					if (lastNavState_ != W.NavStates.TurningRight || !animator_.Playing)
 					{
-						animator_.PlayType(
-							Animation.TurnRightType, Animator.Exclusive);
+						if (CanMove)
+						{
+							animator_.PlayType(
+								Animation.TurnRightType, Animator.Exclusive);
+						}
 					}
 
 					break;

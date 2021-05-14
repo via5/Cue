@@ -132,6 +132,7 @@
 			bool close = person_.Body.PlayerIsClose;
 			if (close != wasClose_)
 			{
+				person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
 				SetClose(close);
 				wasClose_ = close;
 			}
@@ -163,7 +164,9 @@
 		{
 			if (b)
 			{
-				person_.Gaze.LookAt(Cue.Instance.Player);
+				if (person_.CanMoveHead)
+					person_.Gaze.LookAt(Cue.Instance.Player);
+
 				StateString = "happy";
 				SetHappy();
 			}
@@ -218,7 +221,7 @@
 			person_.Expression.Set(new ExpressionIntensity[]
 			{
 					new ExpressionIntensity(Expressions.Happy, 0.2f),
-					new ExpressionIntensity(Expressions.Mischievous, 0.4f)
+					new ExpressionIntensity(Expressions.Mischievous, 0.6f)
 			});
 		}
 
@@ -274,14 +277,20 @@
 			if (b)
 			{
 				StateString = "angry";
-				person_.Gaze.Avoid(Cue.Instance.Player);
+
+				if (person_.CanMoveHead)
+					person_.Gaze.Avoid(Cue.Instance.Player);
+
 				SetAngry();
 				angry_ = true;
 			}
 			else
 			{
 				StateString = "idle";
-				person_.Gaze.LookAtRandom();
+
+				if (person_.CanMoveHead)
+					person_.Gaze.LookAtRandom();
+
 				SetIdle();
 				angry_ = false;
 			}

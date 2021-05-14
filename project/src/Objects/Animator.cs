@@ -198,15 +198,9 @@ namespace Cue
 			{
 				if (Bits.IsSet(flags, Exclusive))
 				{
-					if (!silent)
-					{
-						log_.Error(
-							$"cannot exclusively play {a}, " +
-							$"current animation {currentAnimation_} is also " +
-							$"exclusive");
-					}
-
-					return false;
+					// allow exclusive to override exclusive, happens for walk
+					// and turn, for example
+					return true;
 				}
 				else
 				{

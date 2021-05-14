@@ -19,10 +19,12 @@ namespace Cue.BVH
         private bool usePosition_ = false;
         private bool localRotations_ = true;
         private bool localPositions_ = true;
+        public bool useHead_ = true;
 
         public Animation(
             string path, bool rootXZ, bool rootY, bool reverse,
-            int init, int start, int end, bool usePosition, bool localRot, bool localPos)
+            int init, int start, int end,
+            bool usePosition, bool localRot, bool localPos, bool useHead)
         {
             file_ = new File(path);
             rootXZ_ = rootXZ;
@@ -34,6 +36,7 @@ namespace Cue.BVH
             usePosition_ = usePosition;
             localRotations_ = localRot;
             localPositions_ = localPos;
+            useHead_ = useHead;
 
             if (end_ < 0)
                 end_ = file_.FrameCount - 1;
@@ -104,7 +107,8 @@ namespace Cue.BVH
                 (o.HasKey("end") ? o["end"].AsInt : -1),
                 (o.HasKey("usePosition") ? o["usePosition"].AsBool : false),
                 (o.HasKey("localRotations") ? o["localRotations"].AsBool : true),
-                (o.HasKey("localPositions") ? o["localPositions"].AsBool : true));
+                (o.HasKey("localPositions") ? o["localPositions"].AsBool : true),
+                (o.HasKey("useHead") ? o["useHead"].AsBool : true));
         }
 
         public File File
@@ -157,6 +161,11 @@ namespace Cue.BVH
             get { return usePosition_; }
         }
 
+        public bool UseHead
+        {
+            get { return useHead_; }
+        }
+
         public override string ToString()
         {
             string s = $"bvh {file_.Name} {init_}/{start_}/{end_}";
@@ -180,6 +189,9 @@ namespace Cue.BVH
                 s += " locRot";
             else
                 s += " absRot";
+
+            if (!useHead_)
+                s += " nohead";
 
             return s;
         }

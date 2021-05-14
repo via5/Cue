@@ -83,7 +83,7 @@
 			if (p.Kisser.OnCooldown)
 				return false;
 
-			if (p.Blowjob.Active)
+			if (!p.CanMoveHead)
 				return false;
 
 			if (p.State.Is(PersonState.Walking))

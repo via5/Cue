@@ -431,6 +431,9 @@ namespace Cue.BVH
                 var c = controllerMap_[item.Key];
                 var t = c.fc.transform;
 
+                if (!anim_.useHead_ && item.Key.Contains("head"))
+                    continue;
+
                 var pos = bones_[item.Value].position + new Vector3(0, heelHeight_, 0);
                 var rot = bones_[item.Value].rotation;
 
