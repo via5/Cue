@@ -5,8 +5,21 @@ namespace Cue.W
 {
 	abstract class VamBodyPart : IBodyPart
 	{
+		protected VamAtom atom_;
+		private int type_;
+
+		protected VamBodyPart(VamAtom a, int t)
+		{
+			atom_ = a;
+			type_ = t;
+		}
+
+		public  int Type
+		{
+			get { return type_; }
+		}
+
 		public abstract Transform Transform { get; }
-		public abstract int Type { get; }
 		public abstract bool CanTrigger { get; }
 		public abstract bool Triggering { get; }
 		public abstract bool CanGrab { get; }
@@ -17,15 +30,12 @@ namespace Cue.W
 
 	class RigidbodyBodyPart : VamBodyPart
 	{
-		private VamAtom atom_;
-		private int type_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_ = null;
 
 		public RigidbodyBodyPart(VamAtom a, int type, Rigidbody rb, FreeControllerV3 fc)
+			: base(a, type)
 		{
-			atom_ = a;
-			type_ = type;
 			rb_ = rb;
 			fc_ = fc;
 		}
@@ -33,11 +43,6 @@ namespace Cue.W
 		public override Transform Transform
 		{
 			get { return rb_.transform; }
-		}
-
-		public override int Type
-		{
-			get { return type_; }
 		}
 
 		public override bool CanTrigger
@@ -79,15 +84,12 @@ namespace Cue.W
 
 	class ColliderBodyPart : VamBodyPart
 	{
-		private VamAtom atom_;
-		private int type_;
 		private Collider c_;
 		private FreeControllerV3 fc_;
 
 		public ColliderBodyPart(VamAtom a, int type, Collider c, FreeControllerV3 fc)
+			: base(a, type)
 		{
-			atom_ = a;
-			type_ = type;
 			c_ = c;
 			fc_ = fc;
 		}
@@ -95,11 +97,6 @@ namespace Cue.W
 		public override Transform Transform
 		{
 			get { return c_.transform; }
-		}
-
-		public override int Type
-		{
-			get { return type_; }
 		}
 
 		public override bool CanTrigger
@@ -144,19 +141,14 @@ namespace Cue.W
 
 	class TriggerBodyPart : VamBodyPart
 	{
-		private VamAtom atom_;
-		private int type_;
 		private CollisionTriggerEventHandler h_;
 		private Trigger trigger_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_;
 
-		public TriggerBodyPart(
-			VamAtom a, int type, CollisionTriggerEventHandler h,
-			FreeControllerV3 fc)
+		public TriggerBodyPart(VamAtom a, int type, CollisionTriggerEventHandler h, FreeControllerV3 fc)
+			: base(a, type)
 		{
-			atom_ = a;
-			type_ = type;
 			h_ = h;
 			trigger_ = h.collisionTrigger.trigger;
 			rb_ = h.thisRigidbody;
@@ -166,11 +158,6 @@ namespace Cue.W
 		public override Transform Transform
 		{
 			get { return rb_.transform; }
-		}
-
-		public override int Type
-		{
-			get { return type_; }
 		}
 
 		public override bool CanTrigger
@@ -220,6 +207,58 @@ namespace Cue.W
 			return $"trigger {trigger_.displayName}";
 		}
 	}
+
+
+	class EyesBodyPart : VamBodyPart
+	{
+		private EyeCenter c_;
+		private Rigidbody head_;
+
+		public EyesBodyPart(VamAtom a)
+			: base(a, BodyParts.Eyes)
+		{
+			c_ = a.Atom.GetComponentInChildren<EyeCenter>();
+			if (c_ == null)
+				Cue.LogError($"{a.ID} has no EyeCenter");
+
+			head_ = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "head");
+			if (head_== null)
+				Cue.LogError($"{a.ID} has no head");
+		}
+
+		public override Transform Transform
+		{
+			get { return c_.transform; }
+		}
+
+		public override bool CanTrigger { get { return false; } }
+		public override bool Triggering { get { return false; } }
+		public override bool CanGrab { get { return false; } }
+		public override bool Grabbed { get { return false; } }
+
+		public override Vector3 Position
+		{
+			get
+			{
+				if (c_ == null)
+					return Vector3.Zero;
+				else
+					return VamU.FromUnity(c_.transform.position);
+			}
+		}
+
+		public override Vector3 Direction
+		{
+			get
+			{
+				if (head_ == null)
+					return Vector3.Zero;
+				else
+					return W.VamU.Direction(head_.rotation);
+			}
+		}
+	}
+
 
 
 	class VamAtom : IAtom
@@ -377,6 +416,8 @@ namespace Cue.W
 			list.Add(GetCollider(BodyParts.RightThigh, "rKneeControl", "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
 			list.Add(GetCollider(BodyParts.RightShin, "rKneeControl", "rShin8Joint", "StandardCollidersrShin/_Collider2"));
 			list.Add(GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
+
+			list.Add(new EyesBodyPart(this));
 
 			return list;
 		}

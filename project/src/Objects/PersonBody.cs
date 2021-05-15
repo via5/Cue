@@ -42,7 +42,9 @@ namespace Cue
 		public const int RightShin = 27;
 		public const int RightFoot = 28;
 
-		public const int Count = 29;
+		public const int Eyes = 29;
+
+		public const int Count = 30;
 
 
 		private static string[] names_ = new string[]
@@ -56,7 +58,9 @@ namespace Cue
 			"rightshoulder", "rightarm", "rightforearm", "righthand",
 
 			"leftthigh", "leftshin", "leftfoot",
-			"rightthigh", "rightshin", "rightfoot"
+			"rightthigh", "rightshin", "rightfoot",
+
+			"eyes"
 		};
 
 		public static string ToString(int t)
@@ -217,7 +221,7 @@ namespace Cue
 			{
 				var q = Get(BodyParts.Chest).Direction;
 
-				var avoidHeadU = Head.Position + new Vector3(0, 0.2f, 0);
+				var avoidHeadU = Get(BodyParts.Head).Position + new Vector3(0, 0.2f, 0);
 				var avoidHipU = Get(BodyParts.Hips).Position;
 
 				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
@@ -233,7 +237,7 @@ namespace Cue
 		{
 			get
 			{
-				var avoidHead = Head.Position + new Vector3(0, 0.2f, 0);
+				var avoidHead = Get(BodyParts.Head).Position + new Vector3(0, 0.2f, 0);
 				var avoidFeet = person_.Position;
 
 				var b = new Box(
@@ -268,7 +272,7 @@ namespace Cue
 
 			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
 			var rightHand = Cue.Instance.InteractiveRightHandPosition;
-			var head = Cue.Instance.Player?.Body?.Head?.Position ?? Vector3.Zero;
+			var head = Cue.Instance.Player?.Body?.Get(BodyParts.Head)?.Position ?? Vector3.Zero;
 
 			for (int i = 0; i < all_.Length; ++i)
 			{
@@ -292,10 +296,6 @@ namespace Cue
 			else if (!handsClose_)
 				timeSinceClose_ += s;
 		}
-
-		// convenience
-		public BodyPart Lips { get { return Get(BodyParts.Lips); } }
-		public BodyPart Head { get { return Get(BodyParts.Head); } }
 	}
 
 

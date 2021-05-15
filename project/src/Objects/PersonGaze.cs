@@ -53,7 +53,7 @@ namespace Cue
 				case LookatFront:
 				{
 					eyes_.LookAt(
-						person_.Body.Head?.Position ?? Vector3.Zero +
+						person_.Body.Get(BodyParts.Eyes)?.Position ?? Vector3.Zero +
 						Vector3.Rotate(new Vector3(0, 0, 1), person_.Bearing));
 
 					break;
@@ -75,13 +75,15 @@ namespace Cue
 
 				case LookatRandom:
 				{
-					if (person_.Body.Head.Grabbed)
+					var head = person_.Body.Get(BodyParts.Head);
+
+					if (head.Grabbed)
 					{
 						if (Cue.Instance.Player != null)
 							eyes_.LookAt(Cue.Instance.Player.EyeInterest);
 					}
 
-					if (person_.Body.Head.Close)
+					if (head.Close)
 					{
 						if (!randomInhibited_)
 						{
@@ -290,7 +292,7 @@ namespace Cue
 			var rp = f.RandomPoint();
 
 			pos_ =
-				r.Person.Body.Head.Position +
+				r.Person.Body.Get(BodyParts.Eyes).Position +
 				Vector3.Rotate(rp, r.Person.Body.Get(BodyParts.Chest).Direction);
 
 			return true;
@@ -328,7 +330,7 @@ namespace Cue
 
 		private int[] interestingBodyParts_ = new int[]
 		{
-			BodyParts.Head, BodyParts.Hips, BodyParts.Chest
+			BodyParts.Eyes, BodyParts.Hips, BodyParts.Chest
 		};
 
 		private Person person_;
@@ -528,27 +530,29 @@ namespace Cue
 
 		private void UpdateAvoidBox()
 		{
-			var selfHead = person_.Body.Head;
+			var selfRef = person_.Body.Get(BodyParts.Eyes);
 			var avoidP = avoid_ as Person;
 
 			if (avoidP == null)
 			{
 				avoidBox_ = new Box(
-					avoid_.EyeInterest - selfHead.Position,
+					avoid_.EyeInterest - selfRef.Position,
 					new Vector3(0.2f, 0.2f, 0.2f));
 			}
 			else
 			{
+				var avoidRef = avoidP.Body.Get(BodyParts.Eyes);
+
 				var q = ReferencePart.Direction;
 
 				var avoidHeadU =
-					avoidP.Body.Head.Position -
-					selfHead.Position +
+					avoidRef.Position -
+					selfRef.Position +
 					new Vector3(0, 0.2f, 0);
 
 				var avoidHipU =
 					avoidP.Body.Get(BodyParts.Hips).Position -
-					selfHead.Position;
+					selfRef.Position;
 
 				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
 				var avoidHip = Vector3.RotateInv(avoidHipU, q);
@@ -645,7 +649,7 @@ namespace Cue
 			}
 
 			avoid_.Position =
-				r_.Person.Body.Head.Position +
+				r_.Person.Body.Get(BodyParts.Eyes).Position +
 				Vector3.Rotate(r_.AvoidBox.center, r_.ReferencePart.Direction);
 
 			avoid_.Size = r_.AvoidBox.size;

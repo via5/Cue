@@ -134,7 +134,7 @@ namespace Cue
 		{
 			get
 			{
-				return body_.Head?.Position ?? base.EyeInterest;
+				return body_.Get(BodyParts.Eyes)?.Position ?? base.EyeInterest;
 			}
 		}
 

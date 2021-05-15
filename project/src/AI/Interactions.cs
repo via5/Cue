@@ -26,7 +26,7 @@
 
 		public void Update(float s)
 		{
-			if (person_.Body.Lips == null)
+			if (person_.Body.Get(BodyParts.Lips) == null)
 				return;
 
 			if (person_.Kisser.Active)
@@ -50,7 +50,7 @@
 			if (!CanStart(person_))
 				return false;
 
-			var srcLips = person_.Body.Lips.Position;
+			var srcLips = person_.Body.Get(BodyParts.Lips).Position;
 
 			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
 			{
@@ -58,16 +58,17 @@
 				if (target == person_)
 					continue;
 
-				if (target.Body.Lips == null || target.Kisser.Active)
+				var targetLips = target.Body.Get(BodyParts.Lips);
+
+				if (targetLips == null || target.Kisser.Active)
 					continue;
 
 				if (!CanStart(target))
 					continue;
 
 				// todo: check rotations
-				var targetLips = target.Body.Lips.Position;
 
-				if (Vector3.Distance(srcLips, targetLips) < StartDistance)
+				if (Vector3.Distance(srcLips, targetLips.Position) < StartDistance)
 				{
 					log_.Info($"starting for {person_} and {target}");
 					person_.Kisser.StartReciprocal(target);
@@ -101,12 +102,13 @@
 			if (target == null)
 				return false;
 
-			if (target.Body.Lips == null)
+			var srcLips = person_.Body.Get(BodyParts.Lips);
+			var targetLips = target.Body.Get(BodyParts.Lips);
+
+			if (srcLips == null || targetLips == null)
 				return false;
 
-			var srcLips = person_.Body.Lips.Position;
-			var targetLips = target.Body.Lips.Position;
-			var d = Vector3.Distance(srcLips, targetLips);
+			var d = Vector3.Distance(srcLips.Position, targetLips.Position);
 
 			var hasPlayer = (
 				person_ == Cue.Instance.Player ||

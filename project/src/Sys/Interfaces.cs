@@ -93,9 +93,6 @@ namespace Cue.W
 		bool Action { get; }
 		bool ToggleControls { get; }
 
-		bool Move { get; }
-		Vector3 MoveDirection { get; }
-
 		void Update(float s);
 		HoveredInfo GetLeftHovered();
 		HoveredInfo GetRightHovered();
