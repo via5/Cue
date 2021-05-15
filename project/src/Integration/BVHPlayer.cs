@@ -54,7 +54,9 @@ namespace Cue.BVH
             if (p.Atom is W.VamAtom)
             {
                 containingAtom_ = ((W.VamAtom)p.Atom).Atom;
-                containingAtom_.ResetPhysical();
+
+                if (Cue.Instance.Options.AllowMovement)
+                    containingAtom_.ResetPhysical();
 
                 CreateShadowSkeleton();
                 RecordOffsets();

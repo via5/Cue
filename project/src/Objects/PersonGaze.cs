@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	class Gaze
 	{
@@ -109,10 +111,7 @@
 									person_.Personality.LookAtRandomGazeDuration);
 
 								gazer_.Duration = gazeDuration_.Next();
-
-								eyes_.LookAt(
-									person_.Body.Head.Position +
-									Vector3.Rotate(random_.Position, RandomLookAt.Ref(person_).Direction));
+								eyes_.LookAt(random_.Position);
 							}
 						}
 					}
@@ -190,6 +189,33 @@
 			SetLookat(LookatFront);
 		}
 
+		public override string ToString()
+		{
+			switch (lookat_)
+			{
+				case LookatNothing:
+					return "nothing";
+
+				case LookatFront:
+					return "front";
+
+				case LookatCamera:
+					return "camera";
+
+				case LookatObject:
+					return $"object {object_.ID} {object_.EyeInterest}";
+
+				case LookatRandom:
+					return random_.ToString();
+
+				case LookatPosition:
+					return $"pos {eyes_.Position}";
+
+				default:
+					return $"?{lookat_}";
+			}
+		}
+
 		private void SetLookat(int i)
 		{
 			if (lookat_ != i)
@@ -200,6 +226,79 @@
 				lookat_ = i;
 				randomInhibited_ = false;
 			}
+		}
+	}
+
+
+	interface IRandomTarget
+	{
+		Vector3 Position { get; }
+		void Reset();
+		bool NextPosition(RandomLookAt r);
+	}
+
+
+	class BodyPartTarget : IRandomTarget
+	{
+		private BodyPart part_;
+
+		public BodyPartTarget(BodyPart p)
+		{
+			part_ = p;
+		}
+
+		public Vector3 Position
+		{
+			get { return part_.Position; }
+		}
+
+		public void Reset()
+		{
+		}
+
+		public bool NextPosition(RandomLookAt r)
+		{
+			return r.CanLookAt(part_.Position);
+		}
+
+		public override string ToString()
+		{
+			return $"bodypart {part_}";
+		}
+	}
+
+
+	class RandomPointTarget : IRandomTarget
+	{
+		private Vector3 pos_ = Vector3.Zero;
+
+		public Vector3 Position
+		{
+			get { return pos_; }
+		}
+
+		public void Reset()
+		{
+		}
+
+		public bool NextPosition(RandomLookAt r)
+		{
+			var f = r.RandomAvailableFrustum();
+			if (f.Empty)
+				return false;
+
+			var rp = f.RandomPoint();
+
+			pos_ =
+				r.Person.Body.Head.Position +
+				Vector3.Rotate(rp, r.Person.Body.Get(BodyParts.Chest).Direction);
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			return $"point {pos_}";
 		}
 	}
 
@@ -227,14 +326,19 @@
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
 
+		private int[] interestingBodyParts_ = new int[]
+		{
+			BodyParts.Head, BodyParts.Hips, BodyParts.Chest
+		};
+
 		private Person person_;
-		private Vector3 pos_ = Vector3.Zero;
 		private IObject avoid_ = null;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
 		private Box avoidBox_ = Box.Zero;
 		private RandomLookAtRenderer render_ = null;
 		private Duration delay_ = new Duration(0, 0);
-		private bool forceNext_ = false;
+		private List<IRandomTarget> targets_ = new List<IRandomTarget>();
+		private ShuffledIndex currentTarget_;
 
 		public RandomLookAt(Person p)
 		{
@@ -246,12 +350,14 @@
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
 
+			currentTarget_ = new ShuffledIndex(targets_);
+
 			//render_ = new RandomLookAtRenderer(this);
 		}
 
-		public static BodyPart Ref(Person p)
+		public BodyPart ReferencePart
 		{
-			return p.Body.Get(BodyParts.Chest);
+			get { return person_.Body.Get(BodyParts.Chest); }
 		}
 
 		public Person Person
@@ -277,26 +383,60 @@
 
 		public Vector3 Position
 		{
-			get { return pos_; }
+			get
+			{
+				if (currentTarget_.HasIndex)
+					return targets_[currentTarget_.Index].Position;
+				else
+					return Vector3.Zero;
+			}
+		}
+
+		public bool CanLookAt(Vector3 p)
+		{
+			var box = new Box(p, new Vector3(0.01f, 0.01f, 0.01f));
+
+			for (int i = 0; i < frustums_.Length; ++i)
+			{
+				if (frustums_[i].avoid)
+				{
+					if (frustums_[i].frustum.TestPlanesAABB(box))
+						return false;
+				}
+			}
+
+			return true;
 		}
 
 		public void Reset()
 		{
-			forceNext_ = true;
+			currentTarget_.Reset();
+
+			for (int i = 0; i < targets_.Count; ++i)
+				targets_[i].Reset();
 		}
 
 		public bool Update(float s)
 		{
-			var force = forceNext_;
-			forceNext_ = false;
+			if (targets_.Count == 0)
+				GetTargets();
 
 			delay_.SetRange(person_.Personality.LookAtRandomInterval);
+			//delay_.SetRange(1, 1);
 			delay_.Update(s);
 
-			if (delay_.Finished || force)
+			if (delay_.Finished || !currentTarget_.HasIndex)
 			{
-				NextPosition();
+				NextTarget();
 				return true;
+			}
+			else if (currentTarget_.HasIndex)
+			{
+				if (!CanLookAt(targets_[currentTarget_.Index].Position))
+				{
+					NextTarget();
+					return true;
+				}
 			}
 
 			render_?.Update(s);
@@ -304,27 +444,64 @@
 			return false;
 		}
 
-		private void NextPosition()
+		public override string ToString()
+		{
+			string s = "random: ";
+
+			if (currentTarget_.HasIndex)
+				s += targets_[currentTarget_.Index].ToString();
+			else
+				s += "no target";
+
+			if (avoid_ != null)
+				s += $", avoid {avoid_}";
+
+			return s;
+		}
+
+		private void GetTargets()
+		{
+			targets_.Clear();
+
+			targets_.Add(new RandomPointTarget());
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (Cue.Instance.Persons[i] == person_)
+					continue;
+
+				for (int ii = 0; ii < interestingBodyParts_.Length; ++ii)
+				{
+					targets_.Add(new BodyPartTarget(
+						Cue.Instance.Persons[i].Body.Get(interestingBodyParts_[ii])));
+				}
+			}
+		}
+
+		private void NextTarget()
+		{
+			ResetFrustums();
+			UpdateFrustums();
+
+			currentTarget_.Next((i) =>
+			{
+				if (!targets_[i].NextPosition(this))
+					return false;
+
+				return true;
+			});
+		}
+
+		private void ResetFrustums()
 		{
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				frustums_[i].avoid = false;
 				frustums_[i].selected = false;
 			}
-
-			int av = CheckAvoid();
-			if (av == 0)
-			{
-				Cue.LogError("nowhere to look at");
-				return;
-			}
-
-			var sel = RandomAvailableFrustum(av);
-			frustums_[sel].selected = true;
-			pos_ = frustums_[sel].frustum.RandomPoint();
 		}
 
-		private int CheckAvoid()
+		private int UpdateFrustums()
 		{
 			if (avoid_ == null)
 				return frustums_.Length;
@@ -362,7 +539,7 @@
 			}
 			else
 			{
-				var q = Ref(person_).Direction;
+				var q = ReferencePart.Direction;
 
 				var avoidHeadU =
 					avoidP.Body.Head.Position -
@@ -382,8 +559,17 @@
 			}
 		}
 
-		private int RandomAvailableFrustum(int av)
+		public Frustum RandomAvailableFrustum()
 		{
+			int av = 0;
+
+			for (int i = 0; i < frustums_.Length; ++i)
+			{
+				if (!frustums_[i].avoid)
+					++av;
+			}
+
+
 			int fi = U.RandomInt(0, av - 1);
 
 			for (int i = 0; i < frustums_.Length; ++i)
@@ -392,13 +578,12 @@
 					continue;
 
 				if (fi == 0)
-					return i;
+					return frustums_[i].frustum;
 
 				--fi;
 			}
 
-			Cue.LogError($"RandomAvailableFrustum: fi={fi} av={av} l={frustums_.Length}");
-			return 0;
+			return Frustum.Zero;
 		}
 	}
 
@@ -461,7 +646,7 @@
 
 			avoid_.Position =
 				r_.Person.Body.Head.Position +
-				Vector3.Rotate(r_.AvoidBox.center, RandomLookAt.Ref(r_.Person).Direction);
+				Vector3.Rotate(r_.AvoidBox.center, r_.ReferencePart.Direction);
 
 			avoid_.Size = r_.AvoidBox.size;
 		}

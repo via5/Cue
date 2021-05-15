@@ -10,6 +10,7 @@ namespace Cue.Proc
 		void Start(Person p);
 		void Reset();
 		void Update(float s);
+		void FixedUpdate(float s);
 	}
 
 

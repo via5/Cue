@@ -6,16 +6,17 @@ namespace Cue.Proc
 	{
 		private string rbId_;
 		private Rigidbody rb_ = null;
-		private Vector3 force_;
-		private float time_;
-		private float elapsed_ = 0;
-		private bool fwd_ = true;
+		private Vector3 min_, max_;
+		private Vector3 last_, current_;
+		private Duration duration_;
+		private IEasing easing_ = new SinusoidalEasing();
 
-		public Force(string rbId, Vector3 f, float t)
+		public Force(string rbId, Vector3 min, Vector3 max, Duration d)
 		{
 			rbId_ = rbId;
-			force_ = f;
-			time_ = t;
+			min_ = min;
+			max_ = max;
+			duration_ = d;
 		}
 
 		public bool Done
@@ -25,7 +26,7 @@ namespace Cue.Proc
 
 		public ITarget Clone()
 		{
-			return new Force(rbId_, force_, time_);
+			return new Force(rbId_, min_, max_, duration_);
 		}
 
 		public void Start(Person p)
@@ -36,32 +37,44 @@ namespace Cue.Proc
 				Cue.LogError($"Force: rigidbody {rbId_} not found");
 				return;
 			}
+
+			last_ = Vector3.Zero;
+			Next();
 		}
 
 		public void Reset()
 		{
-			elapsed_ = 0;
-			fwd_ = true;
+			duration_.Reset();
+		}
+
+		public void FixedUpdate(float s)
+		{
+			duration_.Update(s);
+
+			var p = easing_.Magnitude(duration_.Progress);
+			rb_.AddForce(W.VamU.ToUnity(Vector3.Lerp(last_, current_, p)));
+
+			if (duration_.Finished)
+				Next();
 		}
 
 		public void Update(float s)
 		{
-			elapsed_ += s;
-			if (elapsed_ >= time_)
-			{
-				elapsed_ = 0;
-				fwd_ = !fwd_;
-			}
-
-			float p = (fwd_ ? (elapsed_ / time_) : ((time_ - elapsed_) / time_));
-			var f = force_ * p;
-
-			rb_.AddForce(W.VamU.ToUnity(f));
 		}
 
 		public override string ToString()
 		{
 			return rb_.name;
+		}
+
+		private void Next()
+		{
+			last_ = current_;
+
+			current_ = new Vector3(
+				U.RandomFloat(min_.X, max_.X),
+				U.RandomFloat(min_.Y, max_.Y),
+				U.RandomFloat(min_.Z, max_.Z));
 		}
 	}
 }

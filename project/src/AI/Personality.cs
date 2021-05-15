@@ -6,6 +6,7 @@
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
 
+		string Name { get; }
 		string StateString{ get; }
 		Sensitivity Sensitivity { get; }
 		void Update(float s);

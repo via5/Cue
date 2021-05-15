@@ -143,6 +143,20 @@ namespace Cue
 		{
 			get { return Vector3.Bearing(Direction); }
 		}
+
+		public override string ToString()
+		{
+			string s = "";
+
+			if (part_ == null)
+				s += "null";
+			else
+				s += part_.ToString();
+
+			s += $" ({BodyParts.ToString(type_)})";
+
+			return s;
+		}
 	}
 
 

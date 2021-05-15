@@ -34,9 +34,9 @@ namespace Cue.Proc
 			targets_.Add(new Controller(name, pos, rot));
 		}
 
-		public void AddForce(string rbId, Vector3 f, float time)
+		public void AddForce(string rbId, Vector3 min, Vector3 max, Duration d)
 		{
-			targets_.Add(new Force(rbId, f, time));
+			targets_.Add(new Force(rbId, min, max, d));
 		}
 
 		public void Reset()
@@ -50,6 +50,15 @@ namespace Cue.Proc
 			for (int i = 0; i < targets_.Count; ++i)
 			{
 				targets_[i].Update(s);
+				done_ = done_ || targets_[i].Done;
+			}
+		}
+
+		public void FixedUpdate(float s)
+		{
+			for (int i = 0; i < targets_.Count; ++i)
+			{
+				targets_[i].FixedUpdate(s);
 				done_ = done_ || targets_[i].Done;
 			}
 		}

@@ -329,10 +329,11 @@ namespace Cue
 		private VUI.Label anim_ = new VUI.Label();
 		private VUI.Label nav_ = new VUI.Label();
 		private VUI.Label state_ = new VUI.Label();
+		private VUI.Label gaze_ = new VUI.Label();
 
 		private VUI.Label breath_ = new VUI.Label();
 		private VUI.Label eyes_ = new VUI.Label();
-		private VUI.Label gaze_ = new VUI.Label();
+		private VUI.Label gazer_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
 		private VUI.Label kiss_ = new VUI.Label();
 		private VUI.Label handjob_ = new VUI.Label();
@@ -375,6 +376,9 @@ namespace Cue
 			state.Add(new VUI.Label("State"));
 			state.Add(state_);
 
+			state.Add(new VUI.Label("Gaze"));
+			state.Add(gaze_);
+
 			state.Add(new VUI.Spacer(20));
 			state.Add(new VUI.Spacer(20));
 
@@ -385,8 +389,8 @@ namespace Cue
 			state.Add(new VUI.Label("Eyes"));
 			state.Add(eyes_);
 
-			state.Add(new VUI.Label("Gaze"));
-			state.Add(gaze_);
+			state.Add(new VUI.Label("Gazer"));
+			state.Add(gazer_);
 
 			state.Add(new VUI.Label("Speech"));
 			state.Add(speech_);
@@ -421,6 +425,7 @@ namespace Cue
 			action_.Text = person_.Actions.ToString();
 			nav_.Text = person_.MoveStateString();
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
+			gaze_.Text = person_.Gaze.ToString();
 
 			if (person_.Animator.CurrentPlayer == null)
 				player_.Text = "(none)";
@@ -434,7 +439,7 @@ namespace Cue
 
 			breath_.Text = person_.Breathing.ToString();
 			eyes_.Text = person_.Gaze.Eyes.ToString();
-			gaze_.Text = person_.Gaze.Gazer.ToString();
+			gazer_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();
 			kiss_.Text = person_.Kisser.ToString();
 			handjob_.Text = person_.Handjob.ToString();

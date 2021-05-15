@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Cue
 {
-	class Bits
+	static class Bits
 	{
 		public static bool IsSet(int flag, int bits)
 		{
@@ -19,7 +20,7 @@ namespace Cue
 	}
 
 
-	public class Strings
+	static class Strings
 	{
 		public static string Get(string s, params object[] ps)
 		{
@@ -31,7 +32,7 @@ namespace Cue
 	}
 
 
-	class Sexes
+	static class Sexes
 	{
 		public const int Any = 0;
 		public const int Male = 1;
@@ -77,7 +78,41 @@ namespace Cue
 	}
 
 
-	class U
+	static class HashHelper
+	{
+		public static int GetHashCode<T1, T2>(T1 arg1, T2 arg2)
+		{
+			unchecked
+			{
+				return 31 * arg1.GetHashCode() + arg2.GetHashCode();
+			}
+		}
+
+		public static int GetHashCode<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
+		{
+			unchecked
+			{
+				int hash = arg1.GetHashCode();
+				hash = 31 * hash + arg2.GetHashCode();
+				return 31 * hash + arg3.GetHashCode();
+			}
+		}
+
+		public static int GetHashCode<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3,
+			T4 arg4)
+		{
+			unchecked
+			{
+				int hash = arg1.GetHashCode();
+				hash = 31 * hash + arg2.GetHashCode();
+				hash = 31 * hash + arg3.GetHashCode();
+				return 31 * hash + arg4.GetHashCode();
+			}
+		}
+	}
+
+
+	static class U
 	{
 		private static float lastErrorTime_ = 0;
 		private static int errorCount_ = 0;
@@ -156,6 +191,20 @@ namespace Cue
 				return "(none)";
 			else
 				return b.ToString("0.0");
+		}
+
+		public static void Shuffle<T>(IList<T> list)
+		{
+			int n = list.Count;
+
+			while (n > 1)
+			{
+				n--;
+				int k = RandomInt(0, n);
+				T value = list[k];
+				list[k] = list[n];
+				list[n] = value;
+			}
 		}
 	}
 
@@ -482,10 +531,15 @@ namespace Cue
 			get { return U.Clamp(elapsed_ / current_, 0, 1); }
 		}
 
+		public void SetRange(float min, float max)
+		{
+			Minimum = min;
+			Maximum = max;
+		}
+
 		public void SetRange(Pair<float, float> p)
 		{
-			Minimum = p.first;
-			Maximum = p.second;
+			SetRange(p.first, p.second);
 		}
 
 		public void Reset()
@@ -632,6 +686,154 @@ namespace Cue
 		private float Interpolate(float start, float end, float f)
 		{
 			return start + (end - start) * easing_.Magnitude(f);
+		}
+	}
+
+
+	class CircularIndex
+	{
+		private int i_ = -1;
+		protected IList e_;
+
+		public CircularIndex(IList e)
+		{
+			e_ = e;
+		}
+
+		public virtual int Index
+		{
+			get { return i_; }
+		}
+
+		public bool HasIndex
+		{
+			get { return i_ >= 0 && i_ < e_.Count; }
+		}
+
+		public void Reset()
+		{
+			i_ = -1;
+		}
+
+		public virtual void Next(Func<int, bool> f)
+		{
+			int count = e_.Count;
+
+			if (count == 0)
+			{
+				i_ = -1;
+			}
+			else
+			{
+				if (i_ == -1)
+				{
+					i_ = 0;
+				}
+				else
+				{
+					++i_;
+					if (i_ >= count)
+					{
+						WentAround();
+						i_ = 0;
+					}
+				}
+
+
+				var start = i_;
+				bool wentAround = false;
+
+				for (; ; )
+				{
+					if (f(i_))
+						break;
+
+					++i_;
+					if (i_ >= count)
+					{
+						i_ = 0;
+						WentAround();
+						wentAround = true;
+					}
+
+					if (i_ >= start && wentAround)
+					{
+						i_ = -1;
+						break;
+					}
+				}
+			}
+		}
+
+		protected virtual void WentAround()
+		{
+			// no-op
+		}
+	}
+
+
+	class ShuffledIndex : CircularIndex
+	{
+		private List<int> order_ = new List<int>();
+
+		public ShuffledIndex(IList e)
+			: base(e)
+		{
+		}
+
+		public override int Index
+		{
+			get
+			{
+				if (HasIndex)
+					return order_[base.Index];
+				else
+					return -1;
+			}
+		}
+
+		public override void Next(Func<int, bool> f)
+		{
+			if (order_.Count != e_.Count)
+				Shuffle();
+
+			base.Next((i) => f(order_[i]));
+		}
+
+		public static void Shuffle(List<int> list, int count)
+		{
+			if (count == 0)
+			{
+				list.Clear();
+				return;
+			}
+
+			var last = -1;
+			if (list.Count > 0)
+				last = list[list.Count - 1];
+
+			list.Clear();
+			for (int i = 0; i < count; ++i)
+				list.Add(i);
+
+			U.Shuffle(list);
+
+			if (list[0] == last)
+			{
+				var mid = list.Count / 2;
+				list[0] = list[mid];
+				list[mid] = last;
+			}
+		}
+
+		public void Shuffle()
+		{
+			Shuffle(order_, e_.Count);
+		}
+
+		protected override void WentAround()
+		{
+			Shuffle();
 		}
 	}
 }

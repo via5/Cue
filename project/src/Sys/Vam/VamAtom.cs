@@ -69,6 +69,11 @@ namespace Cue.W
 		{
 			get { return W.VamU.Direction(rb_.rotation); }
 		}
+
+		public override string ToString()
+		{
+			return $"rb {rb_.name}";
+		}
 	}
 
 
@@ -128,6 +133,11 @@ namespace Cue.W
 		public override Vector3 Direction
 		{
 			get { return W.VamU.Direction(c_.transform.rotation); }
+		}
+
+		public override string ToString()
+		{
+			return $"collider {c_.name}";
 		}
 	}
 
@@ -203,6 +213,11 @@ namespace Cue.W
 				else
 					return W.VamU.Direction(rb_.rotation);
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"trigger {trigger_.displayName}";
 		}
 	}
 

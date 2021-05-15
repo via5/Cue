@@ -821,6 +821,12 @@ namespace Cue.W
 			return FromUnity(UnityEngine.Quaternion.Inverse(q) * ToUnity(v));
 		}
 
+		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
+		{
+			return FromUnity(
+				UnityEngine.Vector3.Lerp(ToUnity(a), ToUnity(b), p));
+		}
+
 
 		public static bool TestPlanesAABB(Plane[] planes, Box box)
 		{

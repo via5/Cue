@@ -16,6 +16,16 @@ namespace Cue
 		public Ticker ui = new Ticker();
 	}
 
+
+	class Options
+	{
+		public bool AllowMovement
+		{
+			get { return false; }
+		}
+	}
+
+
 	class Cue
 	{
 		private static Cue instance_ = null;
@@ -24,6 +34,7 @@ namespace Cue
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> allObjects_ = new List<IObject>();
 		private readonly UI ui_;
+		private readonly Options options_ = new Options();
 		private readonly Tickers tickers_ = new Tickers();
 
 		private Person player_ = null;
@@ -48,6 +59,7 @@ namespace Cue
 		public List<IObject> Objects { get { return objects_; } }
 		public List<Person> Persons { get { return persons_; } }
 		public UI UI { get { return ui_; } }
+		public Options Options { get { return options_; } }
 
 		public Person Player
 		{
@@ -174,8 +186,11 @@ namespace Cue
 			{
 				var p = persons_[i];
 
-				if (i < spawnPoints.Count)
-					p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
+				if (Options.AllowMovement)
+				{
+					if (i < spawnPoints.Count)
+						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
+				}
 
 				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
@@ -186,6 +201,7 @@ namespace Cue
 					p.AI.EventsEnabled = false;
 					p.AI.InteractionsEnabled = false;
 				}
+
 
 				p.Atom.Init();
 			}

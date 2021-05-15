@@ -529,8 +529,9 @@ namespace Cue.W
 				}
 
 				log_.Info("creating agent");
-				MoveToNavMesh();
 
+				if (Cue.Instance.Options.AllowMovement)
+					MoveToNavMesh();
 
 				agent_ = atom_.Atom.mainController.gameObject.GetComponent<NavMeshAgent>();
 				if (agent_ == null)

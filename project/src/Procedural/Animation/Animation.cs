@@ -52,13 +52,14 @@ namespace Cue.Proc
 				steps_[i].Reset();
 		}
 
+		public void FixedUpdate(float s)
+		{
+			steps_[0].FixedUpdate(s);
+		}
+
 		public void Update(float s)
 		{
 			steps_[0].Update(s);
-		}
-
-		public void FixedUpdate(float s)
-		{
 		}
 
 		public override string ToString()

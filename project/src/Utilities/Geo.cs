@@ -45,6 +45,20 @@ namespace Cue
 			}
 		}
 
+		public override bool Equals(object o)
+		{
+			if (!(o is Vector3))
+				return false;
+
+			var r = (Vector3)o;
+			return (this == r);
+		}
+
+		public override int GetHashCode()
+		{
+			return HashHelper.GetHashCode(X, Y, Z);
+		}
+
 		public override string ToString()
 		{
 			return X.ToString("0.00") + "," + Y.ToString("0.00") + "," + Z.ToString("0.00");
@@ -78,6 +92,16 @@ namespace Cue
 		public static Vector3 operator -(Vector3 v)
 		{
 			return new Vector3(-v.X, -v.Y, -v.Z);
+		}
+
+		public static bool operator ==(Vector3 a, Vector3 b)
+		{
+			return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+		}
+
+		public static bool operator !=(Vector3 a, Vector3 b)
+		{
+			return a.X != b.X && a.Y != b.Y && a.Z != b.Z;
 		}
 
 		public static float Distance(Vector3 a, Vector3 b)
@@ -129,6 +153,12 @@ namespace Cue
 		{
 			// todo
 			return W.VamU.RotateInv(v, dir);
+		}
+
+		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
+		{
+			// todo
+			return W.VamU.Lerp(a, b, p);
 		}
 
 		public static float NormalizeAngle(float degrees)
@@ -560,6 +590,16 @@ namespace Cue
 		public static Frustum Zero
 		{
 			get { return new Frustum(Vector3.Zero, Vector3.Zero); }
+		}
+
+		public bool Empty
+		{
+			get
+			{
+				return
+					NearSize() == Vector3.Zero &&
+					FarSize() == Vector3.Zero;
+			}
 		}
 
 		public Frustum[] Split(int xcount, int ycount)

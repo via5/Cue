@@ -222,6 +222,12 @@ namespace Cue
 		{
 			log_.Info("playing " + a.ToString());
 
+			if (!Cue.Instance.Options.AllowMovement)
+			{
+				Cue.LogVerbose("not playing animation, movement not allowed");
+				return true;
+			}
+
 			if (!CanPlay(a, flags, false))
 				return false;
 

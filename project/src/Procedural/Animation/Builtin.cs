@@ -8,9 +8,12 @@ namespace Cue.Proc
 		{
 			var list = new List<Animation>();
 
-			list.Add(Stand(PersonState.Walking));
-			list.Add(Stand(PersonState.Standing));
-			list.Add(StandIdle());
+			if (Cue.Instance.Options.AllowMovement)
+			{
+				list.Add(Stand(PersonState.Walking));
+				list.Add(Stand(PersonState.Standing));
+				list.Add(StandIdle());
+			}
 
 			return list;
 		}
@@ -40,7 +43,11 @@ namespace Cue.Proc
 
 			var s = a.AddStep();
 
-			s.AddForce("hip", new Vector3(100, 0, 0), 1);
+			s.AddForce(
+				"hip",
+				new Vector3(-100, 0, 0),
+				new Vector3(100, 0, 0),
+				new Duration(1, 5));
 
 			return new Animation(
 				Animation.IdleType, PersonState.None, PersonState.None,

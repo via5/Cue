@@ -76,7 +76,7 @@ namespace Cue.Proc
 			return rt * rt * s + 2 * rt * t * p + t * t * e;
 		}
 
-		public void Update(float s)
+		public void FixedUpdate(float s)
 		{
 			if (fc_ == null)
 			{
@@ -106,6 +106,10 @@ namespace Cue.Proc
 
 			if (t >= 1)
 				done_ = true;
+		}
+
+		public void Update(float s)
+		{
 		}
 	}
 }
