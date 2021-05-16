@@ -211,15 +211,29 @@ namespace Cue.W
 
 	class EyesBodyPart : VamBodyPart
 	{
-		private EyeCenter c_;
+		private Transform lEye_ = null;
+		private Transform rEye_ = null;
 		private Rigidbody head_;
 
 		public EyesBodyPart(VamAtom a)
 			: base(a, BodyParts.Eyes)
 		{
-			c_ = a.Atom.GetComponentInChildren<EyeCenter>();
-			if (c_ == null)
-				Cue.LogError($"{a.ID} has no EyeCenter");
+			foreach (var t in a.Atom.GetComponentsInChildren<DAZBone>())
+			{
+				if (t.name == "lEye")
+					lEye_ = t.transform;
+				else if (t.name == "rEye")
+					rEye_ = t.transform;
+
+				if (lEye_ != null && rEye_ != null)
+					break;
+			}
+
+			if (lEye_ == null)
+				Cue.LogError($"{a.ID} has no left eye");
+
+			if (rEye_ == null)
+				Cue.LogError($"{a.ID} has no right eye");
 
 			head_ = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "head");
 			if (head_== null)
@@ -228,7 +242,7 @@ namespace Cue.W
 
 		public override Transform Transform
 		{
-			get { return c_.transform; }
+			get { return lEye_; }
 		}
 
 		public override bool CanTrigger { get { return false; } }
@@ -240,10 +254,14 @@ namespace Cue.W
 		{
 			get
 			{
-				if (c_ == null)
-					return Vector3.Zero;
+				if (atom_.Possessed)
+					return Cue.Instance.Sys.Camera;
+				else if (lEye_ != null && rEye_ != null)
+					return VamU.FromUnity((lEye_.position + rEye_.position) / 2);
+				else if (head_ != null)
+					return VamU.FromUnity(head_.transform.position) + new Vector3(0, 0.05f, 0);
 				else
-					return VamU.FromUnity(c_.transform.position);
+					return Vector3.Zero;
 			}
 		}
 
@@ -256,6 +274,11 @@ namespace Cue.W
 				else
 					return W.VamU.Direction(head_.rotation);
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"eyes {Position}";
 		}
 	}
 
@@ -418,6 +441,16 @@ namespace Cue.W
 			list.Add(GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
 
 			list.Add(new EyesBodyPart(this));
+
+			if (Sex == Sexes.Male)
+				list.Add(GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
+			else
+				list.Add(GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", ""));
+
+			if (Sex == Sexes.Male)
+				list.Add(GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
+			else
+				list.Add(null);
 
 			return list;
 		}

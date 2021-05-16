@@ -137,6 +137,8 @@ namespace Cue
 	interface IHandjob
 	{
 		bool Active { get; }
+		Person Target { get; }
+
 		void Start(Person target);
 		void Stop();
 		void Update(float s);
@@ -146,6 +148,8 @@ namespace Cue
 	interface IBlowjob
 	{
 		bool Active { get; }
+		Person Target { get; }
+
 		void Start(Person target);
 		void Stop();
 		void Update(float s);

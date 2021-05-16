@@ -98,6 +98,7 @@
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Interactions.cs" />
     <Compile Include="src\AI\Personality.cs" />
+    <Compile Include="src\AI\RandomLookAt.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Events\Event.cs" />
     <Compile Include="src\Events\Lying.cs" />

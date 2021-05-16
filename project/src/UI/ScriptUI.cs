@@ -464,6 +464,7 @@ namespace Cue
 		private VUI.Label moodMouthRate_ = new VUI.Label();
 		private VUI.Label moodBreastsRate_ = new VUI.Label();
 		private VUI.Label moodGenitalsRate_ = new VUI.Label();
+		private VUI.Label moodPenetration_ = new VUI.Label();
 		private VUI.Label moodDecayRate_ = new VUI.Label();
 		private VUI.Label moodRateAdjust_ = new VUI.Label();
 
@@ -512,6 +513,9 @@ namespace Cue
 
 			state.Add(new VUI.Label("Genitals"));
 			state.Add(moodGenitalsRate_);
+
+			state.Add(new VUI.Label("Penetration"));
+			state.Add(moodPenetration_);
 
 			state.Add(new VUI.Label("Decay"));
 			state.Add(moodDecayRate_);
@@ -572,11 +576,12 @@ namespace Cue
 			var ss = person_.Personality.Sensitivity;
 
 			moodState_.Text = person_.Personality.StateString;
-			moodExcitement_.Text = person_.Excitement.Value.ToString("0.00000");
-			moodLastRate_.Text = ss.Change.ToString("0.00000");
+			moodExcitement_.Text = person_.Excitement.ToString();
+			moodLastRate_.Text = ss.Change.ToString("0.000000");
 			moodMouthRate_.Text = ss.MouthRate.ToString();
 			moodBreastsRate_.Text = ss.BreastsRate.ToString();
 			moodGenitalsRate_.Text = ss.GenitalsRate.ToString();
+			moodPenetration_.Text = ss.Penetration.ToString();
 			moodDecayRate_.Text = ss.DecayRate.ToString();
 			moodRateAdjust_.Text = ss.RateAdjust.ToString();
 		}
@@ -591,8 +596,8 @@ namespace Cue
 
 		private void OnForceExcitement(float f)
 		{
-			forceExcitement_.Checked = true;
-			person_.Excitement.ForceValue(f);
+			if (forceExcitement_.Checked)
+				person_.Excitement.ForceValue(f);
 		}
 	}
 

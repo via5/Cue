@@ -10,6 +10,8 @@ namespace Cue
 		public const int Head = 0;
 		public const int Lips = 1;
 		public const int Mouth = 2;
+
+		// female
 		public const int LeftBreast = 3;
 		public const int RightBreast = 4;
 		public const int Labia = 5;
@@ -43,8 +45,12 @@ namespace Cue
 		public const int RightFoot = 28;
 
 		public const int Eyes = 29;
+		public const int Genitals = 30;
 
-		public const int Count = 30;
+		// male
+		public const int Pectorals = 31;
+
+		public const int Count = 32;
 
 
 		private static string[] names_ = new string[]
@@ -60,7 +66,7 @@ namespace Cue
 			"leftthigh", "leftshin", "leftfoot",
 			"rightthigh", "rightshin", "rightfoot",
 
-			"eyes"
+			"eyes", "genitals", "pectorals"
 		};
 
 		public static string ToString(int t)
@@ -353,6 +359,28 @@ namespace Cue
 				return 1;
 			else
 				return Math.Max(v - s * decay_, 0);
+		}
+
+		public override string ToString()
+		{
+			string s = $"{excitement_:0.00000}";
+
+			if (forcedExcitement_ >= 0)
+				s += $" (forced {forcedExcitement_:0.00000})";
+
+			return s;
+		}
+
+		public float Penetration
+		{
+			get
+			{
+				return Math.Min(1,
+					parts_[BodyParts.Labia] * 0.1f +
+					parts_[BodyParts.Vagina] * 0.3f +
+					parts_[BodyParts.DeepVagina] * 1 +
+					parts_[BodyParts.DeeperVagina] * 1);
+			}
 		}
 
 		public float Genitals

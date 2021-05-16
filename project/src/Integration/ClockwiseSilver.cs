@@ -368,6 +368,18 @@ namespace Cue
 			get { return running_.Value; }
 		}
 
+		public Person Target
+		{
+			get
+			{
+				var id = male_.Value;
+				if (id != "")
+					return Cue.Instance.FindPerson(id);
+
+				return null;
+			}
+		}
+
 		public void Start(Person target)
 		{
 			enabled_.Value = true;
@@ -462,6 +474,18 @@ namespace Cue
 		public bool Active
 		{
 			get { return running_.Value; }
+		}
+
+		public Person Target
+		{
+			get
+			{
+				var id = male_.Value;
+				if (id != "")
+					return Cue.Instance.FindPerson(id);
+
+				return null;
+			}
 		}
 
 		public void Start(Person target)

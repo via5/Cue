@@ -113,9 +113,10 @@ namespace Cue
 									person_.Personality.LookAtRandomGazeDuration);
 
 								gazer_.Duration = gazeDuration_.Next();
-								eyes_.LookAt(random_.Position);
 							}
 						}
+
+						eyes_.LookAt(random_.Position);
 					}
 
 					break;
@@ -205,7 +206,7 @@ namespace Cue
 					return "camera";
 
 				case LookatObject:
-					return $"object {object_.ID} {object_.EyeInterest}";
+					return $"object {object_?.ID} {object_?.EyeInterest}";
 
 				case LookatRandom:
 					return random_.ToString();
@@ -228,79 +229,6 @@ namespace Cue
 				lookat_ = i;
 				randomInhibited_ = false;
 			}
-		}
-	}
-
-
-	interface IRandomTarget
-	{
-		Vector3 Position { get; }
-		void Reset();
-		bool NextPosition(RandomLookAt r);
-	}
-
-
-	class BodyPartTarget : IRandomTarget
-	{
-		private BodyPart part_;
-
-		public BodyPartTarget(BodyPart p)
-		{
-			part_ = p;
-		}
-
-		public Vector3 Position
-		{
-			get { return part_.Position; }
-		}
-
-		public void Reset()
-		{
-		}
-
-		public bool NextPosition(RandomLookAt r)
-		{
-			return r.CanLookAt(part_.Position);
-		}
-
-		public override string ToString()
-		{
-			return $"bodypart {part_}";
-		}
-	}
-
-
-	class RandomPointTarget : IRandomTarget
-	{
-		private Vector3 pos_ = Vector3.Zero;
-
-		public Vector3 Position
-		{
-			get { return pos_; }
-		}
-
-		public void Reset()
-		{
-		}
-
-		public bool NextPosition(RandomLookAt r)
-		{
-			var f = r.RandomAvailableFrustum();
-			if (f.Empty)
-				return false;
-
-			var rp = f.RandomPoint();
-
-			pos_ =
-				r.Person.Body.Get(BodyParts.Eyes).Position +
-				Vector3.Rotate(rp, r.Person.Body.Get(BodyParts.Chest).Direction);
-
-			return true;
-		}
-
-		public override string ToString()
-		{
-			return $"point {pos_}";
 		}
 	}
 
@@ -328,23 +256,20 @@ namespace Cue
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
 
-		private int[] interestingBodyParts_ = new int[]
-		{
-			BodyParts.Eyes, BodyParts.Hips, BodyParts.Chest
-		};
-
 		private Person person_;
+		private Logger log_;
 		private IObject avoid_ = null;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
 		private Box avoidBox_ = Box.Zero;
 		private RandomLookAtRenderer render_ = null;
 		private Duration delay_ = new Duration(0, 0);
 		private List<IRandomTarget> targets_ = new List<IRandomTarget>();
-		private ShuffledIndex currentTarget_;
+		private int currentTarget_ = -1;
 
 		public RandomLookAt(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.AI, person_, "RandomLookAt");
 
 			var main = new Frustum(Near, Far);
 			var fs = main.Split(XCount, YCount);
@@ -352,7 +277,16 @@ namespace Cue
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
 
-			currentTarget_ = new ShuffledIndex(targets_);
+			targets_.Add(new RandomPointTarget());
+			targets_.Add(new SexTarget());
+			targets_.Add(new BodyPartsTarget(new int[]{
+				BodyParts.LeftBreast,
+				BodyParts.RightBreast,
+				BodyParts.Pectorals,
+				BodyParts.Genitals
+			}));
+
+			targets_.Add(new EyeContactTarget());
 
 			//render_ = new RandomLookAtRenderer(this);
 		}
@@ -365,6 +299,11 @@ namespace Cue
 		public Person Person
 		{
 			get { return person_; }
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public FrustumInfo GetFrustum(int i)
@@ -387,8 +326,8 @@ namespace Cue
 		{
 			get
 			{
-				if (currentTarget_.HasIndex)
-					return targets_[currentTarget_.Index].Position;
+				if (currentTarget_ >= 0 && currentTarget_ < targets_.Count)
+					return targets_[currentTarget_].Position;
 				else
 					return Vector3.Zero;
 			}
@@ -412,7 +351,7 @@ namespace Cue
 
 		public void Reset()
 		{
-			currentTarget_.Reset();
+			currentTarget_ = -1;
 
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Reset();
@@ -420,21 +359,18 @@ namespace Cue
 
 		public bool Update(float s)
 		{
-			if (targets_.Count == 0)
-				GetTargets();
-
-			delay_.SetRange(person_.Personality.LookAtRandomInterval);
-			//delay_.SetRange(1, 1);
+			//delay_.SetRange(person_.Personality.LookAtRandomInterval);
+			delay_.SetRange(1, 1);
 			delay_.Update(s);
 
-			if (delay_.Finished || !currentTarget_.HasIndex)
+			if (delay_.Finished || currentTarget_ < 0 || currentTarget_ >= targets_.Count)
 			{
 				NextTarget();
 				return true;
 			}
-			else if (currentTarget_.HasIndex)
+			else if (currentTarget_ >= 0 && currentTarget_ < targets_.Count)
 			{
-				if (!CanLookAt(targets_[currentTarget_.Index].Position))
+				if (!CanLookAt(targets_[currentTarget_].Position))
 				{
 					NextTarget();
 					return true;
@@ -450,8 +386,8 @@ namespace Cue
 		{
 			string s = "random: ";
 
-			if (currentTarget_.HasIndex)
-				s += targets_[currentTarget_.Index].ToString();
+			if (currentTarget_ >= 0 && currentTarget_ < targets_.Count)
+				s += targets_[currentTarget_].ToString();
 			else
 				s += "no target";
 
@@ -461,37 +397,48 @@ namespace Cue
 			return s;
 		}
 
-		private void GetTargets()
-		{
-			targets_.Clear();
-
-			targets_.Add(new RandomPointTarget());
-
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
-			{
-				if (Cue.Instance.Persons[i] == person_)
-					continue;
-
-				for (int ii = 0; ii < interestingBodyParts_.Length; ++ii)
-				{
-					targets_.Add(new BodyPartTarget(
-						Cue.Instance.Persons[i].Body.Get(interestingBodyParts_[ii])));
-				}
-			}
-		}
-
 		private void NextTarget()
 		{
 			ResetFrustums();
 			UpdateFrustums();
 
-			currentTarget_.Next((i) =>
-			{
-				if (!targets_[i].NextPosition(this))
-					return false;
 
-				return true;
-			});
+			float[] weights = new float[targets_.Count];
+			float total = 0;
+
+			for (int i = 0; i < targets_.Count; ++i)
+			{
+				weights[i] = person_.Personality.GazeRandomTargetWeight(
+					targets_[i].Type);
+
+				total += weights[i];
+			}
+
+
+			for (int i = 0; i < 10; ++i)
+			{
+				var r = U.RandomFloat(0, total);
+				for (int j = 0; j < weights.Length; ++j)
+				{
+					if (r < weights[j])
+					{
+						log_.Verbose($"trying {(object)targets_[j]}");
+
+						if (targets_[j].NextPosition(this))
+						{
+							log_.Verbose($"picked {targets_[j]}");
+							currentTarget_ = j;
+							return;
+						}
+
+						break;
+					}
+
+					r -= weights[j];
+				}
+			}
+
+			log_.Error($"no valid target");
 		}
 
 		private void ResetFrustums()

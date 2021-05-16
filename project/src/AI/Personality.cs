@@ -5,6 +5,7 @@
 		Pair<float, float> LookAtRandomInterval { get; }
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
+		float GazeRandomTargetWeight(int targetType);
 
 		string Name { get; }
 		string StateString{ get; }
@@ -18,6 +19,7 @@
 		private Person person_;
 
 		private float change_ = 0;
+		private float penetration_ = 0;
 
 		private float mouthRate_ = 0.001f;
 		private float breastsRate_ = 0.01f;
@@ -35,6 +37,7 @@
 		public float MouthRate { get { return mouthRate_; } }
 		public float BreastsRate { get { return breastsRate_; } }
 		public float GenitalsRate { get { return genitalsRate_; } }
+		public float Penetration { get { return penetration_; } }
 		public float DecayRate { get { return decayRate_; } }
 		public float RateAdjust { get { return rateAdjust_; } }
 
@@ -50,6 +53,12 @@
 				rate = decayRate_;
 
 			change_ = rate * s * rateAdjust_;
+
+			var p = person_.Excitement.Penetration;
+			if (p > 0)
+				penetration_ = U.Clamp(penetration_ + s * p, 0, 1);
+			else
+				penetration_ = U.Clamp(penetration_ - s / 5, 0, 1); ;
 		}
 
 		public override string ToString()
@@ -63,7 +72,7 @@
 			else
 				s += "+";
 
-			s += change_.ToString("0.000");
+			s += change_.ToString("0.00000");
 
 			return s;
 		}
@@ -117,6 +126,18 @@
 			get { return 1; }
 		}
 
+		public virtual float GazeRandomTargetWeight(int targetType)
+		{
+			switch (targetType)
+			{
+				case RandomTargetTypes.Sex: return 0;
+				case RandomTargetTypes.Body: return 0;
+				case RandomTargetTypes.Eyes: return 5;
+				case RandomTargetTypes.Random: return 0;
+				default: return 1;
+			}
+		}
+
 		public virtual void Update(float s)
 		{
 			if (!inited_)
@@ -126,9 +147,16 @@
 			}
 
 			sensitivity_.Update(s);
+
 			person_.Excitement.Value += sensitivity_.Change;
-			person_.Breathing.Intensity = person_.Excitement.Value;
-			person_.Expression.Set(Expressions.Pleasure, person_.Excitement.Value);
+
+			var intensity = U.Clamp(
+				person_.Excitement.Value +
+				U.Clamp(sensitivity_.Penetration, 0, 0.7f),
+				0, 1);
+
+			person_.Breathing.Intensity = intensity;
+			person_.Expression.Set(Expressions.Pleasure, intensity);
 
 			bool close = person_.Body.PlayerIsClose;
 			if (close != wasClose_)
@@ -173,6 +201,9 @@
 			}
 			else
 			{
+				if (person_.CanMoveHead)
+					person_.Gaze.LookAtRandom();
+
 				StateString = "idle";
 				SetIdle();
 			}
@@ -270,6 +301,18 @@
 					return new Pair<float, float>(0.3f, 1.5f);
 				else
 					return new Pair<float, float>(1, 3);
+			}
+		}
+
+		public override float GazeRandomTargetWeight(int targetType)
+		{
+			switch (targetType)
+			{
+				case RandomTargetTypes.Sex: return 1;
+				case RandomTargetTypes.Body: return 2;
+				case RandomTargetTypes.Eyes: return 5;
+				case RandomTargetTypes.Random: return 10;
+				default: return 1;
 			}
 		}
 

@@ -88,14 +88,14 @@ namespace Cue
 
 		public bool InteractWith(IObject o)
 		{
-			if (o is Person)
-			{
-				log_.Info("target is person, calling");
-				person_.UnlockSlot();
-				person_.MakeIdle();
-				person_.PushAction(new CallAction(person_, o as Person));
-				return true;
-			}
+			//if (o is Person)
+			//{
+			//	log_.Info("target is person, calling");
+			//	person_.UnlockSlot();
+			//	person_.MakeIdle();
+			//	person_.PushAction(new CallAction(person_, o as Person));
+			//	return true;
+			//}
 
 			if (!person_.TryLockSlot(o))
 			{

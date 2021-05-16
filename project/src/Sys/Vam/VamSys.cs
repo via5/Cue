@@ -318,6 +318,24 @@ namespace Cue.W
 				return pluginPath_ + "\\res\\" + path;
 		}
 
+		public void ForEachChild(Component c, Action<Transform> f)
+		{
+			ForEachChild(c.transform, f);
+		}
+
+		public void ForEachChild(GameObject o, Action<Transform> f)
+		{
+			ForEachChild(o.transform, f);
+		}
+
+		public void ForEachChild(Transform t, Action<Transform> f)
+		{
+			f(t);
+
+			foreach (Transform c in t)
+				ForEachChild(c, f);
+		}
+
 		public GameObject FindChildRecursive(Component c, string name)
 		{
 			return FindChildRecursive(c.gameObject, name);
