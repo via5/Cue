@@ -6,6 +6,7 @@
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
 		float GazeRandomTargetWeight(int targetType);
+		IObject GazeAvoid();
 
 		string Name { get; }
 		string StateString{ get; }
@@ -126,14 +127,19 @@
 			get { return 1; }
 		}
 
+		public virtual IObject GazeAvoid()
+		{
+			return null;
+		}
+
 		public virtual float GazeRandomTargetWeight(int targetType)
 		{
 			switch (targetType)
 			{
-				case RandomTargetTypes.Sex: return 0;
-				case RandomTargetTypes.Body: return 0;
+				case RandomTargetTypes.Sex: return 5;
+				case RandomTargetTypes.Body: return 2;
 				case RandomTargetTypes.Eyes: return 5;
-				case RandomTargetTypes.Random: return 0;
+				case RandomTargetTypes.Random: return 1;
 				default: return 1;
 			}
 		}
@@ -193,17 +199,11 @@
 		{
 			if (b)
 			{
-				if (person_.CanMoveHead)
-					person_.Gaze.LookAt(Cue.Instance.Player);
-
 				StateString = "happy";
 				SetHappy();
 			}
 			else
 			{
-				if (person_.CanMoveHead)
-					person_.Gaze.LookAtRandom();
-
 				StateString = "idle";
 				SetIdle();
 			}
@@ -316,25 +316,25 @@
 			}
 		}
 
+		public override IObject GazeAvoid()
+		{
+			if (angry_)
+				return Cue.Instance.Player;
+
+			return null;
+		}
+
 		protected override void SetClose(bool b)
 		{
 			if (b)
 			{
 				StateString = "angry";
-
-				if (person_.CanMoveHead)
-					person_.Gaze.Avoid(Cue.Instance.Player);
-
 				SetAngry();
 				angry_ = true;
 			}
 			else
 			{
 				StateString = "idle";
-
-				if (person_.CanMoveHead)
-					person_.Gaze.LookAtRandom();
-
 				SetIdle();
 				angry_ = false;
 			}

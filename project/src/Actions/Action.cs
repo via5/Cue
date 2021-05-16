@@ -214,14 +214,12 @@ namespace Cue
 			{
 				log_.Info($"{p} close enough, rotating only");
 				var bearing = Vector3.Bearing(caller_.Position - p.Position);
-				p.MoveTo(p.Position, bearing);
-				p.Gaze.LookAt(caller_);
+				p.MoveTo(caller_, p.Position, bearing);
 			}
 			else
 			{
 				log_.Info($"{p} moving to {caller_}");
-				p.MoveTo(target, caller_.Bearing + 180);
-				p.Gaze.LookAt(caller_);
+				p.MoveTo(caller_, target, caller_.Bearing + 180);
 			}
 
 			return true;
@@ -249,19 +247,21 @@ namespace Cue
 
 	class MoveAction : BasicAction
 	{
+		private IObject target_;
 		private Vector3 to_;
 		private float finalBearing_;
 
-		public MoveAction(IObject o, Vector3 to, float finalBearing)
+		public MoveAction(IObject o, IObject target, Vector3 to, float finalBearing)
 			: base(o, "Move")
 		{
+			target_ = target;
 			to_ = to;
 			finalBearing_ = finalBearing;
 		}
 
 		protected override bool DoStart(float s)
 		{
-			Object.MoveTo(to_, finalBearing_);
+			Object.MoveTo(target_, to_, finalBearing_);
 			return Object.HasTarget;
 		}
 
@@ -289,7 +289,7 @@ namespace Cue
 
 		protected override bool DoStart(float s)
 		{
-			Object.MoveTo(chair_.Position, chair_.Bearing);
+			Object.MoveTo(chair_.ParentObject, chair_.Position, chair_.Bearing);
 			moving_ = true;
 			return true;
 		}

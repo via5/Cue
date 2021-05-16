@@ -192,7 +192,6 @@ namespace Cue
 						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 				}
 
-				p.Gaze.LookAtDefault();
 				p.SetState(PersonState.Standing);
 				p.Clothing.Init();
 
@@ -332,12 +331,6 @@ namespace Cue
 		private void SetPlayer(Person p)
 		{
 			player_ = p;
-
-			for (int i = 0; i < persons_.Count; ++i)
-			{
-				if (!persons_[i].Gaze.HasInterestingTarget)
-					persons_[i].Gaze.LookAtDefault();
-			}
 		}
 
 		private void DoUpdateUI(float s)

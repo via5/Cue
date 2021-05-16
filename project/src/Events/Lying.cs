@@ -23,7 +23,10 @@
 				case NoState:
 				{
 					log_.Info("going to sleep");
-					person_.PushAction(new MoveAction(person_, o_.Position, BasicObject.NoBearing));
+
+					person_.PushAction(new MoveAction(
+						o_, person_, o_.Position, BasicObject.NoBearing));
+
 					state_ = Moving;
 					elapsed_ = 0;
 					break;

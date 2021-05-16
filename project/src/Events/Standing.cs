@@ -59,8 +59,8 @@ namespace Cue
 							return false;
 					}
 
-					person_.Gaze.LookInFront();
-					person_.PushAction(new MoveAction(person_, slot_.Position, slot_.Bearing));
+					person_.PushAction(new MoveAction(
+						person_, slot_.ParentObject, slot_.Position, slot_.Bearing));
 					state_ = Moving;
 
 					break;
@@ -87,8 +87,6 @@ namespace Cue
 								PersonState.Standing, person_.Sex)));
 
 						person_.PushAction(cc);
-						person_.Gaze.LookAtRandom();
-
 						state_ = Idling;
 					}
 

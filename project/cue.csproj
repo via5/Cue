@@ -96,9 +96,10 @@
   <ItemGroup>
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
+    <Compile Include="src\AI\Gaze\Lookat.cs" />
+    <Compile Include="src\AI\Gaze\LookatRandom.cs" />
     <Compile Include="src\AI\Interactions.cs" />
     <Compile Include="src\AI\Personality.cs" />
-    <Compile Include="src\AI\RandomLookAt.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Events\Event.cs" />
     <Compile Include="src\Events\Lying.cs" />
@@ -156,6 +157,7 @@
       <DependentUpon>Easings.tt</DependentUpon>
     </Compile>
     <Compile Include="src\Utilities\Geo.cs" />
+    <Compile Include="src\Utilities\GeoRender.cs" />
     <Compile Include="src\Utilities\Utilities.cs" />
     <Compile Include="src\VUI\BorderLayout.cs" />
     <Compile Include="src\VUI\Button.cs" />

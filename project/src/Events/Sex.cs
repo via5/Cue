@@ -24,7 +24,7 @@
 			{
 				case NoState:
 				{
-					person_.PushAction(new CallAction(person_, receiver_));
+				//	person_.PushAction(new CallAction(person_, receiver_));
 					state_ = CallingState;
 					wait_ = 0;
 
@@ -33,7 +33,7 @@
 
 				case CallingState:
 				{
-					if (person_.Idle)
+					//if (person_.Idle)
 					{
 						if (receiver_.State.Is(PersonState.Sitting))
 						{
@@ -105,7 +105,8 @@
 			{
 				case NoState:
 				{
-					person_.PushAction(new CallAction(person_, receiver_));
+					//person_.PushAction(new CallAction(person_, receiver_));
+					person_.Kisser.Stop();
 					state_ = CallingState;
 					wait_ = 0;
 
@@ -114,7 +115,7 @@
 
 				case CallingState:
 				{
-					if (person_.Idle)
+				//	if (person_.Idle)
 					{
 						person_.SetState(PersonState.Crouching);
 						state_ = CrouchingState;
@@ -188,8 +189,7 @@
 						receiver_.Position +
 						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
 
-					person_.MoveTo(target, receiver_.Bearing + 180);
-					person_.Gaze.LookAt(receiver_);
+					person_.MoveTo(receiver_, target, receiver_.Bearing + 180);
 					state_ = MovingState;
 
 					break;

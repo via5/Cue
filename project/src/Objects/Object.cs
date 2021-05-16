@@ -18,13 +18,14 @@ namespace Cue
 		void SetPaused(bool b);
 
 		bool InteractWith(IObject o);
-		void MoveTo(Vector3 to, float bearing);
-		void MoveToManual(Vector3 to, float bearing);
+		void MoveTo(IObject o, Vector3 to, float bearing);
+		void MoveToManual(IObject o, Vector3 to, float bearing);
 		void MakeIdle();
 		void MakeIdleForMove();
 
 		void TeleportTo(Vector3 to, float bearing);
 		bool HasTarget { get; }
+		IObject MoveTarget{ get; }
 
 		Slots Slots { get; }
 	}
@@ -45,6 +46,7 @@ namespace Cue
 		private float targetBearing_ = NoBearing;
 		private float targetStoppingDistance_ = 0;
 		private int moveState_ = NoMoveState;
+		private IObject moveTarget_ = null;
 
 		private Slots slots_;
 		private Slot locked_ = null;
@@ -265,8 +267,9 @@ namespace Cue
 			return atom_.ID;
 		}
 
-		public void MoveTo(Vector3 to, float bearing)
+		public void MoveTo(IObject o, Vector3 to, float bearing)
 		{
+			moveTarget_ = o;
 			targetStoppingDistance_ = 0;
 			targetPos_ = to;
 
@@ -278,11 +281,11 @@ namespace Cue
 			moveState_ = TentativeMoveState;
 		}
 
-		public void MoveToManual(Vector3 to, float bearing)
+		public void MoveToManual(IObject o, Vector3 to, float bearing)
 		{
 			UnlockSlot();
 			MakeIdleForMove();
-			MoveTo(to, bearing);
+			MoveTo(o, to, bearing);
 
 			// todo
 			targetStoppingDistance_ = 0.1f;
@@ -306,6 +309,11 @@ namespace Cue
 		public bool HasTarget
 		{
 			get { return (moveState_ != NoMoveState); }
+		}
+
+		public IObject MoveTarget
+		{
+			get { return moveTarget_; }
 		}
 
 		protected virtual bool StartMove()

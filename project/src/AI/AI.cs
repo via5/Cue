@@ -116,7 +116,8 @@ namespace Cue
 				if (person_ == Cue.Instance.Player)
 				{
 					person_.PushAction(new SitAction(person_, slot));
-					person_.PushAction(new MoveAction(person_, slot.Position, slot.Bearing));
+					person_.PushAction(new MoveAction(
+						slot.ParentObject, person_, slot.Position, slot.Bearing));
 				}
 				else
 				{
@@ -133,7 +134,8 @@ namespace Cue
 				if (person_ == Cue.Instance.Player)
 				{
 					person_.PushAction(new MakeIdleAction(person_));
-					person_.PushAction(new MoveAction(person_, slot.Position, slot.Bearing));
+					person_.PushAction(new MoveAction(
+						slot.ParentObject, person_, slot.Position, slot.Bearing));
 				}
 				else
 				{

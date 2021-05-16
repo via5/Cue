@@ -297,15 +297,11 @@ namespace Cue
 
 				var target = GetTarget();
 				if (target != null)
-				{
 					log_.Info($"now kissing {target}");
-					person_.Gaze.LookAt(target, false);
-				}
 			}
 			else
 			{
 				log_.Info($"kiss stopped");
-				person_.Gaze.LookAtDefault();
 			}
 
 			wasKissing_ = b;
@@ -495,15 +491,12 @@ namespace Cue
 			if (target != null)
 				male_.Value = target.ID;
 
-			person_.Gaze.LookAt(target, false);
-
 			active_.Value = true;
 		}
 
 		public void Stop()
 		{
 			active_.Value = false;
-			person_.Gaze.LookAtDefault();
 		}
 
 		public void Update(float s)

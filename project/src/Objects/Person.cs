@@ -240,7 +240,10 @@ namespace Cue
 			}
 
 			actions_.Tick(s);
-			gaze_.Update(s);
+
+			if (Cue.Instance.Player != this)
+				gaze_.Update(s);
+
 			Kisser.Update(s);
 			Handjob.Update(s);
 			Blowjob.Update(s);

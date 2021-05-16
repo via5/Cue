@@ -4,7 +4,8 @@ project\src\Actions\Action.cs
 project\src\AI\AI.cs
 project\src\AI\Interactions.cs
 project\src\AI\Personality.cs
-project\src\AI\RandomLookAt.cs
+project\src\AI\Gaze\Lookat.cs
+project\src\AI\Gaze\LookatRandom.cs
 project\src\Events\Event.cs
 project\src\Events\Lying.cs
 project\src\Events\Sex.cs
@@ -56,6 +57,7 @@ project\src\UI\ScriptUI.cs
 project\src\UI\UI.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Geo.cs
+project\src\Utilities\GeoRender.cs
 project\src\Utilities\Utilities.cs
 project\src\VUI\BorderLayout.cs
 project\src\VUI\Button.cs

@@ -168,7 +168,7 @@
 					return true;
 				}
 
-				src.MoveToManual(hit.pos, Vector3.Bearing(hit.pos - src.Position));
+				src.MoveToManual(null, hit.pos, Vector3.Bearing(hit.pos - src.Position));
 				return true;
 			}
 
