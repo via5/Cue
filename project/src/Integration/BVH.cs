@@ -146,6 +146,11 @@ namespace Cue.BVH
             get { return rootY_; }
         }
 
+        public bool ForcesOnly
+        {
+            get { return false; }
+        }
+
         public bool LocalRotations
         {
             get { return localRotations_; }

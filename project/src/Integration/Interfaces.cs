@@ -81,6 +81,7 @@ namespace Cue
 		float InitFrame{ get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
+		bool ForcesOnly { get; }
 	}
 
 	interface IOrgasmer
@@ -137,6 +138,9 @@ namespace Cue
 	interface IHandjob
 	{
 		bool Active { get; }
+		bool LeftUsed { get; }
+		bool RightUsed { get; }
+
 		Person Target { get; }
 
 		void Start(Person target);

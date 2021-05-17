@@ -504,6 +504,11 @@ namespace Cue
 			Next();
 		}
 
+		public Duration(Duration d)
+			: this(d.Minimum, d.Maximum)
+		{
+		}
+
 		public float Minimum
 		{
 			get { return min_; }

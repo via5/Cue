@@ -391,7 +391,7 @@ namespace Cue
 		private int i_ = -1;
 		private const float Delay = 5;
 		private bool playing_ = false;
-		private bool wasClose_ = false;
+		//private bool wasClose_ = false;
 
 		public RandomAnimationAction(IObject o, List<Animation> anims)
 			: base(o, "RandomAnimation")
@@ -420,24 +420,24 @@ namespace Cue
 			}
 
 
-			bool close = p.Body.PlayerIsClose;
-
-			if (close != wasClose_)
-			{
-				if (close)
-				{
-					if (playing_)
-					{
-						//p.Animator.PlayNeutral();
-						playing_ = false;
-					}
-				}
-
-				wasClose_ = close;
-			}
-
-			if (close)
-				return true;
+		//	bool close = p.Body.PlayerIsClose;
+		//
+		//	if (close != wasClose_)
+		//	{
+		//		if (close)
+		//		{
+		//			if (playing_)
+		//			{
+		//				//p.Animator.PlayNeutral();
+		//				playing_ = false;
+		//			}
+		//		}
+		//
+		//		wasClose_ = close;
+		//	}
+		//
+		//	if (close)
+		//		return true;
 
 
 			if (i_ == -1)
@@ -454,7 +454,7 @@ namespace Cue
 				{
 					if (!p.Animator.Playing)
 					{
-						p.Animator.PlayNeutral();
+						//p.Animator.PlayNeutral();
 						playing_ = false;
 					}
 				}

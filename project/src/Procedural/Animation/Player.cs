@@ -9,8 +9,8 @@ namespace Cue.Proc
 		ITarget Clone();
 		void Start(Person p);
 		void Reset();
-		void Update(float s);
 		void FixedUpdate(float s);
+		void Update(float s);
 	}
 
 
@@ -25,6 +25,16 @@ namespace Cue.Proc
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Animation, person_, "ProcPlayer");
+		}
+
+		public ProcAnimation Current
+		{
+			get { return anim_; }
+		}
+
+		public ProcAnimation Proto
+		{
+			get { return proto_; }
 		}
 
 		public bool Playing

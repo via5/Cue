@@ -6,11 +6,13 @@ namespace Cue.Proc
 	class ProcAnimation : IAnimation
 	{
 		private readonly string name_;
+		private bool forcesOnly_;
 		private readonly List<Step> steps_ = new List<Step>();
 
-		public ProcAnimation(string name)
+		public ProcAnimation(string name, bool forcesOnly=false)
 		{
 			name_ = name;
+			forcesOnly_= forcesOnly;
 		}
 
 		public ProcAnimation Clone()
@@ -33,11 +35,21 @@ namespace Cue.Proc
 		public float FirstFrame { get { return -1; } }
 		public float LastFrame { get { return -1; } }
 
+		public bool ForcesOnly
+		{
+			get { return forcesOnly_; }
+		}
+
 		public Step AddStep()
 		{
 			var s = new Step();
 			steps_.Add(s);
 			return s;
+		}
+
+		public List<Step> Steps
+		{
+			get { return steps_; }
 		}
 
 		public void Start(Person p)
@@ -64,7 +76,12 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return name_;
+			string s = name_;
+
+			if (forcesOnly_)
+				s += " (forces only)";
+
+			return s;
 		}
 	}
 }

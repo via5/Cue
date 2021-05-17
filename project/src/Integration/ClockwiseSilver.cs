@@ -364,6 +364,16 @@ namespace Cue
 			get { return running_.Value; }
 		}
 
+		public bool LeftUsed
+		{
+			get { return false; }
+		}
+
+		public bool RightUsed
+		{
+			get { return true; }
+		}
+
 		public Person Target
 		{
 			get
@@ -384,7 +394,7 @@ namespace Cue
 				male_.Value = target.ID;
 
 			// todo
-			hand_.Value = "Right";
+			hand_.Value = "Right";  // also change LeftUsed and RightUsed
 			handX_.Value = 0.03f;
 			handY_.Value = -0.08f;
 			handZ_.Value = 0.00f;

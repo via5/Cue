@@ -94,6 +94,11 @@ namespace Cue
 		public float FirstFrame { get { return -1; } }
 		public float LastFrame { get { return -1; } }
 
+		public bool ForcesOnly
+		{
+			get { return true; }
+		}
+
 		public override string ToString()
 		{
 			return "synergy " + name_;

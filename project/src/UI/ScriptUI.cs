@@ -286,9 +286,9 @@ namespace Cue
 
 			tabs_.Add(new PersonStateTab(person_));
 			tabs_.Add(new PersonAITab(person_));
-			tabs_.Add(new PersonExpressionTab(person_));
+			tabs_.Add(new PersonDumpTab(person_));
 			tabs_.Add(new PersonBodyTab(person_));
-			tabs_.Add(new PersonAnimationTab(person_));
+			tabs_.Add(new PersonAnimationsTab(person_));
 
 			foreach (var t in tabs_)
 				tabsWidget_.AddTab(t.Title, t);
@@ -602,32 +602,28 @@ namespace Cue
 	}
 
 
-	class PersonExpressionTab : Tab
+	class PersonDumpTab : Tab
 	{
 		private Person person_;
-		private Proc.Expression pex_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
-		public PersonExpressionTab(Person p)
+		public PersonDumpTab(Person person)
 		{
-			person_ = p;
+			person_ = person;
 
-			Layout = new VUI.BorderLayout();
+			Layout = new VUI.BorderLayout(10);
 
-			pex_ = p.Expression as Proc.Expression;
-			if (pex_ == null)
-			{
-				Add(new VUI.Label("Not procedural"));
-				return;
-			}
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			p.Add(new VUI.Button("Expression", DumpExpression));
+			p.Add(new VUI.Button("Animation", DumpAnimation));
 
-			Add(new VUI.Button("Refresh", Refresh), VUI.BorderLayout.Top);
+			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
 		}
 
 		public override string Title
 		{
-			get { return "Expression"; }
+			get { return "Dump"; }
 		}
 
 		public override void Update(float s)
@@ -639,11 +635,19 @@ namespace Cue
 			return new string(' ', i * 4);
 		}
 
-		private void Refresh()
+		private void DumpExpression()
 		{
+			var pex = person_.Expression as Proc.Expression;
+			if (pex == null)
+			{
+				list_.Clear();
+				list_.AddItem("not procedural");
+				return;
+			}
+
 			var items = new List<string>();
 
-			foreach (var e in pex_.All)
+			foreach (var e in pex.All)
 			{
 				items.Add(I(1) + e.ToString());
 
@@ -657,6 +661,40 @@ namespace Cue
 						foreach (var line in m.ToString().Split('\n'))
 							items.Add(I(4) + line);
 					}
+				}
+			}
+
+			list_.SetItems(items);
+		}
+
+		private void DumpAnimation()
+		{
+			var player = person_.Animator.CurrentPlayer as Proc.Player;
+			var p = player?.Current;
+
+			if (p == null)
+			{
+				list_.Clear();
+				list_.AddItem("not procedural");
+				return;
+			}
+
+			var items = new List<string>();
+
+			items.Add(p.ToString());
+
+			foreach (var s in p.Steps)
+			{
+				items.Add(I(1) + s.ToString());
+
+				foreach (var t in s.Targets)
+				{
+					var lines = t.ToString().Split('\n');
+					if (lines.Length > 0)
+						items.Add(I(2) + lines[0]);
+
+					for (int i = 1; i < lines.Length; ++i)
+						items.Add(I(3) + lines[i]);
 				}
 			}
 
@@ -790,7 +828,7 @@ namespace Cue
 	}
 
 
-	class PersonAnimationTab : Tab
+	class PersonAnimationsTab : Tab
 	{
 		private Person person_;
 		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
@@ -800,7 +838,7 @@ namespace Cue
 		private IgnoreFlag ignore_ = new IgnoreFlag();
 		private Animation sel_ = null;
 
-		public PersonAnimationTab(Person person)
+		public PersonAnimationsTab(Person person)
 		{
 			person_ = person;
 
@@ -842,7 +880,7 @@ namespace Cue
 
 		public override string Title
 		{
-			get { return "Animation"; }
+			get { return "Animations"; }
 		}
 
 		public override void Update(float s)

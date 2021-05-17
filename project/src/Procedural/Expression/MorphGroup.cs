@@ -7,17 +7,17 @@ namespace Cue.Proc
 		void Reset();
 		void Update(float s);
 		void Set(float intensity);
-		List<Morph> Morphs { get; }
+		List<ClampableMorph> Morphs { get; }
 	}
 
 
 	class ConcurrentProceduralMorphGroup : IProceduralMorphGroup
 	{
-		private readonly List<Morph> morphs_ = new List<Morph>();
+		private readonly List<ClampableMorph> morphs_ = new List<ClampableMorph>();
 		private float maxMorphs_ = 1.0f;
 		private bool limited_ = false;
 
-		public List<Morph> Morphs
+		public List<ClampableMorph> Morphs
 		{
 			get { return morphs_; }
 		}
@@ -27,7 +27,7 @@ namespace Cue.Proc
 			get { return maxMorphs_; }
 		}
 
-		public void Add(Morph m)
+		public void Add(ClampableMorph m)
 		{
 			morphs_.Add(m);
 		}
@@ -86,7 +86,7 @@ namespace Cue.Proc
 		private const int ActiveState = 1;
 		private const int DelayState = 2;
 
-		private readonly List<Morph> morphs_ = new List<Morph>();
+		private readonly List<ClampableMorph> morphs_ = new List<ClampableMorph>();
 		private int i_ = 0;
 		private Duration delay_;
 		private int state_ = ActiveState;
@@ -96,7 +96,7 @@ namespace Cue.Proc
 			delay_ = delay ?? new Duration(0, 0);
 		}
 
-		public List<Morph> Morphs
+		public List<ClampableMorph> Morphs
 		{
 			get { return morphs_; }
 		}
@@ -116,7 +116,7 @@ namespace Cue.Proc
 			get { return state_; }
 		}
 
-		public void Add(Morph m)
+		public void Add(ClampableMorph m)
 		{
 			morphs_.Add(m);
 		}

@@ -34,6 +34,9 @@ namespace Cue
 		public int TransitionTo { get { return to_; } }
 		public int State { get { return state_; } }
 		public int Sex { get { return sex_; } }
+
+		public bool ForcesOnly { get { return anim_.ForcesOnly; } }
+
 		public IAnimation Real { get { return anim_; } }
 
 		public override string ToString()
@@ -222,9 +225,9 @@ namespace Cue
 		{
 			log_.Info("playing " + a.ToString());
 
-			if (!Cue.Instance.Options.AllowMovement)
+			if (!Cue.Instance.Options.AllowMovement && !a.ForcesOnly)
 			{
-				Cue.LogVerbose("not playing animation, movement not allowed");
+				log_.Info("not playing animation, movement not allowed");
 				return true;
 			}
 

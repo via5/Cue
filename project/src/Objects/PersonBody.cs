@@ -139,6 +139,43 @@ namespace Cue
 			set { close_ = value; }
 		}
 
+		public bool Busy
+		{
+			get
+			{
+				// todo
+				switch (type_)
+				{
+					case BodyParts.Head:
+					case BodyParts.Lips:
+					case BodyParts.Mouth:
+					{
+						return person_.Kisser.Active || person_.Blowjob.Active;
+					}
+
+					case BodyParts.LeftArm:
+					case BodyParts.LeftForearm:
+					case BodyParts.LeftHand:
+					{
+						return
+							person_.Handjob.Active &&
+							person_.Handjob.LeftUsed;
+					}
+
+					case BodyParts.RightArm:
+					case BodyParts.RightForearm:
+					case BodyParts.RightHand:
+					{
+						return
+							person_.Handjob.Active &&
+							person_.Handjob.RightUsed;
+					}
+				}
+
+				return false;
+			}
+		}
+
 		public Vector3 Position
 		{
 			get { return part_?.Position ?? Vector3.Zero; }

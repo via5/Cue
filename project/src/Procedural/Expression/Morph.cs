@@ -3,7 +3,67 @@ using UnityEngine;
 
 namespace Cue.Proc
 {
-	class Morph
+	class Morph : ITarget
+	{
+		private int bodyPart_;
+		private string morphId_;
+		private float min_, max_;
+		private Duration duration_;
+		private Duration delay_;
+		private ClampableMorph m_ = null;
+
+		public Morph(
+			int bodyPart, string morphId, float min, float max,
+			Duration d, Duration delay)
+		{
+			bodyPart_ = bodyPart;
+			morphId_ = morphId;
+			min_ = min;
+			max_ = max;
+			duration_ = d;
+			delay_ = delay;
+		}
+
+		public bool Done
+		{
+			get { return m_?.Finished ?? true; }
+		}
+
+		public ITarget Clone()
+		{
+			return new Morph(bodyPart_, morphId_, min_, max_, duration_, delay_);
+		}
+
+		public void Start(Person p)
+		{
+			if (m_ == null)
+			{
+				m_ = new ClampableMorph(
+					p, morphId_, min_, max_, duration_, delay_);
+			}
+		}
+
+		public void Reset()
+		{
+			m_?.Reset();
+		}
+
+		public void FixedUpdate(float s)
+		{
+		}
+
+		public void Update(float s)
+		{
+			if (m_ != null)
+			{
+				m_.Update(s, false);
+				m_.Set(1, float.MaxValue);
+			}
+		}
+	}
+
+
+	class ClampableMorph
 	{
 		public const float NoDisableBlink = 10000;
 
@@ -33,9 +93,10 @@ namespace Cue.Proc
 
 		private float disableBlinkAbove_ = NoDisableBlink;
 
-		public Morph(
-			Person p, string id, float start, float end, float minTime, float maxTime,
-			float delayOff, float delayOn, bool resetBetween = false)
+		private ClampableMorph(
+			Person p, string id, float min, float max,
+			Duration fwdDuration, Duration bwdDuration,
+			Duration delayOff, Duration delayOn, bool resetBetween)
 		{
 			person_ = p;
 			id_ = id;
@@ -44,19 +105,44 @@ namespace Cue.Proc
 			if (morph_ == null)
 				Cue.LogError($"{p.ID}: morph '{id}' not found");
 
-			start_ = start;
-			end_ = end;
+			start_ = min;
+			end_ = max;
 			mid_ = Mid();
 			last_ = mid_;
 			r_ = mid_;
-			forward_ = new Duration(minTime, maxTime);
-			backward_ = new Duration(minTime, maxTime);
-			delayOff_ = new Duration(0, delayOff);
-			delayOn_ = new Duration(0, delayOn);
+
+			forward_ = fwdDuration;
+			backward_ = bwdDuration;
+			delayOff_ = delayOff;
+			delayOn_ = delayOn;
 			easing_ = new SinusoidalEasing();
 			resetBetween_ = resetBetween;
 
 			Reset();
+		}
+
+		public ClampableMorph(
+			Person p, string id, float min, float max,
+			Duration d, Duration delay)
+				: this(
+					 p, id, min, max,
+					 new Duration(d), new Duration(d),
+					 new Duration(delay), new Duration(delay),
+					 false)
+		{
+		}
+
+		public ClampableMorph(
+			Person p, string id, float start, float end,
+			float minTime, float maxTime,
+			float delayOff, float delayOn,
+			bool resetBetween = false)
+				: this(
+					  p, id, start, end,
+					  new Duration(0, minTime), new Duration(0, maxTime),
+					  new Duration(0, delayOff), new Duration(0, delayOn),
+					  resetBetween)
+		{
 		}
 
 		public string Name

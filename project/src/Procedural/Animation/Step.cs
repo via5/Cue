@@ -17,6 +17,11 @@ namespace Cue.Proc
 			return s;
 		}
 
+		public List<ITarget> Targets
+		{
+			get { return targets_; }
+		}
+
 		public bool Done
 		{
 			get { return done_; }
@@ -29,14 +34,9 @@ namespace Cue.Proc
 				targets_[i].Start(p);
 		}
 
-		public void AddController(string name, Vector3 pos, Vector3 rot)
+		public void AddTarget(ITarget t)
 		{
-			targets_.Add(new Controller(name, pos, rot));
-		}
-
-		public void AddForce(string rbId, Vector3 min, Vector3 max, Duration d)
-		{
-			targets_.Add(new Force(rbId, min, max, d));
+			targets_.Add(t);
 		}
 
 		public void Reset()
@@ -45,22 +45,27 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		public void Update(float s)
-		{
-			for (int i = 0; i < targets_.Count; ++i)
-			{
-				targets_[i].Update(s);
-				done_ = done_ || targets_[i].Done;
-			}
-		}
-
 		public void FixedUpdate(float s)
 		{
 			for (int i = 0; i < targets_.Count; ++i)
-			{
 				targets_[i].FixedUpdate(s);
-				done_ = done_ || targets_[i].Done;
+		}
+
+		public void Update(float s)
+		{
+			done_ = true;
+
+			for (int i = 0; i < targets_.Count; ++i)
+			{
+				targets_[i].Update(s);
+				if (!targets_[i].Done)
+					done_ = false;
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"step, {targets_.Count} targets";
 		}
 	}
 }
