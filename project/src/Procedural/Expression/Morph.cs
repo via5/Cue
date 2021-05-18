@@ -50,16 +50,17 @@ namespace Cue.Proc
 
 		public void FixedUpdate(float s)
 		{
-		}
-
-		public void Update(float s)
-		{
 			if (m_ != null)
 			{
-				m_.Update(s, false);
+				m_.FixedUpdate(s, false);
 				m_.Set(1, float.MaxValue);
 			}
 		}
+
+		//public override string ToString()
+		//{
+		//	return "morph "
+		//}
 	}
 
 
@@ -200,7 +201,7 @@ namespace Cue.Proc
 				morph_.morphValue = morph_.startValue;
 		}
 
-		public void Update(float s, bool limitHit)
+		public void FixedUpdate(float s, bool limitHit)
 		{
 			if (morph_ == null)
 			{

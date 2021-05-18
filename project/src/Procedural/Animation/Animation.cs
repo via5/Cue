@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace Cue.Proc
 {
@@ -7,7 +6,7 @@ namespace Cue.Proc
 	{
 		private readonly string name_;
 		private bool forcesOnly_;
-		private readonly List<Step> steps_ = new List<Step>();
+		private ConcurrentTargetGroup root_ = new ConcurrentTargetGroup("root");
 
 		public ProcAnimation(string name, bool forcesOnly=false)
 		{
@@ -17,17 +16,14 @@ namespace Cue.Proc
 
 		public ProcAnimation Clone()
 		{
-			var a = new ProcAnimation(name_);
-
-			foreach (var s in steps_)
-				a.steps_.Add(s.Clone());
-
+			var a = new ProcAnimation(name_, forcesOnly_);
+			a.root_ = (ConcurrentTargetGroup)root_.Clone();
 			return a;
 		}
 
 		public bool Done
 		{
-			get { return steps_[0].Done; }
+			get { return root_.Done; }
 		}
 
 		// todo
@@ -40,48 +36,34 @@ namespace Cue.Proc
 			get { return forcesOnly_; }
 		}
 
-		public Step AddStep()
+		public void AddTarget(ITarget t)
 		{
-			var s = new Step();
-			steps_.Add(s);
-			return s;
+			root_.AddTarget(t);
 		}
 
-		public List<Step> Steps
+		public List<ITarget> Targets
 		{
-			get { return steps_; }
+			get { return root_.Targets; }
 		}
 
 		public void Start(Person p)
 		{
-			for (int i = 0; i < steps_.Count; ++i)
-				steps_[i].Start(p);
+			root_.Start(p);
 		}
 
 		public void Reset()
 		{
-			for (int i = 0; i < steps_.Count; ++i)
-				steps_[i].Reset();
+			root_.Reset();
 		}
 
 		public void FixedUpdate(float s)
 		{
-			steps_[0].FixedUpdate(s);
-		}
-
-		public void Update(float s)
-		{
-			steps_[0].Update(s);
+			root_.FixedUpdate(s);
 		}
 
 		public override string ToString()
 		{
-			string s = name_;
-
-			if (forcesOnly_)
-				s += " (forces only)";
-
-			return s;
+			return name_ + " " + root_.ToString();
 		}
 	}
 }

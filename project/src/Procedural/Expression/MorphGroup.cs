@@ -5,7 +5,7 @@ namespace Cue.Proc
 	interface IProceduralMorphGroup
 	{
 		void Reset();
-		void Update(float s);
+		void FixedUpdate(float s);
 		void Set(float intensity);
 		List<ClampableMorph> Morphs { get; }
 	}
@@ -38,7 +38,7 @@ namespace Cue.Proc
 				morphs_[i].Reset();
 		}
 
-		public void Update(float s)
+		public void FixedUpdate(float s)
 		{
 			int i = 0;
 			int count = morphs_.Count;
@@ -47,7 +47,7 @@ namespace Cue.Proc
 			{
 				var m = morphs_[i];
 
-				m.Update(s, limited_);
+				m.FixedUpdate(s, limited_);
 
 				// move morphs that are close to the start value to the end of
 				// the list so they don't always have prio for max morph
@@ -130,7 +130,7 @@ namespace Cue.Proc
 				morphs_[i].Reset();
 		}
 
-		public void Update(float s)
+		public void FixedUpdate(float s)
 		{
 			if (morphs_.Count == 0)
 				return;
@@ -150,11 +150,11 @@ namespace Cue.Proc
 						}
 
 						if (state_ == ActiveState)
-							morphs_[i_].Update(s, false);
+							morphs_[i_].FixedUpdate(s, false);
 					}
 					else
 					{
-						morphs_[i_].Update(s, false);
+						morphs_[i_].FixedUpdate(s, false);
 					}
 
 					break;

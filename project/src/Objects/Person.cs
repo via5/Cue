@@ -207,6 +207,7 @@ namespace Cue
 		{
 			base.FixedUpdate(s);
 			animator_.FixedUpdate(s);
+			expression_.FixedUpdate(s);
 		}
 
 		public override void Update(float s)
@@ -247,7 +248,6 @@ namespace Cue
 			Kisser.Update(s);
 			Handjob.Update(s);
 			Blowjob.Update(s);
-			expression_.Update(s);
 			excitement_.Update(s);
 			personality_.Update(s);
 

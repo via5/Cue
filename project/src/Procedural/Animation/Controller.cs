@@ -112,9 +112,5 @@ namespace Cue.Proc
 			if (t >= 1)
 				done_ = true;
 		}
-
-		public void Update(float s)
-		{
-		}
 	}
 }

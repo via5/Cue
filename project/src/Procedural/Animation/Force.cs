@@ -8,17 +8,21 @@ namespace Cue.Proc
 		protected string rbId_;
 		protected Rigidbody rb_ = null;
 		protected Vector3 min_, max_;
-		private Vector3 last_, current_;
 		protected Duration duration_;
 		protected Duration delay_;
+		protected bool loop_;
+
+		private Vector3 last_, current_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private Person person_ = null;
 		private bool wasBusy_ = false;
 		private bool inDelay_ = false;
+		private bool done_ = false;
+		private bool finishing_ = false;
 
 		public BasicForce(
 			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay)
+			Duration d, Duration delay, bool loop)
 		{
 			bodyPart_ = bodyPart;
 			rbId_ = rbId;
@@ -26,11 +30,12 @@ namespace Cue.Proc
 			max_ = max;
 			duration_ = d;
 			delay_ = delay;
+			loop_ = loop;
 		}
 
 		public bool Done
 		{
-			get { return false; }
+			get { return done_; }
 		}
 
 		public abstract ITarget Clone();
@@ -47,6 +52,8 @@ namespace Cue.Proc
 			}
 
 			last_ = Vector3.Zero;
+			done_ = false;
+			finishing_ = false;
 			Next();
 		}
 
@@ -54,11 +61,15 @@ namespace Cue.Proc
 		{
 			duration_.Reset();
 			current_ = Vector3.Zero;
+			done_ = false;
+			finishing_ = false;
 			Next();
 		}
 
 		public void FixedUpdate(float s)
 		{
+			done_ = false;
+
 			if (person_.Body.Get(bodyPart_).Busy)
 			{
 				wasBusy_ = true;
@@ -83,10 +94,25 @@ namespace Cue.Proc
 
 				if (duration_.Finished)
 				{
-					if (delay_.Enabled)
-						inDelay_ = true;
+					if (loop_)
+					{
+						if (delay_.Enabled)
+							inDelay_ = true;
+						else
+							Next();
+					}
+					else if (!finishing_)
+					{
+						last_ = current_;
+						current_ = Vector3.Zero;
+						finishing_ = true;
+					}
 					else
+					{
+						done_ = true;
+						finishing_ = false;
 						Next();
+					}
 				}
 			}
 		}
@@ -99,10 +125,6 @@ namespace Cue.Proc
 		private Vector3 Lerped()
 		{
 			return Vector3.Lerp(last_, current_, Magnitude);
-		}
-
-		public void Update(float s)
-		{
 		}
 
 		public override string ToString()
@@ -133,14 +155,16 @@ namespace Cue.Proc
 	{
 		public Force(
 			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay)
-				: base(bodyPart, rbId, min, max, d, delay)
+			Duration d, Duration delay, bool loop)
+				: base(bodyPart, rbId, min, max, d, delay, loop)
 		{
 		}
 
 		public override ITarget Clone()
 		{
-			return new Force(bodyPart_, rbId_, min_, max_, duration_, delay_);
+			return new Force(
+				bodyPart_, rbId_, min_, max_,
+				new Duration(duration_), new Duration(delay_), loop_);
 		}
 
 		protected override void Apply(Vector3 v)
@@ -159,14 +183,16 @@ namespace Cue.Proc
 	{
 		public Torque(
 			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay)
-				: base(bodyPart, rbId, min, max, d, delay)
+			Duration d, Duration delay, bool loop)
+				: base(bodyPart, rbId, min, max, d, delay, loop)
 		{
 		}
 
 		public override ITarget Clone()
 		{
-			return new Torque(bodyPart_, rbId_, min_, max_, duration_, delay_);
+			return new Torque(
+				bodyPart_, rbId_, min_, max_,
+				new Duration(duration_), new Duration(delay_), loop_);
 		}
 
 		protected override void Apply(Vector3 v)

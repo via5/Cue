@@ -213,7 +213,7 @@ namespace Cue
 		void Set(int type, float intensity, bool resetOthers = false);
 		void Set(ExpressionIntensity[] intensities, bool resetOthers = false);
 		bool Enabled { get; set; }
-		void Update(float s);
+		void FixedUpdate(float s);
 		void OnPluginState(bool b);
 		void DumpActive();
 	}

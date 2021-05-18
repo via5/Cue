@@ -130,18 +130,22 @@
 			}
 
 
-			if (person_.Body.PlayerIsClose)
-			{
-				if (avoid_ != Cue.Instance.Player)
-				{
-					if (lookat_ is LookatObject)
-						(lookat_ as LookatObject).Set(Cue.Instance.Player, true);
-					else
-						lookat_ = new LookatObject(person_, Cue.Instance.Player, true);
-
-					return;
-				}
-			}
+			// this is too easy to trigger, it basically happens all the time,
+			// maybe only when hand close to head and only for some
+			// personalities?
+			//
+			//if (person_.Body.PlayerIsClose)
+			//{
+			//	if (avoid_ != Cue.Instance.Player)
+			//	{
+			//		if (lookat_ is LookatObject)
+			//			(lookat_ as LookatObject).Set(Cue.Instance.Player, true);
+			//		else
+			//			lookat_ = new LookatObject(person_, Cue.Instance.Player, true);
+			//
+			//		return;
+			//	}
+			//}
 
 
 			if (!(lookat_ is LookatRandom))

@@ -151,25 +151,28 @@
 
 		private bool DoAction(IObject src, W.HoveredInfo hit)
 		{
-			if (src != null && hit.o != null && hit.o != src)
+			if (Cue.Instance.Options.AllowMovement)
 			{
-				Cue.LogInfo($"{src}: interacting with {hit.o}");
-				if (src.InteractWith(hit.o))
-					return true;
-			}
-
-			if (src != null && hit.hit)
-			{
-				Cue.LogInfo($"{src}: hit on {hit.pos}");
-
-				if (src == Cue.Instance.Player && src.Possessed)
+				if (src != null && hit.o != null && hit.o != src)
 				{
-					Cue.LogInfo("refusing to move the player");
-					return true;
+					Cue.LogInfo($"{src}: interacting with {hit.o}");
+					if (src.InteractWith(hit.o))
+						return true;
 				}
 
-				src.MoveToManual(null, hit.pos, Vector3.Bearing(hit.pos - src.Position));
-				return true;
+				if (src != null && hit.hit)
+				{
+					Cue.LogInfo($"{src}: hit on {hit.pos}");
+
+					if (src == Cue.Instance.Player && src.Possessed)
+					{
+						Cue.LogInfo("refusing to move the player");
+						return true;
+					}
+
+					src.MoveToManual(null, hit.pos, Vector3.Bearing(hit.pos - src.Position));
+					return true;
+				}
 			}
 
 			return false;

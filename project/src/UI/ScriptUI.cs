@@ -683,22 +683,26 @@ namespace Cue
 
 			items.Add(p.ToString());
 
-			foreach (var s in p.Steps)
-			{
-				items.Add(I(1) + s.ToString());
-
-				foreach (var t in s.Targets)
-				{
-					var lines = t.ToString().Split('\n');
-					if (lines.Length > 0)
-						items.Add(I(2) + lines[0]);
-
-					for (int i = 1; i < lines.Length; ++i)
-						items.Add(I(3) + lines[i]);
-				}
-			}
+			foreach (var s in p.Targets)
+				DumpTarget(items, s, 1);
 
 			list_.SetItems(items);
+		}
+
+		private void DumpTarget(List<string> items, Proc.ITarget t, int indent)
+		{
+			var lines = t.ToString().Split('\n');
+			if (lines.Length > 0)
+				items.Add(I(indent) + lines[0]);
+
+			for (int i = 1; i < lines.Length; ++i)
+				items.Add(I(indent + 1) + lines[i]);
+
+			if (t is Proc.ITargetGroup)
+			{
+				foreach (var c in (t as Proc.ITargetGroup).Targets)
+					DumpTarget(items, c, indent + 1);
+			}
 		}
 	}
 

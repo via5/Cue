@@ -7,10 +7,9 @@ namespace Cue.Proc
 	{
 		bool Done { get; }
 		ITarget Clone();
-		void Start(Person p);
 		void Reset();
+		void Start(Person p);
 		void FixedUpdate(float s);
-		void Update(float s);
 	}
 
 
@@ -85,17 +84,15 @@ namespace Cue.Proc
 		public void FixedUpdate(float s)
 		{
 			if (anim_ != null)
+			{
 				anim_.FixedUpdate(s);
+				if (anim_.Done)
+					Stop(false);
+			}
 		}
 
 		public void Update(float s)
 		{
-			if (anim_ != null)
-			{
-				anim_.Update(s);
-				if (anim_.Done)
-					Stop(false);
-			}
 		}
 
 		public override string ToString()

@@ -38,10 +38,10 @@ namespace Cue.Proc
 				groups_[i].Reset();
 		}
 
-		public void Update(float s)
+		public void FixedUpdate(float s)
 		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Update(s);
+				groups_[i].FixedUpdate(s);
 
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].Set(intensity_);
@@ -185,13 +185,13 @@ namespace Cue.Proc
 				expressions_[i].Reset();
 		}
 
-		public void Update(float s)
+		public void FixedUpdate(float s)
 		{
 			if (!enabled_)
 				return;
 
 			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].Update(s);
+				expressions_[i].FixedUpdate(s);
 		}
 
 		public void OnPluginState(bool b)

@@ -19,14 +19,13 @@ namespace Cue.Proc
 		{
 			var a = new ProcAnimation("backToNeutral");
 
-			var s = a.AddStep();
-			s.AddTarget(new Controller("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0)));
-			s.AddTarget(new Controller("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0)));
-			s.AddTarget(new Controller("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0)));
-			s.AddTarget(new Controller("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90)));
-			s.AddTarget(new Controller("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270)));
-			s.AddTarget(new Controller("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0)));
-			s.AddTarget(new Controller("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0)));
+			a.AddTarget(new Controller("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0)));
+			a.AddTarget(new Controller("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0)));
+			a.AddTarget(new Controller("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0)));
+			a.AddTarget(new Controller("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90)));
+			a.AddTarget(new Controller("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270)));
+			a.AddTarget(new Controller("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0)));
+			a.AddTarget(new Controller("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0)));
 
 			return new Animation(
 				Animation.TransitionType,
@@ -38,10 +37,10 @@ namespace Cue.Proc
 		{
 			var a = new ProcAnimation("standIdle", true);
 
-			var s = a.AddStep();
+			ConcurrentTargetGroup g = new ConcurrentTargetGroup("sway");
 
 			var forceMin = new Vector3(-50, 0, -50);
-			var forceMax = new Vector3(50, 50, 50);
+			var forceMax = new Vector3(50, 0, 50);
 			float torque = 5;
 			Duration d = new Duration(1, 6);
 			Duration delay = new Duration(0, 6);
@@ -57,28 +56,117 @@ namespace Cue.Proc
 
 			foreach (var p in forceAndTorque)
 			{
-				s.AddTarget(new Force(
+				g.AddTarget(new Force(
 					p.second, p.first, forceMin, forceMax,
-					new Duration(d), new Duration(delay)));
+					new Duration(d), new Duration(delay), true));
 
-				s.AddTarget(new Torque(
+				g.AddTarget(new Torque(
 					p.second, p.first,
 					new Vector3(-torque, -torque, -torque),
 					new Vector3(torque, torque, torque),
-					new Duration(d), new Duration(delay)));
+					new Duration(d), new Duration(delay), true));
 			}
 
 
 			var headForceMin = new Vector3(-20, 0, -20);
-			var headForceMax = new Vector3(20, 20, 20);
+			var headForceMax = new Vector3(20, 0, 20);
 
-			s.AddTarget(new Force(
+			g.AddTarget(new Force(
 				BodyParts.Head, "head", headForceMin, headForceMax,
-				new Duration(d), new Duration(delay)));
+				new Duration(d), new Duration(delay), true));
 
-			s.AddTarget(new Morph(
+			g.AddTarget(new Morph(
 				BodyParts.RightHand, "Right Fingers Fist", 0.1f, 0.4f,
 				new Duration(d), new Duration(delay)));
+
+			a.AddTarget(g);
+
+
+
+			/*var fg = new SequentialTargetGroup("footup", new Duration(1, 1));
+
+
+			{
+				g = new ConcurrentTargetGroup("footup1", new Duration(0, 0), false);
+
+				d = new Duration(0.7f, 0.7f);
+				float f = 50;
+				float ff = 75;
+
+				g.AddTarget(new Force(
+					BodyParts.RightFoot, "rFoot",
+					new Vector3(0, ff, -ff), new Vector3(0, ff, -ff),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Torque(
+					BodyParts.RightFoot, "rFoot",
+					new Vector3(10, 0, 0), new Vector3(10, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "hip",
+					new Vector3(-f, 0, 0), new Vector3(-f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "chest",
+					new Vector3(-f, 0, 0), new Vector3(-f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "head",
+					new Vector3(-f, 0, 0), new Vector3(-f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.RightThigh, "rThigh",
+					new Vector3(0, 0, f), new Vector3(0, 0, f),
+					new Duration(d), new Duration(0, 0), false));
+
+				fg.AddTarget(g);
+			}
+
+			{
+				g = new ConcurrentTargetGroup("footup2", new Duration(0, 0), false);
+
+				d = new Duration(0.7f, 0.7f);
+				float f = 50;
+				float ff = 75;
+
+				g.AddTarget(new Force(
+					BodyParts.RightFoot, "lFoot",
+					new Vector3(0, ff, -ff), new Vector3(0, ff, -ff),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Torque(
+					BodyParts.RightFoot, "lFoot",
+					new Vector3(10, 0, 0), new Vector3(10, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "hip",
+					new Vector3(f, 0, 0), new Vector3(f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "chest",
+					new Vector3(f, 0, 0), new Vector3(f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.Hips, "head",
+					new Vector3(f, 0, 0), new Vector3(f, 0, 0),
+					new Duration(d), new Duration(0, 0), false));
+
+				g.AddTarget(new Force(
+					BodyParts.RightThigh, "lThigh",
+					new Vector3(0, 0, f), new Vector3(0, 0, f),
+					new Duration(d), new Duration(0, 0), false));
+
+				fg.AddTarget(g);
+			}
+
+			a.AddTarget(fg);*/
 
 			return new Animation(
 				Animation.IdleType, PersonState.None, PersonState.None,
