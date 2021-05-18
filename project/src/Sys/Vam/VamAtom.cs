@@ -32,6 +32,16 @@ namespace Cue.W
 
 		public void Init()
 		{
+			// setting grabFreezePhysics on the atom or
+			// freezeAtomPhysicsWhenGrabbed on controllers doesn't
+			// update the toggle in the ui, the param has to be set
+			// manually
+			foreach (var fc in atom_.freeControllers)
+			{
+				var b = fc.GetBoolJSONParam("freezeAtomPhysicsWhenGrabbed");
+				if (b != null)
+					b.val = false;
+			}
 		}
 
 		public Logger Log

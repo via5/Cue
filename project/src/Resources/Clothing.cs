@@ -8,6 +8,14 @@ namespace Cue
 	{
 		public class Item
 		{
+			public class Collider
+			{
+				public bool enabled = false;
+				public Vector3 rotation = Vector3.Zero;
+				public Vector3 size = Vector3.Zero;
+				public Vector3 center = Vector3.Zero;
+			}
+
 			public string what;
 			public int sex;
 
@@ -20,6 +28,10 @@ namespace Cue
 			public bool hidesBreastsBool = false;
 			public string showsBreastsState = "";
 			public string hidesBreastsState = "";
+
+			public Collider left = new Collider();
+			public Collider right = new Collider();
+
 
 			public Item(string what, int sex)
 			{
@@ -50,6 +62,12 @@ namespace Cue
 					s += $"hb={hidesBreastsBool} ";
 				else
 					s += $"hb={hidesBreastsState} ";
+
+				if (left.enabled)
+					s += "lcoll ";
+
+				if (right.enabled)
+					s += "rcoll ";
 
 				return s;
 			}
@@ -139,6 +157,57 @@ namespace Cue
 				else if (a.HasKey("hidesBreastsState"))
 					item.hidesBreastsState = a["hidesBreastsState"];
 
+				if (a.HasKey("colliders"))
+				{
+					var cs = a["colliders"].AsObject;
+
+					if (cs.HasKey("left") && cs["left"].AsBool)
+					{
+						item.left.enabled = true;
+
+						if (cs.HasKey("leftRotation"))
+						{
+							if (!ParseVector3(cs["leftRotation"], out item.left.rotation))
+								log_.Error($"{item.what}: bad leftRotation");
+						}
+
+						if (cs.HasKey("leftSize"))
+						{
+							if (!ParseVector3(cs["leftSize"], out item.left.size))
+								log_.Error($"{item.what}: bad leftSize");
+						}
+
+						if (cs.HasKey("leftCenter"))
+						{
+							if (!ParseVector3(cs["leftCenter"], out item.left.center))
+								log_.Error($"{item.what}: bad leftCenter");
+						}
+					}
+
+					if (cs.HasKey("right") && cs["right"].AsBool)
+					{
+						item.right.enabled = true;
+
+						if (cs.HasKey("rightRotation"))
+						{
+							if (!ParseVector3(cs["rightRotation"], out item.right.rotation))
+								log_.Error($"{item.what}: bad rightRotation");
+						}
+
+						if (cs.HasKey("rightSize"))
+						{
+							if (!ParseVector3(cs["rightSize"], out item.right.size))
+								log_.Error($"{item.what}: bad rightSize");
+						}
+
+						if (cs.HasKey("rightCenter"))
+						{
+							if (!ParseVector3(cs["rightCenter"], out item.right.center))
+								log_.Error($"{item.what}: bad rightCenter");
+						}
+					}
+				}
+
 				log_.Info("clothing item: " + item.ToString());
 
 				if (id != "")
@@ -146,6 +215,29 @@ namespace Cue
 				else
 					tags_.Add(tag, item);
 			}
+		}
+
+		private bool ParseVector3(JSONNode n, out Vector3 v)
+		{
+			v = Vector3.Zero;
+
+			var a = n.AsArray;
+			if (a == null)
+				return false;
+
+			if (a.Count != 3)
+				return false;
+
+			if (!float.TryParse(a[0], out v.X))
+				return false;
+
+			if (!float.TryParse(a[1], out v.Y))
+				return false;
+
+			if (!float.TryParse(a[2], out v.Z))
+				return false;
+
+			return true;
 		}
 
 		public Item FindItem(int sex, string id, string[] tags)

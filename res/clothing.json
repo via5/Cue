@@ -10,6 +10,22 @@
 		{"id": "CasualDenim2Jeans", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
 
 		{"tag": "pants", "hidesGenitals": true, "sex": "female"},
-		{"tag": "shorts", "hidesGenitals": true, "sex": "female"}
+		{"tag": "shorts", "hidesGenitals": true, "sex": "female"},
+
+		{
+			"id": "Strelok:Platform Ankle Boots",
+			"colliders":
+			{
+				"left": true,
+				"leftRotation": [-45, 0, 0],
+				"leftSize": [0.035, 0.013, 0.20],
+				"leftCenter": [0, -0.137, 0.035],
+
+				"right": true,
+				"rightRotation": [-45, 0, 0],
+				"rightSize": [0.035, 0.013, 0.20],
+				"rightCenter": [0, -0.137, 0.035],
+			}
+		}
 	]
 }

@@ -227,7 +227,9 @@ namespace Cue
 		{
 			base.FixedUpdate(s);
 			animator_.FixedUpdate(s);
-			expression_.FixedUpdate(s);
+
+			if (this != Cue.Instance.Player)
+				expression_.FixedUpdate(s);
 		}
 
 		public override void Update(float s)

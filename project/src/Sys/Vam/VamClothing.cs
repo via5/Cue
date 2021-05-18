@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue.W
 {
@@ -17,7 +18,7 @@ namespace Cue.W
 			{
 				atom_ = a;
 				ci_ = ci;
-				log_ = new Logger(Logger.Clothing, a, $"VamClothingItem {ci_.name}");
+				log_ = new Logger(Logger.Clothing, a, $"VamClothingItem {Name}");
 			}
 
 			public void Init()
@@ -28,11 +29,111 @@ namespace Cue.W
 					ci_.enabled = false;
 					ci_.enabled = true;
 				}
+
+				DestroyOwnedColliders();
+
+				// don't use tags
+				var item = Resources.Clothing.FindItem(atom_.Sex, Name, null);
+
+				if (item != null)
+				{
+					if (item.left.enabled)
+					{
+						DestroyLeft();
+						CreateLeft(item.left);
+					}
+
+					if (item.right.enabled)
+					{
+						DestroyRight();
+						CreateRight(item.right);
+					}
+				}
+			}
+
+			private void DestroyOwnedColliders()
+			{
+				// cleanup
+				if (ci_.colliderLeft != null && ci_.colliderLeft.name.Contains("!cue"))
+					DestroyLeft();
+
+				if (ci_.colliderRight != null && ci_.colliderRight.name.Contains("!cue"))
+					DestroyRight();
+			}
+
+			private void DestroyLeft()
+			{
+				if (ci_.colliderLeft != null)
+				{
+					UnityEngine.Object.Destroy(ci_.colliderLeft);
+					ci_.colliderLeft = null;
+					ci_.colliderLeftRotation = UnityEngine.Vector3.zero;
+					ci_.colliderLeftCenter = UnityEngine.Vector3.zero;
+					ci_.colliderDimensions = UnityEngine.Vector3.zero;
+					ci_.colliderTypeLeft = DAZClothingItem.ColliderType.None;
+				}
+			}
+
+			private void DestroyRight()
+			{
+				if (ci_.colliderRight != null)
+				{
+					UnityEngine.Object.Destroy(ci_.colliderRight);
+					ci_.colliderRight = null;
+					ci_.colliderRightRotation = UnityEngine.Vector3.zero;
+					ci_.colliderRightCenter = UnityEngine.Vector3.zero;
+					ci_.colliderDimensions = UnityEngine.Vector3.zero;
+					ci_.colliderTypeRight = DAZClothingItem.ColliderType.None;
+				}
+			}
+
+			private void CreateLeft(ClothingResources.Item.Collider c)
+			{
+				log_.Info("creating left collider");
+
+				ci_.colliderTypeLeft = DAZClothingItem.ColliderType.Shoe;
+				ci_.colliderLeftRotation = new UnityEngine.Vector3(-45, 0, 0);
+				ci_.colliderDimensions = new UnityEngine.Vector3(0.035f, 0.013f, 0.20f);
+				ci_.colliderLeftCenter = new UnityEngine.Vector3(0, -0.137f, 0.035f);
+
+				var go = new GameObject();
+
+				ci_.colliderLeft = go.AddComponent<UnityEngine.BoxCollider>();
+				ci_.colliderLeft.name = "lShoeCollider!cue";
+				ci_.colliderLeft.transform.SetParent(
+					Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "lFoot").transform, false);
+				ci_.colliderLeft.transform.localEulerAngles = ci_.colliderLeftRotation;
+				ci_.colliderLeft.size = ci_.colliderDimensions;
+				ci_.colliderLeft.center = ci_.colliderLeftCenter;
+			}
+
+			private void CreateRight(ClothingResources.Item.Collider c)
+			{
+				log_.Info("creating right collider");
+
+				ci_.colliderTypeRight = DAZClothingItem.ColliderType.Shoe;
+				ci_.colliderRightRotation = new UnityEngine.Vector3(-45, 0, 0);
+				ci_.colliderDimensions = new UnityEngine.Vector3(0.035f, 0.013f, 0.20f);
+				ci_.colliderRightCenter = new UnityEngine.Vector3(0, -0.137f, 0.035f);
+
+				var go = new GameObject();
+				ci_.colliderRight = go.AddComponent<UnityEngine.BoxCollider>();
+				ci_.colliderRight.name = "rShoeCollider!cue";
+				ci_.colliderRight.transform.SetParent(
+					Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "rFoot").transform, false);
+				ci_.colliderRight.transform.localEulerAngles = ci_.colliderRightRotation;
+				ci_.colliderRight.size = ci_.colliderDimensions;
+				ci_.colliderRight.center = ci_.colliderRightCenter;
 			}
 
 			public DAZClothingItem Daz
 			{
 				get { return ci_; }
+			}
+
+			public string Name
+			{
+				get { return ItemName(ci_); }
 			}
 
 			public bool Enabled
@@ -63,7 +164,7 @@ namespace Cue.W
 						if (wrap_ == null)
 						{
 							log_.Error(
-								$"clothing {ci_.name} has no wrap switcher " +
+								$"clothing {Name} has no wrap switcher " +
 								$"{ci_.isDynamicRuntimeLoaded}");
 
 							return;
@@ -87,7 +188,7 @@ namespace Cue.W
 				else
 				{
 					var item = Resources.Clothing.FindItem(
-						atom_.Sex, ci_.name, ci_.tagsArray);
+						atom_.Sex, Name, ci_.tagsArray);
 
 					if (item == null)
 						return;
@@ -117,7 +218,7 @@ namespace Cue.W
 				else
 				{
 					var item = Resources.Clothing.FindItem(
-						atom_.Sex, ci_.name, ci_.tagsArray);
+						atom_.Sex, Name, ci_.tagsArray);
 
 					if (item == null)
 						return;
@@ -141,7 +242,7 @@ namespace Cue.W
 			public void SetToShowBreasts()
 			{
 				var item = Resources.Clothing.FindItem(
-					atom_.Sex, ci_.name, ci_.tagsArray);
+					atom_.Sex, Name, ci_.tagsArray);
 
 				if (item == null)
 					return;
@@ -164,7 +265,7 @@ namespace Cue.W
 			public void SetToHideBreasts()
 			{
 				var item = Resources.Clothing.FindItem(
-					atom_.Sex, ci_.name, ci_.tagsArray);
+					atom_.Sex, Name, ci_.tagsArray);
 
 				if (item == null)
 					return;
@@ -186,7 +287,7 @@ namespace Cue.W
 
 			public override string ToString()
 			{
-				return ci_.name;
+				return Name;
 			}
 		}
 
@@ -217,7 +318,7 @@ namespace Cue.W
 				{
 					if (c.isActiveAndEnabled)
 					{
-						log_.Info($"found {c.name}");
+						log_.Info($"found {ItemName(c)}");
 						items_.Add(new Item(atom_, c));
 					}
 				}
@@ -229,6 +330,14 @@ namespace Cue.W
 			{
 				log_.Error("VamClothing: ctor failed, " + e.ToString());
 			}
+		}
+
+		public static string ItemName(DAZClothingItem i)
+		{
+			if (i.internalUid != "")
+				return i.internalUid;
+			else
+				return i.name;
 		}
 
 		public void Init()
@@ -341,7 +450,18 @@ namespace Cue.W
 			foreach (var c in char_.clothingItems)
 			{
 				if (c.isActiveAndEnabled)
-					Cue.LogInfo(c.name);
+				{
+					Cue.LogInfo(
+						$"{ItemName(c)}\n" +
+						$"  - driveX: {c.driveXAngleTarget} {c.driveXAngleTargetController1}\n" +
+						$"  - drive2X: {c.drive2XAngleTarget} {c.drive2XAngleTargetController1}\n" +
+						$"  - colliderLeft: {c.colliderLeft}\n" +
+						$"  - colliderRight: {c.colliderRight}\n");
+
+					if (c.colliderLeft != null)
+						Cue.Instance.VamSys.DumpComponentsAndUp(c.colliderLeft);
+
+				}
 			}
 		}
 
