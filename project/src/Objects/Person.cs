@@ -49,6 +49,23 @@ namespace Cue
 		}
 	}
 
+
+	class PersonOptions
+	{
+		private bool canKiss_ = true;
+
+		public PersonOptions(Person p)
+		{
+		}
+
+		public bool CanKiss
+		{
+			get { return canKiss_; }
+			set { canKiss_ = value; }
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_;
@@ -58,6 +75,7 @@ namespace Cue
 		private int lastNavState_ = W.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
 
+		private PersonOptions options_;
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
@@ -79,6 +97,7 @@ namespace Cue
 		{
 			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
+			options_ = new PersonOptions(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
@@ -108,6 +127,7 @@ namespace Cue
 			get { return uprightPos_; }
 		}
 
+		public PersonOptions Options { get { return options_; } }
 		public Animator Animator { get { return animator_; } }
 		public PersonState State { get { return state_; } }
 		public Excitement Excitement { get { return excitement_; } }

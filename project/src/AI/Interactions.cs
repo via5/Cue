@@ -26,6 +26,14 @@
 
 		public void Update(float s)
 		{
+			if (!person_.Options.CanKiss)
+			{
+				if (person_.Kisser.Active)
+					person_.Kisser.Stop();
+
+				return;
+			}
+
 			if (person_.Body.Get(BodyParts.Lips) == null)
 				return;
 
@@ -81,6 +89,9 @@
 
 		private bool CanStart(Person p)
 		{
+			if (!p.Options.CanKiss)
+				return false;
+
 			if (p.Kisser.OnCooldown)
 				return false;
 

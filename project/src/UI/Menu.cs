@@ -6,6 +6,7 @@
 		private VUI.Root root_ = null;
 		private VUI.Label label_ = null;
 		private VUI.Panel buttons_ = null;
+		private VUI.CheckBox canKiss_ = new VUI.CheckBox("Can kiss");
 		private IObject sel_ = null;
 		private IObject hov_ = null;
 
@@ -48,6 +49,7 @@
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stand", OnStand));
+			row.Add(canKiss_);
 			buttons_.Add(row);
 
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
@@ -62,6 +64,8 @@
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			root_.Visible = visible_;
+
+			canKiss_.Changed += OnCanKiss;
 		}
 
 		public bool Visible
@@ -142,9 +146,14 @@
 				root_.Visible = visible_;
 		}
 
-		private void OnSelected(IObject p)
+		private void OnSelected(IObject o)
 		{
-			buttons_.Visible = (p as Person != null);
+			var p = o as Person;
+
+			buttons_.Visible = (p != null);
+
+			if (p != null)
+				canKiss_.Checked = p.Options.CanKiss;
 		}
 
 		private void OnHovered(IObject p)
@@ -223,6 +232,13 @@
 				p.MakeIdle();
 				p.SetState(PersonState.Standing);
 			}
+		}
+
+		private void OnCanKiss(bool b)
+		{
+			var p = Selected as Person;
+			if (p != null)
+				p.Options.CanKiss = b;
 		}
 
 		private void OnSex()

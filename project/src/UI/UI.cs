@@ -47,6 +47,10 @@
 				else
 					CheckDesktopInput();
 			}
+			else
+			{
+				controls_.HoverTargetVisible = false;
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -95,20 +99,26 @@
 			var lh = sys_.Input.GetLeftHovered();
 			var rh = sys_.Input.GetRightHovered();
 
+			bool hoverTargetVisible = false;
+
 			if (sys_.Input.ShowLeftMenu)
 			{
-				controls_.HoverTargetVisible = true;
-				controls_.HoverTargetPosition = rh.pos;
+				if (!(rh.o is Person))
+				{
+					hoverTargetVisible = true;
+					controls_.HoverTargetPosition = rh.pos;
+				}
 			}
 			else if (sys_.Input.ShowRightMenu)
 			{
-				controls_.HoverTargetVisible = true;
-				controls_.HoverTargetPosition = lh.pos;
+				if (!(lh.o is Person))
+				{
+					hoverTargetVisible = true;
+					controls_.HoverTargetPosition = lh.pos;
+				}
 			}
-			else
-			{
-				controls_.HoverTargetVisible = false;
-			}
+
+			controls_.HoverTargetVisible = hoverTargetVisible;
 
 
 			if (lh.o != null)
@@ -182,15 +192,19 @@
 		{
 			var h = sys_.Input.GetMouseHovered();
 
+			bool hoverTargetVisible = false;
+
 			if (h.hit)
 			{
-				controls_.HoverTargetVisible = true;
-				controls_.HoverTargetPosition = h.pos;
+				if (!(h.o is Person))
+				{
+					hoverTargetVisible = true;
+					controls_.HoverTargetPosition = h.pos;
+				}
 			}
-			else
-			{
-				controls_.HoverTargetVisible = false;
-			}
+
+			controls_.HoverTargetVisible = hoverTargetVisible;
+
 
 			if (sys_.Input.Select)
 				desktopMenu_.Selected = h.o as Person;
