@@ -97,11 +97,6 @@ namespace Cue.Proc
 							break;
 						}
 					}
-
-					if (subMorphs_.Count > 0)
-					{
-						Cue.LogInfo($"{id_} is a wrapper");
-					}
 				}
 			}
 

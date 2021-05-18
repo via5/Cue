@@ -44,10 +44,10 @@ namespace Cue.W
 			log_.Info($"tping to pos={v} bearing={U.BearingToString(bearing)}");
 
 			atom_.Atom.collisionEnabled = false;
-			atom_.Atom.mainController.MoveControl(W.VamU.ToUnity(v));
+			atom_.Position = v;
 
 			if (bearing != BasicObject.NoBearing)
-				atom_.Atom.mainController.RotateTo(Quaternion.Euler(0, bearing, 0));
+				atom_.Bearing = bearing;
 
 			enableCollisionsCountdown_ = 100;
 		}
@@ -261,8 +261,8 @@ namespace Cue.W
 
 				var dir = Vector3.Direction(startTurnBearing_);
 
-				atom_.Atom.mainController.transform.rotation =
-					Quaternion.LookRotation(W.VamU.ToUnity(dir));
+				atom_.Direction = VamU.Direction(
+					Quaternion.LookRotation(W.VamU.ToUnity(dir)));
 
 				OnStartingTurnFinished();
 			}
@@ -331,8 +331,8 @@ namespace Cue.W
 
 				var dir = Vector3.Direction(endTurnBearing_);
 
-				atom_.Atom.mainController.transform.rotation =
-					Quaternion.LookRotation(W.VamU.ToUnity(dir));
+				atom_.Direction = VamU.Direction(
+					Quaternion.LookRotation(W.VamU.ToUnity(dir)));
 
 				OnEndingTurnFinished();
 			}
@@ -377,8 +377,8 @@ namespace Cue.W
 					$"b={currentBearing} " +
 					$"tb={targetBearing} td={targetDirection}, done");
 
-				atom_.Atom.mainController.transform.rotation =
-					Quaternion.LookRotation(W.VamU.ToUnity(targetDirection));
+				atom_.Direction = VamU.Direction(
+					Quaternion.LookRotation(W.VamU.ToUnity(targetDirection)));
 
 				return true;
 			}
@@ -388,10 +388,10 @@ namespace Cue.W
 
 				var newRot = Quaternion.LookRotation(VamU.ToUnity(targetDirection));
 
-				atom_.Atom.mainController.transform.rotation = Quaternion.Slerp(
+				atom_.Direction = VamU.Direction(Quaternion.Slerp(
 					turningStart_,
 					newRot,
-					turningElapsed_ / (360 / VamNav.AgentTurnSpeed));
+					turningElapsed_ / (360 / VamNav.AgentTurnSpeed)));
 
 				return false;
 			}
@@ -558,7 +558,7 @@ namespace Cue.W
 			if (NavMesh.SamplePosition(currentPos, out hit, 2, NavMesh.AllAreas))
 			{
 				log_.Info($"moved to navmesh at {hit.position}, was {currentPos}");
-				atom_.Atom.mainController.transform.position = hit.position;
+				atom_.Position = VamU.FromUnity(hit.position);
 			}
 			else
 			{

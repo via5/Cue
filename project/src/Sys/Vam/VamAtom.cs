@@ -109,8 +109,16 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get { return W.VamU.FromUnity(atom_.mainController.transform.position); }
-			set { atom_.mainController.MoveControl(W.VamU.ToUnity(value)); }
+			get
+			{
+				return W.VamU.FromUnity(
+					atom_.mainController.transform.position);
+			}
+
+			set
+			{
+				atom_.mainController.MoveControl(W.VamU.ToUnity(value));
+			}
 		}
 
 		public Vector3 Direction
@@ -153,8 +161,12 @@ namespace Cue.W
 
 		public void SetDefaultControls(string why)
 		{
-			log_.Info($"{ID}: setting default controls ({why})");
-			setOnlyKeyJointsOn_.Fire();
+			// this breaks possession, it stays enabled but control is lost
+			if (!Possessed)
+			{
+				log_.Info($"{ID}: setting default controls ({why})");
+				setOnlyKeyJointsOn_.Fire();
+			}
 		}
 
 		public DAZMorph FindMorph(string id)

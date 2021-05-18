@@ -250,7 +250,7 @@ namespace Cue
 
 			if (target == Cue.Instance.Player)
 			{
-				headAngleX_.Value = 0;
+				headAngleX_.Value = -45;
 				headAngleY_.Value = 0;
 				headAngleZ_.Value = 0;
 				lipDepth_.Value = 0;
