@@ -113,6 +113,8 @@ namespace Cue.Proc
 			var e = new ExpressionType(p, Expressions.Pleasure);
 
 			e.Groups.Add(BE.Pleasure(p));
+			e.Groups.Add(BE.EyesRollBack(p));
+			e.Groups.Add(BE.EyesClosed(p));
 
 			return e;
 		}

@@ -42,6 +42,14 @@ namespace Cue.W
 				if (b != null)
 					b.val = false;
 			}
+
+			{
+				var b = Cue.Instance.VamSys.GetBoolParameter(
+					atom_, "AutoExpressions", "enabled");
+
+				if (b != null)
+					b.val = false;
+			}
 		}
 
 		public Logger Log

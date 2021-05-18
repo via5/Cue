@@ -450,18 +450,7 @@ namespace Cue.W
 			foreach (var c in char_.clothingItems)
 			{
 				if (c.isActiveAndEnabled)
-				{
-					Cue.LogInfo(
-						$"{ItemName(c)}\n" +
-						$"  - driveX: {c.driveXAngleTarget} {c.driveXAngleTargetController1}\n" +
-						$"  - drive2X: {c.drive2XAngleTarget} {c.drive2XAngleTargetController1}\n" +
-						$"  - colliderLeft: {c.colliderLeft}\n" +
-						$"  - colliderRight: {c.colliderRight}\n");
-
-					if (c.colliderLeft != null)
-						Cue.Instance.VamSys.DumpComponentsAndUp(c.colliderLeft);
-
-				}
+					Cue.LogInfo($"{ItemName(c)}");
 			}
 		}
 

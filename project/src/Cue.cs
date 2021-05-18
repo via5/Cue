@@ -40,6 +40,7 @@ namespace Cue
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
 		private bool paused_ = false;
+		private int frame_ = 0;
 
 		public Cue()
 		{
@@ -60,6 +61,8 @@ namespace Cue
 		public List<Person> Persons { get { return persons_; } }
 		public UI UI { get { return ui_; } }
 		public Options Options { get { return options_; } }
+
+		public int Frame { get { return frame_; } }
 
 		public Person Player
 		{
@@ -248,6 +251,7 @@ namespace Cue
 			if (Sys.Paused)
 				return;
 
+			++frame_;
 			tickers_.fixedUpdate.Do(s, () => DoFixedUpdate(s));
 		}
 

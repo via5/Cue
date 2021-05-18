@@ -239,7 +239,7 @@ namespace Cue
 			get
 			{
 				if (angry_)
-					return new Pair<float, float>(1, 5);
+					return new Pair<float, float>(3, 8);
 				else
 					return base.LookAtRandomInterval;
 			}
