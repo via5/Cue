@@ -123,9 +123,9 @@ namespace Cue
 			get { return type_; }
 		}
 
-		public bool Triggering
+		public float Trigger
 		{
-			get { return part_?.Triggering ?? false; }
+			get { return part_?.Trigger ?? 0; }
 		}
 
 		public bool Grabbed
@@ -348,12 +348,34 @@ namespace Cue
 		private float[] parts_ = new float[BodyParts.Count];
 		private float decay_ = 1;
 
-		private float excitement_ = 0;
+		private float flatExcitement_ = 0;
 		private float forcedExcitement_ = -1;
+		private float mouthRate_ = 0;
+		private float breastsRate_ = 0;
+		private float genitalsRate_ = 0;
+		private float penetrationRate_ = 0;
+		private float totalRate_ = 0;
+		private float max_ = 0;
+		private bool postOrgasm_ = false;
+		private float postOrgasmElapsed_ = 0;
+
+		private IEasing easing_ = new CubicOutEasing();
+
 
 		public Excitement(Person p)
 		{
 			person_ = p;
+		}
+
+		public string StateString
+		{
+			get
+			{
+				if (postOrgasm_)
+					return "post orgasm";
+				else
+					return "none";
+			}
 		}
 
 		public float Value
@@ -363,12 +385,7 @@ namespace Cue
 				if (forcedExcitement_ >= 0)
 					return forcedExcitement_;
 				else
-					return excitement_;
-			}
-
-			set
-			{
-				excitement_ = U.Clamp(value, 0, 1);
+					return easing_.Magnitude(flatExcitement_);
 			}
 		}
 
@@ -377,60 +394,99 @@ namespace Cue
 			forcedExcitement_ = s;
 		}
 
-
 		public void Update(float s)
 		{
-			for (int i=0; i<BodyParts.Count; ++i)
-				parts_[i] = Check(s, person_.Body.Get(i), parts_[i]);
+			var ss = person_.Personality.Sensitivity;
 
-			if (excitement_ >= 1)
+
+			if (postOrgasm_)
+			{
+				postOrgasmElapsed_ += s;
+				if (postOrgasmElapsed_ < ss.DelayPostOrgasm)
+					return;
+
+				postOrgasm_ = false;
+				postOrgasmElapsed_ = 0;
+			}
+
+
+			for (int i = 0; i < BodyParts.Count; ++i)
+			{
+				var t = person_.Body.Get(i).Trigger;
+
+				if (t > 0)
+					parts_[i] = t;
+				else
+					parts_[i] = Math.Max(parts_[i] - s * decay_, 0);
+			}
+
+
+			totalRate_ = 0;
+
+			if (flatExcitement_ < ss.MouthMax)
+				mouthRate_ = Mouth * ss.MouthRate * s;
+			else
+				mouthRate_ = 0;
+
+			if (flatExcitement_ < ss.BreastsMax)
+				breastsRate_ = Breasts * ss.BreastsRate * s;
+			else
+				breastsRate_ = 0;
+
+			if (flatExcitement_ < ss.GenitalsMax)
+				genitalsRate_ = Genitals * ss.GenitalsRate * s;
+			else
+				genitalsRate_ = 0;
+
+			if (flatExcitement_ < ss.PenetrationMax)
+				penetrationRate_ = Penetration * ss.PenetrationRate * s;
+			else
+				penetrationRate_ = 0;
+
+
+			totalRate_ += mouthRate_ + breastsRate_ + genitalsRate_ + penetrationRate_;
+			if (totalRate_ == 0)
+				totalRate_ = ss.DecayPerSecond * s;
+
+
+			max_ = 0;
+
+			if (Mouth > 0)
+				max_ = Math.Max(max_, ss.MouthMax);
+
+			if (Breasts > 0)
+				max_ = Math.Max(max_, ss.BreastsMax);
+
+			if (Genitals > 0)
+				max_ = Math.Max(max_, ss.GenitalsMax);
+
+			if (Penetration > 0)
+				max_ = Math.Max(max_, ss.PenetrationMax);
+
+
+
+			if (flatExcitement_ > max_)
+			{
+				flatExcitement_ = Math.Max(flatExcitement_ + ss.DecayPerSecond * s, max_);
+			}
+			else
+			{
+				flatExcitement_ = U.Clamp(flatExcitement_ + totalRate_, 0, max_);
+			}
+
+
+			person_.Breathing.Intensity = Value;
+			person_.Expression.Set(Expressions.Pleasure, Value);
+
+			if (Value >= 1)
 			{
 				person_.Orgasmer.Orgasm();
-				excitement_ = 0;
+				flatExcitement_ = ss.ExcitementPostOrgasm;
+				postOrgasm_ = true;
+				postOrgasmElapsed_ = 0;
 			}
 		}
 
-		private float Check(float s, BodyPart p, float v)
-		{
-			if (p?.Triggering ?? false)
-				return 1;
-			else
-				return Math.Max(v - s * decay_, 0);
-		}
-
-		public override string ToString()
-		{
-			string s = $"{excitement_:0.00000}";
-
-			if (forcedExcitement_ >= 0)
-				s += $" (forced {forcedExcitement_:0.00000})";
-
-			return s;
-		}
-
-		public float Penetration
-		{
-			get
-			{
-				return Math.Min(1,
-					parts_[BodyParts.Labia] * 0.1f +
-					parts_[BodyParts.Vagina] * 0.3f +
-					parts_[BodyParts.DeepVagina] * 1 +
-					parts_[BodyParts.DeeperVagina] * 1);
-			}
-		}
-
-		public float Genitals
-		{
-			get
-			{
-				return Math.Min(1,
-					parts_[BodyParts.Labia] * 0.005f +
-					parts_[BodyParts.Vagina] * 0.01f +
-					parts_[BodyParts.DeepVagina] * 0.2f +
-					parts_[BodyParts.DeeperVagina] * 1);
-			}
-		}
 
 		public float Mouth
 		{
@@ -442,6 +498,11 @@ namespace Cue
 			}
 		}
 
+		public float MouthRate
+		{
+			get { return mouthRate_; }
+		}
+
 		public float Breasts
 		{
 			get
@@ -450,6 +511,63 @@ namespace Cue
 					parts_[BodyParts.LeftBreast] * 0.5f +
 					parts_[BodyParts.RightBreast] * 0.5f;
 			}
+		}
+
+		public float BreastsRate
+		{
+			get { return breastsRate_; }
+		}
+
+		public float Genitals
+		{
+			get
+			{
+				return Math.Min(1,
+					parts_[BodyParts.Labia]);
+			}
+		}
+
+		public float GenitalsRate
+		{
+			get { return genitalsRate_; }
+		}
+
+		public float Penetration
+		{
+			get
+			{
+				return Math.Min(1,
+					parts_[BodyParts.Vagina] * 0.3f +
+					parts_[BodyParts.DeepVagina] * 1 +
+					parts_[BodyParts.DeeperVagina] * 1);
+			}
+		}
+
+		public float PenetrationRate
+		{
+			get { return penetrationRate_; }
+		}
+
+		public float Rate
+		{
+			get { return totalRate_; }
+		}
+
+		public float Max
+		{
+			get { return max_; }
+		}
+
+		public override string ToString()
+		{
+			string s =
+				$"{Value:0.000000} " +
+				$"(flat {flatExcitement_:0.000000}, max {max_:0.000000})";
+
+			if (forcedExcitement_ >= 0)
+				s += $" forced {forcedExcitement_:0.000000})";
+
+			return s;
 		}
 	}
 }

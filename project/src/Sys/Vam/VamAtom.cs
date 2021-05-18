@@ -21,7 +21,7 @@ namespace Cue.W
 
 		public abstract Transform Transform { get; }
 		public abstract bool CanTrigger { get; }
-		public abstract bool Triggering { get; }
+		public abstract float Trigger { get; }
 		public abstract bool CanGrab { get; }
 		public abstract bool Grabbed { get; }
 		public abstract Vector3 Position { get; }
@@ -50,9 +50,9 @@ namespace Cue.W
 			get { return false; }
 		}
 
-		public override bool Triggering
+		public override float Trigger
 		{
-			get { return false; }
+			get { return 0; }
 		}
 
 		public override bool CanGrab
@@ -104,9 +104,9 @@ namespace Cue.W
 			get { return false; }
 		}
 
-		public override bool Triggering
+		public override float Trigger
 		{
-			get { return false; }
+			get { return 0; }
 		}
 
 		public override bool CanGrab
@@ -165,9 +165,9 @@ namespace Cue.W
 			get { return true; }
 		}
 
-		public override bool Triggering
+		public override float Trigger
 		{
-			get { return trigger_.active; }
+			get { return trigger_.active ? 1 : 0; }
 		}
 
 		public override bool CanGrab
@@ -246,7 +246,7 @@ namespace Cue.W
 		}
 
 		public override bool CanTrigger { get { return false; } }
-		public override bool Triggering { get { return false; } }
+		public override float Trigger { get { return 0; } }
 		public override bool CanGrab { get { return false; } }
 		public override bool Grabbed { get { return false; } }
 

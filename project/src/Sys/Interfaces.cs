@@ -136,7 +136,7 @@ namespace Cue.W
 	{
 		int Type { get; }
 		bool CanTrigger { get; }
-		bool Triggering { get; }
+		float Trigger { get; }
 		bool CanGrab { get; }
 		bool Grabbed { get; }
 		Vector3 Position { get; }

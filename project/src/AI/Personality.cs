@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Security.Policy;
+
+namespace Cue
 {
 	interface IPersonality
 	{
@@ -19,64 +21,26 @@
 	{
 		private Person person_;
 
-		private float change_ = 0;
-		private float penetration_ = 0;
-
-		private float mouthRate_ = 0.001f;
-		private float breastsRate_ = 0.01f;
-		private float genitalsRate_ = 0.1f;
-		private float decayRate_ = -0.1f;
-		private float rateAdjust_ = 0.1f;
-
-
 		public Sensitivity(Person p)
 		{
 			person_ = p;
 		}
 
-		public float Change { get { return change_; } }
-		public float MouthRate { get { return mouthRate_; } }
-		public float BreastsRate { get { return breastsRate_; } }
-		public float GenitalsRate { get { return genitalsRate_; } }
-		public float Penetration { get { return penetration_; } }
-		public float DecayRate { get { return decayRate_; } }
-		public float RateAdjust { get { return rateAdjust_; } }
+		public float MouthRate { get { return 0.1f; } }
+		public float MouthMax { get { return 0.05f; } }
 
-		public void Update(float s)
-		{
-			float rate = 0;
+		public float BreastsRate { get { return 0.01f; } }
+		public float BreastsMax { get { return 0.1f; } }
 
-			rate += person_.Excitement.Genitals * genitalsRate_;
-			rate += person_.Excitement.Mouth * mouthRate_;
-			rate += person_.Excitement.Breasts * breastsRate_;
+		public float GenitalsRate { get { return 0.06f; } }
+		public float GenitalsMax { get { return 0.3f; } }
 
-			if (rate == 0)
-				rate = decayRate_;
+		public float PenetrationRate { get { return 0.05f; } }
+		public float PenetrationMax { get { return 1.0f; } }
 
-			change_ = rate * s * rateAdjust_;
-
-			var p = person_.Excitement.Penetration;
-			if (p > 0)
-				penetration_ = U.Clamp(penetration_ + s * p, 0, 1);
-			else
-				penetration_ = U.Clamp(penetration_ - s / 5, 0, 1); ;
-		}
-
-		public override string ToString()
-		{
-			string s = "";
-
-			s += "change=";
-
-			if (change_ < 0)
-				s += "-";
-			else
-				s += "+";
-
-			s += change_.ToString("0.00000");
-
-			return s;
-		}
+		public float DecayPerSecond { get { return -0.1f; } }
+		public float ExcitementPostOrgasm { get { return 0.0f; } }
+		public float DelayPostOrgasm { get { return 10; } }
 	}
 
 
@@ -151,18 +115,6 @@
 				Init();
 				inited_ = true;
 			}
-
-			sensitivity_.Update(s);
-
-			person_.Excitement.Value += sensitivity_.Change;
-
-			var intensity = U.Clamp(
-				person_.Excitement.Value +
-				U.Clamp(sensitivity_.Penetration, 0, 0.7f),
-				0, 1);
-
-			person_.Breathing.Intensity = intensity;
-			person_.Expression.Set(Expressions.Pleasure, intensity);
 
 			bool close = person_.Body.PlayerIsClose;
 			if (close != wasClose_)

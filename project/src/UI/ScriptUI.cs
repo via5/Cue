@@ -458,15 +458,13 @@ namespace Cue
 		private VUI.Label event_ = new VUI.Label();
 		private VUI.Label personality_ = new VUI.Label();
 
-		private VUI.Label moodState_ = new VUI.Label();
-		private VUI.Label moodExcitement_ = new VUI.Label();
-		private VUI.Label moodLastRate_ = new VUI.Label();
-		private VUI.Label moodMouthRate_ = new VUI.Label();
-		private VUI.Label moodBreastsRate_ = new VUI.Label();
-		private VUI.Label moodGenitalsRate_ = new VUI.Label();
-		private VUI.Label moodPenetration_ = new VUI.Label();
-		private VUI.Label moodDecayRate_ = new VUI.Label();
-		private VUI.Label moodRateAdjust_ = new VUI.Label();
+		private VUI.Label excitement_ = new VUI.Label();
+		private VUI.Label mouth_ = new VUI.Label();
+		private VUI.Label breasts_ = new VUI.Label();
+		private VUI.Label genitals_ = new VUI.Label();
+		private VUI.Label penetration_ = new VUI.Label();
+		private VUI.Label total_ = new VUI.Label();
+		private VUI.Label state_ = new VUI.Label();
 
 		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Force excitement");
 		private VUI.FloatTextSlider forceExcitementValue_ = new VUI.FloatTextSlider();
@@ -493,35 +491,29 @@ namespace Cue
 			state.Add(new VUI.Spacer(30));
 			state.Add(new VUI.Spacer(30));
 
-			state.Add(new VUI.Label("Mood", UnityEngine.FontStyle.Bold));
+			state.Add(new VUI.Label("Excitement", UnityEngine.FontStyle.Bold));
 			state.Add(new VUI.Spacer(0));
 
-			state.Add(new VUI.Label("State"));
-			state.Add(moodState_);
-
-			state.Add(new VUI.Label("Excitement"));
-			state.Add(moodExcitement_);
-
-			state.Add(new VUI.Label("Rate"));
-			state.Add(moodLastRate_);
+			state.Add(new VUI.Label("Value"));
+			state.Add(excitement_);
 
 			state.Add(new VUI.Label("Mouth"));
-			state.Add(moodMouthRate_);
+			state.Add(mouth_);
 
 			state.Add(new VUI.Label("Breasts"));
-			state.Add(moodBreastsRate_);
+			state.Add(breasts_);
 
 			state.Add(new VUI.Label("Genitals"));
-			state.Add(moodGenitalsRate_);
+			state.Add(genitals_);
 
 			state.Add(new VUI.Label("Penetration"));
-			state.Add(moodPenetration_);
+			state.Add(penetration_);
 
-			state.Add(new VUI.Label("Decay"));
-			state.Add(moodDecayRate_);
+			state.Add(new VUI.Label("Total rate"));
+			state.Add(total_);
 
-			state.Add(new VUI.Label("Rate adjust"));
-			state.Add(moodRateAdjust_);
+			state.Add(new VUI.Label("State"));
+			state.Add(state_);
 
 			state.Add(new VUI.Spacer(30));
 			state.Add(new VUI.Spacer(30));
@@ -573,17 +565,15 @@ namespace Cue
 
 			personality_.Text = person_.Personality.ToString();
 
-			var ss = person_.Personality.Sensitivity;
+			var e = person_.Excitement; ;
 
-			moodState_.Text = person_.Personality.StateString;
-			moodExcitement_.Text = person_.Excitement.ToString();
-			moodLastRate_.Text = ss.Change.ToString("0.000000");
-			moodMouthRate_.Text = ss.MouthRate.ToString();
-			moodBreastsRate_.Text = ss.BreastsRate.ToString();
-			moodGenitalsRate_.Text = ss.GenitalsRate.ToString();
-			moodPenetration_.Text = ss.Penetration.ToString();
-			moodDecayRate_.Text = ss.DecayRate.ToString();
-			moodRateAdjust_.Text = ss.RateAdjust.ToString();
+			excitement_.Text = e.ToString();
+			mouth_.Text = $"{e.Mouth:0.000000} {e.MouthRate:0.000000}";
+			breasts_.Text = $"{e.Breasts:0.000000} {e.BreastsRate:0.000000}";
+			genitals_.Text = $"{e.Genitals:0.000000} {e.GenitalsRate:0.000000}";
+			penetration_.Text = $"{e.Penetration:0.000000} {e.PenetrationRate:0.000000}";
+			total_.Text = $"{e.Rate:0.000000}";
+			state_.Text = e.StateString;
 		}
 
 		private void OnForceExcitementCheck(bool b)
@@ -787,10 +777,10 @@ namespace Cue
 					{
 						if (w.part.Sys.CanTrigger)
 						{
-							w.triggering.Text = w.part.Triggering.ToString();
+							w.triggering.Text = w.part.Trigger.ToString("0.##");
 
 							w.triggering.TextColor = (
-								w.part.Triggering ?
+								w.part.Trigger > 0 ?
 								W.VamU.ToUnity(Color.Green) :
 								VUI.Style.Theme.TextColor);
 						}
