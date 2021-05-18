@@ -244,6 +244,11 @@ namespace Cue.W
 			get { return null; }
 		}
 
+		public IBody Body
+		{
+			get { return null; }
+		}
+
 		public bool Teleporting
 		{
 			get { return false; }

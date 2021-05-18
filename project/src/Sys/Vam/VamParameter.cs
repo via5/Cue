@@ -82,6 +82,11 @@ namespace Cue.W
 			get { return GetValue(); }
 		}
 
+		public StorableType Parameter
+		{
+			get { return param_; }
+		}
+
 		protected NativeType GetValue(NativeType def = default(NativeType))
 		{
 			if (!Check())

@@ -139,6 +139,7 @@
     <Compile Include="src\Sys\Mock.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
     <Compile Include="src\Sys\Vam\VamAtomNav.cs" />
+    <Compile Include="src\Sys\Vam\VamBody.cs" />
     <Compile Include="src\Sys\Vam\VamCanvas.cs" />
     <Compile Include="src\Sys\Vam\VamClothing.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />

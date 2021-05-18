@@ -215,12 +215,14 @@ namespace Cue
 		private readonly BodyPart[] all_;
 		private bool handsClose_;
 		private float timeSinceClose_ = CloseDelay + 1;
+		private float currentSweat_ = 0;
+		private float targetSweat_ = 0;
 
 		public Body(Person p)
 		{
 			person_ = p;
 
-			var parts = p.Atom.GetBodyParts();
+			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
 
 			for (int i = 0; i < BodyParts.Count; ++i)
@@ -245,6 +247,25 @@ namespace Cue
 			{
 				return handsClose_ || (timeSinceClose_ < CloseDelay);
 			}
+		}
+
+		public bool PlayerIsCloseDelayed
+		{
+			get
+			{
+				return !handsClose_ && (timeSinceClose_ < CloseDelay);
+			}
+		}
+
+		public float Sweat
+		{
+			get { return targetSweat_; }
+			set { targetSweat_ = value; }
+		}
+
+		public float CurrentSweat
+		{
+			get { return currentSweat_; }
 		}
 
 		public BodyPart Get(int type)
@@ -338,6 +359,19 @@ namespace Cue
 				timeSinceClose_ = 0;
 			else if (!handsClose_)
 				timeSinceClose_ += s;
+
+			UpdateSweat(s);
+
+			if (person_.Atom.Body != null)
+				person_.Atom.Body.Sweat = currentSweat_;
+		}
+
+		private void UpdateSweat(float s)
+		{
+			if (targetSweat_ > currentSweat_)
+				currentSweat_ = U.Clamp(currentSweat_ + s / 20, 0, targetSweat_);
+			else
+				currentSweat_ = U.Clamp(currentSweat_ - s / 40, targetSweat_, 1);
 		}
 	}
 
@@ -398,7 +432,6 @@ namespace Cue
 		{
 			var ss = person_.Personality.Sensitivity;
 
-
 			if (postOrgasm_)
 			{
 				postOrgasmElapsed_ += s;
@@ -409,7 +442,15 @@ namespace Cue
 				postOrgasmElapsed_ = 0;
 			}
 
+			UpdateParts(s);
+			UpdateRates(s);
+			UpdateMax(s);
+			UpdateValue(s);
+			Apply(s);
+		}
 
+		private void UpdateParts(float s)
+		{
 			for (int i = 0; i < BodyParts.Count; ++i)
 			{
 				var t = person_.Body.Get(i).Trigger;
@@ -419,7 +460,11 @@ namespace Cue
 				else
 					parts_[i] = Math.Max(parts_[i] - s * decay_, 0);
 			}
+		}
 
+		private void UpdateRates(float s)
+		{
+			var ss = person_.Personality.Sensitivity;
 
 			totalRate_ = 0;
 
@@ -447,7 +492,11 @@ namespace Cue
 			totalRate_ += mouthRate_ + breastsRate_ + genitalsRate_ + penetrationRate_;
 			if (totalRate_ == 0)
 				totalRate_ = ss.DecayPerSecond * s;
+		}
 
+		private void UpdateMax(float s)
+		{
+			var ss = person_.Personality.Sensitivity;
 
 			max_ = 0;
 
@@ -462,20 +511,30 @@ namespace Cue
 
 			if (Penetration > 0)
 				max_ = Math.Max(max_, ss.PenetrationMax);
+		}
 
-
+		private void UpdateValue(float s)
+		{
+			var ss = person_.Personality.Sensitivity;
 
 			if (flatExcitement_ > max_)
 			{
-				flatExcitement_ = Math.Max(flatExcitement_ + ss.DecayPerSecond * s, max_);
+				flatExcitement_ =
+					Math.Max(flatExcitement_ + ss.DecayPerSecond * s, max_);
 			}
 			else
 			{
-				flatExcitement_ = U.Clamp(flatExcitement_ + totalRate_, 0, max_);
+				flatExcitement_ =
+					U.Clamp(flatExcitement_ + totalRate_, 0, max_);
 			}
+		}
 
+		private void Apply(float s)
+		{
+			var ss = person_.Personality.Sensitivity;
 
 			person_.Breathing.Intensity = Value;
+			person_.Body.Sweat = Value;
 			person_.Expression.Set(Expressions.Pleasure, Value);
 
 			if (Value >= 1)

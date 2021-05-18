@@ -288,6 +288,7 @@ namespace Cue
 			tabs_.Add(new PersonAITab(person_));
 			tabs_.Add(new PersonDumpTab(person_));
 			tabs_.Add(new PersonBodyTab(person_));
+			tabs_.Add(new PersonBodyPartsTab(person_));
 			tabs_.Add(new PersonAnimationsTab(person_));
 
 			foreach (var t in tabs_)
@@ -458,17 +459,6 @@ namespace Cue
 		private VUI.Label event_ = new VUI.Label();
 		private VUI.Label personality_ = new VUI.Label();
 
-		private VUI.Label excitement_ = new VUI.Label();
-		private VUI.Label mouth_ = new VUI.Label();
-		private VUI.Label breasts_ = new VUI.Label();
-		private VUI.Label genitals_ = new VUI.Label();
-		private VUI.Label penetration_ = new VUI.Label();
-		private VUI.Label total_ = new VUI.Label();
-		private VUI.Label state_ = new VUI.Label();
-
-		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Force excitement");
-		private VUI.FloatTextSlider forceExcitementValue_ = new VUI.FloatTextSlider();
-
 		public PersonAITab(Person p)
 		{
 			person_ = p;
@@ -488,45 +478,9 @@ namespace Cue
 			state.Add(new VUI.Label("Personality"));
 			state.Add(personality_);
 
-			state.Add(new VUI.Spacer(30));
-			state.Add(new VUI.Spacer(30));
-
-			state.Add(new VUI.Label("Excitement", UnityEngine.FontStyle.Bold));
-			state.Add(new VUI.Spacer(0));
-
-			state.Add(new VUI.Label("Value"));
-			state.Add(excitement_);
-
-			state.Add(new VUI.Label("Mouth"));
-			state.Add(mouth_);
-
-			state.Add(new VUI.Label("Breasts"));
-			state.Add(breasts_);
-
-			state.Add(new VUI.Label("Genitals"));
-			state.Add(genitals_);
-
-			state.Add(new VUI.Label("Penetration"));
-			state.Add(penetration_);
-
-			state.Add(new VUI.Label("Total rate"));
-			state.Add(total_);
-
-			state.Add(new VUI.Label("State"));
-			state.Add(state_);
-
-			state.Add(new VUI.Spacer(30));
-			state.Add(new VUI.Spacer(30));
-
-			state.Add(forceExcitement_);
-			state.Add(forceExcitementValue_);
-
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
-
-			forceExcitement_.Changed += OnForceExcitementCheck;
-			forceExcitementValue_.ValueChanged += OnForceExcitement;
 		}
 
 		public override string Title
@@ -564,30 +518,6 @@ namespace Cue
 				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
 
 			personality_.Text = person_.Personality.ToString();
-
-			var e = person_.Excitement; ;
-
-			excitement_.Text = e.ToString();
-			mouth_.Text = $"{e.Mouth:0.000000} {e.MouthRate:0.000000}";
-			breasts_.Text = $"{e.Breasts:0.000000} {e.BreastsRate:0.000000}";
-			genitals_.Text = $"{e.Genitals:0.000000} {e.GenitalsRate:0.000000}";
-			penetration_.Text = $"{e.Penetration:0.000000} {e.PenetrationRate:0.000000}";
-			total_.Text = $"{e.Rate:0.000000}";
-			state_.Text = e.StateString;
-		}
-
-		private void OnForceExcitementCheck(bool b)
-		{
-			if (b)
-				person_.Excitement.ForceValue(forceExcitementValue_.Value);
-			else
-				person_.Excitement.ForceValue(-1);
-		}
-
-		private void OnForceExcitement(float f)
-		{
-			if (forceExcitement_.Checked)
-				person_.Excitement.ForceValue(f);
 		}
 	}
 
@@ -696,8 +626,120 @@ namespace Cue
 		}
 	}
 
-
 	class PersonBodyTab : Tab
+	{
+		private readonly Person person_;
+
+		private VUI.Label handsClose_ = new VUI.Label();
+		private VUI.Label sweat_ = new VUI.Label();
+
+		private VUI.Label excitement_ = new VUI.Label();
+		private VUI.Label mouth_ = new VUI.Label();
+		private VUI.Label breasts_ = new VUI.Label();
+		private VUI.Label genitals_ = new VUI.Label();
+		private VUI.Label penetration_ = new VUI.Label();
+		private VUI.Label total_ = new VUI.Label();
+		private VUI.Label state_ = new VUI.Label();
+
+		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Force excitement");
+		private VUI.FloatTextSlider forceExcitementValue_ = new VUI.FloatTextSlider();
+
+
+		public PersonBodyTab(Person person)
+		{
+			person_ = person;
+
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalSpacing = 20;
+			gl.HorizontalStretch = new List<bool>() { false, true };
+
+			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Hands close"));
+			p.Add(handsClose_);
+
+			p.Add(new VUI.Label("Sweat"));
+			p.Add(sweat_);
+
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
+
+			p.Add(new VUI.Label("Excitement", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Value"));
+			p.Add(excitement_);
+
+			p.Add(new VUI.Label("Mouth"));
+			p.Add(mouth_);
+
+			p.Add(new VUI.Label("Breasts"));
+			p.Add(breasts_);
+
+			p.Add(new VUI.Label("Genitals"));
+			p.Add(genitals_);
+
+			p.Add(new VUI.Label("Penetration"));
+			p.Add(penetration_);
+
+			p.Add(new VUI.Label("Total rate"));
+			p.Add(total_);
+
+			p.Add(new VUI.Label("State"));
+			p.Add(state_);
+
+			p.Add(forceExcitement_);
+			p.Add(forceExcitementValue_);
+
+
+			Layout = new VUI.BorderLayout();
+			Add(p, VUI.BorderLayout.Top);
+
+
+			forceExcitement_.Changed += OnForceExcitementCheck;
+			forceExcitementValue_.ValueChanged += OnForceExcitement;
+		}
+
+		public override string Title
+		{
+			get { return "Body"; }
+		}
+
+		public override void Update(float s)
+		{
+			handsClose_.Text =
+				$"{person_.Body.PlayerIsClose}" +
+				(person_.Body.PlayerIsCloseDelayed ? " (delayed)" : "");
+
+			sweat_.Text = $"{person_.Body.Sweat} ({person_.Body.CurrentSweat})";
+
+			var e = person_.Excitement;
+			excitement_.Text = e.ToString();
+			mouth_.Text = $"{e.Mouth:0.000000} {e.MouthRate:0.000000}";
+			breasts_.Text = $"{e.Breasts:0.000000} {e.BreastsRate:0.000000}";
+			genitals_.Text = $"{e.Genitals:0.000000} {e.GenitalsRate:0.000000}";
+			penetration_.Text = $"{e.Penetration:0.000000} {e.PenetrationRate:0.000000}";
+			total_.Text = $"{e.Rate:0.000000}";
+			state_.Text = e.StateString;
+		}
+
+		private void OnForceExcitementCheck(bool b)
+		{
+			if (b)
+				person_.Excitement.ForceValue(forceExcitementValue_.Value);
+			else
+				person_.Excitement.ForceValue(-1);
+		}
+
+		private void OnForceExcitement(float f)
+		{
+			if (forceExcitement_.Checked)
+				person_.Excitement.ForceValue(f);
+		}
+	}
+
+
+	class PersonBodyPartsTab : Tab
 	{
 		struct PartWidgets
 		{
@@ -709,7 +751,7 @@ namespace Cue
 		private readonly Person person_;
 		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
 
-		public PersonBodyTab(Person ps)
+		public PersonBodyPartsTab(Person ps)
 		{
 			person_ = ps;
 
@@ -762,7 +804,7 @@ namespace Cue
 
 		public override string Title
 		{
-			get { return "Body"; }
+			get { return "Body parts"; }
 		}
 
 		public override void Update(float s)

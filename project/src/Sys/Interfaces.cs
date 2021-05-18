@@ -154,6 +154,12 @@ namespace Cue.W
 		void Dump();
 	}
 
+	interface IBody
+	{
+		List<IBodyPart> GetBodyParts();
+		float Sweat { set; }
+	}
+
 	interface IAtom
 	{
 		string ID { get; }
@@ -168,8 +174,9 @@ namespace Cue.W
 
 		void Init();
 
-		List<IBodyPart> GetBodyParts();
 		IClothing Clothing { get; }
+		IBody Body { get; }
+
 		void SetDefaultControls(string why);
 
 		void OnPluginState(bool b);
