@@ -103,5 +103,10 @@ namespace Cue
 		{
 			return "synergy " + name_;
 		}
+
+		public string ToDetailedString()
+		{
+			return ToString();
+		}
 	}
 }

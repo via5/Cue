@@ -2,43 +2,66 @@
 
 namespace Cue.Proc
 {
-	abstract class BasicForce : ITarget
+	class Force : ITarget
 	{
-		protected int bodyPart_;
-		protected string rbId_;
-		protected Rigidbody rb_ = null;
-		protected Vector3 min_, max_;
-		protected Duration duration_;
-		protected Duration delay_;
-		protected bool loop_;
+		public const int NoFlags = 0x00;
+		public const int Loop = 0x01;
+		public const int ResetBetween = 0x02;
 
-		private Vector3 last_, current_;
+		public const int RelativeForce = 1;
+		public const int RelativeTorque = 2;
+
+		private const int Forwards = 1;
+		private const int ForwardsDelay = 2;
+		private const int Backwards = 3;
+		private const int BackwardsDelay = 4;
+		private const int Finished = 5;
+
+		private int type_;
+		private int bodyPart_;
+		private string rbId_;
+		private Vector3 min_, max_;
+		private Duration fwdDuration_, bwdDuration_;
+		private Duration fwdDelay_, bwdDelay_;
+		private int flags_;
+
+		private int state_ = Forwards;
+		private Rigidbody rb_ = null;
+		private Vector3 last_ = Vector3.Zero;
+		private Vector3 current_ = Vector3.Zero;
 		private IEasing easing_ = new SinusoidalEasing();
 		private Person person_ = null;
 		private bool wasBusy_ = false;
-		private bool inDelay_ = false;
-		private bool done_ = false;
-		private bool finishing_ = false;
+		private bool oneFrameFinished_ = false;
 
-		public BasicForce(
-			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay, bool loop)
+		public Force(
+			int type, int bodyPart, string rbId, Vector3 min, Vector3 max,
+			Duration fwdDuration, Duration bwdDuration,
+			Duration fwdDelay, Duration bwdDelay, int flags)
 		{
+			type_ = type;
 			bodyPart_ = bodyPart;
 			rbId_ = rbId;
 			min_ = min;
 			max_ = max;
-			duration_ = d;
-			delay_ = delay;
-			loop_ = loop;
+			fwdDuration_ = fwdDuration;
+			bwdDuration_ = bwdDuration;
+			fwdDelay_ = fwdDelay;
+			bwdDelay_ = bwdDelay;
+			flags_ = flags;
 		}
 
 		public bool Done
 		{
-			get { return done_; }
+			get { return oneFrameFinished_; }
 		}
 
-		public abstract ITarget Clone();
+		public ITarget Clone()
+		{
+			return new Force(
+				type_, bodyPart_, rbId_, min_, max_,
+				fwdDuration_, bwdDuration_, fwdDelay_, bwdDelay_, flags_);
+		}
 
 		public void Start(Person p)
 		{
@@ -52,23 +75,24 @@ namespace Cue.Proc
 			}
 
 			last_ = Vector3.Zero;
-			done_ = false;
-			finishing_ = false;
+			state_ = Forwards;
 			Next();
 		}
 
 		public void Reset()
 		{
-			duration_.Reset();
+			fwdDuration_.Reset();
+			bwdDuration_.Reset();
+			fwdDelay_.Reset();
+			bwdDelay_.Reset();
 			current_ = Vector3.Zero;
-			done_ = false;
-			finishing_ = false;
+			state_ = Forwards;
 			Next();
 		}
 
 		public void FixedUpdate(float s)
 		{
-			done_ = false;
+			oneFrameFinished_ = false;
 
 			if (person_.Body.Get(bodyPart_).Busy)
 			{
@@ -81,63 +105,183 @@ namespace Cue.Proc
 				wasBusy_ = false;
 			}
 
-			if (inDelay_)
+			switch (state_)
 			{
-				delay_.Update(s);
-				if (delay_.Finished)
-					inDelay_ = false;
-			}
-			else
-			{
-				duration_.Update(s);
-				Apply(Lerped());
-
-				if (duration_.Finished)
+				case Forwards:
 				{
-					if (loop_)
+					fwdDuration_.Update(s);
+					Apply();
+
+					if (fwdDuration_.Finished)
 					{
-						if (delay_.Enabled)
-							inDelay_ = true;
-						else
+						if (fwdDelay_.Enabled)
+						{
+							state_ = ForwardsDelay;
+						}
+						else if (Bits.IsSet(flags_, ResetBetween))
+						{
+							last_ = current_;
+							current_ = Vector3.Zero;
+							state_ = Backwards;
+						}
+						else if (Bits.IsSet(flags_, Loop))
+						{
 							Next();
+						}
+						else
+						{
+							state_ = Finished;
+							oneFrameFinished_ = true;
+						}
 					}
-					else if (!finishing_)
+
+					break;
+				}
+
+				case ForwardsDelay:
+				{
+					fwdDelay_.Update(s);
+
+					if (fwdDelay_.Finished)
 					{
-						last_ = current_;
-						current_ = Vector3.Zero;
-						finishing_ = true;
+						if (Bits.IsSet(flags_, ResetBetween))
+						{
+							last_ = current_;
+							current_ = Vector3.Zero;
+							state_ = Backwards;
+						}
+						else if (Bits.IsSet(flags_, Loop))
+						{
+							state_ = Forwards;
+							Next();
+						}
+						else
+						{
+							state_ = Finished;
+							oneFrameFinished_ = true;
+						}
 					}
-					else
+
+					break;
+				}
+
+				case Backwards:
+				{
+					bwdDuration_.Update(s);
+					Apply();
+
+					if (bwdDuration_.Finished)
 					{
-						done_ = true;
-						finishing_ = false;
-						Next();
+						if (bwdDelay_.Enabled)
+						{
+							state_ = BackwardsDelay;
+						}
+						else if (Bits.IsSet(flags_, Loop))
+						{
+							state_ = Forwards;
+							Next();
+						}
+						else
+						{
+							state_ = Finished;
+							oneFrameFinished_ = true;
+						}
 					}
+
+					break;
+				}
+
+				case BackwardsDelay:
+				{
+					bwdDelay_.Update(s);
+
+					if (bwdDelay_.Finished)
+					{
+						if (Bits.IsSet(flags_, Loop))
+						{
+							state_ = Forwards;
+							Next();
+						}
+						else
+						{
+							state_ = Finished;
+							oneFrameFinished_ = true;
+						}
+					}
+
+					break;
+				}
+
+				case Finished:
+				{
+					break;
 				}
 			}
 		}
 
-		private float Magnitude
+		private void Apply()
 		{
-			get { return easing_.Magnitude(duration_.Progress); }
+			var v = Lerped();
+
+			switch (type_)
+			{
+				case RelativeForce:
+				{
+					rb_.AddRelativeForce(W.VamU.ToUnity(v));
+					break;
+				}
+
+				case RelativeTorque:
+				{
+					rb_.AddRelativeTorque(W.VamU.ToUnity(v));
+					break;
+				}
+			}
+		}
+
+		private float Progress()
+		{
+			if (state_ == Forwards)
+				return fwdDuration_.Progress;
+			else
+				return bwdDuration_.Progress;
+		}
+
+		private float Magnitude()
+		{
+			return easing_.Magnitude(Progress());
 		}
 
 		private Vector3 Lerped()
 		{
-			return Vector3.Lerp(last_, current_, Magnitude);
+			return Vector3.Lerp(last_, current_, Magnitude());
+		}
+
+		public static string TypeToString(int i)
+		{
+			switch (i)
+			{
+				case RelativeForce: return "rforce";
+				case RelativeTorque: return "rtorque";
+				default: return $"?{i}";
+			}
 		}
 
 		public override string ToString()
 		{
-			return
-				$"{rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
-				$"min={min_} max={max_}\n" +
-				$"last={last_} current={current_}\n" +
-				$"dur={duration_} delay={delay_} p={duration_.Progress:0.00}\n" +
-				$"mag={Magnitude:0.00} lerped={Lerped()}";
+			return $"{rbId_} ({BodyParts.ToString(bodyPart_)})";
 		}
 
-		protected abstract void Apply(Vector3 v);
+		public virtual string ToDetailedString()
+		{
+			return
+				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"min={min_} max={max_}\n" +
+				$"last={last_} current={current_}\n" +
+				$"fdur={fwdDuration_} bdur={bwdDuration_}\n" +
+				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
+				$"p={Progress():0.00} mag={Magnitude():0.00} lerped={Lerped()}";
+		}
 
 		private void Next()
 		{
@@ -147,62 +291,6 @@ namespace Cue.Proc
 				U.RandomFloat(min_.X, max_.X),
 				U.RandomFloat(min_.Y, max_.Y),
 				U.RandomFloat(min_.Z, max_.Z));
-		}
-	}
-
-
-	class Force : BasicForce
-	{
-		public Force(
-			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay, bool loop)
-				: base(bodyPart, rbId, min, max, d, delay, loop)
-		{
-		}
-
-		public override ITarget Clone()
-		{
-			return new Force(
-				bodyPart_, rbId_, min_, max_,
-				new Duration(duration_), new Duration(delay_), loop_);
-		}
-
-		protected override void Apply(Vector3 v)
-		{
-			rb_.AddRelativeForce(W.VamU.ToUnity(v));
-		}
-
-		public override string ToString()
-		{
-			return "force " + base.ToString();
-		}
-	}
-
-
-	class Torque : BasicForce
-	{
-		public Torque(
-			int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration d, Duration delay, bool loop)
-				: base(bodyPart, rbId, min, max, d, delay, loop)
-		{
-		}
-
-		public override ITarget Clone()
-		{
-			return new Torque(
-				bodyPart_, rbId_, min_, max_,
-				new Duration(duration_), new Duration(delay_), loop_);
-		}
-
-		protected override void Apply(Vector3 v)
-		{
-			rb_.AddRelativeTorque(W.VamU.ToUnity(v));
-		}
-
-		public override string ToString()
-		{
-			return "torque " + base.ToString();
 		}
 	}
 }

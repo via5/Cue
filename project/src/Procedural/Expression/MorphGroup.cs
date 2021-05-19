@@ -91,9 +91,14 @@ namespace Cue.Proc
 		private Duration delay_;
 		private int state_ = ActiveState;
 
-		public SequentialProceduralMorphGroup(Duration delay = null)
+		public SequentialProceduralMorphGroup()
+			: this(Duration.Zero)
 		{
-			delay_ = delay ?? new Duration(0, 0);
+		}
+
+		public SequentialProceduralMorphGroup(Duration delay)
+		{
+			delay_ = delay;
 		}
 
 		public List<ClampableMorph> Morphs

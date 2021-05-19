@@ -11,6 +11,7 @@ namespace Cue
 		public const int TransitionType = 4;
 		public const int SexType = 5;
 		public const int IdleType = 6;
+		public const int OrgasmType = 7;
 
 		private readonly int type_ = NoType;
 		private readonly int from_ = PersonState.None;
@@ -56,6 +57,7 @@ namespace Cue
 
 				case SexType:
 				case IdleType:
+				case OrgasmType:
 				{
 					s += PersonState.StateToString(state_) + " ";
 					break;
@@ -83,6 +85,8 @@ namespace Cue
 				return SexType;
 			else if (s == "idle")
 				return IdleType;
+			else if (s == "orgasm")
+				return OrgasmType;
 
 			Cue.LogError($"unknown anim type '{os}'");
 			return NoType;
@@ -99,6 +103,7 @@ namespace Cue
 				case TransitionType: return "transition";
 				case SexType: return "sex";
 				case IdleType: return "idle";
+				case OrgasmType: return "orgasm";
 				default: return $"?{t}";
 			}
 		}
@@ -178,7 +183,14 @@ namespace Cue
 
 		public bool PlayType(int type, int flags = 0)
 		{
-			return Play(Resources.Animations.GetAny(type, person_.Sex), flags);
+			var a = Resources.Animations.GetAny(type, person_.Sex);
+			if (a == null)
+			{
+				log_.Error($"no animation for type {Animation.TypeToString(type)}");
+				return false;
+			}
+
+			return Play(a, flags);
 		}
 
 		public bool PlayNeutral()

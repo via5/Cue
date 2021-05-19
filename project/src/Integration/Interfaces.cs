@@ -82,6 +82,7 @@ namespace Cue
 		float FirstFrame { get; }
 		float LastFrame { get; }
 		bool ForcesOnly { get; }
+		string ToDetailedString();
 	}
 
 	interface IOrgasmer

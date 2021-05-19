@@ -36,6 +36,11 @@ namespace Cue
 		{
 			return "timeline " + name_;
 		}
+
+		public string ToDetailedString()
+		{
+			return ToString();
+		}
 	}
 
 	class TimelinePlayer : IPlayer

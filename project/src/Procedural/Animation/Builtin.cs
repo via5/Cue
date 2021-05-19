@@ -11,6 +11,7 @@ namespace Cue.Proc
 			list.Add(Stand(PersonState.Walking));
 			list.Add(Stand(PersonState.Standing));
 			list.Add(StandIdle());
+			list.Add(Orgasm());
 
 			return list;
 		}
@@ -31,6 +32,24 @@ namespace Cue.Proc
 				Animation.TransitionType,
 				from, PersonState.Standing,
 				PersonState.None, Sexes.Any, a);
+		}
+
+		private static Animation Orgasm()
+		{
+			var a = new ProcAnimation("orgasm", true);
+
+			// delay seems to be while force is high, b
+
+			//a.AddTarget(new Force(
+			//	BodyParts.Hips, "hip",
+			//	new Vector3(0, 0, 500), new Vector3(0, 0, 500),
+			//	new Duration(0.01f, 0.01f), new Duration(0, 1),
+			//	true));
+
+			return new Animation(
+				Animation.OrgasmType,
+				PersonState.None, PersonState.None, PersonState.None,
+				Sexes.Female, a);
 		}
 
 		private static Animation StandIdle()
@@ -57,14 +76,14 @@ namespace Cue.Proc
 			foreach (var p in forceAndTorque)
 			{
 				g.AddTarget(new Force(
-					p.second, p.first, forceMin, forceMax,
-					new Duration(d), new Duration(delay), true));
+					Force.RelativeForce, p.second, p.first, forceMin, forceMax,
+					d, d, delay, delay, Force.Loop));
 
-				g.AddTarget(new Torque(
-					p.second, p.first,
+				g.AddTarget(new Force(
+					Force.RelativeTorque, p.second, p.first,
 					new Vector3(-torque, -torque, -torque),
 					new Vector3(torque, torque, torque),
-					new Duration(d), new Duration(delay), true));
+					d, d, delay, delay, Force.Loop));
 			}
 
 
@@ -72,12 +91,12 @@ namespace Cue.Proc
 			var headForceMax = new Vector3(20, 0, 20);
 
 			g.AddTarget(new Force(
-				BodyParts.Head, "head", headForceMin, headForceMax,
-				new Duration(d), new Duration(delay), true));
+				Force.RelativeForce, BodyParts.Head, "head",
+				headForceMin, headForceMax, d, d, delay, delay, Force.Loop));
 
 			g.AddTarget(new Morph(
 				BodyParts.RightHand, "Right Fingers Fist", 0.1f, 0.4f,
-				new Duration(d), new Duration(delay)));
+				d, delay));
 
 			a.AddTarget(g);
 

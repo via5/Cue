@@ -200,6 +200,11 @@ namespace Cue.BVH
 
             return s;
         }
+
+        public string ToDetailedString()
+        {
+            return ToString();
+        }
     }
 
     public class BvhTransform

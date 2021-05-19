@@ -65,5 +65,10 @@ namespace Cue.Proc
 		{
 			return name_ + " " + root_.ToString();
 		}
+
+		public string ToDetailedString()
+		{
+			return ToString();
+		}
 	}
 }

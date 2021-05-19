@@ -490,18 +490,21 @@ namespace Cue
 	}
 
 
-	class Duration
+	struct Duration
 	{
 		private float min_, max_;
-		private float current_ = 0;
-		private float elapsed_ = 0;
-		private bool finished_ = false;
+		private float current_;
+		private float elapsed_;
+		private bool finished_;
 
-		public Duration(float min, float max)
+		public static Duration Zero
 		{
-			min_ = min;
-			max_ = max;
-			Next();
+			get { return new Duration(0, 0); }
+		}
+
+		public Duration(Pair<float, float> p)
+			: this(p.first, p.second)
+		{
 		}
 
 		public Duration(Duration d)
@@ -509,16 +512,25 @@ namespace Cue
 		{
 		}
 
+		public Duration(float min, float max)
+		{
+			min_ = min;
+			max_ = max;
+			current_ = 0;
+			elapsed_ = 0;
+			finished_ = false;
+
+			Next();
+		}
+
 		public float Minimum
 		{
 			get { return min_; }
-			set { min_ = value; }
 		}
 
 		public float Maximum
 		{
 			get { return max_; }
-			set { max_ = value; }
 		}
 
 		public bool Finished
@@ -534,17 +546,6 @@ namespace Cue
 		public float Progress
 		{
 			get { return U.Clamp(elapsed_ / current_, 0, 1); }
-		}
-
-		public void SetRange(float min, float max)
-		{
-			Minimum = min;
-			Maximum = max;
-		}
-
-		public void SetRange(Pair<float, float> p)
-		{
-			SetRange(p.first, p.second);
 		}
 
 		public void Reset()

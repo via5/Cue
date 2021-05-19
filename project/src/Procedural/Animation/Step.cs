@@ -111,6 +111,11 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
+			return $"congroup {name_}";
+		}
+
+		public string ToDetailedString()
+		{
 			return
 				$"congroup " +
 				$"{name_}, {targets_.Count} targets indelay={inDelay_} " +
@@ -229,6 +234,11 @@ namespace Cue.Proc
 		}
 
 		public override string ToString()
+		{
+			return $"seqgroup {name_}";
+		}
+
+		public string ToDetailedString()
 		{
 			return
 				$"seqgroup " +

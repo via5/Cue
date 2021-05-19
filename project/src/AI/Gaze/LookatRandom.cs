@@ -125,7 +125,7 @@ namespace Cue
 
 		public bool Update(float s)
 		{
-			delay_.SetRange(person_.Personality.LookAtRandomInterval);
+			delay_ = new Duration(person_.Personality.LookAtRandomInterval);
 			//delay_.SetRange(1, 1);
 			delay_.Update(s);
 

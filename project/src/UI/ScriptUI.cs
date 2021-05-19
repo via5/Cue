@@ -601,7 +601,7 @@ namespace Cue
 
 			var items = new List<string>();
 
-			items.Add(p.ToString());
+			items.Add(p.ToDetailedString());
 
 			foreach (var s in p.Targets)
 				DumpTarget(items, s, 1);
@@ -611,7 +611,7 @@ namespace Cue
 
 		private void DumpTarget(List<string> items, Proc.ITarget t, int indent)
 		{
-			var lines = t.ToString().Split('\n');
+			var lines = t.ToDetailedString().Split('\n');
 			if (lines.Length > 0)
 				items.Add(I(indent) + lines[0]);
 

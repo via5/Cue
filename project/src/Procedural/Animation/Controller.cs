@@ -23,11 +23,6 @@ namespace Cue.Proc
 			rot_ = W.VamU.ToUnity(rot);
 		}
 
-		public override string ToString()
-		{
-			return $"controller {name_} pos={pos_} rot={rot_}";
-		}
-
 		public ITarget Clone()
 		{
 			return new Controller(
@@ -111,6 +106,16 @@ namespace Cue.Proc
 
 			if (t >= 1)
 				done_ = true;
+		}
+
+		public override string ToString()
+		{
+			return $"controller {name_} pos={pos_} rot={rot_}";
+		}
+
+		public string ToDetailedString()
+		{
+			return ToString();
 		}
 	}
 }

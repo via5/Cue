@@ -66,6 +66,10 @@ namespace Cue
 
 				postOrgasm_ = false;
 				postOrgasmElapsed_ = 0;
+
+				var a = person_.Animator.CurrentAnimation;
+				if (a != null && a.Type == Animation.OrgasmType)
+					person_.Animator.Stop();
 			}
 
 			UpdateParts(s);
@@ -165,7 +169,9 @@ namespace Cue
 
 			if (Value >= 1)
 			{
+				person_.Log.Info("orgasm");
 				person_.Orgasmer.Orgasm();
+				person_.Animator.PlayType(Animation.OrgasmType);
 				flatExcitement_ = ss.ExcitementPostOrgasm;
 				postOrgasm_ = true;
 				postOrgasmElapsed_ = 0;

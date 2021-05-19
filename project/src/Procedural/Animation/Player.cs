@@ -10,6 +10,7 @@ namespace Cue.Proc
 		void Reset();
 		void Start(Person p);
 		void FixedUpdate(float s);
+		string ToDetailedString();
 	}
 
 

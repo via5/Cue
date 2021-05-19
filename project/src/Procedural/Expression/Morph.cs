@@ -58,10 +58,17 @@ namespace Cue.Proc
 			}
 		}
 
-		//public override string ToString()
-		//{
-		//	return "morph "
-		//}
+		public override string ToString()
+		{
+			return $"morph {morphId_} ({BodyParts.ToString(bodyPart_)})";
+		}
+
+		public string ToDetailedString()
+		{
+			return
+				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"min={min_} max={max_} d={duration_} delay={delay_}";
+		}
 	}
 
 
@@ -237,11 +244,7 @@ namespace Cue.Proc
 		public ClampableMorph(
 			Person p, string id, float min, float max,
 			Duration d, Duration delay)
-				: this(
-					 p, id, min, max,
-					 new Duration(d), new Duration(d),
-					 new Duration(delay), new Duration(delay),
-					 false)
+				: this(p, id, min, max, d, d, delay, delay, false)
 		{
 		}
 
