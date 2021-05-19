@@ -69,6 +69,7 @@ namespace Cue.W
 		protected string storableID_;
 		protected string paramName_;
 		protected StorableType param_ = null;
+		protected NativeType dummyValue_;
 
 		public VamBasicParameterRO(IAtom a, string s, string name)
 		{
@@ -87,10 +88,10 @@ namespace Cue.W
 			get { return param_; }
 		}
 
-		protected NativeType GetValue(NativeType def = default(NativeType))
+		protected NativeType GetValue()
 		{
 			if (!Check())
-				return def;
+				return dummyValue_;
 
 			try
 			{
@@ -106,7 +107,7 @@ namespace Cue.W
 				param_ = null;
 				MakeStale();
 
-				return def;
+				return dummyValue_;
 			}
 		}
 
@@ -182,6 +183,8 @@ namespace Cue.W
 
 		protected void SetValue(NativeType v)
 		{
+			dummyValue_ = v;
+
 			if (!Check())
 				return;
 

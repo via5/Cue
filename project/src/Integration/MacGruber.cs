@@ -38,7 +38,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"MacGruber: intensity={lastIntensity_:0.000} speed=n/a";
+			return $"MacGruber: intensity={intensity_} speed=n/a";
 		}
 	}
 
@@ -211,7 +211,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"MacGruber: enabled={Enabled}";
+			return $"MacGruber: enabled={enabled_}";
 		}
 	}
 }

@@ -5,7 +5,8 @@
 		private bool visible_ = false;
 		private VUI.Root root_ = null;
 		private VUI.Label label_ = null;
-		private VUI.Panel buttons_ = null;
+		private VUI.Panel selButtons_ = null;
+		private VUI.Panel playerButtons_ = null;
 		private VUI.CheckBox canKiss_ = new VUI.CheckBox("Can kiss");
 		private IObject sel_ = null;
 		private IObject hov_ = null;
@@ -18,11 +19,11 @@
 					left,
 					new Vector3(0, 0.1f, 0),
 					new Point(0, 0),
-					new Size(1300, 100));
+					new Size(1300, 150));
 			}
 			else
 			{
-				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 170));
+				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 210));
 			}
 
 
@@ -31,9 +32,13 @@
 			label_ = new VUI.Label();
 			p.Add(label_);
 
-			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
-			buttons_.Visible = false;
-			p.Add(buttons_);
+			selButtons_ = new VUI.Panel(new VUI.VerticalFlow());
+			selButtons_.Visible = false;
+			p.Add(selButtons_);
+
+			playerButtons_ = new VUI.Panel(new VUI.VerticalFlow());
+			playerButtons_.Visible = false;
+			p.Add(playerButtons_);
 
 			if (!Cue.Instance.Sys.IsVR)
 			{
@@ -50,7 +55,7 @@
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stand", OnStand));
 			row.Add(canKiss_);
-			buttons_.Add(row);
+			selButtons_.Add(row);
 
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
@@ -59,7 +64,13 @@
 			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
 			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
 			row.Add(new VUI.ToolButton("test", OnTest));
-			buttons_.Add(row);
+			selButtons_.Add(row);
+
+
+			row = new VUI.Panel(new VUI.HorizontalFlow(5));
+			row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
+			playerButtons_.Add(row);
+
 
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
@@ -135,6 +146,9 @@
 				label_.Text = s;
 			}
 
+			if (playerButtons_ != null)
+				playerButtons_.Visible = (Cue.Instance.Player != null);
+
 			root_?.Update();
 		}
 
@@ -150,7 +164,7 @@
 		{
 			var p = o as Person;
 
-			buttons_.Visible = (p != null);
+			selButtons_.Visible = (p != null);
 
 			if (p != null)
 				canKiss_.Checked = p.Options.CanKiss;
@@ -299,6 +313,13 @@
 			var p = Selected as Person;
 			if (p != null)
 				p.Clothing.Dump();
+		}
+
+		private void OnMovePlayer(bool b)
+		{
+			var p = Cue.Instance.Player;
+			if (p != null)
+				p.VamAtom.SetControlsForMoving(b);
 		}
 	}
 }

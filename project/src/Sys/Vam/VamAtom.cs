@@ -169,6 +169,27 @@ namespace Cue.W
 			}
 		}
 
+		void SetControllerForMoving(string id, bool b)
+		{
+			var fc = Cue.Instance.VamSys.FindController(atom_, id);
+
+			fc.currentPositionState = (b ?
+				FreeControllerV3.PositionState.Off :
+				FreeControllerV3.PositionState.On);
+
+			fc.currentRotationState = (b ?
+				FreeControllerV3.RotationState.Off :
+				FreeControllerV3.RotationState.On);
+		}
+
+		public void SetControlsForMoving(bool b)
+		{
+			SetControllerForMoving("chestControl", b);
+			SetControllerForMoving("hipControl", b);
+			SetControllerForMoving("lFootControl", b);
+			SetControllerForMoving("rFootControl", b);
+		}
+
 		public DAZMorph FindMorph(string id)
 		{
 			return Cue.Instance.VamSys.FindMorph(atom_, id);
