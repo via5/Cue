@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +24,35 @@ namespace Cue.Proc
 			max_ = max;
 			duration_ = d;
 			delay_ = delay;
+		}
+
+		public static Morph Create(JSONClass o)
+		{
+			string id = o["morph"];
+
+			try
+			{
+				var bodyPart = BodyParts.FromString(o["bodyPart"]);
+				if (bodyPart == BodyParts.None)
+					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
+
+				float min;
+				if (!float.TryParse(o["min"], out min))
+					throw new LoadFailed("min is not a number");
+
+				float max;
+				if (!float.TryParse(o["max"], out max))
+					throw new LoadFailed("max is not a number");
+
+				return new Morph(
+					bodyPart, id, min, max,
+					Duration.FromJSON(o, "duration"),
+					Duration.FromJSON(o, "delay"));
+			}
+			catch (LoadFailed e)
+			{
+				throw new LoadFailed($"morph '{id}'/{e.Message}");
+			}
 		}
 
 		public bool Done

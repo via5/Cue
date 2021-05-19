@@ -54,6 +54,7 @@ namespace Cue.Proc
 				case "con": return ConcurrentTargetGroup.Create(o);
 				case "rforce": return Force.Create(Force.RelativeForce, o);
 				case "rtorque": return Force.Create(Force.RelativeTorque, o);
+				case "morph": return Morph.Create(o);
 
 				default:
 				{
