@@ -270,11 +270,13 @@ namespace Cue
 			Kisser.Update(s);
 			Handjob.Update(s);
 			Blowjob.Update(s);
-			excitement_.Update(s);
-			personality_.Update(s);
 
 			if (this != Cue.Instance.Player)
+			{
+				excitement_.Update(s);
+				personality_.Update(s);
 				body_.Update(s);
+			}
 
 			if (ai_ != null && !Atom.Teleporting)
 				ai_.Update(s);

@@ -474,16 +474,21 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			if (p.Animator.CanPlay(anims_[i_]))
-			{
-				p.Animator.Play(anims_[i_]);
-				playing_ = true;
+			var ct = p.Animator.CurrentAnimationType;
 
-				++i_;
-				if (i_ >= anims_.Count)
+			if (ct == Animation.IdleType || ct == Animation.NoType)
+			{
+				if (p.Animator.CanPlay(anims_[i_]))
 				{
-					i_ = 0;
-					anims_.Shuffle();
+					p.Animator.Play(anims_[i_]);
+					playing_ = true;
+
+					++i_;
+					if (i_ >= anims_.Count)
+					{
+						i_ = 0;
+						anims_.Shuffle();
+					}
 				}
 			}
 		}

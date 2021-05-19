@@ -280,7 +280,8 @@ namespace Cue.Proc
 				$"last={last_} current={current_}\n" +
 				$"fdur={fwdDuration_} bdur={bwdDuration_}\n" +
 				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
-				$"p={Progress():0.00} mag={Magnitude():0.00} lerped={Lerped()}";
+				$"p={Progress():0.00} mag={Magnitude():0.00} lerped={Lerped()} " +
+				$"state={state_} busy={wasBusy_}";
 		}
 
 		private void Next()

@@ -38,13 +38,61 @@ namespace Cue.Proc
 		{
 			var a = new ProcAnimation("orgasm", true);
 
-			// delay seems to be while force is high, b
+			var seq = new SequentialTargetGroup("seq");
 
-			//a.AddTarget(new Force(
-			//	BodyParts.Hips, "hip",
-			//	new Vector3(0, 0, 500), new Vector3(0, 0, 500),
-			//	new Duration(0.01f, 0.01f), new Duration(0, 1),
-			//	true));
+			{
+				var min = new Vector3(-30, 0, 100);
+				var max = new Vector3( 30, 0, 150);
+				var d = new Duration(0.05f, 0.1f);
+				var delay = new Duration(0, 0.5f);
+
+				var g = new ConcurrentTargetGroup(
+					"fast", new Duration(0, 0), new Duration(4, 4), false);
+
+				g.AddTarget(new Force(
+					Force.RelativeForce, BodyParts.Hips, "hip",
+					min, max,
+					d, Duration.Zero,
+					Duration.Zero, delay,
+					Force.Loop | Force.ResetBetween));
+
+				g.AddTarget(new Force(
+					Force.RelativeForce, BodyParts.Chest, "chest",
+					min, max,
+					d, Duration.Zero,
+					Duration.Zero, delay,
+					Force.Loop | Force.ResetBetween));
+
+				seq.AddTarget(g);
+			}
+
+			{
+				var min = new Vector3(-50, 0, 50);
+				var max = new Vector3(0, 0, 100);
+				var d = new Duration(0.05f, 0.05f);
+				var delay = new Duration(0, 1);
+
+				var g = new ConcurrentTargetGroup(
+					"slow", new Duration(0, 0), new Duration(4, 4), false);
+
+				g.AddTarget(new Force(
+					Force.RelativeForce, BodyParts.Hips, "hip",
+					min, max,
+					d, Duration.Zero,
+					Duration.Zero, delay,
+					Force.Loop | Force.ResetBetween));
+
+				g.AddTarget(new Force(
+					Force.RelativeForce, BodyParts.Chest, "chest",
+					min, max,
+					d, Duration.Zero,
+					Duration.Zero, delay,
+					Force.Loop | Force.ResetBetween));
+
+				seq.AddTarget(g);
+			}
+
+			a.AddTarget(seq);
 
 			return new Animation(
 				Animation.OrgasmType,

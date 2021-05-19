@@ -146,6 +146,11 @@ namespace Cue
 			get { return currentAnimation_; }
 		}
 
+		public int CurrentAnimationType
+		{
+			get { return currentAnimation_?.Type ?? Animation.NoType; }
+		}
+
 		public bool PlayTransition(int from, int to, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnyTransition(
@@ -273,6 +278,12 @@ namespace Cue
 				currentAnimation_ = null;
 				activeFlags_ = 0;
 			}
+		}
+
+		public void StopType(int type)
+		{
+			if (CurrentAnimationType == type)
+				Stop();
 		}
 
 		public void FixedUpdate(float s)

@@ -66,10 +66,7 @@ namespace Cue
 
 				postOrgasm_ = false;
 				postOrgasmElapsed_ = 0;
-
-				var a = person_.Animator.CurrentAnimation;
-				if (a != null && a.Type == Animation.OrgasmType)
-					person_.Animator.Stop();
+				person_.Animator.StopType(Animation.OrgasmType);
 			}
 
 			UpdateParts(s);

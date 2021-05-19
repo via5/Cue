@@ -12,27 +12,30 @@ namespace Cue.Proc
 	{
 		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
-		private Duration delay_;
+		private Duration delay_, maxDuration_;
 		private bool inDelay_ = false;
 		private bool[] done_ = new bool[0];
 		private bool allDone_ = false;
 		private bool forever_;
 
 		public ConcurrentTargetGroup(string name)
-			: this(name, new Duration(0, 0), true)
+			: this(name, new Duration(0, 0), new Duration(0, 0), true)
 		{
 		}
 
-		public ConcurrentTargetGroup(string name, Duration delay, bool forever)
+		public ConcurrentTargetGroup(
+			string name, Duration delay, Duration maxDuration, bool forever)
 		{
 			name_ = name;
 			delay_ = delay;
+			maxDuration_ = maxDuration;
 			forever_ = forever;
 		}
 
 		public ITarget Clone()
 		{
-			var s = new ConcurrentTargetGroup(name_, delay_, forever_);
+			var s = new ConcurrentTargetGroup(
+				name_, delay_, maxDuration_, forever_);
 
 			foreach (var c in targets_)
 				s.targets_.Add(c.Clone());
@@ -54,6 +57,7 @@ namespace Cue.Proc
 		{
 			inDelay_ = false;
 			delay_.Reset();
+			maxDuration_.Reset();
 
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Reset();
@@ -65,6 +69,7 @@ namespace Cue.Proc
 				targets_[i].Start(p);
 
 			done_ = new bool[targets_.Count];
+			maxDuration_.Reset();
 		}
 
 		public bool Done
@@ -96,6 +101,13 @@ namespace Cue.Proc
 						else
 							allDone_ = false;
 					}
+				}
+
+				if (maxDuration_.Enabled)
+				{
+					maxDuration_.Update(s);
+					if (maxDuration_.Finished)
+						allDone_ = true;
 				}
 
 				if (allDone_)
@@ -174,7 +186,6 @@ namespace Cue.Proc
 		{
 			targets_.Add(t);
 		}
-
 
 		public bool Done
 		{
