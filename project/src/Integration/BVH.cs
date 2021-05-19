@@ -95,7 +95,7 @@ namespace Cue.BVH
             if (path.StartsWith("/") || path.StartsWith("\\"))
                 path = path.Substring(1);
             else
-                path = Cue.Instance.Sys.GetResourcePath("animations/" + path);
+                path = Cue.Instance.Sys.GetResourcePath(path);
 
             return new Animation(
                 path,

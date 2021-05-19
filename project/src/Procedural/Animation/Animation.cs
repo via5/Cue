@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue.Proc
 {
@@ -11,7 +12,55 @@ namespace Cue.Proc
 		public ProcAnimation(string name, bool forcesOnly=false)
 		{
 			name_ = name;
-			forcesOnly_= forcesOnly;
+			forcesOnly_ = forcesOnly;
+		}
+
+		public static ProcAnimation Create(JSONClass o)
+		{
+			var file = Cue.Instance.Sys.GetResourcePath(o["file"]);
+			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(file));
+
+			if (doc == null)
+			{
+				Cue.LogError($"failed to parse proc animation file '{file}'");
+				return null;
+			}
+
+			var docRoot = doc.AsObject;
+			string name = docRoot["name"];
+			bool forcesOnly = docRoot["forcesOnly"].AsBool;
+
+			try
+			{
+				var a = new ProcAnimation(name, forcesOnly);
+
+				foreach (JSONClass n in docRoot["targets"].AsArray)
+					a.root_.AddTarget(CreateTarget(n["type"], n));
+
+				return a;
+			}
+			catch (LoadFailed e)
+			{
+				Cue.LogError($"{file}: {e.Message}");
+				return null;
+			}
+		}
+
+		public static ITarget CreateTarget(string type, JSONClass o)
+		{
+			switch (type)
+			{
+				case "seq": return SequentialTargetGroup.Create(o);
+				case "con": return ConcurrentTargetGroup.Create(o);
+				case "rforce": return Force.Create(Force.RelativeForce, o);
+				case "rtorque": return Force.Create(Force.RelativeTorque, o);
+
+				default:
+				{
+					Cue.LogInfo($"bad target type '{type}'");
+					return null;
+				}
+			}
 		}
 
 		public ProcAnimation Clone()

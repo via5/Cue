@@ -67,7 +67,8 @@ namespace Cue.Proc
 		{
 			return
 				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +
-				$"min={min_} max={max_} d={duration_} delay={delay_}";
+				$"min={min_} max={max_} d={duration_} delay={delay_}\n" +
+				(m_?.ToString() ?? "nomorph");
 		}
 	}
 
@@ -104,7 +105,22 @@ namespace Cue.Proc
 							break;
 						}
 					}
+
+					if (subMorphs_.Count > 0)
+						m_.Reset();
 				}
+			}
+
+			public override string ToString()
+			{
+				string s = id_ + " ";
+
+				if (m_ == null)
+					s += "notfound";
+				else
+					s += $"v={m_.morphValue:0.00} sub={subMorphs_.Count != 0} f={free_} ff={freeFrame_}";
+
+				return s;
 			}
 
 			public string ID
@@ -122,10 +138,10 @@ namespace Cue.Proc
 				get { return m_?.startValue ?? 0; }
 			}
 
-			public void Set(float f)
+			public bool Set(float f)
 			{
 				if (m_ == null)
-					return;
+					return false;
 
 				if (free_ || freeFrame_ != Cue.Instance.Frame)
 				{
@@ -147,7 +163,11 @@ namespace Cue.Proc
 
 					free_ = false;
 					freeFrame_ = Cue.Instance.Frame;
+
+					return true;
 				}
+
+				return false;
 			}
 
 			public void Reset()
@@ -272,8 +292,10 @@ namespace Cue.Proc
 		{
 			return
 				$"start={start_:0.##} end={end_:0.##} mid={mid_} last={last_}\n" +
-				$"fwd={forward_} bwd={backward_} dOff={delayOff_} dOn={delayOn_}\n" +
-				$"state={state_} r={r_:0.##} mag={mag_:0.##} f={finished_} morphValue={morph_.Value}";
+				$"fwd={forward_} bwd={backward_}\n" +
+				$"dOff={delayOff_} dOn={delayOn_}\n" +
+				$"state={state_} r={r_:0.##} mag={mag_:0.##} f={finished_}\n" +
+				morph_.ToString();
 		}
 
 		public IEasing Easing

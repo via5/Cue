@@ -1,8 +1,17 @@
 ﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
 {
+	class LoadFailed : Exception
+	{
+		public LoadFailed(string message)
+			: base(message)
+		{
+		}
+	}
+
 	class Integration
 	{
 		public static List<IPlayer> CreateAnimationPlayers(Person p)

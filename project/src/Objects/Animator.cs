@@ -57,9 +57,14 @@ namespace Cue
 
 				case SexType:
 				case IdleType:
-				case OrgasmType:
 				{
 					s += PersonState.StateToString(state_) + " ";
+					break;
+				}
+
+				case OrgasmType:
+				default:
+				{
 					break;
 				}
 			}

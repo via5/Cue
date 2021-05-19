@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SimpleJSON;
+using UnityEngine;
 
 namespace Cue.Proc
 {
@@ -49,6 +50,38 @@ namespace Cue.Proc
 			fwdDelay_ = fwdDelay;
 			bwdDelay_ = bwdDelay;
 			flags_ = flags;
+		}
+
+		public static Force Create(int type, JSONClass o)
+		{
+			try
+			{
+				var bodyPart = BodyParts.FromString(o["bodyPart"]);
+				if (bodyPart == BodyParts.None)
+					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
+
+				int flags = NoFlags;
+
+				if (o["loop"].AsBool)
+					flags |= Loop;
+
+				if (o["resetBetween"].AsBool)
+					flags |= ResetBetween;
+
+				return new Force(
+					type, bodyPart, o["rigidbody"],
+					Vector3.FromJSON(o, "min"),
+					Vector3.FromJSON(o, "max"),
+					Duration.FromJSON(o, "fwdDuration"),
+					Duration.FromJSON(o, "bwdDuration"),
+					Duration.FromJSON(o, "fwdDelay"),
+					Duration.FromJSON(o, "bwdDelay"),
+					flags);
+			}
+			catch (LoadFailed e)
+			{
+				throw new LoadFailed($"force type {type}/{e.Message}");
+			}
 		}
 
 		public bool Done
@@ -141,6 +174,7 @@ namespace Cue.Proc
 				case ForwardsDelay:
 				{
 					fwdDelay_.Update(s);
+					Apply();
 
 					if (fwdDelay_.Finished)
 					{
@@ -194,6 +228,7 @@ namespace Cue.Proc
 				case BackwardsDelay:
 				{
 					bwdDelay_.Update(s);
+					Apply();
 
 					if (bwdDelay_.Finished)
 					{
@@ -241,10 +276,20 @@ namespace Cue.Proc
 
 		private float Progress()
 		{
-			if (state_ == Forwards)
-				return fwdDuration_.Progress;
-			else
-				return bwdDuration_.Progress;
+			switch (state_)
+			{
+				case Forwards:
+				case ForwardsDelay:
+					return fwdDuration_.Progress;
+
+				case Backwards:
+				case BackwardsDelay:
+					return bwdDuration_.Progress;
+
+				default:
+					Cue.LogError("??");
+					return 0;
+			}
 		}
 
 		private float Magnitude()

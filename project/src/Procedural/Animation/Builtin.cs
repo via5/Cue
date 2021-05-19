@@ -11,7 +11,7 @@ namespace Cue.Proc
 			list.Add(Stand(PersonState.Walking));
 			list.Add(Stand(PersonState.Standing));
 			list.Add(StandIdle());
-			list.Add(Orgasm());
+			//list.Add(Orgasm());
 
 			return list;
 		}
@@ -67,9 +67,9 @@ namespace Cue.Proc
 			}
 
 			{
-				var min = new Vector3(-50, 0, 50);
-				var max = new Vector3(0, 0, 100);
-				var d = new Duration(0.05f, 0.05f);
+				var min = new Vector3(-20, 0, 50);
+				var max = new Vector3(20, 0, 100);
+				var d = new Duration(0.05f, 0.1f);
 				var delay = new Duration(0, 1);
 
 				var g = new ConcurrentTargetGroup(
@@ -124,7 +124,8 @@ namespace Cue.Proc
 			foreach (var p in forceAndTorque)
 			{
 				g.AddTarget(new Force(
-					Force.RelativeForce, p.second, p.first, forceMin, forceMax,
+					Force.RelativeForce, p.second, p.first,
+					forceMin, forceMax,
 					d, d, delay, delay, Force.Loop));
 
 				g.AddTarget(new Force(

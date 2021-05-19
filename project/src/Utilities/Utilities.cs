@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -523,6 +524,34 @@ namespace Cue
 			Next();
 		}
 
+		public static Duration FromJSON(JSONClass o, string key, bool mandatory = false)
+		{
+			if (!o.HasKey(key))
+			{
+				if (mandatory)
+					throw new LoadFailed($"duration '{key}' is missing");
+				else
+					return Zero;
+			}
+
+			var a = o[key].AsArray;
+			if (a == null)
+				throw new LoadFailed($"duration '{key}' node is not an array");
+
+			if (a.Count != 2)
+				throw new LoadFailed($"duration '{key}' array must have 2 elements");
+
+			float min;
+			if (!float.TryParse(a[0], out min))
+				throw new LoadFailed($"duration '{key}' min is not a number");
+
+			float max;
+			if (!float.TryParse(a[1], out max))
+				throw new LoadFailed($"duration '{key}' max is not a number");
+
+			return new Duration(min, max);
+		}
+
 		public float Minimum
 		{
 			get { return min_; }
@@ -561,20 +590,18 @@ namespace Cue
 			{
 				finished_ = false;
 				elapsed_ = 0;
+				Next();
 			}
 
 			elapsed_ += s;
 
 			if (elapsed_ > current_)
-			{
 				finished_ = true;
-				Next();
-			}
 		}
 
 		public override string ToString()
 		{
-			return $"{current_:0.##}/({min_:0.##},{max_:0.##})";
+			return $"{elapsed_:0.##}/{current_:0.##}({min_:0.##},{max_:0.##},{finished_})";
 		}
 
 		private void Next()

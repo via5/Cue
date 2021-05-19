@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue.Proc
 {
@@ -30,6 +31,29 @@ namespace Cue.Proc
 			delay_ = delay;
 			maxDuration_ = maxDuration;
 			forever_ = forever;
+		}
+
+		public static ConcurrentTargetGroup Create(JSONClass o)
+		{
+			string name = o["name"];
+
+			try
+			{
+				var g = new ConcurrentTargetGroup(
+					name,
+					Duration.FromJSON(o, "delay"),
+					Duration.FromJSON(o, "maxDuration"),
+					o["loop"].AsBool);
+
+				foreach (JSONClass n in o["targets"].AsArray)
+					g.targets_.Add(ProcAnimation.CreateTarget(n["type"], n));
+
+				return g;
+			}
+			catch (LoadFailed e)
+			{
+				throw new LoadFailed($"{name}/{e.Message}");
+			}
 		}
 
 		public ITarget Clone()
@@ -162,6 +186,26 @@ namespace Cue.Proc
 		{
 			name_ = name;
 			delay_ = delay;
+		}
+
+		public static SequentialTargetGroup Create(JSONClass o)
+		{
+			string name = o["name"];
+
+			try
+			{
+				var g = new SequentialTargetGroup(
+					name, Duration.FromJSON(o, "delay"));
+
+				foreach (JSONClass n in o["targets"].AsArray)
+					g.targets_.Add(ProcAnimation.CreateTarget(n["type"], n));
+
+				return g;
+			}
+			catch (LoadFailed e)
+			{
+				throw new LoadFailed($"{name}/{e.Message}");
+			}
 		}
 
 		public ITarget Clone()

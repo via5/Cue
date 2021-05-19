@@ -1,0 +1,86 @@
+{
+	"name": "procOrgasm",
+	"forcesOnly": true,
+	"targets":
+	[
+		{
+			"type": "seq",
+			"name": "seq",
+			"targets":
+			[
+				{
+					"type": "con",
+					"name": "fast",
+					"delay": [0, 0],
+					"maxDuration": [4, 4],
+					"loop": false,
+					"targets":
+					[
+						{
+							"type": "rforce",
+							"bodyPart": "hips",
+							"rigidbody": "hip",
+							"min": [-30, 0, 100],
+							"max": [ 30, 0, 150],
+							"fwdDuration": [0.05, 0.1],
+							"bwdDuration": [0, 0],
+							"fwdDelay": [0, 0],
+							"bwdDelay": [0, 0.5],
+							"loop": true,
+							"resetBetween": true
+						},
+						{
+							"type": "rforce",
+							"bodyPart": "chest",
+							"rigidbody": "chest",
+							"min": [-30, 0, 100],
+							"max": [30, 0, 150],
+							"fwdDuration": [0.05, 0.1],
+							"bwdDuration": [0, 0],
+							"fwdDelay": [0, 0],
+							"bwdDelay": [0, 0.5],
+							"loop": true,
+							"resetBetween": true
+						}
+					]
+				},
+				{
+					"type": "con",
+					"name": "slow",
+					"delay": [0, 0],
+					"maxDuration": [4, 4],
+					"loop": false,
+					"targets":
+					[
+						{
+							"type": "rforce",
+							"bodyPart": "hips",
+							"rigidbody": "hip",
+							"min": [-20, 0, 50],
+							"max": [ 20, 0, 100],
+							"fwdDuration": [0.05, 0.1],
+							"bwdDuration": [0, 0],
+							"fwdDelay": [0, 0],
+							"bwdDelay": [0, 1],
+							"loop": true,
+							"resetBetween": true
+						},
+						{
+							"type": "rforce",
+							"bodyPart": "chest",
+							"rigidbody": "chest",
+							"min": [-20, 0, 50],
+							"max": [ 20, 0, 100],
+							"fwdDuration": [0.05, 0.1],
+							"bwdDuration": [0, 0],
+							"fwdDelay": [0, 0],
+							"bwdDelay": [0, 1],
+							"loop": true,
+							"resetBetween": true
+						}
+					]
+				},
+			]
+		}
+	]
+}

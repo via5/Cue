@@ -165,46 +165,18 @@ namespace Cue
 					{
 						item.left.enabled = true;
 
-						if (cs.HasKey("leftRotation"))
-						{
-							if (!ParseVector3(cs["leftRotation"], out item.left.rotation))
-								log_.Error($"{item.what}: bad leftRotation");
-						}
-
-						if (cs.HasKey("leftSize"))
-						{
-							if (!ParseVector3(cs["leftSize"], out item.left.size))
-								log_.Error($"{item.what}: bad leftSize");
-						}
-
-						if (cs.HasKey("leftCenter"))
-						{
-							if (!ParseVector3(cs["leftCenter"], out item.left.center))
-								log_.Error($"{item.what}: bad leftCenter");
-						}
+						item.left.rotation = Vector3.FromJSON(cs, "leftRotation");
+						item.left.size = Vector3.FromJSON(cs, "leftSize");
+						item.left.center = Vector3.FromJSON(cs, "leftCenter");
 					}
 
 					if (cs.HasKey("right") && cs["right"].AsBool)
 					{
 						item.right.enabled = true;
 
-						if (cs.HasKey("rightRotation"))
-						{
-							if (!ParseVector3(cs["rightRotation"], out item.right.rotation))
-								log_.Error($"{item.what}: bad rightRotation");
-						}
-
-						if (cs.HasKey("rightSize"))
-						{
-							if (!ParseVector3(cs["rightSize"], out item.right.size))
-								log_.Error($"{item.what}: bad rightSize");
-						}
-
-						if (cs.HasKey("rightCenter"))
-						{
-							if (!ParseVector3(cs["rightCenter"], out item.right.center))
-								log_.Error($"{item.what}: bad rightCenter");
-						}
+						item.right.rotation = Vector3.FromJSON(cs, "rightRotation");
+						item.right.size = Vector3.FromJSON(cs, "rightSize");
+						item.right.center = Vector3.FromJSON(cs, "rightCenter");
 					}
 				}
 
@@ -215,29 +187,6 @@ namespace Cue
 				else
 					tags_.Add(tag, item);
 			}
-		}
-
-		private bool ParseVector3(JSONNode n, out Vector3 v)
-		{
-			v = Vector3.Zero;
-
-			var a = n.AsArray;
-			if (a == null)
-				return false;
-
-			if (a.Count != 3)
-				return false;
-
-			if (!float.TryParse(a[0], out v.X))
-				return false;
-
-			if (!float.TryParse(a[1], out v.Y))
-				return false;
-
-			if (!float.TryParse(a[2], out v.Z))
-				return false;
-
-			return true;
 		}
 
 		public Item FindItem(int sex, string id, string[] tags)

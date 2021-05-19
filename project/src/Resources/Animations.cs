@@ -162,6 +162,8 @@ namespace Cue
 				a = TimelineAnimation.Create(options);
 			else if (type == "synergy")
 				a = SynergyAnimation.Create(options);
+			else if (type == "proc")
+				a = Proc.ProcAnimation.Create(options);
 			else
 				log_.Error($"unknown animation type '{type}'");
 

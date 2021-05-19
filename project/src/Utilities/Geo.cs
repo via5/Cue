@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
@@ -23,6 +24,38 @@ namespace Cue
 			X = x;
 			Y = y;
 			Z = z;
+		}
+
+		public static Vector3 FromJSON(JSONClass o, string key, bool mandatory = false)
+		{
+			if (!o.HasKey(key))
+			{
+				if (mandatory)
+					throw new LoadFailed($"vector3 '{key}' is missing");
+				else
+					return Zero;
+			}
+
+			var a = o[key].AsArray;
+			if (a == null)
+				throw new LoadFailed($"vector3 '{key}' node is not an array");
+
+			if (a.Count != 3)
+				throw new LoadFailed($"vector3 '{key}' array must have 3 elements");
+
+			float x;
+			if (!float.TryParse(a[0], out x))
+				throw new LoadFailed($"vector3 '{key}' x is not a number");
+
+			float y;
+			if (!float.TryParse(a[1], out y))
+				throw new LoadFailed($"vector3 '{key}' is not a number");
+
+			float z;
+			if (!float.TryParse(a[2], out z))
+				throw new LoadFailed($"vector3 '{key}' is not a number");
+
+			return new Vector3(x, y, z);
 		}
 
 		public Vector3 Normalized

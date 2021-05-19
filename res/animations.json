@@ -7,7 +7,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "walk.bvh",
+				"file": "animations/walk.bvh",
 				"init": 33,
 				"start": 67,
 				"end": 150,
@@ -22,7 +22,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "walkm.bvh",
+				"file": "animations/walkm.bvh",
 				"rootXZ": false,
 				"rootY": false,
 			}
@@ -33,7 +33,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "turn_left.bvh",
+				"file": "animations/turn_left.bvh",
 				"useHead": false
 			}
 		},
@@ -43,7 +43,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "turn_right.bvh",
+				"file": "animations/turn_right.bvh",
 				"useHead": false
 			}
 		},
@@ -56,7 +56,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit.bvh",
+				"file": "animations/sit.bvh",
 				"end": 30
 			}
 		},
@@ -68,7 +68,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit.bvh",
+				"file": "animations/sit.bvh",
 				"reverse": true,
 				"end": 30
 			}
@@ -81,7 +81,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "crouch.bvh",
+				"file": "animations/crouch.bvh",
 				"end": 89
 			}
 		},
@@ -94,7 +94,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "crouch.bvh",
+				"file": "animations/crouch.bvh",
 				"start": 89
 			}
 		},
@@ -106,7 +106,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit_idle_1.bvh"
+				"file": "animations/sit_idle_1.bvh"
 			}
 		},
 
@@ -116,7 +116,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit_idle_2.bvh"
+				"file": "animations/sit_idle_2.bvh"
 			}
 		},
 
@@ -126,7 +126,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit_idle_3.bvh"
+				"file": "animations/sit_idle_3.bvh"
 			}
 		},
 
@@ -136,7 +136,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "sit_idle_4.bvh"
+				"file": "animations/sit_idle_4.bvh"
 			}
 		},
 
@@ -147,7 +147,7 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "straddleSitFromStanding.bvh",
+				"file": "animations/straddleSitFromStanding.bvh",
 				"usePosition": true,
 				"localRotations": false,
 				"localPositions": false,
@@ -163,12 +163,22 @@
 			"type": "bvh",
 			"options":
 			{
-				"file": "standFromStraddleSit.bvh",
+				"file": "animations/standFromStraddleSit.bvh",
 				"usePosition": true,
 				"localRotations": false,
 				"localPositions": false,
 				"rootXZ": false,
 				"rootY": false
+			}
+		},
+
+		{
+			"animation": "orgasm",
+			"sex": "female",
+			"type": "proc",
+			"options":
+			{
+				"file": "animations/orgasm.json"
 			}
 		}
 	]

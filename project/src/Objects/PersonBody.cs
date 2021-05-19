@@ -69,6 +69,17 @@ namespace Cue
 			"eyes", "genitals", "pectorals"
 		};
 
+		public static int FromString(string s)
+		{
+			for (int i = 0; i < names_.Length; ++i)
+			{
+				if (names_[i] == s)
+					return i;
+			}
+
+			return None;
+		}
+
 		public static string ToString(int t)
 		{
 			if (t >= 0 && t < names_.Length)
