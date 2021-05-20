@@ -1,19 +1,121 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.W
 {
+	class VamHair : IHair
+	{
+		class HairItem
+		{
+			private HairSimControl c_;
+			private JSONStorableFloat styleCling_;
+
+			public HairItem(HairSimControl c)
+			{
+				c_ = c;
+				styleCling_ = c_.GetFloatJSONParam("cling");
+				if (styleCling_ == null)
+					Cue.LogInfo("cling not found");
+			}
+
+			public void Reset()
+			{
+				if (styleCling_ != null)
+					styleCling_.val = styleCling_.defaultVal;
+			}
+
+			public void SetLoose(float f)
+			{
+				if (styleCling_ != null)
+				{
+					float min = 0.02f;
+					float max = styleCling_.defaultVal;
+
+					if (min < max)
+					{
+						float range = max - min;
+						styleCling_.val = max - (range * f);
+					}
+				}
+			}
+		}
+
+
+		private VamAtom atom_;
+		private DAZCharacterSelector char_;
+		private float loose_ = 0;
+		private List<HairItem> list_ = new List<HairItem>();
+
+		public VamHair(VamAtom a)
+		{
+			atom_ = a;
+			char_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
+			if (char_ == null)
+				atom_.Log.Error("no DAZCharacterSelector for hair");
+
+			foreach (var g in char_.hairItems)
+			{
+				if (!g.isActiveAndEnabled)
+					continue;
+
+				var h = g.GetComponentInChildren<HairSimControl>();
+				if (h != null)
+					list_.Add(new HairItem(h));
+			}
+		}
+
+		public void OnPluginState(bool b)
+		{
+			if (!b)
+				Reset();
+		}
+
+		public float Loose
+		{
+			set
+			{
+				if (loose_ != value)
+				{
+					loose_ = value;
+					for (int i = 0; i < list_.Count; ++i)
+						list_[i].SetLoose(loose_);
+				}
+			}
+		}
+
+		public void Update(float s)
+		{
+		}
+
+		private void Reset()
+		{
+			for (int i = 0; i < list_.Count; ++i)
+				list_[i].Reset();
+		}
+	}
+
+
 	class VamBody : IBody
 	{
 		private VamAtom atom_;
 		private VamFloatParameter gloss_ = null;
+		private VamColorParameter color_ = null;
+		private Color initialColor_;
 
 		public VamBody(VamAtom a)
 		{
 			atom_ = a;
+
 			gloss_ = new VamFloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
 				atom_.Log.Error("no skin gloss parameter");
+
+			color_ = new VamColorParameter(a, "skin", "Skin Color");
+			if (!color_.Check(true))
+				atom_.Log.Error("no skin color parameter");
+
+			initialColor_ = color_.Value;
 		}
 
 		public List<IBodyPart> GetBodyParts()
@@ -71,6 +173,12 @@ namespace Cue.W
 			return list;
 		}
 
+		public void OnPluginState(bool b)
+		{
+			if (!b)
+				Reset();
+		}
+
 		public float Sweat
 		{
 			set
@@ -84,6 +192,25 @@ namespace Cue.W
 					p.val = def + value * range;
 				}
 			}
+		}
+
+		public void LerpColor(Color target, float f)
+		{
+			var p = color_.Parameter;
+			if (p != null)
+			{
+				var c = Color.Lerp(initialColor_, target, f);
+				p.val = VamU.ToHSV(c);
+			}
+		}
+
+		private void Reset()
+		{
+			if (gloss_.Parameter != null)
+				gloss_.Parameter.val = gloss_.Parameter.defaultVal;
+
+			if (color_.Parameter != null)
+				color_.Parameter.val = VamU.ToHSV(initialColor_);
 		}
 
 		private string MakeName(string nameFemale, string nameMale)

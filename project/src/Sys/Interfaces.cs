@@ -154,10 +154,16 @@ namespace Cue.W
 		void Dump();
 	}
 
+	interface IHair
+	{
+		float Loose { set; }
+	}
+
 	interface IBody
 	{
 		List<IBodyPart> GetBodyParts();
 		float Sweat { set; }
+		void LerpColor(Color c, float f);
 	}
 
 	interface IAtom
@@ -176,6 +182,7 @@ namespace Cue.W
 
 		IClothing Clothing { get; }
 		IBody Body { get; }
+		IHair Hair { get; }
 
 		void SetDefaultControls(string why);
 

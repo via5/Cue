@@ -428,6 +428,64 @@ namespace Cue.W
 	}
 
 
+	class VamColorParameter : VamBasicParameter<Color, JSONStorableColor>
+	{
+		public VamColorParameter(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamColorParameter(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableColor DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetColorParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override Color DoGetValue()
+		{
+			return VamU.FromHSV(param_.val);
+		}
+
+		protected override void DoSetValue(Color c)
+		{
+			param_.val = VamU.ToHSV(c);
+		}
+	}
+
+
+	class VamColorParameterRO : VamBasicParameterRO<Color, JSONStorableColor>
+	{
+		public VamColorParameterRO(IObject o, string s, string name)
+			: base(o.Atom, s, name)
+		{
+		}
+
+		public VamColorParameterRO(IAtom a, string s, string name)
+			: base(a, s, name)
+		{
+		}
+
+		protected override JSONStorableColor DoGetParameter()
+		{
+			return Cue.Instance.VamSys?.GetColorParameter(
+				atom_, storableID_, paramName_);
+		}
+
+		protected override Color DoGetValue()
+		{
+			var hsv = param_.val;
+
+			return VamU.FromUnity(
+				UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
+		}
+	}
+
+
 	class VamActionParameter : VamParameterChecker
 	{
 		protected Atom atom_;

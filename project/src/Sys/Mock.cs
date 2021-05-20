@@ -249,6 +249,11 @@ namespace Cue.W
 			get { return null; }
 		}
 
+		public IHair Hair
+		{
+			get { return null; }
+		}
+
 		public bool Teleporting
 		{
 			get { return false; }

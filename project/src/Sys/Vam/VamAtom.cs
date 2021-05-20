@@ -13,6 +13,7 @@ namespace Cue.W
 		private DAZCharacter char_ = null;
 		private VamClothing clothing_ = null;
 		private VamBody body_ = null;
+		private VamHair hair_ = null;
 
 		public VamAtom(Atom atom)
 		{
@@ -27,6 +28,7 @@ namespace Cue.W
 			{
 				clothing_ = new VamClothing(this);
 				body_ = new VamBody(this);
+				hair_ = new VamHair(this);
 			}
 		}
 
@@ -100,6 +102,11 @@ namespace Cue.W
 		public IBody Body
 		{
 			get { return body_; }
+		}
+
+		public IHair Hair
+		{
+			get { return hair_; }
 		}
 
 		public bool Teleporting
@@ -211,11 +218,14 @@ namespace Cue.W
 			//atom_.mainController.interactableInPlayMode = !b;
 
 			clothing_?.OnPluginState(b);
+			body_?.OnPluginState(b);
+			hair_?.OnPluginState(b);
 		}
 
 		public void Update(float s)
 		{
 			nav_.Update(s);
+			hair_?.Update(s);
 		}
 
 		public void TeleportTo(Vector3 v, float bearing)

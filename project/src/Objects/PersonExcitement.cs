@@ -162,7 +162,9 @@ namespace Cue
 
 			person_.Breathing.Intensity = Value;
 			person_.Body.Sweat = Value;
+			person_.Body.Flush = Value;
 			person_.Expression.Set(Expressions.Pleasure, Value);
+			person_.Hair.Loose = Value;
 
 			if (Value >= 1)
 			{

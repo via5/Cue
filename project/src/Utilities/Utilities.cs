@@ -724,6 +724,54 @@ namespace Cue
 	}
 
 
+	// [0, 1], starts at 0
+	//
+	struct DampedFloat
+	{
+		private float current_;
+		private float target_;
+		private float up_;
+		private float down_;
+
+		private Action<float> set_;
+
+		public DampedFloat(Action<float> set, float upFactor = 0.05f, float downFactor = 0.025f)
+		{
+			current_ = 0;
+			target_ = 0;
+			set_ = set;
+			up_ = upFactor;
+			down_ = downFactor;
+		}
+
+		public float Target
+		{
+			get { return target_; }
+			set { target_ = value; }
+		}
+
+		public float Current
+		{
+			get { return current_; }
+		}
+
+		public void Update(float s)
+		{
+			if (target_ > current_)
+				current_ = U.Clamp(current_ + s * up_, 0, target_);
+			else
+				current_ = U.Clamp(current_ - s * down_, target_, 1);
+
+			set_(current_);
+		}
+
+		public override string ToString()
+		{
+			return $"{target_} ({current_})";
+		}
+	}
+
+
 	class CircularIndex
 	{
 		private int i_ = -1;

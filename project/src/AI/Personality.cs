@@ -8,6 +8,7 @@ namespace Cue
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
 		float GazeRandomTargetWeight(int targetType);
+		float MaxFlush { get; }
 		IObject GazeAvoid();
 
 		string Name { get; }
@@ -89,6 +90,11 @@ namespace Cue
 		public virtual float GazeDuration
 		{
 			get { return 1; }
+		}
+
+		public float MaxFlush
+		{
+			get { return 0.07f; }
 		}
 
 		public virtual IObject GazeAvoid()

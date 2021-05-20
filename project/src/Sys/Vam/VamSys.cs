@@ -455,6 +455,26 @@ namespace Cue.W
 		}
 
 
+		public JSONStorableColor GetColorParameter(
+		IObject o, string storable, string param)
+		{
+			return GetColorParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+		}
+
+		public JSONStorableColor GetColorParameter(
+			Atom a, string storable, string param)
+		{
+			var st = FindStorable(a, storable);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetColorJSONParam(param);
+		}
+
+
 		public JSONStorableAction GetActionParameter(
 			IObject o, string storable, string param)
 		{
@@ -845,6 +865,23 @@ namespace Cue.W
 				UnityEngine.Vector3.Lerp(ToUnity(a), ToUnity(b), p));
 		}
 
+		public static Color Lerp(Color a, Color b, float f)
+		{
+			return FromUnity(UnityEngine.Color.Lerp(
+				ToUnity(a), ToUnity(b), f));
+		}
+
+		public static Color FromHSV(HSVColor hsv)
+		{
+			return FromUnity(UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
+		}
+
+		public static HSVColor ToHSV(Color c)
+		{
+			var hsv = new HSVColor();
+			UnityEngine.Color.RGBToHSV(ToUnity(c), out hsv.H, out hsv.S, out hsv.V);
+			return hsv;
+		}
 
 		public static bool TestPlanesAABB(Plane[] planes, Box box)
 		{

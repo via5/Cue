@@ -79,6 +79,7 @@ namespace Cue
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
+		private Hair hair_;
 		private Gaze gaze_;
 		private IAI ai_ = null;
 		private PersonClothing clothing_;
@@ -101,6 +102,7 @@ namespace Cue
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
+			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
 			ai_ = new PersonAI(this);
 			clothing_ = new PersonClothing(this);
@@ -132,6 +134,7 @@ namespace Cue
 		public PersonState State { get { return state_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
+		public Hair Hair { get { return hair_; } }
 		public Gaze Gaze { get { return gaze_; } }
 		public IAI AI { get { return ai_; } }
 		public PersonClothing Clothing { get { return clothing_; } }
@@ -276,6 +279,7 @@ namespace Cue
 				excitement_.Update(s);
 				personality_.Update(s);
 				body_.Update(s);
+				hair_.Update(s);
 			}
 
 			if (ai_ != null && !Atom.Teleporting)

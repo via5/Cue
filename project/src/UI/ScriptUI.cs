@@ -632,6 +632,8 @@ namespace Cue
 
 		private VUI.Label handsClose_ = new VUI.Label();
 		private VUI.Label sweat_ = new VUI.Label();
+		private VUI.Label flush_ = new VUI.Label();
+		private VUI.Label hairLoose_ = new VUI.Label();
 
 		private VUI.Label excitement_ = new VUI.Label();
 		private VUI.Label mouth_ = new VUI.Label();
@@ -660,6 +662,12 @@ namespace Cue
 
 			p.Add(new VUI.Label("Sweat"));
 			p.Add(sweat_);
+
+			p.Add(new VUI.Label("Flush"));
+			p.Add(flush_);
+
+			p.Add(new VUI.Label("Hair loose"));
+			p.Add(hairLoose_);
 
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
@@ -711,7 +719,9 @@ namespace Cue
 				$"{person_.Body.PlayerIsClose}" +
 				(person_.Body.PlayerIsCloseDelayed ? " (delayed)" : "");
 
-			sweat_.Text = $"{person_.Body.Sweat} ({person_.Body.CurrentSweat})";
+			sweat_.Text = $"{person_.Body.DampedSweat}";
+			flush_.Text = $"{person_.Body.DampedFlush}";
+			hairLoose_.Text = $"{person_.Hair.DampedLoose}";
 
 			var e = person_.Excitement;
 			excitement_.Text = e.ToString();

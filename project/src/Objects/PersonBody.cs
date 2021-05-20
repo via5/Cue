@@ -218,6 +218,35 @@ namespace Cue
 	}
 
 
+	class Hair
+	{
+		private Person person_;
+		private DampedFloat loose_;
+
+		public Hair(Person p)
+		{
+			person_ = p;
+			loose_ = new DampedFloat(x => person_.Atom.Hair.Loose = x);
+		}
+
+		public float Loose
+		{
+			get { return loose_.Target; }
+			set { loose_.Target = value; }
+		}
+
+		public DampedFloat DampedLoose
+		{
+			get { return loose_; }
+		}
+
+		public void Update(float s)
+		{
+			loose_.Update(s);
+		}
+	}
+
+
 	class Body
 	{
 		public const int CloseDelay = 2;
@@ -226,12 +255,16 @@ namespace Cue
 		private readonly BodyPart[] all_;
 		private bool handsClose_;
 		private float timeSinceClose_ = CloseDelay + 1;
-		private float currentSweat_ = 0;
-		private float targetSweat_ = 0;
+		private DampedFloat sweat_, flush_;
 
 		public Body(Person p)
 		{
 			person_ = p;
+
+			sweat_ = new DampedFloat(x => person_.Atom.Body.Sweat = x);
+			flush_ = new DampedFloat(x =>
+				person_.Atom.Body.LerpColor(
+					Color.Red, x * person_.Personality.MaxFlush));
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
@@ -270,13 +303,24 @@ namespace Cue
 
 		public float Sweat
 		{
-			get { return targetSweat_; }
-			set { targetSweat_ = value; }
+			get { return sweat_.Target; }
+			set { sweat_.Target = value; }
 		}
 
-		public float CurrentSweat
+		public DampedFloat DampedSweat
 		{
-			get { return currentSweat_; }
+			get { return sweat_; }
+		}
+
+		public float Flush
+		{
+			get { return flush_.Target; }
+			set { flush_.Target = value; }
+		}
+
+		public DampedFloat DampedFlush
+		{
+			get { return flush_; }
 		}
 
 		public BodyPart Get(int type)
@@ -371,18 +415,8 @@ namespace Cue
 			else if (!handsClose_)
 				timeSinceClose_ += s;
 
-			UpdateSweat(s);
-
-			if (person_.Atom.Body != null)
-				person_.Atom.Body.Sweat = currentSweat_;
-		}
-
-		private void UpdateSweat(float s)
-		{
-			if (targetSweat_ > currentSweat_)
-				currentSweat_ = U.Clamp(currentSweat_ + s / 20, 0, targetSweat_);
-			else
-				currentSweat_ = U.Clamp(currentSweat_ - s / 40, targetSweat_, 1);
+			sweat_.Update(s);
+			flush_.Update(s);
 		}
 	}
 }
