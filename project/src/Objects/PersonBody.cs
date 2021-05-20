@@ -264,7 +264,7 @@ namespace Cue
 			sweat_ = new DampedFloat(x => person_.Atom.Body.Sweat = x);
 			flush_ = new DampedFloat(x =>
 				person_.Atom.Body.LerpColor(
-					Color.Red, x * person_.Personality.MaxFlush));
+					Color.Red, x * person_.Physiology.MaxFlush));
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();

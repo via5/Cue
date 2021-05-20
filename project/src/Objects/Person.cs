@@ -2,11 +2,11 @@
 
 namespace Cue
 {
-	class PersonClothing
+	class Clothing
 	{
 		private Person person_;
 
-		public PersonClothing(Person p)
+		public Clothing(Person p)
 		{
 			person_ = p;
 		}
@@ -66,6 +66,61 @@ namespace Cue
 	}
 
 
+	class Sensitivity
+	{
+		private Person person_;
+
+		public Sensitivity(Person p)
+		{
+			person_ = p;
+		}
+
+		public float MouthRate { get { return 0.1f; } }
+		public float MouthMax { get { return 0.05f; } }
+
+		public float BreastsRate { get { return 0.01f; } }
+		public float BreastsMax { get { return 0.1f; } }
+
+		public float GenitalsRate { get { return 0.06f; } }
+		public float GenitalsMax { get { return 0.3f; } }
+
+		public float PenetrationRate { get { return 0.05f; } }
+		public float PenetrationMax { get { return 1.0f; } }
+
+		public float DecayPerSecond { get { return -0.1f; } }
+		public float ExcitementPostOrgasm { get { return 0.0f; } }
+		public float DelayPostOrgasm { get { return 10; } }
+	}
+
+
+	class Physiology
+	{
+		private Person person_;
+		private Sensitivity sensitivity_;
+
+		public Physiology(Person p)
+		{
+			person_ = p;
+			sensitivity_ = new Sensitivity(p);
+		}
+
+		public Sensitivity Sensitivity
+		{
+			get { return sensitivity_; }
+		}
+
+		public float MaxFlush
+		{
+			get { return 0.07f; }
+		}
+
+		public float VoicePitch
+		{
+			get { return 0.5f; }
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		private readonly RootAction actions_;
@@ -81,8 +136,9 @@ namespace Cue
 		private Body body_;
 		private Hair hair_;
 		private Gaze gaze_;
+		private Physiology physiology_;
 		private IAI ai_ = null;
-		private PersonClothing clothing_;
+		private Clothing clothing_;
 		private IPersonality personality_;
 
 		private IBreather breathing_;
@@ -104,8 +160,9 @@ namespace Cue
 			body_ = new Body(this);
 			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
+			physiology_ = new Physiology(this);
 			ai_ = new PersonAI(this);
-			clothing_ = new PersonClothing(this);
+			clothing_ = new Clothing(this);
 			personality_ = new NeutralPersonality(this);
 
 			breathing_ = Integration.CreateBreather(this);
@@ -136,8 +193,9 @@ namespace Cue
 		public Body Body { get { return body_; } }
 		public Hair Hair { get { return hair_; } }
 		public Gaze Gaze { get { return gaze_; } }
+		public Physiology Physiology { get { return physiology_; } }
 		public IAI AI { get { return ai_; } }
-		public PersonClothing Clothing { get { return clothing_; } }
+		public Clothing Clothing { get { return clothing_; } }
 		public RootAction Actions { get { return actions_; } }
 
 		public IBreather Breathing { get { return breathing_; } }

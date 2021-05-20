@@ -1,17 +1,24 @@
-﻿using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	class MacGruberBreather : IBreather
 	{
 		private Person person_;
 		private W.VamFloatParameter intensity_;
+		private W.VamFloatParameter desktopVolume_;
+		private W.VamFloatParameter vrVolume_;
+		private W.VamFloatParameter pitch_;
 		private float lastIntensity_ = 0;
 
 		public MacGruberBreather(Person p)
 		{
 			person_ = p;
 			intensity_ = new W.VamFloatParameter(p, "MacGruber.Breathing", "Intensity");
+			desktopVolume_ = new W.VamFloatParameter(p, "MacGruber.AudioAttenuation", "Volume Desktop");
+			vrVolume_ = new W.VamFloatParameter(p, "MacGruber.AudioAttenuation", "Volume VR");
+			pitch_ = new W.VamFloatParameter(p, "MacGruber.Breathing", "Pitch");
+
+			vrVolume_.Value = desktopVolume_.Value;
+			pitch_.Value = 0.9f + p.Physiology.VoicePitch * 0.2f;
 		}
 
 		public float Intensity

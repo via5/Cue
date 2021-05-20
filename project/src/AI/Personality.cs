@@ -1,6 +1,4 @@
-﻿using System.Security.Policy;
-
-namespace Cue
+﻿namespace Cue
 {
 	interface IPersonality
 	{
@@ -8,40 +6,11 @@ namespace Cue
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
 		float GazeRandomTargetWeight(int targetType);
-		float MaxFlush { get; }
 		IObject GazeAvoid();
 
 		string Name { get; }
 		string StateString{ get; }
-		Sensitivity Sensitivity { get; }
 		void Update(float s);
-	}
-
-
-	class Sensitivity
-	{
-		private Person person_;
-
-		public Sensitivity(Person p)
-		{
-			person_ = p;
-		}
-
-		public float MouthRate { get { return 0.1f; } }
-		public float MouthMax { get { return 0.05f; } }
-
-		public float BreastsRate { get { return 0.01f; } }
-		public float BreastsMax { get { return 0.1f; } }
-
-		public float GenitalsRate { get { return 0.06f; } }
-		public float GenitalsMax { get { return 0.3f; } }
-
-		public float PenetrationRate { get { return 0.05f; } }
-		public float PenetrationMax { get { return 1.0f; } }
-
-		public float DecayPerSecond { get { return -0.1f; } }
-		public float ExcitementPostOrgasm { get { return 0.0f; } }
-		public float DelayPostOrgasm { get { return 10; } }
 	}
 
 
@@ -49,7 +18,6 @@ namespace Cue
 	{
 		protected readonly Person person_;
 		private readonly string name_;
-		private Sensitivity sensitivity_;
 		private string state_ = "idle";
 		private bool wasClose_ = false;
 		private bool inited_ = false;
@@ -58,7 +26,6 @@ namespace Cue
 		{
 			person_ = p;
 			name_ = name;
-			sensitivity_ = new Sensitivity(p);
 		}
 
 		public string Name
@@ -70,11 +37,6 @@ namespace Cue
 		{
 			get { return state_; }
 			protected set { state_ = value; }
-		}
-
-		public Sensitivity Sensitivity
-		{
-			get { return sensitivity_; }
 		}
 
 		public virtual Pair<float, float> LookAtRandomInterval
@@ -90,11 +52,6 @@ namespace Cue
 		public virtual float GazeDuration
 		{
 			get { return 1; }
-		}
-
-		public float MaxFlush
-		{
-			get { return 0.07f; }
 		}
 
 		public virtual IObject GazeAvoid()

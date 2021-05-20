@@ -56,12 +56,12 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			var ss = person_.Personality.Sensitivity;
+			var pp = person_.Physiology.Sensitivity;
 
 			if (postOrgasm_)
 			{
 				postOrgasmElapsed_ += s;
-				if (postOrgasmElapsed_ < ss.DelayPostOrgasm)
+				if (postOrgasmElapsed_ < pp.DelayPostOrgasm)
 					return;
 
 				postOrgasm_ = false;
@@ -91,7 +91,7 @@ namespace Cue
 
 		private void UpdateRates(float s)
 		{
-			var ss = person_.Personality.Sensitivity;
+			var ss = person_.Physiology.Sensitivity;
 
 			totalRate_ = 0;
 
@@ -123,7 +123,7 @@ namespace Cue
 
 		private void UpdateMax(float s)
 		{
-			var ss = person_.Personality.Sensitivity;
+			var ss = person_.Physiology.Sensitivity;
 
 			max_ = 0;
 
@@ -142,7 +142,7 @@ namespace Cue
 
 		private void UpdateValue(float s)
 		{
-			var ss = person_.Personality.Sensitivity;
+			var ss = person_.Physiology.Sensitivity;
 
 			if (flatExcitement_ > max_)
 			{
@@ -158,7 +158,7 @@ namespace Cue
 
 		private void Apply(float s)
 		{
-			var ss = person_.Personality.Sensitivity;
+			var ss = person_.Physiology.Sensitivity;
 
 			person_.Breathing.Intensity = Value;
 			person_.Body.Sweat = Value;
