@@ -8,6 +8,8 @@
 		private VUI.Panel selButtons_ = null;
 		private VUI.Panel playerButtons_ = null;
 		private VUI.CheckBox canKiss_ = new VUI.CheckBox("Can kiss");
+		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Ex");
+		private VUI.FloatTextSlider excitement_ = new VUI.FloatTextSlider();
 		private IObject sel_ = null;
 		private IObject hov_ = null;
 
@@ -69,6 +71,8 @@
 
 			row = new VUI.Panel(new VUI.HorizontalFlow(5));
 			row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
+			row.Add(forceExcitement_);
+			row.Add(excitement_);
 			playerButtons_.Add(row);
 
 
@@ -77,6 +81,8 @@
 			root_.Visible = visible_;
 
 			canKiss_.Changed += OnCanKiss;
+			forceExcitement_.Changed += (b) => OnExcitement();
+			excitement_.ValueChanged += (f) => OnExcitement();
 		}
 
 		public bool Visible
@@ -320,6 +326,18 @@
 			var p = Cue.Instance.Player;
 			if (p != null)
 				p.VamAtom.SetControlsForMoving(b);
+		}
+
+		private void OnExcitement()
+		{
+			var p = Selected as Person;
+			if (p != null)
+			{
+				if (forceExcitement_.Checked)
+					p.Excitement.ForceValue(excitement_.Value);
+				else
+					p.Excitement.ForceValue(-1);
+			}
 		}
 	}
 }

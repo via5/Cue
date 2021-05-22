@@ -2,50 +2,130 @@
 {
 	class MacGruberBreather : IBreather
 	{
+		struct Pair
+		{
+			public W.VamFloatParameter min, max;
+
+			public Pair(W.VamFloatParameter min, W.VamFloatParameter max)
+			{
+				this.min = min;
+				this.max = max;
+			}
+		}
+
+		struct Parameters
+		{
+			public W.VamFloatParameter intensity;
+			public W.VamFloatParameter desktopVolume;
+			public W.VamFloatParameter vrVolume;
+			public W.VamFloatParameter pitch;
+
+			public Pair chestMorph, chestJointDrive, stomach, mouthMorph;
+			public W.VamFloatParameter chestJointDriveSpring;
+			public W.VamFloatParameter mouthOpenTime, mouthCloseTime;
+			public W.VamFloatParameter lipsMorphMax;
+			public W.VamFloatParameter noseInMorphMax, noseOutMorphMax;
+		}
+
 		private Person person_;
-		private W.VamFloatParameter intensity_;
-		private W.VamFloatParameter desktopVolume_;
-		private W.VamFloatParameter vrVolume_;
-		private W.VamFloatParameter pitch_;
-		private float lastIntensity_ = 0;
+		private Parameters p_ = new Parameters();
 
 		public MacGruberBreather(Person p)
 		{
 			person_ = p;
-			intensity_ = new W.VamFloatParameter(p, "MacGruber.Breathing", "Intensity");
-			desktopVolume_ = new W.VamFloatParameter(p, "MacGruber.AudioAttenuation", "Volume Desktop");
-			vrVolume_ = new W.VamFloatParameter(p, "MacGruber.AudioAttenuation", "Volume VR");
-			pitch_ = new W.VamFloatParameter(p, "MacGruber.Breathing", "Pitch");
 
-			vrVolume_.Value = desktopVolume_.Value;
-			pitch_.Value = 0.9f + p.Physiology.VoicePitch * 0.2f;
+			p_.intensity = BP("Intensity");
+			p_.desktopVolume = AAP("Volume Desktop");
+			p_.vrVolume = AAP("Volume VR");
+			p_.pitch = BP("Pitch");
+			p_.chestMorph = DBPP("ChestMorph Min", "ChestMorph Max");
+			p_.chestJointDrive = DBPP("ChestJointDrive Min", "ChestJointDrive Max");
+			p_.stomach = DBPP("StomachMin", "StomachMax");
+			p_.mouthMorph = DBPP("MouthMorph Min", "MouthMorph Max");
+			p_.chestJointDriveSpring = DBP("ChestJointDrive Spring");
+			p_.mouthOpenTime = DBP("Mouth Open Time");
+			p_.mouthCloseTime = DBP("Mouth Close Time");
+			p_.lipsMorphMax = DBP("LipsMorph Max");
+			p_.noseInMorphMax = DBP("NoseInMorph Max");
+			p_.noseOutMorphMax = DBP("NoseOutMorph Max");
+
+			p_.vrVolume.Value = p_.desktopVolume.Value;
+			p_.pitch.Value = 0.9f + person_.Physiology.VoicePitch * 0.2f;
+		}
+
+		private W.VamFloatParameter DBP(string name)
+		{
+			return new W.VamFloatParameter(
+				person_, "MacGruber.DriverBreathing", name);
+		}
+
+		private Pair DBPP(string min, string max)
+		{
+			return new Pair(
+				new W.VamFloatParameter(
+					person_, "MacGruber.DriverBreathing", min),
+				new W.VamFloatParameter(
+					person_, "MacGruber.DriverBreathing", max));
+		}
+
+		private W.VamFloatParameter BP(string name)
+		{
+			return new W.VamFloatParameter(
+				person_, "MacGruber.Breathing", name);
+		}
+
+		private W.VamFloatParameter AAP(string name)
+		{
+			return new W.VamFloatParameter(
+				person_, "MacGruber.AudioAttenuation", name);
 		}
 
 		public float Intensity
 		{
 			get
 			{
-				lastIntensity_ = intensity_.Value;
-				return lastIntensity_;
+				return p_.intensity.Value;
 			}
 
 			set
 			{
-				intensity_.Value = value;
-				lastIntensity_ = value;
+				p_.intensity.Value = value;
+				Apply();
 			}
 		}
 
-		// not supported
+		// not supported, tied to pitch
+		//
 		public float Speed
 		{
 			get { return 0; }
 			set { }
 		}
 
+		private void Apply()
+		{
+			var f = Intensity;
+
+			var p = p_.mouthMorph.max.Parameter;
+			if (p != null)
+				p.val = p.defaultVal * f;
+
+			p = p_.lipsMorphMax.Parameter;
+			if (p != null)
+				p.val = p.defaultVal * f;
+
+			p = p_.chestMorph.max.Parameter;
+			if (p != null)
+				p.val = p.defaultVal * f;
+
+			p = p_.stomach.max.Parameter;
+			if (p != null)
+				p.val = p.defaultVal * f;
+		}
+
 		public override string ToString()
 		{
-			return $"MacGruber: intensity={intensity_} speed=n/a";
+			return $"MacGruber: v={p_.intensity}";
 		}
 	}
 

@@ -26,8 +26,6 @@ namespace Cue.W
 
 		public bool Check(bool force = false)
 		{
-			checkedOnce_ = true;
-
 			if (!DeadCheck())
 			{
 				stale_ = true;
@@ -53,6 +51,8 @@ namespace Cue.W
 					elapsed_ = 0;
 				}
 			}
+
+			checkedOnce_ = true;
 
 			return !stale_;
 		}
@@ -85,7 +85,11 @@ namespace Cue.W
 
 		public StorableType Parameter
 		{
-			get { return param_; }
+			get
+			{
+				Check();
+				return param_;
+			}
 		}
 
 		protected NativeType GetValue()
@@ -140,8 +144,16 @@ namespace Cue.W
 		protected override bool StaleCheck()
 		{
 			param_ = DoGetParameter();
-			if (param_ != null)
+
+			if (param_ == null)
+			{
+				if (!checkedOnce_)
+					Cue.LogVerbose($"{atom_.uid}: {storableID_} {paramName_} not found");
+			}
+			else
+			{
 				Cue.LogVerbose($"{atom_.uid}: found {storableID_} {paramName_}");
+			}
 
 			return (param_ != null);
 		}

@@ -71,6 +71,8 @@ namespace Cue.Proc
 			{
 				m_ = new ClampableMorph(
 					p, morphId_, min_, max_, duration_, delay_);
+
+				m_.Set(1, float.MaxValue);
 			}
 		}
 
@@ -474,11 +476,10 @@ namespace Cue.Proc
 		public float Set(float intensity, float max)
 		{
 			closeToMid_ = false;
+			intensity_ = intensity;
 
 			if (morph_ == null)
 				return 0;
-
-			intensity_ = intensity;
 
 			var v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
 			if (Math.Abs(v - mid_) > max)

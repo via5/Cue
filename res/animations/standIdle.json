@@ -6,6 +6,7 @@
 		{
 			"type": "con",
 			"name": "sway",
+			"loop": true,
 			"targets":
 			[
 				{
@@ -135,7 +136,16 @@
 					"type": "morph",
 					"bodyPart": "righthand",
 					"morph": "Right Fingers Fist",
-					"min": 0.1,
+					"min": 0.2,
+					"max": 0.4,
+					"duration": [1, 6],
+					"delay": [0, 6]
+				},
+				{
+					"type": "morph",
+					"bodyPart": "lefthand",
+					"morph": "Left Fingers Fist",
+					"min": 0.2,
 					"max": 0.4,
 					"duration": [1, 6],
 					"delay": [0, 6]
