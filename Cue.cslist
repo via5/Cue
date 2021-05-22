@@ -23,11 +23,11 @@ project\src\Integration\Vam.cs
 project\src\Object\Animator.cs
 project\src\Object\Object.cs
 project\src\Object\Slots.cs
+project\src\Person\Body.cs
+project\src\Person\Excitement.cs
+project\src\Person\Gaze.cs
 project\src\Person\Person.cs
-project\src\Person\PersonBody.cs
-project\src\Person\PersonExcitement.cs
-project\src\Person\PersonGaze.cs
-project\src\Person\PersonState.cs
+project\src\Person\State.cs
 project\src\Procedural\Animation\Animation.cs
 project\src\Procedural\Animation\Builtin.cs
 project\src\Procedural\Animation\Controller.cs

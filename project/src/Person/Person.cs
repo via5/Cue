@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Cue
+﻿namespace Cue
 {
 	class Clothing
 	{
