@@ -26,7 +26,7 @@ project\src\Person\Excitement.cs
 project\src\Person\Person.cs
 project\src\Person\State.cs
 project\src\Person\Gaze\Gaze.cs
-project\src\Person\Gaze\Generator.cs
+project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Targets.cs
 project\src\Procedural\Animation\Animation.cs
 project\src\Procedural\Animation\Builtin.cs
