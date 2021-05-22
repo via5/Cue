@@ -96,8 +96,6 @@
   <ItemGroup>
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
-    <Compile Include="src\AI\Gaze\Lookat.cs" />
-    <Compile Include="src\AI\Gaze\LookatRandom.cs" />
     <Compile Include="src\AI\Interactions.cs" />
     <Compile Include="src\AI\Personality.cs" />
     <Compile Include="src\Cue.cs" />
@@ -121,7 +119,9 @@
     <Compile Include="src\Object\Slots.cs" />
     <Compile Include="src\Person\Body.cs" />
     <Compile Include="src\Person\Excitement.cs" />
-    <Compile Include="src\Person\Gaze.cs" />
+    <Compile Include="src\Person\Gaze\Gaze.cs" />
+    <Compile Include="src\Person\Gaze\Generator.cs" />
+    <Compile Include="src\Person\Gaze\Targets.cs" />
     <Compile Include="src\Person\Person.cs" />
     <Compile Include="src\Person\State.cs" />
     <Compile Include="src\Procedural\Animation\Animation.cs" />

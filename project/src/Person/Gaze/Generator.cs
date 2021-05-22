@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class RandomTargetGenerator
+	class GazeTargetPicker
 	{
 		public class FrustumInfo
 		{
@@ -33,7 +33,7 @@
 		private int currentTarget_ = -1;
 		private string lastString_ = "";
 
-		public RandomTargetGenerator(Person p)
+		public GazeTargetPicker(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "RandomLookAt");
@@ -317,12 +317,12 @@
 
 	class RandomTargetGeneratorRenderer
 	{
-		private RandomTargetGenerator r_;
+		private GazeTargetPicker r_;
 		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
 		private W.IGraphic avoid_ = null;
 		private bool visible_ = false;
 
-		public RandomTargetGeneratorRenderer(RandomTargetGenerator r)
+		public RandomTargetGeneratorRenderer(GazeTargetPicker r)
 		{
 			r_ = r;
 		}
@@ -380,7 +380,7 @@
 
 		private void CreateFrustums()
 		{
-			frustums_ = new FrustumRenderer[RandomTargetGenerator.FrustumCount];
+			frustums_ = new FrustumRenderer[GazeTargetPicker.FrustumCount];
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				frustums_[i] = new FrustumRenderer(

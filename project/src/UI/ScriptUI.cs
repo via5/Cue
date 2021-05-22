@@ -644,7 +644,7 @@ namespace Cue
 					items.Add($"Avoid: {p.first} {p.second}");
 			}
 
-			items.Add(person_.Gaze.Generator.LastString);
+			items.Add(person_.Gaze.Picker.LastString);
 
 			list_.SetItems(items);
 		}
