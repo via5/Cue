@@ -159,6 +159,8 @@
 		private int version_ = NotFound;
 		private W.VamBoolParameter enabled_;
 		private W.VamFloatParameter gazeDuration_;
+		private W.VamFloatParameter maxAngleHor_;
+		private W.VamFloatParameter maxAngleVer_;
 
 		// 12
 		private W.VamBoolParameter lookatTarget_;
@@ -172,12 +174,19 @@
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
+
 			enabled_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
 			gazeDuration_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
+			maxAngleHor_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
+			maxAngleVer_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
+
 			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 			lookatAtom_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
 			lookatControl_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
+
 			enabled_.Value = false;
+			maxAngleHor_.Value = 90;
+			maxAngleVer_.Value = 60;
 		}
 
 		public bool Enabled

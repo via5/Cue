@@ -95,7 +95,6 @@ namespace Cue
 		private Person person_;
 		private int type_;
 		private W.IBodyPart part_;
-		private bool close_ = false;
 
 		public BodyPart(Person p, int type, W.IBodyPart part)
 		{
@@ -142,12 +141,6 @@ namespace Cue
 		public bool Grabbed
 		{
 			get { return part_?.Grabbed ?? false; }
-		}
-
-		public bool Close
-		{
-			get { return close_; }
-			set { close_ = value; }
 		}
 
 		public bool Busy
@@ -253,8 +246,6 @@ namespace Cue
 
 		private Person person_;
 		private readonly BodyPart[] all_;
-		private bool handsClose_;
-		private float timeSinceClose_ = CloseDelay + 1;
 		private DampedFloat sweat_, flush_;
 
 		public Body(Person p)
@@ -280,25 +271,170 @@ namespace Cue
 			all_ = all.ToArray();
 		}
 
+		public void Init()
+		{
+		}
+
 		public BodyPart[] Parts
 		{
 			get { return all_; }
 		}
 
-		public bool PlayerIsClose
+		public bool InsidePersonalSpace(Person other)
 		{
-			get
+			var checkParts = new int[]
 			{
-				return handsClose_ || (timeSinceClose_ < CloseDelay);
+				BodyParts.LeftHand, BodyParts.RightHand, BodyParts.Head
+			};
+
+			for (int i = 0; i < all_.Length; ++i)
+			{
+				var part = all_[i];
+				if (part == null)
+					continue;
+
+				for (int pi = 0; pi < checkParts.Length; ++pi)
+				{
+					var otherPart = other.Body.Get(checkParts[pi]);
+					var d = Vector3.Distance(part.Position, otherPart.Position);
+
+					if (d < 0.2f)
+						return true;
+				}
 			}
+
+			return false;
 		}
 
-		public bool PlayerIsCloseDelayed
+		public bool Groped()
 		{
-			get
+			var parts = new int[]
 			{
-				return !handsClose_ && (timeSinceClose_ < CloseDelay);
+				BodyParts.Chest, BodyParts.Genitals
+			};
+
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (GropedBy(Cue.Instance.Persons[i], parts))
+					return true;
 			}
+
+			return false;
+		}
+
+		public bool Penetrated()
+		{
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (PenetratedBy(Cue.Instance.Persons[i]))
+					return true;
+			}
+
+			return false;
+		}
+
+		public bool GropedBy(Person p, int triggerBodyPart)
+		{
+			return GropedBy(p, new int[] { triggerBodyPart });
+		}
+
+		public bool GropedBy(Person p, int[] triggerBodyParts)
+		{
+			if (p == person_)
+				return false;
+
+			var checkParts = new int[]
+			{
+				BodyParts.Head, BodyParts.LeftHand, BodyParts.RightHand,
+				BodyParts.LeftFoot, BodyParts.RightFoot
+			};
+
+			return CheckParts(p, triggerBodyParts, checkParts);
+		}
+
+		public bool PenetratedBy(Person p)
+		{
+			if (p == person_)
+				return false;
+
+			var triggerParts = new int[]
+			{
+				BodyParts.Vagina,
+				BodyParts.DeepVagina,
+				BodyParts.DeeperVagina,
+				BodyParts.Anus
+			};
+
+			var checkParts = new int[]
+			{
+				BodyParts.Genitals
+			};
+
+			return CheckParts(p, triggerParts, checkParts);
+		}
+
+		private bool CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		{
+			for (int i = 0; i < triggerParts.Length; ++i)
+			{
+				// todo: should be more generic than that
+
+				var triggerPart = triggerParts[i];
+
+				if (triggerPart == BodyParts.Chest && person_.Sex == Sexes.Female)
+				{
+					if (CheckPart(by, BodyParts.LeftBreast, checkParts))
+						return true;
+
+					if (CheckPart(by, BodyParts.RightBreast, checkParts))
+						return true;
+				}
+				else if (triggerPart == BodyParts.Genitals && person_.Sex == Sexes.Female)
+				{
+					if (CheckPart(by, BodyParts.Labia, checkParts))
+						return true;
+
+					if (CheckPart(by, BodyParts.Vagina, checkParts))
+						return true;
+
+					if (CheckPart(by, BodyParts.DeepVagina, checkParts))
+						return true;
+
+					if (CheckPart(by, BodyParts.DeeperVagina, checkParts))
+						return true;
+				}
+				else
+				{
+					if (CheckPart(by, triggerParts[i], checkParts))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		private bool CheckPart(Person by, int triggerPartID, int[] checkParts)
+		{
+			var triggerPart = Get(triggerPartID);
+
+			if (triggerPart.Trigger > 0)
+			{
+				for (int j = 0; j < checkParts.Length; ++j)
+				{
+					var checkPart = by.Body.Get(checkParts[j]);
+					if (checkPart.Exists)
+					{
+						var d = Vector3.Distance(
+							triggerPart.Position, checkPart.Position);
+
+						if (d < 0.2f)
+							return true;
+					}
+				}
+			}
+
+			return false;
 		}
 
 		public float Sweat
@@ -385,35 +521,6 @@ namespace Cue
 		{
 			if (person_.Atom.Teleporting)
 				return;
-
-			var wasClose = handsClose_;
-			handsClose_ = false;
-
-			var leftHand = Cue.Instance.InteractiveLeftHandPosition;
-			var rightHand = Cue.Instance.InteractiveRightHandPosition;
-			var head = Cue.Instance.Player?.Body?.Get(BodyParts.Head)?.Position ?? Vector3.Zero;
-
-			for (int i = 0; i < all_.Length; ++i)
-			{
-				var p = all_[i];
-				if (p == null)
-					continue;
-
-				var leftD = Vector3.Distance(p.Position, leftHand);
-				var rightD = Vector3.Distance(p.Position, rightHand);
-
-				var headD = float.MaxValue;
-				if (Cue.Instance.Player != null)
-					headD = Vector3.Distance(p.Position, head);
-
-				p.Close = (leftD < 0.2f) || (rightD < 0.2f) || (headD < 0.2f);
-				handsClose_ = handsClose_ || p.Close;
-			}
-
-			if (wasClose && !handsClose_)
-				timeSinceClose_ = 0;
-			else if (!handsClose_)
-				timeSinceClose_ += s;
 
 			sweat_.Update(s);
 			flush_.Update(s);

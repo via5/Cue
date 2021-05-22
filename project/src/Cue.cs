@@ -86,32 +86,6 @@ namespace Cue
 			return null;
 		}
 
-		public Vector3 InteractiveLeftHandPosition
-		{
-			get
-			{
-				if (Sys.IsVR)
-					return Sys.InteractiveLeftHandPosition;
-				else if (Player != null)
-					return Player.Body.Get(BodyParts.LeftHand).Position;
-				else
-					return Vector3.Zero;
-			}
-		}
-
-		public Vector3 InteractiveRightHandPosition
-		{
-			get
-			{
-				if (Sys.IsVR)
-					return Sys.InteractiveRightHandPosition;
-				else if (Player != null)
-					return Player.Body.Get(BodyParts.RightHand).Position;
-				else
-					return Vector3.Zero;
-			}
-		}
-
 		public void Init()
 		{
 			LogVerbose("cue: init");
@@ -166,7 +140,7 @@ namespace Cue
 				}
 				else
 				{
-					var o = BasicObject.TryCreateFromSlot(a);
+					var o = BasicObject.TryCreateFromSlot(allObjects_.Count, a);
 					if (o != null)
 						AddObject(o);
 				}
@@ -195,23 +169,13 @@ namespace Cue
 						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 				}
 
-				p.SetState(PersonState.Standing);
-				p.Clothing.Init();
-
-				if (p == Player)
-				{
-					p.AI.EventsEnabled = false;
-					p.AI.InteractionsEnabled = false;
-				}
-
-
-				p.Atom.Init();
+				p.Init();
 			}
 		}
 
 		private void AddPerson(W.IAtom a)
 		{
-			var p = new Person(a);
+			var p = new Person(allObjects_.Count, persons_.Count, a);
 
 			var re = new Regex(@"(.+)#(.+)");
 			var m = re.Match(a.ID);

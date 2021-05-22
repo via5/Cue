@@ -536,6 +536,7 @@ namespace Cue
 			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
 			p.Add(new VUI.Button("Expression", DumpExpression));
 			p.Add(new VUI.Button("Animation", DumpAnimation));
+			p.Add(new VUI.Button("Gaze", DumpGaze));
 
 			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
@@ -624,13 +625,35 @@ namespace Cue
 					DumpTarget(items, c, indent + 1);
 			}
 		}
+
+		VUI.Timer tt = null;
+
+		private void DumpGaze()
+		{
+			if (tt == null)
+				tt = VUI.TimerManager.Instance.CreateTimer(1, DumpGaze, VUI.Timer.Repeat);
+
+			var items = new List<string>();
+
+			foreach (var t in person_.Gaze.Targets.All)
+				items.Add($"Target: {t.Weight:0.00} {t}");
+
+			foreach (var p in person_.Gaze.GetAllAvoidForDebug())
+			{
+				if (p.second)
+					items.Add($"Avoid: {p.first} {p.second}");
+			}
+
+			items.Add(person_.Gaze.Generator.LastString);
+
+			list_.SetItems(items);
+		}
 	}
 
 	class PersonBodyTab : Tab
 	{
 		private readonly Person person_;
 
-		private VUI.Label handsClose_ = new VUI.Label();
 		private VUI.Label sweat_ = new VUI.Label();
 		private VUI.Label flush_ = new VUI.Label();
 		private VUI.Label hairLoose_ = new VUI.Label();
@@ -656,9 +679,6 @@ namespace Cue
 			gl.HorizontalStretch = new List<bool>() { false, true };
 
 			var p = new VUI.Panel(gl);
-
-			p.Add(new VUI.Label("Hands close"));
-			p.Add(handsClose_);
 
 			p.Add(new VUI.Label("Sweat"));
 			p.Add(sweat_);
@@ -715,10 +735,6 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			handsClose_.Text =
-				$"{person_.Body.PlayerIsClose}" +
-				(person_.Body.PlayerIsCloseDelayed ? " (delayed)" : "");
-
 			sweat_.Text = $"{person_.Body.DampedSweat}";
 			flush_.Text = $"{person_.Body.DampedFlush}";
 			hairLoose_.Text = $"{person_.Hair.DampedLoose}";
@@ -754,9 +770,8 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, close, grab, position, direction;
+			public VUI.Label name, triggering, grab, position, direction;
 		}
-
 
 		private readonly Person person_;
 		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
@@ -765,13 +780,12 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(6);
+			var gl = new VUI.GridLayout(5);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Close", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
@@ -785,7 +799,6 @@ namespace Cue
 
 				w.name = new VUI.Label(bp.Name);
 				w.triggering = new VUI.Label();
-				w.close = new VUI.Label();
 				w.grab = new VUI.Label();
 				w.position = new VUI.Label();
 				w.direction = new VUI.Label();
@@ -793,14 +806,12 @@ namespace Cue
 				int fontSize = 24;
 				w.name.FontSize = fontSize;
 				w.triggering.FontSize = fontSize;
-				w.close.FontSize = fontSize;
 				w.grab.FontSize = fontSize;
 				w.position.FontSize = fontSize;
 				w.direction.FontSize = fontSize;
 
 				p.Add(w.name);
 				p.Add(w.triggering);
-				p.Add(w.close);
 				p.Add(w.grab);
 				p.Add(w.position);
 				p.Add(w.direction);
@@ -840,15 +851,6 @@ namespace Cue
 						{
 							w.triggering.Text = "";
 						}
-
-
-						w.close.Text = w.part.Close.ToString();
-
-						w.close.TextColor = (
-							w.part.Close ?
-							W.VamU.ToUnity(Color.Green) :
-							VUI.Style.Theme.TextColor);
-
 
 						if (w.part.Sys.CanGrab)
 						{

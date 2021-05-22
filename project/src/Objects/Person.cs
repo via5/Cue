@@ -123,6 +123,7 @@ namespace Cue
 
 	class Person : BasicObject
 	{
+		private readonly int personIndex_;
 		private readonly RootAction actions_;
 		private PersonState state_;
 		private bool deferredTransition_ = false;
@@ -149,9 +150,11 @@ namespace Cue
 		private IBlowjob blowjob_;
 		private IExpression expression_;
 
-		public Person(W.IAtom atom)
-			: base(atom)
+		public Person(int objectIndex, int personIndex, W.IAtom atom)
+			: base(objectIndex, atom)
 		{
+			personIndex_ = personIndex;
+
 			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
 			options_ = new PersonOptions(this);
@@ -174,6 +177,28 @@ namespace Cue
 			expression_ = Integration.CreateExpression(this);
 
 			Atom.SetDefaultControls("init");
+		}
+
+		public void Init()
+		{
+			SetState(PersonState.Standing);
+
+			Body.Init();
+			gaze_.Init();
+			Clothing.Init();
+
+			if (this == Cue.Instance.Player)
+			{
+				AI.EventsEnabled = false;
+				AI.InteractionsEnabled = false;
+			}
+
+			Atom.Init();
+		}
+
+		public int PersonIndex
+		{
+			get { return personIndex_; }
 		}
 
 		public bool Idle

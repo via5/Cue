@@ -5,8 +5,23 @@
 		Pair<float, float> LookAtRandomInterval { get; }
 		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
-		float GazeRandomTargetWeight(int targetType);
-		IObject GazeAvoid();
+
+		bool AvoidGazeInsidePersonalSpace { get; }
+		bool AvoidGazeDuringSex { get; }
+		bool AvoidGazeDuringSexOthers { get; }
+
+		float NaturalRandomWeight { get; }
+		float BlowjobEyesWeight { get; }
+		float BlowjobGenitalsWeight { get; }
+		float HandjobEyesWeight { get; }
+		float HandjobGenitalsWeight { get; }
+		float PenetrationEyesWeight { get; }
+		float PenetrationChestWeight { get; }
+		float PenetrationGenitalsWeight { get; }
+		float GropedEyesWeight { get; }
+		float GropedChestWeight { get; }
+		float GropedGenitalsWeight { get; }
+		float OtherSexEyesWeight { get; }
 
 		string Name { get; }
 		string StateString{ get; }
@@ -59,17 +74,27 @@
 			return null;
 		}
 
-		public virtual float GazeRandomTargetWeight(int targetType)
-		{
-			switch (targetType)
-			{
-				case RandomTargetTypes.Sex: return 5;
-				case RandomTargetTypes.Body: return 2;
-				case RandomTargetTypes.Eyes: return 5;
-				case RandomTargetTypes.Random: return 1;
-				default: return 1;
-			}
-		}
+		public bool AvoidGazeInsidePersonalSpace { get { return false; } }
+		public bool AvoidGazeDuringSex { get { return false; } }
+		public bool AvoidGazeDuringSexOthers { get { return false; } }
+
+		public float NaturalRandomWeight { get { return 0.05f; } }
+
+		public float BlowjobEyesWeight { get { return 0.1f; } }
+		public float BlowjobGenitalsWeight { get { return 1; } }
+
+		public float HandjobEyesWeight { get { return 1; } }
+		public float HandjobGenitalsWeight { get { return 0.2f; } }
+
+		public float PenetrationEyesWeight { get { return 1; } }
+		public float PenetrationChestWeight { get { return 0; } }
+		public float PenetrationGenitalsWeight { get { return 0.2f; } }
+
+		public float GropedEyesWeight { get { return 1; } }
+		public float GropedChestWeight { get { return 0.2f; } }
+		public float GropedGenitalsWeight { get { return 0.2f; } }
+
+		public float OtherSexEyesWeight { get { return 0.2f; } }
 
 		public virtual void Update(float s)
 		{
@@ -79,7 +104,7 @@
 				inited_ = true;
 			}
 
-			bool close = person_.Body.PlayerIsClose;
+			bool close = person_.Body.InsidePersonalSpace(Cue.Instance.Player);
 			if (close != wasClose_)
 			{
 				person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
@@ -216,18 +241,6 @@
 					return new Pair<float, float>(0.3f, 1.5f);
 				else
 					return new Pair<float, float>(1, 3);
-			}
-		}
-
-		public override float GazeRandomTargetWeight(int targetType)
-		{
-			switch (targetType)
-			{
-				case RandomTargetTypes.Sex: return 1;
-				case RandomTargetTypes.Body: return 2;
-				case RandomTargetTypes.Eyes: return 5;
-				case RandomTargetTypes.Random: return 10;
-				default: return 1;
 			}
 		}
 

@@ -4,6 +4,7 @@ namespace Cue
 {
 	interface IObject
 	{
+		int ObjectIndex { get; }
 		string ID { get; }
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
@@ -39,6 +40,7 @@ namespace Cue
 		private const int TentativeMoveState = 1;
 		private const int MovingState = 2;
 
+		private readonly int objectIndex_;
 		private readonly W.IAtom atom_;
 		protected readonly Logger log_;
 
@@ -51,14 +53,15 @@ namespace Cue
 		private Slots slots_;
 		private Slot locked_ = null;
 
-		public BasicObject(W.IAtom atom)
+		public BasicObject(int index, W.IAtom atom)
 		{
+			objectIndex_ = index;
 			atom_ = atom;
 			log_ = new Logger(Logger.Object, this, "");
 			slots_ = new Slots(this);
 		}
 
-		public static BasicObject TryCreateFromSlot(W.IAtom a)
+		public static BasicObject TryCreateFromSlot(int index, W.IAtom a)
 		{
 			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
 			var m = re.Match(a.ID);
@@ -75,10 +78,15 @@ namespace Cue
 				return null;
 			}
 
-			BasicObject o = new BasicObject(a);
+			BasicObject o = new BasicObject(index, a);
 			o.Slots.Add(type);
 
 			return o;
+		}
+
+		public int ObjectIndex
+		{
+			get { return objectIndex_; }
 		}
 
 		public Logger Log
