@@ -10,6 +10,7 @@ namespace Cue
 		private GazeTargets targets_;
 		private GazeTargetPicker pick_;
 		private bool[] avoid_ = new bool[0];
+		private string lastString_ = "";
 
 		public Gaze(Person p)
 		{
@@ -23,6 +24,8 @@ namespace Cue
 		public IEyes Eyes { get { return eyes_; } }
 		public IGazer Gazer { get { return gazer_; } }
 		public GazeTargets Targets { get { return targets_; } }
+		public string LastString { get { return lastString_; } }
+
 
 		public void Init()
 		{
@@ -84,10 +87,12 @@ namespace Cue
 			var ps = person_.Personality;
 
 			Clear();
+			lastString_ = "";
 
 			// exclusive
 			if (person_.Body.Get(BodyParts.Head).Grabbed)
 			{
+				lastString_ = $"head grabbed by player";
 				targets_.SetWeight(Cue.Instance.Player, BodyParts.Eyes, 1);
 				gazer_.Enabled = false;
 				return;
@@ -102,12 +107,14 @@ namespace Cue
 				{
 					if (ps.AvoidGazeInsidePersonalSpace)
 					{
+						lastString_ = $"kissing {t.ID}, avoid in ps";
 						targets_.SetRandomWeight(1);
 						SetShouldAvoid(t, true);
 					}
 					else
 					{
-						targets_.SetExclusive(t, BodyParts.Eyes);
+						lastString_ = $"kissing {t.ID}, looking at eyes";
+						targets_.SetWeight(t, BodyParts.Eyes, 1);
 					}
 
 					gazer_.Enabled = false;
@@ -119,9 +126,15 @@ namespace Cue
 			if (person_.HasTarget)
 			{
 				if (person_.MoveTarget != null)
+				{
+					lastString_ = $"moving to {person_.MoveTarget.ID}, looking at it";
 					targets_.SetObjectWeight(person_.MoveTarget, 1);
+				}
 				else
+				{
+					lastString_ = $"moving to pos, looking in front";
 					targets_.SetFrontWeight(1);
+				}
 
 				gazer_.Enabled = true;
 				return;
@@ -144,10 +157,12 @@ namespace Cue
 				{
 					if (ps.AvoidGazeInsidePersonalSpace)
 					{
+						lastString_ += $"bj {t.ID}, avoid in ps/";
 						SetShouldAvoid(t, true);
 					}
 					else
 					{
+						lastString_ += $"bj {t.ID}/";
 						targets_.SetRandomWeight(0);
 						targets_.SetWeight(t, BodyParts.Eyes, ps.BlowjobEyesWeight);
 						targets_.SetWeight(t, BodyParts.Genitals, ps.BlowjobGenitalsWeight);
@@ -166,10 +181,12 @@ namespace Cue
 				{
 					if (ps.AvoidGazeInsidePersonalSpace)
 					{
+						lastString_ += $"hj {t.ID}, avoid in ps/";
 						SetShouldAvoid(t, true);
 					}
 					else
 					{
+						lastString_ += $"hj {t.ID}/";
 						targets_.SetRandomWeight(0);
 						targets_.SetWeight(t, BodyParts.Eyes, ps.HandjobEyesWeight);
 						targets_.SetWeight(t, BodyParts.Genitals, ps.HandjobGenitalsWeight);
@@ -188,8 +205,11 @@ namespace Cue
 
 				if (person_.Body.InsidePersonalSpace(t))
 				{
+					lastString_ += $"{t.ID} in ps, ";
+
 					if (ps.AvoidGazeInsidePersonalSpace)
 					{
+						lastString_ += $"avoid in ps/";
 						SetShouldAvoid(t, true);
 					}
 					else
@@ -200,6 +220,7 @@ namespace Cue
 
 						if (person_.Body.PenetratedBy(t))
 						{
+							lastString_ += $"pen/";
 							eyes = ps.PenetrationEyesWeight;
 							chest = ps.PenetrationChestWeight;
 							genitals = ps.PenetrationGenitalsWeight;
@@ -208,12 +229,14 @@ namespace Cue
 						{
 							if (person_.Body.GropedBy(t, BodyParts.Chest))
 							{
+								lastString_ += $"grope chest, ";
 								eyes = ps.GropedEyesWeight;
 								chest = ps.GropedChestWeight;
 							}
 
 							if (person_.Body.GropedBy(t, BodyParts.Genitals))
 							{
+								lastString_ += $"grope gen, ";
 								eyes = ps.GropedEyesWeight;
 								genitals = ps.GropedGenitalsWeight;
 							}
@@ -223,12 +246,14 @@ namespace Cue
 						{
 							if (person_.Personality.AvoidGazeDuringSex)
 							{
+								lastString_ += $"avoid in ps/";
 								SetShouldAvoid(t, true);
 							}
 							else
 							{
+								lastString_ += $"ok";
 								targets_.SetWeight(t, BodyParts.Eyes, eyes);
-								targets_.SetWeight(person_, BodyParts.Chest, chest);
+								targets_.SetWeight(t, BodyParts.Chest, chest);
 								targets_.SetWeight(person_, BodyParts.Genitals, genitals);
 
 							}
@@ -237,6 +262,7 @@ namespace Cue
 				}
 				else if (t.Body.Penetrated())
 				{
+					lastString_ += $"{t.ID} other pen";
 					targets_.SetWeight(t, BodyParts.Eyes, ps.OtherSexEyesWeight);
 				}
 			}

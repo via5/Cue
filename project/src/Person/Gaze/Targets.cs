@@ -6,13 +6,12 @@ namespace Cue
 	{
 		private Person person_;
 
-		private List<LookatPart>[] persons_ = new List<LookatPart>[0];
+		private LookatPart[,] persons_ = new LookatPart[0, 0];
 		private LookatFront front_;
 		private LookatNothing nothing_;
 		private LookatRandomPoint random_;
-		private List<LookatObject> objects_ = new List<LookatObject>();
-		private IGazeLookat[] targets_ = new IGazeLookat[0];
-
+		private LookatObject[] objects_ = new LookatObject[0];
+		private IGazeLookat[] all_ = new IGazeLookat[0];
 
 		public GazeTargets(Person p)
 		{
@@ -24,73 +23,65 @@ namespace Cue
 
 		public void Init()
 		{
-			persons_ = new List<LookatPart>[Cue.Instance.Persons.Count];
+			persons_ = new LookatPart[
+				Cue.Instance.Persons.Count, BodyParts.Count];
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			for (int pi = 0; pi < Cue.Instance.Persons.Count; ++pi)
 			{
-				var p = Cue.Instance.Persons[i];
+				var p = Cue.Instance.Persons[pi];
 
-				persons_[i] = new List<LookatPart>();
-				persons_[i].Add(new LookatPart(p, BodyParts.Eyes));
-				persons_[i].Add(new LookatPart(p, BodyParts.Chest));
-				persons_[i].Add(new LookatPart(p, BodyParts.Genitals));
+				for (int bi = 0; bi < BodyParts.Count; ++bi)
+					persons_[pi, bi] = new LookatPart(p, bi);
 			}
 
-			targets_ = GetAll();
+			objects_ = new LookatObject[Cue.Instance.AllObjects.Count];
+			for (int oi = 0; oi < objects_.Length; ++oi)
+				objects_[oi] = new LookatObject(person_, Cue.Instance.AllObjects[oi], 0);
+
+			all_ = GetAll();
 		}
 
 		public IGazeLookat[] All
 		{
-			get { return targets_; }
+			get { return all_; }
 		}
 
 		private IGazeLookat[] GetAll()
 		{
-			var list = new List<IGazeLookat>();
+			var all = new IGazeLookat[
+				persons_.Length +
+				1 +  // front
+				1 +  // nothing
+				1 +  // random
+				objects_.Length];
 
-			foreach (var p in persons_)
+			int i = 0;
+
+			for (int pi = 0; pi < persons_.GetLength(0); ++pi)
 			{
-				foreach (var t in p)
-					list.Add(t);
+				for (int bi = 0; bi < persons_.GetLength(1); ++bi)
+					all[i++] = persons_[pi, bi];
 			}
 
-			list.Add(front_);
-			list.Add(nothing_);
-			list.Add(random_);
+			all[i++] = front_;
+			all[i++] = nothing_;
+			all[i++] = random_;
 
-			foreach (var o in objects_)
-				list.Add(o);
+			for (int oi = 0; oi < objects_.Length; ++oi)
+				all[i++] = objects_[oi];
 
-			return list.ToArray();
+			return all;
 		}
 
 		public void Clear()
 		{
-			objects_.Clear();
-
-			for (int i = 0; i < persons_.Length; ++i)
-			{
-				for (int j = 0; j < persons_[i].Count; ++j)
-					persons_[i][j].Weight = 0;
-			}
-
-			front_.Weight = 0;
-			nothing_.Weight = 0;
-			random_.Weight = 0;
+			for (int i = 0; i < all_.Length; ++i)
+				all_[i].Weight = 0;
 		}
 
 		public void SetWeight(Person p, int bodyPart, float w)
 		{
-			SetWeight(p.PersonIndex, bodyPart, w);
-		}
-
-		private void SetWeight(int personIndex, int bodyPart, float w)
-		{
-			for (int j = 0; j < persons_[personIndex].Count; ++j)
-			{
-				if (persons_[personIndex][j].BodyPart.Type == bodyPart)
-					persons_[personIndex][j].Weight = w;
-			}
+			persons_[p.PersonIndex, bodyPart].Weight = w;
 		}
 
 		public void SetRandomWeight(float w)
@@ -100,7 +91,7 @@ namespace Cue
 
 		public void SetObjectWeight(IObject o, float w)
 		{
-			for (int i = 0; i < objects_.Count; ++i)
+			for (int i = 0; i < objects_.Length; ++i)
 			{
 				if (objects_[i].Object == o)
 				{
@@ -109,43 +100,12 @@ namespace Cue
 				}
 			}
 
-			objects_.Add(new LookatObject(person_, o, w));
+			Cue.LogError($"SetObjectWeight: {o} not in list");
 		}
 
 		public void SetFrontWeight(float w)
 		{
 			front_.Weight = w;
-		}
-
-		public void SetExclusive(Person p, int bodyPart)
-		{
-			for (int i = 0; i < persons_.Length; ++i)
-			{
-				for (int j = 0; j < persons_[i].Count; ++j)
-				{
-					if (i == p.PersonIndex && persons_[i][j].BodyPart.Type == bodyPart)
-						persons_[i][j].Weight = 1;
-					else
-						persons_[i][j].Weight = 0;
-				}
-			}
-
-			front_.Weight = 0;
-			nothing_.Weight = 0;
-			random_.Weight = 0;
-		}
-
-		public void SetExclusiveRandom()
-		{
-			for (int i = 0; i < persons_.Length; ++i)
-			{
-				for (int j = 0; j < persons_[i].Count; ++j)
-					persons_[i][j].Weight = 0;
-			}
-
-			front_.Weight = 0;
-			nothing_.Weight = 0;
-			random_.Weight = 1;
 		}
 	}
 

@@ -284,19 +284,19 @@ namespace Cue
 		{
 			var checkParts = new int[]
 			{
-				BodyParts.LeftHand, BodyParts.RightHand, BodyParts.Head
+				BodyParts.LeftHand, BodyParts.RightHand, BodyParts.Head,
+				BodyParts.Hips, BodyParts.LeftFoot, BodyParts.RightFoot,
+				BodyParts.Genitals
 			};
 
-			for (int i = 0; i < all_.Length; ++i)
+			for (int i = 0; i < checkParts.Length; ++i)
 			{
-				var part = all_[i];
-				if (part == null)
-					continue;
+				var a = person_.Body.Get(checkParts[i]);
 
-				for (int pi = 0; pi < checkParts.Length; ++pi)
+				for (int j = 0; j < checkParts.Length; ++j)
 				{
-					var otherPart = other.Body.Get(checkParts[pi]);
-					var d = Vector3.Distance(part.Position, otherPart.Position);
+					var b = other.Body.Get(checkParts[i]);
+					var d = Vector3.Distance(a.Position, b.Position);
 
 					if (d < 0.2f)
 						return true;

@@ -117,6 +117,7 @@ namespace Cue
 	{
 		private static float lastErrorTime_ = 0;
 		private static int errorCount_ = 0;
+		private const int MaxErrors = 3;
 
 		public static void Safe(Action a)
 		{
@@ -133,11 +134,11 @@ namespace Cue
 				if (now - lastErrorTime_ < 1)
 				{
 					++errorCount_;
-					if (errorCount_ > 5)
+					if (errorCount_ > MaxErrors)
 					{
 						Cue.LogError(
-							"more than 5 errors in the last second, " +
-							"disabling plugin");
+							$"more than {MaxErrors} errors in the last " +
+							"second, disabling plugin");
 
 						Cue.Instance.DisablePlugin();
 					}

@@ -157,14 +157,9 @@
 			UpdateFrustums();
 
 
-			float[] weights = new float[targets_.Length];
 			float total = 0;
-
 			for (int i = 0; i < targets_.Length; ++i)
-			{
-				weights[i] = targets_[i].Weight;
-				total += weights[i];
-			}
+				total += targets_[i].Weight;
 
 			lastString_ += $"tw={total}";
 
@@ -173,9 +168,9 @@
 				var r = U.RandomFloat(0, total);
 				lastString_ += $" r={r}";
 
-				for (int j = 0; j < weights.Length; ++j)
+				for (int j = 0; j < targets_.Length; ++j)
 				{
-					if (r < weights[j])
+					if (r < targets_[j].Weight)
 					{
 						log_.Verbose($"trying {targets_[j]}");
 
@@ -194,7 +189,7 @@
 						break;
 					}
 
-					r -= weights[j];
+					r -= targets_[j].Weight;
 				}
 			}
 

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -631,20 +633,37 @@ namespace Cue
 		private void DumpGaze()
 		{
 			if (tt == null)
-				tt = VUI.TimerManager.Instance.CreateTimer(1, DumpGaze, VUI.Timer.Repeat);
+				tt = VUI.TimerManager.Instance.CreateTimer(0.2f, DumpGaze, VUI.Timer.Repeat);
+
+			var targets = person_.Gaze.Targets.All;
+
+			Array.Sort(targets, (a, b) =>
+			{
+				if (a.Weight < b.Weight)
+					return 1;
+				else if (a.Weight > b.Weight)
+					return -1;
+				else
+					return a.ToString().CompareTo(b.ToString());
+			});
+
 
 			var items = new List<string>();
 
-			foreach (var t in person_.Gaze.Targets.All)
-				items.Add($"Target: {t.Weight:0.00} {t}");
+			items.Add(person_.Gaze.LastString);
+			items.Add(person_.Gaze.Picker.LastString);
+
+			foreach (var t in targets)
+			{
+				if (t.Weight > 0)
+					items.Add($"Target: {t.Weight:0.00} {t}");
+			}
 
 			foreach (var p in person_.Gaze.GetAllAvoidForDebug())
 			{
 				if (p.second)
 					items.Add($"Avoid: {p.first} {p.second}");
 			}
-
-			items.Add(person_.Gaze.Picker.LastString);
 
 			list_.SetItems(items);
 		}

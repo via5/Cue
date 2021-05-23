@@ -10,6 +10,7 @@
 		private VUI.CheckBox canKiss_ = new VUI.CheckBox("Can kiss");
 		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Ex");
 		private VUI.FloatTextSlider excitement_ = new VUI.FloatTextSlider();
+		private bool force_ = false;
 		private IObject sel_ = null;
 		private IObject hov_ = null;
 
@@ -81,8 +82,8 @@
 			root_.Visible = visible_;
 
 			canKiss_.Changed += OnCanKiss;
-			forceExcitement_.Changed += (b) => OnExcitement();
-			excitement_.ValueChanged += (f) => OnExcitement();
+			forceExcitement_.Changed += (b) => OnForceExcitement(b);
+			excitement_.ValueChanged += (f) => OnExcitement(f);
 		}
 
 		public bool Visible
@@ -328,15 +329,27 @@
 				p.VamAtom.SetControlsForMoving(b);
 		}
 
-		private void OnExcitement()
+		private void OnForceExcitement(bool b)
+		{
+			var p = Selected as Person;
+			if (p != null && force_ != b)
+			{
+				force_ = b;
+
+				if (force_)
+					p.Excitement.ForceValue(excitement_.Value);
+				else
+					p.Excitement.ForceValue(-1);
+			}
+		}
+
+		private void OnExcitement(float f)
 		{
 			var p = Selected as Person;
 			if (p != null)
 			{
-				if (forceExcitement_.Checked)
-					p.Excitement.ForceValue(excitement_.Value);
-				else
-					p.Excitement.ForceValue(-1);
+				if (force_)
+					p.Excitement.ForceValue(f);
 			}
 		}
 	}

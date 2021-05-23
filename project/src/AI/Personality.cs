@@ -86,9 +86,11 @@
 		public float HandjobEyesWeight { get { return 1; } }
 		public float HandjobGenitalsWeight { get { return 0.2f; } }
 
+		// should look at genitals, but mg's gaze makes weird angles when
+		// the target is below, so look at chest instead
 		public float PenetrationEyesWeight { get { return 1; } }
-		public float PenetrationChestWeight { get { return 0; } }
-		public float PenetrationGenitalsWeight { get { return 0.2f; } }
+		public float PenetrationChestWeight { get { return 0.2f; } }
+		public float PenetrationGenitalsWeight { get { return 0; } }
 
 		public float GropedEyesWeight { get { return 1; } }
 		public float GropedChestWeight { get { return 0.2f; } }
