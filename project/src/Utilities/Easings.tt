@@ -11,6 +11,9 @@
 
 var easings = new[]
 {
+	("Constant zero", "0"),
+	("Constant one",  "1"),
+
 	("Linear",       "x"),
 	("Sinusoidal",   "-(Cos(PI * x) - 1) / 2"),
 
@@ -69,6 +72,7 @@ var easings = new[]
 };
 
 #>
+using System;
 using System.Collections.Generic;
 using static System.Math;
 
@@ -76,8 +80,37 @@ using static System.Math;
 
 namespace Cue
 {
+	using EasingMap = Dictionary<string, Func<IEasing>>;
+
+	public class EasingFactory
+	{
+		private static EasingMap map_ = new EasingMap()
+		{
+<#
+		foreach (var e in easings)
+		{
+#>
+			{ "<#= ShortName(e.Item1) #>", () => new <#= ClassName(e.Item1) #>() },
+<#
+		}
+#>
+		};
+
+		public static IEasing FromString(string name)
+		{
+			Func<IEasing> f;
+			if (map_.TryGetValue(name, out f))
+				return f();
+
+			return null;
+		}
+	}
+
+
 	public interface IEasing
 	{
+		string GetDisplayName();
+		string GetShortName();
 		IEasing Clone(int cloneFlags = 0);
 		float Magnitude(float f);
 	}
@@ -85,6 +118,8 @@ namespace Cue
 
 	public abstract class BasicEasing : IEasing
 	{
+		public abstract string GetDisplayName();
+		public abstract string GetShortName();
 		public abstract float Magnitude(float f);
 		public abstract IEasing Clone(int cloneFlags = 0);
 
@@ -111,6 +146,7 @@ foreach (var e in easings)
 	var className = ClassName(e.Item1);
 	var factoryTypeName = FactoryTypeName(e.Item1);
 	var displayName = e.Item1;
+	var shortName = ShortName(e.Item1);
 	var equation = e.Item2;
 #>
 
@@ -118,17 +154,23 @@ foreach (var e in easings)
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "<#= displayName #>";
-			}
+			get { return "<#= displayName #>"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "<#= shortName #>"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -160,6 +202,11 @@ public string SanitizeName(string s)
 public string ClassName(string s)
 {
 	return SanitizeName(s) + "Easing";
+}
+
+public string ShortName(string s)
+{
+	return SanitizeName(s).ToLower();
 }
 
 public string FactoryTypeName(string s)

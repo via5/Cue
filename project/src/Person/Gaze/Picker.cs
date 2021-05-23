@@ -28,7 +28,7 @@
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
 		private Box avoidBox_ = Box.Zero;
 		private RandomTargetGeneratorRenderer render_ = null;
-		private Duration delay_ = new Duration(0, 0);
+		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private int currentTarget_ = -1;
 		private string lastString_ = "";
@@ -148,7 +148,7 @@
 
 		private void NextTarget()
 		{
-			delay_ = new Duration(person_.Personality.LookAtRandomInterval);
+			delay_.SetRange(person_.Personality.LookAtRandomInterval);
 			//delay_ = new Duration(1, 1);
 
 			lastString_ = "";

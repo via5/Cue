@@ -62,7 +62,9 @@ namespace Cue.Proc
 
 		public ITarget Clone()
 		{
-			return new Morph(bodyPart_, morphId_, min_, max_, duration_, delay_);
+			return new Morph(
+				bodyPart_, morphId_, min_, max_,
+				new Duration(duration_), new Duration(delay_));
 		}
 
 		public void Start(Person p)
@@ -70,7 +72,8 @@ namespace Cue.Proc
 			if (m_ == null)
 			{
 				m_ = new ClampableMorph(
-					p, morphId_, min_, max_, duration_, delay_);
+					p, morphId_, min_, max_,
+					new Duration(duration_), new Duration(delay_));
 
 				m_.Set(1, float.MaxValue);
 			}

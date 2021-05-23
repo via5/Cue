@@ -22,34 +22,55 @@ namespace Cue.Proc
 		private int bodyPart_;
 		private string rbId_;
 		private Vector3 min_, max_;
-		private Duration fwdDuration_, bwdDuration_;
+		private IEasing excitement_;
+		private SlidingDuration fwdDuration_, bwdDuration_;
 		private Duration fwdDelay_, bwdDelay_;
+		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
 		private int flags_;
 
 		private int state_ = Forwards;
 		private Rigidbody rb_ = null;
 		private Vector3 last_ = Vector3.Zero;
 		private Vector3 current_ = Vector3.Zero;
-		private IEasing easing_ = new SinusoidalEasing();
+		private IEasing fwdEasing_ = new SinusoidalEasing();
+		private IEasing bwdEasing_ = new SinusoidalEasing();
 		private Person person_ = null;
 		private bool wasBusy_ = false;
 		private bool oneFrameFinished_ = false;
 
 		public Force(
-			int type, int bodyPart, string rbId, Vector3 min, Vector3 max,
-			Duration fwdDuration, Duration bwdDuration,
-			Duration fwdDelay, Duration bwdDelay, int flags)
+			int type, int bodyPart, string rbId,
+			Vector3 min, Vector3 max, IEasing excitement,
+			SlidingDuration fwdDuration, SlidingDuration bwdDuration,
+			Duration fwdDelay, Duration bwdDelay,
+			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement,
+			int flags)
 		{
 			type_ = type;
 			bodyPart_ = bodyPart;
 			rbId_ = rbId;
 			min_ = min;
 			max_ = max;
+			excitement_ = excitement;
 			fwdDuration_ = fwdDuration;
 			bwdDuration_ = bwdDuration;
 			fwdDelay_ = fwdDelay;
 			bwdDelay_ = bwdDelay;
+			fwdDelayExcitement_ = fwdDelayExcitement;
+			bwdDelayExcitement_ = bwdDelayExcitement;
 			flags_ = flags;
+		}
+
+		public static IEasing EasingFromJson(JSONClass o, string key)
+		{
+			if (!o.HasKey(key))
+				return new ConstantOneEasing();
+
+			var e = EasingFactory.FromString(o[key]);
+			if (e == null)
+				throw new LoadFailed($"easing type {key} not found");
+
+			return e;
 		}
 
 		public static Force Create(int type, JSONClass o)
@@ -68,14 +89,29 @@ namespace Cue.Proc
 				if (o["resetBetween"].AsBool)
 					flags |= ResetBetween;
 
+				SlidingDuration fwd, bwd;
+
+				if (o.HasKey("duration"))
+				{
+					fwd = SlidingDuration.FromJSON(o, "duration");
+					bwd = null;
+				}
+				else
+				{
+					fwd = SlidingDuration.FromJSON(o, "fwdDuration");
+					bwd = SlidingDuration.FromJSON(o, "bwdDuration");
+				}
+
 				return new Force(
 					type, bodyPart, o["rigidbody"],
 					Vector3.FromJSON(o, "min"),
 					Vector3.FromJSON(o, "max"),
-					Duration.FromJSON(o, "fwdDuration"),
-					Duration.FromJSON(o, "bwdDuration"),
+					EasingFromJson(o, "excitement"),
+					fwd, bwd,
 					Duration.FromJSON(o, "fwdDelay"),
 					Duration.FromJSON(o, "bwdDelay"),
+					EasingFromJson(o, "fwdDelayExcitement"),
+					EasingFromJson(o, "bwdDelayExcitement"),
 					flags);
 			}
 			catch (LoadFailed e)
@@ -92,8 +128,13 @@ namespace Cue.Proc
 		public ITarget Clone()
 		{
 			return new Force(
-				type_, bodyPart_, rbId_, min_, max_,
-				fwdDuration_, bwdDuration_, fwdDelay_, bwdDelay_, flags_);
+				type_, bodyPart_, rbId_,
+				min_, max_, excitement_,
+				new SlidingDuration(fwdDuration_),
+				bwdDuration_ == null ? null : new SlidingDuration(bwdDuration_),
+				new Duration(fwdDelay_), new Duration(bwdDelay_),
+				fwdDelayExcitement_, bwdDelayExcitement_,
+				flags_);
 		}
 
 		public void Start(Person p)
@@ -115,7 +156,7 @@ namespace Cue.Proc
 		public void Reset()
 		{
 			fwdDuration_.Reset();
-			bwdDuration_.Reset();
+			bwdDuration_?.Reset();
 			fwdDelay_.Reset();
 			bwdDelay_.Reset();
 			current_ = Vector3.Zero;
@@ -142,11 +183,16 @@ namespace Cue.Proc
 			{
 				case Forwards:
 				{
-					fwdDuration_.Update(s);
+					CurrentDuration().Update(s);
 					Apply();
 
-					if (fwdDuration_.Finished)
+					if (CurrentDuration().Finished)
 					{
+						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
+
+						if (bwdDuration_ == null)
+							fwdDuration_.Restart();
+
 						if (fwdDelay_.Enabled)
 						{
 							state_ = ForwardsDelay;
@@ -201,11 +247,13 @@ namespace Cue.Proc
 
 				case Backwards:
 				{
-					bwdDuration_.Update(s);
+					CurrentDuration().Update(s);
 					Apply();
 
-					if (bwdDuration_.Finished)
+					if (CurrentDuration().Finished)
 					{
+						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
+
 						if (bwdDelay_.Enabled)
 						{
 							state_ = BackwardsDelay;
@@ -274,27 +322,55 @@ namespace Cue.Proc
 			}
 		}
 
-		private float Progress()
+		private SlidingDuration CurrentDuration()
 		{
 			switch (state_)
 			{
 				case Forwards:
 				case ForwardsDelay:
-					return fwdDuration_.Progress;
+					return fwdDuration_;
 
 				case Backwards:
 				case BackwardsDelay:
-					return bwdDuration_.Progress;
+					return bwdDuration_ == null ? fwdDuration_ : bwdDuration_;
 
 				default:
 					Cue.LogError("??");
-					return 0;
+					return fwdDuration_;
 			}
+		}
+
+		private float Progress()
+		{
+			return CurrentDuration().Progress;
+		}
+
+		private IEasing Easing()
+		{
+			switch (state_)
+			{
+				case Forwards:
+				case ForwardsDelay:
+					return fwdEasing_;
+
+				case Backwards:
+				case BackwardsDelay:
+					return bwdEasing_;
+
+				default:
+					Cue.LogError("??");
+					return null;
+			}
+		}
+
+		private float RawMagnitude()
+		{
+			return Easing()?.Magnitude(Progress()) ?? 0;
 		}
 
 		private float Magnitude()
 		{
-			return easing_.Magnitude(Progress());
+			return RawMagnitude();
 		}
 
 		private Vector3 Lerped()
@@ -323,20 +399,33 @@ namespace Cue.Proc
 				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
 				$"min={min_} max={max_}\n" +
 				$"last={last_} current={current_}\n" +
-				$"fdur={fwdDuration_} bdur={bwdDuration_}\n" +
+				$"fdur={fwdDuration_}\n" +
+				$"bdur={bwdDuration_}\n" +
 				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
-				$"p={Progress():0.00} mag={Magnitude():0.00} lerped={Lerped()} " +
-				$"state={state_} busy={wasBusy_}";
+				$"p={Progress():0.00} mag={Magnitude():0.00} ex={ExcitementFactor():0.00}\n" +
+				$"lerped={Lerped()} state={state_} busy={wasBusy_}";
+		}
+
+		private float ExcitementFactor()
+		{
+			return excitement_.Magnitude(person_.Excitement.Value);
 		}
 
 		private void Next()
 		{
 			last_ = current_;
 
+			var f = ExcitementFactor();
+
 			current_ = new Vector3(
-				U.RandomFloat(min_.X, max_.X),
-				U.RandomFloat(min_.Y, max_.Y),
-				U.RandomFloat(min_.Z, max_.Z));
+				Random(min_.X, max_.X, f),
+				Random(min_.Y, max_.Y, f),
+				Random(min_.Z, max_.Z, f));
+		}
+
+		private float Random(float min, float max, float f)
+		{
+			return U.RandomFloat(min, max) * f;
 		}
 	}
 }

@@ -38,10 +38,13 @@ namespace Cue
 		public void Update(float s, Tickers tickers)
 		{
 			updateElapsed_ += s;
-			if (updateElapsed_ > 0.2f)
+			if (updateElapsed_ > 1)
 			{
 				for (int i = 0; i < tabs_.Count; ++i)
-					tabs_[i].Update(s);
+				{
+					if (tabs_[i].IsVisibleOnScreen())
+						tabs_[i].Update(s);
+				}
 
 				updateElapsed_ = 0;
 			}
@@ -92,6 +95,7 @@ namespace Cue
 		private VUI.CheckBox logSlots_;
 		private VUI.CheckBox logSys_;
 		private VUI.CheckBox logClothing_;
+		private VUI.CheckBox logResources_;
 
 		public MiscTab()
 		{
@@ -105,6 +109,7 @@ namespace Cue
 			logSlots_ = new VUI.CheckBox("Slots", CheckLog);
 			logSys_ = new VUI.CheckBox("Sys", CheckLog);
 			logClothing_ = new VUI.CheckBox("Clothing", CheckLog);
+			logResources_ = new VUI.CheckBox("Resources", CheckLog);
 
 			Layout = new VUI.VerticalFlow();
 			Add(navmeshes_);
@@ -145,6 +150,7 @@ namespace Cue
 			Add(logSlots_);
 			Add(logSys_);
 			Add(logClothing_);
+			Add(logResources_);
 
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
 			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
@@ -185,6 +191,7 @@ namespace Cue
 			if (logSlots_.Checked) e |= Logger.Slots;
 			if (logSys_.Checked) e |= Logger.Sys;
 			if (logClothing_.Checked) e |= Logger.Clothing;
+			if (logResources_.Checked) e |= Logger.Resources;
 
 			Logger.Enabled = e;
 		}
@@ -308,7 +315,10 @@ namespace Cue
 		public override void Update(float s)
 		{
 			for (int i = 0; i < tabs_.Count; ++i)
-				tabs_[i].Update(s);
+			{
+				if (tabs_[i].IsVisibleOnScreen())
+					tabs_[i].Update(s);
+			}
 		}
 
 		public override void OnPluginState(bool b)

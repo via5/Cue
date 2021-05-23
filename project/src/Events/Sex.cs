@@ -159,10 +159,7 @@
 	class SexEvent : BasicEvent
 	{
 		public const int NoState = 0;
-		public const int MovingState = 1;
-		public const int PositioningState = 2;
-		public const int PlayState = 3;
-		public const int ActiveState = 4;
+		public const int PlayState = 1;
 
 		private Person receiver_;
 		private int state_ = NoState;
@@ -185,58 +182,18 @@
 			{
 				case NoState:
 				{
-					var target =
-						receiver_.Position +
-						Vector3.Rotate(new Vector3(0, 0, 0.5f), receiver_.Bearing);
-
-					person_.MoveTo(receiver_, target, receiver_.Bearing + 180);
-					state_ = MovingState;
-
-					break;
-				}
-
-				case MovingState:
-				{
-					if (!person_.HasTarget)
-					{
-						person_.Clothing.GenitalsVisible = true;
-						receiver_.Clothing.GenitalsVisible = true;
-
-						if (receiver_.State.Is(PersonState.Sitting))
-						{
-							person_.SetState(PersonState.SittingStraddling);
-							state_ = PositioningState;
-						}
-						else
-						{
-							state_ = ActiveState;
-						}
-					}
-
-					break;
-				}
-
-				case PositioningState:
-				{
-					if (!person_.Animator.Playing)
-					{
-						person_.Clothing.GenitalsVisible = true;
-						receiver_.Clothing.GenitalsVisible = true;
-						state_ = PlayState;
-					}
-
+					person_.Clothing.GenitalsVisible = true;
+					receiver_.Clothing.GenitalsVisible = true;
+					person_.Animator.Stop();
+					state_ = PlayState;
 					break;
 				}
 
 				case PlayState:
 				{
-					person_.Animator.PlaySex(PersonState.SittingStraddling);
-					state_ = ActiveState;
-					break;
-				}
+					if (!person_.Animator.Playing)
+						person_.Animator.PlaySex(person_.State.Current);
 
-				case ActiveState:
-				{
 					break;
 				}
 			}

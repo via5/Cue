@@ -20,7 +20,7 @@ namespace Cue.Proc
 		private bool forever_;
 
 		public ConcurrentTargetGroup(string name)
-			: this(name, new Duration(0, 0), new Duration(0, 0), true)
+			: this(name, new Duration(), new Duration(), true)
 		{
 		}
 
@@ -59,7 +59,7 @@ namespace Cue.Proc
 		public ITarget Clone()
 		{
 			var s = new ConcurrentTargetGroup(
-				name_, delay_, maxDuration_, forever_);
+				name_, new Duration(delay_), new Duration(maxDuration_), forever_);
 
 			foreach (var c in targets_)
 				s.targets_.Add(c.Clone());
@@ -178,7 +178,7 @@ namespace Cue.Proc
 		private bool done_ = false;
 
 		public SequentialTargetGroup(string name = "")
-			: this(name, new Duration(0, 0))
+			: this(name, new Duration())
 		{
 		}
 
@@ -210,7 +210,7 @@ namespace Cue.Proc
 
 		public ITarget Clone()
 		{
-			var s = new SequentialTargetGroup(name_, delay_);
+			var s = new SequentialTargetGroup(name_, new Duration(delay_));
 
 			foreach (var t in targets_)
 			{

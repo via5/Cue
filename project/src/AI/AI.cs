@@ -228,6 +228,8 @@ namespace Cue
 				events_[i_].Stop();
 				i_ = -1;
 			}
+
+			person_.Actions.Clear();
 		}
 	}
 }

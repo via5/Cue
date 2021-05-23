@@ -48,6 +48,7 @@
 				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
 				tools.Add(new VUI.ToolButton("Reload", OnReload));
 				tools.Add(new VUI.CheckBox("Navmesh", (b) => Cue.Instance.Sys.Nav.Render = b));
+				tools.Add(new VUI.ToolButton("Reload anims", OnReloadAnimations));
 				p.Add(tools);
 			}
 
@@ -57,6 +58,7 @@
 			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
 			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
 			row.Add(new VUI.ToolButton("Stand", OnStand));
+			row.Add(new VUI.ToolButton("Sex", OnSex));
 			row.Add(canKiss_);
 			selButtons_.Add(row);
 
@@ -186,6 +188,14 @@
 			Cue.Instance.ReloadPlugin();
 		}
 
+		private void OnReloadAnimations()
+		{
+			Resources.Animations.Load();
+
+			foreach (var p in Cue.Instance.Persons)
+				p.Animator.Stop();
+		}
+
 		private void OnCall()
 		{
 			var p = Selected as Person;
@@ -255,30 +265,29 @@
 			}
 		}
 
+		private void OnSex()
+		{
+			var p = Selected as Person;
+			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
+			{
+				var s = p.AI.Event as SexEvent;
+
+				if (s == null)
+				{
+					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
+				}
+				else
+				{
+					p.AI.RunEvent(null);
+				}
+			}
+		}
+
 		private void OnCanKiss(bool b)
 		{
 			var p = Selected as Person;
 			if (p != null)
 				p.Options.CanKiss = b;
-		}
-
-		private void OnSex()
-		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				var s = p.AI.Event as SexEvent;
-
-				if (s == null && Cue.Instance.Player != null)
-				{
-					p.MakeIdle();
-					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
-				}
-				else
-				{
-					s.ForceState(SexEvent.PlayState);
-				}
-			}
 		}
 
 		private void OnMakeIdle()
@@ -287,6 +296,7 @@
 			if (p != null)
 			{
 				p.MakeIdle();
+				p.AI.MakeIdle();
 			}
 		}
 

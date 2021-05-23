@@ -190,6 +190,16 @@
 			{
 				"file": "animations/standIdle.json"
 			}
+		},
+
+		{
+			"animation": "sex",
+			"state": "sittingStraddling",
+			"type": "proc",
+			"options":
+			{
+				"file": "animations/sex.json"
+			}
 		}
 	]
 }

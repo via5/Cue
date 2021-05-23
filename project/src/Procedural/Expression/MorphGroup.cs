@@ -92,7 +92,7 @@ namespace Cue.Proc
 		private int state_ = ActiveState;
 
 		public SequentialProceduralMorphGroup()
-			: this(Duration.Zero)
+			: this(new Duration())
 		{
 		}
 

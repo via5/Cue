@@ -1,12 +1,68 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using static System.Math;
 
 // auto generated from Easings.tt
 
 namespace Cue
 {
+	using EasingMap = Dictionary<string, Func<IEasing>>;
+
+	public class EasingFactory
+	{
+		private static EasingMap map_ = new EasingMap()
+		{
+			{ "constantzero", () => new ConstantZeroEasing() },
+			{ "constantone", () => new ConstantOneEasing() },
+			{ "linear", () => new LinearEasing() },
+			{ "sinusoidal", () => new SinusoidalEasing() },
+			{ "quadin", () => new QuadInEasing() },
+			{ "quadout", () => new QuadOutEasing() },
+			{ "quadinout", () => new QuadInOutEasing() },
+			{ "cubicin", () => new CubicInEasing() },
+			{ "cubicout", () => new CubicOutEasing() },
+			{ "cubicinout", () => new CubicInOutEasing() },
+			{ "quartin", () => new QuartInEasing() },
+			{ "quartout", () => new QuartOutEasing() },
+			{ "quartinout", () => new QuartInOutEasing() },
+			{ "quintin", () => new QuintInEasing() },
+			{ "quintout", () => new QuintOutEasing() },
+			{ "quintinout", () => new QuintInOutEasing() },
+			{ "sinein", () => new SineInEasing() },
+			{ "sineout", () => new SineOutEasing() },
+			{ "sineinout", () => new SineInOutEasing() },
+			{ "expoin", () => new ExpoInEasing() },
+			{ "expoout", () => new ExpoOutEasing() },
+			{ "expoinout", () => new ExpoInOutEasing() },
+			{ "circin", () => new CircInEasing() },
+			{ "circout", () => new CircOutEasing() },
+			{ "circinout", () => new CircInOutEasing() },
+			{ "backin", () => new BackInEasing() },
+			{ "backout", () => new BackOutEasing() },
+			{ "backinout", () => new BackInOutEasing() },
+			{ "elasticin", () => new ElasticInEasing() },
+			{ "elasticout", () => new ElasticOutEasing() },
+			{ "elasticinout", () => new ElasticInOutEasing() },
+			{ "bouncein", () => new BounceInEasing() },
+			{ "bounceout", () => new BounceOutEasing() },
+			{ "bounceinout", () => new BounceInOutEasing() },
+		};
+
+		public static IEasing FromString(string name)
+		{
+			Func<IEasing> f;
+			if (map_.TryGetValue(name, out f))
+				return f();
+
+			return null;
+		}
+	}
+
+
 	public interface IEasing
 	{
+		string GetDisplayName();
+		string GetShortName();
 		IEasing Clone(int cloneFlags = 0);
 		float Magnitude(float f);
 	}
@@ -14,6 +70,8 @@ namespace Cue
 
 	public abstract class BasicEasing : IEasing
 	{
+		public abstract string GetDisplayName();
+		public abstract string GetShortName();
 		public abstract float Magnitude(float f);
 		public abstract IEasing Clone(int cloneFlags = 0);
 
@@ -35,21 +93,93 @@ namespace Cue
 	}
 
 
-	public class LinearEasing : BasicEasing
+	public class ConstantZeroEasing : BasicEasing
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Linear";
-			}
+			get { return "Constant zero"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "constantzero"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
+
+		public override IEasing Clone(int cloneFlags = 0)
+		{
+			return new ConstantZeroEasing();
+		}
+
+		public override float Magnitude(float x)
+		{
+			return (float)(0);
+		}
+	}
+
+	public class ConstantOneEasing : BasicEasing
+	{
+		public static string DisplayName
+		{
+			get { return "Constant one"; }
+		}
+
+		public static string ShortName
+		{
+			get { return "constantone"; }
+		}
+
+		public override string GetDisplayName()
+		{
+			return DisplayName;
+		}
+
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
+
+		public override IEasing Clone(int cloneFlags = 0)
+		{
+			return new ConstantOneEasing();
+		}
+
+		public override float Magnitude(float x)
+		{
+			return (float)(1);
+		}
+	}
+
+	public class LinearEasing : BasicEasing
+	{
+		public static string DisplayName
+		{
+			get { return "Linear"; }
+		}
+
+		public static string ShortName
+		{
+			get { return "linear"; }
+		}
+
+		public override string GetDisplayName()
+		{
+			return DisplayName;
+		}
+
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -66,17 +196,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Sinusoidal";
-			}
+			get { return "Sinusoidal"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "sinusoidal"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -93,17 +229,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quad in";
-			}
+			get { return "Quad in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quadin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -120,17 +262,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quad out";
-			}
+			get { return "Quad out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quadout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -147,17 +295,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quad in/out";
-			}
+			get { return "Quad in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quadinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -174,17 +328,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Cubic in";
-			}
+			get { return "Cubic in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "cubicin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -201,17 +361,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Cubic out";
-			}
+			get { return "Cubic out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "cubicout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -228,17 +394,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Cubic in/out";
-			}
+			get { return "Cubic in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "cubicinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -255,17 +427,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quart in";
-			}
+			get { return "Quart in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quartin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -282,17 +460,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quart out";
-			}
+			get { return "Quart out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quartout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -309,17 +493,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quart in/out";
-			}
+			get { return "Quart in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quartinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -336,17 +526,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quint in";
-			}
+			get { return "Quint in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quintin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -363,17 +559,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quint out";
-			}
+			get { return "Quint out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quintout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -390,17 +592,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Quint in/out";
-			}
+			get { return "Quint in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "quintinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -417,17 +625,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Sine in";
-			}
+			get { return "Sine in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "sinein"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -444,17 +658,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Sine out";
-			}
+			get { return "Sine out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "sineout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -471,17 +691,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Sine in/out";
-			}
+			get { return "Sine in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "sineinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -498,17 +724,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Expo in";
-			}
+			get { return "Expo in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "expoin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -525,17 +757,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Expo out";
-			}
+			get { return "Expo out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "expoout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -552,17 +790,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Expo in/out";
-			}
+			get { return "Expo in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "expoinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -579,17 +823,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Circ in";
-			}
+			get { return "Circ in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "circin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -606,17 +856,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Circ out";
-			}
+			get { return "Circ out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "circout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -633,17 +889,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Circ in/out";
-			}
+			get { return "Circ in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "circinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -660,17 +922,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Back in";
-			}
+			get { return "Back in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "backin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -687,17 +955,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Back out";
-			}
+			get { return "Back out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "backout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -714,17 +988,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Back in/out";
-			}
+			get { return "Back in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "backinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -741,17 +1021,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Elastic in";
-			}
+			get { return "Elastic in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "elasticin"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -768,17 +1054,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Elastic out";
-			}
+			get { return "Elastic out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "elasticout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -795,17 +1087,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Elastic in/out";
-			}
+			get { return "Elastic in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "elasticinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -822,17 +1120,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Bounce in";
-			}
+			get { return "Bounce in"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "bouncein"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -849,17 +1153,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Bounce out";
-			}
+			get { return "Bounce out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "bounceout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{
@@ -876,17 +1186,23 @@ namespace Cue
 	{
 		public static string DisplayName
 		{
-			get
-			{
-				return "Bounce in/out";
-			}
+			get { return "Bounce in/out"; }
 		}
 
-		public string GetDisplayName()
+		public static string ShortName
+		{
+			get { return "bounceinout"; }
+		}
+
+		public override string GetDisplayName()
 		{
 			return DisplayName;
 		}
 
+		public override string GetShortName()
+		{
+			return ShortName;
+		}
 
 		public override IEasing Clone(int cloneFlags = 0)
 		{

@@ -35,6 +35,8 @@ namespace Cue
 		{
 			try
 			{
+				anims_.Clear();
+
 				LoadFromFile();
 				LoadBuiltin();
 
