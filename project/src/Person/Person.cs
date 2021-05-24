@@ -88,6 +88,7 @@
 		public float DecayPerSecond { get { return -0.1f; } }
 		public float ExcitementPostOrgasm { get { return 0.0f; } }
 		public float DelayPostOrgasm { get { return 10; } }
+		public float RateAdjustment { get { return 1; } }
 	}
 
 

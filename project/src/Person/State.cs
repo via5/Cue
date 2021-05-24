@@ -112,7 +112,7 @@
 			return s;
 		}
 
-		private static string[] GetNames()
+		public static string[] GetNames()
 		{
 			return new string[]
 			{

@@ -134,7 +134,7 @@ namespace Cue
 
 		public static bool operator !=(Vector3 a, Vector3 b)
 		{
-			return a.X != b.X && a.Y != b.Y && a.Z != b.Z;
+			return !(a == b);
 		}
 
 		public static float Distance(Vector3 a, Vector3 b)

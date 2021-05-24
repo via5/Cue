@@ -194,11 +194,21 @@
 
 		{
 			"animation": "sex",
+			"state": "sitting",
+			"type": "proc",
+			"options":
+			{
+				"file": "animations/sexSitting.json"
+			}
+		},
+
+		{
+			"animation": "sex",
 			"state": "sittingStraddling",
 			"type": "proc",
 			"options":
 			{
-				"file": "animations/sex.json"
+				"file": "animations/sexSittingStraddling.json"
 			}
 		}
 	]

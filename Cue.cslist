@@ -57,9 +57,11 @@ project\src\UI\Controls.cs
 project\src\UI\Menu.cs
 project\src\UI\ScriptUI.cs
 project\src\UI\UI.cs
+project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Geo.cs
 project\src\Utilities\GeoRender.cs
+project\src\Utilities\Movement.cs
 project\src\Utilities\Utilities.cs
 project\src\VUI\BorderLayout.cs
 project\src\VUI\Button.cs

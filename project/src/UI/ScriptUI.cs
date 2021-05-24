@@ -353,6 +353,8 @@ namespace Cue
 		private VUI.Label blowjob_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 
+		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
+
 		public PersonStateTab(Person p)
 		{
 			person_ = p;
@@ -392,6 +394,9 @@ namespace Cue
 			state.Add(new VUI.Label("Gaze"));
 			state.Add(gaze_);
 
+			state.Add(new VUI.Button("Force state", OnForceState));
+			state.Add(states_);
+
 			state.Add(new VUI.Spacer(20));
 			state.Add(new VUI.Spacer(20));
 
@@ -422,6 +427,9 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
+
+
+			states_.SetItems(PersonState.GetNames().ToList());
 		}
 
 		public override string Title
@@ -458,6 +466,11 @@ namespace Cue
 			handjob_.Text = person_.Handjob.ToString();
 			blowjob_.Text = person_.Blowjob.ToString();
 			clothing_.Text = person_.Clothing.ToString();
+		}
+
+		private void OnForceState()
+		{
+			person_.State.Set(PersonState.StateFromString(states_.Selected));
 		}
 	}
 
@@ -990,7 +1003,8 @@ namespace Cue
 
 		private void PlaySelection(float frame = -1)
 		{
-			person_.Animator.Play(sel_, loop_.Checked ? Animator.Loop : 0);
+			person_.Animator.Play(
+				sel_, (loop_.Checked ? Animator.Loop : 0) | Animator.Exclusive);
 
 			var p = person_.Animator.CurrentPlayer;
 			if (p == null)

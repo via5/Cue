@@ -22,6 +22,7 @@
 		float GropedChestWeight { get; }
 		float GropedGenitalsWeight { get; }
 		float OtherSexEyesWeight { get; }
+		float NaturalOtherEyesWeight { get; }
 
 		string Name { get; }
 		string StateString{ get; }
@@ -79,6 +80,7 @@
 		public bool AvoidGazeDuringSexOthers { get { return false; } }
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
+		public float NaturalOtherEyesWeight { get { return 0.2f; } }
 
 		public float BlowjobEyesWeight { get { return 0.1f; } }
 		public float BlowjobGenitalsWeight { get { return 1; } }

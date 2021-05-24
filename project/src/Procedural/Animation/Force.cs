@@ -21,7 +21,7 @@ namespace Cue.Proc
 		private int type_;
 		private int bodyPart_;
 		private string rbId_;
-		private Vector3 min_, max_;
+		private SlidingMovement movement_;
 		private IEasing excitement_;
 		private SlidingDuration fwdDuration_, bwdDuration_;
 		private Duration fwdDelay_, bwdDelay_;
@@ -30,8 +30,6 @@ namespace Cue.Proc
 
 		private int state_ = Forwards;
 		private Rigidbody rb_ = null;
-		private Vector3 last_ = Vector3.Zero;
-		private Vector3 current_ = Vector3.Zero;
 		private IEasing fwdEasing_ = new SinusoidalEasing();
 		private IEasing bwdEasing_ = new SinusoidalEasing();
 		private Person person_ = null;
@@ -40,7 +38,7 @@ namespace Cue.Proc
 
 		public Force(
 			int type, int bodyPart, string rbId,
-			Vector3 min, Vector3 max, IEasing excitement,
+			SlidingMovement m, IEasing excitement,
 			SlidingDuration fwdDuration, SlidingDuration bwdDuration,
 			Duration fwdDelay, Duration bwdDelay,
 			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement,
@@ -49,8 +47,7 @@ namespace Cue.Proc
 			type_ = type;
 			bodyPart_ = bodyPart;
 			rbId_ = rbId;
-			min_ = min;
-			max_ = max;
+			movement_ = m;
 			excitement_ = excitement;
 			fwdDuration_ = fwdDuration;
 			bwdDuration_ = bwdDuration;
@@ -63,12 +60,12 @@ namespace Cue.Proc
 
 		public static IEasing EasingFromJson(JSONClass o, string key)
 		{
-			if (!o.HasKey(key))
+			if (!o.HasKey(key) || o[key].Value == "")
 				return new ConstantOneEasing();
 
 			var e = EasingFactory.FromString(o[key]);
 			if (e == null)
-				throw new LoadFailed($"easing type {key} not found");
+				throw new LoadFailed($"easing type {o[key].Value} not found");
 
 			return e;
 		}
@@ -104,8 +101,7 @@ namespace Cue.Proc
 
 				return new Force(
 					type, bodyPart, o["rigidbody"],
-					Vector3.FromJSON(o, "min"),
-					Vector3.FromJSON(o, "max"),
+					SlidingMovement.FromJSON(o, "movement", true),
 					EasingFromJson(o, "excitement"),
 					fwd, bwd,
 					Duration.FromJSON(o, "fwdDelay"),
@@ -129,7 +125,7 @@ namespace Cue.Proc
 		{
 			return new Force(
 				type_, bodyPart_, rbId_,
-				min_, max_, excitement_,
+				new SlidingMovement(movement_), excitement_,
 				new SlidingDuration(fwdDuration_),
 				bwdDuration_ == null ? null : new SlidingDuration(bwdDuration_),
 				new Duration(fwdDelay_), new Duration(bwdDelay_),
@@ -148,20 +144,17 @@ namespace Cue.Proc
 				return;
 			}
 
-			last_ = Vector3.Zero;
-			state_ = Forwards;
-			Next();
+			Reset();
 		}
 
 		public void Reset()
 		{
+			movement_.Reset();
 			fwdDuration_.Reset();
 			bwdDuration_?.Reset();
 			fwdDelay_.Reset();
 			bwdDelay_.Reset();
-			current_ = Vector3.Zero;
 			state_ = Forwards;
-			Next();
 		}
 
 		public void FixedUpdate(float s)
@@ -183,11 +176,13 @@ namespace Cue.Proc
 			{
 				case Forwards:
 				{
+					movement_.Update(s);
 					CurrentDuration().Update(s);
 					Apply();
 
 					if (CurrentDuration().Finished)
 					{
+						movement_.WindowMagnitude = person_.Excitement.Value;
 						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
 
 						if (bwdDuration_ == null)
@@ -199,8 +194,7 @@ namespace Cue.Proc
 						}
 						else if (Bits.IsSet(flags_, ResetBetween))
 						{
-							last_ = current_;
-							current_ = Vector3.Zero;
+							movement_.SetNext(Vector3.Zero);
 							state_ = Backwards;
 						}
 						else if (Bits.IsSet(flags_, Loop))
@@ -219,6 +213,7 @@ namespace Cue.Proc
 
 				case ForwardsDelay:
 				{
+					movement_.Update(s);
 					fwdDelay_.Update(s);
 					Apply();
 
@@ -226,8 +221,7 @@ namespace Cue.Proc
 					{
 						if (Bits.IsSet(flags_, ResetBetween))
 						{
-							last_ = current_;
-							current_ = Vector3.Zero;
+							movement_.SetNext(Vector3.Zero);
 							state_ = Backwards;
 						}
 						else if (Bits.IsSet(flags_, Loop))
@@ -247,11 +241,13 @@ namespace Cue.Proc
 
 				case Backwards:
 				{
+					movement_.Update(s);
 					CurrentDuration().Update(s);
 					Apply();
 
 					if (CurrentDuration().Finished)
 					{
+						movement_.WindowMagnitude = person_.Excitement.Value;
 						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
 
 						if (bwdDelay_.Enabled)
@@ -275,6 +271,7 @@ namespace Cue.Proc
 
 				case BackwardsDelay:
 				{
+					movement_.Update(s);
 					bwdDelay_.Update(s);
 					Apply();
 
@@ -375,7 +372,7 @@ namespace Cue.Proc
 
 		private Vector3 Lerped()
 		{
-			return Vector3.Lerp(last_, current_, Magnitude());
+			return movement_.Lerped(Magnitude());
 		}
 
 		public static string TypeToString(int i)
@@ -397,8 +394,7 @@ namespace Cue.Proc
 		{
 			return
 				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
-				$"min={min_} max={max_}\n" +
-				$"last={last_} current={current_}\n" +
+				$"{movement_}\n" +
 				$"fdur={fwdDuration_}\n" +
 				$"bdur={bwdDuration_}\n" +
 				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
@@ -413,14 +409,10 @@ namespace Cue.Proc
 
 		private void Next()
 		{
-			last_ = current_;
-
-			var f = ExcitementFactor();
-
-			current_ = new Vector3(
-				Random(min_.X, max_.X, f),
-				Random(min_.Y, max_.Y, f),
-				Random(min_.Z, max_.Z, f));
+			if (!movement_.Next())
+			{
+				movement_.SetNext(movement_.Last);
+			}
 		}
 
 		private float Random(float min, float max, float f)

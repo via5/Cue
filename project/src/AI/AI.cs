@@ -10,6 +10,7 @@ namespace Cue
 		void MakeIdle();
 		bool EventsEnabled { get; set; }
 		bool InteractionsEnabled { get; set; }
+		IEvent ForcedEvent { get; }
 		IEvent Event { get; }
 		void OnPluginState(bool b);
 	}

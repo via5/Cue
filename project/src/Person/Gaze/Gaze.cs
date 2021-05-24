@@ -144,9 +144,8 @@ namespace Cue
 			// non exclusive
 
 			bool gazerEnabled = true;
-
-			// always at least a small change
-			targets_.SetRandomWeight(ps.NaturalRandomWeight);
+			bool clearRandom = false;
+			bool busy = false;
 
 
 			if (person_.Blowjob.Active)
@@ -163,12 +162,13 @@ namespace Cue
 					else
 					{
 						lastString_ += $"bj {t.ID}/";
-						targets_.SetRandomWeight(0);
+						clearRandom = true;
 						targets_.SetWeight(t, BodyParts.Eyes, ps.BlowjobEyesWeight);
 						targets_.SetWeight(t, BodyParts.Genitals, ps.BlowjobGenitalsWeight);
 					}
 
 					gazerEnabled = false;
+					busy = true;
 				}
 			}
 
@@ -187,12 +187,13 @@ namespace Cue
 					else
 					{
 						lastString_ += $"hj {t.ID}/";
-						targets_.SetRandomWeight(0);
+						clearRandom = true;
 						targets_.SetWeight(t, BodyParts.Eyes, ps.HandjobEyesWeight);
 						targets_.SetWeight(t, BodyParts.Genitals, ps.HandjobGenitalsWeight);
 					}
 
 					gazerEnabled = false;
+					busy = true;
 				}
 			}
 
@@ -244,6 +245,8 @@ namespace Cue
 
 						if (eyes != 0 || chest != 0 || genitals != 0)
 						{
+							busy = true;
+
 							if (person_.Personality.AvoidGazeDuringSex)
 							{
 								lastString_ += $"avoid in ps/";
@@ -264,6 +267,23 @@ namespace Cue
 				{
 					lastString_ += $"{t.ID} other pen";
 					targets_.SetWeight(t, BodyParts.Eyes, ps.OtherSexEyesWeight);
+				}
+			}
+
+			if (!clearRandom)
+			{
+				// always at least a small change
+				targets_.SetRandomWeight(ps.NaturalRandomWeight);
+			}
+
+			if (!busy)
+			{
+				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+				{
+					if (i == person_.PersonIndex)
+						continue;
+
+					targets_.SetWeight(Cue.Instance.Persons[i], BodyParts.Eyes, ps.NaturalOtherEyesWeight);
 				}
 			}
 

@@ -189,8 +189,8 @@ namespace Cue.W
 			var rc = fullscreenPanel_.AddComponent<GraphicRaycaster>();
 			var fc = fullscreenPanel_.AddComponent<FaceCamera>();
 
-			float w = 1000;
-			float h = 150;
+			float w = size_.x;
+			float h = size_.y;
 			float yoffset = 0;
 			float s = 0.3f;
 

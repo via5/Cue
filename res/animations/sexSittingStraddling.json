@@ -14,9 +14,15 @@
 					"type": "rforce",
 					"bodyPart": "hips",
 					"rigidbody": "hip",
-					"min": [0, -300, 0],
-					"max": [0, -300, 0],
-					"excitement": "linear",
+					"movement":
+					{
+						"min": [0, -200, 0],
+						"max": [0, -800, 0],
+						"window": [0,  200, 0],
+						"windowEasing": "linear",
+						"nextMinTime": 5,
+						"nextMaxTime": 5
+					},
 					"duration":
 					{
 						"min": 1,

@@ -22,7 +22,7 @@
 					left,
 					new Vector3(0, 0.1f, 0),
 					new Point(0, 0),
-					new Size(1300, 150));
+					new Size(1000, 250));
 			}
 			else
 			{
@@ -270,7 +270,7 @@
 			var p = Selected as Person;
 			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
 			{
-				var s = p.AI.Event as SexEvent;
+				var s = p.AI.ForcedEvent as SexEvent;
 
 				if (s == null)
 				{
@@ -279,6 +279,7 @@
 				else
 				{
 					p.AI.RunEvent(null);
+					p.Animator.StopType(Animation.SexType);
 				}
 			}
 		}

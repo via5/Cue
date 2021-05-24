@@ -153,6 +153,7 @@
     <Compile Include="src\UI\Menu.cs" />
     <Compile Include="src\UI\ScriptUI.cs" />
     <Compile Include="src\UI\UI.cs" />
+    <Compile Include="src\Utilities\Duration.cs" />
     <Compile Include="src\Utilities\Easings.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -160,6 +161,7 @@
     </Compile>
     <Compile Include="src\Utilities\Geo.cs" />
     <Compile Include="src\Utilities\GeoRender.cs" />
+    <Compile Include="src\Utilities\Movement.cs" />
     <Compile Include="src\Utilities\Utilities.cs" />
     <Compile Include="src\VUI\BorderLayout.cs" />
     <Compile Include="src\VUI\Button.cs" />

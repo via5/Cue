@@ -19,7 +19,7 @@ namespace Cue
 		private bool postOrgasm_ = false;
 		private float postOrgasmElapsed_ = 0;
 
-		private IEasing easing_ = new CubicOutEasing();
+		private IEasing easing_ = new SinusoidalEasing();
 
 
 		public Excitement(Person p)
@@ -117,6 +117,8 @@ namespace Cue
 
 
 			totalRate_ += mouthRate_ + breastsRate_ + genitalsRate_ + penetrationRate_;
+			totalRate_ *= ss.RateAdjustment;
+
 			if (totalRate_ == 0)
 				totalRate_ = ss.DecayPerSecond * s;
 		}
