@@ -47,7 +47,7 @@ namespace Cue.W
 					if (b != null)
 						b.val = false;
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					// happens sometimes, not sure why
 				}

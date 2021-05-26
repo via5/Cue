@@ -70,13 +70,13 @@ namespace Cue
 		public void Update(float s)
 		{
 			UpdateTargets();
-			pick_.Update(s);
+
+			if (pick_.Update(s))
+				gazer_.Duration = person_.Personality.GazeDuration;
 
 			if (pick_.HasTarget)
 				eyes_.LookAt(pick_.Position);
 			// else ?
-
-			//gazer_.Duration = person_.Personality.GazeDuration;
 
 			eyes_.Update(s);
 			gazer_.Update(s);
@@ -147,7 +147,6 @@ namespace Cue
 			bool clearRandom = false;
 			bool busy = false;
 
-
 			if (person_.Blowjob.Active)
 			{
 				var t = person_.Blowjob.Target;
@@ -216,26 +215,27 @@ namespace Cue
 					else
 					{
 						float eyes = 0;
-						float chest = 0;
+						float selfChest = 0;
+						float otherChest = 0;
 						float genitals = 0;
 
 						if (person_.Body.PenetratedBy(t))
 						{
 							lastString_ += $"pen/";
 							eyes = ps.PenetrationEyesWeight;
-							chest = ps.PenetrationChestWeight;
+							otherChest = ps.PenetrationChestWeight;
 							genitals = ps.PenetrationGenitalsWeight;
 						}
 						else
 						{
-							if (person_.Body.GropedBy(t, BodyParts.Chest))
+							if (person_.Body.GropedBy(t, BodyParts.BreastParts))
 							{
 								lastString_ += $"grope chest, ";
 								eyes = ps.GropedEyesWeight;
-								chest = ps.GropedChestWeight;
+								selfChest = ps.GropedChestWeight;
 							}
 
-							if (person_.Body.GropedBy(t, BodyParts.Genitals))
+							if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
 							{
 								lastString_ += $"grope gen, ";
 								eyes = ps.GropedEyesWeight;
@@ -243,7 +243,7 @@ namespace Cue
 							}
 						}
 
-						if (eyes != 0 || chest != 0 || genitals != 0)
+						if (eyes != 0 || selfChest != 0 || otherChest != 0 || genitals != 0)
 						{
 							busy = true;
 
@@ -256,9 +256,9 @@ namespace Cue
 							{
 								lastString_ += $"ok";
 								targets_.SetWeight(t, BodyParts.Eyes, eyes);
-								targets_.SetWeight(t, BodyParts.Chest, chest);
+								targets_.SetWeight(person_, BodyParts.Chest, selfChest);
+								targets_.SetWeight(t, BodyParts.Chest, otherChest);
 								targets_.SetWeight(person_, BodyParts.Genitals, genitals);
-
 							}
 						}
 					}
@@ -277,16 +277,16 @@ namespace Cue
 			}
 
 			if (!busy)
+				lastString_ += "not busy";
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
 			{
-				lastString_ = "not busy";
+				if (i == person_.PersonIndex)
+					continue;
 
-				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
-				{
-					if (i == person_.PersonIndex)
-						continue;
-
-					targets_.SetWeight(Cue.Instance.Persons[i], BodyParts.Eyes, ps.NaturalOtherEyesWeight);
-				}
+				targets_.SetWeightIfZero(
+					Cue.Instance.Persons[i], BodyParts.Eyes,
+					busy ? ps.BusyOtherEyesWeight : ps.NaturalOtherEyesWeight);
 			}
 
 			gazer_.Enabled = gazerEnabled;

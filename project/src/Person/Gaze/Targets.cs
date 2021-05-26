@@ -79,6 +79,12 @@ namespace Cue
 				all_[i].Weight = 0;
 		}
 
+		public void SetWeightIfZero(Person p, int bodyPart, float w)
+		{
+			if (persons_[p.PersonIndex, bodyPart].Weight == 0)
+				persons_[p.PersonIndex, bodyPart].Weight = w;
+		}
+
 		public void SetWeight(Person p, int bodyPart, float w)
 		{
 			persons_[p.PersonIndex, bodyPart].Weight = w;

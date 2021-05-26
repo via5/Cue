@@ -53,6 +53,28 @@ namespace Cue
 		public const int Count = 32;
 
 
+		private static int[] breasts_ = new int[] { LeftBreast, RightBreast };
+		public static int[] BreastParts
+		{
+			get { return breasts_; }
+		}
+
+		private static int[] genitals_ = new int[] { Labia, Vagina, DeepVagina, DeeperVagina };
+		public static int[] GenitalParts
+		{
+			get { return genitals_; }
+		}
+
+		private static int[] personalSpace_ = new[]{
+			LeftHand, RightHand, Head, Chest, LeftBreast, RightBreast,
+			Hips, Genitals, Labia, Vagina, DeepVagina, DeeperVagina,
+			LeftFoot, RightFoot};
+		public static int[] PersonalSpaceParts
+		{
+			get { return personalSpace_; }
+		}
+
+
 		private static string[] names_ = new string[]
 		{
 			"head", "lips", "mouth", "leftbreast", "rightbreast",
@@ -141,6 +163,31 @@ namespace Cue
 		public bool Grabbed
 		{
 			get { return part_?.Grabbed ?? false; }
+		}
+
+		public bool TriggeredBy(BodyPart other)
+		{
+			if (!Exists || !other.Exists)
+				return false;
+
+			if (Trigger == 0)
+				return false;
+
+			return CloseToImpl(other);
+		}
+
+		public bool CloseTo(BodyPart other)
+		{
+			if (!Exists || !other.Exists)
+				return false;
+
+			return CloseToImpl(other);
+		}
+
+		private bool CloseToImpl(BodyPart other)
+		{
+			var d = Vector3.Distance(Position, other.Position);
+			return (d < 0.2f);
 		}
 
 		public bool Busy
@@ -282,12 +329,7 @@ namespace Cue
 
 		public bool InsidePersonalSpace(Person other)
 		{
-			var checkParts = new int[]
-			{
-				BodyParts.LeftHand, BodyParts.RightHand, BodyParts.Head,
-				BodyParts.Hips, BodyParts.LeftFoot, BodyParts.RightFoot,
-				BodyParts.Genitals
-			};
+			var checkParts = BodyParts.PersonalSpaceParts;
 
 			for (int i = 0; i < checkParts.Length; ++i)
 			{
@@ -295,10 +337,8 @@ namespace Cue
 
 				for (int j = 0; j < checkParts.Length; ++j)
 				{
-					var b = other.Body.Get(checkParts[i]);
-					var d = Vector3.Distance(a.Position, b.Position);
-
-					if (d < 0.2f)
+					var b = other.Body.Get(checkParts[j]);
+					if (a.CloseTo(b))
 						return true;
 				}
 			}
@@ -378,59 +418,12 @@ namespace Cue
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
 			{
-				// todo: should be more generic than that
+				var triggerPart = Get(triggerParts[i]);
 
-				var triggerPart = triggerParts[i];
-
-				if (triggerPart == BodyParts.Chest && person_.Sex == Sexes.Female)
-				{
-					if (CheckPart(by, BodyParts.LeftBreast, checkParts))
-						return true;
-
-					if (CheckPart(by, BodyParts.RightBreast, checkParts))
-						return true;
-				}
-				else if (triggerPart == BodyParts.Genitals && person_.Sex == Sexes.Female)
-				{
-					if (CheckPart(by, BodyParts.Labia, checkParts))
-						return true;
-
-					if (CheckPart(by, BodyParts.Vagina, checkParts))
-						return true;
-
-					if (CheckPart(by, BodyParts.DeepVagina, checkParts))
-						return true;
-
-					if (CheckPart(by, BodyParts.DeeperVagina, checkParts))
-						return true;
-				}
-				else
-				{
-					if (CheckPart(by, triggerParts[i], checkParts))
-						return true;
-				}
-			}
-
-			return false;
-		}
-
-		private bool CheckPart(Person by, int triggerPartID, int[] checkParts)
-		{
-			var triggerPart = Get(triggerPartID);
-
-			if (triggerPart.Trigger > 0)
-			{
 				for (int j = 0; j < checkParts.Length; ++j)
 				{
-					var checkPart = by.Body.Get(checkParts[j]);
-					if (checkPart.Exists)
-					{
-						var d = Vector3.Distance(
-							triggerPart.Position, checkPart.Position);
-
-						if (d < 0.2f)
-							return true;
-					}
+					if (triggerPart.TriggeredBy(by.Body.Get(checkParts[j])))
+						return true;
 				}
 			}
 

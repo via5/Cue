@@ -124,23 +124,29 @@
 			return true;
 		}
 
-		public void Update(float s)
+		public bool Update(float s)
 		{
+			bool changed = false;
+
 			delay_.Update(s);
 
 			if (delay_.Finished || !HasTarget)
 			{
 				NextTarget();
+				changed = true;
 			}
 			else if (HasTarget)
 			{
 				if (!CanLookAt(targets_[currentTarget_]))
 				{
 					NextTarget();
+					changed = true;
 				}
 			}
 
 			render_?.Update(s);
+
+			return changed;
 		}
 
 		public override string ToString()
@@ -177,12 +183,12 @@
 				{
 					if (r < targets_[j].Weight)
 					{
-						log_.Info($"trying {targets_[j]}");
+						log_.Verbose($"trying {targets_[j]}");
 
 						if (targets_[j].Next())
 						{
 							lastString_ += $" j={j} t={targets_[j]}";
-							log_.Info($"picked {targets_[j]}");
+							log_.Verbose($"picked {targets_[j]}");
 							currentTarget_ = j;
 							return;
 						}

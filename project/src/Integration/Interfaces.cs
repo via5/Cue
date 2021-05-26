@@ -180,6 +180,11 @@ namespace Cue
 			first = f;
 			second = s;
 		}
+
+		public override string ToString()
+		{
+			return $"{first} {second}";
+		}
 	}
 
 

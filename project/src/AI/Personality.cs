@@ -3,7 +3,6 @@
 	interface IPersonality
 	{
 		Pair<float, float> LookAtRandomInterval { get; }
-		Pair<float, float> LookAtRandomGazeDuration { get; }
 		float GazeDuration { get; }
 
 		bool AvoidGazeInsidePersonalSpace { get; }
@@ -11,18 +10,24 @@
 		bool AvoidGazeDuringSexOthers { get; }
 
 		float NaturalRandomWeight { get; }
+
 		float BlowjobEyesWeight { get; }
 		float BlowjobGenitalsWeight { get; }
+
 		float HandjobEyesWeight { get; }
 		float HandjobGenitalsWeight { get; }
+
 		float PenetrationEyesWeight { get; }
 		float PenetrationChestWeight { get; }
 		float PenetrationGenitalsWeight { get; }
+
 		float GropedEyesWeight { get; }
 		float GropedChestWeight { get; }
 		float GropedGenitalsWeight { get; }
+
 		float OtherSexEyesWeight { get; }
 		float NaturalOtherEyesWeight { get; }
+		float BusyOtherEyesWeight { get; }
 
 		string Name { get; }
 		string StateString{ get; }
@@ -37,6 +42,12 @@
 		private string state_ = "idle";
 		private bool wasClose_ = false;
 		private bool inited_ = false;
+
+		private SlidingDuration gazeRandomInterval_ = new SlidingDuration(
+			10, 1, 0, 0, 5, new CubicInEasing());
+
+		private SlidingDuration gazeDuration_ = new SlidingDuration(
+			1.2f, 0.2f, 0, 0, 0.3f, new CubicInEasing());
 
 		public BasicPersonality(Person p, string name)
 		{
@@ -57,17 +68,17 @@
 
 		public virtual Pair<float, float> LookAtRandomInterval
 		{
-			get { return new Pair<float, float>(4, 10); }
-		}
-
-		public virtual Pair<float, float> LookAtRandomGazeDuration
-		{
-			get { return new Pair<float, float>(1, 3); }
+			get
+			{
+				return new Pair<float, float>(
+					gazeRandomInterval_.Minimum,
+					gazeRandomInterval_.Maximum);
+			}
 		}
 
 		public virtual float GazeDuration
 		{
-			get { return 1; }
+			get { return gazeDuration_.Current; }
 		}
 
 		public virtual IObject GazeAvoid()
@@ -81,6 +92,7 @@
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
 		public float NaturalOtherEyesWeight { get { return 0.2f; } }
+		public float BusyOtherEyesWeight { get { return 0.1f; } }
 
 		public float BlowjobEyesWeight { get { return 0.1f; } }
 		public float BlowjobGenitalsWeight { get { return 1; } }
@@ -115,6 +127,12 @@
 				SetClose(close);
 				wasClose_ = close;
 			}
+
+			gazeDuration_.WindowMagnitude = person_.Excitement.Value;
+			gazeDuration_.Update(s);
+
+			gazeRandomInterval_.WindowMagnitude = person_.Excitement.Value;
+			gazeRandomInterval_.Update(s);
 		}
 
 		public override string ToString()
@@ -234,17 +252,6 @@
 					return new Pair<float, float>(3, 8);
 				else
 					return base.LookAtRandomInterval;
-			}
-		}
-
-		public override Pair<float, float> LookAtRandomGazeDuration
-		{
-			get
-			{
-				if (angry_)
-					return new Pair<float, float>(0.3f, 1.5f);
-				else
-					return new Pair<float, float>(1, 3);
 			}
 		}
 

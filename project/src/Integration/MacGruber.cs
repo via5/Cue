@@ -307,7 +307,7 @@
 
 		public override string ToString()
 		{
-			return $"MacGruber: enabled={enabled_}";
+			return $"MacGruber: enabled={enabled_} d={gazeDuration_}";
 		}
 	}
 }

@@ -127,6 +127,11 @@ namespace Cue
 			get { return d_.Progress; }
 		}
 
+		public float Current
+		{
+			get { return d_.Current; }
+		}
+
 		public float WindowMagnitude
 		{
 			set { f_ = value; }
@@ -284,6 +289,11 @@ namespace Cue
 		public float Progress
 		{
 			get { return U.Clamp(elapsed_ / current_, 0, 1); }
+		}
+
+		public float Current
+		{
+			get { return current_; }
 		}
 
 		public void Reset()
