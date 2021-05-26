@@ -278,6 +278,8 @@ namespace Cue
 
 			if (!busy)
 			{
+				lastString_ = "not busy";
+
 				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
 				{
 					if (i == person_.PersonIndex)

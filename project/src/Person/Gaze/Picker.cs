@@ -103,8 +103,13 @@
 			get { return targets_; }
 		}
 
-		public bool CanLookAt(Vector3 p)
+		public bool CanLookAt(IGazeLookat t)
 		{
+			if (t.Weight == 0)
+				return false;
+
+			var p = t.Position;
+
 			var box = new Box(p, new Vector3(0.01f, 0.01f, 0.01f));
 
 			for (int i = 0; i < frustums_.Length; ++i)
@@ -129,7 +134,7 @@
 			}
 			else if (HasTarget)
 			{
-				if (!CanLookAt(targets_[currentTarget_].Position))
+				if (!CanLookAt(targets_[currentTarget_]))
 				{
 					NextTarget();
 				}
@@ -141,7 +146,7 @@
 		public override string ToString()
 		{
 			if (HasTarget)
-				return targets_[currentTarget_].ToString();
+				return $"j={currentTarget_} {targets_[currentTarget_]}";
 			else
 				return "no target";
 		}
@@ -172,12 +177,12 @@
 				{
 					if (r < targets_[j].Weight)
 					{
-						log_.Verbose($"trying {targets_[j]}");
+						log_.Info($"trying {targets_[j]}");
 
 						if (targets_[j].Next())
 						{
-							lastString_ += $" t={targets_[j]}";
-							log_.Verbose($"picked {targets_[j]}");
+							lastString_ += $" j={j} t={targets_[j]}";
+							log_.Info($"picked {targets_[j]}");
 							currentTarget_ = j;
 							return;
 						}

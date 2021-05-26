@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.W
@@ -40,9 +41,16 @@ namespace Cue.W
 			// manually
 			foreach (var fc in atom_.freeControllers)
 			{
-				var b = fc.GetBoolJSONParam("freezeAtomPhysicsWhenGrabbed");
-				if (b != null)
-					b.val = false;
+				try
+				{
+					var b = fc.GetBoolJSONParam("freezeAtomPhysicsWhenGrabbed");
+					if (b != null)
+						b.val = false;
+				}
+				catch (Exception e)
+				{
+					// happens sometimes, not sure why
+				}
 			}
 
 			{

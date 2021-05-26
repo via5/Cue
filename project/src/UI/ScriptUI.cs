@@ -659,27 +659,17 @@ namespace Cue
 				tt = VUI.TimerManager.Instance.CreateTimer(0.2f, DumpGaze, VUI.Timer.Repeat);
 
 			var targets = person_.Gaze.Targets.All;
-
-			Array.Sort(targets, (a, b) =>
-			{
-				if (a.Weight < b.Weight)
-					return 1;
-				else if (a.Weight > b.Weight)
-					return -1;
-				else
-					return a.ToString().CompareTo(b.ToString());
-			});
-
-
 			var items = new List<string>();
 
 			items.Add(person_.Gaze.LastString);
 			items.Add(person_.Gaze.Picker.LastString);
 
-			foreach (var t in targets)
+			for (int i=0; i<targets.Length; ++i)
 			{
+				var t = targets[i];
+
 				if (t.Weight > 0)
-					items.Add($"Target: {t.Weight:0.00} {t}");
+					items.Add($"Target {i}: {t.Weight:0.00} {t}");
 			}
 
 			foreach (var p in person_.Gaze.GetAllAvoidForDebug())
