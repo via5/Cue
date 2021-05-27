@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,6 +51,47 @@ namespace Cue.W
 		public void Log(string s, int level)
 		{
 			log_.Log(s, level);
+		}
+
+		public JSONClass GetConfig()
+		{
+			var a = SuperController.singleton.GetAtomByUid("cueconfig");
+			if (a == null)
+				return null;
+
+			var t = a.GetStorableByID("Text");
+			if (t == null)
+			{
+				Cue.LogError($"cueconfig has no Text storable");
+				return null;
+			}
+
+			var p = t.GetStringJSONParam("text");
+			if (p == null)
+			{
+				Cue.LogError($"cueconfig Text storable has no text parameter");
+				return null;
+			}
+
+			Cue.LogVerbose($"found cueconfig");
+
+			try
+			{
+				var doc = JSON.Parse(p.val);
+				if (doc == null)
+				{
+					Cue.LogError("cueconfig bad json");
+					return null;
+				}
+
+				return doc.AsObject;
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("cueconfig bad json, " + e.Message);
+			}
+
+			return null;
 		}
 
 		public INav Nav

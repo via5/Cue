@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using SimpleJSON;
+
+namespace Cue
 {
 	class Clothing
 	{
@@ -178,7 +180,7 @@
 			Atom.SetDefaultControls("init");
 		}
 
-		public void Init()
+		public void Init(JSONClass config)
 		{
 			SetState(PersonState.Standing);
 
@@ -193,6 +195,14 @@
 			}
 
 			Atom.Init();
+
+			if (config.HasKey(ID))
+			{
+				var pc = config[ID].AsObject;
+
+				if (pc.HasKey("personality"))
+					Personality = BasicPersonality.FromString(this, pc["personality"]);
+			}
 		}
 
 		public int PersonIndex

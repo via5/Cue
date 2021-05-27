@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -25,6 +26,11 @@ namespace Cue.W
 
 		public void ClearLog()
 		{
+		}
+
+		public JSONClass GetConfig()
+		{
+			return null;
 		}
 
 		public void Log(string s, int level)

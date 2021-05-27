@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -19,9 +20,16 @@ namespace Cue
 
 	class Options
 	{
+		private bool allowMovement_ = false;
+
+		public void Init(JSONClass config)
+		{
+			allowMovement_ = config["allowMovement"].AsBool;
+		}
+
 		public bool AllowMovement
 		{
-			get { return false; }
+			get { return allowMovement_; }
 		}
 	}
 
@@ -98,6 +106,10 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
+			var config = Sys.GetConfig();
+
+			options_.Init(config);
+
 			LogVerbose("cue: loading resources");
 			Resources.Animations.Load();
 			Resources.Clothing.Load();
@@ -109,7 +121,7 @@ namespace Cue
 			FindObjects();
 
 			LogVerbose("cue: initializing persons");
-			InitPersons();
+			InitPersons(config);
 
 			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
@@ -153,7 +165,7 @@ namespace Cue
 			}
 		}
 
-		private void InitPersons()
+		private void InitPersons(JSONClass config)
 		{
 			var spawnPoints = new List<Slot>();
 			foreach (var o in objects_)
@@ -169,27 +181,13 @@ namespace Cue
 						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 				}
 
-				p.Init();
+				p.Init(config);
 			}
 		}
 
 		private void AddPerson(W.IAtom a)
 		{
 			var p = new Person(allObjects_.Count, persons_.Count, a);
-
-			var re = new Regex(@"(.+)#(.+)");
-			var m = re.Match(a.ID);
-
-			if (m != null && m.Success)
-			{
-				var pname = m.Groups[2].Value;
-
-				if (pname == "quirky")
-					p.Personality = new QuirkyPersonality(p);
-				else if (pname == "tsundere")
-					p.Personality = new TsunderePersonality(p);
-			}
-
 			persons_.Add(p);
 			allObjects_.Add(p);
 		}

@@ -48,12 +48,25 @@
 			10, 1, 0, 0, 5, new CubicInEasing());
 
 		private SlidingDuration gazeDuration_ = new SlidingDuration(
-			1.2f, 0.2f, 0, 0, 0.3f, new CubicInEasing());
+			0.8f, 0.2f, 0, 0, 0.3f, new CubicInEasing());
 
 		public BasicPersonality(Person p, string name)
 		{
 			person_ = p;
 			name_ = name;
+		}
+
+		public static IPersonality FromString(Person p, string name)
+		{
+			if (name == "quirky")
+				return new QuirkyPersonality(p);
+			else if (name == "tsundere")
+				return new TsunderePersonality(p);
+			else if (name == "neutral")
+				return new NeutralPersonality(p);
+
+			Cue.LogError($"config: bad personality {name}");
+			return new NeutralPersonality(p);
 		}
 
 		public string Name

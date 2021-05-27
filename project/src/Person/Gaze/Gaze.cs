@@ -233,6 +233,12 @@ namespace Cue
 						}
 						else
 						{
+							if (person_.Body.GropedBy(t, BodyParts.Head))
+							{
+								lastString_ += $"grope head, ";
+								eyes = ps.GropedEyesWeight;
+							}
+
 							if (person_.Body.GropedBy(t, BodyParts.BreastParts))
 							{
 								lastString_ += $"grope chest, ";

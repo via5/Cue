@@ -155,6 +155,11 @@ namespace Cue
 			get { return type_; }
 		}
 
+		public bool CanTrigger
+		{
+			get { return part_?.CanTrigger ?? false; }
+		}
+
 		public float Trigger
 		{
 			get { return part_?.Trigger ?? 0; }
@@ -422,8 +427,18 @@ namespace Cue
 
 				for (int j = 0; j < checkParts.Length; ++j)
 				{
-					if (triggerPart.TriggeredBy(by.Body.Get(checkParts[j])))
-						return true;
+					var byPart = by.Body.Get(checkParts[j]);
+
+					if (triggerPart.CanTrigger)
+					{
+						if (triggerPart.TriggeredBy(byPart))
+							return true;
+					}
+					else
+					{
+						if (triggerPart.CloseTo(byPart))
+							return true;
+					}
 				}
 			}
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -27,6 +28,7 @@ namespace Cue.W
 	{
 		void ClearLog();
 		void Log(string s, int level);
+		JSONClass GetConfig();
 		IAtom GetAtom(string id);
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
