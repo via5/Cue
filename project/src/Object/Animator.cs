@@ -171,8 +171,7 @@ namespace Cue
 				return false;
 			}
 
-			Play(a, flags);
-			return true;
+			return Play(a, flags);
 		}
 
 		public bool PlaySex(int state, int flags = 0)
@@ -250,7 +249,7 @@ namespace Cue
 			if (!Cue.Instance.Options.AllowMovement && !a.ForcesOnly)
 			{
 				log_.Info("not playing animation, movement not allowed");
-				return true;
+				return false;
 			}
 
 			if (!CanPlay(a, flags, false))
@@ -271,7 +270,7 @@ namespace Cue
 			}
 
 			log_.Error("no player can play " + a.ToString());
-			return true;
+			return false;
 		}
 
 		public void Stop()

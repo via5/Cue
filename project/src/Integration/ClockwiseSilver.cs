@@ -19,8 +19,13 @@ namespace Cue
 		private W.VamFloatParameter headAngleY_ = null;
 		private W.VamFloatParameter headAngleZ_ = null;
 		private W.VamFloatParameter lipDepth_ = null;
+		private W.VamFloatParameter morphDuration_ = null;
+		private W.VamFloatParameter morphSpeed_ = null;
+		private W.VamFloatParameter tongueLength_ = null;
+		private W.VamBoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
-		private bool random_ = false;
+		private bool randomMovements_ = false;
+		private bool randomSpeeds_ = false;
 		private float elapsed_ = 0;
 		private float cooldownRemaining_ = 0;
 
@@ -91,6 +96,18 @@ namespace Cue
 			lipDepth_ = new W.VamFloatParameter(
 				p, "ClockwiseSilver.Kiss", "Lip Depth");
 
+			morphDuration_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Morph Duration");
+
+			morphSpeed_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Morph Speed");
+
+			tongueLength_ = new W.VamFloatParameter(
+				p, "ClockwiseSilver.Kiss", "Tongue Length");
+
+			closeEyes_ = new W.VamBoolParameter(
+				p, "ClockwiseSilver.Kiss", "closeEyes");
+
 			active_.Value = false;
 		}
 
@@ -135,7 +152,7 @@ namespace Cue
 			if (k)
 				elapsed_ += s;
 
-			if (k && random_ && active_.Value)
+			if (k && randomMovements_ && active_.Value)
 			{
 				bool changed = false;
 
@@ -159,6 +176,17 @@ namespace Cue
 						t.headAngleZ_.Value = t.startAngleZ_ + randomHeadAngleZ_.Value;
 					}
 				}
+			}
+
+			if (k && randomSpeeds_ && active_.Value)
+			{
+				morphDuration_.Value =
+					morphDuration_.DefaultValue -
+					person_.Excitement.Value * 0.4f;
+
+				morphSpeed_.Value =
+					morphSpeed_.DefaultValue +
+					person_.Excitement.Value * 4;
 			}
 		}
 
@@ -255,31 +283,43 @@ namespace Cue
 				headAngleZ_.Value = 0;
 				lipDepth_.Value = 0;
 
-				random_ = false;
+				closeEyes_.Value = !person_.Personality.AvoidGazePlayer;
+
+				randomMovements_ = false;
+				randomSpeeds_ = true;
 			}
 			else
 			{
-				startAngleX_ = -10;
-				startAngleY_ = 0;
-
 				if (leader)
-					startAngleZ_ = -30;
+				{
+					startLipDepth_ = 0.06f;
+					startAngleX_ = -50;
+					startAngleY_ = 20;
+					startAngleZ_ = -40;
+				}
 				else
-					startAngleZ_ = -20;
+				{
+					startLipDepth_ = 0;
+					startAngleX_ = -25;
+					startAngleY_ = 0;
+					startAngleZ_ = -50;
+				}
 
-				startLipDepth_ = 0;
 
 				headAngleX_.Value = startAngleX_;
 				headAngleY_.Value = startAngleY_;
 				headAngleZ_.Value = startAngleZ_;
 				lipDepth_.Value = startLipDepth_;
 
+				closeEyes_.Value = true;
+
 				randomHeadAngleX_.Reset();
 				randomHeadAngleY_.Reset();
 				randomHeadAngleZ_.Reset();
 				randomLipDepth_.Reset();
 
-				random_ = leader;
+				randomMovements_ = leader;
+				randomSpeeds_ = true;
 			}
 
 			trackPos_.Value = leader;

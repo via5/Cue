@@ -53,7 +53,12 @@ namespace Cue
 
 			var min = Vector3.FromJSON(oo, "min", true);
 			var max = Vector3.FromJSON(oo, "max", true);
-			var ws = Vector3.FromJSON(oo, "window", true);
+
+			Vector3 ws;
+			if (oo.HasKey("window"))
+				ws = Vector3.FromJSON(oo, "window", true);
+			else
+				ws = max - min;
 
 			IEasing e = null;
 			if (oo.HasKey("windowEasing") && oo["windowEasing"].Value != "")
@@ -61,16 +66,22 @@ namespace Cue
 				string en = oo["windowEasing"];
 				e = EasingFactory.FromString(en);
 				if (e == null)
-					throw new LoadFailed($"duration '{key}' bad easing name");
+					throw new LoadFailed($"movement '{key}' bad easing name");
 			}
 
-			float nextMin;
-			if (!float.TryParse(oo["nextMinTime"], out nextMin))
-				throw new LoadFailed($"duration '{key}' nextMinTime is not a number");
+			float nextMin = 0;
+			if (oo.HasKey("nextMinTime"))
+			{
+				if (!float.TryParse(oo["nextMinTime"], out nextMin))
+					throw new LoadFailed($"movement '{key}' nextMinTime is not a number");
+			}
 
-			float nextMax;
-			if (!float.TryParse(oo["nextMaxTime"], out nextMax))
-				throw new LoadFailed($"duration '{key}' nextMaxTime is not a number");
+			float nextMax = 0;
+			if (oo.HasKey("nextMaxTime"))
+			{
+				if (!float.TryParse(oo["nextMaxTime"], out nextMax))
+					throw new LoadFailed($"movement '{key}' nextMaxTime is not a number");
+			}
 
 			return new SlidingMovement(min, max, nextMin, nextMax, ws, e);
 		}

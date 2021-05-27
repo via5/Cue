@@ -432,6 +432,11 @@
 						state_.Current, PersonState.Standing,
 						Animator.Exclusive);
 				}
+				else
+				{
+					// no animation, just finish transition
+					state_.FinishTransition();
+				}
 			}
 		}
 

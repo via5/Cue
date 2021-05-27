@@ -20,8 +20,11 @@
 							"type": "rforce",
 							"bodyPart": "hips",
 							"rigidbody": "hip",
-							"min": [-50, 0, 200],
-							"max": [ 50, 0, 300],
+							"movement":
+							{
+								"min": [-50, 0, 200],
+								"max": [ 50, 0, 300]
+							},
 							"fwdDuration": [0.05, 0.1],
 							"bwdDuration": [0, 0],
 							"fwdDelay": [0, 0],
@@ -33,8 +36,11 @@
 							"type": "rforce",
 							"bodyPart": "chest",
 							"rigidbody": "chest",
-							"min": [-50, 0, 200],
-							"max": [ 50, 0, 300],
+							"movement":
+							{
+								"min": [-50, 0, 200],
+								"max": [ 50, 0, 300]
+							},
 							"fwdDuration": [0.05, 0.1],
 							"bwdDuration": [0, 0],
 							"fwdDelay": [0, 0],
@@ -56,8 +62,11 @@
 							"type": "rforce",
 							"bodyPart": "hips",
 							"rigidbody": "hip",
-							"min": [-20, 0, 50],
-							"max": [ 20, 0, 100],
+							"movement":
+							{
+								"min": [-20, 0, 50],
+								"max": [ 20, 0, 100]
+							},
 							"fwdDuration": [0.05, 0.1],
 							"bwdDuration": [0, 0],
 							"fwdDelay": [0, 0],
@@ -69,8 +78,11 @@
 							"type": "rforce",
 							"bodyPart": "chest",
 							"rigidbody": "chest",
-							"min": [-20, 0, 50],
-							"max": [ 20, 0, 100],
+							"movement":
+							{
+								"min": [-20, 0, 50],
+								"max": [ 20, 0, 100]
+							},
 							"fwdDuration": [0.05, 0.1],
 							"bwdDuration": [0, 0],
 							"fwdDelay": [0, 0],

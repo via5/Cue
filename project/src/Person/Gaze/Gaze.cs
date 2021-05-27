@@ -203,7 +203,12 @@ namespace Cue
 				if (t == person_)
 					continue;
 
-				if (person_.Body.InsidePersonalSpace(t))
+				if (t == Cue.Instance.Player && ps.AvoidGazePlayer)
+				{
+					lastString_ += $"avoid player, ";
+					SetShouldAvoid(t, true);
+				}
+				else if (person_.Body.InsidePersonalSpace(t))
 				{
 					lastString_ += $"{t.ID} in ps, ";
 
@@ -284,9 +289,14 @@ namespace Cue
 				if (i == person_.PersonIndex)
 					continue;
 
-				targets_.SetWeightIfZero(
-					Cue.Instance.Persons[i], BodyParts.Eyes,
-					busy ? ps.BusyOtherEyesWeight : ps.NaturalOtherEyesWeight);
+				var p = Cue.Instance.Persons[i];
+				if (p == Cue.Instance.Player && ps.AvoidGazePlayer)
+					continue;
+
+				float w = busy ? ps.BusyOtherEyesWeight : ps.NaturalOtherEyesWeight;
+				w *= (p.Excitement.Value + 1);
+
+				targets_.SetWeightIfZero(p, BodyParts.Eyes, w);
 			}
 
 			gazer_.Enabled = gazerEnabled;

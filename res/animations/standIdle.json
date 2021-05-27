@@ -13,8 +13,11 @@
 					"type": "rforce",
 					"bodyPart": "hips",
 					"rigidbody": "hip",
-					"min": [-50, 0, -50],
-					"max": [ 50, 0, 50],
+					"movement":
+					{
+						"min": [-50, 0, -50],
+						"max": [ 50, 0, 50]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -26,8 +29,11 @@
 					"type": "rforce",
 					"bodyPart": "chest",
 					"rigidbody": "chest",
-					"min": [-50, 0, -50],
-					"max": [ 50, 0, 50],
+					"movement":
+					{
+						"min": [-50, 0, -50],
+						"max": [ 50, 0, 50]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -39,8 +45,11 @@
 					"type": "rforce",
 					"bodyPart": "lefthand",
 					"rigidbody": "lHand",
-					"min": [-50, 0, -50],
-					"max": [ 50, 0, 50],
+					"movement":
+					{
+						"min": [-50, 0, -50],
+						"max": [ 50, 0, 50]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -52,8 +61,11 @@
 					"type": "rforce",
 					"bodyPart": "righthand",
 					"rigidbody": "rHand",
-					"min": [-50, 0, -50],
-					"max": [ 50, 0, 50],
+					"movement":
+					{
+						"min": [-50, 0, -50],
+						"max": [ 50, 0, 50]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -67,8 +79,11 @@
 					"type": "rtorque",
 					"bodyPart": "hips",
 					"rigidbody": "hip",
-					"min": [-5, -5, -5],
-					"max": [ 5,  5,  5],
+					"movement":
+					{
+						"min": [-5, -5, -5],
+						"max": [ 5,  5,  5]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -80,8 +95,11 @@
 					"type": "rtorque",
 					"bodyPart": "chest",
 					"rigidbody": "chest",
-					"min": [-5, -5, -5],
-					"max": [ 5,  5,  5],
+					"movement":
+					{
+						"min": [-5, -5, -5],
+						"max": [ 5,  5,  5]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -93,8 +111,11 @@
 					"type": "rtorque",
 					"bodyPart": "lefthand",
 					"rigidbody": "lHand",
-					"min": [-5, -5, -5],
-					"max": [ 5,  5,  5],
+					"movement":
+					{
+						"min": [-5, -5, -5],
+						"max": [ 5,  5,  5]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -106,8 +127,11 @@
 					"type": "rtorque",
 					"bodyPart": "righthand",
 					"rigidbody": "rHand",
-					"min": [-5, -5, -5],
-					"max": [ 5,  5,  5],
+					"movement":
+					{
+						"min": [-5, -5, -5],
+						"max": [ 5,  5,  5]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],
@@ -121,8 +145,11 @@
 					"type": "rforce",
 					"bodyPart": "head",
 					"rigidbody": "head",
-					"min": [-20, 0, -20],
-					"max": [ 20, 0, 20],
+					"movement":
+					{
+						"min": [-20, 0, -20],
+						"max": [ 20, 0, 20]
+					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],
 					"fwdDelay": [0, 6],

@@ -83,6 +83,11 @@ namespace Cue.W
 			get { return GetValue(); }
 		}
 
+		public NativeType DefaultValue
+		{
+			get { return GetDefaultValue(); }
+		}
+
 		public StorableType Parameter
 		{
 			get
@@ -105,6 +110,29 @@ namespace Cue.W
 			{
 				Cue.LogError(
 					$"{atom_.uid}: can't get val " +
+					$"for '{storableID_}' '{paramName_}': " +
+					e.ToString());
+
+				param_ = null;
+				MakeStale();
+
+				return dummyValue_;
+			}
+		}
+
+		protected NativeType GetDefaultValue()
+		{
+			if (!Check())
+				return dummyValue_;
+
+			try
+			{
+				return DoGetDefaultValue();
+			}
+			catch (Exception e)
+			{
+				Cue.LogError(
+					$"{atom_.uid}: can't get def val " +
 					$"for '{storableID_}' '{paramName_}': " +
 					e.ToString());
 
@@ -175,6 +203,7 @@ namespace Cue.W
 
 		protected abstract StorableType DoGetParameter();
 		protected abstract NativeType DoGetValue();
+		protected abstract NativeType DoGetDefaultValue();
 	}
 
 
@@ -242,6 +271,11 @@ namespace Cue.W
 		{
 			return param_.val;
 		}
+
+		protected override bool DoGetDefaultValue()
+		{
+			return param_.defaultVal;
+		}
 	}
 
 
@@ -272,6 +306,11 @@ namespace Cue.W
 		{
 			param_.val = b;
 		}
+
+		protected override bool DoGetDefaultValue()
+		{
+			return param_.defaultVal;
+		}
 	}
 
 
@@ -296,6 +335,11 @@ namespace Cue.W
 		protected override float DoGetValue()
 		{
 			return param_.val;
+		}
+
+		protected override float DoGetDefaultValue()
+		{
+			return param_.defaultVal;
 		}
 	}
 
@@ -327,6 +371,11 @@ namespace Cue.W
 		{
 			param_.val = b;
 		}
+
+		protected override float DoGetDefaultValue()
+		{
+			return param_.defaultVal;
+		}
 	}
 
 
@@ -357,6 +406,11 @@ namespace Cue.W
 		{
 			param_.val = b;
 		}
+
+		protected override string DoGetDefaultValue()
+		{
+			return param_.defaultVal;
+		}
 	}
 
 
@@ -381,6 +435,11 @@ namespace Cue.W
 		protected override string DoGetValue()
 		{
 			return param_.val;
+		}
+
+		protected override string DoGetDefaultValue()
+		{
+			return param_.defaultVal;
 		}
 	}
 
@@ -412,6 +471,11 @@ namespace Cue.W
 		{
 			param_.val = b;
 		}
+
+		protected override string DoGetDefaultValue()
+		{
+			return param_.defaultVal;
+		}
 	}
 
 
@@ -436,6 +500,11 @@ namespace Cue.W
 		protected override string DoGetValue()
 		{
 			return param_.val;
+		}
+
+		protected override string DoGetDefaultValue()
+		{
+			return param_.defaultVal;
 		}
 	}
 
@@ -467,6 +536,11 @@ namespace Cue.W
 		{
 			param_.val = VamU.ToHSV(c);
 		}
+
+		protected override Color DoGetDefaultValue()
+		{
+			return VamU.FromHSV(param_.defaultVal);
+		}
 	}
 
 
@@ -494,6 +568,11 @@ namespace Cue.W
 
 			return VamU.FromUnity(
 				UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
+		}
+
+		protected override Color DoGetDefaultValue()
+		{
+			return VamU.FromHSV(param_.defaultVal);
 		}
 	}
 

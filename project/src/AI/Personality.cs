@@ -5,6 +5,7 @@
 		Pair<float, float> LookAtRandomInterval { get; }
 		float GazeDuration { get; }
 
+		bool AvoidGazePlayer { get; }
 		bool AvoidGazeInsidePersonalSpace { get; }
 		bool AvoidGazeDuringSex { get; }
 		bool AvoidGazeDuringSexOthers { get; }
@@ -81,14 +82,10 @@
 			get { return gazeDuration_.Current; }
 		}
 
-		public virtual IObject GazeAvoid()
-		{
-			return null;
-		}
-
-		public bool AvoidGazeInsidePersonalSpace { get { return false; } }
-		public bool AvoidGazeDuringSex { get { return false; } }
-		public bool AvoidGazeDuringSexOthers { get { return false; } }
+		public virtual bool AvoidGazePlayer { get; }
+		public virtual bool AvoidGazeInsidePersonalSpace { get { return false; } }
+		public virtual bool AvoidGazeDuringSex { get { return false; } }
+		public virtual bool AvoidGazeDuringSexOthers { get { return false; } }
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
 		public float NaturalOtherEyesWeight { get { return 0.2f; } }
@@ -120,7 +117,10 @@
 				inited_ = true;
 			}
 
-			bool close = person_.Body.InsidePersonalSpace(Cue.Instance.Player);
+			bool close =
+				person_.Body.InsidePersonalSpace(Cue.Instance.Player) ||
+				person_.Kisser.Target == Cue.Instance.Player;
+
 			if (close != wasClose_)
 			{
 				person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
@@ -244,6 +244,11 @@
 			SetIdle();
 		}
 
+		public override bool AvoidGazePlayer { get { return true; } }
+		public override bool AvoidGazeInsidePersonalSpace { get { return true; } }
+		public override bool AvoidGazeDuringSex { get { return true; } }
+		public override bool AvoidGazeDuringSexOthers { get { return false; } }
+
 		public override Pair<float, float> LookAtRandomInterval
 		{
 			get
@@ -253,14 +258,6 @@
 				else
 					return base.LookAtRandomInterval;
 			}
-		}
-
-		public override IObject GazeAvoid()
-		{
-			if (angry_)
-				return Cue.Instance.Player;
-
-			return null;
 		}
 
 		protected override void SetClose(bool b)
