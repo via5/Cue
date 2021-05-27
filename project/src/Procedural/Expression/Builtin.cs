@@ -5,7 +5,7 @@
 		public static IProceduralMorphGroup Smile(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup();
-			g.Add(new ClampableMorph(p, "Smile Open Full Face", 0, 1, 1, 5, 2, 2));
+			g.Add(new ClampableMorph(p, "Smile Open Full Face", 0, 1, 0.3f, 3, 2, 1));
 			return g;
 		}
 

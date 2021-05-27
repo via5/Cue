@@ -147,8 +147,8 @@
 					"rigidbody": "head",
 					"movement":
 					{
-						"min": [-20, 0, -20],
-						"max": [ 20, 0, 20]
+						"min": [-40, 0, -40],
+						"max": [ 40, 0, 40]
 					},
 					"fwdDuration": [1, 6],
 					"bwdDuration": [1, 6],

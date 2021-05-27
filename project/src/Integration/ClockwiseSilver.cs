@@ -188,6 +188,27 @@ namespace Cue
 					morphSpeed_.DefaultValue +
 					person_.Excitement.Value * 4;
 			}
+
+			if (k && active_.Value)
+			{
+				var t = Target;
+				if (t != null)
+				{
+					var l1 = person_.Body.Get(BodyParts.Lips);
+					var l2 = t.Body.Get(BodyParts.Lips);
+					var d = Vector3.Distance(l1.Position, l2.Position);
+
+					if (trackPos_.Value)
+					{
+						if (d > 0.04f)
+							startLipDepth_ += 0.03f * s;
+						else if (d < 0.03f)
+							startLipDepth_ -= 0.03f * s;
+
+						startLipDepth_ = U.Clamp(startLipDepth_, 0, 0.1f);
+					}
+				}
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -292,7 +313,7 @@ namespace Cue
 			{
 				if (leader)
 				{
-					startLipDepth_ = 0.06f;
+					startLipDepth_ = 0.01f;
 					startAngleX_ = -50;
 					startAngleY_ = 20;
 					startAngleZ_ = -40;
