@@ -98,11 +98,27 @@ namespace Cue
 	{
 		private Person person_;
 		private Sensitivity sensitivity_;
+		private float pitch_ = 0.5f;
 
-		public Physiology(Person p)
+		public Physiology(Person p, JSONClass config)
 		{
 			person_ = p;
 			sensitivity_ = new Sensitivity(p);
+
+			if (config != null && config.HasKey("physiology"))
+			{
+				var pc = config["physiology"].AsObject;
+				if (pc.HasKey("voicePitch"))
+				{
+					string s = pc["voicePitch"].Value;
+					float v;
+
+					if (float.TryParse(s, out v))
+						pitch_ = v;
+					else
+						person_.Log.Error($"bad voice pitch '{s}'");
+				}
+			}
 		}
 
 		public Sensitivity Sensitivity
@@ -117,7 +133,14 @@ namespace Cue
 
 		public float VoicePitch
 		{
-			get { return 0.5f; }
+			get { return pitch_; }
+		}
+
+		// todo
+		//
+		public string Voice
+		{
+			get { return "Original"; }
 		}
 	}
 
@@ -151,7 +174,7 @@ namespace Cue
 		private IBlowjob blowjob_;
 		private IExpression expression_;
 
-		public Person(int objectIndex, int personIndex, W.IAtom atom)
+		public Person(int objectIndex, int personIndex, W.IAtom atom, JSONClass config)
 			: base(objectIndex, atom)
 		{
 			personIndex_ = personIndex;
@@ -164,10 +187,14 @@ namespace Cue
 			body_ = new Body(this);
 			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
-			physiology_ = new Physiology(this);
+			physiology_ = new Physiology(this, config);
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);
-			personality_ = new NeutralPersonality(this);
+
+			if (config != null && config.HasKey("personality"))
+				Personality = BasicPersonality.FromString(this, config["personality"]);
+			else
+				Personality = new NeutralPersonality(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -180,7 +207,7 @@ namespace Cue
 			Atom.SetDefaultControls("init");
 		}
 
-		public void Init(JSONClass config)
+		public void Init()
 		{
 			SetState(PersonState.Standing);
 
@@ -195,14 +222,6 @@ namespace Cue
 			}
 
 			Atom.Init();
-
-			if (config.HasKey(ID))
-			{
-				var pc = config[ID].AsObject;
-
-				if (pc.HasKey("personality"))
-					Personality = BasicPersonality.FromString(this, pc["personality"]);
-			}
 		}
 
 		public int PersonIndex

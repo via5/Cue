@@ -118,10 +118,10 @@ namespace Cue
 			Sys.Nav.Update();
 
 			LogVerbose("cue: finding objects");
-			FindObjects();
+			FindObjects(config);
 
 			LogVerbose("cue: initializing persons");
-			InitPersons(config);
+			InitPersons();
 
 			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
@@ -142,13 +142,13 @@ namespace Cue
 			LogInfo("cue: running");
 		}
 
-		private void FindObjects()
+		private void FindObjects(JSONClass config)
 		{
 			foreach (var a in Sys.GetAtoms())
 			{
 				if (a.IsPerson)
 				{
-					AddPerson(a);
+					AddPerson(config, a);
 				}
 				else
 				{
@@ -165,7 +165,7 @@ namespace Cue
 			}
 		}
 
-		private void InitPersons(JSONClass config)
+		private void InitPersons()
 		{
 			var spawnPoints = new List<Slot>();
 			foreach (var o in objects_)
@@ -181,13 +181,17 @@ namespace Cue
 						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
 				}
 
-				p.Init(config);
+				p.Init();
 			}
 		}
 
-		private void AddPerson(W.IAtom a)
+		private void AddPerson(JSONClass config, W.IAtom a)
 		{
-			var p = new Person(allObjects_.Count, persons_.Count, a);
+			JSONClass o = null;
+			if (config.HasKey(a.ID))
+				o = config[a.ID].AsObject;
+
+			var p = new Person(allObjects_.Count, persons_.Count, a, o);
 			persons_.Add(p);
 			allObjects_.Add(p);
 		}

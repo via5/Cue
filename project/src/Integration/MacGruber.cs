@@ -15,6 +15,8 @@
 
 		struct Parameters
 		{
+			public W.VamStringChooserParameter breathDataset_;
+			public W.VamStringChooserParameter orgasmDataset_;
 			public W.VamFloatParameter intensity;
 			public W.VamFloatParameter desktopVolume;
 			public W.VamFloatParameter vrVolume;
@@ -34,32 +36,36 @@
 		{
 			person_ = p;
 
-			p_.intensity = BP("Intensity");
-			p_.desktopVolume = AAP("Volume Desktop");
-			p_.vrVolume = AAP("Volume VR");
-			p_.pitch = BP("Pitch");
-			p_.chestMorph = DBPP("ChestMorph Min", "ChestMorph Max");
-			p_.chestJointDrive = DBPP("ChestJointDrive Min", "ChestJointDrive Max");
-			p_.stomach = DBPP("StomachMin", "StomachMax");
-			p_.mouthMorph = DBPP("MouthMorph Min", "MouthMorph Max");
-			p_.chestJointDriveSpring = DBP("ChestJointDrive Spring");
-			p_.mouthOpenTime = DBP("Mouth Open Time");
-			p_.mouthCloseTime = DBP("Mouth Close Time");
-			p_.lipsMorphMax = DBP("LipsMorph Max");
-			p_.noseInMorphMax = DBP("NoseInMorph Max");
-			p_.noseOutMorphMax = DBP("NoseOutMorph Max");
+			p_.breathDataset_ = BSC("Breath Dataset");
+			p_.orgasmDataset_ = BSC("Orgasm Dataset");
+			p_.intensity = BF("Intensity");
+			p_.desktopVolume = AAF("Volume Desktop");
+			p_.vrVolume = AAF("Volume VR");
+			p_.pitch = BF("Pitch");
+			p_.chestMorph = DBPF("ChestMorph Min", "ChestMorph Max");
+			p_.chestJointDrive = DBPF("ChestJointDrive Min", "ChestJointDrive Max");
+			p_.stomach = DBPF("StomachMin", "StomachMax");
+			p_.mouthMorph = DBPF("MouthMorph Min", "MouthMorph Max");
+			p_.chestJointDriveSpring = DBF("ChestJointDrive Spring");
+			p_.mouthOpenTime = DBF("Mouth Open Time");
+			p_.mouthCloseTime = DBF("Mouth Close Time");
+			p_.lipsMorphMax = DBF("LipsMorph Max");
+			p_.noseInMorphMax = DBF("NoseInMorph Max");
+			p_.noseOutMorphMax = DBF("NoseOutMorph Max");
 
+			p_.breathDataset_.Value = p.Physiology.Voice;
+			p_.orgasmDataset_.Value = "Candy Orgasm Soft";
 			p_.vrVolume.Value = p_.desktopVolume.Value;
-			p_.pitch.Value = 0.9f + person_.Physiology.VoicePitch * 0.2f;
+			p_.pitch.Value = 0.8f + person_.Physiology.VoicePitch * 0.4f;
 		}
 
-		private W.VamFloatParameter DBP(string name)
+		private W.VamFloatParameter DBF(string name)
 		{
 			return new W.VamFloatParameter(
 				person_, "MacGruber.DriverBreathing", name);
 		}
 
-		private Pair DBPP(string min, string max)
+		private Pair DBPF(string min, string max)
 		{
 			return new Pair(
 				new W.VamFloatParameter(
@@ -68,13 +74,19 @@
 					person_, "MacGruber.DriverBreathing", max));
 		}
 
-		private W.VamFloatParameter BP(string name)
+		private W.VamStringChooserParameter BSC(string name)
+		{
+			return new W.VamStringChooserParameter(
+				person_, "MacGruber.Breathing", name);
+		}
+
+		private W.VamFloatParameter BF(string name)
 		{
 			return new W.VamFloatParameter(
 				person_, "MacGruber.Breathing", name);
 		}
 
-		private W.VamFloatParameter AAP(string name)
+		private W.VamFloatParameter AAF(string name)
 		{
 			return new W.VamFloatParameter(
 				person_, "MacGruber.AudioAttenuation", name);
