@@ -89,6 +89,11 @@ namespace Cue
 			Clear();
 			lastString_ = "";
 
+
+			// do this even for exclusives
+			targets_.SetAboveWeight(person_.Excitement.Value * ps.LookAboveMaxWeight);
+
+
 			// exclusive
 			if (person_.Body.Get(BodyParts.Head).Grabbed)
 			{

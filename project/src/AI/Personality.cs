@@ -29,6 +29,7 @@
 		float OtherSexEyesWeight { get; }
 		float NaturalOtherEyesWeight { get; }
 		float BusyOtherEyesWeight { get; }
+		float LookAboveMaxWeight { get; }
 
 		string Name { get; }
 		string StateString{ get; }
@@ -99,6 +100,7 @@
 		public virtual bool AvoidGazeInsidePersonalSpace { get { return false; } }
 		public virtual bool AvoidGazeDuringSex { get { return false; } }
 		public virtual bool AvoidGazeDuringSexOthers { get { return false; } }
+		public virtual float LookAboveMaxWeight { get { return 0.2f; } }
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
 		public float NaturalOtherEyesWeight { get { return 0.2f; } }

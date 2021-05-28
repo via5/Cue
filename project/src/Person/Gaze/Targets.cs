@@ -11,6 +11,7 @@ namespace Cue
 		private LookatNothing nothing_;
 		private LookatRandomPoint random_;
 		private LookatObject[] objects_ = new LookatObject[0];
+		private LookatAbove above_;
 		private IGazeLookat[] all_ = new IGazeLookat[0];
 
 		public GazeTargets(Person p)
@@ -19,6 +20,7 @@ namespace Cue
 			front_ = new LookatFront(p);
 			nothing_ = new LookatNothing(p);
 			random_ = new LookatRandomPoint(p);
+			above_ = new LookatAbove(p);
 		}
 
 		public void Init()
@@ -53,6 +55,7 @@ namespace Cue
 				1 +  // front
 				1 +  // nothing
 				1 +  // random
+				1 +  // above
 				objects_.Length];
 
 			int i = 0;
@@ -66,6 +69,7 @@ namespace Cue
 			all[i++] = front_;
 			all[i++] = nothing_;
 			all[i++] = random_;
+			all[i++] = above_;
 
 			for (int oi = 0; oi < objects_.Length; ++oi)
 				all[i++] = objects_[oi];
@@ -93,6 +97,11 @@ namespace Cue
 		public void SetRandomWeight(float w)
 		{
 			random_.Weight = w;
+		}
+
+		public void SetAboveWeight(float w)
+		{
+			above_.Weight = w;
 		}
 
 		public void SetObjectWeight(IObject o, float w)
@@ -280,6 +289,40 @@ namespace Cue
 				return "bodypart (null)";
 			else
 				return $"bodypart {bodyPart_.Person.ID} {bodyPart_}";
+		}
+	}
+
+
+	class LookatAbove : BasicGazeLookat
+	{
+		private Person person_;
+
+		public LookatAbove(Person p)
+		{
+			person_ = p;
+		}
+
+		public override bool HasPosition
+		{
+			get { return true; }
+		}
+
+		public override Vector3 Position
+		{
+			get
+			{
+				var h = person_.Body.Get(BodyParts.Head);
+				var c = person_.Body.Get(BodyParts.Chest);
+				var d = new Vector3(0, 0.5f, 0.05f);
+				var p = h.Position + Vector3.Rotate(d, c.Direction);
+
+				return p;
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"above";
 		}
 	}
 
