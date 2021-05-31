@@ -111,8 +111,7 @@ namespace Cue
 			options_.Init(config);
 
 			LogVerbose("cue: loading resources");
-			Resources.Animations.Load();
-			Resources.Clothing.Load();
+			Resources.LoadAll();
 
 			LogVerbose("cue: updating nav");
 			Sys.Nav.Update();

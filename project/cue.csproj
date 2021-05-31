@@ -136,6 +136,7 @@
     <Compile Include="src\Procedural\Expression\MorphGroup.cs" />
     <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Clothing.cs" />
+    <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
@@ -147,6 +148,7 @@
     <Compile Include="src\Sys\Vam\VamInput.cs" />
     <Compile Include="src\Sys\Vam\VamLog.cs" />
     <Compile Include="src\Sys\Vam\VamNav.cs" />
+    <Compile Include="src\Sys\Vam\VamObjects.cs" />
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />

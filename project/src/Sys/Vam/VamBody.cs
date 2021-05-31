@@ -429,8 +429,6 @@ namespace Cue.W
 
 			if (joint_ == null)
 				Cue.LogError("bone has no configurable joint");
-
-			Cue.LogInfo($"{joint_.name} {joint_.connectedBody.name}");
 		}
 
 		public Vector3 Position

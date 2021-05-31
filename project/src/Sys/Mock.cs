@@ -142,9 +142,9 @@ namespace Cue.W
 			return path;
 		}
 
-		public bool CreateObject(int type, string id, Action<IAtom> f)
+		public IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts)
 		{
-			return false;
+			return null;
 		}
 
 		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)

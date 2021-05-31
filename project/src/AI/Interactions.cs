@@ -36,7 +36,7 @@ namespace Cue
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Interaction, p, "SmokeInt");
-			enabled_ = p.Smoker;
+			enabled_ = p.HasTrait("smoker");
 
 			if (!enabled_)
 				log_.Info("not a smoker");
@@ -93,27 +93,30 @@ namespace Cue
 
 			log_.Info("creating cigarette");
 
-			Cue.Instance.Sys.CreateObject(ObjectFactory.Cigarette, CigaretteID, (o) =>
+			var oc = Resources.Objects.Get("cigarette");
+			if (oc == null)
 			{
-				SetCigarette(o);
-			});
+				log_.Error("no cigarette object creator, disabling");
+				enabled_ = false;
+				return;
+			}
+
+			oc.Create(CigaretteID, (o) => { SetCigarette(o); });
 		}
 
-		private void SetCigarette(W.IAtom a)
+		private void SetCigarette(IObject o)
 		{
-			if (a == null)
+			if (o == null)
 			{
 				log_.Error("failed to create cigarette, disabling");
 				enabled_ = false;
 				return;
 			}
 
-			cig_ = new BasicObject(-1, a);
-
-			a.Collisions = false;
-			a.Physics = false;
-			a.Hidden = true;
-
+			cig_ = o;
+			o.Atom.Collisions = false;
+			o.Atom.Physics = false;
+			o.Atom.Hidden = true;
 		}
 	}
 

@@ -2,12 +2,6 @@
 
 namespace Cue
 {
-	static class ObjectFactory
-	{
-		public const int Cigarette = 1;
-	}
-
-
 	interface IObject
 	{
 		int ObjectIndex { get; }

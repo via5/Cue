@@ -51,7 +51,7 @@ namespace Cue.W
 		float RealtimeSinceStartup { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
-		bool CreateObject(int type, string id, Action<IAtom> f);
+		IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts);
 		VUI.Root CreateHud(Vector3 offset, Point pos, Size size);
 		VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);

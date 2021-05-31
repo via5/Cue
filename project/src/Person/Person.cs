@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -167,14 +168,15 @@ namespace Cue
 		private IBlowjob blowjob_;
 		private IExpression expression_;
 
-		private bool smoker_ = false;
+		private List<string> traits_ = new List<string>();
 
 		public Person(int objectIndex, int personIndex, W.IAtom atom, JSONClass config)
 			: base(objectIndex, atom)
 		{
 			personIndex_ = personIndex;
 
-			smoker_ = config["smoker"].AsBool;
+			foreach (JSONNode n in config["traits"].AsArray)
+				traits_.Add(n.Value);
 
 			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
@@ -233,9 +235,15 @@ namespace Cue
 			get { return uprightPos_; }
 		}
 
-		public bool Smoker
+		public bool HasTrait(string name)
 		{
-			get { return smoker_; }
+			for (int i = 0; i < traits_.Count; ++i)
+			{
+				if (traits_[i] == name)
+					return true;
+			}
+
+			return false;
 		}
 
 		public PersonOptions Options { get { return options_; } }

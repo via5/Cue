@@ -8,6 +8,14 @@ namespace Cue
 	{
 		private static AnimationResources animations_ = new AnimationResources();
 		private static ClothingResources clothing_ = new ClothingResources();
+		private static ObjectResources objects_ = new ObjectResources();
+
+		public static void LoadAll()
+		{
+			animations_.Load();
+			clothing_.Load();
+			objects_.Load();
+		}
 
 		public static AnimationResources Animations
 		{
@@ -17,6 +25,11 @@ namespace Cue
 		public static ClothingResources Clothing
 		{
 			get { return clothing_; }
+		}
+
+		public static ObjectResources Objects
+		{
+			get { return objects_; }
 		}
 	}
 
