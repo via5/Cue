@@ -87,10 +87,10 @@ namespace Cue
 		public float PenetrationRate { get { return 0.05f; } }
 		public float PenetrationMax { get { return 1.0f; } }
 
-		public float DecayPerSecond { get { return -0.1f; } }
+		public float DecayPerSecond { get { return -0.01f; } }
 		public float ExcitementPostOrgasm { get { return 0.0f; } }
 		public float DelayPostOrgasm { get { return 10; } }
-		public float RateAdjustment { get { return 1; } }
+		public float RateAdjustment { get { return 0.7f; } }
 	}
 
 
@@ -105,19 +105,12 @@ namespace Cue
 			person_ = p;
 			sensitivity_ = new Sensitivity(p);
 
-			if (config != null && config.HasKey("physiology"))
+			if (config.HasKey("physiology"))
 			{
-				var pc = config["physiology"].AsObject;
-				if (pc.HasKey("voicePitch"))
-				{
-					string s = pc["voicePitch"].Value;
-					float v;
+				string vp = config["physiology"]?["voicePitch"]?.Value ?? "";
 
-					if (float.TryParse(s, out v))
-						pitch_ = v;
-					else
-						person_.Log.Error($"bad voice pitch '{s}'");
-				}
+				if (vp != "" && !float.TryParse(vp, out pitch_))
+					person_.Log.Error($"bad voice pitch '{vp}'");
 			}
 		}
 
@@ -174,10 +167,14 @@ namespace Cue
 		private IBlowjob blowjob_;
 		private IExpression expression_;
 
+		private bool smoker_ = false;
+
 		public Person(int objectIndex, int personIndex, W.IAtom atom, JSONClass config)
 			: base(objectIndex, atom)
 		{
 			personIndex_ = personIndex;
+
+			smoker_ = config["smoker"].AsBool;
 
 			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
@@ -191,10 +188,7 @@ namespace Cue
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);
 
-			if (config != null && config.HasKey("personality"))
-				Personality = BasicPersonality.FromString(this, config["personality"]);
-			else
-				Personality = new NeutralPersonality(this);
+			Personality = BasicPersonality.FromString(this, config["personality"]);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -237,6 +231,11 @@ namespace Cue
 		public Vector3 UprightPosition
 		{
 			get { return uprightPos_; }
+		}
+
+		public bool Smoker
+		{
+			get { return smoker_; }
 		}
 
 		public PersonOptions Options { get { return options_; } }

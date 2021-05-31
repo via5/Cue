@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections;
+
+namespace Cue
 {
 	interface IInteraction
 	{
@@ -6,7 +8,117 @@
 	}
 
 
-	class KissingInteraction : IInteraction
+	abstract class BasicInteraction : IInteraction
+	{
+		public static IInteraction[] All(Person p)
+		{
+			return new IInteraction[]
+			{
+				new SmokingInteraction(p),
+				new KissingInteraction(p)
+			};
+		}
+
+		public abstract void Update(float s);
+	}
+
+
+	class SmokingInteraction : BasicInteraction
+	{
+		private Person person_;
+		private Logger log_;
+		private float elapsed_ = 0;
+		private IObject cig_ = null;
+		private bool inited_ = false;
+		private bool enabled_ = true;
+
+		public SmokingInteraction(Person p)
+		{
+			person_ = p;
+			log_ = new Logger(Logger.Interaction, p, "SmokeInt");
+			enabled_ = p.Smoker;
+
+			if (!enabled_)
+				log_.Info("not a smoker");
+		}
+
+		private string CigaretteID
+		{
+			get
+			{
+				return person_.ID + "_cue_cigarette";
+			}
+		}
+
+		public override void Update(float s)
+		{
+			if (!enabled_)
+				return;
+
+			if (!inited_)
+			{
+				log_.Info("initing");
+				inited_ = true;
+				elapsed_ = 0;
+				enabled_ = true;
+				CreateCigarette();
+			}
+			else if (cig_ != null)
+			{
+				var ia = person_.Body.RightHand.Index.Intermediate;
+				var ib = person_.Body.RightHand.Middle.Intermediate;
+				var ip = ia.Position + (ib.Position - ia.Position) / 2;
+
+				var da = person_.Body.RightHand.Index.Distal;
+				var db = person_.Body.RightHand.Middle.Distal;
+				var dp = da.Position + (db.Position - da.Position) / 2;
+
+				var p = ip + (dp - ip) / 2;
+				var r = person_.Body.RightHand.Middle.Intermediate.Rotation;
+
+				cig_.Position = p + Vector3.RotateEuler(new Vector3(0, -0.025f, 0), r);
+				cig_.Rotation = r;
+			}
+		}
+
+		private void CreateCigarette()
+		{
+			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
+
+			if (a != null)
+			{
+				log_.Info("already exists, destroying");
+				a.Destroy();
+			}
+
+			log_.Info("creating cigarette");
+
+			Cue.Instance.Sys.CreateObject(ObjectFactory.Cigarette, CigaretteID, (o) =>
+			{
+				SetCigarette(o);
+			});
+		}
+
+		private void SetCigarette(W.IAtom a)
+		{
+			if (a == null)
+			{
+				log_.Error("failed to create cigarette, disabling");
+				enabled_ = false;
+				return;
+			}
+
+			cig_ = new BasicObject(-1, a);
+
+			a.Collisions = false;
+			a.Physics = false;
+			a.Hidden = true;
+
+		}
+	}
+
+
+	class KissingInteraction : BasicInteraction
 	{
 		public const float StartDistance = 0.15f;
 		public const float StopDistance = 0.1f;
@@ -24,7 +136,7 @@
 			log_ = new Logger(Logger.Interaction, p, "KissInt");
 		}
 
-		public void Update(float s)
+		public override void Update(float s)
 		{
 			if (!person_.Options.CanKiss)
 			{

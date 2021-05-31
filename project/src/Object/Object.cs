@@ -2,6 +2,12 @@
 
 namespace Cue
 {
+	static class ObjectFactory
+	{
+		public const int Cigarette = 1;
+	}
+
+
 	interface IObject
 	{
 		int ObjectIndex { get; }
@@ -9,6 +15,7 @@ namespace Cue
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
+		Vector3 Rotation { get; set; }
 		Vector3 EyeInterest { get; }
 		float Bearing { get; }
 		bool Possessed { get; }
@@ -119,6 +126,12 @@ namespace Cue
 		{
 			get { return atom_.Direction; }
 			set { atom_.Direction = value; }
+		}
+
+		public Vector3 Rotation
+		{
+			get { return atom_.Rotation; }
+			set { atom_.Rotation = value; }
 		}
 
 		public virtual Vector3 EyeInterest

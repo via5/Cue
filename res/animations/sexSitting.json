@@ -1,6 +1,6 @@
 {
 	"name": "procSexSitting",
-	"forcesOnly": true,
+	"hasMovement": false,
 	"targets":
 	[
 		{

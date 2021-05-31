@@ -43,8 +43,7 @@ namespace Cue
 			//}
 
 			events_.Add(new StandEvent(p));
-
-			interactions_.Add(new KissingInteraction(person_));
+			interactions_.AddRange(BasicInteraction.All(p));
 		}
 
 		public bool EventsEnabled

@@ -106,7 +106,7 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
-			var config = Sys.GetConfig();
+			var config = Sys.GetConfig() ?? new JSONClass();
 
 			options_.Init(config);
 
@@ -187,9 +187,7 @@ namespace Cue
 
 		private void AddPerson(JSONClass config, W.IAtom a)
 		{
-			JSONClass o = null;
-			if (config.HasKey(a.ID))
-				o = config[a.ID].AsObject;
+			JSONClass o = config[a.ID]?.AsObject ?? new JSONClass();
 
 			var p = new Person(allObjects_.Count, persons_.Count, a, o);
 			persons_.Add(p);

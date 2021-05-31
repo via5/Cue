@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -50,6 +51,7 @@ namespace Cue.W
 		float RealtimeSinceStartup { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
+		bool CreateObject(int type, string id, Action<IAtom> f);
 		VUI.Root CreateHud(Vector3 offset, Point pos, Size size);
 		VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size);
 		VUI.Root Create2D(float topOffset, Size size);
@@ -145,6 +147,12 @@ namespace Cue.W
 		Vector3 Direction { get; }
 	}
 
+	interface IBone
+	{
+		Vector3 Position { get; }
+		Vector3 Rotation { get; }
+	}
+
 	interface IClothing
 	{
 		float HeelsAngle { get; }
@@ -163,7 +171,9 @@ namespace Cue.W
 
 	interface IBody
 	{
-		List<IBodyPart> GetBodyParts();
+		IBodyPart[]  GetBodyParts();
+		IBone[][] GetLeftHandBones();
+		IBone[][] GetRightHandBones();
 		float Sweat { set; }
 		void LerpColor(Color c, float f);
 	}
@@ -177,16 +187,24 @@ namespace Cue.W
 		bool Possessed { get; }
 		bool Selected { get; }
 
+		bool Collisions { get; set; }
+		bool Physics { get; set; }
+		bool Hidden { get; set; }
+		float Scale { get; set; }
+
 		Vector3 Position { get; set; }
 		Vector3 Direction { get; set; }
+		Vector3 Rotation { get; set; }
 
 		void Init();
+		void Destroy();
 
 		IClothing Clothing { get; }
 		IBody Body { get; }
 		IHair Hair { get; }
 
 		void SetDefaultControls(string why);
+		void SetParentLink(IBodyPart bp);
 
 		void OnPluginState(bool b);
 

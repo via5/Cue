@@ -1,6 +1,6 @@
 {
 	"name": "procStandIdle",
-	"forcesOnly": true,
+	"hasMovement": false,
 	"targets":
 	[
 		{

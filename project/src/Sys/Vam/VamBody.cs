@@ -102,6 +102,7 @@ namespace Cue.W
 		private VamFloatParameter gloss_ = null;
 		private VamColorParameter color_ = null;
 		private Color initialColor_;
+		private DAZBone hipBone_ = null;
 
 		public VamBody(VamAtom a)
 		{
@@ -116,61 +117,163 @@ namespace Cue.W
 				atom_.Log.Error("no skin color parameter");
 
 			initialColor_ = color_.Value;
+
+
+			//var t = Cue.Instance.VamSys.FindChildRecursive(atom_.Atom, "lThumb3");
+			//Cue.Instance.VamSys.DumpComponentsAndUp(t);
+
 		}
 
-		public List<IBodyPart> GetBodyParts()
+		public IBodyPart[] GetBodyParts()
 		{
+			var map = new Dictionary<int, IBodyPart>();
+
+			Action<int, IBodyPart> add = (type, p) =>
+			{
+				map[type] = p;
+			};
+
+			add(BodyParts.Head, GetRigidbody(BodyParts.Head, "headControl", "head"));
+
+			add(BodyParts.Lips, GetTrigger(BodyParts.Lips, "", "LipTrigger"));
+			add(BodyParts.Mouth, GetTrigger(BodyParts.Mouth, "", "MouthTrigger"));
+			add(BodyParts.LeftBreast, GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
+			add(BodyParts.RightBreast, GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
+			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", ""));
+
+			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", ""));
+
+			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", ""));
+			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", ""));
+			add(BodyParts.Anus, null);
+
+			add(BodyParts.Chest, GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
+			add(BodyParts.Belly, GetRigidbody(BodyParts.Belly, "", "abdomen2"));
+			add(BodyParts.Hips, GetRigidbody(BodyParts.Hips, "hipControl", "abdomen"));
+			add(BodyParts.LeftGlute, GetCollider(BodyParts.LeftGlute, "", "LGlute1Joint", ""));
+			add(BodyParts.RightGlute, GetCollider(BodyParts.RightGlute, "", "RGlute1Joint", ""));
+
+			add(BodyParts.LeftShoulder, GetCollider(BodyParts.LeftShoulder, "lArmControl", "lShldr"));
+			add(BodyParts.LeftArm, GetCollider(BodyParts.LeftArm, "lElbowControl", "StandardColliderslShldr/_Collider1"));
+			add(BodyParts.LeftForearm, GetCollider(BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
+			add(BodyParts.LeftHand, GetRigidbody(BodyParts.LeftHand, "lHandControl", "lHand"));
+
+			add(BodyParts.RightShoulder, GetCollider(BodyParts.RightShoulder, "rArmControl", "rShldr"));
+			add(BodyParts.RightArm, GetCollider(BodyParts.RightArm, "rElbowControl", "StandardCollidersrShldr/_Collider1"));
+			add(BodyParts.RightForearm, GetCollider(BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
+			add(BodyParts.RightHand, GetRigidbody(BodyParts.RightHand, "rHandControl", "rHand"));
+
+			add(BodyParts.LeftThigh, GetCollider(BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
+			add(BodyParts.LeftShin, GetCollider(BodyParts.LeftShin, "lKneeControl", "lShin8Joint", "StandardColliderslShin/_Collider2"));
+			add(BodyParts.LeftFoot, GetRigidbody(BodyParts.LeftFoot, "lFootControl", "lFoot"));
+
+			add(BodyParts.RightThigh, GetCollider(BodyParts.RightThigh, "rKneeControl", "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
+			add(BodyParts.RightShin, GetCollider(BodyParts.RightShin, "rKneeControl", "rShin8Joint", "StandardCollidersrShin/_Collider2"));
+			add(BodyParts.RightFoot, GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
+
+			add(BodyParts.Eyes, new EyesBodyPart(atom_));
+
+			if (atom_.Sex == Sexes.Male)
+				add(BodyParts.Genitals, GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
+			else
+				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", ""));
+
+			if (atom_.Sex == Sexes.Male)
+				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
+			else
+				add(BodyParts.Pectorals, null);
+
+
 			var list = new List<IBodyPart>();
 
-			list.Add(GetRigidbody(BodyParts.Head, "headControl", "head"));
+			for (int i = 0; i < BodyParts.Count; ++i)
+				list.Add(map[i]);
 
-			list.Add(GetTrigger(BodyParts.Lips, "", "LipTrigger"));
-			list.Add(GetTrigger(BodyParts.Mouth, "", "MouthTrigger"));
-			list.Add(GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
-			list.Add(GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
-			list.Add(GetTrigger(BodyParts.Labia, "", "LabiaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", ""));
-			list.Add(GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", ""));
-			list.Add(null);  // anus
+			return list.ToArray();
+		}
 
-			list.Add(GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
-			list.Add(GetRigidbody(BodyParts.Belly, "", "abdomen2"));
-			list.Add(GetRigidbody(BodyParts.Hips, "hipControl", "abdomen"));
-			list.Add(GetCollider(BodyParts.LeftGlute, "", "LGlute1Joint", ""));
-			list.Add(GetCollider(BodyParts.RightGlute, "", "RGlute1Joint", ""));
+		public IBone[][] GetLeftHandBones()
+		{
+			return GetHandBones("l");
+		}
 
-			list.Add(GetCollider(BodyParts.LeftShoulder, "lArmControl", "lShldr"));
-			list.Add(GetCollider(BodyParts.LeftArm, "lElbowControl", "StandardColliderslShldr/_Collider1"));
-			list.Add(GetCollider(BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.LeftHand, "lHandControl", "lHand"));
+		public IBone[][] GetRightHandBones()
+		{
+			return GetHandBones("r");
+		}
 
-			list.Add(GetCollider(BodyParts.RightShoulder, "rArmControl", "rShldr"));
-			list.Add(GetCollider(BodyParts.RightArm, "rElbowControl", "StandardCollidersrShldr/_Collider1"));
-			list.Add(GetCollider(BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.RightHand, "rHandControl", "rHand"));
+		private IBone[][] GetHandBones(string s)
+		{
+			var bones = new IBone[5][];
 
-			list.Add(GetCollider(BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
-			list.Add(GetCollider(BodyParts.LeftShin, "lKneeControl", "lShin8Joint", "StandardColliderslShin/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.LeftFoot, "lFootControl", "lFoot"));
+			for (int i = 0; i < 5; ++i)
+				bones[i] = new IBone[3];
 
-			list.Add(GetCollider(BodyParts.RightThigh, "rKneeControl", "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
-			list.Add(GetCollider(BodyParts.RightShin, "rKneeControl", "rShin8Joint", "StandardCollidersrShin/_Collider2"));
-			list.Add(GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
+			var hand = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, $"{s}Hand");
 
-			list.Add(new EyesBodyPart(atom_));
+			bones[0][0] = FindFingerBone(hand, s, $"{s}Thumb1");
+			bones[0][1] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2");
+			bones[0][2] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2/{s}Thumb3");
 
-			if (atom_.Sex == Sexes.Male)
-				list.Add(GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
-			else
-				list.Add(GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", ""));
+			bones[1][0] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1");
+			bones[1][1] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1/{s}Index2");
+			bones[1][2] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1/{s}Index2/{s}Index3");
 
-			if (atom_.Sex == Sexes.Male)
-				list.Add(GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
-			else
-				list.Add(null);
+			bones[2][0] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1");
+			bones[2][1] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1/{s}Mid2");
+			bones[2][2] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1/{s}Mid2/{s}Mid3");
 
-			return list;
+			bones[3][0] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1");
+			bones[3][1] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1/{s}Ring2");
+			bones[3][2] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1/{s}Ring2/{s}Ring3");
+
+			bones[4][0] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1");
+			bones[4][1] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1/{s}Pinky2");
+			bones[4][2] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1/{s}Pinky2/{s}Pinky3");
+
+			return bones;
+		}
+
+		private IBone FindFingerBone(Rigidbody hand, string s, string name)
+		{
+			if (hipBone_ == null)
+			{
+				foreach (var bb in atom_.Atom.GetComponentsInChildren<DAZBone>())
+				{
+					if (bb.name == "hip")
+					{
+						hipBone_ = bb;
+						break;
+					}
+				}
+
+				if (hipBone_ == null)
+				{
+					Cue.LogError($"{atom_.ID} can't find hip bone");
+					return null;
+				}
+			}
+
+
+			var id =
+				$"abdomen/abdomen2/" +
+				$"chest/{s}Collar/{s}Shldr/{s}ForeArm/{s}Hand/{name}";
+
+			var t = hipBone_.transform.Find(id);
+			if (t == null)
+			{
+				Cue.LogError($"{atom_.ID}: no finger bone {id}");
+				return null;
+			}
+
+			var b = t.GetComponent<DAZBone>();
+			if (b == null)
+			{
+				Cue.LogError($"{atom_.ID}: no DAZBone in {id}");
+				return null;
+			}
+
+			return new VamBone(hand, b);
 		}
 
 		public void OnPluginState(bool b)
@@ -247,7 +350,9 @@ namespace Cue.W
 			return new RigidbodyBodyPart(atom_, id, rb, fc);
 		}
 
-		private IBodyPart GetTrigger(int id, string controller, string nameFemale, string nameMale = "same")
+		private IBodyPart GetTrigger(
+			int id, string controller,
+			string nameFemale, string nameMale = "same", bool ignoreTrigger = false)
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -281,7 +386,7 @@ namespace Cue.W
 					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.ID}");
 			}
 
-			return new TriggerBodyPart(atom_, id, t, fc);
+			return new TriggerBodyPart(atom_, id, t, fc, ignoreTrigger);
 		}
 
 		private IBodyPart GetCollider(int id, string controller, string nameFemale, string nameMale = "same")
@@ -310,6 +415,40 @@ namespace Cue.W
 	}
 
 
+	class VamBone : IBone
+	{
+		private Rigidbody parent_;
+		private DAZBone bone_;
+		private ConfigurableJoint joint_;
+
+		public VamBone(Rigidbody parent, DAZBone b)
+		{
+			parent_ = parent;
+			bone_ = b;
+			joint_ = b.GetComponent<ConfigurableJoint>();
+
+			if (joint_ == null)
+				Cue.LogError("bone has no configurable joint");
+
+			Cue.LogInfo($"{joint_.name} {joint_.connectedBody.name}");
+		}
+
+		public Vector3 Position
+		{
+			get { return VamU.FromUnity(bone_.transform.position); }
+		}
+
+		public Vector3 Rotation
+		{
+			get
+			{
+				var rb = bone_.GetComponent<Rigidbody>();
+				return VamU.FromUnity(bone_.transform.rotation.eulerAngles);
+			}
+		}
+	}
+
+
 	abstract class VamBodyPart : IBodyPart
 	{
 		protected VamAtom atom_;
@@ -327,6 +466,8 @@ namespace Cue.W
 		}
 
 		public abstract Transform Transform { get; }
+		public abstract Rigidbody Rigidbody { get; }
+
 		public abstract bool CanTrigger { get; }
 		public abstract float Trigger { get; }
 		public abstract bool CanGrab { get; }
@@ -334,6 +475,7 @@ namespace Cue.W
 		public abstract Vector3 Position { get; }
 		public abstract Vector3 Direction { get; }
 	}
+
 
 	class RigidbodyBodyPart : VamBodyPart
 	{
@@ -350,6 +492,11 @@ namespace Cue.W
 		public override Transform Transform
 		{
 			get { return rb_.transform; }
+		}
+
+		public override Rigidbody Rigidbody
+		{
+			get { return rb_; }
 		}
 
 		public override bool CanTrigger
@@ -406,6 +553,11 @@ namespace Cue.W
 			get { return c_.transform; }
 		}
 
+		public override Rigidbody Rigidbody
+		{
+			get { return null; }
+		}
+
 		public override bool CanTrigger
 		{
 			get { return false; }
@@ -452,19 +604,28 @@ namespace Cue.W
 		private Trigger trigger_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_;
+		private bool ignoreTrigger_;
 
-		public TriggerBodyPart(VamAtom a, int type, CollisionTriggerEventHandler h, FreeControllerV3 fc)
-			: base(a, type)
+		public TriggerBodyPart(
+			VamAtom a, int type, CollisionTriggerEventHandler h,
+			FreeControllerV3 fc, bool ignoreTrigger = false)
+				: base(a, type)
 		{
 			h_ = h;
 			trigger_ = h.collisionTrigger.trigger;
 			rb_ = h.thisRigidbody;
 			fc_ = fc;
+			ignoreTrigger_ = ignoreTrigger;
 		}
 
 		public override Transform Transform
 		{
 			get { return rb_.transform; }
+		}
+
+		public override Rigidbody Rigidbody
+		{
+			get { return rb_; }
 		}
 
 		public override bool CanTrigger
@@ -474,7 +635,13 @@ namespace Cue.W
 
 		public override float Trigger
 		{
-			get { return trigger_.active ? 1 : 0; }
+			get
+			{
+				if (ignoreTrigger_)
+					return 0;
+				else
+					return trigger_.active ? 1 : 0;
+			}
 		}
 
 		public override bool CanGrab
@@ -550,6 +717,11 @@ namespace Cue.W
 		public override Transform Transform
 		{
 			get { return lEye_; }
+		}
+
+		public override Rigidbody Rigidbody
+		{
+			get { return head_; }
 		}
 
 		public override bool CanTrigger { get { return false; } }

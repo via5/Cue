@@ -182,6 +182,12 @@ namespace Cue
 			return W.VamU.Rotate(v, dir);
 		}
 
+		public static Vector3 RotateEuler(Vector3 v, Vector3 angles)
+		{
+			// todo
+			return W.VamU.RotateEuler(v, angles);
+		}
+
 		public static Vector3 RotateInv(Vector3 v, Vector3 dir)
 		{
 			// todo

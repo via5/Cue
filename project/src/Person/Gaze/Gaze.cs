@@ -208,7 +208,7 @@ namespace Cue
 				if (t == person_)
 					continue;
 
-				if (t == Cue.Instance.Player && ps.AvoidGazePlayer)
+				if (t == Cue.Instance.Player && ShouldAvoidPlayer())
 				{
 					lastString_ += $"avoid player, ";
 					SetShouldAvoid(t, true);
@@ -217,7 +217,7 @@ namespace Cue
 				{
 					lastString_ += $"{t.ID} in ps, ";
 
-					if (ps.AvoidGazeInsidePersonalSpace)
+					if (ShouldAvoidInsidePersonalSpace())
 					{
 						lastString_ += $"avoid in ps/";
 						SetShouldAvoid(t, true);
@@ -263,7 +263,7 @@ namespace Cue
 						{
 							busy = true;
 
-							if (person_.Personality.AvoidGazeDuringSex)
+							if (ShouldAvoidDuringSex())
 							{
 								lastString_ += $"avoid in ps/";
 								SetShouldAvoid(t, true);
@@ -286,7 +286,7 @@ namespace Cue
 				}
 			}
 
-			if (!clearRandom)
+			if (!clearRandom || person_.Excitement.Value > ps.MaxExcitementForRandomGaze)
 			{
 				// always at least a small change
 				targets_.SetRandomWeight(ps.NaturalRandomWeight);
@@ -311,6 +311,49 @@ namespace Cue
 			}
 
 			gazer_.Enabled = gazerEnabled;
+		}
+
+		private bool ShouldAvoidPlayer()
+		{
+			var ps = person_.Personality;
+
+			if (!ps.AvoidGazePlayer)
+				return false;
+
+			return IsBored();
+		}
+
+		private bool IsBored()
+		{
+			var ps = person_.Personality;
+
+			if (person_.Excitement.Value >= ps.MaxExcitementForAvoid)
+				return false;
+
+			if (person_.Excitement.TimeSinceLastOrgasm < ps.AvoidDelayAfterOrgasm)
+				return false;
+
+			return true;
+		}
+
+		private bool ShouldAvoidInsidePersonalSpace()
+		{
+			var ps = person_.Personality;
+
+			if (!ps.AvoidGazeInsidePersonalSpace)
+				return false;
+
+			return IsBored();
+		}
+
+		private bool ShouldAvoidDuringSex()
+		{
+			var ps = person_.Personality;
+
+			if (!ps.AvoidGazeDuringSex)
+				return false;
+
+			return IsBored();
 		}
 
 

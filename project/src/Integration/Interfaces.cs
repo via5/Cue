@@ -90,7 +90,7 @@ namespace Cue
 		float InitFrame{ get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
-		bool ForcesOnly { get; }
+		bool HasMovement { get; }
 		string ToDetailedString();
 	}
 

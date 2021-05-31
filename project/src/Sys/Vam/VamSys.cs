@@ -204,6 +204,112 @@ namespace Cue.W
 			return UnityEngine.Random.Range(first, last);
 		}
 
+		private string ObjectTypeToString(int type)
+		{
+			switch (type)
+			{
+				case ObjectFactory.Cigarette:
+					return "CustomUnityAsset";
+			}
+
+			return "";
+		}
+
+		private IEnumerator CreateObjectRoutine(
+			string type, string id, Action<IAtom> f)
+		{
+			var sc = SuperController.singleton;
+
+			Cue.LogInfo($"creating object {id}, type {type}");
+
+			yield return sc.AddAtomByType(type, id);
+
+			var atom = sc.GetAtomByUid(id);
+			if (atom == null)
+			{
+				Cue.LogError($"failed to create object '{id}' of type '{type}'");
+				f(null);
+				yield break;
+			}
+
+			Cue.LogInfo($"object {id} created, getting components");
+
+			var cua = atom.GetComponentInChildren<CustomUnityAssetLoader>();
+			if (cua == null)
+			{
+				Cue.LogError($"object '{id}' has no CustomUnityAssetLoader component");
+				f(null);
+				yield break;
+			}
+
+			var asset = atom.GetStorableByID("asset");
+			if (asset == null)
+			{
+				Cue.LogError($"object '{id}' has no asset storable");
+				f(null);
+				yield break;
+			}
+
+			var url = asset.GetUrlJSONParam("assetUrl");
+			if (asset == null)
+			{
+				Cue.LogError($"object '{id}' asset has no assetUrl param");
+				f(null);
+				yield break;
+			}
+
+			var name = asset.GetStringChooserJSONParam("assetName");
+			if (asset == null)
+			{
+				Cue.LogError($"object '{id}' asset has no assetName param");
+				f(null);
+				yield break;
+			}
+
+			cua.RegisterAssetLoadedCallback(() =>
+			{
+				Cue.LogInfo($"object {id} done, name is {name.val}");
+
+				var a = new VamAtom(atom);
+
+				var o = atom.transform.Find("reParentObject/object/rescaleObject");
+				o.localPosition = new UnityEngine.Vector3(0, 0.025f, -0.012f);
+				a.Scale = 0.8f;
+
+				f(a);
+			});
+
+			Cue.LogInfo($"object {id} loading url");
+			url.val = "Custom/Assets/cigarette.assetbundle";
+
+			for (; ; )
+			{
+				yield return new WaitForSeconds(0.25f);
+				if (name.choices.Count > 0)
+				{
+					Cue.LogInfo($"object {id} url loaded, setting name");
+					name.val = "Assets/New Folder/Cigarette.unity";
+					yield break;
+				}
+			}
+		}
+
+		public bool CreateObject(int type, string id, Action<IAtom> f)
+		{
+			var sc = SuperController.singleton;
+
+			var ts = ObjectTypeToString(type);
+			if (ts == "")
+			{
+				Cue.LogError($"unkown object factory type '{type}'");
+				return false;
+			}
+
+			sc.StartCoroutine(CreateObjectRoutine(ts, id, f));
+
+			return true;
+		}
+
 		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
 		{
 			return new VUI.Root(
@@ -893,6 +999,12 @@ namespace Cue.W
 		{
 			return FromUnity(
 				UnityEngine.Quaternion.LookRotation(ToUnity(dir)) * ToUnity(v));
+		}
+
+		public static Vector3 RotateEuler(Vector3 v, Vector3 angles)
+		{
+			return FromUnity(
+				UnityEngine.Quaternion.Euler(ToUnity(angles)) * ToUnity(v));
 		}
 
 		public static Vector3 RotateInv(Vector3 v, Vector3 dir)

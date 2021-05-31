@@ -298,6 +298,7 @@ namespace Cue
 			tabs_.Add(new PersonDumpTab(person_));
 			tabs_.Add(new PersonBodyTab(person_));
 			tabs_.Add(new PersonBodyPartsTab(person_));
+			tabs_.Add(new PersonHandsTab(person_));
 			tabs_.Add(new PersonAnimationsTab(person_));
 
 			foreach (var t in tabs_)
@@ -901,6 +902,91 @@ namespace Cue
 
 						w.position.Text = w.part.Position.ToString();
 						w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");
+					}
+				}
+			}
+		}
+	}
+
+
+	class PersonHandsTab : Tab
+	{
+		struct BoneWidgets
+		{
+			public Bone bone;
+			public VUI.Label name, position, direction;
+		}
+
+		private readonly Person person_;
+		private readonly List<BoneWidgets> widgets_ = new List<BoneWidgets>();
+
+		public PersonHandsTab(Person ps)
+		{
+			person_ = ps;
+
+			var gl = new VUI.GridLayout(3);
+			gl.UniformHeight = false;
+			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Rotation", UnityEngine.FontStyle.Bold));
+
+			AddHand(p, person_.Body.LeftHand);
+			AddHand(p, person_.Body.RightHand);
+
+			Layout = new VUI.BorderLayout();
+			Add(p, VUI.BorderLayout.Top);
+		}
+
+		private void AddHand(VUI.Panel p, Hand h)
+		{
+			for (int i = 0; i < h.Fingers.Length; ++i)
+			{
+				var f = h.Fingers[i];
+
+				for (int j = 0; j < f.Bones.Length; ++j)
+				{
+					var b = f.Bones[j];
+
+					var w = new BoneWidgets();
+					w.bone = b;
+
+					w.name = new VUI.Label($"{h.Name}/{f.Name}/{b.Name}");
+					w.position = new VUI.Label();
+					w.direction = new VUI.Label();
+
+					int fontSize = 24;
+					w.name.FontSize = fontSize;
+					w.position.FontSize = fontSize;
+					w.direction.FontSize = fontSize;
+
+					p.Add(w.name);
+					p.Add(w.position);
+					p.Add(w.direction);
+
+					widgets_.Add(w);
+				}
+			}
+		}
+
+		public override string Title
+		{
+			get { return "Fingers"; }
+		}
+
+		public override void Update(float s)
+		{
+			if (IsVisibleOnScreen())
+			{
+				for (int i = 0; i < widgets_.Count; ++i)
+				{
+					var w = widgets_[i];
+
+					if (w.bone.Exists)
+					{
+						w.position.Text = w.bone.Position.ToString();
+						w.direction.Text = w.bone.Rotation.ToString();
 					}
 				}
 			}

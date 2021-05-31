@@ -14,12 +14,13 @@ namespace Cue
 		private float breastsRate_ = 0;
 		private float genitalsRate_ = 0;
 		private float penetrationRate_ = 0;
+		private float otherSexRate_ = 0;
 		private float totalRate_ = 0;
 		private float max_ = 0;
 		private bool postOrgasm_ = false;
-		private float postOrgasmElapsed_ = 0;
+		private float postOrgasmElapsed_ = 1000;
 
-		private IEasing easing_ = new SinusoidalEasing();
+		private IEasing easing_ = new SineOutEasing();
 
 
 		public Excitement(Person p)
@@ -49,6 +50,11 @@ namespace Cue
 			}
 		}
 
+		public float TimeSinceLastOrgasm
+		{
+			get { return postOrgasmElapsed_; }
+		}
+
 		public void ForceValue(float s)
 		{
 			forcedExcitement_ = s;
@@ -61,12 +67,11 @@ namespace Cue
 			if (postOrgasm_)
 			{
 				postOrgasmElapsed_ += s;
-				if (postOrgasmElapsed_ < pp.DelayPostOrgasm)
-					return;
-
-				postOrgasm_ = false;
-				postOrgasmElapsed_ = 0;
-				person_.Animator.StopType(Animation.OrgasmType);
+				if (postOrgasmElapsed_ > pp.DelayPostOrgasm)
+				{
+					postOrgasm_ = false;
+					person_.Animator.StopType(Animation.OrgasmType);
+				}
 			}
 
 			UpdateParts(s);
@@ -92,6 +97,7 @@ namespace Cue
 		private void UpdateRates(float s)
 		{
 			var ss = person_.Physiology.Sensitivity;
+			var ps = person_.Personality;
 
 			totalRate_ = 0;
 
@@ -115,8 +121,21 @@ namespace Cue
 			else
 				penetrationRate_ = 0;
 
+			otherSexRate_ = 0;
+			if (flatExcitement_ < ps.MaxOtherSexExcitement)
+			{
+				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+				{
+					if (i == person_.PersonIndex)
+						continue;
 
-			totalRate_ += mouthRate_ + breastsRate_ + genitalsRate_ + penetrationRate_;
+					var p = Cue.Instance.Persons[i];
+					otherSexRate_ += ps.OtherSexExcitementRate * p.Excitement.totalRate_;
+				}
+			}
+
+
+			totalRate_ += mouthRate_ + breastsRate_ + genitalsRate_ + penetrationRate_ + otherSexRate_;
 			totalRate_ *= ss.RateAdjustment;
 
 			if (totalRate_ == 0)
@@ -126,6 +145,7 @@ namespace Cue
 		private void UpdateMax(float s)
 		{
 			var ss = person_.Physiology.Sensitivity;
+			var ps = person_.Personality;
 
 			max_ = 0;
 
@@ -140,6 +160,9 @@ namespace Cue
 
 			if (Penetration > 0)
 				max_ = Math.Max(max_, ss.PenetrationMax);
+
+			if (otherSexRate_ > 0)
+				max_ = Math.Max(max_, ps.MaxOtherSexExcitement);
 		}
 
 		private void UpdateValue(float s)

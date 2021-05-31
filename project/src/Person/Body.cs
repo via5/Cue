@@ -18,6 +18,8 @@ namespace Cue
 		public const int Vagina = 6;
 		public const int DeepVagina = 7;
 		public const int DeeperVagina = 8;
+
+		// all
 		public const int Anus = 9;
 
 		public const int Chest = 10;
@@ -49,6 +51,7 @@ namespace Cue
 
 		// male
 		public const int Pectorals = 31;
+
 
 		public const int Count = 32;
 
@@ -292,12 +295,164 @@ namespace Cue
 	}
 
 
+	class Bone
+	{
+		private string name_;
+		private W.IBone sys_;
+
+		public Bone(string name, W.IBone b)
+		{
+			name_ = name;
+			sys_ = b;
+		}
+
+		public bool Exists
+		{
+			get { return (sys_ != null); }
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public Vector3 Position
+		{
+			get
+			{
+				if (sys_ == null)
+					return Vector3.Zero;
+				else
+					return sys_.Position;
+			}
+		}
+
+		public Vector3 Rotation
+		{
+			get
+			{
+				if (sys_ == null)
+					return Vector3.Zero;
+				else
+					return sys_.Rotation;
+			}
+		}
+	}
+
+
+	class Finger
+	{
+		private Hand hand_;
+		private string name_;
+		private Bone[] bones_;
+
+		public Finger(Hand h, string name, W.IBone[] bones)
+		{
+			hand_ = h;
+			name_ = name;
+			bones_ = new Bone[3];
+
+			bones_[0] = new Bone("proximal", bones[0]);
+			bones_[1] = new Bone("intermediate", bones[1]);
+			bones_[2] = new Bone("distal", bones[2]);
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public Bone[] Bones
+		{
+			get { return bones_; }
+		}
+
+		// closest to palm
+		//
+		public Bone Proximal
+		{
+			get { return bones_[0]; }
+		}
+
+		// middle
+		//
+		public Bone Intermediate
+		{
+			get { return bones_[1]; }
+		}
+
+		// closest to tip
+		//
+		public Bone Distal
+		{
+			get { return bones_[2]; }
+		}
+	}
+
+
+	class Hand
+	{
+		private Person person_;
+		private string name_;
+		private Finger[] fingers_;
+
+		public Hand(Person p, string name, W.IBone[][] bones)
+		{
+			person_ = p;
+			name_ = name;
+			fingers_ = new Finger[5];
+
+			fingers_[0] = new Finger(this, "thumb", bones[0]);
+			fingers_[1] = new Finger(this, "index", bones[1]);
+			fingers_[2] = new Finger(this, "middle", bones[2]);
+			fingers_[3] = new Finger(this, "ring", bones[3]);
+			fingers_[4] = new Finger(this, "little", bones[4]);
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public Finger[] Fingers
+		{
+			get { return fingers_; }
+		}
+
+		public Finger Thumb
+		{
+			get { return fingers_[0]; }
+		}
+
+		public Finger Index
+		{
+			get { return fingers_[1]; }
+		}
+
+		public Finger Middle
+		{
+			get { return fingers_[2]; }
+		}
+
+		public Finger Ring
+		{
+			get { return fingers_[3]; }
+		}
+
+		public Finger Little
+		{
+			get { return fingers_[4]; }
+		}
+	}
+
+
 	class Body
 	{
 		public const int CloseDelay = 2;
 
 		private Person person_;
 		private readonly BodyPart[] all_;
+		private Hand leftHand_, rightHand_;
 		private DampedFloat sweat_, flush_;
 
 		public Body(Person p)
@@ -321,6 +476,9 @@ namespace Cue
 			}
 
 			all_ = all.ToArray();
+
+			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHandBones());
+			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHandBones());
 		}
 
 		public void Init()
@@ -476,6 +634,16 @@ namespace Cue
 			}
 
 			return all_[type];
+		}
+
+		public Hand LeftHand
+		{
+			get { return leftHand_; }
+		}
+
+		public Hand RightHand
+		{
+			get { return rightHand_; }
 		}
 
 		public Box TopBox

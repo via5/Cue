@@ -9,6 +9,12 @@
 		bool AvoidGazeInsidePersonalSpace { get; }
 		bool AvoidGazeDuringSex { get; }
 		bool AvoidGazeDuringSexOthers { get; }
+		float MaxExcitementForAvoid { get; }
+		float AvoidDelayAfterOrgasm { get; }
+		float MaxExcitementForRandomGaze { get; }
+
+		float OtherSexExcitementRate { get; }
+		float MaxOtherSexExcitement{ get; }
 
 		float NaturalRandomWeight { get; }
 
@@ -63,7 +69,7 @@
 				return new QuirkyPersonality(p);
 			else if (name == "tsundere")
 				return new TsunderePersonality(p);
-			else if (name == "neutral")
+			else if (name == "neutral" || string.IsNullOrEmpty(name))
 				return new NeutralPersonality(p);
 
 			Cue.LogError($"config: bad personality {name}");
@@ -100,7 +106,15 @@
 		public virtual bool AvoidGazeInsidePersonalSpace { get { return false; } }
 		public virtual bool AvoidGazeDuringSex { get { return false; } }
 		public virtual bool AvoidGazeDuringSexOthers { get { return false; } }
+		public virtual float MaxExcitementForAvoid { get { return 0.6f; } }
+		public virtual float AvoidDelayAfterOrgasm { get { return 15; } }
+
 		public virtual float LookAboveMaxWeight { get { return 0.2f; } }
+
+		public virtual float OtherSexExcitementRate { get { return 0.3f; } }
+		public virtual float MaxOtherSexExcitement { get { return 0.5f; } }
+		public virtual float MaxExcitementForRandomGaze { get { return 0.2f; } }
+
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
 		public float NaturalOtherEyesWeight { get { return 0.2f; } }
@@ -132,9 +146,14 @@
 				inited_ = true;
 			}
 
-			bool close =
-				person_.Body.InsidePersonalSpace(Cue.Instance.Player) ||
-				person_.Kisser.Target == Cue.Instance.Player;
+			bool close = false;
+
+			if (Cue.Instance.Player != null)
+			{
+				close =
+					person_.Body.InsidePersonalSpace(Cue.Instance.Player) ||
+					person_.Kisser.Target == Cue.Instance.Player;
+			}
 
 			if (close != wasClose_)
 			{

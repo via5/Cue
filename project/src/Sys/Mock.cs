@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue.W
@@ -139,6 +140,11 @@ namespace Cue.W
 		public string GetResourcePath(string path)
 		{
 			return path;
+		}
+
+		public bool CreateObject(int type, string id, Action<IAtom> f)
+		{
+			return false;
 		}
 
 		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
@@ -282,7 +288,41 @@ namespace Cue.W
 			set { }
 		}
 
+		public Vector3 Rotation
+		{
+			get { return Vector3.Zero; }
+			set { }
+		}
+
+		public bool Collisions
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool Physics
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool Hidden
+		{
+			get { return false; }
+			set { }
+		}
+
+		public float Scale
+		{
+			get { return 1; }
+			set { }
+		}
+
 		public void Init()
+		{
+		}
+
+		public void Destroy()
 		{
 		}
 
@@ -297,6 +337,10 @@ namespace Cue.W
 		}
 
 		public void SetDefaultControls(string why)
+		{
+		}
+
+		public void SetParentLink(IBodyPart bp)
 		{
 		}
 

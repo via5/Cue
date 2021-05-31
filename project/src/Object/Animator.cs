@@ -36,7 +36,7 @@ namespace Cue
 		public int State { get { return state_; } }
 		public int Sex { get { return sex_; } }
 
-		public bool ForcesOnly { get { return anim_.ForcesOnly; } }
+		public bool HasMovement { get { return anim_.HasMovement; } }
 
 		public IAnimation Real { get { return anim_; } }
 
@@ -246,7 +246,7 @@ namespace Cue
 		{
 			log_.Info("playing " + a.ToString());
 
-			if (!Cue.Instance.Options.AllowMovement && !a.ForcesOnly)
+			if (!Cue.Instance.Options.AllowMovement && a.HasMovement)
 			{
 				log_.Info("not playing animation, movement not allowed");
 				return false;

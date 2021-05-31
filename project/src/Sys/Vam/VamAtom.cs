@@ -16,6 +16,10 @@ namespace Cue.W
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
 
+		private VamBoolParameter collisions_;
+		private VamBoolParameter physics_;
+		private VamFloatParameter scale_;
+
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
@@ -31,6 +35,10 @@ namespace Cue.W
 				body_ = new VamBody(this);
 				hair_ = new VamHair(this);
 			}
+
+			collisions_ = new VamBoolParameter(this, "AtomControl", "collisionEnabled");
+			physics_ = new VamBoolParameter(this, "control", "physicsEnabled");
+			scale_ = new VamFloatParameter(this, "scale", "scale");
 		}
 
 		public void Init()
@@ -60,6 +68,12 @@ namespace Cue.W
 				if (b != null)
 					b.val = false;
 			}
+		}
+
+		public void Destroy()
+		{
+			atom_.SetUID(atom_.uid + $"_cue_destroy");
+			SuperController.singleton.RemoveAtom(atom_);
 		}
 
 		public Logger Log
@@ -154,6 +168,45 @@ namespace Cue.W
 			}
 		}
 
+		public Vector3 Rotation
+		{
+			get
+			{
+				var v = atom_.mainController.transform.rotation.eulerAngles;
+				return W.VamU.FromUnity(v);
+			}
+
+			set
+			{
+				var r = Quaternion.Euler(W.VamU.ToUnity(value));
+				atom_.mainController.RotateTo(r);
+			}
+		}
+
+		public bool Collisions
+		{
+			get { return collisions_.Value; }
+			set { collisions_.Value = value; }
+		}
+
+		public bool Physics
+		{
+			get { return physics_.Value; }
+			set { physics_.Value = value; }
+		}
+
+		public bool Hidden
+		{
+			get { return atom_.hidden; }
+			set { atom_.hidden = value; }
+		}
+
+		public float Scale
+		{
+			get { return scale_.Value; }
+			set { scale_.Value = value; }
+		}
+
 		public float Bearing
 		{
 			get { return Vector3.Angle(Vector3.Zero, Direction); }
@@ -182,6 +235,25 @@ namespace Cue.W
 				log_.Info($"{ID}: setting default controls ({why})");
 				setOnlyKeyJointsOn_.Fire();
 			}
+		}
+
+		public void SetParentLink(IBodyPart bp)
+		{
+			var v = bp as VamBodyPart;
+			if (v == null)
+			{
+				log_.Error($"SetParentLink: {bp} not a VamBodyPart");
+				return;
+			}
+
+			var rb = v.Rigidbody;
+			if (rb == null)
+			{
+				log_.Error($"SetParentLink: {bp} has no associated rigidbody");
+				return;
+			}
+
+			atom_.mainController.SelectLinkToRigidbody(rb);
 		}
 
 		void SetControllerForMoving(string id, bool b)

@@ -6,13 +6,13 @@ namespace Cue.Proc
 	class ProcAnimation : IAnimation
 	{
 		private readonly string name_;
-		private bool forcesOnly_;
+		private bool hasMovement_;
 		private ConcurrentTargetGroup root_ = new ConcurrentTargetGroup("root");
 
-		public ProcAnimation(string name, bool forcesOnly=false)
+		public ProcAnimation(string name, bool hasMovement=true)
 		{
 			name_ = name;
-			forcesOnly_ = forcesOnly;
+			hasMovement_ = hasMovement;
 		}
 
 		public static ProcAnimation Create(JSONClass o)
@@ -28,11 +28,11 @@ namespace Cue.Proc
 
 			var docRoot = doc.AsObject;
 			string name = docRoot["name"];
-			bool forcesOnly = docRoot["forcesOnly"].AsBool;
+			bool hasMovement = docRoot["hasMovement"].AsBool;
 
 			try
 			{
-				var a = new ProcAnimation(name, forcesOnly);
+				var a = new ProcAnimation(name, hasMovement);
 
 				foreach (JSONClass n in docRoot["targets"].AsArray)
 					a.root_.AddTarget(CreateTarget(n["type"], n));
@@ -66,7 +66,7 @@ namespace Cue.Proc
 
 		public ProcAnimation Clone()
 		{
-			var a = new ProcAnimation(name_, forcesOnly_);
+			var a = new ProcAnimation(name_, hasMovement_);
 			a.root_ = (ConcurrentTargetGroup)root_.Clone();
 			return a;
 		}
@@ -81,9 +81,9 @@ namespace Cue.Proc
 		public float FirstFrame { get { return -1; } }
 		public float LastFrame { get { return -1; } }
 
-		public bool ForcesOnly
+		public bool HasMovement
 		{
-			get { return forcesOnly_; }
+			get { return hasMovement_; }
 		}
 
 		public void AddTarget(ITarget t)
