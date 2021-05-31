@@ -442,8 +442,8 @@ namespace Cue
 		{
 			id_.Text = person_.ID;
 			pos_.Text = person_.Position.ToString();
-			dir_.Text = person_.Direction.ToString();
-			bearing_.Text = person_.Bearing.ToString();
+			dir_.Text = person_.Rotation.ToString();
+			bearing_.Text = person_.Rotation.Bearing.ToString();
 			action_.Text = person_.Actions.ToString();
 			nav_.Text = person_.MoveStateString();
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
@@ -901,7 +901,7 @@ namespace Cue
 
 
 						w.position.Text = w.part.Position.ToString();
-						w.direction.Text = Vector3.Bearing(w.part.Direction).ToString("0.0");
+						w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
 					}
 				}
 			}

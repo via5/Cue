@@ -54,7 +54,7 @@ namespace Cue
 				{
 					log_.Info("going to sit");
 					person_.PushAction(new MoveAction(
-						person_, o_, pos, slot_.Bearing));
+						person_, o_, pos, slot_.Rotation.Bearing));
 					state_ = Moving;
 					break;
 				}

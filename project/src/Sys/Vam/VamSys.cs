@@ -821,6 +821,11 @@ namespace Cue.W
 			return new UnityEngine.Vector3(v.X, v.Y, v.Z);
 		}
 
+		public static UnityEngine.Quaternion ToUnity(Quaternion v)
+		{
+			return v.Internal;
+		}
+
 		public static UnityEngine.Vector2 ToUnity(Size s)
 		{
 			return new UnityEngine.Vector2(s.Width, s.Height);
@@ -854,6 +859,11 @@ namespace Cue.W
 			return new Vector3(v.x, v.y, v.z);
 		}
 
+		public static Quaternion FromUnity(UnityEngine.Quaternion q)
+		{
+			return Quaternion.FromInternal(q);
+		}
+
 		public static Color FromUnity(UnityEngine.Color c)
 		{
 			return new Color(c.r, c.g, c.b, c.a);
@@ -864,17 +874,6 @@ namespace Cue.W
 			return new Box(FromUnity(b.center), FromUnity(b.size));
 		}
 
-
-		public static Vector3 Direction(Quaternion q)
-		{
-			var v = q * UnityEngine.Vector3.forward;
-			return FromUnity(v).Normalized;
-		}
-
-		public static float Bearing(Quaternion q)
-		{
-			return Vector3.Bearing(Direction(q));
-		}
 
 		public static float Distance(Vector3 a, Vector3 b)
 		{

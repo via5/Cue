@@ -20,7 +20,7 @@ namespace Cue.W
 		private float endTurnBearing_ = BasicObject.NoBearing;
 		private NavMeshAgent agent_ = null;
 		private float turningElapsed_ = 0;
-		private Quaternion turningStart_ = Quaternion.identity;
+		private Quaternion turningStart_ = Quaternion.Zero;
 		private float pathStuckCheckElapsed_ = 0;
 		private Vector3 pathStuckLastPos_ = Vector3.Zero;
 		private int stuckCount_ = 0;
@@ -47,7 +47,7 @@ namespace Cue.W
 			atom_.Position = v;
 
 			if (bearing != BasicObject.NoBearing)
-				atom_.Bearing = bearing;
+				atom_.Rotation = Quaternion.FromBearing(bearing);
 
 			enableCollisionsCountdown_ = 100;
 		}
@@ -103,13 +103,13 @@ namespace Cue.W
 			{
 				log_.Info("close enough, tping");
 				atom_.Position = v;
-				atom_.Direction = Vector3.Rotate(new Vector3(0, 0, 1), bearing);
+				atom_.Rotation = Quaternion.FromBearing(bearing);
 			}
 			else if (PositionClose(v))
 			{
 				log_.Info("close enough, only rotating");
 				endTurnBearing_ = bearing;
-				turningStart_ = atom_.Atom.mainController.transform.rotation;
+				turningStart_ = VamU.FromUnity(atom_.Atom.mainController.transform.rotation);
 				turningElapsed_ = 0;
 				pathStuckCheckElapsed_ = 0;
 				pathStuckLastPos_ = atom_.Position;
@@ -168,9 +168,7 @@ namespace Cue.W
 
 					case StartingTurn:
 					{
-						var initBearing = Vector3.Bearing(
-							W.VamU.FromUnity(turningStart_.eulerAngles));
-
+						var initBearing = turningStart_.Bearing;
 						var a = Vector3.AngleBetweenBearings(
 							startTurnBearing_, initBearing);
 
@@ -182,9 +180,7 @@ namespace Cue.W
 
 					case EndingTurn:
 					{
-						var initBearing = Vector3.Bearing(
-							W.VamU.FromUnity(turningStart_.eulerAngles));
-
+						var initBearing = turningStart_.Bearing;
 						var a = Vector3.AngleBetweenBearings(
 							endTurnBearing_, initBearing);
 
@@ -249,20 +245,19 @@ namespace Cue.W
 
 		private void OnPathCalculated()
 		{
-			turningStart_ = atom_.Atom.mainController.transform.rotation;
+			turningStart_ = VamU.FromUnity(
+				atom_.Atom.mainController.transform.rotation);
+
 			var nextPos = VamU.FromUnity(agent_.steeringTarget);
 			startTurnBearing_ = Vector3.Bearing(nextPos - atom_.Position);
 
-			if (CanSkipTurn(atom_.Bearing, startTurnBearing_))
+			if (CanSkipTurn(atom_.Rotation.Bearing, startTurnBearing_))
 			{
 				log_.Info(
 					$"start bearing close enough, setting instead, " +
-					$"{atom_.Bearing} {startTurnBearing_}");
+					$"{atom_.Rotation.Bearing} {startTurnBearing_}");
 
-				var dir = Vector3.Direction(startTurnBearing_);
-
-				atom_.Direction = VamU.Direction(
-					Quaternion.LookRotation(W.VamU.ToUnity(dir)));
+				atom_.Rotation = Quaternion.FromBearing(startTurnBearing_);
 
 				OnStartingTurnFinished();
 			}
@@ -272,7 +267,7 @@ namespace Cue.W
 					$"ready to turn, pos={atom_.Position} " +
 					$"next={nextPos}, " +
 					$"will do starting turn from " +
-					$"{VamU.Bearing(turningStart_)} " +
+					$"{turningStart_.Bearing} " +
 					$"to {U.BearingToString(startTurnBearing_)}");
 
 				state_ = StartingTurn;
@@ -320,19 +315,18 @@ namespace Cue.W
 				$"pos is {atom_.Position}, " +
 				$"d={Vector3.Distance(atom_.Position, finalPosition_)}");
 
-			turningStart_ = atom_.Atom.mainController.transform.rotation;
+			turningStart_ = VamU.FromUnity(
+				atom_.Atom.mainController.transform.rotation);
+
 			turningElapsed_ = 0;
 
-			if (CanSkipTurn(atom_.Bearing, endTurnBearing_))
+			if (CanSkipTurn(atom_.Rotation.Bearing, endTurnBearing_))
 			{
 				log_.Info(
 					$"end bearing close enough, setting instead, " +
-					$"{atom_.Bearing} {endTurnBearing_}");
+					$"{atom_.Rotation.Bearing} {endTurnBearing_}");
 
-				var dir = Vector3.Direction(endTurnBearing_);
-
-				atom_.Direction = VamU.Direction(
-					Quaternion.LookRotation(W.VamU.ToUnity(dir)));
+				atom_.Rotation = Quaternion.FromBearing(endTurnBearing_);
 
 				OnEndingTurnFinished();
 			}
@@ -340,7 +334,7 @@ namespace Cue.W
 			{
 				log_.Info(
 					$"will do ending turn from " +
-					$"{VamU.Bearing(turningStart_)} " +
+					$"{turningStart_.Bearing} " +
 					$"to {U.BearingToString(endTurnBearing_)}");
 
 
@@ -367,8 +361,8 @@ namespace Cue.W
 
 		private bool DoTurn(float s, float targetBearing)
 		{
-			var targetDirection = Vector3.Direction(targetBearing);
-			var currentBearing = atom_.Bearing;
+			var targetDirection = Quaternion.FromBearing(targetBearing);
+			var currentBearing = atom_.Rotation.Bearing;
 
 			if (ReachedTargetBearing(currentBearing, targetBearing))
 			{
@@ -377,8 +371,7 @@ namespace Cue.W
 					$"b={currentBearing} " +
 					$"tb={targetBearing} td={targetDirection}, done");
 
-				atom_.Direction = VamU.Direction(
-					Quaternion.LookRotation(W.VamU.ToUnity(targetDirection)));
+				atom_.Rotation = targetDirection;
 
 				return true;
 			}
@@ -386,12 +379,12 @@ namespace Cue.W
 			{
 				turningElapsed_ += s;
 
-				var newRot = Quaternion.LookRotation(VamU.ToUnity(targetDirection));
+				var newRot = targetDirection;
 
-				atom_.Direction = VamU.Direction(Quaternion.Slerp(
+				atom_.Rotation = Quaternion.Slerp(
 					turningStart_,
 					newRot,
-					turningElapsed_ / (360 / VamNav.AgentTurnSpeed)));
+					turningElapsed_ / (360 / VamNav.AgentTurnSpeed));
 
 				return false;
 			}
@@ -473,8 +466,8 @@ namespace Cue.W
 					{
 						log_.Error("seems stuck, stopping nav");
 						log_.Error(
-							$"pos={atom_.Position} dir={atom_.Direction} " +
-							$"b={atom_.Bearing} " +
+							$"pos={atom_.Position} dir={atom_.Rotation} " +
+							$"b={atom_.Rotation.Bearing} " +
 							$"target={finalPosition_} d={d}");
 
 						Stop("stuck");
@@ -581,7 +574,7 @@ namespace Cue.W
 			if (bearing == BasicObject.NoBearing)
 				return true;
 
-			var currentBearing = Vector3.Angle(Vector3.Zero, atom_.Direction);
+			var currentBearing = atom_.Rotation.Bearing;
 			var d = Math.Abs(currentBearing - bearing);
 			if (d < 5 || d >= 355)
 				return true;

@@ -270,7 +270,7 @@
 			{
 				var avoidRef = avoidP.Body.Get(BodyParts.Eyes);
 
-				var q = ReferencePart.Direction;
+				var q = ReferencePart.Rotation;
 
 				var avoidHeadU =
 					avoidRef.Position -
@@ -281,8 +281,8 @@
 					avoidP.Body.Get(BodyParts.Hips).Position -
 					selfRef.Position;
 
-				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
-				var avoidHip = Vector3.RotateInv(avoidHipU, q);
+				var avoidHead = q.RotateInv(avoidHeadU);
+				var avoidHip = q.RotateInv(avoidHipU);
 
 				avoidBox_ = new Box(
 					avoidHip + (avoidHead - avoidHip) / 2,
@@ -379,7 +379,7 @@
 
 			avoid_.Position =
 				r_.Person.Body.Get(BodyParts.Eyes).Position +
-				Vector3.Rotate(r_.AvoidBox.center, r_.ReferencePart.Direction);
+				r_.ReferencePart.Rotation.Rotate(r_.AvoidBox.center);
 
 			avoid_.Size = r_.AvoidBox.size;
 		}

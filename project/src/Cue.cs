@@ -177,7 +177,11 @@ namespace Cue
 				if (Options.AllowMovement)
 				{
 					if (i < spawnPoints.Count)
-						p.TeleportTo(spawnPoints[i].Position, spawnPoints[i].Bearing);
+					{
+						p.TeleportTo(
+							spawnPoints[i].Position,
+							spawnPoints[i].Rotation.Bearing);
+					}
 				}
 
 				p.Init();

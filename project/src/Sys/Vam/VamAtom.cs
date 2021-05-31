@@ -150,37 +150,10 @@ namespace Cue.W
 			}
 		}
 
-		public Vector3 Direction
+		public Quaternion Rotation
 		{
-			get
-			{
-				var v =
-					atom_.mainController.transform.rotation *
-					UnityEngine.Vector3.forward;
-
-				return W.VamU.FromUnity(v);
-			}
-
-			set
-			{
-				var r = Quaternion.LookRotation(W.VamU.ToUnity(value));
-				atom_.mainController.RotateTo(r);
-			}
-		}
-
-		public Vector3 Rotation
-		{
-			get
-			{
-				var v = atom_.mainController.transform.rotation.eulerAngles;
-				return W.VamU.FromUnity(v);
-			}
-
-			set
-			{
-				var r = Quaternion.Euler(W.VamU.ToUnity(value));
-				atom_.mainController.RotateTo(r);
-			}
+			get { return W.VamU.FromUnity(atom_.mainController.transform.rotation); }
+			set { atom_.mainController.transform.rotation = VamU.ToUnity(value); }
 		}
 
 		public bool Collisions
@@ -205,12 +178,6 @@ namespace Cue.W
 		{
 			get { return scale_.Value; }
 			set { scale_.Value = value; }
-		}
-
-		public float Bearing
-		{
-			get { return Vector3.Angle(Vector3.Zero, Direction); }
-			set { Direction = Vector3.Rotate(0, value, 0); }
 		}
 
 		public Atom Atom

@@ -8,10 +8,8 @@ namespace Cue
 		string ID { get; }
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
-		Vector3 Direction { get; set; }
-		Vector3 Rotation { get; set; }
+		Quaternion Rotation { get; set; }
 		Vector3 EyeInterest { get; }
-		float Bearing { get; }
 		bool Possessed { get; }
 
 		void FixedUpdate(float s);
@@ -116,13 +114,7 @@ namespace Cue
 			set { atom_.Position = value; }
 		}
 
-		public Vector3 Direction
-		{
-			get { return atom_.Direction; }
-			set { atom_.Direction = value; }
-		}
-
-		public Vector3 Rotation
+		public Quaternion Rotation
 		{
 			get { return atom_.Rotation; }
 			set { atom_.Rotation = value; }
@@ -131,12 +123,6 @@ namespace Cue
 		public virtual Vector3 EyeInterest
 		{
 			get { return Position; }
-		}
-
-		public float Bearing
-		{
-			get { return Vector3.Angle(Vector3.Zero, Direction); }
-			set { Direction = Vector3.Rotate(0, value, 0); }
 		}
 
 		public Slots Slots
@@ -291,7 +277,7 @@ namespace Cue
 			if (bearing == NoBearing)
 				targetBearing_ = NoBearing;
 			else
-				targetBearing_ = Vector3.NormalizeAngle(bearing);
+				targetBearing_ = Quaternion.NormalizeAngle(bearing);
 
 			moveState_ = TentativeMoveState;
 		}

@@ -191,7 +191,9 @@ namespace Cue
 				caller_.Position - p.Position,
 				p.Body.FullBox.size);
 
-			b.center = Vector3.Rotate(b.center, 180 - caller_.Bearing);
+			b.center =
+				Quaternion.FromBearing(180 - caller_.Rotation.Bearing)
+					.Rotate(b.center);
 
 			return caller_.Body.ClosenessFrustum.TestPlanesAABB(b);
 		}
@@ -208,7 +210,7 @@ namespace Cue
 
 			var target =
 				caller_.UprightPosition +
-				Vector3.Rotate(new Vector3(0, 0, 0.5f), caller_.Bearing);
+				Quaternion.FromBearing(caller_.Rotation.Bearing).Rotate(new Vector3(0, 0, 0.5f));
 
 			if (CloseEnough(p))
 			{
@@ -219,7 +221,7 @@ namespace Cue
 			else
 			{
 				log_.Info($"{p} moving to {caller_}");
-				p.MoveTo(caller_, target, caller_.Bearing + 180);
+				p.MoveTo(caller_, target, caller_.Rotation.Bearing + 180);
 			}
 
 			return true;
@@ -289,7 +291,7 @@ namespace Cue
 
 		protected override bool DoStart(float s)
 		{
-			Object.MoveTo(chair_.ParentObject, chair_.Position, chair_.Bearing);
+			Object.MoveTo(chair_.ParentObject, chair_.Position, chair_.Rotation.Bearing);
 			moving_ = true;
 			return true;
 		}

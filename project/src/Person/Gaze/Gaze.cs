@@ -196,7 +196,6 @@ namespace Cue
 						targets_.SetWeight(t, BodyParts.Genitals, ps.HandjobGenitalsWeight);
 					}
 
-					gazerEnabled = false;
 					busy = true;
 				}
 			}

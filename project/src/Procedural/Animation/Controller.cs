@@ -2,6 +2,8 @@
 
 namespace Cue.Proc
 {
+	using Quaternion = UnityEngine.Quaternion;
+
 	class Controller : ITarget
 	{
 		private readonly string name_;

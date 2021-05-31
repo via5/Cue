@@ -60,7 +60,7 @@ namespace Cue
 					}
 
 					person_.PushAction(new MoveAction(
-						person_, slot_.ParentObject, slot_.Position, slot_.Bearing));
+						person_, slot_.ParentObject, slot_.Position, slot_.Rotation.Bearing));
 					state_ = Moving;
 
 					break;

@@ -117,7 +117,7 @@ namespace Cue
 				{
 					person_.PushAction(new SitAction(person_, slot));
 					person_.PushAction(new MoveAction(
-						slot.ParentObject, person_, slot.Position, slot.Bearing));
+						slot.ParentObject, person_, slot.Position, slot.Rotation.Bearing));
 				}
 				else
 				{
@@ -135,7 +135,7 @@ namespace Cue
 				{
 					person_.PushAction(new MakeIdleAction(person_));
 					person_.PushAction(new MoveAction(
-						slot.ParentObject, person_, slot.Position, slot.Bearing));
+						slot.ParentObject, person_, slot.Position, slot.Rotation.Bearing));
 				}
 				else
 				{

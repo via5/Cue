@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Cue.BVH
 {
     using Vector3 = UnityEngine.Vector3;
+    using Quaternion = UnityEngine.Quaternion;
 
     class Animation : IAnimation
     {

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace Cue
 {
@@ -25,12 +26,25 @@ namespace Cue
 
 	class SmokingInteraction : BasicInteraction
 	{
+		private const int NoState = 0;
+		private const int MovingToMouth = 1;
+		private const int Pull = 2;
+		private const int MovingBack = 3;
+		private const int Stop = 4;
+
+		private const float MoveTime = 2;
+
 		private Person person_;
 		private Logger log_;
 		private float elapsed_ = 0;
 		private IObject cig_ = null;
 		private bool inited_ = false;
 		private bool enabled_ = true;
+		private int state_ = NoState;
+		private Vector3 startPos_ = Vector3.Zero;
+		private Quaternion startRot_ = Quaternion.Zero;
+		private Vector3 targetPos_ = Vector3.Zero;
+		private Quaternion targetRot_ = Quaternion.Zero;
 
 		public SmokingInteraction(Person p)
 		{
@@ -57,28 +71,133 @@ namespace Cue
 
 			if (!inited_)
 			{
-				log_.Info("initing");
-				inited_ = true;
-				elapsed_ = 0;
-				enabled_ = true;
-				CreateCigarette();
+				Init();
+				if (!enabled_)
+					return;
 			}
-			else if (cig_ != null)
+
+			if (cig_ == null)
+				return;
+
+			elapsed_ += s;
+
+			switch (state_)
 			{
-				var ia = person_.Body.RightHand.Index.Intermediate;
-				var ib = person_.Body.RightHand.Middle.Intermediate;
-				var ip = ia.Position + (ib.Position - ia.Position) / 2;
+				case NoState:
+				{
+					StartMoveToMouth();
+					break;
+				}
 
-				var da = person_.Body.RightHand.Index.Distal;
-				var db = person_.Body.RightHand.Middle.Distal;
-				var dp = da.Position + (db.Position - da.Position) / 2;
+				case MovingToMouth:
+				{
+					MoveToMouth();
+					break;
+				}
 
-				var p = ip + (dp - ip) / 2;
-				var r = person_.Body.RightHand.Middle.Intermediate.Rotation;
+				case Pull:
+				{
+					if (elapsed_ > 2)
+					{
+						elapsed_ = 0;
+						state_ = MovingBack;
+					}
 
-				cig_.Position = p + Vector3.RotateEuler(new Vector3(0, -0.025f, 0), r);
-				cig_.Rotation = r;
+					break;
+				}
+
+				case MovingBack:
+				{
+					MoveBack();
+					break;
+				}
+
+				case Stop:
+				{
+					break;
+				}
 			}
+
+			SetPosition();
+		}
+
+		private void StartMoveToMouth()
+		{
+			var mouth = person_.Body.Get(BodyParts.Mouth);
+			var hand = person_.Body.Get(BodyParts.RightHand);
+
+			startPos_ = hand.Position;
+			startRot_ = hand.Rotation;
+
+			targetPos_ =
+				mouth.Position +
+				mouth.Rotation.Rotate(new Vector3(0, 0, 0.1f));
+
+			targetRot_ = Quaternion.FromEuler(0, 90, 90);
+
+			elapsed_ = 0;
+			state_ = MovingToMouth;
+		}
+
+		private void MoveToMouth()
+		{
+			var f = U.Clamp(elapsed_ / MoveTime, 0, 1);
+			var p = Vector3.Lerp(startPos_, targetPos_, f);
+			var r = Quaternion.Lerp(startRot_, targetRot_, f);
+
+			var hand = person_.Body.Get(BodyParts.RightHand);
+
+			hand.Position = p;
+			hand.Rotation = r;
+
+			if (elapsed_ >= MoveTime)
+			{
+				elapsed_ = 0;
+				state_ = Pull;
+			}
+		}
+
+		private void MoveBack()
+		{
+			var f = U.Clamp(elapsed_ / MoveTime, 0, 1);
+			var p = Vector3.Lerp(targetPos_, startPos_, f);
+			var r = Quaternion.Lerp(targetRot_, startRot_, f);
+
+			var hand = person_.Body.Get(BodyParts.RightHand);
+			hand.Position = p;
+			hand.Rotation = r;
+
+			if (elapsed_ >= MoveTime)
+			{
+				elapsed_ = 0;
+				state_ = Stop;
+			}
+		}
+
+		private void Init()
+		{
+			log_.Info("initing");
+			inited_ = true;
+			elapsed_ = 0;
+			enabled_ = true;
+			CreateCigarette();
+		}
+
+		private void SetPosition()
+		{
+			var ia = person_.Body.RightHand.Index.Intermediate;
+			var ib = person_.Body.RightHand.Middle.Intermediate;
+			var ip = ia.Position + (ib.Position - ia.Position) / 2;
+
+			var da = person_.Body.RightHand.Index.Distal;
+			var db = person_.Body.RightHand.Middle.Distal;
+			var dp = da.Position + (db.Position - da.Position) / 2;
+
+			var p = ip + (dp - ip) / 2;
+			var r = person_.Body.RightHand.Middle.Intermediate.Rotation;
+
+			cig_.Position = p + r.Rotate(new Vector3(0, -0.025f, 0));
+			cig_.Rotation = r;
 		}
 
 		private void CreateCigarette()

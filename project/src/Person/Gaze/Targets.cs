@@ -212,7 +212,7 @@ namespace Cue
 		{
 			pos_ =
 				p.Body.Get(BodyParts.Eyes).Position +
-				Vector3.Rotate(new Vector3(0, 0, 1), p.Bearing);
+				p.Rotation.Rotate(new Vector3(0, 0, 1));
 		}
 
 		public override string ToString()
@@ -314,7 +314,7 @@ namespace Cue
 				var h = person_.Body.Get(BodyParts.Head);
 				var c = person_.Body.Get(BodyParts.Chest);
 				var d = new Vector3(0, 0.5f, 0.05f);
-				var p = h.Position + Vector3.Rotate(d, c.Direction);
+				var p = h.Position + c.Rotation.Rotate(d);
 
 				return p;
 			}
@@ -384,11 +384,10 @@ namespace Cue
 			}
 
 			var rp = f.RandomPoint();
+			var eyes = person_.Body.Get(BodyParts.Eyes);
+			var chest = person_.Body.Get(BodyParts.Chest);
 
-			pos_ =
-				person_.Body.Get(BodyParts.Eyes).Position +
-				Vector3.Rotate(rp, person_.Body.Get(BodyParts.Chest).Direction);
-
+			pos_ = eyes.Position + chest.Rotation.Rotate(rp);
 			hasPos_ = true;
 
 			return true;

@@ -143,14 +143,14 @@ namespace Cue.W
 		float Trigger { get; }
 		bool CanGrab { get; }
 		bool Grabbed { get; }
-		Vector3 Position { get; }
-		Vector3 Direction { get; }
+		Vector3 Position { get; set; }
+		Quaternion Rotation { get; set; }
 	}
 
 	interface IBone
 	{
 		Vector3 Position { get; }
-		Vector3 Rotation { get; }
+		Quaternion Rotation { get; }
 	}
 
 	interface IClothing
@@ -193,8 +193,7 @@ namespace Cue.W
 		float Scale { get; set; }
 
 		Vector3 Position { get; set; }
-		Vector3 Direction { get; set; }
-		Vector3 Rotation { get; set; }
+		Quaternion Rotation { get; set; }
 
 		void Init();
 		void Destroy();
@@ -229,7 +228,7 @@ namespace Cue.W
 	{
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }
-		Vector3 Direction { get; set; }
+		Quaternion Rotation { get; set; }
 		Vector3 Size { get; set; }
 		Color Color { get; set; }
 		bool Collision { get; set; }

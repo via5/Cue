@@ -92,10 +92,10 @@ namespace Cue.W
 			set { object_.transform.position = VamU.ToUnity(value); }
 		}
 
-		public Vector3 Direction
+		public Quaternion Rotation
 		{
-			get { return VamU.Direction(object_.transform.rotation); }
-			set { object_.transform.rotation = Quaternion.LookRotation(VamU.ToUnity(value)); }
+			get { return VamU.FromUnity(object_.transform.rotation); }
+			set { object_.transform.rotation = VamU.ToUnity(value); }
 		}
 
 		public Vector3 Size

@@ -237,17 +237,31 @@ namespace Cue
 
 		public Vector3 Position
 		{
-			get { return part_?.Position ?? Vector3.Zero; }
+			get
+			{
+				return part_?.Position ?? Vector3.Zero;
+
+			}
+
+			set
+			{
+				if (part_ != null)
+					part_.Position = value;
+			}
 		}
 
-		public Vector3 Direction
+		public Quaternion Rotation
 		{
-			get { return part_?.Direction ?? Vector3.Zero; }
-		}
+			get
+			{
+				return part_?.Rotation ?? Quaternion.Zero;
+			}
 
-		public float Bearing
-		{
-			get { return Vector3.Bearing(Direction); }
+			set
+			{
+				if (part_ != null)
+					part_.Rotation = value;
+			}
 		}
 
 		public override string ToString()
@@ -327,12 +341,12 @@ namespace Cue
 			}
 		}
 
-		public Vector3 Rotation
+		public Quaternion Rotation
 		{
 			get
 			{
 				if (sys_ == null)
-					return Vector3.Zero;
+					return Quaternion.Zero;
 				else
 					return sys_.Rotation;
 			}
@@ -650,13 +664,13 @@ namespace Cue
 		{
 			get
 			{
-				var q = Get(BodyParts.Chest).Direction;
+				var q = Get(BodyParts.Chest).Rotation;
 
 				var avoidHeadU = Get(BodyParts.Head).Position + new Vector3(0, 0.2f, 0);
 				var avoidHipU = Get(BodyParts.Hips).Position;
 
-				var avoidHead = Vector3.RotateInv(avoidHeadU, q);
-				var avoidHip = Vector3.RotateInv(avoidHipU, q);
+				var avoidHead = q.RotateInv(avoidHeadU);
+				var avoidHip = q.RotateInv(avoidHipU);
 
 				return new Box(
 					avoidHip + (avoidHead - avoidHip) / 2,

@@ -149,11 +149,6 @@ namespace Cue
 			return W.VamU.Angle(a, b);
 		}
 
-		public static Vector3 Direction(float bearing)
-		{
-			return Rotate(new Vector3(0, 0, 1), bearing);
-		}
-
 		public static float Bearing(Vector3 dir)
 		{
 			return Angle(Zero, dir.Normalized);
@@ -164,40 +159,76 @@ namespace Cue
 			return ((((bearing2 - bearing1) % 360) + 540) % 360) - 180;
 		}
 
-		public static Vector3 Rotate(float x, float y, float z)
-		{
-			// todo
-			return W.VamU.Rotate(x, y, z);
-		}
-
-		public static Vector3 Rotate(Vector3 v, float bearing)
-		{
-			// todo
-			return W.VamU.Rotate(v, bearing);
-		}
-
-		public static Vector3 Rotate(Vector3 v, Vector3 dir)
-		{
-			// todo
-			return W.VamU.Rotate(v, dir);
-		}
-
-		public static Vector3 RotateEuler(Vector3 v, Vector3 angles)
-		{
-			// todo
-			return W.VamU.RotateEuler(v, angles);
-		}
-
-		public static Vector3 RotateInv(Vector3 v, Vector3 dir)
-		{
-			// todo
-			return W.VamU.RotateInv(v, dir);
-		}
-
 		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
 		{
 			// todo
 			return W.VamU.Lerp(a, b, p);
+		}
+	}
+
+	struct Quaternion
+	{
+		private UnityEngine.Quaternion q_;
+
+		private Quaternion(UnityEngine.Quaternion q)
+		{
+			q_ = q;
+		}
+
+		public UnityEngine.Quaternion Internal
+		{
+			get { return q_; }
+		}
+
+		public static Quaternion Zero
+		{
+			get { return new Quaternion(UnityEngine.Quaternion.identity); }
+		}
+
+		public static Quaternion FromInternal(UnityEngine.Quaternion q)
+		{
+			return new Quaternion(q);
+		}
+
+		public static Quaternion FromEuler(float x, float y, float z)
+		{
+			return new Quaternion(UnityEngine.Quaternion.Euler(x, y, z));
+		}
+
+		public static Quaternion FromBearing(float b)
+		{
+			return new Quaternion(UnityEngine.Quaternion.Euler(0, b, 0));
+		}
+
+		public float Bearing
+		{
+			get
+			{
+				var d = W.VamU.FromUnity(q_ * UnityEngine.Vector3.forward);
+				return Vector3.Angle(Vector3.Zero, d);
+			}
+		}
+
+		public Vector3 Rotate(Vector3 v)
+		{
+			return W.VamU.FromUnity(q_ * W.VamU.ToUnity(v));
+		}
+
+		public Vector3 RotateInv(Vector3 v)
+		{
+			return W.VamU.FromUnity(UnityEngine.Quaternion.Inverse(q_) * W.VamU.ToUnity(v));
+		}
+
+		public static Quaternion Lerp(Quaternion a, Quaternion b, float f)
+		{
+			return W.VamU.FromUnity(UnityEngine.Quaternion.Lerp(
+				W.VamU.ToUnity(a), W.VamU.ToUnity(b), f));
+		}
+
+		public static Quaternion Slerp(Quaternion a, Quaternion b, float f)
+		{
+			return W.VamU.FromUnity(UnityEngine.Quaternion.Slerp(
+				W.VamU.ToUnity(a), W.VamU.ToUnity(b), f));
 		}
 
 		public static float NormalizeAngle(float degrees)
@@ -207,6 +238,11 @@ namespace Cue
 				degrees += 360;
 
 			return degrees;
+		}
+
+		public override string ToString()
+		{
+			return q_.ToString();
 		}
 	}
 

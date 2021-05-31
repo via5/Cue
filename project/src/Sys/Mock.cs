@@ -282,15 +282,9 @@ namespace Cue.W
 			set { }
 		}
 
-		public Vector3 Direction
+		public Quaternion Rotation
 		{
-			get { return Vector3.Zero; }
-			set { }
-		}
-
-		public Vector3 Rotation
-		{
-			get { return Vector3.Zero; }
+			get { return Quaternion.Zero; }
 			set { }
 		}
 

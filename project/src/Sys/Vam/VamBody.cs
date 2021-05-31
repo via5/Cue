@@ -436,12 +436,12 @@ namespace Cue.W
 			get { return VamU.FromUnity(bone_.transform.position); }
 		}
 
-		public Vector3 Rotation
+		public Quaternion Rotation
 		{
 			get
 			{
 				var rb = bone_.GetComponent<Rigidbody>();
-				return VamU.FromUnity(bone_.transform.rotation.eulerAngles);
+				return VamU.FromUnity(bone_.transform.rotation);
 			}
 		}
 	}
@@ -470,8 +470,8 @@ namespace Cue.W
 		public abstract float Trigger { get; }
 		public abstract bool CanGrab { get; }
 		public abstract bool Grabbed { get; }
-		public abstract Vector3 Position { get; }
-		public abstract Vector3 Direction { get; }
+		public abstract Vector3 Position { get; set; }
+		public abstract Quaternion Rotation { get; set; }
 	}
 
 
@@ -520,11 +520,13 @@ namespace Cue.W
 		public override Vector3 Position
 		{
 			get { return W.VamU.FromUnity(rb_.position); }
+			set { fc_.transform.position = VamU.ToUnity(value); }
 		}
 
-		public override Vector3 Direction
+		public override Quaternion Rotation
 		{
-			get { return W.VamU.Direction(rb_.rotation); }
+			get { return W.VamU.FromUnity(rb_.rotation); }
+			set { fc_.transform.rotation = VamU.ToUnity(value); }
 		}
 
 		public override string ToString()
@@ -578,15 +580,14 @@ namespace Cue.W
 
 		public override Vector3 Position
 		{
-			get
-			{
-				return W.VamU.FromUnity(c_.bounds.center);
-			}
+			get { return W.VamU.FromUnity(c_.bounds.center); }
+			set { Cue.LogError("cannot move colliders"); }
 		}
 
-		public override Vector3 Direction
+		public override Quaternion Rotation
 		{
-			get { return W.VamU.Direction(c_.transform.rotation); }
+			get { return W.VamU.FromUnity(c_.transform.rotation); }
+			set { Cue.LogError("cannot rotate colliders"); }
 		}
 
 		public override string ToString()
@@ -661,17 +662,14 @@ namespace Cue.W
 				else
 					return W.VamU.FromUnity(rb_.position);
 			}
+
+			set { Cue.LogError("cannot move triggers"); }
 		}
 
-		public override Vector3 Direction
+		public override Quaternion Rotation
 		{
-			get
-			{
-				if (rb_ == null)
-					return Vector3.Zero;
-				else
-					return W.VamU.Direction(rb_.rotation);
-			}
+			get { return W.VamU.FromUnity(rb_.rotation); }
+			set { Cue.LogError("cannot rotate triggers"); }
 		}
 
 		public override string ToString()
@@ -740,17 +738,14 @@ namespace Cue.W
 				else
 					return Vector3.Zero;
 			}
+
+			set { Cue.LogError("cannot move eyes"); }
 		}
 
-		public override Vector3 Direction
+		public override Quaternion Rotation
 		{
-			get
-			{
-				if (head_ == null)
-					return Vector3.Zero;
-				else
-					return W.VamU.Direction(head_.rotation);
-			}
+			get { return W.VamU.FromUnity(head_.rotation); }
+			set { Cue.LogError("cannot rotate eyes"); }
 		}
 
 		public override string ToString()

@@ -88,9 +88,9 @@ namespace Cue
 			get { return self_.Position; }
 		}
 
-		public float Bearing
+		public Quaternion Rotation
 		{
-			get { return self_.Bearing; }
+			get { return self_.Rotation; }
 		}
 
 		private static string[] GetTypes()

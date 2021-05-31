@@ -40,16 +40,16 @@
 
 			near_.Position =
 				RefOffset +
-				Vector3.Rotate(frustum_.NearCenter(), RefDirection);
+				RefRotation.Rotate(frustum_.NearCenter());
 
-			near_.Direction = RefDirection;
+			near_.Rotation = RefRotation;
 
 
 			far_.Position =
 				RefOffset +
-				Vector3.Rotate(frustum_.FarCenter(), RefDirection);
+				RefRotation.Rotate(frustum_.FarCenter());
 
-			far_.Direction = RefDirection;
+			far_.Rotation = RefRotation;
 		}
 
 		public Color Color
@@ -89,14 +89,14 @@
 			}
 		}
 
-		private Vector3 RefDirection
+		private Quaternion RefRotation
 		{
 			get
 			{
 				if (rot_ == BodyParts.None)
-					return person_.Direction;
+					return person_.Rotation;
 				else
-					return person_.Body.Get(rot_).Direction;
+					return person_.Body.Get(rot_).Rotation;
 			}
 		}
 	}
