@@ -159,6 +159,12 @@ namespace Cue
 			return ((((bearing2 - bearing1) % 360) + 540) % 360) - 180;
 		}
 
+		public static Vector3 MoveTowards(Vector3 current, Vector3 target, float maxDistance)
+		{
+			// todo
+			return W.VamU.MoveTowards(current, target, maxDistance);
+		}
+
 		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
 		{
 			// todo
@@ -207,6 +213,11 @@ namespace Cue
 				var d = W.VamU.FromUnity(q_ * UnityEngine.Vector3.forward);
 				return Vector3.Angle(Vector3.Zero, d);
 			}
+		}
+
+		public Vector3 Euler
+		{
+			get { return W.VamU.FromUnity(q_.eulerAngles); }
 		}
 
 		public Vector3 Rotate(Vector3 v)

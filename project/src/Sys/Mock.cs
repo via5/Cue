@@ -346,6 +346,11 @@ namespace Cue.W
 		{
 		}
 
+		public IMorph GetMorph(string id)
+		{
+			return null;
+		}
+
 		public void TeleportTo(Vector3 v, float bearing)
 		{
 		}

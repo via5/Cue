@@ -192,14 +192,22 @@ namespace Cue.W
 			return list.ToArray();
 		}
 
-		public IBone[][] GetLeftHandBones()
+		public Hand GetLeftHand()
 		{
-			return GetHandBones("l");
+			var h = new Hand();
+			h.bones = GetHandBones("l");
+			h.fist = new VamMorph(atom_, "Left Fingers Fist");
+
+			return h;
 		}
 
-		public IBone[][] GetRightHandBones()
+		public Hand GetRightHand()
 		{
-			return GetHandBones("r");
+			var h = new Hand();
+			h.bones = GetHandBones("r");
+			h.fist = new VamMorph(atom_, "Right Fingers Fist");
+
+			return h;
 		}
 
 		private IBone[][] GetHandBones(string s)
@@ -415,6 +423,202 @@ namespace Cue.W
 	}
 
 
+	static class VamMorphManager
+	{
+		public class MorphInfo
+		{
+			private string id_;
+			private DAZMorph m_;
+			private List<MorphInfo> subMorphs_ = new List<MorphInfo>();
+			private bool free_ = true;
+			private int freeFrame_ = -1;
+			private float multiplier_ = 1;
+
+			public MorphInfo(VamAtom atom, string morphId, DAZMorph m)
+			{
+				id_ = morphId;
+				m_ = m;
+
+				if (m_ != null && (m_.deltas == null || m_.deltas.Length == 0))
+				{
+					foreach (var sm in m_.formulas)
+					{
+						if (sm.targetType == DAZMorphFormulaTargetType.MorphValue)
+						{
+							var smm = Get(atom, sm.target, m_.morphBank);
+							smm.multiplier_ = sm.multiplier;
+							subMorphs_.Add(smm);
+						}
+						else
+						{
+							subMorphs_.Clear();
+							break;
+						}
+					}
+
+					if (subMorphs_.Count > 0)
+						m_.Reset();
+				}
+			}
+
+			public override string ToString()
+			{
+				string s = id_ + " ";
+
+				if (m_ == null)
+					s += "notfound";
+				else
+					s += $"v={m_.morphValue:0.00} sub={subMorphs_.Count != 0} f={free_} ff={freeFrame_}";
+
+				return s;
+			}
+
+			public string ID
+			{
+				get { return id_; }
+			}
+
+			public float Value
+			{
+				get { return m_?.morphValue ?? -1; }
+			}
+
+			public float DefaultValue
+			{
+				get { return m_?.startValue ?? 0; }
+			}
+
+			public bool Set(float f)
+			{
+				if (m_ == null)
+					return false;
+
+				if (free_ || freeFrame_ != Cue.Instance.Frame)
+				{
+					if (subMorphs_.Count == 0)
+					{
+						if (f > m_.morphValue)
+							m_.morphValue = Math.Min(m_.morphValue + 0.02f, f);
+						else
+							m_.morphValue = Math.Max(m_.morphValue - 0.02f, f);
+					}
+					else
+					{
+						for (int i = 0; i < subMorphs_.Count; ++i)
+						{
+							float smf = f * subMorphs_[i].multiplier_;
+							subMorphs_[i].Set(smf);
+						}
+					}
+
+					free_ = false;
+					freeFrame_ = Cue.Instance.Frame;
+
+					return true;
+				}
+
+				return false;
+			}
+
+			public void Reset()
+			{
+				if (m_ != null)
+					m_.morphValue = m_.startValue;
+			}
+		}
+
+		private static Dictionary<string, MorphInfo> map_ =
+			new Dictionary<string, MorphInfo>();
+
+		public static MorphInfo Get(VamAtom atom, string morphId, DAZMorphBank bank = null)
+		{
+			string key = atom.ID + "/" + morphId;
+
+			MorphInfo mi;
+			if (map_.TryGetValue(key, out mi))
+				return mi;
+
+			DAZMorph m;
+
+			if (bank == null)
+				m = Cue.Instance.VamSys.FindMorph(atom.Atom, morphId);
+			else
+				m = bank.GetMorph(morphId);
+
+			if (m == null)
+				Cue.LogError($"{atom.ID}: morph '{morphId}' not found");
+
+			mi = new MorphInfo(atom, morphId, m);
+			map_.Add(key, mi);
+
+			return mi;
+		}
+	}
+
+
+	class VamMorph : IMorph
+	{
+		private VamAtom atom_;
+		private string name_;
+		private VamMorphManager.MorphInfo morph_ = null;
+		private bool inited_ = false;
+
+		public VamMorph(VamAtom a, string name)
+		{
+			atom_ = a;
+			name_ = name;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public float Value
+		{
+			get
+			{
+				GetMorph();
+				return morph_?.Value ?? 0;
+			}
+
+			set
+			{
+				GetMorph();
+				if (morph_ != null)
+					morph_.Set(value);
+			}
+		}
+
+		public float DefaultValue
+		{
+			get
+			{
+				GetMorph();
+				return morph_?.DefaultValue ?? 0;
+			}
+		}
+
+		public void Reset()
+		{
+			GetMorph();
+			morph_?.Reset();
+		}
+
+		private void GetMorph()
+		{
+			if (inited_)
+				return;
+
+			morph_ = VamMorphManager.Get(atom_, name_);
+			if (morph_ == null)
+				atom_.Log.Error($"no morph '{name_}'");
+
+			inited_ = true;
+		}
+	}
+
+
 	class VamBone : IBone
 	{
 		private Rigidbody parent_;
@@ -470,8 +674,10 @@ namespace Cue.W
 		public abstract float Trigger { get; }
 		public abstract bool CanGrab { get; }
 		public abstract bool Grabbed { get; }
-		public abstract Vector3 Position { get; set; }
-		public abstract Quaternion Rotation { get; set; }
+		public abstract Vector3 ControlPosition { get; set; }
+		public abstract Quaternion ControlRotation { get; set; }
+		public abstract Vector3 Position { get; }
+		public abstract Quaternion Rotation { get; }
 	}
 
 
@@ -517,16 +723,26 @@ namespace Cue.W
 			get { return fc_?.isGrabbing ?? false; }
 		}
 
+		public override Vector3 ControlPosition
+		{
+			get { return W.VamU.FromUnity(fc_.transform.position); }
+			set { fc_.transform.position = VamU.ToUnity(value); }
+		}
+
+		public override Quaternion ControlRotation
+		{
+			get { return W.VamU.FromUnity(fc_.transform.rotation); }
+			set { fc_.transform.rotation = VamU.ToUnity(value); }
+		}
+
 		public override Vector3 Position
 		{
 			get { return W.VamU.FromUnity(rb_.position); }
-			set { fc_.transform.position = VamU.ToUnity(value); }
 		}
 
 		public override Quaternion Rotation
 		{
 			get { return W.VamU.FromUnity(rb_.rotation); }
-			set { fc_.transform.rotation = VamU.ToUnity(value); }
 		}
 
 		public override string ToString()
@@ -578,16 +794,26 @@ namespace Cue.W
 			get { return (fc_?.isGrabbing ?? false); }
 		}
 
-		public override Vector3 Position
+		public override Vector3 ControlPosition
 		{
 			get { return W.VamU.FromUnity(c_.bounds.center); }
 			set { Cue.LogError("cannot move colliders"); }
 		}
 
-		public override Quaternion Rotation
+		public override Quaternion ControlRotation
 		{
 			get { return W.VamU.FromUnity(c_.transform.rotation); }
 			set { Cue.LogError("cannot rotate colliders"); }
+		}
+
+		public override Vector3 Position
+		{
+			get { return ControlPosition; }
+		}
+
+		public override Quaternion Rotation
+		{
+			get { return ControlRotation; }
 		}
 
 		public override string ToString()
@@ -653,7 +879,7 @@ namespace Cue.W
 			get { return fc_?.isGrabbing ?? false; }
 		}
 
-		public override Vector3 Position
+		public override Vector3 ControlPosition
 		{
 			get
 			{
@@ -666,10 +892,20 @@ namespace Cue.W
 			set { Cue.LogError("cannot move triggers"); }
 		}
 
-		public override Quaternion Rotation
+		public override Quaternion ControlRotation
 		{
 			get { return W.VamU.FromUnity(rb_.rotation); }
 			set { Cue.LogError("cannot rotate triggers"); }
+		}
+
+		public override Vector3 Position
+		{
+			get { return ControlPosition; }
+		}
+
+		public override Quaternion Rotation
+		{
+			get { return ControlRotation; }
 		}
 
 		public override string ToString()
@@ -725,7 +961,7 @@ namespace Cue.W
 		public override bool CanGrab { get { return false; } }
 		public override bool Grabbed { get { return false; } }
 
-		public override Vector3 Position
+		public override Vector3 ControlPosition
 		{
 			get
 			{
@@ -742,10 +978,20 @@ namespace Cue.W
 			set { Cue.LogError("cannot move eyes"); }
 		}
 
-		public override Quaternion Rotation
+		public override Quaternion ControlRotation
 		{
 			get { return W.VamU.FromUnity(head_.rotation); }
 			set { Cue.LogError("cannot rotate eyes"); }
+		}
+
+		public override Vector3 Position
+		{
+			get { return ControlPosition; }
+		}
+
+		public override Quaternion Rotation
+		{
+			get { return ControlRotation; }
 		}
 
 		public override string ToString()

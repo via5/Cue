@@ -148,7 +148,7 @@ namespace Cue
 
 			// non exclusive
 
-			bool gazerEnabled = true;
+			bool gazerEnabled = !person_.Body.Get(BodyParts.Head).Busy;
 			bool clearRandom = false;
 			bool busy = false;
 

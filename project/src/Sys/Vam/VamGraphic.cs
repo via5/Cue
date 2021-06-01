@@ -21,9 +21,10 @@ namespace Cue.W
 			object_.layer = Layer;
 
 			renderer_ = object_.GetComponent<Renderer>();
-			renderer_.enabled = false;
+			renderer_.enabled = true;
 
 			SetMaterial();
+			Collision = false;
 		}
 
 		private void SetMaterial()

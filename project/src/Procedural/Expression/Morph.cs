@@ -1,11 +1,10 @@
 ﻿using SimpleJSON;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Proc
 {
-	class Morph : ITarget
+	class AnimatedMorph : ITarget
 	{
 		private int bodyPart_;
 		private string morphId_;
@@ -14,7 +13,7 @@ namespace Cue.Proc
 		private Duration delay_;
 		private ClampableMorph m_ = null;
 
-		public Morph(
+		public AnimatedMorph(
 			int bodyPart, string morphId, float min, float max,
 			Duration d, Duration delay)
 		{
@@ -26,7 +25,7 @@ namespace Cue.Proc
 			delay_ = delay;
 		}
 
-		public static Morph Create(JSONClass o)
+		public static AnimatedMorph Create(JSONClass o)
 		{
 			string id = o["morph"];
 
@@ -44,7 +43,7 @@ namespace Cue.Proc
 				if (!float.TryParse(o["max"], out max))
 					throw new LoadFailed("max is not a number");
 
-				return new Morph(
+				return new AnimatedMorph(
 					bodyPart, id, min, max,
 					Duration.FromJSON(o, "duration"),
 					Duration.FromJSON(o, "delay"));
@@ -62,7 +61,7 @@ namespace Cue.Proc
 
 		public ITarget Clone()
 		{
-			return new Morph(
+			return new AnimatedMorph(
 				bodyPart_, morphId_, min_, max_,
 				new Duration(duration_), new Duration(delay_));
 		}
@@ -72,7 +71,7 @@ namespace Cue.Proc
 			if (m_ == null)
 			{
 				m_ = new ClampableMorph(
-					p, morphId_, min_, max_,
+					p, bodyPart_, morphId_, min_, max_,
 					new Duration(duration_), new Duration(delay_));
 
 				m_.Set(1, float.MaxValue);
@@ -108,139 +107,6 @@ namespace Cue.Proc
 	}
 
 
-	static class PersonMorphs
-	{
-		public class MorphInfo
-		{
-			private string id_;
-			private DAZMorph m_;
-			private List<MorphInfo> subMorphs_ = new List<MorphInfo>();
-			private bool free_ = true;
-			private int freeFrame_ = -1;
-			private float multiplier_ = 1;
-
-			public MorphInfo(Person p, string id, DAZMorph m)
-			{
-				id_ = id;
-				m_ = m;
-
-				if (m_ != null && (m_.deltas == null || m_.deltas.Length == 0))
-				{
-					foreach (var sm in m_.formulas)
-					{
-						if (sm.targetType == DAZMorphFormulaTargetType.MorphValue)
-						{
-							var smm = Get(p, sm.target, m_.morphBank);
-							smm.multiplier_ = sm.multiplier;
-							subMorphs_.Add(smm);
-						}
-						else
-						{
-							subMorphs_.Clear();
-							break;
-						}
-					}
-
-					if (subMorphs_.Count > 0)
-						m_.Reset();
-				}
-			}
-
-			public override string ToString()
-			{
-				string s = id_ + " ";
-
-				if (m_ == null)
-					s += "notfound";
-				else
-					s += $"v={m_.morphValue:0.00} sub={subMorphs_.Count != 0} f={free_} ff={freeFrame_}";
-
-				return s;
-			}
-
-			public string ID
-			{
-				get { return id_; }
-			}
-
-			public float Value
-			{
-				get { return m_?.morphValue ?? -1; }
-			}
-
-			public float DefaultValue
-			{
-				get { return m_?.startValue ?? 0; }
-			}
-
-			public bool Set(float f)
-			{
-				if (m_ == null)
-					return false;
-
-				if (free_ || freeFrame_ != Cue.Instance.Frame)
-				{
-					if (subMorphs_.Count == 0)
-					{
-						if (f > m_.morphValue)
-							m_.morphValue = Math.Min(m_.morphValue + 0.01f, f);
-						else
-							m_.morphValue = Math.Max(m_.morphValue - 0.01f, f);
-					}
-					else
-					{
-						for (int i = 0; i < subMorphs_.Count; ++i)
-						{
-							float smf = f * subMorphs_[i].multiplier_;
-							subMorphs_[i].Set(smf);
-						}
-					}
-
-					free_ = false;
-					freeFrame_ = Cue.Instance.Frame;
-
-					return true;
-				}
-
-				return false;
-			}
-
-			public void Reset()
-			{
-				if (m_ != null)
-					m_.morphValue = m_.startValue;
-			}
-		}
-
-		private static Dictionary<string, MorphInfo> map_ =
-			new Dictionary<string, MorphInfo>();
-
-		public static MorphInfo Get(Person p, string morphId, DAZMorphBank bank = null)
-		{
-			string key = p.ID + "/" + morphId;
-
-			MorphInfo mi;
-			if (map_.TryGetValue(key, out mi))
-				return mi;
-
-			DAZMorph m;
-
-			if (bank == null)
-				m = p.VamAtom.FindMorph(morphId);
-			else
-				m = bank.GetMorph(morphId);
-
-			if (m == null)
-				Cue.LogError($"{p.ID}: morph '{morphId}' not found");
-
-			mi = new MorphInfo(p, morphId, m);
-			map_.Add(key, mi);
-
-			return mi;
-		}
-	}
-
-
 
 	class ClampableMorph
 	{
@@ -253,8 +119,9 @@ namespace Cue.Proc
 		private const int DelayOffState = 4;
 
 		private Person person_;
+		private int bodyPart_;
 		private string id_;
-		private PersonMorphs.MorphInfo morph_ = null;
+		private Morph morph_ = null;
 		private float start_, end_, mid_;
 		private Duration forward_, backward_;
 		private Duration delayOff_, delayOn_;
@@ -273,13 +140,14 @@ namespace Cue.Proc
 		private float disableBlinkAbove_ = NoDisableBlink;
 
 		private ClampableMorph(
-			Person p, string id, float min, float max,
+			Person p, int bodyPart, string id, float min, float max,
 			Duration fwdDuration, Duration bwdDuration,
 			Duration delayOff, Duration delayOn, bool resetBetween)
 		{
 			person_ = p;
+			bodyPart_ = bodyPart;
 			id_ = id;
-			morph_ = PersonMorphs.Get(p, id);
+			morph_ = new Morph(p.Atom.GetMorph(id));
 			start_ = min;
 			end_ = max;
 			mid_ = Mid();
@@ -297,19 +165,19 @@ namespace Cue.Proc
 		}
 
 		public ClampableMorph(
-			Person p, string id, float min, float max,
+			Person p, int bodyPart, string id, float min, float max,
 			Duration d, Duration delay)
-				: this(p, id, min, max, d, d, delay, delay, false)
+				: this(p, bodyPart, id, min, max, d, d, delay, delay, false)
 		{
 		}
 
 		public ClampableMorph(
-			Person p, string id, float start, float end,
+			Person p, int bodyPart, string id, float start, float end,
 			float minTime, float maxTime,
 			float delayOff, float delayOn,
 			bool resetBetween = false)
 				: this(
-					  p, id, start, end,
+					  p, bodyPart, id, start, end,
 					  new Duration(minTime, maxTime),
 					  new Duration(minTime, maxTime),
 					  new Duration(0, delayOff),
@@ -320,7 +188,7 @@ namespace Cue.Proc
 
 		public string Name
 		{
-			get { return morph_.ID; }
+			get { return morph_.Name; }
 		}
 
 		public override string ToString()
@@ -366,7 +234,10 @@ namespace Cue.Proc
 			delayOn_.Reset();
 
 			if (morph_ != null)
-				morph_.Reset();
+			{
+				if (bodyPart_ == BodyParts.None || !person_.Body.Get(bodyPart_).Busy)
+					morph_.Reset();
+			}
 		}
 
 		public void FixedUpdate(float s, bool limitHit)
@@ -490,7 +361,8 @@ namespace Cue.Proc
 
 			var d = v - mid_;
 
-			morph_.Set(v);
+			if (bodyPart_ == BodyParts.None || !person_.Body.Get(bodyPart_).Busy)
+				morph_.Value = v;
 
 			if (disableBlinkAbove_ != NoDisableBlink)
 				person_.Gaze.Eyes.Blink = (d < disableBlinkAbove_);

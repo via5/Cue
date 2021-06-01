@@ -244,9 +244,9 @@ namespace Cue.W
 			SetControllerForMoving("rFootControl", b);
 		}
 
-		public DAZMorph FindMorph(string id)
+		public IMorph GetMorph(string name)
 		{
-			return Cue.Instance.VamSys.FindMorph(atom_, id);
+			return new VamMorph(this, name);
 		}
 
 		public void OnPluginState(bool b)

@@ -885,6 +885,12 @@ namespace Cue.W
 			return UnityEngine.Quaternion.LookRotation(ToUnity(b - a)).eulerAngles.y;
 		}
 
+		public static Vector3 MoveTowards(Vector3 current, Vector3 target, float maxDistance)
+		{
+			return FromUnity(UnityEngine.Vector3.MoveTowards(
+				ToUnity(current), ToUnity(target), maxDistance));
+		}
+
 		public static Vector3 Rotate(float x, float y, float z)
 		{
 			return FromUnity(

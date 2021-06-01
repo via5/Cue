@@ -161,7 +161,7 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
-			if (person_.Body.Get(bodyPart_).Busy)
+			if (bodyPart_ != BodyParts.None && person_.Body.Get(bodyPart_).Busy)
 			{
 				wasBusy_ = true;
 				return;

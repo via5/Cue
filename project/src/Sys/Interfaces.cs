@@ -61,6 +61,7 @@ namespace Cue.W
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
 	}
 
+
 	struct HoveredInfo
 	{
 		public IObject o;
@@ -143,8 +144,10 @@ namespace Cue.W
 		float Trigger { get; }
 		bool CanGrab { get; }
 		bool Grabbed { get; }
-		Vector3 Position { get; set; }
-		Quaternion Rotation { get; set; }
+		Vector3 ControlPosition { get; set; }
+		Quaternion ControlRotation { get; set; }
+		Vector3 Position { get; }
+		Quaternion Rotation { get; }
 	}
 
 	interface IBone
@@ -169,11 +172,25 @@ namespace Cue.W
 		float Loose { set; }
 	}
 
+	interface IMorph
+	{
+		string Name { get; }
+		float Value { get; set; }
+		float DefaultValue { get; }
+		void Reset();
+	}
+
+	struct Hand
+	{
+		public IMorph fist;
+		public IBone[][] bones;
+	}
+
 	interface IBody
 	{
-		IBodyPart[]  GetBodyParts();
-		IBone[][] GetLeftHandBones();
-		IBone[][] GetRightHandBones();
+		IBodyPart[] GetBodyParts();
+		Hand GetLeftHand();
+		Hand GetRightHand();
 		float Sweat { set; }
 		void LerpColor(Color c, float f);
 	}
@@ -201,6 +218,8 @@ namespace Cue.W
 		IClothing Clothing { get; }
 		IBody Body { get; }
 		IHair Hair { get; }
+
+		IMorph GetMorph(string id);
 
 		void SetDefaultControls(string why);
 		void SetParentLink(IBodyPart bp);

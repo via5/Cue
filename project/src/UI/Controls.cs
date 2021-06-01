@@ -18,7 +18,9 @@ namespace Cue
 				object_.Position, new Vector3(0.5f, 0.05f, 0.5f),
 				new Color(0, 0, 1, 0.05f));
 
+			graphic_.Visible = false;
 			graphic_.Rotation = object_.Rotation;
+
 			UpdateColor();
 		}
 

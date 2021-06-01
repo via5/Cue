@@ -120,6 +120,7 @@ namespace Cue
 		private Person person_;
 		private int type_;
 		private W.IBodyPart part_;
+		private bool forceBusy_ = false;
 
 		public BodyPart(Person p, int type, W.IBodyPart part)
 		{
@@ -198,10 +199,18 @@ namespace Cue
 			return (d < 0.2f);
 		}
 
+		public void ForceBusy(bool b)
+		{
+			forceBusy_ = b;
+		}
+
 		public bool Busy
 		{
 			get
 			{
+				if (forceBusy_)
+					return true;
+
 				// todo
 				switch (type_)
 				{
@@ -235,18 +244,41 @@ namespace Cue
 			}
 		}
 
-		public Vector3 Position
+		public Vector3 ControlPosition
 		{
 			get
 			{
-				return part_?.Position ?? Vector3.Zero;
+				return part_?.ControlPosition ?? Vector3.Zero;
 
 			}
 
 			set
 			{
 				if (part_ != null)
-					part_.Position = value;
+					part_.ControlPosition = value;
+			}
+		}
+
+		public Quaternion ControlRotation
+		{
+			get
+			{
+				return part_?.ControlRotation ?? Quaternion.Zero;
+			}
+
+			set
+			{
+				if (part_ != null)
+					part_.ControlRotation = value;
+			}
+		}
+
+		public Vector3 Position
+		{
+			get
+			{
+				return part_?.Position ?? Vector3.Zero;
+
 			}
 		}
 
@@ -255,12 +287,6 @@ namespace Cue
 			get
 			{
 				return part_?.Rotation ?? Quaternion.Zero;
-			}
-
-			set
-			{
-				if (part_ != null)
-					part_.Rotation = value;
 			}
 		}
 
@@ -354,6 +380,38 @@ namespace Cue
 	}
 
 
+	class Morph
+	{
+		private W.IMorph m_;
+
+		public Morph(W.IMorph m)
+		{
+			m_ = m;
+		}
+
+		public string Name
+		{
+			get { return m_.Name; }
+		}
+
+		public float Value
+		{
+			get { return m_.Value; }
+			set { m_.Value = value; }
+		}
+
+		public float DefaultValue
+		{
+			get { return m_.DefaultValue; }
+		}
+
+		public void Reset()
+		{
+			m_.Reset();
+		}
+	}
+
+
 	class Finger
 	{
 		private Hand hand_;
@@ -409,18 +467,21 @@ namespace Cue
 		private Person person_;
 		private string name_;
 		private Finger[] fingers_;
+		private Morph fist_;
 
-		public Hand(Person p, string name, W.IBone[][] bones)
+		public Hand(Person p, string name, W.Hand h)
 		{
 			person_ = p;
 			name_ = name;
-			fingers_ = new Finger[5];
 
-			fingers_[0] = new Finger(this, "thumb", bones[0]);
-			fingers_[1] = new Finger(this, "index", bones[1]);
-			fingers_[2] = new Finger(this, "middle", bones[2]);
-			fingers_[3] = new Finger(this, "ring", bones[3]);
-			fingers_[4] = new Finger(this, "little", bones[4]);
+			fingers_ = new Finger[5];
+			fingers_[0] = new Finger(this, "thumb", h.bones[0]);
+			fingers_[1] = new Finger(this, "index", h.bones[1]);
+			fingers_[2] = new Finger(this, "middle", h.bones[2]);
+			fingers_[3] = new Finger(this, "ring", h.bones[3]);
+			fingers_[4] = new Finger(this, "little", h.bones[4]);
+
+			fist_ = new Morph(h.fist);
 		}
 
 		public string Name
@@ -457,6 +518,12 @@ namespace Cue
 		{
 			get { return fingers_[4]; }
 		}
+
+		public float Fist
+		{
+			get { return fist_.Value; }
+			set { fist_.Value = value; }
+		}
 	}
 
 
@@ -491,8 +558,8 @@ namespace Cue
 
 			all_ = all.ToArray();
 
-			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHandBones());
-			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHandBones());
+			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHand());
+			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHand());
 		}
 
 		public void Init()
