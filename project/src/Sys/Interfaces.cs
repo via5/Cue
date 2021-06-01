@@ -182,7 +182,7 @@ namespace Cue.W
 
 	struct Hand
 	{
-		public IMorph fist;
+		public IMorph fist, inOut;
 		public IBone[][] bones;
 	}
 

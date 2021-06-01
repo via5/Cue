@@ -29,7 +29,7 @@ namespace Cue
 	{
 		struct Render
 		{
-			public IGraphic hand, cig, targetHand, targetCig, mouth;
+			public IGraphic hand, cig, targetHand, targetHandMid, targetCig, mouth;
 		}
 
 		private const int NoState = 0;
@@ -40,7 +40,7 @@ namespace Cue
 		private const int MovingBack = 5;
 		private const int Stop = 6;
 
-		private const float MoveTime = 1;
+		private const float MoveTime = 2;
 		private const float AdjustTime = 2;
 		private const float AdjustPerSecond = 0.07f;
 		private const float PullTime = 2;
@@ -66,6 +66,7 @@ namespace Cue
 		private int state_ = NoState;
 		private Vector3 startPos_ = Vector3.Zero;
 		private Quaternion startRot_ = Quaternion.Zero;
+		private Vector3 targetMidPos_ = Vector3.Zero;
 		private Vector3 targetPos_ = Vector3.Zero;
 		private Quaternion targetRot_ = Quaternion.Zero;
 		private Render render_ = new Render();
@@ -73,6 +74,10 @@ namespace Cue
 		private float targetFist_ = 0;
 		private Morph mouthOpen_;
 		private Morph lipsPucker_;
+
+		private IEasing moveToMouthEasing_ = new SinusoidalEasing();
+		private IEasing moveBackEasing_ = new SinusoidalEasing();
+		private IEasing morphEasing_ = new SinusoidalEasing();
 
 
 		public SmokingInteraction(Person p)
@@ -93,11 +98,14 @@ namespace Cue
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
+
 			//var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
 			//
 			//render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
 			//render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
 			//render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
+			//render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
+
 			//render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
 			//render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
 		}
@@ -126,6 +134,7 @@ namespace Cue
 				return;
 
 			elapsed_ += s;
+			hand_.InOut = -1;
 
 			switch (state_)
 			{
@@ -178,6 +187,7 @@ namespace Cue
 			//render_.hand.Position = handPart_.Position;
 			//render_.cig.Position = cig_.Position;
 			//render_.targetHand.Position = targetPos_;
+			//render_.targetHandMid.Position = targetMidPos_;
 			//render_.targetCig.Position =
 			//	targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
 			//render_.mouth.Position = mouth.Position;
@@ -200,8 +210,10 @@ namespace Cue
 				head.Rotation.Euler.Y + 90,
 				head.Rotation.Euler.Z + 90);
 
-			targetPos_ =
-				mouth.Position - targetRot_.Rotate(d);
+			targetPos_ = mouth.Position - targetRot_.Rotate(d);
+			targetMidPos_ =
+				startPos_ + (targetPos_ - startPos_) / 2 +
+				head.Rotation.Rotate(new Vector3(0, 0, 0.2f));
 
 			targetFist_ = 0;
 
@@ -212,10 +224,20 @@ namespace Cue
 			handPart_.ForceBusy(true);
 		}
 
+		public static Vector3 Bezier(
+			Vector3 s,
+			Vector3 p,
+			Vector3 e,
+			float t)
+		{
+			float rt = 1 - t;
+			return rt * rt * s + 2 * rt * t * p + t * t * e;
+		}
+
 		private void MoveToMouth()
 		{
-			var f = U.Clamp(elapsed_ / MoveTime, 0, 1);
-			var p = Vector3.Lerp(startPos_, targetPos_, f);
+			var f = moveToMouthEasing_.Magnitude(U.Clamp(elapsed_ / MoveTime, 0, 1));
+			var p = Bezier(startPos_, targetMidPos_, targetPos_, f);
 			var r = Quaternion.Lerp(startRot_, targetRot_, f);
 
 			handPart_.ControlPosition = p;
@@ -238,7 +260,7 @@ namespace Cue
 			var cig = CigarettePosition();
 
 			{
-				float f = U.Clamp(elapsed_ / MouthOpenTime, 0, 1);
+				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / MouthOpenTime, 0, 1));
 				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * f;
 			}
 
@@ -250,7 +272,7 @@ namespace Cue
 			}
 
 			var offset = mouth.Position - cig;
-			var maxD = s * AdjustPerSecond;
+			var maxD = (s * AdjustPerSecond);
 
 			targetPos_ = handPart_.ControlPosition + offset;
 
@@ -269,12 +291,12 @@ namespace Cue
 		private void Pull()
 		{
 			{
-				float f = U.Clamp(elapsed_ / MouthCloseTime, 0, 1);
+				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / MouthCloseTime, 0, 1));
 				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * (1 - f);
 			}
 
 			{
-				float f = U.Clamp(elapsed_ / LipsPuckerTime, 0, 1);
+				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / LipsPuckerTime, 0, 1));
 				lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * f;
 			}
 
@@ -291,12 +313,12 @@ namespace Cue
 		private void Inhale()
 		{
 			{
-				float f = U.Clamp(elapsed_ / MouthOpenTime, 0, 1);
+				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / MouthOpenTime, 0, 1));
 				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * f;
 			}
 
 			{
-				float ff = U.Clamp(elapsed_ / LipsPuckerTime, 0, 1);
+				float ff = morphEasing_.Magnitude(U.Clamp(elapsed_ / LipsPuckerTime, 0, 1));
 				lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * (ff - 1);
 			}
 
@@ -312,8 +334,8 @@ namespace Cue
 
 		private void MoveBack()
 		{
-			var f = U.Clamp((MoveTime - elapsed_) / MoveTime, 0, 1);
-			var p = Vector3.Lerp(startPos_, targetPos_, f);
+			var f = moveBackEasing_.Magnitude(U.Clamp((MoveTime - elapsed_) / MoveTime, 0, 1));
+			var p = Bezier(startPos_, targetMidPos_, targetPos_, f);
 			var r = Quaternion.Lerp(startRot_, targetRot_, f);
 
 			var head = person_.Body.Get(BodyParts.Head);
@@ -323,7 +345,7 @@ namespace Cue
 			hand_.Fist = startFist_ + (targetFist_ - startFist_) * f;
 
 			{
-				float ff = U.Clamp(elapsed_ / MouthOpenTime, 0, 1);
+				float ff = morphEasing_.Magnitude(U.Clamp(elapsed_ / MouthOpenTime, 0, 1));
 				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * (1 - ff);
 			}
 
@@ -359,7 +381,7 @@ namespace Cue
 			var p = ip + (dp - ip) / 2;
 			var r = person_.Body.RightHand.Middle.Intermediate.Rotation;
 
-			return p + r.Rotate(new Vector3(0.01f, -0.025f, 0));
+			return p + r.Rotate(new Vector3(0.02f, -0.025f, 0));
 		}
 
 		private void SetPosition()

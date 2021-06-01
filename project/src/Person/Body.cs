@@ -468,6 +468,7 @@ namespace Cue
 		private string name_;
 		private Finger[] fingers_;
 		private Morph fist_;
+		private Morph inOut_;
 
 		public Hand(Person p, string name, W.Hand h)
 		{
@@ -482,6 +483,7 @@ namespace Cue
 			fingers_[4] = new Finger(this, "little", h.bones[4]);
 
 			fist_ = new Morph(h.fist);
+			inOut_ = new Morph(h.inOut);
 		}
 
 		public string Name
@@ -523,6 +525,12 @@ namespace Cue
 		{
 			get { return fist_.Value; }
 			set { fist_.Value = value; }
+		}
+
+		public float InOut
+		{
+			get { return inOut_.Value; }
+			set { inOut_.Value = value; }
 		}
 	}
 

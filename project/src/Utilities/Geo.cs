@@ -112,6 +112,11 @@ namespace Cue
 			return new Vector3(v.X * f, v.Y * f, v.Z * f);
 		}
 
+		public static Vector3 operator *(float f, Vector3 v)
+		{
+			return new Vector3(v.X * f, v.Y * f, v.Z * f);
+		}
+
 		public static Vector3 operator *(Vector3 a, Vector3 b)
 		{
 			return new Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);

@@ -197,6 +197,7 @@ namespace Cue.W
 			var h = new Hand();
 			h.bones = GetHandBones("l");
 			h.fist = new VamMorph(atom_, "Left Fingers Fist");
+			h.inOut = new VamMorph(atom_, "Left Fingers In-Out");
 
 			return h;
 		}
@@ -206,6 +207,7 @@ namespace Cue.W
 			var h = new Hand();
 			h.bones = GetHandBones("r");
 			h.fist = new VamMorph(atom_, "Right Fingers Fist");
+			h.inOut = new VamMorph(atom_, "Right Fingers In-Out");
 
 			return h;
 		}
