@@ -6,6 +6,7 @@ namespace Cue
 	{
 		bool InteractWith(IObject o);
 		void RunEvent(IEvent e);
+		void FixedUpdate(float s);
 		void Update(float s);
 		void MakeIdle();
 		bool EventsEnabled { get; set; }
@@ -174,6 +175,15 @@ namespace Cue
 			{
 				log_.Info($"stop to run forced event {forced_}");
 				Stop();
+			}
+		}
+
+		public void FixedUpdate(float s)
+		{
+			if (interactionsEnabled_)
+			{
+				for (int i = 0; i < interactions_.Count; ++i)
+					interactions_[i].FixedUpdate(s);
 			}
 		}
 

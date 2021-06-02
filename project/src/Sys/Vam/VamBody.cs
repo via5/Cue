@@ -680,6 +680,16 @@ namespace Cue.W
 		public abstract Quaternion ControlRotation { get; set; }
 		public abstract Vector3 Position { get; }
 		public abstract Quaternion Rotation { get; }
+
+		public virtual void AddRelativeForce(Vector3 v)
+		{
+			// no-op
+		}
+
+		public virtual void AddRelativeTorque(Vector3 v)
+		{
+			// no-op
+		}
 	}
 
 
@@ -745,6 +755,16 @@ namespace Cue.W
 		public override Quaternion Rotation
 		{
 			get { return W.VamU.FromUnity(rb_.rotation); }
+		}
+
+		public override void AddRelativeForce(Vector3 v)
+		{
+			rb_.AddRelativeForce(VamU.ToUnity(v));
+		}
+
+		public override void AddRelativeTorque(Vector3 v)
+		{
+			rb_.AddRelativeTorque(VamU.ToUnity(v));
 		}
 
 		public override string ToString()

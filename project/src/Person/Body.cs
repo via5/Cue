@@ -290,6 +290,16 @@ namespace Cue
 			}
 		}
 
+		public void AddRelativeForce(Vector3 v)
+		{
+			part_?.AddRelativeForce(v);
+		}
+
+		public void AddRelativeTorque(Vector3 v)
+		{
+			part_?.AddRelativeTorque(v);
+		}
+
 		public override string ToString()
 		{
 			string s = "";

@@ -351,6 +351,9 @@ namespace Cue
 
 			if (this != Cue.Instance.Player)
 				expression_.FixedUpdate(s);
+
+			if (ai_ != null && !Atom.Teleporting)
+				ai_.FixedUpdate(s);
 		}
 
 		public override void Update(float s)

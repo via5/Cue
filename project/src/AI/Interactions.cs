@@ -6,6 +6,7 @@ namespace Cue
 {
 	interface IInteraction
 	{
+		void FixedUpdate(float s);
 		void Update(float s);
 	}
 
@@ -21,7 +22,15 @@ namespace Cue
 			};
 		}
 
-		public abstract void Update(float s);
+		public virtual void FixedUpdate(float s)
+		{
+			// no-op
+		}
+
+		public virtual void Update(float s)
+		{
+			// no-op
+		}
 	}
 
 
@@ -61,6 +70,9 @@ namespace Cue
 		private const float LipsPuckerTime = 0.2f;
 
 		private const float MidPointDistance = 0.3f;
+
+		private const float HeadUpTorque = -15;
+		private const float HeadUpTime = 1;
 
 		private Person person_;
 		private Logger log_;
@@ -105,15 +117,15 @@ namespace Cue
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
-			var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
-
-			render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
-			render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
-			render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
-			render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
-
-			render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
-			render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
+			//var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
+			//
+			//render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
+			//render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
+			//render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
+			//render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
+			//
+			//render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
+			//render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
 		}
 
 		private string CigaretteID
@@ -124,7 +136,7 @@ namespace Cue
 			}
 		}
 
-		public override void Update(float s)
+		public override void FixedUpdate(float s)
 		{
 			if (!enabled_)
 				return;
@@ -195,14 +207,14 @@ namespace Cue
 			SetPosition();
 
 
-			var mouth = person_.Body.Get(BodyParts.Lips);
-			render_.hand.Position = handPart_.Position;
-			render_.cig.Position = cig_.Position;
-			render_.targetHand.Position = targetPos_;
-			render_.targetHandMid.Position = targetMidPos_;
-			render_.targetCig.Position =
-				targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
-			render_.mouth.Position = mouth.Position;
+//			var mouth = person_.Body.Get(BodyParts.Lips);
+//			render_.hand.Position = handPart_.Position;
+//			render_.cig.Position = cig_.Position;
+//			render_.targetHand.Position = targetPos_;
+//			render_.targetHandMid.Position = targetMidPos_;
+//			render_.targetCig.Position =
+//				targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
+//			render_.mouth.Position = mouth.Position;
 		}
 
 		private void StartMoveToMouth()
@@ -225,7 +237,7 @@ namespace Cue
 
 			targetPos_ =
 				mouth.Position - targetRot_.Rotate(d) +
-				head.Rotation.Rotate(new Vector3(0, 0, 0.01f));
+				head.Rotation.Rotate(new Vector3(0, 0, 0.005f));
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
@@ -448,6 +460,11 @@ namespace Cue
 					float f = morphEasing_.Magnitude(U.Clamp(e / LipsPuckerTime, 0, 1));
 					lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * f;
 				}
+
+				{
+					float f = moveToMouthEasing_.Magnitude(U.Clamp(e / HeadUpTime, 0, 1));
+					head.AddRelativeTorque(new Vector3(HeadUpTorque * f, 0, 0));
+				}
 			}
 
 			{
@@ -462,7 +479,7 @@ namespace Cue
 				hand_.Fist = startFist_ + (targetFist_ - startFist_) * f;
 			}
 
-			if (elapsed_ >= ExhaleTime && elapsed_ >= MoveTime && elapsed_ >= RotationTime)
+			if (elapsed_ >= ExhaleTime && elapsed_ >= MoveTime && elapsed_ >= RotationTime && elapsed_ >= HeadUpTime)
 			{
 				head.ForceBusy(false);
 				handPart_.ForceBusy(false);
@@ -478,6 +495,8 @@ namespace Cue
 
 		private void Reset()
 		{
+			var head = person_.Body.Get(BodyParts.Head);
+
 			{
 				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
 				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * (1 - f);
@@ -486,6 +505,11 @@ namespace Cue
 			{
 				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
 				lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * (1 - f);
+			}
+
+			{
+				float f = moveToMouthEasing_.Magnitude(U.Clamp(elapsed_ / HeadUpTime, 0, 1));
+				head.AddRelativeTorque(new Vector3(HeadUpTorque * (1 - f), 0, 0));
 			}
 
 			if (elapsed_ >= ResetTime)

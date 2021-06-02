@@ -148,6 +148,8 @@ namespace Cue.W
 		Quaternion ControlRotation { get; set; }
 		Vector3 Position { get; }
 		Quaternion Rotation { get; }
+		void AddRelativeForce(Vector3 v);
+		void AddRelativeTorque(Vector3 v);
 	}
 
 	interface IBone
