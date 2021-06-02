@@ -53,7 +53,7 @@ namespace Cue
 		private const float MoveTime = 2;
 		private const float RotationTime = 2;
 		private const float AdjustTime = 2;
-		private const float AdjustPerSecond = 0.07f;
+		private const float AdjustPerSecond = 0.05f;
 		private const float PullTime = 2;
 		private const float InhaleTime = 0.3f;
 		private const float HoldInTime = 1;
@@ -117,15 +117,15 @@ namespace Cue
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
-			//var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
-			//
-			//render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
-			//render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
-			//render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
-			//render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
-			//
-			//render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
-			//render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
+			var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
+
+			render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
+			render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
+			render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
+			render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
+
+			render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
+			render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
 		}
 
 		private string CigaretteID
@@ -207,14 +207,49 @@ namespace Cue
 			SetPosition();
 
 
-//			var mouth = person_.Body.Get(BodyParts.Lips);
-//			render_.hand.Position = handPart_.Position;
-//			render_.cig.Position = cig_.Position;
-//			render_.targetHand.Position = targetPos_;
-//			render_.targetHandMid.Position = targetMidPos_;
-//			render_.targetCig.Position =
-//				targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
-//			render_.mouth.Position = mouth.Position;
+			var mouth = person_.Body.Get(BodyParts.Lips);
+			render_.hand.Position = handPart_.Position;
+			render_.cig.Position = cig_.Position;
+			render_.targetHand.Position = targetPos_;
+			render_.targetHandMid.Position = targetMidPos_;
+			render_.targetCig.Position =
+				targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
+			render_.mouth.Position = mouth.Position;
+		}
+
+		private Quaternion GetTargetRotation()
+		{
+			var head = person_.Body.Get(BodyParts.Head);
+
+			if (hand_ == person_.Body.RightHand)
+			{
+				return Quaternion.FromEuler(
+					head.Rotation.Euler.X,
+					head.Rotation.Euler.Y + 90,
+					head.Rotation.Euler.Z + 90);
+			}
+			else
+			{
+				return Quaternion.FromEuler(
+					head.Rotation.Euler.X,
+					head.Rotation.Euler.Y + 270,
+					head.Rotation.Euler.Z + 270 );
+			}
+		}
+
+		private void CheckTarget()
+		{
+			var head = person_.Body.Get(BodyParts.Head);
+			var mouth = person_.Body.Get(BodyParts.Lips);
+
+			var d = handPart_.ControlRotation.RotateInv(
+				CigarettePosition() - handPart_.ControlPosition);
+
+			targetRot_ = GetTargetRotation();
+
+			targetPos_ =
+				mouth.Position - targetRot_.Rotate(d) +
+				head.Rotation.Rotate(new Vector3(0, 0, 0.005f));
 		}
 
 		private void StartMoveToMouth()
@@ -223,21 +258,11 @@ namespace Cue
 			var chest = person_.Body.Get(BodyParts.Chest);
 			var mouth = person_.Body.Get(BodyParts.Lips);
 
-			var d = handPart_.ControlRotation.RotateInv(
-				CigarettePosition() - handPart_.ControlPosition);
-
 			startPos_ = handPart_.Position;
 			startRot_ = handPart_.Rotation;
 			startFist_ = hand_.Fist;
 
-			targetRot_ = Quaternion.FromEuler(
-				head.Rotation.Euler.X,
-				head.Rotation.Euler.Y + 90,
-				head.Rotation.Euler.Z + 90);
-
-			targetPos_ =
-				mouth.Position - targetRot_.Rotate(d) +
-				head.Rotation.Rotate(new Vector3(0, 0, 0.005f));
+			CheckTarget();
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
@@ -262,7 +287,7 @@ namespace Cue
 			return rt * rt * s + 2 * rt * t * p + t * t * e;
 		}
 
-		private Quaternion GetRotationPoint(float f)
+		private Quaternion GetRotationPoint(float f, bool xNeg, bool yNeg, bool zNeg)
 		{
 			var s = startRot_.Euler;
 			var t = targetRot_.Euler;
@@ -275,8 +300,16 @@ namespace Cue
 
 				if (Math.Abs(Vector3.AngleBetweenBearings(x1, x2)) > 50)
 				{
-					if (x2 > x1)
-						x1 += 360;
+					if (xNeg)
+					{
+						if (x2 > x1)
+							x1 += 360;
+					}
+					else
+					{
+						if (x1 > x2)
+							x2 += 360;
+					}
 
 					x = x1 + (x2 - x1) * f;
 				}
@@ -292,8 +325,16 @@ namespace Cue
 
 				if (Math.Abs(Vector3.AngleBetweenBearings(y1, y2)) > 50)
 				{
-					if (y1 > y2)
-						y2 += 360;
+					if (yNeg)
+					{
+						if (y2 > y1)
+							y1 += 360;
+					}
+					else
+					{
+						if (y1 > y2)
+							y2 += 360;
+					}
 
 					y = y1 + (y2 - y1) * f;
 				}
@@ -309,8 +350,16 @@ namespace Cue
 
 				if (Math.Abs(Vector3.AngleBetweenBearings(z1, z2)) > 50)
 				{
-					if (z2 > z1)
-						z1 += 360;
+					if (zNeg)
+					{
+						if (z2 > z1)
+							z1 += 360;
+					}
+					else
+					{
+						if (z1 > z2)
+							z2 += 360;
+					}
 
 					z = z1 + (z2 - z1) * f;
 				}
@@ -328,8 +377,23 @@ namespace Cue
 			var s = startRot_.Euler;
 			var t = targetRot_.Euler;
 
+			bool xNeg, yNeg, zNeg;
+
+			if (hand_ == person_.Body.RightHand)
+			{
+				xNeg = true;
+				yNeg = false;
+				zNeg = true;
+			}
+			else
+			{
+				xNeg = true;
+				yNeg = true;
+				zNeg = false;
+			}
+
 			float midF = 0.3f;
-			var mid = GetRotationPoint(midF);
+			var mid = GetRotationPoint(midF, xNeg, yNeg, zNeg);
 
 			if (f <= midF)
 				return Quaternion.Lerp(startRot_, mid, f / midF);
@@ -339,6 +403,9 @@ namespace Cue
 
 		private void MoveToMouth()
 		{
+			if (elapsed_ < (MoveTime - 0.5f))
+				CheckTarget();
+
 			var f = moveToMouthEasing_.Magnitude(U.Clamp(elapsed_ / MoveTime, 0, 1));
 			var p = Bezier(startPos_, targetMidPos_, targetPos_, f);
 
@@ -529,23 +596,30 @@ namespace Cue
 
 		private Vector3 CigarettePosition()
 		{
-			var ia = person_.Body.RightHand.Index.Intermediate;
-			var ib = person_.Body.RightHand.Middle.Intermediate;
+			var ia = hand_.Index.Intermediate;
+			var ib = hand_.Middle.Intermediate;
 			var ip = ia.Position + (ib.Position - ia.Position) / 2;
 
-			var da = person_.Body.RightHand.Index.Distal;
-			var db = person_.Body.RightHand.Middle.Distal;
+			var da = hand_.Index.Distal;
+			var db = hand_.Middle.Distal;
 			var dp = da.Position + (db.Position - da.Position) / 2;
 
 			var p = ip + (dp - ip) / 2;
-			var r = person_.Body.RightHand.Middle.Intermediate.Rotation;
+			var r = hand_.Middle.Intermediate.Rotation;
 
-			return p + r.Rotate(new Vector3(0.02f, -0.025f, 0));
+			float vertOffset;
+
+			if (hand_ == person_.Body.RightHand)
+				vertOffset = 0.02f;
+			else
+				vertOffset = -0.01f;
+
+			return p + r.Rotate(new Vector3(vertOffset, -0.025f, 0));
 		}
 
 		private void SetPosition()
 		{
-			var e = person_.Body.RightHand.Middle.Intermediate.Rotation.Euler;
+			var e = hand_.Middle.Intermediate.Rotation.Euler;
 			var q = Quaternion.FromEuler(e.X, e.Y, e.Z + 10);
 
 			cig_.Position = CigarettePosition();
