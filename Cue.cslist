@@ -62,6 +62,7 @@ project\src\UI\ScriptUI\AITab.cs
 project\src\UI\ScriptUI\AnimationsTab.cs
 project\src\UI\ScriptUI\BodyTab.cs
 project\src\UI\ScriptUI\DumpTab.cs
+project\src\UI\ScriptUI\ExcitementTab.cs
 project\src\UI\ScriptUI\MiscTab.cs
 project\src\UI\ScriptUI\ScriptUI.cs
 project\src\UI\ScriptUI\StateTab.cs

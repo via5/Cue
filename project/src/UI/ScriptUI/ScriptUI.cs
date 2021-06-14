@@ -89,11 +89,10 @@ namespace Cue
 
 			tabs_.Add(new PersonStateTab(person_));
 			tabs_.Add(new PersonAITab(person_));
-			tabs_.Add(new PersonDumpTab(person_));
+			tabs_.Add(new PersonExcitementTab(person_));
 			tabs_.Add(new PersonBodyTab(person_));
-			tabs_.Add(new PersonBodyPartsTab(person_));
-			tabs_.Add(new PersonHandsTab(person_));
 			tabs_.Add(new PersonAnimationsTab(person_));
+			tabs_.Add(new PersonDumpTab(person_));
 
 			foreach (var t in tabs_)
 				tabsWidget_.AddTab(t.Title, t);
