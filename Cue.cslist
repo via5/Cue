@@ -57,8 +57,8 @@ project\src\Sys\Vam\VamParameter.cs
 project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
 project\src\UI\Menu.cs
-project\src\UI\ScriptUI.cs
 project\src\UI\UI.cs
+project\src\UI\ScriptUI\ScriptUI.cs
 project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Geo.cs
