@@ -153,7 +153,14 @@
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />
     <Compile Include="src\UI\Menu.cs" />
+    <Compile Include="src\UI\ScriptUI\AITab.cs" />
+    <Compile Include="src\UI\ScriptUI\BodyTab.cs" />
+    <Compile Include="src\UI\ScriptUI\AnimationsTab.cs" />
+    <Compile Include="src\UI\ScriptUI\DumpTab.cs" />
+    <Compile Include="src\UI\ScriptUI\MiscTab.cs" />
     <Compile Include="src\UI\ScriptUI\ScriptUI.cs" />
+    <Compile Include="src\UI\ScriptUI\StateTab.cs" />
+    <Compile Include="src\UI\ScriptUI\UnityTab.cs" />
     <Compile Include="src\UI\UI.cs" />
     <Compile Include="src\Utilities\Duration.cs" />
     <Compile Include="src\Utilities\Easings.cs">

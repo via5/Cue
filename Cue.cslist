@@ -58,7 +58,14 @@ project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
 project\src\UI\Menu.cs
 project\src\UI\UI.cs
+project\src\UI\ScriptUI\AITab.cs
+project\src\UI\ScriptUI\AnimationsTab.cs
+project\src\UI\ScriptUI\BodyTab.cs
+project\src\UI\ScriptUI\DumpTab.cs
+project\src\UI\ScriptUI\MiscTab.cs
 project\src\UI\ScriptUI\ScriptUI.cs
+project\src\UI\ScriptUI\StateTab.cs
+project\src\UI\ScriptUI\UnityTab.cs
 project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Geo.cs
