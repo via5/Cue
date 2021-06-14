@@ -6,6 +6,8 @@ namespace Cue
 {
 	class ScriptUI
 	{
+		private const float UpdateInterval = 0.3f;
+
 		private VUI.Root root_ = null;
 
 		private VUI.Panel panel_ = new VUI.Panel();
@@ -38,7 +40,7 @@ namespace Cue
 		public void Update(float s, Tickers tickers)
 		{
 			updateElapsed_ += s;
-			if (updateElapsed_ > 1)
+			if (updateElapsed_ > UpdateInterval)
 			{
 				for (int i = 0; i < tabs_.Count; ++i)
 				{
@@ -863,46 +865,43 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			if (IsVisibleOnScreen())
+			for (int i = 0; i < widgets_.Count; ++i)
 			{
-				for (int i = 0; i < widgets_.Count; ++i)
+				var w = widgets_[i];
+
+				if (w.part.Exists)
 				{
-					var w = widgets_[i];
-
-					if (w.part.Exists)
+					if (w.part.Sys.CanTrigger)
 					{
-						if (w.part.Sys.CanTrigger)
-						{
-							w.triggering.Text = w.part.Trigger.ToString("0.##");
+						w.triggering.Text = w.part.Trigger.ToString("0.##");
 
-							w.triggering.TextColor = (
-								w.part.Trigger > 0 ?
-								W.VamU.ToUnity(Color.Green) :
-								VUI.Style.Theme.TextColor);
-						}
-						else
-						{
-							w.triggering.Text = "";
-						}
-
-						if (w.part.Sys.CanGrab)
-						{
-							w.grab.Text = w.part.Grabbed.ToString();
-
-							w.grab.TextColor = (
-								w.part.Grabbed ?
-								W.VamU.ToUnity(Color.Green) :
-								VUI.Style.Theme.TextColor);
-						}
-						else
-						{
-							w.grab.Text = "";
-						}
-
-
-						w.position.Text = w.part.Position.ToString();
-						w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
+						w.triggering.TextColor = (
+							w.part.Trigger > 0 ?
+							W.VamU.ToUnity(Color.Green) :
+							VUI.Style.Theme.TextColor);
 					}
+					else
+					{
+						w.triggering.Text = "";
+					}
+
+					if (w.part.Sys.CanGrab)
+					{
+						w.grab.Text = w.part.Grabbed.ToString();
+
+						w.grab.TextColor = (
+							w.part.Grabbed ?
+							W.VamU.ToUnity(Color.Green) :
+							VUI.Style.Theme.TextColor);
+					}
+					else
+					{
+						w.grab.Text = "";
+					}
+
+
+					w.position.Text = w.part.Position.ToString();
+					w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
 				}
 			}
 		}
@@ -977,17 +976,14 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			if (IsVisibleOnScreen())
+			for (int i = 0; i < widgets_.Count; ++i)
 			{
-				for (int i = 0; i < widgets_.Count; ++i)
-				{
-					var w = widgets_[i];
+				var w = widgets_[i];
 
-					if (w.bone.Exists)
-					{
-						w.position.Text = w.bone.Position.ToString();
-						w.direction.Text = w.bone.Rotation.ToString();
-					}
+				if (w.bone.Exists)
+				{
+					w.position.Text = w.bone.Position.ToString();
+					w.direction.Text = w.bone.Rotation.ToString();
 				}
 			}
 		}
