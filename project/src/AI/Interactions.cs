@@ -18,8 +18,9 @@ namespace Cue
 		{
 			return new IInteraction[]
 			{
-				new SmokingInteraction(p),
-				new KissingInteraction(p)
+				new FingerSuckInteraction(p),
+				new KissingInteraction(p),
+				new SmokingInteraction(p)
 			};
 		}
 
@@ -36,6 +37,37 @@ namespace Cue
 		public virtual void Update(float s)
 		{
 			// no-op
+		}
+	}
+
+
+	class FingerSuckInteraction : BasicInteraction
+	{
+		private Person person_;
+		private Logger log_;
+		private bool busy_ = false;
+
+		public FingerSuckInteraction(Person p)
+		{
+			person_ = p;
+			log_ = new Logger(Logger.Interaction, p, "FSuckInt");
+		}
+
+		public override void Update(float s)
+		{
+			var t = person_.Body.Get(BodyParts.Lips).Trigger;
+			var head = person_.Body.Get(BodyParts.Head);
+
+			if (!busy_ && t > 0 && !head.Busy)
+			{
+				busy_ = true;
+				head.ForceBusy(true);
+			}
+			else if (busy_ && t == 0)
+			{
+				busy_ = false;
+				head.ForceBusy(false);
+			}
 		}
 	}
 
@@ -164,7 +196,9 @@ namespace Cue
 			{
 				case NoState:
 				{
-					StartMoveToMouth();
+					if (CanRun())
+						StartMoveToMouth();
+
 					break;
 				}
 
@@ -223,6 +257,26 @@ namespace Cue
 					targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
 				render_.mouth.Position = mouth.Position;
 			}
+		}
+
+		private bool CanRun()
+		{
+			var b = person_.Body;
+			var head = b.Get(BodyParts.Head);
+			var lips = b.Get(BodyParts.Lips);
+
+			bool busy =
+				handPart_.Busy ||
+				head.Busy || head.Trigger > 0 ||
+				lips.Busy || lips.Trigger > 0;
+
+			if (busy)
+				return false;
+
+			if (b.GropedByAny(BodyParts.Head))
+				return false;
+
+			return true;
 		}
 
 		private Quaternion GetTargetRotation()
@@ -596,7 +650,7 @@ namespace Cue
 
 			if (elapsed_ >= ResetTime)
 			{
-				StartMoveToMouth();
+				state_ = NoState;
 				smoke_.Opacity = 0;
 			}
 		}
@@ -628,32 +682,39 @@ namespace Cue
 
 			if (a != null)
 			{
-				person_.Log.Info("cig already exists, destroying");
-				a.Destroy();
+				person_.Log.Info("cig already exists, taking");
+				SetCigarette(new BasicObject(-1, a));
 			}
-
-			person_.Log.Info("creating cigarette");
-
-			var oc = Resources.Objects.Get("cigarette");
-			if (oc == null)
+			else
 			{
-				person_.Log.Error("no cigarette object creator");
-				return;
-			}
+				person_.Log.Info("creating cigarette");
 
-			oc.Create(CigaretteID, (o) =>
-			{
-				if (o == null)
+				var oc = Resources.Objects.Get("cigarette");
+				if (oc == null)
 				{
-					person_.Log.Error("failed to create cigarette");
+					person_.Log.Error("no cigarette object creator");
 					return;
 				}
 
-				cig_ = o;
-				cig_.Atom.Collisions = false;
-				cig_.Atom.Physics = false;
-				cig_.Atom.Hidden = true;
-			});
+				oc.Create(CigaretteID, (o) =>
+				{
+					if (o == null)
+					{
+						person_.Log.Error("failed to create cigarette");
+						return;
+					}
+
+					SetCigarette(o);
+				});
+			}
+		}
+
+		private void SetCigarette(IObject o)
+		{
+			cig_ = o;
+			cig_.Atom.Collisions = false;
+			cig_.Atom.Physics = false;
+			cig_.Atom.Hidden = true;
 		}
 
 		private Vector3 CigarettePosition()

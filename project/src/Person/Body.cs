@@ -636,6 +636,17 @@ namespace Cue
 			return false;
 		}
 
+		public bool GropedByAny(int triggerBodyPart)
+		{
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (GropedBy(Cue.Instance.Persons[i], BodyParts.Head))
+					return true;
+			}
+
+			return false;
+		}
+
 		public bool GropedBy(Person p, int triggerBodyPart)
 		{
 			return GropedBy(p, new int[] { triggerBodyPart });

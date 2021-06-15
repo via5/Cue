@@ -14,17 +14,19 @@
 
 			if (a != null)
 			{
-				Cue.LogInfo("smoke already exists, destroying");
-				a.Destroy();
+				Cue.LogInfo("smoke already exists, taking");
+				SetSmoke(new BasicObject(-1, a));
 			}
-
-			Cue.LogInfo("creating smoke");
-
-			var oc = Resources.Objects.Get("cigaretteSmoke");
-			if (oc == null)
-				Cue.LogWarning("no cigarette smoke object creator");
 			else
-				oc.Create(id, (o) => { SetSmoke(o); });
+			{
+				Cue.LogInfo("creating smoke");
+
+				var oc = Resources.Objects.Get("cigaretteSmoke");
+				if (oc == null)
+					Cue.LogWarning("no cigarette smoke object creator");
+				else
+					oc.Create(id, (o) => { SetSmoke(o); });
+			}
 		}
 
 		public Vector3 Position

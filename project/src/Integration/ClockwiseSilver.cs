@@ -456,8 +456,8 @@ namespace Cue
 
 			// todo
 			hand_.Value = "Right";  // also change LeftUsed and RightUsed
-			handX_.Value = 0.03f;
-			handY_.Value = -0.08f;
+			handX_.Value = 0;
+			handY_.Value = 0;
 			handZ_.Value = 0.00f;
 			closeMax_.Value = 0.5f;
 
@@ -480,7 +480,7 @@ namespace Cue
 				if (elapsed_ >= 2)
 				{
 					closedHand_ = true;
-					closeMax_.Value = 0.75f;
+					//closeMax_.Value = 0.75f;
 				}
 			}
 		}
@@ -533,9 +533,9 @@ namespace Cue
 			sfxVolume_.Value = 0;
 			moanVolume_.Value = 0;
 			volumeScaling_.Value = 0;
-			headX_.Value = 0.01f;
-			headY_.Value = 0.12f;
-			headZ_.Value = 0.03f;
+			headX_.Value = 0;
+			headY_.Value = 0;
+			headZ_.Value = 0;
 		}
 
 		public bool Active
