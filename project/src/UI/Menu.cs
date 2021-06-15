@@ -7,9 +7,9 @@
 		private VUI.Label label_ = null;
 		private VUI.Panel selButtons_ = null;
 		private VUI.Panel playerButtons_ = null;
-		private VUI.CheckBox canKiss_ = new VUI.CheckBox("Can kiss");
-		private VUI.CheckBox forceExcitement_ = new VUI.CheckBox("Ex");
-		private VUI.FloatTextSlider excitement_ = new VUI.FloatTextSlider();
+		private VUI.CheckBox canKiss_ = null;
+		private VUI.CheckBox forceExcitement_ = null;
+		private VUI.FloatTextSlider excitement_ = null;
 		private bool force_ = false;
 		private IObject sel_ = null;
 		private IObject hov_ = null;
@@ -28,6 +28,10 @@
 			{
 				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 210));
 			}
+
+			canKiss_ = new VUI.CheckBox("Can kiss");
+			forceExcitement_ = new VUI.CheckBox("Ex");
+			excitement_ = new VUI.FloatTextSlider();
 
 
 			var p = new VUI.Panel(new VUI.VerticalFlow());

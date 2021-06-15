@@ -139,12 +139,11 @@ namespace Cue.W
 			add(BodyParts.Mouth, GetTrigger(BodyParts.Mouth, "", "MouthTrigger"));
 			add(BodyParts.LeftBreast, GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
 			add(BodyParts.RightBreast, GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
-			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", ""));
 
-			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", ""));
-
-			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", ""));
-			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", ""));
+			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", new string[] { "lThigh", "rThigh" }));
+			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
+			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
+			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
 			add(BodyParts.Anus, null);
 
 			add(BodyParts.Chest, GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
@@ -362,7 +361,7 @@ namespace Cue.W
 
 		private IBodyPart GetTrigger(
 			int id, string controller,
-			string nameFemale, string nameMale = "same", bool ignoreTrigger = false)
+			string nameFemale, string nameMale = "same", string[] ignoreTransforms=null)
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -396,7 +395,7 @@ namespace Cue.W
 					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.ID}");
 			}
 
-			return new TriggerBodyPart(atom_, id, t, fc, ignoreTrigger);
+			return new TriggerBodyPart(atom_, id, t, fc, ignoreTransforms);
 		}
 
 		private IBodyPart GetCollider(int id, string controller, string nameFemale, string nameMale = "same")
@@ -851,18 +850,40 @@ namespace Cue.W
 		private Trigger trigger_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_;
-		private bool ignoreTrigger_;
+		private Transform ignoreStop_ = null;
+		private Transform[] ignoreTransforms_ = new Transform[0];
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, bool ignoreTrigger = false)
+			FreeControllerV3 fc, string[] ignoreTransforms)
 				: base(a, type)
 		{
 			h_ = h;
 			trigger_ = h.collisionTrigger.trigger;
 			rb_ = h.thisRigidbody;
 			fc_ = fc;
-			ignoreTrigger_ = ignoreTrigger;
+
+			if (ignoreTransforms != null)
+			{
+				var rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, "hip");
+				if (rb == null)
+					Cue.LogError($"{a.ID}: trigger {h.name}: no hip");
+				else
+					ignoreStop_ = rb.transform;
+
+				var list = new List<Transform>();
+				for (int i = 0; i < ignoreTransforms.Length; ++i)
+				{
+					rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, ignoreTransforms[i]);
+					if (rb == null)
+						Cue.LogError($"{a.ID}: trigger {h.name}: no ignore {ignoreTransforms[i]}");
+					else
+						list.Add(rb.transform);
+				}
+
+				if (list.Count > 0)
+					ignoreTransforms_ = list.ToArray();
+			}
 		}
 
 		public override Transform Transform
@@ -884,10 +905,10 @@ namespace Cue.W
 		{
 			get
 			{
-				if (ignoreTrigger_)
-					return 0;
+				if (trigger_.active && !ShouldIgnore())
+					return 1;
 				else
-					return trigger_.active ? 1 : 0;
+					return 0;
 			}
 		}
 
@@ -933,6 +954,52 @@ namespace Cue.W
 		public override string ToString()
 		{
 			return $"trigger {trigger_.displayName}";
+		}
+
+		private bool ShouldIgnore()
+		{
+			foreach (var kv in h_.collidingWithDictionary)
+			{
+				if (kv.Value)
+				{
+					if (!ShouldIgnore(kv.Key))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		private bool ShouldIgnore(Collider c)
+		{
+			if (ignoreTransforms_.Length == 0)
+				return false;
+
+			var t = c.transform;
+
+			while (t != null)
+			{
+				if (t == ignoreStop_)
+					break;
+
+				bool ignore = false;
+
+				for (int i = 0; i < ignoreTransforms_.Length; ++i)
+				{
+					if (ignoreTransforms_[i] == t)
+					{
+						ignore = true;
+						break;
+					}
+				}
+
+				if (ignore)
+					return true;
+
+				t = t.parent;
+			}
+
+			return false;
 		}
 	}
 

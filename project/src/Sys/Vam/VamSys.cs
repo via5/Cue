@@ -674,6 +674,22 @@ namespace Cue.W
 			return null;
 		}
 
+		public Atom AtomForCollider(Collider c)
+		{
+			var p = c.transform;
+
+			while (p != null)
+			{
+				var a = p.GetComponent<Atom>();
+				if (a != null)
+					return a;
+
+				p = p.parent;
+			}
+
+			return null;
+		}
+
 		public void DumpComponents(Transform t, int indent = 0)
 		{
 			DumpComponents(t.gameObject, indent);

@@ -63,6 +63,8 @@
 
 		private void CreateUI()
 		{
+			Cue.LogInfo("creating ui");
+
 			controls_.Create();
 
 			if (vr_)
@@ -88,6 +90,8 @@
 
 		private void DestroyUI()
 		{
+			Cue.LogInfo("destroying ui");
+
 			controls_?.Destroy();
 			leftMenu_?.Destroy();
 			rightMenu_?.Destroy();

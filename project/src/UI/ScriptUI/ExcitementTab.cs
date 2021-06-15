@@ -11,10 +11,14 @@ namespace Cue
 		private VUI.Label hairLoose_ = new VUI.Label();
 
 		private VUI.Label excitement_ = new VUI.Label();
+		private VUI.Label[] reasons_ = new VUI.Label[Excitement.ReasonCount];
 		private VUI.Label mouth_ = new VUI.Label();
 		private VUI.Label breasts_ = new VUI.Label();
 		private VUI.Label genitals_ = new VUI.Label();
 		private VUI.Label penetration_ = new VUI.Label();
+		private VUI.Label otherSex_ = new VUI.Label();
+		private VUI.Label physical_ = new VUI.Label();
+		private VUI.Label emotional_ = new VUI.Label();
 		private VUI.Label total_ = new VUI.Label();
 		private VUI.Label state_ = new VUI.Label();
 
@@ -50,20 +54,28 @@ namespace Cue
 			p.Add(new VUI.Label("Value"));
 			p.Add(excitement_);
 
-			p.Add(new VUI.Label("Mouth"));
-			p.Add(mouth_);
 
-			p.Add(new VUI.Label("Breasts"));
-			p.Add(breasts_);
+			for (int i = 0; i < Excitement.ReasonCount; ++i)
+			{
+				reasons_[i] = new VUI.Label();
+				p.Add(new VUI.Label(person_.Excitement.GetReason(i).Name));
+				p.Add(reasons_[i]);
+			}
 
-			p.Add(new VUI.Label("Genitals"));
-			p.Add(genitals_);
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
 
-			p.Add(new VUI.Label("Penetration"));
-			p.Add(penetration_);
+			p.Add(new VUI.Label("Physical rate"));
+			p.Add(physical_);
+
+			p.Add(new VUI.Label("Emotional rate"));
+			p.Add(emotional_);
 
 			p.Add(new VUI.Label("Total rate"));
 			p.Add(total_);
+
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
 
 			p.Add(new VUI.Label("State"));
 			p.Add(state_);
@@ -93,11 +105,14 @@ namespace Cue
 
 			var e = person_.Excitement;
 			excitement_.Text = e.ToString();
-			mouth_.Text = $"{e.Mouth:0.000000} {e.MouthRate:0.000000}";
-			breasts_.Text = $"{e.Breasts:0.000000} {e.BreastsRate:0.000000}";
-			genitals_.Text = $"{e.Genitals:0.000000} {e.GenitalsRate:0.000000}";
-			penetration_.Text = $"{e.Penetration:0.000000} {e.PenetrationRate:0.000000}";
-			total_.Text = $"{e.Rate:0.000000}";
+
+			for (int i = 0; i < reasons_.Length; ++i)
+				reasons_[i].Text = e.GetReason(i).ToString();
+
+			physical_.Text = $"{e.PhysicalRate:0.000000}";
+			emotional_.Text = $"{e.EmotionalRate:0.000000}";
+			total_.Text = $"{e.TotalRate:0.000000}";
+
 			state_.Text = e.StateString;
 		}
 
