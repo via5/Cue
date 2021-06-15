@@ -905,7 +905,7 @@ namespace Cue.W
 		{
 			get
 			{
-				if (trigger_.active && !ShouldIgnore())
+				if (trigger_.active && ValidTrigger())
 					return 1;
 				else
 					return 0;
@@ -956,25 +956,25 @@ namespace Cue.W
 			return $"trigger {trigger_.displayName}";
 		}
 
-		private bool ShouldIgnore()
+		private bool ValidTrigger()
 		{
+			if (ignoreTransforms_.Length == 0)
+				return true;
+
 			foreach (var kv in h_.collidingWithDictionary)
 			{
 				if (kv.Value)
 				{
-					if (!ShouldIgnore(kv.Key))
-						return false;
+					if (ValidTrigger(kv.Key))
+						return true;
 				}
 			}
 
-			return true;
+			return false;
 		}
 
-		private bool ShouldIgnore(Collider c)
+		private bool ValidTrigger(Collider c)
 		{
-			if (ignoreTransforms_.Length == 0)
-				return false;
-
 			var t = c.transform;
 
 			while (t != null)
@@ -982,24 +982,16 @@ namespace Cue.W
 				if (t == ignoreStop_)
 					break;
 
-				bool ignore = false;
-
 				for (int i = 0; i < ignoreTransforms_.Length; ++i)
 				{
 					if (ignoreTransforms_[i] == t)
-					{
-						ignore = true;
-						break;
-					}
+						return false;
 				}
-
-				if (ignore)
-					return true;
 
 				t = t.parent;
 			}
 
-			return false;
+			return true;
 		}
 	}
 
