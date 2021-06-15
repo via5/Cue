@@ -213,9 +213,9 @@
 				if (value != enabled_.Value)
 				{
 					if (value)
-						log_.Info("enabling");
+						log_.Verbose("enabling");
 					else
-						log_.Info("disabling");
+						log_.Verbose("disabling");
 
 					enabled_.Value = value;
 				}

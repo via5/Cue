@@ -86,6 +86,12 @@ namespace Cue.W
 			get { return atom_.uid; }
 		}
 
+		public bool Visible
+		{
+			get { return atom_.on; }
+			set { atom_.SetOn(value); }
+		}
+
 		public bool IsPerson
 		{
 			get { return atom_.type == "Person"; }

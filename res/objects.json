@@ -11,6 +11,14 @@
 				"positionOffset": [0, 0.025, -0.012],
 				"scale": 0.8
 			}
+		},
+		{
+			"name": "cigaretteSmoke",
+			"type": "cua",
+			"options":
+			{
+				"preset": "objects/cigaretteSmoke.json"
+			}
 		}
 	]
 }

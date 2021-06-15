@@ -12,6 +12,7 @@ namespace Cue.W
 		private string assetName_;
 		private Vector3 posOffset_;
 		private float scale_;
+		private string preset_;
 
 		public VamCuaObjectCreator(string name, JSONClass opts)
 		{
@@ -20,6 +21,7 @@ namespace Cue.W
 			assetName_ = opts["name"].Value;
 			posOffset_ = Vector3.FromJSON(opts, "positionOffset");
 			scale_ = opts["scale"].AsFloat;
+			preset_ = opts["preset"].Value;
 		}
 
 		public string Name
@@ -82,30 +84,39 @@ namespace Cue.W
 				yield break;
 			}
 
-			cua.RegisterAssetLoadedCallback(() =>
+
+			if (!string.IsNullOrEmpty(preset_))
 			{
-				Cue.LogInfo($"object {id} done, name is {name.val}");
-
-				var a = new VamAtom(atom);
-
-				var o = atom.transform.Find("reParentObject/object/rescaleObject");
-				o.localPosition = VamU.ToUnity(posOffset_);
-				a.Scale = scale_;
-
-				f(new BasicObject(-1, a));
-			});
-
-			Cue.LogInfo($"object {id} loading url");
-			url.val = assetUrl_;
-
-			for (; ; )
+				atom.LoadPreset(Cue.Instance.Sys.GetResourcePath(preset_));
+				f(new BasicObject(-1, new VamAtom(atom)));
+			}
+			else
 			{
-				yield return new WaitForSeconds(0.25f);
-				if (name.choices.Count > 0)
+				cua.RegisterAssetLoadedCallback(() =>
 				{
-					Cue.LogInfo($"object {id} url loaded, setting name");
-					name.val = assetName_;
-					yield break;
+					Cue.LogInfo($"object {id} done, name is {name.val}");
+
+					var a = new VamAtom(atom);
+
+					var o = atom.transform.Find("reParentObject/object/rescaleObject");
+					o.localPosition = VamU.ToUnity(posOffset_);
+					a.Scale = scale_;
+
+					f(new BasicObject(-1, a));
+				});
+
+				Cue.LogInfo($"object {id} loading url");
+				url.val = assetUrl_;
+
+				for (; ; )
+				{
+					yield return new WaitForSeconds(0.25f);
+					if (name.choices.Count > 0)
+					{
+						Cue.LogInfo($"object {id} url loaded, setting name");
+						name.val = assetName_;
+						yield break;
+					}
 				}
 			}
 		}

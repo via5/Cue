@@ -236,6 +236,12 @@ namespace Cue.W
 			get { return id_; }
 		}
 
+		public bool Visible
+		{
+			get { return true; }
+			set { }
+		}
+
 		public bool IsPerson
 		{
 			get { return true; }

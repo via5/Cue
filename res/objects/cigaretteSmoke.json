@@ -1,0 +1,84 @@
+{
+   "atoms" : [
+      {
+         "on" : "true",
+         "type" : "CustomUnityAsset",
+         "position" : {
+            "x" : "0",
+            "y" : "0",
+            "z" : "0"
+         },
+         "rotation" : {
+            "x" : "0",
+            "y" : "0",
+            "z" : "0"
+         },
+         "containerPosition" : {
+            "x" : "0",
+            "y" : "0.6503307",
+            "z" : "1.73012"
+         },
+         "containerRotation" : {
+            "x" : "0",
+            "y" : "0",
+            "z" : "0"
+         },
+         "storables" : [
+            {
+               "id" : "Preset",
+               "presetName" : "1"
+            },
+            {
+               "id" : "CollisionTrigger",
+               "trigger" : {
+                  "startActions" : [
+                  ],
+                  "transitionActions" : [
+                  ],
+                  "endActions" : [
+                  ]
+               }
+            },
+            {
+               "id" : "asset",
+               "assetName" : "assets/vamparticles/spacedust101/smoke_01_cube_editable.prefab",
+               "assetUrl" : "hazmhox.spacedust101.2:/Custom/Assets/hazmhox/particles/spacedust101.assetbundle"
+            },
+            {
+               "id" : "PluginManager",
+               "plugins" : {
+                  "plugin#0" : "hazmhox.spacedust101.2:/Custom/Scripts/Spacedust101/smoke_cube_editor.cs"
+               }
+            },
+            {
+               "id" : "control",
+               "position" : {
+                  "x" : "0",
+                  "y" : "0.6503307",
+                  "z" : "1.73012"
+               },
+               "rotation" : {
+                  "x" : "0",
+                  "y" : "0",
+                  "z" : "0"
+               }
+            },
+            {
+               "id" : "plugin#0_SmokeCubeEditorPlugin.SmokeCubeEditor",
+               "Smoke opacity" : "0.15",
+               "Smoke emission rate" : "1000",
+               "Max Smoke" : "25",
+               "Min Lifetime" : "2",
+               "Max Lifetime" : "5",
+               "Min Size" : "20",
+               "Max Size" : "25",
+               "Smoke field size (X)" : "1",
+               "Smoke field size (Y)" : "1",
+               "Smoke field size (Z)" : "1",
+               "Smoke speed modifier" : "0.4",
+               "Particles priority" : "1"
+            }
+         ]
+      }
+   ]
+}

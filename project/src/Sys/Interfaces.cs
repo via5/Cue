@@ -200,6 +200,7 @@ namespace Cue.W
 	interface IAtom
 	{
 		string ID { get; }
+		bool Visible { get; set; }
 		bool IsPerson { get; }
 		int Sex { get; }
 		bool Teleporting { get; }

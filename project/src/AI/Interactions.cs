@@ -6,6 +6,7 @@ namespace Cue
 {
 	interface IInteraction
 	{
+		void OnPluginState(bool b);
 		void FixedUpdate(float s);
 		void Update(float s);
 	}
@@ -20,6 +21,11 @@ namespace Cue
 				new SmokingInteraction(p),
 				new KissingInteraction(p)
 			};
+		}
+
+		public virtual void OnPluginState(bool b)
+		{
+			// no-op
 		}
 
 		public virtual void FixedUpdate(float s)
@@ -74,10 +80,13 @@ namespace Cue
 		private const float HeadUpTorque = -15;
 		private const float HeadUpTime = 1;
 
+		private const float SmokeOpacityMax = 0.15f;
+
 		private Person person_;
 		private Logger log_;
 		private float elapsed_ = 0;
 		private IObject cig_ = null;
+		private ISmoke smoke_ = null;
 		private Hand hand_ = null;
 		private BodyPart handPart_ = null;
 		private bool inited_ = false;
@@ -98,6 +107,8 @@ namespace Cue
 		private IEasing moveBackEasing_ = new SinusoidalEasing();
 		private IEasing morphEasing_ = new SinusoidalEasing();
 
+		private bool DoRender = false;
+
 
 		public SmokingInteraction(Person p)
 		{
@@ -117,22 +128,17 @@ namespace Cue
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
-			var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
-
-			render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
-			render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
-			render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
-			render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
-
-			render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
-			render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
-		}
-
-		private string CigaretteID
-		{
-			get
+			if (DoRender)
 			{
-				return person_.ID + "_cue_cigarette";
+				var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
+
+				render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
+				render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
+				render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
+				render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
+
+				render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
+				render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
 			}
 		}
 
@@ -206,15 +212,17 @@ namespace Cue
 
 			SetPosition();
 
-
-			var mouth = person_.Body.Get(BodyParts.Lips);
-			render_.hand.Position = handPart_.Position;
-			render_.cig.Position = cig_.Position;
-			render_.targetHand.Position = targetPos_;
-			render_.targetHandMid.Position = targetMidPos_;
-			render_.targetCig.Position =
-				targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
-			render_.mouth.Position = mouth.Position;
+			if (DoRender)
+			{
+				var mouth = person_.Body.Get(BodyParts.Lips);
+				render_.hand.Position = handPart_.Position;
+				render_.cig.Position = cig_.Position;
+				render_.targetHand.Position = targetPos_;
+				render_.targetHandMid.Position = targetMidPos_;
+				render_.targetCig.Position =
+					targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
+				render_.mouth.Position = mouth.Position;
+			}
 		}
 
 		private Quaternion GetTargetRotation()
@@ -532,6 +540,9 @@ namespace Cue
 					float f = moveToMouthEasing_.Magnitude(U.Clamp(e / HeadUpTime, 0, 1));
 					head.AddRelativeTorque(new Vector3(HeadUpTorque * f, 0, 0));
 				}
+
+				smoke_.Position = head.Position;
+				smoke_.Opacity = SmokeOpacityMax;
 			}
 
 			{
@@ -579,10 +590,25 @@ namespace Cue
 				head.AddRelativeTorque(new Vector3(HeadUpTorque * (1 - f), 0, 0));
 			}
 
+			{
+				smoke_.Opacity = SmokeOpacityMax / 2;
+			}
+
 			if (elapsed_ >= ResetTime)
 			{
 				StartMoveToMouth();
+				smoke_.Opacity = 0;
 			}
+		}
+
+		private string CigaretteID
+		{
+			get { return person_.ID + "_cue_cigarette"; }
+		}
+
+		private string SmokeID
+		{
+			get { return person_.ID + "_cue_cigarette_smoke"; }
 		}
 
 		private void Init()
@@ -591,7 +617,43 @@ namespace Cue
 			inited_ = true;
 			elapsed_ = 0;
 			enabled_ = true;
+
 			CreateCigarette();
+			smoke_ = Integration.CreateSmoke(SmokeID);
+		}
+
+		private void CreateCigarette()
+		{
+			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
+
+			if (a != null)
+			{
+				person_.Log.Info("cig already exists, destroying");
+				a.Destroy();
+			}
+
+			person_.Log.Info("creating cigarette");
+
+			var oc = Resources.Objects.Get("cigarette");
+			if (oc == null)
+			{
+				person_.Log.Error("no cigarette object creator");
+				return;
+			}
+
+			oc.Create(CigaretteID, (o) =>
+			{
+				if (o == null)
+				{
+					person_.Log.Error("failed to create cigarette");
+					return;
+				}
+
+				cig_ = o;
+				cig_.Atom.Collisions = false;
+				cig_.Atom.Physics = false;
+				cig_.Atom.Hidden = true;
+			});
 		}
 
 		private Vector3 CigarettePosition()
@@ -624,44 +686,6 @@ namespace Cue
 
 			cig_.Position = CigarettePosition();
 			cig_.Rotation = q;
-		}
-
-		private void CreateCigarette()
-		{
-			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
-
-			if (a != null)
-			{
-				log_.Info("already exists, destroying");
-				a.Destroy();
-			}
-
-			log_.Info("creating cigarette");
-
-			var oc = Resources.Objects.Get("cigarette");
-			if (oc == null)
-			{
-				log_.Error("no cigarette object creator, disabling");
-				enabled_ = false;
-				return;
-			}
-
-			oc.Create(CigaretteID, (o) => { SetCigarette(o); });
-		}
-
-		private void SetCigarette(IObject o)
-		{
-			if (o == null)
-			{
-				log_.Error("failed to create cigarette, disabling");
-				enabled_ = false;
-				return;
-			}
-
-			cig_ = o;
-			o.Atom.Collisions = false;
-			o.Atom.Physics = false;
-			o.Atom.Hidden = true;
 		}
 	}
 

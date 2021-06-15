@@ -69,6 +69,11 @@ namespace Cue
 		{
 			return new Proc.Expression(p);
 		}
+
+		public static ISmoke CreateSmoke(string id)
+		{
+			return new VamSmoke(id);
+		}
 	}
 
 
@@ -231,5 +236,13 @@ namespace Cue
 		void FixedUpdate(float s);
 		void OnPluginState(bool b);
 		void DumpActive();
+	}
+
+
+	interface ISmoke
+	{
+		Vector3 Position { get; set; }
+		Quaternion Rotation { get; set; }
+		float Opacity { get; set; }
 	}
 }

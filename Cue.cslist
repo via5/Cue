@@ -15,6 +15,7 @@ project\src\Integration\BVHPlayer.cs
 project\src\Integration\ClockwiseSilver.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
+project\src\Integration\Objects.cs
 project\src\Integration\Synergy.cs
 project\src\Integration\Timeline.cs
 project\src\Integration\Vam.cs

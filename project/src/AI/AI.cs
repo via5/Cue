@@ -229,6 +229,8 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
+			for (int i = 0; i < interactions_.Count; ++i)
+				interactions_[i].OnPluginState(b);
 		}
 
 		private void Stop()

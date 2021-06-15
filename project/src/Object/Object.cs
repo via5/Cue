@@ -6,6 +6,7 @@ namespace Cue
 	{
 		int ObjectIndex { get; }
 		string ID { get; }
+		bool Visible { get; set; }
 		W.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
@@ -106,6 +107,12 @@ namespace Cue
 		public string ID
 		{
 			get { return atom_.ID; }
+		}
+
+		public bool Visible
+		{
+			get { return atom_.Visible; }
+			set { atom_.Visible = value; }
 		}
 
 		public Vector3 Position
