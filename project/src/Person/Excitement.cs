@@ -156,10 +156,10 @@ namespace Cue
 		{
 			for (int i = 0; i < BodyParts.Count; ++i)
 			{
-				var t = person_.Body.Get(i).Trigger;
+				var ts = person_.Body.Get(i).GetTriggers();
 
-				if (t > 0)
-					parts_[i] = t;
+				if (ts != null && ts.Length > 0)
+					parts_[i] = ts[0].value; // todo
 				else
 					parts_[i] = Math.Max(parts_[i] - s * decay_, 0);
 			}

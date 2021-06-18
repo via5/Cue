@@ -137,11 +137,39 @@ namespace Cue.W
 		}
 	}
 
+	struct TriggerInfo
+	{
+		public int personIndex;
+		public int sourcePartIndex;
+		public float value;
+
+		public TriggerInfo(int pi, int spi, float v)
+		{
+			personIndex = pi;
+			sourcePartIndex = spi;
+			value = v;
+		}
+
+		public override string ToString()
+		{
+			if (personIndex == -1 || sourcePartIndex == -1)
+				return "?";
+
+			var p = Cue.Instance.Persons[personIndex];
+			var bp = p.Body.Get(sourcePartIndex);
+
+			if (value == 1)
+				return $"{p.ID}.{bp.Name}";
+			else
+				return $"{p.ID}.{bp.Name}/{value:0.0}";
+		}
+	}
+
 	interface IBodyPart
 	{
 		int Type { get; }
 		bool CanTrigger { get; }
-		float Trigger { get; }
+		TriggerInfo[] GetTriggers();
 		bool CanGrab { get; }
 		bool Grabbed { get; }
 		Vector3 ControlPosition { get; set; }

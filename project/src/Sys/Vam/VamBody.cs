@@ -103,6 +103,8 @@ namespace Cue.W
 		private VamColorParameter color_ = null;
 		private Color initialColor_;
 		private DAZBone hipBone_ = null;
+		private IBodyPart[] parts_;
+		private Dictionary<Collider, int> partMap_ = new Dictionary<Collider, int>();
 
 		public VamBody(VamAtom a)
 		{
@@ -117,14 +119,48 @@ namespace Cue.W
 				atom_.Log.Error("no skin color parameter");
 
 			initialColor_ = color_.Value;
-
-
-			//var t = Cue.Instance.VamSys.FindChildRecursive(atom_.Atom, "lThumb3");
-			//Cue.Instance.VamSys.DumpComponentsAndUp(t);
-
+			parts_ = CreateBodyParts();
 		}
 
 		public IBodyPart[] GetBodyParts()
+		{
+			return parts_;
+		}
+
+		public IBodyPart GetPart(int i)
+		{
+			return parts_[i];
+		}
+
+		public int BodyPartForCollider(Collider c)
+		{
+			int p;
+			if (partMap_.TryGetValue(c, out p))
+				return p;
+
+			var t = c.transform;
+
+			while (t != null)
+			{
+				for (int i = 0; i < parts_.Length; ++i)
+				{
+					var vp = (VamBodyPart)parts_[i];
+					if (vp != null && vp.Transform == t)
+					{
+						partMap_.Add(c, i);
+						return i;
+					}
+				}
+
+				t = t.parent;
+				if (t.GetComponent<Atom>() != null)
+					break;
+			}
+
+			return -1;
+		}
+
+		private IBodyPart[] CreateBodyParts()
 		{
 			var map = new Dictionary<int, IBodyPart>();
 
@@ -140,8 +176,8 @@ namespace Cue.W
 			add(BodyParts.LeftBreast, GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
 			add(BodyParts.RightBreast, GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
 
-			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", new string[] { "lThigh", "rThigh" }));
-			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
+			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", new string[] { "lThigh", "rThigh", "FemaleAutoCollidersabdomen" }));
+			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", new string[] { "lThigh", "rThigh", "FemaleAutoCollidersabdomen" }));
 			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
 			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
 			add(BodyParts.Anus, null);
@@ -671,8 +707,16 @@ namespace Cue.W
 		public abstract Transform Transform { get; }
 		public abstract Rigidbody Rigidbody { get; }
 
-		public abstract bool CanTrigger { get; }
-		public abstract float Trigger { get; }
+		public virtual bool CanTrigger
+		{
+			get { return false; }
+		}
+
+		public virtual TriggerInfo[] GetTriggers()
+		{
+			return null;
+		}
+
 		public abstract bool CanGrab { get; }
 		public abstract bool Grabbed { get; }
 		public abstract Vector3 ControlPosition { get; set; }
@@ -712,16 +756,6 @@ namespace Cue.W
 		public override Rigidbody Rigidbody
 		{
 			get { return rb_; }
-		}
-
-		public override bool CanTrigger
-		{
-			get { return false; }
-		}
-
-		public override float Trigger
-		{
-			get { return 0; }
 		}
 
 		public override bool CanGrab
@@ -795,16 +829,6 @@ namespace Cue.W
 			get { return null; }
 		}
 
-		public override bool CanTrigger
-		{
-			get { return false; }
-		}
-
-		public override float Trigger
-		{
-			get { return 0; }
-		}
-
 		public override bool CanGrab
 		{
 			get { return (fc_ != null); }
@@ -846,12 +870,16 @@ namespace Cue.W
 
 	class TriggerBodyPart : VamBodyPart
 	{
+		private const float TriggerCheckDelay = 1;
+
 		private CollisionTriggerEventHandler h_;
 		private Trigger trigger_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_;
 		private Transform ignoreStop_ = null;
 		private Transform[] ignoreTransforms_ = new Transform[0];
+		private TriggerInfo[] triggers_ = null;
+		private float lastTriggerCheck_ = 0;
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
@@ -875,10 +903,20 @@ namespace Cue.W
 				for (int i = 0; i < ignoreTransforms.Length; ++i)
 				{
 					rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, ignoreTransforms[i]);
-					if (rb == null)
-						Cue.LogError($"{a.ID}: trigger {h.name}: no ignore {ignoreTransforms[i]}");
-					else
+					if (rb != null)
+					{
 						list.Add(rb.transform);
+					}
+					else
+					{
+						var t = Cue.Instance.VamSys.FindChildRecursive(
+							a.Atom, ignoreTransforms[i])?.transform;
+
+						if (t != null)
+							list.Add(t);
+						else
+							Cue.LogError($"{a.ID}: trigger {h.name}: no ignore {ignoreTransforms[i]}");
+					}
 				}
 
 				if (list.Count > 0)
@@ -901,15 +939,91 @@ namespace Cue.W
 			get { return true; }
 		}
 
-		public override float Trigger
+		public override TriggerInfo[] GetTriggers()
 		{
-			get
+			if (Time.realtimeSinceStartup >= (lastTriggerCheck_ + TriggerCheckDelay))
 			{
-				if (trigger_.active && ValidTrigger())
-					return 1;
-				else
-					return 0;
+				lastTriggerCheck_ = Time.realtimeSinceStartup;
+				UpdateTriggers();
 			}
+
+			return triggers_;
+		}
+
+		private void UpdateTriggers()
+		{
+			if (!trigger_.active)
+			{
+				triggers_ = null;
+				return;
+			}
+
+			List<TriggerInfo> list = null;
+
+			var found = new bool[Cue.Instance.Persons.Count, BodyParts.Count];
+			List<string> foundOther = null;
+
+			foreach (var kv in h_.collidingWithDictionary)
+			{
+				if (!kv.Value)
+					continue;
+
+				if (!ValidTrigger(kv.Key))
+					continue;
+
+				if (list == null)
+					list = new List<TriggerInfo>();
+
+				var p = PersonForCollider(kv.Key);
+				if (p == null)
+				{
+					bool skip = false;
+
+					if (foundOther == null)
+						foundOther = new List<string>();
+					else if (foundOther.Contains(kv.Key.name))
+						skip = true;
+					else
+						foundOther.Add(kv.Key.name);
+
+					if (!skip)
+						list.Add(new TriggerInfo(-1, -1, 1.0f));
+				}
+				else
+				{
+					var bp = ((VamBody)p.Atom.Body).BodyPartForCollider(kv.Key);
+
+					if (bp == -1)
+					{
+						Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
+					}
+					else if (!found[p.PersonIndex, bp])
+					{
+						found[p.PersonIndex, bp] = true;
+						list.Add(new TriggerInfo(p.PersonIndex, bp, 1.0f));
+					}
+				}
+			}
+
+			if (list == null)
+				triggers_ = null;
+			else
+				triggers_ = list.ToArray();
+		}
+
+		private Person PersonForCollider(Collider c)
+		{
+			var a = c.transform.GetComponentInParent<Atom>();
+			if (a == null)
+				return null;
+
+			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			{
+				if (Cue.Instance.Persons[i].VamAtom.Atom == a)
+					return Cue.Instance.Persons[i];
+			}
+
+			return null;
 		}
 
 		public override bool CanGrab
@@ -954,23 +1068,6 @@ namespace Cue.W
 		public override string ToString()
 		{
 			return $"trigger {trigger_.displayName}";
-		}
-
-		private bool ValidTrigger()
-		{
-			if (ignoreTransforms_.Length == 0)
-				return true;
-
-			foreach (var kv in h_.collidingWithDictionary)
-			{
-				if (kv.Value)
-				{
-					if (ValidTrigger(kv.Key))
-						return true;
-				}
-			}
-
-			return false;
 		}
 
 		private bool ValidTrigger(Collider c)
@@ -1037,8 +1134,6 @@ namespace Cue.W
 			get { return head_; }
 		}
 
-		public override bool CanTrigger { get { return false; } }
-		public override float Trigger { get { return 0; } }
 		public override bool CanGrab { get { return false; } }
 		public override bool Grabbed { get { return false; } }
 

@@ -55,15 +55,15 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			var t = person_.Body.Get(BodyParts.Lips).Trigger;
+			var lipsTriggered = person_.Body.Get(BodyParts.Lips).Triggered;
 			var head = person_.Body.Get(BodyParts.Head);
 
-			if (!busy_ && t > 0 && !head.Busy)
+			if (!busy_ && lipsTriggered && !head.Busy)
 			{
 				busy_ = true;
 				head.ForceBusy(true);
 			}
-			else if (busy_ && t == 0)
+			else if (busy_ && !lipsTriggered)
 			{
 				busy_ = false;
 				head.ForceBusy(false);
@@ -267,8 +267,8 @@ namespace Cue
 
 			bool busy =
 				handPart_.Busy ||
-				head.Busy || head.Trigger > 0 ||
-				lips.Busy || lips.Trigger > 0;
+				head.Busy || head.Triggered ||
+				lips.Busy || lips.Triggered;
 
 			if (busy)
 				return false;

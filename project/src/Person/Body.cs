@@ -164,25 +164,29 @@ namespace Cue
 			get { return part_?.CanTrigger ?? false; }
 		}
 
-		public float Trigger
+		public TriggerInfo[] GetTriggers()
 		{
-			get { return part_?.Trigger ?? 0; }
+			return part_?.GetTriggers();
+		}
+
+		public bool Triggered
+		{
+			get
+			{
+				if (part_ == null)
+					return false;
+
+				var ts = part_?.GetTriggers();
+				if (ts == null)
+					return false;
+
+				return (ts.Length > 0);
+			}
 		}
 
 		public bool Grabbed
 		{
 			get { return part_?.Grabbed ?? false; }
-		}
-
-		public bool TriggeredBy(BodyPart other)
-		{
-			if (!Exists || !other.Exists)
-				return false;
-
-			if (Trigger == 0)
-				return false;
-
-			return CloseToImpl(other);
 		}
 
 		public bool CloseTo(BodyPart other)
@@ -699,7 +703,7 @@ namespace Cue
 
 					if (triggerPart.CanTrigger)
 					{
-						if (triggerPart.TriggeredBy(byPart))
+						if (TriggeredBy(triggerPart, byPart))
 							return true;
 					}
 					else
@@ -707,6 +711,28 @@ namespace Cue
 						if (triggerPart.CloseTo(byPart))
 							return true;
 					}
+				}
+			}
+
+			return false;
+		}
+
+		private bool TriggeredBy(BodyPart p, BodyPart by)
+		{
+			if (!p.Exists || !by.Exists)
+				return false;
+
+			var ts = p.GetTriggers();
+
+			if (ts != null)
+			{
+				for (int i = 0; i < ts.Length; ++i)
+				{
+					var pp = Cue.Instance.Persons[ts[i].personIndex];
+					var bp = pp.Body.Get(ts[i].sourcePartIndex);
+
+					if (bp == by)
+						return true;
 				}
 			}
 

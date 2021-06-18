@@ -118,10 +118,24 @@ namespace Cue
 				{
 					if (w.part.Sys.CanTrigger)
 					{
-						w.triggering.Text = w.part.Trigger.ToString("0.##");
+						var ss = "";
+
+						var ts = w.part.GetTriggers();
+						if (ts != null)
+						{
+							for (int j = 0; j < ts.Length; ++j)
+							{
+								if (ss != "")
+									ss += ",";
+
+								ss += ts[j].ToString();
+							}
+						}
+
+						w.triggering.Text = ss;
 
 						w.triggering.TextColor = (
-							w.part.Trigger > 0 ?
+							(ts != null && ts.Length > 0) ?
 							W.VamU.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
 					}
