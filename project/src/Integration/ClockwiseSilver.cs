@@ -314,14 +314,14 @@ namespace Cue
 				if (leader)
 				{
 					startLipDepth_ = 0.01f;
-					startAngleX_ = -50;
+					startAngleX_ = -25;
 					startAngleY_ = 20;
 					startAngleZ_ = -40;
 				}
 				else
 				{
 					startLipDepth_ = 0;
-					startAngleX_ = -25;
+					startAngleX_ = -5;
 					startAngleY_ = 0;
 					startAngleZ_ = -50;
 				}

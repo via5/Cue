@@ -29,7 +29,7 @@ namespace Cue.W
 			{
 				if (styleCling_ != null)
 				{
-					float min = 0.02f;
+					float min = 0.01f;
 					float max = styleCling_.defaultVal;
 
 					if (min < max)
@@ -995,7 +995,7 @@ namespace Cue.W
 
 					if (bp == -1)
 					{
-						Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
+						//Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
 					}
 					else if (!found[p.PersonIndex, bp])
 					{

@@ -43,6 +43,15 @@ namespace Cue.W
 
 		public void Init()
 		{
+			DisableFreezeWhenGrabbed();
+			DisableAutoExpressions();
+			SetStrongerDamping("hipControl");
+			SetStrongerDamping("chestControl");
+			SetStrongerDamping("headControl");
+		}
+
+		private void DisableFreezeWhenGrabbed()
+		{
 			// setting grabFreezePhysics on the atom or
 			// freezeAtomPhysicsWhenGrabbed on controllers doesn't
 			// update the toggle in the ui, the param has to be set
@@ -60,14 +69,28 @@ namespace Cue.W
 					// happens sometimes, not sure why
 				}
 			}
+		}
 
+		private void DisableAutoExpressions()
+		{
+			var b = Cue.Instance.VamSys.GetBoolParameter(
+				atom_, "AutoExpressions", "enabled");
+
+			if (b != null)
+				b.val = false;
+		}
+
+		private void SetStrongerDamping(string cn)
+		{
+			var c = Cue.Instance.VamSys.FindController(atom_, cn);
+			if (c == null)
 			{
-				var b = Cue.Instance.VamSys.GetBoolParameter(
-					atom_, "AutoExpressions", "enabled");
-
-				if (b != null)
-					b.val = false;
+				log_.Error($"SetStrongerSpring: controller '{cn}' not found");
+				return;
 			}
+
+			c.RBHoldPositionDamper = 100;
+			c.RBHoldRotationDamper = 10;
 		}
 
 		public void Destroy()

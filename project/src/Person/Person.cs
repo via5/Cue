@@ -91,7 +91,7 @@ namespace Cue
 		public float DecayPerSecond { get { return -0.01f; } }
 		public float ExcitementPostOrgasm { get { return 0.0f; } }
 		public float DelayPostOrgasm { get { return 10; } }
-		public float RateAdjustment { get { return 0.7f; } }
+		public float RateAdjustment { get { return 0.4f; } }
 	}
 
 
@@ -122,7 +122,7 @@ namespace Cue
 
 		public float MaxFlush
 		{
-			get { return 0.07f; }
+			get { return 0.065f; }
 		}
 
 		public float VoicePitch

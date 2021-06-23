@@ -84,7 +84,7 @@ namespace Cue
 		private bool postOrgasm_ = false;
 		private float postOrgasmElapsed_ = 1000;
 
-		private IEasing easing_ = new SineOutEasing();
+		private IEasing easing_ = new CubicOutEasing();
 
 
 		public Excitement(Person p)
@@ -128,6 +128,11 @@ namespace Cue
 		public void ForceValue(float s)
 		{
 			forcedExcitement_ = s;
+		}
+
+		public void ForceOrgasm()
+		{
+			DoOrgasm();
 		}
 
 		public void Update(float s)
@@ -270,8 +275,6 @@ namespace Cue
 
 		private void Apply(float s)
 		{
-			var ss = person_.Physiology.Sensitivity;
-
 			person_.Breathing.Intensity = Value;
 			person_.Body.Sweat = Value;
 			person_.Body.Flush = Value;
@@ -279,14 +282,19 @@ namespace Cue
 			person_.Hair.Loose = Value;
 
 			if (Value >= 1)
-			{
-				person_.Log.Info("orgasm");
-				person_.Orgasmer.Orgasm();
-				person_.Animator.PlayType(Animation.OrgasmType);
-				flatExcitement_ = ss.ExcitementPostOrgasm;
-				postOrgasm_ = true;
-				postOrgasmElapsed_ = 0;
-			}
+				DoOrgasm();
+		}
+
+		private void DoOrgasm()
+		{
+			var ss = person_.Physiology.Sensitivity;
+
+			person_.Log.Info("orgasm");
+			person_.Orgasmer.Orgasm();
+			person_.Animator.PlayType(Animation.OrgasmType);
+			flatExcitement_ = ss.ExcitementPostOrgasm;
+			postOrgasm_ = true;
+			postOrgasmElapsed_ = 0;
 		}
 
 		public Reason GetReason(int i)

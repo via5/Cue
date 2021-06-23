@@ -164,7 +164,7 @@ namespace Cue
 			get { return part_?.CanTrigger ?? false; }
 		}
 
-		public TriggerInfo[] GetTriggers()
+		public W.TriggerInfo[] GetTriggers()
 		{
 			return part_?.GetTriggers();
 		}
@@ -728,11 +728,14 @@ namespace Cue
 			{
 				for (int i = 0; i < ts.Length; ++i)
 				{
-					var pp = Cue.Instance.Persons[ts[i].personIndex];
-					var bp = pp.Body.Get(ts[i].sourcePartIndex);
+					if (ts[i].sourcePartIndex >= 0)
+					{
+						var pp = Cue.Instance.Persons[ts[i].personIndex];
+						var bp = pp.Body.Get(ts[i].sourcePartIndex);
 
-					if (bp == by)
-						return true;
+						if (bp == by)
+							return true;
+					}
 				}
 			}
 

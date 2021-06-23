@@ -83,6 +83,9 @@ namespace Cue
 			p.Add(forceExcitement_);
 			p.Add(forceExcitementValue_);
 
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Button("Orgasm", () => { person_.Excitement.ForceOrgasm(); }));
+
 
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
