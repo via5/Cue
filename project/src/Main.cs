@@ -31,6 +31,7 @@ namespace Cue
 				{
 					deltaTime = (float)((now - deltaTime) / 1000.0);
 
+					sys_.Update(Time.deltaTime);
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
 				}
@@ -165,6 +166,7 @@ namespace Cue
 			{
 				try
 				{
+					sys_.Update(Time.deltaTime);
 					cue_.Update(Time.deltaTime);
 					sui_.Update(Time.deltaTime, cue_.Tickers);
 				}

@@ -26,19 +26,19 @@ namespace Cue
 		public void Init()
 		{
 			persons_ = new LookatPart[
-				Cue.Instance.Persons.Count, BodyParts.Count];
+				Cue.Instance.AllPersons.Count, BodyParts.Count];
 
-			for (int pi = 0; pi < Cue.Instance.Persons.Count; ++pi)
+			for (int pi = 0; pi < Cue.Instance.AllPersons.Count; ++pi)
 			{
-				var p = Cue.Instance.Persons[pi];
+				var p = Cue.Instance.AllPersons[pi];
 
 				for (int bi = 0; bi < BodyParts.Count; ++bi)
 					persons_[pi, bi] = new LookatPart(p, bi);
 			}
 
-			objects_ = new LookatObject[Cue.Instance.AllObjects.Count];
+			objects_ = new LookatObject[Cue.Instance.Everything.Count];
 			for (int oi = 0; oi < objects_.Length; ++oi)
-				objects_[oi] = new LookatObject(person_, Cue.Instance.AllObjects[oi], 0);
+				objects_[oi] = new LookatObject(person_, Cue.Instance.Everything[oi], 0);
 
 			all_ = GetAll();
 		}

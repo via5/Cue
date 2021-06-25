@@ -73,7 +73,7 @@ namespace Cue.W
 
 		public VamBasicParameterRO(IAtom a, string s, string name)
 		{
-			atom_ = ((W.VamAtom)a).Atom;
+			atom_ = (a as VamAtom)?.Atom;
 			storableID_ = s;
 			paramName_ = name;
 		}
@@ -99,7 +99,7 @@ namespace Cue.W
 
 		protected NativeType GetValue()
 		{
-			if (!Check())
+			if (atom_ == null || !Check())
 				return dummyValue_;
 
 			try
@@ -122,7 +122,7 @@ namespace Cue.W
 
 		protected NativeType GetDefaultValue()
 		{
-			if (!Check())
+			if (atom_ == null || !Check())
 				return dummyValue_;
 
 			try
@@ -145,6 +145,9 @@ namespace Cue.W
 
 		protected override bool DeadCheck()
 		{
+			if (atom_ == null)
+				return false;
+
 			if (param_ != null)
 			{
 				if (param_.storable == null)
@@ -171,6 +174,9 @@ namespace Cue.W
 
 		protected override bool StaleCheck()
 		{
+			if (atom_ == null)
+				return false;
+
 			param_ = DoGetParameter();
 
 			if (param_ == null)
@@ -585,7 +591,7 @@ namespace Cue.W
 		protected JSONStorableAction param_ = null;
 
 		public VamActionParameter(IObject o, string s, string name)
-			: this(((W.VamAtom)o.Atom).Atom, s, name)
+			: this((o.Atom as VamAtom)?.Atom, s, name)
 		{
 		}
 

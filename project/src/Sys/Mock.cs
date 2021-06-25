@@ -55,7 +55,7 @@ namespace Cue.W
 			get { return null; }
 		}
 
-		public Vector3 Camera
+		public Vector3 CameraPosition
 		{
 			get { return Vector3.Zero; }
 		}
@@ -113,6 +113,10 @@ namespace Cue.W
 		public float RandomFloat(float first, float last)
 		{
 			return 0;
+		}
+
+		public void Update(float s)
+		{
 		}
 
 		public void OnPluginState(bool b)

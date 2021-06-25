@@ -196,7 +196,7 @@
 		{
 			Resources.Animations.Load();
 
-			foreach (var p in Cue.Instance.Persons)
+			foreach (var p in Cue.Instance.ActivePersons)
 				p.Animator.Stop();
 		}
 

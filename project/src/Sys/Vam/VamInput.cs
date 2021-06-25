@@ -352,12 +352,10 @@ namespace Cue.W
 			if (!HitAtom(out h, out a))
 				return HoveredInfo.None;
 
-			var ps = Cue.Instance.Persons;
-
-			for (int i = 0; i < ps.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (((W.VamAtom)ps[i].Atom).Atom == a)
-					return new HoveredInfo(ps[i], h.pos, true);
+				if (p.VamAtom.Atom == a)
+					return new HoveredInfo(p, h.pos, true);
 			}
 
 			return HoveredInfo.None;

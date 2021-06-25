@@ -805,9 +805,8 @@ namespace Cue
 
 			var srcLips = person_.Body.Get(BodyParts.Lips).Position;
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var target in Cue.Instance.ActivePersons)
 			{
-				var target = Cue.Instance.Persons[i];
 				if (target == person_)
 					continue;
 

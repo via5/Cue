@@ -304,6 +304,9 @@ namespace Cue.W
 			atom_ = a;
 			log_ = new Logger(Logger.Clothing, atom_, "VamClothing");
 
+			if (atom_ == null)
+				return;
+
 			try
 			{
 				char_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();

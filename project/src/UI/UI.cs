@@ -77,11 +77,11 @@
 				desktopMenu_?.Create(false, false);
 				desktopMenu_.Visible = true;
 
-				for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+				foreach (var p in Cue.Instance.ActivePersons)
 				{
-					if (Cue.Instance.Persons[i].Atom.Selected)
+					if (p.Atom.Selected)
 					{
-						desktopMenu_.Selected = Cue.Instance.Persons[i];
+						desktopMenu_.Selected = p;
 						break;
 					}
 				}

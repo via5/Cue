@@ -80,7 +80,7 @@ namespace Cue
 			pos_ = p;
 			lookMode_.Value = "Target";
 			update_ = true;
-			eyesImpl_.SetPosition(p);
+			eyesImpl_?.SetPosition(p);
 		}
 
 		public void LookAtNothing()
@@ -92,7 +92,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (update_)
-				eyesImpl_.SetPosition(pos_);
+				eyesImpl_?.SetPosition(pos_);
 		}
 
 		public override string ToString()

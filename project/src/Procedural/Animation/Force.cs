@@ -137,14 +137,17 @@ namespace Cue.Proc
 		{
 			person_ = p;
 
-			rb_ = Cue.Instance.VamSys.FindRigidbody(p.VamAtom.Atom, rbId_);
-			if (rb_ == null)
+			if (p.VamAtom != null)
 			{
-				Cue.LogError($"Force: rigidbody {rbId_} not found");
-				return;
-			}
+				rb_ = Cue.Instance.VamSys.FindRigidbody(p.VamAtom.Atom, rbId_);
+				if (rb_ == null)
+				{
+					Cue.LogError($"Force: rigidbody {rbId_} not found");
+					return;
+				}
 
-			Reset();
+				Reset();
+			}
 		}
 
 		public void Reset()
@@ -307,13 +310,13 @@ namespace Cue.Proc
 			{
 				case RelativeForce:
 				{
-					rb_.AddRelativeForce(W.VamU.ToUnity(v));
+					rb_?.AddRelativeForce(W.VamU.ToUnity(v));
 					break;
 				}
 
 				case RelativeTorque:
 				{
-					rb_.AddRelativeTorque(W.VamU.ToUnity(v));
+					rb_?.AddRelativeTorque(W.VamU.ToUnity(v));
 					break;
 				}
 			}

@@ -15,6 +15,8 @@ namespace Cue.W
 		private readonly VamInput input_;
 		private string pluginPath_ = "";
 		private GameObject root_;
+		private VamCameraAtom cameraAtom_ = new VamCameraAtom();
+		private bool wasVR_ = false;
 
 		public VamSys(MVRScript s)
 		{
@@ -123,7 +125,14 @@ namespace Cue.W
 					list.Add(new VamAtom(a));
 			}
 
+			list.Add(cameraAtom_);
+
 			return list;
+		}
+
+		public VamCameraAtom CameraAtom
+		{
+			get { return cameraAtom_; }
 		}
 
 		public Transform RootTransform
@@ -131,12 +140,17 @@ namespace Cue.W
 			get { return root_.transform; }
 		}
 
+		public bool IsVRHands(Atom a)
+		{
+			return (a.uid == "[CameraRig]");
+		}
+
 		public IAtom ContainingAtom
 		{
 			get { return new VamAtom(script_.containingAtom); }
 		}
 
-		public Vector3 Camera
+		public Vector3 CameraPosition
 		{
 			get { return VamU.FromUnity(SuperController.singleton.lookCamera.transform.position); }
 		}
@@ -257,6 +271,17 @@ namespace Cue.W
 			string name, Vector3 pos, float radius, Color c)
 		{
 			return new VamSphereGraphic(name, pos, radius, c);
+		}
+
+		public void Update(float s)
+		{
+			bool vr = IsVR;
+
+			if (wasVR_ != vr)
+			{
+				wasVR_ = vr;
+				//SuperController.singleton.commonHandModelControl.useCollision = true;
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -431,12 +456,15 @@ namespace Cue.W
 		public JSONStorableFloat GetFloatParameter(
 			IObject o, string storable, string param)
 		{
-			return GetFloatParameter(((W.VamAtom)o).Atom, storable, param);
+			return GetFloatParameter((o as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableFloat GetFloatParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -450,12 +478,15 @@ namespace Cue.W
 		public JSONStorableBool GetBoolParameter(
 			IObject o, string storable, string param)
 		{
-			return GetBoolParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+			return GetBoolParameter((o.Atom as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableBool GetBoolParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -469,12 +500,15 @@ namespace Cue.W
 		public JSONStorableString GetStringParameter(
 			IObject o, string storable, string param)
 		{
-			return GetStringParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+			return GetStringParameter((o.Atom as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableString GetStringParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -489,12 +523,15 @@ namespace Cue.W
 		public JSONStorableStringChooser GetStringChooserParameter(
 			IObject o, string storable, string param)
 		{
-			return GetStringChooserParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+			return GetStringChooserParameter((o.Atom as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableStringChooser GetStringChooserParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -509,12 +546,15 @@ namespace Cue.W
 		public JSONStorableColor GetColorParameter(
 		IObject o, string storable, string param)
 		{
-			return GetColorParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+			return GetColorParameter((o.Atom as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableColor GetColorParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -529,12 +569,15 @@ namespace Cue.W
 		public JSONStorableAction GetActionParameter(
 			IObject o, string storable, string param)
 		{
-			return GetActionParameter(((W.VamAtom)o.Atom).Atom, storable, param);
+			return GetActionParameter((o.Atom as VamAtom)?.Atom, storable, param);
 		}
 
 		public JSONStorableAction GetActionParameter(
 			Atom a, string storable, string param)
 		{
+			if (a == null)
+				return null;
+
 			var st = FindStorable(a, storable);
 			if (st == null)
 			{
@@ -547,11 +590,14 @@ namespace Cue.W
 
 		public Rigidbody FindRigidbody(IObject o, string name)
 		{
-			return FindRigidbody(((W.VamAtom)o.Atom).Atom, name);
+			return FindRigidbody((o.Atom as VamAtom)?.Atom, name);
 		}
 
 		public Rigidbody FindRigidbody(Atom a, string name)
 		{
+			if (a == null)
+				return null;
+
 			foreach (var rb in a.rigidbodies)
 			{
 				if (rb.name == name)

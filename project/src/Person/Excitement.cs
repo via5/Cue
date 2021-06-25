@@ -193,12 +193,11 @@ namespace Cue
 
 			reasons_[OtherSex].Value = 0;
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (i == person_.PersonIndex)
+				if (p == person_)
 					continue;
 
-				var p = Cue.Instance.Persons[i];
 				reasons_[OtherSex].Value += p.Excitement.physicalRate_;
 			}
 		}

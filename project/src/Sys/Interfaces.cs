@@ -35,10 +35,11 @@ namespace Cue.W
 		IAtom ContainingAtom { get; }
 		INav Nav { get; }
 		IInput Input { get; }
-		Vector3 Camera { get; }
+		Vector3 CameraPosition { get; }
 		Vector3 InteractiveLeftHandPosition { get; }
 		Vector3 InteractiveRightHandPosition { get; }
 		bool Paused { get; }
+		void Update(float s);
 		void OnPluginState(bool b);
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
@@ -155,7 +156,7 @@ namespace Cue.W
 			if (personIndex == -1 || sourcePartIndex == -1)
 				return "?";
 
-			var p = Cue.Instance.Persons[personIndex];
+			var p = Cue.Instance.AllPersons[personIndex];
 			var bp = p.Body.Get(sourcePartIndex);
 
 			if (value == 1)

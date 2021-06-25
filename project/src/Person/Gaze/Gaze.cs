@@ -30,7 +30,7 @@ namespace Cue
 		public void Init()
 		{
 			targets_.Init();
-			avoid_ = new bool[Cue.Instance.AllObjects.Count];
+			avoid_ = new bool[Cue.Instance.Everything.Count];
 			pick_.SetTargets(targets_.All);
 		}
 
@@ -57,7 +57,7 @@ namespace Cue
 			var list = new List<Pair<IObject, bool>>();
 
 			for (int i = 0; i < avoid_.Length; ++i)
-				list.Add(new Pair<IObject, bool>(Cue.Instance.AllObjects[i], avoid_[i]));
+				list.Add(new Pair<IObject, bool>(Cue.Instance.Everything[i], avoid_[i]));
 
 			return list;
 		}
@@ -201,9 +201,8 @@ namespace Cue
 			}
 
 
-			for (int i=0; i<Cue.Instance.Persons.Count; ++i)
+			foreach (var t in Cue.Instance.ActivePersons)
 			{
-				var t = Cue.Instance.Persons[i];
 				if (t == person_)
 					continue;
 
@@ -294,12 +293,11 @@ namespace Cue
 			if (!busy)
 				lastString_ += "not busy";
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (i == person_.PersonIndex)
+				if (p == person_)
 					continue;
 
-				var p = Cue.Instance.Persons[i];
 				if (p == Cue.Instance.Player && ps.AvoidGazePlayer)
 					continue;
 

@@ -39,14 +39,22 @@ namespace Cue
 		private static Cue instance_ = null;
 
 		private readonly List<Person> persons_ = new List<Person>();
+		private readonly List<Person> activePersons_ = new List<Person>();
+		private Person[] activePersonsArray_ = new Person[0];
+
 		private readonly List<IObject> objects_ = new List<IObject>();
-		private readonly List<IObject> allObjects_ = new List<IObject>();
+		private readonly List<IObject> activeObjects_ = new List<IObject>();
+		private IObject[] activeObjectsArray_ = new IObject[0];
+
+		private readonly List<IObject> everything_ = new List<IObject>();
+		private readonly List<IObject> everythingActive_ = new List<IObject>();
+		private IObject[] everythingActiveArray_ = new IObject[0];
+
 		private readonly UI ui_;
 		private readonly Options options_ = new Options();
 		private readonly Tickers tickers_ = new Tickers();
 
 		private Person player_ = null;
-		private Person forcedPlayer_ = null;
 		private bool paused_ = false;
 		private int frame_ = 0;
 
@@ -64,9 +72,16 @@ namespace Cue
 		public W.ISys Sys { get { return CueMain.Instance.Sys; } }
 		public W.VamSys VamSys { get { return Sys as W.VamSys; } }
 
-		public List<IObject> AllObjects { get { return allObjects_; } }
-		public List<IObject> Objects { get { return objects_; } }
-		public List<Person> Persons { get { return persons_; } }
+		public List<Person> AllPersons { get { return persons_; } }
+		public Person[] ActivePersons { get { return activePersonsArray_; } }
+
+		public List<IObject> AllObjects { get { return objects_; } }
+		public IObject[] ActiveObjects { get { return activeObjectsArray_; } }
+
+		public List<IObject> Everything { get { return everything_; } }
+		public IObject[] EverythingActive { get { return everythingActiveArray_; } }
+
+
 		public UI UI { get { return ui_; } }
 		public Options Options { get { return options_; } }
 
@@ -74,13 +89,12 @@ namespace Cue
 
 		public Person Player
 		{
-			get
-			{
-				if (player_ != null)
-					return player_;
-				else
-					return forcedPlayer_;
-			}
+			get { return player_; }
+		}
+
+		public Person GetPerson(int i)
+		{
+			return persons_[i];
 		}
 
 		public Person FindPerson(string id)
@@ -151,17 +165,15 @@ namespace Cue
 				}
 				else
 				{
-					var o = BasicObject.TryCreateFromSlot(allObjects_.Count, a);
+					var o = BasicObject.TryCreateFromSlot(everything_.Count, a);
 					if (o != null)
 						AddObject(o);
 				}
 			}
 
-			foreach (var p in persons_)
-			{
-				if (p.ID == "Player")
-					forcedPlayer_ = p;
-			}
+			activePersonsArray_ = activePersons_.ToArray();
+			activeObjectsArray_ = activeObjects_.ToArray();
+			everythingActiveArray_ = everythingActive_.ToArray();
 		}
 
 		private void InitPersons()
@@ -192,15 +204,32 @@ namespace Cue
 		{
 			JSONClass o = config[a.ID]?.AsObject ?? new JSONClass();
 
-			var p = new Person(allObjects_.Count, persons_.Count, a, o);
+			var p = new Person(everything_.Count, persons_.Count, a, o);
+
 			persons_.Add(p);
-			allObjects_.Add(p);
+
+			if (p.Visible)
+				activePersons_.Add(p);
+
+			AddEverything(p);
 		}
 
 		private void AddObject(IObject o)
 		{
 			objects_.Add(o);
-			allObjects_.Add(o);
+
+			if (o.Visible)
+				activeObjects_.Add(o);
+
+			AddEverything(o);
+		}
+
+		private void AddEverything(IObject o)
+		{
+			everything_.Add(o);
+
+			if (o.Visible)
+				everythingActive_.Add(o);
 		}
 
 		public void ReloadPlugin()
@@ -224,8 +253,8 @@ namespace Cue
 
 		private void DoFixedUpdate(float s)
 		{
-			for (int i = 0; i < allObjects_.Count; ++i)
-				allObjects_[i].FixedUpdate(s);
+			for (int i = 0; i < everythingActive_.Count; ++i)
+				everythingActive_[i].FixedUpdate(s);
 		}
 
 		public void Update(float s)
@@ -264,16 +293,16 @@ namespace Cue
 			if (Sys.Paused != paused_)
 			{
 				paused_ = Sys.Paused;
-				for (int i = 0; i < allObjects_.Count; ++i)
-					allObjects_[i].SetPaused(Sys.Paused);
+				for (int i = 0; i < everythingActive_.Count; ++i)
+					everythingActive_[i].SetPaused(Sys.Paused);
 			}
 
 			if (!Sys.Paused)
 			{
 				CheckPossess(s);
 
-				for (int i = 0; i < allObjects_.Count; ++i)
-					allObjects_[i].Update(s);
+				for (int i = 0; i < everythingActive_.Count; ++i)
+					everythingActive_[i].Update(s);
 			}
 		}
 
@@ -289,10 +318,11 @@ namespace Cue
 			{
 				for (int i = 0; i < persons_.Count; ++i)
 				{
-					if (persons_[i].Possessed)
+					var p = persons_[i];
+					if (p.Possessed)
 					{
-						LogInfo($"{persons_[i]} now possessed");
-						SetPlayer(persons_[i]);
+						LogInfo($"{p} now possessed");
+						SetPlayer(p);
 						break;
 					}
 				}
@@ -316,8 +346,8 @@ namespace Cue
 			Sys.OnPluginState(b);
 			ui_.OnPluginState(b);
 
-			for (int i = 0; i < allObjects_.Count; ++i)
-				allObjects_[i].OnPluginState(b);
+			for (int i = 0; i < everythingActive_.Count; ++i)
+				everythingActive_[i].OnPluginState(b);
 
 			LogVerbose($"cue: plugin state {b} finished");
 		}

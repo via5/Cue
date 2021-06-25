@@ -50,6 +50,9 @@ namespace Cue.W
 		public VamHair(VamAtom a)
 		{
 			atom_ = a;
+			if (atom_ == null)
+				return;
+
 			char_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
 			if (char_ == null)
 				atom_.Log.Error("no DAZCharacterSelector for hair");
@@ -96,7 +99,20 @@ namespace Cue.W
 	}
 
 
-	class VamBody : IBody
+	abstract class VamBasicBody : IBody
+	{
+		public abstract float Sweat { set; }
+
+		public abstract IBodyPart[] GetBodyParts();
+		public abstract Hand GetLeftHand();
+		public abstract Hand GetRightHand();
+		public abstract void LerpColor(Color c, float f);
+
+		public abstract int BodyPartForCollider(Collider c);
+	}
+
+
+	class VamBody : VamBasicBody
 	{
 		private VamAtom atom_;
 		private VamFloatParameter gloss_ = null;
@@ -122,7 +138,7 @@ namespace Cue.W
 			parts_ = CreateBodyParts();
 		}
 
-		public IBodyPart[] GetBodyParts()
+		public override IBodyPart[] GetBodyParts()
 		{
 			return parts_;
 		}
@@ -132,7 +148,7 @@ namespace Cue.W
 			return parts_[i];
 		}
 
-		public int BodyPartForCollider(Collider c)
+		public override int BodyPartForCollider(Collider c)
 		{
 			int p;
 			if (partMap_.TryGetValue(c, out p))
@@ -227,7 +243,7 @@ namespace Cue.W
 			return list.ToArray();
 		}
 
-		public Hand GetLeftHand()
+		public override Hand GetLeftHand()
 		{
 			var h = new Hand();
 			h.bones = GetHandBones("l");
@@ -237,7 +253,7 @@ namespace Cue.W
 			return h;
 		}
 
-		public Hand GetRightHand()
+		public override Hand GetRightHand()
 		{
 			var h = new Hand();
 			h.bones = GetHandBones("r");
@@ -327,7 +343,7 @@ namespace Cue.W
 				Reset();
 		}
 
-		public float Sweat
+		public override float Sweat
 		{
 			set
 			{
@@ -342,7 +358,7 @@ namespace Cue.W
 			}
 		}
 
-		public void LerpColor(Color target, float f)
+		public override void LerpColor(Color target, float f)
 		{
 			var p = color_.Parameter;
 			if (p != null)
@@ -699,26 +715,17 @@ namespace Cue.W
 			type_ = t;
 		}
 
-		public int Type
-		{
-			get { return type_; }
-		}
+		public int Type { get { return type_; } }
 
-		public abstract Transform Transform { get; }
-		public abstract Rigidbody Rigidbody { get; }
+		public virtual Transform Transform { get { return null; } }
+		public virtual Rigidbody Rigidbody { get { return null; } }
 
-		public virtual bool CanTrigger
-		{
-			get { return false; }
-		}
+		public virtual bool CanTrigger { get { return false; } }
+		public virtual TriggerInfo[] GetTriggers() { return null; }
 
-		public virtual TriggerInfo[] GetTriggers()
-		{
-			return null;
-		}
+		public virtual bool CanGrab{ get { return false; } }
+		public virtual bool Grabbed { get { return false; } }
 
-		public abstract bool CanGrab { get; }
-		public abstract bool Grabbed { get; }
 		public abstract Vector3 ControlPosition { get; set; }
 		public abstract Quaternion ControlRotation { get; set; }
 		public abstract Vector3 Position { get; }
@@ -960,12 +967,12 @@ namespace Cue.W
 
 			List<TriggerInfo> list = null;
 
-			var found = new bool[Cue.Instance.Persons.Count, BodyParts.Count];
+			var found = new bool[Cue.Instance.AllPersons.Count, BodyParts.Count];
 			List<string> foundOther = null;
 
 			foreach (var kv in h_.collidingWithDictionary)
 			{
-				if (!kv.Value)
+				if (!kv.Value || kv.Key == null)
 					continue;
 
 				if (!ValidTrigger(kv.Key))
@@ -991,11 +998,11 @@ namespace Cue.W
 				}
 				else
 				{
-					var bp = ((VamBody)p.Atom.Body).BodyPartForCollider(kv.Key);
+					var bp = ((VamBasicBody)p.Atom.Body).BodyPartForCollider(kv.Key);
 
 					if (bp == -1)
 					{
-						//Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
+						Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
 					}
 					else if (!found[p.PersonIndex, bp])
 					{
@@ -1017,10 +1024,21 @@ namespace Cue.W
 			if (a == null)
 				return null;
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			if (Cue.Instance.VamSys.IsVRHands(a))
 			{
-				if (Cue.Instance.Persons[i].VamAtom.Atom == a)
-					return Cue.Instance.Persons[i];
+				foreach (var p in Cue.Instance.ActivePersons)
+				{
+					if (p.Atom == Cue.Instance.VamSys.CameraAtom)
+						return p;
+				}
+
+				return null;
+			}
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p.VamAtom.Atom == a)
+					return p;
 			}
 
 			return null;
@@ -1142,7 +1160,7 @@ namespace Cue.W
 			get
 			{
 				if (atom_.Possessed)
-					return Cue.Instance.Sys.Camera;
+					return Cue.Instance.Sys.CameraPosition;
 				else if (lEye_ != null && rEye_ != null)
 					return VamU.FromUnity((lEye_.position + rEye_.position) / 2);
 				else if (head_ != null)

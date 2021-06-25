@@ -405,23 +405,31 @@ namespace Cue
 
 		public string Name
 		{
-			get { return m_.Name; }
+			get { return m_?.Name ?? "?"; }
 		}
 
 		public float Value
 		{
-			get { return m_.Value; }
-			set { m_.Value = value; }
+			get
+			{
+				return m_?.Value ?? 0;
+			}
+
+			set
+			{
+				if (m_ != null)
+					m_.Value = value;
+			}
 		}
 
 		public float DefaultValue
 		{
-			get { return m_.DefaultValue; }
+			get { return m_?.DefaultValue ?? 0; }
 		}
 
 		public void Reset()
 		{
-			m_.Reset();
+			m_?.Reset();
 		}
 	}
 
@@ -438,9 +446,9 @@ namespace Cue
 			name_ = name;
 			bones_ = new Bone[3];
 
-			bones_[0] = new Bone("proximal", bones[0]);
-			bones_[1] = new Bone("intermediate", bones[1]);
-			bones_[2] = new Bone("distal", bones[2]);
+			bones_[0] = new Bone("proximal", bones?[0]);
+			bones_[1] = new Bone("intermediate", bones?[1]);
+			bones_[2] = new Bone("distal", bones?[2]);
 		}
 
 		public string Name
@@ -490,11 +498,11 @@ namespace Cue
 			name_ = name;
 
 			fingers_ = new Finger[5];
-			fingers_[0] = new Finger(this, "thumb", h.bones[0]);
-			fingers_[1] = new Finger(this, "index", h.bones[1]);
-			fingers_[2] = new Finger(this, "middle", h.bones[2]);
-			fingers_[3] = new Finger(this, "ring", h.bones[3]);
-			fingers_[4] = new Finger(this, "little", h.bones[4]);
+			fingers_[0] = new Finger(this, "thumb", h.bones?[0]);
+			fingers_[1] = new Finger(this, "index", h.bones?[1]);
+			fingers_[2] = new Finger(this, "middle", h.bones?[2]);
+			fingers_[3] = new Finger(this, "ring", h.bones?[3]);
+			fingers_[4] = new Finger(this, "little", h.bones?[4]);
 
 			fist_ = new Morph(h.fist);
 			inOut_ = new Morph(h.inOut);
@@ -620,9 +628,9 @@ namespace Cue
 			};
 
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(Cue.Instance.Persons[i], parts))
+				if (GropedBy(p, parts))
 					return true;
 			}
 
@@ -631,9 +639,9 @@ namespace Cue
 
 		public bool Penetrated()
 		{
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (PenetratedBy(Cue.Instance.Persons[i]))
+				if (PenetratedBy(p))
 					return true;
 			}
 
@@ -642,9 +650,9 @@ namespace Cue
 
 		public bool GropedByAny(int triggerBodyPart)
 		{
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(Cue.Instance.Persons[i], BodyParts.Head))
+				if (GropedBy(p, BodyParts.Head))
 					return true;
 			}
 
@@ -730,7 +738,7 @@ namespace Cue
 				{
 					if (ts[i].sourcePartIndex >= 0)
 					{
-						var pp = Cue.Instance.Persons[ts[i].personIndex];
+						var pp = Cue.Instance.GetPerson(ts[i].personIndex);
 						var bp = pp.Body.Get(ts[i].sourcePartIndex);
 
 						if (bp == by)

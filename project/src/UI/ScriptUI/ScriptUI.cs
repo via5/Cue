@@ -20,7 +20,7 @@ namespace Cue
 		{
 			misc_ = new MiscTab();
 
-			foreach (var p in Cue.Instance.Persons)
+			foreach (var p in Cue.Instance.AllPersons)
 				tabs_.Add(new PersonTab(p));
 
 			tabs_.Add(misc_);

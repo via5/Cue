@@ -96,7 +96,7 @@ namespace Cue
 
 		public W.VamAtom VamAtom
 		{
-			get { return (W.VamAtom)atom_; }
+			get { return atom_ as W.VamAtom; }
 		}
 
 		public W.IAtom Atom

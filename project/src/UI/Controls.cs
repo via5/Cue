@@ -136,7 +136,7 @@ namespace Cue
 			moveTarget_.Collision = false;
 			moveTarget_.Visible = false;
 
-			foreach (var o in Cue.Instance.Objects)
+			foreach (var o in Cue.Instance.AllObjects)
 				controls_.Add(new ObjectControls(o));
 		}
 

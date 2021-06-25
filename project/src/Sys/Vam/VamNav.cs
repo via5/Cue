@@ -37,9 +37,9 @@ namespace Cue.W
 
 			var pathColor = new Color(1, 1, 1, 1);
 
-			for (int i = 0; i < Cue.Instance.Persons.Count; ++i)
+			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				var a = Cue.Instance.Persons[i].VamAtom.VamAtomNav.Agent;
+				var a = p.VamAtom.VamAtomNav.Agent;
 				if (!a.hasPath && a.path.corners.Length < 2)
 					continue;
 

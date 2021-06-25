@@ -245,11 +245,11 @@
 			// todo: must support multiple avoid boxes
 			IObject avoidO = null;
 
-			for (int i = 0; i < Cue.Instance.AllObjects.Count; ++i)
+			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
-				if (person_.Gaze.ShouldAvoid(Cue.Instance.AllObjects[i]))
+				if (person_.Gaze.ShouldAvoid(Cue.Instance.Everything[i]))
 				{
-					avoidO = Cue.Instance.AllObjects[i];
+					avoidO = Cue.Instance.Everything[i];
 					break;
 				}
 			}
