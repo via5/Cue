@@ -84,7 +84,7 @@ namespace Cue
 		private bool postOrgasm_ = false;
 		private float postOrgasmElapsed_ = 1000;
 
-		private IEasing easing_ = new CubicOutEasing();
+		private IEasing easing_ = new SinusoidalEasing();
 
 
 		public Excitement(Person p)

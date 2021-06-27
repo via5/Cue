@@ -354,7 +354,7 @@ namespace Cue.W
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p.VamAtom.Atom == a)
+				if (p.VamAtom != null && p.VamAtom.Atom == a)
 					return new HoveredInfo(p, h.pos, true);
 			}
 

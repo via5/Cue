@@ -46,6 +46,8 @@ namespace Cue.W
 			SetStrongerDamping("hipControl");
 			SetStrongerDamping("chestControl");
 			SetStrongerDamping("headControl");
+			SetStrongerDamping("lFootControl");
+			SetStrongerDamping("rFootControl");
 		}
 
 		private void DisableFreezeWhenGrabbed()

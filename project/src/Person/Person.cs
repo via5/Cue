@@ -77,13 +77,13 @@ namespace Cue
 		}
 
 		public float MouthRate { get { return 0.1f; } }
-		public float MouthMax { get { return 0.05f; } }
+		public float MouthMax { get { return 0.3f; } }
 
 		public float BreastsRate { get { return 0.01f; } }
-		public float BreastsMax { get { return 0.1f; } }
+		public float BreastsMax { get { return 0.4f; } }
 
 		public float GenitalsRate { get { return 0.06f; } }
-		public float GenitalsMax { get { return 0.3f; } }
+		public float GenitalsMax { get { return 0.8f; } }
 
 		public float PenetrationRate { get { return 0.05f; } }
 		public float PenetrationMax { get { return 1.0f; } }
@@ -91,7 +91,7 @@ namespace Cue
 		public float DecayPerSecond { get { return -0.01f; } }
 		public float ExcitementPostOrgasm { get { return 0.0f; } }
 		public float DelayPostOrgasm { get { return 10; } }
-		public float RateAdjustment { get { return 0.4f; } }
+		public float RateAdjustment { get { return 0.3f; } }
 	}
 
 
