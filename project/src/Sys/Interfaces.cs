@@ -1,9 +1,8 @@
 ﻿using SimpleJSON;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
-namespace Cue.W
+namespace Cue.Sys
 {
 	class LogLevels
 	{

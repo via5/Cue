@@ -8,21 +8,21 @@ namespace Cue
 
 		private Logger log_;
 		private Person person_;
-		private W.VamBoolParameter enabled_ = null;
-		private W.VamBoolParameter active_ = null;
-		private W.VamBoolParameterRO running_ = null;
-		private W.VamStringChooserParameter atom_ = null;
-		private W.VamStringChooserParameter target_ = null;
-		private W.VamBoolParameter trackPos_ = null;
-		private W.VamBoolParameter trackRot_ = null;
-		private W.VamFloatParameter headAngleX_ = null;
-		private W.VamFloatParameter headAngleY_ = null;
-		private W.VamFloatParameter headAngleZ_ = null;
-		private W.VamFloatParameter lipDepth_ = null;
-		private W.VamFloatParameter morphDuration_ = null;
-		private W.VamFloatParameter morphSpeed_ = null;
-		private W.VamFloatParameter tongueLength_ = null;
-		private W.VamBoolParameter closeEyes_ = null;
+		private Sys.Vam.BoolParameter enabled_ = null;
+		private Sys.Vam.BoolParameter active_ = null;
+		private Sys.Vam.BoolParameterRO running_ = null;
+		private Sys.Vam.StringChooserParameter atom_ = null;
+		private Sys.Vam.StringChooserParameter target_ = null;
+		private Sys.Vam.BoolParameter trackPos_ = null;
+		private Sys.Vam.BoolParameter trackRot_ = null;
+		private Sys.Vam.FloatParameter headAngleX_ = null;
+		private Sys.Vam.FloatParameter headAngleY_ = null;
+		private Sys.Vam.FloatParameter headAngleZ_ = null;
+		private Sys.Vam.FloatParameter lipDepth_ = null;
+		private Sys.Vam.FloatParameter morphDuration_ = null;
+		private Sys.Vam.FloatParameter morphSpeed_ = null;
+		private Sys.Vam.FloatParameter tongueLength_ = null;
+		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
 		private bool randomMovements_ = false;
 		private bool randomSpeeds_ = false;
@@ -63,49 +63,49 @@ namespace Cue
 
 			person_ = p;
 
-			enabled_ = new W.VamBoolParameter(
+			enabled_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "enabled");
 
-			active_ = new W.VamBoolParameter(
+			active_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "isActive");
 
-			running_ = new W.VamBoolParameterRO(
+			running_ = new Sys.Vam.BoolParameterRO(
 				p, "ClockwiseSilver.Kiss", "Is Kissing");
 
-			atom_ = new W.VamStringChooserParameter(
+			atom_ = new Sys.Vam.StringChooserParameter(
 				p, "ClockwiseSilver.Kiss", "atom");
 
-			target_ = new W.VamStringChooserParameter(
+			target_ = new Sys.Vam.StringChooserParameter(
 				p, "ClockwiseSilver.Kiss", "kissTargetJSON");
 
-			trackPos_ = new W.VamBoolParameter(
+			trackPos_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "trackPosition");
 
-			trackRot_ = new W.VamBoolParameter(
+			trackRot_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "trackRotation");
 
-			headAngleX_ = new W.VamFloatParameter(
+			headAngleX_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Head Angle X");
 
-			headAngleY_ = new W.VamFloatParameter(
+			headAngleY_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Head Angle Y");
 
-			headAngleZ_ = new W.VamFloatParameter(
+			headAngleZ_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Head Angle Z");
 
-			lipDepth_ = new W.VamFloatParameter(
+			lipDepth_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Lip Depth");
 
-			morphDuration_ = new W.VamFloatParameter(
+			morphDuration_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Morph Duration");
 
-			morphSpeed_ = new W.VamFloatParameter(
+			morphSpeed_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Morph Speed");
 
-			tongueLength_ = new W.VamFloatParameter(
+			tongueLength_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Tongue Length");
 
-			closeEyes_ = new W.VamBoolParameter(
+			closeEyes_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "closeEyes");
 
 			active_.Value = false;
@@ -391,15 +391,15 @@ namespace Cue
 	{
 		private Person person_;
 		private Logger log_;
-		private W.VamBoolParameter enabled_ = null;
-		private W.VamBoolParameter active_ = null;
-		private W.VamBoolParameterRO running_ = null;
-		private W.VamStringChooserParameter male_ = null;
-		private W.VamStringChooserParameter hand_ = null;
-		private W.VamFloatParameter handX_ = null;
-		private W.VamFloatParameter handY_ = null;
-		private W.VamFloatParameter handZ_ = null;
-		private W.VamFloatParameter closeMax_ = null;
+		private Sys.Vam.BoolParameter enabled_ = null;
+		private Sys.Vam.BoolParameter active_ = null;
+		private Sys.Vam.BoolParameterRO running_ = null;
+		private Sys.Vam.StringChooserParameter male_ = null;
+		private Sys.Vam.StringChooserParameter hand_ = null;
+		private Sys.Vam.FloatParameter handX_ = null;
+		private Sys.Vam.FloatParameter handY_ = null;
+		private Sys.Vam.FloatParameter handZ_ = null;
+		private Sys.Vam.FloatParameter closeMax_ = null;
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
 
@@ -407,15 +407,15 @@ namespace Cue
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "ClockwiseHJ");
-			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "enabled");
-			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.HJ", "isActive");
-			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
-			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
-			hand_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
-			handX_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Side/Side");
-			handY_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Fwd/Bkwd");
-			handZ_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Shift Up/Down");
-			closeMax_ = new W.VamFloatParameter(p, "ClockwiseSilver.HJ", "Hand Close Max");
+			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "enabled");
+			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
+			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
+			hand_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
+			handX_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Side/Side");
+			handY_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Fwd/Bkwd");
+			handZ_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Shift Up/Down");
+			closeMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Close Max");
 
 			active_.Value = false;
 		}
@@ -503,31 +503,31 @@ namespace Cue
 	{
 		private Person person_;
 		private Logger log_;
-		private W.VamBoolParameter enabled_ = null;
-		private W.VamBoolParameter active_ = null;
-		private W.VamBoolParameterRO running_ = null;
-		private W.VamStringChooserParameter male_ = null;
-		private W.VamFloatParameter sfxVolume_ = null;
-		private W.VamFloatParameter moanVolume_ = null;
-		private W.VamFloatParameter volumeScaling_ = null;
-		private W.VamFloatParameter headX_ = null;
-		private W.VamFloatParameter headY_ = null;
-		private W.VamFloatParameter headZ_ = null;
+		private Sys.Vam.BoolParameter enabled_ = null;
+		private Sys.Vam.BoolParameter active_ = null;
+		private Sys.Vam.BoolParameterRO running_ = null;
+		private Sys.Vam.StringChooserParameter male_ = null;
+		private Sys.Vam.FloatParameter sfxVolume_ = null;
+		private Sys.Vam.FloatParameter moanVolume_ = null;
+		private Sys.Vam.FloatParameter volumeScaling_ = null;
+		private Sys.Vam.FloatParameter headX_ = null;
+		private Sys.Vam.FloatParameter headY_ = null;
+		private Sys.Vam.FloatParameter headZ_ = null;
 
 		public ClockwiseSilverBlowjob(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "ClockwiseBJ");
-			enabled_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "enabled");
-			active_ = new W.VamBoolParameter(p, "ClockwiseSilver.BJ", "isActive");
-			running_ = new W.VamBoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
-			male_ = new W.VamStringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
-			sfxVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
-			moanVolume_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
-			volumeScaling_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Volume Scaling");
-			headX_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Side/Side");
-			headY_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Up/Down");
-			headZ_ = new W.VamFloatParameter(p, "ClockwiseSilver.BJ", "Head Fwd/Bkwd");
+			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "enabled");
+			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
+			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
+			sfxVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
+			moanVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
+			volumeScaling_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Volume Scaling");
+			headX_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Head Side/Side");
+			headY_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Head Up/Down");
+			headZ_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Head Fwd/Bkwd");
 
 			active_.Value = false;
 			sfxVolume_.Value = 0;

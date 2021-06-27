@@ -52,9 +52,9 @@ namespace Cue.BVH
 
             CreateMappings();
 
-            if (p.Atom is W.VamAtom)
+            if (p.Atom is Sys.Vam.VamAtom)
             {
-                containingAtom_ = ((W.VamAtom)p.Atom).Atom;
+                containingAtom_ = ((Sys.Vam.VamAtom)p.Atom).Atom;
 
                 if (Cue.Instance.Options.AllowMovement)
                     containingAtom_.ResetPhysical();

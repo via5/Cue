@@ -4,9 +4,9 @@
 	{
 		struct Pair
 		{
-			public W.VamFloatParameter min, max;
+			public Sys.Vam.FloatParameter min, max;
 
-			public Pair(W.VamFloatParameter min, W.VamFloatParameter max)
+			public Pair(Sys.Vam.FloatParameter min, Sys.Vam.FloatParameter max)
 			{
 				this.min = min;
 				this.max = max;
@@ -15,18 +15,18 @@
 
 		struct Parameters
 		{
-			public W.VamStringChooserParameter breathDataset_;
-			public W.VamStringChooserParameter orgasmDataset_;
-			public W.VamFloatParameter intensity;
-			public W.VamFloatParameter desktopVolume;
-			public W.VamFloatParameter vrVolume;
-			public W.VamFloatParameter pitch;
+			public Sys.Vam.StringChooserParameter breathDataset_;
+			public Sys.Vam.StringChooserParameter orgasmDataset_;
+			public Sys.Vam.FloatParameter intensity;
+			public Sys.Vam.FloatParameter desktopVolume;
+			public Sys.Vam.FloatParameter vrVolume;
+			public Sys.Vam.FloatParameter pitch;
 
 			public Pair chestMorph, chestJointDrive, stomach, mouthMorph;
-			public W.VamFloatParameter chestJointDriveSpring;
-			public W.VamFloatParameter mouthOpenTime, mouthCloseTime;
-			public W.VamFloatParameter lipsMorphMax;
-			public W.VamFloatParameter noseInMorphMax, noseOutMorphMax;
+			public Sys.Vam.FloatParameter chestJointDriveSpring;
+			public Sys.Vam.FloatParameter mouthOpenTime, mouthCloseTime;
+			public Sys.Vam.FloatParameter lipsMorphMax;
+			public Sys.Vam.FloatParameter noseInMorphMax, noseOutMorphMax;
 		}
 
 		private Person person_;
@@ -59,36 +59,36 @@
 			p_.pitch.Value = 0.8f + person_.Physiology.VoicePitch * 0.4f;
 		}
 
-		private W.VamFloatParameter DBF(string name)
+		private Sys.Vam.FloatParameter DBF(string name)
 		{
-			return new W.VamFloatParameter(
+			return new Sys.Vam.FloatParameter(
 				person_, "MacGruber.DriverBreathing", name);
 		}
 
 		private Pair DBPF(string min, string max)
 		{
 			return new Pair(
-				new W.VamFloatParameter(
+				new Sys.Vam.FloatParameter(
 					person_, "MacGruber.DriverBreathing", min),
-				new W.VamFloatParameter(
+				new Sys.Vam.FloatParameter(
 					person_, "MacGruber.DriverBreathing", max));
 		}
 
-		private W.VamStringChooserParameter BSC(string name)
+		private Sys.Vam.StringChooserParameter BSC(string name)
 		{
-			return new W.VamStringChooserParameter(
+			return new Sys.Vam.StringChooserParameter(
 				person_, "MacGruber.Breathing", name);
 		}
 
-		private W.VamFloatParameter BF(string name)
+		private Sys.Vam.FloatParameter BF(string name)
 		{
-			return new W.VamFloatParameter(
+			return new Sys.Vam.FloatParameter(
 				person_, "MacGruber.Breathing", name);
 		}
 
-		private W.VamFloatParameter AAF(string name)
+		private Sys.Vam.FloatParameter AAF(string name)
 		{
-			return new W.VamFloatParameter(
+			return new Sys.Vam.FloatParameter(
 				person_, "MacGruber.AudioAttenuation", name);
 		}
 
@@ -145,12 +145,12 @@
 	class MacGruberOrgasmer : IOrgasmer
 	{
 		private Person person_ = null;
-		private W.VamActionParameter action_;
+		private Sys.Vam.ActionParameter action_;
 
 		public MacGruberOrgasmer(Person p)
 		{
 			person_ = p;
-			action_ = new W.VamActionParameter(p, "MacGruber.Breathing", "QueueOrgasm");
+			action_ = new Sys.Vam.ActionParameter(p, "MacGruber.Breathing", "QueueOrgasm");
 		}
 
 		public void Orgasm()
@@ -169,17 +169,17 @@
 		private Person person_;
 		private Logger log_;
 		private int version_ = NotFound;
-		private W.VamBoolParameter enabled_;
-		private W.VamFloatParameter gazeDuration_;
-		private W.VamFloatParameter maxAngleHor_;
-		private W.VamFloatParameter maxAngleVer_;
+		private Sys.Vam.BoolParameter enabled_;
+		private Sys.Vam.FloatParameter gazeDuration_;
+		private Sys.Vam.FloatParameter maxAngleHor_;
+		private Sys.Vam.FloatParameter maxAngleVer_;
 
 		// 12
-		private W.VamBoolParameter lookatTarget_;
+		private Sys.Vam.BoolParameter lookatTarget_;
 
 		// 13+
-		private W.VamStringChooserParameter lookatAtom_;
-		private W.VamStringChooserParameter lookatControl_;
+		private Sys.Vam.StringChooserParameter lookatAtom_;
+		private Sys.Vam.StringChooserParameter lookatControl_;
 
 
 		public MacGruberGaze(Person p)
@@ -187,14 +187,14 @@
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
 
-			enabled_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "enabled");
-			gazeDuration_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
-			maxAngleHor_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
-			maxAngleVer_ = new W.VamFloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
+			enabled_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "enabled");
+			gazeDuration_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
+			maxAngleHor_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
+			maxAngleVer_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
 
-			lookatTarget_ = new W.VamBoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
-			lookatAtom_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
-			lookatControl_ = new W.VamStringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
+			lookatTarget_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
+			lookatAtom_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
+			lookatControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
 
 			enabled_.Value = false;
 			maxAngleHor_.Value = 90;

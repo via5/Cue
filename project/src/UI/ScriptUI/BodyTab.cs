@@ -136,7 +136,7 @@ namespace Cue
 
 						w.triggering.TextColor = (
 							(ts != null && ts.Length > 0) ?
-							W.VamU.ToUnity(Color.Green) :
+							Sys.Vam.U.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
 					}
 					else
@@ -150,7 +150,7 @@ namespace Cue
 
 						w.grab.TextColor = (
 							w.part.Grabbed ?
-							W.VamU.ToUnity(Color.Green) :
+							Sys.Vam.U.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
 					}
 					else

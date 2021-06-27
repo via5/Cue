@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
-	abstract class VamParameterChecker
+	abstract class ParameterChecker
 	{
 		private readonly float interval_;
 		private float elapsed_ = 0;
@@ -10,7 +10,7 @@ namespace Cue.W
 		protected bool checkedOnce_ = false;
 		private int backoff_ = 0;
 
-		public VamParameterChecker(float interval = -1)
+		public ParameterChecker(float interval = -1)
 		{
 			// so they don't all check on the same frame
 			interval_ = (interval < 0 ? U.RandomFloat(1.5f, 2.5f) : interval);
@@ -62,7 +62,7 @@ namespace Cue.W
 	}
 
 
-	abstract class VamBasicParameterRO<NativeType, StorableType> : VamParameterChecker
+	abstract class BasicParameterRO<NativeType, StorableType> : ParameterChecker
 		where StorableType : JSONStorableParam
 	{
 		protected Atom atom_;
@@ -71,7 +71,7 @@ namespace Cue.W
 		protected StorableType param_ = null;
 		protected NativeType dummyValue_;
 
-		public VamBasicParameterRO(IAtom a, string s, string name)
+		public BasicParameterRO(IAtom a, string s, string name)
 		{
 			atom_ = (a as VamAtom)?.Atom;
 			storableID_ = s;
@@ -213,11 +213,11 @@ namespace Cue.W
 	}
 
 
-	abstract class VamBasicParameter<NativeType, StorableType>
-		: VamBasicParameterRO<NativeType, StorableType>
+	abstract class BasicParameter<NativeType, StorableType>
+		: BasicParameterRO<NativeType, StorableType>
 			where StorableType : JSONStorableParam
 	{
-		public VamBasicParameter(IAtom a, string s, string name)
+		public BasicParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -255,14 +255,14 @@ namespace Cue.W
 	}
 
 
-	class VamBoolParameterRO : VamBasicParameterRO<bool, JSONStorableBool>
+	class BoolParameterRO : BasicParameterRO<bool, JSONStorableBool>
 	{
-		public VamBoolParameterRO(IObject o, string s, string name)
+		public BoolParameterRO(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamBoolParameterRO(IAtom a, string s, string name)
+		public BoolParameterRO(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -285,14 +285,14 @@ namespace Cue.W
 	}
 
 
-	class VamBoolParameter : VamBasicParameter<bool, JSONStorableBool>
+	class BoolParameter : BasicParameter<bool, JSONStorableBool>
 	{
-		public VamBoolParameter(IObject o, string s, string name)
+		public BoolParameter(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamBoolParameter(IAtom a, string s, string name)
+		public BoolParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -320,14 +320,14 @@ namespace Cue.W
 	}
 
 
-	class VamFloatParameterRO : VamBasicParameterRO<float, JSONStorableFloat>
+	class FloatParameterRO : BasicParameterRO<float, JSONStorableFloat>
 	{
-		public VamFloatParameterRO(IObject o, string s, string name)
+		public FloatParameterRO(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamFloatParameterRO(IAtom a, string s, string name)
+		public FloatParameterRO(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -350,14 +350,14 @@ namespace Cue.W
 	}
 
 
-	class VamFloatParameter : VamBasicParameter<float, JSONStorableFloat>
+	class FloatParameter : BasicParameter<float, JSONStorableFloat>
 	{
-		public VamFloatParameter(IObject o, string s, string name)
+		public FloatParameter(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamFloatParameter(IAtom a, string s, string name)
+		public FloatParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -385,14 +385,14 @@ namespace Cue.W
 	}
 
 
-	class VamStringChooserParameter : VamBasicParameter<string, JSONStorableStringChooser>
+	class StringChooserParameter : BasicParameter<string, JSONStorableStringChooser>
 	{
-		public VamStringChooserParameter(IObject o, string s, string name)
+		public StringChooserParameter(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamStringChooserParameter(IAtom a, string s, string name)
+		public StringChooserParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -420,14 +420,14 @@ namespace Cue.W
 	}
 
 
-	class VamStringChooserParameterRO : VamBasicParameterRO<string, JSONStorableStringChooser>
+	class StringChooserParameterRO : BasicParameterRO<string, JSONStorableStringChooser>
 	{
-		public VamStringChooserParameterRO(IObject o, string s, string name)
+		public StringChooserParameterRO(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamStringChooserParameterRO(IAtom a, string s, string name)
+		public StringChooserParameterRO(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -450,14 +450,14 @@ namespace Cue.W
 	}
 
 
-	class VamStringParameter : VamBasicParameter<string, JSONStorableString>
+	class StringParameter : BasicParameter<string, JSONStorableString>
 	{
-		public VamStringParameter(IObject o, string s, string name)
+		public StringParameter(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamStringParameter(IAtom a, string s, string name)
+		public StringParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -485,14 +485,14 @@ namespace Cue.W
 	}
 
 
-	class VamStringParameterRO : VamBasicParameterRO<string, JSONStorableString>
+	class StringParameterRO : BasicParameterRO<string, JSONStorableString>
 	{
-		public VamStringParameterRO(IObject o, string s, string name)
+		public StringParameterRO(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamStringParameterRO(IAtom a, string s, string name)
+		public StringParameterRO(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -515,14 +515,14 @@ namespace Cue.W
 	}
 
 
-	class VamColorParameter : VamBasicParameter<Color, JSONStorableColor>
+	class ColorParameter : BasicParameter<Color, JSONStorableColor>
 	{
-		public VamColorParameter(IObject o, string s, string name)
+		public ColorParameter(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamColorParameter(IAtom a, string s, string name)
+		public ColorParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -535,29 +535,29 @@ namespace Cue.W
 
 		protected override Color DoGetValue()
 		{
-			return VamU.FromHSV(param_.val);
+			return U.FromHSV(param_.val);
 		}
 
 		protected override void DoSetValue(Color c)
 		{
-			param_.val = VamU.ToHSV(c);
+			param_.val = U.ToHSV(c);
 		}
 
 		protected override Color DoGetDefaultValue()
 		{
-			return VamU.FromHSV(param_.defaultVal);
+			return U.FromHSV(param_.defaultVal);
 		}
 	}
 
 
-	class VamColorParameterRO : VamBasicParameterRO<Color, JSONStorableColor>
+	class ColorParameterRO : BasicParameterRO<Color, JSONStorableColor>
 	{
-		public VamColorParameterRO(IObject o, string s, string name)
+		public ColorParameterRO(IObject o, string s, string name)
 			: base(o.Atom, s, name)
 		{
 		}
 
-		public VamColorParameterRO(IAtom a, string s, string name)
+		public ColorParameterRO(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
 		}
@@ -571,31 +571,29 @@ namespace Cue.W
 		protected override Color DoGetValue()
 		{
 			var hsv = param_.val;
-
-			return VamU.FromUnity(
-				UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
+			return U.FromUnity(UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
 		}
 
 		protected override Color DoGetDefaultValue()
 		{
-			return VamU.FromHSV(param_.defaultVal);
+			return U.FromHSV(param_.defaultVal);
 		}
 	}
 
 
-	class VamActionParameter : VamParameterChecker
+	class ActionParameter : ParameterChecker
 	{
 		protected Atom atom_;
 		protected string storableID_;
 		protected string paramName_;
 		protected JSONStorableAction param_ = null;
 
-		public VamActionParameter(IObject o, string s, string name)
+		public ActionParameter(IObject o, string s, string name)
 			: this((o.Atom as VamAtom)?.Atom, s, name)
 		{
 		}
 
-		public VamActionParameter(Atom a, string s, string name)
+		public ActionParameter(Atom a, string s, string name)
 		{
 			atom_ = a;
 			storableID_ = s;

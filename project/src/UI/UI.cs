@@ -2,14 +2,14 @@
 {
 	class UI
 	{
-		private W.ISys sys_;
+		private Sys.ISys sys_;
 		private Menu leftMenu_ = null;
 		private Menu rightMenu_ = null;
 		private Menu desktopMenu_ = null;
 		private Controls controls_ = null;
 		private bool vr_ = false;
 
-		public UI(W.ISys sys)
+		public UI(Sys.ISys sys)
 		{
 			sys_ = sys;
 			vr_ = sys_.IsVR;
@@ -163,7 +163,7 @@
 			}
 		}
 
-		private bool DoAction(IObject src, W.HoveredInfo hit)
+		private bool DoAction(IObject src, Sys.HoveredInfo hit)
 		{
 			if (Cue.Instance.Options.AllowMovement)
 			{

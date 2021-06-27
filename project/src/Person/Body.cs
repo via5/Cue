@@ -119,10 +119,10 @@ namespace Cue
 	{
 		private Person person_;
 		private int type_;
-		private W.IBodyPart part_;
+		private Sys.IBodyPart part_;
 		private bool forceBusy_ = false;
 
-		public BodyPart(Person p, int type, W.IBodyPart part)
+		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
 			person_ = p;
 			type_ = type;
@@ -134,14 +134,14 @@ namespace Cue
 			get { return person_; }
 		}
 
-		public W.IBodyPart Sys
+		public Sys.IBodyPart Sys
 		{
 			get { return part_; }
 		}
 
-		public W.VamBodyPart VamSys
+		public Sys.Vam.VamBodyPart VamSys
 		{
-			get { return part_ as W.VamBodyPart; }
+			get { return part_ as Sys.Vam.VamBodyPart; }
 		}
 
 		public bool Exists
@@ -164,7 +164,7 @@ namespace Cue
 			get { return part_?.CanTrigger ?? false; }
 		}
 
-		public W.TriggerInfo[] GetTriggers()
+		public Sys.TriggerInfo[] GetTriggers()
 		{
 			return part_?.GetTriggers();
 		}
@@ -352,9 +352,9 @@ namespace Cue
 	class Bone
 	{
 		private string name_;
-		private W.IBone sys_;
+		private Sys.IBone sys_;
 
-		public Bone(string name, W.IBone b)
+		public Bone(string name, Sys.IBone b)
 		{
 			name_ = name;
 			sys_ = b;
@@ -396,9 +396,9 @@ namespace Cue
 
 	class Morph
 	{
-		private W.IMorph m_;
+		private Sys.IMorph m_;
 
-		public Morph(W.IMorph m)
+		public Morph(Sys.IMorph m)
 		{
 			m_ = m;
 		}
@@ -440,7 +440,7 @@ namespace Cue
 		private string name_;
 		private Bone[] bones_;
 
-		public Finger(Hand h, string name, W.IBone[] bones)
+		public Finger(Hand h, string name, Sys.IBone[] bones)
 		{
 			hand_ = h;
 			name_ = name;
@@ -492,7 +492,7 @@ namespace Cue
 		private Morph fist_;
 		private Morph inOut_;
 
-		public Hand(Person p, string name, W.Hand h)
+		public Hand(Person p, string name, Sys.Hand h)
 		{
 			person_ = p;
 			name_ = name;

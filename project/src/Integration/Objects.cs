@@ -3,7 +3,7 @@
 	class VamSmoke : ISmoke
 	{
 		private IObject smoke_ = null;
-		private W.VamFloatParameter smokeOpacityParam_ = null;
+		private Sys.Vam.FloatParameter smokeOpacityParam_ = null;
 		private Vector3 pos_ = Vector3.Zero;
 		private Quaternion rot_ = Quaternion.Zero;
 		private float smokeOpacity_ = 0;
@@ -97,7 +97,7 @@
 
 			if (smokeOpacityParam_ == null)
 			{
-				smokeOpacityParam_ = new W.VamFloatParameter(
+				smokeOpacityParam_ = new Sys.Vam.FloatParameter(
 					smoke_,
 					"SmokeCubeEditorPlugin.SmokeCubeEditor",
 					"Smoke opacity");

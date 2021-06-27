@@ -69,8 +69,8 @@ namespace Cue
 		public static Cue Instance { get { return instance_; } }
 
 		public Tickers Tickers { get { return tickers_; } }
-		public W.ISys Sys { get { return CueMain.Instance.Sys; } }
-		public W.VamSys VamSys { get { return Sys as W.VamSys; } }
+		public Sys.ISys Sys { get { return CueMain.Instance.Sys; } }
+		public Sys.Vam.VamSys VamSys { get { return Sys as Sys.Vam.VamSys; } }
 
 		public List<Person> AllPersons { get { return persons_; } }
 		public Person[] ActivePersons { get { return activePersonsArray_; } }
@@ -200,7 +200,7 @@ namespace Cue
 			}
 		}
 
-		private void AddPerson(JSONClass config, W.IAtom a)
+		private void AddPerson(JSONClass config, Sys.IAtom a)
 		{
 			JSONClass o = config[a.ID]?.AsObject ?? new JSONClass();
 
@@ -359,22 +359,24 @@ namespace Cue
 
 		static public void LogInfo(string s)
 		{
-			Instance.Sys.Log(s, W.LogLevels.Info);
+			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Info);
 		}
 
 		static public void LogWarning(string s)
 		{
-			Instance.Sys.Log(s, W.LogLevels.Warning);
+			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Warning);
 		}
 
 		static public void LogError(string s)
 		{
-			Instance.Sys.Log(s, W.LogLevels.Error);
+			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Error);
 		}
 
 		static public void LogErrorST(string s)
 		{
-			Instance.Sys.Log(s + "\n" + new StackTrace(1).ToString(), W.LogLevels.Error);
+			Instance.Sys.Log(
+				s + "\n" + new StackTrace(1).ToString(),
+				global::Cue.Sys.LogLevels.Error);
 		}
 
 		private void test()

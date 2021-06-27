@@ -112,7 +112,7 @@ namespace Cue
 	}
 
 
-	static class U
+	class U
 	{
 		private static float lastErrorTime_ = 0;
 		private static int errorCount_ = 0;
@@ -440,7 +440,7 @@ namespace Cue
 			prefix_ = () => o.ID + (prefix == "" ? "" : " " + prefix);
 		}
 
-		public Logger(int type, W.IAtom a, string prefix)
+		public Logger(int type, Sys.IAtom a, string prefix)
 		{
 			type_ = type;
 			prefix_ = () => a.ID + (prefix == "" ? "" : " " + prefix);

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	abstract class VamGraphic : IGraphic
 	{
@@ -56,7 +56,7 @@ namespace Cue.W
 				}
 			}
 
-			material_.color = VamU.ToUnity(color_);
+			material_.color = U.ToUnity(color_);
 			renderer_.material = material_;
 		}
 
@@ -89,20 +89,20 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get { return VamU.FromUnity(object_.transform.position); }
-			set { object_.transform.position = VamU.ToUnity(value); }
+			get { return U.FromUnity(object_.transform.position); }
+			set { object_.transform.position = U.ToUnity(value); }
 		}
 
 		public Quaternion Rotation
 		{
-			get { return VamU.FromUnity(object_.transform.rotation); }
-			set { object_.transform.rotation = VamU.ToUnity(value); }
+			get { return U.FromUnity(object_.transform.rotation); }
+			set { object_.transform.rotation = U.ToUnity(value); }
 		}
 
 		public Vector3 Size
 		{
-			get { return VamU.FromUnity(object_.transform.localScale); }
-			set { object_.transform.localScale = VamU.ToUnity(value); }
+			get { return U.FromUnity(object_.transform.localScale); }
+			set { object_.transform.localScale = U.ToUnity(value); }
 		}
 
 		public bool Visible
@@ -137,8 +137,8 @@ namespace Cue.W
 		public VamBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 			: base(name, PrimitiveType.Cube, c)
 		{
-			object_.transform.localScale = VamU.ToUnity(size);
-			object_.transform.position = VamU.ToUnity(pos);
+			object_.transform.localScale = U.ToUnity(size);
+			object_.transform.position = U.ToUnity(pos);
 		}
 	}
 
@@ -151,7 +151,7 @@ namespace Cue.W
 			object_.transform.localScale =
 				new UnityEngine.Vector3(radius, radius, radius);
 
-			object_.transform.position = VamU.ToUnity(pos);
+			object_.transform.position = U.ToUnity(pos);
 		}
 	}
 }

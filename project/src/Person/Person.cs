@@ -146,7 +146,7 @@ namespace Cue
 		private PersonState state_;
 		private bool deferredTransition_ = false;
 		private int deferredState_ = PersonState.None;
-		private int lastNavState_ = W.NavStates.None;
+		private int lastNavState_ = Sys.NavStates.None;
 		private Vector3 uprightPos_ = new Vector3();
 
 		private PersonOptions options_;
@@ -170,7 +170,7 @@ namespace Cue
 
 		private List<string> traits_ = new List<string>();
 
-		public Person(int objectIndex, int personIndex, W.IAtom atom, JSONClass config)
+		public Person(int objectIndex, int personIndex, Sys.IAtom atom, JSONClass config)
 			: base(objectIndex, atom)
 		{
 			personIndex_ = personIndex;
@@ -529,9 +529,9 @@ namespace Cue
 
 			switch (navState)
 			{
-				case W.NavStates.None:
+				case Sys.NavStates.None:
 				{
-					if (lastNavState_ != W.NavStates.None)
+					if (lastNavState_ != Sys.NavStates.None)
 					{
 						// force the state to standing first, there are no
 						// animations for walk->stand
@@ -546,19 +546,19 @@ namespace Cue
 					break;
 				}
 
-				case W.NavStates.Calculating:
+				case Sys.NavStates.Calculating:
 				{
 					// wait
 					break;
 				}
 
-				case W.NavStates.Moving:
+				case Sys.NavStates.Moving:
 				{
 					state_.Set(PersonState.Walking);
 
 					if ((
-							lastNavState_ != W.NavStates.Moving &&
-							lastNavState_ != W.NavStates.Calculating
+							lastNavState_ != Sys.NavStates.Moving &&
+							lastNavState_ != Sys.NavStates.Calculating
 						)
 						|| !animator_.Playing)
 					{
@@ -570,9 +570,9 @@ namespace Cue
 					break;
 				}
 
-				case W.NavStates.TurningLeft:
+				case Sys.NavStates.TurningLeft:
 				{
-					if (lastNavState_ != W.NavStates.TurningLeft || !animator_.Playing)
+					if (lastNavState_ != Sys.NavStates.TurningLeft || !animator_.Playing)
 					{
 						if (CanMove)
 						{
@@ -584,9 +584,9 @@ namespace Cue
 					break;
 				}
 
-				case W.NavStates.TurningRight:
+				case Sys.NavStates.TurningRight:
 				{
-					if (lastNavState_ != W.NavStates.TurningRight || !animator_.Playing)
+					if (lastNavState_ != Sys.NavStates.TurningRight || !animator_.Playing)
 					{
 						if (CanMove)
 						{

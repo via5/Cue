@@ -7,7 +7,7 @@ namespace Cue
 		int ObjectIndex { get; }
 		string ID { get; }
 		bool Visible { get; set; }
-		W.IAtom Atom { get; }
+		Sys.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
 		Vector3 EyeInterest { get; }
@@ -41,7 +41,7 @@ namespace Cue
 		private const int MovingState = 2;
 
 		private readonly int objectIndex_;
-		private readonly W.IAtom atom_;
+		private readonly Sys.IAtom atom_;
 		protected readonly Logger log_;
 
 		private Vector3 targetPos_ = Vector3.Zero;
@@ -53,7 +53,7 @@ namespace Cue
 		private Slots slots_;
 		private Slot locked_ = null;
 
-		public BasicObject(int index, W.IAtom atom)
+		public BasicObject(int index, Sys.IAtom atom)
 		{
 			objectIndex_ = index;
 			atom_ = atom;
@@ -61,7 +61,7 @@ namespace Cue
 			slots_ = new Slots(this);
 		}
 
-		public static BasicObject TryCreateFromSlot(int index, W.IAtom a)
+		public static BasicObject TryCreateFromSlot(int index, Sys.IAtom a)
 		{
 			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
 			var m = re.Match(a.ID);
@@ -94,12 +94,12 @@ namespace Cue
 			get { return log_; }
 		}
 
-		public W.VamAtom VamAtom
+		public Sys.Vam.VamAtom VamAtom
 		{
-			get { return atom_ as W.VamAtom; }
+			get { return atom_ as Sys.Vam.VamAtom; }
 		}
 
-		public W.IAtom Atom
+		public Sys.IAtom Atom
 		{
 			get { return atom_; }
 		}
@@ -226,7 +226,7 @@ namespace Cue
 					return $"tentative to {targetPos_} {U.BearingToString(targetBearing_)}";
 
 				case MovingState:
-					return $"moving, nav {W.NavStates.ToString(Atom.NavState)}";
+					return $"moving, nav {Sys.NavStates.ToString(Atom.NavState)}";
 
 				case NoMoveState:
 				default:
@@ -249,7 +249,7 @@ namespace Cue
 
 			if (moveState_ == MovingState)
 			{
-				if (Atom.NavState == W.NavStates.None)
+				if (Atom.NavState == Sys.NavStates.None)
 				{
 					moveState_ = NoMoveState;
 					Atom.NavStop("nav state is none");

@@ -325,7 +325,7 @@
 	{
 		private GazeTargetPicker r_;
 		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
-		private W.IGraphic avoid_ = null;
+		private Sys.IGraphic avoid_ = null;
 		private bool visible_ = false;
 
 		public RandomTargetGeneratorRenderer(GazeTargetPicker r)

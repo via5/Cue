@@ -1,8 +1,7 @@
 ﻿using System;
-using UnityEngine;
 using UnityEngine.AI;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamAtomNav
 	{
@@ -109,7 +108,7 @@ namespace Cue.W
 			{
 				log_.Info("close enough, only rotating");
 				endTurnBearing_ = bearing;
-				turningStart_ = VamU.FromUnity(atom_.Atom.mainController.transform.rotation);
+				turningStart_ = U.FromUnity(atom_.Atom.mainController.transform.rotation);
 				turningElapsed_ = 0;
 				pathStuckCheckElapsed_ = 0;
 				pathStuckLastPos_ = atom_.Position;
@@ -126,7 +125,7 @@ namespace Cue.W
 				pathStuckCheckElapsed_ = 0;
 				pathStuckLastPos_ = atom_.Position;
 				stuckCount_ = 0;
-				agent_.destination = W.VamU.ToUnity(finalPosition_);
+				agent_.destination = U.ToUnity(finalPosition_);
 				agent_.stoppingDistance = stoppingDistance;
 				agent_.isStopped = true;
 				state_ = CalculatingPath;
@@ -245,10 +244,10 @@ namespace Cue.W
 
 		private void OnPathCalculated()
 		{
-			turningStart_ = VamU.FromUnity(
+			turningStart_ = U.FromUnity(
 				atom_.Atom.mainController.transform.rotation);
 
-			var nextPos = VamU.FromUnity(agent_.steeringTarget);
+			var nextPos = U.FromUnity(agent_.steeringTarget);
 			startTurnBearing_ = Vector3.Bearing(nextPos - atom_.Position);
 
 			if (CanSkipTurn(atom_.Rotation.Bearing, startTurnBearing_))
@@ -315,7 +314,7 @@ namespace Cue.W
 				$"pos is {atom_.Position}, " +
 				$"d={Vector3.Distance(atom_.Position, finalPosition_)}");
 
-			turningStart_ = VamU.FromUnity(
+			turningStart_ = U.FromUnity(
 				atom_.Atom.mainController.transform.rotation);
 
 			turningElapsed_ = 0;
@@ -551,7 +550,7 @@ namespace Cue.W
 			if (NavMesh.SamplePosition(currentPos, out hit, 2, NavMesh.AllAreas))
 			{
 				log_.Info($"moved to navmesh at {hit.position}, was {currentPos}");
-				atom_.Position = VamU.FromUnity(hit.position);
+				atom_.Position = U.FromUnity(hit.position);
 			}
 			else
 			{

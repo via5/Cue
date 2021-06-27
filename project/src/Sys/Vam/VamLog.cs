@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamLog
 	{

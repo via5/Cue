@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamCameraEyes : VamBodyPart
 	{
@@ -57,12 +57,12 @@ namespace Cue.W
 
 		public override Vector3 Position
 		{
-			get { return VamU.FromUnity(t_.position); }
+			get { return U.FromUnity(t_.position); }
 		}
 
 		public override Quaternion Rotation
 		{
-			get { return VamU.FromUnity(t_.rotation); }
+			get { return U.FromUnity(t_.rotation); }
 		}
 	}
 

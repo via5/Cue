@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Cue
 {
@@ -13,14 +11,14 @@ namespace Cue
 		{
 			pos_ = v;
 			hasPos_ = true;
-			transform.position = W.VamU.ToUnity(v);
+			transform.position = Sys.Vam.U.ToUnity(v);
 		}
 
 		public void LateUpdate()
 		{
 			if (hasPos_)
 			{
-				transform.position = W.VamU.ToUnity(pos_);
+				transform.position = Sys.Vam.U.ToUnity(pos_);
 				hasPos_ = false;
 			}
 		}
@@ -29,10 +27,10 @@ namespace Cue
 	class VamEyes : IEyes
 	{
 		private Person person_;
-		private W.VamStringChooserParameter lookMode_;
-		private W.VamFloatParameter leftRightAngle_;
-		private W.VamFloatParameter upDownAngle_;
-		private W.VamBoolParameter blink_;
+		private Sys.Vam.StringChooserParameter lookMode_;
+		private Sys.Vam.FloatParameter leftRightAngle_;
+		private Sys.Vam.FloatParameter upDownAngle_;
+		private Sys.Vam.BoolParameter blink_;
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
 		private Vector3 pos_ = Vector3.Zero;
@@ -41,10 +39,10 @@ namespace Cue
 		public VamEyes(Person p)
 		{
 			person_ = p;
-			lookMode_ = new W.VamStringChooserParameter(p, "Eyes", "lookMode");
-			leftRightAngle_ = new W.VamFloatParameter(p, "Eyes", "leftRightAngleAdjust");
-			upDownAngle_ = new W.VamFloatParameter(p, "Eyes", "upDownAngleAdjust");
-			blink_ = new W.VamBoolParameter(p, "EyelidControl", "blinkEnabled");
+			lookMode_ = new Sys.Vam.StringChooserParameter(p, "Eyes", "lookMode");
+			leftRightAngle_ = new Sys.Vam.FloatParameter(p, "Eyes", "leftRightAngleAdjust");
+			upDownAngle_ = new Sys.Vam.FloatParameter(p, "Eyes", "upDownAngleAdjust");
+			blink_ = new Sys.Vam.BoolParameter(p, "EyelidControl", "blinkEnabled");
 
 			eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
 
@@ -72,7 +70,7 @@ namespace Cue
 
 		public Vector3 Position
 		{
-			get { return W.VamU.FromUnity(eyes_.position); }
+			get { return Sys.Vam.U.FromUnity(eyes_.position); }
 		}
 
 		public void LookAt(Vector3 p)
@@ -112,13 +110,13 @@ namespace Cue
 	class VamSpeaker : ISpeaker
 	{
 		private Person person_;
-		private W.VamStringParameter text_;
+		private Sys.Vam.StringParameter text_;
 		private string lastText_ = "";
 
 		public VamSpeaker(Person p)
 		{
 			person_ = p;
-			text_ = new W.VamStringParameter(p, "SpeechBubble", "bubbleText");
+			text_ = new Sys.Vam.StringParameter(p, "SpeechBubble", "bubbleText");
 		}
 
 		public void Say(string s)

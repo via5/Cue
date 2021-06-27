@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamCuaObjectCreator : IObjectCreator
 	{
@@ -99,7 +99,7 @@ namespace Cue.W
 					var a = new VamAtom(atom);
 
 					var o = atom.transform.Find("reParentObject/object/rescaleObject");
-					o.localPosition = VamU.ToUnity(posOffset_);
+					o.localPosition = U.ToUnity(posOffset_);
 					a.Scale = scale_;
 
 					f(new BasicObject(-1, a));

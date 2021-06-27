@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamClothing : IClothing
 	{

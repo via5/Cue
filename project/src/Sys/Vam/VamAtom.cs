@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
 		private Logger log_;
-		private VamActionParameter setOnlyKeyJointsOn_;
+		private ActionParameter setOnlyKeyJointsOn_;
 		private VamAtomNav nav_;
 		private FreeControllerV3 head_ = null;
 		private DAZCharacter char_ = null;
@@ -14,15 +14,15 @@ namespace Cue.W
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
 
-		private VamBoolParameter collisions_;
-		private VamBoolParameter physics_;
-		private VamFloatParameter scale_;
+		private BoolParameter collisions_;
+		private BoolParameter physics_;
+		private FloatParameter scale_;
 
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
 			log_ = new Logger(Logger.Sys, this, "VamAtom");
-			setOnlyKeyJointsOn_ = new VamActionParameter(
+			setOnlyKeyJointsOn_ = new ActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 			nav_ = new VamAtomNav(this);
 
@@ -34,9 +34,9 @@ namespace Cue.W
 				hair_ = new VamHair(this);
 			}
 
-			collisions_ = new VamBoolParameter(this, "AtomControl", "collisionEnabled");
-			physics_ = new VamBoolParameter(this, "control", "physicsEnabled");
-			scale_ = new VamFloatParameter(this, "scale", "scale");
+			collisions_ = new BoolParameter(this, "AtomControl", "collisionEnabled");
+			physics_ = new BoolParameter(this, "control", "physicsEnabled");
+			scale_ = new FloatParameter(this, "scale", "scale");
 		}
 
 		public void Init()
@@ -167,22 +167,14 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get
-			{
-				return W.VamU.FromUnity(
-					atom_.mainController.transform.position);
-			}
-
-			set
-			{
-				atom_.mainController.MoveControl(W.VamU.ToUnity(value));
-			}
+			get { return U.FromUnity(atom_.mainController.transform.position); }
+			set { atom_.mainController.MoveControl(U.ToUnity(value)); }
 		}
 
 		public Quaternion Rotation
 		{
-			get { return W.VamU.FromUnity(atom_.mainController.transform.rotation); }
-			set { atom_.mainController.transform.rotation = VamU.ToUnity(value); }
+			get { return U.FromUnity(atom_.mainController.transform.rotation); }
+			set { atom_.mainController.transform.rotation = U.ToUnity(value); }
 		}
 
 		public bool Collisions
@@ -346,8 +338,7 @@ namespace Cue.W
 			if (head_ != null)
 				return;
 
-			var vsys = ((W.VamSys)Cue.Instance.Sys);
-			head_ = vsys.FindController(atom_, "headControl");
+			head_ = Cue.Instance.VamSys.FindController(atom_, "headControl");
 		}
 	}
 }

@@ -6,15 +6,15 @@ namespace Cue
 	class SynergyPlayer : IPlayer
 	{
 		private readonly Person person_;
-		private W.VamBoolParameter playing_;
-		private W.VamStringParameter step_;
+		private Sys.Vam.BoolParameter playing_;
+		private Sys.Vam.StringParameter step_;
 		private SynergyAnimation anim_ = null;
 
 		public SynergyPlayer(Person p)
 		{
 			person_ = p;
-			playing_ = new W.VamBoolParameter(p, "Synergy.Synergy", "Is Playing");
-			step_ = new W.VamStringParameter(p, "Synergy.Synergy", "Force Play Step");
+			playing_ = new Sys.Vam.BoolParameter(p, "Synergy.Synergy", "Is Playing");
+			step_ = new Sys.Vam.StringParameter(p, "Synergy.Synergy", "Force Play Step");
 		}
 
 		public bool Playing

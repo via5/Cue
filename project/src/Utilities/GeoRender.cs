@@ -5,8 +5,8 @@
 		private Person person_;
 		private Frustum frustum_;
 		private Color color_ = Color.Zero;
-		private W.IGraphic near_ = null;
-		private W.IGraphic far_ = null;
+		private Sys.IGraphic near_ = null;
+		private Sys.IGraphic far_ = null;
 		private int offset_, rot_;
 
 		public FrustumRenderer(Person p, Frustum f, int offsetBodyPart, int rotationBodyPart)
@@ -66,7 +66,7 @@
 			}
 		}
 
-		private W.IGraphic Create(Vector3 size)
+		private Sys.IGraphic Create(Vector3 size)
 		{
 			var g = Cue.Instance.Sys.CreateBoxGraphic(
 				"FrustumRender.near", Vector3.Zero, size, Color.Zero);

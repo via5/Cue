@@ -310,13 +310,13 @@ namespace Cue.Proc
 			{
 				case RelativeForce:
 				{
-					rb_?.AddRelativeForce(W.VamU.ToUnity(v));
+					rb_?.AddRelativeForce(Sys.Vam.U.ToUnity(v));
 					break;
 				}
 
 				case RelativeTorque:
 				{
-					rb_?.AddRelativeTorque(W.VamU.ToUnity(v));
+					rb_?.AddRelativeTorque(Sys.Vam.U.ToUnity(v));
 					break;
 				}
 			}

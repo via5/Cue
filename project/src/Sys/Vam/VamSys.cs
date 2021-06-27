@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamSys : ISys
 	{
@@ -152,7 +152,7 @@ namespace Cue.W
 
 		public Vector3 CameraPosition
 		{
-			get { return VamU.FromUnity(SuperController.singleton.lookCamera.transform.position); }
+			get { return U.FromUnity(SuperController.singleton.lookCamera.transform.position); }
 		}
 
 		public bool Paused
@@ -192,7 +192,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return VamU.FromUnity(SuperController.singleton.leftHand.position);
+				return U.FromUnity(SuperController.singleton.leftHand.position);
 			}
 		}
 
@@ -200,7 +200,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return VamU.FromUnity(SuperController.singleton.rightHand.position);
+				return U.FromUnity(SuperController.singleton.rightHand.position);
 			}
 		}
 
@@ -231,9 +231,9 @@ namespace Cue.W
 		{
 			return new VUI.Root(
 				new VRTopHudRootSupport(
-					VamU.ToUnity(offset),
-					VamU.ToUnity(pos),
-					VamU.ToUnity(size)));
+					U.ToUnity(offset),
+					U.ToUnity(pos),
+					U.ToUnity(size)));
 		}
 
 		public VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size)
@@ -241,9 +241,9 @@ namespace Cue.W
 			return new VUI.Root(
 				new VRHandRootSupport(
 					left,
-					VamU.ToUnity(offset),
-					VamU.ToUnity(pos),
-					VamU.ToUnity(size)));
+					U.ToUnity(offset),
+					U.ToUnity(pos),
+					U.ToUnity(size)));
 		}
 
 		public VUI.Root Create2D(float topOffset, Size size)
@@ -834,7 +834,7 @@ namespace Cue.W
 	}
 
 
-	class VamU
+	class U : global::Cue.U
 	{
 		public static string FullName(Transform t)
 		{

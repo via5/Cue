@@ -1,12 +1,11 @@
-﻿using Cue.W;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
 	class ObjectControls
 	{
 		private IObject object_;
-		private IGraphic graphic_;
+		private Sys.IGraphic graphic_;
 		private bool hovered_ = false;
 
 		public ObjectControls(IObject o)
@@ -40,7 +39,7 @@ namespace Cue
 			set { graphic_.Visible = value; }
 		}
 
-		public IGraphic Graphic
+		public Sys.IGraphic Graphic
 		{
 			get { return graphic_; }
 		}
@@ -74,7 +73,7 @@ namespace Cue
 	{
 		private bool visible_ = false;
 		private List<ObjectControls> controls_ = new List<ObjectControls>();
-		private IGraphic moveTarget_ = null;
+		private Sys.IGraphic moveTarget_ = null;
 
 		public Controls()
 		{

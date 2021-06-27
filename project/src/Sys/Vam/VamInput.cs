@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamButton
 	{
@@ -52,7 +52,7 @@ namespace Cue.W
 		{
 			get
 			{
-				return W.VamU.FromUnity(
+				return U.FromUnity(
 					SuperController.singleton.MonitorCenterCamera
 						.transform.position);
 			}
@@ -289,7 +289,7 @@ namespace Cue.W
 			if (!b)
 				return HoveredInfo.None;
 
-			return new HoveredInfo(null, W.VamU.FromUnity(hit.point), true);
+			return new HoveredInfo(null, U.FromUnity(hit.point), true);
 		}
 
 		private bool GetMouseRay()
@@ -338,7 +338,7 @@ namespace Cue.W
 				if (g.Transform == hit.transform)
 				{
 					return new HoveredInfo(
-						cs[i].Object, W.VamU.FromUnity(hit.point), true);
+						cs[i].Object, U.FromUnity(hit.point), true);
 				}
 			}
 
@@ -436,7 +436,7 @@ namespace Cue.W
 
 			if (a != null)
 			{
-				hi = new HoveredInfo(null, W.VamU.FromUnity(closestPoint), true);
+				hi = new HoveredInfo(null, U.FromUnity(closestPoint), true);
 				return true;
 			}
 

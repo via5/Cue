@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	class VamHair : IHair
 	{
@@ -115,8 +115,8 @@ namespace Cue.W
 	class VamBody : VamBasicBody
 	{
 		private VamAtom atom_;
-		private VamFloatParameter gloss_ = null;
-		private VamColorParameter color_ = null;
+		private FloatParameter gloss_ = null;
+		private ColorParameter color_ = null;
 		private Color initialColor_;
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
@@ -126,11 +126,11 @@ namespace Cue.W
 		{
 			atom_ = a;
 
-			gloss_ = new VamFloatParameter(a, "skin", "Gloss");
+			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
 				atom_.Log.Error("no skin gloss parameter");
 
-			color_ = new VamColorParameter(a, "skin", "Skin Color");
+			color_ = new ColorParameter(a, "skin", "Skin Color");
 			if (!color_.Check(true))
 				atom_.Log.Error("no skin color parameter");
 
@@ -364,7 +364,7 @@ namespace Cue.W
 			if (p != null)
 			{
 				var c = Color.Lerp(initialColor_, target, f);
-				p.val = VamU.ToHSV(c);
+				p.val = U.ToHSV(c);
 			}
 		}
 
@@ -374,7 +374,7 @@ namespace Cue.W
 				gloss_.Parameter.val = gloss_.Parameter.defaultVal;
 
 			if (color_.Parameter != null)
-				color_.Parameter.val = VamU.ToHSV(initialColor_);
+				color_.Parameter.val = U.ToHSV(initialColor_);
 		}
 
 		private string MakeName(string nameFemale, string nameMale)
@@ -690,7 +690,7 @@ namespace Cue.W
 
 		public Vector3 Position
 		{
-			get { return VamU.FromUnity(bone_.transform.position); }
+			get { return U.FromUnity(bone_.transform.position); }
 		}
 
 		public Quaternion Rotation
@@ -698,7 +698,7 @@ namespace Cue.W
 			get
 			{
 				var rb = bone_.GetComponent<Rigidbody>();
-				return VamU.FromUnity(bone_.transform.rotation);
+				return U.FromUnity(bone_.transform.rotation);
 			}
 		}
 	}
@@ -777,34 +777,34 @@ namespace Cue.W
 
 		public override Vector3 ControlPosition
 		{
-			get { return W.VamU.FromUnity(fc_.transform.position); }
-			set { fc_.transform.position = VamU.ToUnity(value); }
+			get { return U.FromUnity(fc_.transform.position); }
+			set { fc_.transform.position = U.ToUnity(value); }
 		}
 
 		public override Quaternion ControlRotation
 		{
-			get { return W.VamU.FromUnity(fc_.transform.rotation); }
-			set { fc_.transform.rotation = VamU.ToUnity(value); }
+			get { return U.FromUnity(fc_.transform.rotation); }
+			set { fc_.transform.rotation = U.ToUnity(value); }
 		}
 
 		public override Vector3 Position
 		{
-			get { return W.VamU.FromUnity(rb_.position); }
+			get { return U.FromUnity(rb_.position); }
 		}
 
 		public override Quaternion Rotation
 		{
-			get { return W.VamU.FromUnity(rb_.rotation); }
+			get { return U.FromUnity(rb_.rotation); }
 		}
 
 		public override void AddRelativeForce(Vector3 v)
 		{
-			rb_.AddRelativeForce(VamU.ToUnity(v));
+			rb_.AddRelativeForce(U.ToUnity(v));
 		}
 
 		public override void AddRelativeTorque(Vector3 v)
 		{
-			rb_.AddRelativeTorque(VamU.ToUnity(v));
+			rb_.AddRelativeTorque(U.ToUnity(v));
 		}
 
 		public override string ToString()
@@ -848,13 +848,13 @@ namespace Cue.W
 
 		public override Vector3 ControlPosition
 		{
-			get { return W.VamU.FromUnity(c_.bounds.center); }
+			get { return U.FromUnity(c_.bounds.center); }
 			set { Cue.LogError("cannot move colliders"); }
 		}
 
 		public override Quaternion ControlRotation
 		{
-			get { return W.VamU.FromUnity(c_.transform.rotation); }
+			get { return U.FromUnity(c_.transform.rotation); }
 			set { Cue.LogError("cannot rotate colliders"); }
 		}
 
@@ -1061,7 +1061,7 @@ namespace Cue.W
 				if (rb_ == null)
 					return Vector3.Zero;
 				else
-					return W.VamU.FromUnity(rb_.position);
+					return U.FromUnity(rb_.position);
 			}
 
 			set { Cue.LogError("cannot move triggers"); }
@@ -1069,7 +1069,7 @@ namespace Cue.W
 
 		public override Quaternion ControlRotation
 		{
-			get { return W.VamU.FromUnity(rb_.rotation); }
+			get { return U.FromUnity(rb_.rotation); }
 			set { Cue.LogError("cannot rotate triggers"); }
 		}
 
@@ -1162,9 +1162,9 @@ namespace Cue.W
 				if (atom_.Possessed)
 					return Cue.Instance.Sys.CameraPosition;
 				else if (lEye_ != null && rEye_ != null)
-					return VamU.FromUnity((lEye_.position + rEye_.position) / 2);
+					return U.FromUnity((lEye_.position + rEye_.position) / 2);
 				else if (head_ != null)
-					return VamU.FromUnity(head_.transform.position) + new Vector3(0, 0.05f, 0);
+					return U.FromUnity(head_.transform.position) + new Vector3(0, 0.05f, 0);
 				else
 					return Vector3.Zero;
 			}
@@ -1174,7 +1174,7 @@ namespace Cue.W
 
 		public override Quaternion ControlRotation
 		{
-			get { return W.VamU.FromUnity(head_.rotation); }
+			get { return U.FromUnity(head_.rotation); }
 			set { Cue.LogError("cannot rotate eyes"); }
 		}
 

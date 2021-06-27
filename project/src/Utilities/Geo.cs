@@ -145,13 +145,13 @@ namespace Cue
 		public static float Distance(Vector3 a, Vector3 b)
 		{
 			// todo
-			return W.VamU.Distance(a, b);
+			return Sys.Vam.U.Distance(a, b);
 		}
 
 		public static float Angle(Vector3 a, Vector3 b)
 		{
 			// todo
-			return W.VamU.Angle(a, b);
+			return Sys.Vam.U.Angle(a, b);
 		}
 
 		public static float Bearing(Vector3 dir)
@@ -167,13 +167,13 @@ namespace Cue
 		public static Vector3 MoveTowards(Vector3 current, Vector3 target, float maxDistance)
 		{
 			// todo
-			return W.VamU.MoveTowards(current, target, maxDistance);
+			return Sys.Vam.U.MoveTowards(current, target, maxDistance);
 		}
 
 		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
 		{
 			// todo
-			return W.VamU.Lerp(a, b, p);
+			return Sys.Vam.U.Lerp(a, b, p);
 		}
 	}
 
@@ -215,36 +215,36 @@ namespace Cue
 		{
 			get
 			{
-				var d = W.VamU.FromUnity(q_ * UnityEngine.Vector3.forward);
+				var d = Sys.Vam.U.FromUnity(q_ * UnityEngine.Vector3.forward);
 				return Vector3.Angle(Vector3.Zero, d);
 			}
 		}
 
 		public Vector3 Euler
 		{
-			get { return W.VamU.FromUnity(q_.eulerAngles); }
+			get { return Sys.Vam.U.FromUnity(q_.eulerAngles); }
 		}
 
 		public Vector3 Rotate(Vector3 v)
 		{
-			return W.VamU.FromUnity(q_ * W.VamU.ToUnity(v));
+			return Sys.Vam.U.FromUnity(q_ * Sys.Vam.U.ToUnity(v));
 		}
 
 		public Vector3 RotateInv(Vector3 v)
 		{
-			return W.VamU.FromUnity(UnityEngine.Quaternion.Inverse(q_) * W.VamU.ToUnity(v));
+			return Sys.Vam.U.FromUnity(UnityEngine.Quaternion.Inverse(q_) * Sys.Vam.U.ToUnity(v));
 		}
 
 		public static Quaternion Lerp(Quaternion a, Quaternion b, float f)
 		{
-			return W.VamU.FromUnity(UnityEngine.Quaternion.Lerp(
-				W.VamU.ToUnity(a), W.VamU.ToUnity(b), f));
+			return Sys.Vam.U.FromUnity(UnityEngine.Quaternion.Lerp(
+				Sys.Vam.U.ToUnity(a), Sys.Vam.U.ToUnity(b), f));
 		}
 
 		public static Quaternion Slerp(Quaternion a, Quaternion b, float f)
 		{
-			return W.VamU.FromUnity(UnityEngine.Quaternion.Slerp(
-				W.VamU.ToUnity(a), W.VamU.ToUnity(b), f));
+			return Sys.Vam.U.FromUnity(UnityEngine.Quaternion.Slerp(
+				Sys.Vam.U.ToUnity(a), Sys.Vam.U.ToUnity(b), f));
 		}
 
 		public static float NormalizeAngle(float degrees)
@@ -584,7 +584,7 @@ namespace Cue
 		public static Color Lerp(Color a, Color b, float f)
 		{
 			// todo
-			return W.VamU.Lerp(a, b, f);
+			return Sys.Vam.U.Lerp(a, b, f);
 		}
 	}
 
@@ -812,7 +812,7 @@ namespace Cue
 		public bool TestPlanesAABB(Box box)
 		{
 			// todo
-			return W.VamU.TestPlanesAABB(planes, box);
+			return Sys.Vam.U.TestPlanesAABB(planes, box);
 		}
 	}
 }

@@ -9,14 +9,14 @@ namespace Cue
 	{
 		static private CueMain instance_ = null;
 
-		private W.MockSys sys_ = null;
+		private Sys.Mock.MockSys sys_ = null;
 		private Cue cue_ = null;
 
 		public CueMain()
 		{
 			instance_ = this;
 
-			sys_ = new W.MockSys();
+			sys_ = new Sys.Mock.MockSys();
 			cue_ = new Cue();
 			cue_.Init();
 
@@ -72,7 +72,7 @@ namespace Cue
 			get { return ""; }
 		}
 
-		public W.ISys Sys
+		public Sys.ISys Sys
 		{
 			get { return sys_; }
 		}

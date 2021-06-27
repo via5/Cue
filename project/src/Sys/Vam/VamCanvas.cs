@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	using Vector3 = UnityEngine.Vector3;
 	using Color = UnityEngine.Color;

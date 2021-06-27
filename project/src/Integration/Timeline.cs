@@ -46,17 +46,17 @@ namespace Cue
 	class TimelinePlayer : IPlayer
 	{
 		private readonly Person person_;
-		private W.VamActionParameter stop_;
-		private W.VamBoolParameter playing_;
+		private Sys.Vam.ActionParameter stop_;
+		private Sys.Vam.BoolParameter playing_;
 		private TimelineAnimation current_ = null;
-		private W.VamActionParameter play_ = null;
+		private Sys.Vam.ActionParameter play_ = null;
 		private int flags_ = 0;
 
 		public TimelinePlayer(Person p)
 		{
 			person_ = p;
-			stop_ = new W.VamActionParameter(p, "VamTimeline.AtomPlugin", "Stop");
-			playing_ = new W.VamBoolParameter(p, "VamTimeline.AtomPlugin", "Is Playing");
+			stop_ = new Sys.Vam.ActionParameter(p, "VamTimeline.AtomPlugin", "Stop");
+			playing_ = new Sys.Vam.BoolParameter(p, "VamTimeline.AtomPlugin", "Is Playing");
 		}
 
 		public bool Playing
@@ -90,7 +90,7 @@ namespace Cue
 				return false;
 
 			SetControllers();
-			play_ = new W.VamActionParameter(
+			play_ = new Sys.Vam.ActionParameter(
 				person_, "VamTimeline.AtomPlugin", "Play " + current_.Name);
 
 			if (!play_.Check(true))
@@ -173,25 +173,27 @@ namespace Cue
 			foreach (var c in cs)
 				notFound.Add(c.Key);
 
-			var atom = ((W.VamAtom)person_.Atom).Atom;
-
-			foreach (var c in atom.freeControllers)
+			var atom = person_.VamAtom?.Atom;
+			if (atom != null)
 			{
-				bool b;
-				if (cs.TryGetValue(c.name, out b))
+				foreach (var c in atom.freeControllers)
 				{
-					if (b)
+					bool b;
+					if (cs.TryGetValue(c.name, out b))
 					{
-						c.currentRotationState = FreeControllerV3.RotationState.On;
-						c.currentPositionState = FreeControllerV3.PositionState.On;
-					}
-					else
-					{
-						c.currentRotationState = FreeControllerV3.RotationState.Off;
-						c.currentPositionState = FreeControllerV3.PositionState.Off;
-					}
+						if (b)
+						{
+							c.currentRotationState = FreeControllerV3.RotationState.On;
+							c.currentPositionState = FreeControllerV3.PositionState.On;
+						}
+						else
+						{
+							c.currentRotationState = FreeControllerV3.RotationState.Off;
+							c.currentPositionState = FreeControllerV3.PositionState.Off;
+						}
 
-					notFound.Remove(c.name);
+						notFound.Remove(c.name);
+					}
 				}
 			}
 

@@ -21,16 +21,16 @@ namespace Cue.Proc
 		public Controller(string name, Vector3 pos, Vector3 rot)
 		{
 			name_ = name;
-			pos_ = W.VamU.ToUnity(pos);
-			rot_ = W.VamU.ToUnity(rot);
+			pos_ = Sys.Vam.U.ToUnity(pos);
+			rot_ = Sys.Vam.U.ToUnity(rot);
 		}
 
 		public ITarget Clone()
 		{
 			return new Controller(
 				name_,
-				W.VamU.FromUnity(pos_),
-				W.VamU.FromUnity(rot_));
+				Sys.Vam.U.FromUnity(pos_),
+				Sys.Vam.U.FromUnity(rot_));
 		}
 
 		public bool Done

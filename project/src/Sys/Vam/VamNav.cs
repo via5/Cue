@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Cue.W
+namespace Cue.Sys.Vam
 {
 	using Color = UnityEngine.Color;
 
@@ -195,14 +195,12 @@ namespace Cue.W
 			f.agentTypeID = AgentTypeID;
 
 			bool b = NavMesh.CalculatePath(
-				VamU.ToUnity(from),
-				VamU.ToUnity(to),
-				f, path);
+				U.ToUnity(from), U.ToUnity(to), f, path);
 
 			if (b)
 			{
 				for (int i = 0; i < path.corners.Length; ++i)
-					list.Add(VamU.FromUnity(path.corners[i]));
+					list.Add(U.FromUnity(path.corners[i]));
 			}
 
 			return list;

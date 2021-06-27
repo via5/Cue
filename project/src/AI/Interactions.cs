@@ -1,6 +1,4 @@
-﻿using Cue.W;
-using System;
-using System.Collections;
+﻿using System;
 
 namespace Cue
 {
@@ -76,7 +74,7 @@ namespace Cue
 	{
 		struct Render
 		{
-			public IGraphic hand, cig, targetHand, targetHandMid, targetCig, mouth;
+			public Sys.IGraphic hand, cig, targetHand, targetHandMid, targetCig, mouth;
 		}
 
 		private const int NoState = 0;
