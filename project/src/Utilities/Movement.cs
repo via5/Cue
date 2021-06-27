@@ -101,6 +101,12 @@ namespace Cue
 			return m_.Next();
 		}
 
+		public void SetRange(Vector3 min, Vector3 max)
+		{
+			min_ = min;
+			max_ = max;
+		}
+
 		public void SetNext(Vector3 v)
 		{
 			m_.SetNext(v);

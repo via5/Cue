@@ -86,7 +86,7 @@ namespace Cue
 	{
 		static private CueMain instance_ = null;
 
-		private W.ISys sys_ = null;
+		private Sys.ISys sys_ = null;
 		private Cue cue_ = null;
 		private ScriptUI sui_ = null;
 		private bool inited_ = false;
@@ -101,7 +101,7 @@ namespace Cue
 			get { return instance_; }
 		}
 
-		public W.ISys Sys
+		public Sys.ISys Sys
 		{
 			get { return sys_; }
 		}
@@ -117,7 +117,7 @@ namespace Cue
 
 			try
 			{
-				sys_ = new W.VamSys(this);
+				sys_ = new Sys.Vam.VamSys(this);
 				cue_ = new Cue();
 				sui_ = new ScriptUI();
 				sys_.OnReady(DoInit);

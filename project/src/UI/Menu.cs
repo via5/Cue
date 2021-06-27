@@ -341,7 +341,7 @@
 		{
 			var p = Cue.Instance.Player;
 			if (p != null)
-				p.VamAtom.SetControlsForMoving(b);
+				p.VamAtom?.SetControlsForMoving(b);
 		}
 
 		private void OnForceExcitement(bool b)

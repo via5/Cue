@@ -193,6 +193,7 @@
 		},
 
 		{
+			"enabled": false,
 			"animation": "sex",
 			"state": "sitting",
 			"type": "proc",
@@ -203,6 +204,7 @@
 		},
 
 		{
+			"enabled": false,
 			"animation": "sex",
 			"state": "sittingStraddling",
 			"type": "proc",

@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 using UnityEngine;
 
 namespace Cue.Proc
@@ -11,6 +12,8 @@ namespace Cue.Proc
 
 		public const int RelativeForce = 1;
 		public const int RelativeTorque = 2;
+		public const int AbsoluteForce = 3;
+		public const int AbsoluteTorque = 4;
 
 		private const int Forwards = 1;
 		private const int ForwardsDelay = 2;
@@ -35,6 +38,8 @@ namespace Cue.Proc
 		private Person person_ = null;
 		private bool wasBusy_ = false;
 		private bool oneFrameFinished_ = false;
+
+		private Action beforeNext_ = null;
 
 		public Force(
 			int type, int bodyPart, string rbId,
@@ -116,14 +121,30 @@ namespace Cue.Proc
 			}
 		}
 
+		public Action BeforeNextAction
+		{
+			get { return beforeNext_; }
+			set { beforeNext_ = value; }
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
 		public bool Done
 		{
 			get { return oneFrameFinished_; }
 		}
 
-		public ITarget Clone()
+		public SlidingMovement Movement
 		{
-			return new Force(
+			get { return movement_; }
+		}
+
+		public virtual ITarget Clone()
+		{
+			var f = new Force(
 				type_, bodyPart_, rbId_,
 				new SlidingMovement(movement_), excitement_,
 				new SlidingDuration(fwdDuration_),
@@ -131,6 +152,10 @@ namespace Cue.Proc
 				new Duration(fwdDelay_), new Duration(bwdDelay_),
 				fwdDelayExcitement_, bwdDelayExcitement_,
 				flags_);
+
+			f.beforeNext_ = beforeNext_;
+
+			return f;
 		}
 
 		public void Start(Person p)
@@ -319,6 +344,18 @@ namespace Cue.Proc
 					rb_?.AddRelativeTorque(Sys.Vam.U.ToUnity(v));
 					break;
 				}
+
+				case AbsoluteForce:
+				{
+					rb_?.AddForce(Sys.Vam.U.ToUnity(v));
+					break;
+				}
+
+				case AbsoluteTorque:
+				{
+					rb_?.AddTorque(Sys.Vam.U.ToUnity(v));
+					break;
+				}
 			}
 		}
 
@@ -384,6 +421,8 @@ namespace Cue.Proc
 			{
 				case RelativeForce: return "rforce";
 				case RelativeTorque: return "rtorque";
+				case AbsoluteForce: return "force";
+				case AbsoluteTorque: return "torque";
 				default: return $"?{i}";
 			}
 		}
@@ -412,10 +451,10 @@ namespace Cue.Proc
 
 		private void Next()
 		{
+			beforeNext_?.Invoke();
+
 			if (!movement_.Next())
-			{
 				movement_.SetNext(movement_.Last);
-			}
 		}
 
 		private float Random(float min, float max, float f)

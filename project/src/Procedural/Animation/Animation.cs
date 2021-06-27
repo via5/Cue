@@ -8,6 +8,7 @@ namespace Cue.Proc
 		private readonly string name_;
 		private bool hasMovement_;
 		private ConcurrentTargetGroup root_ = new ConcurrentTargetGroup("root");
+		protected Person person_ = null;
 
 		public ProcAnimation(string name, bool hasMovement=true)
 		{
@@ -64,11 +65,16 @@ namespace Cue.Proc
 			}
 		}
 
-		public ProcAnimation Clone()
+		public virtual ProcAnimation Clone()
 		{
 			var a = new ProcAnimation(name_, hasMovement_);
-			a.root_ = (ConcurrentTargetGroup)root_.Clone();
+			a.CopyFrom(this);
 			return a;
+		}
+
+		protected virtual void CopyFrom(ProcAnimation o)
+		{
+			root_ = (ConcurrentTargetGroup)o.root_.Clone();
 		}
 
 		public bool Done
@@ -96,17 +102,18 @@ namespace Cue.Proc
 			get { return root_.Targets; }
 		}
 
-		public void Start(Person p)
+		public virtual void Start(Person p)
 		{
+			person_ = p;
 			root_.Start(p);
 		}
 
-		public void Reset()
+		public virtual void Reset()
 		{
 			root_.Reset();
 		}
 
-		public void FixedUpdate(float s)
+		public virtual void FixedUpdate(float s)
 		{
 			root_.FixedUpdate(s);
 		}

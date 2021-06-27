@@ -351,7 +351,7 @@ namespace Cue.Sys.Vam
 				if (p != null)
 				{
 					float def = p.defaultVal;
-					float range = p.max - def;
+					float range = (p.max - def) * 0.8f;  // max is too much
 
 					p.val = def + value * range;
 				}
@@ -1037,7 +1037,7 @@ namespace Cue.Sys.Vam
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p.VamAtom.Atom == a)
+				if (p.VamAtom?.Atom == a)
 					return p;
 			}
 

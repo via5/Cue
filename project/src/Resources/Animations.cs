@@ -88,6 +88,9 @@ namespace Cue
 			if (a == null)
 				return null;
 
+			if (o.HasKey("enabled") && !o["enabled"].AsBool)
+				return null;
+
 			if (!o.HasKey("animation"))
 			{
 				log_.Error("object missing 'animation'");
@@ -270,7 +273,7 @@ namespace Cue
 			{
 				if (anims_[i].Type == Animation.SexType)
 				{
-					if (anims_[i].State == state)
+					if (anims_[i].State == state || anims_[i].State == PersonState.None)
 					{
 						if (Sexes.Match(anims_[i].Sex, sex))
 							return anims_[i];
