@@ -35,31 +35,33 @@ namespace Cue.Proc
 
 		public static ISync Create(JSONClass o)
 		{
-			SlidingDuration fwd, bwd;
+			if (o == null)
+				throw new LoadFailed("sync null object");
 
-			if (o.HasKey("duration"))
+			if (!o.HasKey("type"))
+				throw new LoadFailed("sync missing type");
+
+			var type = o["type"].Value;
+			switch (type)
 			{
-				fwd = SlidingDuration.FromJSON(o, "duration");
-				bwd = null;
+				//case "duration":
+				//	return DurationSync.Create(o);
+
+				case "sliding":
+					return SlidingDurationSync.Create(o);
+
+				case "nosync":
+					return NoSync.Create(o);
+
+				case "parent":
+					return ParentTargetSync.Create(o);
+
+				case "elapsed":
+					return ElapsedSync.Create(o);
+
+				default:
+					throw new LoadFailed($"bad sync type '{type}'");
 			}
-			else
-			{
-				fwd = SlidingDuration.FromJSON(o, "fwdDuration");
-				bwd = SlidingDuration.FromJSON(o, "bwdDuration");
-			}
-
-			var fwdD = Duration.FromJSON(o, "fwdDelay");
-			var bwdD = Duration.FromJSON(o, "bwdDelay");
-
-			int flags = SlidingDurationSync.NoFlags;
-
-			if (o["loop"].AsBool)
-				flags |= SlidingDurationSync.Loop;
-
-			if (o["resetBetween"].AsBool)
-				flags |= SlidingDurationSync.ResetBetween;
-
-			return new SlidingDurationSync(fwd, bwd, fwdD, bwdD, flags);
 		}
 
 		public abstract ISync Clone();
@@ -88,6 +90,191 @@ namespace Cue.Proc
 	}
 
 
+	class NoSync : BasicSync
+	{
+		public override float Magnitude { get { return 0; } }
+		public override float Excitement { set { } }
+		public override bool Finished { get { return true; } }
+
+		public new static NoSync Create(JSONClass o)
+		{
+			return new NoSync();
+		}
+
+		public override ISync Clone()
+		{
+			return new NoSync();
+		}
+
+		public override int FixedUpdate(float s)
+		{
+			return SyncFinished;
+		}
+
+		public override string ToDetailedString()
+		{
+			return "nosync";
+		}
+	}
+
+
+	class ParentTargetSync : BasicSync
+	{
+		public ParentTargetSync()
+		{
+		}
+
+		public override float Magnitude { get { return 0; } }
+		public override float Excitement { set { } }
+		public override bool Finished { get { return true; } }
+
+		public new static ParentTargetSync Create(JSONClass o)
+		{
+			return new ParentTargetSync();
+		}
+
+		public override ISync Clone()
+		{
+			return new NoSync();
+		}
+
+		public override int FixedUpdate(float s)
+		{
+			return SyncFinished;
+		}
+
+		public override string ToDetailedString()
+		{
+			return "nosync";
+		}
+	}
+
+
+	class ElapsedSync : BasicSync
+	{
+		private float elapsed_ = 0;
+		private float duration_;
+		private IEasing easing_ = new SinusoidalEasing();
+
+		public ElapsedSync(float duration)
+		{
+			duration_ = duration;
+		}
+
+		public override float Magnitude
+		{
+			get
+			{
+				if (duration_ <= 0)
+					return 1;
+
+				float p = U.Clamp(elapsed_ / duration_, 0, 1);
+				return easing_.Magnitude(p);
+			}
+		}
+
+		public override float Excitement { set { } }
+		public override bool Finished
+		{
+			get { return (elapsed_ >= duration_); }
+		}
+
+		public new static ElapsedSync Create(JSONClass o)
+		{
+			return new ElapsedSync(o["duration"].AsFloat);
+		}
+
+		public override ISync Clone()
+		{
+			return new ElapsedSync(duration_);
+		}
+
+		public override void Reset()
+		{
+			base.Reset();
+			elapsed_ = 0;
+		}
+
+		public override int FixedUpdate(float s)
+		{
+			elapsed_ += s;
+			if (elapsed_ >= duration_)
+				return SyncFinished;
+
+			return Working;
+		}
+
+		public override string ToDetailedString()
+		{
+			return $"{elapsed_}/{duration_}";
+		}
+	}
+
+	/*
+	class DurationSync : BasicSync
+	{
+		private Duration duration_;
+		private Duration delay_;
+
+		public DurationSync(Duration duration, Duration delay)
+		{
+			duration_ = duration;
+			delay_ = delay;
+		}
+
+		public override float Magnitude
+		{
+			get
+			{
+				if (duration_ <= 0)
+					return 1;
+
+				float p = U.Clamp(elapsed_ / duration_, 0, 1);
+				return easing_.Magnitude(p);
+			}
+		}
+
+		public override float Excitement { set { } }
+		public override bool Finished
+		{
+			get { return (elapsed_ >= duration_); }
+		}
+
+		public new static DurationSync Create(JSONClass o)
+		{
+			return new DurationSync(
+				Duration.FromJSON(o, "duration"),
+				Duration.FromJSON(o, "delay"));
+		}
+
+		public override ISync Clone()
+		{
+			return new DurationSync(
+				new Duration(duration_), new Duration(delay_));
+		}
+
+		public override void Reset()
+		{
+			base.Reset();
+			elapsed_ = 0;
+		}
+
+		public override int FixedUpdate(float s)
+		{
+			elapsed_ += s;
+			if (elapsed_ >= duration_)
+				return SyncFinished;
+
+			return Working;
+		}
+
+		public override string ToDetailedString()
+		{
+			return $"{elapsed_}/{duration_}";
+		}
+	}*/
+
+
 	class SlidingDurationSync : BasicSync
 	{
 		public const int NoFlags = 0x00;
@@ -109,6 +296,35 @@ namespace Cue.Proc
 			fwdDelay_ = fwdDelay;
 			bwdDelay_ = bwdDelay;
 			flags_ = flags;
+		}
+
+		public new static SlidingDurationSync Create(JSONClass o)
+		{
+			SlidingDuration fwd, bwd;
+
+			if (o.HasKey("duration"))
+			{
+				fwd = SlidingDuration.FromJSON(o, "duration");
+				bwd = null;
+			}
+			else
+			{
+				fwd = SlidingDuration.FromJSON(o, "fwdDuration");
+				bwd = SlidingDuration.FromJSON(o, "bwdDuration");
+			}
+
+			var fwdD = Duration.FromJSON(o, "fwdDelay");
+			var bwdD = Duration.FromJSON(o, "bwdDelay");
+
+			int flags = NoFlags;
+
+			if (o["loop"].AsBool)
+				flags |= Loop;
+
+			if (o["resetBetween"].AsBool)
+				flags |= ResetBetween;
+
+			return new SlidingDurationSync(fwd, bwd, fwdD, bwdD, flags);
 		}
 
 		public override ISync Clone()

@@ -57,7 +57,7 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				log_.Error("failed to load animations, " + e.Message);
+				log_.Error("failed to load animations, " + e.ToString());
 				return false;
 			}
 		}

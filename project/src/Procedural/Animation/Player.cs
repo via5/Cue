@@ -2,7 +2,9 @@
 {
 	interface ITarget
 	{
+		ITarget Parent { get; set; }
 		bool Done { get; }
+
 		ITarget Clone();
 		void Reset();
 		void Start(Person p);
@@ -13,11 +15,18 @@
 
 	abstract class BasicTarget : ITarget
 	{
+		private ITarget parent_ = null;
 		private ISync sync_;
 
 		protected BasicTarget(ISync sync)
 		{
 			sync_ = sync;
+		}
+
+		public ITarget Parent
+		{
+			get { return parent_; }
+			set { parent_ = value; }
 		}
 
 		public ISync Sync { get { return sync_; } }

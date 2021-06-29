@@ -7,13 +7,14 @@ namespace Cue.Proc
 	{
 		private readonly string name_;
 		private bool hasMovement_;
-		private ConcurrentTargetGroup root_ = new ConcurrentTargetGroup("root");
+		private ConcurrentTargetGroup root_;
 		protected Person person_ = null;
 
 		public ProcAnimation(string name, bool hasMovement=true)
 		{
 			name_ = name;
 			hasMovement_ = hasMovement;
+			root_ = new ConcurrentTargetGroup("root", new NoSync());
 		}
 
 		public static ProcAnimation Create(JSONClass o)

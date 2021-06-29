@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Cue.Proc
 {
-	class AnimatedMorph : ITarget
+	class AnimatedMorph : BasicTarget
 	{
 		private int bodyPart_;
 		private string morphId_;
@@ -16,6 +16,7 @@ namespace Cue.Proc
 		public AnimatedMorph(
 			int bodyPart, string morphId, float min, float max,
 			Duration d, Duration delay)
+				: base(new NoSync())
 		{
 			bodyPart_ = bodyPart;
 			morphId_ = morphId;
@@ -54,19 +55,19 @@ namespace Cue.Proc
 			}
 		}
 
-		public bool Done
+		public override bool Done
 		{
 			get { return m_?.Finished ?? true; }
 		}
 
-		public ITarget Clone()
+		public override ITarget Clone()
 		{
 			return new AnimatedMorph(
 				bodyPart_, morphId_, min_, max_,
 				new Duration(duration_), new Duration(delay_));
 		}
 
-		public void Start(Person p)
+		public override void Start(Person p)
 		{
 			if (m_ == null)
 			{
@@ -78,12 +79,13 @@ namespace Cue.Proc
 			}
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
+			base.Reset();
 			m_?.Reset();
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			if (m_ != null)
 			{
@@ -97,7 +99,7 @@ namespace Cue.Proc
 			return $"morph {morphId_} ({BodyParts.ToString(bodyPart_)})";
 		}
 
-		public string ToDetailedString()
+		public override string ToDetailedString()
 		{
 			return
 				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +

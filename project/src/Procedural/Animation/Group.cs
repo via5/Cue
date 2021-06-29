@@ -9,7 +9,18 @@ namespace Cue.Proc
 	}
 
 
-	class ConcurrentTargetGroup : ITargetGroup
+	abstract class BasicTargetGroup : BasicTarget, ITargetGroup
+	{
+		protected BasicTargetGroup(ISync sync)
+			: base(sync)
+		{
+		}
+
+		public abstract List<ITarget> Targets { get; }
+	}
+
+
+	class ConcurrentTargetGroup : BasicTargetGroup
 	{
 		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
@@ -19,13 +30,15 @@ namespace Cue.Proc
 		private bool allDone_ = false;
 		private bool forever_;
 
-		public ConcurrentTargetGroup(string name)
-			: this(name, new Duration(), new Duration(), true)
+		public ConcurrentTargetGroup(string name, ISync sync)
+			: this(name, new Duration(), new Duration(), true, sync)
 		{
 		}
 
 		public ConcurrentTargetGroup(
-			string name, Duration delay, Duration maxDuration, bool forever)
+			string name, Duration delay, Duration maxDuration,
+			bool forever, ISync sync)
+				: base(sync)
 		{
 			name_ = name;
 			delay_ = delay;
@@ -39,14 +52,18 @@ namespace Cue.Proc
 
 			try
 			{
+				if (!o.HasKey("sync"))
+					throw new LoadFailed("no sync");
+
 				var g = new ConcurrentTargetGroup(
 					name,
 					Duration.FromJSON(o, "delay"),
 					Duration.FromJSON(o, "maxDuration"),
-					o["loop"].AsBool);
+					o["loop"].AsBool,
+					BasicSync.Create(o["sync"].AsObject));
 
 				foreach (JSONClass n in o["targets"].AsArray)
-					g.targets_.Add(ProcAnimation.CreateTarget(n["type"], n));
+					g.AddTarget(ProcAnimation.CreateTarget(n["type"], n));
 
 				return g;
 			}
@@ -56,18 +73,19 @@ namespace Cue.Proc
 			}
 		}
 
-		public ITarget Clone()
+		public override ITarget Clone()
 		{
 			var s = new ConcurrentTargetGroup(
-				name_, new Duration(delay_), new Duration(maxDuration_), forever_);
+				name_, new Duration(delay_), new Duration(maxDuration_),
+				forever_, Sync.Clone());
 
 			foreach (var c in targets_)
-				s.targets_.Add(c.Clone());
+				s.AddTarget(c.Clone());
 
 			return s;
 		}
 
-		public List<ITarget> Targets
+		public override List<ITarget> Targets
 		{
 			get { return targets_; }
 		}
@@ -75,10 +93,13 @@ namespace Cue.Proc
 		public void AddTarget(ITarget t)
 		{
 			targets_.Add(t);
+			t.Parent = this;
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
+			base.Reset();
+
 			inDelay_ = false;
 			delay_.Reset();
 			maxDuration_.Reset();
@@ -87,7 +108,7 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		public void Start(Person p)
+		public override void Start(Person p)
 		{
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
@@ -96,14 +117,15 @@ namespace Cue.Proc
 			maxDuration_.Reset();
 		}
 
-		public bool Done
+		public override bool Done
 		{
 			get { return allDone_; }
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			allDone_ = false;
+			Sync.FixedUpdate(s);
 
 			if (inDelay_)
 			{
@@ -150,7 +172,7 @@ namespace Cue.Proc
 			return $"congroup {name_}";
 		}
 
-		public string ToDetailedString()
+		public override string ToDetailedString()
 		{
 			return
 				$"congroup " +
@@ -160,7 +182,7 @@ namespace Cue.Proc
 	}
 
 
-	class SequentialTargetGroup : ITargetGroup
+	class SequentialTargetGroup : BasicTargetGroup
 	{
 		struct TargetInfo
 		{
@@ -177,12 +199,13 @@ namespace Cue.Proc
 		private int i_ = 0;
 		private bool done_ = false;
 
-		public SequentialTargetGroup(string name = "")
-			: this(name, new Duration())
+		public SequentialTargetGroup(string name, ISync sync)
+			: this(name, new Duration(), sync)
 		{
 		}
 
-		public SequentialTargetGroup(string name, Duration delay)
+		public SequentialTargetGroup(string name, Duration delay, ISync sync)
+			: base(sync)
 		{
 			name_ = name;
 			delay_ = delay;
@@ -194,11 +217,15 @@ namespace Cue.Proc
 
 			try
 			{
+				if (!o.HasKey("sync"))
+					throw new LoadFailed("no sync");
+
 				var g = new SequentialTargetGroup(
-					name, Duration.FromJSON(o, "delay"));
+					name, Duration.FromJSON(o, "delay"),
+					BasicSync.Create(o["sync"].AsObject));
 
 				foreach (JSONClass n in o["targets"].AsArray)
-					g.targets_.Add(ProcAnimation.CreateTarget(n["type"], n));
+					g.AddTarget(ProcAnimation.CreateTarget(n["type"], n));
 
 				return g;
 			}
@@ -208,20 +235,21 @@ namespace Cue.Proc
 			}
 		}
 
-		public ITarget Clone()
+		public override ITarget Clone()
 		{
-			var s = new SequentialTargetGroup(name_, new Duration(delay_));
+			var s = new SequentialTargetGroup(
+				name_, new Duration(delay_), Sync.Clone());
 
 			foreach (var t in targets_)
 			{
-				s.targets_.Add(t.Clone());
+				s.AddTarget(t.Clone());
 				s.targetInfos_.Add(new TargetInfo());
 			}
 
 			return s;
 		}
 
-		public List<ITarget> Targets
+		public override List<ITarget> Targets
 		{
 			get { return targets_; }
 		}
@@ -229,15 +257,18 @@ namespace Cue.Proc
 		public void AddTarget(ITarget t)
 		{
 			targets_.Add(t);
+			t.Parent = this;
 		}
 
-		public bool Done
+		public override bool Done
 		{
 			get { return done_; }
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
+			base.Reset();
+
 			inDelay_ = false;
 			delay_.Reset();
 
@@ -245,14 +276,16 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		public void Start(Person p)
+		public override void Start(Person p)
 		{
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
+			Sync.FixedUpdate(s);
+
 			if (targets_.Count == 0)
 			{
 				done_ = true;
@@ -293,7 +326,7 @@ namespace Cue.Proc
 			return $"seqgroup {name_}";
 		}
 
-		public string ToDetailedString()
+		public override string ToDetailedString()
 		{
 			return
 				$"seqgroup " +

@@ -19,13 +19,15 @@ namespace Cue.Proc
 		{
 			var a = new ProcAnimation("backToNeutral");
 
-			a.AddTarget(new Controller("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0)));
-			a.AddTarget(new Controller("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0)));
-			a.AddTarget(new Controller("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0)));
-			a.AddTarget(new Controller("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90)));
-			a.AddTarget(new Controller("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270)));
-			a.AddTarget(new Controller("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0)));
-			a.AddTarget(new Controller("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0)));
+			var s = new ElapsedSync(1);
+
+			a.AddTarget(new Controller("headControl", new Vector3(0, 1.6f, 0), new Vector3(0, 0, 0), s.Clone()));
+			a.AddTarget(new Controller("chestControl", new Vector3(0, 1.4f, 0), new Vector3(20, 0, 0), s.Clone()));
+			a.AddTarget(new Controller("hipControl", new Vector3(0, 1.1f, 0), new Vector3(340, 10, 0), s.Clone()));
+			a.AddTarget(new Controller("lHandControl", new Vector3(-0.2f, 0.9f, 0), new Vector3(0, 10, 90), s.Clone()));
+			a.AddTarget(new Controller("rHandControl", new Vector3(0.2f, 0.9f, 0), new Vector3(0, 0, 270), s.Clone()));
+			a.AddTarget(new Controller("lFootControl", new Vector3(-0.1f, 0, 0), new Vector3(20, 10, 0), s.Clone()));
+			a.AddTarget(new Controller("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0), s.Clone()));
 
 			return new Animation(
 				Animation.TransitionType,
@@ -63,14 +65,7 @@ namespace Cue.Proc
 			: base("procSex", false)
 		{
 			var g = new ConcurrentTargetGroup(
-				"g", new Duration(), new Duration(), true);
-
-			g.AddTarget(new Force(
-				Force.AbsoluteForce, BodyParts.Hips, "hip",
-				new SlidingMovement(
-					Vector3.Zero, Vector3.Zero,
-					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(),
+				"g", new Duration(), new Duration(), true,
 				new SlidingDurationSync(
 					new SlidingDuration(
 						durationMin_, durationMax_,
@@ -81,7 +76,15 @@ namespace Cue.Proc
 						durationInterval_, durationInterval_,
 						durationWin_, new LinearEasing()),
 					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween),
+					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
+
+
+			g.AddTarget(new Force(
+				Force.AbsoluteForce, BodyParts.Hips, "hip",
+				new SlidingMovement(
+					Vector3.Zero, Vector3.Zero,
+					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+				new LinearEasing(), new ParentTargetSync(),
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
@@ -90,18 +93,7 @@ namespace Cue.Proc
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(),
-				new SlidingDurationSync(
-				new SlidingDuration(
-						durationMin_, durationMax_,
-						durationInterval_, durationInterval_,
-						durationWin_, new LinearEasing()),
-					new SlidingDuration(
-						durationMin_, durationMax_,
-						durationInterval_, durationInterval_,
-						durationWin_, new LinearEasing()),
-					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween),
+				new LinearEasing(), new ParentTargetSync(),
 				new LinearEasing(), new LinearEasing()));
 
 			AddTarget(g);
