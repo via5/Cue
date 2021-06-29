@@ -71,17 +71,18 @@ namespace Cue.Proc
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
 				new LinearEasing(),
-				new SlidingDuration(
-					durationMin_, durationMax_,
-					durationInterval_, durationInterval_,
-					durationWin_, new LinearEasing()),
-				new SlidingDuration(
-					durationMin_, durationMax_,
-					durationInterval_, durationInterval_,
-					durationWin_, new LinearEasing()),
-				new Duration(0, 0), new Duration(0, 0),
-				new LinearEasing(), new LinearEasing(),
-				Force.Loop | Force.ResetBetween));
+				new SlidingDurationSync(
+					new SlidingDuration(
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new LinearEasing()),
+					new SlidingDuration(
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new LinearEasing()),
+					new Duration(0, 0), new Duration(0, 0),
+					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween),
+				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
 				Force.RelativeTorque, BodyParts.Hips, "hip",
@@ -90,17 +91,18 @@ namespace Cue.Proc
 					new Vector3(hipTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
 				new LinearEasing(),
+				new SlidingDurationSync(
 				new SlidingDuration(
-					durationMin_, durationMax_,
-					durationInterval_, durationInterval_,
-					durationWin_, new LinearEasing()),
-				new SlidingDuration(
-					durationMin_, durationMax_,
-					durationInterval_, durationInterval_,
-					durationWin_, new LinearEasing()),
-				new Duration(0, 0), new Duration(0, 0),
-				new LinearEasing(), new LinearEasing(),
-				Force.Loop | Force.ResetBetween));
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new LinearEasing()),
+					new SlidingDuration(
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new LinearEasing()),
+					new Duration(0, 0), new Duration(0, 0),
+					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween),
+				new LinearEasing(), new LinearEasing()));
 
 			AddTarget(g);
 		}

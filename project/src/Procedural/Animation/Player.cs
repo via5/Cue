@@ -11,6 +11,30 @@
 	}
 
 
+	abstract class BasicTarget : ITarget
+	{
+		private ISync sync_;
+
+		protected BasicTarget(ISync sync)
+		{
+			sync_ = sync;
+		}
+
+		public ISync Sync { get { return sync_; } }
+		public abstract bool Done { get; }
+
+		public abstract ITarget Clone();
+		public abstract void FixedUpdate(float s);
+		public abstract void Start(Person p);
+		public abstract string ToDetailedString();
+
+		public virtual void Reset()
+		{
+			sync_.Reset();
+		}
+	}
+
+
 	class Player : IPlayer
 	{
 		private Person person_;

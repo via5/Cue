@@ -131,6 +131,7 @@
     <Compile Include="src\Procedural\Animation\Force.cs" />
     <Compile Include="src\Procedural\Animation\Group.cs" />
     <Compile Include="src\Procedural\Animation\Player.cs" />
+    <Compile Include="src\Procedural\Animation\Sync.cs" />
     <Compile Include="src\Procedural\Expression\Builtin.cs" />
     <Compile Include="src\Procedural\Expression\Expression.cs" />
     <Compile Include="src\Procedural\Expression\Morph.cs" />

@@ -2,7 +2,17 @@
 
 namespace Cue
 {
-	class SlidingDuration
+	interface IDuration
+	{
+		bool Enabled { get; }
+		bool Finished { get; }
+		float Progress { get; }
+		float Excitement { set; }
+		void Update(float s);
+	}
+
+
+	class SlidingDuration : IDuration
 	{
 		private Duration d_;
 		private float min_, max_;
@@ -125,6 +135,11 @@ namespace Cue
 		public float Progress
 		{
 			get { return d_.Progress; }
+		}
+
+		public float Excitement
+		{
+			set { WindowMagnitude = value; }
 		}
 
 		public float Current

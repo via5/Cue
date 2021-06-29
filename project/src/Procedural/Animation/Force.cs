@@ -4,37 +4,21 @@ using UnityEngine;
 
 namespace Cue.Proc
 {
-	class Force : ITarget
+	class Force : BasicTarget
 	{
-		public const int NoFlags = 0x00;
-		public const int Loop = 0x01;
-		public const int ResetBetween = 0x02;
-
 		public const int RelativeForce = 1;
 		public const int RelativeTorque = 2;
 		public const int AbsoluteForce = 3;
 		public const int AbsoluteTorque = 4;
-
-		private const int Forwards = 1;
-		private const int ForwardsDelay = 2;
-		private const int Backwards = 3;
-		private const int BackwardsDelay = 4;
-		private const int Finished = 5;
 
 		private int type_;
 		private int bodyPart_;
 		private string rbId_;
 		private SlidingMovement movement_;
 		private IEasing excitement_;
-		private SlidingDuration fwdDuration_, bwdDuration_;
-		private Duration fwdDelay_, bwdDelay_;
 		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
-		private int flags_;
 
-		private int state_ = Forwards;
 		private Rigidbody rb_ = null;
-		private IEasing fwdEasing_ = new SinusoidalEasing();
-		private IEasing bwdEasing_ = new SinusoidalEasing();
 		private Person person_ = null;
 		private bool wasBusy_ = false;
 		private bool oneFrameFinished_ = false;
@@ -43,24 +27,17 @@ namespace Cue.Proc
 
 		public Force(
 			int type, int bodyPart, string rbId,
-			SlidingMovement m, IEasing excitement,
-			SlidingDuration fwdDuration, SlidingDuration bwdDuration,
-			Duration fwdDelay, Duration bwdDelay,
-			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement,
-			int flags)
+			SlidingMovement m, IEasing excitement, ISync sync,
+			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
+				: base(sync)
 		{
 			type_ = type;
 			bodyPart_ = bodyPart;
 			rbId_ = rbId;
 			movement_ = m;
 			excitement_ = excitement;
-			fwdDuration_ = fwdDuration;
-			bwdDuration_ = bwdDuration;
-			fwdDelay_ = fwdDelay;
-			bwdDelay_ = bwdDelay;
 			fwdDelayExcitement_ = fwdDelayExcitement;
 			bwdDelayExcitement_ = bwdDelayExcitement;
-			flags_ = flags;
 		}
 
 		public static IEasing EasingFromJson(JSONClass o, string key)
@@ -83,37 +60,19 @@ namespace Cue.Proc
 				if (bodyPart == BodyParts.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
-				int flags = NoFlags;
+				ISync sync = null;
+				if (!o.HasKey("sync"))
+					throw new LoadFailed("no sync");
 
-				if (o["loop"].AsBool)
-					flags |= Loop;
-
-				if (o["resetBetween"].AsBool)
-					flags |= ResetBetween;
-
-				SlidingDuration fwd, bwd;
-
-				if (o.HasKey("duration"))
-				{
-					fwd = SlidingDuration.FromJSON(o, "duration");
-					bwd = null;
-				}
-				else
-				{
-					fwd = SlidingDuration.FromJSON(o, "fwdDuration");
-					bwd = SlidingDuration.FromJSON(o, "bwdDuration");
-				}
+				sync = BasicSync.Create(o["sync"].AsObject);
 
 				return new Force(
 					type, bodyPart, o["rigidbody"],
 					SlidingMovement.FromJSON(o, "movement", true),
 					EasingFromJson(o, "excitement"),
-					fwd, bwd,
-					Duration.FromJSON(o, "fwdDelay"),
-					Duration.FromJSON(o, "bwdDelay"),
+					sync,
 					EasingFromJson(o, "fwdDelayExcitement"),
-					EasingFromJson(o, "bwdDelayExcitement"),
-					flags);
+					EasingFromJson(o, "bwdDelayExcitement"));
 			}
 			catch (LoadFailed e)
 			{
@@ -127,12 +86,12 @@ namespace Cue.Proc
 			set { beforeNext_ = value; }
 		}
 
-		public int Type
+		public virtual int Type
 		{
 			get { return type_; }
 		}
 
-		public bool Done
+		public override bool Done
 		{
 			get { return oneFrameFinished_; }
 		}
@@ -142,23 +101,20 @@ namespace Cue.Proc
 			get { return movement_; }
 		}
 
-		public virtual ITarget Clone()
+		public override ITarget Clone()
 		{
 			var f = new Force(
 				type_, bodyPart_, rbId_,
 				new SlidingMovement(movement_), excitement_,
-				new SlidingDuration(fwdDuration_),
-				bwdDuration_ == null ? null : new SlidingDuration(bwdDuration_),
-				new Duration(fwdDelay_), new Duration(bwdDelay_),
-				fwdDelayExcitement_, bwdDelayExcitement_,
-				flags_);
+				Sync.Clone(),
+				fwdDelayExcitement_, bwdDelayExcitement_);
 
 			f.beforeNext_ = beforeNext_;
 
 			return f;
 		}
 
-		public void Start(Person p)
+		public override void Start(Person p)
 		{
 			person_ = p;
 
@@ -175,17 +131,13 @@ namespace Cue.Proc
 			}
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
+			base.Reset();
 			movement_.Reset();
-			fwdDuration_.Reset();
-			bwdDuration_?.Reset();
-			fwdDelay_.Reset();
-			bwdDelay_.Reset();
-			state_ = Forwards;
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			oneFrameFinished_ = false;
 
@@ -200,130 +152,46 @@ namespace Cue.Proc
 				wasBusy_ = false;
 			}
 
-			switch (state_)
+
+			movement_.Update(s);
+			int r = Sync.FixedUpdate(s);
+			Apply();
+
+			switch (r)
 			{
-				case Forwards:
-				{
-					movement_.Update(s);
-					CurrentDuration().Update(s);
-					Apply();
-
-					if (CurrentDuration().Finished)
-					{
-						movement_.WindowMagnitude = person_.Excitement.Value;
-						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
-
-						if (bwdDuration_ == null)
-							fwdDuration_.Restart();
-
-						if (fwdDelay_.Enabled)
-						{
-							state_ = ForwardsDelay;
-						}
-						else if (Bits.IsSet(flags_, ResetBetween))
-						{
-							movement_.SetNext(Vector3.Zero);
-							state_ = Backwards;
-						}
-						else if (Bits.IsSet(flags_, Loop))
-						{
-							Next();
-						}
-						else
-						{
-							state_ = Finished;
-							oneFrameFinished_ = true;
-						}
-					}
-
-					break;
-				}
-
-				case ForwardsDelay:
-				{
-					movement_.Update(s);
-					fwdDelay_.Update(s);
-					Apply();
-
-					if (fwdDelay_.Finished)
-					{
-						if (Bits.IsSet(flags_, ResetBetween))
-						{
-							movement_.SetNext(Vector3.Zero);
-							state_ = Backwards;
-						}
-						else if (Bits.IsSet(flags_, Loop))
-						{
-							state_ = Forwards;
-							Next();
-						}
-						else
-						{
-							state_ = Finished;
-							oneFrameFinished_ = true;
-						}
-					}
-
-					break;
-				}
-
-				case Backwards:
-				{
-					movement_.Update(s);
-					CurrentDuration().Update(s);
-					Apply();
-
-					if (CurrentDuration().Finished)
-					{
-						movement_.WindowMagnitude = person_.Excitement.Value;
-						CurrentDuration().WindowMagnitude = person_.Excitement.Value;
-
-						if (bwdDelay_.Enabled)
-						{
-							state_ = BackwardsDelay;
-						}
-						else if (Bits.IsSet(flags_, Loop))
-						{
-							state_ = Forwards;
-							Next();
-						}
-						else
-						{
-							state_ = Finished;
-							oneFrameFinished_ = true;
-						}
-					}
-
-					break;
-				}
-
-				case BackwardsDelay:
-				{
-					movement_.Update(s);
-					bwdDelay_.Update(s);
-					Apply();
-
-					if (bwdDelay_.Finished)
-					{
-						if (Bits.IsSet(flags_, Loop))
-						{
-							state_ = Forwards;
-							Next();
-						}
-						else
-						{
-							state_ = Finished;
-							oneFrameFinished_ = true;
-						}
-					}
-
-					break;
-				}
-
-				case Finished:
+				case BasicSync.Working:
 				{
 					break;
 				}
+
+				case BasicSync.DurationFinished:
+				{
+					movement_.WindowMagnitude = person_.Excitement.Value;
+					Sync.Excitement = person_.Excitement.Value;
+					break;
+				}
+
+				case BasicSync.DelayFinished:
+				{
+					break;
+				}
+
+				case BasicSync.Looping:
+				{
+					movement_.WindowMagnitude = person_.Excitement.Value;
+					Sync.Excitement = person_.Excitement.Value;
+					Next();
+					break;
+				}
+
+				case BasicSync.SyncFinished:
+				{
+					movement_.WindowMagnitude = person_.Excitement.Value;
+					Sync.Excitement = person_.Excitement.Value;
+					oneFrameFinished_ = true;
+					break;
+				}
+
 			}
 		}
 
@@ -359,60 +227,9 @@ namespace Cue.Proc
 			}
 		}
 
-		private SlidingDuration CurrentDuration()
-		{
-			switch (state_)
-			{
-				case Forwards:
-				case ForwardsDelay:
-					return fwdDuration_;
-
-				case Backwards:
-				case BackwardsDelay:
-					return bwdDuration_ == null ? fwdDuration_ : bwdDuration_;
-
-				default:
-					Cue.LogError("??");
-					return fwdDuration_;
-			}
-		}
-
-		private float Progress()
-		{
-			return CurrentDuration().Progress;
-		}
-
-		private IEasing Easing()
-		{
-			switch (state_)
-			{
-				case Forwards:
-				case ForwardsDelay:
-					return fwdEasing_;
-
-				case Backwards:
-				case BackwardsDelay:
-					return bwdEasing_;
-
-				default:
-					Cue.LogError("??");
-					return null;
-			}
-		}
-
-		private float RawMagnitude()
-		{
-			return Easing()?.Magnitude(Progress()) ?? 0;
-		}
-
-		private float Magnitude()
-		{
-			return RawMagnitude();
-		}
-
 		private Vector3 Lerped()
 		{
-			return movement_.Lerped(Magnitude());
+			return movement_.Lerped(Sync.Magnitude);
 		}
 
 		public static string TypeToString(int i)
@@ -432,16 +249,14 @@ namespace Cue.Proc
 			return $"{rbId_} ({BodyParts.ToString(bodyPart_)})";
 		}
 
-		public virtual string ToDetailedString()
+		public override string ToDetailedString()
 		{
 			return
 				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"{Sync.ToDetailedString()}\n" +
 				$"{movement_}\n" +
-				$"fdur={fwdDuration_}\n" +
-				$"bdur={bwdDuration_}\n" +
-				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
-				$"p={Progress():0.00} mag={Magnitude():0.00} ex={ExcitementFactor():0.00}\n" +
-				$"lerped={Lerped()} state={state_} busy={wasBusy_}";
+				$"ex={ExcitementFactor():0.00}\n" +
+				$"lerped={Lerped()} busy={wasBusy_}";
 		}
 
 		private float ExcitementFactor()
@@ -455,11 +270,6 @@ namespace Cue.Proc
 
 			if (!movement_.Next())
 				movement_.SetNext(movement_.Last);
-		}
-
-		private float Random(float min, float max, float f)
-		{
-			return U.RandomFloat(min, max) * f;
 		}
 	}
 }

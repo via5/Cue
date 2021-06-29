@@ -35,6 +35,7 @@ project\src\Procedural\Animation\Controller.cs
 project\src\Procedural\Animation\Force.cs
 project\src\Procedural\Animation\Group.cs
 project\src\Procedural\Animation\Player.cs
+project\src\Procedural\Animation\Sync.cs
 project\src\Procedural\Expression\Builtin.cs
 project\src\Procedural\Expression\Expression.cs
 project\src\Procedural\Expression\Morph.cs
