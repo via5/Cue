@@ -49,15 +49,21 @@ namespace Cue.Proc
 	{
 		private const float DirectionCheckInterval = 1;
 
-		private float elapsed_ = 0;
-		private float hipForce_ = 500;
-		private float hipTorque_ = -30;
+		private float hipForceMin_ = 300;
+		private float hipForceMax_ = 800;
+		private float hipTorqueMin_ = -20;
+		private float hipTorqueMax_ = -40;
+		private float durationMin_ = 1;
+		private float durationMax_ = 0.2f;
+		private float durationWin_ = 0.2f;
+		private float durationInterval_ = 10;
 		private Force[] forces_ = null;
 
 		public SexProcAnimation()
 			: base("procSex", false)
 		{
-			var g = new ConcurrentTargetGroup("g", new Duration(), new Duration(), true);
+			var g = new ConcurrentTargetGroup(
+				"g", new Duration(), new Duration(), true);
 
 			g.AddTarget(new Force(
 				Force.AbsoluteForce, BodyParts.Hips, "hip",
@@ -65,20 +71,35 @@ namespace Cue.Proc
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
 				new LinearEasing(),
-				new SlidingDuration(1, 1, 1, 1, 0, new LinearEasing()),
-				new SlidingDuration(1, 1, 1, 1, 0, new LinearEasing()),
-				new Duration(0, 0), new Duration(0, 0), new LinearEasing(), new LinearEasing(),
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new LinearEasing()),
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new LinearEasing()),
+				new Duration(0, 0), new Duration(0, 0),
+				new LinearEasing(), new LinearEasing(),
 				Force.Loop | Force.ResetBetween));
 
 			g.AddTarget(new Force(
 				Force.RelativeTorque, BodyParts.Hips, "hip",
 				new SlidingMovement(
-					new Vector3(hipTorque_, 0, 0), new Vector3(hipTorque_, 0, 0),
+					new Vector3(hipTorqueMin_, 0, 0),
+					new Vector3(hipTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
 				new LinearEasing(),
-				new SlidingDuration(1, 1, 1, 1, 0, new LinearEasing()),
-				new SlidingDuration(1, 1, 1, 1, 0, new LinearEasing()),
-				new Duration(0, 0), new Duration(0, 0), new LinearEasing(), new LinearEasing(),
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new LinearEasing()),
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new LinearEasing()),
+				new Duration(0, 0), new Duration(0, 0),
+				new LinearEasing(), new LinearEasing(),
 				Force.Loop | Force.ResetBetween));
 
 			AddTarget(g);
@@ -94,7 +115,6 @@ namespace Cue.Proc
 		public override void Start(Person p)
 		{
 			base.Start(p);
-			elapsed_ = DirectionCheckInterval + 1;
 
 			if (forces_ == null)
 			{
@@ -104,18 +124,6 @@ namespace Cue.Proc
 			}
 
 			UpdateForces(true);
-		}
-
-		public override void Reset()
-		{
-			base.Reset();
-			elapsed_ = DirectionCheckInterval + 1;
-		}
-
-		public override void FixedUpdate(float s)
-		{
-			//UpdateForces();
-			base.FixedUpdate(s);
 		}
 
 		private void UpdateForces(bool force=false)
@@ -136,7 +144,7 @@ namespace Cue.Proc
 			var d = (genBase.Position - hips.Position).Normalized;
 			Cue.LogInfo($"{d}");
 
-			f.Movement.SetRange(d * hipForce_, d * hipForce_);
+			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);
 		}
 
 		private void GatherForces(List<Force> list, List<ITarget> targets)

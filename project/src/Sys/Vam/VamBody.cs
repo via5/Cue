@@ -1002,7 +1002,7 @@ namespace Cue.Sys.Vam
 
 					if (bp == -1)
 					{
-						Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
+						//Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
 					}
 					else if (!found[p.PersonIndex, bp])
 					{
