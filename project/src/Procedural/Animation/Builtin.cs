@@ -136,7 +136,6 @@ namespace Cue.Proc
 			var hips = person_.Body.Get(BodyParts.Hips);
 			var genBase = person_.Body.Get(BodyParts.Genitals);
 			var d = (genBase.Position - hips.Position).Normalized;
-			Cue.LogInfo($"{d}");
 
 			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);
 		}

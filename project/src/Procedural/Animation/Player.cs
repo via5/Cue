@@ -3,6 +3,7 @@
 	interface ITarget
 	{
 		ITarget Parent { get; set; }
+		ISync Sync { get; }
 		bool Done { get; }
 
 		ITarget Clone();
@@ -21,6 +22,7 @@
 		protected BasicTarget(ISync sync)
 		{
 			sync_ = sync;
+			sync_.Target = this;
 		}
 
 		public ITarget Parent

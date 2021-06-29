@@ -9,7 +9,7 @@
 			"loop": true,
 			"sync":
 			{
-				"type": "parent"
+				"type": "nosync"
 			},
 			"targets":
 			[

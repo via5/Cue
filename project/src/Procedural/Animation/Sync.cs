@@ -4,9 +4,13 @@ namespace Cue.Proc
 {
 	interface ISync
 	{
+		ITarget Target { get; set; }
+
 		ISync Clone();
 
 		int State{ get; }
+		int UpdateResult { get; }
+
 		bool Finished { get; }
 		float Magnitude { get; }
 		float Excitement { set; }
@@ -27,11 +31,15 @@ namespace Cue.Proc
 
 		public const int Working = 1;
 		public const int DurationFinished = 2;
-		public const int DelayFinished = 3;
-		public const int Looping = 4;
-		public const int SyncFinished = 5;
+		public const int Delaying = 3;
+		public const int DelayFinished = 4;
+		public const int Looping = 5;
+		public const int SyncFinished = 6;
 
+		private ITarget target_ = null;
 		private int state_ = ForwardsState;
+		private int updateResult_ = Working;
+
 
 		public static ISync Create(JSONClass o)
 		{
@@ -66,9 +74,20 @@ namespace Cue.Proc
 
 		public abstract ISync Clone();
 
+		public ITarget Target
+		{
+			get { return target_; }
+			set { target_ = value; }
+		}
+
 		public int State
 		{
 			get { return state_; }
+		}
+
+		public int UpdateResult
+		{
+			get { return updateResult_; }
 		}
 
 		public abstract float Magnitude { get; }
@@ -81,7 +100,14 @@ namespace Cue.Proc
 		}
 
 		public abstract string ToDetailedString();
-		public abstract int FixedUpdate(float s);
+
+		public int FixedUpdate(float s)
+		{
+			updateResult_ = DoFixedUpdate(s);
+			return updateResult_;
+		}
+
+		protected abstract int DoFixedUpdate(float s);
 
 		protected void SetState(int s)
 		{
@@ -106,7 +132,7 @@ namespace Cue.Proc
 			return new NoSync();
 		}
 
-		public override int FixedUpdate(float s)
+		protected override int DoFixedUpdate(float s)
 		{
 			return SyncFinished;
 		}
@@ -124,9 +150,20 @@ namespace Cue.Proc
 		{
 		}
 
-		public override float Magnitude { get { return 0; } }
-		public override float Excitement { set { } }
-		public override bool Finished { get { return true; } }
+		public override float Magnitude
+		{
+			get { return Target?.Parent?.Sync.Magnitude ?? 1; }
+		}
+
+		public override float Excitement
+		{
+			set { }
+		}
+
+		public override bool Finished
+		{
+			get { return Target?.Parent?.Sync.Finished ?? true; }
+		}
 
 		public new static ParentTargetSync Create(JSONClass o)
 		{
@@ -135,17 +172,17 @@ namespace Cue.Proc
 
 		public override ISync Clone()
 		{
-			return new NoSync();
+			return new ParentTargetSync();
 		}
 
-		public override int FixedUpdate(float s)
+		protected override int DoFixedUpdate(float s)
 		{
-			return SyncFinished;
+			return Target?.Parent?.Sync.UpdateResult ?? SyncFinished;
 		}
 
 		public override string ToDetailedString()
 		{
-			return "nosync";
+			return "parent";
 		}
 	}
 
@@ -195,7 +232,7 @@ namespace Cue.Proc
 			elapsed_ = 0;
 		}
 
-		public override int FixedUpdate(float s)
+		protected override int DoFixedUpdate(float s)
 		{
 			elapsed_ += s;
 			if (elapsed_ >= duration_)
@@ -404,7 +441,7 @@ namespace Cue.Proc
 			bwdDelay_.Reset();
 		}
 
-		public override int FixedUpdate(float s)
+		protected override int DoFixedUpdate(float s)
 		{
 			switch (State)
 			{
@@ -447,7 +484,7 @@ namespace Cue.Proc
 				if (fwdDelay_.Enabled)
 				{
 					SetState(ForwardsDelayState);
-					return DurationFinished;
+					return Delaying;
 				}
 				else if (Bits.IsSet(flags_, ResetBetween))
 				{
@@ -505,7 +542,7 @@ namespace Cue.Proc
 				if (bwdDelay_.Enabled)
 				{
 					SetState(BackwardsDelayState);
-					return DurationFinished;
+					return Delaying;
 				}
 				else if (Bits.IsSet(flags_, Loop))
 				{
@@ -531,7 +568,7 @@ namespace Cue.Proc
 				if (Bits.IsSet(flags_, Loop))
 				{
 					SetState(ForwardsState);
-					return DelayFinished;
+					return Looping;
 				}
 				else
 				{

@@ -165,9 +165,11 @@ namespace Cue.Proc
 				{
 					movement_.WindowMagnitude = person_.Excitement.Value;
 					Sync.Excitement = person_.Excitement.Value;
+					movement_.SetNext(Vector3.Zero);
 					break;
 				}
 
+				case BasicSync.Delaying:
 				case BasicSync.DelayFinished:
 				{
 					break;
