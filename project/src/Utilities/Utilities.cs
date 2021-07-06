@@ -654,6 +654,53 @@ namespace Cue
 	}
 
 
+	class ForceableValue
+	{
+		private float value_;
+		private float forced_;
+		private bool isForced_;
+
+		public ForceableValue()
+		{
+			value_ = 0;
+			forced_ = 0;
+			isForced_ = false;
+		}
+
+		public float Value
+		{
+			get
+			{
+				if (isForced_)
+					return forced_;
+				else
+					return value_;
+			}
+
+			set
+			{
+				value_ = value;
+			}
+		}
+
+		public float UnforcedValue
+		{
+			get { return value_; }
+		}
+
+		public void SetForced(float f)
+		{
+			isForced_ = true;
+			forced_ = f;
+		}
+
+		public void UnsetForced()
+		{
+			isForced_ = false;
+		}
+	}
+
+
 	class CircularIndex
 	{
 		private int i_ = -1;

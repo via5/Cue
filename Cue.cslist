@@ -23,8 +23,11 @@ project\src\Object\Animator.cs
 project\src\Object\Object.cs
 project\src\Object\Slots.cs
 project\src\Person\Body.cs
+project\src\Person\Clothing.cs
 project\src\Person\Excitement.cs
+project\src\Person\Mood.cs
 project\src\Person\Person.cs
+project\src\Person\Physiology.cs
 project\src\Person\State.cs
 project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs

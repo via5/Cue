@@ -119,11 +119,14 @@
     <Compile Include="src\Object\Object.cs" />
     <Compile Include="src\Object\Slots.cs" />
     <Compile Include="src\Person\Body.cs" />
+    <Compile Include="src\Person\Clothing.cs" />
     <Compile Include="src\Person\Excitement.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
     <Compile Include="src\Person\Gaze\Targets.cs" />
+    <Compile Include="src\Person\Mood.cs" />
     <Compile Include="src\Person\Person.cs" />
+    <Compile Include="src\Person\Physiology.cs" />
     <Compile Include="src\Person\State.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
