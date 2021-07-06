@@ -43,6 +43,8 @@ namespace Cue.Sys.Vam
 		{
 			DisableFreezeWhenGrabbed();
 			DisableAutoExpressions();
+			EnableAudioJawDriving();
+
 			SetStrongerDamping("hipControl");
 			SetStrongerDamping("chestControl");
 			SetStrongerDamping("headControl");
@@ -80,6 +82,20 @@ namespace Cue.Sys.Vam
 
 			if (b != null)
 				b.val = false;
+		}
+
+		private void EnableAudioJawDriving()
+		{
+			var p = Cue.Instance.VamSys.GetBoolParameter(
+				atom_, "JawControl", "driveXRotationFromAudioSource");
+
+			if (p != null)
+				p.val = true;
+
+			var v = Cue.Instance.VamSys.GetFloatParameter(
+				atom_, "JawControl", "driveXRotationFromAudioSourceMultiplier");
+
+			v.val = v.max;
 		}
 
 		private void SetStrongerDamping(string cn)

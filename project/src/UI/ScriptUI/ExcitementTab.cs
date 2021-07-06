@@ -53,6 +53,11 @@ namespace Cue
 
 		private VUI.Label state_ = new VUI.Label();
 
+		private VUI.Label temperature_ = new VUI.Label();
+		private VUI.Label sweat_ = new VUI.Label();
+		private VUI.Label flush_ = new VUI.Label();
+		private VUI.Label hairLoose_ = new VUI.Label();
+
 		private VUI.Label exValue_ = new VUI.Label();
 		private VUI.Label exFlat_ = new VUI.Label();
 		private VUI.Label exMax_ = new VUI.Label();
@@ -93,6 +98,35 @@ namespace Cue
 
 			Add(p);
 			Add(new VUI.Spacer(30));
+
+
+
+			gl = new VUI.GridLayout(2);
+			gl.HorizontalSpacing = 20;
+			gl.HorizontalStretch = new List<bool>() { false, true };
+
+			p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
+
+			p.Add(new VUI.Label("Body", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Temperature"));
+			p.Add(temperature_);
+
+			p.Add(new VUI.Label("Sweat"));
+			p.Add(sweat_);
+
+			p.Add(new VUI.Label("Flush"));
+			p.Add(flush_);
+
+			p.Add(new VUI.Label("Hair loose"));
+			p.Add(hairLoose_);
+
+			Add(p);
+
 
 
 			gl = new VUI.GridLayout(2);
@@ -146,6 +180,11 @@ namespace Cue
 		{
 			for (int i = 0; i < forceables_.Count; ++i)
 				forceables_[i].Update(s);
+
+			temperature_.Text = $"{person_.Body.DampedTemperature}";
+			sweat_.Text = $"{person_.Atom.Body.Sweat}";
+			flush_.Text = $"{person_.Atom.Body.Flush}";
+			hairLoose_.Text = $"{person_.Atom.Hair.Loose}";
 
 			var e = person_.Excitement;
 
