@@ -166,8 +166,8 @@ namespace Cue.Proc
 
 				case BasicSync.DurationFinished:
 				{
-					movement_.WindowMagnitude = person_.Excitement.Value;
-					Sync.Excitement = person_.Excitement.Value;
+					movement_.WindowMagnitude = person_.Mood.Excitement;
+					Sync.Excitement = person_.Mood.Excitement;
 					movement_.SetNext(Vector3.Zero);
 					break;
 				}
@@ -180,16 +180,16 @@ namespace Cue.Proc
 
 				case BasicSync.Looping:
 				{
-					movement_.WindowMagnitude = person_.Excitement.Value;
-					Sync.Excitement = person_.Excitement.Value;
+					movement_.WindowMagnitude = person_.Mood.Excitement;
+					Sync.Excitement = person_.Mood.Excitement;
 					Next();
 					break;
 				}
 
 				case BasicSync.SyncFinished:
 				{
-					movement_.WindowMagnitude = person_.Excitement.Value;
-					Sync.Excitement = person_.Excitement.Value;
+					movement_.WindowMagnitude = person_.Mood.Excitement;
+					Sync.Excitement = person_.Mood.Excitement;
 					oneFrameFinished_ = true;
 					break;
 				}
@@ -263,7 +263,7 @@ namespace Cue.Proc
 
 		private float ExcitementFactor()
 		{
-			return excitement_.Magnitude(person_.Excitement.Value);
+			return excitement_.Magnitude(person_.Mood.Excitement);
 		}
 
 		private void Next()

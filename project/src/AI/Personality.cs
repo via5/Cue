@@ -36,6 +36,7 @@
 		float NaturalOtherEyesWeight { get; }
 		float BusyOtherEyesWeight { get; }
 		float LookAboveMaxWeight { get; }
+		float LookAboveMaxWeightOrgasm { get; }
 
 		string Name { get; }
 		string StateString{ get; }
@@ -113,6 +114,7 @@
 		public virtual float AvoidDelayAfterOrgasm { get { return 15; } }
 
 		public virtual float LookAboveMaxWeight { get { return 0.2f; } }
+		public virtual float LookAboveMaxWeightOrgasm { get { return 0.5f; } }
 
 		public virtual float OtherSexExcitementRate { get { return 0.3f; } }
 		public virtual float MaxOtherSexExcitement { get { return 0.5f; } }
@@ -165,10 +167,10 @@
 				wasClose_ = close;
 			}
 
-			gazeDuration_.WindowMagnitude = person_.Excitement.Value;
+			gazeDuration_.WindowMagnitude = person_.Mood.Excitement;
 			gazeDuration_.Update(s);
 
-			gazeRandomInterval_.WindowMagnitude = person_.Excitement.Value;
+			gazeRandomInterval_.WindowMagnitude = person_.Mood.Excitement;
 			gazeRandomInterval_.Update(s);
 		}
 

@@ -352,9 +352,9 @@
 				force_ = b;
 
 				if (force_)
-					p.Excitement.ForceValue(excitement_.Value);
+					p.Mood.ForceExcitement(excitement_.Value);
 				else
-					p.Excitement.ForceValue(-1);
+					p.Mood.ForceExcitement(-1);
 			}
 		}
 
@@ -364,7 +364,7 @@
 			if (p != null)
 			{
 				if (force_)
-					p.Excitement.ForceValue(f);
+					p.Mood.ForceExcitement(f);
 			}
 		}
 	}

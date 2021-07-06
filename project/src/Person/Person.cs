@@ -89,8 +89,9 @@ namespace Cue
 		public float PenetrationMax { get { return 1.0f; } }
 
 		public float DecayPerSecond { get { return -0.01f; } }
-		public float ExcitementPostOrgasm { get { return 0.0f; } }
-		public float DelayPostOrgasm { get { return 10; } }
+		public float ExcitementPostOrgasm { get { return 0.4f; } }
+		public float OrgasmTime { get { return 8; } }
+		public float PostOrgasmTime { get { return 10; } }
 		public float RateAdjustment { get { return 0.3f; } }
 	}
 
@@ -139,6 +140,66 @@ namespace Cue
 	}
 
 
+	class Mood
+	{
+		private readonly Person person_;
+
+		private float excitement_ = 0;
+		private float forcedExcitement_ = -1;
+
+		private float tiredness_ = 0;
+		private float forcedTiredness_ = -1;
+
+		public Mood(Person p)
+		{
+			person_ = p;
+		}
+
+		public float Excitement
+		{
+			get
+			{
+				if (forcedExcitement_ >= 0)
+					return forcedExcitement_;
+				else
+					return excitement_;
+			}
+		}
+
+		public void ForceExcitement(float s)
+		{
+			forcedExcitement_ = s;
+		}
+
+		public float Tiredness
+		{
+			get
+			{
+				if (forcedExcitement_ >= 0)
+					return forcedTiredness_;
+				else
+					return tiredness_;
+			}
+		}
+
+		public void ForceTiredness(float s)
+		{
+			forcedTiredness_ = s;
+		}
+
+		public void Update(float s)
+		{
+			excitement_ = person_.Excitement.Current;
+
+			person_.Breathing.Intensity = excitement_;
+			person_.Body.Sweat = excitement_;
+			person_.Body.Flush = excitement_;
+			person_.Expression.Set(Expressions.Pleasure, excitement_);
+			person_.Hair.Loose = excitement_;
+		}
+	}
+
+
 	class Person : BasicObject
 	{
 		private readonly int personIndex_;
@@ -156,6 +217,7 @@ namespace Cue
 		private Hair hair_;
 		private Gaze gaze_;
 		private Physiology physiology_;
+		private Mood mood_;
 		private IAI ai_ = null;
 		private Clothing clothing_;
 		private IPersonality personality_;
@@ -187,6 +249,7 @@ namespace Cue
 			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
 			physiology_ = new Physiology(this, config);
+			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);
 
@@ -254,6 +317,7 @@ namespace Cue
 		public Hair Hair { get { return hair_; } }
 		public Gaze Gaze { get { return gaze_; } }
 		public Physiology Physiology { get { return physiology_; } }
+		public Mood Mood { get { return mood_; } }
 		public IAI AI { get { return ai_; } }
 		public Clothing Clothing { get { return clothing_; } }
 		public RootAction Actions { get { return actions_; } }
@@ -399,6 +463,7 @@ namespace Cue
 			{
 				excitement_.Update(s);
 				personality_.Update(s);
+				mood_.Update(s);
 				body_.Update(s);
 				hair_.Update(s);
 			}

@@ -12,7 +12,6 @@ namespace Cue
 			private float rate_ = 0;
 			private float personalityModifier_ = 0;
 			private float personalityMax_ = 0;
-			private BodyPart source_ = null;
 
 			public Reason(string name, bool physical)
 			{
@@ -63,6 +62,8 @@ namespace Cue
 			}
 		}
 
+		public const float NoOrgasm = 10000;
+
 		public const int Mouth = 0;
 		public const int Breasts = 1;
 		public const int Genitals = 2;
@@ -70,20 +71,22 @@ namespace Cue
 		public const int OtherSex = 4;
 		public const int ReasonCount = 5;
 
+		public const int NormalState = 1;
+		public const int OrgasmState = 2;
+		public const int PostOrgasmState = 3;
+
 		private Person person_;
 		private float[] parts_ = new float[BodyParts.Count];
-		private float decay_ = 1;
 
-		private float flatExcitement_ = 0;
-		private float forcedExcitement_ = -1;
 		private Reason[] reasons_ = new Reason[ReasonCount];
 		private float physicalRate_ = 0;
 		private float emotionalRate_ = 0;
 		private float totalRate_ = 0;
 		private float max_ = 0;
-		private bool postOrgasm_ = false;
-		private float postOrgasmElapsed_ = 1000;
-
+		private float flatValue_ = 0;
+		private int state_ = NormalState;
+		private float elapsed_ = 0;
+		private float timeSinceLastOrgasm_ = NoOrgasm;
 		private IEasing easing_ = new SinusoidalEasing();
 
 
@@ -98,36 +101,40 @@ namespace Cue
 			reasons_[OtherSex] = new Reason("Other sex", false);
 		}
 
+		public int State
+		{
+			get { return state_; }
+		}
+
 		public string StateString
 		{
 			get
 			{
-				if (postOrgasm_)
-					return "post orgasm";
-				else
-					return "none";
+				switch (state_)
+				{
+					case NormalState:
+						return "normal";
+
+					case OrgasmState:
+						return "orgasm";
+
+					case PostOrgasmState:
+						return "post orgasm";
+
+					default:
+						return $"?{state_}";
+				}
 			}
 		}
 
-		public float Value
+		public float Current
 		{
-			get
-			{
-				if (forcedExcitement_ >= 0)
-					return forcedExcitement_;
-				else
-					return easing_.Magnitude(flatExcitement_);
-			}
+			get { return easing_.Magnitude(flatValue_); ; }
 		}
 
 		public float TimeSinceLastOrgasm
 		{
-			get { return postOrgasmElapsed_; }
-		}
-
-		public void ForceValue(float s)
-		{
-			forcedExcitement_ = s;
+			get { return timeSinceLastOrgasm_; }
 		}
 
 		public void ForceOrgasm()
@@ -137,24 +144,64 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			var pp = person_.Physiology.Sensitivity;
+			elapsed_ += s;
 
-			if (postOrgasm_)
+			switch (state_)
 			{
-				postOrgasmElapsed_ += s;
-				if (postOrgasmElapsed_ > pp.DelayPostOrgasm)
+				case NormalState:
 				{
-					postOrgasm_ = false;
-					person_.Animator.StopType(Animation.OrgasmType);
+					UpdateNormal(s);
+					break;
+				}
+
+				case OrgasmState:
+				{
+					UpdateOrgasm(s);
+					break;
+				}
+
+				case PostOrgasmState:
+				{
+					UpdatePostOrgasm(s);
+					break;
 				}
 			}
+		}
+
+		private void UpdateNormal(float s)
+		{
+			timeSinceLastOrgasm_ += s;
 
 			UpdateParts(s);
 			UpdateReasonValues(s);
 			UpdateReasonRates(s);
 			UpdateMax(s);
 			UpdateValue(s);
-			Apply(s);
+
+			if (Current >= 1)
+				DoOrgasm();
+		}
+
+		private void UpdateOrgasm(float s)
+		{
+			var ss = person_.Physiology.Sensitivity;
+
+			if (elapsed_ >= ss.OrgasmTime)
+			{
+				person_.Animator.StopType(Animation.OrgasmType);
+				SetState(PostOrgasmState);
+			}
+		}
+
+		private void UpdatePostOrgasm(float s)
+		{
+			var ss = person_.Physiology.Sensitivity;
+
+			if (elapsed_ > ss.PostOrgasmTime)
+			{
+				SetState(NormalState);
+				flatValue_ = ss.ExcitementPostOrgasm;
+			}
 		}
 
 		private void UpdateParts(float s)
@@ -166,7 +213,7 @@ namespace Cue
 				if (ts != null && ts.Length > 0)
 					parts_[i] = ts[0].value; // todo
 				else
-					parts_[i] = Math.Max(parts_[i] - s * decay_, 0);
+					parts_[i] = Math.Max(parts_[i] - s, 0);
 			}
 		}
 
@@ -260,28 +307,14 @@ namespace Cue
 		{
 			var ss = person_.Physiology.Sensitivity;
 
-			if (flatExcitement_ > max_)
+			if (flatValue_ > max_)
 			{
-				flatExcitement_ =
-					Math.Max(flatExcitement_ + ss.DecayPerSecond * s, max_);
+				flatValue_ = Math.Max(flatValue_ + ss.DecayPerSecond * s, max_);
 			}
 			else
 			{
-				flatExcitement_ =
-					U.Clamp(flatExcitement_ + totalRate_, 0, max_);
+				flatValue_ = U.Clamp(flatValue_ + totalRate_, 0, max_);
 			}
-		}
-
-		private void Apply(float s)
-		{
-			person_.Breathing.Intensity = Value;
-			person_.Body.Sweat = Value;
-			person_.Body.Flush = Value;
-			person_.Expression.Set(Expressions.Pleasure, Value);
-			person_.Hair.Loose = Value;
-
-			if (Value >= 1)
-				DoOrgasm();
 		}
 
 		private void DoOrgasm()
@@ -291,9 +324,15 @@ namespace Cue
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
 			person_.Animator.PlayType(Animation.OrgasmType);
-			flatExcitement_ = ss.ExcitementPostOrgasm;
-			postOrgasm_ = true;
-			postOrgasmElapsed_ = 0;
+			flatValue_ = 1;
+			SetState(OrgasmState);
+			timeSinceLastOrgasm_ = 0;
+		}
+
+		private void SetState(int s)
+		{
+			state_ = s;
+			elapsed_ = 0;
 		}
 
 		public Reason GetReason(int i)
@@ -324,11 +363,11 @@ namespace Cue
 		public override string ToString()
 		{
 			string s =
-				$"{Value:0.000000} " +
-				$"(flat {flatExcitement_:0.000000}, max {max_:0.000000})";
+				$"{Current:0.000000} " +
+				$"(flat {flatValue_:0.000000}, max {max_:0.000000})";
 
-			if (forcedExcitement_ >= 0)
-				s += $" forced {forcedExcitement_:0.000000})";
+			if (flatValue_ >= 0)
+				s += $" forced {flatValue_:0.000000})";
 
 			return s;
 		}

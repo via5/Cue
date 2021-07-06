@@ -150,7 +150,8 @@
 		public MacGruberOrgasmer(Person p)
 		{
 			person_ = p;
-			action_ = new Sys.Vam.ActionParameter(p, "MacGruber.Breathing", "QueueOrgasm");
+			action_ = new Sys.Vam.ActionParameter(
+				p, "MacGruber.Breathing", "QueueOrgasm");
 		}
 
 		public void Orgasm()

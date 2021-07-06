@@ -122,15 +122,15 @@ namespace Cue
 		private void OnForceExcitementCheck(bool b)
 		{
 			if (b)
-				person_.Excitement.ForceValue(forceExcitementValue_.Value);
+				person_.Mood.ForceExcitement(forceExcitementValue_.Value);
 			else
-				person_.Excitement.ForceValue(-1);
+				person_.Mood.ForceExcitement(-1);
 		}
 
 		private void OnForceExcitement(float f)
 		{
 			if (forceExcitement_.Checked)
-				person_.Excitement.ForceValue(f);
+				person_.Mood.ForceExcitement(f);
 		}
 	}
 }
