@@ -9,9 +9,11 @@ namespace Cue
 		private List<Tab> tabs_ = new List<Tab>();
 
 		public PersonBodyTab(Person person)
+			: base("Body")
 		{
 			person_ = person;
 
+			tabs_.Add(new PersonBodyStateTab(person_));
 			tabs_.Add(new PersonBodyPartsTab(person_));
 			tabs_.Add(new PersonHandsTab(person_));
 
@@ -20,11 +22,6 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(tabsWidget_, VUI.BorderLayout.Center);
-		}
-
-		public override string Title
-		{
-			get { return "Body"; }
 		}
 
 		public override void Update(float s)
@@ -45,6 +42,46 @@ namespace Cue
 	}
 
 
+	class PersonBodyStateTab : Tab
+	{
+		private readonly Person person_;
+		private VUI.Label sweat_ = new VUI.Label();
+		private VUI.Label flush_ = new VUI.Label();
+		private VUI.Label hairLoose_ = new VUI.Label();
+
+		public PersonBodyStateTab(Person ps)
+			: base("State")
+		{
+			person_ = ps;
+
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalSpacing = 20;
+			gl.HorizontalStretch = new List<bool>() { false, true };
+
+			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Sweat"));
+			p.Add(sweat_);
+
+			p.Add(new VUI.Label("Flush"));
+			p.Add(flush_);
+
+			p.Add(new VUI.Label("Hair loose"));
+			p.Add(hairLoose_);
+
+			Layout = new VUI.VerticalFlow();
+			Add(p);
+		}
+
+		public override void Update(float s)
+		{
+			sweat_.Text = $"{person_.Body.DampedSweat}";
+			flush_.Text = $"{person_.Body.DampedFlush}";
+			hairLoose_.Text = $"{person_.Hair.DampedLoose}";
+		}
+	}
+
+
 	class PersonBodyPartsTab : Tab
 	{
 		struct PartWidgets
@@ -57,6 +94,7 @@ namespace Cue
 		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
 
 		public PersonBodyPartsTab(Person ps)
+			: base ("Parts")
 		{
 			person_ = ps;
 
@@ -101,11 +139,6 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
-		}
-
-		public override string Title
-		{
-			get { return "Body parts"; }
 		}
 
 		public override void Update(float s)
@@ -179,6 +212,7 @@ namespace Cue
 		private readonly List<BoneWidgets> widgets_ = new List<BoneWidgets>();
 
 		public PersonHandsTab(Person ps)
+			: base("Fingers")
 		{
 			person_ = ps;
 
@@ -226,11 +260,6 @@ namespace Cue
 					widgets_.Add(w);
 				}
 			}
-		}
-
-		public override string Title
-		{
-			get { return "Fingers"; }
 		}
 
 		public override void Update(float s)

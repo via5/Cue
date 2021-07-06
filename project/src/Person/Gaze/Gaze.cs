@@ -91,7 +91,7 @@ namespace Cue
 
 
 			// do this even for exclusives
-			if (person_.Excitement.State == Excitement.OrgasmState)
+			if (person_.Mood.State == Mood.OrgasmState)
 			{
 				targets_.SetAboveWeight(
 					person_.Mood.Excitement * ps.LookAboveMaxWeight);
@@ -335,7 +335,7 @@ namespace Cue
 			if (person_.Mood.Excitement >= ps.MaxExcitementForAvoid)
 				return false;
 
-			if (person_.Excitement.TimeSinceLastOrgasm < ps.AvoidDelayAfterOrgasm)
+			if (person_.Mood.TimeSinceLastOrgasm < ps.AvoidDelayAfterOrgasm)
 				return false;
 
 			return true;

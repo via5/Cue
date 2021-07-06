@@ -62,7 +62,6 @@ namespace Cue
 			}
 		}
 
-		public const float NoOrgasm = 10000;
 
 		public const int Mouth = 0;
 		public const int Breasts = 1;
@@ -70,10 +69,6 @@ namespace Cue
 		public const int Penetration = 3;
 		public const int OtherSex = 4;
 		public const int ReasonCount = 5;
-
-		public const int NormalState = 1;
-		public const int OrgasmState = 2;
-		public const int PostOrgasmState = 3;
 
 		private Person person_;
 		private float[] parts_ = new float[BodyParts.Count];
@@ -84,9 +79,6 @@ namespace Cue
 		private float totalRate_ = 0;
 		private float max_ = 0;
 		private float flatValue_ = 0;
-		private int state_ = NormalState;
-		private float elapsed_ = 0;
-		private float timeSinceLastOrgasm_ = NoOrgasm;
 		private IEasing easing_ = new SinusoidalEasing();
 
 
@@ -101,107 +93,56 @@ namespace Cue
 			reasons_[OtherSex] = new Reason("Other sex", false);
 		}
 
-		public int State
+		public float Value
 		{
-			get { return state_; }
+			get { return easing_.Magnitude(flatValue_); }
 		}
 
-		public string StateString
+		public float FlatValue
 		{
-			get
-			{
-				switch (state_)
-				{
-					case NormalState:
-						return "normal";
-
-					case OrgasmState:
-						return "orgasm";
-
-					case PostOrgasmState:
-						return "post orgasm";
-
-					default:
-						return $"?{state_}";
-				}
-			}
+			get { return flatValue_; }
+			set { flatValue_ = value; }
 		}
 
-		public float Current
+		public float Max
 		{
-			get { return easing_.Magnitude(flatValue_); ; }
+			get { return max_; }
 		}
 
-		public float TimeSinceLastOrgasm
+		public Reason GetReason(int i)
 		{
-			get { return timeSinceLastOrgasm_; }
+			return reasons_[i];
 		}
 
-		public void ForceOrgasm()
+		public float PhysicalRate
 		{
-			DoOrgasm();
+			get { return physicalRate_; }
+		}
+
+		public float EmotionalRate
+		{
+			get { return emotionalRate_; }
+		}
+
+		public float TotalRate
+		{
+			get { return totalRate_; }
 		}
 
 		public void Update(float s)
 		{
-			elapsed_ += s;
-
-			switch (state_)
-			{
-				case NormalState:
-				{
-					UpdateNormal(s);
-					break;
-				}
-
-				case OrgasmState:
-				{
-					UpdateOrgasm(s);
-					break;
-				}
-
-				case PostOrgasmState:
-				{
-					UpdatePostOrgasm(s);
-					break;
-				}
-			}
-		}
-
-		private void UpdateNormal(float s)
-		{
-			timeSinceLastOrgasm_ += s;
-
 			UpdateParts(s);
 			UpdateReasonValues(s);
 			UpdateReasonRates(s);
 			UpdateMax(s);
 			UpdateValue(s);
-
-			if (Current >= 1)
-				DoOrgasm();
 		}
 
-		private void UpdateOrgasm(float s)
+		public override string ToString()
 		{
-			var ss = person_.Physiology.Sensitivity;
-
-			if (elapsed_ >= ss.OrgasmTime)
-			{
-				person_.Animator.StopType(Animation.OrgasmType);
-				SetState(PostOrgasmState);
-			}
-		}
-
-		private void UpdatePostOrgasm(float s)
-		{
-			var ss = person_.Physiology.Sensitivity;
-
-			if (elapsed_ > ss.PostOrgasmTime)
-			{
-				SetState(NormalState);
-				flatValue_ = ss.ExcitementPostOrgasm;
-			}
+			return
+				$"{Value:0.000000} " +
+				$"(flat {flatValue_:0.000000}, max {max_:0.000000})";
 		}
 
 		private void UpdateParts(float s)
@@ -315,61 +256,6 @@ namespace Cue
 			{
 				flatValue_ = U.Clamp(flatValue_ + totalRate_, 0, max_);
 			}
-		}
-
-		private void DoOrgasm()
-		{
-			var ss = person_.Physiology.Sensitivity;
-
-			person_.Log.Info("orgasm");
-			person_.Orgasmer.Orgasm();
-			person_.Animator.PlayType(Animation.OrgasmType);
-			flatValue_ = 1;
-			SetState(OrgasmState);
-			timeSinceLastOrgasm_ = 0;
-		}
-
-		private void SetState(int s)
-		{
-			state_ = s;
-			elapsed_ = 0;
-		}
-
-		public Reason GetReason(int i)
-		{
-			return reasons_[i];
-		}
-
-		public float PhysicalRate
-		{
-			get { return physicalRate_; }
-		}
-
-		public float EmotionalRate
-		{
-			get { return emotionalRate_; }
-		}
-
-		public float TotalRate
-		{
-			get { return totalRate_; }
-		}
-
-		public float Max
-		{
-			get { return max_; }
-		}
-
-		public override string ToString()
-		{
-			string s =
-				$"{Current:0.000000} " +
-				$"(flat {flatValue_:0.000000}, max {max_:0.000000})";
-
-			if (flatValue_ >= 0)
-				s += $" forced {flatValue_:0.000000})";
-
-			return s;
 		}
 	}
 }

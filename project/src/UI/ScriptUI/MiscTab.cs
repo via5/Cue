@@ -25,6 +25,7 @@ namespace Cue
 		private VUI.CheckBox logResources_;
 
 		public MiscTab()
+			: base("Misc")
 		{
 			logAnimation_ = new VUI.CheckBox("Animation", CheckLog);
 			logAction_ = new VUI.CheckBox("Action", CheckLog);
@@ -81,11 +82,6 @@ namespace Cue
 
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
 			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
-		}
-
-		public override string Title
-		{
-			get { return "Stuff"; }
 		}
 
 		public override void Update(float s)

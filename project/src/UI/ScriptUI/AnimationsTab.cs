@@ -13,6 +13,7 @@ namespace Cue
 		private Animation sel_ = null;
 
 		public PersonAnimationsTab(Person person)
+			: base("Animations")
 		{
 			person_ = person;
 
@@ -50,11 +51,6 @@ namespace Cue
 
 			paused_.Changed += OnPaused;
 			seek_.ValueChanged += OnSeek;
-		}
-
-		public override string Title
-		{
-			get { return "Animations"; }
 		}
 
 		public override void Update(float s)

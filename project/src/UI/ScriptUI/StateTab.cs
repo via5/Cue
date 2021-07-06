@@ -28,6 +28,7 @@ namespace Cue
 		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
 
 		public PersonStateTab(Person p)
+			: base("State")
 		{
 			person_ = p;
 
@@ -102,11 +103,6 @@ namespace Cue
 
 
 			states_.SetItems(PersonState.GetNames().ToList());
-		}
-
-		public override string Title
-		{
-			get { return "State"; }
 		}
 
 		public override void Update(float s)

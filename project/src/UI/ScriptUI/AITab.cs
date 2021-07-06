@@ -13,6 +13,7 @@ namespace Cue
 		private VUI.CheckBox close_ = new VUI.CheckBox();
 
 		public PersonAITab(Person p)
+			: base("AI")
 		{
 			person_ = p;
 			ai_ = (PersonAI)person_.AI;
@@ -39,11 +40,6 @@ namespace Cue
 			Add(state, VUI.BorderLayout.Top);
 
 			close_.Changed += OnClose;
-		}
-
-		public override string Title
-		{
-			get { return "AI"; }
 		}
 
 		public override void Update(float s)

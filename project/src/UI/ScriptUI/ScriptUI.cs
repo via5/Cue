@@ -67,7 +67,18 @@ namespace Cue
 
 	abstract class Tab : VUI.Panel
 	{
-		public abstract string Title { get; }
+		private string title_;
+
+		protected Tab(string title)
+		{
+			title_ = title;
+		}
+
+		public string Title
+		{
+			get { return title_; }
+		}
+
 		public abstract void Update(float s);
 
 		public virtual void OnPluginState(bool b)
@@ -84,6 +95,7 @@ namespace Cue
 		private List<Tab> tabs_ = new List<Tab>();
 
 		public PersonTab(Person p)
+			: base(p.ID)
 		{
 			person_ = p;
 
@@ -99,11 +111,6 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(tabsWidget_, VUI.BorderLayout.Center);
-		}
-
-		public override string Title
-		{
-			get { return person_.ID; }
 		}
 
 		public override void Update(float s)

@@ -140,62 +140,199 @@ namespace Cue
 	}
 
 
+	class ForceableValue
+	{
+		private float value_;
+		private float forced_;
+		private bool isForced_;
+
+		public ForceableValue()
+		{
+			value_ = 0;
+			forced_ = 0;
+			isForced_ = false;
+		}
+
+		public float Value
+		{
+			get
+			{
+				if (isForced_)
+					return forced_;
+				else
+					return value_;
+			}
+
+			set
+			{
+				value_ = value;
+			}
+		}
+
+		public float UnforcedValue
+		{
+			get { return value_; }
+		}
+
+		public void SetForced(float f)
+		{
+			isForced_ = true;
+			forced_ = f;
+		}
+
+		public void UnsetForced()
+		{
+			isForced_ = false;
+		}
+	}
+
+
 	class Mood
 	{
+		public const float NoOrgasm = 10000;
+
+		public const int NormalState = 1;
+		public const int OrgasmState = 2;
+		public const int PostOrgasmState = 3;
+
 		private readonly Person person_;
+		private int state_ = NormalState;
+		private float elapsed_ = 0;
+		private float timeSinceLastOrgasm_ = NoOrgasm;
 
-		private float excitement_ = 0;
-		private float forcedExcitement_ = -1;
-
-		private float tiredness_ = 0;
-		private float forcedTiredness_ = -1;
+		private ForceableValue excitement_ = new ForceableValue();
+		private ForceableValue tiredness_ = new ForceableValue();
 
 		public Mood(Person p)
 		{
 			person_ = p;
 		}
 
-		public float Excitement
+		public int State
+		{
+			get { return state_; }
+		}
+
+		public string StateString
 		{
 			get
 			{
-				if (forcedExcitement_ >= 0)
-					return forcedExcitement_;
-				else
-					return excitement_;
+				switch (state_)
+				{
+					case NormalState:
+						return "normal";
+
+					case OrgasmState:
+						return "orgasm";
+
+					case PostOrgasmState:
+						return "post orgasm";
+
+					default:
+						return $"?{state_}";
+				}
 			}
 		}
 
-		public void ForceExcitement(float s)
+		public float TimeSinceLastOrgasm
 		{
-			forcedExcitement_ = s;
+			get { return timeSinceLastOrgasm_; }
+		}
+
+		public float Excitement
+		{
+			get { return excitement_.Value; }
+		}
+
+		public ForceableValue ExcitementValue
+		{
+			get { return excitement_; }
 		}
 
 		public float Tiredness
 		{
-			get
-			{
-				if (forcedExcitement_ >= 0)
-					return forcedTiredness_;
-				else
-					return tiredness_;
-			}
+			get { return tiredness_.Value; }
 		}
 
-		public void ForceTiredness(float s)
+		public ForceableValue TirednessValue
 		{
-			forcedTiredness_ = s;
+			get { return tiredness_; }
+		}
+
+		public void ForceOrgasm()
+		{
+			DoOrgasm();
 		}
 
 		public void Update(float s)
 		{
-			excitement_ = person_.Excitement.Current;
+			elapsed_ += s;
 
-			person_.Breathing.Intensity = excitement_;
-			person_.Body.Sweat = excitement_;
-			person_.Body.Flush = excitement_;
-			person_.Expression.Set(Expressions.Pleasure, excitement_);
-			person_.Hair.Loose = excitement_;
+			excitement_.Value = person_.Excitement.Value;
+
+			person_.Breathing.Intensity = Excitement;
+			person_.Body.Sweat = Excitement;
+			person_.Body.Flush = Excitement;
+			person_.Expression.Set(Expressions.Pleasure, Excitement);
+			person_.Hair.Loose = Excitement;
+
+			if (excitement_.UnforcedValue >= 1)
+				DoOrgasm();
+
+			switch (state_)
+			{
+				case NormalState:
+				{
+					timeSinceLastOrgasm_ += s;
+					break;
+				}
+
+				case OrgasmState:
+				{
+					var ss = person_.Physiology.Sensitivity;
+
+					if (elapsed_ >= ss.OrgasmTime)
+					{
+						person_.Animator.StopType(Animation.OrgasmType);
+						SetState(PostOrgasmState);
+					}
+
+					break;
+				}
+
+				case PostOrgasmState:
+				{
+					var ss = person_.Physiology.Sensitivity;
+
+					tiredness_.Value += s;
+
+					if (elapsed_ > ss.PostOrgasmTime)
+					{
+						SetState(NormalState);
+						person_.Excitement.FlatValue = ss.ExcitementPostOrgasm;
+					}
+
+					break;
+				}
+			}
+		}
+
+		private void DoOrgasm()
+		{
+			var ss = person_.Physiology.Sensitivity;
+
+			person_.Log.Info("orgasm");
+			person_.Orgasmer.Orgasm();
+			person_.Animator.PlayType(Animation.OrgasmType);
+			person_.Excitement.FlatValue = 1;
+			SetState(OrgasmState);
+			timeSinceLastOrgasm_ = 0;
+		}
+
+		private void SetState(int s)
+		{
+			state_ = s;
+			elapsed_ = 0;
 		}
 	}
 

@@ -2,7 +2,6 @@
 
 namespace Cue
 {
-
 	class UnityTab : Tab
 	{
 		class UnityObject
@@ -37,6 +36,7 @@ namespace Cue
 		private List<UnityObject> items_ = new List<UnityObject>();
 
 		public UnityTab()
+			: base("Unity")
 		{
 			Layout = new VUI.BorderLayout();
 			Add(refresh_, VUI.BorderLayout.Top);
@@ -46,11 +46,6 @@ namespace Cue
 
 			refresh_.Clicked += Refresh;
 			objects_.ItemIndexActivated += OnActivated;
-		}
-
-		public override string Title
-		{
-			get { return "Unity"; }
 		}
 
 		public override void Update(float s)

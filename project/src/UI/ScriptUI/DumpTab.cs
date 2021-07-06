@@ -8,6 +8,7 @@ namespace Cue
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
 		public PersonDumpTab(Person person)
+			: base("dump")
 		{
 			person_ = person;
 
@@ -20,11 +21,6 @@ namespace Cue
 
 			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
-		}
-
-		public override string Title
-		{
-			get { return "Dump"; }
 		}
 
 		public override void Update(float s)
