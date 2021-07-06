@@ -97,6 +97,11 @@ namespace Cue.Sys.Vam
 
 		public float Loose
 		{
+			get
+			{
+				return loose_;
+			}
+
 			set
 			{
 				if (loose_ != value)
@@ -122,12 +127,12 @@ namespace Cue.Sys.Vam
 
 	abstract class VamBasicBody : IBody
 	{
-		public abstract float Sweat { set; }
+		public abstract float Sweat { get; set; }
+		public abstract float Flush { get; set; }
 
 		public abstract IBodyPart[] GetBodyParts();
 		public abstract Hand GetLeftHand();
 		public abstract Hand GetRightHand();
-		public abstract void LerpColor(Color c, float f);
 
 		public abstract int BodyPartForCollider(Collider c);
 	}
@@ -142,8 +147,12 @@ namespace Cue.Sys.Vam
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
 		private Dictionary<Collider, int> partMap_ = new Dictionary<Collider, int>();
+
+		private float sweat_ = 0;
 		private IEasing sweatEasing_ = new CubicInEasing();
-		private IEasing skinEasing_ = new CubicInEasing();
+
+		private float flush_ = 0;
+		private IEasing flushEasing_ = new CubicInEasing();
 
 		public VamBody(VamAtom a)
 		{
@@ -368,25 +377,46 @@ namespace Cue.Sys.Vam
 
 		public override float Sweat
 		{
+			get
+			{
+				return sweat_;
+			}
+
 			set
 			{
+				sweat_ = value;
+
 				var p = gloss_.Parameter;
 				if (p != null)
 				{
 					float def = p.defaultVal;
-					float range = (p.max - def) * 0.8f;  // max is too much
+					float range = (p.max - def) * 0.7f;  // max is too much
 
-					p.val = def + sweatEasing_.Magnitude(value) * range;
+					p.val = def + sweatEasing_.Magnitude(sweat_) * range;
 				}
 			}
 		}
 
-		public override void LerpColor(Color target, float f)
+		public override float Flush
+		{
+			get
+			{
+				return flush_;
+			}
+
+			set
+			{
+				flush_ = value;
+				LerpColor(Color.Red, flush_ * 0.35f);
+			}
+		}
+
+		private void LerpColor(Color target, float f)
 		{
 			var p = color_.Parameter;
 			if (p != null)
 			{
-				var c = Color.Lerp(initialColor_, target, skinEasing_.Magnitude(f));
+				var c = Color.Lerp(initialColor_, target, flushEasing_.Magnitude(f));
 				p.val = U.ToHSV(c);
 			}
 		}

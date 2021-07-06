@@ -84,10 +84,7 @@
 			excitement_.Value = person_.Excitement.Value;
 
 			person_.Breathing.Intensity = Excitement;
-			person_.Body.Sweat = Excitement;
-			person_.Body.Flush = Excitement;
 			person_.Expression.Set(Expressions.Pleasure, Excitement);
-			person_.Hair.Loose = Excitement;
 
 			if (excitement_.UnforcedValue >= 1)
 				DoOrgasm();

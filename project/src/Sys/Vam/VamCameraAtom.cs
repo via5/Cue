@@ -84,6 +84,13 @@ namespace Cue.Sys.Vam
 
 		public override float Sweat
 		{
+			get { return 0; }
+			set { }
+		}
+
+		public override float Flush
+		{
+			get { return 0; }
 			set { }
 		}
 
@@ -100,10 +107,6 @@ namespace Cue.Sys.Vam
 		public override Hand GetRightHand()
 		{
 			return new Hand();
-		}
-
-		public override void LerpColor(Color c, float f)
-		{
 		}
 
 		public override int BodyPartForCollider(Collider c)

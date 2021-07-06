@@ -56,9 +56,14 @@ namespace Cue
 			get { return sensitivity_; }
 		}
 
+		public float MaxSweat
+		{
+			get { return 1; }
+		}
+
 		public float MaxFlush
 		{
-			get { return 0.065f; }
+			get { return 1; }
 		}
 
 		public float VoicePitch

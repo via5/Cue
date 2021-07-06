@@ -323,28 +323,14 @@ namespace Cue
 	class Hair
 	{
 		private Person person_;
-		private DampedFloat loose_;
 
 		public Hair(Person p)
 		{
 			person_ = p;
-			loose_ = new DampedFloat(x => person_.Atom.Hair.Loose = x);
-		}
-
-		public float Loose
-		{
-			get { return loose_.Target; }
-			set { loose_.Target = value; }
-		}
-
-		public DampedFloat DampedLoose
-		{
-			get { return loose_; }
 		}
 
 		public void Update(float s)
 		{
-			loose_.Update(s);
 		}
 	}
 
@@ -564,16 +550,12 @@ namespace Cue
 		private Person person_;
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
-		private DampedFloat sweat_, flush_;
+		private DampedFloat temperature_;
 
 		public Body(Person p)
 		{
 			person_ = p;
-
-			sweat_ = new DampedFloat(x => person_.Atom.Body.Sweat = x);
-			flush_ = new DampedFloat(x =>
-				person_.Atom.Body.LerpColor(
-					Color.Red, x * person_.Physiology.MaxFlush));
+			temperature_ = new DampedFloat(OnTemperatureChanged);
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
@@ -750,26 +732,14 @@ namespace Cue
 			return false;
 		}
 
-		public float Sweat
+		public float Temperature
 		{
-			get { return sweat_.Target; }
-			set { sweat_.Target = value; }
+			get { return temperature_.Target; }
 		}
 
-		public DampedFloat DampedSweat
+		public DampedFloat DampedTemperature
 		{
-			get { return sweat_; }
-		}
-
-		public float Flush
-		{
-			get { return flush_.Target; }
-			set { flush_.Target = value; }
-		}
-
-		public DampedFloat DampedFlush
-		{
-			get { return flush_; }
+			get { return temperature_; }
 		}
 
 		public BodyPart Get(int type)
@@ -842,11 +812,15 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (person_.Atom.Teleporting)
-				return;
+			temperature_.Target = person_.Mood.Excitement;
+			temperature_.Update(s);
+		}
 
-			sweat_.Update(s);
-			flush_.Update(s);
+		private void OnTemperatureChanged(float f)
+		{
+			person_.Atom.Body.Sweat = f * person_.Physiology.MaxSweat;
+			person_.Atom.Body.Flush = f * person_.Physiology.MaxFlush;
+			person_.Atom.Hair.Loose = f;
 		}
 	}
 }

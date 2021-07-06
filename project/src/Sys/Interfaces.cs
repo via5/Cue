@@ -199,7 +199,7 @@ namespace Cue.Sys
 
 	interface IHair
 	{
-		float Loose { set; }
+		float Loose { get; set; }
 	}
 
 	interface IMorph
@@ -221,8 +221,8 @@ namespace Cue.Sys
 		IBodyPart[] GetBodyParts();
 		Hand GetLeftHand();
 		Hand GetRightHand();
-		float Sweat { set; }
-		void LerpColor(Color c, float f);
+		float Sweat { get; set; }
+		float Flush { get; set; }
 	}
 
 	interface IAtom

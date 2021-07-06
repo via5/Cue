@@ -45,6 +45,8 @@ namespace Cue
 	class PersonBodyStateTab : Tab
 	{
 		private readonly Person person_;
+
+		private VUI.Label temperature_ = new VUI.Label();
 		private VUI.Label sweat_ = new VUI.Label();
 		private VUI.Label flush_ = new VUI.Label();
 		private VUI.Label hairLoose_ = new VUI.Label();
@@ -59,6 +61,9 @@ namespace Cue
 			gl.HorizontalStretch = new List<bool>() { false, true };
 
 			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Temperature"));
+			p.Add(temperature_);
 
 			p.Add(new VUI.Label("Sweat"));
 			p.Add(sweat_);
@@ -75,9 +80,10 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			sweat_.Text = $"{person_.Body.DampedSweat}";
-			flush_.Text = $"{person_.Body.DampedFlush}";
-			hairLoose_.Text = $"{person_.Hair.DampedLoose}";
+			temperature_.Text = $"{person_.Body.DampedTemperature}";
+			sweat_.Text = $"{person_.Atom.Body.Sweat}";
+			flush_.Text = $"{person_.Atom.Body.Flush}";
+			hairLoose_.Text = $"{person_.Atom.Hair.Loose}";
 		}
 	}
 
