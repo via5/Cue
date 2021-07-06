@@ -52,15 +52,18 @@ namespace Cue.Proc
 
 			try
 			{
-				if (!o.HasKey("sync"))
-					throw new LoadFailed("no sync");
+				ISync sync = null;
+				if (o.HasKey("sync"))
+					sync = BasicSync.Create(o["sync"].AsObject);
+				else
+					sync = new ParentTargetSync();
 
 				var g = new ConcurrentTargetGroup(
 					name,
 					Duration.FromJSON(o, "delay"),
 					Duration.FromJSON(o, "maxDuration"),
 					o["loop"].AsBool,
-					BasicSync.Create(o["sync"].AsObject));
+					sync);
 
 				foreach (JSONClass n in o["targets"].AsArray)
 					g.AddTarget(ProcAnimation.CreateTarget(n["type"], n));
@@ -217,12 +220,15 @@ namespace Cue.Proc
 
 			try
 			{
-				if (!o.HasKey("sync"))
-					throw new LoadFailed("no sync");
+				ISync sync = null;
+				if (o.HasKey("sync"))
+					sync = BasicSync.Create(o["sync"].AsObject);
+				else
+					sync = new ParentTargetSync();
 
 				var g = new SequentialTargetGroup(
 					name, Duration.FromJSON(o, "delay"),
-					BasicSync.Create(o["sync"].AsObject));
+					sync);
 
 				foreach (JSONClass n in o["targets"].AsArray)
 					g.AddTarget(ProcAnimation.CreateTarget(n["type"], n));

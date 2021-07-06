@@ -60,20 +60,23 @@ namespace Cue.Proc
 				if (bodyPart == BodyParts.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
-				if (!o.HasKey("sync"))
-					throw new LoadFailed("no sync");
+				ISync sync = null;
+				if (o.HasKey("sync"))
+					sync = BasicSync.Create(o["sync"].AsObject);
+				else
+					sync = new ParentTargetSync();
 
 				return new Force(
 					type, bodyPart, o["rigidbody"],
 					SlidingMovement.FromJSON(o, "movement", true),
 					EasingFromJson(o, "excitement"),
-					BasicSync.Create(o["sync"].AsObject),
+					sync,
 					EasingFromJson(o, "fwdDelayExcitement"),
 					EasingFromJson(o, "bwdDelayExcitement"));
 			}
 			catch (LoadFailed e)
 			{
-				throw new LoadFailed($"force type {type}/{e.Message}");
+				throw new LoadFailed($"{TypeToString(type)}/{e.Message}");
 			}
 		}
 
