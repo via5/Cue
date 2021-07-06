@@ -10,6 +10,7 @@ namespace Cue
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label event_ = new VUI.Label();
 		private VUI.Label personality_ = new VUI.Label();
+		private VUI.CheckBox close_ = new VUI.CheckBox();
 
 		public PersonAITab(Person p)
 		{
@@ -30,9 +31,14 @@ namespace Cue
 			state.Add(new VUI.Label("Personality"));
 			state.Add(personality_);
 
+			state.Add(new VUI.Label("Force close"));
+			state.Add(close_);
+
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
+
+			close_.Changed += OnClose;
 		}
 
 		public override string Title
@@ -70,6 +76,12 @@ namespace Cue
 				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
 
 			personality_.Text = person_.Personality.ToString();
+		}
+
+		private void OnClose(bool b)
+		{
+			var sp = person_.Personality as BasicPersonality;
+			sp.ForceSetClose(b, b);
 		}
 	}
 }

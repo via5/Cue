@@ -51,6 +51,9 @@
 		private bool wasClose_ = false;
 		private bool inited_ = false;
 
+		private bool forcedClose_ = false;
+		private bool isCloseForced_ = false;
+
 		private SlidingDuration gazeRandomInterval_ = new SlidingDuration(
 			10, 1, 0, 0, 5, new CubicInEasing());
 
@@ -158,7 +161,7 @@
 			if (close != wasClose_)
 			{
 				person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
-				SetClose(close);
+				DoSetClose(close);
 				wasClose_ = close;
 			}
 
@@ -176,6 +179,21 @@
 
 		protected abstract void Init();
 		protected abstract void SetClose(bool b);
+
+		public void ForceSetClose(bool enabled, bool close)
+		{
+			isCloseForced_ = enabled;
+			forcedClose_ = close;
+			DoSetClose(close);
+		}
+
+		private void DoSetClose(bool b)
+		{
+			if (isCloseForced_)
+				SetClose(forcedClose_);
+			else
+				SetClose(b);
+		}
 	}
 
 
@@ -221,7 +239,7 @@
 		{
 			person_.Expression.Set(new ExpressionIntensity[]
 			{
-				new ExpressionIntensity(Expressions.Happy, 0.5f),
+				new ExpressionIntensity(Expressions.Happy, 0.7f),
 				new ExpressionIntensity(Expressions.Mischievous, 0.0f)
 			});
 		}
@@ -230,8 +248,8 @@
 		{
 			person_.Expression.Set(new ExpressionIntensity[]
 			{
-				new ExpressionIntensity(Expressions.Happy, 0.5f),
-				new ExpressionIntensity(Expressions.Mischievous, 0.0f)
+				new ExpressionIntensity(Expressions.Happy, 1.0f),
+				new ExpressionIntensity(Expressions.Mischievous, 0.2f)
 			});
 		}
 	}
@@ -249,7 +267,7 @@
 			person_.Expression.Set(new ExpressionIntensity[]
 			{
 					new ExpressionIntensity(Expressions.Happy, 0.2f),
-					new ExpressionIntensity(Expressions.Mischievous, 0.6f)
+					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
 			});
 		}
 
@@ -257,7 +275,7 @@
 		{
 			person_.Expression.Set(new ExpressionIntensity[]
 			{
-					new ExpressionIntensity(Expressions.Happy, 0.4f),
+					new ExpressionIntensity(Expressions.Happy, 0.5f),
 					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
 			});
 		}
@@ -316,7 +334,7 @@
 			{
 				new ExpressionIntensity(Expressions.Happy, 0.0f),
 				new ExpressionIntensity(Expressions.Mischievous, 0.2f),
-				new ExpressionIntensity(Expressions.Angry, 0.3f)
+				new ExpressionIntensity(Expressions.Angry, 0.6f)
 			});
 		}
 

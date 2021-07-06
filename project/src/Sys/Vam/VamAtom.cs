@@ -48,6 +48,8 @@ namespace Cue.Sys.Vam
 			SetStrongerDamping("headControl");
 			SetStrongerDamping("lFootControl");
 			SetStrongerDamping("rFootControl");
+			SetStrongerDamping("lKneeControl");
+			SetStrongerDamping("rKneeControl");
 		}
 
 		private void DisableFreezeWhenGrabbed()

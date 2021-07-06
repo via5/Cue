@@ -92,9 +92,9 @@ namespace Cue.Sys.Vam
 				log_.Info("creating left collider");
 
 				ci_.colliderTypeLeft = DAZClothingItem.ColliderType.Shoe;
-				ci_.colliderLeftRotation = new UnityEngine.Vector3(-45, 0, 0);
-				ci_.colliderDimensions = new UnityEngine.Vector3(0.035f, 0.013f, 0.20f);
-				ci_.colliderLeftCenter = new UnityEngine.Vector3(0, -0.137f, 0.035f);
+				ci_.colliderLeftRotation = U.ToUnity(c.rotation);
+				ci_.colliderDimensions = U.ToUnity(c.size);
+				ci_.colliderLeftCenter = U.ToUnity(c.center);
 
 				var go = new GameObject();
 
@@ -112,9 +112,9 @@ namespace Cue.Sys.Vam
 				log_.Info("creating right collider");
 
 				ci_.colliderTypeRight = DAZClothingItem.ColliderType.Shoe;
-				ci_.colliderRightRotation = new UnityEngine.Vector3(-45, 0, 0);
-				ci_.colliderDimensions = new UnityEngine.Vector3(0.035f, 0.013f, 0.20f);
-				ci_.colliderRightCenter = new UnityEngine.Vector3(0, -0.137f, 0.035f);
+				ci_.colliderRightRotation = U.ToUnity(c.rotation);
+				ci_.colliderDimensions = U.ToUnity(c.size);
+				ci_.colliderRightCenter = U.ToUnity(c.center);
 
 				var go = new GameObject();
 				ci_.colliderRight = go.AddComponent<UnityEngine.BoxCollider>();

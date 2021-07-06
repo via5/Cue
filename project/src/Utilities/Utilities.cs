@@ -617,7 +617,7 @@ namespace Cue
 
 		private Action<float> set_;
 
-		public DampedFloat(Action<float> set, float upFactor = 0.05f, float downFactor = 0.025f)
+		public DampedFloat(Action<float> set, float upFactor = 0.025f, float downFactor = 0.08f)
 		{
 			current_ = 0;
 			target_ = 0;

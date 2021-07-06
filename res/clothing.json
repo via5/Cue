@@ -37,6 +37,22 @@
 				"rightSize": [0.035, 0.013, 0.20],
 				"rightCenter": [0, -0.137, 0.035],
 			}
+		},
+
+		{
+			"id": "YameteOuji:Shoes_MidHeelA",
+			"colliders":
+			{
+				"left": true,
+				"leftRotation": [-32, 0, 0],
+				"leftSize": [0.035, 0.020, 0.04],
+				"leftCenter": [0, -0.0811, -0.0285],
+
+				"right": true,
+				"rightRotation": [-32, 0, 0],
+				"rightSize": [0.035, 0.020, 0.04],
+				"rightCenter": [0, -0.0811, -0.0285],
+			}
 		}
 	]
 }

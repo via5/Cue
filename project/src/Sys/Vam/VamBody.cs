@@ -10,19 +10,28 @@ namespace Cue.Sys.Vam
 		{
 			private HairSimControl c_;
 			private JSONStorableFloat styleCling_;
+			private JSONStorableFloat rigidityRolloff_;
 
 			public HairItem(HairSimControl c)
 			{
 				c_ = c;
+
 				styleCling_ = c_.GetFloatJSONParam("cling");
 				if (styleCling_ == null)
 					Cue.LogInfo("cling not found");
+
+				rigidityRolloff_ = c_.GetFloatJSONParam("rigidityRolloffPower");
+				if (rigidityRolloff_ == null)
+					Cue.LogInfo("rigidityRolloffPower not found");
 			}
 
 			public void Reset()
 			{
 				if (styleCling_ != null)
 					styleCling_.val = styleCling_.defaultVal;
+
+				if (rigidityRolloff_ != null)
+					rigidityRolloff_.val = rigidityRolloff_.defaultVal;
 			}
 
 			public void SetLoose(float f)
@@ -36,6 +45,18 @@ namespace Cue.Sys.Vam
 					{
 						float range = max - min;
 						styleCling_.val = max - (range * f);
+					}
+				}
+
+				if (rigidityRolloff_ != null)
+				{
+					float min = rigidityRolloff_.defaultVal;
+					float max = rigidityRolloff_.max;
+
+					if (min < max)
+					{
+						float range = max - min;
+						rigidityRolloff_.val = min + (range * f);
 					}
 				}
 			}
@@ -121,6 +142,8 @@ namespace Cue.Sys.Vam
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
 		private Dictionary<Collider, int> partMap_ = new Dictionary<Collider, int>();
+		private IEasing sweatEasing_ = new CubicInEasing();
+		private IEasing skinEasing_ = new CubicInEasing();
 
 		public VamBody(VamAtom a)
 		{
@@ -353,7 +376,7 @@ namespace Cue.Sys.Vam
 					float def = p.defaultVal;
 					float range = (p.max - def) * 0.8f;  // max is too much
 
-					p.val = def + value * range;
+					p.val = def + sweatEasing_.Magnitude(value) * range;
 				}
 			}
 		}
@@ -363,7 +386,7 @@ namespace Cue.Sys.Vam
 			var p = color_.Parameter;
 			if (p != null)
 			{
-				var c = Color.Lerp(initialColor_, target, f);
+				var c = Color.Lerp(initialColor_, target, skinEasing_.Magnitude(f));
 				p.val = U.ToHSV(c);
 			}
 		}
