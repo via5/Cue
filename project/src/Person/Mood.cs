@@ -13,8 +13,8 @@
 		private float elapsed_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 
-		private ForceableValue excitement_ = new ForceableValue();
-		private ForceableValue tiredness_ = new ForceableValue();
+		private ForceableFloat excitement_ = new ForceableFloat();
+		private DampedFloat tiredness_ = new DampedFloat();
 
 		public Mood(Person p)
 		{
@@ -57,7 +57,7 @@
 			get { return excitement_.Value; }
 		}
 
-		public ForceableValue ExcitementValue
+		public ForceableFloat ExcitementValue
 		{
 			get { return excitement_; }
 		}
@@ -67,7 +67,7 @@
 			get { return tiredness_.Value; }
 		}
 
-		public ForceableValue TirednessValue
+		public DampedFloat DampedTiredness
 		{
 			get { return tiredness_; }
 		}
@@ -94,6 +94,7 @@
 				case NormalState:
 				{
 					timeSinceLastOrgasm_ += s;
+
 					break;
 				}
 
@@ -112,9 +113,9 @@
 
 				case PostOrgasmState:
 				{
-					var ss = person_.Physiology.Sensitivity;
+					var pp = person_.Physiology;
+					var ss = pp.Sensitivity;
 
-					tiredness_.Value += s;
 
 					if (elapsed_ > ss.PostOrgasmTime)
 					{
@@ -125,6 +126,32 @@
 					break;
 				}
 			}
+
+			UpdateTiredness(s);
+		}
+
+		private void UpdateTiredness(float s)
+		{
+			var pp = person_.Physiology;
+			float rate = 0;
+
+			if (state_ == PostOrgasmState)
+			{
+				rate = pp.TirednessRateDuringPostOrgasm;
+			}
+			else
+			{
+				if (timeSinceLastOrgasm_ < pp.DelayAfterOrgasmUntilTirednessDecay)
+				{
+					// no change
+				}
+				else
+				{
+
+				}
+			}
+
+			tiredness_.Target += s * rate;
 		}
 
 		private void DoOrgasm()

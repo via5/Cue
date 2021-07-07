@@ -4,17 +4,17 @@ namespace Cue
 {
 	class PersonExcitementTab : Tab
 	{
-		class ForceableValueWidgets
+		class ForceableFloatWidgets
 		{
-			private readonly ForceableValue fv_;
+			private readonly ForceableFloat f_;
 			private readonly VUI.Label caption_;
 			private readonly VUI.Label value_;
 			private readonly VUI.CheckBox isForced_;
 			private readonly VUI.FloatTextSlider forced_;
 
-			public ForceableValueWidgets(ForceableValue fv, string caption)
+			public ForceableFloatWidgets(ForceableFloat f, string caption)
 			{
-				fv_ = fv;
+				f_ = f;
 				caption_ = new VUI.Label(caption);
 				value_ = new VUI.Label();
 				isForced_ = new VUI.CheckBox("Force");
@@ -31,21 +31,21 @@ namespace Cue
 
 			public void Update(float s)
 			{
-				value_.Text = $"{fv_.Value}";
+				value_.Text = $"{f_}";
 			}
 
 			private void OnForceChecked(bool b)
 			{
 				if (b)
-					fv_.SetForced(forced_.Value);
+					f_.SetForced(forced_.Value);
 				else
-					fv_.UnsetForced();
+					f_.UnsetForced();
 			}
 
 			private void OnForceChanged(float f)
 			{
 				if (isForced_.Checked)
-					fv_.SetForced(forced_.Value);
+					f_.SetForced(forced_.Value);
 			}
 		}
 
@@ -66,8 +66,8 @@ namespace Cue
 		private VUI.Label emotional_ = new VUI.Label();
 		private VUI.Label total_ = new VUI.Label();
 
-		private List<ForceableValueWidgets> forceables_ =
-			new List<ForceableValueWidgets>();
+		private List<ForceableFloatWidgets> forceables_ =
+			new List<ForceableFloatWidgets>();
 
 
 		public PersonExcitementTab(Person person)
@@ -89,7 +89,7 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 
 			AddForceable(p, person_.Mood.ExcitementValue, "Excitement");
-			AddForceable(p, person_.Mood.TirednessValue, "Tiredness");
+			AddForceable(p, person_.Mood.DampedTiredness, "Tiredness");
 
 			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
 			p.Add(new VUI.Spacer(0));
@@ -181,7 +181,7 @@ namespace Cue
 			for (int i = 0; i < forceables_.Count; ++i)
 				forceables_[i].Update(s);
 
-			temperature_.Text = $"{person_.Body.TemperatureString}";
+			temperature_.Text = $"{person_.Body.DampedTemperature}";
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
@@ -202,9 +202,9 @@ namespace Cue
 			state_.Text = person_.Mood.StateString;
 		}
 
-		private void AddForceable(VUI.Panel p, ForceableValue v, string caption)
+		private void AddForceable(VUI.Panel p, ForceableFloat v, string caption)
 		{
-			var w = new ForceableValueWidgets(v, caption);
+			var w = new ForceableFloatWidgets(v, caption);
 
 			p.Add(w.Caption);
 			p.Add(w.Value);

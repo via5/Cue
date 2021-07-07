@@ -76,9 +76,26 @@ namespace Cue
 			get { return 0.005f; }
 		}
 
+		// excitement at which temperature is at max
+		//
 		public float TemperatureExcitementMax
 		{
 			get { return 0.8f; }
+		}
+
+		public float TirednessRateDuringPostOrgasm
+		{
+			get { return 0.01f; }
+		}
+
+		public float TirednessExcitementRate
+		{
+			get { return 0.01f; }
+		}
+
+		public float DelayAfterOrgasmUntilTirednessDecay
+		{
+			get { return 10; }
 		}
 
 		public float VoicePitch

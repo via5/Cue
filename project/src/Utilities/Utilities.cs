@@ -606,76 +606,13 @@ namespace Cue
 	}
 
 
-	// [0, 1], starts at 0
-	//
-	struct DampedFloat
-	{
-		private float current_;
-		private float target_;
-		private float up_;
-		private float down_;
-
-		private Action<float> set_;
-
-		public DampedFloat(Action<float> set, float upFactor = 0.1f, float downFactor = 0.1f)
-		{
-			current_ = 0;
-			target_ = 0;
-			set_ = set;
-			up_ = upFactor;
-			down_ = downFactor;
-		}
-
-		public float Target
-		{
-			get { return target_; }
-			set { target_ = value; }
-		}
-
-		public float Current
-		{
-			get { return current_; }
-		}
-
-		public float UpRate
-		{
-			get { return up_; }
-			set { up_ = value; }
-		}
-
-		public float DownRate
-		{
-			get { return down_; }
-			set { down_ = value; }
-		}
-
-		public void Update(float s)
-		{
-			if (target_ > current_)
-				current_ = U.Clamp(current_ + s * up_, 0, target_);
-			else
-				current_ = U.Clamp(current_ - s * down_, target_, 1);
-
-			set_(current_);
-		}
-
-		public override string ToString()
-		{
-			if (Math.Abs(target_ - current_) > 0.001f)
-				return $"{current_:0.000000}=>{target_:0.000000}";
-			else
-				return $"{current_:0.000000}";
-		}
-	}
-
-
-	class ForceableValue
+	class ForceableFloat
 	{
 		private float value_;
 		private float forced_;
 		private bool isForced_;
 
-		public ForceableValue()
+		public ForceableFloat()
 		{
 			value_ = 0;
 			forced_ = 0;
@@ -698,6 +635,11 @@ namespace Cue
 			}
 		}
 
+		public bool IsForced
+		{
+			get { return isForced_; }
+		}
+
 		public float UnforcedValue
 		{
 			get { return value_; }
@@ -712,6 +654,88 @@ namespace Cue
 		public void UnsetForced()
 		{
 			isForced_ = false;
+		}
+
+		public override string ToString()
+		{
+			if (isForced_)
+				return $"{forced_:0.000} (forced)";
+			else
+				return $"{value_:0.000}";
+		}
+	}
+
+
+	// [0, 1], starts at 0
+	//
+	class DampedFloat : ForceableFloat
+	{
+		private float target_;
+		private float up_;
+		private float down_;
+
+		private Action<float> set_;
+
+		public DampedFloat(Action<float> set=null, float upFactor = 0.1f, float downFactor = 0.1f)
+		{
+			target_ = 0;
+			set_ = set;
+			up_ = upFactor;
+			down_ = downFactor;
+		}
+
+		public float Target
+		{
+			get { return target_; }
+			set { target_ = value; }
+		}
+
+		public new float Value
+		{
+			get { return base.Value; }
+		}
+
+		public float UpRate
+		{
+			get { return up_; }
+			set { up_ = value; }
+		}
+
+		public float DownRate
+		{
+			get { return down_; }
+			set { down_ = value; }
+		}
+
+		public float CurrentRate
+		{
+			get
+			{
+				if (target_ > Value)
+					return up_;
+				else
+					return -down_;
+			}
+		}
+
+		public void Update(float s)
+		{
+			if (target_ > Value)
+				base.Value = U.Clamp(Value + s * up_, 0, target_);
+			else
+				base.Value = U.Clamp(Value - s * down_, target_, 1);
+
+			set_?.Invoke(Value);
+		}
+
+		public override string ToString()
+		{
+			if (IsForced)
+				return base.ToString();
+			else if (Math.Abs(target_ - Value) > 0.001f)
+				return $"{Value:0.000}=>{target_:0.000}@{CurrentRate:0.000}";
+			else
+				return $"{Value:0.000}";
 		}
 	}
 
