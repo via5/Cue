@@ -15,6 +15,7 @@
 
 		private ForceableFloat excitement_ = new ForceableFloat();
 		private DampedFloat tiredness_ = new DampedFloat();
+		private float baseTiredness_ = 0;
 
 		public Mood(Person p)
 		{
@@ -72,6 +73,11 @@
 			get { return tiredness_; }
 		}
 
+		public float BaseTiredness
+		{
+			get { return baseTiredness_; }
+		}
+
 		public void ForceOrgasm()
 		{
 			DoOrgasm();
@@ -86,25 +92,29 @@
 			person_.Breathing.Intensity = Excitement;
 			person_.Expression.Set(Expressions.Pleasure, Excitement);
 
-			if (excitement_.UnforcedValue >= 1)
-				DoOrgasm();
-
 			switch (state_)
 			{
 				case NormalState:
 				{
 					timeSinceLastOrgasm_ += s;
 
+					if (excitement_.UnforcedValue >= 1)
+						DoOrgasm();
+
 					break;
 				}
 
 				case OrgasmState:
 				{
-					var ss = person_.Physiology.Sensitivity;
+					var pp = person_.Physiology;
+					var ss = pp.Sensitivity;
 
 					if (elapsed_ >= ss.OrgasmTime)
 					{
 						person_.Animator.StopType(Animation.OrgasmType);
+						tiredness_.UpRate = pp.TirednessRateDuringPostOrgasm;
+						tiredness_.Target = 1;
+						baseTiredness_ += pp.OrgasmBaseTirednessIncrease;
 						SetState(PostOrgasmState);
 					}
 
@@ -115,7 +125,6 @@
 				{
 					var pp = person_.Physiology;
 					var ss = pp.Sensitivity;
-
 
 					if (elapsed_ > ss.PostOrgasmTime)
 					{
@@ -134,24 +143,24 @@
 		{
 			var pp = person_.Physiology;
 
-			tiredness_.DownRate = pp.TirednessDecayRate;
+			if (state_ == NormalState)
+			{
+				if (timeSinceLastOrgasm_ > pp.DelayAfterOrgasmUntilTirednessDecay)
+				{
+					if (Excitement < pp.TirednessMaxExcitementForBaseDecay)
+					{
+						baseTiredness_ = U.Clamp(
+							baseTiredness_ - s * pp.TirednessBaseDecayRate,
+							0, 1);
+					}
+				}
 
-			if (state_ == PostOrgasmState)
-			{
-				tiredness_.UpRate = pp.TirednessRateDuringPostOrgasm;
-				tiredness_.Target = 1;
+				tiredness_.DownRate = pp.TirednessBackToBaseRate;
+				tiredness_.Target = baseTiredness_;
 			}
-			else
+			else if (state_ == OrgasmState)
 			{
-				if (Excitement >= pp.TirednessMaxExcitementDecay)
-				{
-					tiredness_.UpRate = Excitement * pp.TirednessExcitementRate;
-					tiredness_.Target = 1;
-				}
-				else if (timeSinceLastOrgasm_ >= pp.DelayAfterOrgasmUntilTirednessDecay)
-				{
-					tiredness_.Target = 0;
-				}
+				tiredness_.DownRate = 0;
 			}
 
 			tiredness_.Update(s);
