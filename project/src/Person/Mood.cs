@@ -67,7 +67,7 @@
 			get { return tiredness_.Value; }
 		}
 
-		public DampedFloat DampedTiredness
+		public DampedFloat TirednessValue
 		{
 			get { return tiredness_; }
 		}
@@ -133,25 +133,28 @@
 		private void UpdateTiredness(float s)
 		{
 			var pp = person_.Physiology;
-			float rate = 0;
+
+			tiredness_.DownRate = pp.TirednessDecayRate;
 
 			if (state_ == PostOrgasmState)
 			{
-				rate = pp.TirednessRateDuringPostOrgasm;
+				tiredness_.UpRate = pp.TirednessRateDuringPostOrgasm;
+				tiredness_.Target = 1;
 			}
 			else
 			{
-				if (timeSinceLastOrgasm_ < pp.DelayAfterOrgasmUntilTirednessDecay)
+				if (Excitement >= pp.TirednessMaxExcitementDecay)
 				{
-					// no change
+					tiredness_.UpRate = Excitement * pp.TirednessExcitementRate;
+					tiredness_.Target = 1;
 				}
-				else
+				else if (timeSinceLastOrgasm_ >= pp.DelayAfterOrgasmUntilTirednessDecay)
 				{
-
+					tiredness_.Target = 0;
 				}
 			}
 
-			tiredness_.Target += s * rate;
+			tiredness_.Update(s);
 		}
 
 		private void DoOrgasm()

@@ -88,7 +88,17 @@ namespace Cue
 			get { return 0.01f; }
 		}
 
+		public float TirednessMaxExcitementDecay
+		{
+			get { return 0.2f; }
+		}
+
 		public float TirednessExcitementRate
+		{
+			get { return 0.001f; }
+		}
+
+		public float TirednessDecayRate
 		{
 			get { return 0.01f; }
 		}

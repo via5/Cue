@@ -732,8 +732,8 @@ namespace Cue
 		{
 			if (IsForced)
 				return base.ToString();
-			else if (Math.Abs(target_ - Value) > 0.001f)
-				return $"{Value:0.000}=>{target_:0.000}@{CurrentRate:0.000}";
+			else if (Math.Abs(target_ - Value) > 0.0001f)
+				return $"{Value:0.000}=>{target_:0.000}@{CurrentRate:0.00000}";
 			else
 				return $"{Value:0.000}";
 		}

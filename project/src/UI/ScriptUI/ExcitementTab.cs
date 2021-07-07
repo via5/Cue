@@ -89,7 +89,7 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 
 			AddForceable(p, person_.Mood.ExcitementValue, "Excitement");
-			AddForceable(p, person_.Mood.DampedTiredness, "Tiredness");
+			AddForceable(p, person_.Mood.TirednessValue, "Tiredness");
 
 			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
 			p.Add(new VUI.Spacer(0));
