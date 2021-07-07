@@ -66,6 +66,21 @@ namespace Cue
 			get { return 1; }
 		}
 
+		public float TemperatureExcitementRate
+		{
+			get { return 0.01f; }
+		}
+
+		public float TemperatureDecayRate
+		{
+			get { return 0.005f; }
+		}
+
+		public float TemperatureExcitementMax
+		{
+			get { return 0.8f; }
+		}
+
 		public float VoicePitch
 		{
 			get { return pitch_; }

@@ -551,6 +551,8 @@ namespace Cue
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
+		private float temperatureRate_ = 0;
+		private float temperatureMax_ = 0;
 
 		public Body(Person p)
 		{
@@ -742,6 +744,16 @@ namespace Cue
 			get { return temperature_; }
 		}
 
+		public string TemperatureString
+		{
+			get
+			{
+				return
+					$"{temperature_} " +
+					$"(rate={temperatureRate_:0.000000}, max={temperatureMax_})";
+			}
+		}
+
 		public BodyPart Get(int type)
 		{
 			if (type < 0 || type >= all_.Length)
@@ -812,7 +824,20 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			temperature_.Target = person_.Mood.Excitement;
+			var pp = person_.Physiology;
+
+			temperatureMax_ = U.Clamp(
+				person_.Mood.Excitement / pp.TemperatureExcitementMax,
+				0, 1);
+
+			temperatureRate_ =
+				person_.Mood.Excitement * pp.TemperatureExcitementRate;
+
+			temperature_.UpRate = temperatureRate_;
+			temperature_.DownRate = pp.TemperatureDecayRate;
+
+			temperature_.Target = temperatureMax_;
+
 			temperature_.Update(s);
 		}
 

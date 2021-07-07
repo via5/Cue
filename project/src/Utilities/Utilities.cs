@@ -637,6 +637,18 @@ namespace Cue
 			get { return current_; }
 		}
 
+		public float UpRate
+		{
+			get { return up_; }
+			set { up_ = value; }
+		}
+
+		public float DownRate
+		{
+			get { return down_; }
+			set { down_ = value; }
+		}
+
 		public void Update(float s)
 		{
 			if (target_ > current_)
@@ -649,7 +661,10 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{target_} ({current_})";
+			if (Math.Abs(target_ - current_) > 0.001f)
+				return $"{current_:0.000000}=>{target_:0.000000}";
+			else
+				return $"{current_:0.000000}";
 		}
 	}
 

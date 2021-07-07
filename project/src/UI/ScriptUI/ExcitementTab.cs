@@ -181,16 +181,16 @@ namespace Cue
 			for (int i = 0; i < forceables_.Count; ++i)
 				forceables_[i].Update(s);
 
-			temperature_.Text = $"{person_.Body.DampedTemperature}";
-			sweat_.Text = $"{person_.Atom.Body.Sweat}";
-			flush_.Text = $"{person_.Atom.Body.Flush}";
-			hairLoose_.Text = $"{person_.Atom.Hair.Loose}";
+			temperature_.Text = $"{person_.Body.TemperatureString}";
+			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
+			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
+			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
 
 			var e = person_.Excitement;
 
-			exValue_.Text = $"{e.Value}";
-			exFlat_.Text = $"{e.FlatValue}";
-			exMax_.Text = $"{e.Max}";
+			exValue_.Text = $"{e.Value:0.000000}";
+			exFlat_.Text = $"{e.FlatValue:0.000000}";
+			exMax_.Text = $"{e.Max:0.000000}";
 
 			for (int i = 0; i < reasons_.Length; ++i)
 				reasons_[i].Text = e.GetReason(i).ToString();
