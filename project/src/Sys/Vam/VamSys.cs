@@ -293,6 +293,8 @@ namespace Cue.Sys.Vam
 
 			for (int i = 0; i < 32; ++i)
 				Physics.IgnoreLayerCollision(i, VamBoxGraphic.Layer, b);
+
+			VamMorphManager.Instance.OnPluginState(b);
 		}
 
 		private Action deferredInit_ = null;

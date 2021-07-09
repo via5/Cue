@@ -5,10 +5,32 @@ using UnityEngine;
 namespace Cue
 {
 #if MOCK
+	class CueToken
+	{
+		private int time_;
+
+		public CueToken()
+		{
+			time_ = System.Environment.TickCount;
+		}
+
+		public bool Same(CueToken other)
+		{
+			return (time_ == other.time_);
+		}
+
+		public override string ToString()
+		{
+			return $"{time_}";
+		}
+	}
+
+
 	class CueMain
 	{
 		static private CueMain instance_ = null;
 
+		private readonly CueToken token_ = new CueToken();
 		private Sys.Mock.MockSys sys_ = null;
 		private Cue cue_ = null;
 
@@ -52,6 +74,11 @@ namespace Cue
 			get { return instance_; }
 		}
 
+		public CueToken Token
+		{
+			get { return token_; }
+		}
+
 		public UnityEngine.Transform UITransform
 		{
 			get { return null; }
@@ -82,10 +109,32 @@ namespace Cue
 		}
 	}
 #else
+	class CueToken
+	{
+		private float time_;
+
+		public CueToken()
+		{
+			time_ = UnityEngine.Time.realtimeSinceStartup;
+		}
+
+		public bool Same(CueToken other)
+		{
+			return (time_ == other.time_);
+		}
+
+		public override string ToString()
+		{
+			return $"{time_}";
+		}
+	}
+
+
 	class CueMain : MVRScript
 	{
 		static private CueMain instance_ = null;
 
+		private readonly CueToken token_ = new CueToken();
 		private Sys.ISys sys_ = null;
 		private Cue cue_ = null;
 		private ScriptUI sui_ = null;
@@ -99,6 +148,11 @@ namespace Cue
 		static public CueMain Instance
 		{
 			get { return instance_; }
+		}
+
+		public CueToken Token
+		{
+			get { return token_; }
 		}
 
 		public Sys.ISys Sys

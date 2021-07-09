@@ -110,7 +110,7 @@ namespace Cue
 
 		public void Init()
 		{
-			LogVerbose("cue: init");
+			LogVerbose($"cue: init (token {CueMain.Instance.Token})");
 
 			VUI.Glue.Set(
 				() => CueMain.Instance.MVRPluginManager,

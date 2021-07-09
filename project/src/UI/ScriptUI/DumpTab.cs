@@ -18,6 +18,7 @@ namespace Cue
 			p.Add(new VUI.Button("Expression", DumpExpression));
 			p.Add(new VUI.Button("Animation", DumpAnimation));
 			p.Add(new VUI.Button("Gaze", DumpGaze));
+			p.Add(new VUI.Button("Morphs", DumpMorphs));
 
 			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
@@ -102,13 +103,8 @@ namespace Cue
 			}
 		}
 
-		VUI.Timer tt = null;
-
 		private void DumpGaze()
 		{
-			if (tt == null)
-				tt = VUI.TimerManager.Instance.CreateTimer(0.2f, DumpGaze, VUI.Timer.Repeat);
-
 			var targets = person_.Gaze.Targets.All;
 			var items = new List<string>();
 
@@ -128,6 +124,17 @@ namespace Cue
 				if (p.second)
 					items.Add($"Avoid: {p.first} {p.second}");
 			}
+
+			list_.SetItems(items);
+		}
+
+		private void DumpMorphs()
+		{
+			var items = new List<string>();
+			var mm = Sys.Vam.VamMorphManager.Instance;
+
+			foreach (var m in mm.GetAll())
+				items.Add(m.ToString());
 
 			list_.SetItems(items);
 		}

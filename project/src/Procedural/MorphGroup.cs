@@ -4,20 +4,45 @@ namespace Cue.Proc
 {
 	interface IProceduralMorphGroup
 	{
+		string Name { get; }
+		List<ClampableMorph> Morphs { get; }
+
 		void Reset();
 		void FixedUpdate(float s);
 		void Set(float intensity);
-		List<ClampableMorph> Morphs { get; }
 	}
 
 
-	class ConcurrentProceduralMorphGroup : IProceduralMorphGroup
+	abstract class BasicProceduralMorphGroup : IProceduralMorphGroup
+	{
+		private string name_;
+
+		protected BasicProceduralMorphGroup(string name)
+		{
+			name_ = name;
+		}
+
+		public string Name { get { return name_; } }
+
+		public abstract List<ClampableMorph> Morphs { get; }
+		public abstract void FixedUpdate(float s);
+		public abstract void Reset();
+		public abstract void Set(float intensity);
+	}
+
+
+	class ConcurrentProceduralMorphGroup : BasicProceduralMorphGroup
 	{
 		private readonly List<ClampableMorph> morphs_ = new List<ClampableMorph>();
 		private float maxMorphs_ = 1.0f;
 		private bool limited_ = false;
 
-		public List<ClampableMorph> Morphs
+		public ConcurrentProceduralMorphGroup(string name)
+			: base(name)
+		{
+		}
+
+		public override List<ClampableMorph> Morphs
 		{
 			get { return morphs_; }
 		}
@@ -32,13 +57,13 @@ namespace Cue.Proc
 			morphs_.Add(m);
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			for (int i = 0; i < morphs_.Count; ++i)
 				morphs_[i].Reset();
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			int i = 0;
 			int count = morphs_.Count;
@@ -65,7 +90,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public void Set(float intensity)
+		public override void Set(float intensity)
 		{
 			float remaining = maxMorphs_;
 			for (int i = 0; i < morphs_.Count; ++i)
@@ -76,12 +101,12 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"concurrent max={maxMorphs_}";
+			return $"con {Name} max={maxMorphs_}";
 		}
 	}
 
 
-	class SequentialProceduralMorphGroup : IProceduralMorphGroup
+	class SequentialProceduralMorphGroup : BasicProceduralMorphGroup
 	{
 		private const int ActiveState = 1;
 		private const int DelayState = 2;
@@ -91,17 +116,18 @@ namespace Cue.Proc
 		private Duration delay_;
 		private int state_ = ActiveState;
 
-		public SequentialProceduralMorphGroup()
-			: this(new Duration())
+		public SequentialProceduralMorphGroup(string name)
+			: this(name, new Duration())
 		{
 		}
 
-		public SequentialProceduralMorphGroup(Duration delay)
+		public SequentialProceduralMorphGroup(string name, Duration delay)
+			: base(name)
 		{
 			delay_ = delay;
 		}
 
-		public List<ClampableMorph> Morphs
+		public override List<ClampableMorph> Morphs
 		{
 			get { return morphs_; }
 		}
@@ -126,7 +152,7 @@ namespace Cue.Proc
 			morphs_.Add(m);
 		}
 
-		public void Reset()
+		public override void Reset()
 		{
 			i_ = 0;
 			state_ = ActiveState;
@@ -135,7 +161,7 @@ namespace Cue.Proc
 				morphs_[i].Reset();
 		}
 
-		public void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			if (morphs_.Count == 0)
 				return;
@@ -177,7 +203,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public void Set(float intensity)
+		public override void Set(float intensity)
 		{
 			if (morphs_.Count == 0)
 				return;
@@ -187,7 +213,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"sequential i={i_} delay={delay_} state={state_}";
+			return $"seq {Name} i={i_} delay={delay_} state={state_}";
 		}
 	}
 }
