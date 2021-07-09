@@ -41,9 +41,9 @@ namespace Cue.Sys.Vam
 			DoInstall(m);
 
 			if (hadOld)
-				Cue.LogInfo($"hijacked {m.ID} (replaced old)");
+				Cue.LogVerbose($"hijacked {m.ID} (replaced old)");
 			else
-				Cue.LogInfo($"hijacked {m.ID} (new)");
+				Cue.LogVerbose($"hijacked {m.ID} (new)");
 		}
 
 		public static bool Uninstall(MorphInfo m)
@@ -51,7 +51,7 @@ namespace Cue.Sys.Vam
 			bool found = DoUninstall(m);
 
 			if (found)
-				Cue.LogInfo($"restored {m.ID}");
+				Cue.LogVerbose($"restored {m.ID}");
 
 			return found;
 		}

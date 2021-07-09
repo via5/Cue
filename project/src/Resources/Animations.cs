@@ -9,12 +9,14 @@ namespace Cue
 		private static AnimationResources animations_ = new AnimationResources();
 		private static ClothingResources clothing_ = new ClothingResources();
 		private static ObjectResources objects_ = new ObjectResources();
+		private static PhysiologyResources physiologies_ = new PhysiologyResources();
 
 		public static void LoadAll()
 		{
 			animations_.Load();
 			clothing_.Load();
 			objects_.Load();
+			physiologies_.Load();
 		}
 
 		public static AnimationResources Animations
@@ -30,6 +32,11 @@ namespace Cue
 		public static ObjectResources Objects
 		{
 			get { return objects_; }
+		}
+
+		public static PhysiologyResources Physiologies
+		{
+			get { return physiologies_; }
 		}
 	}
 

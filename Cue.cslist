@@ -46,6 +46,7 @@ project\src\Procedural\Sync.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Clothing.cs
 project\src\Resources\Objects.cs
+project\src\Resources\Physiologies.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
@@ -80,6 +81,7 @@ project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Geo.cs
 project\src\Utilities\GeoRender.cs
+project\src\Utilities\Json.cs
 project\src\Utilities\Movement.cs
 project\src\Utilities\Utilities.cs
 project\src\VUI\BorderLayout.cs

@@ -1,145 +1,198 @@
-﻿using SimpleJSON;
-
-namespace Cue
+﻿namespace Cue
 {
-	class Sensitivity
+	static class PE
 	{
-		private Person person_;
+		// floats
+		public const int MaxSweat = 0;
+		public const int MaxFlush = 1;
 
-		public Sensitivity(Person p)
+		public const int TemperatureExcitementRate = 2;
+		public const int TemperatureDecayRate = 3;
+
+		// excitement at which temperature is at max
+		//
+		public const int TemperatureExcitementMax = 4;
+
+		public const int TirednessRateDuringPostOrgasm = 5;
+		public const int TirednessBaseDecayRate = 6;
+		public const int TirednessBackToBaseRate = 7;
+		public const int DelayAfterOrgasmUntilTirednessDecay = 8;
+		public const int TirednessMaxExcitementForBaseDecay = 9;
+		public const int OrgasmBaseTirednessIncrease = 10;
+
+		public const int NeutralVoicePitch = 11;
+		public const int VoicePitch = 12;
+
+		public const int MouthRate = 13;
+		public const int MouthMax = 14;
+
+		public const int BreastsRate = 15;
+		public const int BreastsMax = 16;
+
+		public const int GenitalsRate = 17;
+		public const int GenitalsMax = 18;
+
+		public const int PenetrationRate = 19;
+		public const int PenetrationMax = 20;
+
+		public const int DecayPerSecond = 21;
+		public const int ExcitementPostOrgasm = 22;
+		public const int OrgasmTime = 23;
+		public const int PostOrgasmTime = 24;
+		public const int RateAdjustment = 25;
+
+		public const int FloatCount = 26;
+
+
+		// strings
+		public const int Voice = 0;
+
+		public const int StringCount = 1;
+
+
+		private static string[] floatNames_ = new string[]
 		{
-			person_ = p;
-		}
+			"maxSweat", "maxFlush",
 
-		public float MouthRate { get { return 0.0001f; } }
-		public float MouthMax { get { return 0.3f; } }
+			"temperatureExcitementRate", "temperatureDecayRate",
+			"temperatureExcitementMax",
 
-		public float BreastsRate { get { return 0.0003f; } }
-		public float BreastsMax { get { return 0.4f; } }
+			"tirednessRateDuringPostOrgasm", "tirednessBaseDecayRate",
+			"tirednessBackToBaseRate", "delayAfterOrgasmUntilTirednessDecay",
+			"tirednessMaxExcitementForBaseDecay", "orgasmBaseTirednessIncrease",
 
-		public float GenitalsRate { get { return 0.0005f; } }
-		public float GenitalsMax { get { return 1.0f; } }
+			"neutralVoicePitch", "voicePitch",
 
-		public float PenetrationRate { get { return 0.01f; } }
-		public float PenetrationMax { get { return 1.0f; } }
 
-		public float DecayPerSecond { get { return -0.01f; } }
-		public float ExcitementPostOrgasm { get { return 0.3f; } }
-		public float OrgasmTime { get { return 8; } }
-		public float PostOrgasmTime { get { return 10; } }
-		public float RateAdjustment { get { return 1; } }
+			"mouthRate", "mouthMax",
+			"breastsRate", "breastsMax",
+			"genitalsRate", "genitalsMax",
+			"penetrationRate", "penetrationMax",
 
-		public float SpecificModifier(int part, Sys.TriggerInfo t)
+			"decayPerSecond", "excitementPostOrgasm", "orgasmTime",
+			"postOrgasmTime", "rateAdjustment",
+		};
+
+		public static int FloatFromString(string s)
 		{
-			if (part == BodyParts.Labia)
+			for (int i = 0; i < floatNames_.Length; ++i)
 			{
-				if (!t.IsPerson() || BodyParts.IsHandPart(t.sourcePartIndex))
-				{
-					return 20;
-				}
+				if (floatNames_[i] == s)
+					return i;
 			}
 
-			return 1;
+			return -1;
+		}
+
+		public static string FloatToString(int i)
+		{
+			return floatNames_[i];
+		}
+
+
+		private static string[] stringNames_ = new string[]
+		{
+			"voice"
+		};
+
+		public static int StringFromString(string s)
+		{
+			for (int i = 0; i < stringNames_.Length; ++i)
+			{
+				if (stringNames_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static string StringToString(int i)
+		{
+			return stringNames_[i];
 		}
 	}
 
 
 	class Physiology
 	{
-		private const float DefaultPitch = 0.5f;
-
-		private Person person_;
-		private Sensitivity sensitivity_;
-		private float pitch_ = 0.5f;
-
-		public Physiology(Person p, JSONClass config)
+		public struct SpecificModifier
 		{
-			person_ = p;
-			sensitivity_ = new Sensitivity(p);
-			pitch_ = U.Clamp(DefaultPitch + (1 - person_.Atom.Body.Scale), 0, 1);
+			public int bodyPart;
+			public int sourceBodyPart;
+			public float modifier;
+		}
 
-			if (config.HasKey("physiology"))
+
+		private string name_;
+		private float[] floats_ = new float[PE.FloatCount];
+		private string[] strings_ = new string[PE.StringCount];
+		private SpecificModifier[] specificModifiers_ = new SpecificModifier[0];
+
+		public Physiology(string name)
+		{
+			name_ = name;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public Physiology Clone(Person p)
+		{
+			var pp = new Physiology(name_);
+
+			for (int i = 0; i < floats_.Length; ++i)
+				pp.floats_[i] = floats_[i];
+
+			for (int i = 0; i < strings_.Length; ++i)
+				pp.strings_[i] = strings_[i];
+
+			for (int i = 0; i < specificModifiers_.Length; ++i)
+				pp.specificModifiers_[i] = specificModifiers_[i];
+
+			pp.Init(p);
+
+			return pp;
+		}
+
+		private void Init(Person p)
+		{
+			if (floats_[PE.VoicePitch] < 0)
 			{
-				string vp = config["physiology"]?["voicePitch"]?.Value ?? "";
-
-				if (vp != "" && !float.TryParse(vp, out pitch_))
-					person_.Log.Error($"bad voice pitch '{vp}'");
+				floats_[PE.VoicePitch] = U.Clamp(
+					Get(PE.NeutralVoicePitch) + (1 - p.Atom.Body.Scale),
+					0, 1);
 			}
 		}
 
-		public Sensitivity Sensitivity
+		public void Set(float[] fs, string[] ss, SpecificModifier[] sms)
 		{
-			get { return sensitivity_; }
+			floats_ = fs;
+			strings_ = ss;
+			specificModifiers_ = sms;
 		}
 
-		public float MaxSweat
+		public float Get(int i)
 		{
-			get { return 1; }
+			return floats_[i];
 		}
 
-		public float MaxFlush
+		public string GetString(int i)
 		{
-			get { return 1; }
+			return strings_[i];
 		}
 
-		public float TemperatureExcitementRate
+		public float GetSpecificModifier(int part, Sys.TriggerInfo t)
 		{
-			get { return 0.01f; }
-		}
+			for (int i = 0; i < specificModifiers_.Length; ++i)
+			{
+				var sm = specificModifiers_[i];
+				if (sm.bodyPart == part && sm.sourceBodyPart == t.sourcePartIndex)
+					return sm.modifier;
+			}
 
-		public float TemperatureDecayRate
-		{
-			get { return 0.005f; }
-		}
-
-		// excitement at which temperature is at max
-		//
-		public float TemperatureExcitementMax
-		{
-			get { return 0.8f; }
-		}
-
-
-		public float TirednessRateDuringPostOrgasm
-		{
-			get { return 0.3f; }
-		}
-
-		public float TirednessBaseDecayRate
-		{
-			get { return 0.005f; }
-		}
-
-		public float TirednessBackToBaseRate
-		{
-			get { return 0.02f; }
-		}
-
-		public float DelayAfterOrgasmUntilTirednessDecay
-		{
-			get { return 10; }
-		}
-
-		public float TirednessMaxExcitementForBaseDecay
-		{
-			get { return 0.5f; }
-		}
-
-		public float OrgasmBaseTirednessIncrease
-		{
-			get { return 0.2f; }
-		}
-
-		public float VoicePitch
-		{
-			get { return pitch_; }
-		}
-
-		// todo
-		//
-		public string Voice
-		{
-			get { return "Original"; }
+			return 1;
 		}
 	}
 }

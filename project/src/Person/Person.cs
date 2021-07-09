@@ -67,7 +67,7 @@ namespace Cue
 			body_ = new Body(this);
 			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
-			physiology_ = new Physiology(this, config);
+			physiology_ = Resources.Physiologies.Clone("standard", this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);

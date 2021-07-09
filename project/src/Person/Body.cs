@@ -112,6 +112,9 @@ namespace Cue
 					return i;
 			}
 
+			if (s == "unknown")
+				return -1;
+
 			return None;
 		}
 
@@ -829,11 +832,11 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			temperature_.UpRate = person_.Mood.RawExcitement * pp.TemperatureExcitementRate;
-			temperature_.DownRate = pp.TemperatureDecayRate;
+			temperature_.UpRate = person_.Mood.RawExcitement * pp.Get(PE.TemperatureExcitementRate);
+			temperature_.DownRate = pp.Get(PE.TemperatureDecayRate);
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.RawExcitement / pp.TemperatureExcitementMax,
+				person_.Mood.RawExcitement / pp.Get(PE.TemperatureExcitementMax),
 				0, 1);
 
 			temperature_.Update(s);
@@ -843,8 +846,10 @@ namespace Cue
 
 		private void OnTemperatureChanged(float f)
 		{
-			person_.Atom.Body.Sweat = f * person_.Physiology.MaxSweat;
-			person_.Atom.Body.Flush = f * person_.Physiology.MaxFlush;
+			var pp = person_.Physiology;
+
+			person_.Atom.Body.Sweat = f * pp.Get(PE.MaxSweat);
+			person_.Atom.Body.Flush = f * pp.Get(PE.MaxFlush);
 			person_.Atom.Hair.Loose = f;
 		}
 	}

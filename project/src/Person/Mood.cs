@@ -120,14 +120,13 @@
 				case OrgasmState:
 				{
 					var pp = person_.Physiology;
-					var ss = pp.Sensitivity;
 
-					if (elapsed_ >= ss.OrgasmTime)
+					if (elapsed_ >= pp.Get(PE.OrgasmTime))
 					{
 						person_.Animator.StopType(Animation.OrgasmType);
-						tiredness_.UpRate = pp.TirednessRateDuringPostOrgasm;
+						tiredness_.UpRate = pp.Get(PE.TirednessRateDuringPostOrgasm);
 						tiredness_.Target = 1;
-						baseTiredness_ += pp.OrgasmBaseTirednessIncrease;
+						baseTiredness_ += pp.Get(PE.OrgasmBaseTirednessIncrease);
 						SetState(PostOrgasmState);
 					}
 
@@ -137,12 +136,11 @@
 				case PostOrgasmState:
 				{
 					var pp = person_.Physiology;
-					var ss = pp.Sensitivity;
 
-					if (elapsed_ > ss.PostOrgasmTime)
+					if (elapsed_ > pp.Get(PE.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						person_.Excitement.FlatValue = ss.ExcitementPostOrgasm;
+						person_.Excitement.FlatValue = pp.Get(PE.ExcitementPostOrgasm);
 					}
 
 					break;
@@ -158,17 +156,17 @@
 
 			if (state_ == NormalState)
 			{
-				if (timeSinceLastOrgasm_ > pp.DelayAfterOrgasmUntilTirednessDecay)
+				if (timeSinceLastOrgasm_ > pp.Get(PE.DelayAfterOrgasmUntilTirednessDecay))
 				{
-					if (RawExcitement < pp.TirednessMaxExcitementForBaseDecay)
+					if (RawExcitement < pp.Get(PE.TirednessMaxExcitementForBaseDecay))
 					{
 						baseTiredness_ = U.Clamp(
-							baseTiredness_ - s * pp.TirednessBaseDecayRate,
+							baseTiredness_ - s * pp.Get(PE.TirednessBaseDecayRate),
 							0, 1);
 					}
 				}
 
-				tiredness_.DownRate = pp.TirednessBackToBaseRate;
+				tiredness_.DownRate = pp.Get(PE.TirednessBackToBaseRate);
 				tiredness_.Target = baseTiredness_;
 			}
 			else if (state_ == OrgasmState)
@@ -181,8 +179,6 @@
 
 		private void DoOrgasm()
 		{
-			var ss = person_.Physiology.Sensitivity;
-
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
 			person_.Animator.PlayType(Animation.OrgasmType);

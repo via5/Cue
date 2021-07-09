@@ -164,7 +164,7 @@ namespace Cue
 
 		private void UpdateParts(float s)
 		{
-			var ss = person_.Physiology.Sensitivity;
+			var pp = person_.Physiology;
 
 			for (int i = 0; i < BodyParts.Count; ++i)
 			{
@@ -183,7 +183,7 @@ namespace Cue
 					for (int j = 0; j < ts.Length; ++j)
 					{
 						parts_[i].value += ts[j].value;
-						parts_[i].specificModifier += ss.SpecificModifier(i, ts[j]);
+						parts_[i].specificModifier += pp.GetSpecificModifier(i, ts[j]);
 					}
 				}
 			}
@@ -242,19 +242,19 @@ namespace Cue
 
 		private void UpdateReasonRates(float s)
 		{
-			var ss = person_.Physiology.Sensitivity;
+			var pp = person_.Physiology;
 			var ps = person_.Personality;
 
-			reasons_[Mouth].GlobalSensitivityRate = ss.MouthRate;
-			reasons_[Breasts].GlobalSensitivityRate = ss.BreastsRate;
-			reasons_[Genitals].GlobalSensitivityRate = ss.GenitalsRate;
-			reasons_[Penetration].GlobalSensitivityRate = ss.PenetrationRate;
+			reasons_[Mouth].GlobalSensitivityRate = pp.Get(PE.MouthRate);
+			reasons_[Breasts].GlobalSensitivityRate = pp.Get(PE.BreastsRate);
+			reasons_[Genitals].GlobalSensitivityRate = pp.Get(PE.GenitalsRate);
+			reasons_[Penetration].GlobalSensitivityRate = pp.Get(PE.PenetrationRate);
 			reasons_[OtherSex].GlobalSensitivityRate = ps.OtherSexExcitementRate;
 
-			reasons_[Mouth].SensitivityMax = ss.MouthMax;
-			reasons_[Breasts].SensitivityMax = ss.BreastsMax;
-			reasons_[Genitals].SensitivityMax = ss.GenitalsMax;
-			reasons_[Penetration].SensitivityMax = ss.PenetrationMax;
+			reasons_[Mouth].SensitivityMax = pp.Get(PE.MouthMax);
+			reasons_[Breasts].SensitivityMax = pp.Get(PE.BreastsMax);
+			reasons_[Genitals].SensitivityMax = pp.Get(PE.GenitalsMax);
+			reasons_[Penetration].SensitivityMax = pp.Get(PE.PenetrationMax);
 			reasons_[OtherSex].SensitivityMax = ps.MaxOtherSexExcitement;
 
 			physicalRate_ = 0;
@@ -275,15 +275,14 @@ namespace Cue
 
 			totalRate_ = physicalRate_ + emotionalRate_;
 
-			totalRate_ *= ss.RateAdjustment;
+			totalRate_ *= pp.Get(PE.RateAdjustment);
 
 			if (totalRate_ == 0)
-				totalRate_ = ss.DecayPerSecond;
+				totalRate_ = pp.Get(PE.DecayPerSecond);
 		}
 
 		private void UpdateMax(float s)
 		{
-			var ss = person_.Physiology.Sensitivity;
 			var ps = person_.Personality;
 
 			max_ = 0;
@@ -297,11 +296,11 @@ namespace Cue
 
 		private void UpdateValue(float s)
 		{
-			var ss = person_.Physiology.Sensitivity;
+			var pp = person_.Physiology;
 
 			if (flatValue_ > max_)
 			{
-				flatValue_ = Math.Max(flatValue_ + ss.DecayPerSecond * s, max_);
+				flatValue_ = Math.Max(flatValue_ + pp.Get(PE.DecayPerSecond) * s, max_);
 			}
 			else
 			{

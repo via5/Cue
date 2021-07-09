@@ -1,0 +1,64 @@
+{
+	"physiologies":
+	[
+		{
+			"name": "standard",
+			"maxSweat": 1,
+			"maxFlush": 1,
+
+			"temperatureExcitementRate": 0.01,
+			"temperatureDecayRate": 0.005,
+			"temperatureExcitementMax": 0.8,
+
+			"tirednessRateDuringPostOrgasm": 0.3,
+			"tirednessBaseDecayRate": 0.005,
+			"tirednessBackToBaseRate": 0.02,
+			"delayAfterOrgasmUntilTirednessDecay": 10,
+			"tirednessMaxExcitementForBaseDecay": 0.5,
+			"orgasmBaseTirednessIncrease": 0.2,
+
+			"voice": "Original",
+			"neutralVoicePitch": 0.5,
+			"voicePitch": -1,
+
+			"mouthRate": 0.0001,
+			"mouthMax": 0.3,
+
+			"breastsRate": 0.0003,
+			"breastsMax": 0.4,
+
+			"genitalsRate": 0.0005,
+			"genitalsMax": 1.0,
+
+			"penetrationRate": 0.01,
+			"penetrationMax": 1.0,
+
+			"decayPerSecond": -0.01,
+			"excitementPostOrgasm": 0.3,
+			"orgasmTime": 8,
+			"postOrgasmTime": 10,
+			"rateAdjustment": 1,
+
+			"specificModifiers":
+			[
+				{
+					"bodyPart": "labia",
+					"sourceBodyPart": "lefthand",
+					"modifier": 20
+				},
+
+				{
+					"bodyPart": "labia",
+					"sourceBodyPart": "righthand",
+					"modifier": 20
+				},
+
+				{
+					"bodyPart": "labia",
+					"sourceBodyPart": "unknown",
+					"modifier": 20
+				},
+			]
+		}
+	]
+}

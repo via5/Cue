@@ -53,20 +53,28 @@ namespace Cue
 		private readonly Person person_;
 		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
 
+		private static bool Positions = false;
+
 		public PersonBodyPartsTab(Person ps)
 			: base ("Parts")
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(5);
+			var gl = new VUI.GridLayout(Positions ? 5 : 3);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
+
+			if (Positions)
+			{
+				p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
+				p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
+			}
+
+			int fontSize = 20;
 
 			for (int i = 0; i < person_.Body.Parts.Length; ++i)
 			{
@@ -76,23 +84,27 @@ namespace Cue
 				w.part = bp;
 
 				w.name = new VUI.Label(bp.Name);
-				w.triggering = new VUI.Label();
-				w.grab = new VUI.Label();
-				w.position = new VUI.Label();
-				w.direction = new VUI.Label();
-
-				int fontSize = 20;
 				w.name.FontSize = fontSize;
-				w.triggering.FontSize = fontSize;
-				w.grab.FontSize = fontSize;
-				w.position.FontSize = fontSize;
-				w.direction.FontSize = fontSize;
-
 				p.Add(w.name);
+
+				w.triggering = new VUI.Label();
+				w.triggering.FontSize = fontSize;
 				p.Add(w.triggering);
+
+				w.grab = new VUI.Label();
+				w.grab.FontSize = fontSize;
 				p.Add(w.grab);
-				p.Add(w.position);
-				p.Add(w.direction);
+
+				if (Positions)
+				{
+					w.position = new VUI.Label();
+					w.position.FontSize = fontSize;
+					p.Add(w.position);
+
+					w.direction = new VUI.Label();
+					w.direction.FontSize = fontSize;
+					p.Add(w.direction);
+				}
 
 				widgets_.Add(w);
 			}
@@ -152,8 +164,11 @@ namespace Cue
 					}
 
 
-					w.position.Text = w.part.Position.ToString();
-					w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
+					if (Positions)
+					{
+						w.position.Text = w.part.Position.ToString();
+						w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
+					}
 				}
 			}
 		}

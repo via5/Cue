@@ -53,10 +53,10 @@
 			p_.noseInMorphMax = DBF("NoseInMorph Max");
 			p_.noseOutMorphMax = DBF("NoseOutMorph Max");
 
-			p_.breathDataset_.Value = p.Physiology.Voice;
+			p_.breathDataset_.Value = p.Physiology.GetString(PE.Voice);
 			p_.orgasmDataset_.Value = "Candy Orgasm Soft";
 			p_.vrVolume.Value = p_.desktopVolume.Value;
-			p_.pitch.Value = 0.8f + person_.Physiology.VoicePitch * 0.4f;
+			p_.pitch.Value = 0.8f + person_.Physiology.Get(PE.VoicePitch) * 0.4f;
 		}
 
 		private Sys.Vam.FloatParameter DBF(string name)
