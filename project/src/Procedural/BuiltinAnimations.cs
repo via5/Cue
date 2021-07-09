@@ -55,6 +55,10 @@ namespace Cue.Proc
 		private float hipForceMax_ = 800;
 		private float hipTorqueMin_ = -20;
 		private float hipTorqueMax_ = -40;
+		private float chestTorqueMin_ = -20;
+		private float chestTorqueMax_ = -40;
+		private float headTorqueMin_ = 0;
+		private float headTorqueMax_ = -10;
 		private float durationMin_ = 1;
 		private float durationMax_ = 0.1f;
 		private float durationWin_ = 0.25f;
@@ -92,6 +96,24 @@ namespace Cue.Proc
 				new SlidingMovement(
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
+					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+				new LinearEasing(), new ParentTargetSync(),
+				new LinearEasing(), new LinearEasing()));
+
+			g.AddTarget(new Force(
+				Force.RelativeTorque, BodyParts.Chest, "chest",
+				new SlidingMovement(
+					new Vector3(chestTorqueMin_, 0, 0),
+					new Vector3(chestTorqueMax_, 0, 0),
+					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+				new LinearEasing(), new ParentTargetSync(),
+				new LinearEasing(), new LinearEasing()));
+
+			g.AddTarget(new Force(
+				Force.RelativeTorque, BodyParts.Head, "head",
+				new SlidingMovement(
+					new Vector3(headTorqueMin_, 0, 0),
+					new Vector3(headTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
 				new LinearEasing(), new ParentTargetSync(),
 				new LinearEasing(), new LinearEasing()));
