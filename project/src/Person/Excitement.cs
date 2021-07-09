@@ -10,8 +10,9 @@ namespace Cue
 			private bool physical_;
 			private float value_ = 0;
 			private float rate_ = 0;
-			private float personalityModifier_ = 0;
-			private float personalityMax_ = 0;
+			private float specificSensitivityModifier_ = 0;
+			private float globalSensitivityRate_ = 0;
+			private float sensitivityMax_ = 0;
 
 			public Reason(string name, bool physical)
 			{
@@ -41,16 +42,22 @@ namespace Cue
 				set { rate_ = value; }
 			}
 
-			public float PersonalityModifier
+			public float SpecificSensitivityModifier
 			{
-				get { return personalityModifier_; }
-				set { personalityModifier_ = value; }
+				get { return specificSensitivityModifier_; }
+				set { specificSensitivityModifier_ = value; }
 			}
 
-			public float PersonalityMax
+			public float GlobalSensitivityRate
 			{
-				get { return personalityMax_; }
-				set { personalityMax_ = value; }
+				get { return globalSensitivityRate_; }
+				set { globalSensitivityRate_ = value; }
+			}
+
+			public float SensitivityMax
+			{
+				get { return sensitivityMax_; }
+				set { sensitivityMax_ = value; }
 			}
 
 			public override string ToString()
@@ -62,6 +69,12 @@ namespace Cue
 			}
 		}
 
+		private struct PartValue
+		{
+			public float value;
+			public float specificModifier;
+		}
+
 
 		public const int Mouth = 0;
 		public const int Breasts = 1;
@@ -71,7 +84,7 @@ namespace Cue
 		public const int ReasonCount = 5;
 
 		private Person person_;
-		private float[] parts_ = new float[BodyParts.Count];
+		private PartValue[] parts_ = new PartValue[BodyParts.Count];
 
 		private Reason[] reasons_ = new Reason[ReasonCount];
 		private float physicalRate_ = 0;
@@ -147,14 +160,28 @@ namespace Cue
 
 		private void UpdateParts(float s)
 		{
+			var ss = person_.Physiology.Sensitivity;
+
 			for (int i = 0; i < BodyParts.Count; ++i)
 			{
 				var ts = person_.Body.Get(i).GetTriggers();
 
-				if (ts != null && ts.Length > 0)
-					parts_[i] = ts[0].value; // todo
+				if (ts == null || ts.Length == 0)
+				{
+					// todo, decay
+					parts_[i].value = Math.Max(parts_[i].value - s, 0);
+				}
 				else
-					parts_[i] = Math.Max(parts_[i] - s, 0);
+				{
+					parts_[i].value = 0;
+					parts_[i].specificModifier = 0;
+
+					for (int j = 0; j < ts.Length; ++j)
+					{
+						parts_[i].value += ts[j].value;
+						parts_[i].specificModifier += ss.SpecificModifier(i, ts[j].sourcePartIndex);
+					}
+				}
 			}
 		}
 
@@ -163,20 +190,39 @@ namespace Cue
 			var ps = person_.Personality;
 
 			reasons_[Mouth].Value =
-				parts_[BodyParts.Lips] * 0.1f +
-				parts_[BodyParts.Mouth] * 0.9f;
+				parts_[BodyParts.Lips].value * 0.1f +
+				parts_[BodyParts.Mouth].value * 0.9f;
+
+			reasons_[Mouth].SpecificSensitivityModifier =
+				parts_[BodyParts.Lips].specificModifier +
+				parts_[BodyParts.Mouth].specificModifier;
+
 
 			reasons_[Breasts].Value =
-				parts_[BodyParts.LeftBreast] * 0.5f +
-				parts_[BodyParts.RightBreast] * 0.5f;
+				parts_[BodyParts.LeftBreast].value * 0.5f +
+				parts_[BodyParts.RightBreast].value * 0.5f;
+
+			reasons_[Breasts].SpecificSensitivityModifier =
+				parts_[BodyParts.LeftBreast].specificModifier +
+				parts_[BodyParts.RightBreast].specificModifier;
+
 
 			reasons_[Genitals].Value = Math.Min(1,
-				parts_[BodyParts.Labia]);
+				parts_[BodyParts.Labia].value);
+
+			reasons_[Genitals].SpecificSensitivityModifier =
+				parts_[BodyParts.Labia].specificModifier;
+
 
 			reasons_[Penetration].Value = Math.Min(1,
-				parts_[BodyParts.Vagina] * 0.3f +
-				parts_[BodyParts.DeepVagina] * 1 +
-				parts_[BodyParts.DeeperVagina] * 1);
+				parts_[BodyParts.Vagina].value * 0.3f +
+				parts_[BodyParts.DeepVagina].value * 1 +
+				parts_[BodyParts.DeeperVagina].value * 1);
+
+			reasons_[Penetration].SpecificSensitivityModifier =
+				parts_[BodyParts.Vagina].specificModifier +
+				parts_[BodyParts.DeepVagina].specificModifier +
+				parts_[BodyParts.DeeperVagina].specificModifier;
 
 
 			reasons_[OtherSex].Value = 0;
@@ -195,29 +241,32 @@ namespace Cue
 			var ss = person_.Physiology.Sensitivity;
 			var ps = person_.Personality;
 
-			reasons_[Mouth].PersonalityModifier = ss.MouthRate;
-			reasons_[Breasts].PersonalityModifier = ss.BreastsRate;
-			reasons_[Genitals].PersonalityModifier = ss.GenitalsRate;
-			reasons_[Penetration].PersonalityModifier = ss.PenetrationRate;
-			reasons_[OtherSex].PersonalityModifier = ps.OtherSexExcitementRate;
+			reasons_[Mouth].GlobalSensitivityRate = ss.MouthRate;
+			reasons_[Breasts].GlobalSensitivityRate = ss.BreastsRate;
+			reasons_[Genitals].GlobalSensitivityRate = ss.GenitalsRate;
+			reasons_[Penetration].GlobalSensitivityRate = ss.PenetrationRate;
+			reasons_[OtherSex].GlobalSensitivityRate = ps.OtherSexExcitementRate;
 
-			reasons_[Mouth].PersonalityMax = ss.MouthMax;
-			reasons_[Breasts].PersonalityMax = ss.BreastsMax;
-			reasons_[Genitals].PersonalityMax = ss.GenitalsMax;
-			reasons_[Penetration].PersonalityMax = ss.PenetrationMax;
-			reasons_[OtherSex].PersonalityMax = ps.MaxOtherSexExcitement;
+			reasons_[Mouth].SensitivityMax = ss.MouthMax;
+			reasons_[Breasts].SensitivityMax = ss.BreastsMax;
+			reasons_[Genitals].SensitivityMax = ss.GenitalsMax;
+			reasons_[Penetration].SensitivityMax = ss.PenetrationMax;
+			reasons_[OtherSex].SensitivityMax = ps.MaxOtherSexExcitement;
 
 			physicalRate_ = 0;
 			emotionalRate_ = 0;
 
 			for (int i = 0; i < ReasonCount; ++i)
 			{
-				reasons_[i].Rate = reasons_[i].Value * reasons_[i].PersonalityModifier * s;
+				reasons_[i].Rate =
+					reasons_[i].Value *
+					reasons_[i].GlobalSensitivityRate *
+					reasons_[i].SpecificSensitivityModifier;
 
 				if (reasons_[i].Physical)
-					physicalRate_ += reasons_[i].Rate;
+					physicalRate_ += reasons_[i].Rate * s;
 				else
-					emotionalRate_ += reasons_[i].Rate;
+					emotionalRate_ += reasons_[i].Rate * s;
 			}
 
 			totalRate_ =
@@ -240,7 +289,7 @@ namespace Cue
 			for (int i = 0; i < ReasonCount; ++i)
 			{
 				if (reasons_[i].Rate > 0)
-					max_ = Math.Max(max_, reasons_[i].PersonalityMax);
+					max_ = Math.Max(max_, reasons_[i].SensitivityMax);
 			}
 		}
 

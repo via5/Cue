@@ -112,7 +112,7 @@
 		{
 			var g = new ConcurrentProceduralMorphGroup("eyesClosedTired");
 
-			var eyesClosed = new ClampableMorph(p, BodyParts.None, "Eyes Closed", 0.2f, 1, 3, 8, 4, 4);
+			var eyesClosed = new ClampableMorph(p, BodyParts.None, "Eyes Closed", 0.2f, 1, 2, 5, 3, 3);
 			eyesClosed.DisableBlinkAbove = 0.5f;
 			g.Add(eyesClosed);
 

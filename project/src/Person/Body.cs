@@ -57,24 +57,34 @@ namespace Cue
 
 
 		private static int[] breasts_ = new int[] { LeftBreast, RightBreast };
-		public static int[] BreastParts
-		{
-			get { return breasts_; }
-		}
+		public static int[] BreastParts { get { return breasts_; } }
 
 		private static int[] genitals_ = new int[] { Labia, Vagina, DeepVagina, DeeperVagina };
-		public static int[] GenitalParts
+		public static int[] GenitalParts { get { return genitals_; } }
+		public static bool IsGenitalPart(int i)
 		{
-			get { return genitals_; }
+			return
+				(i == Labia) ||
+				(i == Vagina) ||
+				(i == DeepVagina) ||
+				(i == DeeperVagina);
 		}
+
 
 		private static int[] personalSpace_ = new[]{
 			LeftHand, RightHand, Head, Chest, LeftBreast, RightBreast,
 			Hips, Genitals, Labia, Vagina, DeepVagina, DeeperVagina,
 			LeftFoot, RightFoot};
+
 		public static int[] PersonalSpaceParts
 		{
 			get { return personalSpace_; }
+		}
+
+
+		public static bool IsHandPart(int i)
+		{
+			return (i == LeftHand) || (i == RightHand);
 		}
 
 

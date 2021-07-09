@@ -11,23 +11,36 @@ namespace Cue
 			person_ = p;
 		}
 
-		public float MouthRate { get { return 0.03f; } }
+		public float MouthRate { get { return 0.003f; } }
 		public float MouthMax { get { return 0.3f; } }
 
-		public float BreastsRate { get { return 0.01f; } }
+		public float BreastsRate { get { return 0.005f; } }
 		public float BreastsMax { get { return 0.4f; } }
 
-		public float GenitalsRate { get { return 0.007f; } }
+		public float GenitalsRate { get { return 0.01f; } }
 		public float GenitalsMax { get { return 1.0f; } }
 
-		public float PenetrationRate { get { return 0.02f; } }
+		public float PenetrationRate { get { return 0.015f; } }
 		public float PenetrationMax { get { return 1.0f; } }
 
 		public float DecayPerSecond { get { return -0.01f; } }
-		public float ExcitementPostOrgasm { get { return 0.4f; } }
+		public float ExcitementPostOrgasm { get { return 0.3f; } }
 		public float OrgasmTime { get { return 8; } }
 		public float PostOrgasmTime { get { return 10; } }
 		public float RateAdjustment { get { return 1; } }
+
+		public float SpecificModifier(int part, int sourcePart)
+		{
+			if (BodyParts.IsGenitalPart(part))
+			{
+				if (BodyParts.IsHandPart(sourcePart))
+				{
+					return 3;
+				}
+			}
+
+			return 1;
+		}
 	}
 
 
