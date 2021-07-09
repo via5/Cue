@@ -243,7 +243,7 @@ namespace Cue.Proc
 
 		public override string ToDetailedString()
 		{
-			return $"{elapsed_}/{duration_}";
+			return $"elapsed\n{elapsed_}/{duration_}";
 		}
 	}
 
@@ -465,6 +465,7 @@ namespace Cue.Proc
 		public override string ToDetailedString()
 		{
 			return
+				$"sliding\n" +
 				$"fdur={fwdDuration_}\n" +
 				$"bdur={bwdDuration_}\n" +
 				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +

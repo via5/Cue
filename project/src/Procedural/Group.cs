@@ -22,6 +22,7 @@ namespace Cue.Proc
 
 	class ConcurrentTargetGroup : BasicTargetGroup
 	{
+		private Person person_ = null;
 		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private Duration delay_, maxDuration_;
@@ -113,6 +114,8 @@ namespace Cue.Proc
 
 		public override void Start(Person p)
 		{
+			person_ = p;
+
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
 
@@ -128,6 +131,8 @@ namespace Cue.Proc
 		public override void FixedUpdate(float s)
 		{
 			allDone_ = false;
+
+			Sync.Energy = person_.Mood.Energy;
 			Sync.FixedUpdate(s);
 
 			if (inDelay_)
@@ -194,6 +199,7 @@ namespace Cue.Proc
 
 		}
 
+		private Person person_ = null;
 		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private readonly List<TargetInfo> targetInfos_ = new List<TargetInfo>();
@@ -284,12 +290,15 @@ namespace Cue.Proc
 
 		public override void Start(Person p)
 		{
+			person_ = p;
+
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
 		}
 
 		public override void FixedUpdate(float s)
 		{
+			Sync.Energy = person_.Mood.Energy;
 			Sync.FixedUpdate(s);
 
 			if (targets_.Count == 0)

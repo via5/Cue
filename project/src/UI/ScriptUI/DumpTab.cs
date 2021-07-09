@@ -93,6 +93,15 @@ namespace Cue
 			if (lines.Length > 0)
 				items.Add(I(indent) + lines[0]);
 
+			{
+				var syncLines = t.Sync.ToDetailedString().Split('\n');
+				if (syncLines.Length > 0)
+					items.Add(I(indent + 1) + "sync: " + syncLines[0]);
+
+				for (int i = 1; i < syncLines.Length; ++i)
+					items.Add(I(indent + 2) + syncLines[i]);
+			}
+
 			for (int i = 1; i < lines.Length; ++i)
 				items.Add(I(indent + 1) + lines[i]);
 

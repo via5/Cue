@@ -255,7 +255,6 @@ namespace Cue.Proc
 		{
 			return
 				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
-				$"{Sync.ToDetailedString()}\n" +
 				$"{movement_}\n" +
 				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";

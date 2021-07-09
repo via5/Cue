@@ -55,9 +55,9 @@ namespace Cue.Proc
 		private float hipForceMax_ = 800;
 		private float hipTorqueMin_ = -20;
 		private float hipTorqueMax_ = -40;
-		private float durationMin_ = 1;
-		private float durationMax_ = 0.2f;
-		private float durationWin_ = 0.2f;
+		private float durationMin_ = 0.8f;
+		private float durationMax_ = 0.1f;
+		private float durationWin_ = 0.25f;
 		private float durationInterval_ = 10;
 		private Force[] forces_ = null;
 
@@ -138,6 +138,7 @@ namespace Cue.Proc
 			var d = (genBase.Position - hips.Position).Normalized;
 
 			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);
+			Cue.LogInfo($"{d}");
 		}
 
 		private void GatherForces(List<Force> list, List<ITarget> targets)

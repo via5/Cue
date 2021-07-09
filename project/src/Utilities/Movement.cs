@@ -110,6 +110,7 @@ namespace Cue
 		public void SetNext(Vector3 v)
 		{
 			m_.SetNext(v);
+			SetWindow();
 		}
 
 		public Vector3 Lerped(float m)

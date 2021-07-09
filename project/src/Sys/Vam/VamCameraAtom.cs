@@ -30,6 +30,11 @@ namespace Cue.Sys.Vam
 		{
 			get { return Quaternion.Zero; }
 		}
+
+		public override string ToString()
+		{
+			return $"camera";
+		}
 	}
 
 
