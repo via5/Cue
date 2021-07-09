@@ -137,7 +137,7 @@
 
 		public override string ToString()
 		{
-			return $"MacGruber: v={p_.intensity}";
+			return $"MacGruber: v={p_.intensity} pitch={p_.pitch.Value}";
 		}
 	}
 

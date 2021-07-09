@@ -226,6 +226,7 @@ namespace Cue.Sys
 		IBodyPart[] GetBodyParts();
 		Hand GetLeftHand();
 		Hand GetRightHand();
+		float Scale { get; }
 		float Sweat { get; set; }
 		float Flush { get; set; }
 	}

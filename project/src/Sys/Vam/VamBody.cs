@@ -38,6 +38,7 @@ namespace Cue.Sys.Vam
 
 	abstract class VamBasicBody : IBody
 	{
+		public abstract float Scale { get; }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }
 
@@ -52,6 +53,7 @@ namespace Cue.Sys.Vam
 	class VamBody : VamBasicBody
 	{
 		private VamAtom atom_;
+		private FloatParameter scale_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
 		private Color initialColor_;
@@ -68,6 +70,10 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 		{
 			atom_ = a;
+
+			scale_ = new FloatParameter(a, "rescaleObject", "scale");
+			if (!scale_.Check(true))
+				atom_.Log.Error("no scale parameter");
 
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
@@ -284,6 +290,11 @@ namespace Cue.Sys.Vam
 		{
 			if (!b)
 				Reset();
+		}
+
+		public override float Scale
+		{
+			get { return scale_?.Value ?? 1; }
 		}
 
 		public override float Sweat

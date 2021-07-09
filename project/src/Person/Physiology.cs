@@ -46,6 +46,8 @@ namespace Cue
 
 	class Physiology
 	{
+		private const float DefaultPitch = 0.5f;
+
 		private Person person_;
 		private Sensitivity sensitivity_;
 		private float pitch_ = 0.5f;
@@ -54,6 +56,7 @@ namespace Cue
 		{
 			person_ = p;
 			sensitivity_ = new Sensitivity(p);
+			pitch_ = U.Clamp(DefaultPitch + (1 - person_.Atom.Body.Scale), 0, 1);
 
 			if (config.HasKey("physiology"))
 			{

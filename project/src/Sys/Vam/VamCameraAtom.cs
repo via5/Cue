@@ -87,6 +87,11 @@ namespace Cue.Sys.Vam
 				BodyParts.RightHand, SuperController.singleton.rightHand);
 		}
 
+		public override float Scale
+		{
+			get { return 1; }
+		}
+
 		public override float Sweat
 		{
 			get { return 0; }
