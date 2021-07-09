@@ -64,8 +64,12 @@ namespace Cue
 			{
 				if (rate_ == 0)
 					return "0";
-				else
-					return $"{value_:0.000000} {rate_:0.000000}";
+
+				return
+					$"{value_:0.000000}*" +
+					$"{globalSensitivityRate_:0.000000}*" +
+					$"{specificSensitivityModifier_:0.000000}=" +
+					$"{rate_:0.000000}";
 			}
 		}
 
@@ -179,7 +183,7 @@ namespace Cue
 					for (int j = 0; j < ts.Length; ++j)
 					{
 						parts_[i].value += ts[j].value;
-						parts_[i].specificModifier += ss.SpecificModifier(i, ts[j].sourcePartIndex);
+						parts_[i].specificModifier += ss.SpecificModifier(i, ts[j]);
 					}
 				}
 			}
@@ -264,19 +268,17 @@ namespace Cue
 					reasons_[i].SpecificSensitivityModifier;
 
 				if (reasons_[i].Physical)
-					physicalRate_ += reasons_[i].Rate * s;
+					physicalRate_ += reasons_[i].Rate;
 				else
-					emotionalRate_ += reasons_[i].Rate * s;
+					emotionalRate_ += reasons_[i].Rate;
 			}
 
-			totalRate_ =
-				physicalRate_ +
-				emotionalRate_;
+			totalRate_ = physicalRate_ + emotionalRate_;
 
 			totalRate_ *= ss.RateAdjustment;
 
 			if (totalRate_ == 0)
-				totalRate_ = ss.DecayPerSecond * s;
+				totalRate_ = ss.DecayPerSecond;
 		}
 
 		private void UpdateMax(float s)
@@ -303,7 +305,7 @@ namespace Cue
 			}
 			else
 			{
-				flatValue_ = U.Clamp(flatValue_ + totalRate_, 0, max_);
+				flatValue_ = U.Clamp(flatValue_ + totalRate_ * s, 0, max_);
 			}
 		}
 	}

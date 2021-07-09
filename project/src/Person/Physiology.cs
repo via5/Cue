@@ -11,16 +11,16 @@ namespace Cue
 			person_ = p;
 		}
 
-		public float MouthRate { get { return 0.003f; } }
+		public float MouthRate { get { return 0.0001f; } }
 		public float MouthMax { get { return 0.3f; } }
 
-		public float BreastsRate { get { return 0.005f; } }
+		public float BreastsRate { get { return 0.0003f; } }
 		public float BreastsMax { get { return 0.4f; } }
 
-		public float GenitalsRate { get { return 0.01f; } }
+		public float GenitalsRate { get { return 0.0005f; } }
 		public float GenitalsMax { get { return 1.0f; } }
 
-		public float PenetrationRate { get { return 0.015f; } }
+		public float PenetrationRate { get { return 0.01f; } }
 		public float PenetrationMax { get { return 1.0f; } }
 
 		public float DecayPerSecond { get { return -0.01f; } }
@@ -29,13 +29,13 @@ namespace Cue
 		public float PostOrgasmTime { get { return 10; } }
 		public float RateAdjustment { get { return 1; } }
 
-		public float SpecificModifier(int part, int sourcePart)
+		public float SpecificModifier(int part, Sys.TriggerInfo t)
 		{
-			if (BodyParts.IsGenitalPart(part))
+			if (part == BodyParts.Labia)
 			{
-				if (BodyParts.IsHandPart(sourcePart))
+				if (!t.IsPerson() || BodyParts.IsHandPart(t.sourcePartIndex))
 				{
-					return 3;
+					return 20;
 				}
 			}
 

@@ -150,6 +150,11 @@ namespace Cue.Sys
 			value = v;
 		}
 
+		public bool IsPerson()
+		{
+			return (personIndex != -1 && sourcePartIndex != -1);
+		}
+
 		public override string ToString()
 		{
 			if (personIndex == -1 || sourcePartIndex == -1)

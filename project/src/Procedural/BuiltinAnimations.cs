@@ -55,7 +55,7 @@ namespace Cue.Proc
 		private float hipForceMax_ = 800;
 		private float hipTorqueMin_ = -20;
 		private float hipTorqueMax_ = -40;
-		private float durationMin_ = 0.8f;
+		private float durationMin_ = 1;
 		private float durationMax_ = 0.1f;
 		private float durationWin_ = 0.25f;
 		private float durationInterval_ = 10;
