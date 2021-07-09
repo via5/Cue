@@ -94,12 +94,12 @@ namespace Cue
 			if (person_.Mood.State == Mood.OrgasmState)
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Excitement * ps.LookAboveMaxWeight);
+					person_.Mood.Energy * ps.LookAboveMaxWeight);
 			}
 			else
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Excitement * ps.LookAboveMaxWeightOrgasm);
+					person_.Mood.Energy * ps.LookAboveMaxWeightOrgasm);
 			}
 
 			// exclusive
@@ -292,7 +292,7 @@ namespace Cue
 				}
 			}
 
-			if (!clearRandom || person_.Mood.Excitement > ps.MaxExcitementForRandomGaze)
+			if (!clearRandom || person_.Mood.Energy > ps.MaxEnergyForRandomGaze)
 			{
 				// always at least a small change
 				targets_.SetRandomWeight(ps.NaturalRandomWeight);
@@ -310,7 +310,7 @@ namespace Cue
 					continue;
 
 				float w = busy ? ps.BusyOtherEyesWeight : ps.NaturalOtherEyesWeight;
-				w *= (p.Mood.Excitement + 1);
+				w *= (p.Mood.RawExcitement + 1);
 
 				targets_.SetWeightIfZero(p, BodyParts.Eyes, w);
 			}
@@ -332,7 +332,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.Excitement >= ps.MaxExcitementForAvoid)
+			if (person_.Mood.RawExcitement >= ps.MaxExcitementForAvoid)
 				return false;
 
 			if (person_.Mood.TimeSinceLastOrgasm < ps.AvoidDelayAfterOrgasm)

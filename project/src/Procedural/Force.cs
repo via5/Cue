@@ -166,8 +166,8 @@ namespace Cue.Proc
 
 				case BasicSync.DurationFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.Excitement;
-					Sync.Excitement = person_.Mood.Excitement;
+					movement_.WindowMagnitude = person_.Mood.Energy;
+					Sync.Energy = person_.Mood.Energy;
 					movement_.SetNext(Vector3.Zero);
 					break;
 				}
@@ -180,16 +180,16 @@ namespace Cue.Proc
 
 				case BasicSync.Looping:
 				{
-					movement_.WindowMagnitude = person_.Mood.Excitement;
-					Sync.Excitement = person_.Mood.Excitement;
+					movement_.WindowMagnitude = person_.Mood.Energy;
+					Sync.Energy = person_.Mood.Energy;
 					Next();
 					break;
 				}
 
 				case BasicSync.SyncFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.Excitement;
-					Sync.Excitement = person_.Mood.Excitement;
+					movement_.WindowMagnitude = person_.Mood.Energy;
+					Sync.Energy = person_.Mood.Energy;
 					oneFrameFinished_ = true;
 					break;
 				}
@@ -257,13 +257,13 @@ namespace Cue.Proc
 				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
 				$"{Sync.ToDetailedString()}\n" +
 				$"{movement_}\n" +
-				$"ex={ExcitementFactor():0.00}\n" +
+				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";
 		}
 
-		private float ExcitementFactor()
+		private float EnergyFactor()
 		{
-			return excitement_.Magnitude(person_.Mood.Excitement);
+			return excitement_.Magnitude(person_.Mood.Energy);
 		}
 
 		private void Next()

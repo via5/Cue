@@ -13,7 +13,7 @@ namespace Cue.Proc
 
 		bool Finished { get; }
 		float Magnitude { get; }
-		float Excitement { set; }
+		float Energy { set; }
 
 		void Reset();
 		int FixedUpdate(float s);
@@ -91,7 +91,7 @@ namespace Cue.Proc
 		}
 
 		public abstract float Magnitude { get; }
-		public abstract float Excitement { set; }
+		public abstract float Energy { set; }
 		public abstract bool Finished { get; }
 
 		public virtual void Reset()
@@ -119,7 +119,7 @@ namespace Cue.Proc
 	class NoSync : BasicSync
 	{
 		public override float Magnitude { get { return 0; } }
-		public override float Excitement { set { } }
+		public override float Energy { set { } }
 		public override bool Finished { get { return true; } }
 
 		public new static NoSync Create(JSONClass o)
@@ -155,7 +155,7 @@ namespace Cue.Proc
 			get { return Target?.Parent?.Sync.Magnitude ?? 1; }
 		}
 
-		public override float Excitement
+		public override float Energy
 		{
 			set { }
 		}
@@ -210,7 +210,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public override float Excitement { set { } }
+		public override float Energy { set { } }
 		public override bool Finished
 		{
 			get { return (elapsed_ >= duration_); }
@@ -379,11 +379,11 @@ namespace Cue.Proc
 			get { return CurrentDuration().Finished; }
 		}
 
-		public override float Excitement
+		public override float Energy
 		{
 			set
 			{
-				CurrentDuration().Excitement = value;
+				CurrentDuration().Energy = value;
 			}
 		}
 

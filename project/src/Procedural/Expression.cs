@@ -8,6 +8,7 @@ namespace Cue.Proc
 	{
 		private readonly int type_;
 		private float intensity_ = 0;
+		private float dampen_ = 0;
 		private readonly List<IProceduralMorphGroup> groups_ =
 			new List<IProceduralMorphGroup>();
 
@@ -27,6 +28,12 @@ namespace Cue.Proc
 			set { intensity_ = value; }
 		}
 
+		public float Dampen
+		{
+			get { return dampen_; }
+			set { dampen_ = value; }
+		}
+
 		public List<IProceduralMorphGroup> Groups
 		{
 			get { return groups_; }
@@ -44,14 +51,14 @@ namespace Cue.Proc
 				groups_[i].FixedUpdate(s);
 
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Set(intensity_);
+				groups_[i].Set(intensity_ * (1 - dampen_));
 		}
 
 		public override string ToString()
 		{
 			return
-				Expressions.ToString(type_) + " " +
-				"intensity=" + intensity_.ToString();
+				$"{Expressions.ToString(type_)} " +
+				$"int={intensity_} damp={dampen_}";
 		}
 	}
 
@@ -73,6 +80,16 @@ namespace Cue.Proc
 			expressions_.Add(CreateMischievous(p));
 			expressions_.Add(CreatePleasure(p));
 			expressions_.Add(CreateAngry(p));
+			expressions_.Add(CreateTired(p));
+
+			for (int i = 0; i < expressions_.Count; ++i)
+			{
+				if (expressions_[i].Type != i)
+					Cue.LogError("bad expression type/index");
+			}
+
+			if (expressions_.Count != Expressions.Count)
+				Cue.LogError("bad expression count");
 		}
 
 		public List<ExpressionType> All
@@ -130,50 +147,31 @@ namespace Cue.Proc
 			return e;
 		}
 
-		public void Set(int type, float intensity, bool resetOthers = false)
+		private ExpressionType CreateTired(Person p)
 		{
-			Set(
-				new ExpressionIntensity[]
-				{
-					new ExpressionIntensity(type, intensity)
-				},
-				resetOthers);
+			var e = new ExpressionType(p, Expressions.Tired);
+
+			e.Groups.Add(BE.Drooling(p));
+			e.Groups.Add(BE.EyesRollBack(p));
+			e.Groups.Add(BE.EyesClosedTired(p));
+
+			return e;
 		}
 
-		public void Set(ExpressionIntensity[] intensities, bool resetOthers = false)
+		public void SetIntensity(int type, float intensity)
 		{
-			// todo: let morphs go back to normal
+			expressions_[type].Intensity = intensity;
+		}
 
-			for (int i = 0; i < expressions_.Count; ++i)
-			{
-				bool found = false;
-
-				for (int j = 0; j < intensities.Length; ++j)
-				{
-					if (intensities[j].type == expressions_[i].Type)
-					{
-						expressions_[i].Intensity = intensities[j].intensity;
-						found = true;
-						break;
-					}
-				}
-
-				if (!found && resetOthers)
-					expressions_[i].Intensity = 0;
-			}
+		public void SetDampen(int type, float intensity)
+		{
+			expressions_[type].Dampen = intensity;
 		}
 
 		public bool Enabled
 		{
-			get
-			{
-				return enabled_;
-			}
-
-			set
-			{
-				enabled_ = value;
-			}
+			get { return enabled_; }
+			set { enabled_ = value; }
 		}
 
 		public void MakeNeutral()

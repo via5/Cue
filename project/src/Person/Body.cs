@@ -417,6 +417,11 @@ namespace Cue
 		{
 			m_?.Reset();
 		}
+
+		public override string ToString()
+		{
+			return m_?.ToString() ?? "no morph";
+		}
 	}
 
 
@@ -814,14 +819,16 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			temperature_.UpRate = person_.Mood.Excitement * pp.TemperatureExcitementRate;
+			temperature_.UpRate = person_.Mood.RawExcitement * pp.TemperatureExcitementRate;
 			temperature_.DownRate = pp.TemperatureDecayRate;
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.Excitement / pp.TemperatureExcitementMax,
+				person_.Mood.RawExcitement / pp.TemperatureExcitementMax,
 				0, 1);
 
 			temperature_.Update(s);
+
+			person_.Breathing.Intensity = person_.Mood.Energy;
 		}
 
 		private void OnTemperatureChanged(float f)

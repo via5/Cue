@@ -7,7 +7,7 @@ namespace Cue
 		bool Enabled { get; }
 		bool Finished { get; }
 		float Progress { get; }
-		float Excitement { set; }
+		float Energy { set; }
 		void Update(float s);
 	}
 
@@ -137,7 +137,7 @@ namespace Cue
 			get { return d_.Progress; }
 		}
 
-		public float Excitement
+		public float Energy
 		{
 			set { WindowMagnitude = value; }
 		}

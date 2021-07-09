@@ -8,7 +8,7 @@ namespace Cue
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
 		public PersonDumpTab(Person person)
-			: base("dump")
+			: base("Dump")
 		{
 			person_ = person;
 

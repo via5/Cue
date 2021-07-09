@@ -100,5 +100,23 @@
 			g.Add(new ClampableMorph(p, BodyParts.None, "Lip Top Up", 0, 0.3f, 1, 5, 2, 2));
 			return g;
 		}
+
+		public static IProceduralMorphGroup Drooling(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+			g.Add(new ClampableMorph(p, BodyParts.None, "Mouth Open", 0, 1, 3, 8, 4, 4));
+			return g;
+		}
+
+		public static IProceduralMorphGroup EyesClosedTired(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup();
+
+			var eyesClosed = new ClampableMorph(p, BodyParts.None, "Eyes Closed", 0.2f, 1, 3, 8, 4, 4);
+			eyesClosed.DisableBlinkAbove = 0.5f;
+			g.Add(eyesClosed);
+
+			return g;
+		}
 	}
 }

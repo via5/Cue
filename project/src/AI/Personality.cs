@@ -11,7 +11,7 @@
 		bool AvoidGazeDuringSexOthers { get; }
 		float MaxExcitementForAvoid { get; }
 		float AvoidDelayAfterOrgasm { get; }
-		float MaxExcitementForRandomGaze { get; }
+		float MaxEnergyForRandomGaze { get; }
 
 		float OtherSexExcitementRate { get; }
 		float MaxOtherSexExcitement{ get; }
@@ -118,7 +118,7 @@
 
 		public virtual float OtherSexExcitementRate { get { return 0.3f; } }
 		public virtual float MaxOtherSexExcitement { get { return 0.5f; } }
-		public virtual float MaxExcitementForRandomGaze { get { return 0.2f; } }
+		public virtual float MaxEnergyForRandomGaze { get { return 0.2f; } }
 
 
 		public float NaturalRandomWeight { get { return 0.05f; } }
@@ -167,10 +167,10 @@
 				wasClose_ = close;
 			}
 
-			gazeDuration_.WindowMagnitude = person_.Mood.Excitement;
+			gazeDuration_.WindowMagnitude = person_.Mood.Energy;
 			gazeDuration_.Update(s);
 
-			gazeRandomInterval_.WindowMagnitude = person_.Mood.Excitement;
+			gazeRandomInterval_.WindowMagnitude = person_.Mood.Energy;
 			gazeRandomInterval_.Update(s);
 		}
 
@@ -239,20 +239,14 @@
 
 		protected override void SetIdle()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-				new ExpressionIntensity(Expressions.Happy, 0.7f),
-				new ExpressionIntensity(Expressions.Mischievous, 0.0f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 0.7f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 0.0f);
 		}
 
 		protected override void SetHappy()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-				new ExpressionIntensity(Expressions.Happy, 1.0f),
-				new ExpressionIntensity(Expressions.Mischievous, 0.2f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 1.0f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 0.2f);
 		}
 	}
 
@@ -266,20 +260,14 @@
 
 		protected override void SetIdle()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-					new ExpressionIntensity(Expressions.Happy, 0.2f),
-					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 0.2f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 1.0f);
 		}
 
 		protected override void SetHappy()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-					new ExpressionIntensity(Expressions.Happy, 0.5f),
-					new ExpressionIntensity(Expressions.Mischievous, 1.0f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 0.5f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 1.0f);
 		}
 	}
 
@@ -332,22 +320,16 @@
 
 		private void SetIdle()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-				new ExpressionIntensity(Expressions.Happy, 0.0f),
-				new ExpressionIntensity(Expressions.Mischievous, 0.2f),
-				new ExpressionIntensity(Expressions.Angry, 0.6f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 0.0f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 0.2f);
+			person_.Expression.SetIntensity(Expressions.Angry, 0.6f);
 		}
 
 		private void SetAngry()
 		{
-			person_.Expression.Set(new ExpressionIntensity[]
-			{
-				new ExpressionIntensity(Expressions.Happy, 0.0f),
-				new ExpressionIntensity(Expressions.Mischievous, 0.0f),
-				new ExpressionIntensity(Expressions.Angry, 1.0f)
-			});
+			person_.Expression.SetIntensity(Expressions.Happy, 0.0f);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 0.0f);
+			person_.Expression.SetIntensity(Expressions.Angry, 1.0f);
 		}
 	}
 }

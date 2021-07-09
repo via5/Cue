@@ -193,25 +193,15 @@ namespace Cue
 	}
 
 
-	public struct ExpressionIntensity
-	{
-		public int type;
-		public float intensity;
-
-		public ExpressionIntensity(int type, float intensity)
-		{
-			this.type = type;
-			this.intensity = intensity;
-		}
-	}
-
 	class Expressions
 	{
-		public const int Common = 1;
-		public const int Happy = 2;
-		public const int Mischievous = 3;
-		public const int Pleasure = 4;
-		public const int Angry = 5;
+		public const int Common = 0;
+		public const int Happy = 1;
+		public const int Mischievous = 2;
+		public const int Pleasure = 3;
+		public const int Angry = 4;
+		public const int Tired = 5;
+		public const int Count = 6;
 
 		public static string ToString(int i)
 		{
@@ -222,6 +212,7 @@ namespace Cue
 				case Mischievous: return "mischievous";
 				case Pleasure: return "pleasure";
 				case Angry: return "angry";
+				case Tired: return "tired";
 				default: return $"?{i}";
 			}
 		}
@@ -230,8 +221,8 @@ namespace Cue
 	interface IExpression
 	{
 		void MakeNeutral();
-		void Set(int type, float intensity, bool resetOthers = false);
-		void Set(ExpressionIntensity[] intensities, bool resetOthers = false);
+		void SetIntensity(int type, float intensity);
+		void SetDampen(int type, float intensity);
 		bool Enabled { get; set; }
 		void FixedUpdate(float s);
 		void OnPluginState(bool b);

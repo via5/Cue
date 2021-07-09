@@ -722,6 +722,11 @@ namespace Cue.Sys.Vam
 
 			inited_ = true;
 		}
+
+		public override string ToString()
+		{
+			return $"{morph_}";
+		}
 	}
 
 

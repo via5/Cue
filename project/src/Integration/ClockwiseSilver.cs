@@ -182,11 +182,11 @@ namespace Cue
 			{
 				morphDuration_.Value =
 					morphDuration_.DefaultValue -
-					person_.Mood.Excitement * 0.4f;
+					person_.Mood.Energy * 0.4f;
 
 				morphSpeed_.Value =
 					morphSpeed_.DefaultValue +
-					person_.Mood.Excitement * 4;
+					person_.Mood.Energy * 4;
 			}
 
 			if (k && active_.Value)

@@ -53,7 +53,7 @@
 			get { return timeSinceLastOrgasm_; }
 		}
 
-		public float Excitement
+		public float RawExcitement
 		{
 			get { return excitement_.Value; }
 		}
@@ -63,7 +63,7 @@
 			get { return excitement_; }
 		}
 
-		public float Tiredness
+		public float RawTiredness
 		{
 			get { return tiredness_.Value; }
 		}
@@ -78,6 +78,11 @@
 			get { return baseTiredness_; }
 		}
 
+		public float Energy
+		{
+			get { return RawExcitement * (1 - RawTiredness * 0.8f); }
+		}
+
 		public void ForceOrgasm()
 		{
 			DoOrgasm();
@@ -89,8 +94,16 @@
 
 			excitement_.Value = person_.Excitement.Value;
 
-			person_.Breathing.Intensity = Excitement;
-			person_.Expression.Set(Expressions.Pleasure, Excitement);
+			for (int i = 0; i < Expressions.Count; ++i)
+			{
+				if (i == Expressions.Pleasure)
+					person_.Expression.SetIntensity(i, RawExcitement);
+
+				if (i == Expressions.Tired)
+					person_.Expression.SetIntensity(i, RawTiredness);
+				else
+					person_.Expression.SetDampen(i, RawTiredness);
+			}
 
 			switch (state_)
 			{
@@ -98,7 +111,7 @@
 				{
 					timeSinceLastOrgasm_ += s;
 
-					if (excitement_.UnforcedValue >= 1)
+					if (!excitement_.IsForced && excitement_.Value >= 1)
 						DoOrgasm();
 
 					break;
@@ -147,7 +160,7 @@
 			{
 				if (timeSinceLastOrgasm_ > pp.DelayAfterOrgasmUntilTirednessDecay)
 				{
-					if (Excitement < pp.TirednessMaxExcitementForBaseDecay)
+					if (RawExcitement < pp.TirednessMaxExcitementForBaseDecay)
 					{
 						baseTiredness_ = U.Clamp(
 							baseTiredness_ - s * pp.TirednessBaseDecayRate,
