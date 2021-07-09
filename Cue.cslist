@@ -51,12 +51,15 @@ project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
 project\src\Sys\Vam\VamAtomNav.cs
 project\src\Sys\Vam\VamBody.cs
+project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
 project\src\Sys\Vam\VamCanvas.cs
 project\src\Sys\Vam\VamClothing.cs
 project\src\Sys\Vam\VamGraphic.cs
+project\src\Sys\Vam\VamHair.cs
 project\src\Sys\Vam\VamInput.cs
 project\src\Sys\Vam\VamLog.cs
+project\src\Sys\Vam\VamMorphs.cs
 project\src\Sys\Vam\VamNav.cs
 project\src\Sys\Vam\VamObjects.cs
 project\src\Sys\Vam\VamParameter.cs

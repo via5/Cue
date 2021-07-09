@@ -147,12 +147,15 @@
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
     <Compile Include="src\Sys\Vam\VamAtomNav.cs" />
     <Compile Include="src\Sys\Vam\VamBody.cs" />
+    <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
     <Compile Include="src\Sys\Vam\VamCanvas.cs" />
     <Compile Include="src\Sys\Vam\VamClothing.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />
+    <Compile Include="src\Sys\Vam\VamHair.cs" />
     <Compile Include="src\Sys\Vam\VamInput.cs" />
     <Compile Include="src\Sys\Vam\VamLog.cs" />
+    <Compile Include="src\Sys\Vam\VamMorphs.cs" />
     <Compile Include="src\Sys\Vam\VamNav.cs" />
     <Compile Include="src\Sys\Vam\VamObjects.cs" />
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
