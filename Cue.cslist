@@ -46,6 +46,7 @@ project\src\Procedural\Sync.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Clothing.cs
 project\src\Resources\Objects.cs
+project\src\Resources\Personalities.cs
 project\src\Resources\Physiologies.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs

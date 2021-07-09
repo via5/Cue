@@ -710,6 +710,12 @@ namespace VUI
 			parent_.Remove(this);
 		}
 
+		public void RemoveAllChildren()
+		{
+			while (children_.Count > 0)
+				Remove(children_[0]);
+		}
+
 		public void BringToTop()
 		{
 			if (widgetObject_ != null)

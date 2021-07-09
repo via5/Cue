@@ -203,18 +203,25 @@ namespace Cue
 		public const int Tired = 5;
 		public const int Count = 6;
 
+		private static string[] names_ = new string[]
+		{
+			"common", "happy", "mischievous", "pleasure", "angry", "tired"
+		};
+
+		public static int FromString(string s)
+		{
+			for (int i = 0; i < names_.Length; ++i)
+			{
+				if (names_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
 		public static string ToString(int i)
 		{
-			switch (i)
-			{
-				case Common: return "common";
-				case Happy: return "happy";
-				case Mischievous: return "mischievous";
-				case Pleasure: return "pleasure";
-				case Angry: return "angry";
-				case Tired: return "tired";
-				default: return $"?{i}";
-			}
+			return names_[i];
 		}
 	}
 

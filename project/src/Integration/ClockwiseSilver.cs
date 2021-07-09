@@ -304,7 +304,7 @@ namespace Cue
 				headAngleZ_.Value = 0;
 				lipDepth_.Value = 0;
 
-				closeEyes_.Value = !person_.Personality.AvoidGazePlayer;
+				closeEyes_.Value = !person_.Personality.GetBool(PSE.AvoidGazePlayer);
 
 				randomMovements_ = false;
 				randomSpeeds_ = true;

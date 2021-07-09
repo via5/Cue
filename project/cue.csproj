@@ -142,6 +142,7 @@
     <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Clothing.cs" />
     <Compile Include="src\Resources\Objects.cs" />
+    <Compile Include="src\Resources\Personalities.cs" />
     <Compile Include="src\Resources\Physiologies.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />

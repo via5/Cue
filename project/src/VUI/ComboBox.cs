@@ -283,7 +283,15 @@ namespace VUI
 		{
 		}
 
-		public ComboBox(List<ItemType> items, ItemCallback selectionChanged)
+		public ComboBox(ItemType[] items, IndexCallback selectionChanged)
+			: this(new List<ItemType>(items), null, selectionChanged)
+		{
+		}
+
+		public ComboBox(
+			List<ItemType> items,
+			ItemCallback selectionChanged,
+			IndexCallback selectionIndexChanged = null)
 		{
 			buttons_ = new Panel(new VerticalFlow());
 			up_ = new CustomButton(Utilities.UpArrow, OnUp);
@@ -309,6 +317,9 @@ namespace VUI
 
 			if (selectionChanged != null)
 				SelectionChanged += selectionChanged;
+
+			if (selectionIndexChanged != null)
+				SelectionIndexChanged += selectionIndexChanged;
 		}
 
 		public ComboBox(List<ItemType> items, ItemType sel, ItemCallback selectionChanged)

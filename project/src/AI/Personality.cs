@@ -1,83 +1,263 @@
 ﻿namespace Cue
 {
-	interface IPersonality
+	static class PSE
 	{
-		Pair<float, float> LookAtRandomInterval { get; }
-		float GazeDuration { get; }
+		// sliding durations
+		public const int GazeDuration = 0;
+		public const int SlidingDurationCount = 1;
 
-		bool AvoidGazePlayer { get; }
-		bool AvoidGazeInsidePersonalSpace { get; }
-		bool AvoidGazeDuringSex { get; }
-		bool AvoidGazeDuringSexOthers { get; }
-		float MaxExcitementForAvoid { get; }
-		float AvoidDelayAfterOrgasm { get; }
-		float MaxEnergyForRandomGaze { get; }
+		// bools
+		public const int AvoidGazePlayer = 0;
+		public const int AvoidGazeInsidePersonalSpace = 1;
+		public const int AvoidGazeDuringSex = 2;
+		public const int AvoidGazeDuringSexOthers = 3;
+		public const int BoolCount = 4;
 
-		float OtherSexExcitementRate { get; }
-		float MaxOtherSexExcitement{ get; }
+		// floats
+		public const int MaxExcitementForAvoid = 0;
+		public const int AvoidDelayAfterOrgasm = 1;
+		public const int MaxEnergyForRandomGaze = 2;
+		public const int OtherSexExcitementRate = 3;
+		public const int MaxOtherSexExcitement = 4;
+		public const int NaturalRandomWeight = 5;
+		public const int BlowjobEyesWeight = 6;
+		public const int BlowjobGenitalsWeight = 7;
+		public const int HandjobEyesWeight = 8;
+		public const int HandjobGenitalsWeight = 9;
+		public const int PenetrationEyesWeight = 10;
+		public const int PenetrationChestWeight = 11;
+		public const int PenetrationGenitalsWeight = 12;
+		public const int GropedEyesWeight = 13;
+		public const int GropedChestWeight = 14;
+		public const int GropedGenitalsWeight = 15;
+		public const int OtherSexEyesWeight = 16;
+		public const int NaturalOtherEyesWeight = 17;
+		public const int BusyOtherEyesWeight = 18;
+		public const int LookAboveMaxWeight = 19;
+		public const int LookAboveMaxWeightOrgasm = 20;
+		public const int GazeRandomIntervalMinimum = 21;
+		public const int GazeRandomIntervalMaximum = 22;
+		public const int FloatCount = 23;
 
-		float NaturalRandomWeight { get; }
+		// strings
+		public const int StringCount = 0;
 
-		float BlowjobEyesWeight { get; }
-		float BlowjobGenitalsWeight { get; }
+		// states
+		public const int IdleState = 0;
+		public const int CloseState = 1;
+		public const int StateCount = 2;
 
-		float HandjobEyesWeight { get; }
-		float HandjobGenitalsWeight { get; }
 
-		float PenetrationEyesWeight { get; }
-		float PenetrationChestWeight { get; }
-		float PenetrationGenitalsWeight { get; }
+		private static string[] slidingDurationNames_ = new string[]
+		{
+			"gazeDuration"
+		};
 
-		float GropedEyesWeight { get; }
-		float GropedChestWeight { get; }
-		float GropedGenitalsWeight { get; }
+		public static int SlidingDurationFromString(string s)
+		{
+			for (int i = 0; i < slidingDurationNames_.Length; ++i)
+			{
+				if (slidingDurationNames_[i] == s)
+					return i;
+			}
 
-		float OtherSexEyesWeight { get; }
-		float NaturalOtherEyesWeight { get; }
-		float BusyOtherEyesWeight { get; }
-		float LookAboveMaxWeight { get; }
-		float LookAboveMaxWeightOrgasm { get; }
+			return -1;
+		}
 
-		string Name { get; }
-		string StateString{ get; }
-		void Update(float s);
+		public static string SlidingDurationToString(int i)
+		{
+			return slidingDurationNames_[i];
+		}
+
+
+		private static string[] boolNames_ = new string[]
+		{
+			"avoidGazePlayer", "avoidGazeInsidePersonalSpace",
+			"avoidGazeDuringSex", "avoidGazeDuringSexOthers"
+		};
+
+		public static int BoolFromString(string s)
+		{
+			for (int i = 0; i < boolNames_.Length; ++i)
+			{
+				if (boolNames_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static string BoolToString(int i)
+		{
+			return boolNames_[i];
+		}
+
+
+		private static string[] floatNames_ = new string[]
+		{
+			"maxExcitementForAvoid", "avoidDelayAfterOrgasm",
+			"maxEnergyForRandomGaze", "otherSexExcitementRate",
+			"maxOtherSexExcitement", "naturalRandomWeight", "blowjobEyesWeight",
+			"blowjobGenitalsWeight", "handjobEyesWeight",
+			"handjobGenitalsWeight", "penetrationEyesWeight",
+			"penetrationChestWeight", "penetrationGenitalsWeight",
+			"gropedEyesWeight", "gropedChestWeight", "gropedGenitalsWeight",
+			"otherSexEyesWeight", "naturalOtherEyesWeight",
+			"busyOtherEyesWeight", "lookAboveMaxWeight",
+			"lookAboveMaxWeightOrgasm", "gazeRandomIntervalMinimum",
+			"gazeRandomIntervalMaximum"
+		};
+
+		public static int FloatFromString(string s)
+		{
+			for (int i = 0; i < floatNames_.Length; ++i)
+			{
+				if (floatNames_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static string FloatToString(int i)
+		{
+			return floatNames_[i];
+		}
+
+
+
+		private static string[] stringNames_ = new string[]
+		{
+		};
+
+		public static int StringFromString(string s)
+		{
+			for (int i = 0; i < stringNames_.Length; ++i)
+			{
+				if (stringNames_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static string StringToString(int i)
+		{
+			return stringNames_[i];
+		}
+
+
+		private static string[] stateNames_ = new string[]
+		{
+			"idle", "close"
+		};
+
+		public static string[] StateNames
+		{
+			get { return stateNames_; }
+		}
+
+		public static int StateFromString(string s)
+		{
+			for (int i = 0; i < stateNames_.Length; ++i)
+			{
+				if (stateNames_[i] == s)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public static string StateToString(int i)
+		{
+			return stateNames_[i];
+		}
 	}
 
 
-	abstract class BasicPersonality : IPersonality
+	class Personality
 	{
-		protected readonly Person person_;
+		public class ExpressionIntensity
+		{
+			public int type = -1;
+			public float intensity = 0;
+
+			public ExpressionIntensity()
+			{
+			}
+
+			public ExpressionIntensity(ExpressionIntensity o)
+			{
+				type = o.type;
+				intensity = o.intensity;
+			}
+		}
+
+		public class State
+		{
+			public readonly string name;
+
+			public bool[] bools;
+			public float[] floats;
+			public string[] strings;
+			public SlidingDuration[] slidingDurations;
+			public ExpressionIntensity[] expressions;
+
+			public State(int i)
+			{
+				name = PSE.StateToString(i);
+				bools = new bool[PSE.BoolCount];
+				floats = new float[PSE.FloatCount];
+				strings = new string[PSE.StringCount];
+				slidingDurations = new SlidingDuration[PSE.SlidingDurationCount];
+				expressions = new ExpressionIntensity[0];
+			}
+		}
+
+
 		private readonly string name_;
-		private string state_ = "idle";
+		private Person person_;
+
 		private bool wasClose_ = false;
 		private bool inited_ = false;
-
 		private bool forcedClose_ = false;
 		private bool isCloseForced_ = false;
 
-		private SlidingDuration gazeRandomInterval_ = new SlidingDuration(
-			10, 1, 0, 0, 5, new CubicInEasing());
+		private State[] states_ = new State[PSE.StateCount];
 
-		private SlidingDuration gazeDuration_ = new SlidingDuration(
-			0.8f, 0.2f, 0, 0, 0.3f, new CubicInEasing());
-
-		public BasicPersonality(Person p, string name)
+		public Personality(string name, Person p = null)
 		{
-			person_ = p;
 			name_ = name;
+			person_ = p;
+
+			for (int i = 0; i < PSE.StateCount; ++i)
+				states_[i] = new State(i);
 		}
 
-		public static IPersonality FromString(Person p, string name)
+		public Personality Clone(string newName, Person p)
 		{
-			if (name == "quirky")
-				return new QuirkyPersonality(p);
-			else if (name == "tsundere")
-				return new TsunderePersonality(p);
-			else if (name == "neutral" || string.IsNullOrEmpty(name))
-				return new NeutralPersonality(p);
+			var ps = new Personality(newName ?? name_, p);
 
-			Cue.LogError($"config: bad personality {name}");
-			return new NeutralPersonality(p);
+			for (int si = 0; si < states_.Length; ++si)
+			{
+				for (int i = 0; i < states_[si].bools.Length; ++i)
+					ps.states_[si].bools[i] = states_[si].bools[i];
+
+				for (int i = 0; i < states_[si].floats.Length; ++i)
+					ps.states_[si].floats[i] = states_[si].floats[i];
+
+				for (int i = 0; i < states_[si].strings.Length; ++i)
+					ps.states_[si].strings[i] = states_[si].strings[i];
+
+				for (int i = 0; i < states_[si].slidingDurations.Length; ++i)
+					ps.states_[si].slidingDurations[i] = new SlidingDuration(states_[si].slidingDurations[i]);
+
+				ps.states_[si].expressions = new ExpressionIntensity[states_[si].expressions.Length];
+				for (int i = 0; i < states_[si].expressions.Length; ++i)
+					ps.states_[si].expressions[i] = new ExpressionIntensity(states_[si].expressions[i]);
+			}
+
+			return ps;
 		}
 
 		public string Name
@@ -85,63 +265,66 @@
 			get { return name_; }
 		}
 
-		public string StateString
+		public State[] States
 		{
-			get { return state_; }
-			protected set { state_ = value; }
+			get { return states_; }
 		}
 
-		public virtual Pair<float, float> LookAtRandomInterval
+		public State GetState(int i)
+		{
+			return states_[i];
+		}
+
+		private State CurrentState
+		{
+			get
+			{
+				if (wasClose_)
+					return states_[PSE.CloseState];
+				else
+					return states_[PSE.IdleState];
+			}
+		}
+
+		public Pair<float, float> LookAtRandomInterval
 		{
 			get
 			{
 				return new Pair<float, float>(
-					gazeRandomInterval_.Minimum,
-					gazeRandomInterval_.Maximum);
+					Get(PSE.GazeRandomIntervalMinimum),
+					Get(PSE.GazeRandomIntervalMaximum));
 			}
 		}
 
-		public virtual float GazeDuration
+		public float GazeDuration
 		{
-			get { return gazeDuration_.Current; }
+			get { return GetSlidingDuration(PSE.GazeDuration).Current; }
 		}
 
-		public virtual bool AvoidGazePlayer { get; }
-		public virtual bool AvoidGazeInsidePersonalSpace { get { return false; } }
-		public virtual bool AvoidGazeDuringSex { get { return false; } }
-		public virtual bool AvoidGazeDuringSexOthers { get { return false; } }
-		public virtual float MaxExcitementForAvoid { get { return 0.6f; } }
-		public virtual float AvoidDelayAfterOrgasm { get { return 15; } }
+		public SlidingDuration GetSlidingDuration(int i)
+		{
+			return CurrentState.slidingDurations[i];
+		}
 
-		public virtual float LookAboveMaxWeight { get { return 0.2f; } }
-		public virtual float LookAboveMaxWeightOrgasm { get { return 0.5f; } }
+		public void Set(State[] ss)
+		{
+			states_ = ss;
+		}
 
-		public virtual float OtherSexExcitementRate { get { return 0.3f; } }
-		public virtual float MaxOtherSexExcitement { get { return 0.5f; } }
-		public virtual float MaxEnergyForRandomGaze { get { return 0.2f; } }
+		public bool GetBool(int i)
+		{
+			return CurrentState.bools[i];
+		}
 
+		public float Get(int i)
+		{
+			return CurrentState.floats[i];
+		}
 
-		public float NaturalRandomWeight { get { return 0.05f; } }
-		public float NaturalOtherEyesWeight { get { return 0.2f; } }
-		public float BusyOtherEyesWeight { get { return 0.1f; } }
-
-		public float BlowjobEyesWeight { get { return 0.1f; } }
-		public float BlowjobGenitalsWeight { get { return 1; } }
-
-		public float HandjobEyesWeight { get { return 1; } }
-		public float HandjobGenitalsWeight { get { return 0.2f; } }
-
-		// should look at genitals, but mg's gaze makes weird angles when
-		// the target is below, so look at chest instead
-		public float PenetrationEyesWeight { get { return 1; } }
-		public float PenetrationChestWeight { get { return 0.2f; } }
-		public float PenetrationGenitalsWeight { get { return 0; } }
-
-		public float GropedEyesWeight { get { return 1; } }
-		public float GropedChestWeight { get { return 0.2f; } }
-		public float GropedGenitalsWeight { get { return 0.2f; } }
-
-		public float OtherSexEyesWeight { get { return 0.2f; } }
+		public string GetString(int i)
+		{
+			return CurrentState.strings[i];
+		}
 
 		public virtual void Update(float s)
 		{
@@ -167,20 +350,39 @@
 				wasClose_ = close;
 			}
 
-			gazeDuration_.WindowMagnitude = person_.Mood.Energy;
-			gazeDuration_.Update(s);
-
-			gazeRandomInterval_.WindowMagnitude = person_.Mood.Energy;
-			gazeRandomInterval_.Update(s);
+			for (int i = 0; i < CurrentState.slidingDurations.Length; ++i)
+			{
+				GetSlidingDuration(i).WindowMagnitude = person_.Mood.Energy;
+				GetSlidingDuration(i).Update(s);
+			}
 		}
 
 		public override string ToString()
 		{
-			return $"{Name} {state_}";
+			return $"{Name}";
 		}
 
-		protected abstract void Init();
-		protected abstract void SetClose(bool b);
+		private void Init()
+		{
+			SetClose(false);
+		}
+
+		private void SetClose(bool b)
+		{
+			State s;
+
+			if (b)
+				s = states_[PSE.CloseState];
+			else
+				s = states_[PSE.IdleState];
+
+			for (int i = 0; i < s.expressions.Length; ++i)
+			{
+				person_.Expression.SetIntensity(
+					s.expressions[i].type,
+					s.expressions[i].intensity);
+			}
+		}
 
 		public void ForceSetClose(bool enabled, bool close)
 		{
@@ -195,141 +397,6 @@
 				SetClose(forcedClose_);
 			else
 				SetClose(b);
-		}
-	}
-
-
-	abstract class StandardPersonality : BasicPersonality
-	{
-		protected StandardPersonality(Person p, string name)
-			: base(p, name)
-		{
-		}
-
-		protected override void Init()
-		{
-			SetIdle();
-		}
-
-		protected override void SetClose(bool b)
-		{
-			if (b)
-			{
-				StateString = "happy";
-				SetHappy();
-			}
-			else
-			{
-				StateString = "idle";
-				SetIdle();
-			}
-		}
-
-		protected abstract void SetIdle();
-		protected abstract void SetHappy();
-	}
-
-
-	class NeutralPersonality : StandardPersonality
-	{
-		public NeutralPersonality(Person p)
-			: base(p, "neutral")
-		{
-		}
-
-		protected override void SetIdle()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 0.7f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 0.0f);
-		}
-
-		protected override void SetHappy()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 1.0f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 0.2f);
-		}
-	}
-
-
-	class QuirkyPersonality : StandardPersonality
-	{
-		public QuirkyPersonality(Person p)
-			: base(p, "quirky")
-		{
-		}
-
-		protected override void SetIdle()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 0.2f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 1.0f);
-		}
-
-		protected override void SetHappy()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 0.5f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 1.0f);
-		}
-	}
-
-
-	class TsunderePersonality : BasicPersonality
-	{
-		private bool angry_ = false;
-
-		public TsunderePersonality(Person p)
-			: base(p, "tsundere")
-		{
-		}
-
-		protected override void Init()
-		{
-			SetIdle();
-		}
-
-		public override bool AvoidGazePlayer { get { return true; } }
-		public override bool AvoidGazeInsidePersonalSpace { get { return true; } }
-		public override bool AvoidGazeDuringSex { get { return true; } }
-		public override bool AvoidGazeDuringSexOthers { get { return false; } }
-
-		public override Pair<float, float> LookAtRandomInterval
-		{
-			get
-			{
-				if (angry_)
-					return new Pair<float, float>(3, 8);
-				else
-					return base.LookAtRandomInterval;
-			}
-		}
-
-		protected override void SetClose(bool b)
-		{
-			if (b)
-			{
-				StateString = "angry";
-				SetAngry();
-				angry_ = true;
-			}
-			else
-			{
-				StateString = "idle";
-				SetIdle();
-				angry_ = false;
-			}
-		}
-
-		private void SetIdle()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 0.0f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 0.2f);
-			person_.Expression.SetIntensity(Expressions.Angry, 0.6f);
-		}
-
-		private void SetAngry()
-		{
-			person_.Expression.SetIntensity(Expressions.Happy, 0.0f);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 0.0f);
-			person_.Expression.SetIntensity(Expressions.Angry, 1.0f);
 		}
 	}
 }

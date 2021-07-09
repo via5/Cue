@@ -249,13 +249,13 @@ namespace Cue
 			reasons_[Breasts].GlobalSensitivityRate = pp.Get(PE.BreastsRate);
 			reasons_[Genitals].GlobalSensitivityRate = pp.Get(PE.GenitalsRate);
 			reasons_[Penetration].GlobalSensitivityRate = pp.Get(PE.PenetrationRate);
-			reasons_[OtherSex].GlobalSensitivityRate = ps.OtherSexExcitementRate;
+			reasons_[OtherSex].GlobalSensitivityRate = ps.Get(PSE.OtherSexExcitementRate);
 
 			reasons_[Mouth].SensitivityMax = pp.Get(PE.MouthMax);
 			reasons_[Breasts].SensitivityMax = pp.Get(PE.BreastsMax);
 			reasons_[Genitals].SensitivityMax = pp.Get(PE.GenitalsMax);
 			reasons_[Penetration].SensitivityMax = pp.Get(PE.PenetrationMax);
-			reasons_[OtherSex].SensitivityMax = ps.MaxOtherSexExcitement;
+			reasons_[OtherSex].SensitivityMax = ps.Get(PSE.MaxOtherSexExcitement);
 
 			physicalRate_ = 0;
 			emotionalRate_ = 0;

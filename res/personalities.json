@@ -1,0 +1,245 @@
+{
+	"personalities":
+	[
+		{
+			"name": "neutral",
+
+			"idle":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0.7
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0
+					},
+				],
+
+				"gazeDuration":
+				{
+					"min": 0.8,
+					"max": 0.2,
+					"nextMinTime": 0,
+					"nextMaxTime": 0,
+					"window": 0.3,
+					"windowEasing": "cubicin"
+				}
+
+				"gazeRandomIntervalMinimum": 10,
+				"gazeRandomIntervalMaximum": 1,
+
+				"avoidGazePlayer": false,
+				"avoidGazeInsidePersonalSpace": false,
+				"avoidGazeDuringSex": false,
+				"avoidGazeDuringSexOthers": false,
+				"maxExcitementForAvoid": 0,
+				"avoidDelayAfterOrgasm": 0,
+
+				"lookAboveMaxWeight": 0.2,
+				"lookAboveMaxWeightOrgasm": 0.5,
+
+				"otherSexExcitementRate": 0.3,
+				"maxOtherSexExcitement": 0.5,
+				"maxEnergyForRandomGaze": 0.2,
+
+				"naturalRandomWeight": 0.05,
+				"naturalOtherEyesWeight": 0.2,
+				"busyOtherEyesWeight": 0.1,
+
+				"blowjobEyesWeight": 0.1,
+				"blowjobGenitalsWeight": 1,
+
+				"handjobEyesWeight": 1,
+				"handjobGenitalsWeight": 0.2,
+
+				"penetrationEyesWeight": 1,
+				"penetrationChestWeight": 0.2,
+				"penetrationGenitalsWeight": 0,
+
+				"gropedEyesWeight": 1,
+				"gropedChestWeight": 0.2,
+				"gropedGenitalsWeight": 0.2,
+
+				"otherSexEyesWeight": 0.2
+			},
+
+			"close":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 1
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0.2
+					},
+				],
+
+				"gazeDuration":
+				{
+					"min": 0.8,
+					"max": 0.2,
+					"nextMinTime": 0,
+					"nextMaxTime": 0,
+					"window": 0.3,
+					"windowEasing": "cubicin"
+				},
+
+				"gazeRandomIntervalMinimum": 10,
+				"gazeRandomIntervalMaximum": 1,
+
+				"avoidGazePlayer": false,
+				"avoidGazeInsidePersonalSpace": false,
+				"avoidGazeDuringSex": false,
+				"avoidGazeDuringSexOthers": false,
+				"maxExcitementForAvoid": 0,
+				"avoidDelayAfterOrgasm": 0,
+
+				"lookAboveMaxWeight": 0.2,
+				"lookAboveMaxWeightOrgasm": 0.5,
+
+				"otherSexExcitementRate": 0.3,
+				"maxOtherSexExcitement": 0.5,
+				"maxEnergyForRandomGaze": 0.2,
+
+				"naturalRandomWeight": 0.05,
+				"naturalOtherEyesWeight": 0.2,
+				"busyOtherEyesWeight": 0.1,
+
+				"blowjobEyesWeight": 0.1,
+				"blowjobGenitalsWeight": 1,
+
+				"handjobEyesWeight": 1,
+				"handjobGenitalsWeight": 0.2,
+
+				"penetrationEyesWeight": 1,
+				"penetrationChestWeight": 0.2,
+				"penetrationGenitalsWeight": 0,
+
+				"gropedEyesWeight": 1,
+				"gropedChestWeight": 0.2,
+				"gropedGenitalsWeight": 0.2,
+
+				"otherSexEyesWeight": 0.2,
+			}
+		},
+
+
+		{
+			"name": "quirky",
+			"inherit": "neutral",
+
+			"idle":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0.2
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 1
+					}
+				]
+			},
+
+			"close":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0.5
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 1
+					}
+				]
+			}
+		},
+
+
+		{
+			"name": "tsundere",
+			"inherit": "neutral",
+
+			"idle":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0.2
+					},
+
+					{
+						"type": "angry",
+						"intensity": 0.6
+					}
+				],
+
+				"avoidGazePlayer": true,
+				"avoidGazeInsidePersonalSpace": true,
+				"avoidGazeDuringSex": true,
+				"maxExcitementForAvoid": 0.6,
+				"avoidDelayAfterOrgasm": 15
+			},
+
+			"close":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0
+					},
+
+					{
+						"type": "angry",
+						"intensity": 1
+					},
+				],
+
+				"gazeDuration":
+				{
+					"min": 0.8,
+					"max": 0.2,
+					"nextMinTime": 0,
+					"nextMaxTime": 0,
+					"window": 0.3,
+					"windowEasing": "cubicin"
+				},
+
+				"gazeRandomIntervalMinimum": 3,
+				"gazeRandomIntervalMaximum": 8,
+
+				"avoidGazePlayer": true,
+				"avoidGazeInsidePersonalSpace": true,
+				"avoidGazeDuringSex": true,
+				"maxExcitementForAvoid": 0.6,
+				"avoidDelayAfterOrgasm": 15
+			}
+		}
+	]
+}

@@ -94,12 +94,12 @@ namespace Cue
 			if (person_.Mood.State == Mood.OrgasmState)
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.LookAboveMaxWeight);
+					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeight));
 			}
 			else
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.LookAboveMaxWeightOrgasm);
+					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeightOrgasm));
 			}
 
 			// exclusive
@@ -118,7 +118,7 @@ namespace Cue
 
 				if (t != null)
 				{
-					if (ps.AvoidGazeInsidePersonalSpace)
+					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
 						lastString_ = $"kissing {t.ID}, avoid in ps";
 						targets_.SetRandomWeight(1);
@@ -166,7 +166,7 @@ namespace Cue
 
 				if (t != null)
 				{
-					if (ps.AvoidGazeInsidePersonalSpace)
+					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
 						lastString_ += $"bj {t.ID}, avoid in ps/";
 						SetShouldAvoid(t, true);
@@ -175,8 +175,8 @@ namespace Cue
 					{
 						lastString_ += $"bj {t.ID}/";
 						clearRandom = true;
-						targets_.SetWeight(t, BodyParts.Eyes, ps.BlowjobEyesWeight);
-						targets_.SetWeight(t, BodyParts.Genitals, ps.BlowjobGenitalsWeight);
+						targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.BlowjobEyesWeight));
+						targets_.SetWeight(t, BodyParts.Genitals, ps.Get(PSE.BlowjobGenitalsWeight));
 					}
 
 					gazerEnabled = false;
@@ -191,7 +191,7 @@ namespace Cue
 
 				if (t != null)
 				{
-					if (ps.AvoidGazeInsidePersonalSpace)
+					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
 						lastString_ += $"hj {t.ID}, avoid in ps/";
 						SetShouldAvoid(t, true);
@@ -200,8 +200,8 @@ namespace Cue
 					{
 						lastString_ += $"hj {t.ID}/";
 						clearRandom = true;
-						targets_.SetWeight(t, BodyParts.Eyes, ps.HandjobEyesWeight);
-						targets_.SetWeight(t, BodyParts.Genitals, ps.HandjobGenitalsWeight);
+						targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.HandjobEyesWeight));
+						targets_.SetWeight(t, BodyParts.Genitals, ps.Get(PSE.HandjobGenitalsWeight));
 					}
 
 					busy = true;
@@ -238,30 +238,30 @@ namespace Cue
 						if (person_.Body.PenetratedBy(t))
 						{
 							lastString_ += $"pen/";
-							eyes = ps.PenetrationEyesWeight;
-							otherChest = ps.PenetrationChestWeight;
-							genitals = ps.PenetrationGenitalsWeight;
+							eyes = ps.Get(PSE.PenetrationEyesWeight);
+							otherChest = ps.Get(PSE.PenetrationChestWeight);
+							genitals = ps.Get(PSE.PenetrationGenitalsWeight);
 						}
 						else
 						{
 							if (person_.Body.GropedBy(t, BodyParts.Head))
 							{
 								lastString_ += $"grope head, ";
-								eyes = ps.GropedEyesWeight;
+								eyes = ps.Get(PSE.GropedEyesWeight);
 							}
 
 							if (person_.Body.GropedBy(t, BodyParts.BreastParts))
 							{
 								lastString_ += $"grope chest, ";
-								eyes = ps.GropedEyesWeight;
-								selfChest = ps.GropedChestWeight;
+								eyes = ps.Get(PSE.GropedEyesWeight);
+								selfChest = ps.Get(PSE.GropedChestWeight);
 							}
 
 							if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
 							{
 								lastString_ += $"grope gen, ";
-								eyes = ps.GropedEyesWeight;
-								genitals = ps.GropedGenitalsWeight;
+								eyes = ps.Get(PSE.GropedEyesWeight);
+								genitals = ps.Get(PSE.GropedGenitalsWeight);
 							}
 						}
 
@@ -288,14 +288,14 @@ namespace Cue
 				else if (t.Body.Penetrated())
 				{
 					lastString_ += $"{t.ID} other pen";
-					targets_.SetWeight(t, BodyParts.Eyes, ps.OtherSexEyesWeight);
+					targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.OtherSexEyesWeight));
 				}
 			}
 
-			if (!clearRandom || person_.Mood.Energy > ps.MaxEnergyForRandomGaze)
+			if (!clearRandom || person_.Mood.Energy > ps.Get(PSE.MaxEnergyForRandomGaze))
 			{
 				// always at least a small change
-				targets_.SetRandomWeight(ps.NaturalRandomWeight);
+				targets_.SetRandomWeight(ps.Get(PSE.NaturalRandomWeight));
 			}
 
 			if (!busy)
@@ -306,10 +306,10 @@ namespace Cue
 				if (p == person_)
 					continue;
 
-				if (p == Cue.Instance.Player && ps.AvoidGazePlayer)
+				if (p == Cue.Instance.Player && ps.GetBool(PSE.AvoidGazePlayer))
 					continue;
 
-				float w = busy ? ps.BusyOtherEyesWeight : ps.NaturalOtherEyesWeight;
+				float w = busy ? ps.Get(PSE.BusyOtherEyesWeight) : ps.Get(PSE.NaturalOtherEyesWeight);
 				w *= (p.Mood.RawExcitement + 1);
 
 				targets_.SetWeightIfZero(p, BodyParts.Eyes, w);
@@ -322,7 +322,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.AvoidGazePlayer)
+			if (!ps.GetBool(PSE.AvoidGazePlayer))
 				return false;
 
 			return IsBored();
@@ -332,10 +332,10 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.RawExcitement >= ps.MaxExcitementForAvoid)
+			if (person_.Mood.RawExcitement >= ps.Get(PSE.MaxExcitementForAvoid))
 				return false;
 
-			if (person_.Mood.TimeSinceLastOrgasm < ps.AvoidDelayAfterOrgasm)
+			if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PSE.AvoidDelayAfterOrgasm))
 				return false;
 
 			return true;
@@ -345,7 +345,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.AvoidGazeInsidePersonalSpace)
+			if (!ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 				return false;
 
 			return IsBored();
@@ -355,7 +355,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.AvoidGazeDuringSex)
+			if (!ps.GetBool(PSE.AvoidGazeDuringSex))
 				return false;
 
 			return IsBored();

@@ -39,7 +39,7 @@ namespace Cue
 		private Mood mood_;
 		private IAI ai_ = null;
 		private Clothing clothing_;
-		private IPersonality personality_;
+		private Personality personality_;
 
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
@@ -72,7 +72,7 @@ namespace Cue
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);
 
-			Personality = BasicPersonality.FromString(this, config["personality"]);
+			Personality = Resources.Personalities.Clone("tsundere", this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -162,7 +162,7 @@ namespace Cue
 			}
 		}
 
-		public IPersonality Personality
+		public Personality Personality
 		{
 			get { return personality_; }
 			set { personality_ = value; }
