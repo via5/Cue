@@ -122,7 +122,7 @@ namespace Cue
 					{
 						lastString_ = $"kissing {t.ID}, avoid in ps";
 						targets_.SetRandomWeight(1);
-						g_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(t, true);
 					}
 					else
 					{
@@ -189,7 +189,7 @@ namespace Cue
 					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
 						lastString_ += $"bj {t.ID}, avoid in ps/";
-						g_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(t, true);
 						return Continue | NoGazer | Busy;
 					}
 					else
@@ -228,7 +228,7 @@ namespace Cue
 					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
 						lastString_ += $"hj {t.ID}, avoid in ps/";
-						g_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(t, true);
 						return Continue | Busy;
 					}
 					else
@@ -266,7 +266,7 @@ namespace Cue
 				if (t == Cue.Instance.Player && g_.ShouldAvoidPlayer())
 				{
 					lastString_ += $"avoid player, ";
-					g_.SetShouldAvoid(t, true);
+					targets_.SetShouldAvoid(t, true);
 				}
 				else if (person_.Body.InsidePersonalSpace(t))
 				{
@@ -275,7 +275,7 @@ namespace Cue
 					if (g_.ShouldAvoidInsidePersonalSpace())
 					{
 						lastString_ += $"avoid in ps/";
-						g_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(t, true);
 					}
 					else
 					{
@@ -321,7 +321,7 @@ namespace Cue
 							if (g_.ShouldAvoidDuringSex())
 							{
 								lastString_ += $"avoid in ps/";
-								g_.SetShouldAvoid(t, true);
+								targets_.SetShouldAvoid(t, true);
 							}
 							else
 							{

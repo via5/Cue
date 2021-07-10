@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	class GazeTargets
 	{
@@ -11,6 +13,7 @@
 		private LookatObject[] objects_ = new LookatObject[0];
 		private LookatAbove above_;
 		private IGazeLookat[] all_ = new IGazeLookat[0];
+		private bool[] avoid_ = new bool[0];
 
 		public GazeTargets(Person p)
 		{
@@ -39,6 +42,7 @@
 				objects_[oi] = new LookatObject(person_, Cue.Instance.Everything[oi], 0);
 
 			all_ = GetAll();
+			avoid_ = new bool[Cue.Instance.Everything.Count];
 		}
 
 		public IGazeLookat[] All
@@ -79,6 +83,19 @@
 		{
 			for (int i = 0; i < all_.Length; ++i)
 				all_[i].Weight = 0;
+
+			for (int i = 0; i < avoid_.Length; ++i)
+				avoid_[i] = false;
+		}
+
+		public bool ShouldAvoid(IObject o)
+		{
+			return avoid_[o.ObjectIndex];
+		}
+
+		public void SetShouldAvoid(IObject o, bool b)
+		{
+			avoid_[o.ObjectIndex] = b;
 		}
 
 		public void SetWeightIfZero(Person p, int bodyPart, float w)
@@ -119,6 +136,16 @@
 		public void SetFrontWeight(float w)
 		{
 			front_.Weight = w;
+		}
+
+		public List<Pair<IObject, bool>> GetAllAvoidForDebug()
+		{
+			var list = new List<Pair<IObject, bool>>();
+
+			for (int i = 0; i < avoid_.Length; ++i)
+				list.Add(new Pair<IObject, bool>(Cue.Instance.Everything[i], avoid_[i]));
+
+			return list;
 		}
 	}
 

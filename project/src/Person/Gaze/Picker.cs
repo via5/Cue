@@ -247,7 +247,7 @@
 
 			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
-				if (person_.Gaze.ShouldAvoid(Cue.Instance.Everything[i]))
+				if (person_.Gaze.Targets.ShouldAvoid(Cue.Instance.Everything[i]))
 				{
 					avoidO = Cue.Instance.Everything[i];
 					break;

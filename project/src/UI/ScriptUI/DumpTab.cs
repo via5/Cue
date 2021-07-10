@@ -128,7 +128,7 @@ namespace Cue
 					items.Add($"Target {i}: {t.Weight:0.00} {t}");
 			}
 
-			foreach (var p in person_.Gaze.GetAllAvoidForDebug())
+			foreach (var p in person_.Gaze.Targets.GetAllAvoidForDebug())
 			{
 				if (p.second)
 					items.Add($"Avoid: {p.first} {p.second}");

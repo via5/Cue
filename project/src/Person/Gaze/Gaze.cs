@@ -5,13 +5,25 @@ namespace Cue
 	class Gaze
 	{
 		private Person person_;
+
+		// controls where the eyes are looking at
 		private IEyes eyes_;
+
+		// controls whether the head should move to follow the eyes
 		private IGazer gazer_;
+
+		// a list of valid, weighted targets in the scene and objects to avoid
 		private GazeTargets targets_;
-		private GazeTargetPicker pick_;
+
+		// individual decision-making units that assign weights to targets
 		private IGazeEvent[] events_ = new IGazeEvent[0];
-		private bool[] avoid_ = new bool[0];
+
+		// chooses a random target, handles avoidance
+		private GazeTargetPicker picker_;
+
+		// debug
 		private string lastString_ = "";
+
 
 		public Gaze(Person p)
 		{
@@ -19,7 +31,7 @@ namespace Cue
 			eyes_ = Integration.CreateEyes(p);
 			gazer_ = Integration.CreateGazer(p);
 			targets_ = new GazeTargets(p);
-			pick_ = new GazeTargetPicker(p);
+			picker_ = new GazeTargetPicker(p);
 		}
 
 		public IEyes Eyes { get { return eyes_; } }
@@ -27,57 +39,32 @@ namespace Cue
 		public GazeTargets Targets { get { return targets_; } }
 		public string LastString { get { return lastString_; } }
 
-
 		public void Init()
 		{
 			targets_.Init();
-			avoid_ = new bool[Cue.Instance.Everything.Count];
-			pick_.SetTargets(targets_.All);
+			picker_.SetTargets(targets_.All);
 			events_ = BasicGazeEvent.All(person_);
 		}
 
 		public void Clear()
 		{
-			for (int i = 0; i < avoid_.Length; ++i)
-				avoid_[i] = false;
-
 			targets_.Clear();
-		}
-
-		public bool ShouldAvoid(IObject o)
-		{
-			return avoid_[o.ObjectIndex];
-		}
-
-		public void SetShouldAvoid(IObject o, bool b)
-		{
-			avoid_[o.ObjectIndex] = b;
-		}
-
-		public List<Pair<IObject, bool>> GetAllAvoidForDebug()
-		{
-			var list = new List<Pair<IObject, bool>>();
-
-			for (int i = 0; i < avoid_.Length; ++i)
-				list.Add(new Pair<IObject, bool>(Cue.Instance.Everything[i], avoid_[i]));
-
-			return list;
 		}
 
 		public GazeTargetPicker Picker
 		{
-			get { return pick_; }
+			get { return picker_; }
 		}
 
 		public void Update(float s)
 		{
 			UpdateTargets();
 
-			if (pick_.Update(s))
+			if (picker_.Update(s))
 				gazer_.Duration = person_.Personality.GazeDuration;
 
-			if (pick_.HasTarget)
-				eyes_.LookAt(pick_.Position);
+			if (picker_.HasTarget)
+				eyes_.LookAt(picker_.Position);
 			// else ?
 
 			eyes_.Update(s);
@@ -116,7 +103,6 @@ namespace Cue
 				lastString_ += "not busy";
 
 			gazer_.Enabled = gazerEnabled;
-			// todo: NoRandom, Busy
 		}
 
 		public bool ShouldAvoidPlayer()
@@ -164,7 +150,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return pick_.ToString();
+			return picker_.ToString();
 		}
 	}
 }
