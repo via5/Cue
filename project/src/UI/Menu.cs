@@ -13,6 +13,7 @@
 		private bool force_ = false;
 		private IObject sel_ = null;
 		private IObject hov_ = null;
+		private VUI.Label fps_ = null;
 
 		public void Create(bool vr, bool left)
 		{
@@ -26,13 +27,13 @@
 			}
 			else
 			{
-				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 210));
+				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 220));
 			}
 
 			canKiss_ = new VUI.CheckBox("Can kiss");
 			forceExcitement_ = new VUI.CheckBox("Ex");
 			excitement_ = new VUI.FloatTextSlider();
-
+			fps_ = new VUI.Label();
 
 			var p = new VUI.Panel(new VUI.VerticalFlow());
 
@@ -44,7 +45,6 @@
 			p.Add(selButtons_);
 
 			playerButtons_ = new VUI.Panel(new VUI.VerticalFlow());
-			playerButtons_.Visible = false;
 			p.Add(playerButtons_);
 
 			if (!Cue.Instance.Sys.IsVR)
@@ -80,6 +80,7 @@
 			row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
 			row.Add(forceExcitement_);
 			row.Add(excitement_);
+			row.Add(fps_);
 			playerButtons_.Add(row);
 
 
@@ -159,8 +160,8 @@
 				label_.Text = s;
 			}
 
-			if (playerButtons_ != null)
-				playerButtons_.Visible = (Cue.Instance.Player != null);
+			if (fps_ != null)
+				fps_.Text = Cue.Instance.Sys.Fps;
 
 			root_?.Update();
 		}

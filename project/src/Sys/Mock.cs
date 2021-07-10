@@ -94,6 +94,11 @@ namespace Cue.Sys.Mock
 			get { return 0; }
 		}
 
+		public string Fps
+		{
+			get { return "fps"; }
+		}
+
 		public Vector3 InteractiveLeftHandPosition
 		{
 			get { return Vector3.Zero; }

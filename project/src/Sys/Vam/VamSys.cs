@@ -1,4 +1,5 @@
-﻿using SimpleJSON;
+﻿using MeshVR;
+using SimpleJSON;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace Cue.Sys.Vam
 		private GameObject root_;
 		private VamCameraAtom cameraAtom_ = new VamCameraAtom();
 		private bool wasVR_ = false;
+		private PerfMon perf_ = null;
 
 		public VamSys(MVRScript s)
 		{
@@ -35,6 +37,12 @@ namespace Cue.Sys.Vam
 					UnityEngine.Object.Destroy(temp.gameObject);
 				}
 			}
+
+			perf_ = SuperController.singleton.transform.root
+				.GetComponentInChildren<PerfMon>();
+
+			if (perf_ == null)
+				Cue.LogError("no perfmon");
 
 			root_ = new GameObject("CueRoot");
 			root_.transform.SetParent(vamroot, false);
@@ -186,6 +194,17 @@ namespace Cue.Sys.Vam
 		public float RealtimeSinceStartup
 		{
 			get { return Time.realtimeSinceStartup; }
+		}
+
+		public string Fps
+		{
+			get
+			{
+				if (perf_ == null)
+					return "";
+
+				return perf_.fps;
+			}
 		}
 
 		public Vector3 InteractiveLeftHandPosition

@@ -49,6 +49,7 @@ namespace Cue.Sys
 		bool IsVR { get; }
 		float DeltaTime { get; }
 		float RealtimeSinceStartup { get; }
+		string Fps { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
 		IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts);

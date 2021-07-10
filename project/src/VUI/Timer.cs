@@ -59,6 +59,12 @@ namespace VUI
 		private readonly Callback callback_;
 		private readonly int flags_;
 		private float elapsed_ = 0;
+		private bool paused_ = false;
+
+		public static Timer Create(float seconds, Callback f, int flags = 0)
+		{
+			return TimerManager.Instance.CreateTimer(seconds, f, flags);
+		}
 
 		public Timer(TimerManager tm, float seconds, Callback f, int flags = 0)
 		{
@@ -71,6 +77,12 @@ namespace VUI
 		public void Restart()
 		{
 			elapsed_ = 0;
+		}
+
+		public bool Paused
+		{
+			get { return paused_; }
+			set { paused_ = value; }
 		}
 
 		public void Fire()
@@ -94,7 +106,8 @@ namespace VUI
 
 		public void Tick(float deltaTime)
 		{
-			elapsed_ += deltaTime;
+			if (!paused_)
+				elapsed_ += deltaTime;
 		}
 
 		public bool Ready
