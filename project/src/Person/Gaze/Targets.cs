@@ -2,18 +2,48 @@
 
 namespace Cue
 {
+	// all the possible targets in the scene for a particular person
+	//
 	class GazeTargets
 	{
+		struct AvoidInfo
+		{
+			public bool avoid;
+			public string why;
+
+			public void Clear()
+			{
+				avoid = false;
+				why = "";
+			}
+		}
+
 		private Person person_;
 
-		private LookatPart[,] persons_ = new LookatPart[0, 0];
+		// per body part, per person
+		private LookatPart[,] bodyParts_ = new LookatPart[0, 0];
+
+		// used mostly when moving
 		private LookatFront front_;
+
+		// no-op
 		private LookatNothing nothing_;
+
+		// picks a random point
 		private LookatRandomPoint random_;
+
+		// per object
 		private LookatObject[] objects_ = new LookatObject[0];
+
+		// point above head
 		private LookatAbove above_;
+
+		// all of the above in one array
 		private IGazeLookat[] all_ = new IGazeLookat[0];
-		private bool[] avoid_ = new bool[0];
+
+		// an avoidance flag per object, indexed per ObjectIndex
+		private AvoidInfo[] avoid_ = new AvoidInfo[0];
+
 
 		public GazeTargets(Person p)
 		{
@@ -26,7 +56,7 @@ namespace Cue
 
 		public void Init()
 		{
-			persons_ = new LookatPart[
+			bodyParts_ = new LookatPart[
 				Cue.Instance.AllPersons.Count, BodyParts.Count];
 
 			for (int pi = 0; pi < Cue.Instance.AllPersons.Count; ++pi)
@@ -34,15 +64,15 @@ namespace Cue
 				var p = Cue.Instance.AllPersons[pi];
 
 				for (int bi = 0; bi < BodyParts.Count; ++bi)
-					persons_[pi, bi] = new LookatPart(p, bi);
+					bodyParts_[pi, bi] = new LookatPart(p, bi);
 			}
 
 			objects_ = new LookatObject[Cue.Instance.Everything.Count];
 			for (int oi = 0; oi < objects_.Length; ++oi)
-				objects_[oi] = new LookatObject(person_, Cue.Instance.Everything[oi], 0);
+				objects_[oi] = new LookatObject(person_, Cue.Instance.Everything[oi]);
 
 			all_ = GetAll();
-			avoid_ = new bool[Cue.Instance.Everything.Count];
+			avoid_ = new AvoidInfo[Cue.Instance.Everything.Count];
 		}
 
 		public IGazeLookat[] All
@@ -53,7 +83,7 @@ namespace Cue
 		private IGazeLookat[] GetAll()
 		{
 			var all = new IGazeLookat[
-				persons_.Length +
+				bodyParts_.Length +
 				1 +  // front
 				1 +  // nothing
 				1 +  // random
@@ -62,10 +92,10 @@ namespace Cue
 
 			int i = 0;
 
-			for (int pi = 0; pi < persons_.GetLength(0); ++pi)
+			for (int pi = 0; pi < bodyParts_.GetLength(0); ++pi)
 			{
-				for (int bi = 0; bi < persons_.GetLength(1); ++bi)
-					all[i++] = persons_[pi, bi];
+				for (int bi = 0; bi < bodyParts_.GetLength(1); ++bi)
+					all[i++] = bodyParts_[pi, bi];
 			}
 
 			all[i++] = front_;
@@ -82,50 +112,57 @@ namespace Cue
 		public void Clear()
 		{
 			for (int i = 0; i < all_.Length; ++i)
-				all_[i].Weight = 0;
+				all_[i].Clear();
 
 			for (int i = 0; i < avoid_.Length; ++i)
-				avoid_[i] = false;
+				avoid_[i].Clear();
 		}
 
 		public bool ShouldAvoid(IObject o)
 		{
-			return avoid_[o.ObjectIndex];
+			return avoid_[o.ObjectIndex].avoid;
 		}
 
-		public void SetShouldAvoid(IObject o, bool b)
+		public void SetShouldAvoid(IObject o, bool b, string why)
 		{
-			avoid_[o.ObjectIndex] = b;
+			avoid_[o.ObjectIndex].avoid = b;
+			avoid_[o.ObjectIndex].why = why;
 		}
 
-		public void SetWeightIfZero(Person p, int bodyPart, float w)
+		public void SetWeightIfZero(Person p, int bodyPart, float w, string why)
 		{
-			if (persons_[p.PersonIndex, bodyPart].Weight == 0)
-				persons_[p.PersonIndex, bodyPart].Weight = w;
+			if (bodyParts_[p.PersonIndex, bodyPart].Weight == 0)
+				bodyParts_[p.PersonIndex, bodyPart].SetWeight(w, why);
 		}
 
-		public void SetWeight(Person p, int bodyPart, float w)
+		public void SetWeight(Person p, int bodyPart, float w, string why)
 		{
-			persons_[p.PersonIndex, bodyPart].Weight = w;
+			bodyParts_[p.PersonIndex, bodyPart].SetWeight(w, why);
 		}
 
-		public void SetRandomWeight(float w)
+		public void SetRandomWeight(float w, string why)
 		{
-			random_.Weight = w;
+			random_.SetWeight(w, why);
 		}
 
-		public void SetAboveWeight(float w)
+		public void SetRandomWeightIfZero(float w, string why)
 		{
-			above_.Weight = w;
+			if (random_.Weight == 0)
+				random_.SetWeight(w, why);
 		}
 
-		public void SetObjectWeight(IObject o, float w)
+		public void SetAboveWeight(float w, string why)
+		{
+			above_.SetWeight(w, why);
+		}
+
+		public void SetObjectWeight(IObject o, float w, string why)
 		{
 			for (int i = 0; i < objects_.Length; ++i)
 			{
 				if (objects_[i].Object == o)
 				{
-					objects_[i].Weight = w;
+					objects_[i].SetWeight(w, why);
 					return;
 				}
 			}
@@ -133,17 +170,20 @@ namespace Cue
 			Cue.LogError($"SetObjectWeight: {o} not in list");
 		}
 
-		public void SetFrontWeight(float w)
+		public void SetFrontWeight(float w, string why)
 		{
-			front_.Weight = w;
+			front_.SetWeight(w, why);
 		}
 
-		public List<Pair<IObject, bool>> GetAllAvoidForDebug()
+		public List<string> GetAllAvoidForDebug()
 		{
-			var list = new List<Pair<IObject, bool>>();
+			var list = new List<string>();
 
 			for (int i = 0; i < avoid_.Length; ++i)
-				list.Add(new Pair<IObject, bool>(Cue.Instance.Everything[i], avoid_[i]));
+			{
+				if (avoid_[i].avoid)
+					list.Add($"{Cue.Instance.Everything[i]}, {avoid_[i].why}");
+			}
 
 			return list;
 		}
@@ -152,10 +192,15 @@ namespace Cue
 
 	interface IGazeLookat
 	{
-		float Weight { get; set; }
+		float Weight { get; }
+		string Why { get; }
+		bool WasSet { get; }
+
 		bool HasPosition { get; }
 		Vector3 Position { get; }
 
+		void Clear();
+		void SetWeight(float f, string why);
 		bool Next();
 		void Update(Person p, float s);
 	}
@@ -164,16 +209,40 @@ namespace Cue
 	abstract class BasicGazeLookat : IGazeLookat
 	{
 		private float weight_ = 0;
+		private string why_;
+		private bool set_ = false;
 
-		protected BasicGazeLookat(float w = 0)
+		protected BasicGazeLookat()
 		{
-			weight_ = w;
 		}
 
 		public float Weight
 		{
 			get { return weight_; }
-			set { weight_ = value; }
+		}
+
+		public string Why
+		{
+			get { return why_; }
+		}
+
+		public bool WasSet
+		{
+			get { return set_; }
+		}
+
+		public void Clear()
+		{
+			weight_ = 0;
+			why_ = "";
+			set_ = false;
+		}
+
+		public void SetWeight(float f, string why)
+		{
+			weight_ = f;
+			why_ = why;
+			set_ = true;
 		}
 
 		public abstract bool HasPosition { get; }
@@ -210,7 +279,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "nothing";
+			return "look at nothing";
 		}
 	}
 
@@ -242,7 +311,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "front";
+			return "look in front";
 		}
 	}
 
@@ -251,8 +320,7 @@ namespace Cue
 	{
 		private IObject object_ = null;
 
-		public LookatObject(Person p, IObject o, float weight)
-			: base(weight)
+		public LookatObject(Person p, IObject o)
 		{
 			object_ = o;
 		}
@@ -347,7 +415,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"above";
+			return $"look above";
 		}
 	}
 
@@ -373,7 +441,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"position {pos_}";
+			return $"look at position {pos_}";
 		}
 	}
 
@@ -421,9 +489,9 @@ namespace Cue
 		public override string ToString()
 		{
 			if (hasPos_)
-				return $"random {pos_}";
+				return $"random point {pos_}";
 			else
-				return "random (none)";
+				return "random point (none)";
 		}
 	}
 }

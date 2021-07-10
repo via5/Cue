@@ -84,23 +84,30 @@ namespace Cue
 			for (int i = 0; i < events_.Length; ++i)
 			{
 				var e = events_[i];
-				var r = e.Check(flags);
+				flags |= e.Check(flags);
 
-				if (Bits.IsSet(r, BasicGazeEvent.NoGazer))
+				if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
 					gazerEnabled = false;
 
-				if (Bits.IsSet(r, BasicGazeEvent.NoRandom))
-					flags |= BasicGazeEvent.NoRandom;
-
-				if (Bits.IsSet(r, BasicGazeEvent.Busy))
-					flags |= BasicGazeEvent.Busy;
-
-				if (Bits.IsSet(r, BasicGazeEvent.Exclusive))
+				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
 					break;
 			}
 
-			if (!Bits.IsSet(flags, BasicGazeEvent.Busy))
-				lastString_ += "not busy";
+
+			if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
+				lastString_ += "exclusive ";
+
+			if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
+				lastString_ += "nogazer ";
+
+			if (Bits.IsSet(flags, BasicGazeEvent.NoRandom))
+				lastString_ += "norandom ";
+
+			if (Bits.IsSet(flags, BasicGazeEvent.Busy))
+				lastString_ += "busy ";
+
+			if (lastString_ == "")
+				lastString_ = "no flags";
 
 			gazer_.Enabled = gazerEnabled;
 		}
@@ -143,6 +150,16 @@ namespace Cue
 			var ps = person_.Personality;
 
 			if (!ps.GetBool(PSE.AvoidGazeDuringSex))
+				return false;
+
+			return IsBored();
+		}
+
+		public bool ShouldAvoidOthersDuringSex()
+		{
+			var ps = person_.Personality;
+
+			if (!ps.GetBool(PSE.AvoidGazeDuringSexOthers))
 				return false;
 
 			return IsBored();

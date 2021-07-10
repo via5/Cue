@@ -59,7 +59,8 @@ namespace Cue
 		private static int[] breasts_ = new int[] { LeftBreast, RightBreast };
 		public static int[] BreastParts { get { return breasts_; } }
 
-		private static int[] genitals_ = new int[] { Labia, Vagina, DeepVagina, DeeperVagina };
+		private static int[] genitals_ = new int[] {
+			Labia, Vagina, DeepVagina, DeeperVagina };
 		public static int[] GenitalParts { get { return genitals_; } }
 		public static bool IsGenitalPart(int i)
 		{
@@ -70,16 +71,26 @@ namespace Cue
 				(i == DeeperVagina);
 		}
 
-
 		private static int[] personalSpace_ = new[]{
-			LeftHand, RightHand, Head, Chest, LeftBreast, RightBreast,
-			Hips, Genitals, Labia, Vagina, DeepVagina, DeeperVagina,
+			LeftHand, RightHand, Head, Chest, Hips, Genitals, Labia,
 			LeftFoot, RightFoot};
+		public static int[] PersonalSpaceParts { get { return personalSpace_; } }
 
-		public static int[] PersonalSpaceParts
-		{
-			get { return personalSpace_; }
-		}
+		private static int[] groped_ = new[] {
+			Head, LeftBreast, RightBreast, Genitals };
+		public static int[] GropedParts { get { return groped_; } }
+
+		private static int[] gropedBy_ = new[] {
+			Head, LeftHand, RightHand, LeftFoot, RightFoot };
+		public static int[] GropedByParts { get { return gropedBy_; } }
+
+		private static int[] penetrated_ = new []{
+			Vagina, DeepVagina, DeeperVagina, Anus };
+		public static int[] PenetratedParts { get { return penetrated_; } }
+
+		private static int[] penetratedBy_ = new[]{
+			Genitals };
+		public static int[] PenetratedByParts { get { return penetratedBy_; } }
 
 
 		public static bool IsHandPart(int i)
@@ -622,15 +633,9 @@ namespace Cue
 
 		public bool Groped()
 		{
-			var parts = new int[]
-			{
-				BodyParts.Chest, BodyParts.Genitals
-			};
-
-
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(p, parts))
+				if (GropedBy(p, BodyParts.GropedParts))
 					return true;
 			}
 
@@ -650,9 +655,14 @@ namespace Cue
 
 		public bool GropedByAny(int triggerBodyPart)
 		{
+			return GropedByAny(new int[] { triggerBodyPart });
+		}
+
+		public bool GropedByAny(int[] triggerBodyParts)
+		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(p, BodyParts.Head))
+				if (GropedBy(p, triggerBodyParts))
 					return true;
 			}
 
@@ -669,13 +679,7 @@ namespace Cue
 			if (p == person_)
 				return false;
 
-			var checkParts = new int[]
-			{
-				BodyParts.Head, BodyParts.LeftHand, BodyParts.RightHand,
-				BodyParts.LeftFoot, BodyParts.RightFoot
-			};
-
-			return CheckParts(p, triggerBodyParts, checkParts);
+			return CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
 		}
 
 		public bool PenetratedBy(Person p)
@@ -683,20 +687,8 @@ namespace Cue
 			if (p == person_)
 				return false;
 
-			var triggerParts = new int[]
-			{
-				BodyParts.Vagina,
-				BodyParts.DeepVagina,
-				BodyParts.DeeperVagina,
-				BodyParts.Anus
-			};
-
-			var checkParts = new int[]
-			{
-				BodyParts.Genitals
-			};
-
-			return CheckParts(p, triggerParts, checkParts);
+			return CheckParts(
+				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
 		}
 
 		private bool CheckParts(Person by, int[] triggerParts, int[] checkParts)

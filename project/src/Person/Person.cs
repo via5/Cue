@@ -72,7 +72,7 @@ namespace Cue
 			ai_ = new PersonAI(this);
 			clothing_ = new Clothing(this);
 
-			Personality = Resources.Personalities.Clone("tsundere", this);
+			Personality = Resources.Personalities.Clone("standard", this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);

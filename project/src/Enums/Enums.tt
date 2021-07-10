@@ -1,0 +1,67 @@
+﻿<#+
+public string MakeEnum(string[] names, string count)
+{
+	string s = "";
+	for (int i=0; i<names.Length; ++i)
+	{
+		s += $"\t\tpublic const int {names[i]} = {i};\r\n";
+	}
+
+	s += $"\t\tpublic const int {count} = {names.Length};";
+
+	return s;
+}
+
+public string CamelCase(string s, bool firstUpper)
+{
+	var parts = s.Split(' ');
+
+	if (firstUpper)
+		s = parts[0].Substring(0, 1).ToUpper() + parts[0].Substring(1);
+	else
+		s = parts[0].Substring(0, 1).ToLower() + parts[0].Substring(1);
+
+	for (int i = 1; i < parts.Length; ++i)
+		s += parts[i].Substring(0, 1).ToUpper() + parts[1].Substring(1);
+
+	return s;
+}
+
+public string MakeNames(string[] names, string name)
+{
+	string var = CamelCase(name, false) + "Names_";
+
+	string s =
+		$"\t\tprivate static string[] {var} = new string[]\r\n" +
+		$"\t\t{{\r\n";
+
+	foreach (var v in names)
+		s += $"\t\t\t\"{CamelCase(v, false)}\",\r\n";
+
+	s +=
+		$"\t\t}};\r\n" +
+		$"\r\n" +
+		$"\t\tpublic static int {CamelCase(name, true)}FromString(string s)\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\tfor (int i = 0; i<{var}.Length; ++i)\r\n" +
+		$"\t\t\t{{\r\n" +
+		$"\t\t\t\tif ({var}[i] == s)\r\n" +
+		$"\t\t\t\t\treturn i;\r\n" +
+		$"\t\t\t}}\r\n" +
+		$"\r\n" +
+		$"\t\t\treturn -1;\r\n" +
+		$"\t\t}}\r\n" +
+		$"\r\n" +
+		$"\t\tpublic static string {CamelCase(name, true)}ToString(int i)\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\treturn {var}[i];\r\n" +
+		$"\t\t}}\r\n" +
+		$"\r\n" +
+		$"\t\tpublic static string[] {CamelCase(name, true)}Names\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\tget {{ return {var}; }}\r\n" +
+		$"\t\t}}";
+
+	return s;
+}
+#>

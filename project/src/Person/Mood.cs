@@ -80,7 +80,12 @@
 
 		public float Energy
 		{
-			get { return RawExcitement * (1 - RawTiredness * 0.8f); }
+			get
+			{
+
+				var tf = person_.Personality.Get(PSE.EnergyTirednessFactor);
+				return U.Clamp(RawExcitement - (RawTiredness * tf), 0, 1);
+			}
 		}
 
 		public void ForceOrgasm()

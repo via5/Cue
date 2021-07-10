@@ -118,21 +118,19 @@ namespace Cue
 			var items = new List<string>();
 
 			items.Add(person_.Gaze.LastString);
-			items.Add(person_.Gaze.Picker.LastString);
+			items.Add("picker: " + person_.Gaze.Picker.LastString);
+			items.Add("");
 
 			for (int i = 0; i < targets.Length; ++i)
 			{
 				var t = targets[i];
 
-				if (t.Weight > 0)
-					items.Add($"Target {i}: {t.Weight:0.00} {t}");
+				if (t.WasSet)
+					items.Add($"#{i}  {t} w={t.Weight:0.00}: {t.Why}");
 			}
 
-			foreach (var p in person_.Gaze.Targets.GetAllAvoidForDebug())
-			{
-				if (p.second)
-					items.Add($"Avoid: {p.first} {p.second}");
-			}
+			foreach (var a in person_.Gaze.Targets.GetAllAvoidForDebug())
+				items.Add($"Avoid: {a}");
 
 			list_.SetItems(items);
 		}

@@ -2,9 +2,9 @@
 	"personalities":
 	[
 		{
-			"name": "neutral",
+			"name": "standard",
 
-			"idle":
+			"idleState":
 			{
 				"expressions":
 				[
@@ -29,45 +29,54 @@
 					"windowEasing": "cubicin"
 				}
 
-				"gazeRandomIntervalMinimum": 10,
-				"gazeRandomIntervalMaximum": 1,
-
 				"avoidGazePlayer": false,
 				"avoidGazeInsidePersonalSpace": false,
 				"avoidGazeDuringSex": false,
 				"avoidGazeDuringSexOthers": false,
+
+				"gazeRandomIntervalMinimum": 10,
+				"gazeRandomIntervalMaximum": 1,
+
 				"maxExcitementForAvoid": 0,
 				"avoidDelayAfterOrgasm": 0,
 
 				"lookAboveMaxWeight": 0.2,
 				"lookAboveMaxWeightOrgasm": 0.5,
 
-				"otherSexExcitementRate": 0.3,
-				"maxOtherSexExcitement": 0.5,
-				"maxEnergyForRandomGaze": 0.2,
-
 				"naturalRandomWeight": 0.05,
 				"naturalOtherEyesWeight": 0.2,
 				"busyOtherEyesWeight": 0.1,
+				"otherEyesExcitementWeight": 1.0,
+				"maxTirednessForRandomGaze": 0.5,
 
 				"blowjobEyesWeight": 0.1,
 				"blowjobGenitalsWeight": 1,
-
 				"handjobEyesWeight": 1,
 				"handjobGenitalsWeight": 0.2,
-
 				"penetrationEyesWeight": 1,
-				"penetrationChestWeight": 0.2,
-				"penetrationGenitalsWeight": 0,
-
+				"penetrationGenitalsWeight": 0.2,
 				"gropedEyesWeight": 1,
-				"gropedChestWeight": 0.2,
-				"gropedGenitalsWeight": 0.2,
+				"gropedTargetWeight": 0.2,
 
-				"otherSexEyesWeight": 0.2
+				"otherBlowjobEyesWeight": 0.2,
+				"otherBlowjobTargetEyesWeight": 0.2,
+				"otherBlowjobTargetGenitalsWeight": 0.1,
+				"otherHandjobEyesWeight": 0.2,
+				"otherHandjobTargetEyesWeight": 0.2,
+				"otherHandjobTargetGenitalsWeight": 0.1,
+				"otherPenetrationEyesWeight": 0.2,
+				"otherPenetrationSourceEyesWeight": 0.2,
+				"otherPenetrationSourceGenitalsWeight": 0.1,
+				"otherGropedEyesWeight": 0.2,
+				"otherGropedSourceEyesWeight": 0.2,
+				"otherGropedTargetWeight": 0.1,
+
+				"otherSexExcitementRateFactor": 0.3,
+				"maxOtherSexExcitement": 0.5,
+				"energyTirednessFactor": 0.8,
 			},
 
-			"close":
+			"closeState":
 			{
 				"expressions":
 				[
@@ -92,51 +101,60 @@
 					"windowEasing": "cubicin"
 				},
 
-				"gazeRandomIntervalMinimum": 10,
-				"gazeRandomIntervalMaximum": 1,
-
 				"avoidGazePlayer": false,
 				"avoidGazeInsidePersonalSpace": false,
 				"avoidGazeDuringSex": false,
 				"avoidGazeDuringSexOthers": false,
+
+				"gazeRandomIntervalMinimum": 10,
+				"gazeRandomIntervalMaximum": 1,
+
 				"maxExcitementForAvoid": 0,
 				"avoidDelayAfterOrgasm": 0,
 
 				"lookAboveMaxWeight": 0.2,
 				"lookAboveMaxWeightOrgasm": 0.5,
 
-				"otherSexExcitementRate": 0.3,
-				"maxOtherSexExcitement": 0.5,
-				"maxEnergyForRandomGaze": 0.2,
-
 				"naturalRandomWeight": 0.05,
 				"naturalOtherEyesWeight": 0.2,
 				"busyOtherEyesWeight": 0.1,
+				"otherEyesExcitementWeight": 1.0,
+				"maxTirednessForRandomGaze": 0.5,
 
 				"blowjobEyesWeight": 0.1,
 				"blowjobGenitalsWeight": 1,
-
 				"handjobEyesWeight": 1,
 				"handjobGenitalsWeight": 0.2,
-
 				"penetrationEyesWeight": 1,
-				"penetrationChestWeight": 0.2,
-				"penetrationGenitalsWeight": 0,
-
+				"penetrationGenitalsWeight": 0.2,
 				"gropedEyesWeight": 1,
-				"gropedChestWeight": 0.2,
-				"gropedGenitalsWeight": 0.2,
+				"gropedTargetWeight": 0.2,
 
-				"otherSexEyesWeight": 0.2,
+				"otherBlowjobEyesWeight": 0.2,
+				"otherBlowjobTargetEyesWeight": 0.2,
+				"otherBlowjobTargetGenitalsWeight": 0.1,
+				"otherHandjobEyesWeight": 0.2,
+				"otherHandjobTargetEyesWeight": 0.2,
+				"otherHandjobTargetGenitalsWeight": 0.1,
+				"otherPenetrationEyesWeight": 0.2,
+				"otherPenetrationSourceEyesWeight": 0.2,
+				"otherPenetrationSourceGenitalsWeight": 0.1,
+				"otherGropedEyesWeight": 0.2,
+				"otherGropedSourceEyesWeight": 0.2,
+				"otherGropedTargetWeight": 0.1,
+
+				"otherSexExcitementRateFactor": 0.3,
+				"maxOtherSexExcitement": 0.5,
+				"energyTirednessFactor": 0.8,
 			}
 		},
 
 
 		{
 			"name": "quirky",
-			"inherit": "neutral",
+			"inherit": "standard",
 
-			"idle":
+			"idleState":
 			{
 				"expressions":
 				[
@@ -152,7 +170,7 @@
 				]
 			},
 
-			"close":
+			"closeState":
 			{
 				"expressions":
 				[
@@ -172,9 +190,9 @@
 
 		{
 			"name": "tsundere",
-			"inherit": "neutral",
+			"inherit": "standard",
 
-			"idle":
+			"idleState":
 			{
 				"expressions":
 				[
@@ -201,7 +219,7 @@
 				"avoidDelayAfterOrgasm": 15
 			},
 
-			"close":
+			"closeState":
 			{
 				"expressions":
 				[

@@ -36,7 +36,7 @@
 		public GazeTargetPicker(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.AI, person_, "RandomLookAt");
+			log_ = new Logger(Logger.AI, person_, "GazeTargetPicker");
 
 			var main = new Frustum(Near, Far);
 			var fs = main.Split(XCount, YCount);
@@ -187,7 +187,7 @@
 
 						if (targets_[j].Next())
 						{
-							lastString_ += $" j={j} t={targets_[j]}";
+							lastString_ += $" target=#{j}";
 							log_.Verbose($"picked {targets_[j]}");
 							currentTarget_ = j;
 							return;
@@ -205,7 +205,6 @@
 			}
 
 			lastString_ += $" NONE";
-			log_.Error($"no valid target");
 		}
 
 		private void ResetFrustums()

@@ -181,6 +181,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Easings.tt</DependentUpon>
     </Compile>
+    <Compile Include="src\Enums\PersonalityEnum.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PersonalityEnum.tt</DependentUpon>
+    </Compile>
     <Compile Include="src\Utilities\Geo.cs" />
     <Compile Include="src\Utilities\GeoRender.cs" />
     <Compile Include="src\Utilities\Json.cs" />
@@ -209,9 +214,14 @@
     <Compile Include="src\VUI\Widget.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\Enums\Enums.tt" />
     <Content Include="src\Utilities\Easings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Easings.cs</LastGenOutput>
+    </Content>
+    <Content Include="src\Enums\PersonalityEnum.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>PersonalityEnum.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

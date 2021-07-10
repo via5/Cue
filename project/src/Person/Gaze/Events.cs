@@ -19,7 +19,6 @@ namespace Cue
 		protected Person person_;
 		protected Gaze g_;
 		protected GazeTargets targets_;
-		protected string lastString_ = "";
 
 		protected BasicGazeEvent(Person p)
 		{
@@ -32,15 +31,15 @@ namespace Cue
 		{
 			return new List<IGazeEvent>()
 			{
-				new GazeOrgasm(p),
+				new GazeAbove(p),
 				new GazeGrabbed(p),
 				new GazeKissing(p),
 				new GazeMoving(p),
 				new GazeBJ(p),
 				new GazeHJ(p),
-				new GazeOthers(p),
+				new GazeInteractions(p),
 				new GazeRandom(p),
-				new GazeExcitedOthers(p)
+				new GazeOtherPersons(p)
 			}.ToArray();
 		}
 
@@ -53,9 +52,9 @@ namespace Cue
 	}
 
 
-	class GazeOrgasm : BasicGazeEvent
+	class GazeAbove : BasicGazeEvent
 	{
-		public GazeOrgasm(Person p)
+		public GazeAbove(Person p)
 			: base(p)
 		{
 		}
@@ -64,15 +63,21 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.State == Mood.OrgasmState)
+			if (person_.Mood.Energy == 0)
+			{
+				targets_.SetAboveWeight(0, "not energetic");
+			}
+			else if (person_.Mood.State == Mood.OrgasmState)
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeight));
+					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeight),
+					"orgasm state");
 			}
 			else
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeightOrgasm));
+					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeightOrgasm),
+					"normal state");
 			}
 
 			return Continue;
@@ -91,8 +96,10 @@ namespace Cue
 		{
 			if (person_.Body.Get(BodyParts.Head).Grabbed)
 			{
-				lastString_ = $"head grabbed by player";
-				targets_.SetWeight(Cue.Instance.Player, BodyParts.Eyes, 1);
+				targets_.SetWeight(
+					Cue.Instance.Player, BodyParts.Eyes, 1,
+					"head grabbed");
+
 				return Exclusive | NoGazer;
 			}
 
@@ -120,14 +127,12 @@ namespace Cue
 				{
 					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
-						lastString_ = $"kissing {t.ID}, avoid in ps";
-						targets_.SetRandomWeight(1);
-						targets_.SetShouldAvoid(t, true);
+						targets_.SetRandomWeight(1, $"kissing {t.ID}, but avoid in ps");
+						targets_.SetShouldAvoid(t, true, $"kissing, but avoid in ps");
 					}
 					else
 					{
-						lastString_ = $"kissing {t.ID}, looking at eyes";
-						targets_.SetWeight(t, BodyParts.Eyes, 1);
+						targets_.SetWeight(t, BodyParts.Eyes, 1, "kissing");
 					}
 
 					return Exclusive | NoGazer;
@@ -152,13 +157,12 @@ namespace Cue
 			{
 				if (person_.MoveTarget != null)
 				{
-					lastString_ = $"moving to {person_.MoveTarget.ID}, looking at it";
-					targets_.SetObjectWeight(person_.MoveTarget, 1);
+					targets_.SetObjectWeight(
+						person_.MoveTarget, 1, "moving to");
 				}
 				else
 				{
-					lastString_ = $"moving to pos, looking in front";
-					targets_.SetFrontWeight(1);
+					targets_.SetFrontWeight(1, "moving to pos");
 				}
 
 				return Exclusive;
@@ -188,15 +192,20 @@ namespace Cue
 				{
 					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
-						lastString_ += $"bj {t.ID}, avoid in ps/";
-						targets_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(
+							t, true, $"bj, but avoid in ps");
+
 						return Continue | NoGazer | Busy;
 					}
 					else
 					{
-						lastString_ += $"bj {t.ID}/";
-						targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.BlowjobEyesWeight));
-						targets_.SetWeight(t, BodyParts.Genitals, ps.Get(PSE.BlowjobGenitalsWeight));
+						targets_.SetWeight(
+							t, BodyParts.Eyes,
+							ps.Get(PSE.BlowjobEyesWeight), "bj");
+
+						targets_.SetWeight(
+							t, BodyParts.Genitals,
+							ps.Get(PSE.BlowjobGenitalsWeight), "bj");
 
 						return Continue | NoGazer | Busy | NoRandom;
 					}
@@ -227,15 +236,19 @@ namespace Cue
 				{
 					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
 					{
-						lastString_ += $"hj {t.ID}, avoid in ps/";
-						targets_.SetShouldAvoid(t, true);
+						targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
 						return Continue | Busy;
 					}
 					else
 					{
-						lastString_ += $"hj {t.ID}/";
-						targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.HandjobEyesWeight));
-						targets_.SetWeight(t, BodyParts.Genitals, ps.Get(PSE.HandjobGenitalsWeight));
+						targets_.SetWeight(
+							t, BodyParts.Eyes,
+							ps.Get(PSE.HandjobEyesWeight), "hj");
+
+						targets_.SetWeight(
+							t, BodyParts.Genitals,
+							ps.Get(PSE.HandjobGenitalsWeight), "hj");
+
 						return Continue | Busy | NoRandom;
 					}
 				}
@@ -246,106 +259,314 @@ namespace Cue
 	}
 
 
-	class GazeOthers : BasicGazeEvent
+	class GazeInteractions : BasicGazeEvent
 	{
-		public GazeOthers(Person p)
+		public GazeInteractions(Person p)
 			: base(p)
 		{
 		}
 
 		protected override int DoCheck(int flags)
 		{
-			var ps = person_.Personality;
-			bool busy = false;
+			int r = Continue;
 
 			foreach (var t in Cue.Instance.ActivePersons)
 			{
 				if (t == person_)
 					continue;
 
-				if (t == Cue.Instance.Player && g_.ShouldAvoidPlayer())
+				r |= CheckPerson(t);
+			}
+
+			return r;
+		}
+
+		private int CheckPerson(Person t)
+		{
+			var ps = person_.Personality;
+
+			// check player avoidance
+			if (t == Cue.Instance.Player && g_.ShouldAvoidPlayer())
+			{
+				targets_.SetShouldAvoid(t, true, "avoid player");
+				return Continue;
+			}
+
+			if (person_.Body.InsidePersonalSpace(t))
+			{
+				// person is close
+
+				// check avoidance for closeness
+				if (g_.ShouldAvoidInsidePersonalSpace())
 				{
-					lastString_ += $"avoid player, ";
-					targets_.SetShouldAvoid(t, true);
+					targets_.SetShouldAvoid(t, true, "avoid in ps");
+					return Continue;
 				}
-				else if (person_.Body.InsidePersonalSpace(t))
+
+				// more expensive checks that are impossible without being
+				// close; returns true when getting groped or penetrated by this
+				// person
+				if (CheckInsidePS(t))
+					return Busy;
+			}
+
+			// these two persons are not currently interacting
+			CheckNotInteracting(t);
+
+			return Continue;
+		}
+
+		struct WeightInfo
+		{
+			public float weight;
+			public string why;
+			public bool set;
+
+			public void Set(float w, string why)
+			{
+				weight = w;
+				this.why = why;
+				set = true;
+			}
+		}
+
+		private bool CheckInsidePS(Person t)
+		{
+			var ps = person_.Personality;
+
+			WeightInfo eyes = new WeightInfo();
+			WeightInfo selfChest = new WeightInfo();
+			WeightInfo otherChest = new WeightInfo();
+			WeightInfo genitals = new WeightInfo();
+
+			// check if being penetrated by this person
+			if (person_.Body.PenetratedBy(t))
+			{
+				eyes.Set(ps.Get(PSE.PenetrationEyesWeight), "penetrated");
+
+				// todo
+				if (t.Gaze.Gazer is MacGruberGaze)
 				{
-					lastString_ += $"{t.ID} in ps, ";
-
-					if (g_.ShouldAvoidInsidePersonalSpace())
-					{
-						lastString_ += $"avoid in ps/";
-						targets_.SetShouldAvoid(t, true);
-					}
-					else
-					{
-						float eyes = 0;
-						float selfChest = 0;
-						float otherChest = 0;
-						float genitals = 0;
-
-						if (person_.Body.PenetratedBy(t))
-						{
-							lastString_ += $"pen/";
-							eyes = ps.Get(PSE.PenetrationEyesWeight);
-							otherChest = ps.Get(PSE.PenetrationChestWeight);
-							genitals = ps.Get(PSE.PenetrationGenitalsWeight);
-						}
-						else
-						{
-							if (person_.Body.GropedBy(t, BodyParts.Head))
-							{
-								lastString_ += $"grope head, ";
-								eyes = ps.Get(PSE.GropedEyesWeight);
-							}
-
-							if (person_.Body.GropedBy(t, BodyParts.BreastParts))
-							{
-								lastString_ += $"grope chest, ";
-								eyes = ps.Get(PSE.GropedEyesWeight);
-								selfChest = ps.Get(PSE.GropedChestWeight);
-							}
-
-							if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
-							{
-								lastString_ += $"grope gen, ";
-								eyes = ps.Get(PSE.GropedEyesWeight);
-								genitals = ps.Get(PSE.GropedGenitalsWeight);
-							}
-						}
-
-						if (eyes != 0 || selfChest != 0 || otherChest != 0 || genitals != 0)
-						{
-							busy = true;
-
-							if (g_.ShouldAvoidDuringSex())
-							{
-								lastString_ += $"avoid in ps/";
-								targets_.SetShouldAvoid(t, true);
-							}
-							else
-							{
-								lastString_ += $"ok";
-								targets_.SetWeight(t, BodyParts.Eyes, eyes);
-								targets_.SetWeight(person_, BodyParts.Chest, selfChest);
-								targets_.SetWeight(t, BodyParts.Chest, otherChest);
-								targets_.SetWeight(person_, BodyParts.Genitals, genitals);
-							}
-						}
-					}
+					otherChest.Set(
+						PSE.PenetrationGenitalsWeight,
+						"penetrated (mg's gaze fix)");
 				}
-				else if (t.Body.Penetrated())
+				else
 				{
-					lastString_ += $"{t.ID} other pen";
-					targets_.SetWeight(t, BodyParts.Eyes, ps.Get(PSE.OtherSexEyesWeight));
+					genitals.Set(
+						ps.Get(PSE.PenetrationGenitalsWeight),
+						"penetrated");
+				}
+			}
+			else
+			{
+				// check if head being groped
+				if (person_.Body.GropedBy(t, BodyParts.Head))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "head groped");
+				}
+
+				// check if breasts being groped
+				if (person_.Body.GropedBy(t, BodyParts.BreastParts))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "chest groped");
+					selfChest.Set(ps.Get(PSE.GropedTargetWeight), "chest groped");
+				}
+
+				// check if genitals being groped
+				if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "genitals groped");
+					genitals.Set(ps.Get(PSE.GropedTargetWeight), "genitals groped");
 				}
 			}
 
-			int r = Continue;
-			if (busy)
-				r |= Busy;
+			if (eyes.set || selfChest.set || otherChest.set || genitals.set)
+			{
+				// this character is being interacted with
 
-			return r;
+				if (g_.ShouldAvoidDuringSex())
+				{
+					targets_.SetShouldAvoid(t, true, "avoid during sex");
+				}
+				else
+				{
+					if (eyes.set)
+					{
+						targets_.SetWeightIfZero(
+							t, BodyParts.Eyes, eyes.weight, eyes.why);
+					}
+
+					if (selfChest.set)
+					{
+						targets_.SetWeightIfZero(
+							person_, BodyParts.Chest,
+							selfChest.weight, selfChest.why);
+					}
+
+					if (otherChest.set)
+					{
+						targets_.SetWeightIfZero(
+							t, BodyParts.Chest,
+							otherChest.weight, otherChest.why);
+					}
+
+					if (genitals.set)
+					{
+						targets_.SetWeightIfZero(
+							person_, BodyParts.Genitals,
+							genitals.weight, genitals.why);
+					}
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private void CheckNotInteracting(Person t)
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == t || p == person_)
+					continue;
+
+				CheckOtherInteraction(p, t);
+			}
+		}
+
+		private void CheckOtherInteraction(Person source, Person target)
+		{
+			var ps = person_.Personality;
+
+			WeightInfo sourceEyes = new WeightInfo();
+			WeightInfo sourceChest = new WeightInfo();
+			WeightInfo sourceGenitals = new WeightInfo();
+
+			WeightInfo targetEyes = new WeightInfo();
+			WeightInfo targetChest = new WeightInfo();
+			WeightInfo targetGenitals = new WeightInfo();
+
+
+			// check if being penetrated by this person
+			if (target.Body.PenetratedBy(source))
+			{
+				sourceEyes.Set(
+					ps.Get(PSE.OtherPenetrationSourceEyesWeight),
+					$"penetrated by {source.ID}");
+
+				targetEyes.Set(
+					ps.Get(PSE.OtherPenetrationEyesWeight),
+					$"penetrated by {source.ID}");
+
+				sourceGenitals.Set(
+					ps.Get(PSE.OtherPenetrationSourceGenitalsWeight),
+					$"penetrated by {source.ID}");
+			}
+			else
+			{
+				// check if head being groped
+				if (target.Body.GropedBy(source, BodyParts.Head))
+				{
+					targetEyes.Set(
+						ps.Get(PSE.OtherGropedEyesWeight),
+						$"head groped by {source.ID}");
+
+					sourceEyes.Set(
+						ps.Get(PSE.OtherGropedSourceEyesWeight),
+						$"head groped by {source.ID}");
+				}
+
+				// check if breasts being groped
+				if (target.Body.GropedBy(source, BodyParts.BreastParts))
+				{
+					targetEyes.Set(
+						ps.Get(PSE.OtherGropedEyesWeight),
+						$"breasts groped by {source.ID}");
+
+					sourceEyes.Set(
+						ps.Get(PSE.OtherGropedSourceEyesWeight),
+						$"breasts groped by {source.ID}");
+
+					targetChest.Set(
+						ps.Get(PSE.OtherGropedTargetWeight),
+						$"breasts groped by {source.ID}");
+				}
+
+				// check if genitals being groped
+				if (target.Body.GropedBy(source, BodyParts.GenitalParts))
+				{
+					targetEyes.Set(
+						ps.Get(PSE.OtherGropedEyesWeight),
+						$"genitals groped by {source.ID}");
+
+					sourceEyes.Set(
+						ps.Get(PSE.OtherGropedSourceEyesWeight),
+						$"genitals groped by {source.ID}");
+
+					targetGenitals.Set(
+						ps.Get(PSE.OtherGropedTargetWeight),
+						$"genitals groped by {source.ID}");
+				}
+			}
+
+			if (sourceEyes.set || sourceChest.set || sourceGenitals.set ||
+				targetEyes.set || targetChest.set || targetGenitals.set)
+			{
+				// this character is being interacted with by someone else
+
+				if (g_.ShouldAvoidOthersDuringSex())
+				{
+					targets_.SetShouldAvoid(source, true, "avoid others during sex");
+					targets_.SetShouldAvoid(target, true, "avoid others during sex");
+				}
+				else
+				{
+					if (targetEyes.set)
+					{
+						targets_.SetWeightIfZero(
+							target, BodyParts.Eyes,
+							targetEyes.weight, targetEyes.why);
+					}
+
+					if (targetChest.set)
+					{
+						targets_.SetWeightIfZero(
+							target, BodyParts.Chest,
+							targetChest.weight, targetChest.why);
+					}
+
+					if (targetGenitals.set)
+					{
+						targets_.SetWeightIfZero(
+							target, BodyParts.Genitals,
+							targetGenitals.weight, targetGenitals.why);
+					}
+
+
+					if (sourceEyes.set)
+					{
+						targets_.SetWeightIfZero(
+							source, BodyParts.Eyes,
+							sourceEyes.weight, sourceEyes.why);
+					}
+
+					if (sourceChest.set)
+					{
+						targets_.SetWeightIfZero(
+							source, BodyParts.Chest,
+							sourceChest.weight, sourceChest.why);
+					}
+
+					if (sourceGenitals.set)
+					{
+						targets_.SetWeightIfZero(
+							source, BodyParts.Genitals,
+							sourceGenitals.weight, sourceGenitals.why);
+					}
+				}
+			}
 		}
 	}
 
@@ -361,10 +582,18 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!Bits.IsSet(flags, NoRandom) || person_.Mood.Energy > ps.Get(PSE.MaxEnergyForRandomGaze))
+			if (Bits.IsSet(flags, NoRandom))
 			{
-				// always at least a small change
-				targets_.SetRandomWeight(ps.Get(PSE.NaturalRandomWeight));
+				targets_.SetRandomWeightIfZero(0, "random, but busy");
+			}
+			else if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
+			{
+				targets_.SetRandomWeightIfZero(0, "random, but tired");
+			}
+			else
+			{
+				targets_.SetRandomWeightIfZero(
+					ps.Get(PSE.NaturalRandomWeight), "random");
 			}
 
 			return Continue;
@@ -372,9 +601,9 @@ namespace Cue
 	}
 
 
-	class GazeExcitedOthers : BasicGazeEvent
+	class GazeOtherPersons : BasicGazeEvent
 	{
-		public GazeExcitedOthers(Person p)
+		public GazeOtherPersons(Person p)
 			: base(p)
 		{
 		}
@@ -388,18 +617,28 @@ namespace Cue
 				if (p == person_)
 					continue;
 
-				if (p == Cue.Instance.Player && ps.GetBool(PSE.AvoidGazePlayer))
+				if (p == Cue.Instance.Player && g_.ShouldAvoidPlayer())
 					continue;
 
-				float w;
-				if (Bits.IsSet(flags, Busy))
-					w = ps.Get(PSE.BusyOtherEyesWeight);
+				float w = 0;
+				string why;
+
+				if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
+				{
+					why = "random person, but tired";
+				}
 				else
-					w = ps.Get(PSE.NaturalOtherEyesWeight);
+				{
+					if (Bits.IsSet(flags, Busy))
+						w = ps.Get(PSE.BusyOtherEyesWeight);
+					else
+						w = ps.Get(PSE.NaturalOtherEyesWeight);
 
-				w *= (p.Mood.RawExcitement + 1);
+					w += p.Mood.RawExcitement * ps.Get(PSE.OtherEyesExcitementWeight);
+					why = "random person";
+				}
 
-				targets_.SetWeightIfZero(p, BodyParts.Eyes, w);
+				targets_.SetWeightIfZero(p, BodyParts.Eyes, w, why);
 			}
 
 			return Continue;
