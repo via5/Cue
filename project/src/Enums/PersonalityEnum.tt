@@ -1,106 +1,78 @@
 ﻿<#@ include file="Enums.tt" #>
 <#
-var slidingDurations = new[]
+var vars = new string[][]
 {
-	"GazeDuration"
-};
-
-var bools = new[]
-{
-	"AvoidGazePlayer",
-	"AvoidGazeInsidePersonalSpace",
-	"AvoidGazeDuringSex",
-	"AvoidGazeDuringSexOthers"
-};
-
-var floats = new[]
-{
-	"GazeRandomIntervalMinimum",
-	"GazeRandomIntervalMaximum",
-
-	"MaxExcitementForAvoid",
-	"AvoidDelayAfterOrgasm",
-
-	"LookAboveMaxWeight",
-	"LookAboveMaxWeightOrgasm",
-
-	"NaturalRandomWeight",
-	"NaturalOtherEyesWeight",
-	"BusyOtherEyesWeight",
-	"MaxTirednessForRandomGaze",
-	"OtherEyesExcitementWeight",
-
-	"BlowjobEyesWeight",
-	"BlowjobGenitalsWeight",
-	"HandjobEyesWeight",
-	"HandjobGenitalsWeight",
-	"PenetrationEyesWeight",
-	"PenetrationGenitalsWeight",
-	"GropedEyesWeight",
-	"GropedTargetWeight",
-
-	"OtherBlowjobEyesWeight",
-	"OtherBlowjobTargetEyesWeight",
-	"OtherBlowjobTargetGenitalsWeight",
-	"OtherHandjobEyesWeight",
-	"OtherHandjobTargetEyesWeight",
-	"OtherHandjobTargetGenitalsWeight",
-	"OtherPenetrationEyesWeight",
-	"OtherPenetrationSourceEyesWeight",
-	"OtherPenetrationSourceGenitalsWeight",
-	"OtherGropedEyesWeight",
-	"OtherGropedSourceEyesWeight",
-	"OtherGropedTargetWeight",
-
-	"OtherSexExcitementRateFactor",
-	"MaxOtherSexExcitement",
-	"EnergyTirednessFactor",
-};
-
-var strings = new string[]
-{
-};
-
-var states = new []
-{
-	"IdleState",
-	"CloseState"
-};
-
-#>// auto generated from PersonalityEnums.tt
-
-namespace Cue
-{
-	class PSE_Enum
+	// sliding durations
+	new string[]
 	{
-		// sliding durations
-<#= MakeEnum(slidingDurations, "SlidingDurationCount") #>
+		"GazeDuration"
+	},
 
-		// bools
-<#= MakeEnum(bools, "BoolCount") #>
+	// bools
+	new string[]
+	{
+		"AvoidGazePlayer",
+		"AvoidGazeInsidePersonalSpace",
+		"AvoidGazeDuringSex",
+		"AvoidGazeDuringSexOthers"
+	},
 
-		// floats
-<#= MakeEnum(floats, "FloatCount") #>
+	// floats
+	new string[]
+	{
+		"GazeRandomIntervalMinimum",
+		"GazeRandomIntervalMaximum",
 
-		// strings
-<#= MakeEnum(strings, "StringCount") #>
+		"MaxExcitementForAvoid",
+		"AvoidDelayAfterOrgasm",
 
-		// states
-<#= MakeEnum(states, "StateCount") #>
+		"LookAboveMaxWeight",
+		"LookAboveMaxWeightOrgasm",
 
+		"NaturalRandomWeight",
+		"NaturalOtherEyesWeight",
+		"BusyOtherEyesWeight",
+		"MaxTirednessForRandomGaze",
+		"OtherEyesExcitementWeight",
 
-<#= MakeNames(slidingDurations, "sliding duration") #>
+		"BlowjobEyesWeight",
+		"BlowjobGenitalsWeight",
+		"HandjobEyesWeight",
+		"HandjobGenitalsWeight",
+		"PenetrationEyesWeight",
+		"PenetrationGenitalsWeight",
+		"GropedEyesWeight",
+		"GropedTargetWeight",
 
+		"OtherBlowjobEyesWeight",
+		"OtherBlowjobTargetEyesWeight",
+		"OtherBlowjobTargetGenitalsWeight",
+		"OtherHandjobEyesWeight",
+		"OtherHandjobTargetEyesWeight",
+		"OtherHandjobTargetGenitalsWeight",
+		"OtherPenetrationEyesWeight",
+		"OtherPenetrationSourceEyesWeight",
+		"OtherPenetrationSourceGenitalsWeight",
+		"OtherGropedEyesWeight",
+		"OtherGropedSourceEyesWeight",
+		"OtherGropedTargetWeight",
 
-<#= MakeNames(bools, "bool") #>
+		"OtherSexExcitementRateFactor",
+		"MaxOtherSexExcitement",
+		"EnergyTirednessFactor",
+	},
 
+	// strings
+	new string[]
+	{
+	},
 
-<#= MakeNames(floats, "float") #>
-
-
-<#= MakeNames(strings, "string") #>
-
-
-<#= MakeNames(states, "state") #>
+	// states
+	new string[]
+	{
+		"IdleState",
+		"CloseState"
 	}
-}
+};
+
+#><#= Generate(vars, "PSE", "Personality") #>

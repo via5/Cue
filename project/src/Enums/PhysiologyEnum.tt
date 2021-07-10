@@ -1,0 +1,58 @@
+﻿<#@ include file="Enums.tt" #>
+<#
+var vars = new string[][]
+{
+	// sliding durations
+	new string[]
+	{
+	},
+
+	// bools
+	new string[]
+	{
+	},
+
+	// floats
+	new string[]
+	{
+		"MaxSweat",
+		"MaxFlush",
+		"TemperatureExcitementRate",
+		"TemperatureDecayRate",
+		"TemperatureExcitementMax",
+		"TirednessRateDuringPostOrgasm",
+		"TirednessBaseDecayRate",
+		"TirednessBackToBaseRate",
+		"DelayAfterOrgasmUntilTirednessDecay",
+		"TirednessMaxExcitementForBaseDecay",
+		"OrgasmBaseTirednessIncrease",
+		"NeutralVoicePitch",
+		"VoicePitch",
+		"MouthRate",
+		"MouthMax",
+		"BreastsRate",
+		"BreastsMax",
+		"GenitalsRate",
+		"GenitalsMax",
+		"PenetrationRate",
+		"PenetrationMax",
+		"DecayPerSecond",
+		"ExcitementPostOrgasm",
+		"OrgasmTime",
+		"PostOrgasmTime",
+		"RateAdjustment"
+	},
+
+	// strings
+	new string[]
+	{
+		"Voice"
+	},
+
+	// states
+	new string[]
+	{
+	}
+};
+
+#><#= Generate(vars, "PE", "Physiology") #>

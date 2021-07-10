@@ -87,7 +87,6 @@ namespace Cue
 			get { return slidingDurationNames_; }
 		}
 
-
 		private static string[] boolNames_ = new string[]
 		{
 			"avoidGazePlayer",
@@ -116,7 +115,6 @@ namespace Cue
 		{
 			get { return boolNames_; }
 		}
-
 
 		private static string[] floatNames_ = new string[]
 		{
@@ -177,7 +175,6 @@ namespace Cue
 			get { return floatNames_; }
 		}
 
-
 		private static string[] stringNames_ = new string[]
 		{
 		};
@@ -202,7 +199,6 @@ namespace Cue
 		{
 			get { return stringNames_; }
 		}
-
 
 		private static string[] stateNames_ = new string[]
 		{

@@ -17,8 +17,7 @@ Terms
 
     energy (float, [0, 1])
       how energetic a character is, goes up with excitement but is dampened by
-      tiredness; this is `excitement - (tiredness * energyTirednessFactor)`,
-      clamped [0, 1]
+      tiredness; see energyTirednessFactor
 
     busy
       used for some gaze targets; whether a person is currently doing an action
@@ -160,6 +159,7 @@ Controls what characters are looking at.
       while being groped, looking at the character's eyes or body part or the
       groper's eyes
 
+
 Excitement
 ==========
 Controls some excitement values that are not physiological.
@@ -177,4 +177,5 @@ Controls some excitement values that are not physiological.
       of other characters; this avoids orgasms just by looking at people
 
     energyTirednessFactor
-      todo
+      impact of tiredness on excitement to determine energy; energy is
+      `excitement - (tiredness * energyTirednessFactor)`, clamped [0, 1]
