@@ -26,18 +26,26 @@ namespace Cue
 		public const int VoicePitch = 12;
 		public const int MouthRate = 13;
 		public const int MouthMax = 14;
-		public const int BreastsRate = 15;
-		public const int BreastsMax = 16;
-		public const int GenitalsRate = 17;
-		public const int GenitalsMax = 18;
-		public const int PenetrationRate = 19;
-		public const int PenetrationMax = 20;
-		public const int DecayPerSecond = 21;
-		public const int ExcitementPostOrgasm = 22;
-		public const int OrgasmTime = 23;
-		public const int PostOrgasmTime = 24;
-		public const int RateAdjustment = 25;
-		public const int FloatCount = 26;
+		public const int LipsFactor = 15;
+		public const int MouthFactor = 16;
+		public const int BreastsRate = 17;
+		public const int BreastsMax = 18;
+		public const int LeftBreastFactor = 19;
+		public const int RightBreastFactor = 20;
+		public const int GenitalsRate = 21;
+		public const int GenitalsMax = 22;
+		public const int LabiaFactor = 23;
+		public const int PenetrationRate = 24;
+		public const int PenetrationMax = 25;
+		public const int VaginaFactor = 26;
+		public const int DeepVaginaFactor = 27;
+		public const int DeeperVaginaFactor = 28;
+		public const int ExcitementDecayRate = 29;
+		public const int ExcitementPostOrgasm = 30;
+		public const int OrgasmTime = 31;
+		public const int PostOrgasmTime = 32;
+		public const int RateAdjustment = 33;
+		public const int FloatCount = 34;
 
 		// strings
 		public const int Voice = 0;
@@ -114,13 +122,21 @@ namespace Cue
 			"voicePitch",
 			"mouthRate",
 			"mouthMax",
+			"lipsFactor",
+			"mouthFactor",
 			"breastsRate",
 			"breastsMax",
+			"leftBreastFactor",
+			"rightBreastFactor",
 			"genitalsRate",
 			"genitalsMax",
+			"labiaFactor",
 			"penetrationRate",
 			"penetrationMax",
-			"decayPerSecond",
+			"vaginaFactor",
+			"deepVaginaFactor",
+			"deeperVaginaFactor",
+			"excitementDecayRate",
 			"excitementPostOrgasm",
 			"orgasmTime",
 			"postOrgasmTime",

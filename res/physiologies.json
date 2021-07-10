@@ -23,17 +23,25 @@
 
 			"mouthRate": 0.0001,
 			"mouthMax": 0.3,
+			"lipsFactor": 0.1,
+			"mouthFactor": 0.9,
 
 			"breastsRate": 0.0003,
 			"breastsMax": 0.4,
+			"leftBreastFactor": 0.5,
+			"rightBreastFactor": 0.5,
 
 			"genitalsRate": 0.0005,
 			"genitalsMax": 1.0,
+			"labiaFactor": 1.0,
 
 			"penetrationRate": 0.01,
 			"penetrationMax": 1.0,
+			"vaginaFactor": 0.3,
+			"deepVaginaFactor": 1.0,
+			"deeperVaginaFactor": 1.0,
 
-			"decayPerSecond": -0.01,
+			"excitementDecayRate": -0.01,
 			"excitementPostOrgasm": 0.3,
 			"orgasmTime": 8,
 			"postOrgasmTime": 10,

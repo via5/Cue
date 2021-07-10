@@ -192,10 +192,11 @@ namespace Cue
 		private void UpdateReasonValues(float s)
 		{
 			var ps = person_.Personality;
+			var pg = person_.Physiology;
 
 			reasons_[Mouth].Value =
-				parts_[BodyParts.Lips].value * 0.1f +
-				parts_[BodyParts.Mouth].value * 0.9f;
+				parts_[BodyParts.Lips].value * pg.Get(PE.LipsFactor) +
+				parts_[BodyParts.Mouth].value * pg.Get(PE.MouthFactor);
 
 			reasons_[Mouth].SpecificSensitivityModifier =
 				parts_[BodyParts.Lips].specificModifier +
@@ -203,25 +204,25 @@ namespace Cue
 
 
 			reasons_[Breasts].Value =
-				parts_[BodyParts.LeftBreast].value * 0.5f +
-				parts_[BodyParts.RightBreast].value * 0.5f;
+				parts_[BodyParts.LeftBreast].value * pg.Get(PE.LeftBreastFactor) +
+				parts_[BodyParts.RightBreast].value * pg.Get(PE.RightBreastFactor);
 
 			reasons_[Breasts].SpecificSensitivityModifier =
 				parts_[BodyParts.LeftBreast].specificModifier +
 				parts_[BodyParts.RightBreast].specificModifier;
 
 
-			reasons_[Genitals].Value = Math.Min(1,
-				parts_[BodyParts.Labia].value);
+			reasons_[Genitals].Value =
+				parts_[BodyParts.Labia].value * pg.Get(PE.LabiaFactor);
 
 			reasons_[Genitals].SpecificSensitivityModifier =
 				parts_[BodyParts.Labia].specificModifier;
 
 
-			reasons_[Penetration].Value = Math.Min(1,
-				parts_[BodyParts.Vagina].value * 0.3f +
-				parts_[BodyParts.DeepVagina].value * 1 +
-				parts_[BodyParts.DeeperVagina].value * 1);
+			reasons_[Penetration].Value =
+				parts_[BodyParts.Vagina].value * pg.Get(PE.VaginaFactor) +
+				parts_[BodyParts.DeepVagina].value * pg.Get(PE.DeepVaginaFactor) +
+				parts_[BodyParts.DeeperVagina].value * pg.Get(PE.DeeperVaginaFactor);
 
 			reasons_[Penetration].SpecificSensitivityModifier =
 				parts_[BodyParts.Vagina].specificModifier +
@@ -278,7 +279,7 @@ namespace Cue
 			totalRate_ *= pp.Get(PE.RateAdjustment);
 
 			if (totalRate_ == 0)
-				totalRate_ = pp.Get(PE.DecayPerSecond);
+				totalRate_ = pp.Get(PE.ExcitementDecayRate);
 		}
 
 		private void UpdateMax(float s)
@@ -300,7 +301,7 @@ namespace Cue
 
 			if (flatValue_ > max_)
 			{
-				flatValue_ = Math.Max(flatValue_ + pp.Get(PE.DecayPerSecond) * s, max_);
+				flatValue_ = Math.Max(flatValue_ + pp.Get(PE.ExcitementDecayRate) * s, max_);
 			}
 			else
 			{
