@@ -29,6 +29,7 @@ project\src\Person\Mood.cs
 project\src\Person\Person.cs
 project\src\Person\Physiology.cs
 project\src\Person\State.cs
+project\src\Person\Gaze\Events.cs
 project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Targets.cs

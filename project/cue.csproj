@@ -121,6 +121,7 @@
     <Compile Include="src\Person\Body.cs" />
     <Compile Include="src\Person\Clothing.cs" />
     <Compile Include="src\Person\Excitement.cs" />
+    <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
     <Compile Include="src\Person\Gaze\Targets.cs" />
