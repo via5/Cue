@@ -96,7 +96,7 @@ namespace Cue
 		private float totalRate_ = 0;
 		private float max_ = 0;
 		private float flatValue_ = 0;
-		private IEasing easing_ = new SinusoidalEasing();
+		private IEasing easing_ = new SineOutEasing();
 
 
 		public Excitement(Person p)

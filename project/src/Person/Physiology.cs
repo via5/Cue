@@ -12,6 +12,14 @@
 			public int bodyPart;
 			public int sourceBodyPart;
 			public float modifier;
+
+			public override string ToString()
+			{
+				return
+					$"{BodyParts.ToString(bodyPart)}=>" +
+					$"{BodyParts.ToString(sourceBodyPart)}   " +
+					$"{modifier}";
+			}
 		}
 
 
@@ -40,8 +48,7 @@
 			for (int i = 0; i < strings_.Length; ++i)
 				pp.strings_[i] = strings_[i];
 
-			for (int i = 0; i < specificModifiers_.Length; ++i)
-				pp.specificModifiers_[i] = specificModifiers_[i];
+			pp.specificModifiers_ = specificModifiers_;
 
 			pp.Init(p);
 
@@ -85,6 +92,11 @@
 			}
 
 			return 1;
+		}
+
+		public SpecificModifier[] SpecificModifiers
+		{
+			get { return specificModifiers_; }
 		}
 
 		public override string ToString()

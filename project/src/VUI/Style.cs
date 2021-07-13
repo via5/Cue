@@ -62,6 +62,14 @@ namespace VUI
 			}
 		}
 
+		public Font MonospaceFont
+		{
+			get
+			{
+				return UnityEngine.Font.CreateDynamicFontFromOSFont("Consolas", 20);
+			}
+		}
+
 		public int DefaultFontSize
 		{
 			get { return 28; }
@@ -1006,6 +1014,11 @@ namespace VUI
 					ForComponent<UnityEngine.UI.Button>(e.popupButtonPrefab, (prefab) =>
 					{
 						Polish(prefab, Button.Polishing.Default, info);
+					});
+
+					ForComponentInChildren<UnityEngine.UI.Text>(e.popupButtonPrefab, (prefab) =>
+					{
+						Polish(prefab, info);
 					});
 				}
 

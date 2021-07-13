@@ -1,4 +1,6 @@
-﻿using SimpleJSON;
+﻿#if MOCK
+
+using SimpleJSON;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -460,3 +462,5 @@ namespace Cue.Sys.Mock
 		}
 	}
 }
+
+#endif

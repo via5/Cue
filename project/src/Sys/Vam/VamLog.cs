@@ -64,7 +64,7 @@ namespace Cue.Sys.Vam
 				logFont_ = logText_.font;
 				logStyle_.fontSize = 24;
 				logText_.resizeTextForBestFit = false;
-				logText_.font = Font.CreateDynamicFontFromOSFont("Consolas", 24);
+				logText_.font = VUI.Style.Theme.MonospaceFont;
 				logStyle_.UpdateStyle();
 			}
 			else

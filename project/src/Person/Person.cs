@@ -51,13 +51,10 @@ namespace Cue
 
 		private List<string> traits_ = new List<string>();
 
-		public Person(int objectIndex, int personIndex, Sys.IAtom atom, JSONClass config)
+		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
 			: base(objectIndex, atom)
 		{
 			personIndex_ = personIndex;
-
-			foreach (JSONNode n in config["traits"].AsArray)
-				traits_.Add(n.Value);
 
 			actions_ = new RootAction(this);
 			state_ = new PersonState(this);
@@ -100,6 +97,20 @@ namespace Cue
 			}
 
 			Atom.Init();
+		}
+
+		public override void LoadConfig(JSONClass r)
+		{
+			base.LoadConfig(r);
+
+			foreach (JSONNode n in r["traits"].AsArray)
+				traits_.Add(n.Value);
+
+			if (r.HasKey("personality"))
+				personality_ = Resources.Personalities.Clone(r["personality"], this);
+
+			if (r.HasKey("events"))
+				ai_.EventsEnabled = r["events"].AsBool;
 		}
 
 		public int PersonIndex

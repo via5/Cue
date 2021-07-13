@@ -88,6 +88,7 @@ namespace Cue
 					sm.bodyPart = BodyParts.FromString(J.ReqString(smn, "bodyPart"));
 					sm.sourceBodyPart = BodyParts.FromString(J.ReqString(smn, "sourceBodyPart"));
 					sm.modifier = J.ReqFloat(smn, "modifier");
+					sms.Add(sm);
 				}
 			}
 

@@ -22,9 +22,11 @@ namespace Cue
 	{
 		private bool allowMovement_ = false;
 
-		public void Init(JSONClass config)
+		public void Init(JSONClass r)
 		{
-			allowMovement_ = config["allowMovement"].AsBool;
+			var o = r["options"].AsObject;
+
+			allowMovement_ = o["allowMovement"].AsBool;
 		}
 
 		public bool AllowMovement
@@ -121,9 +123,8 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
-			var config = Sys.GetConfig() ?? new JSONClass();
-
-			options_.Init(config);
+			var conf = Sys.GetConfig() ?? new JSONClass();
+			options_.Init(conf);
 
 			LogVerbose("cue: loading resources");
 			Resources.LoadAll();
@@ -132,7 +133,7 @@ namespace Cue
 			Sys.Nav.Update();
 
 			LogVerbose("cue: finding objects");
-			FindObjects(config);
+			FindObjects();
 
 			LogVerbose("cue: initializing persons");
 			InitPersons();
@@ -153,16 +154,27 @@ namespace Cue
 				}
 			}
 
+			LoadConfig(conf);
+
 			LogInfo("cue: running");
 		}
 
-		private void FindObjects(JSONClass config)
+		private void LoadConfig(JSONClass c)
+		{
+			foreach (var o in everything_)
+			{
+				if (c.HasKey(o.ID))
+					o.LoadConfig(c[o.ID].AsObject);
+			}
+		}
+
+		private void FindObjects()
 		{
 			foreach (var a in Sys.GetAtoms())
 			{
 				if (a.IsPerson)
 				{
-					AddPerson(config, a);
+					AddPerson(a);
 				}
 				else
 				{
@@ -201,11 +213,9 @@ namespace Cue
 			}
 		}
 
-		private void AddPerson(JSONClass config, Sys.IAtom a)
+		private void AddPerson(Sys.IAtom a)
 		{
-			JSONClass o = config[a.ID]?.AsObject ?? new JSONClass();
-
-			var p = new Person(everything_.Count, persons_.Count, a, o);
+			var p = new Person(everything_.Count, persons_.Count, a);
 
 			persons_.Add(p);
 

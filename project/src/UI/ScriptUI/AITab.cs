@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -136,8 +137,8 @@ namespace Cue
 		private Person person_;
 		private Physiology pp_;
 
-		private VUI.Label[] floats_ = new VUI.Label[PE.FloatCount];
-		private VUI.Label[] strings_ = new VUI.Label[PE.StringCount];
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private bool inited_ = false;
 
 		public PersonAIPhysiologyTab(Person p)
 			: base("Physiology")
@@ -145,46 +146,34 @@ namespace Cue
 			person_ = p;
 			pp_ = p.Physiology;
 
-			var gl = new VUI.GridLayout(2);
-			var panel = new VUI.Panel(gl);
-
-			int fontSize = 22;
-
-			for (int i = 0; i < floats_.Length; ++i)
-			{
-				floats_[i] = new VUI.Label();
-				floats_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PE.FloatToString(i));
-				caption.FontSize = fontSize;
-
-				panel.Add(caption);
-				panel.Add(floats_[i]);
-			}
-
-			for (int i = 0; i < strings_.Length; ++i)
-			{
-				strings_[i] = new VUI.Label();
-				strings_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PE.StringToString(i));
-				caption.FontSize = fontSize;
-
-				panel.Add(caption);
-				panel.Add(strings_[i]);
-			}
-
 			Layout = new VUI.BorderLayout();
-			Add(panel, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
 		}
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < floats_.Length; ++i)
-				floats_[i].Text = pp_.Get(i).ToString();
+			if (inited_)
+				return;
 
-			for (int i = 0; i < strings_.Length; ++i)
-				strings_[i].Text = pp_.GetString(i);
+			inited_ = true;
+			var items = new List<string>();
+			int longest = 0;
+
+			foreach (var n in PE.AllNames)
+				longest = Math.Max(longest, n.Length);
+
+			for (int i = 0; i < PE.FloatCount; ++i)
+				items.Add(PE.FloatToString(i).PadRight(longest) + "   " + pp_.Get(i).ToString());
+
+			for (int i = 0; i < PE.StringCount; ++i)
+				items.Add(PE.StringToString(i).PadRight(longest) + "   " + pp_.GetString(i));
+
+			for (int i = 0; i < pp_.SpecificModifiers.Length; ++i)
+				items.Add(pp_.SpecificModifiers[i].ToString());
+
+			list_.SetItems(items);
 		}
 	}
 

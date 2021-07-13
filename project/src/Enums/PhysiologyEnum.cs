@@ -214,5 +214,49 @@ namespace Cue
 		{
 			get { return stateNames_; }
 		}
+
+
+		private static string[] allNames_ = new string[] {
+			"maxSweat",
+			"maxFlush",
+			"temperatureExcitementRate",
+			"temperatureDecayRate",
+			"temperatureExcitementMax",
+			"tirednessRateDuringPostOrgasm",
+			"tirednessBaseDecayRate",
+			"tirednessBackToBaseRate",
+			"delayAfterOrgasmUntilTirednessDecay",
+			"tirednessMaxExcitementForBaseDecay",
+			"orgasmBaseTirednessIncrease",
+			"neutralVoicePitch",
+			"voicePitch",
+			"mouthRate",
+			"mouthMax",
+			"lipsFactor",
+			"mouthFactor",
+			"breastsRate",
+			"breastsMax",
+			"leftBreastFactor",
+			"rightBreastFactor",
+			"genitalsRate",
+			"genitalsMax",
+			"labiaFactor",
+			"penetrationRate",
+			"penetrationMax",
+			"vaginaFactor",
+			"deepVaginaFactor",
+			"deeperVaginaFactor",
+			"excitementDecayRate",
+			"excitementPostOrgasm",
+			"orgasmTime",
+			"postOrgasmTime",
+			"rateAdjustment",
+			"voice",
+		};
+
+		public static string[] AllNames
+		{
+			get { return allNames_; }
+		}
 	}
 }

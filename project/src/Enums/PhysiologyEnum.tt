@@ -1,5 +1,4 @@
-﻿<#@ include file="Enums.tt" #>
-<#
+﻿<#@ include file="Enums.tt" #><#
 var vars = new string[][]
 {
 	// sliding durations

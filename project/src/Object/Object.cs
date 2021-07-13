@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using SimpleJSON;
+using System.Text.RegularExpressions;
 
 namespace Cue
 {
@@ -13,6 +14,7 @@ namespace Cue
 		Vector3 EyeInterest { get; }
 		bool Possessed { get; }
 
+		void LoadConfig(JSONClass r);
 		void FixedUpdate(float s);
 		void Update(float s);
 		void OnPluginState(bool b);
@@ -255,6 +257,11 @@ namespace Cue
 					Atom.NavStop("nav state is none");
 				}
 			}
+		}
+
+		public virtual void LoadConfig(JSONClass r)
+		{
+			// no-op
 		}
 
 		public virtual void FixedUpdate(float s)

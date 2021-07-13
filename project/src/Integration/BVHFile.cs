@@ -83,6 +83,7 @@ namespace Cue.BVH
             if (inited_)
                 return;
 
+            inited_ = true;
             ReadZeroPos();
         }
 

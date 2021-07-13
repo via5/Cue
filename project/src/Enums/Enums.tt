@@ -1,4 +1,5 @@
-﻿<#+
+﻿<#@ import namespace="System.Collections.Generic" #>
+<#+
 public string Generate(string[][] vars, string name, string file)
 {
 	string defs = "";
@@ -10,13 +11,15 @@ public string Generate(string[][] vars, string name, string file)
 	var strings = vars[3];
 	var states = vars[4];
 
+	var allNames = new List<string>();
+
 	//if (slidingDurations.Length > 0)
 	{
 		defs +=
 			$"\t\t// sliding durations\r\n" +
 			MakeEnum(vars[0], "SlidingDurationCount");
 
-		names += MakeNames(slidingDurations, "sliding duration");
+		names += MakeNames(slidingDurations, "sliding duration", allNames);
 	}
 
 	//if (bools.Length > 0)
@@ -31,7 +34,7 @@ public string Generate(string[][] vars, string name, string file)
 			$"\t\t// bools\r\n" +
 			MakeEnum(bools, "BoolCount");
 
-		names += MakeNames(bools, "bool");
+		names += MakeNames(bools, "bool", allNames);
 	}
 
 	//if (floats.Length > 0)
@@ -46,7 +49,7 @@ public string Generate(string[][] vars, string name, string file)
 			$"\t\t// floats\r\n" +
 			MakeEnum(floats, "FloatCount");
 
-		names += MakeNames(floats, "float");
+		names += MakeNames(floats, "float", allNames);
 	}
 
 	//if (strings.Length > 0)
@@ -61,7 +64,7 @@ public string Generate(string[][] vars, string name, string file)
 			$"\t\t// strings\r\n" +
 			MakeEnum(strings, "StringCount");
 
-		names += MakeNames(strings, "string");
+		names += MakeNames(strings, "string", allNames);
 	}
 
 	//if (states.Length >0)
@@ -76,8 +79,22 @@ public string Generate(string[][] vars, string name, string file)
 			$"\t\t// states\r\n" +
 			MakeEnum(states, "StateCount");
 
-		names += MakeNames(states, "state");
+		names += MakeNames(states, "state", allNames);
 	}
+
+	string allNamesArray =
+		$"\t\tprivate static string[] allNames_ = new string[] {{\r\n";
+
+	foreach (var n in allNames)
+		allNamesArray += $"\t\t\t\"{n}\",\r\n";
+
+	allNamesArray +=
+		$"\t\t}};\r\n" +
+		$"\r\n" +
+		$"\t\tpublic static string[] AllNames\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\tget {{ return allNames_; }}\r\n" +
+		$"\t\t}}";
 
 	string s =
 		$"// auto generated from {file}Enums.tt\r\n" +
@@ -87,7 +104,8 @@ public string Generate(string[][] vars, string name, string file)
 		$"\tclass {name}_Enum\r\n" +
 		$"\t{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
-		names + "\r\n" +
+		names + "\r\n\r\n\r\n" +
+		allNamesArray + "\r\n" +
 		$"\t}}\r\n" +
 		$"}}";
 
@@ -122,7 +140,7 @@ public string CamelCase(string s, bool firstUpper)
 	return s;
 }
 
-public string MakeNames(string[] names, string name)
+public string MakeNames(string[] names, string name, List<string> allNames)
 {
 	string var = CamelCase(name, false) + "Names_";
 
@@ -131,7 +149,12 @@ public string MakeNames(string[] names, string name)
 		$"\t\t{{\r\n";
 
 	foreach (var v in names)
-		s += $"\t\t\t\"{CamelCase(v, false)}\",\r\n";
+	{
+		var ename = CamelCase(v, false);
+
+		s += $"\t\t\t\"{ename}\",\r\n";
+		allNames.Add(ename);
+	}
 
 	s +=
 		$"\t\t}};\r\n" +
