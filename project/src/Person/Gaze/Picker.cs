@@ -126,27 +126,25 @@
 
 		public bool Update(float s)
 		{
-			bool changed = false;
+			bool needsTarget = false;
 
 			delay_.Update(s);
 
 			if (delay_.Finished || !HasTarget)
 			{
-				NextTarget();
-				changed = true;
+				needsTarget = true;
 			}
 			else if (HasTarget)
 			{
 				if (!CanLookAt(targets_[currentTarget_]))
 				{
-					NextTarget();
-					changed = true;
+					needsTarget = true;
 				}
 			}
 
 			render_?.Update(s);
 
-			return changed;
+			return needsTarget;
 		}
 
 		public override string ToString()
@@ -157,11 +155,15 @@
 				return "no target";
 		}
 
-		private void NextTarget()
+		public void ForceNextTarget()
+		{
+			delay_.Reset();
+			NextTarget();
+		}
+
+		public void NextTarget()
 		{
 			delay_.SetRange(person_.Personality.LookAtRandomInterval);
-			//delay_ = new Duration(1, 1);
-
 			lastString_ = "";
 
 			ResetFrustums();

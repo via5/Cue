@@ -58,10 +58,15 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			UpdateTargets();
+			if (UpdateEmergencyTargets())
+				picker_.ForceNextTarget();
 
 			if (picker_.Update(s))
+			{
+				UpdateTargets();
+				picker_.NextTarget();
 				gazer_.Duration = person_.Personality.GazeDuration;
+			}
 
 			if (picker_.HasTarget)
 				eyes_.LookAt(picker_.Position);
@@ -71,7 +76,20 @@ namespace Cue
 			gazer_.Update(s);
 		}
 
-		public void UpdateTargets()
+		private bool UpdateEmergencyTargets()
+		{
+			for (int i = 0; i < events_.Length; ++i)
+			{
+				var e = events_[i];
+
+				if (e.CheckEmergency())
+					return true;
+			}
+
+			return false;
+		}
+
+		private void UpdateTargets()
 		{
 			var ps = person_.Personality;
 

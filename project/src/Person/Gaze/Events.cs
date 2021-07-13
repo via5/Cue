@@ -5,6 +5,7 @@ namespace Cue
 	interface IGazeEvent
 	{
 		int Check(int flags);
+		bool CheckEmergency();
 	}
 
 
@@ -48,7 +49,17 @@ namespace Cue
 			return DoCheck(flags);
 		}
 
+		public bool CheckEmergency()
+		{
+			return DoCheckEmergency();
+		}
+
 		protected abstract int DoCheck(int flags);
+
+		protected virtual bool DoCheckEmergency()
+		{
+			return false;
+		}
 	}
 
 
@@ -620,28 +631,57 @@ namespace Cue
 				if (p == Cue.Instance.Player && g_.ShouldAvoidPlayer())
 					continue;
 
-				float w = 0;
-				string why;
-
 				if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
 				{
-					why = "random person, but tired";
+					// doesn't do anything, just to get the why in the ui
+					targets_.SetWeightIfZero(
+						p, BodyParts.Eyes, 0, "random person, but tired");
 				}
 				else
 				{
+					float w = 0;
+
 					if (Bits.IsSet(flags, Busy))
 						w = ps.Get(PSE.BusyOtherEyesWeight);
 					else
 						w = ps.Get(PSE.NaturalOtherEyesWeight);
 
 					w += p.Mood.RawExcitement * ps.Get(PSE.OtherEyesExcitementWeight);
-					why = "random person";
-				}
 
-				targets_.SetWeightIfZero(p, BodyParts.Eyes, w, why);
+					targets_.SetWeightIfZero(
+						p, BodyParts.Eyes, w, "random person");
+				}
 			}
 
 			return Continue;
+		}
+
+		protected override bool DoCheckEmergency()
+		{
+			var ps = person_.Personality;
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_)
+					continue;
+
+				if (p.Mood.OrgasmJustStarted)
+				{
+					if (!ps.GetBool(PSE.AvoidGazeDuringSexOthers))
+					{
+						person_.Log.Info(
+							$"emergency gaze switch, {p} is orgasming");
+
+						targets_.SetWeightIfZero(
+							p, BodyParts.Eyes,
+							ps.Get(PSE.OtherEyesOrgasmWeight), "orgasming");
+
+						return true;
+					}
+				}
+			}
+
+			return false;
 		}
 	}
 }

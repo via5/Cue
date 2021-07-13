@@ -78,6 +78,11 @@
 			get { return baseTiredness_; }
 		}
 
+		public bool OrgasmJustStarted
+		{
+			get { return state_ == OrgasmState && elapsed_ == 0; }
+		}
+
 		public float Energy
 		{
 			get
