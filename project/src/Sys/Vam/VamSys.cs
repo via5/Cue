@@ -178,6 +178,11 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public bool HasUI
+		{
+			get { return true; }
+		}
+
 		public bool IsPlayMode
 		{
 			get

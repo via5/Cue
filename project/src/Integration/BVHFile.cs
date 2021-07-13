@@ -15,6 +15,7 @@ namespace Cue.BVH
         private float frameTime_;
         private string path_;
         private string name_;
+        private bool inited_ = false;
 
         public File(string _path)
         {
@@ -75,6 +76,13 @@ namespace Cue.BVH
             frames_ = ReadMotion(raw);
             frameTime_ = ReadFrameTime(raw);
             nFrames_ = frames_.Length;
+        }
+
+        public void Init()
+        {
+            if (inited_)
+                return;
+
             ReadZeroPos();
         }
 

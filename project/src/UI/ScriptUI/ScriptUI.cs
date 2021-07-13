@@ -15,9 +15,15 @@ namespace Cue
 		private List<Tab> tabs_ = new List<Tab>();
 		private float updateElapsed_ = 1000;
 		private MiscTab misc_;
+		private bool inited_ = false;
 
 		public void Init()
 		{
+			if (inited_)
+				return;
+
+			inited_ = true;
+
 			misc_ = new MiscTab();
 
 			foreach (var p in Cue.Instance.AllPersons)

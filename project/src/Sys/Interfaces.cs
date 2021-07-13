@@ -47,6 +47,7 @@ namespace Cue.Sys
 		void ReloadPlugin();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
+		bool HasUI { get; }
 		float DeltaTime { get; }
 		float RealtimeSinceStartup { get; }
 		string Fps { get; }

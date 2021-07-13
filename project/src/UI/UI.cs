@@ -3,6 +3,7 @@
 	class UI
 	{
 		private Sys.ISys sys_;
+		private ScriptUI sui_ = null;
 		private Menu leftMenu_ = null;
 		private Menu rightMenu_ = null;
 		private Menu desktopMenu_ = null;
@@ -13,6 +14,7 @@
 		{
 			sys_ = sys;
 			vr_ = sys_.IsVR;
+			sui_ = new ScriptUI();
 			leftMenu_ = new Menu();
 			rightMenu_ = new Menu();
 			desktopMenu_ = new Menu();
@@ -59,6 +61,9 @@
 				CreateUI();
 			else
 				DestroyUI();
+
+			if (sui_ != null)
+				sui_.OnPluginState(true);
 		}
 
 		private void CreateUI()
@@ -66,6 +71,7 @@
 			Cue.LogInfo("creating ui");
 
 			controls_.Create();
+			sui_.Init();
 
 			if (vr_)
 			{
@@ -229,6 +235,7 @@
 			leftMenu_?.Update();
 			rightMenu_?.Update();
 			desktopMenu_?.Update();
+			sui_.Update(s, Cue.Instance.Tickers);
 		}
 	}
 }

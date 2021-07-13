@@ -63,7 +63,8 @@ namespace Cue
 			instance_ = this;
 			LogVerbose("cue: ctor");
 
-			ui_ = new UI(Sys);
+			if (Sys.HasUI)
+				ui_ = new UI(Sys);
 		}
 
 		public static Cue Instance { get { return instance_; } }
@@ -285,7 +286,7 @@ namespace Cue
 				throw new PluginGone();
 			}
 
-			ui_.CheckInput();
+			ui_?.CheckInput();
 		}
 
 		private void DoUpdateObjects(float s)
@@ -336,7 +337,7 @@ namespace Cue
 
 		private void DoUpdateUI(float s)
 		{
-			ui_.Update(s);
+			ui_?.Update(s);
 		}
 
 		public void OnPluginState(bool b)
@@ -344,7 +345,7 @@ namespace Cue
 			LogVerbose($"cue: plugin state {b}");
 
 			Sys.OnPluginState(b);
-			ui_.OnPluginState(b);
+			ui_?.OnPluginState(b);
 
 			for (int i = 0; i < everythingActive_.Count; ++i)
 				everythingActive_[i].OnPluginState(b);

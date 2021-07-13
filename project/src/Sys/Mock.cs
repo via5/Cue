@@ -1,9 +1,25 @@
 ﻿using SimpleJSON;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Cue.Sys.Mock
 {
+	class MockGraphic : IGraphic
+	{
+		public bool Visible { get; set; }
+		public Vector3 Position { get; set; }
+		public Quaternion Rotation { get; set; }
+		public Vector3 Size { get; set; }
+		public Color Color { get; set; }
+		public bool Collision { get; set; }
+
+		public void Destroy()
+		{
+		}
+	}
+
+
 	class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
@@ -79,6 +95,12 @@ namespace Cue.Sys.Mock
 			get { return false; }
 		}
 
+		public bool HasUI
+		{
+			get { return false; }
+		}
+
+
 		public bool IsPlayMode
 		{
 			get { return true; }
@@ -142,12 +164,37 @@ namespace Cue.Sys.Mock
 
 		public string ReadFileIntoString(string path)
 		{
-			return "";
+			return File.ReadAllText(path);
+		}
+
+		private string RootPath()
+		{
+			string exeDir;
+			var exe = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+
+			if (exe == null)
+			{
+				exeDir = AppDomain.CurrentDomain?.BaseDirectory;
+
+				if (exeDir == null)
+					exeDir = Directory.GetCurrentDirectory();
+			}
+			else
+			{
+				exeDir = Path.GetDirectoryName(exe);
+			}
+
+			return Path.GetFullPath(Path.Combine(exeDir, "../../.."));
+		}
+
+		private string ResPath()
+		{
+			return Path.Combine(RootPath(), "res");
 		}
 
 		public string GetResourcePath(string path)
 		{
-			return path;
+			return Path.Combine(ResPath(), path);
 		}
 
 		public IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts)
@@ -182,12 +229,12 @@ namespace Cue.Sys.Mock
 
 		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
-			return null;
+			return new MockGraphic();
 		}
 
 		public IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c)
 		{
-			return null;
+			return new MockGraphic();
 		}
 	}
 

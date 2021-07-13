@@ -53,7 +53,7 @@ namespace Cue
 				{
 					deltaTime = (float)((now - deltaTime) / 1000.0);
 
-					sys_.Update(Time.deltaTime);
+					sys_.Update(deltaTime);
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
 				}
@@ -137,7 +137,6 @@ namespace Cue
 		private readonly CueToken token_ = new CueToken();
 		private Sys.ISys sys_ = null;
 		private Cue cue_ = null;
-		private ScriptUI sui_ = null;
 		private bool inited_ = false;
 
 		public CueMain()
@@ -173,7 +172,6 @@ namespace Cue
 			{
 				sys_ = new Sys.Vam.VamSys(this);
 				cue_ = new Cue();
-				sui_ = new ScriptUI();
 				sys_.OnReady(DoInit);
 			}
 			catch (Exception e)
@@ -189,7 +187,6 @@ namespace Cue
 			try
 			{
 				cue_.Init();
-				sui_.Init();
 				inited_ = true;
 			}
 			catch (Exception e)
@@ -222,7 +219,6 @@ namespace Cue
 				{
 					sys_.Update(Time.deltaTime);
 					cue_.Update(Time.deltaTime);
-					sui_.Update(Time.deltaTime, cue_.Tickers);
 				}
 				catch(PluginGone e)
 				{
@@ -239,9 +235,6 @@ namespace Cue
 			{
 				if (cue_ != null)
 					cue_.OnPluginState(true);
-
-				if (sui_ != null)
-					sui_.OnPluginState(true);
 			});
 		}
 
@@ -254,9 +247,6 @@ namespace Cue
 			{
 				if (cue_ != null)
 					cue_.OnPluginState(false);
-
-				if (sui_ != null)
-					sui_.OnPluginState(false);
 			});
 		}
 

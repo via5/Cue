@@ -143,6 +143,8 @@ namespace Cue.BVH
             }
 
             anim_ = ba;
+            anim_.File.Init();
+
             flags_ = flags;
             frameTime_ = anim_.File.FrameTime;
             frame_ = (int)anim_.InitFrame;
