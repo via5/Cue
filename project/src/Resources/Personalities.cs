@@ -41,6 +41,21 @@ namespace Cue
 			return new Personality(name);
 		}
 
+		public List<Personality> All
+		{
+			get { return new List<Personality>(ps_); }
+		}
+
+		public List<string> AllNames()
+		{
+			var names = new List<string>();
+
+			foreach (var p in ps_)
+				names.Add(p.Name);
+
+			return names;
+		}
+
 		private void LoadFromFile()
 		{
 			var meta = Cue.Instance.Sys.GetResourcePath("personalities.json");

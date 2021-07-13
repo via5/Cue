@@ -49,7 +49,7 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label event_ = new VUI.Label();
-		private VUI.Label personality_ = new VUI.Label();
+		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
 
 
@@ -80,6 +80,7 @@ namespace Cue
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
 
+			personality_.SelectionChanged += OnPersonality;
 			close_.Changed += OnClose;
 		}
 
@@ -112,12 +113,20 @@ namespace Cue
 				(ai_.Event == null ? "(none)" : ai_.Event.ToString()) + " " +
 				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
 
-			personality_.Text = person_.Personality.ToString();
+			personality_.SetItems(
+				Resources.Personalities.AllNames(),
+				person_.Personality.Name);
 		}
 
 		private void OnClose(bool b)
 		{
 			person_.Personality.ForceSetClose(b, b);
+		}
+
+		private void OnPersonality(string name)
+		{
+			if (name != "" && name != person_.Personality.Name)
+				person_.Personality = Resources.Personalities.Clone(name, person_);
 		}
 	}
 
