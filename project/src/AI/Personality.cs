@@ -38,7 +38,7 @@
 
 			public void CopyFrom(State s)
 			{
-				CopyFrom((EnumValueManager)this);
+				base.CopyFrom(s);
 
 				expressions = new ExpressionIntensity[s.expressions.Length];
 				for (int i = 0; i < s.expressions.Length; ++i)

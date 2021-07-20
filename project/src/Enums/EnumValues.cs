@@ -58,14 +58,6 @@
 				strings_[i] = v.strings_[i];
 		}
 
-		//public void Set(SlidingDuration[] sds, bool[] bs, float[] fs, string[] ss)
-		//{
-		//	slidingDurations_ = sds;
-		//	bools_ = bs;
-		//	floats_ = fs;
-		//	strings_ = ss;
-		//}
-		//
 		public virtual SlidingDuration GetSlidingDuration(int i)
 		{
 			return slidingDurations_[i];

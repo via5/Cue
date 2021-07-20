@@ -40,6 +40,10 @@
 // sex
 //     includes both penetration and groping
 //
+// scene idle
+//     the current scene is considered idle if the excitement of all characters
+//     is 0
+//
 
 var vars = new V[]
 {
@@ -98,7 +102,10 @@ V.Float("LookAboveMaxWeight"),
 V.Float("LookAboveMaxWeightOrgasm"),
 
 
-// looking at a random point when not busy
+// looking at a random point when not busy and scene is idle
+V.Float("IdleNaturalRandomWeight"),
+
+// looking at a random point when not busy and scene is not idle
 V.Float("NaturalRandomWeight"),
 
 // looking at a random person when not busy; see also otherEyesExcitementWeight

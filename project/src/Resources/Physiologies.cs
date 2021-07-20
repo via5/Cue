@@ -29,12 +29,12 @@ namespace Cue
 			}
 		}
 
-		public Physiology Clone(string name, Person p)
+		public Physiology Clone(string name, Person person)
 		{
 			foreach (var ps in ps_)
 			{
 				if (ps.Name == name)
-					return ps.Clone(p);
+					return ps.Clone(person);
 			}
 
 			Cue.LogError($"physiology '{name}' not found");

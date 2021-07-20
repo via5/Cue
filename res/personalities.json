@@ -43,7 +43,8 @@
 				"lookAboveMaxWeight": 0.2,
 				"lookAboveMaxWeightOrgasm": 0.5,
 
-				"naturalRandomWeight": 0.05,
+				"idleNaturalRandomWeight": 0.05,
+				"naturalRandomWeight": 0,
 				"naturalOtherEyesWeight": 0.2,
 				"busyOtherEyesWeight": 0.1,
 				"otherEyesExcitementWeight": 1.0,
@@ -116,7 +117,8 @@
 				"lookAboveMaxWeight": 0.2,
 				"lookAboveMaxWeightOrgasm": 0.5,
 
-				"naturalRandomWeight": 0.05,
+				"idleNaturalRandomWeight": 0.05,
+				"naturalRandomWeight": 0,
 				"naturalOtherEyesWeight": 0.2,
 				"busyOtherEyesWeight": 0.1,
 				"otherEyesExcitementWeight": 1.0,

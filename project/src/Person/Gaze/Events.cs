@@ -597,17 +597,39 @@ namespace Cue
 			{
 				targets_.SetRandomWeightIfZero(0, "random, but busy");
 			}
-			else if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
-			{
-				targets_.SetRandomWeightIfZero(0, "random, but tired");
-			}
 			else
 			{
-				targets_.SetRandomWeightIfZero(
-					ps.Get(PSE.NaturalRandomWeight), "random");
+				if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
+				{
+					targets_.SetRandomWeightIfZero(0, "random, but tired");
+				}
+				else
+				{
+					if (IsSceneIdle())
+					{
+						targets_.SetRandomWeightIfZero(
+							ps.Get(PSE.IdleNaturalRandomWeight), "random scene idle");
+					}
+					else
+					{
+						targets_.SetRandomWeightIfZero(
+							ps.Get(PSE.NaturalRandomWeight), "random");
+					}
+				}
 			}
 
 			return Continue;
+		}
+
+		private bool IsSceneIdle()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p.Mood.RawExcitement > 0)
+					return false;
+			}
+
+			return true;
 		}
 	}
 

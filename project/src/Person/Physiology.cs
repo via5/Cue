@@ -44,7 +44,7 @@
 
 		private void CopyFrom(Physiology p)
 		{
-			CopyFrom((EnumValueManager)this);
+			base.CopyFrom(p);
 			specificModifiers_ = p.specificModifiers_;
 		}
 
