@@ -1,79 +1,193 @@
-﻿<#@ include file="Enums.tt" #>
-<#
-var vars = new string[][]
+﻿<#@ include file="Enums.tt" #><#
+
+// Terms
+// =====
+//
+// excitement (float, [0, 1])
+//     character's excitement value, orgasm at 1
+//
+// tiredness (float, [0, 1])
+//     how tired a character is:
+//         - "base" tiredness starts at 0, goes up slightly for every orgasm,
+//         decays when excitement stays low enough
+//         - "actual" tiredness is never below base, but always shoots up to 1.0
+//         quickly after orgasm and slowly goes back to base
+//
+// energy (float, [0, 1])
+//     how energetic a character is, goes up with excitement but is dampened by
+//     tiredness; see energyTirednessFactor
+//
+// busy
+//     used for some gaze targets; whether a person is currently doing an action
+//     where they're unlikely to look away, such as a HJ, BJ, etc.
+//
+// weight
+//     each gaze target has a weight as a number; to decide which target a
+//     person should look at next, the chance of a target being picked is its
+//     weight divided by the sum of the weight of all targets (that is, the
+//     higher the weight, the more chances a target has of getting picked)
+//
+// personal space
+//     a character is inside another character's personal space when certain
+//     body parts are close enough (this is an expensive check, so only some
+//     body parts are handled, such as hands, head, chest, hips, genitals and
+//     feet)
+//
+// groped
+//     whether a character's head, breasts or genitals are currently being
+//     touched by another character
+//
+// sex
+//     includes both penetration and groping
+//
+
+var vars = new V[]
 {
-	// sliding durations
-	new string[]
-	{
-		"GazeDuration"
-	},
 
-	// bools
-	new string[]
-	{
-		"AvoidGazePlayer",
-		"AvoidGazeInsidePersonalSpace",
-		"AvoidGazeDuringSex",
-		"AvoidGazeDuringSexOthers"
-	},
+// Gaze
+// ====
+// Controls what characters are looking at.
 
-	// floats
-	new string[]
-	{
-		"GazeRandomIntervalMinimum",
-		"GazeRandomIntervalMaximum",
+// Durations
+// ---------
 
-		"MaxExcitementForAvoid",
-		"AvoidDelayAfterOrgasm",
+// time it takes to move the head to follow the eyes
+V.SlidingDuration("GazeDuration"),
 
-		"LookAboveMaxWeight",
-		"LookAboveMaxWeightOrgasm",
+// time to wait before picking the next target (seconds)
+V.Float("GazeRandomIntervalMinimum"),
+V.Float("GazeRandomIntervalMaximum"),
 
-		"NaturalRandomWeight",
-		"NaturalOtherEyesWeight",
-		"BusyOtherEyesWeight",
-		"MaxTirednessForRandomGaze",
-		"OtherEyesExcitementWeight",
-		"OtherEyesOrgasmWeight",
 
-		"BlowjobEyesWeight",
-		"BlowjobGenitalsWeight",
-		"HandjobEyesWeight",
-		"HandjobGenitalsWeight",
-		"PenetrationEyesWeight",
-		"PenetrationGenitalsWeight",
-		"GropedEyesWeight",
-		"GropedTargetWeight",
+// Avoidance
+// ---------
 
-		"OtherBlowjobEyesWeight",
-		"OtherBlowjobTargetEyesWeight",
-		"OtherBlowjobTargetGenitalsWeight",
-		"OtherHandjobEyesWeight",
-		"OtherHandjobTargetEyesWeight",
-		"OtherHandjobTargetGenitalsWeight",
-		"OtherPenetrationEyesWeight",
-		"OtherPenetrationSourceEyesWeight",
-		"OtherPenetrationSourceGenitalsWeight",
-		"OtherGropedEyesWeight",
-		"OtherGropedSourceEyesWeight",
-		"OtherGropedTargetWeight",
+// whether to avoid looking at the player at all times (see also
+// maxExcitementForAvoid)
+V.Bool("AvoidGazePlayer"),
 
-		"OtherSexExcitementRateFactor",
-		"MaxOtherSexExcitement",
-		"EnergyTirednessFactor",
-	},
+// whether to avoid looking at the player when inside personal space (see also
+// maxExcitementForAvoid)
+V.Bool("AvoidGazeInsidePersonalSpace"),
 
-	// strings
-	new string[]
-	{
-	},
+// whether to avoid looking at the characters involved in sex with this
+// character
+V.Bool("AvoidGazeDuringSex"),
 
-	// states
-	new string[]
-	{
-		"IdleState",
-		"CloseState"
-	}
+// whether to avoid looking at other characters having sex but not involved with
+// this character
+V.Bool("AvoidGazeDuringSexOthers"),
+
+// excitement value above which avoidance is disabled
+V.Float("MaxExcitementForAvoid", new Limit(0, 1)),
+
+// time after orgasm during which avoidable is disabled, starts after the
+// post-orgasm state (seconds)
+V.Float("AvoidDelayAfterOrgasm"),
+
+
+// Weights
+// -------
+
+// looking at a target directly above the character's head when mood is normal
+// or post-orgasm; this weight is multiplied by the character's energy
+V.Float("LookAboveMaxWeight"),
+
+// looking at a target directly above the character's head during orgasm; this
+// weight is multiplied by the character's energy
+V.Float("LookAboveMaxWeightOrgasm"),
+
+
+// looking at a random point when not busy
+V.Float("NaturalRandomWeight"),
+
+// looking at a random person when not busy; see also otherEyesExcitementWeight
+V.Float("NaturalOtherEyesWeight"),
+
+// looking at a random person when busy; see also otherEyesExcitementWeight
+V.Float("BusyOtherEyesWeight"),
+
+// tiredness value above which random points and targets are disabled
+V.Float("MaxTirednessForRandomGaze", new Limit(0, 1)),
+
+// used with naturalOtherEyesWeight and busyOtherEyesWeight: multiplied by the
+// target's excitement and added to those weights; this is used to increase the
+// chances of looking at a target that has a high excitement value
+V.Float("OtherEyesExcitementWeight"),
+
+// looking at a person who is currently orgasming
+V.Float("OtherEyesOrgasmWeight"),
+
+
+// if this character is giving a BJ, looking at the other character's eyes
+// or genitals
+V.Float("BlowjobEyesWeight"),
+V.Float("BlowjobGenitalsWeight"),
+
+// if this character is giving a HJ, looking at the other character's eyes or
+// genitals
+V.Float("HandjobEyesWeight"),
+V.Float("HandjobGenitalsWeight"),
+
+// if this character is being penetrated, looking at the other character's eyes
+// or genitals
+V.Float("PenetrationEyesWeight"),
+V.Float("PenetrationGenitalsWeight"),
+
+// while being groped, looking at the other character's eyes or the body part
+// being groped
+V.Float("GropedEyesWeight"),
+V.Float("GropedTargetWeight"),
+
+// if another character is giving a BJ, looking at that character's eyes or the
+// target's eyes or genitals
+V.Float("OtherBlowjobEyesWeight"),
+V.Float("OtherBlowjobTargetEyesWeight"),
+V.Float("OtherBlowjobTargetGenitalsWeight"),
+
+// if another character is giving a HJ, looking at that character's eyes or the
+// target's eyes or genitals
+V.Float("OtherHandjobEyesWeight"),
+V.Float("OtherHandjobTargetEyesWeight"),
+V.Float("OtherHandjobTargetGenitalsWeight"),
+
+// if another character is being penetrated, looking at that character's eyes or
+// the penetrator's eyes genitals
+V.Float("OtherPenetrationEyesWeight"),
+V.Float("OtherPenetrationSourceEyesWeight"),
+V.Float("OtherPenetrationSourceGenitalsWeight"),
+
+// if another character is being groped, looking at that character's eyes or
+// body part, or the groper's eyes
+V.Float("OtherGropedEyesWeight"),
+V.Float("OtherGropedSourceEyesWeight"),
+V.Float("OtherGropedTargetWeight"),
+
+
+
+// Excitement
+// ==========
+// Controls some excitement values that are not physiological.
+
+// the sum of all the excitement rates (not values) of all other characters in
+// the scene is multiplied by this number; the result is added to the rate at
+// which this character's excitement is going up
+//
+// this is used to increase the excitement of a character if other characters
+// are getting excited
+V.Float("OtherSexExcitementRateFactor"),
+
+// the highest excitement a character can reach using only the excitement of
+// other characters; this avoids orgasms just by looking at people
+V.Float("MaxOtherSexExcitement", new Limit(0, 1)),
+
+// impact of tiredness on excitement to determine energy; energy is
+//    `excitement - (tiredness * energyTirednessFactor)`, clamped [0, 1]
+V.Float("EnergyTirednessFactor"),
+
+
+V.State("IdleState"),
+V.State("CloseState")
 };
 
 #><#= Generate(vars, "PSE", "Personality") #>

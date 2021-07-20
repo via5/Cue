@@ -13,9 +13,9 @@ namespace Cue
 		// floats
 		public const int MaxSweat = 0;
 		public const int MaxFlush = 1;
-		public const int TemperatureExcitementRate = 2;
-		public const int TemperatureDecayRate = 3;
-		public const int TemperatureExcitementMax = 4;
+		public const int TemperatureExcitementMax = 2;
+		public const int TemperatureExcitementRate = 3;
+		public const int TemperatureDecayRate = 4;
 		public const int TirednessRateDuringPostOrgasm = 5;
 		public const int TirednessBaseDecayRate = 6;
 		public const int TirednessBackToBaseRate = 7;
@@ -109,9 +109,9 @@ namespace Cue
 		{
 			"maxSweat",
 			"maxFlush",
+			"temperatureExcitementMax",
 			"temperatureExcitementRate",
 			"temperatureDecayRate",
-			"temperatureExcitementMax",
 			"tirednessRateDuringPostOrgasm",
 			"tirednessBaseDecayRate",
 			"tirednessBackToBaseRate",
@@ -219,9 +219,9 @@ namespace Cue
 		private static string[] allNames_ = new string[] {
 			"maxSweat",
 			"maxFlush",
+			"temperatureExcitementMax",
 			"temperatureExcitementRate",
 			"temperatureDecayRate",
-			"temperatureExcitementMax",
 			"tirednessRateDuringPostOrgasm",
 			"tirednessBaseDecayRate",
 			"tirednessBackToBaseRate",

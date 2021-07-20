@@ -1,23 +1,103 @@
 ﻿<#@ import namespace="System.Collections.Generic" #>
 <#+
-public string Generate(string[][] vars, string name, string file)
+public class Limit
+{
+	public Limit(float min, float max)
+	{
+	}
+}
+
+public class V
+{
+	public string name, type;
+
+	public V(string name, string type)
+	{
+		this.name = name;
+		this.type = type;
+	}
+
+	public static V SlidingDuration(string name)
+	{
+		return new V(name, "slidingDuration");
+	}
+
+	public static V Bool(string name)
+	{
+		return new V(name, "bool");
+	}
+
+	public static V Float(string name)
+	{
+		return new V(name, "float");
+	}
+
+	public static V Float(string name, Limit lm)
+	{
+		return new V(name, "float");
+	}
+
+	public static V String(string name)
+	{
+		return new V(name, "string");
+	}
+
+	public static V State(string name)
+	{
+		return new V(name, "state");
+	}
+}
+
+
+public string Generate(V[] vars, string name, string file)
+{
+	var slidingDurations = new List<string>();
+	var bools = new List<string>();
+	var floats = new List<string>();
+	var strings = new List<string>();
+	var states = new List<string>();
+
+	foreach (var v in vars)
+	{
+		if (v.type == "slidingDuration")
+			slidingDurations.Add(v.name);
+		else if (v.type == "bool")
+			bools.Add(v.name);
+		else if (v.type == "float")
+			floats.Add(v.name);
+		else if (v.type == "string")
+			strings.Add(v.name);
+		else if (v.type == "state")
+			states.Add(v.name);
+		else
+			throw new Exception($"bad type {v.type}");
+	}
+
+	return Generate3(
+		slidingDurations.ToArray(), bools.ToArray(),
+		floats.ToArray(), strings.ToArray(), states.ToArray(),
+		name, file);
+}
+
+
+public string Generate2(string[][] vars, string name, string file)
+{
+	return Generate3(vars[0], vars[1], vars[2], vars[3], vars[4], name, file);
+}
+
+public string Generate3(
+	string[] slidingDurations, string[] bools, string[] floats,
+	string[] strings, string[] states, string name, string file)
 {
 	string defs = "";
 	string names = "";
-
-	var slidingDurations = vars[0];
-	var bools = vars[1];
-	var floats = vars[2];
-	var strings = vars[3];
-	var states = vars[4];
-
 	var allNames = new List<string>();
 
 	//if (slidingDurations.Length > 0)
 	{
 		defs +=
 			$"\t\t// sliding durations\r\n" +
-			MakeEnum(vars[0], "SlidingDurationCount");
+			MakeEnum(slidingDurations, "SlidingDurationCount");
 
 		names += MakeNames(slidingDurations, "sliding duration", allNames);
 	}

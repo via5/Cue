@@ -1,5 +1,4 @@
-﻿
-// auto generated from PersonalityEnums.tt
+﻿// auto generated from PersonalityEnums.tt
 
 namespace Cue
 {
