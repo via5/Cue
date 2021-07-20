@@ -151,6 +151,11 @@ public string Generate3(
 		$"\t\tpublic static string[] AllNames\r\n" +
 		$"\t\t{{\r\n" +
 		$"\t\t\tget {{ return allNames_; }}\r\n" +
+		$"\t\t}}\r\n" +
+		$"\r\n" +
+		$"\t\tpublic string[] GetAllNames()\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\treturn AllNames;\r\n" +
 		$"\t\t}}";
 
 	string s =
@@ -158,7 +163,7 @@ public string Generate3(
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"\tclass {name}_Enum : IEnumValues\r\n" +
+		$"\tclass {name} : IEnumValues\r\n" +
 		$"\t{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
 		names + "\r\n\r\n\r\n" +

@@ -202,12 +202,17 @@ namespace Cue
 			}
 		}
 
-		public override string ToString()
+		public string ToLiveString()
 		{
 			return
-				d_.ToString() +
+				d_.ToLiveString() +
 				$"/ws={windowSize_:0.00},f={f_:0.00}," +
 				$"e={windowEasing_?.GetShortName()}";
+		}
+
+		public override string ToString()
+		{
+			return d_.ToString() + $"/ws={windowSize_:0.00}";
 		}
 	}
 
@@ -360,11 +365,16 @@ namespace Cue
 				finished_ = true;
 		}
 
-		public override string ToString()
+		public string ToLiveString()
 		{
 			return
 				$"{elapsed_:0.##}/{current_:0.##}" +
 				$"({min_:0.##},{max_:0.##},{finished_},{next_})";
+		}
+
+		public override string ToString()
+		{
+			return $"[{min_:0.##},{max_:0.##}]";
 		}
 
 		private void Next()

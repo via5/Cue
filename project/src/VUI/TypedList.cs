@@ -49,7 +49,7 @@ namespace VUI
 		public TypedList(List<ItemType> items, ItemCallback selectionChanged)
 		{
 			if (items != null)
-				SetItems(items);
+				SetItems(items.ToArray());
 
 			if (selectionChanged != null)
 				SelectionChanged += selectionChanged;
@@ -140,16 +140,21 @@ namespace VUI
 
 		public void Clear()
 		{
-			SetItems(new List<ItemType>());
+			SetItems(new ItemType[0]);
 		}
 
-		public virtual void SetItems(List<ItemType> items, ItemType sel = null)
+		public void SetItems(List<ItemType> items, ItemType sel = null)
+		{
+			SetItems(items.ToArray(), sel);
+		}
+
+		public virtual void SetItems(ItemType[] items, ItemType sel = null)
 		{
 			items_.Clear();
 
 			int selIndex = -1;
 
-			for (int i = 0; i < items.Count; ++i)
+			for (int i = 0; i < items.Length; ++i)
 			{
 				if (ItemsEqual(items[i], sel))
 					selIndex = i;

@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class PSE_Enum : IEnumValues
+	class PSE : IEnumValues
 	{
 		// sliding durations
 		public const int GazeDuration = 0;
@@ -268,6 +268,11 @@ namespace Cue
 		public static string[] AllNames
 		{
 			get { return allNames_; }
+		}
+
+		public string[] GetAllNames()
+		{
+			return AllNames;
 		}
 	}
 }

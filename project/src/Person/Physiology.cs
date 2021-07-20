@@ -1,10 +1,5 @@
 ﻿namespace Cue
 {
-	class PE : PE_Enum
-	{
-	}
-
-
 	class Physiology : EnumValueManager
 	{
 		public struct SpecificModifier

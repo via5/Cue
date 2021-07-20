@@ -2,6 +2,8 @@
 {
 	interface IEnumValues
 	{
+		string[] GetAllNames();
+
 		string GetSlidingDurationName(int i);
 		int GetSlidingDurationCount();
 

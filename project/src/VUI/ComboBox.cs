@@ -68,7 +68,7 @@ namespace VUI
 			}
 		}
 
-		public override void SetItems(List<ItemType> items, ItemType sel = null)
+		public override void SetItems(ItemType[] items, ItemType sel = null)
 		{
 			base.SetItems(items, sel);
 
@@ -405,12 +405,17 @@ namespace VUI
 			list_.Clear();
 		}
 
-		public void SetItems(List<ItemType> items, ItemType sel = null)
+		public void SetItems(ItemType[] items, ItemType sel = null)
 		{
 			list_.SetItems(items, sel);
 
 			if (SelectedIndex == -1 && Count > 0)
 				Select(0);
+		}
+
+		public void SetItems(List<ItemType> items, ItemType sel = null)
+		{
+			SetItems(items.ToArray(), sel);
 		}
 
 		public void UpdateItemsText()

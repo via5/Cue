@@ -1,9 +1,5 @@
 ﻿namespace Cue
 {
-	class PSE : PSE_Enum
-	{
-	}
-
 	class Personality
 	{
 		public const int IdleState = 0;

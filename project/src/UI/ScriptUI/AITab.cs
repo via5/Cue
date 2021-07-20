@@ -158,22 +158,71 @@ namespace Cue
 				return;
 
 			inited_ = true;
-			var items = new List<string>();
+
+			var sms = new List<string[]>();
+			for (int i = 0; i < pp_.SpecificModifiers.Length; ++i)
+			{
+				var sm = pp_.SpecificModifiers[i];
+
+				sms.Add(new string[]{
+					$"{BodyParts.ToString(sm.bodyPart)}=>{BodyParts.ToString(sm.sourceBodyPart)}",
+					$"{sm.modifier}" });
+			}
+
+			list_.SetItems(MakeTable(pp_, sms.ToArray()));
+		}
+
+		public static List<string> MakeTable(EnumValueManager v, string[][] more)
+		{
 			int longest = 0;
 
-			foreach (var n in PE.AllNames)
+			foreach (var n in v.Values.GetAllNames())
 				longest = Math.Max(longest, n.Length);
 
-			for (int i = 0; i < PE.FloatCount; ++i)
-				items.Add(PE.FloatToString(i).PadRight(longest) + "   " + pp_.Get(i).ToString());
 
-			for (int i = 0; i < PE.StringCount; ++i)
-				items.Add(PE.StringToString(i).PadRight(longest) + "   " + pp_.GetString(i));
+			var items = new List<string>();
 
-			for (int i = 0; i < pp_.SpecificModifiers.Length; ++i)
-				items.Add(pp_.SpecificModifiers[i].ToString());
+			for (int i = 0; i < v.Values.GetSlidingDurationCount(); ++i)
+			{
+				items.Add(
+					v.Values.GetSlidingDurationName(i).PadRight(longest) +
+					"   " +
+					v.GetSlidingDuration(i).ToString());
+			}
 
-			list_.SetItems(items);
+			for (int i = 0; i < v.Values.GetBoolCount(); ++i)
+			{
+				items.Add(
+					v.Values.GetBoolName(i).PadRight(longest) +
+					"   " +
+					v.GetBool(i).ToString());
+			}
+
+			for (int i = 0; i < v.Values.GetFloatCount(); ++i)
+			{
+				items.Add(
+					v.Values.GetFloatName(i).PadRight(longest) +
+					"   " +
+					v.Get(i).ToString());
+			}
+
+			for (int i = 0; i < v.Values.GetStringCount(); ++i)
+			{
+				items.Add(
+					v.Values.GetStringName(i).PadRight(longest) +
+					"   " +
+					v.GetString(i));
+			}
+
+			for (int i = 0; i < more.Length; ++i)
+			{
+				items.Add(
+					more[i][0].PadRight(longest) +
+					"   " +
+					more[i][1]);
+			}
+
+			return items;
 		}
 	}
 
@@ -183,13 +232,9 @@ namespace Cue
 		private Person person_;
 		private Personality ps_;
 
-		private VUI.Panel panel_;
-		private List<VUI.Label> bools_ = new List<VUI.Label>();
-		private List<VUI.Label> floats_ = new List<VUI.Label>();
-		private List<VUI.Label> strings_ = new List<VUI.Label>();
-		private List<VUI.Label> slidingDurations_ = new List<VUI.Label>();
-		private List<VUI.Label> expressions_ = new List<VUI.Label>();
-		private int currentState_ = 0;
+		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private int currentState_ = -1;
 
 		public PersonAIPersonalityTab(Person p)
 			: base("Personality")
@@ -197,118 +242,34 @@ namespace Cue
 			person_ = p;
 			ps_ = p.Personality;
 
-			var gl = new VUI.GridLayout(2);
-			panel_ = new VUI.Panel(gl);
-
 			Layout = new VUI.BorderLayout();
-			Add(new VUI.ComboBox<string>(Personality.StateNames, OnState), VUI.BorderLayout.Top);
-			Add(panel_, VUI.BorderLayout.Center);
+			Add(states_, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
 
-			Rebuild();
-		}
-
-		private void OnState(int i)
-		{
-			currentState_ = i;
-			Rebuild();
-		}
-
-		private void Rebuild()
-		{
-			Remove(panel_);
-			panel_ = new VUI.Panel(new VUI.GridLayout(2));
-			Add(panel_, VUI.BorderLayout.Center);
-			//panel_.RemoveAllChildren();
-
-			int fontSize = 20;
-
-			bools_ = new List<VUI.Label>();
-			for (int i = 0; i < PSE.BoolCount; ++i)
-			{
-				bools_.Add(new VUI.Label());
-				bools_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PSE.BoolToString(i));
-				caption.FontSize = fontSize;
-
-				panel_.Add(caption);
-				panel_.Add(bools_[i]);
-			}
-
-			floats_ = new List<VUI.Label>();
-			for (int i = 0; i < PSE.FloatCount; ++i)
-			{
-				floats_.Add(new VUI.Label());
-				floats_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PSE.FloatToString(i));
-				caption.FontSize = fontSize;
-
-				panel_.Add(caption);
-				panel_.Add(floats_[i]);
-			}
-
-			strings_ = new List<VUI.Label>();
-			for (int i = 0; i < PSE.StringCount; ++i)
-			{
-				strings_.Add(new VUI.Label());
-				strings_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PSE.StringToString(i));
-				caption.FontSize = fontSize;
-
-				panel_.Add(caption);
-				panel_.Add(strings_[i]);
-			}
-
-			slidingDurations_ = new List<VUI.Label>();
-			for (int i = 0; i < PSE.SlidingDurationCount; ++i)
-			{
-				slidingDurations_.Add(new VUI.Label());
-				slidingDurations_[i].FontSize = fontSize;
-
-				var caption = new VUI.Label(PSE.SlidingDurationToString(i));
-				caption.FontSize = fontSize;
-
-				panel_.Add(caption);
-				panel_.Add(slidingDurations_[i]);
-			}
-
-			var st = ps_.GetState(currentState_);
-			expressions_ = new List<VUI.Label>();
-			for (int i = 0; i < st.expressions.Length; ++i)
-			{
-				var ex = st.expressions[i];
-
-				var val = new VUI.Label();
-				val.FontSize = fontSize;
-				expressions_.Add(val);
-
-				var caption = new VUI.Label(Expressions.ToString(ex.type));
-				caption.FontSize = fontSize;
-
-				panel_.Add(caption);
-				panel_.Add(val);
-			}
+			states_.SetItems(Personality.StateNames);
+			list_.Font = VUI.Style.Theme.MonospaceFont;
 		}
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < bools_.Count; ++i)
-				bools_[i].Text = ps_.GetBool(i).ToString();
+			if (currentState_ == states_.SelectedIndex)
+				return;
 
-			for (int i = 0; i < floats_.Count; ++i)
-				floats_[i].Text = ps_.Get(i).ToString();
-
-			for (int i = 0; i < strings_.Count; ++i)
-				strings_[i].Text = ps_.GetString(i);
-
-			for (int i = 0; i < slidingDurations_.Count; ++i)
-				slidingDurations_[i].Text = ps_.GetSlidingDuration(i).ToString();
+			currentState_ = states_.SelectedIndex;
 
 			var st = ps_.GetState(currentState_);
-			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].Text = st.expressions[i].intensity.ToString();
+
+			var exps = new List<string[]>();
+			for (int i = 0; i < st.expressions.Length; ++i)
+			{
+				var ex = st.expressions[i];
+
+				exps.Add(new string[] {
+					Expressions.ToString(ex.type),
+					ex.intensity.ToString() });
+			}
+
+			list_.SetItems(PersonAIPhysiologyTab.MakeTable(st, exps.ToArray()));
 		}
 	}
 }
