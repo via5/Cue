@@ -99,6 +99,7 @@
     <Compile Include="src\AI\Interactions.cs" />
     <Compile Include="src\AI\Personality.cs" />
     <Compile Include="src\Cue.cs" />
+    <Compile Include="src\Enums\EnumValues.cs" />
     <Compile Include="src\Enums\PhysiologyEnum.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -150,6 +151,7 @@
     <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Resources\Personalities.cs" />
     <Compile Include="src\Resources\Physiologies.cs" />
+    <Compile Include="src\Resources\Resources.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />

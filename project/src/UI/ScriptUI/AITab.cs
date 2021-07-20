@@ -201,7 +201,7 @@ namespace Cue
 			panel_ = new VUI.Panel(gl);
 
 			Layout = new VUI.BorderLayout();
-			Add(new VUI.ComboBox<string>(PSE.StateNames, OnState), VUI.BorderLayout.Top);
+			Add(new VUI.ComboBox<string>(Personality.StateNames, OnState), VUI.BorderLayout.Top);
 			Add(panel_, VUI.BorderLayout.Center);
 
 			Rebuild();

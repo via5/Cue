@@ -183,11 +183,8 @@ V.Float("MaxOtherSexExcitement", new Limit(0, 1)),
 
 // impact of tiredness on excitement to determine energy; energy is
 //    `excitement - (tiredness * energyTirednessFactor)`, clamped [0, 1]
-V.Float("EnergyTirednessFactor"),
+V.Float("EnergyTirednessFactor")
 
-
-V.State("IdleState"),
-V.State("CloseState")
 };
 
 #><#= Generate(vars, "PSE", "Personality") #>

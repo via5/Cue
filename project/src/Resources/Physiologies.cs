@@ -65,19 +65,7 @@ namespace Cue
 		{
 			var p = new Physiology(J.ReqString(o, "name"));
 
-			float[] fs = new float[PE.FloatCount];
-			for (int i = 0; i < PE.FloatCount; ++i)
-			{
-				string key = PE.FloatToString(i);
-				fs[i] = J.ReqFloat(o, key);
-			}
-
-			string[] ss = new string[PE.StringCount];
-			for (int i = 0; i < PE.StringCount; ++i)
-			{
-				string key = PE.StringToString(i);
-				ss[i] = J.ReqString(o, key);
-			}
+			Resources.LoadEnumValues(p, o, false);
 
 			var sms = new List<Physiology.SpecificModifier>();
 			if (o.HasKey("specificModifiers"))
@@ -92,7 +80,7 @@ namespace Cue
 				}
 			}
 
-			p.Set(fs, ss, sms.ToArray());
+			p.Set(sms.ToArray());
 
 			return p;
 		}

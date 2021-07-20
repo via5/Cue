@@ -2,11 +2,12 @@
 
 namespace Cue
 {
-	class PSE_Enum
+	class PSE_Enum : IEnumValues
 	{
 		// sliding durations
 		public const int GazeDuration = 0;
 		public const int SlidingDurationCount = 1;
+		public int GetSlidingDurationCount() { return 1; }
 
 		// bools
 		public const int AvoidGazePlayer = 0;
@@ -14,6 +15,7 @@ namespace Cue
 		public const int AvoidGazeDuringSex = 2;
 		public const int AvoidGazeDuringSexOthers = 3;
 		public const int BoolCount = 4;
+		public int GetBoolCount() { return 4; }
 
 		// floats
 		public const int GazeRandomIntervalMinimum = 0;
@@ -52,14 +54,11 @@ namespace Cue
 		public const int MaxOtherSexExcitement = 33;
 		public const int EnergyTirednessFactor = 34;
 		public const int FloatCount = 35;
+		public int GetFloatCount() { return 35; }
 
 		// strings
 		public const int StringCount = 0;
-
-		// states
-		public const int IdleState = 0;
-		public const int CloseState = 1;
-		public const int StateCount = 2;
+		public int GetStringCount() { return 0; }
 
 
 		private static string[] slidingDurationNames_ = new string[]
@@ -76,6 +75,11 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public string GetSlidingDurationName(int i)
+		{
+			return SlidingDurationToString(i);
 		}
 
 		public static string SlidingDurationToString(int i)
@@ -105,6 +109,11 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public string GetBoolName(int i)
+		{
+			return BoolToString(i);
 		}
 
 		public static string BoolToString(int i)
@@ -167,6 +176,11 @@ namespace Cue
 			return -1;
 		}
 
+		public string GetFloatName(int i)
+		{
+			return FloatToString(i);
+		}
+
 		public static string FloatToString(int i)
 		{
 			return floatNames_[i];
@@ -192,6 +206,11 @@ namespace Cue
 			return -1;
 		}
 
+		public string GetStringName(int i)
+		{
+			return StringToString(i);
+		}
+
 		public static string StringToString(int i)
 		{
 			return stringNames_[i];
@@ -200,33 +219,6 @@ namespace Cue
 		public static string[] StringNames
 		{
 			get { return stringNames_; }
-		}
-
-		private static string[] stateNames_ = new string[]
-		{
-			"idleState",
-			"closeState",
-		};
-
-		public static int StateFromString(string s)
-		{
-			for (int i = 0; i<stateNames_.Length; ++i)
-			{
-				if (stateNames_[i] == s)
-					return i;
-			}
-
-			return -1;
-		}
-
-		public static string StateToString(int i)
-		{
-			return stateNames_[i];
-		}
-
-		public static string[] StateNames
-		{
-			get { return stateNames_; }
 		}
 
 
@@ -271,8 +263,6 @@ namespace Cue
 			"otherSexExcitementRateFactor",
 			"maxOtherSexExcitement",
 			"energyTirednessFactor",
-			"idleState",
-			"closeState",
 		};
 
 		public static string[] AllNames

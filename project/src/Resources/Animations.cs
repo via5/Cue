@@ -4,50 +4,6 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Resources
-	{
-		private static AnimationResources animations_ = new AnimationResources();
-		private static ClothingResources clothing_ = new ClothingResources();
-		private static ObjectResources objects_ = new ObjectResources();
-		private static PhysiologyResources physiologies_ = new PhysiologyResources();
-		private static PersonalityResources personalities_ = new PersonalityResources();
-
-		public static void LoadAll()
-		{
-			animations_.Load();
-			clothing_.Load();
-			objects_.Load();
-			physiologies_.Load();
-			personalities_.Load();
-		}
-
-		public static AnimationResources Animations
-		{
-			get { return animations_; }
-		}
-
-		public static ClothingResources Clothing
-		{
-			get { return clothing_; }
-		}
-
-		public static ObjectResources Objects
-		{
-			get { return objects_; }
-		}
-
-		public static PhysiologyResources Physiologies
-		{
-			get { return physiologies_; }
-		}
-
-		public static PersonalityResources Personalities
-		{
-			get { return personalities_; }
-		}
-	}
-
-
 	class AnimationResources
 	{
 		private Logger log_;

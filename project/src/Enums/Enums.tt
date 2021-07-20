@@ -41,11 +41,6 @@ public class V
 	{
 		return new V(name, "string");
 	}
-
-	public static V State(string name)
-	{
-		return new V(name, "state");
-	}
 }
 
 
@@ -55,7 +50,6 @@ public string Generate(V[] vars, string name, string file)
 	var bools = new List<string>();
 	var floats = new List<string>();
 	var strings = new List<string>();
-	var states = new List<string>();
 
 	foreach (var v in vars)
 	{
@@ -67,27 +61,25 @@ public string Generate(V[] vars, string name, string file)
 			floats.Add(v.name);
 		else if (v.type == "string")
 			strings.Add(v.name);
-		else if (v.type == "state")
-			states.Add(v.name);
 		else
 			throw new Exception($"bad type {v.type}");
 	}
 
 	return Generate3(
 		slidingDurations.ToArray(), bools.ToArray(),
-		floats.ToArray(), strings.ToArray(), states.ToArray(),
+		floats.ToArray(), strings.ToArray(),
 		name, file);
 }
 
 
 public string Generate2(string[][] vars, string name, string file)
 {
-	return Generate3(vars[0], vars[1], vars[2], vars[3], vars[4], name, file);
+	return Generate3(vars[0], vars[1], vars[2], vars[3], name, file);
 }
 
 public string Generate3(
 	string[] slidingDurations, string[] bools, string[] floats,
-	string[] strings, string[] states, string name, string file)
+	string[] strings, string name, string file)
 {
 	string defs = "";
 	string names = "";
@@ -147,21 +139,6 @@ public string Generate3(
 		names += MakeNames(strings, "string", allNames);
 	}
 
-	//if (states.Length >0)
-	{
-		if (defs != "")
-		{
-			defs += "\r\n\r\n";
-			names += "\r\n\r\n";
-		}
-
-		defs +=
-			$"\t\t// states\r\n" +
-			MakeEnum(states, "StateCount");
-
-		names += MakeNames(states, "state", allNames);
-	}
-
 	string allNamesArray =
 		$"\t\tprivate static string[] allNames_ = new string[] {{\r\n";
 
@@ -181,7 +158,7 @@ public string Generate3(
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"\tclass {name}_Enum\r\n" +
+		$"\tclass {name}_Enum : IEnumValues\r\n" +
 		$"\t{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
 		names + "\r\n\r\n\r\n" +
@@ -200,7 +177,9 @@ public string MakeEnum(string[] names, string count)
 		s += $"\t\tpublic const int {names[i]} = {i};\r\n";
 	}
 
-	s += $"\t\tpublic const int {count} = {names.Length};";
+	s +=
+		$"\t\tpublic const int {count} = {names.Length};\r\n" +
+		$"\t\tpublic int Get{count}() {{ return {names.Length}; }}";
 
 	return s;
 }
@@ -223,6 +202,7 @@ public string CamelCase(string s, bool firstUpper)
 public string MakeNames(string[] names, string name, List<string> allNames)
 {
 	string var = CamelCase(name, false) + "Names_";
+	string ccName = CamelCase(name, true);
 
 	string s =
 		$"\t\tprivate static string[] {var} = new string[]\r\n" +
@@ -239,7 +219,7 @@ public string MakeNames(string[] names, string name, List<string> allNames)
 	s +=
 		$"\t\t}};\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static int {CamelCase(name, true)}FromString(string s)\r\n" +
+		$"\t\tpublic static int {ccName}FromString(string s)\r\n" +
 		$"\t\t{{\r\n" +
 		$"\t\t\tfor (int i = 0; i<{var}.Length; ++i)\r\n" +
 		$"\t\t\t{{\r\n" +
@@ -250,12 +230,17 @@ public string MakeNames(string[] names, string name, List<string> allNames)
 		$"\t\t\treturn -1;\r\n" +
 		$"\t\t}}\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static string {CamelCase(name, true)}ToString(int i)\r\n" +
+		$"\t\tpublic string Get{ccName}Name(int i)\r\n" +
+		$"\t\t{{\r\n" +
+		$"\t\t\treturn {ccName}ToString(i);\r\n" +
+		$"\t\t}}\r\n" +
+		$"\r\n" +
+		$"\t\tpublic static string {ccName}ToString(int i)\r\n" +
 		$"\t\t{{\r\n" +
 		$"\t\t\treturn {var}[i];\r\n" +
 		$"\t\t}}\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static string[] {CamelCase(name, true)}Names\r\n" +
+		$"\t\tpublic static string[] {ccName}Names\r\n" +
 		$"\t\t{{\r\n" +
 		$"\t\t\tget {{ return {var}; }}\r\n" +
 		$"\t\t}}";

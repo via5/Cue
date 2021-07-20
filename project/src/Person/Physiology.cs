@@ -5,7 +5,7 @@
 	}
 
 
-	class Physiology
+	class Physiology : EnumValueManager
 	{
 		public struct SpecificModifier
 		{
@@ -24,11 +24,10 @@
 
 
 		private string name_;
-		private float[] floats_ = new float[PE.FloatCount];
-		private string[] strings_ = new string[PE.StringCount];
 		private SpecificModifier[] specificModifiers_ = new SpecificModifier[0];
 
 		public Physiology(string name)
+			: base(new PE())
 		{
 			name_ = name;
 		}
@@ -42,44 +41,31 @@
 		{
 			var pp = new Physiology(name_);
 
-			for (int i = 0; i < floats_.Length; ++i)
-				pp.floats_[i] = floats_[i];
-
-			for (int i = 0; i < strings_.Length; ++i)
-				pp.strings_[i] = strings_[i];
-
-			pp.specificModifiers_ = specificModifiers_;
-
+			pp.CopyFrom(this);
 			pp.Init(p);
 
 			return pp;
 		}
 
+		private void CopyFrom(Physiology p)
+		{
+			CopyFrom((EnumValueManager)this);
+			specificModifiers_ = p.specificModifiers_;
+		}
+
 		private void Init(Person p)
 		{
-			if (floats_[PE.VoicePitch] < 0)
+			if (Get(PE.VoicePitch) <  0)
 			{
-				floats_[PE.VoicePitch] = U.Clamp(
+				Set(PE.VoicePitch, U.Clamp(
 					Get(PE.NeutralVoicePitch) + (1 - p.Atom.Body.Scale),
-					0, 1);
+					0, 1));
 			}
 		}
 
-		public void Set(float[] fs, string[] ss, SpecificModifier[] sms)
+		public void Set( SpecificModifier[] sms)
 		{
-			floats_ = fs;
-			strings_ = ss;
 			specificModifiers_ = sms;
-		}
-
-		public float Get(int i)
-		{
-			return floats_[i];
-		}
-
-		public string GetString(int i)
-		{
-			return strings_[i];
 		}
 
 		public float GetSpecificModifier(int part, Sys.TriggerInfo t)

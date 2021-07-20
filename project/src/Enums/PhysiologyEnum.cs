@@ -2,13 +2,15 @@
 
 namespace Cue
 {
-	class PE_Enum
+	class PE_Enum : IEnumValues
 	{
 		// sliding durations
 		public const int SlidingDurationCount = 0;
+		public int GetSlidingDurationCount() { return 0; }
 
 		// bools
 		public const int BoolCount = 0;
+		public int GetBoolCount() { return 0; }
 
 		// floats
 		public const int MaxSweat = 0;
@@ -46,13 +48,12 @@ namespace Cue
 		public const int PostOrgasmTime = 32;
 		public const int RateAdjustment = 33;
 		public const int FloatCount = 34;
+		public int GetFloatCount() { return 34; }
 
 		// strings
 		public const int Voice = 0;
 		public const int StringCount = 1;
-
-		// states
-		public const int StateCount = 0;
+		public int GetStringCount() { return 1; }
 
 
 		private static string[] slidingDurationNames_ = new string[]
@@ -68,6 +69,11 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public string GetSlidingDurationName(int i)
+		{
+			return SlidingDurationToString(i);
 		}
 
 		public static string SlidingDurationToString(int i)
@@ -93,6 +99,11 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public string GetBoolName(int i)
+		{
+			return BoolToString(i);
 		}
 
 		public static string BoolToString(int i)
@@ -154,6 +165,11 @@ namespace Cue
 			return -1;
 		}
 
+		public string GetFloatName(int i)
+		{
+			return FloatToString(i);
+		}
+
 		public static string FloatToString(int i)
 		{
 			return floatNames_[i];
@@ -180,6 +196,11 @@ namespace Cue
 			return -1;
 		}
 
+		public string GetStringName(int i)
+		{
+			return StringToString(i);
+		}
+
 		public static string StringToString(int i)
 		{
 			return stringNames_[i];
@@ -188,31 +209,6 @@ namespace Cue
 		public static string[] StringNames
 		{
 			get { return stringNames_; }
-		}
-
-		private static string[] stateNames_ = new string[]
-		{
-		};
-
-		public static int StateFromString(string s)
-		{
-			for (int i = 0; i<stateNames_.Length; ++i)
-			{
-				if (stateNames_[i] == s)
-					return i;
-			}
-
-			return -1;
-		}
-
-		public static string StateToString(int i)
-		{
-			return stateNames_[i];
-		}
-
-		public static string[] StateNames
-		{
-			get { return stateNames_; }
 		}
 
 

@@ -4,9 +4,13 @@
 	{
 	}
 
-
 	class Personality
 	{
+		public const int IdleState = 0;
+		public const int CloseState = 1;
+		public const int StateCount = 2;
+
+
 		public class ExpressionIntensity
 		{
 			public int type = -1;
@@ -23,24 +27,26 @@
 			}
 		}
 
-		public class State
+		public class State : EnumValueManager
 		{
 			public readonly string name;
 
-			public bool[] bools;
-			public float[] floats;
-			public string[] strings;
-			public SlidingDuration[] slidingDurations;
 			public ExpressionIntensity[] expressions;
 
 			public State(int i)
+				: base(new PSE())
 			{
-				name = PSE.StateToString(i);
-				bools = new bool[PSE.BoolCount];
-				floats = new float[PSE.FloatCount];
-				strings = new string[PSE.StringCount];
-				slidingDurations = new SlidingDuration[PSE.SlidingDurationCount];
+				name = StateToString(i);
 				expressions = new ExpressionIntensity[0];
+			}
+
+			public void CopyFrom(State s)
+			{
+				CopyFrom((EnumValueManager)this);
+
+				expressions = new ExpressionIntensity[s.expressions.Length];
+				for (int i = 0; i < s.expressions.Length; ++i)
+					expressions[i] = new ExpressionIntensity(s.expressions[i]);
 			}
 		}
 
@@ -53,14 +59,14 @@
 		private bool forcedClose_ = false;
 		private bool isCloseForced_ = false;
 
-		private State[] states_ = new State[PSE.StateCount];
+		private State[] states_ = new State[StateCount];
 
 		public Personality(string name, Person p = null)
 		{
 			name_ = name;
 			person_ = p;
 
-			for (int i = 0; i < PSE.StateCount; ++i)
+			for (int i = 0; i < StateCount; ++i)
 				states_[i] = new State(i);
 		}
 
@@ -69,23 +75,7 @@
 			var ps = new Personality(newName ?? name_, p);
 
 			for (int si = 0; si < states_.Length; ++si)
-			{
-				for (int i = 0; i < states_[si].bools.Length; ++i)
-					ps.states_[si].bools[i] = states_[si].bools[i];
-
-				for (int i = 0; i < states_[si].floats.Length; ++i)
-					ps.states_[si].floats[i] = states_[si].floats[i];
-
-				for (int i = 0; i < states_[si].strings.Length; ++i)
-					ps.states_[si].strings[i] = states_[si].strings[i];
-
-				for (int i = 0; i < states_[si].slidingDurations.Length; ++i)
-					ps.states_[si].slidingDurations[i] = new SlidingDuration(states_[si].slidingDurations[i]);
-
-				ps.states_[si].expressions = new ExpressionIntensity[states_[si].expressions.Length];
-				for (int i = 0; i < states_[si].expressions.Length; ++i)
-					ps.states_[si].expressions[i] = new ExpressionIntensity(states_[si].expressions[i]);
-			}
+				ps.states_[si].CopyFrom(states_[si]);
 
 			return ps;
 		}
@@ -110,9 +100,9 @@
 			get
 			{
 				if (wasClose_)
-					return states_[PSE.CloseState];
+					return states_[CloseState];
 				else
-					return states_[PSE.IdleState];
+					return states_[IdleState];
 			}
 		}
 
@@ -131,29 +121,29 @@
 			get { return GetSlidingDuration(PSE.GazeDuration).Current; }
 		}
 
-		public SlidingDuration GetSlidingDuration(int i)
-		{
-			return CurrentState.slidingDurations[i];
-		}
-
 		public void Set(State[] ss)
 		{
 			states_ = ss;
 		}
 
+		public SlidingDuration GetSlidingDuration(int i)
+		{
+			return CurrentState.GetSlidingDuration(i);
+		}
+
 		public bool GetBool(int i)
 		{
-			return CurrentState.bools[i];
+			return CurrentState.GetBool(i);
 		}
 
 		public float Get(int i)
 		{
-			return CurrentState.floats[i];
+			return CurrentState.Get(i);
 		}
 
 		public string GetString(int i)
 		{
-			return CurrentState.strings[i];
+			return CurrentState.GetString(i);
 		}
 
 		public virtual void Update(float s)
@@ -180,7 +170,7 @@
 				wasClose_ = close;
 			}
 
-			for (int i = 0; i < CurrentState.slidingDurations.Length; ++i)
+			for (int i = 0; i < PSE.SlidingDurationCount; ++i)
 			{
 				GetSlidingDuration(i).WindowMagnitude = person_.Mood.Energy;
 				GetSlidingDuration(i).Update(s);
@@ -192,6 +182,20 @@
 			return $"{Name}";
 		}
 
+		public static string StateToString(int s)
+		{
+			if (s < 0 || s >= StateCount)
+				return $"?{s}";
+
+			return StateNames[s];
+		}
+
+		public static string[] StateNames
+		{
+			get { return new string[] { "idleState", "closeState" }; }
+		}
+
+
 		private void Init()
 		{
 			SetClose(false);
@@ -202,9 +206,9 @@
 			State s;
 
 			if (b)
-				s = states_[PSE.CloseState];
+				s = states_[CloseState];
 			else
-				s = states_[PSE.IdleState];
+				s = states_[IdleState];
 
 			for (int i = 0; i < s.expressions.Length; ++i)
 			{

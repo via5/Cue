@@ -112,14 +112,14 @@ namespace Cue
 			else
 			{
 				p = new Personality(J.ReqString(o, "name"));
-				states = new Personality.State[PSE.StateCount];
+				states = new Personality.State[Personality.StateCount];
 
-				for (int si = 0; si < PSE.StateCount; ++si)
+				for (int si = 0; si < Personality.StateCount; ++si)
 					states[si] = new Personality.State(si);
 			}
 
 
-			for (int si = 0; si < PSE.StateCount; ++si)
+			for (int si = 0; si < Personality.StateCount; ++si)
 			{
 				var s = states[si];
 
@@ -144,51 +144,7 @@ namespace Cue
 
 		private void ParseState(Personality.State s, JSONClass o, bool inherited)
 		{
-			for (int i = 0; i < s.bools.Length; ++i)
-			{
-				string key = PSE.BoolToString(i);
-
-				if (inherited)
-					J.OptBool(o, key, ref s.bools[i]);
-				else
-					s.bools[i] = J.ReqBool(o, key);
-			}
-
-			for (int i = 0; i < s.floats.Length; ++i)
-			{
-				string key = PSE.FloatToString(i);
-
-				if (inherited)
-					J.OptFloat(o, key, ref s.floats[i]);
-				else
-					s.floats[i] = J.ReqFloat(o, key);
-			}
-
-			for (int i = 0; i < s.strings.Length; ++i)
-			{
-				string key = PE.StringToString(i);
-
-				if (inherited)
-					J.OptString(o, key, ref s.strings[i]);
-				else
-					s.strings[i] = J.ReqString(o, key);
-			}
-
-			for (int i = 0; i < s.slidingDurations.Length; ++i)
-			{
-				string key = PSE.SlidingDurationToString(i);
-
-				if (inherited)
-				{
-					if (o.HasKey(key))
-						s.slidingDurations[i] = SlidingDuration.FromJSON(o, key, false);
-				}
-				else
-				{
-					s.slidingDurations[i] = SlidingDuration.FromJSON(o, key, true);
-				}
-			}
-
+			Resources.LoadEnumValues(s, o, inherited);
 
 			var exps = new List<Personality.ExpressionIntensity>(s.expressions);
 
