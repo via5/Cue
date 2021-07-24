@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue.Sys.Vam
 {
@@ -53,7 +54,7 @@ namespace Cue.Sys.Vam
 
 					if (min < max)
 					{
-						float range = max - min;
+						float range = Math.Min(max - min, 4);
 						rigidityRolloff_.val = min + (range * f);
 					}
 				}
