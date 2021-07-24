@@ -170,6 +170,8 @@ namespace Cue
 			{
 				var ts = person_.Body.Get(i).GetTriggers();
 
+				parts_[i].specificModifier = 1;
+
 				if (ts == null || ts.Length == 0)
 				{
 					// todo, decay
@@ -178,7 +180,6 @@ namespace Cue
 				else
 				{
 					parts_[i].value = 0;
-					parts_[i].specificModifier = 0;
 
 					for (int j = 0; j < ts.Length; ++j)
 					{
@@ -220,7 +221,7 @@ namespace Cue
 
 
 			reasons_[Penetration].Value =
-				parts_[BodyParts.Vagina].value * pg.Get(PE.VaginaFactor) +
+				GetFixedPenetrationValue() +
 				parts_[BodyParts.DeepVagina].value * pg.Get(PE.DeepVaginaFactor) +
 				parts_[BodyParts.DeeperVagina].value * pg.Get(PE.DeeperVaginaFactor);
 
@@ -239,6 +240,39 @@ namespace Cue
 
 				reasons_[OtherSex].Value += p.Excitement.physicalRate_;
 			}
+		}
+
+		private float GetFixedPenetrationValue()
+		{
+			var pg = person_.Physiology;
+
+			if (parts_[BodyParts.Vagina].value > 0)
+			{
+				return
+					parts_[BodyParts.Vagina].value *
+					pg.Get(PE.VaginaFactor);
+			}
+
+			// if penetration is shallow, the vagina trigger doesn't activate
+			// at all, it seems rather deep
+			//
+			// if the labia is triggered by a genital, assume penetration
+
+			var ts = person_.Body.Get(BodyParts.Labia).GetTriggers();
+			if (ts != null)
+			{
+				for (int i = 0; i < ts.Length; i++)
+				{
+					if (ts[i].sourcePartIndex == BodyParts.Genitals)
+					{
+						return
+							parts_[BodyParts.Labia].value *
+							pg.Get(PE.VaginaFactor);
+					}
+				}
+			}
+
+			return 0;
 		}
 
 		private void UpdateReasonRates(float s)

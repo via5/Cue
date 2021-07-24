@@ -72,7 +72,7 @@
 					return sm.modifier;
 			}
 
-			return 1;
+			return 0;
 		}
 
 		public SpecificModifier[] SpecificModifiers

@@ -52,16 +52,16 @@ namespace Cue.Proc
 		private const float DirectionCheckInterval = 1;
 
 		private float hipForceMin_ = 300;
-		private float hipForceMax_ = 800;
-		private float hipTorqueMin_ = -20;
-		private float hipTorqueMax_ = -40;
+		private float hipForceMax_ = 1000;
+		private float hipTorqueMin_ = 0;
+		private float hipTorqueMax_ = -20;
 		private float chestTorqueMin_ = -20;
 		private float chestTorqueMax_ = -40;
 		private float headTorqueMin_ = 0;
 		private float headTorqueMax_ = -10;
 		private float durationMin_ = 1;
 		private float durationMax_ = 0.1f;
-		private float durationWin_ = 0.25f;
+		private float durationWin_ = 0.15f;
 		private float durationInterval_ = 10;
 		private Force[] forces_ = null;
 
@@ -74,11 +74,11 @@ namespace Cue.Proc
 					new SlidingDuration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
-						durationWin_, new LinearEasing()),
+						durationWin_, new CubicOutEasing()),
 					new SlidingDuration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
-						durationWin_, new LinearEasing()),
+						durationWin_, new CubicOutEasing()),
 					new Duration(0, 0), new Duration(0, 0),
 					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
 
@@ -160,7 +160,6 @@ namespace Cue.Proc
 			var d = (genBase.Position - hips.Position).Normalized;
 
 			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);
-			Cue.LogInfo($"{d}");
 		}
 
 		private void GatherForces(List<Force> list, List<ITarget> targets)

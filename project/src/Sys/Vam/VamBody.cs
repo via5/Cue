@@ -312,7 +312,7 @@ namespace Cue.Sys.Vam
 				if (p != null)
 				{
 					float def = p.defaultVal;
-					float range = (p.max - def) * 0.7f;  // max is too much
+					float range = (p.max - def);
 
 					p.val = def + sweatEasing_.Magnitude(sweat_) * range;
 				}
