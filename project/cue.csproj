@@ -161,6 +161,7 @@
     <Compile Include="src\Sys\Vam\VamCanvas.cs" />
     <Compile Include="src\Sys\Vam\VamClothing.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
+    <Compile Include="src\Sys\Vam\VamFixes.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />
     <Compile Include="src\Sys\Vam\VamHair.cs" />
     <Compile Include="src\Sys\Vam\VamInput.cs" />

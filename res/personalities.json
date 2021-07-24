@@ -262,6 +262,53 @@
 				"maxExcitementForAvoid": 0.6,
 				"avoidDelayAfterOrgasm": 15
 			}
-		}
-	]
+		},
+
+		{
+			"name": "shy",
+			"inherit": "standard",
+
+			"idleState":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0.3
+					},
+
+					{
+						"type": "angry",
+						"intensity": 0.1
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0
+					}
+				]
+			},
+
+			"closeState":
+			{
+				"expressions":
+				[
+					{
+						"type": "happy",
+						"intensity": 0.5
+					},
+
+					{
+						"type": "angry",
+						"intensity": 0.2
+					},
+
+					{
+						"type": "mischievous",
+						"intensity": 0
+					}
+				]
+			}
+		},
+]
 }

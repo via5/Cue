@@ -5,7 +5,7 @@ namespace Cue
 	interface IGazeEvent
 	{
 		int Check(int flags);
-		bool CheckEmergency();
+		int CheckEmergency();
 	}
 
 
@@ -49,16 +49,19 @@ namespace Cue
 			return DoCheck(flags);
 		}
 
-		public bool CheckEmergency()
+		public int CheckEmergency()
 		{
 			return DoCheckEmergency();
 		}
 
-		protected abstract int DoCheck(int flags);
-
-		protected virtual bool DoCheckEmergency()
+		protected virtual int DoCheck(int flags)
 		{
-			return false;
+			return Continue;
+		}
+
+		protected virtual int DoCheckEmergency()
+		{
+			return Continue;
 		}
 	}
 
@@ -103,7 +106,7 @@ namespace Cue
 		{
 		}
 
-		protected override int DoCheck(int flags)
+		protected override int DoCheckEmergency()
 		{
 			if (person_.Body.Get(BodyParts.Head).Grabbed)
 			{
@@ -678,7 +681,7 @@ namespace Cue
 			return Continue;
 		}
 
-		protected override bool DoCheckEmergency()
+		protected override int DoCheckEmergency()
 		{
 			var ps = person_.Personality;
 
@@ -698,12 +701,12 @@ namespace Cue
 							p, BodyParts.Eyes,
 							ps.Get(PSE.OtherEyesOrgasmWeight), "orgasming");
 
-						return true;
+						return Exclusive;
 					}
 				}
 			}
 
-			return false;
+			return Continue;
 		}
 	}
 }

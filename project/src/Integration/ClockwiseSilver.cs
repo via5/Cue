@@ -29,24 +29,55 @@ namespace Cue
 		private float elapsed_ = 0;
 		private float cooldownRemaining_ = 0;
 
+
+		private const float MinDistance = 0.001f;
+		private const float MaxDistance = 0.008f;
+		private const float MaxLipDepth = 0.14f;
+
+		private const float HeadAngleXMin = -10;
+		private const float HeadAngleXMax = 10;
+		private const float HeadAngleYMin = -10;
+		private const float HeadAngleYMax = 10;
+		private const float HeadAngleZMin = -10;
+		private const float HeadAngleZMax = 10;
+
+		private const float StartHeadAngleXWithPlayer = -45;
+		private const float StartHeadAngleYWithPlayer = 0;
+		private const float StartHeadAngleZWithPlayer = 0;
+		private const float StartHeadAngleXLeader = -10;
+		private const float StartHeadAngleYLeader = 0;
+		private const float StartHeadAngleZLeader = -30;
+		private const float StartHeadAngleX = -10;
+		private const float StartHeadAngleY = 0;
+		private const float StartHeadAngleZ = -30;
+
+		// this was trying to fix a probably non-existent problem, where lip
+		// triggers are not positioned properly after moving colliders with
+		// AB's collider editor until a reload
+		//
+		// trying to change the lip depth dynamically just makes everything move
+		// weird
+		private bool EnableDepthCheck = false;
+
+
 		private float startAngleX_ = 0;
 		private InterpolatedRandomRange randomHeadAngleX_ =
 			new InterpolatedRandomRange(
-				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(HeadAngleXMin, HeadAngleXMax),
 				new Pair<float, float>(0, 5),
 				new Pair<float, float>(1, 3));
 
 		private float startAngleY_ = 0;
 		private InterpolatedRandomRange randomHeadAngleY_ =
 			new InterpolatedRandomRange(
-				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(HeadAngleYMin, HeadAngleYMax),
 				new Pair<float, float>(0, 5),
 				new Pair<float, float>(1, 3));
 
 		private float startAngleZ_ = 0;
 		private InterpolatedRandomRange randomHeadAngleZ_ =
 			new InterpolatedRandomRange(
-				new Pair<float, float>(-10, 10),
+				new Pair<float, float>(HeadAngleZMin, HeadAngleZMax),
 				new Pair<float, float>(0, 5),
 				new Pair<float, float>(1, 3));
 
@@ -166,7 +197,9 @@ namespace Cue
 					headAngleX_.Value = startAngleX_ + randomHeadAngleX_.Value;
 					headAngleY_.Value = startAngleY_ + randomHeadAngleY_.Value;
 					headAngleZ_.Value = startAngleZ_ + randomHeadAngleZ_.Value;
-					lipDepth_.Value = startLipDepth_ + randomLipDepth_.Value;
+
+					if (EnableDepthCheck)
+						lipDepth_.Value = startLipDepth_ + randomLipDepth_.Value;
 
 					var t = Target?.Kisser as ClockwiseSilverKiss;
 					if (t != null)
@@ -189,7 +222,7 @@ namespace Cue
 					person_.Mood.Energy * 4;
 			}
 
-			if (k && active_.Value)
+			if (k && active_.Value && EnableDepthCheck)
 			{
 				var t = Target;
 				if (t != null)
@@ -200,12 +233,12 @@ namespace Cue
 
 					if (trackPos_.Value)
 					{
-						if (d > 0.04f)
+						if (d > MaxDistance)
 							startLipDepth_ += 0.03f * s;
-						else if (d < 0.03f)
+						else if (d < MinDistance)
 							startLipDepth_ -= 0.03f * s;
 
-						startLipDepth_ = U.Clamp(startLipDepth_, 0, 0.1f);
+						startLipDepth_ = U.Clamp(startLipDepth_, 0, MaxLipDepth);
 					}
 				}
 			}
@@ -299,9 +332,9 @@ namespace Cue
 
 			if (target == Cue.Instance.Player)
 			{
-				headAngleX_.Value = -45;
-				headAngleY_.Value = 0;
-				headAngleZ_.Value = 0;
+				headAngleX_.Value = StartHeadAngleXWithPlayer;
+				headAngleY_.Value = StartHeadAngleYWithPlayer;
+				headAngleZ_.Value = StartHeadAngleZWithPlayer;
 				lipDepth_.Value = 0;
 
 				closeEyes_.Value = !person_.Personality.GetBool(PSE.AvoidGazePlayer);
@@ -314,16 +347,16 @@ namespace Cue
 				if (leader)
 				{
 					startLipDepth_ = 0.01f;
-					startAngleX_ = -25;
-					startAngleY_ = 20;
-					startAngleZ_ = -40;
+					startAngleX_ = StartHeadAngleXLeader;
+					startAngleY_ = StartHeadAngleYLeader;
+					startAngleZ_ = StartHeadAngleZLeader;
 				}
 				else
 				{
 					startLipDepth_ = 0;
-					startAngleX_ = -5;
-					startAngleY_ = 0;
-					startAngleZ_ = -50;
+					startAngleX_ = StartHeadAngleX;
+					startAngleY_ = StartHeadAngleY;
+					startAngleZ_ = StartHeadAngleZ;
 				}
 
 

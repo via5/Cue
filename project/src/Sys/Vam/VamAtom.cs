@@ -41,74 +41,7 @@ namespace Cue.Sys.Vam
 
 		public void Init()
 		{
-			DisableFreezeWhenGrabbed();
-			DisableAutoExpressions();
-			EnableAudioJawDriving();
-
-			SetStrongerDamping("hipControl");
-			SetStrongerDamping("chestControl");
-			SetStrongerDamping("headControl");
-			SetStrongerDamping("lFootControl");
-			SetStrongerDamping("rFootControl");
-			SetStrongerDamping("lKneeControl");
-			SetStrongerDamping("rKneeControl");
-		}
-
-		private void DisableFreezeWhenGrabbed()
-		{
-			// setting grabFreezePhysics on the atom or
-			// freezeAtomPhysicsWhenGrabbed on controllers doesn't
-			// update the toggle in the ui, the param has to be set
-			// manually
-			foreach (var fc in atom_.freeControllers)
-			{
-				try
-				{
-					var b = fc.GetBoolJSONParam("freezeAtomPhysicsWhenGrabbed");
-					if (b != null)
-						b.val = false;
-				}
-				catch (Exception)
-				{
-					// happens sometimes, not sure why
-				}
-			}
-		}
-
-		private void DisableAutoExpressions()
-		{
-			var b = Cue.Instance.VamSys.GetBoolParameter(
-				atom_, "AutoExpressions", "enabled");
-
-			if (b != null)
-				b.val = false;
-		}
-
-		private void EnableAudioJawDriving()
-		{
-			var p = Cue.Instance.VamSys.GetBoolParameter(
-				atom_, "JawControl", "driveXRotationFromAudioSource");
-
-			if (p != null)
-				p.val = true;
-
-			var v = Cue.Instance.VamSys.GetFloatParameter(
-				atom_, "JawControl", "driveXRotationFromAudioSourceMultiplier");
-
-			v.val = v.max;
-		}
-
-		private void SetStrongerDamping(string cn)
-		{
-			var c = Cue.Instance.VamSys.FindController(atom_, cn);
-			if (c == null)
-			{
-				log_.Error($"SetStrongerSpring: controller '{cn}' not found");
-				return;
-			}
-
-			c.RBHoldPositionDamper = 100;
-			c.RBHoldRotationDamper = 10;
+			VamFixes.Run(atom_);
 		}
 
 		public void Destroy()

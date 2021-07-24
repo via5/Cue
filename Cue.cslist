@@ -62,6 +62,7 @@ project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
 project\src\Sys\Vam\VamCanvas.cs
 project\src\Sys\Vam\VamClothing.cs
+project\src\Sys\Vam\VamFixes.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamHair.cs
 project\src\Sys\Vam\VamInput.cs

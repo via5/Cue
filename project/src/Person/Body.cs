@@ -145,12 +145,47 @@ namespace Cue
 		private int type_;
 		private Sys.IBodyPart part_;
 		private bool forceBusy_ = false;
+		private Sys.IGraphic render_ = null;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
 			person_ = p;
 			type_ = type;
 			part_ = part;
+		}
+
+		public bool Render
+		{
+			set
+			{
+				if (value)
+				{
+					if (render_ == null)
+					{
+						render_ = Cue.Instance.Sys.CreateBoxGraphic(
+							Name + "_render",
+							Vector3.Zero, new Vector3(0.005f, 0.005f, 0.005f),
+							new Color(0, 0, 1, 0.1f));
+					}
+
+					render_.Visible = true;
+					++person_.Body.RenderingParts;
+				}
+				else
+				{
+					if (render_ != null)
+					{
+						render_.Visible = false;
+						--person_.Body.RenderingParts;
+					}
+				}
+			}
+		}
+
+		public void UpdateRender()
+		{
+			if (render_ != null)
+				render_.Position = part_.Position;
 		}
 
 		public Person Person
@@ -580,6 +615,7 @@ namespace Cue
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
+		private int renderingParts_ = 0;
 
 		public Body(Person p)
 		{
@@ -610,6 +646,12 @@ namespace Cue
 		public BodyPart[] Parts
 		{
 			get { return all_; }
+		}
+
+		public int RenderingParts
+		{
+			get { return renderingParts_; }
+			set { renderingParts_ = value; }
 		}
 
 		public bool InsidePersonalSpace(Person other)
@@ -834,6 +876,12 @@ namespace Cue
 			temperature_.Update(s);
 
 			person_.Breathing.Intensity = person_.Mood.Energy;
+
+			if (renderingParts_ > 0)
+			{
+				for (int i = 0; i < all_.Length; ++i)
+					all_[i].UpdateRender();
+			}
 		}
 
 		private void OnTemperatureChanged(float f)

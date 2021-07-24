@@ -21,6 +21,9 @@ namespace Cue
 		// chooses a random target, handles avoidance
 		private GazeTargetPicker picker_;
 
+		// index of last emergency event, if any
+		private int lastEmergency_ = -1;
+
 		// debug
 		private string lastString_ = "";
 
@@ -58,14 +61,22 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (UpdateEmergencyTargets())
-				picker_.ForceNextTarget();
-
-			if (picker_.Update(s))
+			var emergency = UpdateEmergencyTargets();
+			if (emergency != -1)
 			{
-				UpdateTargets();
-				picker_.NextTarget();
-				gazer_.Duration = person_.Personality.GazeDuration;
+				if (lastEmergency_ != emergency)
+					picker_.ForceNextTarget();
+
+				lastEmergency_ = emergency;
+			}
+			else
+			{
+				if (picker_.Update(s))
+				{
+					UpdateTargets();
+					picker_.NextTarget();
+					gazer_.Duration = person_.Personality.GazeDuration;
+				}
 			}
 
 			if (picker_.HasTarget)
@@ -76,17 +87,21 @@ namespace Cue
 			gazer_.Update(s);
 		}
 
-		private bool UpdateEmergencyTargets()
+		private int UpdateEmergencyTargets()
 		{
 			for (int i = 0; i < events_.Length; ++i)
 			{
 				var e = events_[i];
+				int flags = e.CheckEmergency();
 
-				if (e.CheckEmergency())
-					return true;
+				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
+				{
+					gazer_.Enabled = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
+					return i;
+				}
 			}
 
-			return false;
+			return -1;
 		}
 
 		private void UpdateTargets()
