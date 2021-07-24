@@ -65,7 +65,10 @@ namespace Cue
 			if (emergency != -1)
 			{
 				if (lastEmergency_ != emergency)
+				{
+					person_.Log.Info($"gaze emergency: {events_[emergency]}");
 					picker_.ForceNextTarget();
+				}
 
 				lastEmergency_ = emergency;
 			}

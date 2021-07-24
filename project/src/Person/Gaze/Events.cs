@@ -690,13 +690,10 @@ namespace Cue
 				if (p == person_)
 					continue;
 
-				if (p.Mood.OrgasmJustStarted)
+				if (p.Mood.State == Mood.OrgasmState)
 				{
 					if (!ps.GetBool(PSE.AvoidGazeDuringSexOthers))
 					{
-						person_.Log.Info(
-							$"emergency gaze switch, {p} is orgasming");
-
 						targets_.SetWeightIfZero(
 							p, BodyParts.Eyes,
 							ps.Get(PSE.OtherEyesOrgasmWeight), "orgasming");

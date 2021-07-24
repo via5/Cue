@@ -125,10 +125,42 @@ namespace Cue
 
 				if (!o.HasKey(s.name))
 					throw new LoadFailed($"missing state {s.name}");
+
 				try
 				{
+					var so = o[s.name].AsObject;
+					bool stateInherited = false;
 
-					ParseState(s, o[s.name].AsObject, inherited);
+					if (so.HasKey("inherit"))
+					{
+						stateInherited = true;
+
+						if (so["inherit"].Value == s.name)
+						{
+							throw new LoadFailed(
+								$"state {s.name} inheriting from itself");
+						}
+
+						bool found = false;
+						for (int ssi = 0; ssi < si; ++ssi)
+						{
+							if (states[ssi].name == so["inherit"].Value)
+							{
+								s.CopyFrom(states[ssi]);
+								found = true;
+								break;
+							}
+						}
+
+						if (!found)
+						{
+							throw new LoadFailed(
+								$"state {s.name} inherits from non existing " +
+								$"state {so["inherit"].Value}");
+						}
+					}
+
+					ParseState(s, so, inherited || stateInherited);
 				}
 				catch (LoadFailed e)
 				{
