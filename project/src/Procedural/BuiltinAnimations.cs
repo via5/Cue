@@ -55,8 +55,8 @@ namespace Cue.Proc
 		private float hipForceMax_ = 1000;
 		private float hipTorqueMin_ = 0;
 		private float hipTorqueMax_ = -20;
-		private float chestTorqueMin_ = -20;
-		private float chestTorqueMax_ = -40;
+		private float chestTorqueMin_ = -10;
+		private float chestTorqueMax_ = -50;
 		private float headTorqueMin_ = 0;
 		private float headTorqueMax_ = -10;
 		private float durationMin_ = 1;

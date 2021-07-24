@@ -6,7 +6,7 @@
 			"maxSweat": 1,
 			"maxFlush": 1,
 
-			"temperatureExcitementRate": 0.01,
+			"temperatureExcitementRate": 0.015,
 			"temperatureDecayRate": 0.005,
 			"temperatureExcitementMax": 0.8,
 

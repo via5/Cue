@@ -22,8 +22,8 @@
 							"rigidbody": "hip",
 							"movement":
 							{
-								"min": [-50, 0, 200],
-								"max": [ 50, 0, 300]
+								"min": [-75, 0, 200],
+								"max": [ 75, 0, 400]
 							},
 							"sync":
 							{
@@ -42,8 +42,68 @@
 							"rigidbody": "chest",
 							"movement":
 							{
-								"min": [-50, 0, 200],
-								"max": [ 50, 0, 300]
+								"min": [-75, 0, 200],
+								"max": [ 75, 0, 400]
+							},
+							"sync":
+							{
+								"type": "sliding",
+								"fwdDuration": [0.05, 0.1],
+								"bwdDuration": [0, 0],
+								"fwdDelay": [0, 0],
+								"bwdDelay": [0, 0.5],
+								"loop": true,
+								"resetBetween": true
+							}
+						},
+						{
+							"type": "rforce",
+							"bodyPart": "head",
+							"rigidbody": "head",
+							"movement":
+							{
+								"min": [-35, 0, 50],
+								"max": [ 35, 0, 10]
+							},
+							"sync":
+							{
+								"type": "sliding",
+								"fwdDuration": [0.05, 0.1],
+								"bwdDuration": [0, 0],
+								"fwdDelay": [0, 0],
+								"bwdDelay": [0, 0.5],
+								"loop": true,
+								"resetBetween": true
+							}
+						},
+						{
+							"type": "rforce",
+							"bodyPart": "righthand",
+							"rigidbody": "rHand",
+							"movement":
+							{
+								"min": [-35, 0, 50],
+								"max": [ 35, 0, 10]
+							},
+							"sync":
+							{
+								"type": "sliding",
+								"fwdDuration": [0.05, 0.1],
+								"bwdDuration": [0, 0],
+								"fwdDelay": [0, 0],
+								"bwdDelay": [0, 0.5],
+								"loop": true,
+								"resetBetween": true
+							}
+						},
+						{
+							"type": "rforce",
+							"bodyPart": "lefthand",
+							"rigidbody": "lHand",
+							"movement":
+							{
+								"min": [-35, 0, 50],
+								"max": [ 35, 0, 10]
 							},
 							"sync":
 							{
