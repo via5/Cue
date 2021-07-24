@@ -27,7 +27,9 @@
 					"nextMaxTime": 0,
 					"window": 0.3,
 					"windowEasing": "cubicin"
-				}
+				},
+
+				"emergencyGazeDuration": 0.2,
 
 				"avoidGazePlayer": false,
 				"avoidGazeInsidePersonalSpace": false,

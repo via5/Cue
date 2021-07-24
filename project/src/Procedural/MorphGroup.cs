@@ -8,8 +8,9 @@ namespace Cue.Proc
 		List<ClampableMorph> Morphs { get; }
 
 		void Reset();
-		void FixedUpdate(float s);
-		void Set(float intensity);
+		void FixedUpdate(float s, float intensity);
+		void ForceChange();
+		void Set();
 	}
 
 
@@ -25,9 +26,10 @@ namespace Cue.Proc
 		public string Name { get { return name_; } }
 
 		public abstract List<ClampableMorph> Morphs { get; }
-		public abstract void FixedUpdate(float s);
+		public abstract void FixedUpdate(float s, float intensity);
+		public abstract void ForceChange();
 		public abstract void Reset();
-		public abstract void Set(float intensity);
+		public abstract void Set();
 	}
 
 
@@ -63,7 +65,7 @@ namespace Cue.Proc
 				morphs_[i].Reset();
 		}
 
-		public override void FixedUpdate(float s)
+		public override void FixedUpdate(float s, float intensity)
 		{
 			int i = 0;
 			int count = morphs_.Count;
@@ -72,7 +74,7 @@ namespace Cue.Proc
 			{
 				var m = morphs_[i];
 
-				m.FixedUpdate(s, limited_);
+				m.FixedUpdate(s, intensity, limited_);
 
 				// move morphs that are close to the start value to the end of
 				// the list so they don't always have prio for max morph
@@ -90,11 +92,17 @@ namespace Cue.Proc
 			}
 		}
 
-		public override void Set(float intensity)
+		public override void ForceChange()
+		{
+			for (int i = 0; i < morphs_.Count; ++i)
+				morphs_[i].ForceChange();
+		}
+
+		public override void Set()
 		{
 			float remaining = maxMorphs_;
 			for (int i = 0; i < morphs_.Count; ++i)
-				remaining -= morphs_[i].Set(intensity, remaining);
+				remaining -= morphs_[i].Set(remaining);
 
 			limited_ = (remaining <= 0);
 		}
@@ -161,7 +169,7 @@ namespace Cue.Proc
 				morphs_[i].Reset();
 		}
 
-		public override void FixedUpdate(float s)
+		public override void FixedUpdate(float s, float intensity)
 		{
 			if (morphs_.Count == 0)
 				return;
@@ -181,11 +189,11 @@ namespace Cue.Proc
 						}
 
 						if (state_ == ActiveState)
-							morphs_[i_].FixedUpdate(s, false);
+							morphs_[i_].FixedUpdate(s, intensity, false);
 					}
 					else
 					{
-						morphs_[i_].FixedUpdate(s, false);
+						morphs_[i_].FixedUpdate(s, intensity, false);
 					}
 
 					break;
@@ -203,12 +211,18 @@ namespace Cue.Proc
 			}
 		}
 
-		public override void Set(float intensity)
+		public override void ForceChange()
+		{
+			for (int i = 0; i < morphs_.Count; ++i)
+				morphs_[i].ForceChange();
+		}
+
+		public override void Set()
 		{
 			if (morphs_.Count == 0)
 				return;
 
-			morphs_[i_].Set(intensity, float.MaxValue);
+			morphs_[i_].Set(float.MaxValue);
 		}
 
 		public override string ToString()

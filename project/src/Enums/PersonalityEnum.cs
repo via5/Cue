@@ -20,42 +20,43 @@ namespace Cue
 		// floats
 		public const int GazeRandomIntervalMinimum = 0;
 		public const int GazeRandomIntervalMaximum = 1;
-		public const int MaxExcitementForAvoid = 2;
-		public const int AvoidDelayAfterOrgasm = 3;
-		public const int LookAboveMaxWeight = 4;
-		public const int LookAboveMaxWeightOrgasm = 5;
-		public const int IdleNaturalRandomWeight = 6;
-		public const int NaturalRandomWeight = 7;
-		public const int NaturalOtherEyesWeight = 8;
-		public const int BusyOtherEyesWeight = 9;
-		public const int MaxTirednessForRandomGaze = 10;
-		public const int OtherEyesExcitementWeight = 11;
-		public const int OtherEyesOrgasmWeight = 12;
-		public const int BlowjobEyesWeight = 13;
-		public const int BlowjobGenitalsWeight = 14;
-		public const int HandjobEyesWeight = 15;
-		public const int HandjobGenitalsWeight = 16;
-		public const int PenetrationEyesWeight = 17;
-		public const int PenetrationGenitalsWeight = 18;
-		public const int GropedEyesWeight = 19;
-		public const int GropedTargetWeight = 20;
-		public const int OtherBlowjobEyesWeight = 21;
-		public const int OtherBlowjobTargetEyesWeight = 22;
-		public const int OtherBlowjobTargetGenitalsWeight = 23;
-		public const int OtherHandjobEyesWeight = 24;
-		public const int OtherHandjobTargetEyesWeight = 25;
-		public const int OtherHandjobTargetGenitalsWeight = 26;
-		public const int OtherPenetrationEyesWeight = 27;
-		public const int OtherPenetrationSourceEyesWeight = 28;
-		public const int OtherPenetrationSourceGenitalsWeight = 29;
-		public const int OtherGropedEyesWeight = 30;
-		public const int OtherGropedSourceEyesWeight = 31;
-		public const int OtherGropedTargetWeight = 32;
-		public const int OtherSexExcitementRateFactor = 33;
-		public const int MaxOtherSexExcitement = 34;
-		public const int EnergyTirednessFactor = 35;
-		public const int FloatCount = 36;
-		public int GetFloatCount() { return 36; }
+		public const int EmergencyGazeDuration = 2;
+		public const int MaxExcitementForAvoid = 3;
+		public const int AvoidDelayAfterOrgasm = 4;
+		public const int LookAboveMaxWeight = 5;
+		public const int LookAboveMaxWeightOrgasm = 6;
+		public const int IdleNaturalRandomWeight = 7;
+		public const int NaturalRandomWeight = 8;
+		public const int NaturalOtherEyesWeight = 9;
+		public const int BusyOtherEyesWeight = 10;
+		public const int MaxTirednessForRandomGaze = 11;
+		public const int OtherEyesExcitementWeight = 12;
+		public const int OtherEyesOrgasmWeight = 13;
+		public const int BlowjobEyesWeight = 14;
+		public const int BlowjobGenitalsWeight = 15;
+		public const int HandjobEyesWeight = 16;
+		public const int HandjobGenitalsWeight = 17;
+		public const int PenetrationEyesWeight = 18;
+		public const int PenetrationGenitalsWeight = 19;
+		public const int GropedEyesWeight = 20;
+		public const int GropedTargetWeight = 21;
+		public const int OtherBlowjobEyesWeight = 22;
+		public const int OtherBlowjobTargetEyesWeight = 23;
+		public const int OtherBlowjobTargetGenitalsWeight = 24;
+		public const int OtherHandjobEyesWeight = 25;
+		public const int OtherHandjobTargetEyesWeight = 26;
+		public const int OtherHandjobTargetGenitalsWeight = 27;
+		public const int OtherPenetrationEyesWeight = 28;
+		public const int OtherPenetrationSourceEyesWeight = 29;
+		public const int OtherPenetrationSourceGenitalsWeight = 30;
+		public const int OtherGropedEyesWeight = 31;
+		public const int OtherGropedSourceEyesWeight = 32;
+		public const int OtherGropedTargetWeight = 33;
+		public const int OtherSexExcitementRateFactor = 34;
+		public const int MaxOtherSexExcitement = 35;
+		public const int EnergyTirednessFactor = 36;
+		public const int FloatCount = 37;
+		public int GetFloatCount() { return 37; }
 
 		// strings
 		public const int StringCount = 0;
@@ -131,6 +132,7 @@ namespace Cue
 		{
 			"gazeRandomIntervalMinimum",
 			"gazeRandomIntervalMaximum",
+			"emergencyGazeDuration",
 			"maxExcitementForAvoid",
 			"avoidDelayAfterOrgasm",
 			"lookAboveMaxWeight",
@@ -232,6 +234,7 @@ namespace Cue
 			"avoidGazeDuringSexOthers",
 			"gazeRandomIntervalMinimum",
 			"gazeRandomIntervalMaximum",
+			"emergencyGazeDuration",
 			"maxExcitementForAvoid",
 			"avoidDelayAfterOrgasm",
 			"lookAboveMaxWeight",

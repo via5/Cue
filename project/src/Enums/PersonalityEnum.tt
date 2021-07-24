@@ -44,6 +44,10 @@
 //     the current scene is considered idle if the excitement of all characters
 //     is 0
 //
+// emergency
+//     something characters should be looking at immediately, such as another
+//     character orgasming or the player's eyes when grabbing the head
+//
 
 var vars = new V[]
 {
@@ -61,6 +65,9 @@ V.SlidingDuration("GazeDuration"),
 // time to wait before picking the next target (seconds)
 V.Float("GazeRandomIntervalMinimum"),
 V.Float("GazeRandomIntervalMaximum"),
+
+// time it takes to move the head when looking at an emergency
+V.Float("EmergencyGazeDuration"),
 
 
 // Avoidance

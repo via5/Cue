@@ -48,10 +48,16 @@ namespace Cue.Proc
 		public void FixedUpdate(float s)
 		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].FixedUpdate(s);
+				groups_[i].FixedUpdate(s, intensity_ * (1 - dampen_));
 
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Set(intensity_ * (1 - dampen_));
+				groups_[i].Set();
+		}
+
+		public void ForceChange()
+		{
+			for (int i = 0; i < groups_.Count; ++i)
+				groups_[i].ForceChange();
 		}
 
 		public override string ToString()
@@ -192,6 +198,12 @@ namespace Cue.Proc
 
 			for (int i = 0; i < expressions_.Count; ++i)
 				expressions_[i].FixedUpdate(s);
+		}
+
+		public void ForceChange()
+		{
+			for (int i = 0; i < expressions_.Count; ++i)
+				expressions_[i].ForceChange();
 		}
 
 		public void OnPluginState(bool b)

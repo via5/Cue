@@ -68,12 +68,15 @@ namespace Cue
 				{
 					person_.Log.Info($"gaze emergency: {events_[emergency]}");
 					picker_.ForceNextTarget();
+					gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
 				}
 
 				lastEmergency_ = emergency;
 			}
 			else
 			{
+				lastEmergency_ = -1;
+
 				if (picker_.Update(s))
 				{
 					UpdateTargets();

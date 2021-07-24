@@ -87,7 +87,6 @@
 		{
 			get
 			{
-
 				var tf = person_.Personality.Get(PSE.EnergyTirednessFactor);
 				return U.Clamp(RawExcitement - (RawTiredness * tf), 0, 1);
 			}
@@ -102,18 +101,6 @@
 		{
 			elapsed_ += s;
 
-			excitement_.Value = person_.Excitement.Value;
-
-			for (int i = 0; i < Expressions.Count; ++i)
-			{
-				if (i == Expressions.Pleasure)
-					person_.Expression.SetIntensity(i, RawExcitement);
-
-				if (i == Expressions.Tired)
-					person_.Expression.SetIntensity(i, RawTiredness);
-				else
-					person_.Expression.SetDampen(i, RawTiredness);
-			}
 
 			switch (state_)
 			{
@@ -157,7 +144,24 @@
 				}
 			}
 
+			excitement_.Value = person_.Excitement.Value;
+
 			UpdateTiredness(s);
+			UpdateExpressions();
+		}
+
+		private void UpdateExpressions()
+		{
+			for (int i = 0; i < Expressions.Count; ++i)
+			{
+				if (i == Expressions.Pleasure)
+					person_.Expression.SetIntensity(i, RawExcitement);
+
+				if (i == Expressions.Tired)
+					person_.Expression.SetIntensity(i, RawTiredness);
+				else
+					person_.Expression.SetDampen(i, RawTiredness);
+			}
 		}
 
 		private void UpdateTiredness(float s)
@@ -193,6 +197,7 @@
 			person_.Orgasmer.Orgasm();
 			person_.Animator.PlayType(Animation.OrgasmType);
 			person_.Excitement.FlatValue = 1;
+			person_.Expression.ForceChange();
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
 		}

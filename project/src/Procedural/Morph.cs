@@ -75,7 +75,7 @@ namespace Cue.Proc
 					p, bodyPart_, morphId_, min_, max_,
 					new Duration(duration_), new Duration(delay_));
 
-				m_.Set(1, float.MaxValue);
+				m_.Set(float.MaxValue);
 			}
 		}
 
@@ -89,8 +89,8 @@ namespace Cue.Proc
 		{
 			if (m_ != null)
 			{
-				m_.FixedUpdate(s, false);
-				m_.Set(1, float.MaxValue);
+				m_.FixedUpdate(s, 1, false);
+				m_.Set(float.MaxValue);
 			}
 		}
 
@@ -227,13 +227,7 @@ namespace Cue.Proc
 
 		public void Reset()
 		{
-			state_ = NoState;
-			finished_ = false;
-
-			forward_.Reset();
-			backward_.Reset();
-			delayOff_.Reset();
-			delayOn_.Reset();
+			ForceChange();
 
 			if (morph_ != null)
 			{
@@ -242,8 +236,22 @@ namespace Cue.Proc
 			}
 		}
 
-		public void FixedUpdate(float s, bool limitHit)
+		public void ForceChange()
 		{
+			state_ = NoState;
+			finished_ = false;
+			timeActive_ = 0;
+
+			forward_.Reset();
+			backward_.Reset();
+			delayOff_.Reset();
+			delayOn_.Reset();
+		}
+
+		public void FixedUpdate(float s, float intensity, bool limitHit)
+		{
+			intensity_ = intensity;
+
 			if (morph_ == null)
 			{
 				finished_ = true;
@@ -349,10 +357,9 @@ namespace Cue.Proc
 			return morph_.DefaultValue;
 		}
 
-		public float Set(float intensity, float max)
+		public float Set(float max)
 		{
 			closeToMid_ = false;
-			intensity_ = intensity;
 
 			if (morph_ == null)
 				return 0;
@@ -392,7 +399,7 @@ namespace Cue.Proc
 			if (resetBetween_)
 				last_ = mid_;
 			else
-				last_ = r_;
+				last_ = morph_.Value;
 
 			if (limitHit && timeActive_ >= 10)
 			{

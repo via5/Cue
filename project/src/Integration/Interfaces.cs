@@ -234,6 +234,7 @@ namespace Cue
 		void FixedUpdate(float s);
 		void OnPluginState(bool b);
 		void DumpActive();
+		void ForceChange();
 	}
 
 
