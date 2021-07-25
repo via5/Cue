@@ -50,11 +50,6 @@ namespace Cue
 			events_ = BasicGazeEvent.All(person_);
 		}
 
-		public void Clear()
-		{
-			targets_.Clear();
-		}
-
 		public GazeTargetPicker Picker
 		{
 			get { return picker_; }
@@ -89,7 +84,8 @@ namespace Cue
 					// todo: this is necessary to handle cases where characters
 					// need to immediately look away, but a better system based
 					// on the type of emergency and personality would be better
-					picker_.ForceNextTarget();
+					UpdateTargets();
+					picker_.ForceNextTarget(false);
 
 					lastEmergency_ = -1;
 				}
@@ -108,7 +104,7 @@ namespace Cue
 					$"gaze emergency: {events_[emergency]}, " +
 					$"gazer was {gazerEnabledBeforeEmergency_}");
 
-				picker_.ForceNextTarget();
+				picker_.ForceNextTarget(true);
 				picker_.Update(s);
 
 				lastEmergency_ = emergency;
@@ -120,6 +116,12 @@ namespace Cue
 
 			eyes_.Update(s);
 			gazer_.Update(s);
+		}
+
+		public void Clear()
+		{
+			targets_.Clear();
+			lastString_ = "";
 		}
 
 		private int UpdateEmergencyTargets()
@@ -137,6 +139,7 @@ namespace Cue
 						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
 						gazer_.Enabled = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
 						gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
+						lastString_ += "emergency ";
 					}
 
 					return i;
@@ -148,10 +151,9 @@ namespace Cue
 
 		private void UpdateTargets()
 		{
-			var ps = person_.Personality;
-
 			Clear();
-			lastString_ = "";
+
+			var ps = person_.Personality;
 
 			bool gazerEnabled = !person_.Body.Get(BodyParts.Head).Busy;
 			int flags = 0;

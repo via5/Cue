@@ -43,7 +43,7 @@ namespace Cue
 				tabsWidget_.AddTab(t.Title, t);
 		}
 
-		public void Update(float s, Tickers tickers)
+		public void Update(float s)
 		{
 			updateElapsed_ += s;
 			if (updateElapsed_ > UpdateInterval)
@@ -57,10 +57,13 @@ namespace Cue
 				updateElapsed_ = 0;
 			}
 
+			root_.Update();
+		}
+
+		public void UpdateTickers(Tickers tickers)
+		{
 			if (tickers.update.Updated)
 				misc_.UpdateTickers(tickers);
-
-			root_.Update();
 		}
 
 		public void OnPluginState(bool b)

@@ -31,6 +31,7 @@
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private int currentTarget_ = -1;
+		private bool emergency_ = false;
 		private string lastString_ = "";
 
 		public GazeTargetPicker(Person p)
@@ -138,6 +139,9 @@
 
 		public bool CanLookAtPoint(Vector3 p)
 		{
+			if (emergency_)
+				return true;
+
 			var f = FindFrustum(p);
 			return f == null || !f.avoid;
 		}
@@ -175,8 +179,9 @@
 				return "no target";
 		}
 
-		public void ForceNextTarget()
+		public void ForceNextTarget(bool emergency)
 		{
+			emergency_ = emergency;
 			delay_.Reset();
 			NextTarget();
 		}

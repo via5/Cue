@@ -271,6 +271,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			tickers_.update.Do(s, () => DoUpdate(s));
+			ui_.PostUpdate();
 		}
 
 		private void DoUpdate(float s)

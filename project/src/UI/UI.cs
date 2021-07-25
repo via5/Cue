@@ -235,7 +235,12 @@
 			leftMenu_?.Update();
 			rightMenu_?.Update();
 			desktopMenu_?.Update();
-			sui_.Update(s, Cue.Instance.Tickers);
+			sui_.Update(s);
+		}
+
+		public void PostUpdate()
+		{
+			sui_.UpdateTickers(Cue.Instance.Tickers);
 		}
 	}
 }

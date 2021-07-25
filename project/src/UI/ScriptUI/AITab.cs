@@ -309,7 +309,7 @@ namespace Cue
 			p.Add(new VUI.Label("Blink"));
 			p.Add(eyesBlink_);
 
-			p.Add(new VUI.Label("Position"));
+			p.Add(new VUI.Label("Look at"));
 			p.Add(eyesPos_);
 
 

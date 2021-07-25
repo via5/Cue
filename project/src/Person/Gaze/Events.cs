@@ -117,6 +117,8 @@ namespace Cue
 		{
 			if (person_.Body.Get(BodyParts.Head).Grabbed)
 			{
+				person_.Gaze.Clear();
+
 				targets_.SetWeight(
 					Cue.Instance.Player, BodyParts.Eyes, 1,
 					"head grabbed");
@@ -736,6 +738,8 @@ namespace Cue
 				{
 					if (!ps.GetBool(PSE.AvoidGazeDuringSexOthers))
 					{
+						person_.Gaze.Clear();
+
 						targets_.SetWeightIfZero(
 							p, BodyParts.Eyes,
 							ps.Get(PSE.OtherEyesOrgasmWeight), "orgasming");
