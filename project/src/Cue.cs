@@ -2,19 +2,95 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace Cue
 {
 	class PluginGone : Exception { }
 
-	class Tickers
+	class I
 	{
-		public Ticker update = new Ticker();
-		public Ticker fixedUpdate = new Ticker();
-		public Ticker input = new Ticker();
-		public Ticker objects = new Ticker();
-		public Ticker ui = new Ticker();
+		public const int Update = 0;
+		public const int UpdateInput = 1;
+		public const int UpdateObjects = 2;
+		public const int UpdateObjectsAtoms = 3;
+		public const int UpdateObjectsMove = 4;
+		public const int UpdatePersonTransitions = 5;
+		public const int UpdatePersonActions = 6;
+		public const int UpdatePersonGaze = 7;
+		public const int UpdatePersonInteractions = 8;
+		public const int UpdatePersonExcitement = 9;
+		public const int UpdatePersonPersonality = 10;
+		public const int UpdatePersonMood = 11;
+		public const int UpdatePersonBody = 12;
+		public const int UpdatePersonAI = 13;
+		public const int UpdateUi = 14;
+		public const int FixedUpdate = 15;
+		public const int TickerCount = 16;
+
+		private Ticker[] tickers_ = new Ticker[TickerCount];
+		private int[] depth_ = new int[TickerCount]
+		{
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
+		};
+
+
+		private static I instance_ = new I();
+
+		private I()
+		{
+			tickers_[Update] = new Ticker("Update");
+			tickers_[UpdateInput] = new Ticker("Input");
+			tickers_[UpdateObjects] = new Ticker("Objects");
+			tickers_[UpdateObjectsAtoms] = new Ticker("Atoms");
+			tickers_[UpdateObjectsMove] = new Ticker("Move");
+			tickers_[UpdatePersonTransitions] = new Ticker("Transitions");
+			tickers_[UpdatePersonActions] = new Ticker("Actions");
+			tickers_[UpdatePersonGaze] = new Ticker("Gaze");
+			tickers_[UpdatePersonInteractions] = new Ticker("Interactions");
+			tickers_[UpdatePersonExcitement] = new Ticker("Excitement");
+			tickers_[UpdatePersonPersonality] = new Ticker("Personality");
+			tickers_[UpdatePersonMood] = new Ticker("Mood");
+			tickers_[UpdatePersonBody] = new Ticker("Body");
+			tickers_[UpdatePersonAI] = new Ticker("AI");
+			tickers_[UpdateUi] = new Ticker("UI");
+			tickers_[FixedUpdate] = new Ticker("Fixed update");
+		}
+
+		public static I Instance
+		{
+			get { return instance_; }
+		}
+
+		public static bool Updated
+		{
+			get { return instance_.tickers_[Update].Updated; }
+		}
+
+		public static void Do(int i, Action f)
+		{
+			instance_.tickers_[i].Do(f);
+		}
+
+		public static int Depth(int i)
+		{
+			return instance_.depth_[i];
+		}
+
+		public static string Name(int i)
+		{
+			return instance_.tickers_[i].Name;
+		}
+
+		public static Ticker Get(int i)
+		{
+			return instance_.tickers_[i];
+		}
+
+		public static void UpdateTickers(float s)
+		{
+			for (int i = 0; i < instance_.tickers_.Length; ++i)
+				instance_.tickers_[i].Update(s);
+		}
 	}
 
 
@@ -54,7 +130,6 @@ namespace Cue
 
 		private readonly UI ui_;
 		private readonly Options options_ = new Options();
-		private readonly Tickers tickers_ = new Tickers();
 
 		private Person player_ = null;
 		private bool paused_ = false;
@@ -71,7 +146,6 @@ namespace Cue
 
 		public static Cue Instance { get { return instance_; } }
 
-		public Tickers Tickers { get { return tickers_; } }
 		public Sys.ISys Sys { get { return CueMain.Instance.Sys; } }
 		public Sys.Vam.VamSys VamSys { get { return Sys as Sys.Vam.VamSys; } }
 
@@ -259,7 +333,7 @@ namespace Cue
 				return;
 
 			++frame_;
-			tickers_.fixedUpdate.Do(s, () => DoFixedUpdate(s));
+			I.Do(I.FixedUpdate, () => DoFixedUpdate(s));
 		}
 
 		private void DoFixedUpdate(float s)
@@ -270,15 +344,16 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			tickers_.update.Do(s, () => DoUpdate(s));
+			I.Do(I.Update, () => DoUpdate(s));
+			I.UpdateTickers(s);
 			ui_.PostUpdate();
 		}
 
 		private void DoUpdate(float s)
 		{
-			tickers_.input.Do(s, () => DoUpdateInput(s));
-			tickers_.objects.Do(s, () => DoUpdateObjects(s));
-			tickers_.ui.Do(s, () => DoUpdateUI(s));
+			I.Do(I.UpdateInput, () => DoUpdateInput(s));
+			I.Do(I.UpdateObjects, () => DoUpdateObjects(s));
+			I.Do(I.UpdateUi, () => DoUpdateUI(s));
 		}
 
 		private void DoUpdateInput(float s)

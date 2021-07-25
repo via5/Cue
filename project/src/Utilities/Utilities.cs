@@ -297,6 +297,7 @@ namespace Cue
 
 	class Ticker
 	{
+		private readonly string name_;
 		private Stopwatch w_ = new Stopwatch();
 		private long freq_ = Stopwatch.Frequency;
 		private long ticks_ = 0;
@@ -310,7 +311,17 @@ namespace Cue
 		private long lastCalls_ = 0;
 		private bool updated_ = false;
 
-		public void Do(float s, Action f)
+		public Ticker(string name = "")
+		{
+			name_ = name;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public void Do(Action f)
 		{
 			updated_ = false;
 
@@ -322,7 +333,10 @@ namespace Cue
 			++calls_;
 			ticks_ += w_.ElapsedTicks;
 			peak_ = Math.Max(peak_, w_.ElapsedTicks);
+		}
 
+		public void Update(float s)
+		{
 			elapsed_ += s;
 			if (elapsed_ >= 1)
 			{

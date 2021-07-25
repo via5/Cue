@@ -240,7 +240,7 @@
 
 		public void PostUpdate()
 		{
-			sui_.UpdateTickers(Cue.Instance.Tickers);
+			sui_.UpdateTickers();
 		}
 	}
 }

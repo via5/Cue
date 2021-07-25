@@ -238,25 +238,31 @@ namespace Cue
 
 		public virtual void Update(float s)
 		{
-			Atom.Update(s);
-
-			if (moveState_ == TentativeMoveState)
+			I.Do(I.UpdateObjectsAtoms, () =>
 			{
-				if (StartMove())
-				{
-					Atom.NavTo(targetPos_, targetBearing_, targetStoppingDistance_);
-					moveState_ = MovingState;
-				}
-			}
+				Atom.Update(s);
+			});
 
-			if (moveState_ == MovingState)
+			I.Do(I.UpdateObjectsMove, () =>
 			{
-				if (Atom.NavState == Sys.NavStates.None)
+				if (moveState_ == TentativeMoveState)
 				{
-					moveState_ = NoMoveState;
-					Atom.NavStop("nav state is none");
+					if (StartMove())
+					{
+						Atom.NavTo(targetPos_, targetBearing_, targetStoppingDistance_);
+						moveState_ = MovingState;
+					}
 				}
-			}
+
+				if (moveState_ == MovingState)
+				{
+					if (Atom.NavState == Sys.NavStates.None)
+					{
+						moveState_ = NoMoveState;
+						Atom.NavStop("nav state is none");
+					}
+				}
+			});
 		}
 
 		public virtual void LoadConfig(JSONClass r)

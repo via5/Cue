@@ -6,11 +6,8 @@ namespace Cue
 	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button renav_ = new VUI.Button("Update nav");
-		private VUI.Label update_ = new VUI.Label();
-		private VUI.Label fixedUpdate_ = new VUI.Label();
-		private VUI.Label input_ = new VUI.Label();
-		private VUI.Label objects_ = new VUI.Label();
-		private VUI.Label ui_ = new VUI.Label();
+
+		private VUI.Label[] tickers_ = new VUI.Label[I.TickerCount];
 
 		private VUI.CheckBox logAnimation_;
 		private VUI.CheckBox logAction_;
@@ -49,36 +46,28 @@ namespace Cue
 
 			var p = new VUI.Panel(gl);
 
-			p.Add(new VUI.Label("Update"));
-			p.Add(update_);
-
-			p.Add(new VUI.Label("  Input"));
-			p.Add(input_);
-
-			p.Add(new VUI.Label("  Objects"));
-			p.Add(objects_);
-
-			p.Add(new VUI.Label("  UI"));
-			p.Add(ui_);
-
-			p.Add(new VUI.Label("Fixed Update"));
-			p.Add(fixedUpdate_);
+			for (int i = 0; i < I.TickerCount; ++i)
+			{
+				tickers_[i] = new VUI.Label();
+				p.Add(new VUI.Label(new string(' ', I.Depth(i) * 2) + I.Name(i)));
+				p.Add(tickers_[i]);
+			}
 
 			Add(p);
-			Add(new VUI.Spacer(30));
-
-			Add(new VUI.Label("Logs", UnityEngine.FontStyle.Bold));
-			Add(logAnimation_);
-			Add(logAction_);
-			Add(logInteraction_);
-			Add(logAI_);
-			Add(logEvent_);
-			Add(logIntegration_);
-			Add(logObject_);
-			Add(logSlots_);
-			Add(logSys_);
-			Add(logClothing_);
-			Add(logResources_);
+			//Add(new VUI.Spacer(30));
+			//
+			//Add(new VUI.Label("Logs", UnityEngine.FontStyle.Bold));
+			//Add(logAnimation_);
+			//Add(logAction_);
+			//Add(logInteraction_);
+			//Add(logAI_);
+			//Add(logEvent_);
+			//Add(logIntegration_);
+			//Add(logObject_);
+			//Add(logSlots_);
+			//Add(logSys_);
+			//Add(logClothing_);
+			//Add(logResources_);
 
 			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
 			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
@@ -88,15 +77,12 @@ namespace Cue
 		{
 		}
 
-		public void UpdateTickers(Tickers tickers)
+		public void UpdateTickers()
 		{
 			if (IsVisibleOnScreen())
 			{
-				update_.Text = tickers.update.ToString();
-				input_.Text = tickers.input.ToString();
-				objects_.Text = tickers.objects.ToString();
-				ui_.Text = tickers.ui.ToString();
-				fixedUpdate_.Text = tickers.fixedUpdate.ToString();
+				for (int i = 0; i < I.TickerCount; ++i)
+					tickers_[i].Text = I.Get(i).ToString();
 			}
 		}
 

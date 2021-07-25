@@ -254,52 +254,81 @@ namespace Cue
 		{
 			base.Update(s);
 
-			CheckNavState();
-
-			if (deferredTransition_)
+			I.Do(I.UpdatePersonTransitions, () =>
 			{
-				if (StartTransition())
-					PlayTransition();
-			}
+				CheckNavState();
 
-			if (State.IsUpright)
-				uprightPos_ = Position;
-
-			animator_.Update(s);
-
-			if (!deferredTransition_ && !animator_.Playing)
-			{
-				state_.FinishTransition();
-				if (deferredState_ != PersonState.None)
+				if (deferredTransition_)
 				{
-					log_.Info("animation finished, setting deferred state");
-
-					var ds = deferredState_;
-					deferredState_ = PersonState.None;
-					SetState(ds);
+					if (StartTransition())
+						PlayTransition();
 				}
-			}
 
-			actions_.Tick(s);
+				if (State.IsUpright)
+					uprightPos_ = Position;
 
-			if (Cue.Instance.Player != this)
-				gaze_.Update(s);
+				animator_.Update(s);
 
-			Kisser.Update(s);
-			Handjob.Update(s);
-			Blowjob.Update(s);
+				if (!deferredTransition_ && !animator_.Playing)
+				{
+					state_.FinishTransition();
+					if (deferredState_ != PersonState.None)
+					{
+						log_.Info("animation finished, setting deferred state");
+
+						var ds = deferredState_;
+						deferredState_ = PersonState.None;
+						SetState(ds);
+					}
+				}
+			});
+
+			I.Do(I.UpdatePersonActions, () =>
+			{
+				actions_.Tick(s);
+			});
+
+			I.Do(I.UpdatePersonGaze, () =>
+			{
+				if (Cue.Instance.Player != this)
+					gaze_.Update(s);
+			});
+
+			I.Do(I.UpdatePersonInteractions, () =>
+			{
+				Kisser.Update(s);
+				Handjob.Update(s);
+				Blowjob.Update(s);
+			});
 
 			if (this != Cue.Instance.Player)
 			{
-				excitement_.Update(s);
-				personality_.Update(s);
-				mood_.Update(s);
-				body_.Update(s);
-				hair_.Update(s);
+				I.Do(I.UpdatePersonExcitement, () =>
+				{
+					excitement_.Update(s);
+				});
+
+				I.Do(I.UpdatePersonPersonality, () =>
+				{
+					personality_.Update(s);
+				});
+
+				I.Do(I.UpdatePersonMood, () =>
+				{
+					mood_.Update(s);
+				});
+
+				I.Do(I.UpdatePersonBody, () =>
+				{
+					body_.Update(s);
+				});
 			}
 
-			if (ai_ != null && !Atom.Teleporting)
-				ai_.Update(s);
+			I.Do(I.UpdatePersonAI, () =>
+			{
+				if (ai_ != null && !Atom.Teleporting)
+					ai_.Update(s);
+			});
 		}
 
 		public override void OnPluginState(bool b)

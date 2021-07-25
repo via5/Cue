@@ -35,6 +35,16 @@ namespace Cue.Sys.Vam
 
 			public void SetLoose(float f)
 			{
+				// both these values are expensive to change; cling is [0, 1]
+				// and rolloff is [0, 16], so only change them if they're
+				// different enough to make a difference
+				//
+				// when a value changes, the hair joints are rebuilt, which
+				// takes time; it'd be nice to be able to set both and rebuild
+				// once, but vam doesn't support that
+				const float ClingTreshold = 0.02f;
+				const float RolloffTreshold = 0.1f;
+
 				if (styleCling_ != null)
 				{
 					float min = 0.01f;
@@ -43,7 +53,10 @@ namespace Cue.Sys.Vam
 					if (min < max)
 					{
 						float range = max - min;
-						styleCling_.val = max - (range * f);
+						float nv = max - (range * f);
+
+						if (Math.Abs(styleCling_.val - nv) > ClingTreshold)
+							styleCling_.val = nv;
 					}
 				}
 
@@ -55,7 +68,10 @@ namespace Cue.Sys.Vam
 					if (min < max)
 					{
 						float range = Math.Min(max - min, 4);
-						rigidityRolloff_.val = min + (range * f);
+						float nv = min + (range * f);
+
+						if (Math.Abs(rigidityRolloff_.val - nv) > RolloffTreshold)
+							rigidityRolloff_.val = nv;
 					}
 				}
 			}
@@ -103,12 +119,9 @@ namespace Cue.Sys.Vam
 
 			set
 			{
-				if (loose_ != value)
-				{
-					loose_ = value;
-					for (int i = 0; i < list_.Count; ++i)
-						list_[i].SetLoose(loose_);
-				}
+				loose_ = value;
+				for (int i = 0; i < list_.Count; ++i)
+					list_[i].SetLoose(loose_);
 			}
 		}
 

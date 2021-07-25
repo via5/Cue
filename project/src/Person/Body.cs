@@ -387,10 +387,6 @@ namespace Cue
 		{
 			person_ = p;
 		}
-
-		public void Update(float s)
-		{
-		}
 	}
 
 

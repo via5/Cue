@@ -60,10 +60,10 @@ namespace Cue
 			root_.Update();
 		}
 
-		public void UpdateTickers(Tickers tickers)
+		public void UpdateTickers()
 		{
-			if (tickers.update.Updated)
-				misc_.UpdateTickers(tickers);
+			if (I.Updated)
+				misc_.UpdateTickers();
 		}
 
 		public void OnPluginState(bool b)
