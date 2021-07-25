@@ -819,17 +819,20 @@ namespace Cue
 		{
 			get
 			{
-				var q = Get(BodyParts.Chest).Rotation;
+				Vector3 topPos = person_.EyeInterest + new Vector3(0, 0.2f, 0);
+				Vector3 bottomPos;
 
-				var avoidHeadU = Get(BodyParts.Head).Position + new Vector3(0, 0.2f, 0);
-				var avoidHipU = Get(BodyParts.Hips).Position;
+				var hips = Get(BodyParts.Hips);
 
-				var avoidHead = q.RotateInv(avoidHeadU);
-				var avoidHip = q.RotateInv(avoidHipU);
+				// this happens for the camera pseudo-person
+				if (hips.Exists)
+					bottomPos = hips.Position;
+				else
+					bottomPos = topPos - new Vector3(0, 0.5f, 0);
 
 				return new Box(
-					avoidHip + (avoidHead - avoidHip) / 2,
-					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
+					bottomPos + (topPos - bottomPos) / 2,
+					new Vector3(0.5f, (topPos - bottomPos).Y, 0.5f));
 			}
 		}
 

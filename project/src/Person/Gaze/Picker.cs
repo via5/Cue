@@ -304,37 +304,23 @@
 
 		private Box CreateObjectAvoidBox(BasicObject avoidO)
 		{
+			var q = ReferencePart.Rotation;
 			var selfRef = person_.Body.Get(BodyParts.Eyes);
+			var rp = avoidO.EyeInterest - selfRef.Position;
+			var aaP = q.RotateInv(rp);
 
-			// todo: broken, needs rotation
-			return new Box(
-				avoidO.EyeInterest - selfRef.Position,
-				new Vector3(0.2f, 0.2f, 0.2f));
+			return new Box(aaP, new Vector3(0.2f, 0.2f, 0.2f));
 		}
 
 		private Box CreatePersonAvoidBox(Person avoidP)
 		{
 			var selfRef = person_.Body.Get(BodyParts.Eyes);
-
-			var avoidRef = avoidP.Body.Get(BodyParts.Eyes);
-
 			var q = ReferencePart.Rotation;
 
-			var avoidHeadU =
-				avoidRef.Position -
-				selfRef.Position +
-				new Vector3(0, 0.2f, 0);
+			var b = avoidP.Body.TopBox;
+			b.center = q.RotateInv(b.center - selfRef.Position);
 
-			var avoidHipU =
-				avoidP.Body.Get(BodyParts.Hips).Position -
-				selfRef.Position;
-
-			var avoidHead = q.RotateInv(avoidHeadU);
-			var avoidHip = q.RotateInv(avoidHipU);
-
-			return new Box(
-				avoidHip + (avoidHead - avoidHip) / 2,
-				new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
+			return b;
 		}
 
 		public Frustum RandomAvailableFrustum()
@@ -433,14 +419,19 @@
 			var boxes = r_.AvoidBoxes;
 
 			if (boxes.Length != avoid_.Length)
+			{
+				for (int i = 0; i < avoid_.Length; ++i)
+					avoid_[i].Destroy();
+
 				avoid_ = new Sys.IGraphic[boxes.Length];
+
+				for (int i = 0; i < boxes.Length; ++i)
+					avoid_[i] = CreateAvoid();
+			}
 
 
 			for (int i = 0; i < boxes.Length; ++i)
 			{
-				if (avoid_[i] == null)
-					avoid_[i] = CreateAvoid();
-
 				avoid_[i].Position =
 					r_.Person.Body.Get(BodyParts.Eyes).Position +
 					r_.ReferencePart.Rotation.Rotate(boxes[i].center);
