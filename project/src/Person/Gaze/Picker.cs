@@ -26,7 +26,7 @@
 		private Person person_;
 		private Logger log_;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
-		private Box avoidBox_ = Box.Zero;
+		private Box[] avoidBoxes_ = new Box[0];
 		private RandomTargetGeneratorRenderer render_ = null;
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
@@ -89,9 +89,9 @@
 			return frustums_[i];
 		}
 
-		public Box AvoidBox
+		public Box[] AvoidBoxes
 		{
-			get { return avoidBox_; }
+			get { return avoidBoxes_; }
 		}
 
 		public bool HasTarget
@@ -146,7 +146,7 @@
 		{
 			bool needsTarget = false;
 
-			UpdateAvoidBox();
+			UpdateAvoidBoxes();
 			UpdateFrustums();
 			delay_.Update(s);
 
@@ -232,8 +232,16 @@
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				var fi = frustums_[i];
+				fi.avoid = false;
 
-				fi.avoid = fi.frustum.TestPlanesAABB(avoidBox_);
+				for (int j = 0; j < avoidBoxes_.Length; ++j)
+				{
+					if (fi.frustum.TestPlanesAABB(avoidBoxes_[j]))
+					{
+						fi.avoid = true;
+						break;
+					}
+				}
 
 				fi.selected = (
 					HasTarget &&
@@ -264,56 +272,69 @@
 			return new Box(aaP, new Vector3(0.01f, 0.01f, 0.01f));
 		}
 
-		private bool UpdateAvoidBox()
+		private void UpdateAvoidBoxes()
 		{
-			// todo: must support multiple avoid boxes
-			IObject avoidO = null;
+			int avoidCount = 0;
 
 			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
 				if (person_.Gaze.Targets.ShouldAvoid(Cue.Instance.Everything[i]))
+					++avoidCount;
+			}
+
+			if (avoidCount != avoidBoxes_.Length)
+				avoidBoxes_ = new Box[avoidCount];
+
+			int boxIndex = 0;
+			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
+			{
+				var o = Cue.Instance.Everything[i];
+
+				if (person_.Gaze.Targets.ShouldAvoid(o))
 				{
-					avoidO = Cue.Instance.Everything[i];
-					break;
+					if (o is Person)
+						avoidBoxes_[boxIndex] = CreatePersonAvoidBox(o as Person);
+					else
+						avoidBoxes_[boxIndex] = CreateObjectAvoidBox(o as BasicObject);
+
+					++boxIndex;
 				}
 			}
+		}
 
-			if (avoidO == null)
-				return false;
-
+		private Box CreateObjectAvoidBox(BasicObject avoidO)
+		{
 			var selfRef = person_.Body.Get(BodyParts.Eyes);
-			var avoidP = avoidO as Person;
 
-			if (avoidP == null)
-			{
-				avoidBox_ = new Box(
-					avoidO.EyeInterest - selfRef.Position,
-					new Vector3(0.2f, 0.2f, 0.2f));
-			}
-			else
-			{
-				var avoidRef = avoidP.Body.Get(BodyParts.Eyes);
+			// todo: broken, needs rotation
+			return new Box(
+				avoidO.EyeInterest - selfRef.Position,
+				new Vector3(0.2f, 0.2f, 0.2f));
+		}
 
-				var q = ReferencePart.Rotation;
+		private Box CreatePersonAvoidBox(Person avoidP)
+		{
+			var selfRef = person_.Body.Get(BodyParts.Eyes);
 
-				var avoidHeadU =
-					avoidRef.Position -
-					selfRef.Position +
-					new Vector3(0, 0.2f, 0);
+			var avoidRef = avoidP.Body.Get(BodyParts.Eyes);
 
-				var avoidHipU =
-					avoidP.Body.Get(BodyParts.Hips).Position -
-					selfRef.Position;
+			var q = ReferencePart.Rotation;
 
-				var avoidHead = q.RotateInv(avoidHeadU);
-				var avoidHip = q.RotateInv(avoidHipU);
+			var avoidHeadU =
+				avoidRef.Position -
+				selfRef.Position +
+				new Vector3(0, 0.2f, 0);
 
-				avoidBox_ = new Box(
-					avoidHip + (avoidHead - avoidHip) / 2,
-					new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
-			}
+			var avoidHipU =
+				avoidP.Body.Get(BodyParts.Hips).Position -
+				selfRef.Position;
 
-			return true;
+			var avoidHead = q.RotateInv(avoidHeadU);
+			var avoidHip = q.RotateInv(avoidHipU);
+
+			return new Box(
+				avoidHip + (avoidHead - avoidHip) / 2,
+				new Vector3(0.5f, (avoidHead - avoidHip).Y, 0.5f));
 		}
 
 		public Frustum RandomAvailableFrustum()
@@ -349,7 +370,7 @@
 	{
 		private GazeTargetPicker r_;
 		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
-		private Sys.IGraphic avoid_ = null;
+		private Sys.IGraphic[] avoid_ = new Sys.IGraphic[0];
 		private Sys.IGraphic lookAt_ = null;
 		private bool visible_ = false;
 
@@ -374,22 +395,23 @@
 					if (frustums_.Length == 0)
 						CreateFrustums();
 
-					if (avoid_ == null)
-						CreateAvoid();
-
 					if (lookAt_ == null)
 						CreateLookAt();
 				}
 
 				for (int i = 0; i < frustums_.Length; ++i)
 					frustums_[i].Visible = value;
-
-				if (avoid_ != null)
-					avoid_.Visible = value;
 			}
 		}
 
 		public void Update(float s)
+		{
+			UpdateFrustums(s);
+			UpdateAvoidBoxes();
+			UpdateTargetBox();
+		}
+
+		private void UpdateFrustums(float s)
 		{
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
@@ -404,14 +426,32 @@
 
 				frustums_[i].Update(s);
 			}
+		}
 
-			avoid_.Position =
-				r_.Person.Body.Get(BodyParts.Eyes).Position +
-				r_.ReferencePart.Rotation.Rotate(r_.AvoidBox.center);
+		private void UpdateAvoidBoxes()
+		{
+			var boxes = r_.AvoidBoxes;
 
-			avoid_.Size = r_.AvoidBox.size;
+			if (boxes.Length != avoid_.Length)
+				avoid_ = new Sys.IGraphic[boxes.Length];
 
 
+			for (int i = 0; i < boxes.Length; ++i)
+			{
+				if (avoid_[i] == null)
+					avoid_[i] = CreateAvoid();
+
+				avoid_[i].Position =
+					r_.Person.Body.Get(BodyParts.Eyes).Position +
+					r_.ReferencePart.Rotation.Rotate(boxes[i].center);
+
+				avoid_[i].Size = boxes[i].size;
+				avoid_[i].Visible = visible_;
+			}
+		}
+
+		private void UpdateTargetBox()
+		{
 			if (r_.HasTarget)
 			{
 				var b = r_.CurrentTargetAABox;
@@ -443,13 +483,15 @@
 			}
 		}
 
-		private void CreateAvoid()
+		private Sys.IGraphic CreateAvoid()
 		{
-			avoid_ = Cue.Instance.Sys.CreateBoxGraphic(
+			var g = Cue.Instance.Sys.CreateBoxGraphic(
 				"RandomTargetGenerator.AvoidRender",
 				Vector3.Zero, Vector3.Zero, new Color(1, 0, 0, 0.1f));
 
-			avoid_.Visible = visible_;
+			g.Visible = visible_;
+
+			return g;
 		}
 
 		private void CreateLookAt()
