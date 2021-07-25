@@ -198,8 +198,8 @@
 			lookatControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
 
 			enabled_.Value = false;
-			maxAngleHor_.Value = 90;
-			maxAngleVer_.Value = 60;
+			maxAngleHor_.Value = 130;
+			maxAngleVer_.Value = 70;
 		}
 
 		public bool Enabled

@@ -63,6 +63,8 @@ namespace Cue
 		{
 			return Continue;
 		}
+
+		public override abstract string ToString();
 	}
 
 
@@ -96,6 +98,11 @@ namespace Cue
 
 			return Continue;
 		}
+
+		public override string ToString()
+		{
+			return "look above";
+		}
 	}
 
 
@@ -118,6 +125,11 @@ namespace Cue
 			}
 
 			return Continue;
+		}
+
+		public override string ToString()
+		{
+			return "head grabbed";
 		}
 	}
 
@@ -155,6 +167,11 @@ namespace Cue
 
 			return Continue;
 		}
+
+		public override string ToString()
+		{
+			return "kissing";
+		}
 	}
 
 
@@ -183,6 +200,11 @@ namespace Cue
 			}
 
 			return Continue;
+		}
+
+		public override string ToString()
+		{
+			return "moving";
 		}
 	}
 
@@ -228,6 +250,11 @@ namespace Cue
 
 			return Continue;
 		}
+
+		public override string ToString()
+		{
+			return "bj";
+		}
 	}
 
 
@@ -269,6 +296,11 @@ namespace Cue
 			}
 
 			return Continue;
+		}
+
+		public override string ToString()
+		{
+			return "hj";
 		}
 	}
 
@@ -582,6 +614,11 @@ namespace Cue
 				}
 			}
 		}
+
+		public override string ToString()
+		{
+			return "interactions";
+		}
 	}
 
 
@@ -633,6 +670,11 @@ namespace Cue
 			}
 
 			return true;
+		}
+
+		public override string ToString()
+		{
+			return "random";
 		}
 	}
 
@@ -704,6 +746,11 @@ namespace Cue
 			}
 
 			return Continue;
+		}
+
+		public override string ToString()
+		{
+			return "others";
 		}
 	}
 }

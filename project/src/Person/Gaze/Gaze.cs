@@ -23,6 +23,7 @@ namespace Cue
 
 		// index of last emergency event, if any
 		private int lastEmergency_ = -1;
+		private bool gazerEnabledBeforeEmergency_ = false;
 
 		// debug
 		private string lastString_ = "";
@@ -62,20 +63,23 @@ namespace Cue
 		public void Update(float s)
 		{
 			var emergency = UpdateEmergencyTargets();
-			if (emergency != -1)
-			{
-				if (lastEmergency_ != emergency)
-				{
-					person_.Log.Info($"gaze emergency: {events_[emergency]}");
-					picker_.ForceNextTarget();
-					gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
-				}
 
-				lastEmergency_ = emergency;
-			}
-			else
+			if (emergency == -1)
 			{
-				lastEmergency_ = -1;
+				// no emergency
+
+				if (lastEmergency_ != -1)
+				{
+					// but one has just terminated, restore gazer state
+					person_.Log.Info(
+						$"gaze emergency finished: {events_[lastEmergency_]}, " +
+						$"gazer now {gazerEnabledBeforeEmergency_}");
+
+					gazer_.Enabled = gazerEnabledBeforeEmergency_;
+					gazer_.Duration = person_.Personality.GazeDuration;
+
+					lastEmergency_ = -1;
+				}
 
 				if (picker_.Update(s))
 				{
@@ -83,6 +87,18 @@ namespace Cue
 					picker_.NextTarget();
 					gazer_.Duration = person_.Personality.GazeDuration;
 				}
+			}
+			else if (lastEmergency_ != emergency)
+			{
+				// new emergency
+				person_.Log.Info(
+					$"gaze emergency: {events_[emergency]}, " +
+					$"gazer was {gazerEnabledBeforeEmergency_}");
+
+				picker_.ForceNextTarget();
+				picker_.Update(s);
+
+				lastEmergency_ = emergency;
 			}
 
 			if (picker_.HasTarget)
@@ -102,7 +118,14 @@ namespace Cue
 
 				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
 				{
-					gazer_.Enabled = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
+					if (i != lastEmergency_)
+					{
+						// new emergency
+						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
+						gazer_.Enabled = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
+						gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
+					}
+
 					return i;
 				}
 			}
