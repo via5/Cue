@@ -33,9 +33,8 @@
 		{
 			if (near_ == null)
 			{
-				near_ = Create(frustum_.NearSize());
-				far_ = Create(frustum_.FarSize());
-				Cue.LogInfo($"{frustum_.nearTL} {frustum_.nearTR} {frustum_.nearBL} {frustum_.nearBR}");
+				near_ = Create(frustum_.NearSize(), "near");
+				far_ = Create(frustum_.FarSize(), "far");
 			}
 
 			near_.Position =
@@ -66,10 +65,10 @@
 			}
 		}
 
-		private Sys.IGraphic Create(Vector3 size)
+		private Sys.IGraphic Create(Vector3 size, string name)
 		{
 			var g = Cue.Instance.Sys.CreateBoxGraphic(
-				"FrustumRender.near", Vector3.Zero, size, Color.Zero);
+				$"FrustumRender.{name}", Vector3.Zero, size, Color.Zero);
 
 			g.Collision = false;
 			g.Color = color_;

@@ -60,6 +60,11 @@ namespace Cue
 			get { return picker_; }
 		}
 
+		public bool IsEmergency
+		{
+			get { return lastEmergency_ != -1; }
+		}
+
 		public void Update(float s)
 		{
 			var emergency = UpdateEmergencyTargets();
@@ -70,13 +75,21 @@ namespace Cue
 
 				if (lastEmergency_ != -1)
 				{
-					// but one has just terminated, restore gazer state
+					// but one has just terminated
 					person_.Log.Info(
 						$"gaze emergency finished: {events_[lastEmergency_]}, " +
 						$"gazer now {gazerEnabledBeforeEmergency_}");
 
+					// restore gazer state
 					gazer_.Enabled = gazerEnabledBeforeEmergency_;
 					gazer_.Duration = person_.Personality.GazeDuration;
+
+					// force a next target
+					//
+					// todo: this is necessary to handle cases where characters
+					// need to immediately look away, but a better system based
+					// on the type of emergency and personality would be better
+					picker_.ForceNextTarget();
 
 					lastEmergency_ = -1;
 				}

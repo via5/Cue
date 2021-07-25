@@ -202,6 +202,11 @@
 			maxAngleVer_.Value = 70;
 		}
 
+		public string Name
+		{
+			get { return "MacGruber's Gaze"; }
+		}
+
 		public bool Enabled
 		{
 			get

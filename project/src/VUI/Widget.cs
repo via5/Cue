@@ -1023,7 +1023,7 @@ namespace VUI
 
 		private int size_;
 
-		public Spacer(int size)
+		public Spacer(int size = 0)
 		{
 			size_ = size;
 		}

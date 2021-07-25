@@ -70,7 +70,13 @@ namespace Cue
 
 		public Vector3 Position
 		{
-			get { return Sys.Vam.U.FromUnity(eyes_.position); }
+			get
+			{
+				if (eyes_ == null)
+					return Vector3.Zero;
+				else
+					return Sys.Vam.U.FromUnity(eyes_.position);
+			}
 		}
 
 		public void LookAt(Vector3 p)

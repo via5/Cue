@@ -112,6 +112,8 @@ namespace Cue
 
 	interface IGazer
 	{
+		string Name { get; }
+
 		float Duration { get; set; }
 		bool Enabled { get; set; }
 

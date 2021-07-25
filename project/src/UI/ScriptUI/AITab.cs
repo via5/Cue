@@ -17,6 +17,7 @@ namespace Cue
 			tabs_.Add(new PersonAIStateTab(person_));
 			tabs_.Add(new PersonAIPersonalityTab(person_));
 			tabs_.Add(new PersonAIPhysiologyTab(person_));
+			tabs_.Add(new PersonAIGazeTab(person_));
 
 			foreach (var t in tabs_)
 				tabsWidget_.AddTab(t.Title, t);
@@ -270,6 +271,118 @@ namespace Cue
 			}
 
 			list_.SetItems(PersonAIPhysiologyTab.MakeTable(st, exps.ToArray()));
+		}
+	}
+
+	class PersonAIGazeTab : Tab
+	{
+		private Person person_;
+		private PersonAI ai_;
+
+		private VUI.Label eyesBlink_ = new VUI.Label();
+		private VUI.Label eyesPos_ = new VUI.Label();
+		private VUI.Label gazerType_ = new VUI.Label();
+		private VUI.Label gazerEnabled_ = new VUI.Label();
+		private VUI.Label gazerDuration_ = new VUI.Label();
+		private VUI.Label targetType_ = new VUI.Label();
+		private VUI.Label targetEmergency_ = new VUI.Label();
+
+
+		public PersonAIGazeTab(Person person)
+			: base("Gaze")
+		{
+			person_ = person;
+			ai_ = (PersonAI)person_.AI;
+
+			Layout = new VUI.VerticalFlow();
+
+
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalSpacing = 20;
+			gl.HorizontalStretch = new List<bool>() { false, true };
+
+			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Eyes",	UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer());
+
+			p.Add(new VUI.Label("Blink"));
+			p.Add(eyesBlink_);
+
+			p.Add(new VUI.Label("Position"));
+			p.Add(eyesPos_);
+
+
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+
+
+			p.Add(new VUI.Label("Gazer", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer());
+
+			p.Add(new VUI.Label("Type"));
+			p.Add(gazerType_);
+
+			p.Add(new VUI.Label("Enabled"));
+			p.Add(gazerEnabled_);
+
+			p.Add(new VUI.Label("Duration"));
+			p.Add(gazerDuration_);
+
+
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+
+
+			p.Add(new VUI.Label("Target", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer());
+
+			p.Add(new VUI.Label("Type"));
+			p.Add(targetType_);
+
+			p.Add(new VUI.Label("Emergency"));
+			p.Add(targetEmergency_);
+
+
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+
+			Add(p);
+
+
+			p = new VUI.Panel(new VUI.VerticalFlow());
+
+			p.Add(new VUI.CheckBox("Render frustums", OnRenderFrustums));
+
+			Add(p);
+		}
+
+		public override void Update(float s)
+		{
+			var g = person_.Gaze;
+
+			eyesBlink_.Text = $"{g.Eyes.Blink}";
+			eyesPos_.Text = $"{g.Eyes.Position}";
+
+			gazerType_.Text = $"{g.Gazer.Name}";
+			gazerEnabled_.Text = $"{g.Gazer.Enabled}";
+			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
+
+			if (g.Picker.HasTarget)
+			{
+				targetType_.Text = $"{g.Picker.CurrentTarget}";
+				targetEmergency_.Text = $"{g.IsEmergency}";
+			}
+			else
+			{
+				targetType_.Text = "none";
+				targetEmergency_.Text = "no";
+			}
+		}
+
+		private void OnRenderFrustums(bool b)
+		{
+			person_.Gaze.Picker.Render = b;
 		}
 	}
 }

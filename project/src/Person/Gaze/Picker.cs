@@ -16,8 +16,8 @@
 			}
 		}
 
-		private Vector3 Near = new Vector3(2, 1, 0.1f);
-		private Vector3 Far = new Vector3(6, 3, 2);
+		private Vector3 Near = new Vector3(2, 2, 0.1f);
+		private Vector3 Far = new Vector3(10, 10, 2);
 
 		public const int XCount = 5;
 		public const int YCount = 5;
@@ -43,8 +43,25 @@
 
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
+		}
 
-			//render_ = new RandomTargetGeneratorRenderer(this);
+		public bool Render
+		{
+			set
+			{
+				if (value)
+				{
+					if (render_ == null)
+						render_ = new RandomTargetGeneratorRenderer(this);
+
+					render_.Visible = value;
+				}
+				else
+				{
+					if (render_ != null)
+						render_.Visible = false;
+				}
+			}
 		}
 
 		public BodyPart ReferencePart
@@ -82,6 +99,22 @@
 			get { return currentTarget_ >= 0 && currentTarget_ < targets_.Length; }
 		}
 
+		public IGazeLookat CurrentTarget
+		{
+			get { return HasTarget ? targets_[currentTarget_] : null; }
+		}
+
+		public Box CurrentTargetAABox
+		{
+			get
+			{
+				if (HasTarget)
+					return CreateBoxForFrustum(CurrentTarget.Position);
+				else
+					return Box.Zero;
+			}
+		}
+
 		public Vector3 Position
 		{
 			get
@@ -103,31 +136,18 @@
 			get { return targets_; }
 		}
 
-		public bool CanLookAt(IGazeLookat t)
+		public bool CanLookAtPoint(Vector3 p)
 		{
-			if (t.Weight == 0)
-				return false;
-
-			var p = t.Position;
-
-			var box = new Box(p, new Vector3(0.01f, 0.01f, 0.01f));
-
-			for (int i = 0; i < frustums_.Length; ++i)
-			{
-				if (frustums_[i].avoid)
-				{
-					if (frustums_[i].frustum.TestPlanesAABB(box))
-						return false;
-				}
-			}
-
-			return true;
+			var f = FindFrustum(p);
+			return f == null || !f.avoid;
 		}
 
 		public bool Update(float s)
 		{
 			bool needsTarget = false;
 
+			UpdateAvoidBox();
+			UpdateFrustums();
 			delay_.Update(s);
 
 			if (delay_.Finished || !HasTarget)
@@ -136,7 +156,7 @@
 			}
 			else if (HasTarget)
 			{
-				if (!CanLookAt(targets_[currentTarget_]))
+				if (!CanLookAtPoint(targets_[currentTarget_].Position))
 				{
 					needsTarget = true;
 				}
@@ -166,10 +186,6 @@
 			delay_.SetRange(person_.Personality.LookAtRandomInterval);
 			lastString_ = "";
 
-			ResetFrustums();
-			UpdateFrustums();
-
-
 			float total = 0;
 			for (int i = 0; i < targets_.Length; ++i)
 				total += targets_[i].Weight;
@@ -189,16 +205,16 @@
 
 						if (targets_[j].Next())
 						{
-							lastString_ += $" target=#{j}";
-							log_.Verbose($"picked {targets_[j]}");
-							currentTarget_ = j;
-							return;
-						}
-						else
-						{
-							lastString_ += $" {j}=X";
+							if (CanLookAtPoint(targets_[j].Position))
+							{
+								lastString_ += $" target=#{j}";
+								log_.Verbose($"picked {targets_[j]}");
+								currentTarget_ = j;
+								return;
+							}
 						}
 
+						lastString_ += $" {j}=X";
 						break;
 					}
 
@@ -209,36 +225,43 @@
 			lastString_ += $" NONE";
 		}
 
-		private void ResetFrustums()
+		private void UpdateFrustums()
 		{
+			Box currentBox = CurrentTargetAABox;
+
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
-				frustums_[i].avoid = false;
-				frustums_[i].selected = false;
+				var fi = frustums_[i];
+
+				fi.avoid = fi.frustum.TestPlanesAABB(avoidBox_);
+
+				fi.selected = (
+					HasTarget &&
+					fi.frustum.TestPlanesAABB(currentBox));
 			}
 		}
 
-		private int UpdateFrustums()
+		private FrustumInfo FindFrustum(Vector3 p)
 		{
-			if (!UpdateAvoidBox())
-				return frustums_.Length;
-
-			int av = 0;
+			var box = CreateBoxForFrustum(p);
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
-				if (frustums_[i].frustum.TestPlanesAABB(avoidBox_))
-				{
-					frustums_[i].avoid = true;
-				}
-				else
-				{
-					frustums_[i].avoid = false;
-					++av;
-				}
+				if (frustums_[i].frustum.TestPlanesAABB(box))
+					return frustums_[i];
 			}
 
-			return av;
+			return null;
+		}
+
+		private Box CreateBoxForFrustum(Vector3 p)
+		{
+			var q = ReferencePart.Rotation;
+			var selfRef = person_.Body.Get(BodyParts.Eyes);
+			var rp = p - selfRef.Position;
+			var aaP = q.RotateInv(rp);
+
+			return new Box(aaP, new Vector3(0.01f, 0.01f, 0.01f));
 		}
 
 		private bool UpdateAvoidBox()
@@ -327,6 +350,7 @@
 		private GazeTargetPicker r_;
 		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
 		private Sys.IGraphic avoid_ = null;
+		private Sys.IGraphic lookAt_ = null;
 		private bool visible_ = false;
 
 		public RandomTargetGeneratorRenderer(GazeTargetPicker r)
@@ -352,6 +376,9 @@
 
 					if (avoid_ == null)
 						CreateAvoid();
+
+					if (lookAt_ == null)
+						CreateLookAt();
 				}
 
 				for (int i = 0; i < frustums_.Length; ++i)
@@ -371,7 +398,7 @@
 				if (fi.avoid)
 					frustums_[i].Color = new Color(1, 0, 0, 0.1f);
 				else if (fi.selected)
-					frustums_[i].Color = new Color(1, 1, 1, 0.1f);
+					frustums_[i].Color = new Color(1, 1, 1, 0.3f);
 				else
 					frustums_[i].Color = new Color(0, 1, 0, 0.1f);
 
@@ -383,6 +410,24 @@
 				r_.ReferencePart.Rotation.Rotate(r_.AvoidBox.center);
 
 			avoid_.Size = r_.AvoidBox.size;
+
+
+			if (r_.HasTarget)
+			{
+				var b = r_.CurrentTargetAABox;
+
+				lookAt_.Visible = true;
+
+				lookAt_.Position =
+					r_.Person.Body.Get(BodyParts.Eyes).Position +
+					r_.ReferencePart.Rotation.Rotate(b.center);
+
+				lookAt_.Size = b.size;
+			}
+			else
+			{
+				lookAt_.Visible = false;
+			}
 		}
 
 		private void CreateFrustums()
@@ -402,10 +447,18 @@
 		{
 			avoid_ = Cue.Instance.Sys.CreateBoxGraphic(
 				"RandomTargetGenerator.AvoidRender",
+				Vector3.Zero, Vector3.Zero, new Color(1, 0, 0, 0.1f));
+
+			avoid_.Visible = visible_;
+		}
+
+		private void CreateLookAt()
+		{
+			lookAt_ = Cue.Instance.Sys.CreateBoxGraphic(
+				"RandomTargetGenerator.LookAt",
 				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
 
-			avoid_.Collision = false;
-			avoid_.Visible = visible_;
+			lookAt_.Visible = visible_;
 		}
 	}
 }
