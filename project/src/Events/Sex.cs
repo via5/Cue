@@ -176,6 +176,12 @@
 			state_ = s;
 		}
 
+		public override void Stop()
+		{
+			base.Stop();
+			person_.Atom.SetBodyDamping(Sys.BodyDamping.Normal);
+		}
+
 		public override bool Update(float s)
 		{
 			switch (state_)
@@ -185,6 +191,7 @@
 					person_.Clothing.GenitalsVisible = true;
 					receiver_.Clothing.GenitalsVisible = true;
 					person_.Animator.Stop();
+					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
 					state_ = PlayState;
 					break;
 				}

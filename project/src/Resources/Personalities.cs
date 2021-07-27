@@ -178,29 +178,13 @@ namespace Cue
 		{
 			Resources.LoadEnumValues(s, o, inherited);
 
-			var exps = new List<Personality.ExpressionIntensity>(s.expressions);
-
 			foreach (JSONClass en in o.AsObject["expressions"].AsArray.Childs)
 			{
-				var ne = new Personality.ExpressionIntensity();
-				ne.type = Expressions.FromString(J.ReqString(en, "type"));
-				ne.intensity = J.ReqFloat(en, "intensity");
+				int type = Expressions.FromString(J.ReqString(en, "type"));
+				float maximum = J.ReqFloat(en, "maximum");
 
-				bool found = false;
-				for (int j = 0; j < exps.Count; ++j)
-				{
-					if (exps[j].type == ne.type)
-					{
-						found = true;
-						exps[j] = ne;
-					}
-				}
-
-				if (!found)
-					exps.Add(ne);
+				s.SetMaximum(type, maximum);
 			}
-
-			s.expressions = exps.ToArray();
 		}
 
 		private void Add(Personality p)

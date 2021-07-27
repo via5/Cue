@@ -7,6 +7,7 @@ namespace Cue.Proc
 	class ExpressionType
 	{
 		private readonly int type_;
+		private float max_ = 0;
 		private float intensity_ = 0;
 		private float dampen_ = 0;
 		private readonly List<IProceduralMorphGroup> groups_ =
@@ -20,6 +21,12 @@ namespace Cue.Proc
 		public int Type
 		{
 			get { return type_; }
+		}
+
+		public float Maximum
+		{
+			get { return max_; }
+			set { max_ = value; }
 		}
 
 		public float Intensity
@@ -48,7 +55,7 @@ namespace Cue.Proc
 		public void FixedUpdate(float s)
 		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].FixedUpdate(s, intensity_ * (1 - dampen_));
+				groups_[i].FixedUpdate(s, max_ * intensity_ * (1 - dampen_));
 
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].Set();
@@ -64,7 +71,7 @@ namespace Cue.Proc
 		{
 			return
 				$"{Expressions.ToString(type_)} " +
-				$"int={intensity_} damp={dampen_}";
+				$"max={max_} int ={intensity_} damp={dampen_}";
 		}
 	}
 
@@ -162,6 +169,11 @@ namespace Cue.Proc
 			e.Groups.Add(BE.EyesClosedTired(p));
 
 			return e;
+		}
+
+		public void SetMaximum(int type, float max)
+		{
+			expressions_[type].Maximum = max;
 		}
 
 		public void SetIntensity(int type, float intensity)

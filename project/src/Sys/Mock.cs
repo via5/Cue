@@ -401,6 +401,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void SetBodyDamping(int e)
+		{
+		}
+
 		public void OnPluginState(bool b)
 		{
 		}

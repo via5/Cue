@@ -115,9 +115,17 @@ namespace Cue
 				(ai_.Event == null ? "(none)" : ai_.Event.ToString()) + " " +
 				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
 
-			personality_.SetItems(
-				Resources.Personalities.AllNames(),
-				person_.Personality.Name);
+			if (personality_.Count == 0)
+			{
+				personality_.SetItems(
+					Resources.Personalities.AllNames(),
+					person_.Personality.Name);
+			}
+			else
+			{
+				if (personality_.Selected != person_.Personality.Name)
+					personality_.Select(person_.Personality.Name);
+			}
 		}
 
 		private void OnClose(bool b)
@@ -231,7 +239,6 @@ namespace Cue
 	class PersonAIPersonalityTab : Tab
 	{
 		private Person person_;
-		private Personality ps_;
 
 		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
@@ -241,7 +248,6 @@ namespace Cue
 			: base("Personality")
 		{
 			person_ = p;
-			ps_ = p.Personality;
 
 			Layout = new VUI.BorderLayout();
 			Add(states_, VUI.BorderLayout.Top);
@@ -258,16 +264,18 @@ namespace Cue
 
 			currentState_ = states_.SelectedIndex;
 
-			var st = ps_.GetState(currentState_);
+			var ps = person_.Personality;
+			var st = ps.GetState(currentState_);
 
 			var exps = new List<string[]>();
-			for (int i = 0; i < st.expressions.Length; ++i)
+			var maxs = st.Maximums;
+			for (int i = 0; i < maxs.Length; ++i)
 			{
-				var ex = st.expressions[i];
+				var m = maxs[i];
 
 				exps.Add(new string[] {
-					Expressions.ToString(ex.type),
-					ex.intensity.ToString() });
+					Expressions.ToString(m.type),
+					m.maximum.ToString() });
 			}
 
 			list_.SetItems(PersonAIPhysiologyTab.MakeTable(st, exps.ToArray()));

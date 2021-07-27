@@ -13,14 +13,6 @@ namespace Cue.Sys.Vam
 			DisableAutoExpressions(a);
 			EnableAudioJawDriving(a);
 			FixTriggers(a);
-
-			SetStrongerDamping(a, "hipControl");
-			SetStrongerDamping(a, "chestControl");
-			SetStrongerDamping(a, "headControl");
-			SetStrongerDamping(a, "lFootControl");
-			SetStrongerDamping(a, "rFootControl");
-			SetStrongerDamping(a, "lKneeControl");
-			SetStrongerDamping(a, "rKneeControl");
 		}
 
 		private static void DisableFreezeWhenGrabbed(Atom a)
@@ -65,19 +57,6 @@ namespace Cue.Sys.Vam
 				a, "JawControl", "driveXRotationFromAudioSourceMultiplier");
 
 			v.val = v.max;
-		}
-
-		private static void SetStrongerDamping(Atom a, string cn)
-		{
-			var c = Cue.Instance.VamSys.FindController(a, cn);
-			if (c == null)
-			{
-				Cue.LogError($"SetStrongerSpring: controller '{cn}' not found in {a.uid}");
-				return;
-			}
-
-			c.RBHoldPositionDamper = 100;
-			c.RBHoldRotationDamper = 10;
 		}
 
 		private static void FixTriggers(Atom a)

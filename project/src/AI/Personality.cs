@@ -7,19 +7,20 @@
 		public const int StateCount = 2;
 
 
-		public class ExpressionIntensity
+		public class ExpressionMaximum
 		{
 			public int type = -1;
-			public float intensity = 0;
+			public float maximum = 0;
 
-			public ExpressionIntensity()
+			public ExpressionMaximum(int type)
 			{
+				this.type = type;
 			}
 
-			public ExpressionIntensity(ExpressionIntensity o)
+			public ExpressionMaximum(ExpressionMaximum o)
 			{
 				type = o.type;
-				intensity = o.intensity;
+				maximum = o.maximum;
 			}
 		}
 
@@ -27,22 +28,34 @@
 		{
 			public readonly string name;
 
-			public ExpressionIntensity[] expressions;
+			private ExpressionMaximum[] maximums_;
 
-			public State(int i)
+			public State(int stateIndex)
 				: base(new PSE())
 			{
-				name = StateToString(i);
-				expressions = new ExpressionIntensity[0];
+				name = StateToString(stateIndex);
+
+				maximums_ = new ExpressionMaximum[Expressions.Count];
+				for (int i = 0; i < maximums_.Length; i++)
+					maximums_[i] = new ExpressionMaximum(i);
+			}
+
+			public ExpressionMaximum[] Maximums
+			{
+				get{ return maximums_; }
+			}
+
+			public void SetMaximum(int type, float max)
+			{
+				maximums_[type].maximum = max;
 			}
 
 			public void CopyFrom(State s)
 			{
 				base.CopyFrom(s);
 
-				expressions = new ExpressionIntensity[s.expressions.Length];
-				for (int i = 0; i < s.expressions.Length; ++i)
-					expressions[i] = new ExpressionIntensity(s.expressions[i]);
+				for (int i = 0; i < s.maximums_.Length; ++i)
+					maximums_[i] = new ExpressionMaximum(s.maximums_[i]);
 			}
 		}
 
@@ -206,12 +219,8 @@
 			else
 				s = states_[IdleState];
 
-			for (int i = 0; i < s.expressions.Length; ++i)
-			{
-				person_.Expression.SetIntensity(
-					s.expressions[i].type,
-					s.expressions[i].intensity);
-			}
+			foreach (var m in s.Maximums)
+				person_.Expression.SetMaximum(m.type, m.maximum);
 		}
 
 		public void ForceSetClose(bool enabled, bool close)

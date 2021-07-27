@@ -230,6 +230,7 @@ namespace Cue
 	interface IExpression
 	{
 		void MakeNeutral();
+		void SetMaximum(int type, float intensity);
 		void SetIntensity(int type, float intensity);
 		void SetDampen(int type, float intensity);
 		bool Enabled { get; set; }

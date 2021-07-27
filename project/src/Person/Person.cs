@@ -97,6 +97,7 @@ namespace Cue
 			}
 
 			Atom.Init();
+			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
 		}
 
 		public override void LoadConfig(JSONClass r)

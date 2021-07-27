@@ -9,14 +9,34 @@
 				"expressions":
 				[
 					{
+						"type": "common",
+						"maximum": 1
+					},
+
+					{
 						"type": "happy",
-						"intensity": 0.7
+						"maximum": 0.7
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0
+						"maximum": 0
 					},
+
+					{
+						"type": "pleasure",
+						"maximum": 1
+					},
+
+					{
+						"type": "angry",
+						"maximum": 0
+					},
+
+					{
+						"type": "tired",
+						"maximum": 1
+					}
 				],
 
 				"gazeDuration":
@@ -88,12 +108,12 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 1
+						"maximum": 1
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0.2
+						"maximum": 0.2
 					},
 				]
 			}
@@ -110,12 +130,12 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0.2
+						"maximum": 0.2
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 1
+						"maximum": 1
 					}
 				]
 			},
@@ -126,12 +146,12 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0.5
+						"maximum": 0.5
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 1
+						"maximum": 1
 					}
 				]
 			}
@@ -148,17 +168,17 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0
+						"maximum": 0
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0.2
+						"maximum": 0.2
 					},
 
 					{
 						"type": "angry",
-						"intensity": 0.6
+						"maximum": 0.6
 					}
 				],
 
@@ -175,17 +195,17 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0
+						"maximum": 0
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0
+						"maximum": 0
 					},
 
 					{
 						"type": "angry",
-						"intensity": 1
+						"maximum": 1
 					},
 				],
 
@@ -220,17 +240,17 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0.3
+						"maximum": 0.0
 					},
 
 					{
 						"type": "angry",
-						"intensity": 0.1
+						"maximum": 0.1
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0
+						"maximum": 0
 					}
 				]
 			},
@@ -241,17 +261,17 @@
 				[
 					{
 						"type": "happy",
-						"intensity": 0.5
+						"maximum": 0.1
 					},
 
 					{
 						"type": "angry",
-						"intensity": 0.2
+						"maximum": 0.3
 					},
 
 					{
 						"type": "mischievous",
-						"intensity": 0
+						"maximum": 0
 					}
 				]
 			}

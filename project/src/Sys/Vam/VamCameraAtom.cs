@@ -238,6 +238,10 @@ namespace Cue.Sys.Vam
 		{
 		}
 
+		public void SetBodyDamping(int e)
+		{
+		}
+
 		public void TeleportTo(Vector3 p, float bearing)
 		{
 		}

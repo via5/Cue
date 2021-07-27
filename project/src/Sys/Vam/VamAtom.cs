@@ -195,6 +195,42 @@ namespace Cue.Sys.Vam
 			atom_.mainController.SelectLinkToRigidbody(rb);
 		}
 
+		public void SetBodyDamping(int e)
+		{
+			float pos = 130;
+			float rot = 15;
+
+			float hipsPos = pos;
+			float hipsRot = rot;
+
+			if (e == BodyDamping.Sex)
+			{
+				hipsPos = 35;
+				hipsRot = 5;
+			}
+
+			SetStrongerDamping("hipControl", hipsPos, hipsRot);
+			SetStrongerDamping("chestControl", pos, rot);
+			SetStrongerDamping("headControl", pos, rot);
+			SetStrongerDamping("lFootControl", pos, rot);
+			SetStrongerDamping("rFootControl", pos, rot);
+			SetStrongerDamping("lKneeControl", pos, rot);
+			SetStrongerDamping("rKneeControl", pos, rot);
+		}
+
+		private void SetStrongerDamping(string cn, float pos, float rot)
+		{
+			var c = Cue.Instance.VamSys.FindController(atom_, cn);
+			if (c == null)
+			{
+				log_.Error($"SetStrongerDamping: controller '{cn}' not found");
+				return;
+			}
+
+			c.RBHoldPositionDamper = pos;
+			c.RBHoldRotationDamper = rot;
+		}
+
 		void SetControllerForMoving(string id, bool b)
 		{
 			var fc = Cue.Instance.VamSys.FindController(atom_, id);

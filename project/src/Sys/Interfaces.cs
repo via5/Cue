@@ -233,6 +233,12 @@ namespace Cue.Sys
 		float Flush { get; set; }
 	}
 
+	static class BodyDamping
+	{
+		public const int Normal = 0;
+		public const int Sex = 1;
+	}
+
 	interface IAtom
 	{
 		string ID { get; }
@@ -262,6 +268,7 @@ namespace Cue.Sys
 
 		void SetDefaultControls(string why);
 		void SetParentLink(IBodyPart bp);
+		void SetBodyDamping(int e);
 
 		void OnPluginState(bool b);
 
