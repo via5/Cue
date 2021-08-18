@@ -46,10 +46,12 @@ namespace Cue
 		private const float StartHeadAngleZWithPlayer = 0;
 		private const float StartHeadAngleXLeader = -10;
 		private const float StartHeadAngleYLeader = 0;
-		private const float StartHeadAngleZLeader = -30;
+		private const float StartHeadAngleZLeader = -40;
 		private const float StartHeadAngleX = -10;
 		private const float StartHeadAngleY = 0;
-		private const float StartHeadAngleZ = -30;
+		private const float StartHeadAngleZ = -40;
+		private const float StartLipDepthLeader = 0.02f;
+		private const float StartLipDepth = 0;
 
 		// this was trying to fix a probably non-existent problem, where lip
 		// triggers are not positioned properly after moving colliders with
@@ -58,6 +60,11 @@ namespace Cue
 		// trying to change the lip depth dynamically just makes everything move
 		// weird
 		private bool EnableDepthCheck = false;
+
+
+		// random angle changes can be nice, but cw doesn't always handle them
+		// well, heads have trouble syncing
+		private bool EnableRandomMovements = false;
 
 
 		private float startAngleX_ = 0;
@@ -183,7 +190,7 @@ namespace Cue
 			if (k)
 				elapsed_ += s;
 
-			if (k && randomMovements_ && active_.Value)
+			if (k && randomMovements_ && active_.Value && EnableRandomMovements)
 			{
 				bool changed = false;
 
@@ -353,14 +360,14 @@ namespace Cue
 			{
 				if (leader)
 				{
-					startLipDepth_ = 0.01f;
+					startLipDepth_ = StartLipDepthLeader;
 					startAngleX_ = StartHeadAngleXLeader;
 					startAngleY_ = StartHeadAngleYLeader;
 					startAngleZ_ = StartHeadAngleZLeader;
 				}
 				else
 				{
-					startLipDepth_ = 0;
+					startLipDepth_ = StartLipDepth;
 					startAngleX_ = StartHeadAngleX;
 					startAngleY_ = StartHeadAngleY;
 					startAngleZ_ = StartHeadAngleZ;

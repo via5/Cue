@@ -175,6 +175,10 @@
 		private Sys.Vam.FloatParameter maxAngleHor_;
 		private Sys.Vam.FloatParameter maxAngleVer_;
 		private Sys.Vam.FloatParameter verOffset_;
+		private Sys.Vam.FloatParameter rollAngleMin_;
+		private Sys.Vam.FloatParameter rollAngleMax_;
+		private Sys.Vam.FloatParameter rollDurationMin_;
+		private Sys.Vam.FloatParameter rollDurationMax_;
 
 		// 12
 		private Sys.Vam.BoolParameter lookatTarget_;
@@ -194,6 +198,10 @@
 			maxAngleHor_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
 			maxAngleVer_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
 			verOffset_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Eye Angle Vertical Offset");
+			rollAngleMin_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Roll Angle Min");
+			rollAngleMax_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Roll Angle Max");
+			rollDurationMin_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Roll Duration Min");
+			rollDurationMax_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Roll Duration Max");
 
 			lookatTarget_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 			lookatAtom_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
@@ -202,6 +210,9 @@
 			enabled_.Value = false;
 			maxAngleHor_.Value = 130;
 			maxAngleVer_.Value = 70;
+			rollDurationMin_.Value = 1;
+			rollAngleMin_.Value = -25;
+			rollAngleMax_.Value = 25;
 		}
 
 		public string Name

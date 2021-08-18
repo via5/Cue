@@ -34,6 +34,7 @@ namespace Cue
 		private Rigidbody eyes_;
 		private VamEyesBehaviour eyesImpl_ = null;
 		private Vector3 pos_ = Vector3.Zero;
+		private float minDistance_ = 0.5f;
 		private bool update_ = false;
 
 		public VamEyes(Person p)
@@ -96,7 +97,25 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (update_)
-				eyesImpl_?.SetPosition(pos_);
+				eyesImpl_?.SetPosition(AdjustedPosition());
+		}
+
+		private Vector3 AdjustedPosition()
+		{
+			var pos = pos_;
+
+			var head = person_.Body.Get(BodyParts.Head).Position;
+			var d = Vector3.Distance(head, pos);
+
+			if (d < minDistance_)
+			{
+				var add = minDistance_ - d;
+				var dir = (pos - head).Normalized;
+
+				pos += (dir * add);
+			}
+
+			return pos;
 		}
 
 		public override string ToString()
