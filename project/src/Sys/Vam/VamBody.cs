@@ -134,6 +134,19 @@ namespace Cue.Sys.Vam
 				map[type] = p;
 			};
 
+			// some colliders can fire the labia/vagina triggers even though
+			// they don't really make sense, especially for larger body parts;
+			// ignore them
+			var genitalsIgnore = new string[]
+			{
+				// happens for crossed legs
+				"lThigh", "rThigh",
+
+				// happens for larger bellies
+				"FemaleAutoCollidersabdomen",
+				"FemaleAutoColliderschest"
+			};
+
 			add(BodyParts.Head, GetRigidbody(BodyParts.Head, "headControl", "head"));
 
 			add(BodyParts.Lips, GetTrigger(BodyParts.Lips, "", "LipTrigger"));
@@ -141,10 +154,10 @@ namespace Cue.Sys.Vam
 			add(BodyParts.LeftBreast, GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
 			add(BodyParts.RightBreast, GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
 
-			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", new string[] { "lThigh", "rThigh", "FemaleAutoCollidersabdomen" }));
-			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", new string[] { "lThigh", "rThigh", "FemaleAutoCollidersabdomen" }));
-			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
-			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "", new string[] { "lThigh", "rThigh" }));
+			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", genitalsIgnore));
+			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", genitalsIgnore));
+			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", "", genitalsIgnore));
+			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "", genitalsIgnore));
 			add(BodyParts.Anus, null);
 
 			add(BodyParts.Chest, GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
@@ -176,7 +189,7 @@ namespace Cue.Sys.Vam
 			if (atom_.Sex == Sexes.Male)
 				add(BodyParts.Genitals, GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
 			else
-				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", ""));
+				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", "", genitalsIgnore));
 
 			if (atom_.Sex == Sexes.Male)
 				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));

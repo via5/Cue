@@ -305,6 +305,8 @@ namespace Cue.Sys.Vam
 					}
 					else if (!found[p.PersonIndex, bp])
 					{
+						//Cue.LogInfo($"{kv.Key}");
+
 						found[p.PersonIndex, bp] = true;
 						list.Add(new TriggerInfo(p.PersonIndex, bp, 1.0f));
 					}
