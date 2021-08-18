@@ -650,6 +650,11 @@ namespace Cue
 			set { renderingParts_ = value; }
 		}
 
+		public bool HasPenis
+		{
+			get { return person_.Atom.HasPenis; }
+		}
+
 		public bool InsidePersonalSpace(Person other)
 		{
 			var checkParts = BodyParts.PersonalSpaceParts;

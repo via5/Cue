@@ -447,8 +447,16 @@ namespace Cue
 		private Sys.Vam.FloatParameter handY_ = null;
 		private Sys.Vam.FloatParameter handZ_ = null;
 		private Sys.Vam.FloatParameter closeMax_ = null;
+		private Sys.Vam.FloatParameter speed_ = null;
+		private Sys.Vam.FloatParameter zStrokeMax_ = null;
+		private Sys.Vam.FloatParameter hand2Side_ = null;
+		private Sys.Vam.FloatParameter hand2UpDown_ = null;
+		private Sys.Vam.FloatParameter topOnlyChance_ = null;
+
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
+
+		private const float MaxDistanceToStart = 0.15f;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -463,6 +471,11 @@ namespace Cue
 			handY_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Fwd/Bkwd");
 			handZ_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Shift Up/Down");
 			closeMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Close Max");
+			speed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Overall Speed");
+			zStrokeMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Z Stroke Max");
+			hand2Side_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand2 Side/Side");
+			hand2UpDown_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand2 Shift Up/Down");
+			topOnlyChance_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Top Only Chance");
 
 			active_.Value = false;
 		}
@@ -474,44 +487,113 @@ namespace Cue
 
 		public bool LeftUsed
 		{
-			get { return false; }
+			get
+			{
+				if (Active)
+				{
+					if (hand_.Value == "Left" || hand_.Value == "Both")
+						return true;
+				}
+
+				return false;
+			}
 		}
 
 		public bool RightUsed
 		{
-			get { return true; }
+			get
+			{
+				if (Active)
+				{
+					if (hand_.Value == "Right" || hand_.Value == "Both")
+						return true;
+				}
+
+				return false;
+			}
 		}
 
-		public Person Target
+		public Person[] Targets
 		{
 			get
 			{
-				var id = male_.Value;
-				if (id != "")
-					return Cue.Instance.FindPerson(id);
+				if (Active)
+				{
+					var id = male_.Value;
+					if (id != "")
+					{
+						var p = Cue.Instance.FindPerson(id);
+						if (p != null)
+							return new Person[] { p };
+					}
+				}
 
 				return null;
 			}
 		}
 
-		public void Start(Person target)
+		private Person FindTarget(int handPart)
 		{
+			var hand = person_.Body.Get(handPart);
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_ || !p.Body.HasPenis)
+					continue;
+
+				var g = p.Body.Get(BodyParts.Genitals);
+				var d = Vector3.Distance(hand.Position, g.Position);
+
+				Cue.LogInfo($"{person_.ID} {p.ID} {hand.Name} {d}");
+
+				if (d < MaxDistanceToStart)
+					return p;
+			}
+
+			return null;
+		}
+
+		public bool Start()
+		{
+			var rightTarget = FindTarget(BodyParts.RightHand);
+			var leftTarget = FindTarget(BodyParts.LeftHand);
+
+			if (rightTarget == null && leftTarget == null)
+				return false;
+
 			enabled_.Value = true;
+			male_.Value = rightTarget?.ID ?? leftTarget.ID;
 
-			if (target != null)
-				male_.Value = target.ID;
+			if (rightTarget != null && leftTarget != null)
+			{
+				hand_.Value = "Both";
+				zStrokeMax_.Value = 10;
+				hand2Side_.Value = -0.05f;
+				hand2UpDown_.Value = 0.15f;
+				topOnlyChance_.Value = 0;
+			}
+			else
+			{
+				if (rightTarget != null)
+					hand_.Value = "Right";
+				else
+					hand_.Value = "Left";
 
-			// todo
-			hand_.Value = "Right";  // also change LeftUsed and RightUsed
+				zStrokeMax_.Value = zStrokeMax_.DefaultValue;
+				topOnlyChance_.Value = 0.1f;
+			}
+
 			handX_.Value = 0;
 			handY_.Value = 0;
-			handZ_.Value = 0.00f;
+			handZ_.Value = 0;
 			closeMax_.Value = 0.5f;
 
 			elapsed_ = 0;
 			closedHand_ = false;
 
 			active_.Value = true;
+
+			return true;
 		}
 
 		public void Stop()
@@ -529,6 +611,15 @@ namespace Cue
 					closedHand_ = true;
 					//closeMax_.Value = 0.75f;
 				}
+			}
+
+			// speed
+			{
+				// not too fast
+				var range = (speed_.Maximum - speed_.DefaultValue) * 0.9f;
+
+				var v = speed_.DefaultValue + range * person_.Mood.MovementEnergy;
+				speed_.Value = v;
 			}
 		}
 

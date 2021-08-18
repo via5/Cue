@@ -269,27 +269,36 @@ namespace Cue
 
 			if (person_.Handjob.Active)
 			{
-				var t = person_.Handjob.Target;
+				var ts = person_.Handjob.Targets;
 
-				if (t != null)
+				if (ts != null && ts.Length > 0)
 				{
-					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
-					{
-						targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
-						return Continue | Busy;
-					}
-					else
-					{
-						targets_.SetWeight(
-							t, BodyParts.Eyes,
-							ps.Get(PSE.HandjobEyesWeight), "hj");
+					int ret = 0;
 
-						targets_.SetWeight(
-							t, BodyParts.Genitals,
-							ps.Get(PSE.HandjobGenitalsWeight), "hj");
+					for (int i = 0; i < ts.Length; ++i)
+					{
+						var t = ts[i];
 
-						return Continue | Busy | NoRandom;
+						if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
+						{
+							targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
+							ret |= Continue | Busy;
+						}
+						else
+						{
+							targets_.SetWeight(
+								t, BodyParts.Eyes,
+								ps.Get(PSE.HandjobEyesWeight), "hj");
+
+							targets_.SetWeight(
+								t, BodyParts.Genitals,
+								ps.Get(PSE.HandjobGenitalsWeight), "hj");
+
+							ret |= Continue | Busy | NoRandom;
+						}
 					}
+
+					return ret;
 				}
 			}
 

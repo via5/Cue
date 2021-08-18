@@ -88,6 +88,11 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public bool HasPenis
+		{
+			get { return Sex == Sexes.Male; }
+		}
+
 		public bool Selected
 		{
 			get
@@ -197,8 +202,8 @@ namespace Cue.Sys.Vam
 
 		public void SetBodyDamping(int e)
 		{
-			float pos = 130;
-			float rot = 15;
+			float pos = 160;
+			float rot = 25;
 
 			float hipsPos = pos;
 			float hipsRot = rot;
@@ -212,6 +217,8 @@ namespace Cue.Sys.Vam
 			SetStrongerDamping("hipControl", hipsPos, hipsRot);
 			SetStrongerDamping("chestControl", pos, rot);
 			SetStrongerDamping("headControl", pos, rot);
+			SetStrongerDamping("lThighControl", pos, rot);
+			SetStrongerDamping("rThighControl", pos, rot);
 			SetStrongerDamping("lFootControl", pos, rot);
 			SetStrongerDamping("rFootControl", pos, rot);
 			SetStrongerDamping("lKneeControl", pos, rot);

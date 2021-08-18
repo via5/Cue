@@ -158,9 +158,9 @@ namespace Cue
 		bool LeftUsed { get; }
 		bool RightUsed { get; }
 
-		Person Target { get; }
+		Person[] Targets { get; }
 
-		void Start(Person target);
+		bool Start();
 		void Stop();
 		void Update(float s);
 		void OnPluginState(bool b);

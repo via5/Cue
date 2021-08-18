@@ -245,6 +245,7 @@ namespace Cue.Sys
 		bool Visible { get; set; }
 		bool IsPerson { get; }
 		int Sex { get; }
+		bool HasPenis { get; }
 		bool Teleporting { get; }
 		bool Possessed { get; }
 		bool Selected { get; }

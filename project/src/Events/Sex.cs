@@ -62,7 +62,7 @@
 					wait_ += s;
 					if (wait_ >= 0.5f)
 					{
-						person_.Handjob.Start(receiver_);
+						//person_.Handjob.Start(receiver_);
 						receiver_.Clothing.GenitalsVisible = true;
 						state_ = ActiveState;
 					}

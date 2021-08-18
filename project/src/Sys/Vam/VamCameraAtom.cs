@@ -163,6 +163,11 @@ namespace Cue.Sys.Vam
 			get { return Sexes.Male; }
 		}
 
+		public bool HasPenis
+		{
+			get { return false; }
+		}
+
 		public bool Teleporting
 		{
 			get { return false; }

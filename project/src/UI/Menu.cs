@@ -239,12 +239,12 @@
 		private void OnHandjob()
 		{
 			var p = Selected as Person;
-			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
+			if (p != null && p != Cue.Instance.Player)
 			{
 				if (p.Handjob.Active)
 					p.Handjob.Stop();
 				else
-					p.Handjob.Start(Cue.Instance.Player);
+					p.Handjob.Start();
 			}
 		}
 
