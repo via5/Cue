@@ -148,7 +148,7 @@ namespace Cue
 
 			if (!enabled_)
 			{
-				log_.Info("not a smoker");
+				//log_.Info("not a smoker");
 				return;
 			}
 

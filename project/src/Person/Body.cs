@@ -275,35 +275,10 @@ namespace Cue
 					return true;
 
 				// todo
-				switch (type_)
-				{
-					case BodyParts.Head:
-					case BodyParts.Lips:
-					case BodyParts.Mouth:
-					{
-						return person_.Kisser.Active || person_.Blowjob.Active;
-					}
-
-					case BodyParts.LeftArm:
-					case BodyParts.LeftForearm:
-					case BodyParts.LeftHand:
-					{
-						return
-							person_.Handjob.Active &&
-							person_.Handjob.LeftUsed;
-					}
-
-					case BodyParts.RightArm:
-					case BodyParts.RightForearm:
-					case BodyParts.RightHand:
-					{
-						return
-							person_.Handjob.Active &&
-							person_.Handjob.RightUsed;
-					}
-				}
-
-				return false;
+				return
+					person_.Kisser.IsBusy(type_) ||
+					person_.Blowjob.IsBusy(type_) ||
+					person_.Handjob.IsBusy(type_);
 			}
 		}
 

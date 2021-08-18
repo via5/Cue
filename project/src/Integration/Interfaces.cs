@@ -147,6 +147,7 @@ namespace Cue
 		void StartReciprocal(Person p);
 		void StopSelf();
 		void Stop();
+		bool IsBusy(int bodyPart);
 
 		void Update(float s);
 		void OnPluginState(bool b);
@@ -164,17 +165,19 @@ namespace Cue
 		void Stop();
 		void Update(float s);
 		void OnPluginState(bool b);
+		bool IsBusy(int bodyPart);
 	}
 
 	interface IBlowjob
 	{
 		bool Active { get; }
-		Person Target { get; }
+		Person[] Targets { get; }
 
-		void Start(Person target);
+		bool Start();
 		void Stop();
 		void Update(float s);
 		void OnPluginState(bool b);
+		bool IsBusy(int bodyPart);
 	}
 
 	struct Pair<First, Second>

@@ -137,7 +137,7 @@
 					wait_ += s;
 					if (wait_ >= 0.5f)
 					{
-						person_.Blowjob.Start(receiver_);
+						//person_.Blowjob.Start(receiver_);
 						receiver_.Clothing.GenitalsVisible = true;
 						state_ = ActiveState;
 					}

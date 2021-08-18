@@ -220,29 +220,38 @@ namespace Cue
 
 			if (person_.Blowjob.Active)
 			{
-				var t = person_.Blowjob.Target;
+				var ts = person_.Blowjob.Targets;
 
-				if (t != null)
+				if (ts != null && ts.Length > 0)
 				{
-					if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
+					int ret = 0;
+
+					for (int i = 0; i < ts.Length; i++)
 					{
-						targets_.SetShouldAvoid(
-							t, true, $"bj, but avoid in ps");
+						var t = ts[i];
 
-						return Continue | NoGazer | Busy;
+						if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
+						{
+							targets_.SetShouldAvoid(
+								t, true, $"bj, but avoid in ps");
+
+							ret |= Continue | NoGazer | Busy;
+						}
+						else
+						{
+							targets_.SetWeight(
+								t, BodyParts.Eyes,
+								ps.Get(PSE.BlowjobEyesWeight), "bj");
+
+							targets_.SetWeight(
+								t, BodyParts.Genitals,
+								ps.Get(PSE.BlowjobGenitalsWeight), "bj");
+
+							ret |= Continue | NoGazer | Busy | NoRandom;
+						}
 					}
-					else
-					{
-						targets_.SetWeight(
-							t, BodyParts.Eyes,
-							ps.Get(PSE.BlowjobEyesWeight), "bj");
 
-						targets_.SetWeight(
-							t, BodyParts.Genitals,
-							ps.Get(PSE.BlowjobGenitalsWeight), "bj");
-
-						return Continue | NoGazer | Busy | NoRandom;
-					}
+					return ret;
 				}
 			}
 

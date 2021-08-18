@@ -251,12 +251,12 @@
 		private void OnBlowjob()
 		{
 			var p = Selected as Person;
-			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
+			if (p != null && p != Cue.Instance.Player)
 			{
 				if (p.Blowjob.Active)
 					p.Blowjob.Stop();
 				else
-					p.Blowjob.Start(Cue.Instance.Player);
+					p.Blowjob.Start();
 			}
 		}
 

@@ -179,6 +179,20 @@ namespace Cue
 			}
 		}
 
+		public bool IsBusy(int bodyPart)
+		{
+			switch (bodyPart)
+			{
+				case BodyParts.Head:
+				case BodyParts.Lips:
+				case BodyParts.Mouth:
+					return Active;
+
+				default:
+					return false;
+			}
+		}
+
 		public void Update(float s)
 		{
 			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
@@ -532,6 +546,25 @@ namespace Cue
 			}
 		}
 
+		public bool IsBusy(int bodyPart)
+		{
+			switch (bodyPart)
+			{
+				case BodyParts.LeftArm:
+				case BodyParts.LeftForearm:
+				case BodyParts.LeftHand:
+					return Active && person_.Handjob.LeftUsed;
+
+				case BodyParts.RightArm:
+				case BodyParts.RightForearm:
+				case BodyParts.RightHand:
+					return Active && person_.Handjob.RightUsed;
+
+				default:
+					return false;
+			}
+		}
+
 		private Person FindTarget(int handPart)
 		{
 			var hand = person_.Body.Get(handPart);
@@ -603,6 +636,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (!Active)
+				return;
+
 			if (!closedHand_)
 			{
 				elapsed_ += s;
@@ -652,6 +688,14 @@ namespace Cue
 		private Sys.Vam.FloatParameter headY_ = null;
 		private Sys.Vam.FloatParameter headZ_ = null;
 
+		private Sys.Vam.FloatParameter overallSpeed_ = null;
+		private Sys.Vam.FloatParameter speedMin_ = null;
+		private Sys.Vam.FloatParameter speedMax_ = null;
+		private Sys.Vam.FloatParameter topOnlyChance_ = null;
+		private Sys.Vam.FloatParameter mouthOpenMax_ = null;
+
+		private const float MaxDistanceToStart = 0.3f;
+
 		public ClockwiseSilverBlowjob(Person p)
 		{
 			person_ = p;
@@ -667,6 +711,12 @@ namespace Cue
 			headY_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Head Up/Down");
 			headZ_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Head Fwd/Bkwd");
 
+			overallSpeed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Overall Speed");
+			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Min");
+			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Max");
+			topOnlyChance_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Top Only Chance");
+			mouthOpenMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Mouth Open Max");
+
 			active_.Value = false;
 			sfxVolume_.Value = 0;
 			moanVolume_.Value = 0;
@@ -674,6 +724,7 @@ namespace Cue
 			headX_.Value = 0;
 			headY_.Value = 0;
 			headZ_.Value = 0;
+			topOnlyChance_.Value = 0.1f;
 		}
 
 		public bool Active
@@ -681,26 +732,72 @@ namespace Cue
 			get { return running_.Value; }
 		}
 
-		public Person Target
+		public Person[] Targets
 		{
 			get
 			{
-				var id = male_.Value;
-				if (id != "")
-					return Cue.Instance.FindPerson(id);
+				if (Active)
+				{
+					var id = male_.Value;
+					if (id != "")
+					{
+						var p = Cue.Instance.FindPerson(id);
+						if (p != null)
+							return new Person[] { p };
+					}
+				}
 
 				return null;
 			}
 		}
 
-		public void Start(Person target)
+		public bool IsBusy(int bodyPart)
 		{
+			switch (bodyPart)
+			{
+				case BodyParts.Head:
+				case BodyParts.Lips:
+				case BodyParts.Mouth:
+				case BodyParts.Eyes:   // cw also handles eyes
+					return Active;
+
+				default:
+					return false;
+			}
+		}
+
+		private Person FindTarget()
+		{
+			var head = person_.Body.Get(BodyParts.Head);
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_ || !p.Body.HasPenis)
+					continue;
+
+				var g = p.Body.Get(BodyParts.Genitals);
+				var d = Vector3.Distance(head.Position, g.Position);
+
+				Cue.LogInfo($"{person_.ID} {p.ID} {d}");
+
+				if (d < MaxDistanceToStart)
+					return p;
+			}
+
+			return null;
+		}
+
+		public bool Start()
+		{
+			var p = FindTarget();
+			if (p == null)
+				return false;
+
 			enabled_.Value = true;
-
-			if (target != null)
-				male_.Value = target.ID;
-
+			male_.Value = p.ID;
 			active_.Value = true;
+
+			return true;
 		}
 
 		public void Stop()
@@ -710,6 +807,20 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (!Active)
+				return;
+
+			// speed
+			{
+				var minRange = speedMin_.Maximum - speedMin_.DefaultValue;
+				var maxRange = speedMax_.Maximum - speedMax_.DefaultValue;
+				var range = overallSpeed_.Maximum - overallSpeed_.DefaultValue;
+				var p = person_.Mood.MovementEnergy;
+
+				speedMin_.Value = speedMin_.DefaultValue + minRange * p;
+				speedMax_.Value = speedMax_.DefaultValue + maxRange * p;
+				overallSpeed_.Value = overallSpeed_.DefaultValue + range * p;
+			}
 		}
 
 		public void OnPluginState(bool b)
