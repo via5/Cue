@@ -54,9 +54,16 @@ namespace Cue
 		public const int OtherGropedTargetWeight = 33;
 		public const int OtherSexExcitementRateFactor = 34;
 		public const int MaxOtherSexExcitement = 35;
-		public const int EnergyTirednessFactor = 36;
-		public const int FloatCount = 37;
-		public int GetFloatCount() { return 37; }
+		public const int KissSpeedEnergyFactor = 36;
+		public const int IdleMaxExcitement = 37;
+		public const int GazeEnergyTirednessFactor = 38;
+		public const int GazeTirednessFactor = 39;
+		public const int MovementEnergyTirednessFactor = 40;
+		public const int MovementTirednessFactor = 41;
+		public const int ExpressionExcitementFactor = 42;
+		public const int ExpressionTirednessFactor = 43;
+		public const int FloatCount = 44;
+		public int GetFloatCount() { return 44; }
 
 		// strings
 		public const int StringCount = 0;
@@ -166,7 +173,14 @@ namespace Cue
 			"otherGropedTargetWeight",
 			"otherSexExcitementRateFactor",
 			"maxOtherSexExcitement",
-			"energyTirednessFactor",
+			"kissSpeedEnergyFactor",
+			"idleMaxExcitement",
+			"gazeEnergyTirednessFactor",
+			"gazeTirednessFactor",
+			"movementEnergyTirednessFactor",
+			"movementTirednessFactor",
+			"expressionExcitementFactor",
+			"expressionTirednessFactor",
 		};
 
 		public static int FloatFromString(string s)
@@ -268,7 +282,14 @@ namespace Cue
 			"otherGropedTargetWeight",
 			"otherSexExcitementRateFactor",
 			"maxOtherSexExcitement",
-			"energyTirednessFactor",
+			"kissSpeedEnergyFactor",
+			"idleMaxExcitement",
+			"gazeEnergyTirednessFactor",
+			"gazeTirednessFactor",
+			"movementEnergyTirednessFactor",
+			"movementTirednessFactor",
+			"expressionExcitementFactor",
+			"expressionTirednessFactor",
 		};
 
 		public static string[] AllNames

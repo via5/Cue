@@ -234,8 +234,14 @@ namespace Cue
 
 			U.Safe(() =>
 			{
-				if (cue_ != null)
-					cue_.OnPluginState(true);
+				try
+				{
+					if (cue_ != null)
+						cue_.OnPluginState(true);
+				}
+				catch(PluginGone e)
+				{
+				}
 			});
 		}
 
@@ -246,8 +252,14 @@ namespace Cue
 
 			U.Safe(() =>
 			{
-				if (cue_ != null)
-					cue_.OnPluginState(false);
+				try
+				{
+					if (cue_ != null)
+							cue_.OnPluginState(false);
+				}
+				catch(PluginGone e)
+				{
+				}
 			});
 		}
 

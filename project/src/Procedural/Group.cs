@@ -132,7 +132,7 @@ namespace Cue.Proc
 		{
 			allDone_ = false;
 
-			Sync.Energy = person_.Mood.Energy;
+			Sync.Energy = person_.Mood.MovementEnergy;
 			Sync.FixedUpdate(s);
 
 			if (inDelay_)
@@ -298,7 +298,7 @@ namespace Cue.Proc
 
 		public override void FixedUpdate(float s)
 		{
-			Sync.Energy = person_.Mood.Energy;
+			Sync.Energy = person_.Mood.MovementEnergy;
 			Sync.FixedUpdate(s);
 
 			if (targets_.Count == 0)

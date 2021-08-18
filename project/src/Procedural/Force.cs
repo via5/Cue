@@ -166,8 +166,8 @@ namespace Cue.Proc
 
 				case BasicSync.DurationFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.Energy;
-					Sync.Energy = person_.Mood.Energy;
+					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
+					Sync.Energy = person_.Mood.MovementEnergy;
 					movement_.SetNext(Vector3.Zero);
 					break;
 				}
@@ -180,16 +180,16 @@ namespace Cue.Proc
 
 				case BasicSync.Looping:
 				{
-					movement_.WindowMagnitude = person_.Mood.Energy;
-					Sync.Energy = person_.Mood.Energy;
+					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
+					Sync.Energy = person_.Mood.MovementEnergy;
 					Next();
 					break;
 				}
 
 				case BasicSync.SyncFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.Energy;
-					Sync.Energy = person_.Mood.Energy;
+					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
+					Sync.Energy = person_.Mood.MovementEnergy;
 					oneFrameFinished_ = true;
 					break;
 				}
@@ -262,7 +262,7 @@ namespace Cue.Proc
 
 		private float EnergyFactor()
 		{
-			return excitement_.Magnitude(person_.Mood.Energy);
+			return excitement_.Magnitude(person_.Mood.MovementEnergy);
 		}
 
 		private void Next()

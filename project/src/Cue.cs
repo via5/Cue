@@ -466,6 +466,16 @@ namespace Cue
 				global::Cue.Sys.LogLevels.Error);
 		}
 
+		static public void Assert(bool b)
+		{
+			if (!b)
+			{
+				LogErrorST("assertion failed");
+				Instance.DisablePlugin();
+				throw new PluginGone();
+			}
+		}
+
 		private void test()
 		{
 		}

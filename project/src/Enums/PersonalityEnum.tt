@@ -14,8 +14,8 @@
 //         quickly after orgasm and slowly goes back to base
 //
 // energy (float, [0, 1])
-//     how energetic a character is, goes up with excitement but is dampened by
-//     tiredness; see energyTirednessFactor
+//     how energetic a character is, goes up with excitement but can be dampened
+//     by tiredness; see *TirednessFactor
 //
 // busy
 //     used for some gaze targets; whether a person is currently doing an action
@@ -195,9 +195,48 @@ V.Float("OtherSexExcitementRateFactor"),
 // other characters; this avoids orgasms just by looking at people
 V.Float("MaxOtherSexExcitement", new Limit(0, 1)),
 
-// impact of tiredness on excitement to determine energy; energy is
-//    `excitement - (tiredness * energyTirednessFactor)`, clamped [0, 1]
-V.Float("EnergyTirednessFactor")
+// effect of energy on kiss movements; depends on the integration plugin, a
+// value of 1.0 should make morph movements faster as energy goes up
+V.Float("KissSpeedEnergyFactor"),
+
+// excitement value under which the character is considered idle; when all
+// characters in a scene are idle, some behaviours will change, such as looking
+// around randomly
+V.Float("IdleMaxExcitement", new Limit(0, 1)),
+
+
+// impact of tiredness on excitement to determine gaze energy; affects speed
+// of head movement and delay between switching targets
+//
+// gaze energy is `excitement - (tiredness * this)`, clamped [0, 1]
+V.Float("GazeEnergyTirednessFactor"),
+
+// impact of tiredness on gaze; inhibits some gaze targets, see
+// MaxTirednessForRandomGaze
+//
+// gaze tiredness is `tiredness * this`, clamped [0, 1]
+V.Float("GazeTirednessFactor"),
+
+// impact of tiredness on excitement to determine movement energy; affects
+// the speed of various movements, such as sex animations
+//
+// movement energy is `excitement - (tiredness * this)`, clamped [0, 1]
+V.Float("MovementEnergyTirednessFactor"),
+
+// impact of tiredness on movement; unused for now
+V.Float("MovementTirednessFactor"),
+
+// impact of excitement on expressions; affects range of morph values and rate
+// of change
+//
+// expression excitement is `excitement * this`, clamped [0, 1]
+V.Float("ExpressionExcitementFactor"),
+
+// impact of tiredness on expressions; affects range of morph values and rate
+// of change for tired expressions, and dampens the other expressions
+//
+// expression tiredness is `tiredness * this`, clamped [0, 1]
+V.Float("ExpressionTirednessFactor"),
 
 };
 

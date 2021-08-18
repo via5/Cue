@@ -53,7 +53,7 @@
 			get { return timeSinceLastOrgasm_; }
 		}
 
-		public float RawExcitement
+		public float Excitement
 		{
 			get { return excitement_.Value; }
 		}
@@ -63,7 +63,7 @@
 			get { return excitement_; }
 		}
 
-		public float RawTiredness
+		public float Tiredness
 		{
 			get { return tiredness_.Value; }
 		}
@@ -83,12 +83,65 @@
 			get { return state_ == OrgasmState && elapsed_ == 0; }
 		}
 
-		public float Energy
+		public float GazeEnergy
 		{
 			get
 			{
-				var tf = person_.Personality.Get(PSE.EnergyTirednessFactor);
-				return U.Clamp(RawExcitement - (RawTiredness * tf), 0, 1);
+				var tf = person_.Personality.Get(PSE.GazeEnergyTirednessFactor);
+				return U.Clamp(Excitement - (Tiredness * tf), 0, 1);
+			}
+		}
+
+		public float GazeTiredness
+		{
+			get
+			{
+				var tf = person_.Personality.Get(PSE.GazeTirednessFactor);
+				return U.Clamp(Tiredness * tf, 0, 1);
+			}
+		}
+
+		public float MovementEnergy
+		{
+			get
+			{
+				var tf = person_.Personality.Get(PSE.MovementEnergyTirednessFactor);
+				return U.Clamp(Excitement - (Tiredness * tf), 0, 1);
+			}
+		}
+
+		public float MovementTiredness
+		{
+			get
+			{
+				var tf = person_.Personality.Get(PSE.MovementTirednessFactor);
+				return U.Clamp(Tiredness * tf, 0, 1);
+			}
+		}
+
+		public float ExpressionExcitement
+		{
+			get
+			{
+				var tf = person_.Personality.Get(PSE.ExpressionExcitementFactor);
+				return U.Clamp(Excitement * tf, 0, 1);
+			}
+		}
+
+		public float ExpressionTiredness
+		{
+			get
+			{
+				var tf = person_.Personality.Get(PSE.ExpressionTirednessFactor);
+				return U.Clamp(Tiredness * tf, 0, 1);
+			}
+		}
+
+		public bool IsIdle
+		{
+			get
+			{
+				return (Excitement < person_.Personality.Get(PSE.IdleMaxExcitement));
 			}
 		}
 
@@ -155,12 +208,12 @@
 			for (int i = 0; i < Expressions.Count; ++i)
 			{
 				if (i == Expressions.Pleasure)
-					person_.Expression.SetIntensity(i, RawExcitement);
+					person_.Expression.SetIntensity(i, ExpressionExcitement);
 
 				if (i == Expressions.Tired)
-					person_.Expression.SetIntensity(i, RawTiredness);
+					person_.Expression.SetIntensity(i, ExpressionTiredness);
 				else
-					person_.Expression.SetDampen(i, RawTiredness);
+					person_.Expression.SetDampen(i, ExpressionTiredness);
 			}
 		}
 
@@ -172,7 +225,7 @@
 			{
 				if (timeSinceLastOrgasm_ > pp.Get(PE.DelayAfterOrgasmUntilTirednessDecay))
 				{
-					if (RawExcitement < pp.Get(PE.TirednessMaxExcitementForBaseDecay))
+					if (Excitement < pp.Get(PE.TirednessMaxExcitementForBaseDecay))
 					{
 						baseTiredness_ = U.Clamp(
 							baseTiredness_ - s * pp.Get(PE.TirednessBaseDecayRate),

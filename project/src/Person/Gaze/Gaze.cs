@@ -203,7 +203,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.RawExcitement >= ps.Get(PSE.MaxExcitementForAvoid))
+			if (person_.Mood.Excitement >= ps.Get(PSE.MaxExcitementForAvoid))
 				return false;
 
 			if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PSE.AvoidDelayAfterOrgasm))

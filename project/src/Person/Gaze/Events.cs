@@ -79,20 +79,16 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.Energy == 0)
-			{
-				targets_.SetAboveWeight(0, "not energetic");
-			}
-			else if (person_.Mood.State == Mood.OrgasmState)
+			if (person_.Mood.State == Mood.OrgasmState)
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeight),
+					person_.Mood.GazeEnergy * ps.Get(PSE.LookAboveMaxWeightOrgasm),
 					"orgasm state");
 			}
 			else
 			{
 				targets_.SetAboveWeight(
-					person_.Mood.Energy * ps.Get(PSE.LookAboveMaxWeightOrgasm),
+					person_.Mood.GazeEnergy * ps.Get(PSE.LookAboveMaxWeight),
 					"normal state");
 			}
 
@@ -641,7 +637,7 @@ namespace Cue
 			}
 			else
 			{
-				if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
+				if (person_.Mood.GazeTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
 				{
 					targets_.SetRandomWeightIfZero(0, "random, but tired");
 				}
@@ -667,7 +663,7 @@ namespace Cue
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p.Mood.RawExcitement > 0)
+				if (!p.Mood.IsIdle)
 					return false;
 			}
 
@@ -700,7 +696,7 @@ namespace Cue
 				if (p == Cue.Instance.Player && g_.ShouldAvoidPlayer())
 					continue;
 
-				if (person_.Mood.RawTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
+				if (person_.Mood.GazeTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
 				{
 					// doesn't do anything, just to get the why in the ui
 					targets_.SetWeightIfZero(
@@ -715,7 +711,7 @@ namespace Cue
 					else
 						w = ps.Get(PSE.NaturalOtherEyesWeight);
 
-					w += p.Mood.RawExcitement * ps.Get(PSE.OtherEyesExcitementWeight);
+					w += p.Mood.GazeEnergy * ps.Get(PSE.OtherEyesExcitementWeight);
 
 					targets_.SetWeightIfZero(
 						p, BodyParts.Eyes, w, "random person");

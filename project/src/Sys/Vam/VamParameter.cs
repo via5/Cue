@@ -97,50 +97,48 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		protected NativeType GetValue()
+		protected bool Wrap(string what, Action f)
 		{
 			if (atom_ == null || !Check())
-				return dummyValue_;
+				return false;
 
 			try
 			{
-				return DoGetValue();
+				f();
+				return true;
 			}
 			catch (Exception e)
 			{
 				Cue.LogError(
-					$"{atom_.uid}: can't get val " +
+					$"{atom_.uid}: can't {what} " +
 					$"for '{storableID_}' '{paramName_}': " +
 					e.ToString());
 
 				param_ = null;
 				MakeStale();
 
-				return dummyValue_;
+				return false;
 			}
+		}
+
+		protected NativeType GetValue()
+		{
+			NativeType v = default(NativeType);
+
+			if (Wrap("get val", () => { v = DoGetValue(); }))
+				return v;
+			else
+				return dummyValue_;
 		}
 
 		protected NativeType GetDefaultValue()
 		{
-			if (atom_ == null || !Check())
+			NativeType v = default(NativeType);
+
+			if (Wrap("get def val", () => { v = DoGetDefaultValue(); }))
+				return v;
+			else
 				return dummyValue_;
-
-			try
-			{
-				return DoGetDefaultValue();
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(
-					$"{atom_.uid}: can't get def val " +
-					$"for '{storableID_}' '{paramName_}': " +
-					e.ToString());
-
-				param_ = null;
-				MakeStale();
-
-				return dummyValue_;
-			}
 		}
 
 		protected override bool DeadCheck()
@@ -332,6 +330,26 @@ namespace Cue.Sys.Vam
 		{
 		}
 
+		public float Minimum
+		{
+			get
+			{
+				float v = 0;
+				Wrap("get min", () => { v = param_.min; });
+				return v;
+			}
+		}
+
+		public float Maximum
+		{
+			get
+			{
+				float v = 0;
+				Wrap("get max", () => { v = param_.max; });
+				return v;
+			}
+		}
+
 		protected override JSONStorableFloat DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetFloatParameter(
@@ -360,6 +378,26 @@ namespace Cue.Sys.Vam
 		public FloatParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
+		}
+
+		public float Minimum
+		{
+			get
+			{
+				float v = 0;
+				Wrap("get min", () => { v = param_.min; });
+				return v;
+			}
+		}
+
+		public float Maximum
+		{
+			get
+			{
+				float v = 0;
+				Wrap("get max", () => { v = param_.max; });
+				return v;
+			}
 		}
 
 		protected override JSONStorableFloat DoGetParameter()

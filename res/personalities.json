@@ -97,7 +97,15 @@
 
 				"otherSexExcitementRateFactor": 0.3,
 				"maxOtherSexExcitement": 0.5,
-				"energyTirednessFactor": 0.8,
+				"kissSpeedEnergyFactor": 1,
+				"idleMaxExcitement": 0,
+
+				"gazeEnergyTirednessFactor": 1,
+				"gazeTirednessFactor": 1,
+				"movementEnergyTirednessFactor": 0,
+				"movementTirednessFactor": 0,
+				"expressionExcitementFactor": 1,
+				"expressionTirednessFactor": 1,
 			},
 
 			"closeState":

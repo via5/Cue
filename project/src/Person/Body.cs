@@ -865,16 +865,16 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			temperature_.UpRate = person_.Mood.RawExcitement * pp.Get(PE.TemperatureExcitementRate);
+			temperature_.UpRate = person_.Mood.Excitement * pp.Get(PE.TemperatureExcitementRate);
 			temperature_.DownRate = pp.Get(PE.TemperatureDecayRate);
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.RawExcitement / pp.Get(PE.TemperatureExcitementMax),
+				person_.Mood.Excitement / pp.Get(PE.TemperatureExcitementMax),
 				0, 1);
 
 			temperature_.Update(s);
 
-			person_.Breathing.Intensity = person_.Mood.Energy;
+			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
 
 			if (renderingParts_ > 0)
 			{

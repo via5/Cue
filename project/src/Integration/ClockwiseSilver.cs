@@ -213,13 +213,20 @@ namespace Cue
 
 			if (k && randomSpeeds_ && active_.Value)
 			{
+				var ps = person_.Personality;
+
+				// don't go too low
+				var range =
+					(morphDuration_.DefaultValue - morphDuration_.Minimum) * 0.6f;
+
 				morphDuration_.Value =
 					morphDuration_.DefaultValue -
-					person_.Mood.Energy * 0.4f;
+					range * person_.Mood.MovementEnergy;
 
+				range = morphSpeed_.Maximum - morphSpeed_.DefaultValue;
 				morphSpeed_.Value =
 					morphSpeed_.DefaultValue +
-					person_.Mood.Energy * 4;
+					range * person_.Mood.MovementEnergy;
 			}
 
 			if (k && active_.Value && EnableDepthCheck)

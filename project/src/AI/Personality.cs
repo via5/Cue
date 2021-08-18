@@ -179,11 +179,11 @@
 				wasClose_ = close;
 			}
 
-			for (int i = 0; i < PSE.SlidingDurationCount; ++i)
-			{
-				GetSlidingDuration(i).WindowMagnitude = person_.Mood.Energy;
-				GetSlidingDuration(i).Update(s);
-			}
+
+			// todo
+			Cue.Assert(PSE.SlidingDurationCount == 1);
+			GetSlidingDuration(PSE.GazeDuration).WindowMagnitude = person_.Mood.GazeEnergy;
+			GetSlidingDuration(PSE.GazeDuration).Update(s);
 		}
 
 		public override string ToString()
@@ -221,6 +221,12 @@
 
 			foreach (var m in s.Maximums)
 				person_.Expression.SetMaximum(m.type, m.maximum);
+			
+			// todo
+			person_.Expression.SetIntensity(Expressions.Common, 1);
+			person_.Expression.SetIntensity(Expressions.Happy, 1);
+			person_.Expression.SetIntensity(Expressions.Mischievous, 1);
+			person_.Expression.SetIntensity(Expressions.Angry, 1);
 		}
 
 		public void ForceSetClose(bool enabled, bool close)

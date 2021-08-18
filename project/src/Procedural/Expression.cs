@@ -54,8 +54,10 @@ namespace Cue.Proc
 
 		public void FixedUpdate(float s)
 		{
+			float intensity = max_ * intensity_ * (1 - dampen_);
+
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].FixedUpdate(s, max_ * intensity_ * (1 - dampen_));
+				groups_[i].FixedUpdate(s, intensity);
 
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].Set();
