@@ -174,6 +174,7 @@
 		private Sys.Vam.FloatParameter gazeDuration_;
 		private Sys.Vam.FloatParameter maxAngleHor_;
 		private Sys.Vam.FloatParameter maxAngleVer_;
+		private Sys.Vam.FloatParameter verOffset_;
 
 		// 12
 		private Sys.Vam.BoolParameter lookatTarget_;
@@ -192,6 +193,7 @@
 			gazeDuration_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
 			maxAngleHor_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
 			maxAngleVer_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
+			verOffset_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Eye Angle Vertical Offset");
 
 			lookatTarget_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "LookAt EyeTarget");
 			lookatAtom_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
@@ -245,6 +247,36 @@
 		{
 			if (ParameterChanged())
 				SetParameter();
+
+			if (Enabled)
+			{
+				// gaze has a a problem with the head vertical angle when the
+				// camera is really close, making the head point downwards
+				//
+				// increase the vertical offset when the head is closer than
+				// `far`
+
+				var eyes = person_.Body.Get(BodyParts.Eyes).Position;
+				var target = person_.Gaze.Eyes.TargetPosition;
+				var d = Vector3.Distance(eyes, target);
+
+				float far = 0.2f;
+				float def = verOffset_.DefaultValue;
+
+				if (d <= far)
+				{
+					float max = verOffset_.Maximum;
+					float range = (max - def);
+					float p = (far - d) / far;
+					float v = def + range * p;
+
+					verOffset_.Value = v;
+				}
+				else
+				{
+					verOffset_.Value = def;
+				}
+			}
 		}
 
 		private void SetParameter()

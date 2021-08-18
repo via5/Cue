@@ -221,7 +221,7 @@
 
 			foreach (var m in s.Maximums)
 				person_.Expression.SetMaximum(m.type, m.maximum);
-			
+
 			// todo
 			person_.Expression.SetIntensity(Expressions.Common, 1);
 			person_.Expression.SetIntensity(Expressions.Happy, 1);

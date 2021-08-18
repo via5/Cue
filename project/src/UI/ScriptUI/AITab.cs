@@ -370,7 +370,7 @@ namespace Cue
 			var g = person_.Gaze;
 
 			eyesBlink_.Text = $"{g.Eyes.Blink}";
-			eyesPos_.Text = $"{g.Eyes.Position}";
+			eyesPos_.Text = $"{g.Eyes.TargetPosition}";
 
 			gazerType_.Text = $"{g.Gazer.Name}";
 			gazerEnabled_.Text = $"{g.Gazer.Enabled}";

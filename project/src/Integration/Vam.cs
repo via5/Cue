@@ -68,7 +68,7 @@ namespace Cue
 			set { blink_.Value = value; }
 		}
 
-		public Vector3 Position
+		public Vector3 TargetPosition
 		{
 			get
 			{

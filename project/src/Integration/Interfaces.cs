@@ -123,7 +123,7 @@ namespace Cue
 	interface IEyes
 	{
 		bool Blink { get; set; }
-		Vector3 Position { get; }
+		Vector3 TargetPosition { get; }
 
 		void LookAt(Vector3 p);
 		void LookAtNothing();
