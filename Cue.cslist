@@ -16,6 +16,7 @@ project\src\Integration\BVH.cs
 project\src\Integration\BVHFile.cs
 project\src\Integration\BVHPlayer.cs
 project\src\Integration\ClockwiseSilver.cs
+project\src\Integration\ClothingManager.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Objects.cs
@@ -26,7 +27,6 @@ project\src\Object\Animator.cs
 project\src\Object\Object.cs
 project\src\Object\Slots.cs
 project\src\Person\Body.cs
-project\src\Person\Clothing.cs
 project\src\Person\Excitement.cs
 project\src\Person\Mood.cs
 project\src\Person\Person.cs
@@ -61,7 +61,6 @@ project\src\Sys\Vam\VamBody.cs
 project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
 project\src\Sys\Vam\VamCanvas.cs
-project\src\Sys\Vam\VamClothing.cs
 project\src\Sys\Vam\VamFixes.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamHair.cs

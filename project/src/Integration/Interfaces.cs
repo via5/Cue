@@ -65,6 +65,11 @@ namespace Cue
 			return new ClockwiseSilverBlowjob(p);
 		}
 
+		public static IClothing CreateClothing(Person p)
+		{
+			return new ClothingManager(p);
+		}
+
 		public static IExpression CreateExpression(Person p)
 		{
 			return new Proc.Expression(p);
@@ -178,6 +183,15 @@ namespace Cue
 		void Update(float s);
 		void OnPluginState(bool b);
 		bool IsBusy(int bodyPart);
+	}
+
+	interface IClothing
+	{
+		float HeelsAngle { get; }
+		float HeelsHeight { get; }
+		bool GenitalsVisible { get; set; }
+		bool BreastsVisible { get; set; }
+		void Dump();
 	}
 
 	struct Pair<First, Second>

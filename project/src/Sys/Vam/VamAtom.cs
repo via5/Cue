@@ -10,7 +10,6 @@ namespace Cue.Sys.Vam
 		private VamAtomNav nav_;
 		private FreeControllerV3 head_ = null;
 		private DAZCharacter char_ = null;
-		private VamClothing clothing_ = null;
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
 
@@ -29,7 +28,6 @@ namespace Cue.Sys.Vam
 			char_ = atom_.GetComponentInChildren<DAZCharacter>();
 			if (char_ != null)
 			{
-				clothing_ = new VamClothing(this);
 				body_ = new VamBody(this);
 				hair_ = new VamHair(this);
 			}
@@ -99,11 +97,6 @@ namespace Cue.Sys.Vam
 			{
 				return (SuperController.singleton.GetSelectedAtom() == atom_);
 			}
-		}
-
-		public IClothing Clothing
-		{
-			get { return clothing_; }
 		}
 
 		public IBody Body
@@ -279,7 +272,6 @@ namespace Cue.Sys.Vam
 			//
 			//atom_.mainController.interactableInPlayMode = !b;
 
-			clothing_?.OnPluginState(b);
 			body_?.OnPluginState(b);
 			hair_?.OnPluginState(b);
 		}

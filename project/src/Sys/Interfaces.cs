@@ -193,17 +193,6 @@ namespace Cue.Sys
 		Quaternion Rotation { get; }
 	}
 
-	interface IClothing
-	{
-		float HeelsAngle { get; }
-		float HeelsHeight { get; }
-		bool GenitalsVisible { get; set; }
-		bool BreastsVisible { get; set; }
-		void Init();
-		void OnPluginState(bool b);
-		void Dump();
-	}
-
 	interface IHair
 	{
 		float Loose { get; set; }
@@ -261,7 +250,6 @@ namespace Cue.Sys
 		void Init();
 		void Destroy();
 
-		IClothing Clothing { get; }
 		IBody Body { get; }
 		IHair Hair { get; }
 

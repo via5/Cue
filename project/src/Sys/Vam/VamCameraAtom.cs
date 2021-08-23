@@ -138,13 +138,11 @@ namespace Cue.Sys.Vam
 	class VamCameraAtom : IAtom
 	{
 		private VamCameraBody body_;
-		private VamClothing clothing_;
 		private VamHair hair_;
 
 		public VamCameraAtom()
 		{
 			body_ = new VamCameraBody(this);
-			clothing_ = new VamClothing(null);
 			hair_ = new VamHair(null);
 		}
 
@@ -195,7 +193,6 @@ namespace Cue.Sys.Vam
 			get { return false; }
 		}
 
-		public IClothing Clothing { get { return clothing_; } }
 		public IBody Body { get { return body_; } }
 		public IHair Hair { get { return hair_; } }
 

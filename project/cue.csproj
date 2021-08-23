@@ -114,6 +114,7 @@
     <Compile Include="src\Integration\BVHFile.cs" />
     <Compile Include="src\Integration\BVHPlayer.cs" />
     <Compile Include="src\Integration\ClockwiseSilver.cs" />
+    <Compile Include="src\Integration\ClothingManager.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
     <Compile Include="src\Integration\Objects.cs" />
@@ -125,7 +126,6 @@
     <Compile Include="src\Object\Object.cs" />
     <Compile Include="src\Object\Slots.cs" />
     <Compile Include="src\Person\Body.cs" />
-    <Compile Include="src\Person\Clothing.cs" />
     <Compile Include="src\Person\Excitement.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
@@ -159,7 +159,6 @@
     <Compile Include="src\Sys\Vam\VamBody.cs" />
     <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
     <Compile Include="src\Sys\Vam\VamCanvas.cs" />
-    <Compile Include="src\Sys\Vam\VamClothing.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
     <Compile Include="src\Sys\Vam\VamFixes.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />

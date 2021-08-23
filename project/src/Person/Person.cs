@@ -38,7 +38,6 @@ namespace Cue
 		private Physiology physiology_;
 		private Mood mood_;
 		private IAI ai_ = null;
-		private Clothing clothing_;
 		private Personality personality_;
 
 		private IBreather breathing_;
@@ -47,6 +46,7 @@ namespace Cue
 		private IKisser kisser_;
 		private IHandjob handjob_;
 		private IBlowjob blowjob_;
+		private IClothing clothing_;
 		private IExpression expression_;
 
 		private List<string> traits_ = new List<string>();
@@ -67,7 +67,6 @@ namespace Cue
 			physiology_ = Resources.Physiologies.Clone("standard", this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
-			clothing_ = new Clothing(this);
 
 			Personality = Resources.Personalities.Clone("standard", this);
 
@@ -77,6 +76,7 @@ namespace Cue
 			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
 			blowjob_ = Integration.CreateBlowjob(this);
+			clothing_ = Integration.CreateClothing(this);
 			expression_ = Integration.CreateExpression(this);
 
 			Atom.SetDefaultControls("init");
@@ -88,7 +88,6 @@ namespace Cue
 
 			Body.Init();
 			gaze_.Init();
-			Clothing.Init();
 
 			if (this == Cue.Instance.Player)
 			{
@@ -150,7 +149,7 @@ namespace Cue
 		public Physiology Physiology { get { return physiology_; } }
 		public Mood Mood { get { return mood_; } }
 		public IAI AI { get { return ai_; } }
-		public Clothing Clothing { get { return clothing_; } }
+		public IClothing Clothing { get { return clothing_; } }
 		public RootAction Actions { get { return actions_; } }
 
 		public IBreather Breathing { get { return breathing_; } }
