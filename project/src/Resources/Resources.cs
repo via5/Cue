@@ -5,7 +5,6 @@ namespace Cue
 	class Resources
 	{
 		private static AnimationResources animations_ = new AnimationResources();
-		private static ClothingResources clothing_ = new ClothingResources();
 		private static ObjectResources objects_ = new ObjectResources();
 		private static PhysiologyResources physiologies_ = new PhysiologyResources();
 		private static PersonalityResources personalities_ = new PersonalityResources();
@@ -13,7 +12,6 @@ namespace Cue
 		public static void LoadAll()
 		{
 			animations_.Load();
-			clothing_.Load();
 			objects_.Load();
 			physiologies_.Load();
 			personalities_.Load();
@@ -22,11 +20,6 @@ namespace Cue
 		public static AnimationResources Animations
 		{
 			get { return animations_; }
-		}
-
-		public static ClothingResources Clothing
-		{
-			get { return clothing_; }
 		}
 
 		public static ObjectResources Objects

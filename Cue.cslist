@@ -48,7 +48,6 @@ project\src\Procedural\MorphGroup.cs
 project\src\Procedural\Player.cs
 project\src\Procedural\Sync.cs
 project\src\Resources\Animations.cs
-project\src\Resources\Clothing.cs
 project\src\Resources\Objects.cs
 project\src\Resources\Personalities.cs
 project\src\Resources\Physiologies.cs

@@ -147,7 +147,6 @@
     <Compile Include="src\Procedural\Player.cs" />
     <Compile Include="src\Procedural\Sync.cs" />
     <Compile Include="src\Resources\Animations.cs" />
-    <Compile Include="src\Resources\Clothing.cs" />
     <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Resources\Personalities.cs" />
     <Compile Include="src\Resources\Physiologies.cs" />
