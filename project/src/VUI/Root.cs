@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -37,7 +38,7 @@ namespace VUI
 
 		public Overlay(Rectangle b)
 		{
-			Bounds = b;
+			SetBounds(b);
 		}
 
 		protected override void DoCreate()
@@ -63,16 +64,40 @@ namespace VUI
 		public override string TypeName { get { return "RootPanel"; } }
 
 		private readonly Root root_;
+		private bool dirty_ = true;
 
-		public RootPanel(Root r)
+		public RootPanel(Root r, string name)
+			: base(name)
 		{
 			root_ = r;
 			Margins = new Insets(5);
 		}
 
+		public void Update(bool forceLayout)
+		{
+			if (dirty_ || forceLayout)
+			{
+				var start = Time.realtimeSinceStartup;
+
+				DoLayout();
+				Create();
+				UpdateBounds();
+
+				var t = Time.realtimeSinceStartup - start;
+
+				Glue.LogVerbose($"layout {Name}: {t:0.000:}s");
+
+				dirty_ = false;
+			}
+		}
+
 		protected override void NeedsLayoutImpl(string why)
 		{
-			root_.SetDirty(why);
+			if (!dirty_)
+			{
+				Glue.LogVerbose($"{Name} needs layout: {why}");
+				dirty_ = true;
+			}
 		}
 
 		public override Root GetRoot()
@@ -155,11 +180,12 @@ namespace VUI
 		private Overlay overlay_ = null;
 		private readonly TooltipManager tooltips_;
 		private float topOffset_ = 0;
-		private bool dirty_ = true;
 		private Canvas canvas_;
 
 		private UIPopup openedPopup_ = null;
 		private Widget focused_ = null;
+		private Point lastMouse_ = new Point(-10000, -10000);
+		private List<Widget> track_ = new List<Widget>();
 
 		private TimerManager ownTm_ = null;
 		private Timer checkReadyTimer_ = null;
@@ -187,8 +213,8 @@ namespace VUI
 			if (TimerManager.Instance == null)
 				ownTm_ = new TimerManager();
 
-			content_ = new RootPanel(this);
-			floating_ = new RootPanel(this);
+			content_ = new RootPanel(this, "content");
+			floating_ = new RootPanel(this, "floating");
 			tooltips_ = new TooltipManager(this);
 
 			AttachTo(support);
@@ -277,8 +303,8 @@ namespace VUI
 				Style.SetupRoot(support_.ScriptUI);
 			}
 
-			content_.Bounds = new Rectangle(bounds_);
-			floating_.Bounds = new Rectangle(bounds_);
+			content_.SetBounds(bounds_);
+			floating_.SetBounds(bounds_);
 		}
 
 		private void CheckScriptUIReady()
@@ -341,6 +367,14 @@ namespace VUI
 			set { support_.RootParent.gameObject.SetActive(value); }
 		}
 
+		public void TrackPointer(Widget w, bool b)
+		{
+			if (b)
+				track_.Add(w);
+			else
+				track_.Remove(w);
+		}
+
 		public void Update(bool forceLayout=false)
 		{
 			if (ownTm_ != null)
@@ -349,33 +383,22 @@ namespace VUI
 				ownTm_.CheckTimers();
 			}
 
-			if (dirty_ || forceLayout)
+			content_.Update(forceLayout);
+			floating_.Update(forceLayout);
+
+			var mp = MousePosition;
+
+			if (track_.Count > 0 && mp != lastMouse_)
 			{
-				var start = Time.realtimeSinceStartup;
-
-				content_.DoLayout();
-				content_.Create();
-				content_.UpdateBounds();
-
-				floating_.DoLayout();
-				floating_.Create();
-				floating_.UpdateBounds();
-
-				var t = Time.realtimeSinceStartup - start;
-
-				Glue.LogVerbose("layout: " + t.ToString("0.000") + "s");
-
-				dirty_ = false;
+				for (int i = 0; i < track_.Count; ++i)
+				{
+					var r = track_[i].AbsoluteClientBounds;
+					if (r.Contains(mp))
+						track_[i].OnPointerMoveInternal();
+				}
 			}
-		}
 
-		public void SetDirty(string why)
-		{
-			if (!dirty_)
-			{
-				Glue.LogVerbose("needs layout: " + why);
-				dirty_ = true;
-			}
+			lastMouse_ = mp;
 		}
 
 		public bool OverlayVisible
@@ -389,29 +412,31 @@ namespace VUI
 			}
 		}
 
+		public Point ToLocal(Vector2 v)
+		{
+			if (canvas_ == null)
+			{
+				canvas_ = support_.Canvas;
+				if (canvas_ == null)
+					return NoMousePos;
+			}
+
+			Vector2 pp;
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(
+				canvas_.transform as RectTransform, v,
+				canvas_.worldCamera, out pp);
+
+			pp.x = bounds_.Left + bounds_.Width / 2 + pp.x;
+			pp.y = bounds_.Top + (bounds_.Height - pp.y + topOffset_);
+
+			return new Point(pp.x, pp.y);
+		}
+
 		public Point MousePosition
 		{
 			get
 			{
-				if (canvas_ == null)
-				{
-					canvas_ = support_.Canvas;
-					if (canvas_ == null)
-						return NoMousePos;
-				}
-
-
-				var mp = Input.mousePosition;
-
-				Vector2 pp;
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(
-					canvas_.transform as RectTransform, mp,
-					canvas_.worldCamera, out pp);
-
-				pp.x = bounds_.Left + bounds_.Width / 2 + pp.x;
-				pp.y = bounds_.Top + (bounds_.Height - pp.y + topOffset_);
-
-				return new Point(pp.x, pp.y);
+				return ToLocal(Input.mousePosition);
 			}
 		}
 
@@ -436,11 +461,30 @@ namespace VUI
 				overlay_.Visible = false;
 		}
 
+		public void WidgetEntered(Widget w)
+		{
+			Tooltips.WidgetEntered(w);
+		}
+
+		public void WidgetExited(Widget w)
+		{
+			Tooltips.WidgetExited(w);
+		}
+
+		public void PointerDown(Widget w)
+		{
+			Tooltips.Hide();
+		}
+
 		public static float TextLength(Font font, int fontSize, string s)
 		{
 			var ts = ts_;
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.horizontalOverflow = HorizontalWrapMode.Overflow;
+			ts.verticalOverflow = VerticalWrapMode.Overflow;
+			ts.generateOutOfBounds = false;
+			ts.resizeTextForBestFit = false;
 
 			return tg_.GetPreferredWidth(s, ts);
 		}
@@ -457,8 +501,16 @@ namespace VUI
 
 			foreach (var line in s.Split('\n'))
 			{
+				// todo: line spacing, but this is broken, really
+				if (size.Height > 0)
+					size.Height += 1;
+
 				size.Width = Math.Max(size.Width, tg_.GetPreferredWidth(line, ts));
-				size.Height += tg_.GetPreferredHeight(line, ts);
+
+				if (line == "")
+					size.Height += tg_.GetPreferredHeight("W", ts);
+				else
+					size.Height += tg_.GetPreferredHeight(line, ts);
 			}
 
 			return size;
@@ -502,8 +554,16 @@ namespace VUI
 
 			foreach (var line in s.Split('\n'))
 			{
+				// todo: line spacing, but this is broken, really
+				if (size.Height > 0)
+					size.Height += 1;
+
 				size.Width = Math.Max(size.Width, tg_.GetPreferredWidth(line, ts));
-				size.Height += tg_.GetPreferredHeight(line, ts);
+
+				if (line == "")
+					size.Height += tg_.GetPreferredHeight("W", ts);
+				else
+					size.Height += tg_.GetPreferredHeight(line, ts);
 			}
 
 			if (maxSize.Width != Widget.DontCare)

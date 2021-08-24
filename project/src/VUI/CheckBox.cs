@@ -32,10 +32,13 @@ namespace VUI
 
 			set
 			{
-				checked_ = value;
+				if (checked_ != value)
+				{
+					checked_ = value;
 
-				if (toggle_ != null)
-					toggle_.toggle.isOn = value;
+					if (toggle_ != null)
+						toggle_.toggle.isOn = value;
+				}
 			}
 		}
 

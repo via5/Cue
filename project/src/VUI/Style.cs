@@ -19,7 +19,7 @@ namespace VUI
 
 		public float MaxTooltipWidth
 		{
-			get { return 400; }
+			get { return 800; }
 		}
 
 		public float TooltipBorderOffset
@@ -309,6 +309,29 @@ namespace VUI
 			}
 
 			f(c);
+		}
+
+		private static void ForComponents<T>(GameObject o, Action<T> f)
+		{
+			if (o == null)
+			{
+				Glue.LogErrorST("ForComponents null");
+				return;
+			}
+
+			var cs = o.GetComponentsInChildren<T>();
+
+			if (cs.Length == 0)
+			{
+				Glue.LogErrorST(
+					"component " + typeof(T).ToString() + " not found " +
+					"in " + o.name);
+
+				return;
+			}
+
+			for (int i=0; i<cs.Length;++i)
+				f(cs[i]);
 		}
 
 		private static void ForComponentInChildren<T>(Component o, Action<T> f)
@@ -658,7 +681,8 @@ namespace VUI
 
 		public static void Adjust(Label e)
 		{
-			ForComponent<Text>(e.WidgetObject, (text) =>
+			// also includes ellipsis, if any
+			ForComponents<Text>(e.MainObject, (text) =>
 			{
 				Adjust(text, new Info(e));
 			});
@@ -666,7 +690,8 @@ namespace VUI
 
 		public static void Polish(Label e)
 		{
-			ForComponent<Text>(e.WidgetObject, (text) =>
+			// also includes ellipsis, if any
+			ForComponents<Text>(e.MainObject, (text) =>
 			{
 				Polish(text, new Info(e));
 			});
@@ -709,7 +734,7 @@ namespace VUI
 
 		private static void Adjust(UIDynamicToggle e, Info info)
 		{
-			// no-op
+			Adjust(e.labelText, info);
 		}
 
 		private static void Polish(UIDynamicToggle e, Info info)
@@ -729,6 +754,8 @@ namespace VUI
 
 			// there doesn't seem to be any way to change the checkmark color,
 			// so the box will have to stay white for now
+
+			Polish(e.labelText, info);
 		}
 
 		private static void Adjust(UnityEngine.UI.Button e, Info info)

@@ -23,7 +23,6 @@
 			Borders = new Insets(1);
 
 			content_.Margins = new Insets(10, 20, 10, 10);
-			title_.Wrap = false;
 			title_.BackgroundColor = Style.Theme.DialogTitleBackgroundColor;
 			title_.Padding = new Insets(0, 5, 0, 10);
 
@@ -49,10 +48,10 @@
 			root_.OverlayVisible = true;
 
 			var ps = GetRealPreferredSize(root_.Bounds.Width, root_.Bounds.Height);
-			Bounds = new Rectangle(
+			SetBounds(new Rectangle(
 				root_.Bounds.Center.X - (ps.Width / 2),
 				root_.Bounds.Center.Y - (ps.Height / 2),
-				ps);
+				ps));
 
 			DoLayout();
 			Create();

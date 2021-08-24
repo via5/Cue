@@ -89,8 +89,8 @@ namespace VUI
 
 				var ps = b.GetRealPreferredSize(av.Width, av.Height);
 
-				b.Bounds = Rectangle.FromSize(
-					left, av.Bottom - ps.Height, ps.Width, ps.Height);
+				b.SetBounds(Rectangle.FromSize(
+					left, av.Bottom - ps.Height, ps.Width, ps.Height));
 
 				left += ps.Width;
 			}

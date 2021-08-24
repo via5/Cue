@@ -181,7 +181,7 @@ namespace VUI
 						r.Right -= Spacing;
 				}
 
-				w.Bounds = r;
+				w.SetBounds(r);
 			}
 
 			if (tallest > 0)
@@ -228,7 +228,7 @@ namespace VUI
 						r.Right -= Spacing;
 				}
 
-				w.Bounds = r;
+				w.SetBounds(r);
 			}
 
 			if (tallest > 0)
@@ -276,7 +276,7 @@ namespace VUI
 						r.Bottom -= Spacing;
 				}
 
-				w.Bounds = r;
+				w.SetBounds(r);
 			}
 
 			if (widest > 0)
@@ -324,7 +324,7 @@ namespace VUI
 						r.Bottom -= Spacing;
 				}
 
-				w.Bounds = r;
+				w.SetBounds(r);
 			}
 
 			if (widest > 0)
@@ -340,7 +340,7 @@ namespace VUI
 				if (!w.Visible)
 					continue;
 
-				w.Bounds = av;
+				w.SetBounds(av);
 			}
 		}
 

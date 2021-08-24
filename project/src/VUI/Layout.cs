@@ -266,7 +266,7 @@ namespace VUI
 			for (int i = 0; i < Children.Count; ++i)
 			{
 				if (bounds[i] != null)
-					Children[i].Bounds = bounds[i].Value;
+					Children[i].SetBounds(bounds[i].Value);
 			}
 		}
 
@@ -423,7 +423,7 @@ namespace VUI
 			for (int i = 0; i < Children.Count; ++i)
 			{
 				if (bounds[i] != null)
-					Children[i].Bounds = bounds[i].Value;
+					Children[i].SetBounds(bounds[i].Value);
 			}
 		}
 

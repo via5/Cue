@@ -1,20 +1,48 @@
-﻿using UnityEngine.UI;
+﻿using System;
+using UnityEngine.UI;
 
 namespace VUI
 {
 	class Tooltip
 	{
 		private string text_ = "";
+		private int fontSize_ = -1;
+		private Func<string> textFunc_ = null;
 
 		public Tooltip(string text = "")
 		{
 			text_ = text;
 		}
 
+		public bool HasValue
+		{
+			get { return textFunc_ != null || text_ != ""; }
+		}
+
+		public Func<string> TextFunc
+		{
+			get { return textFunc_; }
+			set { textFunc_ = value; }
+		}
+
 		public string Text
 		{
 			get { return text_; }
 			set { text_ = value; }
+		}
+
+		public int FontSize
+		{
+			get { return fontSize_; }
+			set { fontSize_ = value; }
+		}
+
+		public string GetText()
+		{
+			if (textFunc_ != null)
+				return textFunc_();
+			else
+				return text_;
 		}
 	}
 
@@ -35,6 +63,9 @@ namespace VUI
 			Visible = false;
 
 			label_ = new Label();
+			label_.WrapMode = VUI.Label.Wrap;
+			label_.Alignment = VUI.Label.AlignLeft | VUI.Label.AlignTop;
+
 			Add(label_, BorderLayout.Center);
 
 			Tooltip.Text = "";
@@ -54,10 +85,15 @@ namespace VUI
 			base.Destroy();
 		}
 
-		public string Text
+		public Size Set(Tooltip tt)
 		{
-			get { return label_.Text; }
-			set { label_.Text = value; }
+			label_.Text = tt.GetText();
+			label_.FontSize = tt.FontSize;
+			label_.Polish();
+
+			return Root.FitText(
+				null, label_.FontSize, label_.Text, new Size(
+					Style.Metrics.MaxTooltipWidth, Widget.DontCare));
 		}
 	}
 
@@ -86,7 +122,7 @@ namespace VUI
 			if (active_ == w)
 				return;
 
-			if (w.Tooltip.Text != "")
+			if (w.Tooltip.HasValue)
 			{
 				Hide();
 				active_ = w;
@@ -114,11 +150,9 @@ namespace VUI
 				return;
 
 			active_ = w;
-			widget_.Text = w.Tooltip.Text;
 
 			// size of text
-			var size = Root.FitText(null, -1, widget_.Text, new Size(
-				Style.Metrics.MaxTooltipWidth, Widget.DontCare));
+			var size = widget_.Set(w.Tooltip);
 
 			// widget is size of text plus its insets
 			size += widget_.Insets.Size;
@@ -144,7 +178,7 @@ namespace VUI
 				p.Y = mp.Y - size.Height;
 			}
 
-			widget_.Bounds = new Rectangle(p.X, p.Y, size);
+			widget_.SetBounds(new Rectangle(p.X, p.Y, size));
 			widget_.Visible = true;
 			widget_.BringToTop();
 			widget_.DoLayout();

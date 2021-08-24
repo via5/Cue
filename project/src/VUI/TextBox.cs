@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -292,12 +293,18 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return new Size(Root.TextLength(Font, FontSize, text_) + 20, 40);
+			return new Size(
+				Root.TextLength(Font, FontSize, text_) + 20, 40);
 		}
 
 		protected override Size DoGetMinimumSize()
 		{
 			return new Size(100, DontCare);
+		}
+
+		protected override void DoSetRender(bool b)
+		{
+			WidgetObject.gameObject.SetActive(b);
 		}
 
 		private void OnMouseDown(PointerEventData data)

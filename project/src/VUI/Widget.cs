@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -6,137 +7,6 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	class BorderGraphics : MaskableGraphic
-	{
-		private Insets borders_ = new Insets();
-		private Color color_ = new Color(0, 0, 0, 0);
-
-		public BorderGraphics()
-		{
-			raycastTarget = false;
-		}
-
-		public Insets Borders
-		{
-			get
-			{
-				return borders_;
-			}
-
-			set
-			{
-				borders_ = value;
-				SetVerticesDirty();
-			}
-		}
-
-		public Color Color
-		{
-			get
-			{
-				return color_;
-			}
-
-			set
-			{
-				color_ = value;
-				SetVerticesDirty();
-			}
-		}
-
-		protected override void OnPopulateMesh(VertexHelper vh)
-		{
-			vh.Clear();
-
-			var rt = rectTransform;
-
-			// left
-			Line(vh,
-				new Point(rt.rect.xMin, -rt.rect.yMin),
-				new Point(rt.rect.xMin + borders_.Left, -rt.rect.yMax),
-				color_);
-
-			// top
-			Line(vh,
-				new Point(rt.rect.xMin, -rt.rect.yMin),
-				new Point(rt.rect.xMax, -rt.rect.yMin - borders_.Top),
-				color_);
-
-			// right
-			Line(vh,
-				new Point(rt.rect.xMax - borders_.Right, -rt.rect.yMin),
-				new Point(rt.rect.xMax, -rt.rect.yMax),
-				color_);
-
-			// bottom
-			Line(vh,
-				new Point(rt.rect.xMin, -rt.rect.yMax + borders_.Bottom),
-				new Point(rt.rect.xMax, -rt.rect.yMax),
-				color_);
-		}
-
-		private void Line(VertexHelper vh, Point a, Point b, Color c)
-		{
-			Color32 c32 = c;
-			var i = vh.currentVertCount;
-
-			vh.AddVert(new Vector3(a.X, a.Y), c32, new Vector2(0f, 0f));
-			vh.AddVert(new Vector3(a.X, b.Y), c32, new Vector2(0f, 1f));
-			vh.AddVert(new Vector3(b.X, b.Y), c32, new Vector2(1f, 1f));
-			vh.AddVert(new Vector3(b.X, a.Y), c32, new Vector2(1f, 0f));
-
-			vh.AddTriangle(i+0, i+1, i+2);
-			vh.AddTriangle(i+2, i+3, i+0);
-		}
-	}
-
-
-	class MouseCallbacks : MonoBehaviour,
-		IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
-	{
-		private Widget widget_ = null;
-
-		public Widget Widget
-		{
-			get { return widget_; }
-			set { widget_ = value; }
-		}
-
-		public void OnPointerEnter(PointerEventData d)
-		{
-			Utilities.Handler(() =>
-			{
-				if (widget_ != null)
-					widget_.OnPointerEnter(d);
-			});
-		}
-
-		public void OnPointerExit(PointerEventData d)
-		{
-			Utilities.Handler(() =>
-			{
-				if (widget_ != null)
-					widget_.OnPointerExit(d);
-			});
-		}
-
-		public void OnPointerDown(PointerEventData d)
-		{
-			Utilities.Handler(() =>
-			{
-				if (widget_ != null)
-					widget_.OnPointerDown(d);
-			});
-		}
-	}
-
-
-	interface IWidget
-	{
-		void Remove();
-	}
-
-
 	abstract class Widget : IDisposable, IWidget
 	{
 		public virtual string TypeName { get { return "Widget"; } }
@@ -153,12 +23,14 @@ namespace VUI
 		private Rectangle bounds_ = new Rectangle();
 		private Size minSize_ = new Size(DontCare, DontCare);
 		private Size maxSize_ = new Size(DontCare, DontCare);
+		private bool fixedBounds_ = false;
 
 		private GameObject mainObject_ = null;
 		private GameObject widgetObject_ = null;
 		private GameObject graphicsObject_ = null;
-		private BorderGraphics borderGraphics_ = null;
+		private WidgetBorderGraphics borderGraphics_ = null;
 
+		private bool render_ = true;
 		private bool visible_ = true;
 		private bool enabled_ = true;
 		private Insets margins_ = new Insets();
@@ -170,6 +42,7 @@ namespace VUI
 		private int fontSize_ = -1;
 		private Color textColor_ = Style.Theme.TextColor;
 		private readonly Tooltip tooltip_;
+		private Events events_ = new Events();
 
 		private bool dirty_ = true;
 
@@ -301,6 +174,28 @@ namespace VUI
 			get { return widgetObject_; }
 		}
 
+		public Events Events
+		{
+			get { return events_; }
+		}
+
+		public bool Render
+		{
+			get
+			{
+				return render_;
+			}
+
+			set
+			{
+				if (render_ != value)
+				{
+					render_ = value;
+					SetRender(render_);
+				}
+			}
+		}
+
 		public bool Visible
 		{
 			get
@@ -313,20 +208,24 @@ namespace VUI
 				if (visible_ != value)
 				{
 					visible_ = value;
+					UpdateActiveState();
+				}
+			}
+		}
 
-					if (mainObject_ != null)
-						mainObject_.SetActive(visible_);
+		private void UpdateActiveState()
+		{
+			if (mainObject_ != null)
+				mainObject_.SetActive(render_ && visible_);
 
-					if (visible_)
-					{
-						var dirtyChild = AnyDirtyChild();
-						if (dirtyChild != null)
-						{
-							NeedsLayout(
-								"visibility changed, dirty child:\n" +
-								dirtyChild.DebugLine);
-						}
-					}
+			if (render_ && visible_)
+			{
+				var dirtyChild = AnyDirtyChild();
+				if (dirtyChild != null)
+				{
+					NeedsLayout(
+						"visibility changed, dirty child:\n" +
+						dirtyChild.DebugLine);
 				}
 			}
 		}
@@ -352,7 +251,7 @@ namespace VUI
 		public bool IsVisibleOnScreen()
 		{
 			if (mainObject_ == null)
-				return visible_;
+				return render_ && visible_;
 			else
 				return mainObject_.activeInHierarchy;
 		}
@@ -497,7 +396,19 @@ namespace VUI
 		public Rectangle Bounds
 		{
 			get { return new Rectangle(bounds_); }
-			set { bounds_ = value; }
+		}
+
+		public bool FixedBounds()
+		{
+			if (fixedBounds_)
+				return true;
+
+			return parent_?.FixedBounds() ?? false;
+		}
+
+		public bool StrictlyFixedBounds
+		{
+			get { return fixedBounds_; }
 		}
 
 		public Rectangle AbsoluteClientBounds
@@ -541,6 +452,12 @@ namespace VUI
 			}
 		}
 
+		public void SetBounds(Rectangle r, bool isFixed = false)
+		{
+			bounds_ = r;
+			fixedBounds_ = isFixed;
+		}
+
 		public List<Widget> Children
 		{
 			get { return new List<Widget>(children_); }
@@ -568,6 +485,12 @@ namespace VUI
 				s.Height = Math.Min(s.Height, maxSize_.Height);
 
 			s += Margins.Size + Borders.Size + Padding.Size;
+
+			if (maxWidth != DontCare)
+				s.Width = Math.Min(maxWidth, s.Width);
+
+			if (maxHeight != DontCare)
+				s.Height = Math.Min(maxHeight, s.Height);
 
 			return s;
 		}
@@ -654,6 +577,7 @@ namespace VUI
 				list.Add("rb=" + RelativeBounds.ToString());
 				list.Add("ps=" + GetRealPreferredSize(DontCare, DontCare).ToString());
 				list.Add("ly=" + (Layout?.TypeName ?? "none"));
+				list.Add("r=" + render_.ToString());
 				list.Add("v=" + visible_.ToString());
 				list.Add("d=" + dirty_.ToString());
 
@@ -728,7 +652,7 @@ namespace VUI
 
 			foreach (var w in children_)
 			{
-				if (w.Visible)
+				if (w.IsVisibleOnScreen())
 					w.DoLayout();
 			}
 
@@ -743,7 +667,6 @@ namespace VUI
 				mainObject_.AddComponent<RectTransform>();
 				mainObject_.AddComponent<LayoutElement>();
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
-				mainObject_.SetActive(visible_);
 
 				if (parent_?.MainObject == null)
 					mainObject_.transform.SetParent(GetRoot().WidgetParentTransform, false);
@@ -760,17 +683,39 @@ namespace VUI
 				graphicsObject_ = new GameObject("WidgetBorders");
 				graphicsObject_.transform.SetParent(mainObject_.transform, false);
 
-				borderGraphics_ = graphicsObject_.AddComponent<BorderGraphics>();
+				borderGraphics_ = graphicsObject_.AddComponent<WidgetBorderGraphics>();
 				borderGraphics_.Borders = borders_;
 				borderGraphics_.Color = borderColor_;
 
+				UpdateActiveState();
 				SetBackground();
 			}
 
 			foreach (var w in children_)
 				w.Create();
 
+			SetRender(render_);
 			Created?.Invoke();
+		}
+
+		private void SetRender(bool b)
+		{
+			if (widgetObject_ != null)
+			{
+				if (!borders_.Empty)
+					borderGraphics_?.gameObject?.SetActive(b);
+
+				DoSetRender(b);
+
+				foreach (var c in children_)
+					c.SetRender(b);
+			}
+		}
+
+		protected virtual void DoSetRender(bool b)
+		{
+			foreach (var cr in widgetObject_.GetComponentsInChildren<CanvasRenderer>())
+				cr.cull = !b;
 		}
 
 		private void SetMainObjectBounds()
@@ -816,7 +761,7 @@ namespace VUI
 			foreach (var w in children_)
 				w.UpdateBounds();
 
-			mainObject_.SetActive(visible_);
+			UpdateActiveState();
 		}
 
 		public void NeedsLayout(string why)
@@ -824,7 +769,7 @@ namespace VUI
 			if (parent_ != null && parent_.Layout is AbsoluteLayout)
 				return;
 
-			if (Visible)
+			if (IsVisibleOnScreen())
 				NeedsLayoutImpl(TypeName + ": " + why);
 			else
 				SetDirty(true, TypeName + ": " + why);
@@ -911,171 +856,68 @@ namespace VUI
 			return new Size(DontCare, DontCare);
 		}
 
-		public virtual void OnPointerEnter(PointerEventData d)
+
+		public void OnPointerEnterInternal(PointerEventData d)
 		{
-			GetRoot()?.Tooltips.WidgetEntered(this);
+			GetRoot()?.WidgetEntered(this);
+			events_.FirePointerEnter(this, d);
 		}
 
-		public virtual void OnPointerExit(PointerEventData d)
+		public void OnPointerExitInternal(PointerEventData d)
 		{
-			GetRoot()?.Tooltips.WidgetExited(this);
+			GetRoot()?.WidgetExited(this);
+			events_.FirePointerExit(this, d);
 		}
 
-		public virtual void OnPointerDown(PointerEventData d)
+		public void OnPointerDownInternal(PointerEventData d)
 		{
-			GetRoot()?.Tooltips.Hide();
-		}
-	}
-
-
-	class Panel : Widget
-	{
-		public override string TypeName { get { return "Panel"; } }
-
-		private GameObject bgObject_ = null;
-		private Color bgColor_ = new Color(0, 0, 0, 0);
-
-		public Panel(string name = "")
-			: base(name)
-		{
+			GetRoot()?.PointerDown(this);
+			bool? bubble = events_.FirePointerDown(this, d);
+			if (bubble ?? false && parent_ != null)
+				parent_.OnPointerDownInternal(d);
 		}
 
-		public Panel(Layout ly)
+		public void OnPointerUpInternal(PointerEventData d)
 		{
-			Layout = ly;
+			bool? bubble = events_.FirePointerUp(this, d);
+			if (bubble ?? false && parent_ != null)
+				parent_.OnPointerUpInternal(d);
 		}
 
-		public Color BackgroundColor
+		public void OnPointerClickInternal(PointerEventData d)
 		{
-			get
-			{
-				return bgColor_;
-			}
-
-			set
-			{
-				bgColor_ = value;
-				SetBackgroundColor();
-			}
+			bool? bubble = events_.FirePointerClick(this, d);
+			if (bubble ?? false && parent_ != null)
+				parent_.OnPointerClickInternal(d);
 		}
 
-		protected override void DoCreate()
+		public void OnPointerMoveInternal()
 		{
-			base.DoCreate();
-			SetBackground();
+			bool? bubble = events_.FirePointerMove(this, null);
+			if (bubble ?? true && parent_ != null)
+				parent_.OnPointerMoveInternal();
 		}
 
-		public override void UpdateBounds()
+		public void OnBeginDragInternal(PointerEventData d)
 		{
-			base.UpdateBounds();
-			SetBackgroundBounds();
+			events_.FireDragStart(this, d);
 		}
 
-		protected override void Destroy()
+		public void OnDragInternal(PointerEventData d)
 		{
-			if (bgObject_ != null)
-				bgObject_ = null;
-
-			base.Destroy();
+			events_.FireDrag(this, d);
 		}
 
-		private void SetBackground()
+		public void OnEndDragInternal(PointerEventData d)
 		{
-			SetBackgroundBounds();
-			SetBackgroundColor();
+			events_.FireDragEnd(this, d);
 		}
 
-		private void SetBackgroundBounds()
+		public void OnWheelInternal(PointerEventData d)
 		{
-			if (bgObject_ == null)
-				return;
-
-			bgObject_.transform.SetAsFirstSibling();
-
-			var image = bgObject_.GetComponent<Image>();
-			image.color = bgColor_;
-			image.raycastTarget = false;
-
-			var r = new Rectangle(0, 0, Bounds.Size);
-			r.Deflate(Margins);
-
-			Utilities.SetRectTransform(bgObject_, r);
-		}
-
-		private void SetBackgroundColor()
-		{
-			if (MainObject == null)
-				return;
-
-			if (bgObject_ == null && bgColor_.a > 0)
-			{
-				bgObject_ = new GameObject("WidgetBackground");
-				bgObject_.transform.SetParent(MainObject.transform, false);
-				bgObject_.AddComponent<Image>();
-			}
-		}
-	}
-
-
-	class Spacer : Panel
-	{
-		public override string TypeName { get { return "Spacer"; } }
-
-		private int size_;
-
-		public Spacer(int size = 0)
-		{
-			size_ = size;
-		}
-
-		protected override Size DoGetPreferredSize(float maxWidth, float maxHeight)
-		{
-			return new Size(size_, size_);
-		}
-
-		protected override Size DoGetMinimumSize()
-		{
-			return new Size(size_, size_);
-		}
-	}
-
-
-	class HorizontalStretch : Panel
-	{
-		public override string TypeName { get { return "HorizontalStretch"; } }
-
-		public HorizontalStretch()
-		{
-		}
-
-		protected override Size DoGetPreferredSize(float maxWidth, float maxHeight)
-		{
-			return new Size(maxWidth, DontCare);
-		}
-
-		protected override Size DoGetMinimumSize()
-		{
-			return new Size(0, 0);
-		}
-	}
-
-
-	class VerticalStretch : Panel
-	{
-		public override string TypeName { get { return "VerticalStretch"; } }
-
-		public VerticalStretch()
-		{
-		}
-
-		protected override Size DoGetPreferredSize(float maxWidth, float maxHeight)
-		{
-			return new Size(DontCare, maxHeight);
-		}
-
-		protected override Size DoGetMinimumSize()
-		{
-			return new Size(0, 0);
+			bool? bubble = events_.FireWheel(this, d);
+			if (bubble ?? true && parent_ != null)
+				parent_.OnWheelInternal(d);
 		}
 	}
 }

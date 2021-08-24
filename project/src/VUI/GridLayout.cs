@@ -123,7 +123,7 @@ namespace VUI
 
 		private float hspacing_ = 0;
 		private float vspacing_ = 0;
-		private bool uniformWidth_ = true;
+		private bool uniformWidth_ = false;
 		private bool uniformHeight_ = true;
 		private int nextCol_ = 0;
 		private int nextRow_ = 0;
@@ -373,7 +373,9 @@ namespace VUI
 						if (!w.Visible)
 							continue;
 
-						w.Bounds = wr;
+						// a widget's size can never change again when uniform,
+						// unless the grid itself changes size
+						w.SetBounds(wr, uniformWidth_ && uniformHeight_);
 					}
 
 					x += uniformWidth + extraWidth[colIndex];
@@ -437,7 +439,16 @@ namespace VUI
 					}
 
 					d.sizes.Set(colIndex, rowIndex, cellPs);
-					d.widths[colIndex] = Math.Max(d.widths[colIndex], cellPs.Width);
+
+					if (uniformWidth_)
+					{
+						var avWidth = maxWidth - (HorizontalSpacing * (widgets_.ColumnCount - 1));
+						d.widths[colIndex] = avWidth / widgets_.ColumnCount;
+					}
+					else
+					{
+						d.widths[colIndex] = Math.Max(d.widths[colIndex], cellPs.Width);
+					}
 
 					if (colIndex > 0)
 						width += HorizontalSpacing;

@@ -14,12 +14,19 @@ namespace VUI
 		public const int AlignVCenter = 0x10;
 		public const int AlignBottom = 0x20;
 
+		public const int Wrap = 0;
+		public const int Overflow = 1;
+		public const int Clip = 2;
+		public const int ClipEllipsis = 3;
+
 		private string text_;
 		private int align_;
 		private Text textObject_ = null;
-		private bool wrap_ = true;
+		private Text ellipsis_ = null;
+		private int wrap_ = Overflow;
+		private bool autoTooltip_ = false;
 
-		public Label(string t = "", int align = AlignLeft|AlignVCenter)
+		public Label(string t = "", int align = AlignLeft | AlignVCenter)
 		{
 			text_ = t;
 			align_ = align;
@@ -44,16 +51,51 @@ namespace VUI
 				{
 					text_ = value;
 
-					if (IsVisibleOnScreen())
-					{
-						if (Root.TextLength(Font, FontSize, text_) > Bounds.Width)
-							NeedsLayout($"text changed");
-					}
+					if (NeedsLayoutForTextChanged())
+						NeedsLayout($"text changed");
 
 					if (textObject_ != null)
+					{
 						textObject_.text = value;
+						UpdateClip();
+					}
 				}
 			}
+		}
+
+		private bool NeedsLayoutForTextChanged()
+		{
+			// optimization to avoid a relayout every time the text changes; a
+			// relayout occurs when:
+			//
+			//  1) the label is visible,
+			//  2) the bounds of the label are not fixed (like in a grid layout
+			//     with uniform sizes),
+			//  3) the text is too long
+			//
+			// for 3), another optimization is for the ellipsis clip: if the
+			// ellipsis is already present, the text is already too long, so
+			// don't bother checking it and assume the label can't grow anymore
+
+			// not visible
+			if (!IsVisibleOnScreen())
+				return false;
+
+			// can't grow anymore
+			if (FixedBounds())
+				return false;
+
+			// text already too long
+			if (wrap_ == ClipEllipsis && EllipsisVisible())
+				return false;
+
+			// check if text is longer than current bounds
+			return TextTooLong();
+		}
+
+		private bool EllipsisVisible()
+		{
+			return (ellipsis_?.gameObject?.activeInHierarchy ?? false);
 		}
 
 		public int Alignment
@@ -70,7 +112,7 @@ namespace VUI
 			}
 		}
 
-		public bool Wrap
+		public int WrapMode
 		{
 			get
 			{
@@ -84,6 +126,19 @@ namespace VUI
 			}
 		}
 
+		public bool AutoTooltip
+		{
+			get
+			{
+				return autoTooltip_;
+			}
+
+			set
+			{
+				autoTooltip_ = value;
+				UpdateClip();
+			}
+		}
 
 		protected override void DoCreate()
 		{
@@ -91,12 +146,21 @@ namespace VUI
 
 			textObject_ = WidgetObject.AddComponent<Text>();
 			textObject_.text = text_;
-			textObject_.horizontalOverflow =
-				(wrap_ ? HorizontalWrapMode.Wrap : HorizontalWrapMode.Overflow);
+			textObject_.horizontalOverflow = GetHorizontalOverflow();
 			textObject_.maskable = true;
-			textObject_.raycastTarget = false;
+
+			// needed for tooltips
+			textObject_.raycastTarget = true;
 
 			Style.Setup(this);
+		}
+
+		private HorizontalWrapMode GetHorizontalOverflow()
+		{
+			if (wrap_ == Wrap)
+				return HorizontalWrapMode.Wrap;
+			else
+				return HorizontalWrapMode.Overflow;
 		}
 
 		protected override void DoPolish()
@@ -109,18 +173,132 @@ namespace VUI
 		{
 			base.UpdateBounds();
 			textObject_.alignment = ToTextAnchor(align_);
+			UpdateClip();
+		}
+
+		private Rect MakeClipRect()
+		{
+			var root = GetRoot();
+			if (root == null)
+				return Rect.zero;
+
+			var ar = AbsoluteClientBounds;
+
+			return new Rect(
+				ar.Left - root.Bounds.Width / 2 - 2,
+				root.Bounds.Height - ar.Top + ar.Height - 1,
+				ar.Width, ar.Height + 3);
+		}
+
+		private void UpdateClip()
+		{
+			if (textObject_ == null)
+				return;
+
+			switch (wrap_)
+			{
+				case Wrap:
+				case Overflow:
+				{
+					textObject_.SetClipRect(Rect.zero, false);
+					break;
+				}
+
+				case Clip:
+				{
+					textObject_.SetClipRect(MakeClipRect(), true);
+					break;
+				}
+
+				case ClipEllipsis:
+				{
+					if (TextTooLong())
+					{
+						var ellipsisSize = Root.TextSize(Font, FontSize, "...");
+
+						var cr = MakeClipRect();
+						cr.width -= (ellipsisSize.Width + 5);
+
+						textObject_.SetClipRect(cr, true);
+
+						if (ellipsis_ == null)
+							CreateEllipsis();
+
+						var r = Rectangle.FromSize(
+							RelativeBounds.Width - ellipsisSize.Width,
+							RelativeBounds.Top,
+							ellipsisSize.Width, ellipsisSize.Height);
+
+						ellipsis_.gameObject.SetActive(true);
+
+						Utilities.SetRectTransform(ellipsis_, r);
+
+						if (autoTooltip_)
+							Tooltip.Text = text_;
+					}
+					else
+					{
+						if (autoTooltip_)
+							Tooltip.Text = "";
+
+						if (ellipsis_ != null)
+							ellipsis_.gameObject.SetActive(false);
+
+						textObject_.SetClipRect(Rect.zero, false);
+					}
+
+					break;
+				}
+			}
+		}
+
+		private void CreateEllipsis()
+		{
+			var go = new GameObject("ellipsis");
+			go.AddComponent<RectTransform>();
+			go.AddComponent<LayoutElement>();
+			ellipsis_ = go.AddComponent<Text>();
+			go.SetActive(true);
+			go.transform.SetParent(MainObject.transform, false);
+			ellipsis_.text = "...";
+			ellipsis_.raycastTarget = false;
+
+			Polish();
 		}
 
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return Root.FitText(
-				Font, FontSize, text_, new Size(maxWidth, maxHeight));
+			if (wrap_ == Wrap)
+			{
+				return Root.FitText(
+					Font, FontSize, text_, new Size(maxWidth, maxHeight));
+			}
+			else
+			{
+				return Root.FitText(
+					Font, FontSize, text_, new Size(DontCare, maxHeight));
+			}
 		}
 
 		protected override Size DoGetMinimumSize()
 		{
 			return Root.TextSize(Font, FontSize, text_) + new Size(0, 5);
+		}
+
+		protected override void DoSetRender(bool b)
+		{
+			base.DoSetRender(b);
+
+			if (ellipsis_ != null)
+				ellipsis_.GetComponent<CanvasRenderer>().cull = !b;
+		}
+
+		private bool TextTooLong()
+		{
+			// todo: wrap mode
+			var tl = Root.TextLength(Font, FontSize, text_);
+			return (tl > Bounds.Width);
 		}
 
 		public static TextAnchor ToTextAnchor(int a)
