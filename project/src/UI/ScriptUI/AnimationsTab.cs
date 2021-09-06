@@ -8,7 +8,7 @@ namespace Cue
 		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
 		private VUI.CheckBox loop_ = new VUI.CheckBox("Loop");
 		private VUI.CheckBox paused_ = new VUI.CheckBox("Paused");
-		private VUI.TextSlider seek_ = new VUI.TextSlider();
+		private VUI.FloatTextSlider seek_ = new VUI.FloatTextSlider();
 		private IgnoreFlag ignore_ = new IgnoreFlag();
 		private Animation sel_ = null;
 
@@ -44,7 +44,7 @@ namespace Cue
 			Add(anims_, VUI.BorderLayout.Center);
 
 			var items = new List<Animation>();
-			foreach (var a in Resources.Animations.GetAll(Animation.NoType, person_.Sex))
+			foreach (var a in Resources.Animations.GetAll(Animation.NoType, person_.MovementStyle))
 				items.Add(a);
 
 			anims_.SetItems(items);

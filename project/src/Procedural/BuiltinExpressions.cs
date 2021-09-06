@@ -33,7 +33,7 @@
 		{
 			var g = new ConcurrentProceduralMorphGroup("eyesRollback");
 
-			if (p.Sex == Sexes.Female)
+			if (p.MovementStyle == MovementStyles.Feminine)
 				g.Add(new ClampableMorph(p, BodyParts.Eyes, "Eye Roll Back_DD", 0, 0.4f, 1, 5, 2, 2));
 
 			return g;

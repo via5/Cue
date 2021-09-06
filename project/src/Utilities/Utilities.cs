@@ -32,24 +32,24 @@ namespace Cue
 	}
 
 
-	static class Sexes
+	static class MovementStyles
 	{
 		public const int Any = 0;
-		public const int Male = 1;
-		public const int Female = 2;
+		public const int Masculine = 1;
+		public const int Feminine = 2;
 
 		public static int FromString(string os)
 		{
 			var s = os.ToLower();
 
-			if (s == "male")
-				return Male;
-			else if (s == "female")
-				return Female;
+			if (s == "masculine" || s == "male")
+				return Masculine;
+			else if (s == "feminine" || s == "female")
+				return Feminine;
 			else if (s == "")
 				return Any;
 
-			Cue.LogError("bad sex value '" + os + "'");
+			Cue.LogError("bad style value '" + os + "'");
 			return Any;
 		}
 
@@ -57,11 +57,11 @@ namespace Cue
 		{
 			switch (i)
 			{
-				case Male:
-					return "male";
+				case Masculine:
+					return "masculine";
 
-				case Female:
-					return "female";
+				case Feminine:
+					return "feminine";
 
 				default:
 					return "any";

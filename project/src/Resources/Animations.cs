@@ -118,11 +118,13 @@ namespace Cue
 				}
 			}
 
-			int sex = Sexes.Any;
+			int ms = MovementStyles.Any;
 			if (o.HasKey("sex"))
-				sex = Sexes.FromString(o["sex"]);
+				ms = MovementStyles.FromString(o["sex"]);
+			else if (o.HasKey("style"))
+				ms = MovementStyles.FromString(o["style"]);
 
-			return new Animation(type, from, to, state, sex, a);
+			return new Animation(type, from, to, state, ms, a);
 		}
 
 		private IAnimation CreateIntegrationAnimation(JSONClass o)
@@ -167,13 +169,13 @@ namespace Cue
 			}
 		}
 
-		public Animation GetAny(int type, int sex)
+		public Animation GetAny(int type, int style)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
 				if (anims_[i].Type == type)
 				{
-					if (Sexes.Match(anims_[i].Sex, sex))
+					if (MovementStyles.Match(anims_[i].MovementStyle, style))
 						return anims_[i];
 				}
 			}
@@ -181,7 +183,7 @@ namespace Cue
 			return null;
 		}
 
-		public List<Animation> GetAll(int type, int sex)
+		public List<Animation> GetAll(int type, int style)
 		{
 			if (type == Animation.NoType)
 				return anims_;
@@ -192,7 +194,7 @@ namespace Cue
 			{
 				if (anims_[i].Type == type)
 				{
-					if (Sexes.Match(anims_[i].Sex, sex))
+					if (MovementStyles.Match(anims_[i].MovementStyle, style))
 						list.Add(anims_[i]);
 				}
 			}
@@ -200,7 +202,7 @@ namespace Cue
 			return list;
 		}
 
-		public List<Animation> GetAllIdles(int state, int sex)
+		public List<Animation> GetAllIdles(int state, int style)
 		{
 			var list = new List<Animation>();
 
@@ -210,7 +212,7 @@ namespace Cue
 				{
 					if (anims_[i].State == state)
 					{
-						if (Sexes.Match(anims_[i].Sex, sex))
+						if (MovementStyles.Match(anims_[i].MovementStyle, style))
 							list.Add(anims_[i]);
 					}
 				}
@@ -219,7 +221,7 @@ namespace Cue
 			return list;
 		}
 
-		public Animation GetAnyTransition(int from, int to, int sex)
+		public Animation GetAnyTransition(int from, int to, int style)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
@@ -227,8 +229,8 @@ namespace Cue
 				{
 					if (anims_[i].TransitionFrom == from &&
 						anims_[i].TransitionTo == to)
-					{
-						if (Sexes.Match(anims_[i].Sex, sex))
+{
+						if (MovementStyles.Match(anims_[i].MovementStyle, style))
 							return anims_[i];
 					}
 				}
@@ -237,7 +239,7 @@ namespace Cue
 			return null;
 		}
 
-		public Animation GetAnySex(int state, int sex)
+		public Animation GetAnySex(int state, int style)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
@@ -245,7 +247,7 @@ namespace Cue
 				{
 					if (anims_[i].State == state || anims_[i].State == PersonState.None)
 					{
-						if (Sexes.Match(anims_[i].Sex, sex))
+						if (MovementStyles.Match(anims_[i].MovementStyle, style))
 							return anims_[i];
 					}
 				}

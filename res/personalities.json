@@ -279,7 +279,7 @@
 
 					{
 						"type": "mischievous",
-						"maximum": 0
+						"maximum": 0.3
 					}
 				]
 			}

@@ -186,12 +186,12 @@ namespace Cue.Sys.Vam
 
 			add(BodyParts.Eyes, new EyesBodyPart(atom_));
 
-			if (atom_.Sex == Sexes.Male)
+			if (atom_.IsMale)
 				add(BodyParts.Genitals, GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
 			else
 				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", "", genitalsIgnore));
 
-			if (atom_.Sex == Sexes.Male)
+			if (atom_.IsMale)
 				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
 			else
 				add(BodyParts.Pectorals, null);
@@ -367,7 +367,7 @@ namespace Cue.Sys.Vam
 
 		private string MakeName(string nameFemale, string nameMale)
 		{
-			if (atom_.Sex == Sexes.Female)
+			if (!atom_.IsMale)
 				return nameFemale;
 
 			if (nameMale == "")

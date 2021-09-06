@@ -753,7 +753,7 @@ namespace Cue
 	{
 		public const float StartDistance = 0.15f;
 		public const float StopDistance = 0.1f;
-		public const float PlayerStopDistance = 0.2f;
+		public const float PlayerStopDistance = 0.15f;
 		public const float MinimumActiveTime = 3;
 		public const float MinimumStoppedTime = 2;
 

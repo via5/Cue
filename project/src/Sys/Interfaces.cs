@@ -233,7 +233,7 @@ namespace Cue.Sys
 		string ID { get; }
 		bool Visible { get; set; }
 		bool IsPerson { get; }
-		int Sex { get; }
+		bool IsMale { get; }
 		bool HasPenis { get; }
 		bool Teleporting { get; }
 		bool Possessed { get; }

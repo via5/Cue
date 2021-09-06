@@ -32,7 +32,7 @@ namespace Cue.Proc
 			return new Animation(
 				Animation.TransitionType,
 				from, PersonState.Standing,
-				PersonState.None, Sexes.Any, a);
+				PersonState.None, MovementStyles.Any, a);
 		}
 
 		private static Animation Sex()
@@ -42,7 +42,7 @@ namespace Cue.Proc
 			return new Animation(
 				Animation.SexType,
 				PersonState.None, PersonState.None,
-				PersonState.None, Sexes.Any, a);
+				PersonState.None, MovementStyles.Any, a);
 		}
 	}
 

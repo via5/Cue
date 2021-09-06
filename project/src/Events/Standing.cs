@@ -84,7 +84,7 @@ namespace Cue
 
 						cc.Push(new RandomAnimationAction(person_,
 							Resources.Animations.GetAllIdles(
-								PersonState.Standing, person_.Sex)));
+								PersonState.Standing, person_.MovementStyle)));
 
 						person_.PushAction(cc);
 						state_ = Idling;

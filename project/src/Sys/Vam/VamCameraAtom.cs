@@ -156,9 +156,9 @@ namespace Cue.Sys.Vam
 			get { return true; }
 		}
 
-		public int Sex
+		public bool IsMale
 		{
-			get { return Sexes.Male; }
+			get { return true; }
 		}
 
 		public bool HasPenis

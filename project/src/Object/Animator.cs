@@ -17,16 +17,16 @@ namespace Cue
 		private readonly int from_ = PersonState.None;
 		private readonly int to_ = PersonState.None;
 		private readonly int state_ = PersonState.None;
-		private readonly int sex_ = Sexes.Any;
+		private readonly int style_ = MovementStyles.Any;
 		private readonly IAnimation anim_ = null;
 
-		public Animation(int type, int from, int to, int state, int sex, IAnimation anim)
+		public Animation(int type, int from, int to, int state, int ms, IAnimation anim)
 		{
 			type_ = type;
 			from_ = from;
 			to_ = to;
 			state_ = state;
-			sex_ = sex;
+			style_ = ms;
 			anim_ = anim;
 		}
 
@@ -34,7 +34,7 @@ namespace Cue
 		public int TransitionFrom { get { return from_; } }
 		public int TransitionTo { get { return to_; } }
 		public int State { get { return state_; } }
-		public int Sex { get { return sex_; } }
+		public int MovementStyle { get { return style_; } }
 
 		public bool HasMovement { get { return anim_.HasMovement; } }
 
@@ -69,7 +69,7 @@ namespace Cue
 				}
 			}
 
-			s += "sex=" + Sexes.ToString(sex_) + " " + anim_.ToString();
+			s += "ms=" + MovementStyles.ToString(style_) + " " + anim_.ToString();
 
 			return s;
 		}
@@ -159,7 +159,7 @@ namespace Cue
 		public bool PlayTransition(int from, int to, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnyTransition(
-				from, to, person_.Sex);
+				from, to, person_.MovementStyle);
 
 			if (a == null)
 			{
@@ -176,7 +176,7 @@ namespace Cue
 
 		public bool PlaySex(int state, int flags = 0)
 		{
-			var a = Resources.Animations.GetAnySex(state, person_.Sex);
+			var a = Resources.Animations.GetAnySex(state, person_.MovementStyle);
 
 			if (a == null)
 			{
@@ -192,7 +192,7 @@ namespace Cue
 
 		public bool PlayType(int type, int flags = 0)
 		{
-			var a = Resources.Animations.GetAny(type, person_.Sex);
+			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
 			{
 				log_.Error($"no animation for type {Animation.TypeToString(type)}");

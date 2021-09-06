@@ -69,26 +69,23 @@ namespace Cue.Sys.Vam
 			get { return atom_.type == "Person"; }
 		}
 
-		public int Sex
+		public bool IsMale
 		{
 			get
 			{
 				if (char_ == null)
 				{
 					log_.Error($"VamAtom.Sex: atom {ID} is not a person");
-					return Sexes.Male;
+					return true;
 				}
 
-				if (char_.isMale)
-					return Sexes.Male;
-				else
-					return Sexes.Female;
+				return char_.isMale;
 			}
 		}
 
 		public bool HasPenis
 		{
-			get { return Sex == Sexes.Male; }
+			get { return IsMale; }
 		}
 
 		public bool Selected

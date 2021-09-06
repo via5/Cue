@@ -304,9 +304,9 @@ namespace Cue.Sys.Mock
 			get { return true; }
 		}
 
-		public int Sex
+		public bool IsMale
 		{
-			get { return Sexes.Any; }
+			get { return true; }
 		}
 
 		public bool HasPenis

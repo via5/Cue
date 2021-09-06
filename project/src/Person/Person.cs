@@ -160,9 +160,15 @@ namespace Cue
 		public IBlowjob Blowjob { get { return blowjob_; } }
 		public IExpression Expression { get { return expression_; } }
 
-		public int Sex
+		public int MovementStyle
 		{
-			get { return Atom.Sex; }
+			get
+			{
+				if (Atom.IsMale)
+					return MovementStyles.Masculine;
+				else
+					return MovementStyles.Feminine;
+			}
 		}
 
 		public override Vector3 EyeInterest
