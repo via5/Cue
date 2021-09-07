@@ -47,13 +47,15 @@ namespace Cue
 		public const int RightFoot = 28;
 
 		public const int Eyes = 29;
+
 		public const int Genitals = 30;
 
 		// male
 		public const int Pectorals = 31;
+		public const int Penis = 32;
 
 
-		public const int Count = 32;
+		public const int Count = 33;
 
 
 		private static int[] breasts_ = new int[] { LeftBreast, RightBreast };
@@ -72,12 +74,12 @@ namespace Cue
 		}
 
 		private static int[] personalSpace_ = new[]{
-			LeftHand, RightHand, Head, Chest, Hips, Genitals, Labia,
+			LeftHand, RightHand, Head, Chest, Hips, Labia, Penis,
 			LeftFoot, RightFoot};
 		public static int[] PersonalSpaceParts { get { return personalSpace_; } }
 
 		private static int[] groped_ = new[] {
-			Head, LeftBreast, RightBreast, Genitals };
+			Head, LeftBreast, RightBreast, Labia, Penis };
 		public static int[] GropedParts { get { return groped_; } }
 
 		private static int[] gropedBy_ = new[] {
@@ -89,7 +91,7 @@ namespace Cue
 		public static int[] PenetratedParts { get { return penetrated_; } }
 
 		private static int[] penetratedBy_ = new[]{
-			Genitals };
+			Labia };
 		public static int[] PenetratedByParts { get { return penetratedBy_; } }
 
 
@@ -112,7 +114,7 @@ namespace Cue
 			"leftthigh", "leftshin", "leftfoot",
 			"rightthigh", "rightshin", "rightfoot",
 
-			"eyes", "genitals", "pectorals"
+			"eyes", "genitals", "pectorals", "penis"
 		};
 
 		public static int FromString(string s)
@@ -627,7 +629,10 @@ namespace Cue
 
 		public bool HasPenis
 		{
-			get { return person_.Atom.HasPenis; }
+			get
+			{
+				return Get(BodyParts.Penis).Exists;
+			}
 		}
 
 		public bool InsidePersonalSpace(Person other)

@@ -161,13 +161,12 @@
 		public const int NoState = 0;
 		public const int PlayState = 1;
 
-		private Person receiver_;
+		private Person receiver_ = null;
 		private int state_ = NoState;
 
-		public SexEvent(Person p, Person receiver, int forceState=NoState)
+		public SexEvent(Person p, int forceState=NoState)
 			: base(p, "Sex")
 		{
-			receiver_ = receiver;
 			state_ = forceState;
 		}
 
@@ -188,6 +187,21 @@
 			{
 				case NoState:
 				{
+					if (!person_.Body.HasPenis)
+					{
+						person_.Log.Error($"cannot start sex, not penis");
+						return false;
+					}
+
+					receiver_ = FindReceiver();
+					if (receiver_ == null)
+					{
+						person_.Log.Error($"cannot start sex, not valid receiver");
+						return false;
+					}
+
+					log_.Info($"starting sex, receiver={receiver_.ID}");
+
 					person_.Clothing.GenitalsVisible = true;
 					receiver_.Clothing.GenitalsVisible = true;
 					person_.Animator.Stop();
@@ -199,13 +213,35 @@
 				case PlayState:
 				{
 					if (!person_.Animator.Playing && person_.Mood.State == Mood.NormalState)
-						person_.Animator.PlaySex(person_.State.Current);
+						person_.Animator.PlaySex(person_.State.Current, receiver_);
 
 					break;
 				}
 			}
 
 			return true;
+		}
+
+		private Person FindReceiver()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_)
+					continue;
+
+				var a = person_.Body.Get(BodyParts.Penis);
+				var b = p.Body.Get(BodyParts.Labia);
+
+				if ((a?.Exists ?? false) && (b?.Exists ?? false))
+				{
+					var d = Vector3.Distance(a.Position, b.Position);
+
+					if (d < 0.15f)
+						return p;
+				}
+			}
+
+			return null;
 		}
 	}
 }

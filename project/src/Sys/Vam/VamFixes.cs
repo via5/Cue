@@ -7,6 +7,60 @@ namespace Cue.Sys.Vam
 {
 	class VamFixes
 	{
+		public static void Run()
+		{
+			FixDildos();
+		}
+
+		private static void FixDildos()
+		{
+			foreach (var a in SuperController.singleton.GetAtoms())
+			{
+				if (a.type == "Dildo")
+					FixDildo(a);
+			}
+		}
+
+		private static void FixDildo(Atom a)
+		{
+			// looks like the CollisionTriggerEventHandler on the main object
+			// never receives the OnCollision* callbacks, but there's a bunch
+			// of colliders in subobjects
+			//
+			// this adds a CollisionTriggerEventHandler to every rigidbody and
+			// changes the various references to point to the main handler
+
+			var ct = a.GetComponentInChildren<CollisionTrigger>();
+
+			// there's no CollisionTriggerEventHandler without this
+			ct.triggerEnabled = true;
+
+			var h = a.GetComponentInChildren<CollisionTriggerEventHandler>();
+			var d1 = a.transform
+				.Find("reParentObject")
+				.Find("object")
+				.Find("rescaleObject")
+				.Find("quick_test_subdiv1_correct")
+				.Find("dildo1");
+
+			foreach (var rb in d1.GetComponentsInChildren<Rigidbody>())
+			{
+				var old = rb.gameObject.GetComponent<CollisionTriggerEventHandler>();
+				if (old == null)
+				{
+					var cc = rb.gameObject.AddComponent<CollisionTriggerEventHandler>();
+
+					// forward to main handler
+					cc.collisionTrigger = h.collisionTrigger;
+					cc.collidingWithDictionary = h.collidingWithDictionary;
+					cc.collidingWithButFailedVelocityTestDictionary = h.collidingWithButFailedVelocityTestDictionary;
+					cc.collidingWith = h.collidingWith;
+				}
+			}
+
+			h.Reset();
+		}
+
 		public static void Run(Atom a)
 		{
 			DisableFreezeWhenGrabbed(a);

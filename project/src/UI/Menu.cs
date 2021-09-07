@@ -273,13 +273,13 @@
 		private void OnSex()
 		{
 			var p = Selected as Person;
-			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
+			if (p != null)
 			{
 				var s = p.AI.ForcedEvent as SexEvent;
 
 				if (s == null)
 				{
-					p.AI.RunEvent(new SexEvent(p, Cue.Instance.Player));
+					p.AI.RunEvent(new SexEvent(p));
 				}
 				else
 				{

@@ -47,7 +47,7 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, grab, position, direction;
+			public VUI.Label name, triggering, grab, source, position, direction;
 		}
 
 		private readonly Person person_;
@@ -60,13 +60,14 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(Positions ? 5 : 3);
+			var gl = new VUI.GridLayout(Positions ? 6 : 4);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
 
 			if (Positions)
 			{
@@ -94,6 +95,10 @@ namespace Cue
 				w.grab = new VUI.Label();
 				w.grab.FontSize = fontSize;
 				p.Add(w.grab);
+
+				w.source = new VUI.Label(bp.Sys?.ToString() ?? "");
+				w.source.FontSize = fontSize;
+				p.Add(w.source);
 
 				if (Positions)
 				{
@@ -162,7 +167,6 @@ namespace Cue
 					{
 						w.grab.Text = "";
 					}
-
 
 					if (Positions)
 					{

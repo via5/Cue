@@ -169,7 +169,27 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"collider {c_.name}";
+			var ignore = new string[]
+			{
+				"AutoColliderFemaleAutoColliders",
+				"AutoColliderMaleAutoColliders"
+			};
+
+			string s = "";
+
+			foreach (var i in ignore)
+			{
+				if (c_.name.StartsWith(i))
+				{
+					s = c_.name.Substring(i.Length);
+					break;
+				}
+			}
+
+			if (s == "")
+				s = c_.name;
+
+			return "collider " + s;
 		}
 	}
 
@@ -182,6 +202,7 @@ namespace Cue.Sys.Vam
 		private Trigger trigger_;
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_;
+		private Transform t_;
 		private Transform ignoreStop_ = null;
 		private Transform[] ignoreTransforms_ = new Transform[0];
 		private TriggerInfo[] triggers_ = null;
@@ -189,13 +210,14 @@ namespace Cue.Sys.Vam
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, string[] ignoreTransforms)
+			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
 				: base(a, type)
 		{
 			h_ = h;
 			trigger_ = h.collisionTrigger.trigger;
 			rb_ = h.thisRigidbody;
 			fc_ = fc;
+			t_ = tr;
 
 			if (ignoreTransforms != null)
 			{
@@ -232,7 +254,7 @@ namespace Cue.Sys.Vam
 
 		public override Transform Transform
 		{
-			get { return rb_.transform; }
+			get { return t_; }
 		}
 
 		public override Rigidbody Rigidbody
@@ -305,6 +327,9 @@ namespace Cue.Sys.Vam
 					}
 					else if (!found[p.PersonIndex, bp])
 					{
+						if (!ValidCollision(p, bp))
+							continue;
+
 						//Cue.LogInfo($"{kv.Key}");
 
 						found[p.PersonIndex, bp] = true;
@@ -317,6 +342,32 @@ namespace Cue.Sys.Vam
 				triggers_ = null;
 			else
 				triggers_ = list.ToArray();
+		}
+
+		private bool ValidCollision(Person p, int bp)
+		{
+			// self collision
+			if (p.VamAtom == atom_)
+			{
+				if (bp == BodyParts.Penis)
+				{
+					// probably the dildo touching genitals, ignore
+					return false;
+				}
+				else
+				{
+					if (Type == BodyParts.Penis)
+					{
+						if (bp == BodyParts.Hips)
+						{
+							// probably the dildo touching genitals, ignore
+							return false;
+						}
+					}
+				}
+			}
+
+			return true;
 		}
 
 		private Person PersonForCollider(Collider c)
@@ -339,6 +390,12 @@ namespace Cue.Sys.Vam
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p.VamAtom?.Atom == a)
+					return p;
+
+				// todo, handles dildos separately because the trigger is not
+				// part of the person itself, it's a different atom
+				var pn = p.Body.Get(BodyParts.Penis).VamSys as TriggerBodyPart;
+				if (pn != null && pn.Transform == a.transform)
 					return p;
 			}
 
@@ -386,7 +443,20 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"trigger {trigger_.displayName}";
+			string s = "";
+
+			if (fc_?.containingAtom != null && atom_?.Atom != fc_.containingAtom)
+				s += fc_.containingAtom.uid;
+
+			if (trigger_ != null && trigger_.displayName != "")
+			{
+				if (s != "")
+					s += ".";
+
+				s += trigger_.displayName;
+			}
+
+			return $"trigger {s}";
 		}
 
 		private bool ValidTrigger(Collider c)

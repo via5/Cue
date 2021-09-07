@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cue.Sys.Vam
+﻿namespace Cue.Sys.Vam
 {
 	class VamAtom : IAtom
 	{
@@ -81,11 +79,6 @@ namespace Cue.Sys.Vam
 
 				return char_.isMale;
 			}
-		}
-
-		public bool HasPenis
-		{
-			get { return IsMale; }
 		}
 
 		public bool Selected

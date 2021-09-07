@@ -128,6 +128,12 @@ namespace Cue.Proc
 			return a;
 		}
 
+		protected override void CopyFrom(ProcAnimation o)
+		{
+			base.CopyFrom(o);
+			receiver_ = (o as SexProcAnimation).receiver_;
+		}
+
 		public override void Start(Person p)
 		{
 			base.Start(p);
@@ -155,9 +161,9 @@ namespace Cue.Proc
 
 		private void UpdateForce(Force f)
 		{
-			var hips = person_.Body.Get(BodyParts.Hips);
-			var genBase = person_.Body.Get(BodyParts.Genitals);
-			var d = (genBase.Position - hips.Position).Normalized;
+			var thisGens = person_.Body.Get(BodyParts.Genitals);
+			var targetGens = receiver_.Body.Get(BodyParts.Genitals);
+			var d = (targetGens.Position - thisGens.Position).Normalized;
 
 			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);
 		}

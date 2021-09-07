@@ -263,7 +263,7 @@ namespace Cue
 			{
 				for (int i = 0; i < ts.Length; i++)
 				{
-					if (ts[i].sourcePartIndex == BodyParts.Genitals)
+					if (ts[i].sourcePartIndex == BodyParts.Penis)
 					{
 						return
 							parts_[BodyParts.Labia].value *

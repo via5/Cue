@@ -244,7 +244,7 @@ namespace Cue
 								ps.Get(PSE.BlowjobEyesWeight), "bj");
 
 							targets_.SetWeight(
-								t, BodyParts.Genitals,
+								t, BodyParts.Penis,
 								ps.Get(PSE.BlowjobGenitalsWeight), "bj");
 
 							ret |= Continue | NoGazer | Busy | NoRandom;
@@ -300,7 +300,7 @@ namespace Cue
 								ps.Get(PSE.HandjobEyesWeight), "hj");
 
 							targets_.SetWeight(
-								t, BodyParts.Genitals,
+								t, BodyParts.Penis,
 								ps.Get(PSE.HandjobGenitalsWeight), "hj");
 
 							ret |= Continue | Busy | NoRandom;

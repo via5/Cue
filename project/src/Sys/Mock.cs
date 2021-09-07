@@ -309,11 +309,6 @@ namespace Cue.Sys.Mock
 			get { return true; }
 		}
 
-		public bool HasPenis
-		{
-			get { return false; }
-		}
-
 		public bool Selected
 		{
 			get { return false; }

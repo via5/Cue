@@ -46,6 +46,8 @@ namespace Cue.Sys.Vam
 
 			root_ = new GameObject("CueRoot");
 			root_.transform.SetParent(vamroot, false);
+
+			VamFixes.Run();
 		}
 
 		static public VamSys Instance
@@ -795,7 +797,7 @@ namespace Cue.Sys.Vam
 
 		public void DumpComponentsAndUp(GameObject o)
 		{
-			Cue.LogInfo(o.name);
+			Cue.LogInfo($"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
 
 			var rt = o.GetComponent<RectTransform>();
 			if (rt != null)
@@ -824,7 +826,7 @@ namespace Cue.Sys.Vam
 		public void DumpComponentsAndDown(
 			GameObject o, bool dumpRt = false, int indent = 0)
 		{
-			Cue.LogInfo(new string(' ', indent * 2) + o.name);
+			Cue.LogInfo(new string(' ', indent * 2) + $"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
 
 			if (dumpRt)
 			{

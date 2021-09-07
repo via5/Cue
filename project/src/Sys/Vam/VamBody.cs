@@ -117,12 +117,42 @@ namespace Cue.Sys.Vam
 					}
 				}
 
-				t = t.parent;
 				if (t.GetComponent<Atom>() != null)
 					break;
+
+				t = t.parent;
 			}
 
 			return -1;
+		}
+
+		private TriggerBodyPart CreateDildoTrigger()
+		{
+			var d = SuperController.singleton.GetAtomByUid($"Dildo#{atom_.ID}");
+			if (d == null)
+				return null;
+
+			var ct = d.GetComponentInChildren<CollisionTrigger>();
+			if (ct == null)
+			{
+				Cue.LogError($"{d.uid} has no collision trigger");
+				return null;
+			}
+
+			var oldTriggerEnabled = ct.triggerEnabled;
+			ct.triggerEnabled = true;
+
+			var h = d.GetComponentInChildren<CollisionTriggerEventHandler>();
+			if (h == null)
+			{
+				Cue.LogError($"{d.uid} has no collision trigger handler");
+				ct.triggerEnabled = oldTriggerEnabled;
+				return null;
+			}
+
+			return new TriggerBodyPart(
+				atom_, BodyParts.Penis, h, d.mainController,
+				d.transform, null);
 		}
 
 		private IBodyPart[] CreateBodyParts()
@@ -187,14 +217,28 @@ namespace Cue.Sys.Vam
 			add(BodyParts.Eyes, new EyesBodyPart(atom_));
 
 			if (atom_.IsMale)
+			{
 				add(BodyParts.Genitals, GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
-			else
-				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", "", genitalsIgnore));
-
-			if (atom_.IsMale)
 				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
+				add(BodyParts.Penis, GetRigidbody(BodyParts.Penis, "penisBaseControl", "", "Gen1"));
+			}
 			else
+			{
+				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", "", genitalsIgnore));
 				add(BodyParts.Pectorals, null);
+
+				var dildo = CreateDildoTrigger();
+
+				if (dildo == null)
+				{
+					add(BodyParts.Penis, null);
+				}
+				else
+				{
+					Cue.LogInfo($"{atom_.ID} uses dildo {dildo.Transform.name}");
+					add(BodyParts.Penis, dildo);
+				}
+			}
 
 
 			var list = new List<IBodyPart>();
@@ -435,7 +479,8 @@ namespace Cue.Sys.Vam
 					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.ID}");
 			}
 
-			return new TriggerBodyPart(atom_, id, t, fc, ignoreTransforms);
+			return new TriggerBodyPart(
+				atom_, id, t, fc, t.thisRigidbody.transform, ignoreTransforms);
 		}
 
 		private IBodyPart GetCollider(int id, string controller, string nameFemale, string nameMale = "same")

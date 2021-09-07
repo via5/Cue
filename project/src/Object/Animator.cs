@@ -174,9 +174,10 @@ namespace Cue
 			return Play(a, flags);
 		}
 
-		public bool PlaySex(int state, int flags = 0)
+		public bool PlaySex(int state, Person receiver, int flags = 0)
 		{
-			var a = Resources.Animations.GetAnySex(state, person_.MovementStyle);
+			var a = Resources.Animations.GetAnySex(
+				state, person_.MovementStyle);
 
 			if (a == null)
 			{
@@ -186,6 +187,10 @@ namespace Cue
 
 				return false;
 			}
+
+			var pa = a.Real as Proc.ProcAnimation;
+			if (pa != null)
+				pa.Receiver = receiver;
 
 			return Play(a, flags);
 		}

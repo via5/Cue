@@ -574,7 +574,7 @@ namespace Cue
 				if (p == person_ || !p.Body.HasPenis)
 					continue;
 
-				var g = p.Body.Get(BodyParts.Genitals);
+				var g = p.Body.Get(BodyParts.Penis);
 				var d = Vector3.Distance(hand.Position, g.Position);
 
 				Cue.LogInfo($"{person_.ID} {p.ID} {hand.Name} {d}");
@@ -775,7 +775,7 @@ namespace Cue
 				if (p == person_ || !p.Body.HasPenis)
 					continue;
 
-				var g = p.Body.Get(BodyParts.Genitals);
+				var g = p.Body.Get(BodyParts.Penis);
 				var d = Vector3.Distance(head.Position, g.Position);
 
 				Cue.LogInfo($"{person_.ID} {p.ID} {d}");
