@@ -219,6 +219,9 @@ namespace Cue.Sys.Vam
 			fc_ = fc;
 			t_ = tr;
 
+			if (rb_ == null)
+				Cue.LogError($"{a.ID}: trigger {h.name}: no rb");
+
 			if (ignoreTransforms != null)
 			{
 				var rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, "hip");

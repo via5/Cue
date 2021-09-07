@@ -161,8 +161,8 @@ namespace Cue.Proc
 
 		private void UpdateForce(Force f)
 		{
-			var thisGens = person_.Body.Get(BodyParts.Genitals);
-			var targetGens = receiver_.Body.Get(BodyParts.Genitals);
+			var thisGens = person_.Body.Get(person_.Body.GenitalsBodyPart);
+			var targetGens = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 			var d = (targetGens.Position - thisGens.Position).Normalized;
 
 			f.Movement.SetRange(d * hipForceMin_, d * hipForceMax_);

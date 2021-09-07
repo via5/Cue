@@ -253,6 +253,14 @@ namespace Cue
 					pg.Get(PE.VaginaFactor);
 			}
 
+			if (parts_[BodyParts.Penis].value > 0)
+			{
+				// todo
+				return
+					parts_[BodyParts.Penis].value *
+					pg.Get(PE.VaginaFactor);
+			}
+
 			// if penetration is shallow, the vagina trigger doesn't activate
 			// at all, it seems rather deep
 			//

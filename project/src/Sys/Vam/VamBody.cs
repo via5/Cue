@@ -126,7 +126,7 @@ namespace Cue.Sys.Vam
 			return -1;
 		}
 
-		private TriggerBodyPart CreateDildoTrigger()
+		private TriggerBodyPart CreateDildoTrigger(int bodyPart)
 		{
 			var d = SuperController.singleton.GetAtomByUid($"Dildo#{atom_.ID}");
 			if (d == null)
@@ -151,7 +151,7 @@ namespace Cue.Sys.Vam
 			}
 
 			return new TriggerBodyPart(
-				atom_, BodyParts.Penis, h, d.mainController,
+				atom_, bodyPart, h, d.mainController,
 				d.transform, null);
 		}
 
@@ -218,24 +218,22 @@ namespace Cue.Sys.Vam
 
 			if (atom_.IsMale)
 			{
-				add(BodyParts.Genitals, GetRigidbody(BodyParts.Genitals, "penisBaseControl", "", "Gen1"));
 				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
 				add(BodyParts.Penis, GetRigidbody(BodyParts.Penis, "penisBaseControl", "", "Gen1"));
 			}
 			else
 			{
-				add(BodyParts.Genitals, GetTrigger(BodyParts.Genitals, "", "LabiaTrigger", "", genitalsIgnore));
-				add(BodyParts.Pectorals, null);
-
-				var dildo = CreateDildoTrigger();
+				var dildo = CreateDildoTrigger(BodyParts.Penis);
 
 				if (dildo == null)
 				{
+					add(BodyParts.Pectorals, null);
 					add(BodyParts.Penis, null);
 				}
 				else
 				{
 					Cue.LogInfo($"{atom_.ID} uses dildo {dildo.Transform.name}");
+					add(BodyParts.Pectorals, null);
 					add(BodyParts.Penis, dildo);
 				}
 			}

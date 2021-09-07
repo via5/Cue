@@ -43,6 +43,9 @@ namespace Cue.Sys.Vam
 				.Find("quick_test_subdiv1_correct")
 				.Find("dildo1");
 
+			// rb isn't set
+			h.thisRigidbody = h.gameObject.GetComponent<Rigidbody>();
+
 			foreach (var rb in d1.GetComponentsInChildren<Rigidbody>())
 			{
 				var old = rb.gameObject.GetComponent<CollisionTriggerEventHandler>();

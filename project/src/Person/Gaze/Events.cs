@@ -476,7 +476,7 @@ namespace Cue
 					if (genitals.set)
 					{
 						targets_.SetWeightIfZero(
-							person_, BodyParts.Genitals,
+							person_, person_.Body.GenitalsBodyPart,
 							genitals.weight, genitals.why);
 					}
 				}
@@ -602,7 +602,7 @@ namespace Cue
 					if (targetGenitals.set)
 					{
 						targets_.SetWeightIfZero(
-							target, BodyParts.Genitals,
+							target, target.Body.GenitalsBodyPart,
 							targetGenitals.weight, targetGenitals.why);
 					}
 
@@ -624,7 +624,7 @@ namespace Cue
 					if (sourceGenitals.set)
 					{
 						targets_.SetWeightIfZero(
-							source, BodyParts.Genitals,
+							source, source.Body.GenitalsBodyPart,
 							sourceGenitals.weight, sourceGenitals.why);
 					}
 				}

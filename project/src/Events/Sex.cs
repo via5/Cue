@@ -187,16 +187,10 @@
 			{
 				case NoState:
 				{
-					if (!person_.Body.HasPenis)
-					{
-						person_.Log.Error($"cannot start sex, not penis");
-						return false;
-					}
-
 					receiver_ = FindReceiver();
 					if (receiver_ == null)
 					{
-						person_.Log.Error($"cannot start sex, not valid receiver");
+						person_.Log.Error($"cannot start sex, no valid receiver");
 						return false;
 					}
 
@@ -229,16 +223,8 @@
 				if (p == person_)
 					continue;
 
-				var a = person_.Body.Get(BodyParts.Penis);
-				var b = p.Body.Get(BodyParts.Labia);
-
-				if ((a?.Exists ?? false) && (b?.Exists ?? false))
-				{
-					var d = Vector3.Distance(a.Position, b.Position);
-
-					if (d < 0.15f)
-						return p;
-				}
+				if (person_.Body.PenetratedBy(p) || p.Body.PenetratedBy(person_))
+					return p;
 			}
 
 			return null;

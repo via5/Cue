@@ -48,14 +48,12 @@ namespace Cue
 
 		public const int Eyes = 29;
 
-		public const int Genitals = 30;
-
 		// male
-		public const int Pectorals = 31;
-		public const int Penis = 32;
+		public const int Pectorals = 30;
+		public const int Penis = 31;
 
 
-		public const int Count = 33;
+		public const int Count = 32;
 
 
 		private static int[] breasts_ = new int[] { LeftBreast, RightBreast };
@@ -91,7 +89,7 @@ namespace Cue
 		public static int[] PenetratedParts { get { return penetrated_; } }
 
 		private static int[] penetratedBy_ = new[]{
-			Labia };
+			Penis };
 		public static int[] PenetratedByParts { get { return penetratedBy_; } }
 
 
@@ -632,6 +630,17 @@ namespace Cue
 			get
 			{
 				return Get(BodyParts.Penis).Exists;
+			}
+		}
+
+		public int GenitalsBodyPart
+		{
+			get
+			{
+				if (HasPenis)
+					return BodyParts.Penis;
+				else
+					return BodyParts.Labia;
 			}
 		}
 
