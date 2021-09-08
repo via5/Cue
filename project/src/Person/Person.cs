@@ -33,7 +33,6 @@ namespace Cue
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
-		private Hair hair_;
 		private Gaze gaze_;
 		private Physiology physiology_;
 		private Mood mood_;
@@ -62,7 +61,6 @@ namespace Cue
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
-			hair_ = new Hair(this);
 			gaze_ = new Gaze(this);
 			physiology_ = Resources.Physiologies.Clone("standard", this);
 			mood_ = new Mood(this);
@@ -144,7 +142,6 @@ namespace Cue
 		public PersonState State { get { return state_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
-		public Hair Hair { get { return hair_; } }
 		public Gaze Gaze { get { return gaze_; } }
 		public Physiology Physiology { get { return physiology_; } }
 		public Mood Mood { get { return mood_; } }

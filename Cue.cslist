@@ -3,7 +3,6 @@ project\src\Main.cs
 project\src\Actions\Action.cs
 project\src\AI\AI.cs
 project\src\AI\Interactions.cs
-project\src\AI\Personality.cs
 project\src\Enums\EnumValues.cs
 project\src\Enums\PersonalityEnum.cs
 project\src\Enums\PhysiologyEnum.cs
@@ -26,12 +25,15 @@ project\src\Integration\Vam.cs
 project\src\Object\Animator.cs
 project\src\Object\Object.cs
 project\src\Object\Slots.cs
-project\src\Person\Body.cs
 project\src\Person\Excitement.cs
 project\src\Person\Mood.cs
 project\src\Person\Person.cs
+project\src\Person\Personality.cs
 project\src\Person\Physiology.cs
 project\src\Person\State.cs
+project\src\Person\Body\Body.cs
+project\src\Person\Body\BodyPart.cs
+project\src\Person\Body\BodyParts.cs
 project\src\Person\Gaze\Events.cs
 project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs
