@@ -51,6 +51,9 @@ namespace Cue
 
 		public int CheckEmergency()
 		{
+			if (person_.Body.Get(BodyParts.Head).Busy)
+				return Continue;
+
 			return DoCheckEmergency();
 		}
 

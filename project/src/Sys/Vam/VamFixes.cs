@@ -16,7 +16,7 @@ namespace Cue.Sys.Vam
 		{
 			foreach (var a in SuperController.singleton.GetAtoms())
 			{
-				if (a.type == "Dildo")
+				if (a.on && a.type == "Dildo")
 					FixDildo(a);
 			}
 		}

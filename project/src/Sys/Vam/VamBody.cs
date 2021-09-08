@@ -129,7 +129,7 @@ namespace Cue.Sys.Vam
 		private TriggerBodyPart CreateDildoTrigger(int bodyPart)
 		{
 			var d = SuperController.singleton.GetAtomByUid($"Dildo#{atom_.ID}");
-			if (d == null)
+			if (d == null || !d.on)
 				return null;
 
 			var ct = d.GetComponentInChildren<CollisionTrigger>();

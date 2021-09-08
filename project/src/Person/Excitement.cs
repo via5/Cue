@@ -232,10 +232,11 @@ namespace Cue
 
 
 			reasons_[OtherSex].Value = 0;
+			reasons_[OtherSex].SpecificSensitivityModifier = 1;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_)
+				if (p == person_ || p.Body.HavingSexWith(person_))
 					continue;
 
 				reasons_[OtherSex].Value += p.Excitement.physicalRate_;

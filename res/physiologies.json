@@ -38,8 +38,8 @@
 			"penetrationRate": 0.01,
 			"penetrationMax": 1.0,
 			"vaginaFactor": 0.3,
-			"deepVaginaFactor": 1.0,
-			"deeperVaginaFactor": 1.0,
+			"deepVaginaFactor": 0.1,
+			"deeperVaginaFactor": 0.1,
 
 			"excitementDecayRate": -0.01,
 			"excitementPostOrgasm": 0.3,

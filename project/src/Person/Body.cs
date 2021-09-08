@@ -723,6 +723,11 @@ namespace Cue
 				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
 		}
 
+		public bool HavingSexWith(Person p)
+		{
+			return PenetratedBy(p) || p.Body.PenetratedBy(person_);
+		}
+
 		private bool CheckParts(Person by, int[] triggerParts, int[] checkParts)
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
