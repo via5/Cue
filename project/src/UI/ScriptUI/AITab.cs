@@ -302,6 +302,7 @@ namespace Cue
 		private VUI.Label gazerType_ = new VUI.Label();
 		private VUI.Label gazerEnabled_ = new VUI.Label();
 		private VUI.Label gazerDuration_ = new VUI.Label();
+		private VUI.Label gazerVariance_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
 		private VUI.Label targetEmergency_ = new VUI.Label();
 		private VUI.Label avoid_ = new VUI.Label();
@@ -347,6 +348,9 @@ namespace Cue
 
 			p.Add(new VUI.Label("Duration"));
 			p.Add(gazerDuration_);
+
+			p.Add(new VUI.Label("Variance"));
+			p.Add(gazerVariance_);
 
 
 			p.Add(new VUI.Spacer(20));
@@ -394,6 +398,7 @@ namespace Cue
 			gazerType_.Text = $"{g.Gazer.Name}";
 			gazerEnabled_.Text = $"{g.Gazer.Enabled}";
 			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
+			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}s";
 
 			if (g.Picker.HasTarget)
 			{

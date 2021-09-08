@@ -325,8 +325,8 @@
 		private void UpdateVariance()
 		{
 			maxAngleHor_.SetValueInRange(variance_);
-			rollAngleMin_.Value = -25 * variance_;
-			rollAngleMax_.Value = 25 * variance_;
+			rollAngleMin_.Value = -15 * variance_;
+			rollAngleMax_.Value = 15 * variance_;
 			headRotationSpring_.SetValueInRangeAboveDefault(1 - variance_);
 		}
 

@@ -4,16 +4,25 @@
 	{
 		private bool visible_ = false;
 		private VUI.Root root_ = null;
-		private VUI.Label label_ = null;
+		private VUI.Label name_ = null;
+
 		private VUI.Panel selButtons_ = null;
-		private VUI.Panel playerButtons_ = null;
+		private VUI.CheckBox hj_ = null;
+		private VUI.CheckBox bj_ = null;
+		private VUI.CheckBox thrust_ = null;
 		private VUI.CheckBox canKiss_ = null;
+
+		private VUI.Panel playerButtons_ = null;
+		private VUI.CheckBox movePlayer_ = null;
+
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
+		private VUI.Label fps_ = null;
+
 		private bool force_ = false;
 		private IObject sel_ = null;
 		private IObject hov_ = null;
-		private VUI.Label fps_ = null;
+		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
 
 		public void Create(bool vr, bool left)
 		{
@@ -30,67 +39,63 @@
 				root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 220));
 			}
 
-			canKiss_ = new VUI.CheckBox("Can kiss");
-			forceExcitement_ = new VUI.CheckBox("Ex");
-			excitement_ = new VUI.FloatTextSlider();
-			fps_ = new VUI.Label();
+
 
 			var p = new VUI.Panel(new VUI.VerticalFlow());
 
-			label_ = new VUI.Label();
-			p.Add(label_);
-
-			selButtons_ = new VUI.Panel(new VUI.VerticalFlow());
-			selButtons_.Visible = false;
-			p.Add(selButtons_);
-
-			playerButtons_ = new VUI.Panel(new VUI.VerticalFlow());
-			p.Add(playerButtons_);
-
-			if (!Cue.Instance.Sys.IsVR)
+			// top row
 			{
-				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
-				tools.Add(new VUI.ToolButton("Reload", OnReload));
-				tools.Add(new VUI.CheckBox("Navmesh", (b) => Cue.Instance.Sys.Nav.Render = b));
-				tools.Add(new VUI.ToolButton("Reload anims", OnReloadAnimations));
-				p.Add(tools);
+				name_ = p.Add(new VUI.Label());
 			}
 
-			var row = new VUI.Panel(new VUI.HorizontalFlow(5));
-			row.Add(new VUI.ToolButton("Call", OnCall));
-			row.Add(new VUI.ToolButton("Straddle", OnStraddle));
-			row.Add(new VUI.ToolButton("Handjob", OnHandjob));
-			row.Add(new VUI.ToolButton("Blowjob", OnBlowjob));
-			row.Add(new VUI.ToolButton("Stand", OnStand));
-			row.Add(new VUI.ToolButton("Sex", OnSex));
-			row.Add(canKiss_);
-			selButtons_.Add(row);
+			// sel row
+			{
+				selButtons_ = new VUI.Panel(new VUI.VerticalFlow());
+				selButtons_.Visible = false;
+				p.Add(selButtons_);
 
-			row = new VUI.Panel(new VUI.HorizontalFlow(5));
-			row.Add(new VUI.ToolButton("Stop kiss", OnStopKiss));
-			row.Add(new VUI.ToolButton("Make idle", OnMakeIdle));
-			row.Add(new VUI.ToolButton("Crouch", OnCrouch));
-			row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
-			row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
-			row.Add(new VUI.ToolButton("test", OnTest));
-			selButtons_.Add(row);
+				var row = new VUI.Panel(new VUI.HorizontalFlow(5));
+				hj_ = row.Add(new VUI.CheckBox("Handjob", OnHandjob));
+				bj_ = row.Add(new VUI.CheckBox("Blowjob", OnBlowjob));
+				thrust_ = row.Add(new VUI.CheckBox("Thrust", OnThrust));
+				canKiss_ = row.Add(new VUI.CheckBox("Can kiss", OnCanKiss));
+				selButtons_.Add(row);
 
+				row = new VUI.Panel(new VUI.HorizontalFlow(5));
+				row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
+				row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
+				selButtons_.Add(row);
+			}
 
-			row = new VUI.Panel(new VUI.HorizontalFlow(5));
-			row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
-			row.Add(forceExcitement_);
-			row.Add(excitement_);
-			row.Add(fps_);
-			playerButtons_.Add(row);
+			// player row
+			{
+				playerButtons_ = new VUI.Panel(new VUI.VerticalFlow());
+				playerButtons_.Visible = false;
+				p.Add(playerButtons_);
+
+				var row = new VUI.Panel(new VUI.HorizontalFlow(5));
+				movePlayer_ = row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
+				playerButtons_.Add(row);
+			}
+
+			// debug row
+			{
+				if (!Cue.Instance.Sys.IsVR)
+				{
+					var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
+					tools.Add(new VUI.ToolButton("Reload", OnReload));
+					forceExcitement_ = tools.Add(new VUI.CheckBox("Ex", OnForceExcitement));
+					excitement_ = tools.Add(new VUI.FloatTextSlider(OnExcitement));
+					tools.Add(new VUI.ToolButton("test", OnTest));
+					fps_ = tools.Add(new VUI.Label());
+					p.Add(tools);
+				}
+			}
 
 
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			root_.Visible = visible_;
-
-			canKiss_.Changed += OnCanKiss;
-			forceExcitement_.Changed += (b) => OnForceExcitement(b);
-			excitement_.ValueChanged += (f) => OnExcitement(f);
 		}
 
 		public bool Visible
@@ -147,7 +152,7 @@
 
 		public void Update()
 		{
-			if (label_ != null)
+			if (name_ != null)
 			{
 				string s = "";
 
@@ -157,11 +162,22 @@
 				if (hov_ != null)
 					s += " (" + hov_.ID + ")";
 
-				label_.Text = s;
+				name_.Text = s;
 			}
 
 			if (fps_ != null)
 				fps_.Text = Cue.Instance.Sys.Fps;
+
+			if (playerButtons_ != null)
+			{
+				var p = Cue.Instance.Player;
+
+				// todo, player is the pseudo camera atom if not possessed,
+				// find a better way
+				bool playerPerson = (p != null && p.Atom is Sys.Vam.VamAtom);
+
+				playerButtons_.Visible = playerPerson;
+			}
 
 			root_?.Update();
 		}
@@ -178,10 +194,20 @@
 		{
 			var p = o as Person;
 
-			selButtons_.Visible = (p != null);
+			ignore_.Do(() =>
+			{
+				selButtons_.Visible = (p != null);
 
-			if (p != null)
-				canKiss_.Checked = p.Options.CanKiss;
+				if (p != null)
+				{
+					hj_.Checked = p.Handjob.Active;
+					bj_.Checked = p.Blowjob.Active;
+					thrust_.Checked = p.AI.Event is SexEvent;
+					canKiss_.Checked = p.Options.CanKiss;
+					forceExcitement_.Checked = p.Mood.ExcitementValue.IsForced;
+					excitement_.Value = p.Mood.ExcitementValue.Value;
+				}
+			});
 		}
 
 		private void OnHovered(IObject p)
@@ -193,91 +219,44 @@
 			Cue.Instance.ReloadPlugin();
 		}
 
-		private void OnReloadAnimations()
+		private void OnHandjob(bool b)
 		{
-			Resources.Animations.Load();
+			if (ignore_) return;
 
-			foreach (var p in Cue.Instance.ActivePersons)
-				p.Animator.Stop();
-		}
-
-		private void OnCall()
-		{
-			var p = Selected as Person;
-			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-				p.AI.RunEvent(new CallEvent(p, Cue.Instance.Player));
-		}
-
-		private void OnStraddle()
-		{
-			var p = Selected as Person;
-			if (p != null && Cue.Instance.Player != null && p != Cue.Instance.Player)
-			{
-				if (!Cue.Instance.Player.State.Is(PersonState.Sitting))
-				{
-					Cue.LogError("can't straddle, player not sitting");
-					return;
-				}
-
-				p.MakeIdle();
-				p.AI.RunEvent(new CallEvent(
-					p, Cue.Instance.Player,
-					() => { p.SetState(PersonState.SittingStraddling); }));
-			}
-		}
-
-		private void OnCrouch()
-		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				p.MakeIdle();
-				p.SetState(PersonState.Crouching);
-			}
-		}
-
-		private void OnHandjob()
-		{
 			var p = Selected as Person;
 			if (p != null && p != Cue.Instance.Player)
 			{
-				if (p.Handjob.Active)
-					p.Handjob.Stop();
-				else
+				if (b)
 					p.Handjob.Start();
+				else
+					p.Handjob.Stop();
 			}
 		}
 
-		private void OnBlowjob()
+		private void OnBlowjob(bool b)
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null && p != Cue.Instance.Player)
 			{
-				if (p.Blowjob.Active)
-					p.Blowjob.Stop();
-				else
+				if (b)
 					p.Blowjob.Start();
+				else
+					p.Blowjob.Stop();
 			}
 		}
 
-		private void OnStand()
+		private void OnThrust(bool b)
 		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				p.MakeIdle();
-				p.SetState(PersonState.Standing);
-			}
-		}
+			if (ignore_) return;
 
-		private void OnSex()
-		{
 			var p = Selected as Person;
 			if (p != null)
 			{
 				var s = p.AI.ForcedEvent as SexEvent;
 
-				if (s == null)
+				if (b)
 				{
 					p.AI.RunEvent(new SexEvent(p));
 				}
@@ -291,30 +270,17 @@
 
 		private void OnCanKiss(bool b)
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null)
 				p.Options.CanKiss = b;
 		}
 
-		private void OnMakeIdle()
-		{
-			var p = Selected as Person;
-			if (p != null)
-			{
-				p.MakeIdle();
-				p.AI.MakeIdle();
-			}
-		}
-
-		private void OnStopKiss()
-		{
-			var p = Selected as Person;
-			if (p != null)
-				p.Kisser.Stop();
-		}
-
 		private void OnToggleGenitals()
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null)
 			{
@@ -324,6 +290,8 @@
 
 		private void OnToggleBreasts()
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null)
 			{
@@ -333,6 +301,8 @@
 
 		private void OnTest()
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null)
 				p.Clothing.Dump();
@@ -340,6 +310,8 @@
 
 		private void OnMovePlayer(bool b)
 		{
+			if (ignore_) return;
+
 			var p = Cue.Instance.Player;
 			if (p != null)
 				p.VamAtom?.SetControlsForMoving(b);
@@ -347,6 +319,8 @@
 
 		private void OnForceExcitement(bool b)
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null && force_ != b)
 			{
@@ -361,6 +335,8 @@
 
 		private void OnExcitement(float f)
 		{
+			if (ignore_) return;
+
 			var p = Selected as Person;
 			if (p != null)
 			{
