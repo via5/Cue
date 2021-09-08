@@ -400,6 +400,28 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public void SetValueInRange(float p)
+		{
+			float range;
+
+			if (Maximum > Minimum)
+			{
+				range = Maximum - Minimum;
+				Value = Minimum + range * p;
+			}
+			else
+			{
+				range = Minimum - Maximum;
+				Value = Maximum + range * p;
+			}
+		}
+
+		public void SetValueInRangeAboveDefault(float p)
+		{
+			float range = Maximum - DefaultValue;
+			Value = DefaultValue + range * p;
+		}
+
 		protected override JSONStorableFloat DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetFloatParameter(

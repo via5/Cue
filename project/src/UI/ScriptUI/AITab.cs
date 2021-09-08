@@ -53,7 +53,6 @@ namespace Cue
 		private VUI.Label event_ = new VUI.Label();
 		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
-		private VUI.CheckBox forceCamera_ = new VUI.CheckBox();
 
 
 		public PersonAIStateTab(Person p)
@@ -79,16 +78,12 @@ namespace Cue
 			state.Add(new VUI.Label("Force close"));
 			state.Add(close_);
 
-			state.Add(new VUI.Label("Look at camera"));
-			state.Add(forceCamera_);
-
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
 
 			personality_.SelectionChanged += OnPersonality;
 			close_.Changed += OnClose;
-			forceCamera_.Changed += OnCamera;
 		}
 
 		public override void Update(float s)
@@ -136,11 +131,6 @@ namespace Cue
 		private void OnClose(bool b)
 		{
 			person_.Personality.ForceSetClose(b, b);
-		}
-
-		private void OnCamera(bool b)
-		{
-			person_.Gaze.ForceLookAtCamera = b;
 		}
 
 		private void OnPersonality(string name)
@@ -387,6 +377,9 @@ namespace Cue
 			p = new VUI.Panel(new VUI.VerticalFlow());
 
 			p.Add(new VUI.CheckBox("Render frustums", OnRenderFrustums));
+			p.Add(new VUI.ComboBox<string>(
+				new string[] { "Free look", "Force camera", "Force up" },
+				OnForceLook));
 
 			Add(p);
 		}
@@ -420,6 +413,11 @@ namespace Cue
 		private void OnRenderFrustums(bool b)
 		{
 			person_.Gaze.Picker.Render = b;
+		}
+
+		private void OnForceLook(int s)
+		{
+			person_.Gaze.ForceLook = s;
 		}
 	}
 }

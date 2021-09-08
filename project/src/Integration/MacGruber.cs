@@ -185,6 +185,10 @@
 
 		private Person person_;
 		private Logger log_;
+		private float variance_ = 1;
+
+		private Sys.Vam.FloatParameter headRotationSpring_;
+
 		private int version_ = NotFound;
 		private Sys.Vam.BoolParameter enabled_;
 		private Sys.Vam.FloatParameter gazeDuration_;
@@ -209,6 +213,9 @@
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
 
+			headRotationSpring_ = new Sys.Vam.FloatParameter(
+				p, "headControl", "holdRotationSpring");
+
 			enabled_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "enabled");
 			gazeDuration_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
 			maxAngleHor_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
@@ -224,11 +231,8 @@
 			lookatControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
 
 			enabled_.Value = false;
-			maxAngleHor_.Value = 130;
 			maxAngleVer_.Value = 70;
 			rollDurationMin_.Value = 1;
-			rollAngleMin_.Value = -25;
-			rollAngleMax_.Value = 25;
 		}
 
 		public string Name
@@ -270,6 +274,12 @@
 			}
 		}
 
+		public float Variance
+		{
+			get { return variance_; }
+			set { variance_ = value; }
+		}
+
 		public void Update(float s)
 		{
 			if (ParameterChanged())
@@ -277,33 +287,47 @@
 
 			if (Enabled)
 			{
-				// gaze has a a problem with the head vertical angle when the
-				// camera is really close, making the head point downwards
-				//
-				// increase the vertical offset when the head is closer than
-				// `far`
-
-				var eyes = person_.Body.Get(BodyParts.Eyes).Position;
-				var target = person_.Gaze.Eyes.TargetPosition;
-				var d = Vector3.Distance(eyes, target);
-
-				float far = 1;
-				float def = verOffset_.DefaultValue;
-
-				if (d <= far)
-				{
-					float max = verOffset_.Maximum;
-					float range = (max - def);
-					float p = (far - d) / far;
-					float v = def + range * p;
-
-					verOffset_.Value = v;
-				}
-				else
-				{
-					verOffset_.Value = def;
-				}
+				UpdateVerticalOffset();
+				UpdateVariance();
 			}
+		}
+
+		private void UpdateVerticalOffset()
+		{
+			// gaze has a a problem with the head vertical angle when the
+			// camera is really close, making the head point downwards
+			//
+			// increase the vertical offset when the head is closer than
+			// `far`
+
+			var eyes = person_.Body.Get(BodyParts.Eyes).Position;
+			var target = person_.Gaze.Eyes.TargetPosition;
+			var d = Vector3.Distance(eyes, target);
+
+			float far = 1;
+			float def = verOffset_.DefaultValue;
+
+			if (d <= far)
+			{
+				float max = verOffset_.Maximum;
+				float range = (max - def);
+				float p = (far - d) / far;
+				float v = def + range * p;
+
+				verOffset_.Value = v;
+			}
+			else
+			{
+				verOffset_.Value = def;
+			}
+		}
+
+		private void UpdateVariance()
+		{
+			maxAngleHor_.SetValueInRange(variance_);
+			rollAngleMin_.Value = -25 * variance_;
+			rollAngleMax_.Value = 25 * variance_;
+			headRotationSpring_.SetValueInRangeAboveDefault(1 - variance_);
 		}
 
 		private void SetParameter()

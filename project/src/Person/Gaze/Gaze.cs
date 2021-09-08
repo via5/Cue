@@ -2,6 +2,14 @@
 
 namespace Cue
 {
+	public static class ForceLooks
+	{
+		public const int None = 0;
+		public const int Camera = 1;
+		public const int Up = 2;
+	}
+
+
 	class Gaze
 	{
 		private Person person_;
@@ -27,7 +35,7 @@ namespace Cue
 
 		// debug
 		private string lastString_ = "";
-		private bool forceCamera_ = false;
+		private int forceLook_ = ForceLooks.None;
 
 
 		public Gaze(Person p)
@@ -61,18 +69,23 @@ namespace Cue
 			get { return lastEmergency_ != -1; }
 		}
 
-		public bool ForceLookAtCamera
+		public int ForceLook
 		{
-			get { return forceCamera_; }
-			set { forceCamera_ = value; }
+			get { return forceLook_; }
+			set { forceLook_ = value; }
 		}
 
 		public void Update(float s)
 		{
-			if (forceCamera_)
+			if (forceLook_ != ForceLooks.None)
 			{
 				Clear();
-				targets_.SetWeight(Cue.Instance.FindPerson("Camera"), BodyParts.Eyes, 1, "forced");
+
+				if (forceLook_ == ForceLooks.Camera)
+					targets_.SetWeight(Cue.Instance.FindPerson("Camera"), BodyParts.Eyes, 1, "forced");
+				else if (forceLook_ == ForceLooks.Up)
+					targets_.SetAboveWeight(1, "forced");
+
 				picker_.ForceNextTarget(false);
 			}
 			else
@@ -127,7 +140,10 @@ namespace Cue
 			}
 
 			if (picker_.HasTarget)
+			{
+				gazer_.Variance = picker_.CurrentTarget.Variance;
 				eyes_.LookAt(picker_.Position);
+			}
 			// else ?
 
 			eyes_.Update(s);

@@ -198,6 +198,7 @@ namespace Cue
 
 		bool HasPosition { get; }
 		Vector3 Position { get; }
+		float Variance { get; }
 
 		void Clear();
 		void SetWeight(float f, string why);
@@ -247,6 +248,11 @@ namespace Cue
 
 		public abstract bool HasPosition { get; }
 		public abstract Vector3 Position { get; }
+
+		public virtual float Variance
+		{
+			get { return 1; }
+		}
 
 		public virtual bool Next()
 		{
@@ -411,6 +417,11 @@ namespace Cue
 
 				return p;
 			}
+		}
+
+		public override float Variance
+		{
+			get { return 0; }
 		}
 
 		public override string ToString()
