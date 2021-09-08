@@ -238,6 +238,31 @@ V.Float("ExpressionExcitementFactor"),
 // expression tiredness is `tiredness * this`, clamped [0, 1]
 V.Float("ExpressionTirednessFactor"),
 
+
+// Voices
+// ======
+// Controls datasets and pitches depending on intensities; only applies to
+// MacGruber's Breathing plugin for now
+//
+// The voice pitch values are [0, 1]. Higher values have higher pitch. The
+// integration module is in charge of figuring out what that means. For
+// MacGruber's Breathing, this corresponds to a pitch between [0.8, 1.2].
+//
+//
+// orgasm object:
+//   dataset: name of the orgasm dataset
+//   pitch:   pitch during orgasm
+//
+// datasets array:
+//  object:
+//    dataset:       name of the breathe dataset
+//    pitch:         pitch
+//
+//    intensityMin,
+//    intensityMax:  range of intensities where this dataset is used; intensity
+//                   is [0, 1] and corresponds to the movement energy (see
+//                   MovementEnergyTirednessFactor)
+
 };
 
 #><#= Generate(vars, "PSE", "Personality") #>

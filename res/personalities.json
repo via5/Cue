@@ -106,6 +106,32 @@
 				"movementTirednessFactor": 0,
 				"expressionExcitementFactor": 1,
 				"expressionTirednessFactor": 1,
+
+				"voice":
+				{
+					"orgasm":
+					{
+						"dataset": "Candy Orgasm Soft",
+						"pitch": -1
+					},
+
+					"datasets":
+					[
+						{
+							"dataset": "Candy Nose",
+							"intensityMin": 0,
+							"intensityMax": 0.2,
+							"pitch": -1,
+						},
+
+						{
+							"dataset": "Original",
+							"intensityMin": 0.2,
+							"intensityMax": 1,
+							"pitch": -1,
+						}
+					]
+				}
 			},
 
 			"closeState":

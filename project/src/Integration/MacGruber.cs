@@ -16,7 +16,6 @@
 		struct Parameters
 		{
 			public Sys.Vam.StringChooserParameter breathDataset_;
-			public Sys.Vam.StringChooserParameter orgasmDataset_;
 			public Sys.Vam.FloatParameter intensity;
 			public Sys.Vam.FloatParameter desktopVolume;
 			public Sys.Vam.FloatParameter vrVolume;
@@ -37,7 +36,6 @@
 			person_ = p;
 
 			p_.breathDataset_ = BSC("Breath Dataset");
-			p_.orgasmDataset_ = BSC("Orgasm Dataset");
 			p_.intensity = BF("Intensity");
 			p_.desktopVolume = AAF("Volume Desktop");
 			p_.vrVolume = AAF("Volume VR");
@@ -53,10 +51,9 @@
 			p_.noseInMorphMax = DBF("NoseInMorph Max");
 			p_.noseOutMorphMax = DBF("NoseOutMorph Max");
 
-			p_.breathDataset_.Value = p.Physiology.GetString(PE.Voice);
-			p_.orgasmDataset_.Value = "Candy Orgasm Soft";
 			p_.vrVolume.Value = p_.desktopVolume.Value;
-			p_.pitch.Value = 0.8f + person_.Physiology.Get(PE.VoicePitch) * 0.4f;
+
+			Apply();
 		}
 
 		private Sys.Vam.FloatParameter DBF(string name)
@@ -117,6 +114,14 @@
 		private void Apply()
 		{
 			var f = Intensity;
+			var ds = person_.Personality.Voice.GetDatasetForIntensity(f);
+
+			// taken over by MacGruberOrgasmer during orgasm
+			if (person_.Mood.State != Mood.OrgasmState)
+			{
+				p_.breathDataset_.Value = ds.Name;
+				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
+			}
 
 			var p = p_.mouthMorph.max.Parameter;
 			if (p != null)
@@ -146,16 +151,27 @@
 	{
 		private Person person_ = null;
 		private Sys.Vam.ActionParameter action_;
+		private Sys.Vam.StringChooserParameter orgasmDataset_;
+		private Sys.Vam.FloatParameter pitch_;
 
 		public MacGruberOrgasmer(Person p)
 		{
 			person_ = p;
 			action_ = new Sys.Vam.ActionParameter(
 				p, "MacGruber.Breathing", "QueueOrgasm");
+			orgasmDataset_ = new Sys.Vam.StringChooserParameter(
+				p, "MacGruber.Breathing", "Orgasm Dataset");
+			pitch_ = new Sys.Vam.FloatParameter(
+				p, "MacGruber.Breathing", "Pitch");
 		}
 
 		public void Orgasm()
 		{
+			var ds = person_.Personality.Voice.OrgasmDataset;
+
+			orgasmDataset_.Value = ds.Name;
+			pitch_.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
+
 			action_.Fire();
 		}
 	}
@@ -271,7 +287,7 @@
 				var target = person_.Gaze.Eyes.TargetPosition;
 				var d = Vector3.Distance(eyes, target);
 
-				float far = 0.2f;
+				float far = 1;
 				float def = verOffset_.DefaultValue;
 
 				if (d <= far)

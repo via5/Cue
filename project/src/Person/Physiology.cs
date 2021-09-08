@@ -35,10 +35,7 @@
 		public Physiology Clone(Person p)
 		{
 			var pp = new Physiology(name_);
-
 			pp.CopyFrom(this);
-			pp.Init(p);
-
 			return pp;
 		}
 
@@ -46,16 +43,6 @@
 		{
 			base.CopyFrom(p);
 			specificModifiers_ = p.specificModifiers_;
-		}
-
-		private void Init(Person p)
-		{
-			if (Get(PE.VoicePitch) <  0)
-			{
-				Set(PE.VoicePitch, U.Clamp(
-					Get(PE.NeutralVoicePitch) + (1 - p.Atom.Body.Scale),
-					0, 1));
-			}
 		}
 
 		public void Set( SpecificModifier[] sms)

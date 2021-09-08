@@ -76,7 +76,7 @@ namespace Cue
 				if (eyes_ == null)
 					return Vector3.Zero;
 				else
-					return Sys.Vam.U.FromUnity(eyes_.position);
+					return pos_;
 			}
 		}
 

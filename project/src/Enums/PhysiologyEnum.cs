@@ -25,35 +25,33 @@ namespace Cue
 		public const int TirednessMaxExcitementForBaseDecay = 9;
 		public const int OrgasmBaseTirednessIncrease = 10;
 		public const int NeutralVoicePitch = 11;
-		public const int VoicePitch = 12;
-		public const int MouthRate = 13;
-		public const int MouthMax = 14;
-		public const int LipsFactor = 15;
-		public const int MouthFactor = 16;
-		public const int BreastsRate = 17;
-		public const int BreastsMax = 18;
-		public const int LeftBreastFactor = 19;
-		public const int RightBreastFactor = 20;
-		public const int GenitalsRate = 21;
-		public const int GenitalsMax = 22;
-		public const int LabiaFactor = 23;
-		public const int PenetrationRate = 24;
-		public const int PenetrationMax = 25;
-		public const int VaginaFactor = 26;
-		public const int DeepVaginaFactor = 27;
-		public const int DeeperVaginaFactor = 28;
-		public const int ExcitementDecayRate = 29;
-		public const int ExcitementPostOrgasm = 30;
-		public const int OrgasmTime = 31;
-		public const int PostOrgasmTime = 32;
-		public const int RateAdjustment = 33;
-		public const int FloatCount = 34;
-		public int GetFloatCount() { return 34; }
+		public const int MouthRate = 12;
+		public const int MouthMax = 13;
+		public const int LipsFactor = 14;
+		public const int MouthFactor = 15;
+		public const int BreastsRate = 16;
+		public const int BreastsMax = 17;
+		public const int LeftBreastFactor = 18;
+		public const int RightBreastFactor = 19;
+		public const int GenitalsRate = 20;
+		public const int GenitalsMax = 21;
+		public const int LabiaFactor = 22;
+		public const int PenetrationRate = 23;
+		public const int PenetrationMax = 24;
+		public const int VaginaFactor = 25;
+		public const int DeepVaginaFactor = 26;
+		public const int DeeperVaginaFactor = 27;
+		public const int ExcitementDecayRate = 28;
+		public const int ExcitementPostOrgasm = 29;
+		public const int OrgasmTime = 30;
+		public const int PostOrgasmTime = 31;
+		public const int RateAdjustment = 32;
+		public const int FloatCount = 33;
+		public int GetFloatCount() { return 33; }
 
 		// strings
-		public const int Voice = 0;
-		public const int StringCount = 1;
-		public int GetStringCount() { return 1; }
+		public const int StringCount = 0;
+		public int GetStringCount() { return 0; }
 
 
 		private static string[] slidingDurationNames_ = new string[]
@@ -130,7 +128,6 @@ namespace Cue
 			"tirednessMaxExcitementForBaseDecay",
 			"orgasmBaseTirednessIncrease",
 			"neutralVoicePitch",
-			"voicePitch",
 			"mouthRate",
 			"mouthMax",
 			"lipsFactor",
@@ -182,7 +179,6 @@ namespace Cue
 
 		private static string[] stringNames_ = new string[]
 		{
-			"voice",
 		};
 
 		public static int StringFromString(string s)
@@ -225,7 +221,6 @@ namespace Cue
 			"tirednessMaxExcitementForBaseDecay",
 			"orgasmBaseTirednessIncrease",
 			"neutralVoicePitch",
-			"voicePitch",
 			"mouthRate",
 			"mouthMax",
 			"lipsFactor",
@@ -247,7 +242,6 @@ namespace Cue
 			"orgasmTime",
 			"postOrgasmTime",
 			"rateAdjustment",
-			"voice",
 		};
 
 		public static string[] AllNames

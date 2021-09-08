@@ -27,6 +27,7 @@ namespace Cue
 
 		// debug
 		private string lastString_ = "";
+		private bool forceCamera_ = false;
 
 
 		public Gaze(Person p)
@@ -60,54 +61,69 @@ namespace Cue
 			get { return lastEmergency_ != -1; }
 		}
 
+		public bool ForceLookAtCamera
+		{
+			get { return forceCamera_; }
+			set { forceCamera_ = value; }
+		}
+
 		public void Update(float s)
 		{
-			var emergency = UpdateEmergencyTargets();
-
-			if (emergency == -1)
+			if (forceCamera_)
 			{
-				// no emergency
-
-				if (lastEmergency_ != -1)
-				{
-					// but one has just terminated
-					person_.Log.Info(
-						$"gaze emergency finished: {events_[lastEmergency_]}, " +
-						$"gazer now {gazerEnabledBeforeEmergency_}");
-
-					// restore gazer state
-					gazer_.Enabled = gazerEnabledBeforeEmergency_;
-					gazer_.Duration = person_.Personality.GazeDuration;
-
-					// force a next target
-					//
-					// todo: this is necessary to handle cases where characters
-					// need to immediately look away, but a better system based
-					// on the type of emergency and personality would be better
-					UpdateTargets();
-					picker_.ForceNextTarget(false);
-
-					lastEmergency_ = -1;
-				}
-
-				if (picker_.Update(s))
-				{
-					UpdateTargets();
-					picker_.NextTarget();
-					gazer_.Duration = person_.Personality.GazeDuration;
-				}
+				Clear();
+				targets_.SetWeight(Cue.Instance.FindPerson("Camera"), BodyParts.Eyes, 1, "forced");
+				picker_.ForceNextTarget(false);
 			}
-			else if (lastEmergency_ != emergency)
+			else
 			{
-				// new emergency
-				person_.Log.Info(
-					$"gaze emergency: {events_[emergency]}, " +
-					$"gazer was {gazerEnabledBeforeEmergency_}");
+				var emergency = UpdateEmergencyTargets();
 
-				picker_.ForceNextTarget(true);
-				picker_.Update(s);
+				if (emergency == -1)
+				{
+					// no emergency
 
-				lastEmergency_ = emergency;
+					if (lastEmergency_ != -1)
+					{
+						// but one has just terminated
+						person_.Log.Info(
+							$"gaze emergency finished: {events_[lastEmergency_]}, " +
+							$"gazer now {gazerEnabledBeforeEmergency_}");
+
+						// restore gazer state
+						gazer_.Enabled = gazerEnabledBeforeEmergency_;
+						gazer_.Duration = person_.Personality.GazeDuration;
+
+						// force a next target
+						//
+						// todo: this is necessary to handle cases where characters
+						// need to immediately look away, but a better system based
+						// on the type of emergency and personality would be better
+						UpdateTargets();
+						picker_.ForceNextTarget(false);
+
+						lastEmergency_ = -1;
+					}
+
+					if (picker_.Update(s))
+					{
+						UpdateTargets();
+						picker_.NextTarget();
+						gazer_.Duration = person_.Personality.GazeDuration;
+					}
+				}
+				else if (lastEmergency_ != emergency)
+				{
+					// new emergency
+					person_.Log.Info(
+						$"gaze emergency: {events_[emergency]}, " +
+						$"gazer was {gazerEnabledBeforeEmergency_}");
+
+					picker_.ForceNextTarget(true);
+					picker_.Update(s);
+
+					lastEmergency_ = emergency;
+				}
 			}
 
 			if (picker_.HasTarget)

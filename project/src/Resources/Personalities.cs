@@ -178,13 +178,53 @@ namespace Cue
 		{
 			Resources.LoadEnumValues(s, o, inherited);
 
-			foreach (JSONClass en in o.AsObject["expressions"].AsArray.Childs)
+			foreach (JSONClass en in o["expressions"].AsArray.Childs)
 			{
 				int type = Expressions.FromString(J.ReqString(en, "type"));
 				float maximum = J.ReqFloat(en, "maximum");
 
 				s.SetMaximum(type, maximum);
 			}
+
+			List<Voice.DatasetForIntensity> dss = null;
+			Voice.Dataset orgasmDs = null;
+			var voice = o["voice"].AsObject;
+
+			if (voice.HasKey("datasets"))
+			{
+				dss = new List<Voice.DatasetForIntensity>();
+
+				foreach (JSONClass dn in voice["datasets"].AsArray.Childs)
+				{
+					var ds = new Voice.DatasetForIntensity(
+						new Voice.Dataset(
+							J.ReqString(dn, "dataset"),
+							J.ReqFloat(dn, "pitch")),
+						J.ReqFloat(dn, "intensityMin"),
+						J.ReqFloat(dn, "intensityMax"));
+
+					dss.Add(ds);
+				}
+			}
+			else
+			{
+				if (!inherited)
+					throw new LoadFailed("missing voice datasets");
+			}
+
+			if (voice.HasKey("orgasm"))
+			{
+				var oo = voice["orgasm"].AsObject;
+				orgasmDs = new Voice.Dataset(
+					J.ReqString(oo, "dataset"),
+					J.ReqFloat(oo, "pitch"));
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing orgasm dataset");
+			}
+
+			s.Voice.Set(dss, orgasmDs);
 		}
 
 		private void Add(Personality p)

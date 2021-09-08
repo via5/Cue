@@ -57,7 +57,7 @@
 
 
 			var m = new ClampableMorph(p, BodyParts.Mouth, "Mouth Open",
-				-0.1f, -0.1f, 0.3f, 0.3f, 0, 0, true);
+				-0.1f, -0.1f, 0.2f, 0.2f, 0, 0, true);
 			m.Easing = new SineOutEasing();
 
 			g.Add(m);
@@ -70,7 +70,7 @@
 
 
 			m = new ClampableMorph(p, BodyParts.Mouth, "Mouth Open",
-				0.1f, 0.2f, 0.3f, 0.3f, 0, 0, true);
+				0.05f, 0.1f, 0.2f, 0.2f, 0, 0, true);
 			m.Easing = new SineOutEasing();
 
 			g.Add(m);

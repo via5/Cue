@@ -66,22 +66,10 @@ V.Float("OrgasmBaseTirednessIncrease"),
 
 // Voice
 // =====
-// The voice pitch values are [0, 1]. Higher values have higher pitch. The
-// integration module is in charge of figuring out what that means. For
-// MacGruber's Life, this corresponds to a pitch between [0.8, 1.2].
-
 // central value in the range for a neutral voice pitch, defaults to 0.5,
 // which is mapped to 1.0 for MacGruber's Life
 V.Float("NeutralVoicePitch"),
 
-// forces a voice pitch for this physiology; if -1, uses the person's scale
-// instead, where a scale of 0.5 is a voice pitch of 1, and 1.5 is a voice pitch
-// of 0.
-V.Float("VoicePitch"),
-
-// directly given to the integration module; for MacGruber's Life, this is the
-// name of the "Breath Dataset"
-V.String("Voice"),
 
 // Sensitivity
 // ===========

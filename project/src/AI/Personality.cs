@@ -1,5 +1,126 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
+	class Voice
+	{
+		public class Dataset
+		{
+			private string name_;
+			private float pitch_;
+
+			public Dataset(string name, float pitch)
+			{
+				name_ = name;
+				pitch_ = pitch;
+			}
+
+			public Dataset(Dataset d)
+			{
+				name_ = d.name_;
+				pitch_ = d.pitch_;
+			}
+
+			public string Name
+			{
+				get { return name_; }
+			}
+
+			public float GetPitch(Person p)
+			{
+				if (pitch_ < 0)
+				{
+					float neutral = p.Physiology.Get(PE.NeutralVoicePitch);
+					float scale = p.Atom.Body.Scale;
+					pitch_ = U.Clamp(neutral + (1 - scale), 0, 1);
+				}
+
+				return pitch_;
+			}
+		}
+
+		public class DatasetForIntensity
+		{
+			public Dataset dataset;
+			public float intensityMin;
+			public float intensityMax;
+
+			public DatasetForIntensity(Dataset ds, float intensityMin, float intensityMax)
+			{
+				this.dataset = ds;
+				this.intensityMin = intensityMin;
+				this.intensityMax = intensityMax;
+			}
+
+			public DatasetForIntensity(DatasetForIntensity d)
+			{
+				dataset = new Dataset(d.dataset);
+				intensityMin = d.intensityMin;
+				intensityMax = d.intensityMax;
+			}
+		}
+
+		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
+		private Dataset orgasm_ = new Dataset("", -1);
+		private Dataset dummy_ = new Dataset("", -1);
+		private bool warned_ = false;
+
+		public void Set(List<DatasetForIntensity> dss, Dataset orgasm)
+		{
+			if (dss != null)
+				datasets_ = dss.ToArray();
+
+			if (orgasm != null)
+				orgasm_ = orgasm;
+		}
+
+		public void CopyFrom(Voice v)
+		{
+			datasets_ = new DatasetForIntensity[v.datasets_.Length];
+			for (int i = 0; i < datasets_.Length; ++i)
+				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
+
+			orgasm_ = new Dataset(v.orgasm_);
+		}
+
+		public DatasetForIntensity[] Datasets
+		{
+			get { return datasets_; }
+		}
+
+		public Dataset OrgasmDataset
+		{
+			get { return orgasm_; }
+		}
+
+		public Dataset GetDatasetForIntensity(float e)
+		{
+			for (int i = 0; i < datasets_.Length; ++i)
+			{
+				if (e >= datasets_[i].intensityMin &&
+					e <= datasets_[i].intensityMax)
+				{
+					return datasets_[i].dataset;
+				}
+			}
+
+			if (!warned_)
+			{
+				Cue.LogError(
+					$"personality missing voice for excitement " +
+					$"{e}");
+
+				warned_ = true;
+			}
+
+			if (datasets_.Length == 0)
+				return dummy_;
+			else
+				return datasets_[0].dataset;
+		}
+	}
+
+
 	class Personality
 	{
 		public const int IdleState = 0;
@@ -24,11 +145,13 @@
 			}
 		}
 
+
 		public class State : EnumValueManager
 		{
 			public readonly string name;
 
 			private ExpressionMaximum[] maximums_;
+			private Voice voice_ = new Voice();
 
 			public State(int stateIndex)
 				: base(new PSE())
@@ -50,12 +173,19 @@
 				maximums_[type].maximum = max;
 			}
 
+			public Voice Voice
+			{
+				get { return voice_; }
+			}
+
 			public void CopyFrom(State s)
 			{
 				base.CopyFrom(s);
 
 				for (int i = 0; i < s.maximums_.Length; ++i)
 					maximums_[i] = new ExpressionMaximum(s.maximums_[i]);
+
+				voice_.CopyFrom(s.voice_);
 			}
 		}
 
@@ -102,6 +232,11 @@
 		public State GetState(int i)
 		{
 			return states_[i];
+		}
+
+		public Voice Voice
+		{
+			get { return CurrentState.Voice; }
 		}
 
 		private State CurrentState
