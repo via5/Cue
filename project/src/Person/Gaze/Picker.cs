@@ -22,6 +22,7 @@
 		public const int XCount = 5;
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
+		private const float AvoidInterval = 5;
 
 		private Person person_;
 		private Logger log_;
@@ -33,6 +34,8 @@
 		private int currentTarget_ = -1;
 		private bool emergency_ = false;
 		private string lastString_ = "";
+		private string avoidString_ = "";
+		private float timeSinceLastAvoid_ = 0;
 
 		public GazeTargetPicker(Person p)
 		{
@@ -85,6 +88,11 @@
 			get { return lastString_; }
 		}
 
+		public string AvoidString
+		{
+			get { return avoidString_; }
+		}
+
 		public FrustumInfo GetFrustum(int i)
 		{
 			return frustums_[i];
@@ -103,6 +111,11 @@
 		public IGazeLookat CurrentTarget
 		{
 			get { return HasTarget ? targets_[currentTarget_] : null; }
+		}
+
+		public float TimeBeforeNext
+		{
+			get { return delay_.Remaining; }
 		}
 
 		public Box CurrentTargetAABox
@@ -148,6 +161,12 @@
 
 		public bool Update(float s)
 		{
+			timeSinceLastAvoid_ += s;
+
+			// so it's displayed in the ui for more than a frame
+			if (timeSinceLastAvoid_ > 2)
+				avoidString_ = "";
+
 			bool needsTarget = false;
 
 			UpdateAvoidBoxes();
@@ -157,12 +176,53 @@
 			if (delay_.Finished || !HasTarget)
 			{
 				needsTarget = true;
+
+				// allow avoidance after a new target is picked naturally
+				timeSinceLastAvoid_ = AvoidInterval;
 			}
 			else if (HasTarget)
 			{
 				if (!CanLookAtPoint(targets_[currentTarget_].Position))
 				{
-					needsTarget = true;
+					// can't look at the current point anymore, must pick a new
+					// target
+					//
+					// the problem is that after a new target is found, the head
+					// will rotate towards it, along with the chest, which
+					// changes the gaze frustum positions
+					//
+					// if the player's eyes is located just right, a frustum
+					// that was valid when initially picked might become
+					// forbidden after the chest rotation
+					//
+					// when this happens, new targets are constantly picked
+					// because frustums always become forbidden after gazing
+					// has ended
+					//
+					// one fix would be to check if the frustum is allowed, but
+					// with the final chest rotation instead of the current one;
+					// that would require predicting the final rotation of the
+					// chest after the head has finished rotating towards the
+					// new target, which is mostly impossible
+					//
+					// instead, the avoid interval makes sure there's some delay
+					// before the next target so the head doesn't constantly
+					// move around; it's also arguably more natural, since the
+					// character isn't just immediately avoiding gaze like a
+					// whack-a-mole
+
+					if (timeSinceLastAvoid_ > AvoidInterval)
+					{
+						needsTarget = true;
+						delay_.Reset();
+						timeSinceLastAvoid_ = 0;
+						avoidString_ = "avoiding";
+					}
+					else
+					{
+						var left = AvoidInterval - timeSinceLastAvoid_;
+						avoidString_ = $"will avoid in {left:0.00}s";
+					}
 				}
 			}
 

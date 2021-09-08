@@ -34,6 +34,8 @@ project\src\Person\State.cs
 project\src\Person\Body\Body.cs
 project\src\Person\Body\BodyPart.cs
 project\src\Person\Body\BodyParts.cs
+project\src\Person\Body\Hand.cs
+project\src\Person\Body\Morph.cs
 project\src\Person\Gaze\Events.cs
 project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs

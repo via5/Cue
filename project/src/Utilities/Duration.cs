@@ -316,6 +316,11 @@ namespace Cue
 			get { return current_; }
 		}
 
+		public float Remaining
+		{
+			get { return current_ - elapsed_; }
+		}
+
 		public void Reset()
 		{
 			elapsed_ = 0;

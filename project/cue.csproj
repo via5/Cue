@@ -128,6 +128,7 @@
     <Compile Include="src\Person\Body\BodyPart.cs" />
     <Compile Include="src\Person\Body\BodyParts.cs" />
     <Compile Include="src\Person\Body\Hand.cs" />
+    <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />

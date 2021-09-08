@@ -314,7 +314,8 @@ namespace Cue
 		private VUI.Label gazerDuration_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
 		private VUI.Label targetEmergency_ = new VUI.Label();
-
+		private VUI.Label avoid_ = new VUI.Label();
+		private VUI.Label next_ = new VUI.Label();
 
 		public PersonAIGazeTab(Person person)
 			: base("Gaze")
@@ -371,6 +372,11 @@ namespace Cue
 			p.Add(new VUI.Label("Emergency"));
 			p.Add(targetEmergency_);
 
+			p.Add(new VUI.Label("Avoid"));
+			p.Add(avoid_);
+
+			p.Add(new VUI.Label("Next in"));
+			p.Add(next_);
 
 			p.Add(new VUI.Spacer(20));
 			p.Add(new VUI.Spacer(20));
@@ -406,6 +412,9 @@ namespace Cue
 				targetType_.Text = "none";
 				targetEmergency_.Text = "no";
 			}
+
+			avoid_.Text = g.Picker.AvoidString;
+			next_.Text = $"{g.Picker.TimeBeforeNext:0.00}s";
 		}
 
 		private void OnRenderFrustums(bool b)
