@@ -47,7 +47,8 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, grab, source, position, direction;
+			public VUI.Label name, triggering, grab, busy, source;
+			public VUI.Label position, direction;
 		}
 
 		private readonly Person person_;
@@ -60,13 +61,14 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(Positions ? 6 : 4);
+			var gl = new VUI.GridLayout(Positions ? 7 : 5);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Busy", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
 
 			if (Positions)
@@ -95,6 +97,10 @@ namespace Cue
 				w.grab = new VUI.Label();
 				w.grab.FontSize = fontSize;
 				p.Add(w.grab);
+
+				w.busy = new VUI.Label();
+				w.busy.FontSize = fontSize;
+				p.Add(w.busy);
 
 				w.source = new VUI.Label(bp.Sys?.ToString() ?? "");
 				w.source.FontSize = fontSize;
@@ -156,7 +162,7 @@ namespace Cue
 
 					if (w.part.Sys.CanGrab)
 					{
-						w.grab.Text = w.part.Grabbed.ToString();
+						w.grab.Text = (w.part.Grabbed ? "grabbed" : "");
 
 						w.grab.TextColor = (
 							w.part.Grabbed ?
@@ -167,6 +173,12 @@ namespace Cue
 					{
 						w.grab.Text = "";
 					}
+
+					w.busy.Text = (w.part.Busy ? "busy" : "");
+					w.busy.TextColor = (
+						w.part.Busy ?
+						Sys.Vam.U.ToUnity(Color.Green) :
+						VUI.Style.Theme.TextColor);
 
 					if (Positions)
 					{

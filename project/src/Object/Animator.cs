@@ -12,6 +12,7 @@ namespace Cue
 		public const int SexType = 5;
 		public const int IdleType = 6;
 		public const int OrgasmType = 7;
+		public const int SmokeType = 8;
 
 		private readonly int type_ = NoType;
 		private readonly int from_ = PersonState.None;
@@ -63,6 +64,7 @@ namespace Cue
 				}
 
 				case OrgasmType:
+				case SmokeType:
 				default:
 				{
 					break;
@@ -92,6 +94,8 @@ namespace Cue
 				return IdleType;
 			else if (s == "orgasm")
 				return OrgasmType;
+			else if (s == "smoke")
+				return SmokeType;
 
 			Cue.LogError($"unknown anim type '{os}'");
 			return NoType;
@@ -109,6 +113,7 @@ namespace Cue
 				case SexType: return "sex";
 				case IdleType: return "idle";
 				case OrgasmType: return "orgasm";
+				case SmokeType: return "smoke";
 				default: return $"?{t}";
 			}
 		}

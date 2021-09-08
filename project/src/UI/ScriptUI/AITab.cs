@@ -50,6 +50,7 @@ namespace Cue
 		private PersonAI ai_;
 
 		private VUI.Label enabled_ = new VUI.Label();
+		private VUI.Label traits_ = new VUI.Label();
 		private VUI.Label event_ = new VUI.Label();
 		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
@@ -68,6 +69,9 @@ namespace Cue
 			var state = new VUI.Panel(gl);
 			state.Add(new VUI.Label("Enabled"));
 			state.Add(enabled_);
+
+			state.Add(new VUI.Label("Traits"));
+			state.Add(traits_);
 
 			state.Add(new VUI.Label("Event"));
 			state.Add(event_);
@@ -110,6 +114,7 @@ namespace Cue
 				es = "nothing";
 
 			enabled_.Text = es;
+			traits_.Text = string.Join(", ", person_.Traits);
 
 			event_.Text =
 				(ai_.Event == null ? "(none)" : ai_.Event.ToString()) + " " +

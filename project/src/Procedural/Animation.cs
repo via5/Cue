@@ -84,7 +84,7 @@ namespace Cue.Proc
 			root_ = (ConcurrentTargetGroup)o.root_.Clone();
 		}
 
-		public bool Done
+		public virtual bool Done
 		{
 			get { return root_.Done; }
 		}

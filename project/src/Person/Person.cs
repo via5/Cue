@@ -137,6 +137,11 @@ namespace Cue
 			return false;
 		}
 
+		public string[] Traits
+		{
+			get { return traits_.ToArray(); }
+		}
+
 		public PersonOptions Options { get { return options_; } }
 		public Animator Animator { get { return animator_; } }
 		public PersonState State { get { return state_; } }
