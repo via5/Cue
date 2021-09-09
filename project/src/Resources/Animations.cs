@@ -229,7 +229,7 @@ namespace Cue
 				{
 					if (anims_[i].TransitionFrom == from &&
 						anims_[i].TransitionTo == to)
-{
+					{
 						if (MovementStyles.Match(anims_[i].MovementStyle, style))
 							return anims_[i];
 					}

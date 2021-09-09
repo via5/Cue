@@ -376,7 +376,10 @@ namespace Cue.Proc
 
 		public override bool Finished
 		{
-			get { return CurrentDuration().Finished; }
+			get
+			{
+				return (State == FinishedState) || CurrentDuration().Finished;
+			}
 		}
 
 		public override float Energy
@@ -409,7 +412,7 @@ namespace Cue.Proc
 					return bwdDuration_ == null ? fwdDuration_ : bwdDuration_;
 
 				default:
-					Cue.LogError("??");
+					//Cue.LogError($"??{State}");
 					return fwdDuration_;
 			}
 		}
@@ -427,7 +430,7 @@ namespace Cue.Proc
 					return bwdEasing_;
 
 				default:
-					Cue.LogError("??");
+					//Cue.LogError($"??{State}");
 					return null;
 			}
 		}
@@ -466,9 +469,9 @@ namespace Cue.Proc
 		{
 			return
 				$"sliding\n" +
-				$"fdur={fwdDuration_}\n" +
-				$"bdur={bwdDuration_}\n" +
-				$"fdel={fwdDelay_} bdel={bwdDelay_}\n" +
+				$"fdur={fwdDuration_.ToLiveString()}\n" +
+				$"bdur={bwdDuration_.ToLiveString()}\n" +
+				$"fdel={fwdDelay_.ToLiveString()} bdel={bwdDelay_.ToLiveString()}\n" +
 				$"p={CurrentDuration().Progress:0.00} mag={Magnitude:0.00}\n" +
 				$"state={State}";
 		}

@@ -13,6 +13,7 @@ namespace Cue.Proc
 			list.Add(Stand(PersonState.Standing));
 			list.Add(Sex());
 			list.Add(Smoke());
+			list.Add(Suck());
 
 			return list;
 		}
@@ -55,6 +56,47 @@ namespace Cue.Proc
 				Animation.SmokeType,
 				PersonState.None, PersonState.None,
 				PersonState.None, MovementStyles.Any, a);
+		}
+
+		private static Animation Suck()
+		{
+			var a = new SuckProcAnimation();
+
+			return new Animation(
+				Animation.SuckType,
+				PersonState.None, PersonState.None,
+				PersonState.None, MovementStyles.Any, a);
+		}
+	}
+
+
+	class SuckProcAnimation : ProcAnimation
+	{
+		private float durationMin_ = 2;
+		private float durationMax_ = 0.5f;
+		private float durationWin_ = 0.5f;
+		private float durationInterval_ = 5;
+
+		public SuckProcAnimation()
+			: base("procSuck", false)
+		{
+			var g = new ConcurrentTargetGroup(
+				"g", new Duration(), new Duration(), true,
+				new SlidingDurationSync(
+					new SlidingDuration(
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new CubicOutEasing()),
+					new SlidingDuration(
+						durationMin_, durationMax_,
+						durationInterval_, durationInterval_,
+						durationWin_, new CubicOutEasing()),
+					new Duration(0, 0), new Duration(0, 0),
+					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
+
+			//g.AddTarget(new AnimatedMorph(
+			//	BodyParts.Lips, "Lips Pucker",
+			//	0, 0.8f,
 		}
 	}
 

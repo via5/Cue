@@ -4,29 +4,60 @@ using UnityEngine;
 
 namespace Cue.Proc
 {
-	class AnimatedMorph : BasicTarget
+	class MorphTarget : BasicTarget
 	{
+		public const float NoDisableBlink = 10000;
+
+		private Person person_ = null;
 		private int bodyPart_;
 		private string morphId_;
-		private float min_, max_;
-		private Duration duration_;
-		private Duration delay_;
-		private ClampableMorph m_ = null;
+		private float min_, max_, mid_;
+		private Morph morph_ = null;
+		private bool autoSet_ = true;
 
-		public AnimatedMorph(
-			int bodyPart, string morphId, float min, float max,
-			Duration d, Duration delay)
-				: base(new NoSync())
+		private float r_ = 0;
+		private float mag_ = 0;
+		private IEasing easing_;
+		private bool finished_ = false;
+		private float last_;
+		private bool closeToMid_ = false;
+		private bool awayFromMid_ = false;
+		private float timeActive_ = 0;
+		private float intensity_ = 1;
+		private bool limitHit_ = false;
+
+		private float disableBlinkAbove_ = NoDisableBlink;
+
+
+		public MorphTarget(
+			Person p, int bodyPart, string id, float start, float end,
+			float minTime, float maxTime, float delayOff, float delayOn,
+			bool resetBetween = false)
+				: this(bodyPart, id, start, end, new SlidingDurationSync(
+					new SlidingDuration(minTime, maxTime, 0, 0, 0, new LinearEasing()),
+					new SlidingDuration(minTime, maxTime, 0, 0, 0, new LinearEasing()),
+					new Duration(0, delayOn),
+					new Duration(0, delayOff),
+					(resetBetween ?
+						SlidingDurationSync.ResetBetween :
+						SlidingDurationSync.Loop)))
+		{
+			Start(p);
+		}
+
+		public MorphTarget(
+			int bodyPart, string morphId, float min, float max, ISync sync)
+				: base(sync)
 		{
 			bodyPart_ = bodyPart;
 			morphId_ = morphId;
 			min_ = min;
 			max_ = max;
-			duration_ = d;
-			delay_ = delay;
+
+			easing_ = new SinusoidalEasing();
 		}
 
-		public static AnimatedMorph Create(JSONClass o)
+		public static MorphTarget Create(JSONClass o)
 		{
 			string id = o["morph"];
 
@@ -44,10 +75,23 @@ namespace Cue.Proc
 				if (!float.TryParse(o["max"], out max))
 					throw new LoadFailed("max is not a number");
 
-				return new AnimatedMorph(
-					bodyPart, id, min, max,
-					Duration.FromJSON(o, "duration"),
-					Duration.FromJSON(o, "delay"));
+				var duration = Duration.FromJSON(o, "duration");
+				var delay = Duration.FromJSON(o, "delay");
+
+				var sync = new SlidingDurationSync(
+					new SlidingDuration(
+						duration.Minimum, duration.Maximum,
+						duration.NextMin, duration.NextMax,
+						0, new LinearEasing()),
+					new SlidingDuration(
+						duration.Minimum, duration.Maximum,
+						duration.NextMin, duration.NextMax,
+						0, new LinearEasing()),
+					new Duration(delay),
+					new Duration(delay),
+					SlidingDurationSync.Loop);
+
+				return new MorphTarget(bodyPart, id, min, max, sync);
 			}
 			catch (LoadFailed e)
 			{
@@ -57,161 +101,19 @@ namespace Cue.Proc
 
 		public override bool Done
 		{
-			get { return m_?.Finished ?? true; }
+			get { return finished_; }
 		}
 
 		public override ITarget Clone()
 		{
-			return new AnimatedMorph(
-				bodyPart_, morphId_, min_, max_,
-				new Duration(duration_), new Duration(delay_));
-		}
-
-		public override void Start(Person p)
-		{
-			if (m_ == null)
-			{
-				m_ = new ClampableMorph(
-					p, bodyPart_, morphId_, min_, max_,
-					new Duration(duration_), new Duration(delay_));
-
-				m_.Set(float.MaxValue);
-			}
-		}
-
-		public override void Reset()
-		{
-			base.Reset();
-			m_?.Reset();
-		}
-
-		public override void FixedUpdate(float s)
-		{
-			if (m_ != null)
-			{
-				m_.FixedUpdate(s, 1, false);
-				m_.Set(float.MaxValue);
-			}
-		}
-
-		public override string ToString()
-		{
-			return $"morph {morphId_} ({BodyParts.ToString(bodyPart_)})";
-		}
-
-		public override string ToDetailedString()
-		{
-			return
-				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +
-				$"min={min_} max={max_} d={duration_} delay={delay_}\n" +
-				(m_?.ToString() ?? "nomorph");
-		}
-	}
-
-
-
-	class ClampableMorph
-	{
-		public const float NoDisableBlink = 10000;
-
-		private const int NoState = 0;
-		private const int ForwardState = 1;
-		private const int DelayOnState = 2;
-		private const int BackwardState = 3;
-		private const int DelayOffState = 4;
-
-		private Person person_;
-		private int bodyPart_;
-		private string id_;
-		private Morph morph_ = null;
-		private float start_, end_, mid_;
-		private Duration forward_, backward_;
-		private Duration delayOff_, delayOn_;
-		private int state_ = NoState;
-		private float r_ = 0;
-		private float mag_ = 0;
-		private IEasing easing_;
-		private bool finished_ = false;
-		private bool resetBetween_;
-		private float last_;
-		private bool closeToMid_ = false;
-		private bool awayFromMid_ = false;
-		private float timeActive_ = 0;
-		private float intensity_ = 0;
-
-		private float disableBlinkAbove_ = NoDisableBlink;
-
-		private ClampableMorph(
-			Person p, int bodyPart, string id, float min, float max,
-			Duration fwdDuration, Duration bwdDuration,
-			Duration delayOff, Duration delayOn, bool resetBetween)
-		{
-			person_ = p;
-			bodyPart_ = bodyPart;
-			id_ = id;
-			morph_ = new Morph(p.Atom.GetMorph(id));
-			start_ = min;
-			end_ = max;
-			mid_ = Mid();
-			last_ = mid_;
-			r_ = mid_;
-
-			forward_ = fwdDuration;
-			backward_ = bwdDuration;
-			delayOff_ = delayOff;
-			delayOn_ = delayOn;
-			easing_ = new SinusoidalEasing();
-			resetBetween_ = resetBetween;
-
-			Reset();
-		}
-
-		public ClampableMorph(
-			Person p, int bodyPart, string id, float min, float max,
-			Duration d, Duration delay)
-				: this(p, bodyPart, id, min, max, d, d, delay, delay, false)
-		{
-		}
-
-		public ClampableMorph(
-			Person p, int bodyPart, string id, float start, float end,
-			float minTime, float maxTime,
-			float delayOff, float delayOn,
-			bool resetBetween = false)
-				: this(
-					  p, bodyPart, id, start, end,
-					  new Duration(minTime, maxTime),
-					  new Duration(minTime, maxTime),
-					  new Duration(0, delayOff),
-					  new Duration(0, delayOn),
-					  resetBetween)
-		{
-		}
-
-		public string Name
-		{
-			get { return morph_.Name; }
-		}
-
-		public override string ToString()
-		{
-			return
-				$"start={start_:0.##} end={end_:0.##} mid={mid_} last={last_}\n" +
-				$"fwd={forward_} bwd={backward_}\n" +
-				$"dOff={delayOff_} dOn={delayOn_}\n" +
-				$"state={state_} r={r_:0.##} mag={mag_:0.##} f={finished_}\n" +
-				morph_.ToString();
+			return new MorphTarget(
+				bodyPart_, morphId_, min_, max_, Sync.Clone());
 		}
 
 		public IEasing Easing
 		{
 			get { return easing_; }
 			set { easing_ = value; }
-		}
-
-		public bool Finished
-		{
-			get { return finished_; }
 		}
 
 		public bool CloseToMid
@@ -225,8 +127,40 @@ namespace Cue.Proc
 			set { disableBlinkAbove_ = value; }
 		}
 
-		public void Reset()
+		public bool LimitHit
 		{
+			get { return limitHit_; }
+			set { limitHit_ = value; }
+		}
+
+		public float Intensity
+		{
+			get { return intensity_; }
+			set { intensity_ = value; }
+		}
+
+		public bool AutoSet
+		{
+			get { return autoSet_; }
+			set { autoSet_ = value; }
+		}
+
+		public override void Start(Person p)
+		{
+			Cue.LogError($"morph start {this}");
+
+			person_ = p;
+			morph_ = new Morph(person_.Atom.GetMorph(morphId_));
+
+			mid_ = Mid();
+			last_ = mid_;
+			r_ = mid_;
+		}
+
+		public override void Reset()
+		{
+			base.Reset();
+
 			ForceChange();
 
 			if (morph_ != null)
@@ -238,20 +172,18 @@ namespace Cue.Proc
 
 		public void ForceChange()
 		{
-			state_ = NoState;
-			finished_ = false;
-			timeActive_ = 0;
-
-			forward_.Reset();
-			backward_.Reset();
-			delayOff_.Reset();
-			delayOn_.Reset();
+			//state_ = NoState;
+			//finished_ = false;
+			//timeActive_ = 0;
+			//
+			//forward_.Reset();
+			//backward_.Reset();
+			//delayOff_.Reset();
+			//delayOn_.Reset();
 		}
 
-		public void FixedUpdate(float s, float intensity, bool limitHit)
+		public override void FixedUpdate(float s)
 		{
-			intensity_ = intensity;
-
 			if (morph_ == null)
 			{
 				finished_ = true;
@@ -261,92 +193,45 @@ namespace Cue.Proc
 			finished_ = false;
 			timeActive_ += s;
 
-			switch (state_)
+			int r = Sync.FixedUpdate(s);
+
+			switch (r)
 			{
-				case NoState:
+				case BasicSync.Working:
+				{
+					mag_ = Sync.Magnitude;
+					break;
+				}
+
+				case BasicSync.DurationFinished:
 				{
 					mag_ = 0;
-					state_ = ForwardState;
-					Next(limitHit);
+					Next(true);
 					break;
 				}
 
-				case ForwardState:
+				case BasicSync.Looping:
 				{
-					forward_.Update(s);
-
-					if (forward_.Finished)
-					{
-						mag_ = 1;
-
-						if (delayOn_.Enabled)
-							state_ = DelayOnState;
-						else
-							state_ = BackwardState;
-					}
-					else
-					{
-						mag_ = forward_.Progress;
-					}
-
+					mag_ = 0;
+					Next(false);
 					break;
 				}
 
-				case DelayOnState:
+				case BasicSync.Delaying:
+				case BasicSync.DelayFinished:
 				{
-					delayOn_.Update(s);
-
-					if (delayOn_.Finished)
-						state_ = BackwardState;
-
 					break;
 				}
 
-				case BackwardState:
+				case BasicSync.SyncFinished:
 				{
-					if (!resetBetween_)
-					{
-						Next(limitHit);
-						mag_ = 0;
-						state_ = ForwardState;
-						finished_ = true;
-						break;
-					}
-
-					backward_.Update(s);
-					mag_ = 1 - backward_.Progress;
-
-					if (backward_.Finished)
-					{
-						Next(limitHit);
-
-						if (delayOff_.Enabled)
-						{
-							state_ = DelayOffState;
-						}
-						else
-						{
-							state_ = ForwardState;
-							finished_ = true;
-						}
-					}
-
-					break;
-				}
-
-				case DelayOffState:
-				{
-					delayOff_.Update(s);
-
-					if (delayOff_.Finished)
-					{
-						state_ = ForwardState;
-						finished_ = true;
-					}
-
+					finished_ = true;
 					break;
 				}
 			}
+
+			if (autoSet_)
+				Set(float.MaxValue);
 		}
 
 		private float Mid()
@@ -394,17 +279,17 @@ namespace Cue.Proc
 			return d;
 		}
 
-		private void Next(bool limitHit)
+		private void Next(bool resetBetween)
 		{
-			if (resetBetween_)
+			if (resetBetween)
 				last_ = mid_;
 			else
 				last_ = morph_.Value;
 
-			if (limitHit && timeActive_ >= 10)
+			if (limitHit_ && timeActive_ >= 10)
 			{
 				Cue.LogVerbose(
-					$"{person_.ID} {Name}: active for {timeActive_:0.00}, " +
+					$"{person_.ID} {morphId_}: active for {timeActive_:0.00}, " +
 					$"too long, forcing to 0");
 
 				// force a reset to allow other morphs to take over the prio
@@ -413,8 +298,23 @@ namespace Cue.Proc
 			}
 			else
 			{
-				r_ = U.RandomFloat(start_, end_) * intensity_;
+				r_ = U.RandomFloat(min_, max_) * intensity_;
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"morph {morphId_} ({BodyParts.ToString(bodyPart_)})";
+		}
+
+		public override string ToDetailedString()
+		{
+			return
+				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
+				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
+				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_}\n" +
+				$"morph={morph_}";
 		}
 	}
 }

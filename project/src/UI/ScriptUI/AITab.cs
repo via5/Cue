@@ -386,10 +386,7 @@ namespace Cue
 			p = new VUI.Panel(new VUI.VerticalFlow());
 
 			p.Add(new VUI.CheckBox("Render frustums", OnRenderFrustums));
-			p.Add(new VUI.ComboBox<string>(
-				new string[] { "Free look", "Force camera", "Force up" },
-				OnForceLook));
-
+			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
 			Add(p);
 		}
 

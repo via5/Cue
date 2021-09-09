@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
@@ -38,6 +39,10 @@ namespace Cue
 			nextMax_ = nextMax;
 			windowSize_ = windowSize;
 			windowEasing_ = windowEasing;
+
+			if (windowSize_ == 0)
+				windowSize_ = Math.Abs(max - min);
+
 			Next();
 		}
 
@@ -299,6 +304,16 @@ namespace Cue
 		public bool Finished
 		{
 			get { return finished_; }
+		}
+
+		public float NextMin
+		{
+			get{ return nextMin_; }
+		}
+
+		public float NextMax
+		{
+			get { return nextMax_; }
 		}
 
 		public bool Enabled

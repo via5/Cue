@@ -5,7 +5,7 @@ namespace Cue.Proc
 	interface IProceduralMorphGroup
 	{
 		string Name { get; }
-		List<ClampableMorph> Morphs { get; }
+		List<MorphTarget> Morphs { get; }
 
 		void Reset();
 		void FixedUpdate(float s, float intensity);
@@ -17,6 +17,7 @@ namespace Cue.Proc
 	abstract class BasicProceduralMorphGroup : IProceduralMorphGroup
 	{
 		private string name_;
+		protected readonly List<MorphTarget> morphs_ = new List<MorphTarget>();
 
 		protected BasicProceduralMorphGroup(string name)
 		{
@@ -25,17 +26,31 @@ namespace Cue.Proc
 
 		public string Name { get { return name_; } }
 
-		public abstract List<ClampableMorph> Morphs { get; }
+		public List<MorphTarget> Morphs
+		{
+			get { return morphs_; }
+		}
+
+		public void Add(MorphTarget m)
+		{
+			m.AutoSet = false;
+			morphs_.Add(m);
+		}
+
+		public virtual void Reset()
+		{
+			for (int i = 0; i < morphs_.Count; ++i)
+				morphs_[i].Reset();
+		}
+
 		public abstract void FixedUpdate(float s, float intensity);
 		public abstract void ForceChange();
-		public abstract void Reset();
 		public abstract void Set();
 	}
 
 
 	class ConcurrentProceduralMorphGroup : BasicProceduralMorphGroup
 	{
-		private readonly List<ClampableMorph> morphs_ = new List<ClampableMorph>();
 		private float maxMorphs_ = 1.0f;
 		private bool limited_ = false;
 
@@ -44,25 +59,9 @@ namespace Cue.Proc
 		{
 		}
 
-		public override List<ClampableMorph> Morphs
-		{
-			get { return morphs_; }
-		}
-
 		public float Max
 		{
 			get { return maxMorphs_; }
-		}
-
-		public void Add(ClampableMorph m)
-		{
-			morphs_.Add(m);
-		}
-
-		public override void Reset()
-		{
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Reset();
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -74,13 +73,15 @@ namespace Cue.Proc
 			{
 				var m = morphs_[i];
 
-				m.FixedUpdate(s, intensity, limited_);
+				m.Intensity = intensity;
+				m.LimitHit = limited_;
+				m.FixedUpdate(s);
 
 				// move morphs that are close to the start value to the end of
 				// the list so they don't always have prio for max morph
 				if (limited_ && (i < (count - 1)) && m.CloseToMid)
 				{
-					Cue.LogVerbose($"moving {m.Name} to end");
+					Cue.LogVerbose($"moving {m} to end");
 					morphs_.RemoveAt(i);
 					morphs_.Add(m);
 					--count;
@@ -119,7 +120,6 @@ namespace Cue.Proc
 		private const int ActiveState = 1;
 		private const int DelayState = 2;
 
-		private readonly List<ClampableMorph> morphs_ = new List<ClampableMorph>();
 		private int i_ = 0;
 		private Duration delay_;
 		private int state_ = ActiveState;
@@ -133,11 +133,6 @@ namespace Cue.Proc
 			: base(name)
 		{
 			delay_ = delay;
-		}
-
-		public override List<ClampableMorph> Morphs
-		{
-			get { return morphs_; }
 		}
 
 		public int Current
@@ -155,18 +150,11 @@ namespace Cue.Proc
 			get { return state_; }
 		}
 
-		public void Add(ClampableMorph m)
-		{
-			morphs_.Add(m);
-		}
-
 		public override void Reset()
 		{
+			base.Reset();
 			i_ = 0;
 			state_ = ActiveState;
-
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Reset();
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -178,7 +166,7 @@ namespace Cue.Proc
 			{
 				case ActiveState:
 				{
-					if (morphs_[i_].Finished)
+					if (morphs_[i_].Done)
 					{
 						++i_;
 						if (i_ >= morphs_.Count)
@@ -189,11 +177,15 @@ namespace Cue.Proc
 						}
 
 						if (state_ == ActiveState)
-							morphs_[i_].FixedUpdate(s, intensity, false);
+						{
+							morphs_[i_].Intensity = intensity;
+							morphs_[i_].FixedUpdate(s);
+						}
 					}
 					else
 					{
-						morphs_[i_].FixedUpdate(s, intensity, false);
+						morphs_[i_].Intensity = intensity;
+						morphs_[i_].FixedUpdate(s);
 					}
 
 					break;

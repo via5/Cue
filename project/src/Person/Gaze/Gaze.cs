@@ -2,11 +2,19 @@
 
 namespace Cue
 {
+	// debugging
+	//
 	public static class ForceLooks
 	{
 		public const int None = 0;
 		public const int Camera = 1;
 		public const int Up = 2;
+		public const int Freeze = 3;
+
+		public static string[] Names
+		{
+			get { return new string[] { "Free", "Camera", "Up", "Freeze" }; }
+		}
 	}
 
 
@@ -28,6 +36,9 @@ namespace Cue
 
 		// chooses a random target, handles avoidance
 		private GazeTargetPicker picker_;
+
+		// whether the gazer is enabled; overriden if the head becomes busy
+		private bool gazerEnabled_ = false;
 
 		// index of last emergency event, if any
 		private int lastEmergency_ = -1;
@@ -81,10 +92,29 @@ namespace Cue
 			{
 				Clear();
 
-				if (forceLook_ == ForceLooks.Camera)
-					targets_.SetWeight(Cue.Instance.FindPerson("Camera"), BodyParts.Eyes, 1, "forced");
-				else if (forceLook_ == ForceLooks.Up)
-					targets_.SetAboveWeight(1, "forced");
+				switch (forceLook_)
+				{
+					case ForceLooks.Camera:
+					{
+						targets_.SetWeight(
+							Cue.Instance.FindPerson("Camera"),
+							BodyParts.Eyes, 1, "forced");
+
+						break;
+					}
+
+					case ForceLooks.Up:
+					{
+						targets_.SetAboveWeight(1, "forced");
+						break;
+					}
+
+					case ForceLooks.Freeze:
+					{
+						person_.Gaze.Gazer.Enabled = false;
+						return;
+					}
+				}
 
 				picker_.ForceNextTarget(false);
 			}
@@ -104,7 +134,7 @@ namespace Cue
 							$"gazer now {gazerEnabledBeforeEmergency_}");
 
 						// restore gazer state
-						gazer_.Enabled = gazerEnabledBeforeEmergency_;
+						gazerEnabled_ = gazerEnabledBeforeEmergency_;
 						gazer_.Duration = person_.Personality.GazeDuration;
 
 						// force a next target
@@ -141,6 +171,11 @@ namespace Cue
 
 			if (picker_.HasTarget)
 			{
+				if (person_.Body.Get(BodyParts.Head).Busy)
+					gazer_.Enabled = false;
+				else
+					gazer_.Enabled = gazerEnabled_;
+
 				gazer_.Variance = picker_.CurrentTarget.Variance;
 				eyes_.LookAt(picker_.Position);
 			}
@@ -169,7 +204,7 @@ namespace Cue
 					{
 						// new emergency
 						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
-						gazer_.Enabled = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
+						gazerEnabled_ = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
 						gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
 						lastString_ += "emergency ";
 					}
@@ -187,7 +222,7 @@ namespace Cue
 
 			var ps = person_.Personality;
 
-			bool gazerEnabled = !person_.Body.Get(BodyParts.Head).Busy;
+			gazerEnabled_ = true;
 			int flags = 0;
 
 			for (int i = 0; i < events_.Length; ++i)
@@ -196,7 +231,7 @@ namespace Cue
 				flags |= e.Check(flags);
 
 				if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
-					gazerEnabled = false;
+					gazerEnabled_ = false;
 
 				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
 					break;
@@ -217,8 +252,6 @@ namespace Cue
 
 			if (lastString_ == "")
 				lastString_ = "no flags";
-
-			gazer_.Enabled = gazerEnabled;
 		}
 
 		public bool ShouldAvoidPlayer()

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	interface IInteraction
 	{
@@ -53,15 +51,15 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			var lipsTriggered = person_.Body.Get(BodyParts.Lips).Triggered;
+			var mouthTriggered = person_.Body.Get(BodyParts.Mouth).Triggered;
 			var head = person_.Body.Get(BodyParts.Head);
 
-			if (!busy_ && lipsTriggered && !head.Busy)
+			if (!busy_ && mouthTriggered && !head.Busy)
 			{
 				busy_ = true;
 				head.ForceBusy(true);
 			}
-			else if (busy_ && !lipsTriggered)
+			else if (busy_ && !mouthTriggered)
 			{
 				busy_ = false;
 				head.ForceBusy(false);

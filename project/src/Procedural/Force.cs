@@ -193,7 +193,6 @@ namespace Cue.Proc
 					oneFrameFinished_ = true;
 					break;
 				}
-
 			}
 		}
 

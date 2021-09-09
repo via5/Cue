@@ -55,8 +55,18 @@ namespace Cue
 
 					foreach (var m in g.Morphs)
 					{
-						items.Add(I(3) + m.Name);
-						foreach (var line in m.ToString().Split('\n'))
+						items.Add(I(3) + m.ToString());
+
+						{
+							var syncLines = m.Sync.ToDetailedString().Split('\n');
+							if (syncLines.Length > 0)
+								items.Add(I(4) + "sync: " + syncLines[0]);
+
+							for (int i = 1; i < syncLines.Length; ++i)
+								items.Add(I(5) + syncLines[i]);
+						}
+
+						foreach (var line in m.ToDetailedString().Split('\n'))
 							items.Add(I(4) + line);
 					}
 				}
