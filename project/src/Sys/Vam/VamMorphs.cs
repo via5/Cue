@@ -145,6 +145,7 @@ namespace Cue.Sys.Vam
 		private DAZMorph m_;
 		private List<MorphInfo> subMorphs_ = new List<MorphInfo>();
 		private float multiplier_ = 1;
+		private bool eyes_ = false;
 
 		private int lastSetFrame_ = -1;
 		private float morphValueOnLastSet_ = -1;
@@ -162,6 +163,9 @@ namespace Cue.Sys.Vam
 
 			if (m_ != null && subMorphs_.Count == 0)
 				MorphValueHijack.Install(this);
+
+			if (morphId == "PHMEyesClosedR" || morphId == "PHMEyesClosedL")
+				eyes_ = true;
 		}
 
 		public static bool SetFromCue
@@ -289,6 +293,9 @@ namespace Cue.Sys.Vam
 			{
 				setFromCue_ = true;
 				m_.morphValue = f;
+
+				if (eyes_)
+					atom_.SetBlink(f < 0.45f);
 			}
 			finally
 			{

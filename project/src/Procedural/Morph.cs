@@ -6,8 +6,6 @@ namespace Cue.Proc
 {
 	class MorphTarget : BasicTarget
 	{
-		public const float NoDisableBlink = 10000;
-
 		private Person person_ = null;
 		private int bodyPart_;
 		private string morphId_;
@@ -25,8 +23,6 @@ namespace Cue.Proc
 		private float timeActive_ = 0;
 		private float intensity_ = 1;
 		private bool limitHit_ = false;
-
-		private float disableBlinkAbove_ = NoDisableBlink;
 
 
 		public MorphTarget(
@@ -122,16 +118,9 @@ namespace Cue.Proc
 			get { return closeToMid_; }
 		}
 
-		public float DisableBlinkAbove
-		{
-			get { return disableBlinkAbove_; }
-			set { disableBlinkAbove_ = value; }
-		}
-
 		public bool LimitHit
 		{
 			get { return limitHit_; }
-			set { limitHit_ = value; }
 		}
 
 		public float Intensity
@@ -230,7 +219,7 @@ namespace Cue.Proc
 			}
 
 			if (autoSet_)
-				Set(float.MaxValue);
+				Set(null);
 		}
 
 		private float Mid()
@@ -241,24 +230,29 @@ namespace Cue.Proc
 			return morph_.DefaultValue;
 		}
 
-		public float Set(float max)
+		public void Set(float[] remaining)
 		{
 			closeToMid_ = false;
 
 			if (morph_ == null)
-				return 0;
+				return;
 
 			var v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
-			if (Math.Abs(v - mid_) > max)
-				v = mid_ + Math.Sign(v) * max;
+
+			limitHit_ = false;
+			if (remaining != null && bodyPart_ >= 0)
+			{
+				if (Math.Abs(v - mid_) > remaining[bodyPart_])
+				{
+					v = mid_ + Math.Sign(v) * remaining[bodyPart_];
+					limitHit_ = true;
+				}
+			}
 
 			var d = v - mid_;
 
 			if (bodyPart_ == BodyParts.None || !person_.Body.Get(bodyPart_).Busy)
 				morph_.Value = v;
-
-			if (disableBlinkAbove_ != NoDisableBlink)
-				person_.Gaze.Eyes.Blink = (d < disableBlinkAbove_);
 
 			d = Math.Abs(d);
 
@@ -275,7 +269,8 @@ namespace Cue.Proc
 				awayFromMid_ = true;
 			}
 
-			return d;
+			if (remaining != null && bodyPart_ >= 0)
+				remaining[bodyPart_] -= d;
 		}
 
 		private void Next(bool resetBetween)

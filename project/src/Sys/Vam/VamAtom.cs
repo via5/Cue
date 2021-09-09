@@ -14,6 +14,7 @@
 		private BoolParameter collisions_;
 		private BoolParameter physics_;
 		private FloatParameter scale_;
+		private BoolParameter blink_;
 
 		public VamAtom(Atom atom)
 		{
@@ -33,6 +34,7 @@
 			collisions_ = new BoolParameter(this, "AtomControl", "collisionEnabled");
 			physics_ = new BoolParameter(this, "control", "physicsEnabled");
 			scale_ = new FloatParameter(this, "scale", "scale");
+			blink_ = new BoolParameter(this, "EyelidControl", "blinkEnabled");
 		}
 
 		public void Init()
@@ -206,6 +208,11 @@
 			SetStrongerDamping("rFootControl", pos, rot);
 			SetStrongerDamping("lKneeControl", pos, rot);
 			SetStrongerDamping("rKneeControl", pos, rot);
+		}
+
+		public void SetBlink(bool b)
+		{
+			blink_.Value = b;
 		}
 
 		private void SetStrongerDamping(string cn, float pos, float rot)

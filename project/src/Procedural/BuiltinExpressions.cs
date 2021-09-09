@@ -42,11 +42,7 @@
 		public static IProceduralMorphGroup EyesClosed(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup("eyesClosed");
-
-			var eyesClosed = new MorphTarget(p, BodyParts.Eyes, "Eyes Closed", 0, 1, 0.5f, 5, 2, 2);
-			eyesClosed.DisableBlinkAbove = 0.5f;
-			g.Add(eyesClosed);
-
+			g.Add(new MorphTarget(p, BodyParts.Eyes, "Eyes Closed", 0, 1, 0.5f, 5, 2, 2));
 			return g;
 		}
 
@@ -111,11 +107,7 @@
 		public static IProceduralMorphGroup EyesClosedTired(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup("eyesClosedTired");
-
-			var eyesClosed = new MorphTarget(p, BodyParts.Eyes, "Eyes Closed", 0.2f, 1, 2, 5, 3, 3);
-			eyesClosed.DisableBlinkAbove = 0.5f;
-			g.Add(eyesClosed);
-
+			g.Add(new MorphTarget(p, BodyParts.Eyes, "Eyes Closed", 0.2f, 1, 2, 5, 3, 3));
 			return g;
 		}
 	}

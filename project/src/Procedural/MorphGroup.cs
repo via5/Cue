@@ -10,7 +10,7 @@ namespace Cue.Proc
 		void Reset();
 		void FixedUpdate(float s, float intensity);
 		void ForceChange();
-		void Set();
+		void Set(float[] remaining);
 	}
 
 
@@ -31,10 +31,11 @@ namespace Cue.Proc
 			get { return morphs_; }
 		}
 
-		public void Add(MorphTarget m)
+		public MorphTarget Add(MorphTarget m)
 		{
 			m.AutoSet = false;
 			morphs_.Add(m);
+			return m;
 		}
 
 		public virtual void Reset()
@@ -45,23 +46,15 @@ namespace Cue.Proc
 
 		public abstract void FixedUpdate(float s, float intensity);
 		public abstract void ForceChange();
-		public abstract void Set();
+		public abstract void Set(float[] remaining);
 	}
 
 
 	class ConcurrentProceduralMorphGroup : BasicProceduralMorphGroup
 	{
-		private float maxMorphs_ = 1.0f;
-		private bool limited_ = false;
-
 		public ConcurrentProceduralMorphGroup(string name)
 			: base(name)
 		{
-		}
-
-		public float Max
-		{
-			get { return maxMorphs_; }
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -74,12 +67,11 @@ namespace Cue.Proc
 				var m = morphs_[i];
 
 				m.Intensity = intensity;
-				m.LimitHit = limited_;
 				m.FixedUpdate(s);
 
 				// move morphs that are close to the start value to the end of
 				// the list so they don't always have prio for max morph
-				if (limited_ && (i < (count - 1)) && m.CloseToMid)
+				if (m.LimitHit && (i < (count - 1)) && m.CloseToMid)
 				{
 					Cue.LogVerbose($"moving {m} to end");
 					morphs_.RemoveAt(i);
@@ -99,18 +91,15 @@ namespace Cue.Proc
 				morphs_[i].ForceChange();
 		}
 
-		public override void Set()
+		public override void Set(float[] remaining)
 		{
-			float remaining = maxMorphs_;
 			for (int i = 0; i < morphs_.Count; ++i)
-				remaining -= morphs_[i].Set(remaining);
-
-			limited_ = (remaining <= 0);
+				morphs_[i].Set(remaining);
 		}
 
 		public override string ToString()
 		{
-			return $"con {Name} max={maxMorphs_}";
+			return $"con {Name}";
 		}
 	}
 
@@ -209,12 +198,12 @@ namespace Cue.Proc
 				morphs_[i].ForceChange();
 		}
 
-		public override void Set()
+		public override void Set(float[] remaining)
 		{
 			if (morphs_.Count == 0)
 				return;
 
-			morphs_[i_].Set(float.MaxValue);
+			morphs_[i_].Set(remaining);
 		}
 
 		public override string ToString()

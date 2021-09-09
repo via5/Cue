@@ -55,12 +55,14 @@ namespace Cue.Proc
 		public void FixedUpdate(float s)
 		{
 			float intensity = max_ * intensity_ * (1 - dampen_);
-
 			for (int i = 0; i < groups_.Count; ++i)
 				groups_[i].FixedUpdate(s, intensity);
+		}
 
+		public void Set(float[] remaining)
+		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Set();
+				groups_[i].Set(remaining);
 		}
 
 		public void ForceChange()
@@ -82,6 +84,8 @@ namespace Cue.Proc
 	{
 		private Person person_;
 		private bool enabled_ = true;
+		private const float MaxMorphs = 1.0f;
+		private float[] remaining_ = new float[BodyParts.Count];
 
 		private readonly List<ExpressionType> expressions_ =
 			new List<ExpressionType>();
@@ -110,6 +114,11 @@ namespace Cue.Proc
 		public List<ExpressionType> All
 		{
 			get { return expressions_; }
+		}
+
+		public float Max
+		{
+			get { return MaxMorphs; }
 		}
 
 		private ExpressionType CreateCommon(Person p)
@@ -212,6 +221,12 @@ namespace Cue.Proc
 
 			for (int i = 0; i < expressions_.Count; ++i)
 				expressions_[i].FixedUpdate(s);
+
+			for (int i = 0; i < remaining_.Length; ++i)
+				remaining_[i] = MaxMorphs;
+
+			for (int i = 0; i < expressions_.Count; ++i)
+				expressions_[i].Set(remaining_);
 		}
 
 		public void ForceChange()
