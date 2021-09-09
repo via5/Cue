@@ -1,4 +1,6 @@
-﻿namespace Cue.Proc
+﻿using System.Collections.Generic;
+
+namespace Cue.Proc
 {
 	interface ITarget
 	{
@@ -48,10 +50,20 @@
 
 	class Player : IPlayer
 	{
+		class Playing
+		{
+			public ProcAnimation proto, anim;
+
+			public Playing(ProcAnimation proto, ProcAnimation anim)
+			{
+				this.proto = proto;
+				this.anim = anim;
+			}
+		}
+
 		private Person person_;
 		private Logger log_;
-		private ProcAnimation proto_ = null;
-		private ProcAnimation anim_ = null;
+		private readonly List<Playing> playing_ = new List<Playing>();
 
 		public Player(Person p)
 		{
@@ -59,26 +71,15 @@
 			log_ = new Logger(Logger.Animation, person_, "ProcPlayer");
 		}
 
-		public ProcAnimation Current
+		private ProcAnimation Find(IAnimation a)
 		{
-			get { return anim_; }
-		}
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+					return playing_[i].anim;
+			}
 
-		public ProcAnimation Proto
-		{
-			get { return proto_; }
-		}
-
-		public bool Playing
-		{
-			get { return (anim_ != null); }
-		}
-
-		// todo
-		public bool Paused
-		{
-			get { return false; }
-			set { }
+			return null;
 		}
 
 		public bool UsesFrames
@@ -86,41 +87,68 @@
 			get { return false; }
 		}
 
-		public void Seek(float f)
+		public IAnimation[] GetPlaying()
+		{
+			var a = new IAnimation[playing_.Count];
+
+			for (int i = 0; i < playing_.Count; ++i)
+				a[i] = playing_[i].anim;
+
+			return a;
+		}
+
+		public bool IsPlaying(IAnimation a)
+		{
+			return !Find(a)?.Done ?? false;
+		}
+
+		public void Seek(IAnimation a, float f)
 		{
 			// todo
 		}
 
 		public bool Play(IAnimation a, int flags)
 		{
-			anim_ = null;
-			proto_ = (a as ProcAnimation);
-			if (proto_ == null)
+			var proto = (a as ProcAnimation);
+			if (proto == null)
 				return false;
 
 			person_.Atom.SetDefaultControls("playing proc anim");
 
-			anim_ = proto_.Clone();
-			anim_.Start(person_);
+			var p = new Playing(proto, proto.Clone());
+
+			playing_.Add(p);
+			p.anim.Start(person_);
 
 			log_.Info($"playing {a}");
 
 			return true;
 		}
 
-		public void Stop(bool rewind)
+		public void Stop(IAnimation a, bool rewind)
 		{
-			anim_ = null;
-			proto_ = null;
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+				{
+					playing_.RemoveAt(i);
+					return;
+				}
+			}
 		}
 
 		public void FixedUpdate(float s)
 		{
-			if (anim_ != null)
+			int i = 0;
+
+			while (i < playing_.Count)
 			{
-				anim_.FixedUpdate(s);
-				if (anim_.Done)
-					Stop(false);
+				playing_[i].anim.FixedUpdate(s);
+
+				if (playing_[i].anim.Done)
+					playing_.RemoveAt(i);
+				else
+					++i;
 			}
 		}
 
@@ -130,7 +158,7 @@
 
 		public override string ToString()
 		{
-			return "Procedural: " + (anim_ == null ? "(none)" : anim_.ToString());
+			return $"Procedural: {playing_.Count} anims";
 		}
 	}
 }

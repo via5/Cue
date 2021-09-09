@@ -54,7 +54,7 @@ namespace Cue
 		}
 
 		public override void Update(float s)
-		{
+		{/*
 			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
 				return;
 
@@ -69,7 +69,7 @@ namespace Cue
 						sel_.Real.FirstFrame, sel_.Real.FirstFrame,
 						sel_.Real.LastFrame);
 				});
-			}
+			}*/
 		}
 
 		private void OnPlay()
@@ -82,7 +82,7 @@ namespace Cue
 		}
 
 		private void PlaySelection(float frame = -1)
-		{
+		{/*
 			person_.Animator.Play(
 				sel_, (loop_.Checked ? Animator.Loop : 0) | Animator.Exclusive);
 
@@ -109,29 +109,29 @@ namespace Cue
 					frame = sel_.Real.InitFrame;
 
 				seek_.Set(frame, sel_.Real.InitFrame, sel_.Real.LastFrame);
-			});
+			});*/
 		}
 
 		private void OnStop()
-		{
+		{/*
 			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
 				return;
 
-			person_.Animator.Stop();
+			person_.Animator.Stop();*/
 		}
 
 		private void OnPaused(bool b)
-		{
+		{/*
 			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
 				return;
 
 			var p = person_.Animator.CurrentPlayer;
 			if (p != null)
-				p.Paused = b;
+				p.Paused = b;*/
 		}
 
 		private void OnSeek(float f)
-		{
+		{/*
 			if (ignore_ || sel_ == null)
 				return;
 
@@ -145,7 +145,7 @@ namespace Cue
 			}
 
 			Cue.LogInfo($"seeking to {f}");
-			person_.Animator.CurrentPlayer.Seek(f);
+			person_.Animator.CurrentPlayer.Seek(f);*/
 		}
 	}
 }

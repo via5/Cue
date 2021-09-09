@@ -17,24 +17,25 @@ namespace Cue
 			step_ = new Sys.Vam.StringParameter(p, "Synergy.Synergy", "Force Play Step");
 		}
 
-		public bool Playing
-		{
-			get { return playing_.Value; }
-		}
-
-		// todo
-		public bool Paused
-		{
-			get { return false; }
-			set { }
-		}
-
 		public bool UsesFrames
 		{
 			get { return false; }
 		}
 
-		public void Seek(float f)
+		public IAnimation[] GetPlaying()
+		{
+			if (playing_.Value)
+				return new IAnimation[] { anim_ };
+			else
+				return new IAnimation[0];
+		}
+
+		public bool IsPlaying(IAnimation a)
+		{
+			return playing_.Value;
+		}
+
+		public void Seek(IAnimation a, float f)
 		{
 			// todo
 		}
@@ -49,7 +50,7 @@ namespace Cue
 			return true;
 		}
 
-		public void Stop(bool rewind)
+		public void Stop(IAnimation a, bool rewind)
 		{
 			step_.Value = "";
 			anim_ = null;

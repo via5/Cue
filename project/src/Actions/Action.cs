@@ -320,7 +320,7 @@ namespace Cue
 			}
 			else
 			{
-				return p.Animator.Playing;
+				return p.Animator.IsPlayingTransitionTo(PersonState.Sitting);
 			}
 		}
 
@@ -392,7 +392,7 @@ namespace Cue
 		private float e_ = 0;
 		private int i_ = -1;
 		private const float Delay = 5;
-		private bool playing_ = false;
+		private Animation playing_ = null;
 		//private bool wasClose_ = false;
 
 		public RandomAnimationAction(IObject o, List<Animation> anims)
@@ -444,7 +444,7 @@ namespace Cue
 
 			if (i_ == -1)
 			{
-				if (!p.Animator.Playing)
+				if (playing_ == null)
 				{
 					i_ = 0;
 					PlayNext(p);
@@ -452,12 +452,12 @@ namespace Cue
 			}
 			else
 			{
-				if (playing_)
+				if (playing_ != null)
 				{
-					if (!p.Animator.Playing)
+					if (!p.Animator.IsPlaying(playing_) && p.Animator.CanPlayType(Animation.IdleType))
 					{
 						//p.Animator.PlayNeutral();
-						playing_ = false;
+						playing_ = null;
 					}
 				}
 				else
@@ -476,14 +476,12 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			var ct = p.Animator.CurrentAnimationType;
-
-			if (ct == Animation.IdleType || ct == Animation.NoType)
+			if (p.Animator.CanPlayType(Animation.IdleType))
 			{
 				if (p.Animator.CanPlay(anims_[i_]))
 				{
 					p.Animator.Play(anims_[i_]);
-					playing_ = true;
+					playing_ = anims_[i_];
 
 					++i_;
 					if (i_ >= anims_.Count)

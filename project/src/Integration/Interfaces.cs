@@ -84,15 +84,15 @@ namespace Cue
 
 	interface IPlayer
 	{
-		bool Playing { get; }
-		bool Paused { get; set; }
 		bool UsesFrames { get; }
 
+		IAnimation[] GetPlaying();
 		bool Play(IAnimation a, int flags);
-		void Stop(bool rewind);
-		void Seek(float where);
+		void Stop(IAnimation a, bool rewind);
+		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
 		void Update(float s);
+		bool IsPlaying(IAnimation a);
 	}
 
 	interface IAnimation

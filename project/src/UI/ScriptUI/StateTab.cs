@@ -10,7 +10,6 @@ namespace Cue
 		private VUI.Label dir_ = new VUI.Label();
 		private VUI.Label bearing_ = new VUI.Label();
 		private VUI.Label action_ = new VUI.Label();
-		private VUI.Label player_ = new VUI.Label();
 		private VUI.Label anim_ = new VUI.Label();
 		private VUI.Label nav_ = new VUI.Label();
 		private VUI.Label state_ = new VUI.Label();
@@ -51,9 +50,6 @@ namespace Cue
 
 			state.Add(new VUI.Label("Action"));
 			state.Add(action_);
-
-			state.Add(new VUI.Label("Player"));
-			state.Add(player_);
 
 			state.Add(new VUI.Label("Animation"));
 			state.Add(anim_);
@@ -115,16 +111,7 @@ namespace Cue
 			nav_.Text = person_.MoveStateString();
 			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
 			gaze_.Text = person_.Gaze.ToString();
-
-			if (person_.Animator.CurrentPlayer == null)
-				player_.Text = "(none)";
-			else
-				player_.Text = person_.Animator.CurrentPlayer.ToString();
-
-			if (person_.Animator.CurrentAnimation == null)
-				anim_.Text = "(none)";
-			else
-				anim_.Text = person_.Animator.CurrentAnimation.ToString();
+			anim_.Text = person_.Animator.ToString();
 
 			breath_.Text = person_.Breathing.ToString();
 			eyes_.Text = person_.Gaze.Eyes.ToString();

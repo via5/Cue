@@ -96,7 +96,7 @@
 
 			if (CanRun())
 			{
-				if (!person_.Animator.Playing)
+				if (person_.Animator.CanPlayType(Animation.SmokeType))
 					person_.Animator.PlayType(Animation.SmokeType);
 			}
 		}

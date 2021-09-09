@@ -277,7 +277,7 @@ namespace Cue
 
 				animator_.Update(s);
 
-				if (!deferredTransition_ && !animator_.Playing)
+				if (!deferredTransition_ && !animator_.IsPlayingTransition())
 				{
 					state_.FinishTransition();
 					if (deferredState_ != PersonState.None)
@@ -492,7 +492,7 @@ namespace Cue
 							lastNavState_ != Sys.NavStates.Moving &&
 							lastNavState_ != Sys.NavStates.Calculating
 						)
-						|| !animator_.Playing)
+						|| !animator_.IsPlayingTransition())
 					{
 						animator_.PlayType(
 							Animation.WalkType,
@@ -504,7 +504,7 @@ namespace Cue
 
 				case Sys.NavStates.TurningLeft:
 				{
-					if (lastNavState_ != Sys.NavStates.TurningLeft || !animator_.Playing)
+					if (lastNavState_ != Sys.NavStates.TurningLeft || !animator_.IsPlayingTransition())
 					{
 						if (CanMove)
 						{
@@ -518,7 +518,7 @@ namespace Cue
 
 				case Sys.NavStates.TurningRight:
 				{
-					if (lastNavState_ != Sys.NavStates.TurningRight || !animator_.Playing)
+					if (lastNavState_ != Sys.NavStates.TurningRight || !animator_.IsPlayingTransition())
 					{
 						if (CanMove)
 						{

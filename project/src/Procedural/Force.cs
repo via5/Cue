@@ -261,6 +261,9 @@ namespace Cue.Proc
 
 		private float EnergyFactor()
 		{
+			if (person_ == null)
+				return 0;
+
 			return excitement_.Magnitude(person_.Mood.MovementEnergy);
 		}
 

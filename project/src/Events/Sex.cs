@@ -206,7 +206,7 @@
 
 				case PlayState:
 				{
-					if (!person_.Animator.Playing && person_.Mood.State == Mood.NormalState)
+					if (person_.Animator.CanPlayType(Animation.SexType) && person_.Mood.State == Mood.NormalState)
 						person_.Animator.PlaySex(person_.State.Current, receiver_);
 
 					break;

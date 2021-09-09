@@ -59,16 +59,17 @@ namespace Cue
 			playing_ = new Sys.Vam.BoolParameter(p, "VamTimeline.AtomPlugin", "Is Playing");
 		}
 
-		public bool Playing
+		public bool IsPlaying(IAnimation a)
 		{
-			get { return playing_.Value; }
+			return playing_.Value;
 		}
 
-		// todo
-		public bool Paused
+		public IAnimation[] GetPlaying()
 		{
-			get { return false; }
-			set { }
+			if (playing_.Value)
+				return new IAnimation[] { current_ };
+			else
+				return new IAnimation[0];
 		}
 
 		public bool UsesFrames
@@ -76,7 +77,7 @@ namespace Cue
 			get { return false; }
 		}
 
-		public void Seek(float f)
+		public void Seek(IAnimation a, float f)
 		{
 			// todo
 		}
@@ -104,7 +105,7 @@ namespace Cue
 			return true;
 		}
 
-		public void Stop(bool rewind)
+		public void Stop(IAnimation a, bool rewind)
 		{
 			stop_.Fire();
 			play_ = null;
@@ -117,7 +118,7 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (current_ != null && !Playing)
+			if (current_ != null && !playing_.Value)
 				current_ = null;
 		}
 

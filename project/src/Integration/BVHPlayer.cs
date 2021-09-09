@@ -95,9 +95,17 @@ namespace Cue.BVH
          };
         }
 
-        public bool Playing
+        public bool IsPlaying(IAnimation a)
         {
-            get { return playing_; }
+            return playing_;
+        }
+
+        public IAnimation[] GetPlaying()
+        {
+            if (playing_)
+                return new IAnimation[] { anim_ };
+            else
+                return new IAnimation[0];
         }
 
         public bool UsesFrames
@@ -164,7 +172,7 @@ namespace Cue.BVH
             return true;
         }
 
-        public void Stop(bool rewind)
+        public void Stop(IAnimation a, bool rewind)
         {
             if (anim_ == null)
                 return;
@@ -353,13 +361,7 @@ namespace Cue.BVH
             containingAtom_.mainController.transform.Translate(rootMotion2D);
         }
 
-        public bool Paused
-        {
-            get { return paused_; }
-            set { paused_ = value; }
-        }
-
-        public void Seek(float frame)
+        public void Seek(IAnimation a, float frame)
         {
             log_.Info($"seeking to {frame}");
 

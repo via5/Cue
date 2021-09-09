@@ -77,22 +77,25 @@ namespace Cue
 
 		private void DumpAnimation()
 		{
-			var player = person_.Animator.CurrentPlayer as Proc.Player;
-			var p = player?.Current;
-
-			if (p == null)
-			{
-				list_.Clear();
-				list_.AddItem("not procedural");
-				return;
-			}
-
 			var items = new List<string>();
 
-			items.Add(p.ToDetailedString());
+			foreach (var pl in person_.Animator.Players)
+			{
+				foreach (var a in pl.GetPlaying())
+				{
+					var p = a as Proc.ProcAnimation;
+					if (p == null)
+						continue;
 
-			foreach (var s in p.Targets)
-				DumpTarget(items, s, 1);
+					items.Add(p.ToDetailedString());
+
+					foreach (var s in p.Targets)
+						DumpTarget(items, s, 1);
+				}
+			}
+
+			if (items.Count == 0)
+				list_.AddItem("not procedural");
 
 			list_.SetItems(items);
 		}
