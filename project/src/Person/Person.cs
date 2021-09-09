@@ -89,7 +89,7 @@ namespace Cue
 
 			if (this == Cue.Instance.Player)
 			{
-				AI.EventsEnabled = false;
+				AI.CommandsEnabled = false;
 				AI.InteractionsEnabled = false;
 			}
 
@@ -107,8 +107,8 @@ namespace Cue
 			if (r.HasKey("personality"))
 				personality_ = Resources.Personalities.Clone(r["personality"], this);
 
-			if (r.HasKey("events"))
-				ai_.EventsEnabled = r["events"].AsBool;
+			if (r.HasKey("commands"))
+				ai_.CommandsEnabled = r["commands"].AsBool;
 		}
 
 		public int PersonIndex

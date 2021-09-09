@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class StandEvent : BasicEvent
+	class StandCommand : BasicCommand
 	{
 		const int NoState = 0;
 		const int Moving = 1;
@@ -12,18 +12,18 @@ namespace Cue
 		private Slot slot_ = null;
 		private int state_ = NoState;
 
-		public StandEvent(Person p)
+		public StandCommand(Person p)
 			: base(p, "Stand")
 		{
 		}
 
-		public StandEvent(Person p, IObject o)
+		public StandCommand(Person p, IObject o)
 			: this(p)
 		{
 			o_ = o;
 		}
 
-		public StandEvent(Person p, Slot s)
+		public StandCommand(Person p, Slot s)
 			: this(p)
 		{
 			o_ = s.ParentObject;

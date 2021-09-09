@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class LieDownEvent : BasicEvent
+	class LieDownCommand : BasicCommand
 	{
 		const int NoState = 0;
 		const int Moving = 1;
@@ -10,7 +10,7 @@
 		private int state_ = NoState;
 		private float elapsed_ = 0;
 
-		public LieDownEvent(Person p, IObject o)
+		public LieDownCommand(Person p, IObject o)
 			: base(p, "LieDown")
 		{
 			o_ = o;

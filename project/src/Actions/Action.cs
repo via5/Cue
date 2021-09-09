@@ -238,7 +238,7 @@ namespace Cue
 
 			if (!p.HasTarget)
 			{
-				log_.Info($"CallAction: {p} reached {caller_}, event finished");
+				log_.Info($"CallAction: {p} reached {caller_}, command finished");
 				return false;
 			}
 

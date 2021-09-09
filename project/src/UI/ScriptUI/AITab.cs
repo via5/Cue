@@ -51,7 +51,7 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
-		private VUI.Label event_ = new VUI.Label();
+		private VUI.Label command_ = new VUI.Label();
 		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
 
@@ -73,8 +73,8 @@ namespace Cue
 			state.Add(new VUI.Label("Traits"));
 			state.Add(traits_);
 
-			state.Add(new VUI.Label("Event"));
-			state.Add(event_);
+			state.Add(new VUI.Label("Command"));
+			state.Add(command_);
 
 			state.Add(new VUI.Label("Personality"));
 			state.Add(personality_);
@@ -94,12 +94,12 @@ namespace Cue
 		{
 			string es = "";
 
-			if (ai_.EventsEnabled)
+			if (ai_.CommandsEnabled)
 			{
 				if (es != "")
 					es += "|";
 
-				es += "events";
+				es += "commands";
 			}
 
 			if (ai_.InteractionsEnabled)
@@ -116,9 +116,9 @@ namespace Cue
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
 
-			event_.Text =
-				(ai_.Event == null ? "(none)" : ai_.Event.ToString()) + " " +
-				(ai_.ForcedEvent == null ? "(forced: none)" : $"(forced: {ai_.ForcedEvent})");
+			command_.Text =
+				(ai_.Command == null ? "(none)" : ai_.Command.ToString()) + " " +
+				(ai_.ForcedCommand == null ? "(forced: none)" : $"(forced: {ai_.ForcedCommand})");
 
 			if (personality_.Count == 0)
 			{

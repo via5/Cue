@@ -420,7 +420,7 @@ namespace Cue
 		public const int Action      = 0x002;
 		public const int Interaction = 0x004;
 		public const int AI          = 0x008;
-		public const int Event       = 0x010;
+		public const int Command     = 0x010;
 		public const int Integration = 0x020;
 		public const int Object      = 0x040;
 		public const int Slots       = 0x080;
@@ -431,7 +431,7 @@ namespace Cue
 		public const int All         = int.MaxValue;
 
 		private static int enabled_ =
-			Action | Interaction | AI | Event | Integration | Object | Animation;
+			Action | Interaction | AI | Command | Integration | Object | Animation;
 
 		private int type_;
 		private Func<string> prefix_;

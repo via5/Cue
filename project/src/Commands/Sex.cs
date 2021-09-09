@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class HandjobEvent : BasicEvent
+	class HandjobCommand : BasicCommand
 	{
 		private const int NoState = 0;
 		private const int CallingState = 1;
@@ -12,7 +12,7 @@
 		private int state_ = NoState;
 		private float wait_ = 0;
 
-		public HandjobEvent(Person p, Person receiver)
+		public HandjobCommand(Person p, Person receiver)
 			: base(p, "HJ")
 		{
 			receiver_ = receiver;
@@ -81,7 +81,7 @@
 	}
 
 
-	class BlowjobEvent : BasicEvent
+	class BlowjobCommand : BasicCommand
 	{
 		private const int NoState = 0;
 		private const int CallingState = 1;
@@ -93,7 +93,7 @@
 		private int state_ = NoState;
 		private float wait_ = 0;
 
-		public BlowjobEvent(Person p, Person receiver)
+		public BlowjobCommand(Person p, Person receiver)
 			: base(p, "BJ")
 		{
 			receiver_ = receiver;

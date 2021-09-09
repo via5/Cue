@@ -2,22 +2,22 @@
 
 namespace Cue
 {
-	interface IEvent
+	interface ICommand
 	{
 		void Stop();
 		bool Update(float s);
 	}
 
-	abstract class BasicEvent : IEvent
+	abstract class BasicCommand : ICommand
 	{
 		protected Person person_;
 		protected Logger log_;
 		private Slot lockedSlot_ = null;
 
-		protected BasicEvent(Person p, string name)
+		protected BasicCommand(Person p, string name)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Event, p, name + "Event");
+			log_ = new Logger(Logger.Command, p, name + "Command");
 		}
 
 		public Slot LockedSlot
@@ -36,7 +36,7 @@ namespace Cue
 		{
 			if (lockedSlot_ != null)
 			{
-				log_.Info($"{this}: {lockedSlot_} was locked by event, unlocking");
+				log_.Info($"{this}: {lockedSlot_} was locked by command, unlocking");
 				lockedSlot_.Unlock(person_);
 				lockedSlot_ = null;
 			}
@@ -46,7 +46,7 @@ namespace Cue
 	}
 
 
-	class CallEvent : BasicEvent
+	class CallCommand : BasicCommand
 	{
 		private const int NoState = 0;
 		private const int MovingState = 1;
@@ -55,7 +55,7 @@ namespace Cue
 		private CallAction call_ = null;
 		private Action post_ = null;
 
-		public CallEvent(Person p, Person caller, Action post=null)
+		public CallCommand(Person p, Person caller, Action post=null)
 			: base(p, "Call")
 		{
 			caller_ = caller;
@@ -83,7 +83,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "CallEvent";
+			return "CallCommand";
 		}
 	}
 }

@@ -97,6 +97,11 @@
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Interactions.cs" />
+    <Compile Include="src\Commands\Command.cs" />
+    <Compile Include="src\Commands\Lying.cs" />
+    <Compile Include="src\Commands\Sex.cs" />
+    <Compile Include="src\Commands\Sitting.cs" />
+    <Compile Include="src\Commands\Standing.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Enums\EnumValues.cs" />
     <Compile Include="src\Enums\PhysiologyEnum.cs">
@@ -104,11 +109,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PhysiologyEnum.tt</DependentUpon>
     </Compile>
-    <Compile Include="src\Events\Event.cs" />
-    <Compile Include="src\Events\Lying.cs" />
-    <Compile Include="src\Events\Sex.cs" />
-    <Compile Include="src\Events\Sitting.cs" />
-    <Compile Include="src\Events\Standing.cs" />
     <Compile Include="src\Integration\BVH.cs" />
     <Compile Include="src\Integration\BVHFile.cs" />
     <Compile Include="src\Integration\BVHPlayer.cs" />

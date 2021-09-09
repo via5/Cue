@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class SitEvent : BasicEvent
+	class SitCommand : BasicCommand
 	{
 		const int NoState = 0;
 		const int Moving = 1;
@@ -13,18 +13,18 @@ namespace Cue
 		private Slot slot_ = null;
 		private int state_ = NoState;
 
-		private SitEvent(Person p)
+		private SitCommand(Person p)
 			: base(p, "Sit")
 		{
 		}
 
-		public SitEvent(Person p, IObject o)
+		public SitCommand(Person p, IObject o)
 			: this(p)
 		{
 			o_ = o;
 		}
 
-		public SitEvent(Person p, Slot s)
+		public SitCommand(Person p, Slot s)
 			: this(p)
 		{
 			o_ = s.ParentObject;

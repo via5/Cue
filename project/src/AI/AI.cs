@@ -6,14 +6,14 @@ namespace Cue
 	{
 		T GetInteraction<T>() where T : class, IInteraction;
 		bool InteractWith(IObject o);
-		void RunEvent(IEvent e);
+		void RunCommand(ICommand e);
 		void FixedUpdate(float s);
 		void Update(float s);
 		void MakeIdle();
-		bool EventsEnabled { get; set; }
+		bool CommandsEnabled { get; set; }
 		bool InteractionsEnabled { get; set; }
-		IEvent ForcedEvent { get; }
-		IEvent Event { get; }
+		ICommand ForcedCommand { get; }
+		ICommand Command { get; }
 		void OnPluginState(bool b);
 	}
 
@@ -23,10 +23,10 @@ namespace Cue
 		private Person person_ = null;
 		private Logger log_;
 		private int i_ = -1;
-		private readonly List<IEvent> events_ = new List<IEvent>();
-		private bool eventsEnabled_ = true;
+		private readonly List<ICommand> commands_ = new List<ICommand>();
+		private bool commandsEnabled_ = true;
 		private bool interactionsEnabled_ = true;
-		private IEvent forced_ = null;
+		private ICommand forced_ = null;
 		private readonly List<IInteraction> interactions_ = new List<IInteraction>();
 
 		public PersonAI(Person p)
@@ -37,28 +37,28 @@ namespace Cue
 			//foreach (var o in Cue.Instance.Objects)
 			//{
 			//	if (o.Slots.Has(Slot.Sit))
-			//		events_.Add(new SitEvent(person_, o));
+			//		commands_.Add(new SitCommand(person_, o));
 			//	if (o.Slots.Has(Slot.Lie))
-			//		events_.Add(new LieDownEvent(person_, o));
+			//		commands_.Add(new LieDownCommand(person_, o));
 			//	if (o.Slots.Has(Slot.Stand))
-			//		events_.Add(new StandEvent(person_, o));
+			//		commands_.Add(new StandCommand(person_, o));
 			//}
 
-			events_.Add(new StandEvent(p));
+			commands_.Add(new StandCommand(p));
 			interactions_.AddRange(BasicInteraction.All(p));
 		}
 
-		public bool EventsEnabled
+		public bool CommandsEnabled
 		{
 			get
 			{
-				return eventsEnabled_;
+				return commandsEnabled_;
 			}
 
 			set
 			{
-				eventsEnabled_ = value;
-				if (!eventsEnabled_)
+				commandsEnabled_ = value;
+				if (!commandsEnabled_)
 					Stop();
 			}
 		}
@@ -80,7 +80,7 @@ namespace Cue
 			return null;
 		}
 
-		public IEvent ForcedEvent
+		public ICommand ForcedCommand
 		{
 			get
 			{
@@ -88,12 +88,12 @@ namespace Cue
 			}
 		}
 
-		public IEvent Event
+		public ICommand Command
 		{
 			get
 			{
-				if (i_ >= 0 && i_ < events_.Count && eventsEnabled_)
-					return events_[i_];
+				if (i_ >= 0 && i_ < commands_.Count && commandsEnabled_)
+					return commands_[i_];
 				else
 					return null;
 			}
@@ -134,7 +134,7 @@ namespace Cue
 				}
 				else
 				{
-					RunEvent(new SitEvent(person_, slot));
+					RunCommand(new SitCommand(person_, slot));
 				}
 
 				return true;
@@ -152,7 +152,7 @@ namespace Cue
 				}
 				else
 				{
-					RunEvent(new StandEvent(person_, slot));
+					RunCommand(new StandCommand(person_, slot));
 				}
 
 				return true;
@@ -170,14 +170,14 @@ namespace Cue
 		public void MakeIdle()
 		{
 			Stop();
-			RunEvent(null);
+			RunCommand(null);
 		}
 
-		public void RunEvent(IEvent e)
+		public void RunCommand(ICommand e)
 		{
 			if (forced_ != null)
 			{
-				log_.Info($"stopping current forced event {forced_}");
+				log_.Info($"stopping current forced command {forced_}");
 				forced_.Stop();
 			}
 
@@ -185,7 +185,7 @@ namespace Cue
 
 			if (forced_ != null)
 			{
-				log_.Info($"stop to run forced event {forced_}");
+				log_.Info($"stop to run forced command {forced_}");
 				Stop();
 			}
 		}
@@ -205,14 +205,14 @@ namespace Cue
 			{
 				if (!forced_.Update(s))
 				{
-					log_.Info("forced event finished, stopping");
+					log_.Info("forced command finished, stopping");
 					forced_.Stop();
 					forced_ = null;
 				}
 			}
-			else if (eventsEnabled_)
+			else if (commandsEnabled_)
 			{
-				if (events_.Count > 0)
+				if (commands_.Count > 0)
 				{
 					if (i_ == -1)
 					{
@@ -220,12 +220,12 @@ namespace Cue
 					}
 					else
 					{
-						if (!events_[i_].Update(s))
+						if (!commands_[i_].Update(s))
 						{
-							events_[i_].Stop();
+							commands_[i_].Stop();
 
 							++i_;
-							if (i_ >= events_.Count)
+							if (i_ >= commands_.Count)
 								i_ = 0;
 						}
 					}
@@ -247,9 +247,9 @@ namespace Cue
 
 		private void Stop()
 		{
-			if (i_ >= 0 && i_ < events_.Count)
+			if (i_ >= 0 && i_ < commands_.Count)
 			{
-				events_[i_].Stop();
+				commands_[i_].Stop();
 				i_ = -1;
 			}
 

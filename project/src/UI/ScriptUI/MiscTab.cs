@@ -13,7 +13,7 @@ namespace Cue
 		private VUI.CheckBox logAction_;
 		private VUI.CheckBox logInteraction_;
 		private VUI.CheckBox logAI_;
-		private VUI.CheckBox logEvent_;
+		private VUI.CheckBox logCommand_;
 		private VUI.CheckBox logIntegration_;
 		private VUI.CheckBox logObject_;
 		private VUI.CheckBox logSlots_;
@@ -28,7 +28,7 @@ namespace Cue
 			logAction_ = new VUI.CheckBox("Action", CheckLog);
 			logInteraction_ = new VUI.CheckBox("Interaction", CheckLog);
 			logAI_ = new VUI.CheckBox("AI", CheckLog);
-			logEvent_ = new VUI.CheckBox("Event", CheckLog);
+			logCommand_ = new VUI.CheckBox("Command", CheckLog);
 			logIntegration_ = new VUI.CheckBox("Integration", CheckLog);
 			logObject_ = new VUI.CheckBox("Object", CheckLog);
 			logSlots_ = new VUI.CheckBox("Slots", CheckLog);
@@ -61,7 +61,7 @@ namespace Cue
 			//Add(logAction_);
 			//Add(logInteraction_);
 			//Add(logAI_);
-			//Add(logEvent_);
+			//Add(logCommand_);
 			//Add(logIntegration_);
 			//Add(logObject_);
 			//Add(logSlots_);
@@ -94,7 +94,7 @@ namespace Cue
 			if (logAction_.Checked) e |= Logger.Action;
 			if (logInteraction_.Checked) e |= Logger.Interaction;
 			if (logAI_.Checked) e |= Logger.AI;
-			if (logEvent_.Checked) e |= Logger.Event;
+			if (logCommand_.Checked) e |= Logger.Command;
 			if (logIntegration_.Checked) e |= Logger.Integration;
 			if (logObject_.Checked) e |= Logger.Object;
 			if (logSlots_.Checked) e |= Logger.Slots;
