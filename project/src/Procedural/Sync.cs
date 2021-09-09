@@ -189,13 +189,18 @@ namespace Cue.Proc
 
 	class ElapsedSync : BasicSync
 	{
-		private float elapsed_ = 0;
+		public const int NoFlags = 0x00;
+		public const int Loop = 0x01;
+
 		private float duration_;
+		private int flags_;
+		private float elapsed_ = 0;
 		private IEasing easing_ = new SinusoidalEasing();
 
-		public ElapsedSync(float duration)
+		public ElapsedSync(float duration, int flags = NoFlags)
 		{
 			duration_ = duration;
+			flags_ = flags;
 		}
 
 		public override float Magnitude
@@ -223,7 +228,7 @@ namespace Cue.Proc
 
 		public override ISync Clone()
 		{
-			return new ElapsedSync(duration_);
+			return new ElapsedSync(duration_, flags_);
 		}
 
 		public override void Reset()
@@ -235,8 +240,19 @@ namespace Cue.Proc
 		protected override int DoFixedUpdate(float s)
 		{
 			elapsed_ += s;
+
 			if (elapsed_ >= duration_)
-				return SyncFinished;
+			{
+				if (Bits.IsSet(flags_, Loop))
+				{
+					elapsed_ = 0;
+					return Looping;
+				}
+				else
+				{
+					return SyncFinished;
+				}
+			}
 
 			return Working;
 		}
@@ -247,69 +263,6 @@ namespace Cue.Proc
 		}
 	}
 
-	/*
-	class DurationSync : BasicSync
-	{
-		private Duration duration_;
-		private Duration delay_;
-
-		public DurationSync(Duration duration, Duration delay)
-		{
-			duration_ = duration;
-			delay_ = delay;
-		}
-
-		public override float Magnitude
-		{
-			get
-			{
-				if (duration_ <= 0)
-					return 1;
-
-				float p = U.Clamp(elapsed_ / duration_, 0, 1);
-				return easing_.Magnitude(p);
-			}
-		}
-
-		public override float Excitement { set { } }
-		public override bool Finished
-		{
-			get { return (elapsed_ >= duration_); }
-		}
-
-		public new static DurationSync Create(JSONClass o)
-		{
-			return new DurationSync(
-				Duration.FromJSON(o, "duration"),
-				Duration.FromJSON(o, "delay"));
-		}
-
-		public override ISync Clone()
-		{
-			return new DurationSync(
-				new Duration(duration_), new Duration(delay_));
-		}
-
-		public override void Reset()
-		{
-			base.Reset();
-			elapsed_ = 0;
-		}
-
-		public override int FixedUpdate(float s)
-		{
-			elapsed_ += s;
-			if (elapsed_ >= duration_)
-				return SyncFinished;
-
-			return Working;
-		}
-
-		public override string ToDetailedString()
-		{
-			return $"{elapsed_}/{duration_}";
-		}
-	}*/
 
 
 	class SlidingDurationSync : BasicSync

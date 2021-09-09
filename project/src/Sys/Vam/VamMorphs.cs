@@ -129,7 +129,7 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				if (MorphInfo.SetFromCue)
+				if (MorphInfo.SetFromCue || SuperController.singleton.freezeAnimation)
 					old(f);
 				else
 					mi.Set(f);

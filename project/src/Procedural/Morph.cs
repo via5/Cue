@@ -46,7 +46,8 @@ namespace Cue.Proc
 		}
 
 		public MorphTarget(
-			int bodyPart, string morphId, float min, float max, ISync sync)
+			int bodyPart, string morphId, float min, float max,
+			ISync sync, IEasing easing = null)
 				: base(sync)
 		{
 			bodyPart_ = bodyPart;
@@ -54,7 +55,7 @@ namespace Cue.Proc
 			min_ = min;
 			max_ = max;
 
-			easing_ = new SinusoidalEasing();
+			easing_ = easing ?? new SinusoidalEasing();
 		}
 
 		public static MorphTarget Create(JSONClass o)
@@ -147,8 +148,6 @@ namespace Cue.Proc
 
 		public override void Start(Person p)
 		{
-			Cue.LogError($"morph start {this}");
-
 			person_ = p;
 			morph_ = new Morph(person_.Atom.GetMorph(morphId_));
 

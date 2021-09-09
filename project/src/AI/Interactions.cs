@@ -58,11 +58,13 @@
 			{
 				busy_ = true;
 				head.ForceBusy(true);
+				person_.Animator.PlayType(Animation.SuckType, Animator.Loop);
 			}
 			else if (busy_ && !mouthTriggered)
 			{
 				busy_ = false;
 				head.ForceBusy(false);
+				person_.Animator.StopType(Animation.SuckType);
 			}
 		}
 	}

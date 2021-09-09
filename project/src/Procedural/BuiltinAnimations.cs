@@ -72,9 +72,9 @@ namespace Cue.Proc
 
 	class SuckProcAnimation : ProcAnimation
 	{
-		private float durationMin_ = 2;
-		private float durationMax_ = 0.5f;
-		private float durationWin_ = 0.5f;
+		private float durationMin_ = 0.8f;
+		private float durationMax_ = 1.5f;
+		private float durationWin_ = 0;
 		private float durationInterval_ = 5;
 
 		public SuckProcAnimation()
@@ -92,11 +92,13 @@ namespace Cue.Proc
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),
 					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
+					SlidingDurationSync.Loop));
 
-			//g.AddTarget(new AnimatedMorph(
-			//	BodyParts.Lips, "Lips Pucker",
-			//	0, 0.8f,
+			g.AddTarget(new MorphTarget(
+				BodyParts.Lips, "Lips Pucker",
+				0, 1, new ParentTargetSync()));
+
+			AddTarget(g);
 		}
 	}
 

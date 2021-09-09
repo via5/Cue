@@ -125,7 +125,7 @@ namespace Cue.Proc
 
 		public override bool Done
 		{
-			get { return allDone_; }
+			get { return !forever_ && allDone_; }
 		}
 
 		public override void FixedUpdate(float s)
