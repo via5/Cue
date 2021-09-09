@@ -202,7 +202,7 @@
 				{
 					hj_.Checked = p.Handjob.Active;
 					bj_.Checked = p.Blowjob.Active;
-					thrust_.Checked = p.AI.GetInteraction<SexInteraction>().Active;
+					thrust_.Checked = p.AI.GetEvent<SexEvent>().Active;
 					canKiss_.Checked = p.Options.CanKiss;
 					forceExcitement_.Checked = p.Mood.ExcitementValue.IsForced;
 					excitement_.Value = p.Mood.ExcitementValue.Value;
@@ -254,7 +254,7 @@
 			var p = Selected as Person;
 			if (p != null)
 			{
-				p.AI.GetInteraction<SexInteraction>().Active = b;
+				p.AI.GetEvent<SexEvent>().Active = b;
 			}
 		}
 

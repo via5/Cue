@@ -90,7 +90,7 @@ namespace Cue
 			if (this == Cue.Instance.Player)
 			{
 				AI.CommandsEnabled = false;
-				AI.InteractionsEnabled = false;
+				AI.EventsEnabled = false;
 			}
 
 			Atom.Init();
@@ -302,7 +302,7 @@ namespace Cue
 					gaze_.Update(s);
 			});
 
-			I.Do(I.UpdatePersonInteractions, () =>
+			I.Do(I.UpdatePersonEvents, () =>
 			{
 				Kisser.Update(s);
 				Handjob.Update(s);

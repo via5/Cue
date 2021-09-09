@@ -102,12 +102,12 @@ namespace Cue
 				es += "commands";
 			}
 
-			if (ai_.InteractionsEnabled)
+			if (ai_.EventsEnabled)
 			{
 				if (es != "")
 					es += "|";
 
-				es += "interactions";
+				es += "events";
 			}
 
 			if (es == "")

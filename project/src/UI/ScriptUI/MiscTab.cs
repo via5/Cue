@@ -11,7 +11,7 @@ namespace Cue
 
 		private VUI.CheckBox logAnimation_;
 		private VUI.CheckBox logAction_;
-		private VUI.CheckBox logInteraction_;
+		private VUI.CheckBox logEvent_;
 		private VUI.CheckBox logAI_;
 		private VUI.CheckBox logCommand_;
 		private VUI.CheckBox logIntegration_;
@@ -26,7 +26,7 @@ namespace Cue
 		{
 			logAnimation_ = new VUI.CheckBox("Animation", CheckLog);
 			logAction_ = new VUI.CheckBox("Action", CheckLog);
-			logInteraction_ = new VUI.CheckBox("Interaction", CheckLog);
+			logEvent_ = new VUI.CheckBox("Event", CheckLog);
 			logAI_ = new VUI.CheckBox("AI", CheckLog);
 			logCommand_ = new VUI.CheckBox("Command", CheckLog);
 			logIntegration_ = new VUI.CheckBox("Integration", CheckLog);
@@ -59,7 +59,7 @@ namespace Cue
 			//Add(new VUI.Label("Logs", UnityEngine.FontStyle.Bold));
 			//Add(logAnimation_);
 			//Add(logAction_);
-			//Add(logInteraction_);
+			//Add(logEvent_);
 			//Add(logAI_);
 			//Add(logCommand_);
 			//Add(logIntegration_);
@@ -92,7 +92,7 @@ namespace Cue
 
 			if (logAnimation_.Checked) e |= Logger.Animation;
 			if (logAction_.Checked) e |= Logger.Action;
-			if (logInteraction_.Checked) e |= Logger.Interaction;
+			if (logEvent_.Checked) e |= Logger.Event;
 			if (logAI_.Checked) e |= Logger.AI;
 			if (logCommand_.Checked) e |= Logger.Command;
 			if (logIntegration_.Checked) e |= Logger.Integration;

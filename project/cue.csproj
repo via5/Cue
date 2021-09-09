@@ -96,7 +96,7 @@
   <ItemGroup>
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
-    <Compile Include="src\AI\Interactions.cs" />
+    <Compile Include="src\AI\Events\Events.cs" />
     <Compile Include="src\Commands\Command.cs" />
     <Compile Include="src\Commands\Lying.cs" />
     <Compile Include="src\Commands\Sex.cs" />

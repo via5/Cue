@@ -17,7 +17,7 @@ namespace Cue
 		public const int UpdatePersonTransitions = 5;
 		public const int UpdatePersonActions = 6;
 		public const int UpdatePersonGaze = 7;
-		public const int UpdatePersonInteractions = 8;
+		public const int UpdatePersonEvents = 8;
 		public const int UpdatePersonExcitement = 9;
 		public const int UpdatePersonPersonality = 10;
 		public const int UpdatePersonMood = 11;
@@ -46,7 +46,7 @@ namespace Cue
 			tickers_[UpdatePersonTransitions] = new Ticker("Transitions");
 			tickers_[UpdatePersonActions] = new Ticker("Actions");
 			tickers_[UpdatePersonGaze] = new Ticker("Gaze");
-			tickers_[UpdatePersonInteractions] = new Ticker("Interactions");
+			tickers_[UpdatePersonEvents] = new Ticker("Events");
 			tickers_[UpdatePersonExcitement] = new Ticker("Excitement");
 			tickers_[UpdatePersonPersonality] = new Ticker("Personality");
 			tickers_[UpdatePersonMood] = new Ticker("Mood");

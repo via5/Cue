@@ -4,14 +4,14 @@ namespace Cue
 {
 	interface IAI
 	{
-		T GetInteraction<T>() where T : class, IInteraction;
+		T GetEvent<T>() where T : class, IEvent;
 		bool InteractWith(IObject o);
 		void RunCommand(ICommand e);
 		void FixedUpdate(float s);
 		void Update(float s);
 		void MakeIdle();
 		bool CommandsEnabled { get; set; }
-		bool InteractionsEnabled { get; set; }
+		bool EventsEnabled { get; set; }
 		ICommand ForcedCommand { get; }
 		ICommand Command { get; }
 		void OnPluginState(bool b);
@@ -25,9 +25,9 @@ namespace Cue
 		private int i_ = -1;
 		private readonly List<ICommand> commands_ = new List<ICommand>();
 		private bool commandsEnabled_ = true;
-		private bool interactionsEnabled_ = true;
+		private bool eventsEnabled_ = true;
 		private ICommand forced_ = null;
-		private readonly List<IInteraction> interactions_ = new List<IInteraction>();
+		private readonly List<IEvent> events_ = new List<IEvent>();
 
 		public PersonAI(Person p)
 		{
@@ -45,7 +45,7 @@ namespace Cue
 			//}
 
 			commands_.Add(new StandCommand(p));
-			interactions_.AddRange(BasicInteraction.All(p));
+			events_.AddRange(BasicEvent.All(p));
 		}
 
 		public bool CommandsEnabled
@@ -63,18 +63,18 @@ namespace Cue
 			}
 		}
 
-		public bool InteractionsEnabled
+		public bool EventsEnabled
 		{
-			get { return interactionsEnabled_; }
-			set { interactionsEnabled_ = value; }
+			get { return eventsEnabled_; }
+			set { eventsEnabled_ = value; }
 		}
 
-		public T GetInteraction<T>() where T : class, IInteraction
+		public T GetEvent<T>() where T : class, IEvent
 		{
-			for (int i = 0; i < interactions_.Count; ++i)
+			for (int i = 0; i < events_.Count; ++i)
 			{
-				if (interactions_[i] is T)
-					return interactions_[i] as T;
+				if (events_[i] is T)
+					return events_[i] as T;
 			}
 
 			return null;
@@ -192,10 +192,10 @@ namespace Cue
 
 		public void FixedUpdate(float s)
 		{
-			if (interactionsEnabled_)
+			if (eventsEnabled_)
 			{
-				for (int i = 0; i < interactions_.Count; ++i)
-					interactions_[i].FixedUpdate(s);
+				for (int i = 0; i < events_.Count; ++i)
+					events_[i].FixedUpdate(s);
 			}
 		}
 
@@ -232,17 +232,17 @@ namespace Cue
 				}
 			}
 
-			if (interactionsEnabled_)
+			if (eventsEnabled_)
 			{
-				for (int i = 0; i < interactions_.Count; ++i)
-					interactions_[i].Update(s);
+				for (int i = 0; i < events_.Count; ++i)
+					events_[i].Update(s);
 			}
 		}
 
 		public void OnPluginState(bool b)
 		{
-			for (int i = 0; i < interactions_.Count; ++i)
-				interactions_[i].OnPluginState(b);
+			for (int i = 0; i < events_.Count; ++i)
+				events_[i].OnPluginState(b);
 		}
 
 		private void Stop()

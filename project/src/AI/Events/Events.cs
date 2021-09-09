@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	interface IInteraction
+	interface IEvent
 	{
 		void OnPluginState(bool b);
 		void FixedUpdate(float s);
@@ -8,25 +8,25 @@
 	}
 
 
-	abstract class BasicInteraction : IInteraction
+	abstract class BasicEvent : IEvent
 	{
 		protected Person person_;
 		protected Logger log_;
 
-		protected BasicInteraction(string name, Person p)
+		protected BasicEvent(string name, Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Interaction, p, "int." + name);
+			log_ = new Logger(Logger.Event, p, "int." + name);
 		}
 
-		public static IInteraction[] All(Person p)
+		public static IEvent[] All(Person p)
 		{
-			return new IInteraction[]
+			return new IEvent[]
 			{
-				new FingerSuckInteraction(p),
-				new KissingInteraction(p),
-				new SmokingInteraction(p),
-				new SexInteraction(p)
+				new FingerSuckEvent(p),
+				new KissingEvent(p),
+				new SmokingEvent(p),
+				new SexEvent(p)
 			};
 		}
 
@@ -47,11 +47,11 @@
 	}
 
 
-	class FingerSuckInteraction : BasicInteraction
+	class FingerSuckEvent : BasicEvent
 	{
 		private bool busy_ = false;
 
-		public FingerSuckInteraction(Person p)
+		public FingerSuckEvent(Person p)
 			: base("fsuck", p)
 		{
 		}
@@ -77,11 +77,11 @@
 	}
 
 
-	class SmokingInteraction : BasicInteraction
+	class SmokingEvent : BasicEvent
 	{
 		private bool enabled_ = true;
 
-		public SmokingInteraction(Person p)
+		public SmokingEvent(Person p)
 			: base("smoke", p)
 		{
 			enabled_ = p.HasTrait("smoker");
@@ -127,7 +127,7 @@
 	}
 
 
-	class KissingInteraction : BasicInteraction
+	class KissingEvent : BasicEvent
 	{
 		public const float StartDistance = 0.15f;
 		public const float StopDistance = 0.1f;
@@ -137,7 +137,7 @@
 
 		private float elapsed_ = 0;
 
-		public KissingInteraction(Person p)
+		public KissingEvent(Person p)
 			: base("kiss", p)
 		{
 			person_ = p;
@@ -257,7 +257,7 @@
 	}
 
 
-	class SexInteraction : BasicInteraction
+	class SexEvent : BasicEvent
 	{
 		public const int NoState = 0;
 		public const int PlayState = 1;
@@ -266,7 +266,7 @@
 		private bool active_ = false;
 		private bool running_ = false;
 
-		public SexInteraction(Person p)
+		public SexEvent(Person p)
 			: base("sex", p)
 		{
 		}
