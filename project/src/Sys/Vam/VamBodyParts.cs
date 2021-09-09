@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
@@ -30,6 +31,11 @@ namespace Cue.Sys.Vam
 		public abstract Vector3 Position { get; }
 		public abstract Quaternion Rotation { get; }
 
+		public virtual float DistanceToSurface(IBodyPart other)
+		{
+			return Vector3.Distance(other.Position, Position);
+		}
+
 		public virtual void AddRelativeForce(Vector3 v)
 		{
 			// no-op
@@ -46,12 +52,30 @@ namespace Cue.Sys.Vam
 	{
 		private Rigidbody rb_;
 		private FreeControllerV3 fc_ = null;
+		private Collider[] colliders_;
 
-		public RigidbodyBodyPart(VamAtom a, int type, Rigidbody rb, FreeControllerV3 fc)
-			: base(a, type)
+		public RigidbodyBodyPart(
+			VamAtom a, int type, Rigidbody rb, FreeControllerV3 fc,
+			string[] colliders)
+				: base(a, type)
 		{
 			rb_ = rb;
 			fc_ = fc;
+
+			var cs = new List<Collider>();
+			foreach (var cn in colliders)
+			{
+				var c = Cue.Instance.VamSys.FindCollider(a.Atom, cn);
+				if (c == null)
+				{
+					Cue.LogError($"collider {cn} not found");
+					continue;
+				}
+
+				cs.Add(c);
+			}
+
+			colliders_ = cs.ToArray();
 		}
 
 		public override Transform Transform
@@ -94,6 +118,21 @@ namespace Cue.Sys.Vam
 		public override Quaternion Rotation
 		{
 			get { return U.FromUnity(rb_.rotation); }
+		}
+
+		public override float DistanceToSurface(IBodyPart other)
+		{
+			float closest = float.MaxValue;
+			var op = U.ToUnity(other.Position);
+
+			for (int i = 0; i < colliders_.Length; ++i)
+			{
+				var p = colliders_[i].ClosestPoint(op);
+				var d = Vector3.Distance(other.Position, U.FromUnity(p));
+				closest = Math.Min(closest, d);
+			}
+
+			return closest;
 		}
 
 		public override void AddRelativeForce(Vector3 v)
@@ -165,6 +204,12 @@ namespace Cue.Sys.Vam
 		public override Quaternion Rotation
 		{
 			get { return ControlRotation; }
+		}
+
+		public override float DistanceToSurface(IBodyPart other)
+		{
+			var p = c_.ClosestPoint(U.ToUnity(other.Position));
+			return Vector3.Distance(other.Position, U.FromUnity(p));
 		}
 
 		public override string ToString()

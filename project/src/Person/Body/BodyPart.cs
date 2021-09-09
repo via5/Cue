@@ -114,13 +114,15 @@
 			if (!Exists || !other.Exists)
 				return false;
 
-			return CloseToImpl(other);
+			return DistanceToSurface(other) < 0.1f;
 		}
 
-		private bool CloseToImpl(BodyPart other)
+		public float DistanceToSurface(BodyPart other)
 		{
-			var d = Vector3.Distance(Position, other.Position);
-			return (d < 0.2f);
+			if (!Exists || !other.Exists)
+				return float.MaxValue;
+
+			return Sys.DistanceToSurface(other.Sys);
 		}
 
 		public void ForceBusy(bool b)

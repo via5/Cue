@@ -696,7 +696,7 @@ namespace Cue.Sys.Vam
 
 			foreach (var c in atom.GetComponentsInChildren<Collider>())
 			{
-				if (c.name == p)
+				if (EquivalentName(c.name, p))
 				{
 					if (path.Length == 1)
 						return c;
@@ -712,7 +712,9 @@ namespace Cue.Sys.Vam
 
 					for (int i = 1; i < path.Length; ++i)
 					{
-						if (check.name != path[path.Length - i - 1])
+						var thispath = path[path.Length - i - 1];
+
+						if (!EquivalentName(check.name, thispath))
 						{
 							okay = false;
 							break;
@@ -735,17 +737,40 @@ namespace Cue.Sys.Vam
 
 			foreach (var c in atom.GetComponentsInChildren<Collider>())
 			{
-				if (c.name == "AutoColliderFemaleAutoColliders" + pathstring)
-					return c;
-
-				if (c.name == "AutoColliderMaleAutoColliders" + pathstring)
-					return c;
-
-				if (c.name == "AutoCollider" + pathstring)
+				if (EquivalentName(c.name, pathstring))
 					return c;
 			}
 
 			return null;
+		}
+
+		private bool EquivalentName(string cn, string pathstring)
+		{
+			if (cn == pathstring)
+				return true;
+
+			if (cn == "AutoColliderFemaleAutoColliders" + pathstring)
+				return true;
+
+			if (cn == "AutoColliderMaleAutoColliders" + pathstring)
+				return true;
+
+			if (cn == "AutoCollider" + pathstring)
+				return true;
+
+			if (cn == "AutoColliderAutoColliders" + pathstring)
+				return true;
+
+			if (cn == "FemaleAutoColliders" + pathstring)
+				return true;
+
+			if (cn == "MaleAutoColliders" + pathstring)
+				return true;
+
+			if (cn == "StandardColliders" + pathstring)
+				return true;
+
+			return false;
 		}
 
 		public Atom AtomForCollider(Collider c)

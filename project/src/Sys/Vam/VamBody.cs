@@ -177,49 +177,201 @@ namespace Cue.Sys.Vam
 				"FemaleAutoColliderschest"
 			};
 
-			add(BodyParts.Head, GetRigidbody(BodyParts.Head, "headControl", "head"));
 
-			add(BodyParts.Lips, GetTrigger(BodyParts.Lips, "", "LipTrigger"));
-			add(BodyParts.Mouth, GetTrigger(BodyParts.Mouth, "", "MouthTrigger"));
-			add(BodyParts.LeftBreast, GetTrigger(BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
-			add(BodyParts.RightBreast, GetTrigger(BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
 
-			add(BodyParts.Labia, GetTrigger(BodyParts.Labia, "", "LabiaTrigger", "", genitalsIgnore));
-			add(BodyParts.Vagina, GetTrigger(BodyParts.Vagina, "", "VaginaTrigger", "", genitalsIgnore));
-			add(BodyParts.DeepVagina, GetTrigger(BodyParts.DeepVagina, "", "DeepVaginaTrigger", "", genitalsIgnore));
-			add(BodyParts.DeeperVagina, GetTrigger(BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "", genitalsIgnore));
+			// head
+			//
+			add(BodyParts.Head, GetRigidbody(
+				BodyParts.Head, new string[] {
+					"HeadHard1Hard", "HeadHard10Hard", "FaceCentral1Hard",
+					"TongueColliders/_Collider1",
+					"lowerJawStandardColliders/_ColliderL1b",
+					"HeadBack1Hard",
+					"FaceHardLeft4Hard",
+					"FaceHardRight4Hard",
+					"neck/StandardColliders/_Collider1l",
+					"neck/StandardColliders/_Collider1r",
+					"neck/StandardColliders/_ColliderB2",
+					"neck/StandardColliders/_Collider4r",
+					"neck/StandardColliders/_Collider4l",
+					"HeadLeftEarHard", "HeadRightEarHard"
+				}, "headControl", "head"));
+
+			add(BodyParts.Lips, GetTrigger(
+				BodyParts.Lips, "", "LipTrigger"));
+
+			add(BodyParts.Mouth, GetTrigger(
+				BodyParts.Mouth, "", "MouthTrigger"));
+
+
+			// breasts
+			//
+			add(BodyParts.LeftBreast, GetTrigger(
+				BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
+
+			add(BodyParts.RightBreast, GetTrigger(
+				BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
+
+
+			// genitals
+			//
+			add(BodyParts.Labia, GetTrigger(
+				BodyParts.Labia, "", "LabiaTrigger", "",
+				genitalsIgnore));
+
+			add(BodyParts.Vagina, GetTrigger(
+				BodyParts.Vagina, "", "VaginaTrigger", "",
+				genitalsIgnore));
+
+			add(BodyParts.DeepVagina, GetTrigger(
+				BodyParts.DeepVagina, "", "DeepVaginaTrigger", "",
+				genitalsIgnore));
+
+			add(BodyParts.DeeperVagina, GetTrigger(
+				BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "",
+				genitalsIgnore));
+
 			add(BodyParts.Anus, null);
 
-			add(BodyParts.Chest, GetRigidbody(BodyParts.Chest, "chestControl", "chest"));
-			add(BodyParts.Belly, GetRigidbody(BodyParts.Belly, "", "abdomen2"));
-			add(BodyParts.Hips, GetRigidbody(BodyParts.Hips, "hipControl", "abdomen"));
-			add(BodyParts.LeftGlute, GetCollider(BodyParts.LeftGlute, "", "LGlute1Joint", ""));
-			add(BodyParts.RightGlute, GetCollider(BodyParts.RightGlute, "", "RGlute1Joint", ""));
 
-			add(BodyParts.LeftShoulder, GetCollider(BodyParts.LeftShoulder, "lArmControl", "lShldr"));
-			add(BodyParts.LeftArm, GetCollider(BodyParts.LeftArm, "lElbowControl", "StandardColliderslShldr/_Collider1"));
-			add(BodyParts.LeftForearm, GetCollider(BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
-			add(BodyParts.LeftHand, GetRigidbody(BodyParts.LeftHand, "lHandControl", "lHand"));
-
-			add(BodyParts.RightShoulder, GetCollider(BodyParts.RightShoulder, "rArmControl", "rShldr"));
-			add(BodyParts.RightArm, GetCollider(BodyParts.RightArm, "rElbowControl", "StandardCollidersrShldr/_Collider1"));
-			add(BodyParts.RightForearm, GetCollider(BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
-			add(BodyParts.RightHand, GetRigidbody(BodyParts.RightHand, "rHandControl", "rHand"));
-
-			add(BodyParts.LeftThigh, GetCollider(BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint", "StandardColliderslThigh/_Collider6"));
-			add(BodyParts.LeftShin, GetCollider(BodyParts.LeftShin, "lKneeControl", "lShin8Joint", "StandardColliderslShin/_Collider2"));
-			add(BodyParts.LeftFoot, GetRigidbody(BodyParts.LeftFoot, "lFootControl", "lFoot"));
-
-			add(BodyParts.RightThigh, GetCollider(BodyParts.RightThigh, "rKneeControl", "rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
-			add(BodyParts.RightShin, GetCollider(BodyParts.RightShin, "rKneeControl", "rShin8Joint", "StandardCollidersrShin/_Collider2"));
-			add(BodyParts.RightFoot, GetRigidbody(BodyParts.RightFoot, "rFootControl", "rFoot"));
-
-			add(BodyParts.Eyes, new EyesBodyPart(atom_));
+			// upper body
+			//
+			add(BodyParts.Chest, GetRigidbody(
+				BodyParts.Chest, new string[] { "chest1/chest1Joint" },
+				"chestControl", "chest"));
 
 			if (atom_.IsMale)
 			{
-				add(BodyParts.Pectorals, GetRigidbody(BodyParts.Pectorals, "chestControl", "chest"));
-				add(BodyParts.Penis, GetRigidbody(BodyParts.Penis, "penisBaseControl", "", "Gen1"));
+				add(BodyParts.Belly, GetRigidbody(
+					BodyParts.Belly, new string[] {
+						"abdomen2/_ColliderL1",
+						"abdomen/_ColliderL1b",
+						"abdomen/_ColliderL1f",
+						"abdomen/_ColliderL1l",
+						"abdomen/_ColliderL1r",
+						"abdomen/_ColliderL2b"
+					}, "", "abdomen2"));
+
+				add(BodyParts.Hips, GetRigidbody(
+					BodyParts.Hips, new string[] {
+					"pelvisF7/pelvisF7Joint",
+					"pelvisFL3/pelvisFL3Joint",
+					"pelvisFR3/pelvisFR3Joint",
+					"pelvisL1/pelvisL1Joint",
+					"pelvisR1/pelvisR1Joint"
+					}, "hipControl", "abdomen"));
+			}
+			else
+			{
+				add(BodyParts.Belly, GetRigidbody(
+					BodyParts.Belly, new string[] {
+						"abdomen2_3/abdomen2_3Joint",
+						"abdomen3/abdomen3Joint",
+						"abdomen7/abdomen7Joint",
+						"abdomen12/abdomen12Joint",
+						"abdomen17/abdomen17Joint",
+						"abdomen20/abdomen20Joint"
+					}, "", "abdomen2"));
+
+				add(BodyParts.Hips, GetRigidbody(
+					BodyParts.Hips, new string[] {
+					"pelvisF7/pelvisF7Joint",
+					"pelvisFL8/pelvisFL8Joint",
+					"pelvisFR8/pelvisFR8Joint",
+					"pelvisL1/pelvisL1Joint",
+					"pelvisR1/pelvisR1Joint"
+					}, "hipControl", "abdomen"));
+			}
+
+			add(BodyParts.LeftGlute, GetCollider(
+				BodyParts.LeftGlute, "", "LGlute1Joint", ""));
+
+			add(BodyParts.RightGlute, GetCollider(
+				BodyParts.RightGlute, "", "RGlute1Joint", ""));
+
+
+			// left arm
+			//
+			add(BodyParts.LeftShoulder, GetCollider(
+				BodyParts.LeftShoulder, "lArmControl", "lShldr"));
+
+			add(BodyParts.LeftArm, GetCollider(
+				BodyParts.LeftArm, "lElbowControl",
+				"StandardColliderslShldr/_Collider1"));
+
+			add(BodyParts.LeftForearm, GetCollider(
+				BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
+
+			add(BodyParts.LeftHand, GetRigidbody(
+				BodyParts.LeftHand, new string[] { "lHand/_Collider" },
+				"lHandControl", "lHand"));
+
+
+			// right arm
+			//
+			add(BodyParts.RightShoulder, GetCollider(
+				BodyParts.RightShoulder, "rArmControl", "rShldr"));
+
+			add(BodyParts.RightArm, GetCollider(
+				BodyParts.RightArm, "rElbowControl",
+				"StandardCollidersrShldr/_Collider1"));
+
+			add(BodyParts.RightForearm, GetCollider(
+				BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
+
+			add(BodyParts.RightHand, GetRigidbody(
+				BodyParts.RightHand, new string[] { "rHand/_Collider" },
+				"rHandControl", "rHand"));
+
+
+			// left leg
+			//
+			add(BodyParts.LeftThigh, GetCollider(
+				BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint",
+				"StandardColliderslThigh/_Collider6"));
+
+			add(BodyParts.LeftShin, GetCollider(
+				BodyParts.LeftShin, "lKneeControl", "lShin8Joint",
+				"StandardColliderslShin/_Collider2"));
+
+			add(BodyParts.LeftFoot, GetRigidbody(
+				BodyParts.LeftFoot, new string[] { "lFoot/_Collider4" },
+				"lFootControl", "lFoot"));
+
+
+			// right leg
+			//
+			add(BodyParts.RightThigh, GetCollider(
+				BodyParts.RightThigh, "rKneeControl", "rThigh12Joint",
+				"StandardCollidersrThigh/_Collider6"));
+
+			add(BodyParts.RightShin, GetCollider(
+				BodyParts.RightShin, "rKneeControl", "rShin8Joint",
+				"StandardCollidersrShin/_Collider2"));
+
+			add(BodyParts.RightFoot, GetRigidbody(
+				BodyParts.RightFoot, new string[] { "rFoot/_Collider4" },
+				"rFootControl", "rFoot"));
+
+
+			// eyes
+			//
+			add(BodyParts.Eyes, new EyesBodyPart(atom_));
+
+
+			// male parts
+			//
+			if (atom_.IsMale)
+			{
+				add(BodyParts.Pectorals, GetRigidbody(
+					BodyParts.Pectorals, new string[] {
+						"chest3/chest3Joint",
+						"chest5/chest5Joint" },
+					"chestControl", "chest"));
+
+				add(BodyParts.Penis, GetRigidbody(
+					BodyParts.Penis, new string[] { "Gen1Hard", "Gen3aHard" },
+					"penisBaseControl", "", "Gen1"));
 			}
 			else
 			{
@@ -237,6 +389,7 @@ namespace Cue.Sys.Vam
 					add(BodyParts.Penis, dildo);
 				}
 			}
+
 
 
 			var list = new List<IBodyPart>();
@@ -420,7 +573,9 @@ namespace Cue.Sys.Vam
 				return nameMale;
 		}
 
-		private IBodyPart GetRigidbody(int id, string controller, string nameFemale, string nameMale = "same")
+		private IBodyPart GetRigidbody(
+			int id, string[] colliders, string controller,
+			string nameFemale, string nameMale = "same")
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -438,7 +593,7 @@ namespace Cue.Sys.Vam
 					Cue.LogError($"rb {name} has no controller {controller} in {atom_.ID}");
 			}
 
-			return new RigidbodyBodyPart(atom_, id, rb, fc);
+			return new RigidbodyBodyPart(atom_, id, rb, fc, colliders);
 		}
 
 		private IBodyPart GetTrigger(
