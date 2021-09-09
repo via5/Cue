@@ -85,7 +85,24 @@
 				hand.grabbed = false;
 
 				var close = FindClose(bp);
-				//Cue.LogError($"{close}");
+				if (close != null)
+				{
+					if (!bp.Busy)
+					{
+						Cue.LogInfo($"linking {bp} with {close}");
+						bp.LinkTo(close);
+						bp.ForceBusy(true);
+					}
+				}
+				else
+				{
+					if (bp.Linked)
+					{
+						Cue.LogInfo($"unlinking {bp}");
+						bp.LinkTo(null);
+						bp.ForceBusy(false);
+					}
+				}
 			}
 		}
 
@@ -126,7 +143,7 @@
 
 					float d = bp.DistanceToSurface(hand);
 
-					if (d < 0.1f)
+					if (d < 0.07f)
 					{
 						if (d < closestDistance)
 						{

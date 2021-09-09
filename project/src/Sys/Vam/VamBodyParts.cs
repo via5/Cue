@@ -19,6 +19,7 @@ namespace Cue.Sys.Vam
 
 		public virtual Transform Transform { get { return null; } }
 		public virtual Rigidbody Rigidbody { get { return null; } }
+		public virtual FreeControllerV3 Controller { get { return null; } }
 
 		public virtual bool CanTrigger { get { return false; } }
 		public virtual TriggerInfo[] GetTriggers() { return null; }
@@ -30,6 +31,47 @@ namespace Cue.Sys.Vam
 		public abstract Quaternion ControlRotation { get; set; }
 		public abstract Vector3 Position { get; }
 		public abstract Quaternion Rotation { get; }
+
+		public virtual bool Linked
+		{
+			get
+			{
+				return
+					Controller?.linkToRB != null &&
+					Controller.currentPositionState == FreeControllerV3.PositionState.ParentLink &&
+					Controller.currentRotationState == FreeControllerV3.RotationState.ParentLink;
+			}
+		}
+
+		public virtual void LinkTo(IBodyPart other)
+		{
+			if (Controller == null)
+			{
+				Cue.LogError($"cannot link {this} to {other}, no controller");
+				return;
+			}
+
+			if (other == null)
+			{
+				Controller.linkToRB = null;
+				Controller.currentPositionState = FreeControllerV3.PositionState.On;
+				Controller.currentRotationState = FreeControllerV3.RotationState.On;
+			}
+			else
+			{
+				var o = other as VamBodyPart;
+				if (o?.Rigidbody == null)
+				{
+					Cue.LogError($"cannot link {this} to {other}, not an rb");
+				}
+				else
+				{
+					Controller.linkToRB = o.Rigidbody;
+					Controller.currentPositionState = FreeControllerV3.PositionState.ParentLink;
+					Controller.currentRotationState = FreeControllerV3.RotationState.ParentLink;
+				}
+			}
+		}
 
 		public virtual float DistanceToSurface(IBodyPart other)
 		{
@@ -86,6 +128,11 @@ namespace Cue.Sys.Vam
 		public override Rigidbody Rigidbody
 		{
 			get { return rb_; }
+		}
+
+		public override FreeControllerV3 Controller
+		{
+			get { return fc_; }
 		}
 
 		public override bool CanGrab
@@ -172,6 +219,11 @@ namespace Cue.Sys.Vam
 		public override Rigidbody Rigidbody
 		{
 			get { return null; }
+		}
+
+		public override FreeControllerV3 Controller
+		{
+			get { return fc_; }
 		}
 
 		public override bool CanGrab
@@ -308,6 +360,11 @@ namespace Cue.Sys.Vam
 		public override Rigidbody Rigidbody
 		{
 			get { return rb_; }
+		}
+
+		public override FreeControllerV3 Controller
+		{
+			get { return fc_; }
 		}
 
 		public override bool CanTrigger

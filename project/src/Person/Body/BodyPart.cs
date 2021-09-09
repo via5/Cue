@@ -130,6 +130,28 @@
 			forceBusy_ = b;
 		}
 
+		public void LinkTo(BodyPart other)
+		{
+			if (!Exists)
+				return;
+
+			if (other != null && !other.Exists)
+				return;
+
+			Sys.LinkTo(other?.Sys);
+		}
+
+		public bool Linked
+		{
+			get
+			{
+				if (!Exists)
+					return false;
+
+				return Sys.Linked;
+			}
+		}
+
 		public bool Busy
 		{
 			get

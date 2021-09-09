@@ -183,6 +183,8 @@ namespace Cue.Sys
 		Quaternion ControlRotation { get; set; }
 		Vector3 Position { get; }
 		Quaternion Rotation { get; }
+		bool Linked { get; }
+		void LinkTo(IBodyPart other);
 		float DistanceToSurface(IBodyPart other);
 		void AddRelativeForce(Vector3 v);
 		void AddRelativeTorque(Vector3 v);
