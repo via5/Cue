@@ -1,10 +1,10 @@
 ﻿namespace Cue
 {
-	class SmokingEvent : BasicEvent
+	class SmokeEvent : BasicEvent
 	{
 		private bool enabled_ = true;
 
-		public SmokingEvent(Person p)
+		public SmokeEvent(Person p)
 			: base("smoke", p)
 		{
 			enabled_ = p.HasTrait("smoker");

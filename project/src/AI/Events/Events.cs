@@ -23,9 +23,9 @@
 		{
 			return new IEvent[]
 			{
-				new FingerSuckEvent(p),
-				new KissingEvent(p),
-				new SmokingEvent(p),
+				new SuckEvent(p),
+				new KissEvent(p),
+				new SmokeEvent(p),
 				new SexEvent(p)
 			};
 		}

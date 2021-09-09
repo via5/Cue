@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class KissingEvent : BasicEvent
+	class KissEvent : BasicEvent
 	{
 		public const float StartDistance = 0.15f;
 		public const float StopDistance = 0.1f;
@@ -10,7 +10,7 @@
 
 		private float elapsed_ = 0;
 
-		public KissingEvent(Person p)
+		public KissEvent(Person p)
 			: base("kiss", p)
 		{
 			person_ = p;
