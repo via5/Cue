@@ -4,6 +4,7 @@ namespace Cue
 {
 	interface IAI
 	{
+		T GetInteraction<T>() where T : class, IInteraction;
 		bool InteractWith(IObject o);
 		void RunEvent(IEvent e);
 		void FixedUpdate(float s);
@@ -66,6 +67,17 @@ namespace Cue
 		{
 			get { return interactionsEnabled_; }
 			set { interactionsEnabled_ = value; }
+		}
+
+		public T GetInteraction<T>() where T : class, IInteraction
+		{
+			for (int i = 0; i < interactions_.Count; ++i)
+			{
+				if (interactions_[i] is T)
+					return interactions_[i] as T;
+			}
+
+			return null;
 		}
 
 		public IEvent ForcedEvent

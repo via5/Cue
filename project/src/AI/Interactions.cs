@@ -10,13 +10,23 @@
 
 	abstract class BasicInteraction : IInteraction
 	{
+		protected Person person_;
+		protected Logger log_;
+
+		protected BasicInteraction(string name, Person p)
+		{
+			person_ = p;
+			log_ = new Logger(Logger.Interaction, p, "int." + name);
+		}
+
 		public static IInteraction[] All(Person p)
 		{
 			return new IInteraction[]
 			{
 				new FingerSuckInteraction(p),
 				new KissingInteraction(p),
-				new SmokingInteraction(p)
+				new SmokingInteraction(p),
+				new SexInteraction(p)
 			};
 		}
 
@@ -39,14 +49,11 @@
 
 	class FingerSuckInteraction : BasicInteraction
 	{
-		private Person person_;
-		private Logger log_;
 		private bool busy_ = false;
 
 		public FingerSuckInteraction(Person p)
+			: base("fsuck", p)
 		{
-			person_ = p;
-			log_ = new Logger(Logger.Interaction, p, "FSuckInt");
 		}
 
 		public override void Update(float s)
@@ -72,14 +79,11 @@
 
 	class SmokingInteraction : BasicInteraction
 	{
-		private Person person_;
-		private Logger log_;
 		private bool enabled_ = true;
 
 		public SmokingInteraction(Person p)
+			: base("smoke", p)
 		{
-			person_ = p;
-			log_ = new Logger(Logger.Interaction, p, "SmokeInt");
 			enabled_ = p.HasTrait("smoker");
 
 			if (!enabled_)
@@ -131,14 +135,12 @@
 		public const float MinimumActiveTime = 3;
 		public const float MinimumStoppedTime = 2;
 
-		private Person person_;
-		private Logger log_;
 		private float elapsed_ = 0;
 
 		public KissingInteraction(Person p)
+			: base("kiss", p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Interaction, p, "KissInt");
 		}
 
 		public override void Update(float s)
@@ -251,6 +253,78 @@
 			}
 
 			return false;
+		}
+	}
+
+
+	class SexInteraction : BasicInteraction
+	{
+		public const int NoState = 0;
+		public const int PlayState = 1;
+
+		private Person receiver_ = null;
+		private bool active_ = false;
+		private bool running_ = false;
+
+		public SexInteraction(Person p)
+			: base("sex", p)
+		{
+		}
+
+		public bool Active
+		{
+			get { return active_; }
+			set { active_ = value; }
+		}
+
+		public override void Update(float s)
+		{
+			if (!active_)
+			{
+				if (running_)
+				{
+					person_.Animator.StopType(Animation.SexType);
+					running_ = false;
+				}
+
+				return;
+			}
+
+			if (receiver_ == null)
+			{
+				receiver_ = FindReceiver();
+				if (receiver_ == null)
+				{
+					person_.Log.Error($"cannot start sex, no valid receiver");
+					active_ = false;
+					return;
+				}
+
+				log_.Info($"starting sex, receiver={receiver_.ID}");
+
+				person_.Clothing.GenitalsVisible = true;
+				receiver_.Clothing.GenitalsVisible = true;
+				person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
+
+				if (person_.Animator.CanPlayType(Animation.SexType) && person_.Mood.State == Mood.NormalState)
+					person_.Animator.PlaySex(person_.State.Current, receiver_);
+
+				running_ = true;
+			}
+		}
+
+		private Person FindReceiver()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_)
+					continue;
+
+				if (person_.Body.PenetratedBy(p) || p.Body.PenetratedBy(person_))
+					return p;
+			}
+
+			return null;
 		}
 	}
 }
