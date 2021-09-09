@@ -3,6 +3,10 @@ project\src\Main.cs
 project\src\Actions\Action.cs
 project\src\AI\AI.cs
 project\src\AI\Events\Events.cs
+project\src\AI\Events\Kiss.cs
+project\src\AI\Events\Sex.cs
+project\src\AI\Events\Smoke.cs
+project\src\AI\Events\Suck.cs
 project\src\Commands\Command.cs
 project\src\Commands\Lying.cs
 project\src\Commands\Sex.cs
