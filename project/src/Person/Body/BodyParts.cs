@@ -82,7 +82,7 @@
 		public static int[] GropedByParts { get { return gropedBy_; } }
 
 		private static int[] penetrated_ = new[]{
-			Vagina, DeepVagina, DeeperVagina, Anus };
+			Labia, Vagina, DeepVagina, DeeperVagina, Anus };
 		public static int[] PenetratedParts { get { return penetrated_; } }
 
 		private static int[] penetratedBy_ = new[]{
