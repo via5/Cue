@@ -196,16 +196,16 @@
 
 			ignore_.Do(() =>
 			{
-				selButtons_.Visible = (p != null);
+				if (selButtons_ != null) selButtons_.Visible = (p != null);
 
 				if (p != null)
 				{
-					hj_.Checked = p.Handjob.Active;
-					bj_.Checked = p.Blowjob.Active;
-					thrust_.Checked = p.AI.GetEvent<SexEvent>().Active;
-					canKiss_.Checked = p.Options.CanKiss;
-					forceExcitement_.Checked = p.Mood.ExcitementValue.IsForced;
-					excitement_.Value = p.Mood.ExcitementValue.Value;
+					if (hj_ != null) hj_.Checked = p.Handjob.Active;
+					if (bj_ != null) bj_.Checked = p.Blowjob.Active;
+					if (thrust_ != null) thrust_.Checked = p.AI.GetEvent<SexEvent>().Active;
+					if (canKiss_ != null) canKiss_.Checked = p.Options.CanKiss;
+					if (forceExcitement_ != null) forceExcitement_.Checked = p.Mood.ExcitementValue.IsForced;
+					if (excitement_ != null) excitement_.Value = p.Mood.ExcitementValue.Value;
 				}
 			});
 		}

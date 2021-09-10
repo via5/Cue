@@ -131,6 +131,7 @@ namespace Cue.Proc
 			{
 				if (playing_[i].proto == a)
 				{
+					playing_[i].anim.Reset();
 					playing_.RemoveAt(i);
 					return;
 				}
