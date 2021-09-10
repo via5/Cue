@@ -147,7 +147,7 @@ namespace Cue
 				var sm = pp_.SpecificModifiers[i];
 
 				sms.Add(new string[]{
-					$"{BodyParts.ToString(sm.bodyPart)}=>{BodyParts.ToString(sm.sourceBodyPart)}",
+					$"{BP.ToString(sm.bodyPart)}=>{BP.ToString(sm.sourceBodyPart)}",
 					$"{sm.modifier}" });
 			}
 

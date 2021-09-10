@@ -26,7 +26,7 @@
 				return;
 			}
 
-			if (person_.Body.Get(BodyParts.Lips) == null)
+			if (person_.Body.Get(BP.Lips) == null)
 				return;
 
 			if (person_.Kisser.Active)
@@ -50,14 +50,14 @@
 			if (!CanStart(person_))
 				return false;
 
-			var srcLips = person_.Body.Get(BodyParts.Lips).Position;
+			var srcLips = person_.Body.Get(BP.Lips).Position;
 
 			foreach (var target in Cue.Instance.ActivePersons)
 			{
 				if (target == person_)
 					continue;
 
-				var targetLips = target.Body.Get(BodyParts.Lips);
+				var targetLips = target.Body.Get(BP.Lips);
 
 				if (targetLips == null || target.Kisser.Active)
 					continue;
@@ -104,8 +104,8 @@
 			if (target == null)
 				return false;
 
-			var srcLips = person_.Body.Get(BodyParts.Lips);
-			var targetLips = target.Body.Get(BodyParts.Lips);
+			var srcLips = person_.Body.Get(BP.Lips);
+			var targetLips = target.Body.Get(BP.Lips);
 
 			if (srcLips == null || targetLips == null)
 				return false;

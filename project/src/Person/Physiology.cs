@@ -11,8 +11,8 @@
 			public override string ToString()
 			{
 				return
-					$"{BodyParts.ToString(bodyPart)}=>" +
-					$"{BodyParts.ToString(sourceBodyPart)}   " +
+					$"{BP.ToString(bodyPart)}=>" +
+					$"{BP.ToString(sourceBodyPart)}   " +
 					$"{modifier}";
 			}
 		}

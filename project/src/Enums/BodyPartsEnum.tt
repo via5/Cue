@@ -50,4 +50,4 @@ V.Value("Penis"),
 
 };
 
-#><#= Generate(vars, "BodyPartsEnum", "BodyParts", false) #>
+#><#= Generate(vars, "BP", "BodyParts", false) #>

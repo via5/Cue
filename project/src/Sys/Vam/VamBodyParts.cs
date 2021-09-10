@@ -431,7 +431,7 @@ namespace Cue.Sys.Vam
 
 			List<TriggerInfo> list = null;
 
-			var found = new bool[Cue.Instance.AllPersons.Count, BodyParts.Count];
+			var found = new bool[Cue.Instance.AllPersons.Count, BP.Count];
 			List<string> foundOther = null;
 
 			foreach (var kv in h_.collidingWithDictionary)
@@ -492,16 +492,16 @@ namespace Cue.Sys.Vam
 			// self collision
 			if (p.VamAtom == atom_)
 			{
-				if (bp == BodyParts.Penis)
+				if (bp == BP.Penis)
 				{
 					// probably the dildo touching genitals, ignore
 					return false;
 				}
 				else
 				{
-					if (Type == BodyParts.Penis)
+					if (Type == BP.Penis)
 					{
-						if (bp == BodyParts.Hips)
+						if (bp == BP.Hips)
 						{
 							// probably the dildo touching genitals, ignore
 							return false;
@@ -537,7 +537,7 @@ namespace Cue.Sys.Vam
 
 				// todo, handles dildos separately because the trigger is not
 				// part of the person itself, it's a different atom
-				var pn = p.Body.Get(BodyParts.Penis).VamSys as TriggerBodyPart;
+				var pn = p.Body.Get(BP.Penis).VamSys as TriggerBodyPart;
 				if (pn != null && pn.Transform == a.transform)
 					return p;
 			}
@@ -632,7 +632,7 @@ namespace Cue.Sys.Vam
 		private Rigidbody head_;
 
 		public EyesBodyPart(VamAtom a)
-			: base(a, BodyParts.Eyes)
+			: base(a, BP.Eyes)
 		{
 			foreach (var t in a.Atom.GetComponentsInChildren<DAZBone>())
 			{

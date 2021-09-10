@@ -202,7 +202,7 @@ namespace Cue
 		{
 			get
 			{
-				return body_.Get(BodyParts.Eyes)?.Position ?? base.EyeInterest;
+				return body_.Get(BP.Eyes)?.Position ?? base.EyeInterest;
 			}
 		}
 

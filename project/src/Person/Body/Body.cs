@@ -20,7 +20,7 @@ namespace Cue
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
 
-			for (int i = 0; i < BodyParts.Count; ++i)
+			for (int i = 0; i < BP.Count; ++i)
 			{
 				if (parts[i] != null && parts[i].Type != i)
 					Cue.LogError($"mismatched body part type {parts[i].Type} {i}");
@@ -53,7 +53,7 @@ namespace Cue
 		{
 			get
 			{
-				return Get(BodyParts.Penis).Exists;
+				return Get(BP.Penis).Exists;
 			}
 		}
 
@@ -62,9 +62,9 @@ namespace Cue
 			get
 			{
 				if (HasPenis)
-					return BodyParts.Penis;
+					return BP.Penis;
 				else
-					return BodyParts.Labia;
+					return BP.Labia;
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace Cue
 				Vector3 topPos = person_.EyeInterest + new Vector3(0, 0.2f, 0);
 				Vector3 bottomPos;
 
-				var hips = Get(BodyParts.Hips);
+				var hips = Get(BP.Hips);
 
 				// this happens for the camera pseudo-person
 				if (hips.Exists)
@@ -259,7 +259,7 @@ namespace Cue
 		{
 			get
 			{
-				var avoidHead = Get(BodyParts.Head).Position + new Vector3(0, 0.2f, 0);
+				var avoidHead = Get(BP.Head).Position + new Vector3(0, 0.2f, 0);
 				var avoidFeet = person_.Position;
 
 				var b = new Box(

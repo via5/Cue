@@ -183,9 +183,9 @@ namespace Cue
 		{
 			switch (bodyPart)
 			{
-				case BodyParts.Head:
-				case BodyParts.Lips:
-				case BodyParts.Mouth:
+				case BP.Head:
+				case BP.Lips:
+				case BP.Mouth:
 					return Active;
 
 				default:
@@ -255,8 +255,8 @@ namespace Cue
 				var t = Target;
 				if (t != null)
 				{
-					var l1 = person_.Body.Get(BodyParts.Lips);
-					var l2 = t.Body.Get(BodyParts.Lips);
+					var l1 = person_.Body.Get(BP.Lips);
+					var l2 = t.Body.Get(BP.Lips);
 					var d = Vector3.Distance(l1.Position, l2.Position);
 
 					if (trackPos_.Value)
@@ -550,14 +550,14 @@ namespace Cue
 		{
 			switch (bodyPart)
 			{
-				case BodyParts.LeftArm:
-				case BodyParts.LeftForearm:
-				case BodyParts.LeftHand:
+				case BP.LeftArm:
+				case BP.LeftForearm:
+				case BP.LeftHand:
 					return Active && person_.Handjob.LeftUsed;
 
-				case BodyParts.RightArm:
-				case BodyParts.RightForearm:
-				case BodyParts.RightHand:
+				case BP.RightArm:
+				case BP.RightForearm:
+				case BP.RightHand:
 					return Active && person_.Handjob.RightUsed;
 
 				default:
@@ -574,7 +574,7 @@ namespace Cue
 				if (p == person_ || !p.Body.HasPenis)
 					continue;
 
-				var g = p.Body.Get(BodyParts.Penis);
+				var g = p.Body.Get(BP.Penis);
 				var d = Vector3.Distance(hand.Position, g.Position);
 
 				Cue.LogInfo($"{person_.ID} {p.ID} {hand.Name} {d}");
@@ -588,8 +588,8 @@ namespace Cue
 
 		public bool Start()
 		{
-			var rightTarget = FindTarget(BodyParts.RightHand);
-			var leftTarget = FindTarget(BodyParts.LeftHand);
+			var rightTarget = FindTarget(BP.RightHand);
+			var leftTarget = FindTarget(BP.LeftHand);
 
 			if (rightTarget == null && leftTarget == null)
 				return false;
@@ -755,10 +755,10 @@ namespace Cue
 		{
 			switch (bodyPart)
 			{
-				case BodyParts.Head:
-				case BodyParts.Lips:
-				case BodyParts.Mouth:
-				case BodyParts.Eyes:   // cw also handles eyes
+				case BP.Head:
+				case BP.Lips:
+				case BP.Mouth:
+				case BP.Eyes:   // cw also handles eyes
 					return Active;
 
 				default:
@@ -768,14 +768,14 @@ namespace Cue
 
 		private Person FindTarget()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
+			var head = person_.Body.Get(BP.Head);
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p == person_ || !p.Body.HasPenis)
 					continue;
 
-				var g = p.Body.Get(BodyParts.Penis);
+				var g = p.Body.Get(BP.Penis);
 				var d = Vector3.Distance(head.Position, g.Position);
 
 				Cue.LogInfo($"{person_.ID} {p.ID} {d}");

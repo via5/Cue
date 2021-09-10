@@ -66,8 +66,8 @@
 
 		public override void Update(float s)
 		{
-			var leftHand = person_.Body.Get(BodyParts.LeftHand);
-			var rightHand = person_.Body.Get(BodyParts.RightHand);
+			var leftHand = person_.Body.Get(BP.LeftHand);
+			var rightHand = person_.Body.Get(BP.RightHand);
 
 			Check(leftHand, left_);
 			Check(rightHand, right_);
@@ -113,8 +113,8 @@
 		{
 			int[] selfIgnore = new int[]
 			{
-				BodyParts.LeftShoulder, BodyParts.LeftArm, BodyParts.LeftForearm,
-				BodyParts.RightShoulder, BodyParts.RightArm, BodyParts.RightForearm
+				BP.LeftShoulder, BP.LeftArm, BP.LeftForearm,
+				BP.RightShoulder, BP.RightArm, BP.RightForearm
 			};
 
 			BodyPart closest = null;
@@ -169,11 +169,11 @@
 				if (p == hand.Person)
 					continue;
 
-				var left = p.Body.Get(BodyParts.LeftHand);
+				var left = p.Body.Get(BP.LeftHand);
 				if (left.IsLinkedTo(hand))
 					left.Unlink();
 
-				var right = p.Body.Get(BodyParts.RightHand);
+				var right = p.Body.Get(BP.RightHand);
 				if (right.IsLinkedTo(hand))
 					right.Unlink();
 			}

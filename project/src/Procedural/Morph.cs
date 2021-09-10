@@ -60,8 +60,8 @@ namespace Cue.Proc
 
 			try
 			{
-				var bodyPart = BodyParts.FromString(o["bodyPart"]);
-				if (bodyPart == BodyParts.None)
+				var bodyPart = BP.FromString(o["bodyPart"]);
+				if (bodyPart == BP.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
 				float min;
@@ -153,7 +153,7 @@ namespace Cue.Proc
 
 			if (morph_ != null)
 			{
-				if (bodyPart_ == BodyParts.None || !person_.Body.Get(bodyPart_).Busy)
+				if (bodyPart_ == BP.None || !person_.Body.Get(bodyPart_).Busy)
 					morph_.Reset();
 			}
 		}
@@ -251,7 +251,7 @@ namespace Cue.Proc
 
 			var d = v - mid_;
 
-			if (bodyPart_ == BodyParts.None || !person_.Body.Get(bodyPart_).Busy)
+			if (bodyPart_ == BP.None || !person_.Body.Get(bodyPart_).Busy)
 				morph_.Value = v;
 
 			d = Math.Abs(d);
@@ -298,13 +298,13 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"morph {morphId_} ({BodyParts.ToString(bodyPart_)})";
+			return $"morph {morphId_} ({BP.ToString(bodyPart_)})";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"morph {morphId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"morph {morphId_} ({BP.ToString(bodyPart_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
 				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_}\n" +

@@ -98,7 +98,7 @@ namespace Cue
 					{
 						targets_.SetWeight(
 							Cue.Instance.FindPerson("Camera"),
-							BodyParts.Eyes, 1, "forced");
+							BP.Eyes, 1, "forced");
 
 						break;
 					}
@@ -171,7 +171,7 @@ namespace Cue
 
 			if (picker_.HasTarget)
 			{
-				if (person_.Body.Get(BodyParts.Head).Busy)
+				if (person_.Body.Get(BP.Head).Busy)
 					gazer_.Enabled = false;
 				else
 					gazer_.Enabled = gazerEnabled_;

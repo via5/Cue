@@ -11,8 +11,8 @@
 
 		public override void Update(float s)
 		{
-			var mouthTriggered = person_.Body.Get(BodyParts.Mouth).Triggered;
-			var head = person_.Body.Get(BodyParts.Head);
+			var mouthTriggered = person_.Body.Get(BP.Mouth).Triggered;
+			var head = person_.Body.Get(BP.Head);
 
 			if (!busy_ && mouthTriggered && !head.Busy)
 			{

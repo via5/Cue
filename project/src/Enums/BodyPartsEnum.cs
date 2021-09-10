@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class BodyPartsEnum
+	class BP
 	{
 		public const int None = -1;
 		public const int Head = 0;

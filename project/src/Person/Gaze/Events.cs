@@ -51,7 +51,7 @@ namespace Cue
 
 		public int CheckEmergency()
 		{
-			if (person_.Body.Get(BodyParts.Head).Busy)
+			if (person_.Body.Get(BP.Head).Busy)
 				return Continue;
 
 			return DoCheckEmergency();
@@ -120,12 +120,12 @@ namespace Cue
 
 		protected override int DoCheckEmergency()
 		{
-			if (person_.Body.Get(BodyParts.Head).Grabbed)
+			if (person_.Body.Get(BP.Head).Grabbed)
 			{
 				person_.Gaze.Clear();
 
 				targets_.SetWeight(
-					Cue.Instance.Player, BodyParts.Eyes, 1,
+					Cue.Instance.Player, BP.Eyes, 1,
 					"head grabbed");
 
 				return Exclusive | NoGazer;
@@ -165,7 +165,7 @@ namespace Cue
 					}
 					else
 					{
-						targets_.SetWeight(t, BodyParts.Eyes, 1, "kissing");
+						targets_.SetWeight(t, BP.Eyes, 1, "kissing");
 					}
 
 					return Exclusive | NoGazer;
@@ -249,11 +249,11 @@ namespace Cue
 						else
 						{
 							targets_.SetWeight(
-								t, BodyParts.Eyes,
+								t, BP.Eyes,
 								ps.Get(PSE.BlowjobEyesWeight), "bj");
 
 							targets_.SetWeight(
-								t, BodyParts.Penis,
+								t, BP.Penis,
 								ps.Get(PSE.BlowjobGenitalsWeight), "bj");
 
 							ret |= Continue | NoGazer | Busy | NoRandom;
@@ -305,11 +305,11 @@ namespace Cue
 						else
 						{
 							targets_.SetWeight(
-								t, BodyParts.Eyes,
+								t, BP.Eyes,
 								ps.Get(PSE.HandjobEyesWeight), "hj");
 
 							targets_.SetWeight(
-								t, BodyParts.Penis,
+								t, BP.Penis,
 								ps.Get(PSE.HandjobGenitalsWeight), "hj");
 
 							ret |= Continue | Busy | NoRandom;
@@ -432,7 +432,7 @@ namespace Cue
 			else
 			{
 				// check if head being groped
-				if (person_.Body.GropedBy(t, BodyParts.Head))
+				if (person_.Body.GropedBy(t, BP.Head))
 				{
 					eyes.Set(ps.Get(PSE.GropedEyesWeight), "head groped");
 				}
@@ -465,20 +465,20 @@ namespace Cue
 					if (eyes.set)
 					{
 						targets_.SetWeightIfZero(
-							t, BodyParts.Eyes, eyes.weight, eyes.why);
+							t, BP.Eyes, eyes.weight, eyes.why);
 					}
 
 					if (selfChest.set)
 					{
 						targets_.SetWeightIfZero(
-							person_, BodyParts.Chest,
+							person_, BP.Chest,
 							selfChest.weight, selfChest.why);
 					}
 
 					if (otherChest.set)
 					{
 						targets_.SetWeightIfZero(
-							t, BodyParts.Chest,
+							t, BP.Chest,
 							otherChest.weight, otherChest.why);
 					}
 
@@ -538,7 +538,7 @@ namespace Cue
 			else
 			{
 				// check if head being groped
-				if (target.Body.GropedBy(source, BodyParts.Head))
+				if (target.Body.GropedBy(source, BP.Head))
 				{
 					targetEyes.Set(
 						ps.Get(PSE.OtherGropedEyesWeight),
@@ -597,14 +597,14 @@ namespace Cue
 					if (targetEyes.set)
 					{
 						targets_.SetWeightIfZero(
-							target, BodyParts.Eyes,
+							target, BP.Eyes,
 							targetEyes.weight, targetEyes.why);
 					}
 
 					if (targetChest.set)
 					{
 						targets_.SetWeightIfZero(
-							target, BodyParts.Chest,
+							target, BP.Chest,
 							targetChest.weight, targetChest.why);
 					}
 
@@ -619,14 +619,14 @@ namespace Cue
 					if (sourceEyes.set)
 					{
 						targets_.SetWeightIfZero(
-							source, BodyParts.Eyes,
+							source, BP.Eyes,
 							sourceEyes.weight, sourceEyes.why);
 					}
 
 					if (sourceChest.set)
 					{
 						targets_.SetWeightIfZero(
-							source, BodyParts.Chest,
+							source, BP.Chest,
 							sourceChest.weight, sourceChest.why);
 					}
 
@@ -727,7 +727,7 @@ namespace Cue
 				{
 					// doesn't do anything, just to get the why in the ui
 					targets_.SetWeightIfZero(
-						p, BodyParts.Eyes, 0, "random person, but tired");
+						p, BP.Eyes, 0, "random person, but tired");
 				}
 				else
 				{
@@ -741,7 +741,7 @@ namespace Cue
 					w += p.Mood.GazeEnergy * ps.Get(PSE.OtherEyesExcitementWeight);
 
 					targets_.SetWeightIfZero(
-						p, BodyParts.Eyes, w, "random person");
+						p, BP.Eyes, w, "random person");
 				}
 			}
 
@@ -764,7 +764,7 @@ namespace Cue
 						person_.Gaze.Clear();
 
 						targets_.SetWeightIfZero(
-							p, BodyParts.Eyes,
+							p, BP.Eyes,
 							ps.Get(PSE.OtherEyesOrgasmWeight), "orgasming");
 
 						return Exclusive;

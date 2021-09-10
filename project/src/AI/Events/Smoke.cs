@@ -31,18 +31,18 @@
 		private bool CanRun()
 		{
 			var b = person_.Body;
-			var head = b.Get(BodyParts.Head);
-			var lips = b.Get(BodyParts.Lips);
+			var head = b.Get(BP.Head);
+			var lips = b.Get(BP.Lips);
 
 			bool busy =
-				person_.Body.Get(BodyParts.RightHand).Busy ||
+				person_.Body.Get(BP.RightHand).Busy ||
 				head.Busy || head.Triggered ||
 				lips.Busy || lips.Triggered;
 
 			if (busy)
 				return false;
 
-			if (b.GropedByAny(BodyParts.Head))
+			if (b.GropedByAny(BP.Head))
 				return false;
 
 			return true;

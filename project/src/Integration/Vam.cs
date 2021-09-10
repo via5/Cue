@@ -104,7 +104,7 @@ namespace Cue
 		{
 			var pos = pos_;
 
-			var head = person_.Body.Get(BodyParts.Head).Position;
+			var head = person_.Body.Get(BP.Head).Position;
 			var d = Vector3.Distance(head, pos);
 
 			if (d < minDistance_)

@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class BodyParts : BodyPartsEnum
+	class BodyParts : BP
 	{
 		private static int[] breasts_ = new int[]
 		{

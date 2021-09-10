@@ -70,7 +70,7 @@
 
 		public BodyPart ReferencePart
 		{
-			get { return person_.Body.Get(BodyParts.Chest); }
+			get { return person_.Body.Get(BP.Chest); }
 		}
 
 		public Person Person
@@ -339,7 +339,7 @@
 		private Box CreateBoxForFrustum(Vector3 p)
 		{
 			var q = ReferencePart.Rotation;
-			var selfRef = person_.Body.Get(BodyParts.Eyes);
+			var selfRef = person_.Body.Get(BP.Eyes);
 			var rp = p - selfRef.Position;
 			var aaP = q.RotateInv(rp);
 
@@ -379,7 +379,7 @@
 		private Box CreateObjectAvoidBox(BasicObject avoidO)
 		{
 			var q = ReferencePart.Rotation;
-			var selfRef = person_.Body.Get(BodyParts.Eyes);
+			var selfRef = person_.Body.Get(BP.Eyes);
 			var rp = avoidO.EyeInterest - selfRef.Position;
 			var aaP = q.RotateInv(rp);
 
@@ -388,7 +388,7 @@
 
 		private Box CreatePersonAvoidBox(Person avoidP)
 		{
-			var selfRef = person_.Body.Get(BodyParts.Eyes);
+			var selfRef = person_.Body.Get(BP.Eyes);
 			var q = ReferencePart.Rotation;
 
 			var b = avoidP.Body.TopBox;
@@ -507,7 +507,7 @@
 			for (int i = 0; i < boxes.Length; ++i)
 			{
 				avoid_[i].Position =
-					r_.Person.Body.Get(BodyParts.Eyes).Position +
+					r_.Person.Body.Get(BP.Eyes).Position +
 					r_.ReferencePart.Rotation.Rotate(boxes[i].center);
 
 				avoid_[i].Size = boxes[i].size;
@@ -524,7 +524,7 @@
 				lookAt_.Visible = true;
 
 				lookAt_.Position =
-					r_.Person.Body.Get(BodyParts.Eyes).Position +
+					r_.Person.Body.Get(BP.Eyes).Position +
 					r_.ReferencePart.Rotation.Rotate(b.center);
 
 				lookAt_.Size = b.size;
@@ -542,7 +542,7 @@
 			{
 				frustums_[i] = new FrustumRenderer(
 					r_.Person, r_.GetFrustum(i).frustum,
-					BodyParts.Head, BodyParts.Chest);
+					BP.Head, BP.Chest);
 
 				frustums_[i].Visible = visible_;
 			}

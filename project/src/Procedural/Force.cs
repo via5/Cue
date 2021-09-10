@@ -56,8 +56,8 @@ namespace Cue.Proc
 		{
 			try
 			{
-				var bodyPart = BodyParts.FromString(o["bodyPart"]);
-				if (bodyPart == BodyParts.None)
+				var bodyPart = BP.FromString(o["bodyPart"]);
+				if (bodyPart == BP.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
 				ISync sync = null;
@@ -141,7 +141,7 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
-			if (bodyPart_ != BodyParts.None && person_.Body.Get(bodyPart_).Busy)
+			if (bodyPart_ != BP.None && person_.Body.Get(bodyPart_).Busy)
 			{
 				wasBusy_ = true;
 				return;
@@ -247,13 +247,13 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"{rbId_} ({BodyParts.ToString(bodyPart_)})";
+			return $"{rbId_} ({BP.ToString(bodyPart_)})";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"{TypeToString(type_)} {rbId_} ({BodyParts.ToString(bodyPart_)})\n" +
+				$"{TypeToString(type_)} {rbId_} ({BP.ToString(bodyPart_)})\n" +
 				$"{movement_}\n" +
 				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";

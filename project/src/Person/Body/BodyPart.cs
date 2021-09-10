@@ -71,7 +71,7 @@
 
 		public string Name
 		{
-			get { return BodyParts.ToString(type_); }
+			get { return BP.ToString(type_); }
 		}
 
 		public int Type
@@ -245,7 +245,7 @@
 			else
 				s += part_.ToString();
 
-			s += $" ({BodyParts.ToString(type_)})";
+			s += $" ({BP.ToString(type_)})";
 
 			return s;
 		}

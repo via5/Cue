@@ -5,7 +5,7 @@ namespace Cue.Sys.Vam
 	class VamCameraEyes : VamBodyPart
 	{
 		public VamCameraEyes()
-			: base(null, BodyParts.Eyes)
+			: base(null, BP.Eyes)
 		{
 		}
 
@@ -78,13 +78,13 @@ namespace Cue.Sys.Vam
 
 		public VamCameraBody(VamCameraAtom a)
 		{
-			parts_ = new IBodyPart[BodyParts.Count];
+			parts_ = new IBodyPart[BP.Count];
 
-			parts_[BodyParts.Eyes] = new VamCameraEyes();
-			parts_[BodyParts.LeftHand] = new VamTransformBodyPart(
-				BodyParts.LeftHand, SuperController.singleton.leftHand);
-			parts_[BodyParts.RightHand] = new VamTransformBodyPart(
-				BodyParts.RightHand, SuperController.singleton.rightHand);
+			parts_[BP.Eyes] = new VamCameraEyes();
+			parts_[BP.LeftHand] = new VamTransformBodyPart(
+				BP.LeftHand, SuperController.singleton.leftHand);
+			parts_[BP.RightHand] = new VamTransformBodyPart(
+				BP.RightHand, SuperController.singleton.rightHand);
 		}
 
 		public override float Scale
@@ -126,9 +126,9 @@ namespace Cue.Sys.Vam
 				return -1;
 
 			if (ho.hand == MeshVR.Hands.HandOutput.Hand.Left)
-				return BodyParts.LeftHand;
+				return BP.LeftHand;
 			else if (ho.hand == MeshVR.Hands.HandOutput.Hand.Right)
-				return BodyParts.RightHand;
+				return BP.RightHand;
 			else
 				return -1;
 		}

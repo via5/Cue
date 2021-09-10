@@ -86,7 +86,7 @@ namespace Cue
 		public const int ReasonCount = 5;
 
 		private Person person_;
-		private PartValue[] parts_ = new PartValue[BodyParts.Count];
+		private PartValue[] parts_ = new PartValue[BP.Count];
 
 		private Reason[] reasons_ = new Reason[ReasonCount];
 		private ForceableFloat physicalRate_ = new ForceableFloat();
@@ -152,7 +152,7 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			for (int i = 0; i < BodyParts.Count; ++i)
+			for (int i = 0; i < BP.Count; ++i)
 			{
 				var ts = person_.Body.Get(i).GetTriggers();
 
@@ -182,39 +182,39 @@ namespace Cue
 			var pg = person_.Physiology;
 
 			reasons_[Mouth].Value =
-				parts_[BodyParts.Lips].value * pg.Get(PE.LipsFactor) +
-				parts_[BodyParts.Mouth].value * pg.Get(PE.MouthFactor);
+				parts_[BP.Lips].value * pg.Get(PE.LipsFactor) +
+				parts_[BP.Mouth].value * pg.Get(PE.MouthFactor);
 
 			reasons_[Mouth].SpecificSensitivityModifier =
-				parts_[BodyParts.Lips].specificModifier +
-				parts_[BodyParts.Mouth].specificModifier;
+				parts_[BP.Lips].specificModifier +
+				parts_[BP.Mouth].specificModifier;
 
 
 			reasons_[Breasts].Value =
-				parts_[BodyParts.LeftBreast].value * pg.Get(PE.LeftBreastFactor) +
-				parts_[BodyParts.RightBreast].value * pg.Get(PE.RightBreastFactor);
+				parts_[BP.LeftBreast].value * pg.Get(PE.LeftBreastFactor) +
+				parts_[BP.RightBreast].value * pg.Get(PE.RightBreastFactor);
 
 			reasons_[Breasts].SpecificSensitivityModifier =
-				parts_[BodyParts.LeftBreast].specificModifier +
-				parts_[BodyParts.RightBreast].specificModifier;
+				parts_[BP.LeftBreast].specificModifier +
+				parts_[BP.RightBreast].specificModifier;
 
 
 			reasons_[Genitals].Value =
-				parts_[BodyParts.Labia].value * pg.Get(PE.LabiaFactor);
+				parts_[BP.Labia].value * pg.Get(PE.LabiaFactor);
 
 			reasons_[Genitals].SpecificSensitivityModifier =
-				parts_[BodyParts.Labia].specificModifier;
+				parts_[BP.Labia].specificModifier;
 
 
 			reasons_[Penetration].Value =
 				GetFixedPenetrationValue() +
-				parts_[BodyParts.DeepVagina].value * pg.Get(PE.DeepVaginaFactor) +
-				parts_[BodyParts.DeeperVagina].value * pg.Get(PE.DeeperVaginaFactor);
+				parts_[BP.DeepVagina].value * pg.Get(PE.DeepVaginaFactor) +
+				parts_[BP.DeeperVagina].value * pg.Get(PE.DeeperVaginaFactor);
 
 			reasons_[Penetration].SpecificSensitivityModifier =
-				parts_[BodyParts.Vagina].specificModifier +
-				parts_[BodyParts.DeepVagina].specificModifier +
-				parts_[BodyParts.DeeperVagina].specificModifier;
+				parts_[BP.Vagina].specificModifier +
+				parts_[BP.DeepVagina].specificModifier +
+				parts_[BP.DeeperVagina].specificModifier;
 
 
 			reasons_[OtherSex].Value = 0;
@@ -233,18 +233,18 @@ namespace Cue
 		{
 			var pg = person_.Physiology;
 
-			if (parts_[BodyParts.Vagina].value > 0)
+			if (parts_[BP.Vagina].value > 0)
 			{
 				return
-					parts_[BodyParts.Vagina].value *
+					parts_[BP.Vagina].value *
 					pg.Get(PE.VaginaFactor);
 			}
 
-			if (parts_[BodyParts.Penis].value > 0)
+			if (parts_[BP.Penis].value > 0)
 			{
 				// todo
 				return
-					parts_[BodyParts.Penis].value *
+					parts_[BP.Penis].value *
 					pg.Get(PE.VaginaFactor);
 			}
 
@@ -253,15 +253,15 @@ namespace Cue
 			//
 			// if the labia is triggered by a genital, assume penetration
 
-			var ts = person_.Body.Get(BodyParts.Labia).GetTriggers();
+			var ts = person_.Body.Get(BP.Labia).GetTriggers();
 			if (ts != null)
 			{
 				for (int i = 0; i < ts.Length; i++)
 				{
-					if (ts[i].sourcePartIndex == BodyParts.Penis)
+					if (ts[i].sourcePartIndex == BP.Penis)
 					{
 						return
-							parts_[BodyParts.Labia].value *
+							parts_[BP.Labia].value *
 							pg.Get(PE.VaginaFactor);
 					}
 				}

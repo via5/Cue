@@ -81,7 +81,7 @@
 		{
 			get
 			{
-				if (offset_ == BodyParts.None)
+				if (offset_ == BP.None)
 					return person_.Position;
 				else
 					return person_.Body.Get(offset_).Position;
@@ -92,7 +92,7 @@
 		{
 			get
 			{
-				if (rot_ == BodyParts.None)
+				if (rot_ == BP.None)
 					return person_.Rotation;
 				else
 					return person_.Body.Get(rot_).Rotation;

@@ -300,7 +300,7 @@
 			// increase the vertical offset when the head is closer than
 			// `far`
 
-			var eyes = person_.Body.Get(BodyParts.Eyes).Position;
+			var eyes = person_.Body.Get(BP.Eyes).Position;
 			var target = person_.Gaze.Eyes.TargetPosition;
 			var d = Vector3.Distance(eyes, target);
 

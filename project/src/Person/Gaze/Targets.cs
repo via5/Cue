@@ -57,13 +57,13 @@ namespace Cue
 		public void Init()
 		{
 			bodyParts_ = new LookatPart[
-				Cue.Instance.AllPersons.Count, BodyParts.Count];
+				Cue.Instance.AllPersons.Count, BP.Count];
 
 			for (int pi = 0; pi < Cue.Instance.AllPersons.Count; ++pi)
 			{
 				var p = Cue.Instance.AllPersons[pi];
 
-				for (int bi = 0; bi < BodyParts.Count; ++bi)
+				for (int bi = 0; bi < BP.Count; ++bi)
 					bodyParts_[pi, bi] = new LookatPart(p, bi);
 			}
 
@@ -324,7 +324,7 @@ namespace Cue
 		public override void Update(Person p, float s)
 		{
 			pos_ =
-				p.Body.Get(BodyParts.Eyes).Position +
+				p.Body.Get(BP.Eyes).Position +
 				p.Rotation.Rotate(new Vector3(0, 0, 1));
 		}
 
@@ -423,8 +423,8 @@ namespace Cue
 		{
 			get
 			{
-				var h = person_.Body.Get(BodyParts.Head);
-				var c = person_.Body.Get(BodyParts.Chest);
+				var h = person_.Body.Get(BP.Head);
+				var c = person_.Body.Get(BP.Chest);
 				var d = new Vector3(0, 0.5f, 0.05f);
 				var p = h.Position + c.Rotation.Rotate(d);
 
@@ -501,8 +501,8 @@ namespace Cue
 			}
 
 			var rp = f.RandomPoint();
-			var eyes = person_.Body.Get(BodyParts.Eyes);
-			var chest = person_.Body.Get(BodyParts.Chest);
+			var eyes = person_.Body.Get(BP.Eyes);
+			var chest = person_.Body.Get(BP.Chest);
 
 			pos_ = eyes.Position + chest.Rotation.Rotate(rp);
 			hasPos_ = true;

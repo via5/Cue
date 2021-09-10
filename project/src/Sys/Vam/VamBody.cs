@@ -181,8 +181,8 @@ namespace Cue.Sys.Vam
 
 			// head
 			//
-			add(BodyParts.Head, GetRigidbody(
-				BodyParts.Head, new string[] {
+			add(BP.Head, GetRigidbody(
+				BP.Head, new string[] {
 					"HeadHard1Hard", "HeadHard10Hard", "FaceCentral1Hard",
 					"TongueColliders/_Collider1",
 					"lowerJawStandardColliders/_ColliderL1b",
@@ -197,53 +197,53 @@ namespace Cue.Sys.Vam
 					"HeadLeftEarHard", "HeadRightEarHard"
 				}, "headControl", "head"));
 
-			add(BodyParts.Lips, GetTrigger(
-				BodyParts.Lips, "", "LipTrigger"));
+			add(BP.Lips, GetTrigger(
+				BP.Lips, "", "LipTrigger"));
 
-			add(BodyParts.Mouth, GetTrigger(
-				BodyParts.Mouth, "", "MouthTrigger"));
+			add(BP.Mouth, GetTrigger(
+				BP.Mouth, "", "MouthTrigger"));
 
 
 			// breasts
 			//
-			add(BodyParts.LeftBreast, GetTrigger(
-				BodyParts.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
+			add(BP.LeftBreast, GetTrigger(
+				BP.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
 
-			add(BodyParts.RightBreast, GetTrigger(
-				BodyParts.RightBreast, "rNippleControl", "rNippleTrigger", ""));
+			add(BP.RightBreast, GetTrigger(
+				BP.RightBreast, "rNippleControl", "rNippleTrigger", ""));
 
 
 			// genitals
 			//
-			add(BodyParts.Labia, GetTrigger(
-				BodyParts.Labia, "", "LabiaTrigger", "",
+			add(BP.Labia, GetTrigger(
+				BP.Labia, "", "LabiaTrigger", "",
 				genitalsIgnore));
 
-			add(BodyParts.Vagina, GetTrigger(
-				BodyParts.Vagina, "", "VaginaTrigger", "",
+			add(BP.Vagina, GetTrigger(
+				BP.Vagina, "", "VaginaTrigger", "",
 				genitalsIgnore));
 
-			add(BodyParts.DeepVagina, GetTrigger(
-				BodyParts.DeepVagina, "", "DeepVaginaTrigger", "",
+			add(BP.DeepVagina, GetTrigger(
+				BP.DeepVagina, "", "DeepVaginaTrigger", "",
 				genitalsIgnore));
 
-			add(BodyParts.DeeperVagina, GetTrigger(
-				BodyParts.DeeperVagina, "", "DeeperVaginaTrigger", "",
+			add(BP.DeeperVagina, GetTrigger(
+				BP.DeeperVagina, "", "DeeperVaginaTrigger", "",
 				genitalsIgnore));
 
-			add(BodyParts.Anus, null);
+			add(BP.Anus, null);
 
 
 			// upper body
 			//
-			add(BodyParts.Chest, GetRigidbody(
-				BodyParts.Chest, new string[] { "chest1/chest1Joint" },
+			add(BP.Chest, GetRigidbody(
+				BP.Chest, new string[] { "chest1/chest1Joint" },
 				"chestControl", "chest"));
 
 			if (atom_.IsMale)
 			{
-				add(BodyParts.Belly, GetRigidbody(
-					BodyParts.Belly, new string[] {
+				add(BP.Belly, GetRigidbody(
+					BP.Belly, new string[] {
 						"abdomen2/_ColliderL1",
 						"abdomen/_ColliderL1b",
 						"abdomen/_ColliderL1f",
@@ -252,8 +252,8 @@ namespace Cue.Sys.Vam
 						"abdomen/_ColliderL2b"
 					}, "", "abdomen2"));
 
-				add(BodyParts.Hips, GetRigidbody(
-					BodyParts.Hips, new string[] {
+				add(BP.Hips, GetRigidbody(
+					BP.Hips, new string[] {
 					"pelvisF7/pelvisF7Joint",
 					"pelvisFL3/pelvisFL3Joint",
 					"pelvisFR3/pelvisFR3Joint",
@@ -263,8 +263,8 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				add(BodyParts.Belly, GetRigidbody(
-					BodyParts.Belly, new string[] {
+				add(BP.Belly, GetRigidbody(
+					BP.Belly, new string[] {
 						"abdomen2_3/abdomen2_3Joint",
 						"abdomen3/abdomen3Joint",
 						"abdomen7/abdomen7Joint",
@@ -273,8 +273,8 @@ namespace Cue.Sys.Vam
 						"abdomen20/abdomen20Joint"
 					}, "", "abdomen2"));
 
-				add(BodyParts.Hips, GetRigidbody(
-					BodyParts.Hips, new string[] {
+				add(BP.Hips, GetRigidbody(
+					BP.Hips, new string[] {
 					"pelvisF7/pelvisF7Joint",
 					"pelvisFL8/pelvisFL8Joint",
 					"pelvisFR8/pelvisFR8Joint",
@@ -283,112 +283,112 @@ namespace Cue.Sys.Vam
 					}, "hipControl", "abdomen"));
 			}
 
-			add(BodyParts.LeftGlute, GetCollider(
-				BodyParts.LeftGlute, "", "LGlute", "LGlute1Joint", ""));
+			add(BP.LeftGlute, GetCollider(
+				BP.LeftGlute, "", "LGlute", "LGlute1Joint", ""));
 
-			add(BodyParts.RightGlute, GetCollider(
-				BodyParts.RightGlute, "", "RGlute", "RGlute1Joint", ""));
+			add(BP.RightGlute, GetCollider(
+				BP.RightGlute, "", "RGlute", "RGlute1Joint", ""));
 
 
 			// left arm
 			//
-			add(BodyParts.LeftShoulder, GetCollider(
-				BodyParts.LeftShoulder, "lArmControl", "lShldr", "lShldr"));
+			add(BP.LeftShoulder, GetCollider(
+				BP.LeftShoulder, "lArmControl", "lShldr", "lShldr"));
 
-			add(BodyParts.LeftArm, GetCollider(
-				BodyParts.LeftArm, "lElbowControl", "lForeArm",
+			add(BP.LeftArm, GetCollider(
+				BP.LeftArm, "lElbowControl", "lForeArm",
 				"StandardColliderslShldr/_Collider1"));
 
-			add(BodyParts.LeftForearm, GetCollider(
-				BodyParts.LeftForearm, "lElbowControl", "lHand",
+			add(BP.LeftForearm, GetCollider(
+				BP.LeftForearm, "lElbowControl", "lHand",
 				"lForeArm/_Collider2"));
 
-			add(BodyParts.LeftHand, GetRigidbody(
-				BodyParts.LeftHand, new string[] { "lHand/_Collider" },
+			add(BP.LeftHand, GetRigidbody(
+				BP.LeftHand, new string[] { "lHand/_Collider" },
 				"lHandControl", "lHand"));
 
 
 			// right arm
 			//
-			add(BodyParts.RightShoulder, GetCollider(
-				BodyParts.RightShoulder, "rArmControl", "rShldr", "rShldr"));
+			add(BP.RightShoulder, GetCollider(
+				BP.RightShoulder, "rArmControl", "rShldr", "rShldr"));
 
-			add(BodyParts.RightArm, GetCollider(
-				BodyParts.RightArm, "rElbowControl", "rForeArm",
+			add(BP.RightArm, GetCollider(
+				BP.RightArm, "rElbowControl", "rForeArm",
 				"StandardCollidersrShldr/_Collider1"));
 
-			add(BodyParts.RightForearm, GetCollider(
-				BodyParts.RightForearm, "rElbowControl", "rHand",
+			add(BP.RightForearm, GetCollider(
+				BP.RightForearm, "rElbowControl", "rHand",
 				"rForeArm/_Collider2"));
 
-			add(BodyParts.RightHand, GetRigidbody(
-				BodyParts.RightHand, new string[] { "rHand/_Collider" },
+			add(BP.RightHand, GetRigidbody(
+				BP.RightHand, new string[] { "rHand/_Collider" },
 				"rHandControl", "rHand"));
 
 
 			// left leg
 			//
-			add(BodyParts.LeftThigh, GetCollider(
-				BodyParts.LeftThigh, "lKneeControl", "lThigh",
+			add(BP.LeftThigh, GetCollider(
+				BP.LeftThigh, "lKneeControl", "lThigh",
 				"lThigh12Joint", "StandardColliderslThigh/_Collider6"));
 
-			add(BodyParts.LeftShin, GetCollider(
-				BodyParts.LeftShin, "lKneeControl", "lShin",
+			add(BP.LeftShin, GetCollider(
+				BP.LeftShin, "lKneeControl", "lShin",
 				"lShin8Joint", "StandardColliderslShin/_Collider2"));
 
-			add(BodyParts.LeftFoot, GetRigidbody(
-				BodyParts.LeftFoot, new string[] { "lFoot/_Collider4" },
+			add(BP.LeftFoot, GetRigidbody(
+				BP.LeftFoot, new string[] { "lFoot/_Collider4" },
 				"lFootControl", "lFoot"));
 
 
 			// right leg
 			//
-			add(BodyParts.RightThigh, GetCollider(
-				BodyParts.RightThigh, "rKneeControl", "rThigh",
+			add(BP.RightThigh, GetCollider(
+				BP.RightThigh, "rKneeControl", "rThigh",
 				"rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
 
-			add(BodyParts.RightShin, GetCollider(
-				BodyParts.RightShin, "rKneeControl", "rShin",
+			add(BP.RightShin, GetCollider(
+				BP.RightShin, "rKneeControl", "rShin",
 				"rShin8Joint", "StandardCollidersrShin/_Collider2"));
 
-			add(BodyParts.RightFoot, GetRigidbody(
-				BodyParts.RightFoot, new string[] { "rFoot/_Collider4" },
+			add(BP.RightFoot, GetRigidbody(
+				BP.RightFoot, new string[] { "rFoot/_Collider4" },
 				"rFootControl", "rFoot"));
 
 
 			// eyes
 			//
-			add(BodyParts.Eyes, new EyesBodyPart(atom_));
+			add(BP.Eyes, new EyesBodyPart(atom_));
 
 
 			// male parts
 			//
 			if (atom_.IsMale)
 			{
-				add(BodyParts.Pectorals, GetRigidbody(
-					BodyParts.Pectorals, new string[] {
+				add(BP.Pectorals, GetRigidbody(
+					BP.Pectorals, new string[] {
 						"chest3/chest3Joint",
 						"chest5/chest5Joint" },
 					"chestControl", "chest"));
 
-				add(BodyParts.Penis, GetRigidbody(
-					BodyParts.Penis, new string[] { "Gen1Hard", "Gen3aHard" },
+				add(BP.Penis, GetRigidbody(
+					BP.Penis, new string[] { "Gen1Hard", "Gen3aHard" },
 					"penisBaseControl", "", "Gen1"));
 			}
 			else
 			{
-				var dildo = CreateDildoTrigger(BodyParts.Penis);
+				var dildo = CreateDildoTrigger(BP.Penis);
 
 				if (dildo == null)
 				{
-					add(BodyParts.Pectorals, null);
-					add(BodyParts.Penis, null);
+					add(BP.Pectorals, null);
+					add(BP.Penis, null);
 				}
 				else
 				{
 					Cue.LogInfo($"{atom_.ID} uses dildo {dildo.Transform.name}");
-					add(BodyParts.Pectorals, null);
-					add(BodyParts.Penis, dildo);
+					add(BP.Pectorals, null);
+					add(BP.Penis, dildo);
 				}
 			}
 
@@ -396,7 +396,7 @@ namespace Cue.Sys.Vam
 
 			var list = new List<IBodyPart>();
 
-			for (int i = 0; i < BodyParts.Count; ++i)
+			for (int i = 0; i < BP.Count; ++i)
 				list.Add(map[i]);
 
 			return list.ToArray();

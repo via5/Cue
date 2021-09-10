@@ -95,7 +95,7 @@ namespace Cue.Proc
 					SlidingDurationSync.Loop));
 
 			g.AddTarget(new MorphTarget(
-				BodyParts.Lips, "Lips Pucker",
+				BP.Lips, "Lips Pucker",
 				0, 1, new ParentTargetSync()));
 
 			AddTarget(g);
@@ -140,7 +140,7 @@ namespace Cue.Proc
 
 
 			g.AddTarget(new Force(
-				Force.AbsoluteForce, BodyParts.Hips, "hip",
+				Force.AbsoluteForce, BP.Hips, "hip",
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
@@ -148,7 +148,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BodyParts.Hips, "hip",
+				Force.RelativeTorque, BP.Hips, "hip",
 				new SlidingMovement(
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
@@ -157,7 +157,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BodyParts.Chest, "chest",
+				Force.RelativeTorque, BP.Chest, "chest",
 				new SlidingMovement(
 					new Vector3(chestTorqueMin_, 0, 0),
 					new Vector3(chestTorqueMax_, 0, 0),
@@ -166,7 +166,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BodyParts.Head, "head",
+				Force.RelativeTorque, BP.Head, "head",
 				new SlidingMovement(
 					new Vector3(headTorqueMin_, 0, 0),
 					new Vector3(headTorqueMax_, 0, 0),
@@ -333,7 +333,7 @@ namespace Cue.Proc
 			base.Start(p);
 
 			hand_ = person_.Body.RightHand;
-			handPart_ = person_.Body.Get(BodyParts.RightHand);
+			handPart_ = person_.Body.Get(BP.RightHand);
 
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
@@ -434,7 +434,7 @@ namespace Cue.Proc
 
 			if (DoRender)
 			{
-				var mouth = person_.Body.Get(BodyParts.Lips);
+				var mouth = person_.Body.Get(BP.Lips);
 				render_.hand.Position = handPart_.Position;
 				render_.cig.Position = cig_.Position;
 				render_.targetHand.Position = targetPos_;
@@ -447,7 +447,7 @@ namespace Cue.Proc
 
 		private Quaternion GetTargetRotation()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
+			var head = person_.Body.Get(BP.Head);
 
 			if (hand_ == person_.Body.RightHand)
 			{
@@ -467,8 +467,8 @@ namespace Cue.Proc
 
 		private void CheckTarget()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
-			var mouth = person_.Body.Get(BodyParts.Lips);
+			var head = person_.Body.Get(BP.Head);
+			var mouth = person_.Body.Get(BP.Lips);
 
 			var d = handPart_.ControlRotation.RotateInv(
 				CigarettePosition() - handPart_.ControlPosition);
@@ -482,9 +482,9 @@ namespace Cue.Proc
 
 		private void StartMoveToMouth()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
-			var chest = person_.Body.Get(BodyParts.Chest);
-			var mouth = person_.Body.Get(BodyParts.Lips);
+			var head = person_.Body.Get(BP.Head);
+			var chest = person_.Body.Get(BP.Chest);
+			var mouth = person_.Body.Get(BP.Lips);
 
 			startPos_ = handPart_.Position;
 			startRot_ = handPart_.Rotation;
@@ -656,7 +656,7 @@ namespace Cue.Proc
 
 		private void Adjust(float s)
 		{
-			var mouth = person_.Body.Get(BodyParts.Lips);
+			var mouth = person_.Body.Get(BP.Lips);
 			var cig = CigarettePosition();
 
 			{
@@ -728,7 +728,7 @@ namespace Cue.Proc
 
 		private void StartExhale()
 		{
-			var chest = person_.Body.Get(BodyParts.Chest);
+			var chest = person_.Body.Get(BP.Chest);
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
@@ -740,7 +740,7 @@ namespace Cue.Proc
 
 		private void Exhale()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
+			var head = person_.Body.Get(BP.Head);
 
 			if (elapsed_ >= HoldInTime)
 			{
@@ -793,7 +793,7 @@ namespace Cue.Proc
 
 		private void DoReset()
 		{
-			var head = person_.Body.Get(BodyParts.Head);
+			var head = person_.Body.Get(BP.Head);
 
 			{
 				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
