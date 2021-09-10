@@ -55,7 +55,7 @@
 				},
 				{
 					"type": "rforce",
-					"bodyPart": "lefthand",
+					"bodyPart": "leftHand",
 					"rigidbody": "lHand",
 					"movement":
 					{
@@ -75,7 +75,7 @@
 				},
 				{
 					"type": "rforce",
-					"bodyPart": "righthand",
+					"bodyPart": "rightHand",
 					"rigidbody": "rHand",
 					"movement":
 					{
@@ -137,7 +137,7 @@
 				},
 				{
 					"type": "rtorque",
-					"bodyPart": "lefthand",
+					"bodyPart": "leftHand",
 					"rigidbody": "lHand",
 					"movement":
 					{
@@ -157,7 +157,7 @@
 				},
 				{
 					"type": "rtorque",
-					"bodyPart": "righthand",
+					"bodyPart": "rightHand",
 					"rigidbody": "rHand",
 					"movement":
 					{
@@ -201,7 +201,7 @@
 
 				{
 					"type": "morph",
-					"bodyPart": "righthand",
+					"bodyPart": "rightHand",
 					"morph": "Right Fingers Fist",
 					"min": 0.2,
 					"max": 0.4,
@@ -210,7 +210,7 @@
 				},
 				{
 					"type": "morph",
-					"bodyPart": "lefthand",
+					"bodyPart": "leftHand",
 					"morph": "Left Fingers Fist",
 					"min": 0.2,
 					"max": 0.4,

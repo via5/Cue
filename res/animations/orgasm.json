@@ -78,7 +78,7 @@
 						},
 						{
 							"type": "rforce",
-							"bodyPart": "righthand",
+							"bodyPart": "rightHand",
 							"rigidbody": "rHand",
 							"movement":
 							{
@@ -98,7 +98,7 @@
 						},
 						{
 							"type": "rforce",
-							"bodyPart": "lefthand",
+							"bodyPart": "leftHand",
 							"rigidbody": "lHand",
 							"movement":
 							{

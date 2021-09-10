@@ -10,11 +10,25 @@ public class Limit
 public class V
 {
 	public string name, type;
+	public bool hasForced;
+	public int forced;
 
-	public V(string name, string type)
+	public V(string name, string type, bool hasForced = false, int forced = 0)
 	{
 		this.name = name;
 		this.type = type;
+		this.hasForced = hasForced;
+		this.forced = forced;
+	}
+
+	public static V Value(string name)
+	{
+		return new V(name, "value");
+	}
+
+	public static V Value(string name, int forced)
+	{
+		return new V(name, "value", true, forced);
 	}
 
 	public static V SlidingDuration(string name)
@@ -44,57 +58,64 @@ public class V
 }
 
 
-public string Generate(V[] vars, string name, string file)
+public string Generate(V[] vars, string name, string file, bool generateEmpty = true)
 {
-	var slidingDurations = new List<string>();
-	var bools = new List<string>();
-	var floats = new List<string>();
-	var strings = new List<string>();
+	var values = new List<V>();
+	var slidingDurations = new List<V>();
+	var bools = new List<V>();
+	var floats = new List<V>();
+	var strings = new List<V>();
 
 	foreach (var v in vars)
 	{
 		if (v.type == "slidingDuration")
-			slidingDurations.Add(v.name);
+			slidingDurations.Add(v);
 		else if (v.type == "bool")
-			bools.Add(v.name);
+			bools.Add(v);
 		else if (v.type == "float")
-			floats.Add(v.name);
+			floats.Add(v);
 		else if (v.type == "string")
-			strings.Add(v.name);
+			strings.Add(v);
+		else if (v.type == "value")
+			values.Add(v);
 		else
 			throw new Exception($"bad type {v.type}");
 	}
 
 	return Generate3(
-		slidingDurations.ToArray(), bools.ToArray(),
+		values.ToArray(), slidingDurations.ToArray(), bools.ToArray(),
 		floats.ToArray(), strings.ToArray(),
-		name, file);
-}
-
-
-public string Generate2(string[][] vars, string name, string file)
-{
-	return Generate3(vars[0], vars[1], vars[2], vars[3], name, file);
+		name, file, generateEmpty);
 }
 
 public string Generate3(
-	string[] slidingDurations, string[] bools, string[] floats,
-	string[] strings, string name, string file)
+	V[] values,
+	V[] slidingDurations, V[] bools, V[] floats,
+	V[] strings, string name, string file, bool generateEmpty)
 {
 	string defs = "";
 	string names = "";
 	var allNames = new List<string>();
+	int sectionCount = 0;
 
-	//if (slidingDurations.Length > 0)
+	if (values.Length > 0 || generateEmpty)
+	{
+		defs += MakeEnum(values, "Count");
+		names += MakeNames(values, "", allNames);
+		++sectionCount;
+	}
+
+	if (slidingDurations.Length > 0 || generateEmpty)
 	{
 		defs +=
 			$"\t\t// sliding durations\r\n" +
 			MakeEnum(slidingDurations, "SlidingDurationCount");
 
 		names += MakeNames(slidingDurations, "sliding duration", allNames);
+		++sectionCount;
 	}
 
-	//if (bools.Length > 0)
+	if (bools.Length > 0 || generateEmpty)
 	{
 		if (defs != "")
 		{
@@ -107,9 +128,10 @@ public string Generate3(
 			MakeEnum(bools, "BoolCount");
 
 		names += MakeNames(bools, "bool", allNames);
+		++sectionCount;
 	}
 
-	//if (floats.Length > 0)
+	if (floats.Length > 0 || generateEmpty)
 	{
 		if (defs != "")
 		{
@@ -122,9 +144,10 @@ public string Generate3(
 			MakeEnum(floats, "FloatCount");
 
 		names += MakeNames(floats, "float", allNames);
+		++sectionCount;
 	}
 
-	//if (strings.Length > 0)
+	if (strings.Length > 0 || generateEmpty)
 	{
 		if (defs != "")
 		{
@@ -137,54 +160,76 @@ public string Generate3(
 			MakeEnum(strings, "StringCount");
 
 		names += MakeNames(strings, "string", allNames);
+		++sectionCount;
 	}
 
-	string allNamesArray =
-		$"\t\tprivate static string[] allNames_ = new string[] {{\r\n";
+	string allNamesArray = "";
 
-	foreach (var n in allNames)
-		allNamesArray += $"\t\t\t\"{n}\",\r\n";
+	if (sectionCount > 1)
+	{
+		allNamesArray +=
+			$"\t\tprivate static string[] allNames_ = new string[] {{\r\n";
 
-	allNamesArray +=
-		$"\t\t}};\r\n" +
-		$"\r\n" +
-		$"\t\tpublic static string[] AllNames\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\tget {{ return allNames_; }}\r\n" +
-		$"\t\t}}\r\n" +
-		$"\r\n" +
-		$"\t\tpublic string[] GetAllNames()\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\treturn AllNames;\r\n" +
-		$"\t\t}}";
+		foreach (var n in allNames)
+			allNamesArray += $"\t\t\t\"{n}\",\r\n";
+
+		allNamesArray +=
+			$"\t\t}};\r\n" +
+			$"\r\n" +
+			$"\t\tpublic static string[] AllNames\r\n" +
+			$"\t\t{{\r\n" +
+			$"\t\t\tget {{ return allNames_; }}\r\n" +
+			$"\t\t}}\r\n" +
+			$"\r\n" +
+			$"\t\tpublic string[] GetAllNames()\r\n" +
+			$"\t\t{{\r\n" +
+			$"\t\t\treturn AllNames;\r\n" +
+			$"\t\t}}";
+
+		allNamesArray = "\r\n\r\n" + allNamesArray + "\r\n";
+	}
 
 	string s =
 		$"// auto generated from {file}Enums.tt\r\n" +
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"\tclass {name} : IEnumValues\r\n" +
+		$"\tclass {name}{(generateEmpty ? " : IEnumValues" : "")}\r\n" +
 		$"\t{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
-		names + "\r\n\r\n\r\n" +
-		allNamesArray + "\r\n" +
+		names + "\r\n" + allNamesArray +
 		$"\t}}\r\n" +
 		$"}}";
 
 	return s;
 }
 
-public string MakeEnum(string[] names, string count)
+public string MakeEnum(V[] names, string count)
 {
 	string s = "";
+	int nextValue = 0;
+
 	for (int i=0; i<names.Length; ++i)
 	{
-		s += $"\t\tpublic const int {names[i]} = {i};\r\n";
+		string v;
+
+		if (names[i].hasForced)
+		{
+			v = names[i].forced.ToString();
+		}
+		else
+		{
+			v = nextValue.ToString();
+			++nextValue;
+		}
+
+		s += $"\t\tpublic const int {names[i].name} = {v};\r\n";
 	}
 
 	s +=
-		$"\t\tpublic const int {count} = {names.Length};\r\n" +
-		$"\t\tpublic int Get{count}() {{ return {names.Length}; }}";
+		$"\r\n" +
+		$"\t\tpublic const int {count} = {nextValue};\r\n" +
+		$"\t\tpublic int Get{count}() {{ return {nextValue}; }}";
 
 	return s;
 }
@@ -204,10 +249,20 @@ public string CamelCase(string s, bool firstUpper)
 	return s;
 }
 
-public string MakeNames(string[] names, string name, List<string> allNames)
+public string MakeNames(V[] names, string name, List<string> allNames)
 {
-	string var = CamelCase(name, false) + "Names_";
-	string ccName = CamelCase(name, true);
+	string var, ccName;
+
+	if (name == "")
+	{
+		var = "names_";
+		ccName = "";
+	}
+	else
+	{
+		var = CamelCase(name, false) + "Names_";
+		ccName = CamelCase(name, true);
+	}
 
 	string s =
 		$"\t\tprivate static string[] {var} = new string[]\r\n" +
@@ -215,7 +270,10 @@ public string MakeNames(string[] names, string name, List<string> allNames)
 
 	foreach (var v in names)
 	{
-		var ename = CamelCase(v, false);
+		if (v.hasForced)
+			continue;
+
+		var ename = CamelCase(v.name, false);
 
 		s += $"\t\t\t\"{ename}\",\r\n";
 		allNames.Add(ename);
@@ -242,7 +300,10 @@ public string MakeNames(string[] names, string name, List<string> allNames)
 		$"\r\n" +
 		$"\t\tpublic static string {ccName}ToString(int i)\r\n" +
 		$"\t\t{{\r\n" +
-		$"\t\t\treturn {var}[i];\r\n" +
+		$"\t\t\tif (i >= 0 && i < {var}.Length)\r\n" +
+		$"\t\t\t\treturn {var}[i];\r\n" +
+		$"\t\t\telse\r\n" +
+		$"\t\t\t\treturn $\"?{{i}}\";\r\n" +
 		$"\t\t}}\r\n" +
 		$"\r\n" +
 		$"\t\tpublic static string[] {ccName}Names\r\n" +
