@@ -141,6 +141,11 @@
 			Sys.LinkTo(other?.Sys);
 		}
 
+		public void Unlink()
+		{
+			LinkTo(null);
+		}
+
 		public bool Linked
 		{
 			get

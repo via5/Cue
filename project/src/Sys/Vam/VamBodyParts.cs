@@ -53,9 +53,7 @@ namespace Cue.Sys.Vam
 
 			if (other == null)
 			{
-				Controller.linkToRB = null;
-				Controller.currentPositionState = FreeControllerV3.PositionState.On;
-				Controller.currentRotationState = FreeControllerV3.RotationState.On;
+				SetOn(Controller);
 			}
 			else
 			{
@@ -66,11 +64,32 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					Controller.linkToRB = o.Rigidbody;
-					Controller.currentPositionState = FreeControllerV3.PositionState.ParentLink;
-					Controller.currentRotationState = FreeControllerV3.RotationState.ParentLink;
+					if (o.Controller?.linkToRB == Rigidbody)
+					{
+						Cue.LogError(
+							$"cannot link {this} to {other}, would be " +
+							$"reciprocal");
+					}
+					else
+					{
+						SetParentLink(Controller, o.Rigidbody);
+					}
 				}
 			}
+		}
+
+		private void SetParentLink(FreeControllerV3 fc, Rigidbody rb)
+		{
+			fc.linkToRB = rb;
+			fc.currentPositionState = FreeControllerV3.PositionState.ParentLink;
+			fc.currentRotationState = FreeControllerV3.RotationState.ParentLink;
+		}
+
+		private void SetOn(FreeControllerV3 fc)
+		{
+			fc.linkToRB = null;
+			fc.currentPositionState = FreeControllerV3.PositionState.On;
+			fc.currentRotationState = FreeControllerV3.RotationState.On;
 		}
 
 		public virtual float DistanceToSurface(IBodyPart other)
@@ -203,12 +222,16 @@ namespace Cue.Sys.Vam
 	{
 		private Collider c_;
 		private FreeControllerV3 fc_;
+		private Rigidbody rb_;
 
-		public ColliderBodyPart(VamAtom a, int type, Collider c, FreeControllerV3 fc)
-			: base(a, type)
+		public ColliderBodyPart(
+			VamAtom a, int type, Collider c, FreeControllerV3 fc,
+			Rigidbody closestRb)
+				: base(a, type)
 		{
 			c_ = c;
 			fc_ = fc;
+			rb_ = closestRb;
 		}
 
 		public override Transform Transform
@@ -218,7 +241,7 @@ namespace Cue.Sys.Vam
 
 		public override Rigidbody Rigidbody
 		{
-			get { return null; }
+			get { return rb_; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -285,6 +308,9 @@ namespace Cue.Sys.Vam
 
 			if (s == "")
 				s = c_.name;
+
+			if (fc_ != null)
+				s = fc_.name + "." + s;
 
 			return "collider " + s;
 		}

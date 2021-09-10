@@ -50,14 +50,14 @@
 
 	class HandLocker : BasicEvent
 	{
-		class Hand
+		class HandInfo
 		{
 			public bool locked = false;
 			public bool grabbed = false;
 		}
 
-		private Hand left_ = new Hand();
-		private Hand right_ = new Hand();
+		private HandInfo left_ = new HandInfo();
+		private HandInfo right_ = new HandInfo();
 
 		public HandLocker(Person p)
 			: base("handlocker", p)
@@ -66,42 +66,42 @@
 
 		public override void Update(float s)
 		{
-			Check(person_.Body.Get(BodyParts.LeftHand), left_);
-			Check(person_.Body.Get(BodyParts.RightHand), right_);
+			var leftHand = person_.Body.Get(BodyParts.LeftHand);
+			var rightHand = person_.Body.Get(BodyParts.RightHand);
+
+			Check(leftHand, left_);
+			Check(rightHand, right_);
 		}
 
-		private void Check(BodyPart bp, Hand hand)
+		private void Check(BodyPart hand, HandInfo info)
 		{
-			bool grabbed = bp.Grabbed;
+			bool grabbed = hand.Grabbed;
 
-			if (grabbed && !hand.grabbed)
+			if (grabbed && !info.grabbed)
 			{
 				// grab started
-				hand.grabbed = true;
+				info.grabbed = true;
 			}
-			else if (!grabbed && hand.grabbed)
+			else if (!grabbed && info.grabbed)
 			{
 				// grab stopped
-				hand.grabbed = false;
+				info.grabbed = false;
 
-				var close = FindClose(bp);
+				var close = FindClose(hand);
 				if (close != null)
 				{
-					if (!bp.Busy)
+					if (!hand.Busy)
 					{
-						Cue.LogInfo($"linking {bp} with {close}");
-						bp.LinkTo(close);
-						bp.ForceBusy(true);
+						Cue.LogInfo($"linking {hand} with {close}");
+						hand.LinkTo(close);
+						hand.ForceBusy(true);
 					}
 				}
 				else
 				{
-					if (bp.Linked)
-					{
-						Cue.LogInfo($"unlinking {bp}");
-						bp.LinkTo(null);
-						bp.ForceBusy(false);
-					}
+					//Cue.LogInfo($"unlinking {thisHand}");
+					hand.Unlink();
+					hand.ForceBusy(false);
 				}
 			}
 		}

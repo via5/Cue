@@ -284,23 +284,24 @@ namespace Cue.Sys.Vam
 			}
 
 			add(BodyParts.LeftGlute, GetCollider(
-				BodyParts.LeftGlute, "", "LGlute1Joint", ""));
+				BodyParts.LeftGlute, "", "LGlute", "LGlute1Joint", ""));
 
 			add(BodyParts.RightGlute, GetCollider(
-				BodyParts.RightGlute, "", "RGlute1Joint", ""));
+				BodyParts.RightGlute, "", "RGlute", "RGlute1Joint", ""));
 
 
 			// left arm
 			//
 			add(BodyParts.LeftShoulder, GetCollider(
-				BodyParts.LeftShoulder, "lArmControl", "lShldr"));
+				BodyParts.LeftShoulder, "lArmControl", "lShldr", "lShldr"));
 
 			add(BodyParts.LeftArm, GetCollider(
-				BodyParts.LeftArm, "lElbowControl",
+				BodyParts.LeftArm, "lElbowControl", "lForeArm",
 				"StandardColliderslShldr/_Collider1"));
 
 			add(BodyParts.LeftForearm, GetCollider(
-				BodyParts.LeftForearm, "lElbowControl", "lForeArm/_Collider2"));
+				BodyParts.LeftForearm, "lElbowControl", "lForeArm",
+				"lForeArm/_Collider2"));
 
 			add(BodyParts.LeftHand, GetRigidbody(
 				BodyParts.LeftHand, new string[] { "lHand/_Collider" },
@@ -310,14 +311,15 @@ namespace Cue.Sys.Vam
 			// right arm
 			//
 			add(BodyParts.RightShoulder, GetCollider(
-				BodyParts.RightShoulder, "rArmControl", "rShldr"));
+				BodyParts.RightShoulder, "rArmControl", "rShldr", "rShldr"));
 
 			add(BodyParts.RightArm, GetCollider(
-				BodyParts.RightArm, "rElbowControl",
+				BodyParts.RightArm, "rElbowControl", "rForeArm",
 				"StandardCollidersrShldr/_Collider1"));
 
 			add(BodyParts.RightForearm, GetCollider(
-				BodyParts.RightForearm, "rElbowControl", "rForeArm/_Collider2"));
+				BodyParts.RightForearm, "rElbowControl", "rForeArm",
+				"rForeArm/_Collider2"));
 
 			add(BodyParts.RightHand, GetRigidbody(
 				BodyParts.RightHand, new string[] { "rHand/_Collider" },
@@ -327,12 +329,12 @@ namespace Cue.Sys.Vam
 			// left leg
 			//
 			add(BodyParts.LeftThigh, GetCollider(
-				BodyParts.LeftThigh, "lKneeControl", "lThigh12Joint",
-				"StandardColliderslThigh/_Collider6"));
+				BodyParts.LeftThigh, "lKneeControl", "lThigh",
+				"lThigh12Joint", "StandardColliderslThigh/_Collider6"));
 
 			add(BodyParts.LeftShin, GetCollider(
-				BodyParts.LeftShin, "lKneeControl", "lShin8Joint",
-				"StandardColliderslShin/_Collider2"));
+				BodyParts.LeftShin, "lKneeControl", "lShin",
+				"lShin8Joint", "StandardColliderslShin/_Collider2"));
 
 			add(BodyParts.LeftFoot, GetRigidbody(
 				BodyParts.LeftFoot, new string[] { "lFoot/_Collider4" },
@@ -342,12 +344,12 @@ namespace Cue.Sys.Vam
 			// right leg
 			//
 			add(BodyParts.RightThigh, GetCollider(
-				BodyParts.RightThigh, "rKneeControl", "rThigh12Joint",
-				"StandardCollidersrThigh/_Collider6"));
+				BodyParts.RightThigh, "rKneeControl", "rThigh",
+				"rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
 
 			add(BodyParts.RightShin, GetCollider(
-				BodyParts.RightShin, "rKneeControl", "rShin8Joint",
-				"StandardCollidersrShin/_Collider2"));
+				BodyParts.RightShin, "rKneeControl", "rShin",
+				"rShin8Joint", "StandardCollidersrShin/_Collider2"));
 
 			add(BodyParts.RightFoot, GetRigidbody(
 				BodyParts.RightFoot, new string[] { "rFoot/_Collider4" },
@@ -636,7 +638,9 @@ namespace Cue.Sys.Vam
 				atom_, id, t, fc, t.thisRigidbody.transform, ignoreTransforms);
 		}
 
-		private IBodyPart GetCollider(int id, string controller, string nameFemale, string nameMale = "same")
+		private IBodyPart GetCollider(
+			int id, string controller, string closestRb,
+			string nameFemale, string nameMale = "same")
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -657,7 +661,15 @@ namespace Cue.Sys.Vam
 					Cue.LogError($"collider {name} has no controller {controller} in {atom_.ID}");
 			}
 
-			return new ColliderBodyPart(atom_, id, c, fc);
+			Rigidbody rb = null;
+			if (closestRb != "")
+			{
+				rb = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, closestRb);
+				if (rb == null)
+					Cue.LogError($"collider {name} has no rb {closestRb} in {atom_.ID}");
+			}
+
+			return new ColliderBodyPart(atom_, id, c, fc, rb);
 		}
 	}
 }
