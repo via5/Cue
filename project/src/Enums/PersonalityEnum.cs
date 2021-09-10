@@ -58,14 +58,15 @@ namespace Cue
 		public const int MaxOtherSexExcitement = 37;
 		public const int KissSpeedEnergyFactor = 38;
 		public const int IdleMaxExcitement = 39;
-		public const int GazeEnergyTirednessFactor = 40;
-		public const int GazeTirednessFactor = 41;
-		public const int MovementEnergyTirednessFactor = 42;
-		public const int MovementTirednessFactor = 43;
-		public const int ExpressionExcitementFactor = 44;
-		public const int ExpressionTirednessFactor = 45;
-		public const int FloatCount = 46;
-		public int GetFloatCount() { return 46; }
+		public const int TirednessExcitementRateFactor = 40;
+		public const int GazeEnergyTirednessFactor = 41;
+		public const int GazeTirednessFactor = 42;
+		public const int MovementEnergyTirednessFactor = 43;
+		public const int MovementTirednessFactor = 44;
+		public const int ExpressionExcitementFactor = 45;
+		public const int ExpressionTirednessFactor = 46;
+		public const int FloatCount = 47;
+		public int GetFloatCount() { return 47; }
 
 		// strings
 		public const int StringCount = 0;
@@ -179,6 +180,7 @@ namespace Cue
 			"maxOtherSexExcitement",
 			"kissSpeedEnergyFactor",
 			"idleMaxExcitement",
+			"tirednessExcitementRateFactor",
 			"gazeEnergyTirednessFactor",
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
@@ -290,6 +292,7 @@ namespace Cue
 			"maxOtherSexExcitement",
 			"kissSpeedEnergyFactor",
 			"idleMaxExcitement",
+			"tirednessExcitementRateFactor",
 			"gazeEnergyTirednessFactor",
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",

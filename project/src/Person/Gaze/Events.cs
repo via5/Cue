@@ -90,7 +90,7 @@ namespace Cue
 			}
 			else
 			{
-				if (person_.Excitement.Value >= ps.Get(PSE.LookAboveMinExcitement))
+				if (person_.Mood.Excitement >= ps.Get(PSE.LookAboveMinExcitement))
 				{
 					if (person_.Excitement.PhysicalRate >= ps.Get(PSE.LookAboveMinPhysicalRate))
 					{
@@ -419,7 +419,7 @@ namespace Cue
 				if (t.Gaze.Gazer is MacGruberGaze)
 				{
 					otherChest.Set(
-						PSE.PenetrationGenitalsWeight,
+						ps.Get(PSE.PenetrationGenitalsWeight),
 						"penetrated (mg's gaze fix)");
 				}
 				else

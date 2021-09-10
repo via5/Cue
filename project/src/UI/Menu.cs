@@ -204,8 +204,8 @@
 					if (bj_ != null) bj_.Checked = p.Blowjob.Active;
 					if (thrust_ != null) thrust_.Checked = p.AI.GetEvent<SexEvent>().Active;
 					if (canKiss_ != null) canKiss_.Checked = p.Options.CanKiss;
-					if (forceExcitement_ != null) forceExcitement_.Checked = p.Mood.ExcitementValue.IsForced;
-					if (excitement_ != null) excitement_.Value = p.Mood.ExcitementValue.Value;
+					if (forceExcitement_ != null) forceExcitement_.Checked = p.Mood.FlatExcitementValue.IsForced;
+					if (excitement_ != null) excitement_.Value = p.Mood.FlatExcitementValue.Value;
 				}
 			});
 		}
@@ -317,9 +317,9 @@
 				force_ = b;
 
 				if (force_)
-					p.Mood.ExcitementValue.SetForced(excitement_.Value);
+					p.Mood.FlatExcitementValue.SetForced(excitement_.Value);
 				else
-					p.Mood.ExcitementValue.UnsetForced();
+					p.Mood.FlatExcitementValue.UnsetForced();
 			}
 		}
 
@@ -331,7 +331,7 @@
 			if (p != null)
 			{
 				if (force_)
-					p.Mood.ExcitementValue.SetForced(f);
+					p.Mood.FlatExcitementValue.SetForced(f);
 			}
 		}
 	}

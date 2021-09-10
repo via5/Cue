@@ -68,12 +68,12 @@ namespace Cue
 		private readonly Person person_;
 
 		private VUI.Label state_ = new VUI.Label();
+		private VUI.Label rate_ = new VUI.Label();
 
 		private VUI.Label sweat_ = new VUI.Label();
 		private VUI.Label flush_ = new VUI.Label();
 		private VUI.Label hairLoose_ = new VUI.Label();
 
-		private VUI.Label exValue_ = new VUI.Label();
 		private VUI.Label exMax_ = new VUI.Label();
 		private VUI.Label[] reasons_ = new VUI.Label[Excitement.ReasonCount];
 		private VUI.Label total_ = new VUI.Label();
@@ -101,8 +101,13 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
-			AddForceable(p, person_.Mood.ExcitementValue, "Excitement");
+			AddForceable(p, person_.Mood.FlatExcitementValue, "Excitement");
 			AddForceable(p, person_.Mood.TirednessValue, "Tiredness");
+
+			p.Add(new VUI.Label("Rate"));
+			p.Add(rate_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
 
 			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
 			p.Add(new VUI.Spacer(0));
@@ -152,13 +157,6 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
-			p.Add(new VUI.Label("Value"));
-			p.Add(exValue_);
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-
-			AddForceable(p, person_.Excitement.ForceableFlatValue, "Flat");
-
 			p.Add(new VUI.Label("Max"));
 			p.Add(exMax_);
 			p.Add(new VUI.Spacer(0));
@@ -187,17 +185,15 @@ namespace Cue
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < forceables_.Count; ++i)
-				forceables_[i].Update(s);
+			state_.Text = person_.Mood.StateString;
+			rate_.Text = person_.Mood.RateString;
 
-			//temperature_.Text = $"{person_.Body.DampedTemperature}";
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
 
 			var e = person_.Excitement;
 
-			exValue_.Text = $"{e.Value:0.000000}";
 			exMax_.Text = $"{e.Max:0.000000}";
 
 			for (int i = 0; i < reasons_.Length; ++i)
@@ -205,7 +201,8 @@ namespace Cue
 
 			total_.Text = $"{e.TotalRate:0.000000}";
 
-			state_.Text = person_.Mood.StateString;
+			for (int i = 0; i < forceables_.Count; ++i)
+				forceables_[i].Update(s);
 		}
 
 		private void AddForceable(VUI.Panel p, ForceableFloat v, string caption)

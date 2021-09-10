@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class Mood
 	{
@@ -13,7 +15,9 @@
 		private float elapsed_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 
-		private ForceableFloat excitement_ = new ForceableFloat();
+		private ForceableFloat flatExcitement_ = new ForceableFloat();
+		private IEasing excitementEasing_ = new SineOutEasing();
+
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 
@@ -48,6 +52,22 @@
 			}
 		}
 
+		public string RateString
+		{
+			get
+			{
+				var tr = person_.Excitement.TotalRate;
+
+				var r = GetRate();
+				if (r == 0)
+					return "0";
+
+				var p = (r / tr) * 100;
+
+				return $"{(int)Math.Round(p)}%";
+			}
+		}
+
 		public float TimeSinceLastOrgasm
 		{
 			get { return timeSinceLastOrgasm_; }
@@ -55,12 +75,12 @@
 
 		public float Excitement
 		{
-			get { return excitement_.Value; }
+			get { return excitementEasing_.Magnitude(flatExcitement_.Value); }
 		}
 
-		public ForceableFloat ExcitementValue
+		public ForceableFloat FlatExcitementValue
 		{
-			get { return excitement_; }
+			get { return flatExcitement_; }
 		}
 
 		public float Tiredness
@@ -161,7 +181,7 @@
 				{
 					timeSinceLastOrgasm_ += s;
 
-					if (!excitement_.IsForced && excitement_.Value >= 1)
+					if (!flatExcitement_.IsForced && flatExcitement_.Value >= 1)
 						DoOrgasm();
 
 					break;
@@ -176,7 +196,10 @@
 						person_.Animator.StopType(Animation.OrgasmType);
 						tiredness_.UpRate = pp.Get(PE.TirednessRateDuringPostOrgasm);
 						tiredness_.Target = 1;
+
 						baseTiredness_ += pp.Get(PE.OrgasmBaseTirednessIncrease);
+						baseTiredness_ = U.Clamp(baseTiredness_, 0, 1);
+
 						SetState(PostOrgasmState);
 					}
 
@@ -190,31 +213,16 @@
 					if (elapsed_ > pp.Get(PE.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						person_.Excitement.FlatValue = pp.Get(PE.ExcitementPostOrgasm);
+						flatExcitement_.Value = pp.Get(PE.ExcitementPostOrgasm);
 					}
 
 					break;
 				}
 			}
 
-			excitement_.Value = person_.Excitement.Value;
-
 			UpdateTiredness(s);
+			UpdateExcitement(s);
 			UpdateExpressions();
-		}
-
-		private void UpdateExpressions()
-		{
-			for (int i = 0; i < Expressions.Count; ++i)
-			{
-				if (i == Expressions.Pleasure)
-					person_.Expression.SetIntensity(i, ExpressionExcitement);
-
-				if (i == Expressions.Tired)
-					person_.Expression.SetIntensity(i, ExpressionTiredness);
-				else
-					person_.Expression.SetDampen(i, ExpressionTiredness);
-			}
 		}
 
 		private void UpdateTiredness(float s)
@@ -244,12 +252,67 @@
 			tiredness_.Update(s);
 		}
 
+		private void UpdateExcitement(float s)
+		{
+			var pp = person_.Physiology;
+			var ps = person_.Personality;
+			var ex = person_.Excitement;
+
+			if (flatExcitement_.Value > ex.Max)
+			{
+				flatExcitement_.Value = Math.Max(
+					flatExcitement_.Value + pp.Get(PE.ExcitementDecayRate) * s,
+					ex.Max);
+			}
+			else
+			{
+				var rate = ex.TotalRate;
+				var tirednessFactor =
+					Tiredness * ps.Get(PSE.TirednessExcitementRateFactor);
+
+				rate = rate - (rate * tirednessFactor);
+
+				rate *= pp.Get(PE.RateAdjustment);
+
+				flatExcitement_.Value = U.Clamp(
+					flatExcitement_.Value + rate * s,
+					0, ex.Max);
+			}
+		}
+
+		private float GetRate()
+		{
+			var ex = person_.Excitement;
+			var ps = person_.Personality;
+
+			var rate = ex.TotalRate;
+
+			var tirednessFactor =
+				Tiredness * ps.Get(PSE.TirednessExcitementRateFactor);
+
+			return rate - (rate * tirednessFactor);
+		}
+
+		private void UpdateExpressions()
+		{
+			for (int i = 0; i < Expressions.Count; ++i)
+			{
+				if (i == Expressions.Pleasure)
+					person_.Expression.SetIntensity(i, ExpressionExcitement);
+
+				if (i == Expressions.Tired)
+					person_.Expression.SetIntensity(i, ExpressionTiredness);
+				else
+					person_.Expression.SetDampen(i, ExpressionTiredness);
+			}
+		}
+
 		private void DoOrgasm()
 		{
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
 			person_.Animator.PlayType(Animation.OrgasmType);
-			person_.Excitement.FlatValue = 1;
+			flatExcitement_.Value = 1;
 			person_.Expression.ForceChange();
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;

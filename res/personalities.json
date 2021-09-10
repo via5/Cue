@@ -89,7 +89,7 @@
 				"maxExcitementForAvoid": 0,
 				"avoidDelayAfterOrgasm": 0,
 
-				"lookAboveMaxWeight": 0.2,
+				"lookAboveMaxWeight": 0.4,
 				"lookAboveMaxWeightOrgasm": 0.5,
 				"lookAboveMinExcitement": 0.35,
 				"lookAboveMinPhysicalRate": 0.001,
@@ -106,8 +106,8 @@
 				"blowjobGenitalsWeight": 1,
 				"handjobEyesWeight": 1,
 				"handjobGenitalsWeight": 0.2,
-				"penetrationEyesWeight": 1,
-				"penetrationGenitalsWeight": 0.2,
+				"penetrationEyesWeight": 1.5,
+				"penetrationGenitalsWeight": 0.4,
 				"gropedEyesWeight": 1,
 				"gropedTargetWeight": 0.2,
 
@@ -128,6 +128,7 @@
 				"maxOtherSexExcitement": 0.3,
 				"kissSpeedEnergyFactor": 1,
 				"idleMaxExcitement": 0,
+				"tirednessExcitementRateFactor": 0.6,
 
 				"gazeEnergyTirednessFactor": 1,
 				"gazeTirednessFactor": 1,

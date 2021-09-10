@@ -93,9 +93,6 @@ namespace Cue
 		private ForceableFloat emotionalRate_ = new ForceableFloat();
 		private float totalRate_ = 0;
 		private float max_ = 0;
-		private ForceableFloat flatValue_ = new ForceableFloat();
-		private IEasing easing_ = new SineOutEasing();
-
 
 		public Excitement(Person p)
 		{
@@ -106,22 +103,6 @@ namespace Cue
 			reasons_[Genitals] = new Reason("Genitals", true);
 			reasons_[Penetration] = new Reason("Penetration", true);
 			reasons_[OtherSex] = new Reason("Other sex", false);
-		}
-
-		public float Value
-		{
-			get { return easing_.Magnitude(flatValue_.Value); }
-		}
-
-		public float FlatValue
-		{
-			get { return flatValue_.Value; }
-			set { flatValue_.Value = value; }
-		}
-
-		public ForceableFloat ForceableFlatValue
-		{
-			get { return flatValue_; }
 		}
 
 		public float Max
@@ -165,14 +146,6 @@ namespace Cue
 			UpdateReasonValues(s);
 			UpdateReasonRates(s);
 			UpdateMax(s);
-			UpdateValue(s);
-		}
-
-		public override string ToString()
-		{
-			return
-				$"{Value:0.000000} " +
-				$"(flat {flatValue_:0.000000}, max {max_:0.000000})";
 		}
 
 		private void UpdateParts(float s)
@@ -332,8 +305,6 @@ namespace Cue
 
 			totalRate_ = physicalRate_.Value + emotionalRate_.Value;
 
-			totalRate_ *= pp.Get(PE.RateAdjustment);
-
 			if (totalRate_ == 0)
 				totalRate_ = pp.Get(PE.ExcitementDecayRate);
 		}
@@ -348,23 +319,6 @@ namespace Cue
 			{
 				if (reasons_[i].Rate > 0)
 					max_ = Math.Max(max_, reasons_[i].SensitivityMax);
-			}
-		}
-
-		private void UpdateValue(float s)
-		{
-			var pp = person_.Physiology;
-
-			if (flatValue_.Value > max_)
-			{
-				flatValue_.Value = Math.Max(
-					flatValue_.Value + pp.Get(PE.ExcitementDecayRate) * s,
-					max_);
-			}
-			else
-			{
-				flatValue_.Value = U.Clamp(
-					flatValue_.Value + totalRate_ * s, 0, max_);
 			}
 		}
 	}

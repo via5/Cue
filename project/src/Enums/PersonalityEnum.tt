@@ -215,6 +215,23 @@ V.Float("KissSpeedEnergyFactor"),
 // around randomly
 V.Float("IdleMaxExcitement", new Limit(0, 1)),
 
+// impact of tiredness on excitement rate; slows down excitement buildup as
+// tiredness goes up, that is, increases the delay between orgasms the more
+// orgasms the character has in a row
+//
+// higher values give slower rates: 0.0 ignores tiredness and 1.0 will freeze
+// the rate completely when tiredness is maxed out
+//
+// excitement rate is `rate - (rate * tiredness * this)`, where `rate` is the
+// sum of emotional and physical rates and tiredness is [0, 1]
+//
+// example: if the rate is at 2.0, this is 0.6, and tiredness is maxed out at
+// 1.0, the excitement rate becomes `2.0 - (2.0 * 1.0 * 0.6)`, which is 0.8
+// (go up at 40% speed when tiredness is maxed); if the tiredness is 0.5, the
+// rate becomes `2.0 - (2.0 * 0.5 * 0.6)`, which is `1.4` (go up at 70% speed
+// when tiredness is at half)
+V.Float("TirednessExcitementRateFactor"),
+
 
 // impact of tiredness on excitement to determine gaze energy; affects speed
 // of head movement and delay between switching targets
