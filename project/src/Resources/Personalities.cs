@@ -38,7 +38,7 @@ namespace Cue
 			}
 
 			Cue.LogError($"personality '{name}' not found");
-			return new Personality(name);
+			return null;
 		}
 
 		public List<Personality> All
@@ -171,6 +171,9 @@ namespace Cue
 
 			p.Set(states);
 
+
+			ParseVoice(p.Voice, o, inherited);
+
 			return p;
 		}
 
@@ -185,7 +188,10 @@ namespace Cue
 
 				s.SetMaximum(type, maximum);
 			}
+		}
 
+		private void ParseVoice(Voice v, JSONClass o, bool inherited)
+		{
 			List<Voice.DatasetForIntensity> dss = null;
 			Voice.Dataset orgasmDs = null;
 			var voice = o["voice"].AsObject;
@@ -224,7 +230,7 @@ namespace Cue
 				throw new LoadFailed("missing orgasm dataset");
 			}
 
-			s.Voice.Set(dss, orgasmDs);
+			v.Set(dss, orgasmDs);
 		}
 
 		private void Add(Personality p)

@@ -64,6 +64,13 @@ namespace Cue.Sys
 	}
 
 
+	interface ILiveSaver
+	{
+		JSONClass Load();
+		void Save(JSONClass o);
+	}
+
+
 	struct HoveredInfo
 	{
 		public IObject o;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -69,6 +70,7 @@ namespace Cue
 		private Dataset orgasm_ = new Dataset("", -1);
 		private Dataset dummy_ = new Dataset("", -1);
 		private bool warned_ = false;
+		private float forcedPitch_ = -1;
 
 		public void Set(List<DatasetForIntensity> dss, Dataset orgasm)
 		{
@@ -98,13 +100,20 @@ namespace Cue
 			get { return orgasm_; }
 		}
 
+		public float ForcedPitch
+		{
+			get { return forcedPitch_; }
+		}
+
 		public float GetNormalPitch(Person p)
 		{
 			return GetDatasetForIntensity(0).GetPitch(p);
 		}
 
-		public void SetPitchForAll(float f)
+		public void ForcePitch(float f)
 		{
+			forcedPitch_ = f;
+
 			foreach (var d in datasets_)
 				d.dataset.SetPitch(f);
 
@@ -169,7 +178,6 @@ namespace Cue
 			public readonly string name;
 
 			private ExpressionMaximum[] maximums_;
-			private Voice voice_ = new Voice();
 
 			public State(int stateIndex)
 				: base(new PSE())
@@ -191,19 +199,12 @@ namespace Cue
 				maximums_[type].maximum = max;
 			}
 
-			public Voice Voice
-			{
-				get { return voice_; }
-			}
-
 			public void CopyFrom(State s)
 			{
 				base.CopyFrom(s);
 
 				for (int i = 0; i < s.maximums_.Length; ++i)
 					maximums_[i] = new ExpressionMaximum(s.maximums_[i]);
-
-				voice_.CopyFrom(s.voice_);
 			}
 		}
 
@@ -217,6 +218,7 @@ namespace Cue
 		private bool isCloseForced_ = false;
 
 		private State[] states_ = new State[StateCount];
+		private Voice voice_ = new Voice();
 
 		public Personality(string name, Person p = null)
 		{
@@ -234,7 +236,37 @@ namespace Cue
 			for (int si = 0; si < states_.Length; ++si)
 				ps.states_[si].CopyFrom(states_[si]);
 
+			ps.voice_.CopyFrom(voice_);
+
 			return ps;
+		}
+
+		public void Load(JSONClass o)
+		{
+			if (o.HasKey("voice"))
+			{
+				var vo = o["voice"].AsObject;
+
+				if (vo.HasKey("pitch"))
+					voice_.ForcePitch(vo["pitch"].AsFloat);
+			}
+		}
+
+		public JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+
+			if (name_ != Resources.DefaultPersonality)
+				o.Add("name", name_);
+
+			if (voice_.ForcedPitch >= 0)
+			{
+				var v = new JSONClass();
+				v.Add("pitch", new JSONData(voice_.ForcedPitch));
+				o.Add("voice", v);
+			}
+
+			return o;
 		}
 
 		public string Name
@@ -254,7 +286,7 @@ namespace Cue
 
 		public Voice Voice
 		{
-			get { return CurrentState.Voice; }
+			get { return voice_; }
 		}
 
 		private State CurrentState

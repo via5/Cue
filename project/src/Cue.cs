@@ -5,6 +5,29 @@ using System.Diagnostics;
 
 namespace Cue
 {
+	class Version
+	{
+		public const int Major = 0;
+		public const int Minor = 1;
+
+		public static string String
+		{
+			get
+			{
+				return Major.ToString() + "." + Minor.ToString();
+			}
+		}
+
+		public static string DisplayString
+		{
+			get
+			{
+				return "Cue " + String;
+			}
+		}
+	}
+
+
 	class PluginGone : Exception { }
 
 	class I
@@ -135,6 +158,9 @@ namespace Cue
 		private bool paused_ = false;
 		private int frame_ = 0;
 
+		private Sys.ILiveSaver saver_ = new Sys.Vam.LiveSaver();
+
+
 		public Cue()
 		{
 			instance_ = this;
@@ -212,6 +238,9 @@ namespace Cue
 			LogVerbose("cue: initializing persons");
 			InitPersons();
 
+			LogVerbose("cue: checking config");
+			CheckConfig();
+
 			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
 
@@ -228,17 +257,64 @@ namespace Cue
 				}
 			}
 
-			LoadConfig(conf);
-
 			LogInfo("cue: running");
 		}
 
-		private void LoadConfig(JSONClass c)
+		private void CheckConfig()
 		{
+			Load(saver_.Load());
+			Save();
+		}
+
+		public void Save()
+		{
+			var oo = new JSONClass();
+			Save(oo);
+			saver_.Save(oo);
+		}
+
+		private void Save(JSONClass json)
+		{
+			json.Add("version", Version.String);
+
+			var a = new JSONArray();
+
 			foreach (var o in everything_)
 			{
-				if (c.HasKey(o.ID))
-					o.LoadConfig(c[o.ID].AsObject);
+				var oo = o.ToJSON();
+
+				if (oo == null)
+					continue;
+
+				if (oo.AsObject != null)
+				{
+					if (oo.AsObject.Count == 0)
+						continue;
+				}
+				else if (oo.AsArray != null)
+				{
+					if (oo.AsArray.Count == 0)
+						continue;
+				}
+
+				a.Add(oo);
+			}
+
+			if (a.Count > 0)
+				json.Add("objects", a);
+		}
+
+		private void Load(JSONClass c)
+		{
+			var objects = c["objects"].AsArray;
+
+			foreach (var o in everything_)
+			{
+				foreach (JSONClass oj in objects)
+				{
+					if (oj["id"].Value == o.ID)
+						o.Load(oj.AsObject);
+				}
 			}
 		}
 

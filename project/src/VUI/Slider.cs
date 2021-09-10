@@ -18,6 +18,7 @@ namespace VUI
 		private T tickValue_ = default(T);
 		private T pageValue_ = default(T);
 		private bool hor_ = true;
+		private bool ignore_ = false;
 
 		public BasicSlider(T tickValue, T pageValue, ValueCallback changed = null)
 		{
@@ -65,7 +66,9 @@ namespace VUI
 				if (slider_ != null)
 				{
 					SetValue(value);
-					ValueChanged?.Invoke(value);
+
+					if (!ignore_)
+						ValueChanged?.Invoke(value);
 				}
 			}
 		}
@@ -155,7 +158,9 @@ namespace VUI
 			slider_.rangeAdjustEnabled = false;
 			SetDirection();
 
+			ignore_ = true;
 			Set(value_, min_, max_);
+			ignore_ = false;
 
 			slider_.slider.onValueChanged.AddListener(OnChanged);
 

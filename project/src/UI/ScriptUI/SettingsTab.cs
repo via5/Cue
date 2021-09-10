@@ -31,7 +31,12 @@ namespace Cue
 			personality_.SelectionChanged += OnPersonality;
 			voicePitch_.ValueChanged += OnVoicePitch;
 
-			voicePitch_.Value = person_.Personality.Voice.GetNormalPitch(person_);
+			ignore_.Do(() =>
+			{
+				voicePitch_.Set(
+					person_.Personality.Voice.GetNormalPitch(person_),
+					0, 1);
+			});
 		}
 
 		public override void Update(float s)
@@ -57,12 +62,24 @@ namespace Cue
 			if (ignore_) return;
 
 			if (name != "" && name != person_.Personality.Name)
+			{
+				var old = person_.Personality;
+
 				person_.Personality = Resources.Personalities.Clone(name, person_);
+
+				if (old.Voice.ForcedPitch >= 0)
+					person_.Personality.Voice.ForcePitch(old.Voice.ForcedPitch);
+
+				Cue.Instance.Save();
+			}
 		}
 
 		private void OnVoicePitch(float f)
 		{
-			person_.Personality.Voice.SetPitchForAll(f);
+			if (ignore_) return;
+
+			person_.Personality.Voice.ForcePitch(f);
+			Cue.Instance.Save();
 		}
 	}
 }

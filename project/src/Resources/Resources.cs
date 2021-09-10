@@ -9,6 +9,9 @@ namespace Cue
 		private static PhysiologyResources physiologies_ = new PhysiologyResources();
 		private static PersonalityResources personalities_ = new PersonalityResources();
 
+		public static string DefaultPersonality = "standard";
+		public static string DefaultPhysiology = "standard";
+
 		public static void LoadAll()
 		{
 			animations_.Load();

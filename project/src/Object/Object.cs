@@ -14,7 +14,6 @@ namespace Cue
 		Vector3 EyeInterest { get; }
 		bool Possessed { get; }
 
-		void LoadConfig(JSONClass r);
 		void FixedUpdate(float s);
 		void Update(float s);
 		void OnPluginState(bool b);
@@ -31,6 +30,9 @@ namespace Cue
 		IObject MoveTarget{ get; }
 
 		Slots Slots { get; }
+
+		JSONNode ToJSON();
+		void Load(JSONClass r);
 	}
 
 
@@ -265,9 +267,14 @@ namespace Cue
 			});
 		}
 
-		public virtual void LoadConfig(JSONClass r)
+		public virtual void Load(JSONClass r)
 		{
 			// no-op
+		}
+
+		public virtual JSONNode ToJSON()
+		{
+			return null;
 		}
 
 		public virtual void FixedUpdate(float s)

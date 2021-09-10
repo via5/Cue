@@ -62,11 +62,11 @@ namespace Cue
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
 			gaze_ = new Gaze(this);
-			physiology_ = Resources.Physiologies.Clone("standard", this);
+			physiology_ = Resources.Physiologies.Clone(Resources.DefaultPhysiology, this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
 
-			Personality = Resources.Personalities.Clone("standard", this);
+			Personality = Resources.Personalities.Clone(Resources.DefaultPersonality, this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -97,18 +97,43 @@ namespace Cue
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
 		}
 
-		public override void LoadConfig(JSONClass r)
+		public override void Load(JSONClass r)
 		{
-			base.LoadConfig(r);
+			base.Load(r);
 
 			foreach (JSONNode n in r["traits"].AsArray)
 				traits_.Add(n.Value);
 
 			if (r.HasKey("personality"))
-				personality_ = Resources.Personalities.Clone(r["personality"], this);
+			{
+				var po = r["personality"].AsObject;
+
+				if (po.HasKey("name"))
+				{
+					var p = Resources.Personalities.Clone(po["name"], this);
+					if (p != null)
+						personality_ = p;
+				}
+
+				personality_.Load(po);
+			}
 
 			if (r.HasKey("commands"))
 				ai_.CommandsEnabled = r["commands"].AsBool;
+		}
+
+		public override JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+
+			var p = personality_.ToJSON();
+			if (p.Count > 0)
+				o.Add("personality", p);
+
+			if (o.Count > 0)
+				o.Add("id", ID);
+
+			return o;
 		}
 
 		public int PersonIndex
