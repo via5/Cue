@@ -300,7 +300,7 @@ namespace Cue.Sys.Vam
 				"StandardColliderslShldr/_Collider1"));
 
 			add(BodyParts.LeftForearm, GetCollider(
-				BodyParts.LeftForearm, "lElbowControl", "lForeArm",
+				BodyParts.LeftForearm, "lElbowControl", "lHand",
 				"lForeArm/_Collider2"));
 
 			add(BodyParts.LeftHand, GetRigidbody(
@@ -318,7 +318,7 @@ namespace Cue.Sys.Vam
 				"StandardCollidersrShldr/_Collider1"));
 
 			add(BodyParts.RightForearm, GetCollider(
-				BodyParts.RightForearm, "rElbowControl", "rForeArm",
+				BodyParts.RightForearm, "rElbowControl", "rHand",
 				"rForeArm/_Collider2"));
 
 			add(BodyParts.RightHand, GetRigidbody(

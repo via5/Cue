@@ -81,6 +81,9 @@
 			{
 				// grab started
 				info.grabbed = true;
+
+				// unlink other hands if they're linked to this one
+				UnlinkOthers(hand);
 			}
 			else if (!grabbed && info.grabbed)
 			{
@@ -157,6 +160,23 @@
 		//	Cue.LogError($"{closest} {closestDistance}");
 
 			return closest;
+		}
+
+		private void UnlinkOthers(BodyPart hand)
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == hand.Person)
+					continue;
+
+				var left = p.Body.Get(BodyParts.LeftHand);
+				if (left.IsLinkedTo(hand))
+					left.Unlink();
+
+				var right = p.Body.Get(BodyParts.RightHand);
+				if (right.IsLinkedTo(hand))
+					right.Unlink();
+			}
 		}
 	}
 }

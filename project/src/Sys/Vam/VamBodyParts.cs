@@ -78,6 +78,18 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public virtual bool IsLinkedTo(IBodyPart other)
+		{
+			var o = other as VamBodyPart;
+			if (o == null)
+				return false;
+
+			if (Controller == null || o.Rigidbody == null)
+				return false;
+
+			return (Controller.linkToRB == o.Rigidbody);
+		}
+
 		private void SetParentLink(FreeControllerV3 fc, Rigidbody rb)
 		{
 			fc.linkToRB = rb;

@@ -157,6 +157,14 @@
 			}
 		}
 
+		public bool IsLinkedTo(BodyPart other)
+		{
+			if (!Exists || other == null || !other.Exists)
+				return false;
+
+			return Sys.IsLinkedTo(other.Sys);
+		}
+
 		public bool Busy
 		{
 			get
