@@ -91,6 +91,8 @@
 
 				"lookAboveMaxWeight": 0.2,
 				"lookAboveMaxWeightOrgasm": 0.5,
+				"lookAboveMinExcitement": 0.35,
+				"lookAboveMinPhysicalRate": 0.001,
 
 				"idleNaturalRandomWeight": 0.05,
 				"naturalRandomWeight": 0,
@@ -123,7 +125,7 @@
 				"otherGropedTargetWeight": 0.1,
 
 				"otherSexExcitementRateFactor": 0.3,
-				"maxOtherSexExcitement": 0.5,
+				"maxOtherSexExcitement": 0.3,
 				"kissSpeedEnergyFactor": 1,
 				"idleMaxExcitement": 0,
 

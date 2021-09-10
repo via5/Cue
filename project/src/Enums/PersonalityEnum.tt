@@ -108,6 +108,16 @@ V.Float("LookAboveMaxWeight"),
 // weight is multiplied by the character's energy
 V.Float("LookAboveMaxWeightOrgasm"),
 
+// excitement value below which looking up is disabled; avoids looking up for
+// low excitement, since it's a pretty strong emote, should probably be higher
+// than MaxOtherSexExcitement
+V.Float("LookAboveMinExcitement"),
+
+// physical rate value below which looking up is disabled; avoids looking up
+// when the excitement source is only emotional (note that rates are low values,
+// typically below 0.02)
+V.Float("LookAboveMinPhysicalRate"),
+
 
 // looking at a random point when not busy and scene is idle
 V.Float("IdleNaturalRandomWeight"),
@@ -192,7 +202,8 @@ V.Float("OtherGropedTargetWeight"),
 V.Float("OtherSexExcitementRateFactor"),
 
 // the highest excitement a character can reach using only the excitement of
-// other characters; this avoids orgasms just by looking at people
+// other characters; this avoids orgasms just by looking at people, see also
+// LookAboveMinExcitement
 V.Float("MaxOtherSexExcitement", new Limit(0, 1)),
 
 // effect of energy on kiss movements; depends on the integration plugin, a

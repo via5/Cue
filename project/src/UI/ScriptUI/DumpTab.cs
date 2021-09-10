@@ -139,7 +139,14 @@ namespace Cue
 				var t = targets[i];
 
 				if (t.WasSet)
-					items.Add($"#{i}  {t} w={t.Weight:0.00}: {t.Why}");
+				{
+					string s = $"#{i}  {t} w={t.Weight:0.00}: {t.Why}";
+
+					if (t.Failure != "")
+						s += $" (failed: {t.Failure})";
+
+					items.Add(s);
+				}
 			}
 
 			foreach (var a in person_.Gaze.Targets.GetAllAvoidForDebug())

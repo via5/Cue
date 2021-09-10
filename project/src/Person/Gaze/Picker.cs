@@ -177,8 +177,9 @@
 			{
 				needsTarget = true;
 
-				// allow avoidance after a new target is picked naturally
-				timeSinceLastAvoid_ = AvoidInterval;
+				// don't allow avoidance after a new target is picked naturally
+				// so the gaze doesn't change immediately
+				timeSinceLastAvoid_ = 0;
 			}
 			else if (HasTarget)
 			{
@@ -277,6 +278,14 @@
 								currentTarget_ = j;
 								return;
 							}
+							else
+							{
+								targets_[j].SetFailed("can't look");
+							}
+						}
+						else
+						{
+							targets_[j].SetFailed("next");
 						}
 
 						lastString_ += $" {j}=X";

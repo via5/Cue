@@ -90,9 +90,15 @@ namespace Cue
 			}
 			else
 			{
-				targets_.SetAboveWeight(
-					person_.Mood.GazeEnergy * ps.Get(PSE.LookAboveMaxWeight),
-					"normal state");
+				if (person_.Excitement.Value >= ps.Get(PSE.LookAboveMinExcitement))
+				{
+					if (person_.Excitement.PhysicalRate >= ps.Get(PSE.LookAboveMinPhysicalRate))
+					{
+						targets_.SetAboveWeight(
+							person_.Mood.GazeEnergy * ps.Get(PSE.LookAboveMaxWeight),
+							"normal state");
+					}
+				}
 			}
 
 			return Continue;

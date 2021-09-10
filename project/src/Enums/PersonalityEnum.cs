@@ -25,45 +25,47 @@ namespace Cue
 		public const int AvoidDelayAfterOrgasm = 4;
 		public const int LookAboveMaxWeight = 5;
 		public const int LookAboveMaxWeightOrgasm = 6;
-		public const int IdleNaturalRandomWeight = 7;
-		public const int NaturalRandomWeight = 8;
-		public const int NaturalOtherEyesWeight = 9;
-		public const int BusyOtherEyesWeight = 10;
-		public const int MaxTirednessForRandomGaze = 11;
-		public const int OtherEyesExcitementWeight = 12;
-		public const int OtherEyesOrgasmWeight = 13;
-		public const int BlowjobEyesWeight = 14;
-		public const int BlowjobGenitalsWeight = 15;
-		public const int HandjobEyesWeight = 16;
-		public const int HandjobGenitalsWeight = 17;
-		public const int PenetrationEyesWeight = 18;
-		public const int PenetrationGenitalsWeight = 19;
-		public const int GropedEyesWeight = 20;
-		public const int GropedTargetWeight = 21;
-		public const int OtherBlowjobEyesWeight = 22;
-		public const int OtherBlowjobTargetEyesWeight = 23;
-		public const int OtherBlowjobTargetGenitalsWeight = 24;
-		public const int OtherHandjobEyesWeight = 25;
-		public const int OtherHandjobTargetEyesWeight = 26;
-		public const int OtherHandjobTargetGenitalsWeight = 27;
-		public const int OtherPenetrationEyesWeight = 28;
-		public const int OtherPenetrationSourceEyesWeight = 29;
-		public const int OtherPenetrationSourceGenitalsWeight = 30;
-		public const int OtherGropedEyesWeight = 31;
-		public const int OtherGropedSourceEyesWeight = 32;
-		public const int OtherGropedTargetWeight = 33;
-		public const int OtherSexExcitementRateFactor = 34;
-		public const int MaxOtherSexExcitement = 35;
-		public const int KissSpeedEnergyFactor = 36;
-		public const int IdleMaxExcitement = 37;
-		public const int GazeEnergyTirednessFactor = 38;
-		public const int GazeTirednessFactor = 39;
-		public const int MovementEnergyTirednessFactor = 40;
-		public const int MovementTirednessFactor = 41;
-		public const int ExpressionExcitementFactor = 42;
-		public const int ExpressionTirednessFactor = 43;
-		public const int FloatCount = 44;
-		public int GetFloatCount() { return 44; }
+		public const int LookAboveMinExcitement = 7;
+		public const int LookAboveMinPhysicalRate = 8;
+		public const int IdleNaturalRandomWeight = 9;
+		public const int NaturalRandomWeight = 10;
+		public const int NaturalOtherEyesWeight = 11;
+		public const int BusyOtherEyesWeight = 12;
+		public const int MaxTirednessForRandomGaze = 13;
+		public const int OtherEyesExcitementWeight = 14;
+		public const int OtherEyesOrgasmWeight = 15;
+		public const int BlowjobEyesWeight = 16;
+		public const int BlowjobGenitalsWeight = 17;
+		public const int HandjobEyesWeight = 18;
+		public const int HandjobGenitalsWeight = 19;
+		public const int PenetrationEyesWeight = 20;
+		public const int PenetrationGenitalsWeight = 21;
+		public const int GropedEyesWeight = 22;
+		public const int GropedTargetWeight = 23;
+		public const int OtherBlowjobEyesWeight = 24;
+		public const int OtherBlowjobTargetEyesWeight = 25;
+		public const int OtherBlowjobTargetGenitalsWeight = 26;
+		public const int OtherHandjobEyesWeight = 27;
+		public const int OtherHandjobTargetEyesWeight = 28;
+		public const int OtherHandjobTargetGenitalsWeight = 29;
+		public const int OtherPenetrationEyesWeight = 30;
+		public const int OtherPenetrationSourceEyesWeight = 31;
+		public const int OtherPenetrationSourceGenitalsWeight = 32;
+		public const int OtherGropedEyesWeight = 33;
+		public const int OtherGropedSourceEyesWeight = 34;
+		public const int OtherGropedTargetWeight = 35;
+		public const int OtherSexExcitementRateFactor = 36;
+		public const int MaxOtherSexExcitement = 37;
+		public const int KissSpeedEnergyFactor = 38;
+		public const int IdleMaxExcitement = 39;
+		public const int GazeEnergyTirednessFactor = 40;
+		public const int GazeTirednessFactor = 41;
+		public const int MovementEnergyTirednessFactor = 42;
+		public const int MovementTirednessFactor = 43;
+		public const int ExpressionExcitementFactor = 44;
+		public const int ExpressionTirednessFactor = 45;
+		public const int FloatCount = 46;
+		public int GetFloatCount() { return 46; }
 
 		// strings
 		public const int StringCount = 0;
@@ -144,6 +146,8 @@ namespace Cue
 			"avoidDelayAfterOrgasm",
 			"lookAboveMaxWeight",
 			"lookAboveMaxWeightOrgasm",
+			"lookAboveMinExcitement",
+			"lookAboveMinPhysicalRate",
 			"idleNaturalRandomWeight",
 			"naturalRandomWeight",
 			"naturalOtherEyesWeight",
@@ -253,6 +257,8 @@ namespace Cue
 			"avoidDelayAfterOrgasm",
 			"lookAboveMaxWeight",
 			"lookAboveMaxWeightOrgasm",
+			"lookAboveMinExcitement",
+			"lookAboveMinPhysicalRate",
 			"idleNaturalRandomWeight",
 			"naturalRandomWeight",
 			"naturalOtherEyesWeight",

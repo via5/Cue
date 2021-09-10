@@ -673,9 +673,9 @@ namespace Cue
 		public override string ToString()
 		{
 			if (isForced_)
-				return $"{forced_:0.000} (forced)";
+				return $"{forced_:0.000000} (forced)";
 			else
-				return $"{value_:0.000}";
+				return $"{value_:0.000000}";
 		}
 	}
 

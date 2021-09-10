@@ -66,9 +66,7 @@ namespace Cue
 					return "0";
 
 				return
-					$"{value_:0.000000}*" +
-					$"{globalSensitivityRate_:0.000000}*" +
-					$"{specificSensitivityModifier_:0.000000}=" +
+					$"{value_:0.00}=" +
 					$"{rate_:0.000000}";
 			}
 		}
@@ -91,11 +89,11 @@ namespace Cue
 		private PartValue[] parts_ = new PartValue[BodyParts.Count];
 
 		private Reason[] reasons_ = new Reason[ReasonCount];
-		private float physicalRate_ = 0;
-		private float emotionalRate_ = 0;
+		private ForceableFloat physicalRate_ = new ForceableFloat();
+		private ForceableFloat emotionalRate_ = new ForceableFloat();
 		private float totalRate_ = 0;
 		private float max_ = 0;
-		private float flatValue_ = 0;
+		private ForceableFloat flatValue_ = new ForceableFloat();
 		private IEasing easing_ = new SineOutEasing();
 
 
@@ -112,13 +110,18 @@ namespace Cue
 
 		public float Value
 		{
-			get { return easing_.Magnitude(flatValue_); }
+			get { return easing_.Magnitude(flatValue_.Value); }
 		}
 
 		public float FlatValue
 		{
+			get { return flatValue_.Value; }
+			set { flatValue_.Value = value; }
+		}
+
+		public ForceableFloat ForceableFlatValue
+		{
 			get { return flatValue_; }
-			set { flatValue_ = value; }
 		}
 
 		public float Max
@@ -133,10 +136,20 @@ namespace Cue
 
 		public float PhysicalRate
 		{
+			get { return physicalRate_.Value; }
+		}
+
+		public ForceableFloat ForceablePhysicalRate
+		{
 			get { return physicalRate_; }
 		}
 
 		public float EmotionalRate
+		{
+			get { return emotionalRate_.Value; }
+		}
+
+		public ForceableFloat ForceableEmotionalRate
 		{
 			get { return emotionalRate_; }
 		}
@@ -239,7 +252,7 @@ namespace Cue
 				if (p == person_ || p.Body.HavingSexWith(person_))
 					continue;
 
-				reasons_[OtherSex].Value += p.Excitement.physicalRate_;
+				reasons_[OtherSex].Value += p.Excitement.physicalRate_.Value;
 			}
 		}
 
@@ -301,8 +314,8 @@ namespace Cue
 			reasons_[Penetration].SensitivityMax = pp.Get(PE.PenetrationMax);
 			reasons_[OtherSex].SensitivityMax = ps.Get(PSE.MaxOtherSexExcitement);
 
-			physicalRate_ = 0;
-			emotionalRate_ = 0;
+			physicalRate_.Value = 0;
+			emotionalRate_.Value = 0;
 
 			for (int i = 0; i < ReasonCount; ++i)
 			{
@@ -312,12 +325,12 @@ namespace Cue
 					reasons_[i].SpecificSensitivityModifier;
 
 				if (reasons_[i].Physical)
-					physicalRate_ += reasons_[i].Rate;
+					physicalRate_.Value += reasons_[i].Rate;
 				else
-					emotionalRate_ += reasons_[i].Rate;
+					emotionalRate_.Value += reasons_[i].Rate;
 			}
 
-			totalRate_ = physicalRate_ + emotionalRate_;
+			totalRate_ = physicalRate_.Value + emotionalRate_.Value;
 
 			totalRate_ *= pp.Get(PE.RateAdjustment);
 
@@ -342,13 +355,16 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			if (flatValue_ > max_)
+			if (flatValue_.Value > max_)
 			{
-				flatValue_ = Math.Max(flatValue_ + pp.Get(PE.ExcitementDecayRate) * s, max_);
+				flatValue_.Value = Math.Max(
+					flatValue_.Value + pp.Get(PE.ExcitementDecayRate) * s,
+					max_);
 			}
 			else
 			{
-				flatValue_ = U.Clamp(flatValue_ + totalRate_ * s, 0, max_);
+				flatValue_.Value = U.Clamp(
+					flatValue_.Value + totalRate_ * s, 0, max_);
 			}
 		}
 	}

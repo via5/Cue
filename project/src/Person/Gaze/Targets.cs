@@ -194,6 +194,7 @@ namespace Cue
 	{
 		float Weight { get; }
 		string Why { get; }
+		string Failure { get; }
 		bool WasSet { get; }
 
 		bool HasPosition { get; }
@@ -202,6 +203,7 @@ namespace Cue
 
 		void Clear();
 		void SetWeight(float f, string why);
+		void SetFailed(string why);
 		bool Next();
 		void Update(Person p, float s);
 	}
@@ -210,7 +212,7 @@ namespace Cue
 	abstract class BasicGazeLookat : IGazeLookat
 	{
 		private float weight_ = 0;
-		private string why_;
+		private string why_, failure_;
 		private bool set_ = false;
 
 		protected BasicGazeLookat()
@@ -227,6 +229,11 @@ namespace Cue
 			get { return why_; }
 		}
 
+		public string Failure
+		{
+			get { return failure_; }
+		}
+
 		public bool WasSet
 		{
 			get { return set_; }
@@ -236,7 +243,13 @@ namespace Cue
 		{
 			weight_ = 0;
 			why_ = "";
+			failure_ = "";
 			set_ = false;
+		}
+
+		public void SetFailed(string why)
+		{
+			failure_ = why;
 		}
 
 		public void SetWeight(float f, string why)
