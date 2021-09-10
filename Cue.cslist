@@ -88,6 +88,7 @@ project\src\UI\ScriptUI\DumpTab.cs
 project\src\UI\ScriptUI\ExcitementTab.cs
 project\src\UI\ScriptUI\MiscTab.cs
 project\src\UI\ScriptUI\ScriptUI.cs
+project\src\UI\ScriptUI\SettingsTab.cs
 project\src\UI\ScriptUI\StateTab.cs
 project\src\UI\ScriptUI\UnityTab.cs
 project\src\Utilities\Duration.cs

@@ -1,20 +1,68 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
+	class TabContainer
+	{
+		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
+		private List<Tab> tabs_ = new List<Tab>();
+		private float updateInterval_ = 0;
+		private float updateElapsed_ = 1000;
+		private bool dirty_ = false;
+
+		public TabContainer()
+		{
+			tabsWidget_.SelectionChanged += (i) => { dirty_ = true; };
+		}
+
+		public float UpdateInterval
+		{
+			get { return updateInterval_; }
+			set { updateInterval_ = value; }
+		}
+
+		public VUI.Tabs TabsWidget
+		{
+			get { return tabsWidget_; }
+		}
+
+		public void AddTab(Tab t)
+		{
+			tabs_.Add(t);
+			tabsWidget_.AddTab(t.Title, t);
+		}
+
+		public void Update(float s)
+		{
+			updateElapsed_ += s;
+			if (updateElapsed_ > updateInterval_ || dirty_)
+			{
+				updateElapsed_ = 0;
+				dirty_ = false;
+
+				for (int i = 0; i < tabs_.Count; ++i)
+				{
+					if (tabs_[i].IsVisibleOnScreen())
+						tabs_[i].Update(s);
+				}
+			}
+		}
+
+		public void OnPluginState(bool b)
+		{
+			foreach (var t in tabs_)
+				t.OnPluginState(b);
+		}
+	}
+
+
 	class ScriptUI
 	{
-		private const float UpdateInterval = 0.3f;
-
 		private VUI.Root root_ = null;
 
 		private VUI.Panel panel_ = new VUI.Panel();
-		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
-		private List<Tab> tabs_ = new List<Tab>();
-		private float updateElapsed_ = 1000;
 		private MiscTab misc_;
+		private TabContainer tabs_ = new TabContainer();
 		private bool inited_ = false;
 
 		public void Init()
@@ -22,41 +70,28 @@ namespace Cue
 			if (inited_)
 				return;
 
-			inited_ = true;
+			tabs_.UpdateInterval = 0.3f;
 
+			inited_ = true;
 			misc_ = new MiscTab();
 
 			foreach (var p in Cue.Instance.AllPersons)
-				tabs_.Add(new PersonTab(p));
+				tabs_.AddTab(new PersonTab(p));
 
-			tabs_.Add(misc_);
-			tabs_.Add(new UnityTab());
+			tabs_.AddTab(misc_);
+			tabs_.AddTab(new UnityTab());
 
 			root_ = Cue.Instance.Sys.CreateScriptUI();
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 
 			panel_.Layout = new VUI.BorderLayout();
-			panel_.Add(tabsWidget_, VUI.BorderLayout.Center);
-
-			foreach (var t in tabs_)
-				tabsWidget_.AddTab(t.Title, t);
+			panel_.Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
 		}
 
 		public void Update(float s)
 		{
-			updateElapsed_ += s;
-			if (updateElapsed_ > UpdateInterval)
-			{
-				for (int i = 0; i < tabs_.Count; ++i)
-				{
-					if (tabs_[i].IsVisibleOnScreen())
-						tabs_[i].Update(s);
-				}
-
-				updateElapsed_ = 0;
-			}
-
+			tabs_.Update(s);
 			root_.Update();
 		}
 
@@ -68,8 +103,7 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			foreach (var t in tabs_)
-				t.OnPluginState(b);
+			tabs_.OnPluginState(b);
 		}
 	}
 
@@ -100,42 +134,34 @@ namespace Cue
 	class PersonTab : Tab
 	{
 		private Person person_;
-		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
-		private List<Tab> tabs_ = new List<Tab>();
+		private TabContainer tabs_ = new TabContainer();
 
 		public PersonTab(Person p)
 			: base(p.ID)
 		{
 			person_ = p;
 
-			tabs_.Add(new PersonStateTab(person_));
-			tabs_.Add(new PersonAITab(person_));
-			tabs_.Add(new PersonExcitementTab(person_));
-			tabs_.Add(new PersonBodyTab(person_));
-			tabs_.Add(new PersonAnimationsTab(person_));
-			tabs_.Add(new PersonDumpTab(person_));
-
-			foreach (var t in tabs_)
-				tabsWidget_.AddTab(t.Title, t);
+			tabs_.AddTab(new PersonSettingsTab(person_));
+			tabs_.AddTab(new PersonStateTab(person_));
+			tabs_.AddTab(new PersonAITab(person_));
+			tabs_.AddTab(new PersonExcitementTab(person_));
+			tabs_.AddTab(new PersonBodyTab(person_));
+//			tabs_.AddTab(new PersonAnimationsTab(person_));
+			tabs_.AddTab(new PersonDumpTab(person_));
 
 			Layout = new VUI.BorderLayout();
-			Add(tabsWidget_, VUI.BorderLayout.Center);
+			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
 		}
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < tabs_.Count; ++i)
-			{
-				if (tabs_[i].IsVisibleOnScreen())
-					tabs_[i].Update(s);
-			}
+			tabs_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)
 		{
 			base.OnPluginState(b);
-			foreach (var t in tabs_)
-				t.OnPluginState(b);
+			tabs_.OnPluginState(b);
 		}
 	}
 }

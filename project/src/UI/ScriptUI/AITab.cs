@@ -6,40 +6,31 @@ namespace Cue
 	class PersonAITab : Tab
 	{
 		private Person person_;
-		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
-		private List<Tab> tabs_ = new List<Tab>();
+		private TabContainer tabs_ = new TabContainer();
 
 		public PersonAITab(Person p)
 			: base("AI")
 		{
 			person_ = p;
 
-			tabs_.Add(new PersonAIStateTab(person_));
-			tabs_.Add(new PersonAIPersonalityTab(person_));
-			tabs_.Add(new PersonAIPhysiologyTab(person_));
-			tabs_.Add(new PersonAIGazeTab(person_));
-
-			foreach (var t in tabs_)
-				tabsWidget_.AddTab(t.Title, t);
+			tabs_.AddTab(new PersonAIStateTab(person_));
+			tabs_.AddTab(new PersonAIPersonalityTab(person_));
+			tabs_.AddTab(new PersonAIPhysiologyTab(person_));
+			tabs_.AddTab(new PersonAIGazeTab(person_));
 
 			Layout = new VUI.BorderLayout();
-			Add(tabsWidget_, VUI.BorderLayout.Center);
+			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
 		}
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < tabs_.Count; ++i)
-			{
-				if (tabs_[i].IsVisibleOnScreen())
-					tabs_[i].Update(s);
-			}
+			tabs_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)
 		{
 			base.OnPluginState(b);
-			foreach (var t in tabs_)
-				t.OnPluginState(b);
+			tabs_.OnPluginState(b);
 		}
 	}
 
@@ -52,7 +43,6 @@ namespace Cue
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
 		private VUI.Label command_ = new VUI.Label();
-		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
 
 
@@ -76,9 +66,6 @@ namespace Cue
 			state.Add(new VUI.Label("Command"));
 			state.Add(command_);
 
-			state.Add(new VUI.Label("Personality"));
-			state.Add(personality_);
-
 			state.Add(new VUI.Label("Force close"));
 			state.Add(close_);
 
@@ -86,7 +73,6 @@ namespace Cue
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
 
-			personality_.SelectionChanged += OnPersonality;
 			close_.Changed += OnClose;
 		}
 
@@ -119,29 +105,11 @@ namespace Cue
 			command_.Text =
 				(ai_.Command == null ? "(none)" : ai_.Command.ToString()) + " " +
 				(ai_.ForcedCommand == null ? "(forced: none)" : $"(forced: {ai_.ForcedCommand})");
-
-			if (personality_.Count == 0)
-			{
-				personality_.SetItems(
-					Resources.Personalities.AllNames(),
-					person_.Personality.Name);
-			}
-			else
-			{
-				if (personality_.Selected != person_.Personality.Name)
-					personality_.Select(person_.Personality.Name);
-			}
 		}
 
 		private void OnClose(bool b)
 		{
 			person_.Personality.ForceSetClose(b, b);
-		}
-
-		private void OnPersonality(string name)
-		{
-			if (name != "" && name != person_.Personality.Name)
-				person_.Personality = Resources.Personalities.Clone(name, person_);
 		}
 	}
 

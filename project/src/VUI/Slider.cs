@@ -187,7 +187,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return new Size(100, 40);
+			return new Size(200, 40);
 		}
 
 		protected override void DoPolish()

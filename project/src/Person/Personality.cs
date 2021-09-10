@@ -32,10 +32,15 @@ namespace Cue
 				{
 					float neutral = p.Physiology.Get(PE.NeutralVoicePitch);
 					float scale = p.Atom.Body.Scale;
-					pitch_ = U.Clamp(neutral + (1 - scale), 0, 1);
+					SetPitch(neutral + (1 - scale));
 				}
 
 				return pitch_;
+			}
+
+			public void SetPitch(float f)
+			{
+				pitch_ = U.Clamp(f, 0, 1);
 			}
 		}
 
@@ -91,6 +96,19 @@ namespace Cue
 		public Dataset OrgasmDataset
 		{
 			get { return orgasm_; }
+		}
+
+		public float GetNormalPitch(Person p)
+		{
+			return GetDatasetForIntensity(0).GetPitch(p);
+		}
+
+		public void SetPitchForAll(float f)
+		{
+			foreach (var d in datasets_)
+				d.dataset.SetPitch(f);
+
+			orgasm_.SetPitch(f);
 		}
 
 		public Dataset GetDatasetForIntensity(float e)

@@ -5,38 +5,29 @@ namespace Cue
 	class PersonBodyTab : Tab
 	{
 		private readonly Person person_;
-		private VUI.Tabs tabsWidget_ = new VUI.Tabs();
-		private List<Tab> tabs_ = new List<Tab>();
+		private TabContainer tabs_ = new TabContainer();
 
 		public PersonBodyTab(Person person)
 			: base("Body")
 		{
 			person_ = person;
 
-			tabs_.Add(new PersonBodyPartsTab(person_));
-			tabs_.Add(new PersonHandsTab(person_));
-
-			foreach (var t in tabs_)
-				tabsWidget_.AddTab(t.Title, t);
+			tabs_.AddTab(new PersonBodyPartsTab(person_));
+			tabs_.AddTab(new PersonHandsTab(person_));
 
 			Layout = new VUI.BorderLayout();
-			Add(tabsWidget_, VUI.BorderLayout.Center);
+			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
 		}
 
 		public override void Update(float s)
 		{
-			for (int i = 0; i < tabs_.Count; ++i)
-			{
-				if (tabs_[i].IsVisibleOnScreen())
-					tabs_[i].Update(s);
-			}
+			tabs_.Update(s);
 		}
 
 		public override void OnPluginState(bool b)
 		{
 			base.OnPluginState(b);
-			foreach (var t in tabs_)
-				t.OnPluginState(b);
+			tabs_.OnPluginState(b);
 		}
 	}
 
