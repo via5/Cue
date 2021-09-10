@@ -6,6 +6,7 @@ namespace Cue
 	{
 		// sliding durations
 		public const int GazeDuration = 0;
+
 		public const int SlidingDurationCount = 1;
 		public int GetSlidingDurationCount() { return 1; }
 
@@ -14,6 +15,7 @@ namespace Cue
 		public const int AvoidGazeInsidePersonalSpace = 1;
 		public const int AvoidGazeDuringSex = 2;
 		public const int AvoidGazeDuringSexOthers = 3;
+
 		public const int BoolCount = 4;
 		public int GetBoolCount() { return 4; }
 
@@ -65,10 +67,12 @@ namespace Cue
 		public const int MovementTirednessFactor = 44;
 		public const int ExpressionExcitementFactor = 45;
 		public const int ExpressionTirednessFactor = 46;
+
 		public const int FloatCount = 47;
 		public int GetFloatCount() { return 47; }
 
 		// strings
+
 		public const int StringCount = 0;
 		public int GetStringCount() { return 0; }
 
@@ -96,7 +100,10 @@ namespace Cue
 
 		public static string SlidingDurationToString(int i)
 		{
-			return slidingDurationNames_[i];
+			if (i >= 0 && i < slidingDurationNames_.Length)
+				return slidingDurationNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] SlidingDurationNames
@@ -130,7 +137,10 @@ namespace Cue
 
 		public static string BoolToString(int i)
 		{
-			return boolNames_[i];
+			if (i >= 0 && i < boolNames_.Length)
+				return boolNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] BoolNames
@@ -207,7 +217,10 @@ namespace Cue
 
 		public static string FloatToString(int i)
 		{
-			return floatNames_[i];
+			if (i >= 0 && i < floatNames_.Length)
+				return floatNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] FloatNames
@@ -237,7 +250,10 @@ namespace Cue
 
 		public static string StringToString(int i)
 		{
-			return stringNames_[i];
+			if (i >= 0 && i < stringNames_.Length)
+				return stringNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] StringNames

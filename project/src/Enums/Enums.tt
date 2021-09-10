@@ -98,7 +98,7 @@ public string Generate3(
 	var allNames = new List<string>();
 	int sectionCount = 0;
 
-	if (values.Length > 0 || generateEmpty)
+	if (values.Length > 0)
 	{
 		defs += MakeEnum(values, "Count");
 		names += MakeNames(values, "", allNames);

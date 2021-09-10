@@ -17,6 +17,9 @@
 //     how energetic a character is, goes up with excitement but can be dampened
 //     by tiredness; see *TirednessFactor
 //
+//     energy is used for gaze and movement, but with independent factors,
+//     because dampening movement too much makes the scene less interesting
+//
 // busy
 //     used for some gaze targets; whether a person is currently doing an action
 //     where they're unlikely to look away, such as a HJ, BJ, etc.

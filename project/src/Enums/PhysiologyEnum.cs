@@ -5,10 +5,12 @@ namespace Cue
 	class PE : IEnumValues
 	{
 		// sliding durations
+
 		public const int SlidingDurationCount = 0;
 		public int GetSlidingDurationCount() { return 0; }
 
 		// bools
+
 		public const int BoolCount = 0;
 		public int GetBoolCount() { return 0; }
 
@@ -46,10 +48,12 @@ namespace Cue
 		public const int OrgasmTime = 30;
 		public const int PostOrgasmTime = 31;
 		public const int RateAdjustment = 32;
+
 		public const int FloatCount = 33;
 		public int GetFloatCount() { return 33; }
 
 		// strings
+
 		public const int StringCount = 0;
 		public int GetStringCount() { return 0; }
 
@@ -76,7 +80,10 @@ namespace Cue
 
 		public static string SlidingDurationToString(int i)
 		{
-			return slidingDurationNames_[i];
+			if (i >= 0 && i < slidingDurationNames_.Length)
+				return slidingDurationNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] SlidingDurationNames
@@ -106,7 +113,10 @@ namespace Cue
 
 		public static string BoolToString(int i)
 		{
-			return boolNames_[i];
+			if (i >= 0 && i < boolNames_.Length)
+				return boolNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] BoolNames
@@ -169,7 +179,10 @@ namespace Cue
 
 		public static string FloatToString(int i)
 		{
-			return floatNames_[i];
+			if (i >= 0 && i < floatNames_.Length)
+				return floatNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] FloatNames
@@ -199,7 +212,10 @@ namespace Cue
 
 		public static string StringToString(int i)
 		{
-			return stringNames_[i];
+			if (i >= 0 && i < stringNames_.Length)
+				return stringNames_[i];
+			else
+				return $"?{i}";
 		}
 
 		public static string[] StringNames
