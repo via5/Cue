@@ -49,6 +49,11 @@ namespace Cue
 			set { renderingParts_ = value; }
 		}
 
+		public bool Exists
+		{
+			get { return person_.Atom.Body.Exists; }
+		}
+
 		public bool HasPenis
 		{
 			get

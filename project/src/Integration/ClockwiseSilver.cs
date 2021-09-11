@@ -470,7 +470,7 @@ namespace Cue
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
 
-		private const float MaxDistanceToStart = 0.15f;
+		private const float MaxDistanceToStart = 0.2f;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -694,7 +694,7 @@ namespace Cue
 		private Sys.Vam.FloatParameter topOnlyChance_ = null;
 		private Sys.Vam.FloatParameter mouthOpenMax_ = null;
 
-		private const float MaxDistanceToStart = 0.3f;
+		private const float MaxDistanceToStart = 0.4f;
 
 		public ClockwiseSilverBlowjob(Person p)
 		{

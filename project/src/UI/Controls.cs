@@ -96,7 +96,7 @@ namespace Cue
 		{
 			set
 			{
-				//moveTarget_.Visible = value;
+				moveTarget_.Visible = false;// value;
 			}
 		}
 

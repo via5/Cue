@@ -4,124 +4,33 @@ namespace Cue
 {
 	class VRMenu
 	{
-		interface IItem
-		{
-			VUI.Widget Panel { get; }
-			bool Selected { set; }
-			void Activate();
-		}
-
-		abstract class Item<W> : IItem
-			where W : VUI.Widget
-		{
-			private VUI.Panel panel_;
-			private W widget_;
-
-			public Item(W w)
-			{
-				widget_ = w;
-
-				panel_ = new VUI.Panel(new VUI.BorderLayout());
-				panel_.Add(widget_, VUI.BorderLayout.Center);
-			}
-
-			public VUI.Widget Panel
-			{
-				get { return panel_; }
-			}
-
-			public W Widget
-			{
-				get { return widget_; }
-			}
-
-			public virtual bool Selected
-			{
-				set
-				{
-					if (value)
-						panel_.BackgroundColor = VUI.Style.Theme.HighlightBackgroundColor;
-					else
-						panel_.BackgroundColor = new UnityEngine.Color(0, 0, 0, 0);
-				}
-			}
-
-			public abstract void Activate();
-		}
-
-
-		class CheckBoxItem : Item<VUI.CheckBox>
-		{
-			public CheckBoxItem(VUI.CheckBox cb)
-				: base(cb)
-			{
-			}
-
-			public override void Activate()
-			{
-				Widget.Toggle();
-			}
-		}
-
-
-		class ButtonItem : Item<VUI.Button>
-		{
-			public ButtonItem(VUI.Button cb)
-				: base(cb)
-			{
-			}
-
-			public override bool Selected
-			{
-				set
-				{
-					if (value)
-						Widget.BackgroundColor = VUI.Style.Theme.HighlightBackgroundColor;
-					else
-						Widget.BackgroundColor = VUI.Style.Theme.ButtonBackgroundColor;
-				}
-			}
-
-			public override void Activate()
-			{
-				Widget.Click();
-			}
-		}
-
-
-
 		private VUI.Root root_ = null;
 		private VUI.Label name_ = null;
-		private List<IItem> items_ = new List<IItem>();
+		private List<UIActions.IItem> items_ = new List<UIActions.IItem>();
 		private int widgetSel_ = -1;
 		private int personSel_ = -1;
 		private bool visible_ = false;
 		private bool left_ = false;
 		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
 
-		public void Create()
+		public void Create(bool debugDesktop)
 		{
-			items_.Add(new CheckBoxItem(new VUI.CheckBox("HJ", OnHJ)));
-			items_.Add(new CheckBoxItem(new VUI.CheckBox("BJ", OnBJ)));
-			items_.Add(new CheckBoxItem(new VUI.CheckBox("Thrust", OnThrust)));
-			items_.Add(new CheckBoxItem(new VUI.CheckBox("Can kiss", OnCanKiss)));
-			items_.Add(new ButtonItem(new VUI.Button("Genitals", OnGenitals)));
-			items_.Add(new ButtonItem(new VUI.Button("Breasts", OnBreasts)));
+			foreach (var i in UIActions.All())
+				items_.Add(i);
 
-			if (Cue.Instance.ActivePersons.Length == 0)
+			if (debugDesktop)
 			{
-				personSel_ = -1;
+				root_ = Cue.Instance.Sys.Create2D(
+					10, new Size(300, 350));
 			}
-			else if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
+			else
 			{
-				personSel_ = 0;
+				root_ = Cue.Instance.Sys.CreateAttached(
+					true,
+					new Vector3(0, 0.1f, 0),
+					new Point(0, 0),
+					new Size(300, 350));
 			}
-
-			root_ = Cue.Instance.Sys.CreateAttached(
-				true,
-				new Vector3(0, 0.1f, 0),
-				new Point(0, 0),
-				new Size(300, 350));
 
 			var ly = new VUI.VerticalFlow();
 			var p = new VUI.Panel(ly);
@@ -139,8 +48,10 @@ namespace Cue
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			UpdateVisibility();
 
-			if (personSel_ != -1)
-				name_.Text = Cue.Instance.ActivePersons[personSel_].ID;
+			if (Cue.Instance.ActivePersons.Length == 0)
+				SetPerson(-1);
+			else if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
+				SetPerson(0);
 		}
 
 		public void Destroy()
@@ -183,33 +94,35 @@ namespace Cue
 				}
 
 
+				int newSel = personSel_;
+
 				if (Cue.Instance.Sys.Input.MenuRight)
 				{
-					++personSel_;
-					if (personSel_ >= Cue.Instance.ActivePersons.Length)
-						personSel_ = 0;
+					++newSel;
+					if (newSel >= Cue.Instance.ActivePersons.Length)
+						newSel = 0;
 				}
 				else if (Cue.Instance.Sys.Input.MenuLeft)
 				{
-					--personSel_;
-					if (personSel_ < 0)
-						personSel_ = Cue.Instance.ActivePersons.Length - 1;
+					--newSel;
+					if (newSel < 0)
+						newSel = Cue.Instance.ActivePersons.Length - 1;
 				}
 
-				if (personSel_ >= Cue.Instance.ActivePersons.Length)
-					personSel_ = -1;
+				if (newSel >= Cue.Instance.ActivePersons.Length)
+					newSel = -1;
 
-				if (personSel_ == -1)
-					name_.Text = "";
-				else
-					name_.Text = Cue.Instance.ActivePersons[personSel_].ID;
-
+				if (newSel != personSel_)
+					SetPerson(newSel);
 
 				if (Cue.Instance.Sys.Input.MenuSelect)
 				{
 					if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
 						items_[widgetSel_].Activate();
 				}
+
+				for (int i = 0; i < items_.Count; ++i)
+					items_[i].Update();
 			}
 
 			root_?.Update();
@@ -267,47 +180,29 @@ namespace Cue
 				if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
 					return null;
 				else
-					return Cue.Instance.ActivePersons[personSel_] as Person;
+					return Cue.Instance.ActivePersons[personSel_];
 			}
 
-			set { }
+			set
+			{
+				if ((value as Person) != null)
+					SetPerson((value as Person).PersonIndex);
+			}
 		}
 
-		private void OnHJ(bool b)
+		private void SetPerson(int index)
 		{
-			if (ignore_) return;
-			UIActions.HJ(Selected as Person, b);
-		}
+			personSel_ = index;
 
-		private void OnBJ(bool b)
-		{
-			if (ignore_) return;
-			UIActions.BJ(Selected as Person, b);
-		}
+			Person p = Selected as Person;
 
-		private void OnThrust(bool b)
-		{
-			if (ignore_) return;
-			UIActions.Thrust(Selected as Person, b);
-		}
+			if (p != null)
+				name_.Text = p.ID;
+			else
+				name_.Text = "";
 
-		private void OnCanKiss(bool b)
-		{
-			if (ignore_) return;
-			UIActions.CanKiss(Selected as Person, b);
+			for (int i = 0; i < items_.Count; ++i)
+				items_[i].Person = p;
 		}
-
-		private void OnGenitals()
-		{
-			if (ignore_) return;
-			UIActions.Genitals(Selected as Person);
-		}
-
-		private void OnBreasts()
-		{
-			if (ignore_) return;
-			UIActions.Breasts(Selected as Person);
-		}
-
 	}
 }

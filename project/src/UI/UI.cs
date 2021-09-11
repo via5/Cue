@@ -2,6 +2,8 @@
 {
 	class UI
 	{
+		private const bool DebugVR = false;
+
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = null;
 		private VRMenu vrMenu_ = null;
@@ -26,7 +28,7 @@
 
 		public void CheckInput()
 		{
-			var vr = sys_.IsVR;
+			var vr = sys_.IsVR || DebugVR;
 
 			if (vr_ != vr)
 			{
@@ -41,11 +43,12 @@
 				CreateUI();
 			}
 
-			if (sys_.IsPlayMode)
+			if (sys_.IsPlayMode || DebugVR)
 			{
-				if (vr_)
+				if (vr_ || DebugVR)
 					CheckVRInput();
-				else
+
+				if (!vr_ || DebugVR)
 					CheckDesktopInput();
 			}
 			else
@@ -74,7 +77,7 @@
 
 			if (vr_)
 			{
-				vrMenu_?.Create();
+				vrMenu_?.Create(DebugVR);
 			}
 			else
 			{
@@ -108,7 +111,7 @@
 
 			bool hoverTargetVisible = false;
 
-			if (sys_.Input.ShowLeftMenu)
+			if (sys_.Input.ShowLeftMenu || DebugVR)
 			{
 				vrMenu_.ShowLeft();
 				vrMenu_.Selected = lh.o as Person;
@@ -197,7 +200,10 @@
 
 
 			if (sys_.Input.Select)
+			{
 				desktopMenu_.Selected = h.o as Person;
+				vrMenu_.Selected = h.o as Person;
+			}
 
 			desktopMenu_.Hovered = h.o;
 			controls_.Hovered = h.o;

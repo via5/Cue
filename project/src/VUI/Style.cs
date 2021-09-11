@@ -856,7 +856,10 @@ namespace VUI
 
 		private static void Polish(Text e, Info info)
 		{
-			e.color = info.TextColor;
+			if (info.Enabled)
+				e.color = info.TextColor;
+			else
+				e.color = Theme.DisabledTextColor;
 
 			if (info.SetFont)
 			{

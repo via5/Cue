@@ -162,12 +162,11 @@ namespace Cue.Sys.Vam
 							$"{storableID_} {paramName_} is dead");
 
 						param_ = null;
-						return false;
 					}
 				}
 			}
 
-			return true;
+			return false;
 		}
 
 		protected override bool StaleCheck()

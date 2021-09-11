@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	class DesktopMenu
 	{
@@ -7,14 +9,7 @@
 		private VUI.Label name_ = null;
 
 		private VUI.Panel selButtons_ = null;
-		private VUI.CheckBox hj_ = null;
-		private VUI.CheckBox bj_ = null;
-		private VUI.CheckBox thrust_ = null;
-		private VUI.CheckBox canKiss_ = null;
-
-		private VUI.Panel playerButtons_ = null;
-		private VUI.CheckBox movePlayer_ = null;
-
+		private List<UIActions.IItem> items_ = new List<UIActions.IItem>();
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
 		private VUI.Label fps_ = null;
@@ -26,58 +21,37 @@
 
 		public void Create()
 		{
-			root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 220));
-			var p = new VUI.Panel(new VUI.VerticalFlow());
+			foreach (var i in UIActions.All())
+				items_.Add(i);
 
-			// top row
-			{
-				name_ = p.Add(new VUI.Label());
-			}
+			root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 220));
+
+			var p = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			name_ = p.Add(new VUI.Label(
+				"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
+				UnityEngine.FontStyle.Bold));
 
 			// sel row
 			{
-				selButtons_ = new VUI.Panel(new VUI.VerticalFlow());
-				selButtons_.Visible = false;
+				selButtons_ = new VUI.Panel(new VUI.HorizontalFlow());
+
+				foreach (var i in items_)
+					selButtons_.Add(i.Panel);
+
 				p.Add(selButtons_);
-
-				var row = new VUI.Panel(new VUI.HorizontalFlow(5));
-				hj_ = row.Add(new VUI.CheckBox("Handjob", OnHandjob));
-				bj_ = row.Add(new VUI.CheckBox("Blowjob", OnBlowjob));
-				thrust_ = row.Add(new VUI.CheckBox("Thrust", OnThrust));
-				canKiss_ = row.Add(new VUI.CheckBox("Can kiss", OnCanKiss));
-				selButtons_.Add(row);
-
-				row = new VUI.Panel(new VUI.HorizontalFlow(5));
-				row.Add(new VUI.ToolButton("Genitals", OnToggleGenitals));
-				row.Add(new VUI.ToolButton("Breasts", OnToggleBreasts));
-				selButtons_.Add(row);
-			}
-
-			// player row
-			{
-				playerButtons_ = new VUI.Panel(new VUI.VerticalFlow());
-				playerButtons_.Visible = false;
-				p.Add(playerButtons_);
-
-				var row = new VUI.Panel(new VUI.HorizontalFlow(5));
-				movePlayer_ = row.Add(new VUI.CheckBox("Move player", OnMovePlayer));
-				playerButtons_.Add(row);
 			}
 
 			// debug row
 			{
-				if (!Cue.Instance.Sys.IsVR)
-				{
-					var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
-					tools.Add(new VUI.ToolButton("Reload", OnReload));
-					forceExcitement_ = tools.Add(new VUI.CheckBox("Ex", OnForceExcitement));
-					excitement_ = tools.Add(new VUI.FloatTextSlider(OnExcitement));
-					tools.Add(new VUI.ToolButton("test", OnTest));
-					fps_ = tools.Add(new VUI.Label());
-					p.Add(tools);
-				}
+				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
+				tools.Add(new VUI.ToolButton("Reload", OnReload));
+				forceExcitement_ = tools.Add(new VUI.CheckBox("Ex", OnForceExcitement));
+				excitement_ = tools.Add(new VUI.FloatTextSlider(OnExcitement));
+				tools.Add(new VUI.ToolButton("test", OnTest));
+				fps_ = tools.Add(new VUI.Label());
+				p.Add(tools);
 			}
-
 
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
@@ -115,16 +89,8 @@
 
 		public IObject Hovered
 		{
-			get
-			{
-				return hov_;
-			}
-
-			set
-			{
-				hov_ = value;
-				OnHovered(value);
-			}
+			get { return hov_; }
+			set { hov_ = value; }
 		}
 
 		public void Destroy()
@@ -134,6 +100,8 @@
 				root_.Destroy();
 				root_ = null;
 			}
+
+			items_.Clear();
 		}
 
 		public void Update()
@@ -154,91 +122,43 @@
 			if (fps_ != null)
 				fps_.Text = Cue.Instance.Sys.Fps;
 
-			if (playerButtons_ != null)
-			{
-				var p = Cue.Instance.Player;
+			for (int i = 0; i < items_.Count; ++i)
+				items_[i].Update();
 
-				// todo, player is the pseudo camera atom if not possessed,
-				// find a better way
-				bool playerPerson = (p != null && p.Atom is Sys.Vam.VamAtom);
-
-				playerButtons_.Visible = playerPerson;
-			}
-
+			UpdateWidgets();
 			root_?.Update();
-		}
-
-		public void Toggle()
-		{
-			visible_ = !visible_;
-
-			if (root_ != null)
-				root_.Visible = visible_;
 		}
 
 		private void OnSelected(IObject o)
 		{
 			var p = o as Person;
+			if (selButtons_ != null)
+				selButtons_.Visible = (p != null);
 
+			foreach (var i in items_)
+				i.Person = p;
+		}
+
+		private void UpdateWidgets()
+		{
 			ignore_.Do(() =>
 			{
-				if (selButtons_ != null) selButtons_.Visible = (p != null);
+				var p = sel_ as Person;
 
 				if (p != null)
 				{
-					if (hj_ != null) hj_.Checked = p.Handjob.Active;
-					if (bj_ != null) bj_.Checked = p.Blowjob.Active;
-					if (thrust_ != null) thrust_.Checked = p.AI.GetEvent<SexEvent>().Active;
-					if (canKiss_ != null) canKiss_.Checked = p.Options.CanKiss;
-					if (forceExcitement_ != null) forceExcitement_.Checked = p.Mood.FlatExcitementValue.IsForced;
-					if (excitement_ != null) excitement_.Value = p.Mood.FlatExcitementValue.Value;
+					if (forceExcitement_ != null)
+						forceExcitement_.Checked = p.Mood.FlatExcitementValue.IsForced;
+
+					if (excitement_ != null)
+						excitement_.Value = p.Mood.FlatExcitementValue.Value;
 				}
 			});
-		}
-
-		private void OnHovered(IObject p)
-		{
 		}
 
 		private void OnReload()
 		{
 			Cue.Instance.ReloadPlugin();
-		}
-
-		private void OnHandjob(bool b)
-		{
-			if (ignore_) return;
-			UIActions.HJ(Selected as Person, b);
-		}
-
-		private void OnBlowjob(bool b)
-		{
-			if (ignore_) return;
-			UIActions.BJ(Selected as Person, b);
-		}
-
-		private void OnThrust(bool b)
-		{
-			if (ignore_) return;
-			UIActions.Thrust(Selected as Person, b);
-		}
-
-		private void OnCanKiss(bool b)
-		{
-			if (ignore_) return;
-			UIActions.CanKiss(Selected as Person, b);
-		}
-
-		private void OnToggleGenitals()
-		{
-			if (ignore_) return;
-			UIActions.Genitals(Selected as Person);
-		}
-
-		private void OnToggleBreasts()
-		{
-			if (ignore_) return;
-			UIActions.Breasts(Selected as Person);
 		}
 
 		private void OnTest()
@@ -248,15 +168,6 @@
 			var p = Selected as Person;
 			if (p != null)
 				p.Clothing.Dump();
-		}
-
-		private void OnMovePlayer(bool b)
-		{
-			if (ignore_) return;
-
-			var p = Cue.Instance.Player;
-			if (p != null)
-				p.VamAtom?.SetControlsForMoving(b);
 		}
 
 		private void OnForceExcitement(bool b)

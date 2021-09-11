@@ -38,6 +38,7 @@ namespace Cue.Sys.Vam
 
 	abstract class VamBasicBody : IBody
 	{
+		public virtual bool Exists { get { return true; } }
 		public abstract float Scale { get; }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }

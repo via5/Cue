@@ -87,6 +87,11 @@ namespace Cue.Sys.Vam
 				BP.RightHand, SuperController.singleton.rightHand);
 		}
 
+		public override bool Exists
+		{
+			get { return false; }
+		}
+
 		public override float Scale
 		{
 			get { return 1; }
