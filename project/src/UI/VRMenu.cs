@@ -117,18 +117,19 @@ namespace Cue
 				personSel_ = 0;
 			}
 
-			root_ = Cue.Instance.Sys.Create2D(300, new Size(300, 420));
-
-			//root_ = Cue.Instance.Sys.CreateAttached(
-			//	true,
-			//	new Vector3(0, 0.1f, 0),
-			//	new Point(0, 0),
-			//	new Size(300, 250));
+			root_ = Cue.Instance.Sys.CreateAttached(
+				true,
+				new Vector3(0, 0.1f, 0),
+				new Point(0, 0),
+				new Size(300, 350));
 
 			var ly = new VUI.VerticalFlow();
 			var p = new VUI.Panel(ly);
 
-			name_ = p.Add(new VUI.Label(""));
+			name_ = p.Add(new VUI.Label(
+				"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
+				UnityEngine.FontStyle.Bold));
+
 			p.Add(new VUI.Spacer(10));
 
 			foreach (var i in items_)

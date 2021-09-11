@@ -113,7 +113,7 @@ namespace Cue.Sys.Vam
 		public void LateUpdate()
 		{
 			var c = Camera.main.transform;
-			transform.LookAt(c.position + c.forward);
+			transform.LookAt(c.position);
 		}
 	}
 
@@ -208,7 +208,7 @@ namespace Cue.Sys.Vam
 			float w = size_.x;
 			float h = size_.y;
 			float yoffset = 0;
-			float s = 0.3f;
+			float s = 0.1f;
 
 			rt.anchorMin = new Vector2(0.5f, 1);
 			rt.anchorMax = new Vector2(0.5f, 1);
@@ -218,7 +218,7 @@ namespace Cue.Sys.Vam
 
 			//rt.anchoredPosition = new Vector2(0.5f, 0.5f);
 			rt.localPosition = new Vector3(0, 0.08f, -0.05f);
-			rt.localScale = new Vector3(s / w, s / w, s / w);
+			rt.localScale = new Vector3(-s / w, s / w, s / w);
 
 			SuperController.singleton.AddCanvas(canvas_);
 		}

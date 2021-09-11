@@ -197,12 +197,22 @@ namespace Cue.Sys.Vam
 		private VamButton middle_ = new VamButton(2);
 		private VamDelayedAction leftAction_, rightAction_;
 		private IVRInput vr_ = new SteamVRInput();
+
 		private bool leftMenu_ = false;
 		private bool leftMenuSticky_ = false;
+
+		private bool rightMenu_ = false;
+		private bool rightMenuSticky_ = false;
+
 		private Latched leftMenuUp_ = new Latched();
 		private Latched leftMenuDown_ = new Latched();
 		private Latched leftMenuLeft_ = new Latched();
 		private Latched leftMenuRight_ = new Latched();
+
+		private Latched rightMenuUp_ = new Latched();
+		private Latched rightMenuDown_ = new Latched();
+		private Latched rightMenuLeft_ = new Latched();
+		private Latched rightMenuRight_ = new Latched();
 
 		public VamInput(VamSys sys)
 		{
@@ -227,6 +237,7 @@ namespace Cue.Sys.Vam
 			leftAction_.Update(s);
 			rightAction_.Update(s);
 
+
 			leftMenu_ = sc_.GetLeftUIPointerShow();
 
 			if (leftMenuSticky_)
@@ -240,12 +251,33 @@ namespace Cue.Sys.Vam
 					leftMenuSticky_ = true;
 			}
 
-			MeshVR.GlobalSceneOptions.singleton.disableNavigation = ShowLeftMenu;
+
+			rightMenu_ = sc_.GetRightUIPointerShow();
+
+			if (rightMenuSticky_)
+			{
+				if (sc_.GetRightGrabRelease())
+					rightMenuSticky_ = false;
+			}
+			else if (rightMenu_)
+			{
+				if (sc_.GetRightGrab())
+					rightMenuSticky_ = true;
+			}
+
+
+			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
+				ShowLeftMenu || ShowRightMenu;
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
 			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
 			leftMenuLeft_.Set(vr_.LeftJoystick.x <= -0.5f);
 			leftMenuRight_.Set(vr_.LeftJoystick.x >= 0.5f);
+
+			rightMenuUp_.Set(vr_.RightJoystick.y >= 0.5f);
+			rightMenuDown_.Set(vr_.RightJoystick.y <= -0.5f);
+			rightMenuLeft_.Set(vr_.RightJoystick.x <= -0.5f);
+			rightMenuRight_.Set(vr_.RightJoystick.x >= 0.5f);
 		}
 
 		public bool HardReset
@@ -288,7 +320,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				return sc_.GetRightUIPointerShow();
+				return rightMenu_ || rightMenuSticky_;
 			}
 		}
 
@@ -326,29 +358,31 @@ namespace Cue.Sys.Vam
 
 		public bool MenuUp
 		{
-			get { return leftMenuUp_.OnFrame; }
+			get { return leftMenuUp_.OnFrame || rightMenuUp_.OnFrame; }
 		}
 
 		public bool MenuDown
 		{
-			get { return leftMenuDown_.OnFrame; }
+			get { return leftMenuDown_.OnFrame || rightMenuDown_.OnFrame; }
 		}
 
 		public bool MenuLeft
 		{
-			get { return leftMenuLeft_.OnFrame; }
+			get { return leftMenuLeft_.OnFrame || rightMenuLeft_.OnFrame; }
 		}
 
 		public bool MenuRight
 		{
-			get { return leftMenuRight_.OnFrame; }
+			get { return leftMenuRight_.OnFrame || rightMenuRight_.OnFrame; }
 		}
 
 		public bool MenuSelect
 		{
 			get
 			{
-				return (ShowLeftMenu && sc_.GetLeftRemoteHoldGrab());
+				return
+					(ShowLeftMenu && sc_.GetLeftRemoteHoldGrab()) ||
+					(ShowRightMenu && sc_.GetRightRemoteHoldGrab());
 			}
 		}
 

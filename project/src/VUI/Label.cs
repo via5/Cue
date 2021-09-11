@@ -26,10 +26,11 @@ namespace VUI
 		private int wrap_ = Overflow;
 		private bool autoTooltip_ = false;
 
-		public Label(string t = "", int align = AlignLeft | AlignVCenter)
+		public Label(string t = "", int align = AlignLeft | AlignVCenter, FontStyle fs = FontStyle.Normal)
 		{
 			text_ = t;
 			align_ = align;
+			FontStyle = fs;
 		}
 
 		public Label(string t, FontStyle fs)
