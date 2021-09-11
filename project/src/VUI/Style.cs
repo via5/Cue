@@ -66,7 +66,7 @@ namespace VUI
 		{
 			get
 			{
-				return UnityEngine.Font.CreateDynamicFontFromOSFont("Consolas", 20);
+				return UnityEngine.Font.CreateDynamicFontFromOSFont("Consolas", 24);
 			}
 		}
 

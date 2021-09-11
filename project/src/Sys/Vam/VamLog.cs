@@ -8,8 +8,8 @@ namespace Cue.Sys.Vam
 		private UnityEngine.UI.Button clear_ = null;
 		private UnityEngine.UI.Text logText_ = null;
 		private UIStyleText logStyle_ = null;
-		private int logFontSize_ = -1;
-		private Font logFont_ = null;
+		private int oldLogFontSize_ = -1;
+		private Font oldLogFont_ = null;
 
 		public VamLog()
 		{
@@ -60,19 +60,37 @@ namespace Cue.Sys.Vam
 
 			if (b)
 			{
-				logFontSize_ = logStyle_.fontSize;
-				logFont_ = logText_.font;
-				logStyle_.fontSize = 24;
+				{
+					// use the message log panel font instead if the error
+					// one, because the old font might not always be restored
+					// if cue has a hard failure somewhere
+					var vp = VUI.Utilities.FindChildRecursive(
+						SuperController.singleton.msgLogPanel, "Viewport");
+
+					var textObject = VUI.Utilities.FindChildRecursive(vp, "Text");
+
+					var t = textObject.GetComponent<UnityEngine.UI.Text>();
+
+					oldLogFontSize_ = t.fontSize;
+					oldLogFont_ = t.font;
+				}
+
+				var f = VUI.Style.Theme.MonospaceFont;
+
 				logText_.resizeTextForBestFit = false;
-				logText_.font = VUI.Style.Theme.MonospaceFont;
+				logText_.font = f;
+				logText_.fontSize = f.fontSize;
+
+				logStyle_.fontSize = f.fontSize;
 				logStyle_.UpdateStyle();
 			}
 			else
 			{
-				logStyle_.fontSize = logFontSize_;
-				logText_.fontSize = logFontSize_;
-				logText_.font = logFont_;
 				logText_.resizeTextForBestFit = true;
+				logText_.font = oldLogFont_;
+				logText_.fontSize = oldLogFontSize_;
+
+				logStyle_.fontSize = oldLogFontSize_;
 				logStyle_.UpdateStyle();
 			}
 		}

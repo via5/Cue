@@ -165,6 +165,22 @@ namespace Cue.Sys.Vam
 			fullscreenPanel_ = null;
 		}
 
+		public void AttachLeft()
+		{
+			Attach(SuperController.singleton.leftHand);
+		}
+
+		public void AttachRight()
+		{
+			Attach(SuperController.singleton.rightHand);
+		}
+
+		private void Attach(Transform parent)
+		{
+			fullscreenPanel_.transform.SetParent(parent, false);
+			fullscreenPanel_.transform.position = parent.position + offset_;
+		}
+
 		private void CreateFullscreenPanel(Transform parent)
 		{
 			fullscreenPanel_ = new GameObject();

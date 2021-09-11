@@ -4,6 +4,51 @@ using UnityEngine.EventSystems;
 
 namespace Cue.Sys.Vam
 {
+	interface IVRInput
+	{
+		Transform LeftController { get; }
+		Transform RightController { get; }
+
+		Vector2 LeftJoystick { get; }
+		Vector2 RightJoystick { get; }
+	}
+
+
+	class SteamVRInput : IVRInput
+	{
+		private SuperController sc_ = SuperController.singleton;
+
+		public Transform LeftController
+		{
+			get { return sc_.viveObjectLeft; }
+		}
+
+		public Transform RightController
+		{
+			get { return sc_.viveObjectRight; }
+		}
+
+		public Vector2 LeftJoystick
+		{
+			get
+			{
+				var v = sc_.GetFreeNavigateVector(sc_.freeModeMoveAction);
+				return new Vector2(v.x, v.y);
+			}
+		}
+
+		public Vector2 RightJoystick
+		{
+			get
+			{
+				var v = sc_.GetFreeNavigateVector(sc_.freeModeMoveAction);
+				return new Vector2(v.z, v.w);
+			}
+		}
+	}
+
+
+
 	class VamButton
 	{
 		private Vector3 downPos_ = Vector3.Zero;
@@ -86,7 +131,7 @@ namespace Cue.Sys.Vam
 			{
 				if (getUp_())
 				{
-					Cue.LogInfo($"{name_} up");
+					//Cue.LogInfo($"{name_} up");
 					down_ = false;
 					trigger_ = false;
 					triggered_ = false;
@@ -98,7 +143,7 @@ namespace Cue.Sys.Vam
 
 					if (elapsed_ > 2 && !triggered_)
 					{
-						Cue.LogInfo($"{name_} triggering");
+						//Cue.LogInfo($"{name_} triggering");
 						triggered_ = true;
 						trigger_ = true;
 					}
@@ -108,7 +153,7 @@ namespace Cue.Sys.Vam
 			{
 				if (getDown_())
 				{
-					Cue.LogInfo($"{name_} down");
+					//Cue.LogInfo($"{name_} down");
 					elapsed_ = 0;
 					down_ = true;
 				}
@@ -122,27 +167,55 @@ namespace Cue.Sys.Vam
 	}
 
 
+
+	class Latched
+	{
+		private bool on_ = false;
+		private bool onFrame_ = false;
+
+		public bool OnFrame
+		{
+			get { return onFrame_; }
+		}
+
+		public void Set(bool on)
+		{
+			onFrame_ = (on && !on_);
+			on_ = on;
+		}
+	}
+
+
+
 	class VamInput : IInput
 	{
+		private SuperController sc_ = SuperController.singleton;
 		private VamSys sys_;
 		private Ray ray_ = new Ray();
 		private VamButton left_ = new VamButton(0);
 		private VamButton right_ = new VamButton(1);
 		private VamButton middle_ = new VamButton(2);
 		private VamDelayedAction leftAction_, rightAction_;
+		private IVRInput vr_ = new SteamVRInput();
+		private bool leftMenu_ = false;
+		private bool leftMenuSticky_ = false;
+		private Latched leftMenuUp_ = new Latched();
+		private Latched leftMenuDown_ = new Latched();
+		private Latched leftMenuLeft_ = new Latched();
+		private Latched leftMenuRight_ = new Latched();
 
 		public VamInput(VamSys sys)
 		{
 			sys_ = sys;
 
 			leftAction_ = new VamDelayedAction(
-				() => SuperController.singleton.GetLeftGrab(),
-				() => SuperController.singleton.GetLeftGrabRelease(),
+				() => sc_.GetLeftGrab(),
+				() => sc_.GetLeftGrabRelease(),
 				"leftgrab");
 
 			rightAction_ = new VamDelayedAction(
-				() => SuperController.singleton.GetRightGrab(),
-				() => SuperController.singleton.GetRightGrabRelease(),
+				() => sc_.GetRightGrab(),
+				() => sc_.GetRightGrabRelease(),
 				"rightgrab");
 		}
 
@@ -153,6 +226,26 @@ namespace Cue.Sys.Vam
 			middle_.Update();
 			leftAction_.Update(s);
 			rightAction_.Update(s);
+
+			leftMenu_ = sc_.GetLeftUIPointerShow();
+
+			if (leftMenuSticky_)
+			{
+				if (sc_.GetLeftGrabRelease())
+					leftMenuSticky_ = false;
+			}
+			else if (leftMenu_)
+			{
+				if (sc_.GetLeftGrab())
+					leftMenuSticky_ = true;
+			}
+
+			MeshVR.GlobalSceneOptions.singleton.disableNavigation = ShowLeftMenu;
+
+			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
+			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
+			leftMenuLeft_.Set(vr_.LeftJoystick.x <= -0.5f);
+			leftMenuRight_.Set(vr_.LeftJoystick.x >= 0.5f);
 		}
 
 		public bool HardReset
@@ -179,7 +272,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				return SuperController.singleton.GetLeftUIPointerShow();
+				return leftMenu_ || leftMenuSticky_;
 			}
 		}
 
@@ -195,7 +288,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				return SuperController.singleton.GetRightUIPointerShow();
+				return sc_.GetRightUIPointerShow();
 			}
 		}
 
@@ -228,6 +321,34 @@ namespace Cue.Sys.Vam
 			get
 			{
 				return middle_.Clicked;
+			}
+		}
+
+		public bool MenuUp
+		{
+			get { return leftMenuUp_.OnFrame; }
+		}
+
+		public bool MenuDown
+		{
+			get { return leftMenuDown_.OnFrame; }
+		}
+
+		public bool MenuLeft
+		{
+			get { return leftMenuLeft_.OnFrame; }
+		}
+
+		public bool MenuRight
+		{
+			get { return leftMenuRight_.OnFrame; }
+		}
+
+		public bool MenuSelect
+		{
+			get
+			{
+				return (ShowLeftMenu && sc_.GetLeftRemoteHoldGrab());
 			}
 		}
 
@@ -294,23 +415,21 @@ namespace Cue.Sys.Vam
 
 		private bool GetMouseRay()
 		{
-			ray_ = SuperController.singleton.MonitorCenterCamera
-				.ScreenPointToRay(Input.mousePosition);
-
+			ray_ = sc_.MonitorCenterCamera.ScreenPointToRay(Input.mousePosition);
 			return true;
 		}
 
 		private bool GetLeftVRRay()
 		{
-			ray_.origin = SuperController.singleton.viveObjectLeft.position;
-			ray_.direction = SuperController.singleton.viveObjectLeft.forward;
+			ray_.origin = vr_.LeftController.position;
+			ray_.direction = vr_.LeftController.forward;
 			return true;
 		}
 
 		private bool GetRightVRRay()
 		{
-			ray_.origin = SuperController.singleton.viveObjectRight.position;
-			ray_.direction = SuperController.singleton.viveObjectRight.forward;
+			ray_.origin = vr_.RightController.position;
+			ray_.direction = vr_.RightController.forward;
 			return true;
 		}
 

@@ -90,6 +90,9 @@ namespace Cue.Proc
 		private readonly List<ExpressionType> expressions_ =
 			new List<ExpressionType>();
 
+		private float i_ = 0;
+		private IProceduralMorphGroup s_ = null;
+
 
 		public Expression(Person p)
 		{
@@ -214,10 +217,29 @@ namespace Cue.Proc
 				expressions_[i].Reset();
 		}
 
+		public void TestExpression(IProceduralMorphGroup s)
+		{
+			if (s_ != null)
+				s_.Reset();
+
+			//s_ = s;
+		}
+
+		public void TestIntensity(float i)
+		{
+			i_ = i;
+		}
+
 		public void FixedUpdate(float s)
 		{
 			if (!enabled_)
 				return;
+
+			if (s_ != null)
+			{
+				s_.FixedUpdate(s, i_);
+				s_.Set(null);
+			}
 
 			for (int i = 0; i < expressions_.Count; ++i)
 				expressions_[i].FixedUpdate(s);
@@ -231,6 +253,9 @@ namespace Cue.Proc
 
 		public void ForceChange()
 		{
+			if (s_ != null)
+				s_.ForceChange();
+
 			for (int i = 0; i < expressions_.Count; ++i)
 				expressions_[i].ForceChange();
 		}

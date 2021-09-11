@@ -4,9 +4,8 @@
 	{
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = null;
-		private Menu leftMenu_ = null;
-		private Menu rightMenu_ = null;
-		private Menu desktopMenu_ = null;
+		private VRMenu vrMenu_ = null;
+		private DesktopMenu desktopMenu_ = null;
 		private Controls controls_ = null;
 		private bool vr_ = false;
 
@@ -15,9 +14,8 @@
 			sys_ = sys;
 			vr_ = sys_.IsVR;
 			sui_ = new ScriptUI();
-			leftMenu_ = new Menu();
-			rightMenu_ = new Menu();
-			desktopMenu_ = new Menu();
+			vrMenu_ = new VRMenu();
+			desktopMenu_ = new DesktopMenu();
 			controls_ = new Controls();
 		}
 
@@ -29,6 +27,7 @@
 		public void CheckInput()
 		{
 			var vr = sys_.IsVR;
+
 			if (vr_ != vr)
 			{
 				vr_ = vr;
@@ -75,12 +74,11 @@
 
 			if (vr_)
 			{
-				leftMenu_?.Create(vr_, true);
-				rightMenu_?.Create(vr_, false);
+				vrMenu_?.Create();
 			}
 			else
 			{
-				desktopMenu_?.Create(false, false);
+				desktopMenu_?.Create();
 				desktopMenu_.Visible = true;
 
 				foreach (var p in Cue.Instance.ActivePersons)
@@ -99,8 +97,7 @@
 			Cue.LogInfo("destroying ui");
 
 			controls_?.Destroy();
-			leftMenu_?.Destroy();
-			rightMenu_?.Destroy();
+			vrMenu_?.Destroy();
 			desktopMenu_?.Destroy();
 		}
 
@@ -113,6 +110,9 @@
 
 			if (sys_.Input.ShowLeftMenu)
 			{
+				vrMenu_.ShowLeft();
+				vrMenu_.Selected = lh.o as Person;
+
 				if (!(rh.o is Person))
 				{
 					hoverTargetVisible = true;
@@ -121,51 +121,31 @@
 			}
 			else if (sys_.Input.ShowRightMenu)
 			{
+				vrMenu_.ShowRight();
+				vrMenu_.Selected = lh.o as Person;
+
 				if (!(lh.o is Person))
 				{
 					hoverTargetVisible = true;
 					controls_.HoverTargetPosition = lh.pos;
 				}
 			}
+			else
+			{
+				vrMenu_.Hide();
+			}
 
 			controls_.HoverTargetVisible = hoverTargetVisible;
 
-
 			if (lh.o != null)
 			{
-				leftMenu_.Visible = sys_.Input.ShowLeftMenu;
-				leftMenu_.Selected = lh.o as Person;
-
-				rightMenu_.Visible = false;
-				rightMenu_.Selected = null;
-
 				if (sys_.Input.RightAction)
-				{
-					Cue.LogInfo($"right action {lh.o} {rh.o}");
 					DoAction(lh.o, rh);
-				}
 			}
 			else if (rh.o != null)
 			{
-				leftMenu_.Visible = false;
-				leftMenu_.Selected = null;
-
-				rightMenu_.Visible = sys_.Input.ShowRightMenu;
-				rightMenu_.Selected = rh.o as Person;
-
 				if (sys_.Input.LeftAction)
-				{
-					Cue.LogInfo($"left action {lh.o} {rh.o}");
 					DoAction(rh.o, lh);
-				}
-			}
-			else
-			{
-				leftMenu_.Visible = false;
-				leftMenu_.Selected = null;
-
-				rightMenu_.Visible = false;
-				rightMenu_.Selected = null;
 			}
 		}
 
@@ -232,8 +212,7 @@
 		public void Update(float s)
 		{
 			controls_?.Update();
-			leftMenu_?.Update();
-			rightMenu_?.Update();
+			vrMenu_?.Update();
 			desktopMenu_?.Update();
 			sui_.Update(s);
 		}

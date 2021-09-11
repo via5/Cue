@@ -160,14 +160,10 @@ namespace Cue.Proc
 
 		public void ForceChange()
 		{
-			//state_ = NoState;
-			//finished_ = false;
-			//timeActive_ = 0;
-			//
-			//forward_.Reset();
-			//backward_.Reset();
-			//delayOff_.Reset();
-			//delayOn_.Reset();
+			Sync.Reset();
+			finished_ = false;
+			timeActive_ = 0;
+			Next(false);
 		}
 
 		public override void FixedUpdate(float s)

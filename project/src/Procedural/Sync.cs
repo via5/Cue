@@ -391,6 +391,7 @@ namespace Cue.Proc
 		public override void Reset()
 		{
 			base.Reset();
+			SetState(ForwardsState);
 			fwdDuration_.Reset();
 			bwdDuration_?.Reset();
 			fwdDelay_.Reset();

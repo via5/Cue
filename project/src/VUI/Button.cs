@@ -110,6 +110,14 @@ namespace VUI
 			}
 		}
 
+		public void Click()
+		{
+			if (button_ != null)
+			{
+				button_.button.onClick?.Invoke();
+			}
+		}
+
 		protected override GameObject CreateGameObject()
 		{
 			return UnityEngine.Object.Instantiate(

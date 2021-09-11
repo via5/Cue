@@ -255,6 +255,12 @@ namespace Cue.Sys.Mock
 		public bool Action { get { return false; } }
 		public bool ToggleControls { get { return false; } }
 
+		public bool MenuUp { get { return false; } }
+		public bool MenuDown { get { return false; } }
+		public bool MenuLeft { get { return false; } }
+		public bool MenuRight { get { return false; } }
+		public bool MenuSelect { get { return false; } }
+
 		public bool Move { get { return false; } }
 		public Vector3 MoveDirection { get { return Vector3.Zero; } }
 

@@ -100,12 +100,14 @@ namespace Cue
 							Cue.Instance.FindPerson("Camera"),
 							BP.Eyes, 1, "forced");
 
+						person_.Gaze.Gazer.Enabled = true;
 						break;
 					}
 
 					case ForceLooks.Up:
 					{
 						targets_.SetAboveWeight(1, "forced");
+						person_.Gaze.Gazer.Enabled = true;
 						break;
 					}
 
@@ -167,19 +169,19 @@ namespace Cue
 
 					lastEmergency_ = emergency;
 				}
+
+				if (picker_.HasTarget)
+				{
+					if (person_.Body.Get(BP.Head).Busy)
+						gazer_.Enabled = false;
+					else
+						gazer_.Enabled = gazerEnabled_;
+				}
+				// else ?
 			}
 
-			if (picker_.HasTarget)
-			{
-				if (person_.Body.Get(BP.Head).Busy)
-					gazer_.Enabled = false;
-				else
-					gazer_.Enabled = gazerEnabled_;
-
-				gazer_.Variance = picker_.CurrentTarget.Variance;
-				eyes_.LookAt(picker_.Position);
-			}
-			// else ?
+			gazer_.Variance = picker_.CurrentTarget.Variance;
+			eyes_.LookAt(picker_.Position);
 
 			eyes_.Update(s);
 			gazer_.Update(s);

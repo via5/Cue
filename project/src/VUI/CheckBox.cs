@@ -42,6 +42,11 @@ namespace VUI
 			}
 		}
 
+		public void Toggle()
+		{
+			Checked = !Checked;
+		}
+
 		protected override GameObject CreateGameObject()
 		{
 			return UnityEngine.Object.Instantiate(

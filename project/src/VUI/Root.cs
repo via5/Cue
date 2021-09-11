@@ -220,7 +220,7 @@ namespace VUI
 			AttachTo(support);
 		}
 
-		public IRootSupport RootParent
+		public IRootSupport RootSupport
 		{
 			get { return support_; }
 		}
@@ -363,8 +363,20 @@ namespace VUI
 
 		public bool Visible
 		{
-			get { return support_.RootParent.gameObject.activeInHierarchy; }
-			set { support_.RootParent.gameObject.SetActive(value); }
+			get
+			{
+				return support_.RootParent.gameObject.activeInHierarchy;
+			}
+
+			set
+			{
+				if (value != Visible)
+				{
+					support_.RootParent.gameObject.SetActive(value);
+					content_.NeedsLayout("root visibility changed");
+					floating_.NeedsLayout("root visibility changed");
+				}
+			}
 		}
 
 		public void TrackPointer(Widget w, bool b)

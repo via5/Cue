@@ -107,6 +107,12 @@ namespace Cue.Sys
 		bool Action { get; }
 		bool ToggleControls { get; }
 
+		bool MenuUp { get; }
+		bool MenuDown { get; }
+		bool MenuLeft { get; }
+		bool MenuRight { get; }
+		bool MenuSelect { get; }
+
 		void Update(float s);
 		HoveredInfo GetLeftHovered();
 		HoveredInfo GetRightHovered();

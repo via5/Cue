@@ -1,7 +1,29 @@
-﻿namespace Cue.Proc
+﻿using System.Collections.Generic;
+
+namespace Cue.Proc
 {
 	class BuiltinExpressions
 	{
+		public static List<IProceduralMorphGroup> All(Person p)
+		{
+			var list = new List<IProceduralMorphGroup>();
+
+			list.Add(Smile(p));
+			list.Add(CornerSmile(p));
+			list.Add(Pleasure(p));
+			list.Add(EyesRollBack(p));
+			list.Add(EyesClosed(p));
+			list.Add(Swallow(p));
+			list.Add(Frown(p));
+			list.Add(Squint(p));
+			list.Add(MouthFrown(p));
+			list.Add(Drooling(p));
+			list.Add(EyesClosedTired(p));
+
+			return list;
+		}
+
+
 		public static IProceduralMorphGroup Smile(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup("smile");

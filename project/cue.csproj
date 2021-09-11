@@ -48,6 +48,7 @@
       <Aliases>global, mscorlib</Aliases>
       <HintPath>..\..\..\..\VaM_Data\Managed\mscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="SteamVR, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <HintPath>..\..\..\..\VaM_Data\Managed\System.Core.dll</HintPath>
@@ -183,6 +184,7 @@
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\UI\Controls.cs" />
+    <Compile Include="src\UI\DesktopMenu.cs" />
     <Compile Include="src\UI\Menu.cs" />
     <Compile Include="src\UI\ScriptUI\AITab.cs" />
     <Compile Include="src\UI\ScriptUI\BodyTab.cs" />
@@ -195,6 +197,7 @@
     <Compile Include="src\UI\ScriptUI\StateTab.cs" />
     <Compile Include="src\UI\ScriptUI\UnityTab.cs" />
     <Compile Include="src\UI\UI.cs" />
+    <Compile Include="src\UI\VRMenu.cs" />
     <Compile Include="src\Utilities\Duration.cs" />
     <Compile Include="src\Utilities\Easings.cs">
       <AutoGen>True</AutoGen>

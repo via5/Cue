@@ -80,8 +80,10 @@ project\src\Sys\Vam\VamObjects.cs
 project\src\Sys\Vam\VamParameter.cs
 project\src\Sys\Vam\VamSys.cs
 project\src\UI\Controls.cs
+project\src\UI\DesktopMenu.cs
 project\src\UI\Menu.cs
 project\src\UI\UI.cs
+project\src\UI\VRMenu.cs
 project\src\UI\ScriptUI\AITab.cs
 project\src\UI\ScriptUI\AnimationsTab.cs
 project\src\UI\ScriptUI\BodyTab.cs

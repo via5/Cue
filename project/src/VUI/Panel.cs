@@ -78,24 +78,27 @@ namespace VUI
 			if (MainObject == null)
 				return;
 
-			if (bgColor_.a == 0 && clickthrough_)
+			if (bgColor_.a == 0 && clickthrough_ && bgObject_ == null)
 				return;
 
-			if (bgObject_ == null)
+			if (bgColor_.a > 0 && bgObject_ == null)
 			{
 				bgObject_ = new GameObject("WidgetBackground");
 				bgObject_.transform.SetParent(MainObject.transform, false);
 				bgImage_ = bgObject_.AddComponent<Image>();
 			}
 
-			bgObject_.transform.SetAsFirstSibling();
-			bgImage_.color = bgColor_;
-			bgImage_.raycastTarget = !clickthrough_;
+			if (bgObject_ != null)
+			{
+				bgObject_.transform.SetAsFirstSibling();
+				bgImage_.color = bgColor_;
+				bgImage_.raycastTarget = !clickthrough_;
 
-			var r = new Rectangle(0, 0, Bounds.Size);
-			r.Deflate(Margins);
+				var r = new Rectangle(0, 0, Bounds.Size);
+				r.Deflate(Margins);
 
-			Utilities.SetRectTransform(bgObject_, r);
+				Utilities.SetRectTransform(bgObject_, r);
+			}
 		}
 	}
 }

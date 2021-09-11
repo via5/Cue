@@ -17,6 +17,7 @@ namespace Cue
 			tabs_.AddTab(new PersonAIPersonalityTab(person_));
 			tabs_.AddTab(new PersonAIPhysiologyTab(person_));
 			tabs_.AddTab(new PersonAIGazeTab(person_));
+			tabs_.AddTab(new PersonAIExpressionTab(person_));
 
 			Layout = new VUI.BorderLayout();
 			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
@@ -393,6 +394,52 @@ namespace Cue
 		private void OnForceLook(int s)
 		{
 			person_.Gaze.ForceLook = s;
+		}
+	}
+
+
+
+	class PersonAIExpressionTab : Tab
+	{
+		private Person person_;
+
+		private VUI.ComboBox<Proc.IProceduralMorphGroup> expressions_ =
+			new VUI.ComboBox<Proc.IProceduralMorphGroup>();
+
+		private VUI.FloatTextSlider slider_ = new VUI.FloatTextSlider(0, 0, 1);
+
+		public PersonAIExpressionTab(Person person)
+			: base("Expression")
+		{
+			person_ = person;
+			Layout = new VUI.VerticalFlow();
+
+			Add(expressions_);
+			Add(slider_);
+
+			var items = Proc.BuiltinExpressions.All(person_);
+			items.Insert(0, null);
+			expressions_.SetItems(items);
+
+			expressions_.SelectionChanged += OnExpressionChanged;
+			slider_.ValueChanged += OnSliderChanged;
+		}
+
+		private void OnSliderChanged(float s)
+		{
+			(person_.Expression as Proc.Expression).TestIntensity(s);
+			(person_.Expression as Proc.Expression).ForceChange();
+		}
+
+		private void OnExpressionChanged(Proc.IProceduralMorphGroup e)
+		{
+			(person_.Expression as Proc.Expression).TestIntensity(slider_.Value);
+			(person_.Expression as Proc.Expression).TestExpression(e);
+			(person_.Expression as Proc.Expression).ForceChange();
+		}
+
+		public override void Update(float s)
+		{
 		}
 	}
 }
