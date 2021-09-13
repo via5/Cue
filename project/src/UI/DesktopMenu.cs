@@ -24,7 +24,7 @@ namespace Cue
 			foreach (var i in UIActions.All())
 				items_.Add(i);
 
-			root_ = Cue.Instance.Sys.Create2D(10, new Size(1000, 220));
+			root_ = new VUI.Root(new VUI.OverlayRootSupport(10, 1000, 220));
 
 			var p = new VUI.Panel(new VUI.VerticalFlow(10));
 

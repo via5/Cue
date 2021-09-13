@@ -60,25 +60,6 @@ namespace VUI
 			toggle_.toggle.isOn = checked_;
 			toggle_.toggle.onValueChanged.AddListener(OnClicked);
 
-			toggle_.toggle.graphic.rectTransform.localScale = new Vector3(
-				0.75f, 0.75f, 0.75f);
-
-			var rt = toggle_.toggle.image.rectTransform;
-			rt.offsetMin = new Vector2(rt.offsetMin.x, rt.offsetMin.y - 8);
-			rt.offsetMax = new Vector2(rt.offsetMax.x - 20, rt.offsetMax.y - 28);
-			rt.anchorMin = new Vector2(0, 1);
-			rt.anchorMax = new Vector2(0, 1);
-			rt.anchoredPosition = new Vector2(
-				rt.offsetMin.x + (rt.offsetMax.x - rt.offsetMin.x) / 2,
-				rt.offsetMin.y + (rt.offsetMax.y - rt.offsetMin.y) / 2);
-
-			rt = toggle_.labelText.rectTransform;
-			rt.offsetMin = new Vector2(rt.offsetMin.x - 15, rt.offsetMin.y);
-			rt.offsetMax = new Vector2(rt.offsetMax.x - 15, rt.offsetMax.y);
-			rt.anchoredPosition = new Vector2(
-				rt.offsetMin.x + (rt.offsetMax.x - rt.offsetMin.x) / 2,
-				rt.offsetMin.y + (rt.offsetMax.y - rt.offsetMin.y) / 2);
-
 			Style.Setup(this);
 		}
 
@@ -90,13 +71,21 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return DoGetMinimumSize();
+			var s = Root.FitText(
+				Font, FontSize, text_, new Size(maxWidth, maxHeight));
+
+			s.Width += Style.Metrics.ToggleLabelSpacing + 35;
+
+			// todo: text doesn't appear without this, sounds like FitText() is
+			// off by one?
+			s.Height += 1;
+
+			return s;
 		}
 
 		protected override Size DoGetMinimumSize()
 		{
-			var w = Root.TextLength(Font, FontSize, text_);
-			return new Size(w + 20 + 40, 40);
+			return DoGetPreferredSize(DontCare, DontCare);
 		}
 
 		protected override void DoPolish()

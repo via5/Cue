@@ -20,16 +20,15 @@ namespace Cue
 
 			if (debugDesktop)
 			{
-				root_ = Cue.Instance.Sys.Create2D(
-					10, new Size(300, 350));
+				root_ = new VUI.Root(new VUI.OverlayRootSupport(10, 300, 350));
 			}
 			else
 			{
-				root_ = Cue.Instance.Sys.CreateAttached(
-					true,
-					new Vector3(0, 0.1f, 0),
-					new Point(0, 0),
-					new Size(300, 350));
+				root_ = new VUI.Root(new VUI.VRHandRootSupport(
+					VUI.VRHandRootSupport.LeftHand,
+					new UnityEngine.Vector3(0, 0.1f, 0),
+					new UnityEngine.Vector2(0, 0),
+					new UnityEngine.Vector2(300, 350)));
 			}
 
 			var ly = new VUI.VerticalFlow();
@@ -156,14 +155,14 @@ namespace Cue
 				{
 					root_.Visible = true;
 
-					var s = root_.RootSupport as Sys.Vam.VRHandRootSupport;
+					var s = root_.RootSupport as VUI.VRHandRootSupport;
 
 					if (s != null)
 					{
 						if (left_)
-							s.AttachLeft();
+							s.Attach(VUI.VRHandRootSupport.LeftHand);
 						else
-							s.AttachRight();
+							s.Attach(VUI.VRHandRootSupport.RightHand);
 					}
 				}
 				else
@@ -196,10 +195,13 @@ namespace Cue
 
 			Person p = Selected as Person;
 
-			if (p != null)
-				name_.Text = p.ID;
-			else
-				name_.Text = "";
+			if (name_ != null)
+			{
+				if (p != null)
+					name_.Text = p.ID;
+				else
+					name_.Text = "";
+			}
 
 			for (int i = 0; i < items_.Count; ++i)
 				items_[i].Person = p;

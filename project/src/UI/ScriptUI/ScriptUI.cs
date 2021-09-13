@@ -81,7 +81,7 @@ namespace Cue
 			tabs_.AddTab(misc_);
 			tabs_.AddTab(new UnityTab());
 
-			root_ = Cue.Instance.Sys.CreateScriptUI();
+			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 

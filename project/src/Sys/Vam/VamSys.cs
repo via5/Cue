@@ -253,36 +253,6 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
-		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
-		{
-			return new VUI.Root(
-				new VRTopHudRootSupport(
-					U.ToUnity(offset),
-					U.ToUnity(pos),
-					U.ToUnity(size)));
-		}
-
-		public VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size)
-		{
-			return new VUI.Root(
-				new VRHandRootSupport(
-					left,
-					U.ToUnity(offset),
-					U.ToUnity(pos),
-					U.ToUnity(size)));
-		}
-
-		public VUI.Root Create2D(float topOffset, Size size)
-		{
-			return new VUI.Root(
-				new OverlayRootSupport(topOffset, size.Width, size.Height));
-		}
-
-		public VUI.Root CreateScriptUI()
-		{
-			return new VUI.Root(CueMain.Instance.MVRScriptUI);
-		}
-
 		public IGraphic CreateBoxGraphic(string name, Box box, Color c)
 		{
 			return new VamBoxGraphic(name, box.center, box.size, c);

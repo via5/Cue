@@ -171,7 +171,6 @@
     <Compile Include="src\Sys\Vam\VamAtomNav.cs" />
     <Compile Include="src\Sys\Vam\VamBody.cs" />
     <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
-    <Compile Include="src\Sys\Vam\VamCanvas.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
     <Compile Include="src\Sys\Vam\VamFixes.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />
@@ -231,6 +230,7 @@
     <Compile Include="src\VUI\Root.cs" />
     <Compile Include="src\VUI\Slider.cs" />
     <Compile Include="src\VUI\Style.cs" />
+    <Compile Include="src\VUI\Support.cs" />
     <Compile Include="src\VUI\Tabs.cs" />
     <Compile Include="src\VUI\TextBox.cs" />
     <Compile Include="src\VUI\Timer.cs" />
@@ -238,6 +238,7 @@
     <Compile Include="src\VUI\TreeView.cs" />
     <Compile Include="src\VUI\TypedList.cs" />
     <Compile Include="src\VUI\Utilities.cs" />
+    <Compile Include="src\VUI\Version.cs" />
     <Compile Include="src\VUI\Widget.cs" />
   </ItemGroup>
   <ItemGroup>

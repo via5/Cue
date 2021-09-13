@@ -112,57 +112,6 @@ namespace VUI
 	}
 
 
-	interface IRootSupport
-	{
-		MVRScriptUI ScriptUI { get; }
-		Canvas Canvas { get; }
-		Transform RootParent { get; }
-		void Destroy();
-	}
-
-
-	class ScriptUIRootSupport : IRootSupport
-	{
-		private MVRScriptUI sui_;
-
-		public ScriptUIRootSupport(MVRScript s)
-			: this(s.UITransform.GetComponentInChildren<MVRScriptUI>())
-		{
-		}
-
-		public ScriptUIRootSupport(MVRScriptUI sui)
-		{
-			sui_ = sui;
-		}
-
-		public MVRScriptUI ScriptUI
-		{
-			get { return sui_; }
-		}
-
-		public Canvas Canvas
-		{
-			get
-			{
-				return sui_.GetComponentInChildren<Image>()?.canvas;
-			}
-		}
-
-		public Transform RootParent
-		{
-			get
-			{
-				return sui_.fullWidthUIContent;
-			}
-		}
-
-		public void Destroy()
-		{
-			// no-op
-		}
-	}
-
-
 	class Root
 	{
 		public const int FocusDefault = 0x0;
@@ -170,6 +119,7 @@ namespace VUI
 
 
 		private IRootSupport support_ = null;
+		private bool ready_ = false;
 		static private TextGenerator tg_ = new TextGenerator();
 		static private TextGenerationSettings ts_ = new TextGenerationSettings();
 
@@ -179,8 +129,6 @@ namespace VUI
 		private RootPanel floating_;
 		private Overlay overlay_ = null;
 		private readonly TooltipManager tooltips_;
-		private float topOffset_ = 0;
-		private Canvas canvas_;
 
 		private UIPopup openedPopup_ = null;
 		private Widget focused_ = null;
@@ -255,82 +203,73 @@ namespace VUI
 
 		public void AttachTo(IRootSupport support)
 		{
+			Glue.LogVerbose($"root: attaching to {support}");
+
 			support_ = support;
 
-			CheckSupportBounds();
+			if (support_.Init())
+			{
+				Glue.LogVerbose("root: support is already ready");
+				OnSupportReady();
+			}
+			else
+			{
+				Glue.LogVerbose("root: support is not ready, creating timer");
+				checkReadyTimer_ = TimerManager.Instance.CreateTimer(
+					0.5f, CheckSupportReady, Timer.Repeat);
+			}
+		}
 
-			var text = support_.RootParent.root.GetComponentInChildren<Text>();
+		private void CheckSupportReady()
+		{
+			if (support_.Init())
+			{
+				Glue.LogVerbose("root: support is finally ready");
+				checkReadyTimer_.Destroy();
+				checkReadyTimer_ = null;
+				OnSupportReady();
+				Glue.LogVerbose("root: all done");
+			}
+		}
+
+		private void OnSupportReady()
+		{
+			//if (support_.ScriptUI == null)
+			//{
+			//	var rt = support_.RootParent.GetComponent<RectTransform>();
+			//
+			//	topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
+			//
+			//	bounds_ = Rectangle.FromPoints(
+			//		0, 0, rt.rect.width, rt.rect.height);
+			//}
+
+			ready_ = true;
+
+			bounds_ = support_.Bounds;
+			Glue.LogVerbose($"root: bounds {bounds_}");
+
+			content_.SetBounds(bounds_);
+			floating_.SetBounds(bounds_);
+
+			var text = SuperController.singleton.GetComponentInChildren<Text>();
 			if (text == null)
 			{
-				Glue.LogError("no text in attach");
+				Glue.LogError($"no text component in supercontroller");
 			}
 			else
 			{
 				tg_ = text.cachedTextGenerator;
 				ts_ = text.GetGenerationSettings(new Vector2());
 			}
-		}
 
-		private void CheckSupportBounds()
-		{
-			if (support_.ScriptUI == null)
-			{
-				var rt = support_.RootParent.GetComponent<RectTransform>();
-
-				topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
-
-				bounds_ = Rectangle.FromPoints(
-					0, 0, rt.rect.width, rt.rect.height);
-			}
-			else
-			{
-				var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
-				var scrollViewRT = scrollView.GetComponent<RectTransform>();
-
-				if (scrollViewRT.rect.width <= 0 || scrollViewRT.rect.height <= 0)
-				{
-					Glue.LogVerbose("vui: scriptui not ready, starting timer");
-
-					checkReadyTimer_ = TimerManager.Instance.CreateTimer(
-						0.5f, CheckScriptUIReady, Timer.Repeat);
-				}
-
-				topOffset_ = scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
-
-				bounds_ = Rectangle.FromPoints(
-					1, 1, scrollViewRT.rect.width - 3, scrollViewRT.rect.height - 3);
-
-				Style.SetupRoot(support_.ScriptUI);
-			}
-
-			content_.SetBounds(bounds_);
-			floating_.SetBounds(bounds_);
-		}
-
-		private void CheckScriptUIReady()
-		{
-			var scrollView = support_.ScriptUI.GetComponentInChildren<ScrollRect>();
-			var scrollViewRT = scrollView.GetComponent<RectTransform>();
-
-			if (scrollViewRT.rect.width <= 0 || scrollViewRT.rect.height <= 0)
-			{
-				// still not ready
-				return;
-			}
-
-			checkReadyTimer_?.Destroy();
-			checkReadyTimer_ = null;
-
-			Glue.LogVerbose("vui: scriptui ready, relayout");
-			CheckSupportBounds();
 			Update(true);
+
+			content_.Dump();
 		}
 
 		public void Destroy()
 		{
-			if (support_.ScriptUI != null)
-				Style.RevertRoot(support_.ScriptUI);
-
 			content_?.Destroy();
 			floating_?.Destroy();
 			overlay_?.Destroy();
@@ -389,28 +328,34 @@ namespace VUI
 
 		public void Update(bool forceLayout=false)
 		{
-			if (ownTm_ != null)
+			Utilities.Handler(() =>
 			{
-				ownTm_.TickTimers(Time.deltaTime);
-				ownTm_.CheckTimers();
-			}
-
-			content_.Update(forceLayout);
-			floating_.Update(forceLayout);
-
-			var mp = MousePosition;
-
-			if (track_.Count > 0 && mp != lastMouse_)
-			{
-				for (int i = 0; i < track_.Count; ++i)
+				if (ownTm_ != null)
 				{
-					var r = track_[i].AbsoluteClientBounds;
-					if (r.Contains(mp))
-						track_[i].OnPointerMoveInternal();
+					ownTm_.TickTimers(Time.deltaTime);
+					ownTm_.CheckTimers();
 				}
-			}
 
-			lastMouse_ = mp;
+				if (ready_)
+				{
+					content_.Update(forceLayout);
+					floating_.Update(forceLayout);
+
+					var mp = MousePosition;
+
+					if (track_.Count > 0 && mp != lastMouse_)
+					{
+						for (int i = 0; i < track_.Count; ++i)
+						{
+							var r = track_[i].AbsoluteClientBounds;
+							if (r.Contains(mp))
+								track_[i].OnPointerMoveInternal();
+						}
+					}
+
+					lastMouse_ = mp;
+				}
+			});
 		}
 
 		public bool OverlayVisible
@@ -426,22 +371,7 @@ namespace VUI
 
 		public Point ToLocal(Vector2 v)
 		{
-			if (canvas_ == null)
-			{
-				canvas_ = support_.Canvas;
-				if (canvas_ == null)
-					return NoMousePos;
-			}
-
-			Vector2 pp;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(
-				canvas_.transform as RectTransform, v,
-				canvas_.worldCamera, out pp);
-
-			pp.x = bounds_.Left + bounds_.Width / 2 + pp.x;
-			pp.y = bounds_.Top + (bounds_.Height - pp.y + topOffset_);
-
-			return new Point(pp.x, pp.y);
+			return support_.ToLocal(v);
 		}
 
 		public Point MousePosition

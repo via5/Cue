@@ -334,6 +334,19 @@ namespace VUI
 			return null;
 		}
 
+		public static string ToString(RectTransform rt, int indent = 0)
+		{
+			var i = new string(' ', indent);
+
+			return
+				i + $"rect: {rt.rect}\n" +
+				i + $"offsetMin: {rt.offsetMin}\n" +
+				i + $"offsetMax: {rt.offsetMax}\n" +
+				i + $"anchorMin: {rt.anchorMin}\n" +
+				i + $"anchorMax: {rt.anchorMax}\n" +
+				i + $"anchorPos: {rt.anchoredPosition}\n";
+		}
+
 		public static void DumpComponents(GameObject o, int indent = 0)
 		{
 			foreach (var c in o.GetComponents(typeof(Component)))
@@ -356,14 +369,7 @@ namespace VUI
 
 			var rt = o.GetComponent<RectTransform>();
 			if (rt != null)
-			{
-				Glue.LogError("  rect: " + rt.rect.ToString());
-				Glue.LogError("  offsetMin: " + rt.offsetMin.ToString());
-				Glue.LogError("  offsetMax: " + rt.offsetMax.ToString());
-				Glue.LogError("  anchorMin: " + rt.anchorMin.ToString());
-				Glue.LogError("  anchorMax: " + rt.anchorMax.ToString());
-				Glue.LogError("  anchorPos: " + rt.anchoredPosition.ToString());
-			}
+				Glue.LogError(ToString(rt, 2));
 
 			DumpComponents(o);
 			Glue.LogError("---");
@@ -387,14 +393,7 @@ namespace VUI
 			{
 				var rt = o.GetComponent<RectTransform>();
 				if (rt != null)
-				{
-					Glue.LogError(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
-					Glue.LogError(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
-					Glue.LogError(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
-					Glue.LogError(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
-					Glue.LogError(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
-					Glue.LogError(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
-				}
+					Glue.LogError(ToString(rt, indent * 2));
 			}
 
 			DumpComponents(o, indent);

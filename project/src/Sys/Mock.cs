@@ -204,26 +204,6 @@ namespace Cue.Sys.Mock
 			return null;
 		}
 
-		public VUI.Root CreateHud(Vector3 offset, Point pos, Size size)
-		{
-			return null;
-		}
-
-		public VUI.Root CreateAttached(bool left, Vector3 offset, Point pos, Size size)
-		{
-			return null;
-		}
-
-		public VUI.Root Create2D(float topOffset, Size size)
-		{
-			return null;
-		}
-
-		public VUI.Root CreateScriptUI()
-		{
-			return null;
-		}
-
 		public IGraphic CreateBoxGraphic(string name, Box box, Color c)
 		{
 			return CreateBoxGraphic(name, box.center, box.size, c);
