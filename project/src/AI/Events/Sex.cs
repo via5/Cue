@@ -94,14 +94,16 @@
 
 				case TentativePenetration:
 				{
-					if (person_.Body.Penetrated())
+					var p = person_.Body.PenetratedBy();
+
+					if (p != null)
 					{
 						elapsedTentative_ += s;
 
 						if (elapsedTentative_ > 1)
 						{
 							penetration_ = Penetrated;
-							OnIn();
+							OnIn(p);
 						}
 					}
 					else
@@ -126,7 +128,7 @@
 			}
 		}
 
-		private void OnIn()
+		private void OnIn(Person by)
 		{
 			Cue.LogError("in");
 

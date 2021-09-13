@@ -105,6 +105,7 @@ namespace Cue
 		{
 			min_ = min;
 			max_ = max;
+			SetWindow();
 		}
 
 		public void SetNext(Vector3 v)

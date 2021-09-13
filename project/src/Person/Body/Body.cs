@@ -103,6 +103,17 @@ namespace Cue
 			return false;
 		}
 
+		public Person PenetratedBy()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (PenetratedBy(p))
+					return p;
+			}
+
+			return null;
+		}
+
 		public bool Penetrated()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)

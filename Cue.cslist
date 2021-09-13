@@ -68,7 +68,6 @@ project\src\Sys\Vam\VamAtomNav.cs
 project\src\Sys\Vam\VamBody.cs
 project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
-project\src\Sys\Vam\VamCanvas.cs
 project\src\Sys\Vam\VamFixes.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamHair.cs
@@ -118,6 +117,7 @@ project\src\VUI\Panel.cs
 project\src\VUI\Root.cs
 project\src\VUI\Slider.cs
 project\src\VUI\Style.cs
+project\src\VUI\Support.cs
 project\src\VUI\Tabs.cs
 project\src\VUI\TextBox.cs
 project\src\VUI\Timer.cs
@@ -125,4 +125,5 @@ project\src\VUI\Tooltip.cs
 project\src\VUI\TreeView.cs
 project\src\VUI\TypedList.cs
 project\src\VUI\Utilities.cs
+project\src\VUI\Version.cs
 project\src\VUI\Widget.cs
