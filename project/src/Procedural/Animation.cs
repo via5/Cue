@@ -82,6 +82,7 @@ namespace Cue.Proc
 		protected virtual void CopyFrom(ProcAnimation o)
 		{
 			root_ = (ConcurrentTargetGroup)o.root_.Clone();
+			receiver_ = o.receiver_;
 		}
 
 		public virtual bool Done

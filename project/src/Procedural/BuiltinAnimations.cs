@@ -191,12 +191,6 @@ namespace Cue.Proc
 			return a;
 		}
 
-		protected override void CopyFrom(ProcAnimation o)
-		{
-			base.CopyFrom(o);
-			receiver_ = (o as SexProcAnimation).receiver_;
-		}
-
 		public override void Start(Person p)
 		{
 			base.Start(p);
@@ -235,6 +229,12 @@ namespace Cue.Proc
 		//
 		private Vector3 GetDirection()
 		{
+			if (receiver_ == null)
+			{
+				var rot = person_.Body.Get(BP.Hips).Rotation;
+				return rot.Rotate(new Vector3(0, 0, 1)).Normalized;
+			}
+
 			var thisBP = person_.Body.Get(person_.Body.GenitalsBodyPart);
 			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 
@@ -269,6 +269,9 @@ namespace Cue.Proc
 		//
 		private float GetForceFactor()
 		{
+			if (receiver_ == null)
+				return 0.7f;
+
 			var thisBP = person_.Body.Get(person_.Body.GenitalsBodyPart);
 			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 
@@ -304,6 +307,8 @@ namespace Cue.Proc
 			var fmax = hipForceMax_ * p;
 
 			var dir = GetDirection();
+
+			Cue.LogError($"{p} {dir}");
 
 			f.Movement.SetRange(dir * fmin, dir * fmax);
 		}

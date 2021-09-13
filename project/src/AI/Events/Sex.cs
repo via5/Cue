@@ -39,21 +39,20 @@
 		{
 			if (active_)
 			{
-				if (receiver_ == null)
+				if (!running_)
 				{
 					receiver_ = FindReceiver();
-					if (receiver_ == null)
-					{
-						person_.Log.Error($"cannot start sex, no valid receiver");
-						active_ = false;
-						return;
-					}
 
-					log_.Info($"starting sex, receiver={receiver_.ID}");
+					if (receiver_ == null)
+						person_.Log.Info($"no valid receiver");
+					else
+						log_.Info($"starting sex, receiver={receiver_.ID}");
 
 					person_.Clothing.GenitalsVisible = true;
-					receiver_.Clothing.GenitalsVisible = true;
 					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
+
+					if (receiver_ != null)
+						receiver_.Clothing.GenitalsVisible = true;
 
 					if (person_.Animator.CanPlayType(Animation.SexType) && person_.Mood.State == Mood.NormalState)
 						person_.Animator.PlaySex(person_.State.Current, receiver_);
