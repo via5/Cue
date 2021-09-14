@@ -9,6 +9,11 @@
 			m_ = m;
 		}
 
+		public Morph(Person p, string id)
+			: this(p.Atom.GetMorph(id))
+		{
+		}
+
 		public string Name
 		{
 			get { return m_?.Name ?? "?"; }

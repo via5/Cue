@@ -54,6 +54,11 @@ namespace Cue
 			above_ = new LookatAbove(p);
 		}
 
+		public IGazeLookat LookatAbove
+		{
+			get { return above_; }
+		}
+
 		public void Init()
 		{
 			bodyParts_ = new LookatPart[

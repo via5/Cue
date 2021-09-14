@@ -31,7 +31,8 @@
 		private RandomTargetGeneratorRenderer render_ = null;
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
-		private int currentTarget_ = -1;
+		private IGazeLookat currentTarget_ = null;
+		private IGazeLookat forcedTarget_ = null;
 		private bool emergency_ = false;
 		private string lastString_ = "";
 		private string avoidString_ = "";
@@ -103,14 +104,20 @@
 			get { return avoidBoxes_; }
 		}
 
-		public bool HasTarget
-		{
-			get { return currentTarget_ >= 0 && currentTarget_ < targets_.Length; }
-		}
-
 		public IGazeLookat CurrentTarget
 		{
-			get { return HasTarget ? targets_[currentTarget_] : null; }
+			get { return forcedTarget_ ?? currentTarget_; }
+		}
+
+		public IGazeLookat ForcedTarget
+		{
+			get { return forcedTarget_; }
+			set { forcedTarget_ = value; }
+		}
+
+		public bool HasTarget
+		{
+			get { return (CurrentTarget != null); }
 		}
 
 		public float TimeBeforeNext
@@ -131,13 +138,7 @@
 
 		public Vector3 Position
 		{
-			get
-			{
-				if (HasTarget)
-					return targets_[currentTarget_].Position;
-				else
-					return Vector3.Zero;
-			}
+			get { return CurrentTarget?.Position ?? Vector3.Zero; }
 		}
 
 		public void SetTargets(IGazeLookat[] t)
@@ -183,7 +184,7 @@
 			}
 			else if (HasTarget)
 			{
-				if (!CanLookAtPoint(targets_[currentTarget_].Position))
+				if (!CanLookAtPoint(CurrentTarget.Position))
 				{
 					// can't look at the current point anymore, must pick a new
 					// target
@@ -235,7 +236,7 @@
 		public override string ToString()
 		{
 			if (HasTarget)
-				return $"j={currentTarget_} {targets_[currentTarget_]}";
+				return $"t={CurrentTarget}";
 			else
 				return "no target";
 		}
@@ -275,7 +276,7 @@
 							{
 								lastString_ += $" target=#{j}";
 								log_.Verbose($"picked {targets_[j]}");
-								currentTarget_ = j;
+								currentTarget_ = targets_[j];
 								return;
 							}
 							else

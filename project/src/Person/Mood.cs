@@ -193,7 +193,7 @@ namespace Cue
 
 					if (elapsed_ >= pp.Get(PE.OrgasmTime))
 					{
-						person_.Animator.StopType(Animation.OrgasmType);
+						person_.Animator.StopType(Animations.Orgasm);
 						tiredness_.UpRate = pp.Get(PE.TirednessRateDuringPostOrgasm);
 						tiredness_.Target = 1;
 
@@ -311,7 +311,7 @@ namespace Cue
 		{
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
-			person_.Animator.PlayType(Animation.OrgasmType);
+			person_.Animator.PlayType(Animations.Orgasm);
 			flatExcitement_.Value = 1;
 			person_.Expression.ForceChange();
 			SetState(OrgasmState);

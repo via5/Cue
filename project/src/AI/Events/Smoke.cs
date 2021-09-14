@@ -23,8 +23,8 @@
 
 			if (CanRun())
 			{
-				if (person_.Animator.CanPlayType(Animation.SmokeType))
-					person_.Animator.PlayType(Animation.SmokeType);
+				if (person_.Animator.CanPlayType(Animations.Smoke))
+					person_.Animator.PlayType(Animations.Smoke);
 			}
 		}
 

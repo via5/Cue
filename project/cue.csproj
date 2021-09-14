@@ -108,6 +108,11 @@
     <Compile Include="src\Commands\Sitting.cs" />
     <Compile Include="src\Commands\Standing.cs" />
     <Compile Include="src\Cue.cs" />
+    <Compile Include="src\Enums\Animations.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Animations.tt</DependentUpon>
+    </Compile>
     <Compile Include="src\Enums\BodyPartsEnum.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -243,6 +248,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\Enums\Enums.tt" />
+    <Content Include="src\Enums\Animations.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Animations.cs</LastGenOutput>
+    </Content>
     <Content Include="src\Enums\BodyPartsEnum.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BodyPartsEnum.cs</LastGenOutput>

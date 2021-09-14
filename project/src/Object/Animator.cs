@@ -4,18 +4,7 @@ namespace Cue
 {
 	class Animation
 	{
-		public const int NoType = 0;
-		public const int WalkType = 1;
-		public const int TurnLeftType = 2;
-		public const int TurnRightType = 3;
-		public const int TransitionType = 4;
-		public const int SexType = 5;
-		public const int IdleType = 6;
-		public const int OrgasmType = 7;
-		public const int SmokeType = 8;
-		public const int SuckType = 9;
-
-		private readonly int type_ = NoType;
+		private readonly int type_ = Animations.None;
 		private readonly int from_ = PersonState.None;
 		private readonly int to_ = PersonState.None;
 		private readonly int state_ = PersonState.None;
@@ -54,11 +43,11 @@ namespace Cue
 
 		public override string ToString()
 		{
-			string s = TypeToString(type_) + " ";
+			string s = Animations.ToString(type_) + " ";
 
 			switch (type_)
 			{
-				case TransitionType:
+				case Animations.Transition:
 				{
 					s +=
 						PersonState.StateToString(from_) + "->" +
@@ -67,8 +56,8 @@ namespace Cue
 					break;
 				}
 
-				case SexType:
-				case IdleType:
+				case Animations.Sex:
+				case Animations.Idle:
 				{
 					s += PersonState.StateToString(state_) + " ";
 					break;
@@ -83,51 +72,6 @@ namespace Cue
 			s += "ms=" + MovementStyles.ToString(style_) + " " + anim_.ToString();
 
 			return s;
-		}
-
-		public static int TypeFromString(string os)
-		{
-			string s = os.ToLower();
-
-			if (s == "walk")
-				return WalkType;
-			else if (s == "turnleft")
-				return TurnLeftType;
-			else if (s == "turnright")
-				return TurnRightType;
-			else if (s == "transition")
-				return TransitionType;
-			else if (s == "sex")
-				return SexType;
-			else if (s == "idle")
-				return IdleType;
-			else if (s == "orgasm")
-				return OrgasmType;
-			else if (s == "smoke")
-				return SmokeType;
-			else if (s == "suck")
-				return SuckType;
-
-			Cue.LogError($"unknown anim type '{os}'");
-			return NoType;
-		}
-
-		public static string TypeToString(int t)
-		{
-			switch (t)
-			{
-				case NoType: return "none";
-				case WalkType: return "walk";
-				case TurnLeftType: return "turnLeft";
-				case TurnRightType: return "turnRight";
-				case TransitionType: return "transition";
-				case SexType: return "sex";
-				case IdleType: return "idle";
-				case OrgasmType: return "orgasm";
-				case SmokeType: return "smoke";
-				case SuckType: return "suck";
-				default: return $"?{t}";
-			}
 		}
 	}
 
@@ -165,7 +109,7 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (a.Type == Animation.TransitionType)
+				if (a.Type == Animations.Transition)
 				{
 					if (a.TransitionTo == state)
 						return true;
@@ -181,7 +125,7 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (a.Type == Animation.TransitionType)
+				if (a.Type == Animations.Transition)
 					return true;
 			}
 
@@ -235,7 +179,7 @@ namespace Cue
 			}
 
 			// todo
-			var pa = a.Real as Proc.ProcAnimation;
+			var pa = a.Real as Proc.BasicProcAnimation;
 			if (pa != null)
 				pa.Receiver = receiver;
 
@@ -247,7 +191,7 @@ namespace Cue
 			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
 			{
-				log_.Error($"no animation for type {Animation.TypeToString(type)}");
+				log_.Error($"no animation for type {Animations.ToString(type)}");
 				return false;
 			}
 
@@ -267,7 +211,7 @@ namespace Cue
 
 		public bool CanPlay(Animation a, int flags = 0, bool silent = true)
 		{
-			if (a.Type == Animation.TransitionType)
+			if (a.Type == Animations.Transition)
 			{
 				if (IsPlayingTransition())
 					return false;

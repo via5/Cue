@@ -54,7 +54,7 @@
 					if (receiver_ != null)
 						receiver_.Clothing.GenitalsVisible = true;
 
-					if (person_.Animator.CanPlayType(Animation.SexType) && person_.Mood.State == Mood.NormalState)
+					if (person_.Animator.CanPlayType(Animations.Sex) && person_.Mood.State == Mood.NormalState)
 						person_.Animator.PlaySex(person_.State.Current, receiver_);
 
 					running_ = true;
@@ -64,7 +64,7 @@
 			{
 				if (running_)
 				{
-					person_.Animator.StopType(Animation.SexType);
+					person_.Animator.StopType(Animations.Sex);
 					running_ = false;
 					receiver_ = null;
 				}
@@ -81,7 +81,7 @@
 					{
 						penetration_ = TentativePenetration;
 						elapsedTentative_ = 0;
-						Cue.LogError("tentative in");
+						Cue.LogVerbose("tentative in");
 					}
 					else
 					{
@@ -107,7 +107,7 @@
 					}
 					else
 					{
-						Cue.LogError("tentative out");
+						Cue.LogVerbose("tentative out");
 						penetration_ = NotPenetrated;
 					}
 
@@ -129,18 +129,19 @@
 
 		private void OnIn(Person by)
 		{
-			Cue.LogError("in");
+			Cue.LogVerbose("in");
 
-			if (elapsedNotPenetrated_ > 10)
+			//if (elapsedNotPenetrated_ > 10)
 			{
 				elapsedNotPenetrated_ = 0;
+				person_.Animator.PlayType(Animations.Penetrated);
 				Cue.LogError("emote");
 			}
 		}
 
 		private void OnOut()
 		{
-			Cue.LogError("out");
+			Cue.LogVerbose("out");
 		}
 
 		private Person FindReceiver()

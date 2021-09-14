@@ -52,9 +52,9 @@ namespace Cue.Proc
 	{
 		class Playing
 		{
-			public ProcAnimation proto, anim;
+			public BasicProcAnimation proto, anim;
 
-			public Playing(ProcAnimation proto, ProcAnimation anim)
+			public Playing(BasicProcAnimation proto, BasicProcAnimation anim)
 			{
 				this.proto = proto;
 				this.anim = anim;
@@ -71,7 +71,7 @@ namespace Cue.Proc
 			log_ = new Logger(Logger.Animation, person_, "ProcPlayer");
 		}
 
-		private ProcAnimation Find(IAnimation a)
+		private BasicProcAnimation Find(IAnimation a)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
@@ -109,7 +109,7 @@ namespace Cue.Proc
 
 		public bool Play(IAnimation a, int flags)
 		{
-			var proto = (a as ProcAnimation);
+			var proto = (a as BasicProcAnimation);
 			if (proto == null)
 				return false;
 

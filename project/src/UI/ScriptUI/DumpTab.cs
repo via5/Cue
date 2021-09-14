@@ -83,7 +83,7 @@ namespace Cue
 			{
 				foreach (var a in pl.GetPlaying())
 				{
-					var p = a as Proc.ProcAnimation;
+					var p = a as Proc.BasicProcAnimation;
 					if (p == null)
 						continue;
 

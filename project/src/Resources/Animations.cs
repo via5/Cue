@@ -67,8 +67,8 @@ namespace Cue
 				return null;
 			}
 
-			int type = Animation.TypeFromString(o["animation"]);
-			if (type == Animation.NoType)
+			int type = Animations.FromString(o["animation"]);
+			if (type == Animations.None)
 				return null;
 
 			int from = PersonState.None;
@@ -77,14 +77,7 @@ namespace Cue
 
 			switch (type)
 			{
-				case Animation.WalkType:
-				case Animation.TurnLeftType:
-				case Animation.TurnRightType:
-				{
-					break;
-				}
-
-				case Animation.TransitionType:
+				case Animations.Transition:
 				{
 					if (!o.HasKey("from"))
 					{
@@ -104,8 +97,8 @@ namespace Cue
 					break;
 				}
 
-				case Animation.SexType:
-				case Animation.IdleType:
+				case Animations.Sex:
+				case Animations.Idle:
 				{
 					if (!o.HasKey("state"))
 					{
@@ -185,7 +178,7 @@ namespace Cue
 
 		public List<Animation> GetAll(int type, int style)
 		{
-			if (type == Animation.NoType)
+			if (type == Animations.None)
 				return anims_;
 
 			var list = new List<Animation>();
@@ -208,7 +201,7 @@ namespace Cue
 
 			for (int i = 0; i < anims_.Count; ++i)
 			{
-				if (anims_[i].Type == Animation.IdleType)
+				if (anims_[i].Type == Animations.Idle)
 				{
 					if (anims_[i].State == state)
 					{
@@ -225,7 +218,7 @@ namespace Cue
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
-				if (anims_[i].Type == Animation.TransitionType)
+				if (anims_[i].Type == Animations.Transition)
 				{
 					if (anims_[i].TransitionFrom == from &&
 						anims_[i].TransitionTo == to)
@@ -243,7 +236,7 @@ namespace Cue
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
-				if (anims_[i].Type == Animation.SexType)
+				if (anims_[i].Type == Animations.Sex)
 				{
 					if (anims_[i].State == state || anims_[i].State == PersonState.None)
 					{

@@ -520,7 +520,7 @@ namespace Cue
 						|| !animator_.IsPlayingTransition())
 					{
 						animator_.PlayType(
-							Animation.WalkType,
+							Animations.Walk,
 							Animator.Loop | Animator.Exclusive);
 					}
 
@@ -534,7 +534,7 @@ namespace Cue
 						if (CanMove)
 						{
 							animator_.PlayType(
-								Animation.TurnLeftType, Animator.Exclusive);
+								Animations.TurnLeft, Animator.Exclusive);
 						}
 					}
 
@@ -548,7 +548,7 @@ namespace Cue
 						if (CanMove)
 						{
 							animator_.PlayType(
-								Animation.TurnRightType, Animator.Exclusive);
+								Animations.TurnRight, Animator.Exclusive);
 						}
 					}
 

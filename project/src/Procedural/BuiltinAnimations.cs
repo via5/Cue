@@ -14,6 +14,7 @@ namespace Cue.Proc
 			list.Add(Sex());
 			list.Add(Smoke());
 			list.Add(Suck());
+			list.Add(Penetrated());
 
 			return list;
 		}
@@ -33,7 +34,7 @@ namespace Cue.Proc
 			a.AddTarget(new Controller("rFootControl", new Vector3(0.1f, 0, -0.1f), new Vector3(20, 10, 0), s.Clone()));
 
 			return new Animation(
-				Animation.TransitionType,
+				Animations.Transition,
 				from, PersonState.Standing,
 				PersonState.None, MovementStyles.Any, a);
 		}
@@ -43,7 +44,7 @@ namespace Cue.Proc
 			var a = new SexProcAnimation();
 
 			return new Animation(
-				Animation.SexType,
+				Animations.Sex,
 				PersonState.None, PersonState.None,
 				PersonState.None, MovementStyles.Any, a);
 		}
@@ -53,7 +54,7 @@ namespace Cue.Proc
 			var a = new SmokeProcAnimation();
 
 			return new Animation(
-				Animation.SmokeType,
+				Animations.Smoke,
 				PersonState.None, PersonState.None,
 				PersonState.None, MovementStyles.Any, a);
 		}
@@ -63,14 +64,85 @@ namespace Cue.Proc
 			var a = new SuckProcAnimation();
 
 			return new Animation(
-				Animation.SuckType,
+				Animations.Suck,
+				PersonState.None, PersonState.None,
+				PersonState.None, MovementStyles.Any, a);
+		}
+
+		private static Animation Penetrated()
+		{
+			var a = new PenetratedAnimation();
+
+			return new Animation(
+				Animations.Penetrated,
 				PersonState.None, PersonState.None,
 				PersonState.None, MovementStyles.Any, a);
 		}
 	}
 
 
-	class SuckProcAnimation : ProcAnimation
+	class PenetratedAnimation : BasicProcAnimation
+	{
+		private const float Time = 2;
+
+		private float elapsed_ = 0;
+		private Morph morph_ = null;
+
+		public PenetratedAnimation()
+			: base("procPenetrated", false)
+		{
+		}
+
+		public override BasicProcAnimation Clone()
+		{
+			var a = new PenetratedAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		public override bool Done
+		{
+			get { return (elapsed_ >= Time); }
+		}
+
+		public override void Start(Person p)
+		{
+			base.Start(p);
+			elapsed_ = 0;
+			morph_ = new Morph(person_, "Smile Open Full Face");
+
+			person_.Gaze.Picker.ForcedTarget = person_.Gaze.Targets.LookatAbove;
+		}
+
+		public override void Reset()
+		{
+			base.Reset();
+			elapsed_ = 0;
+		}
+
+		public override void FixedUpdate(float s)
+		{
+			elapsed_ += s;
+
+			if (elapsed_ < Time)
+			{
+				var p = elapsed_ / Time;
+
+				person_.Body.Get(BP.RightHand).AddRelativeForce(
+					new Vector3(0, 200, 0) * p);
+
+				morph_.Value = p;
+			}
+			else
+			{
+				morph_.Reset();
+				person_.Gaze.Picker.ForcedTarget = null;
+			}
+		}
+	}
+
+
+	class SuckProcAnimation : BasicProcAnimation
 	{
 		private float durationMin_ = 0.8f;
 		private float durationMax_ = 1.5f;
@@ -100,10 +172,17 @@ namespace Cue.Proc
 
 			AddTarget(g);
 		}
+
+		public override BasicProcAnimation Clone()
+		{
+			var a = new SuckProcAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
 	}
 
 
-	class SexProcAnimation : ProcAnimation
+	class SexProcAnimation : BasicProcAnimation
 	{
 		private const float DirectionChangeMaxDistance = 0.05f;
 		private const float ForceFarDistance = 0.07f;
@@ -184,7 +263,7 @@ namespace Cue.Proc
 			AddTarget(g);
 		}
 
-		public override ProcAnimation Clone()
+		public override BasicProcAnimation Clone()
 		{
 			var a = new SexProcAnimation();
 			a.CopyFrom(this);
@@ -338,7 +417,7 @@ namespace Cue.Proc
 	}
 
 
-	class SmokeProcAnimation : ProcAnimation
+	class SmokeProcAnimation : BasicProcAnimation
 	{
 		struct Render
 		{
@@ -410,7 +489,7 @@ namespace Cue.Proc
 		{
 		}
 
-		public override ProcAnimation Clone()
+		public override BasicProcAnimation Clone()
 		{
 			var a = new SmokeProcAnimation();
 			a.CopyFrom(this);

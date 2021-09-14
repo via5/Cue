@@ -44,7 +44,7 @@ namespace Cue
 			Add(anims_, VUI.BorderLayout.Center);
 
 			var items = new List<Animation>();
-			foreach (var a in Resources.Animations.GetAll(Animation.NoType, person_.MovementStyle))
+			foreach (var a in Resources.Animations.GetAll(Animations.None, person_.MovementStyle))
 				items.Add(a);
 
 			anims_.SetItems(items);

@@ -75,6 +75,17 @@ namespace Cue
 			get { return picker_; }
 		}
 
+		public IGazeEvent GetEvent<T>() where T : IGazeEvent
+		{
+			for (int i = 0; i < events_.Length; ++i)
+			{
+				if (events_[i] is T)
+					return events_[i];
+			}
+
+			return null;
+		}
+
 		public bool IsEmergency
 		{
 			get { return lastEmergency_ != -1; }
@@ -253,7 +264,7 @@ namespace Cue
 				lastString_ += "busy ";
 
 			if (lastString_ == "")
-				lastString_ = "no flags";
+				lastString_ = "no flags ";
 		}
 
 		public bool ShouldAvoidPlayer()
