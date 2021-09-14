@@ -427,15 +427,10 @@ namespace Cue
 
 		private void OnSliderChanged(float s)
 		{
-			(person_.Expression as Proc.Expression).TestIntensity(s);
-			(person_.Expression as Proc.Expression).ForceChange();
 		}
 
 		private void OnExpressionChanged(Proc.IProceduralMorphGroup e)
 		{
-			(person_.Expression as Proc.Expression).TestIntensity(slider_.Value);
-			(person_.Expression as Proc.Expression).TestExpression(e);
-			(person_.Expression as Proc.Expression).ForceChange();
 		}
 
 		public override void Update(float s)

@@ -15,6 +15,9 @@
 
 		struct Parameters
 		{
+			public Sys.Vam.BoolParameter breathingEnabled_;
+			public Sys.Vam.BoolParameter driverEnabled_;
+
 			public Sys.Vam.StringChooserParameter breathDataset_;
 			public Sys.Vam.FloatParameter intensity;
 			public Sys.Vam.FloatParameter desktopVolume;
@@ -34,6 +37,12 @@
 		public MacGruberBreather(Person p)
 		{
 			person_ = p;
+
+			p_.breathingEnabled_ = new Sys.Vam.BoolParameter(
+				p, "MacGruber.Breathing", "enabled");
+
+			p_.driverEnabled_ = new Sys.Vam.BoolParameter(
+				p, "MacGruber.DriverBreathing", "enabled");
 
 			p_.breathDataset_ = BSC("Breath Dataset");
 			p_.intensity = BF("Intensity");
@@ -87,6 +96,20 @@
 		{
 			return new Sys.Vam.FloatParameter(
 				person_, "MacGruber.AudioAttenuation", name);
+		}
+
+		public bool Enabled
+		{
+			get
+			{
+				return p_.breathingEnabled_.Value;
+			}
+
+			set
+			{
+				p_.breathingEnabled_.Value = value;
+				p_.driverEnabled_.Value = value;
+			}
 		}
 
 		public float Intensity

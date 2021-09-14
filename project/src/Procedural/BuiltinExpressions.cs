@@ -41,13 +41,35 @@ namespace Cue.Proc
 		public static IProceduralMorphGroup Pleasure(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup("pleasure");
-
 			g.Add(new MorphTarget(p, BP.Mouth, "07-Extreme Pleasure", 0, 1, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.Mouth, "Pain", 0, 0.5f, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.Mouth, "Shock", 0, 1, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.Mouth, "Scream", 0, 1, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.Mouth, "Angry", 0, 0.3f, 1, 5, 2, 2));
+			return g;
+		}
 
+		public static IProceduralMorphGroup Pain(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup("pain");
+			g.Add(new MorphTarget(p, BP.Mouth, "Pain", 0, 0.5f, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Shock(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup("shock");
+			g.Add(new MorphTarget(p, BP.Mouth, "Shock", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Scream(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup("scream");
+			g.Add(new MorphTarget(p, BP.Mouth, "Scream", 0, 1, 1, 5, 2, 2));
+			return g;
+		}
+
+		public static IProceduralMorphGroup Angry(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup("angry");
+			g.Add(new MorphTarget(p, BP.Mouth, "Angry", 0, 0.3f, 1, 5, 2, 2));
 			return g;
 		}
 

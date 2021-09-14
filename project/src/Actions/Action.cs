@@ -454,7 +454,7 @@ namespace Cue
 			{
 				if (playing_ != null)
 				{
-					if (!p.Animator.IsPlaying(playing_) && p.Animator.CanPlayType(Animation.IdleType))
+					if (!p.Animator.IsPlaying(playing_) && p.Animator.CanPlayType(Animations.Idle))
 					{
 						//p.Animator.PlayNeutral();
 						playing_ = null;
@@ -476,7 +476,7 @@ namespace Cue
 
 		private void PlayNext(Person p)
 		{
-			if (p.Animator.CanPlayType(Animation.IdleType))
+			if (p.Animator.CanPlayType(Animations.Idle))
 			{
 				if (p.Animator.CanPlay(anims_[i_]))
 				{

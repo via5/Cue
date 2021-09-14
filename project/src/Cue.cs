@@ -460,10 +460,10 @@ namespace Cue
 					everythingActive_[i].SetPaused(Sys.Paused);
 			}
 
+			CheckPossess(s);
+
 			if (!Sys.Paused)
 			{
-				CheckPossess(s);
-
 				for (int i = 0; i < everythingActive_.Count; ++i)
 					everythingActive_[i].Update(s);
 			}

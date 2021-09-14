@@ -83,10 +83,8 @@ namespace Cue.Proc
 
 	class PenetratedAnimation : BasicProcAnimation
 	{
-		private const float Time = 2;
-
+		private const float Time = 20;
 		private float elapsed_ = 0;
-		private Morph morph_ = null;
 
 		public PenetratedAnimation()
 			: base("procPenetrated", false)
@@ -109,9 +107,21 @@ namespace Cue.Proc
 		{
 			base.Start(p);
 			elapsed_ = 0;
-			morph_ = new Morph(person_, "Smile Open Full Face");
 
-			person_.Gaze.Picker.ForcedTarget = person_.Gaze.Targets.LookatAbove;
+			foreach (var e in (person_.Expression as Proc.Expression).All)
+			{
+				foreach (var g in e.Groups)
+				{
+					if (e.Type == Expressions.Pleasure && g.Name == "pleasure")
+					{
+						g.Force(MorphTarget.ForceToRangePercent, 70, 1);
+					}
+					else
+					{
+						g.Force(MorphTarget.ForceToZero, 7, 1);
+					}
+				}
+			}
 		}
 
 		public override void Reset()
@@ -129,14 +139,19 @@ namespace Cue.Proc
 				var p = elapsed_ / Time;
 
 				person_.Body.Get(BP.RightHand).AddRelativeForce(
-					new Vector3(0, 200, 0) * p);
-
-				morph_.Value = p;
+					new Vector3(0, 500, 0) * p);
 			}
 			else
 			{
-				morph_.Reset();
 				person_.Gaze.Picker.ForcedTarget = null;
+
+				foreach (var e in (person_.Expression as Proc.Expression).All)
+				{
+					foreach (var g in e.Groups)
+					{
+						g.Force(MorphTarget.NoForceTarget, 0, 0);
+					}
+				}
 			}
 		}
 	}

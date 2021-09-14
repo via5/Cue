@@ -9,8 +9,10 @@ namespace Cue.Proc
 
 		void Reset();
 		void FixedUpdate(float s, float intensity);
-		void ForceChange();
 		void Set(float[] remaining);
+
+		void ForceChange();
+		void Force(int type, float speed, float rangePercent);
 	}
 
 
@@ -46,6 +48,8 @@ namespace Cue.Proc
 
 		public abstract void FixedUpdate(float s, float intensity);
 		public abstract void ForceChange();
+		public abstract void Force(int type, float speed, float rangePercent);
+
 		public abstract void Set(float[] remaining);
 	}
 
@@ -55,6 +59,12 @@ namespace Cue.Proc
 		public ConcurrentProceduralMorphGroup(string name)
 			: base(name)
 		{
+		}
+
+		public override void Force(int type, float speed, float rangePercent)
+		{
+			for (int i = 0; i < morphs_.Count; ++i)
+				morphs_[i].Force(type, speed, rangePercent);
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -144,6 +154,14 @@ namespace Cue.Proc
 			base.Reset();
 			i_ = 0;
 			state_ = ActiveState;
+		}
+
+		public override void Force(int type, float speed, float rangePercent)
+		{
+			if (morphs_.Count == 0)
+				return;
+
+			morphs_[i_].Force(type, speed, rangePercent);
 		}
 
 		public override void FixedUpdate(float s, float intensity)
