@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class Morph
 	{
@@ -36,6 +38,15 @@
 		public float DefaultValue
 		{
 			get { return m_?.DefaultValue ?? 0; }
+		}
+
+		public bool LimiterEnabled
+		{
+			set
+			{
+				if (m_ != null)
+					m_.LimiterEnabled = value;
+			}
 		}
 
 		public void Reset()

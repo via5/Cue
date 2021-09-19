@@ -132,7 +132,7 @@ namespace Cue.Sys.Vam
 				if (MorphInfo.SetFromCue || SuperController.singleton.freezeAnimation)
 					old(f);
 				else
-					mi.Set(f);
+					mi.SetFromHijacker(f);
 			}
 		}
 	}
@@ -140,6 +140,9 @@ namespace Cue.Sys.Vam
 
 	class MorphInfo
 	{
+		// per second
+		public const float MaxChangeSpeed = 1.5f;
+
 		private VamAtom atom_;
 		private string id_;
 		private DAZMorph m_;
@@ -150,6 +153,7 @@ namespace Cue.Sys.Vam
 		private int lastSetFrame_ = -1;
 		private float morphValueOnLastSet_ = -1;
 		private float targetOnLastSet_ = -1;
+		private bool limiterEnabled_ = true;
 
 		private static bool setFromCue_ = false;
 
@@ -193,6 +197,11 @@ namespace Cue.Sys.Vam
 			get { return m_?.startValue ?? 0; }
 		}
 
+		public bool LimiterEnabled
+		{
+			set { limiterEnabled_ = value; }
+		}
+
 		public void AddToMap(Dictionary<string, MorphInfo> map)
 		{
 			if (m_ == null)
@@ -229,17 +238,34 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public void SetFromHijacker(float f)
+		{
+			float maxDelta = UnityEngine.Time.fixedDeltaTime * MaxChangeSpeed;
+			DoSet(f, maxDelta);
+		}
+
 		public void Set(float f)
+		{
+			float maxDelta;
+
+			if (limiterEnabled_)
+				maxDelta = UnityEngine.Time.fixedDeltaTime * MaxChangeSpeed;
+			else
+				maxDelta = 10000;
+
+			DoSet(f, maxDelta);
+		}
+
+		public void DoSet(float f, float maxDelta)
 		{
 			if (m_ == null)
 				return;
 
 			if (subMorphs_.Count > 0)
 			{
-				SetSubMorphs(f);
+				SetSubMorphs(f, maxDelta);
 				return;
 			}
-
 
 			bool doSet;
 
@@ -261,9 +287,9 @@ namespace Cue.Sys.Vam
 				targetOnLastSet_ = f;
 
 				if (f > morphValueOnLastSet_)
-					SetMorphValue(Math.Min(morphValueOnLastSet_ + 0.02f, f));
+					SetMorphValue(Math.Min(morphValueOnLastSet_ + maxDelta, f));
 				else
-					SetMorphValue(Math.Max(morphValueOnLastSet_ - 0.02f, f));
+					SetMorphValue(Math.Max(morphValueOnLastSet_ - maxDelta, f));
 
 				lastSetFrame_ = Cue.Instance.Frame;
 			}
@@ -327,12 +353,12 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		private void SetSubMorphs(float f)
+		private void SetSubMorphs(float f, float maxDelta)
 		{
 			for (int i = 0; i < subMorphs_.Count; ++i)
 			{
 				float smf = f * subMorphs_[i].multiplier_;
-				subMorphs_[i].Set(smf);
+				subMorphs_[i].DoSet(smf, maxDelta);
 			}
 		}
 	}
@@ -434,6 +460,16 @@ namespace Cue.Sys.Vam
 			{
 				GetMorph();
 				return morph_?.DefaultValue ?? 0;
+			}
+		}
+
+		public bool LimiterEnabled
+		{
+			set
+			{
+				GetMorph();
+				if (morph_ != null)
+					morph_.LimiterEnabled = value;
 			}
 		}
 

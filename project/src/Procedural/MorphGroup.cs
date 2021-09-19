@@ -9,10 +9,10 @@ namespace Cue.Proc
 
 		void Reset();
 		void FixedUpdate(float s, float intensity);
-		void Set(float[] remaining);
+		void Set(float s, float[] remaining);
 
 		void ForceChange();
-		void Force(int type, float speed, float rangePercent);
+		void Force(int type, float rangePercent);
 	}
 
 
@@ -48,9 +48,9 @@ namespace Cue.Proc
 
 		public abstract void FixedUpdate(float s, float intensity);
 		public abstract void ForceChange();
-		public abstract void Force(int type, float speed, float rangePercent);
+		public abstract void Force(int type, float rangePercent);
 
-		public abstract void Set(float[] remaining);
+		public abstract void Set(float s, float[] remaining);
 	}
 
 
@@ -61,10 +61,10 @@ namespace Cue.Proc
 		{
 		}
 
-		public override void Force(int type, float speed, float rangePercent)
+		public override void Force(int type, float rangePercent)
 		{
 			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Force(type, speed, rangePercent);
+				morphs_[i].Force(type, rangePercent);
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -101,10 +101,10 @@ namespace Cue.Proc
 				morphs_[i].ForceChange();
 		}
 
-		public override void Set(float[] remaining)
+		public override void Set(float s, float[] remaining)
 		{
 			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Set(remaining);
+				morphs_[i].Set(s, remaining);
 		}
 
 		public override string ToString()
@@ -156,12 +156,22 @@ namespace Cue.Proc
 			state_ = ActiveState;
 		}
 
-		public override void Force(int type, float speed, float rangePercent)
+		public override void Force(int type, float rangePercent)
 		{
 			if (morphs_.Count == 0)
 				return;
 
-			morphs_[i_].Force(type, speed, rangePercent);
+			if (type == MorphTarget.ForceToZero || type == MorphTarget.NoForceTarget)
+			{
+				foreach (var m in morphs_)
+					morphs_[i_].Force(type, rangePercent);
+
+				if (state_ == DelayState)
+				{
+					state_ = ActiveState;
+					delay_.Reset();
+				}
+			}
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -216,12 +226,12 @@ namespace Cue.Proc
 				morphs_[i].ForceChange();
 		}
 
-		public override void Set(float[] remaining)
+		public override void Set(float s, float[] remaining)
 		{
 			if (morphs_.Count == 0)
 				return;
 
-			morphs_[i_].Set(remaining);
+			morphs_[i_].Set(s, remaining);
 		}
 
 		public override string ToString()

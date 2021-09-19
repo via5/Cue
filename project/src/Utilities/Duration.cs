@@ -28,6 +28,11 @@ namespace Cue
 		{
 		}
 
+		public SlidingDuration(float min, float max)
+			: this(min, max, 0, 0, 0, null)
+		{
+		}
+
 		public SlidingDuration(
 			float min, float max, float nextMin, float nextMax,
 			float windowSize, IEasing windowEasing)

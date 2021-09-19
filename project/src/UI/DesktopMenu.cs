@@ -14,7 +14,6 @@ namespace Cue
 		private VUI.FloatTextSlider excitement_ = null;
 		private VUI.Label fps_ = null;
 
-		private bool force_ = false;
 		private IObject sel_ = null;
 		private IObject hov_ = null;
 		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
@@ -176,11 +175,9 @@ namespace Cue
 			if (ignore_) return;
 
 			var p = Selected as Person;
-			if (p != null && force_ != b)
+			if (p != null)
 			{
-				force_ = b;
-
-				if (force_)
+				if (b)
 					p.Mood.FlatExcitementValue.SetForced(excitement_.Value);
 				else
 					p.Mood.FlatExcitementValue.UnsetForced();
@@ -194,7 +191,7 @@ namespace Cue
 			var p = Selected as Person;
 			if (p != null)
 			{
-				if (force_)
+				if (p.Mood.FlatExcitementValue.IsForced)
 					p.Mood.FlatExcitementValue.SetForced(f);
 			}
 		}

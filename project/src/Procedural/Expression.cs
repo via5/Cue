@@ -59,16 +59,16 @@ namespace Cue.Proc
 				groups_[i].FixedUpdate(s, intensity);
 		}
 
-		public void Set(float[] remaining)
+		public void Set(float s, float[] remaining)
 		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Set(remaining);
+				groups_[i].Set(s, remaining);
 		}
 
-		public void Force(int type, float speed, float rangePercent)
+		public void Force(int type, float rangePercent)
 		{
 			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Force(type, speed, rangePercent);
+				groups_[i].Force(type, rangePercent);
 		}
 
 		public void ForceChange()
@@ -235,7 +235,7 @@ namespace Cue.Proc
 				remaining_[i] = MaxMorphs;
 
 			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].Set(remaining_);
+				expressions_[i].Set(s, remaining_);
 		}
 
 		public void ForceChange()

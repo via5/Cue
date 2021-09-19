@@ -175,6 +175,10 @@ namespace Cue
 				cue_ = new Cue();
 				sys_.OnReady(DoInit);
 			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
 			catch (Exception e)
 			{
 				SuperController.LogError(e.ToString());
@@ -189,6 +193,10 @@ namespace Cue
 			{
 				cue_.Init();
 				inited_ = true;
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
 			}
 			catch (Exception e)
 			{
@@ -205,7 +213,14 @@ namespace Cue
 
 			U.Safe(() =>
 			{
-				cue_.FixedUpdate(Time.deltaTime);
+				try
+				{
+					cue_.FixedUpdate(Time.deltaTime);
+				}
+				catch(PluginGone e)
+				{
+					SuperController.LogError("plugin disabled");
+				}
 			});
 		}
 
@@ -223,6 +238,7 @@ namespace Cue
 				}
 				catch(PluginGone e)
 				{
+					SuperController.LogError("plugin disabled");
 				}
 			});
 		}
@@ -241,6 +257,7 @@ namespace Cue
 				}
 				catch(PluginGone e)
 				{
+					SuperController.LogError("plugin disabled");
 				}
 			});
 		}
@@ -259,6 +276,7 @@ namespace Cue
 				}
 				catch(PluginGone e)
 				{
+					SuperController.LogError("plugin disabled");
 				}
 			});
 		}
@@ -300,6 +318,7 @@ namespace Cue
 		public void DisablePlugin()
 		{
 			enabledJSON.val = false;
+			throw new PluginGone();
 		}
 	}
 #endif

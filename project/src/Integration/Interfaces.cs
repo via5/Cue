@@ -111,7 +111,7 @@ namespace Cue
 
 	interface IBreather
 	{
-		bool Enabled { get; set; }
+		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }
 		float Speed { get; set; }
 	}

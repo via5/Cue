@@ -33,6 +33,7 @@
 
 		private Person person_;
 		private Parameters p_ = new Parameters();
+		private bool mouthEnabled_ = true;
 
 		public MacGruberBreather(Person p)
 		{
@@ -98,17 +99,23 @@
 				person_, "MacGruber.AudioAttenuation", name);
 		}
 
-		public bool Enabled
+		public bool MouthEnabled
 		{
 			get
 			{
-				return p_.breathingEnabled_.Value;
+				return mouthEnabled_;
 			}
 
 			set
 			{
-				p_.breathingEnabled_.Value = value;
-				p_.driverEnabled_.Value = value;
+				mouthEnabled_ = value;
+
+				if (!mouthEnabled_)
+				{
+					p_.mouthMorph.min.Value = 0;
+					p_.mouthMorph.max.Value = 0;
+					p_.lipsMorphMax.Value = 0;
+				}
 			}
 		}
 
@@ -146,21 +153,26 @@
 				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
 			}
 
-			var p = p_.mouthMorph.max.Parameter;
-			if (p != null)
-				p.val = p.defaultVal * f;
+			if (mouthEnabled_)
+			{
+				var p = p_.mouthMorph.max.Parameter;
+				if (p != null)
+					p.val = p.defaultVal * f;
 
-			p = p_.lipsMorphMax.Parameter;
-			if (p != null)
-				p.val = p.defaultVal * f;
+				p = p_.lipsMorphMax.Parameter;
+				if (p != null)
+					p.val = p.defaultVal * f;
+			}
 
-			p = p_.chestMorph.max.Parameter;
-			if (p != null)
-				p.val = p.defaultVal * f;
+			{
+				var p = p_.chestMorph.max.Parameter;
+				if (p != null)
+					p.val = p.defaultVal * f;
 
-			p = p_.stomach.max.Parameter;
-			if (p != null)
-				p.val = p.defaultVal * f;
+				p = p_.stomach.max.Parameter;
+				if (p != null)
+					p.val = p.defaultVal * f;
+			}
 		}
 
 		public override string ToString()

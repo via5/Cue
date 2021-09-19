@@ -215,6 +215,7 @@ namespace Cue.Sys
 	{
 		string Name { get; }
 		float Value { get; set; }
+		bool LimiterEnabled { set; }
 		float DefaultValue { get; }
 		void Reset();
 	}

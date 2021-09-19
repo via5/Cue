@@ -28,11 +28,12 @@ namespace Cue.Proc
 		private float timeActive_ = 0;
 		private float intensity_ = 1;
 		private bool limitHit_ = false;
+		private float limitedValue_ = 0;
 
 		private int forceType_ = NoForceTarget;
-		private float forceSpeed_ = 0;
 		private float forceRangePercent_ = 0;
 		private float forceTarget_ = 0;
+		private ISync oldSync_ = null;
 
 
 		public MorphTarget(
@@ -174,11 +175,44 @@ namespace Cue.Proc
 			Next(false);
 		}
 
-		public void Force(int type, float speed, float rangePercent)
+		public void Force(int type, float rangePercent, ISync newSync = null)
 		{
+			bool wasForced = (forceType_ != NoForceTarget);
+
 			forceType_ = type;
-			forceSpeed_ = speed;
 			forceRangePercent_ = rangePercent;
+
+			if (forceType_ == ForceToZero)
+			{
+				forceTarget_ = morph_.DefaultValue;
+			}
+			else if (forceType_ == ForceToRangePercent)
+			{
+				var range = Math.Abs(max_ - min_);
+
+				if (min_ < max_)
+					forceTarget_ = min_ + range * forceRangePercent_;
+				else
+					forceTarget_ = min_ - range * forceRangePercent_;
+			}
+
+			if (forceType_ != NoForceTarget)
+			{
+				last_ = morph_.Value;
+				r_ = forceTarget_;
+				morph_.LimiterEnabled = false;
+
+				if (newSync != null)
+				{
+					oldSync_ = Sync;
+					Sync = newSync;
+					Sync.Reset();
+				}
+			}
+			else if (wasForced)
+			{
+				StopForced();
+			}
 		}
 
 		public override void FixedUpdate(float s)
@@ -193,41 +227,6 @@ namespace Cue.Proc
 			timeActive_ += s;
 
 			int r = Sync.FixedUpdate(s);
-
-			if (forceType_ == ForceToZero)
-			{
-				var zero = morph_.DefaultValue;
-
-				if (Math.Abs(forceTarget_ - zero) < 0.0001f)
-				{
-					forceType_ = ForceIgnore;
-				}
-				else
-				{
-					if (zero < morph_.Value)
-						forceTarget_ = Math.Max(morph_.Value - forceSpeed_ * s, zero);
-					else
-						forceTarget_ = Math.Min(morph_.Value + forceSpeed_ * s, zero);
-
-					if (Math.Abs(forceTarget_ - zero) < 0.001f)
-						forceTarget_ = zero;
-				}
-			}
-			else if (forceType_ == ForceToRangePercent)
-			{
-				var range = Math.Abs(max_ - min_);
-
-				float value;
-				if (min_ < max_)
-					value = min_ + range * forceRangePercent_;
-				else
-					value = min_ - range * forceRangePercent_;
-
-				if (value < morph_.Value)
-					forceTarget_ = Math.Max(morph_.Value - forceSpeed_ * s, value);
-				else
-					forceTarget_ = Math.Min(morph_.Value + forceSpeed_ * s, value);
-			}
 
 			switch (r)
 			{
@@ -254,18 +253,37 @@ namespace Cue.Proc
 				case BasicSync.Delaying:
 				case BasicSync.DelayFinished:
 				{
+					morph_.LimiterEnabled = true;
+
 					break;
 				}
 
 				case BasicSync.SyncFinished:
 				{
+					if (forceType_ != NoForceTarget)
+						forceType_ = ForceIgnore;
+
 					finished_ = true;
 					break;
 				}
 			}
 
 			if (autoSet_)
-				Set(null);
+				Set(s, null);
+		}
+
+		private void StopForced()
+		{
+			if (oldSync_ != null)
+			{
+				Sync = oldSync_;
+				oldSync_ = null;
+			}
+
+			morph_.LimiterEnabled = true;
+			mag_ = 0;
+			Next(false);
+			Sync.Reset();
 		}
 
 		private float Mid()
@@ -276,7 +294,7 @@ namespace Cue.Proc
 			return morph_.DefaultValue;
 		}
 
-		public void Set(float[] remaining)
+		public void Set(float s, float[] remaining)
 		{
 			closeToMid_ = false;
 			if (morph_ == null)
@@ -284,23 +302,33 @@ namespace Cue.Proc
 
 			float v;
 
-			if (forceType_ == NoForceTarget)
+			//if (forceType_ == NoForceTarget)
 				v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
-			else
-				v = forceTarget_;
+			//else
+			//	v = forceTarget_;
 
-			if (forceType_ != ForceIgnore)
-				SetValue(v, remaining);
+			SetValue(s, v, remaining);
+
+			//if (forceType_ != NoForceTarget)
+			//{
+			//	if (Math.Abs(forceTarget_ - zero) < 0.0001f)
+			//	{
+			//		forceType_ = ForceIgnore;
+			//	}
+			//}
 		}
 
-		private void SetValue(float v, float[] remaining)
+		private void SetValue(float s, float rawV, float[] remaining)
 		{
+			float v = rawV;
+
 			limitHit_ = false;
 			if (remaining != null && bodyPart_ >= 0)
 			{
-				if (Math.Abs(v - mid_) > remaining[bodyPart_])
+				if (Math.Abs(rawV - mid_) > remaining[bodyPart_])
 				{
-					v = mid_ + Math.Sign(v) * remaining[bodyPart_];
+					limitedValue_ = Math.Sign(rawV) * remaining[bodyPart_];
+					v = mid_ + limitedValue_;
 					limitHit_ = true;
 				}
 			}
@@ -308,7 +336,11 @@ namespace Cue.Proc
 			var d = v - mid_;
 
 			if (bodyPart_ == BP.None || !person_.Body.Get(bodyPart_).Busy)
-				morph_.Value = v;
+			{
+				if (forceType_ != ForceIgnore)
+					morph_.Value = v;
+			}
+
 
 			d = Math.Abs(d);
 
@@ -325,8 +357,11 @@ namespace Cue.Proc
 				awayFromMid_ = true;
 			}
 
-			if (remaining != null && bodyPart_ >= 0)
-				remaining[bodyPart_] -= d;
+			if (forceType_ != ForceIgnore)
+			{
+				if (remaining != null && bodyPart_ >= 0)
+					remaining[bodyPart_] -= d;
+			}
 		}
 
 		private void Next(bool resetBetween)
@@ -369,9 +404,9 @@ namespace Cue.Proc
 				$"morph {morphId_} ({BP.ToString(bodyPart_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
-				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_}\n" +
+				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_} lv={limitedValue_}\n" +
 				$"morph={morph_}\n" +
-				$"force={forceType_} s={forceSpeed_} rp={forceRangePercent_} t={forceTarget_}";
+				$"force={forceType_} rp={forceRangePercent_} t={forceTarget_}";
 		}
 	}
 }

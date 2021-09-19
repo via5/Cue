@@ -348,6 +348,10 @@ namespace Cue.Proc
 			get
 			{
 				var p = CurrentDuration().Progress;
+
+				if (State == BackwardsState)
+					p = 1 - p;
+
 				return CurrentEasing()?.Magnitude(p) ?? 0;
 			}
 		}
@@ -392,10 +396,10 @@ namespace Cue.Proc
 		{
 			base.Reset();
 			SetState(ForwardsState);
-			fwdDuration_.Reset();
+			fwdDuration_?.Reset();
 			bwdDuration_?.Reset();
-			fwdDelay_.Reset();
-			bwdDelay_.Reset();
+			fwdDelay_?.Reset();
+			bwdDelay_?.Reset();
 		}
 
 		protected override int DoFixedUpdate(float s)
@@ -423,10 +427,10 @@ namespace Cue.Proc
 		{
 			return
 				$"sliding\n" +
-				$"fdur={fwdDuration_.ToLiveString()}\n" +
-				$"bdur={bwdDuration_.ToLiveString()}\n" +
-				$"fdel={fwdDelay_.ToLiveString()} bdel={bwdDelay_.ToLiveString()}\n" +
-				$"p={CurrentDuration().Progress:0.00} mag={Magnitude:0.00}\n" +
+				$"fdur={fwdDuration_?.ToLiveString()}\n" +
+				$"bdur={bwdDuration_?.ToLiveString()}\n" +
+				$"fdel={fwdDelay_?.ToLiveString()} bdel={bwdDelay_?.ToLiveString()}\n" +
+				$"p={CurrentDuration()?.Progress:0.00} mag={Magnitude:0.00}\n" +
 				$"state={State}";
 		}
 
@@ -439,7 +443,7 @@ namespace Cue.Proc
 				if (bwdDuration_ == null)
 					fwdDuration_.Restart();
 
-				if (fwdDelay_.Enabled)
+				if (fwdDelay_?.Enabled ?? false)
 				{
 					SetState(ForwardsDelayState);
 					return Delaying;
@@ -486,7 +490,7 @@ namespace Cue.Proc
 				}
 			}
 
-			return Working;
+			return Delaying;
 		}
 
 		private int DoBackwards(float s)
@@ -497,7 +501,7 @@ namespace Cue.Proc
 
 			if (d.Finished)
 			{
-				if (bwdDelay_.Enabled)
+				if (bwdDelay_?.Enabled ?? false)
 				{
 					SetState(BackwardsDelayState);
 					return Delaying;
@@ -535,7 +539,7 @@ namespace Cue.Proc
 				}
 			}
 
-			return Working;
+			return Delaying;
 		}
 	}
 }

@@ -33,7 +33,12 @@ namespace Cue.Proc
 			set { parent_ = value; }
 		}
 
-		public ISync Sync { get { return sync_; } }
+		public ISync Sync
+		{
+			get { return sync_; }
+			set { sync_ = value; }
+		}
+
 		public abstract bool Done { get; }
 
 		public abstract ITarget Clone();
