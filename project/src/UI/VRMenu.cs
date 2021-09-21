@@ -43,7 +43,7 @@ namespace Cue
 			foreach (var i in items_)
 				p.Add(i.Panel);
 
-			if (UI.DebugVRMenu)
+			if (UI.VRMenuDebug)
 			{
 				var gl = new VUI.GridLayout(2, 2);
 				gl.HorizontalStretch = new List<bool> { true, false };

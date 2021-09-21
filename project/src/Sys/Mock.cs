@@ -271,6 +271,11 @@ namespace Cue.Sys.Mock
 		{
 			return "";
 		}
+
+		public string VRInfo()
+		{
+			return "";
+		}
 	}
 
 

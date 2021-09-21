@@ -235,6 +235,9 @@ namespace Cue
 			gl.HorizontalStretch = new List<bool> { false, true };
 			var p = new VUI.Panel(gl);
 
+			p.Add(new VUI.Label("VR"));
+			p.Add(new VUI.Label(i.VRInfo()));
+
 			foreach (var w in inputs_)
 			{
 				p.Add(new VUI.Label(w.Name));

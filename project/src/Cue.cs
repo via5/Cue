@@ -244,7 +244,7 @@ namespace Cue
 			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
 
-			if (Sys.GetAtom("cuetest") != null)
+			if (Sys.GetAtom("cue!test") != null)
 			{
 				try
 				{
@@ -571,6 +571,12 @@ namespace Cue
 
 		private void test()
 		{
+			var p = FindPerson("A");
+			if (p != null)
+			{
+				p.Gaze.ForceLook = ForceLooks.Camera;
+				p.Mood.FlatExcitementValue.SetForced(0);
+			}
 		}
 	}
 }

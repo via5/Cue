@@ -277,7 +277,7 @@ namespace Cue.Sys.Vam
 
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
-				ShowLeftMenu || ShowRightMenu || UI.DebugVRMenu;
+				ShowLeftMenu || ShowRightMenu || UI.VRMenuAlwaysOpened;
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
 			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
@@ -293,6 +293,11 @@ namespace Cue.Sys.Vam
 		public string DebugString()
 		{
 			return $"left:{vr_.LeftJoystick} right:{vr_.RightJoystick}";
+		}
+
+		public string VRInfo()
+		{
+			return $"ovr={sc_.isOVR} openvr={sc_.isOpenVR}";
 		}
 
 		public bool HardReset

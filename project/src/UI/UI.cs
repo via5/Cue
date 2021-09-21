@@ -4,7 +4,8 @@ namespace Cue
 {
 	class UI
 	{
-		public const bool DebugVRMenu = true;
+		public const bool VRMenuDebug = true;
+		public const bool VRMenuAlwaysOpened = false;
 
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = null;
@@ -48,7 +49,7 @@ namespace Cue
 
 		public void CheckInput()
 		{
-			var vr = sys_.IsVR || DebugVRMenu;
+			var vr = sys_.IsVR || VRMenuDebug;
 
 			if (vr_ != vr)
 			{
@@ -63,17 +64,18 @@ namespace Cue
 				CreateUI();
 			}
 
-			if (sys_.IsPlayMode || DebugVRMenu)
+			if (sys_.IsPlayMode || VRMenuAlwaysOpened)
 			{
-				if (vr_ || DebugVRMenu)
+				if (vr_ || VRMenuDebug)
 					CheckVRInput();
 
-				if (!vr_ || DebugVRMenu)
+				if (!vr_ || VRMenuDebug)
 					CheckDesktopInput();
 			}
 			else
 			{
 				controls_.HoverTargetVisible = false;
+				vrMenu_.Hide();
 			}
 		}
 
@@ -101,7 +103,7 @@ namespace Cue
 
 			if (vr_)
 			{
-				vrMenu_?.Create(DebugVRMenu);
+				vrMenu_?.Create(VRMenuDebug);
 			}
 			else
 			{
@@ -135,7 +137,7 @@ namespace Cue
 
 			bool hoverTargetVisible = false;
 
-			if (sys_.Input.ShowLeftMenu || DebugVRMenu)
+			if (sys_.Input.ShowLeftMenu || VRMenuAlwaysOpened)
 			{
 				vrMenu_.ShowLeft();
 				vrMenu_.Selected = lh.o as Person;
