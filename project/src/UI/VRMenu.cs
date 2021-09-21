@@ -60,7 +60,7 @@ namespace Cue
 			if (Cue.Instance.ActivePersons.Length == 0)
 				SetPerson(-1);
 			else if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
-				SetPerson(0);
+				SetPerson(NextPerson(-1, +1));
 		}
 
 		public void Destroy()
@@ -121,15 +121,13 @@ namespace Cue
 
 			if (Cue.Instance.Sys.Input.MenuRight)
 			{
-				++newSel;
-				if (newSel >= Cue.Instance.ActivePersons.Length)
-					newSel = 0;
+				newSel = NextPerson(personSel_, +1);
+				Cue.LogInfo($"vrmenu: menuright {personSel_} {newSel}");
 			}
 			else if (Cue.Instance.Sys.Input.MenuLeft)
 			{
-				--newSel;
-				if (newSel < 0)
-					newSel = Cue.Instance.ActivePersons.Length - 1;
+				newSel = NextPerson(personSel_, -1);
+				Cue.LogInfo($"vrmenu: menuleft {personSel_} {newSel}");
 			}
 
 			if (newSel >= Cue.Instance.ActivePersons.Length)
@@ -146,6 +144,47 @@ namespace Cue
 
 			for (int i = 0; i < items_.Count; ++i)
 				items_[i].Update();
+		}
+
+		private int NextPerson(int current, int dir)
+		{
+			var ps = Cue.Instance.ActivePersons;
+
+			int s = current;
+
+			if (s < 0 || s >= ps.Length)
+			{
+				current = 0;
+				s = 0;
+			}
+			else
+			{
+				s += dir;
+			}
+
+
+			for (; ; )
+			{
+				if (s < 0)
+					s = ps.Length - 1;
+				else if (s >= ps.Length)
+					s = 0;
+
+				if (s == current)
+					break;
+
+				if (ValidPerson(ps[s]))
+					return s;
+
+				s += dir;
+			}
+
+			return current;
+		}
+
+		private bool ValidPerson(Person p)
+		{
+			return (p.IsInteresting && p != Cue.Instance.Player);
 		}
 
 		public void ShowLeft()
@@ -212,6 +251,8 @@ namespace Cue
 
 		private void SetPerson(int index)
 		{
+			Cue.LogInfo($"vrmenu: {index}");
+
 			personSel_ = index;
 
 			Person p = Selected as Person;

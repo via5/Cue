@@ -228,6 +228,11 @@ namespace Cue
 			}
 		}
 
+		public bool IsInteresting
+		{
+			get { return Body.Exists; }
+		}
+
 		public void PushAction(IAction a)
 		{
 			actions_.Push(a);
