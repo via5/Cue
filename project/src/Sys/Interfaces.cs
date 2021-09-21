@@ -114,6 +114,8 @@ namespace Cue.Sys
 		HoveredInfo GetLeftHovered();
 		HoveredInfo GetRightHovered();
 		HoveredInfo GetMouseHovered();
+
+		string DebugString();
 	}
 
 	class NavStates

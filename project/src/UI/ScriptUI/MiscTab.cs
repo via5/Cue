@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
 	class MiscTab : Tab
 	{
 		private MiscTimesTab times_;
+		private MiscInputTab input_;
 
 		public MiscTab()
 			: base("Misc", true)
 		{
-			AddSubTab(new MiscInputTab());
+			input_ = AddSubTab(new MiscInputTab());
 			AddSubTab(new MiscNavTab());
 			times_ = AddSubTab(new MiscTimesTab());
 			AddSubTab(new MiscLogTab());
@@ -18,6 +20,11 @@ namespace Cue
 		public void UpdateTickers()
 		{
 			times_.UpdateTickers();
+		}
+
+		public void UpdateInput(float s)
+		{
+			input_.UpdateInput(s);
 		}
 	}
 
@@ -121,9 +128,130 @@ namespace Cue
 
 	class MiscInputTab : Tab
 	{
+		class Input
+		{
+			private string name_;
+			private Func<bool> fbool_ = null;
+			private Func<string> fstring_ = null;
+			private VUI.Label label_ = null;
+			private float onElapsed_ = 1000;
+
+			public Input(string name, Func<bool> f)
+			{
+				name_ = name;
+				fbool_ = f;
+				label_ = new VUI.Label();
+			}
+
+			public Input(string name, Func<string> f)
+			{
+				name_ = name;
+				fstring_ = f;
+				label_ = new VUI.Label();
+				label_.Font = VUI.Style.Theme.MonospaceFont;
+			}
+
+			public string Name
+			{
+				get { return name_; }
+			}
+
+			public VUI.Widget Widget
+			{
+				get { return label_; }
+			}
+
+			public void Update(float s)
+			{
+				if (fbool_ != null)
+					UpdateBool(s);
+				else if (fstring_ != null)
+					UpdateString(s);
+			}
+
+			private void UpdateBool(float s)
+			{
+				if (fbool_())
+				{
+					label_.TextColor = Sys.Vam.U.ToUnity(Color.Green);
+					label_.Text = "on";
+					onElapsed_ = 0;
+				}
+				else
+				{
+					onElapsed_ += s;
+
+					if (onElapsed_ < 1)
+					{
+						label_.Text = "on";
+						label_.TextColor = MakeColor();
+					}
+					else
+					{
+						label_.Text = "";
+					}
+				}
+			}
+
+			private void UpdateString(float s)
+			{
+				label_.Text = fstring_();
+			}
+
+			private UnityEngine.Color MakeColor()
+			{
+				var from = Sys.Vam.U.FromUnity(VUI.Style.Theme.TextColor);
+				var to = Sys.Vam.U.FromUnity(VUI.Style.Theme.BackgroundColor);
+				var c = Color.Lerp(from, to, onElapsed_);
+
+				return Sys.Vam.U.ToUnity(c);
+			}
+		}
+
+
+		private List<Input> inputs_ = new List<Input>();
+
+
 		public MiscInputTab()
 			: base("Input", false)
 		{
+			var i = Cue.Instance.Sys.Input;
+
+			inputs_.Add(new Input("ShowLeftMenu", () => i.ShowLeftMenu));
+			inputs_.Add(new Input("ShowRightMenu", () => i.ShowRightMenu));
+			inputs_.Add(new Input("LeftAction", () => i.LeftAction));
+			inputs_.Add(new Input("RightAction", () => i.RightAction));
+			inputs_.Add(new Input("Select", () => i.Select));
+			inputs_.Add(new Input("Action", () => i.Action));
+			inputs_.Add(new Input("ToggleControls", () => i.ToggleControls));
+			inputs_.Add(new Input("MenuUp", () => i.MenuUp));
+			inputs_.Add(new Input("MenuDown", () => i.MenuDown));
+			inputs_.Add(new Input("MenuLeft", () => i.MenuLeft));
+			inputs_.Add(new Input("MenuRight", () => i.MenuRight));
+			inputs_.Add(new Input("MenuSelect", () => i.MenuSelect));
+			inputs_.Add(new Input("Sys", () => i.DebugString()));
+
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalStretch = new List<bool> { false, true };
+			var p = new VUI.Panel(gl);
+
+			foreach (var w in inputs_)
+			{
+				p.Add(new VUI.Label(w.Name));
+				p.Add(w.Widget);
+			}
+
+			Layout = new VUI.VerticalFlow();
+			Add(p);
+		}
+
+		public void UpdateInput(float s)
+		{
+			if (IsVisibleOnScreen())
+			{
+				for (int i = 0; i < inputs_.Count; ++i)
+					inputs_[i].Update(s);
+			}
 		}
 	}
 }

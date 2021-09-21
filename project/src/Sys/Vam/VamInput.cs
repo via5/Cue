@@ -290,6 +290,11 @@ namespace Cue.Sys.Vam
 			rightMenuRight_.Set(vr_.RightJoystick.x >= 0.5f);
 		}
 
+		public string DebugString()
+		{
+			return $"left:{vr_.LeftJoystick} right:{vr_.RightJoystick}";
+		}
+
 		public bool HardReset
 		{
 			get

@@ -266,6 +266,11 @@ namespace Cue.Sys.Mock
 		{
 			return HoveredInfo.None;
 		}
+
+		public string DebugString()
+		{
+			return "";
+		}
 	}
 
 

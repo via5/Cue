@@ -61,6 +61,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			tabs_.Update(s);
+			misc_.UpdateInput(s);
 			root_.Update();
 		}
 
