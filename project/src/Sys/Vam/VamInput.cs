@@ -170,8 +170,14 @@ namespace Cue.Sys.Vam
 
 	class Latched
 	{
+		private readonly string name_;
 		private bool on_ = false;
 		private bool onFrame_ = false;
+
+		public Latched(string name)
+		{
+			name_ = name;
+		}
 
 		public bool OnFrame
 		{
@@ -180,8 +186,12 @@ namespace Cue.Sys.Vam
 
 		public void Set(bool on)
 		{
+			var old = onFrame_;
 			onFrame_ = (on && !on_);
 			on_ = on;
+
+			if (old != onFrame_)
+				Cue.LogError($"{name_} {old} {onFrame_}");
 		}
 	}
 
@@ -204,15 +214,15 @@ namespace Cue.Sys.Vam
 		private bool rightMenu_ = false;
 		private bool rightMenuSticky_ = false;
 
-		private Latched leftMenuUp_ = new Latched();
-		private Latched leftMenuDown_ = new Latched();
-		private Latched leftMenuLeft_ = new Latched();
-		private Latched leftMenuRight_ = new Latched();
+		private Latched leftMenuUp_ = new Latched("leftMenuUp");
+		private Latched leftMenuDown_ = new Latched("leftMenuDown");
+		private Latched leftMenuLeft_ = new Latched("leftMenuLeft");
+		private Latched leftMenuRight_ = new Latched("leftMenuRight");
 
-		private Latched rightMenuUp_ = new Latched();
-		private Latched rightMenuDown_ = new Latched();
-		private Latched rightMenuLeft_ = new Latched();
-		private Latched rightMenuRight_ = new Latched();
+		private Latched rightMenuUp_ = new Latched("rightMenuUp");
+		private Latched rightMenuDown_ = new Latched("rightMenuDown");
+		private Latched rightMenuLeft_ = new Latched("rightMenuLeft");
+		private Latched rightMenuRight_ = new Latched("rightMenuRight");
 
 		public VamInput(VamSys sys)
 		{
@@ -267,7 +277,7 @@ namespace Cue.Sys.Vam
 
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
-				ShowLeftMenu || ShowRightMenu;
+				ShowLeftMenu || ShowRightMenu || UI.DebugVRMenu;
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
 			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);

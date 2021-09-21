@@ -302,6 +302,12 @@ namespace Cue
 
 			if (a.Count > 0)
 				json.Add("objects", a);
+
+			json.Add("log", new JSONData(Logger.Enabled));
+
+			var ui = ui_.ToJSON();
+			if (ui != null)
+				json.Add("ui", ui);
 		}
 
 		private void Load(JSONClass c)
@@ -316,6 +322,12 @@ namespace Cue
 						o.Load(oj.AsObject);
 				}
 			}
+
+			if (c.HasKey("log"))
+				Logger.Enabled = c["log"].AsInt;
+
+			if (c.HasKey("ui"))
+				ui_.Load(c["ui"].AsObject);
 		}
 
 		private void FindObjects()
@@ -396,6 +408,11 @@ namespace Cue
 		public void ReloadPlugin()
 		{
 			Sys.ReloadPlugin();
+		}
+
+		public void OpenScriptUI()
+		{
+			Sys.OpenScriptUI();
 		}
 
 		public void DisablePlugin()

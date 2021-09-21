@@ -6,32 +6,17 @@ namespace Cue
 	class PersonAITab : Tab
 	{
 		private Person person_;
-		private TabContainer tabs_ = new TabContainer();
 
 		public PersonAITab(Person p)
-			: base("AI")
+			: base("AI", true)
 		{
 			person_ = p;
 
-			tabs_.AddTab(new PersonAIStateTab(person_));
-			tabs_.AddTab(new PersonAIPersonalityTab(person_));
-			tabs_.AddTab(new PersonAIPhysiologyTab(person_));
-			tabs_.AddTab(new PersonAIGazeTab(person_));
-			tabs_.AddTab(new PersonAIExpressionTab(person_));
-
-			Layout = new VUI.BorderLayout();
-			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
-		}
-
-		public override void Update(float s)
-		{
-			tabs_.Update(s);
-		}
-
-		public override void OnPluginState(bool b)
-		{
-			base.OnPluginState(b);
-			tabs_.OnPluginState(b);
+			AddSubTab(new PersonAIStateTab(person_));
+			AddSubTab(new PersonAIPersonalityTab(person_));
+			AddSubTab(new PersonAIPhysiologyTab(person_));
+			AddSubTab(new PersonAIGazeTab(person_));
+			AddSubTab(new PersonAIExpressionTab(person_));
 		}
 	}
 
@@ -48,7 +33,7 @@ namespace Cue
 
 
 		public PersonAIStateTab(Person p)
-			: base("State")
+			: base("State", false)
 		{
 			person_ = p;
 			ai_ = (PersonAI)person_.AI;
@@ -77,7 +62,7 @@ namespace Cue
 			close_.Changed += OnClose;
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			string es = "";
 
@@ -124,7 +109,7 @@ namespace Cue
 		private bool inited_ = false;
 
 		public PersonAIPhysiologyTab(Person p)
-			: base("Physiology")
+			: base("Physiology", false)
 		{
 			person_ = p;
 			pp_ = p.Physiology;
@@ -135,7 +120,7 @@ namespace Cue
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			if (inited_)
 				return;
@@ -219,7 +204,7 @@ namespace Cue
 		private int currentState_ = -1;
 
 		public PersonAIPersonalityTab(Person p)
-			: base("Personality")
+			: base("Personality", false)
 		{
 			person_ = p;
 
@@ -231,7 +216,7 @@ namespace Cue
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			if (currentState_ == states_.SelectedIndex)
 				return;
@@ -283,7 +268,7 @@ namespace Cue
 		private VUI.Label next_ = new VUI.Label();
 
 		public PersonAIGazeTab(Person person)
-			: base("Gaze")
+			: base("Gaze", false)
 		{
 			person_ = person;
 			ai_ = (PersonAI)person_.AI;
@@ -359,7 +344,7 @@ namespace Cue
 			Add(p);
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			var g = person_.Gaze;
 
@@ -409,7 +394,7 @@ namespace Cue
 		private VUI.FloatTextSlider slider_ = new VUI.FloatTextSlider(0, 0, 1);
 
 		public PersonAIExpressionTab(Person person)
-			: base("Expression")
+			: base("Expression", false)
 		{
 			person_ = person;
 			Layout = new VUI.VerticalFlow();
@@ -430,10 +415,6 @@ namespace Cue
 		}
 
 		private void OnExpressionChanged(Proc.IProceduralMorphGroup e)
-		{
-		}
-
-		public override void Update(float s)
 		{
 		}
 	}

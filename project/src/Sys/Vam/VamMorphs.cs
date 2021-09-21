@@ -256,14 +256,14 @@ namespace Cue.Sys.Vam
 			DoSet(f, maxDelta);
 		}
 
-		public void DoSet(float f, float maxDelta)
+		public void DoSet(float f, float maxDelta, string parentName = "")
 		{
 			if (m_ == null)
 				return;
 
 			if (subMorphs_.Count > 0)
 			{
-				SetSubMorphs(f, maxDelta);
+				SetSubMorphs(f, maxDelta, parentName);
 				return;
 			}
 
@@ -286,11 +286,14 @@ namespace Cue.Sys.Vam
 			{
 				targetOnLastSet_ = f;
 
-				if (f > morphValueOnLastSet_)
-					SetMorphValue(Math.Min(morphValueOnLastSet_ + maxDelta, f));
-				else
-					SetMorphValue(Math.Max(morphValueOnLastSet_ - maxDelta, f));
+				float v;
 
+				if (f > morphValueOnLastSet_)
+					v = Math.Min(morphValueOnLastSet_ + maxDelta, f);
+				else
+					v = Math.Max(morphValueOnLastSet_ - maxDelta, f);
+
+				SetMorphValue(v);
 				lastSetFrame_ = Cue.Instance.Frame;
 			}
 		}
@@ -353,12 +356,18 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		private void SetSubMorphs(float f, float maxDelta)
+		private void SetSubMorphs(float f, float maxDelta, string parentName)
 		{
+			string name = parentName;
+			if (name != "")
+				name += ".";
+
+			name = id_;
+
 			for (int i = 0; i < subMorphs_.Count; ++i)
 			{
 				float smf = f * subMorphs_[i].multiplier_;
-				subMorphs_[i].DoSet(smf, maxDelta);
+				subMorphs_[i].DoSet(smf, maxDelta, name);
 			}
 		}
 	}

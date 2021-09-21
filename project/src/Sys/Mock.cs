@@ -159,6 +159,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void OpenScriptUI()
+		{
+		}
+
 		public void OnReady(Action f)
 		{
 			f?.Invoke();

@@ -4,42 +4,55 @@ namespace Cue
 {
 	class MiscTab : Tab
 	{
+		private MiscTimesTab times_;
+
+		public MiscTab()
+			: base("Misc", true)
+		{
+			AddSubTab(new MiscInputTab());
+			AddSubTab(new MiscNavTab());
+			times_ = AddSubTab(new MiscTimesTab());
+			AddSubTab(new MiscLogTab());
+		}
+
+		public void UpdateTickers()
+		{
+			times_.UpdateTickers();
+		}
+	}
+
+
+	class MiscNavTab : Tab
+	{
 		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
 		private VUI.Button renav_ = new VUI.Button("Update nav");
 
-		private VUI.Label[] tickers_ = new VUI.Label[I.TickerCount];
-
-		private VUI.CheckBox logAnimation_;
-		private VUI.CheckBox logAction_;
-		private VUI.CheckBox logEvent_;
-		private VUI.CheckBox logAI_;
-		private VUI.CheckBox logCommand_;
-		private VUI.CheckBox logIntegration_;
-		private VUI.CheckBox logObject_;
-		private VUI.CheckBox logSlots_;
-		private VUI.CheckBox logSys_;
-		private VUI.CheckBox logClothing_;
-		private VUI.CheckBox logResources_;
-
-		public MiscTab()
-			: base("Misc")
+		public MiscNavTab()
+			: base("Nav", false)
 		{
-			logAnimation_ = new VUI.CheckBox("Animation", CheckLog);
-			logAction_ = new VUI.CheckBox("Action", CheckLog);
-			logEvent_ = new VUI.CheckBox("Event", CheckLog);
-			logAI_ = new VUI.CheckBox("AI", CheckLog);
-			logCommand_ = new VUI.CheckBox("Command", CheckLog);
-			logIntegration_ = new VUI.CheckBox("Integration", CheckLog);
-			logObject_ = new VUI.CheckBox("Object", CheckLog);
-			logSlots_ = new VUI.CheckBox("Slots", CheckLog);
-			logSys_ = new VUI.CheckBox("Sys", CheckLog);
-			logClothing_ = new VUI.CheckBox("Clothing", CheckLog);
-			logResources_ = new VUI.CheckBox("Resources", CheckLog);
+			Layout = new VUI.VerticalFlow(0, false);
 
-			Layout = new VUI.VerticalFlow();
+			Add(new VUI.Label("nav is disabled in this build"));
+			Add(new VUI.Spacer(20));
 			Add(navmeshes_);
 			Add(renav_);
 
+			navmeshes_.Enabled = false;
+			renav_.Enabled = false;
+
+			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
+			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
+		}
+	}
+
+
+	class MiscTimesTab : Tab
+	{
+		private VUI.Label[] tickers_ = new VUI.Label[I.TickerCount];
+
+		public MiscTimesTab()
+			: base("Times", false)
+		{
 			var gl = new VUI.GridLayout(2);
 			gl.HorizontalStretch = new List<bool>() { false, true };
 			gl.HorizontalSpacing = 40;
@@ -53,28 +66,9 @@ namespace Cue
 				p.Add(tickers_[i]);
 			}
 
+
+			Layout = new VUI.VerticalFlow();
 			Add(p);
-			//Add(new VUI.Spacer(30));
-			//
-			//Add(new VUI.Label("Logs", UnityEngine.FontStyle.Bold));
-			//Add(logAnimation_);
-			//Add(logAction_);
-			//Add(logEvent_);
-			//Add(logAI_);
-			//Add(logCommand_);
-			//Add(logIntegration_);
-			//Add(logObject_);
-			//Add(logSlots_);
-			//Add(logSys_);
-			//Add(logClothing_);
-			//Add(logResources_);
-
-			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
-			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
-		}
-
-		public override void Update(float s)
-		{
 		}
 
 		public void UpdateTickers()
@@ -85,24 +79,51 @@ namespace Cue
 					tickers_[i].Text = I.Get(i).ToString();
 			}
 		}
+	}
 
-		private void CheckLog(bool b)
+
+	class MiscLogTab : Tab
+	{
+		private List<VUI.CheckBox> cbs_ = new List<VUI.CheckBox>();
+
+		public MiscLogTab()
+			: base("Log", false)
+		{
+			var names = Logger.Names;
+			var enabled = Logger.Enabled;
+
+			Layout = new VUI.VerticalFlow(0, false);
+
+			for (int i=0; i < names.Length; ++i)
+			{
+				var cb = new VUI.CheckBox(
+					names[i], OnChecked, (enabled & (1 << i)) != 0);
+
+				cbs_.Add(cb);
+				Add(cb);
+			}
+		}
+
+		private void OnChecked(bool b)
 		{
 			int e = 0;
 
-			if (logAnimation_.Checked) e |= Logger.Animation;
-			if (logAction_.Checked) e |= Logger.Action;
-			if (logEvent_.Checked) e |= Logger.Event;
-			if (logAI_.Checked) e |= Logger.AI;
-			if (logCommand_.Checked) e |= Logger.Command;
-			if (logIntegration_.Checked) e |= Logger.Integration;
-			if (logObject_.Checked) e |= Logger.Object;
-			if (logSlots_.Checked) e |= Logger.Slots;
-			if (logSys_.Checked) e |= Logger.Sys;
-			if (logClothing_.Checked) e |= Logger.Clothing;
-			if (logResources_.Checked) e |= Logger.Resources;
+			for (int i = 0; i < cbs_.Count; ++i)
+			{
+				if (cbs_[i].Checked)
+					e |= (1 << i);
+			}
 
 			Logger.Enabled = e;
+			Cue.Instance.Save();
+		}
+	}
+
+	class MiscInputTab : Tab
+	{
+		public MiscInputTab()
+			: base("Input", false)
+		{
 		}
 	}
 }

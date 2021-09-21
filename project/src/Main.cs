@@ -272,7 +272,7 @@ namespace Cue
 				try
 				{
 					if (cue_ != null)
-							cue_.OnPluginState(false);
+						cue_.OnPluginState(false);
 				}
 				catch(PluginGone e)
 				{

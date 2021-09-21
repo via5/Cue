@@ -1,8 +1,10 @@
-﻿namespace Cue
+﻿using SimpleJSON;
+
+namespace Cue
 {
 	class UI
 	{
-		private const bool DebugVR = false;
+		public const bool DebugVRMenu = true;
 
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = null;
@@ -26,9 +28,27 @@
 			get { return controls_; }
 		}
 
+		public JSONClass ToJSON()
+		{
+			var sui = sui_.ToJSON();
+			if (sui == null)
+				return null;
+
+			var o = new JSONClass();
+			o["sui"] = sui;
+
+			return o;
+		}
+
+		public void Load(JSONClass o)
+		{
+			if (o != null && o.HasKey("sui"))
+				sui_.Load(o["sui"].AsObject);
+		}
+
 		public void CheckInput()
 		{
-			var vr = sys_.IsVR || DebugVR;
+			var vr = sys_.IsVR || DebugVRMenu;
 
 			if (vr_ != vr)
 			{
@@ -43,12 +63,12 @@
 				CreateUI();
 			}
 
-			if (sys_.IsPlayMode || DebugVR)
+			if (sys_.IsPlayMode || DebugVRMenu)
 			{
-				if (vr_ || DebugVR)
+				if (vr_ || DebugVRMenu)
 					CheckVRInput();
 
-				if (!vr_ || DebugVR)
+				if (!vr_ || DebugVRMenu)
 					CheckDesktopInput();
 			}
 			else
@@ -68,6 +88,10 @@
 				sui_.OnPluginState(true);
 		}
 
+		public void OpenScriptUI()
+		{
+		}
+
 		private void CreateUI()
 		{
 			Cue.LogInfo("creating ui");
@@ -77,7 +101,7 @@
 
 			if (vr_)
 			{
-				vrMenu_?.Create(DebugVR);
+				vrMenu_?.Create(DebugVRMenu);
 			}
 			else
 			{
@@ -111,7 +135,7 @@
 
 			bool hoverTargetVisible = false;
 
-			if (sys_.Input.ShowLeftMenu || DebugVR)
+			if (sys_.Input.ShowLeftMenu || DebugVRMenu)
 			{
 				vrMenu_.ShowLeft();
 				vrMenu_.Selected = lh.o as Person;

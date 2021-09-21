@@ -45,6 +45,7 @@ namespace Cue.Sys
 		string GetResourcePath(string path);
 		void HardReset();
 		void ReloadPlugin();
+		void OpenScriptUI();
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
 		bool HasUI { get; }

@@ -5,32 +5,16 @@ namespace Cue
 	class PersonBodyTab : Tab
 	{
 		private readonly Person person_;
-		private TabContainer tabs_ = new TabContainer();
 
 		public PersonBodyTab(Person person)
-			: base("Body")
+			: base("Body", true)
 		{
 			person_ = person;
 
-			tabs_.AddTab(new PersonBodyPartsTab(person_));
-			tabs_.AddTab(new PersonHandsTab(person_));
-
-			Layout = new VUI.BorderLayout();
-			Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
-		}
-
-		public override void Update(float s)
-		{
-			tabs_.Update(s);
-		}
-
-		public override void OnPluginState(bool b)
-		{
-			base.OnPluginState(b);
-			tabs_.OnPluginState(b);
+			AddSubTab(new PersonBodyPartsTab(person_));
+			AddSubTab(new PersonHandsTab(person_));
 		}
 	}
-
 
 
 	class PersonBodyPartsTab : Tab
@@ -48,7 +32,7 @@ namespace Cue
 		private static bool Positions = false;
 
 		public PersonBodyPartsTab(Person ps)
-			: base ("Parts")
+			: base ("Parts", false)
 		{
 			person_ = ps;
 
@@ -115,7 +99,7 @@ namespace Cue
 			Add(p, VUI.BorderLayout.Top);
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			for (int i = 0; i < widgets_.Count; ++i)
 			{
@@ -194,7 +178,7 @@ namespace Cue
 		private readonly List<BoneWidgets> widgets_ = new List<BoneWidgets>();
 
 		public PersonHandsTab(Person ps)
-			: base("Fingers")
+			: base("Fingers", false)
 		{
 			person_ = ps;
 
@@ -244,7 +228,7 @@ namespace Cue
 			}
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			for (int i = 0; i < widgets_.Count; ++i)
 			{

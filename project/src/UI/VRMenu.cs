@@ -43,6 +43,16 @@ namespace Cue
 			foreach (var i in items_)
 				p.Add(i.Panel);
 
+			if (UI.DebugVRMenu)
+			{
+				var gl = new VUI.GridLayout(2, 2);
+				gl.HorizontalStretch = new List<bool> { true, false };
+				var dp = new VUI.Panel(gl);
+				dp.Add(new VUI.ToolButton("Reload", () => Cue.Instance.ReloadPlugin()));
+				dp.Add(new VUI.ToolButton("UI", () => Cue.Instance.OpenScriptUI()));
+				p.Add(dp);
+			}
+
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			UpdateVisibility();
@@ -67,64 +77,75 @@ namespace Cue
 		public void Update()
 		{
 			if (root_?.Visible ?? false)
-			{
-				var old = widgetSel_;
-
-				if (Cue.Instance.Sys.Input.MenuDown)
-				{
-					++widgetSel_;
-					if (widgetSel_ >= items_.Count)
-						widgetSel_ = 0;
-				}
-				else if (Cue.Instance.Sys.Input.MenuUp)
-				{
-					--widgetSel_;
-					if (widgetSel_ < 0)
-						widgetSel_ = items_.Count - 1;
-				}
-
-				if (widgetSel_ == -1)
-					widgetSel_ = 0;
-
-				if (widgetSel_ != old)
-				{
-					for (int i = 0; i < items_.Count; ++i)
-						items_[i].Selected = (i == widgetSel_);
-				}
-
-
-				int newSel = personSel_;
-
-				if (Cue.Instance.Sys.Input.MenuRight)
-				{
-					++newSel;
-					if (newSel >= Cue.Instance.ActivePersons.Length)
-						newSel = 0;
-				}
-				else if (Cue.Instance.Sys.Input.MenuLeft)
-				{
-					--newSel;
-					if (newSel < 0)
-						newSel = Cue.Instance.ActivePersons.Length - 1;
-				}
-
-				if (newSel >= Cue.Instance.ActivePersons.Length)
-					newSel = -1;
-
-				if (newSel != personSel_)
-					SetPerson(newSel);
-
-				if (Cue.Instance.Sys.Input.MenuSelect)
-				{
-					if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
-						items_[widgetSel_].Activate();
-				}
-
-				for (int i = 0; i < items_.Count; ++i)
-					items_[i].Update();
-			}
+				CheckInput();
 
 			root_?.Update();
+		}
+
+		private void CheckInput()
+		{
+			CheckItemInput();
+			CheckPersonInput();
+		}
+
+		private void CheckItemInput()
+		{
+			var old = widgetSel_;
+
+			if (Cue.Instance.Sys.Input.MenuDown)
+			{
+				++widgetSel_;
+				if (widgetSel_ >= items_.Count)
+					widgetSel_ = 0;
+			}
+			else if (Cue.Instance.Sys.Input.MenuUp)
+			{
+				--widgetSel_;
+				if (widgetSel_ < 0)
+					widgetSel_ = items_.Count - 1;
+			}
+
+			if (widgetSel_ == -1)
+				widgetSel_ = 0;
+
+			if (widgetSel_ != old)
+			{
+				for (int i = 0; i < items_.Count; ++i)
+					items_[i].Selected = (i == widgetSel_);
+			}
+		}
+
+		private void CheckPersonInput()
+		{
+			int newSel = personSel_;
+
+			if (Cue.Instance.Sys.Input.MenuRight)
+			{
+				++newSel;
+				if (newSel >= Cue.Instance.ActivePersons.Length)
+					newSel = 0;
+			}
+			else if (Cue.Instance.Sys.Input.MenuLeft)
+			{
+				--newSel;
+				if (newSel < 0)
+					newSel = Cue.Instance.ActivePersons.Length - 1;
+			}
+
+			if (newSel >= Cue.Instance.ActivePersons.Length)
+				newSel = -1;
+
+			if (newSel != personSel_)
+				SetPerson(newSel);
+
+			if (Cue.Instance.Sys.Input.MenuSelect)
+			{
+				if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
+					items_[widgetSel_].Activate();
+			}
+
+			for (int i = 0; i < items_.Count; ++i)
+				items_[i].Update();
 		}
 
 		public void ShowLeft()

@@ -10,7 +10,7 @@ namespace Cue
 		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
 
 		public PersonSettingsTab(Person person)
-			: base("Settings")
+			: base("Settings", false)
 		{
 			person_ = person;
 
@@ -39,7 +39,7 @@ namespace Cue
 			});
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			ignore_.Do(() =>
 			{

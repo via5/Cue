@@ -36,7 +36,7 @@ namespace Cue
 		private List<UnityObject> items_ = new List<UnityObject>();
 
 		public UnityTab()
-			: base("Unity")
+			: base("Unity", false)
 		{
 			Layout = new VUI.BorderLayout();
 			Add(refresh_, VUI.BorderLayout.Top);
@@ -46,10 +46,6 @@ namespace Cue
 
 			refresh_.Clicked += Refresh;
 			objects_.ItemIndexActivated += OnActivated;
-		}
-
-		public override void Update(float s)
-		{
 		}
 
 		private void Refresh()

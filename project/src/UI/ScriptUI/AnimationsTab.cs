@@ -13,7 +13,7 @@ namespace Cue
 		private Animation sel_ = null;
 
 		public PersonAnimationsTab(Person person)
-			: base("Animations")
+			: base("Animations", false)
 		{
 			person_ = person;
 
@@ -53,7 +53,7 @@ namespace Cue
 			seek_.ValueChanged += OnSeek;
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{/*
 			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
 				return;

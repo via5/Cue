@@ -238,6 +238,18 @@ namespace VUI
 			}
 		}
 
+		public string SelectedCaption
+		{
+			get
+			{
+				var i = Selected;
+				if (i < 0 || i >= tabs_.Count)
+					return "";
+
+				return tabs_[i]?.Button?.Text ?? "";
+			}
+		}
+
 		public void AddTab(string text, Widget w)
 		{
 			var t = new Tab(this, text, w);
@@ -262,7 +274,19 @@ namespace VUI
 			var i = IndexOfWidget(w);
 			if (i == -1)
 			{
-				Glue.LogError("Select: widget not found");
+				Glue.LogError($"Select: widget '{w}' not found");
+				return;
+			}
+
+			Select(i);
+		}
+
+		public void Select(string caption)
+		{
+			var i = IndexOfCaption(caption);
+			if (i == -1)
+			{
+				Glue.LogError($"Select: caption '{caption}' not found");
 				return;
 			}
 
@@ -305,6 +329,17 @@ namespace VUI
 			for (int i = 0; i < tabs_.Count; ++i)
 			{
 				if (tabs_[i].Widget == w)
+					return i;
+			}
+
+			return -1;
+		}
+
+		public int IndexOfCaption(string s)
+		{
+			for (int i = 0; i < tabs_.Count; ++i)
+			{
+				if (tabs_[i].Button?.Text == s)
 					return i;
 			}
 

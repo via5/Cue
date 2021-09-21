@@ -172,7 +172,8 @@ namespace Cue
 		{
 			return new List<IItem>
 			{
-				HJ(), BJ(), Thrust(), Genitals(), Breasts(), MovePlayer()
+				HJ(), BJ(), Thrust(), CanKiss(),
+				Genitals(), Breasts(), MovePlayer()
 			};
 		}
 

@@ -466,6 +466,27 @@ namespace Cue
 			set { enabled_ = value; }
 		}
 
+		public static string[] Names
+		{
+			get
+			{
+				return new string[]
+				{
+					"animation",
+					"action",
+					"event",
+					"ai",
+					"command",
+					"integration",
+					"object",
+					"slots",
+					"sys",
+					"clothing",
+					"resources"
+				};
+			}
+		}
+
 		public string Prefix
 		{
 			get { return prefix_(); }

@@ -83,7 +83,7 @@ namespace Cue
 
 
 		public PersonExcitementTab(Person person)
-			: base("Mood")
+			: base("Mood", false)
 		{
 			person_ = person;
 
@@ -183,7 +183,7 @@ namespace Cue
 			Add(p);
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			state_.Text = person_.Mood.StateString;
 			rate_.Text = person_.Mood.RateString;

@@ -134,7 +134,7 @@
 			//if (elapsedNotPenetrated_ > 10)
 			{
 				elapsedNotPenetrated_ = 0;
-				person_.Animator.PlayType(Animations.Penetrated);
+			//	person_.Animator.PlayType(Animations.Penetrated);
 				Cue.LogError("emote");
 			}
 		}

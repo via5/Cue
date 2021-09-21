@@ -335,6 +335,33 @@ namespace Cue.Sys.Vam
 
 		public void ReloadPlugin()
 		{
+			var pui = GetPluginUI();
+			if (pui == null)
+				return;
+
+			ClearLog();
+			SuperController.LogError("reloading");
+			pui.reloadButton?.onClick?.Invoke();
+		}
+
+		public void OpenScriptUI()
+		{
+			var pui = GetPluginUI();
+			if (pui == null)
+				return;
+
+			var scui = pui.GetComponentInChildren<MVRScriptControllerUI>();
+			if (scui == null)
+			{
+				SuperController.LogError("no MVRScriptControllerUI");
+				return;
+			}
+
+			scui.openUIButton?.onClick?.Invoke();
+		}
+
+		private MVRPluginUI GetPluginUI()
+		{
 			// don't use cue for logging in case something went wrong when
 			// loading
 
@@ -351,19 +378,18 @@ namespace Cue.Sys.Vam
 				if (uit?.parent == null)
 				{
 					SuperController.LogError("sill no main ui, can't reload, open main UI once");
-					return;
+					return null;
 				}
 			}
 
 			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
 			{
 				if (pui.urlText.text.Contains("Cue.cslist"))
-				{
-					ClearLog();
-					SuperController.LogError("reloading");
-					pui.reloadButton.onClick.Invoke();
-				}
+					return pui;
 			}
+
+			SuperController.LogError("no MVRPluginUI found for this plugin");
+			return null;
 		}
 
 		public string ReadFileIntoString(string path)
