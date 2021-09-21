@@ -187,27 +187,15 @@
 
 		public void SetBodyDamping(int e)
 		{
-			float pos = 160;
-			float rot = 25;
-
-			float hipsPos = pos;
-			float hipsRot = rot;
-
-			if (e == BodyDamping.Sex)
-			{
-				hipsPos = 35;
-				hipsRot = 5;
-			}
-
-			SetStrongerDamping("hipControl", hipsPos, hipsRot);
-			SetStrongerDamping("chestControl", pos, rot);
-			SetStrongerDamping("headControl", pos, rot);
-			SetStrongerDamping("lThighControl", pos, rot);
-			SetStrongerDamping("rThighControl", pos, rot);
-			SetStrongerDamping("lFootControl", pos, rot);
-			SetStrongerDamping("rFootControl", pos, rot);
-			SetStrongerDamping("lKneeControl", pos, rot);
-			SetStrongerDamping("rKneeControl", pos, rot);
+			SetStrongerDamping("hipControl", e, true);
+			SetStrongerDamping("chestControl", e, true);
+			SetStrongerDamping("headControl", e, true);
+			SetStrongerDamping("lThighControl", e, true);
+			SetStrongerDamping("rThighControl", e, true);
+			SetStrongerDamping("lFootControl", e, false);
+			SetStrongerDamping("rFootControl", e, false);
+			SetStrongerDamping("lKneeControl", e, false);
+			SetStrongerDamping("rKneeControl", e, false);
 		}
 
 		public void SetBlink(bool b)
@@ -215,8 +203,17 @@
 			blink_.Value = b;
 		}
 
-		private void SetStrongerDamping(string cn, float pos, float rot)
+		private void SetStrongerDamping(string cn, int e, bool lowerForSex)
 		{
+			float pos = 160;
+			float rot = 25;
+
+			if (e == BodyDamping.Sex || lowerForSex)
+			{
+				pos = 35;
+				rot = 5;
+			}
+
 			var c = Cue.Instance.VamSys.FindController(atom_, cn);
 			if (c == null)
 			{

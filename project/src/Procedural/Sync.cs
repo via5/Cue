@@ -349,7 +349,7 @@ namespace Cue.Proc
 			{
 				var p = CurrentDuration().Progress;
 
-				if (State == BackwardsState)
+				if (State == BackwardsState && !Bits.IsSet(flags_, ResetBetween))
 					p = 1 - p;
 
 				return CurrentEasing()?.Magnitude(p) ?? 0;

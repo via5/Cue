@@ -4,8 +4,8 @@ namespace Cue
 {
 	class UI
 	{
-		public const bool VRMenuDebug = true;
-		public const bool VRMenuAlwaysOpened = false;
+		public static readonly bool VRMenuDebug = false;
+		public static readonly bool VRMenuAlwaysOpened = false;
 
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = null;

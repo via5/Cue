@@ -247,7 +247,7 @@ namespace Cue.Proc
 		private const float DirectionChangeMaxDistance = 0.05f;
 		private const float ForceFarDistance = 0.07f;
 		private const float ForceCloseDistance = 0.04f;
-		private const float MinimumForce = 0.4f;
+		private const float MinimumForce = 1;//0.4f;
 		private const float ForceChangeMaxAmount = 0.02f;
 
 		private float hipForceMin_ = 300;
@@ -447,8 +447,6 @@ namespace Cue.Proc
 
 			var dir = GetDirection();
 
-			Cue.LogError($"{p} {dir}");
-
 			f.Movement.SetRange(dir * fmin, dir * fmax);
 		}
 
@@ -473,6 +471,13 @@ namespace Cue.Proc
 					}
 				}
 			}
+		}
+
+		public override string ToDetailedString()
+		{
+			return
+				base.ToDetailedString() + "\n" +
+				$"ff={lastForceFactor_} dir={lastDir_}";
 		}
 	}
 

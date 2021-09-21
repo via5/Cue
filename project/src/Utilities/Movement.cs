@@ -35,6 +35,16 @@ namespace Cue
 		{
 		}
 
+		public Vector3 Minimum
+		{
+			get { return min_; }
+		}
+
+		public Vector3 Maximum
+		{
+			get { return max_; }
+		}
+
 		public static SlidingMovement FromJSON(
 			JSONClass o, string key, bool mandatory = false)
 		{
@@ -96,9 +106,9 @@ namespace Cue
 			m_.Update(s);
 		}
 
-		public bool Next()
+		public bool Next(bool force = false)
 		{
-			return m_.Next();
+			return m_.Next(force);
 		}
 
 		public void SetRange(Vector3 min, Vector3 max)

@@ -82,7 +82,7 @@ namespace Cue.Proc
 			return name_ + " " + root_.ToString();
 		}
 
-		public string ToDetailedString()
+		public virtual string ToDetailedString()
 		{
 			return ToString();
 		}

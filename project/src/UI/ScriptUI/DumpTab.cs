@@ -83,7 +83,13 @@ namespace Cue
 					if (p == null)
 						continue;
 
-					items.Add(p.ToDetailedString());
+					var ds = p.ToDetailedString().Split('\n');
+					if (ds.Length > 0)
+					{
+						items.Add(ds[0]);
+						for (int i = 1; i < ds.Length; ++i)
+							items.Add(I(1) + ds[i]);
+					}
 
 					foreach (var s in p.Targets)
 						DumpTarget(items, s, 1);
