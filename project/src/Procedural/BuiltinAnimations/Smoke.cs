@@ -47,8 +47,8 @@ namespace Cue.Proc
 
 
 		private float elapsed_ = 0;
-		private IObject cig_ = null;
-		private ISmoke smoke_ = null;
+		private IObject unsafeCig_ = null;
+		private ISmoke unsafeSmoke_ = null;
 		private Hand hand_ = null;
 		private BodyPart handPart_ = null;
 		private int state_ = NoState;
@@ -92,8 +92,8 @@ namespace Cue.Proc
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
-			cig_ = FindCigarette();
-			smoke_ = FindSmoke();
+			unsafeCig_ = FindCigarette();
+			unsafeSmoke_ = FindSmoke();
 
 			if (DoRender)
 			{
@@ -146,7 +146,7 @@ namespace Cue.Proc
 
 		public override void FixedUpdate(float s)
 		{
-			if (cig_ == null)
+			if (unsafeCig_ == null)
 			{
 				state_ = Finished;
 				return;
@@ -211,7 +211,16 @@ namespace Cue.Proc
 			{
 				var mouth = person_.Body.Get(BP.Lips);
 				render_.hand.Position = handPart_.Position;
-				render_.cig.Position = cig_.Position;
+
+				try
+				{
+					render_.cig.Position = unsafeCig_.Position;
+				}
+				catch (Exception)
+				{
+					// eat it
+				}
+
 				render_.targetHand.Position = targetPos_;
 				render_.targetHandMid.Position = targetMidPos_;
 				render_.targetCig.Position =
@@ -543,8 +552,15 @@ namespace Cue.Proc
 					head.AddRelativeTorque(new Vector3(HeadUpTorque * f, 0, 0));
 				}
 
-				smoke_.Position = head.Position;
-				smoke_.Opacity = SmokeOpacityMax;
+				try
+				{
+					unsafeSmoke_.Position = head.Position;
+					unsafeSmoke_.Opacity = SmokeOpacityMax;
+				}
+				catch (Exception)
+				{
+					// eat it
+				}
 			}
 
 			{
@@ -592,14 +608,21 @@ namespace Cue.Proc
 				head.AddRelativeTorque(new Vector3(HeadUpTorque * (1 - f), 0, 0));
 			}
 
-			{
-				smoke_.Opacity = SmokeOpacityMax / 2;
-			}
+			float opacity = SmokeOpacityMax / 2;
 
 			if (elapsed_ >= ResetTime)
 			{
 				state_ = Finished;
-				smoke_.Opacity = 0;
+				opacity = 0;
+			}
+
+			try
+			{
+				unsafeSmoke_.Opacity = opacity;
+			}
+			catch (Exception)
+			{
+				// eat it
 			}
 		}
 
@@ -631,8 +654,15 @@ namespace Cue.Proc
 			var e = hand_.Middle.Intermediate.Rotation.Euler;
 			var q = Quaternion.FromEuler(e.X, e.Y, e.Z + 10);
 
-			cig_.Position = CigarettePosition();
-			cig_.Rotation = q;
+			try
+			{
+				unsafeCig_.Position = CigarettePosition();
+				unsafeCig_.Rotation = q;
+			}
+			catch (Exception)
+			{
+				// eat them
+			}
 		}
 	}
 }

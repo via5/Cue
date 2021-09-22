@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Cue
@@ -13,6 +14,9 @@ namespace Cue
 		Quaternion Rotation { get; set; }
 		Vector3 EyeInterest { get; }
 		bool Possessed { get; }
+
+		bool HasTrait(string name);
+		string[] Traits { get; set; }
 
 		void Destroy();
 		void FixedUpdate(float s);
@@ -57,6 +61,9 @@ namespace Cue
 
 		private Slots slots_;
 		private Slot locked_ = null;
+
+		private string[] traits_ = new string[0];
+
 
 		public BasicObject(int index, Sys.IAtom atom)
 		{
@@ -157,6 +164,31 @@ namespace Cue
 		public bool Possessed
 		{
 			get { return Atom.Possessed; }
+		}
+
+		public bool HasTrait(string name)
+		{
+			for (int i = 0; i < traits_.Length; ++i)
+			{
+				if (traits_[i] == name)
+					return true;
+			}
+
+			return false;
+		}
+
+		public string[] Traits
+		{
+			get
+			{
+				return traits_;
+			}
+
+			set
+			{
+				traits_ = value;
+				Cue.Instance.Save();
+			}
 		}
 
 		public bool TryLockSlot(IObject o)
@@ -276,12 +308,27 @@ namespace Cue
 
 		public virtual void Load(JSONClass r)
 		{
-			// no-op
+			var ts = new List<string>();
+			foreach (JSONNode n in r["traits"].AsArray)
+				ts.Add(n.Value);
+			traits_ = ts.ToArray();
 		}
 
 		public virtual JSONNode ToJSON()
 		{
-			return null;
+			var o = new JSONClass();
+
+			if (traits_.Length > 0)
+			{
+				var a = new JSONArray();
+
+				for (int i = 0; i < traits_.Length; ++i)
+					a.Add(new JSONData(traits_[i]));
+
+				o.Add("traits", a);
+			}
+
+			return o;
 		}
 
 		public virtual void FixedUpdate(float s)

@@ -48,7 +48,6 @@ namespace Cue
 		private IClothing clothing_;
 		private IExpression expression_;
 
-		private string[] traits_ = new string[0];
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
 			: base(objectIndex, atom)
@@ -101,11 +100,6 @@ namespace Cue
 		{
 			base.Load(r);
 
-			var ts = new List<string>();
-			foreach (JSONNode n in r["traits"].AsArray)
-				ts.Add(n.Value);
-			traits_ = ts.ToArray();
-
 			if (r.HasKey("personality"))
 			{
 				var po = r["personality"].AsObject;
@@ -126,7 +120,7 @@ namespace Cue
 
 		public override JSONNode ToJSON()
 		{
-			var o = new JSONClass();
+			var o = base.ToJSON();
 
 			var p = personality_.ToJSON();
 			if (p.Count > 0)
@@ -151,23 +145,6 @@ namespace Cue
 		public Vector3 UprightPosition
 		{
 			get { return uprightPos_; }
-		}
-
-		public bool HasTrait(string name)
-		{
-			for (int i = 0; i < traits_.Length; ++i)
-			{
-				if (traits_[i] == name)
-					return true;
-			}
-
-			return false;
-		}
-
-		public string[] Traits
-		{
-			get { return traits_; }
-			set { traits_ = value; }
 		}
 
 		public PersonOptions Options { get { return options_; } }
