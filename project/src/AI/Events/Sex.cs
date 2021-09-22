@@ -54,10 +54,18 @@
 					if (receiver_ != null)
 						receiver_.Clothing.GenitalsVisible = true;
 
-					if (person_.Animator.CanPlayType(Animations.Sex) && person_.Mood.State == Mood.NormalState)
-						person_.Animator.PlaySex(person_.State.Current, receiver_);
-
 					running_ = true;
+				}
+
+				if (!person_.Animator.IsPlayingType(Animations.Sex))
+				{
+					if (person_.Mood.State == Mood.NormalState)
+					{
+						if (person_.Animator.CanPlayType(Animations.Sex))
+						{
+							person_.Animator.PlaySex(person_.State.Current, receiver_);
+						}
+					}
 				}
 			}
 			else

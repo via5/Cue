@@ -574,8 +574,8 @@ namespace Cue
 			var p = FindPerson("A");
 			if (p != null)
 			{
-				p.Gaze.ForceLook = ForceLooks.Camera;
-				p.Mood.FlatExcitementValue.SetForced(0);
+				//p.Gaze.ForceLook = ForceLooks.Camera;
+				//p.Mood.FlatExcitementValue.SetForced(0);
 			}
 		}
 	}

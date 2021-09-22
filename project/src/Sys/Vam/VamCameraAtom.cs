@@ -33,7 +33,43 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"camera";
+			return $"camera eyes";
+		}
+	}
+
+
+	class VamCameraHead : VamBodyPart
+	{
+		public VamCameraHead()
+			: base(null, BP.Head)
+		{
+		}
+
+		public override Vector3 ControlPosition
+		{
+			get { return Position; }
+			set { }
+		}
+
+		public override Quaternion ControlRotation
+		{
+			get { return Rotation; }
+			set { }
+		}
+
+		public override Vector3 Position
+		{
+			get { return Cue.Instance.VamSys.CameraPosition; }
+		}
+
+		public override Quaternion Rotation
+		{
+			get { return Quaternion.Zero; }
+		}
+
+		public override string ToString()
+		{
+			return $"camera head";
 		}
 	}
 
@@ -69,6 +105,11 @@ namespace Cue.Sys.Vam
 		{
 			get { return U.FromUnity(t_.rotation); }
 		}
+
+		public override string ToString()
+		{
+			return $"camera {t_.name}";
+		}
 	}
 
 
@@ -80,6 +121,7 @@ namespace Cue.Sys.Vam
 		{
 			parts_ = new IBodyPart[BP.Count];
 
+			parts_[BP.Head] = new VamCameraHead();
 			parts_[BP.Eyes] = new VamCameraEyes();
 			parts_[BP.LeftHand] = new VamTransformBodyPart(
 				BP.LeftHand, SuperController.singleton.leftHand);

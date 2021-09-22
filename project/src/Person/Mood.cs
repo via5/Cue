@@ -21,6 +21,7 @@ namespace Cue
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 
+
 		public Mood(Person p)
 		{
 			person_ = p;
@@ -194,6 +195,7 @@ namespace Cue
 					if (elapsed_ >= pp.Get(PE.OrgasmTime))
 					{
 						person_.Animator.StopType(Animations.Orgasm);
+
 						tiredness_.UpRate = pp.Get(PE.TirednessRateDuringPostOrgasm);
 						tiredness_.Target = 1;
 
@@ -311,7 +313,10 @@ namespace Cue
 		{
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
+
+			person_.Animator.StopType(Animations.Sex);
 			person_.Animator.PlayType(Animations.Orgasm);
+
 			flatExcitement_.Value = 1;
 			person_.Expression.ForceChange();
 			SetState(OrgasmState);

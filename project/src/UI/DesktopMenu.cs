@@ -166,7 +166,8 @@ namespace Cue
 
 			var p = Selected as Person;
 			if (p != null)
-				p.Animator.PlayType(Animations.Penetrated);
+				p.Mood.ForceOrgasm();
+				//p.Animator.PlayType(Animations.Penetrated);
 				//p.Clothing.Dump();
 		}
 

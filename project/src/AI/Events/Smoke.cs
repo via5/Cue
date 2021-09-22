@@ -15,7 +15,7 @@ namespace Cue
 		public SmokeEvent(Person p)
 			: base("smoke", p)
 		{
-			wait_ = new Duration(15, 30);
+			wait_ = new Duration(15, 40);
 		}
 
 		private void CheckEnabled(float s)

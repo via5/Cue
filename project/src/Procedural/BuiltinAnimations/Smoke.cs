@@ -35,8 +35,20 @@ namespace Cue.Proc
 		private const float MouthCloseTime = 0.2f;
 
 		private const float LipsPuckerMin = 0;
-		private const float LipsPuckerMax = 0.5f;
+		private const float LipsPuckerMax = 0.3f;
 		private const float LipsPuckerTime = 0.2f;
+
+		private const float ExhaleMouthOpenMin = 0;
+		private const float ExhaleMouthOpenMax = 0;
+		private const float ExhaleMorphsTime = 0.2f;
+		private const float ExhaleLipsPuckerMin = 0;
+		private const float ExhaleLipsPuckerMax = 0.4f;
+		private const float ExhaleLipsPartMin = 0;
+		private const float ExhaleLipsPartMax = 0.2f;
+		private const float ExhaleLipsPuckerWideMin = 0;
+		private const float ExhaleLipsPuckerWideMax = 0;
+		private const float ExhaleMouthNarrowMin = 0;
+		private const float ExhaleMouthNarrowMax = 0.15f;
 
 		private const float MidPointDistance = 0.3f;
 
@@ -60,9 +72,10 @@ namespace Cue.Proc
 		private Render render_ = new Render();
 		private float startFist_ = 0;
 		private float targetFist_ = 0;
-		private Morph mouthOpen_;
-		private Morph lipsPucker_;
 		private bool busySet_ = false;
+
+		private Morph mouthOpen_;
+		private Morph lipsPucker_, mouthNarrow_, lipsPart_, lipsPuckerWide_;
 
 		private IEasing moveToMouthEasing_ = new SinusoidalEasing();
 		private IEasing moveBackEasing_ = new SinusoidalEasing();
@@ -91,6 +104,9 @@ namespace Cue.Proc
 
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
+			mouthNarrow_ = new Morph(p.Atom.GetMorph("Mouth Narrow"));
+			lipsPart_ = new Morph(p.Atom.GetMorph("Lips Part"));
+			lipsPuckerWide_ = new Morph(p.Atom.GetMorph("Lips Pucker Wide"));
 
 			unsafeCig_ = FindCigarette();
 			unsafeSmoke_ = FindSmoke();
@@ -124,6 +140,9 @@ namespace Cue.Proc
 
 			mouthOpen_?.Reset();
 			lipsPucker_?.Reset();
+			mouthNarrow_?.Reset();
+			lipsPart_?.Reset();
+			lipsPuckerWide_?.Reset();
 		}
 
 		private IObject FindCigarette()
@@ -295,9 +314,8 @@ namespace Cue.Proc
 
 		private void SetBusy(bool b)
 		{
-			var head = person_.Body.Get(BP.Head);
-
-			head?.ForceBusy(b);
+			person_.Body.Get(BP.Head)?.ForceBusy(b);
+			person_.Body.Get(BP.Mouth)?.ForceBusy(b);
 			handPart_?.ForceBusy(b);
 			busySet_ = b;
 		}
@@ -543,15 +561,8 @@ namespace Cue.Proc
 			{
 				var e = elapsed_ - HoldInTime;
 
-				{
-					float f = morphEasing_.Magnitude(U.Clamp(e / MouthOpenTime, 0, 1));
-					mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * f;
-				}
-
-				{
-					float f = morphEasing_.Magnitude(U.Clamp(e / LipsPuckerTime, 0, 1));
-					lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * f;
-				}
+				float mf = morphEasing_.Magnitude(U.Clamp(e / ExhaleMorphsTime, 0, 1));
+				SetExhaleMorphs(mf);
 
 				{
 					float f = moveToMouthEasing_.Magnitude(U.Clamp(e / HeadUpTime, 0, 1));
@@ -583,8 +594,7 @@ namespace Cue.Proc
 
 			if (elapsed_ >= ExhaleTime && elapsed_ >= MoveTime && elapsed_ >= RotationTime && elapsed_ >= HeadUpTime)
 			{
-				head.ForceBusy(false);
-				handPart_.ForceBusy(false);
+				SetBusy(false);
 				StartReset();
 			}
 		}
@@ -599,15 +609,8 @@ namespace Cue.Proc
 		{
 			var head = person_.Body.Get(BP.Head);
 
-			{
-				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
-				mouthOpen_.Value = MouthOpenMin + (MouthOpenMax - MouthOpenMin) * (1 - f);
-			}
-
-			{
-				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
-				lipsPucker_.Value = LipsPuckerMin + (LipsPuckerMax - LipsPuckerMin) * (1 - f);
-			}
+			float mf = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
+			SetExhaleMorphs(1 - mf);
 
 			{
 				float f = moveToMouthEasing_.Magnitude(U.Clamp(elapsed_ / HeadUpTime, 0, 1));
@@ -630,6 +633,15 @@ namespace Cue.Proc
 			{
 				// eat it
 			}
+		}
+
+		private void SetExhaleMorphs(float f)
+		{
+			mouthOpen_.Value = ExhaleMouthOpenMin + (ExhaleMouthOpenMax - ExhaleMouthOpenMin) * f;
+			lipsPucker_.Value = ExhaleLipsPuckerMin + (ExhaleLipsPuckerMax - ExhaleLipsPuckerMin) * f;
+			mouthNarrow_.Value = ExhaleMouthNarrowMin + (ExhaleMouthNarrowMax - ExhaleMouthNarrowMin) * f;
+			lipsPart_.Value = ExhaleLipsPartMin + (ExhaleLipsPartMax - ExhaleLipsPartMin) * f;
+			lipsPuckerWide_.Value = ExhaleLipsPuckerWideMin + (ExhaleLipsPuckerWideMax - ExhaleLipsPuckerWideMin) * f;
 		}
 	}
 }
