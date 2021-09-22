@@ -62,6 +62,7 @@ namespace Cue.Proc
 		private float targetFist_ = 0;
 		private Morph mouthOpen_;
 		private Morph lipsPucker_;
+		private bool busySet_ = false;
 
 		private IEasing moveToMouthEasing_ = new SinusoidalEasing();
 		private IEasing moveBackEasing_ = new SinusoidalEasing();
@@ -91,6 +92,9 @@ namespace Cue.Proc
 			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
 			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
 
+			cig_ = FindCigarette();
+			smoke_ = FindSmoke();
+
 			if (DoRender)
 			{
 				var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
@@ -105,19 +109,34 @@ namespace Cue.Proc
 			}
 
 			elapsed_ = 0;
-
-			CreateCigarette();
-			smoke_ = Integration.CreateSmoke(SmokeID);
 		}
 
-		private string CigaretteID
+		public override void Reset()
 		{
-			get { return person_.ID + "_cue_cigarette"; }
+			base.Reset();
+
+			if (busySet_)
+				SetBusy(false);
+
+			mouthOpen_?.Reset();
+			lipsPucker_?.Reset();
 		}
 
-		private string SmokeID
+		private IObject FindCigarette()
 		{
-			get { return person_.ID + "_cue_cigarette_smoke"; }
+			var a = Cue.Instance.Sys.GetAtom(
+				SmokeEvent.MakeCigaretteID(person_));
+
+			if (a == null)
+				return null;
+
+			return new BasicObject(-1, a);
+		}
+
+		private ISmoke FindSmoke()
+		{
+			return Integration.CreateSmoke(
+				SmokeEvent.MakeSmokeID(person_), true);
 		}
 
 		public override bool Done
@@ -128,7 +147,10 @@ namespace Cue.Proc
 		public override void FixedUpdate(float s)
 		{
 			if (cig_ == null)
+			{
+				state_ = Finished;
 				return;
+			}
 
 			elapsed_ += s;
 			hand_.InOut = -1;
@@ -235,7 +257,6 @@ namespace Cue.Proc
 
 		private void StartMoveToMouth()
 		{
-			var head = person_.Body.Get(BP.Head);
 			var chest = person_.Body.Get(BP.Chest);
 			var mouth = person_.Body.Get(BP.Lips);
 
@@ -254,8 +275,16 @@ namespace Cue.Proc
 			elapsed_ = 0;
 			state_ = MovingToMouth;
 
-			head.ForceBusy(true);
-			handPart_.ForceBusy(true);
+			SetBusy(true);
+		}
+
+		private void SetBusy(bool b)
+		{
+			var head = person_.Body.Get(BP.Head);
+
+			head?.ForceBusy(b);
+			handPart_?.ForceBusy(b);
+			busySet_ = b;
 		}
 
 		public static Vector3 Bezier(
@@ -572,47 +601,6 @@ namespace Cue.Proc
 				state_ = Finished;
 				smoke_.Opacity = 0;
 			}
-		}
-
-		private void CreateCigarette()
-		{
-			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
-
-			if (a != null)
-			{
-				person_.Log.Info("cig already exists, taking");
-				SetCigarette(new BasicObject(-1, a));
-			}
-			else
-			{
-				person_.Log.Info("creating cigarette");
-
-				var oc = Resources.Objects.Get("cigarette");
-				if (oc == null)
-				{
-					person_.Log.Error("no cigarette object creator");
-					return;
-				}
-
-				oc.Create(CigaretteID, (o) =>
-				{
-					if (o == null)
-					{
-						person_.Log.Error("failed to create cigarette");
-						return;
-					}
-
-					SetCigarette(o);
-				});
-			}
-		}
-
-		private void SetCigarette(IObject o)
-		{
-			cig_ = o;
-			cig_.Atom.Collisions = false;
-			cig_.Atom.Physics = false;
-			cig_.Atom.Hidden = true;
 		}
 
 		private Vector3 CigarettePosition()

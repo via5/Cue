@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue.Proc
 {
@@ -136,11 +137,16 @@ namespace Cue.Proc
 			{
 				if (playing_[i].proto == a)
 				{
-					playing_[i].anim.Reset();
-					playing_.RemoveAt(i);
+					DoStop(i);
 					return;
 				}
 			}
+		}
+
+		private void DoStop(int i)
+		{
+			playing_[i].anim.Reset();
+			playing_.RemoveAt(i);
 		}
 
 		public void FixedUpdate(float s)
@@ -149,12 +155,25 @@ namespace Cue.Proc
 
 			while (i < playing_.Count)
 			{
-				playing_[i].anim.FixedUpdate(s);
+				try
+				{
+					playing_[i].anim.FixedUpdate(s);
 
-				if (playing_[i].anim.Done)
-					playing_.RemoveAt(i);
-				else
-					++i;
+					if (playing_[i].anim.Done)
+						playing_.RemoveAt(i);
+					else
+						++i;
+				}
+				catch (Exception e)
+				{
+					Cue.LogError(e.ToString());
+
+					Cue.LogError(
+						$"proc: exception during animation " +
+						$"{playing_[i].anim}, stopping");
+
+					DoStop(i);
+				}
 			}
 		}
 

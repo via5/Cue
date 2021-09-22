@@ -1079,6 +1079,7 @@ namespace Cue.Sys.Vam
 
 		private Atom atom_ = null;
 		private JSONStorableString p_ = null;
+		private JSONClass save_ = null;
 
 		public LiveSaver()
 		{
@@ -1088,10 +1089,22 @@ namespace Cue.Sys.Vam
 
 		public void Save(JSONClass o)
 		{
+			if (save_ != null)
+			{
+				// already in process
+				save_ = o;
+				return;
+			}
+
 			if (p_ == null)
-				SuperController.singleton.StartCoroutine(CreateAtom(o));
+			{
+				save_ = o;
+				SuperController.singleton.StartCoroutine(CreateAtom());
+			}
 			else
+			{
 				DoSave(o);
+			}
 		}
 
 		public JSONClass Load()
@@ -1153,7 +1166,7 @@ namespace Cue.Sys.Vam
 			return st.GetStringJSONParam("text");
 		}
 
-		private IEnumerator CreateAtom(JSONClass o)
+		private IEnumerator CreateAtom()
 		{
 			if (atom_ == null)
 			{
@@ -1161,7 +1174,7 @@ namespace Cue.Sys.Vam
 				if (atom_ == null)
 				{
 					Cue.LogInfo($"livesaver: creating atom {AtomID}");
-					yield return CreateAtom();
+					yield return DoCreateAtom();
 				}
 
 				Cue.LogInfo($"livesaver: looking for atom");
@@ -1180,13 +1193,10 @@ namespace Cue.Sys.Vam
 				}
 
 				if (atom_ == null)
-				{
 					Cue.LogError("lifesaver: failed to create live saver atom");
-					yield break;
-				}
 			}
 
-			if (p_ == null)
+			if (atom_ != null && p_ == null)
 			{
 				p_ = GetParameter();
 				if (p_ == null)
@@ -1196,8 +1206,13 @@ namespace Cue.Sys.Vam
 				}
 			}
 
-			CheckAtom();
-			DoSave(o);
+			if (p_ != null)
+			{
+				CheckAtom();
+				DoSave(save_);
+			}
+
+			save_ = null;
 		}
 
 		private void DoSave(JSONClass o)
@@ -1205,7 +1220,7 @@ namespace Cue.Sys.Vam
 			p_.val = o.ToString();
 		}
 
-		private IEnumerator CreateAtom()
+		private IEnumerator DoCreateAtom()
 		{
 			return SuperController.singleton.AddAtomByType("UIText", AtomID);
 		}

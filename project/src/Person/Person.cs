@@ -48,7 +48,7 @@ namespace Cue
 		private IClothing clothing_;
 		private IExpression expression_;
 
-		private List<string> traits_ = new List<string>();
+		private string[] traits_ = new string[0];
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
 			: base(objectIndex, atom)
@@ -101,8 +101,10 @@ namespace Cue
 		{
 			base.Load(r);
 
+			var ts = new List<string>();
 			foreach (JSONNode n in r["traits"].AsArray)
-				traits_.Add(n.Value);
+				ts.Add(n.Value);
+			traits_ = ts.ToArray();
 
 			if (r.HasKey("personality"))
 			{
@@ -153,7 +155,7 @@ namespace Cue
 
 		public bool HasTrait(string name)
 		{
-			for (int i = 0; i < traits_.Count; ++i)
+			for (int i = 0; i < traits_.Length; ++i)
 			{
 				if (traits_[i] == name)
 					return true;
@@ -164,7 +166,8 @@ namespace Cue
 
 		public string[] Traits
 		{
-			get { return traits_.ToArray(); }
+			get { return traits_; }
+			set { traits_ = value; }
 		}
 
 		public PersonOptions Options { get { return options_; } }

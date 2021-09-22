@@ -7,15 +7,18 @@ namespace Cue.Sys.Vam
 {
 	class VamCuaObjectCreator : IObjectCreator
 	{
+		private SuperController sc_;
 		private string name_;
 		private string assetUrl_;
 		private string assetName_;
 		private Vector3 posOffset_;
 		private float scale_;
 		private string preset_;
+		private bool creating_ = false;
 
 		public VamCuaObjectCreator(string name, JSONClass opts)
 		{
+			sc_ = SuperController.singleton;
 			name_ = name;
 			assetUrl_ = opts["url"].Value;
 			assetName_ = opts["name"].Value;
@@ -31,18 +34,25 @@ namespace Cue.Sys.Vam
 
 		public void Create(string id, Action<IObject> callback)
 		{
-			var sc = SuperController.singleton;
-			sc.StartCoroutine(CreateObjectRoutine(id, callback));
+			if (creating_)
+				return;
+
+			creating_ = true;
+
+			sc_.StartCoroutine(CreateObjectRoutine(
+				id, (o) =>
+				{
+					creating_ = false;
+					callback(o);
+				}));
 		}
 
 		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
 		{
-			var sc = SuperController.singleton;
-
 			Cue.LogInfo($"creating cua {id}");
-			yield return sc.AddAtomByType("CustomUnityAsset", id);
+			yield return sc_.AddAtomByType("CustomUnityAsset", id);
 
-			var atom = sc.GetAtomByUid(id);
+			var atom = sc_.GetAtomByUid(id);
 			if (atom == null)
 			{
 				Cue.LogError($"failed to create cua '{id}'");

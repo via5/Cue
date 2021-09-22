@@ -7,26 +7,45 @@
 		private Vector3 pos_ = Vector3.Zero;
 		private Quaternion rot_ = Quaternion.Zero;
 		private float smokeOpacity_ = 0;
+		private bool destroy_ = false;
 
-		public VamSmoke(string id)
+		private VamSmoke(IObject o)
+		{
+			SetSmoke(o);
+		}
+
+		private VamSmoke(string id)
+		{
+			Cue.LogInfo("creating smoke");
+
+			var oc = Resources.Objects.Get("cigaretteSmoke");
+			if (oc == null)
+				Cue.LogWarning("no cigarette smoke object creator");
+			else
+				oc.Create(id, (o) => { SetSmoke(o); });
+		}
+
+		public static VamSmoke Create(string id, bool existsOnly)
 		{
 			var a = Cue.Instance.Sys.GetAtom(id);
 
 			if (a != null)
 			{
 				Cue.LogInfo("smoke already exists, taking");
-				SetSmoke(new BasicObject(-1, a));
+				return new VamSmoke(new BasicObject(-1, a));
 			}
-			else
+			else if (existsOnly)
 			{
-				Cue.LogInfo("creating smoke");
-
-				var oc = Resources.Objects.Get("cigaretteSmoke");
-				if (oc == null)
-					Cue.LogWarning("no cigarette smoke object creator");
-				else
-					oc.Create(id, (o) => { SetSmoke(o); });
+				return null;
 			}
+
+			return new VamSmoke(id);
+		}
+
+		public void Destroy()
+		{
+			smoke_?.Destroy();
+			destroy_ = true;
 		}
 
 		public Vector3 Position
@@ -80,6 +99,12 @@
 			if (o == null)
 			{
 				Cue.LogWarning("failed to create cigarette smoke");
+				return;
+			}
+
+			if (destroy_)
+			{
+				o.Destroy();
 				return;
 			}
 

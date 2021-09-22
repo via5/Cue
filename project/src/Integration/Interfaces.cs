@@ -75,9 +75,9 @@ namespace Cue
 			return new Proc.Expression(p);
 		}
 
-		public static ISmoke CreateSmoke(string id)
+		public static ISmoke CreateSmoke(string id, bool existsOnly = false)
 		{
-			return new VamSmoke(id);
+			return VamSmoke.Create(id, existsOnly);
 		}
 	}
 
@@ -265,5 +265,6 @@ namespace Cue
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
 		float Opacity { get; set; }
+		void Destroy();
 	}
 }

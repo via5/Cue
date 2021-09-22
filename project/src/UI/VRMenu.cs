@@ -122,12 +122,12 @@ namespace Cue
 			if (Cue.Instance.Sys.Input.MenuRight)
 			{
 				newSel = NextPerson(personSel_, +1);
-				Cue.LogInfo($"vrmenu: menuright {personSel_} {newSel}");
+				//Cue.LogInfo($"vrmenu: menuright {personSel_} {newSel}");
 			}
 			else if (Cue.Instance.Sys.Input.MenuLeft)
 			{
 				newSel = NextPerson(personSel_, -1);
-				Cue.LogInfo($"vrmenu: menuleft {personSel_} {newSel}");
+				//Cue.LogInfo($"vrmenu: menuleft {personSel_} {newSel}");
 			}
 
 			if (newSel >= Cue.Instance.ActivePersons.Length)
@@ -251,7 +251,7 @@ namespace Cue
 
 		private void SetPerson(int index)
 		{
-			Cue.LogInfo($"vrmenu: {index}");
+			//Cue.LogInfo($"vrmenu: {index}");
 
 			personSel_ = index;
 

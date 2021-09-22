@@ -14,6 +14,7 @@ namespace Cue
 		Vector3 EyeInterest { get; }
 		bool Possessed { get; }
 
+		void Destroy();
 		void FixedUpdate(float s);
 		void Update(float s);
 		void OnPluginState(bool b);
@@ -67,25 +68,31 @@ namespace Cue
 
 		public static BasicObject TryCreateFromSlot(int index, Sys.IAtom a)
 		{
-			var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
-			var m = re.Match(a.ID);
+			return null;
+			//var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
+			//var m = re.Match(a.ID);
+			//
+			//if (m == null || !m.Success)
+			//	return null;
+			//
+			//var typeName = m.Groups[1].Value;
+			//
+			//var type = Slot.TypeFromString(typeName);
+			//if (type == Slot.NoType)
+			//{
+			//	Cue.LogError("bad object type '" + typeName + "'");
+			//	return null;
+			//}
+			//
+			//BasicObject o = new BasicObject(index, a);
+			//o.Slots.Add(type);
+			//
+			//return o;
+		}
 
-			if (m == null || !m.Success)
-				return null;
-
-			var typeName = m.Groups[1].Value;
-
-			var type = Slot.TypeFromString(typeName);
-			if (type == Slot.NoType)
-			{
-				Cue.LogError("bad object type '" + typeName + "'");
-				return null;
-			}
-
-			BasicObject o = new BasicObject(index, a);
-			o.Slots.Add(type);
-
-			return o;
+		public void Destroy()
+		{
+			atom_?.Destroy();
 		}
 
 		public int ObjectIndex
