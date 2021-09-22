@@ -157,12 +157,14 @@ namespace Cue.Sys
 		public int personIndex;
 		public int sourcePartIndex;
 		public float value;
+		public bool forced;
 
-		public TriggerInfo(int pi, int spi, float v)
+		public TriggerInfo(int sourcePersonIndex, int sourceBodyPart, float v, bool forced=false)
 		{
-			personIndex = pi;
-			sourcePartIndex = spi;
+			personIndex = sourcePersonIndex;
+			sourcePartIndex = sourceBodyPart;
 			value = v;
+			this.forced = forced;
 		}
 
 		public bool IsPerson()

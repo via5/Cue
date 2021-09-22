@@ -1,12 +1,19 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	class BodyPart
 	{
+		private const float TriggerCheckDelay = 1;
+
 		private Person person_;
 		private int type_;
 		private Sys.IBodyPart part_;
 		private bool forceBusy_ = false;
 		private Sys.IGraphic render_ = null;
+		private Sys.TriggerInfo[] triggers_ = null;
+		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
+		private float lastTriggerCheck_ = 0;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
@@ -84,9 +91,76 @@
 			get { return part_?.CanTrigger ?? false; }
 		}
 
+		public void AddForcedTrigger(
+			int sourcePersonIndex, int sourceBodyPart, float value = 1)
+		{
+			forcedTriggers_.Add(new Sys.TriggerInfo(
+				sourcePersonIndex, sourceBodyPart, value, true));
+		}
+
+		public void RemoveForcedTrigger(int sourcePersonIndex, int sourceBodyPart)
+		{
+			for (int i = 0; i < forcedTriggers_.Count; ++i)
+			{
+				if (forcedTriggers_[i].personIndex == sourcePersonIndex)
+				{
+					if (forcedTriggers_[i].sourcePartIndex == sourceBodyPart)
+					{
+						forcedTriggers_.RemoveAt(i);
+						return;
+					}
+				}
+			}
+
+			Cue.LogError(
+				$"{this} RemoveForcedTrigger: not found for " +
+				$"pi={sourcePersonIndex} bp={sourceBodyPart}");
+		}
+
 		public Sys.TriggerInfo[] GetTriggers()
 		{
-			return part_?.GetTriggers();
+			// todo
+			if (UnityEngine.Time.realtimeSinceStartup >= (lastTriggerCheck_ + TriggerCheckDelay))
+			{
+				lastTriggerCheck_ = UnityEngine.Time.realtimeSinceStartup;
+				triggers_ = part_?.GetTriggers();
+
+				if (forcedTriggers_.Count > 0)
+				{
+					if (triggers_ == null)
+					{
+						triggers_ = forcedTriggers_.ToArray();
+					}
+					else
+					{
+						var copy = new List<Sys.TriggerInfo>(triggers_);
+
+						for (int i = 0; i < forcedTriggers_.Count; ++i)
+						{
+							bool found = false;
+
+							for (int j = 0; j < triggers_.Length; ++j)
+							{
+								if (triggers_[j].personIndex == forcedTriggers_[i].personIndex)
+								{
+									if (triggers_[j].sourcePartIndex == forcedTriggers_[i].sourcePartIndex)
+									{
+										found = true;
+										break;
+									}
+								}
+							}
+
+							if (!found)
+								copy.Add(forcedTriggers_[i]);
+						}
+
+						triggers_ = copy.ToArray();
+					}
+				}
+			}
+
+			return triggers_;
 		}
 
 		public bool Triggered
@@ -96,7 +170,7 @@
 				if (part_ == null)
 					return false;
 
-				var ts = part_?.GetTriggers();
+				var ts = GetTriggers();
 				if (ts == null)
 					return false;
 

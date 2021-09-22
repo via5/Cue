@@ -172,26 +172,21 @@ namespace Cue
 		{
 			return new List<IItem>
 			{
-				HJ(), BJ(), Thrust(), CanKiss(),
+				Hand(), BJ(), Thrust(), CanKiss(),
 				Genitals(), Breasts(), MovePlayer()
 			};
 		}
 
-		private static IItem HJ()
+		private static IItem Hand()
 		{
-			return new CheckBoxItem("HJ",
+			return new CheckBoxItem("Hand",
 				(p, b) =>
 				{
-					if (p != null && p != Cue.Instance.Player)
-					{
-						if (b)
-							p.Handjob.Start();
-						else
-							p.Handjob.Stop();
-					}
+					if (p != null)
+						p.AI.GetEvent<HandEvent>().Active = b;
 				},
 
-				(p) => p.Handjob.Active);
+				(p) => p.AI.GetEvent<HandEvent>()?.Active ?? false);
 		}
 
 		public static IItem BJ()

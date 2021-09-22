@@ -9,6 +9,8 @@ namespace Cue.Proc
 		ISync Sync { get; }
 		bool Done { get; }
 
+		float MovementEnergy { get; }
+
 		ITarget Clone();
 		void Reset();
 		void Start(Person p);
@@ -38,6 +40,11 @@ namespace Cue.Proc
 		{
 			get { return sync_; }
 			set { sync_ = value; }
+		}
+
+		public virtual float MovementEnergy
+		{
+			get { return parent_.MovementEnergy; }
 		}
 
 		public abstract bool Done { get; }
@@ -113,7 +120,7 @@ namespace Cue.Proc
 			// todo
 		}
 
-		public bool Play(IAnimation a, int flags)
+		public bool Play(IAnimation a, object ps, int flags)
 		{
 			var proto = (a as BasicProcAnimation);
 			if (proto == null)
@@ -124,7 +131,7 @@ namespace Cue.Proc
 			var p = new Playing(proto, proto.Clone());
 
 			playing_.Add(p);
-			if (!p.anim.Start(person_))
+			if (!p.anim.Start(person_, ps))
 				return false;
 
 			log_.Info($"playing {a}");

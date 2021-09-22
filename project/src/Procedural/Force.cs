@@ -38,6 +38,8 @@ namespace Cue.Proc
 			excitement_ = excitement;
 			fwdDelayExcitement_ = fwdDelayExcitement;
 			bwdDelayExcitement_ = bwdDelayExcitement;
+
+			Next();
 		}
 
 		public static IEasing EasingFromJson(JSONClass o, string key)
@@ -166,8 +168,8 @@ namespace Cue.Proc
 
 				case BasicSync.DurationFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
-					Sync.Energy = person_.Mood.MovementEnergy;
+					movement_.WindowMagnitude = MovementEnergy;
+					Sync.Energy = MovementEnergy;
 					movement_.SetNext(Vector3.Zero);
 					break;
 				}
@@ -180,16 +182,16 @@ namespace Cue.Proc
 
 				case BasicSync.Looping:
 				{
-					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
-					Sync.Energy = person_.Mood.MovementEnergy;
+					movement_.WindowMagnitude = MovementEnergy;
+					Sync.Energy = MovementEnergy;
 					Next();
 					break;
 				}
 
 				case BasicSync.SyncFinished:
 				{
-					movement_.WindowMagnitude = person_.Mood.MovementEnergy;
-					Sync.Energy = person_.Mood.MovementEnergy;
+					movement_.WindowMagnitude = MovementEnergy;
+					Sync.Energy = MovementEnergy;
 					oneFrameFinished_ = true;
 					break;
 				}
@@ -264,7 +266,7 @@ namespace Cue.Proc
 			if (person_ == null)
 				return 0;
 
-			return excitement_.Magnitude(person_.Mood.MovementEnergy);
+			return excitement_.Magnitude(MovementEnergy);
 		}
 
 		private void Next()

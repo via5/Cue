@@ -50,12 +50,12 @@
 			specificModifiers_ = sms;
 		}
 
-		public float GetSpecificModifier(int part, Sys.TriggerInfo t)
+		public float GetSpecificModifier(int part, int sourcePart)
 		{
 			for (int i = 0; i < specificModifiers_.Length; ++i)
 			{
 				var sm = specificModifiers_[i];
-				if (sm.bodyPart == part && sm.sourceBodyPart == t.sourcePartIndex)
+				if (sm.bodyPart == part && sm.sourceBodyPart == sourcePart)
 					return sm.modifier;
 			}
 

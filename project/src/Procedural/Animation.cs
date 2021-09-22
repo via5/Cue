@@ -7,33 +7,26 @@ namespace Cue.Proc
 	{
 		private readonly string name_;
 		private bool hasMovement_;
-		private ConcurrentTargetGroup root_;
+		private RootTargetGroup root_;
 		protected Person person_ = null;
-		protected Person receiver_ = null;
 
 		public BasicProcAnimation(string name, bool hasMovement = true)
 		{
 			name_ = name;
 			hasMovement_ = hasMovement;
-			root_ = new ConcurrentTargetGroup("root", new NoSync());
+			root_ = new RootTargetGroup();
 		}
 
 		public abstract BasicProcAnimation Clone();
 
 		protected virtual void CopyFrom(BasicProcAnimation o)
 		{
-			root_ = (ConcurrentTargetGroup)o.root_.Clone();
-			receiver_ = o.receiver_;
+			root_ = (RootTargetGroup)o.root_.Clone();
 		}
 
 		public string Name
 		{
 			get { return name_; }
-		}
-
-		public Person Receiver
-		{
-			set { receiver_ = value; }
 		}
 
 		public virtual bool Done
@@ -61,11 +54,17 @@ namespace Cue.Proc
 			get { return root_.Targets; }
 		}
 
-		public virtual bool Start(Person p)
+		public virtual bool Start(Person p, object ps)
 		{
 			person_ = p;
+			SetEnergySource(p);
 			root_.Start(p);
 			return true;
+		}
+
+		protected void SetEnergySource(Person p)
+		{
+			root_.SetEnergySource(p);
 		}
 
 		public virtual void Reset()

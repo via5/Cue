@@ -15,9 +15,11 @@ namespace Cue
 		public const int Smoke = 7;
 		public const int Suck = 8;
 		public const int Penetrated = 9;
+		public const int RightFinger = 10;
+		public const int LeftFinger = 11;
 
-		public const int Count = 10;
-		public int GetCount() { return 10; }
+		public const int Count = 12;
+		public int GetCount() { return 12; }
 
 
 		private static string[] names_ = new string[]

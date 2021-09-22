@@ -40,7 +40,7 @@ namespace Cue
 			// todo
 		}
 
-		public bool Play(IAnimation a, int flags)
+		public bool Play(IAnimation a, object ps, int flags)
 		{
 			anim_ = a as SynergyAnimation;
 			if (anim_ == null)

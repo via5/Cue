@@ -73,8 +73,17 @@ namespace Cue
 				foreach (JSONClass smn in o.AsObject["specificModifiers"].AsArray.Childs)
 				{
 					var sm = new Physiology.SpecificModifier();
-					sm.bodyPart = BP.FromString(J.ReqString(smn, "bodyPart"));
-					sm.sourceBodyPart = BP.FromString(J.ReqString(smn, "sourceBodyPart"));
+
+					var s = J.ReqString(smn, "bodyPart");
+					sm.bodyPart = BP.FromString(s);
+					if (sm.bodyPart == -1 && s != "unknown")
+						log_.Error($"{p}: bad bodyPart {s}");
+
+					s = J.ReqString(smn, "sourceBodyPart");
+					sm.sourceBodyPart = BP.FromString(s);
+					if (sm.sourceBodyPart == -1 && s != "unknown")
+						log_.Error($"{p}: bad sourceBodyPart {s}");
+
 					sm.modifier = J.ReqFloat(smn, "modifier");
 					sms.Add(sm);
 				}

@@ -82,7 +82,7 @@ namespace Cue
 			// todo
 		}
 
-		public bool Play(IAnimation a, int flags)
+		public bool Play(IAnimation a, object ps, int flags)
 		{
 			current_ = (a as TimelineAnimation);
 			flags_ = flags;

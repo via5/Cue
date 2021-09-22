@@ -470,8 +470,6 @@ namespace Cue
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
 
-		private const float MaxDistanceToStart = 0.2f;
-
 		public ClockwiseSilverHandjob(Person p)
 		{
 			person_ = p;
@@ -565,56 +563,37 @@ namespace Cue
 			}
 		}
 
-		private Person FindTarget(int handPart)
+		public bool StartBoth(Person p)
 		{
-			var hand = person_.Body.Get(handPart);
+			StartCommon(p, "Both");
 
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (p == person_ || !p.Body.HasPenis)
-					continue;
+			zStrokeMax_.Value = 10;
+			hand2Side_.Value = -0.05f;
+			hand2UpDown_.Value = 0.15f;
+			topOnlyChance_.Value = 0;
 
-				var g = p.Body.Get(BP.Penis);
-				var d = Vector3.Distance(hand.Position, g.Position);
-
-				Cue.LogInfo($"{person_.ID} {p.ID} {hand.Name} {d}");
-
-				if (d < MaxDistanceToStart)
-					return p;
-			}
-
-			return null;
+			return true;
 		}
 
-		public bool Start()
+		public bool StartLeft(Person p)
 		{
-			var rightTarget = FindTarget(BP.RightHand);
-			var leftTarget = FindTarget(BP.LeftHand);
+			StartCommon(p, "Left");
+			StartSingleHandCommon(p);
+			return true;
+		}
 
-			if (rightTarget == null && leftTarget == null)
-				return false;
+		public bool StartRight(Person p)
+		{
+			StartCommon(p, "Right");
+			StartSingleHandCommon(p);
+			return true;
+		}
 
+		private void StartCommon(Person p, string hand)
+		{
+			hand_.Value = hand;
 			enabled_.Value = true;
-			male_.Value = rightTarget?.ID ?? leftTarget.ID;
-
-			if (rightTarget != null && leftTarget != null)
-			{
-				hand_.Value = "Both";
-				zStrokeMax_.Value = 10;
-				hand2Side_.Value = -0.05f;
-				hand2UpDown_.Value = 0.15f;
-				topOnlyChance_.Value = 0;
-			}
-			else
-			{
-				if (rightTarget != null)
-					hand_.Value = "Right";
-				else
-					hand_.Value = "Left";
-
-				zStrokeMax_.Value = zStrokeMax_.DefaultValue;
-				topOnlyChance_.Value = 0.1f;
-			}
+			male_.Value = p.ID;
 
 			handX_.Value = 0;
 			handY_.Value = 0;
@@ -625,13 +604,29 @@ namespace Cue
 			closedHand_ = false;
 
 			active_.Value = true;
+		}
 
-			return true;
+		private void StartSingleHandCommon(Person p)
+		{
+			zStrokeMax_.Value = zStrokeMax_.DefaultValue;
+			topOnlyChance_.Value = 0.1f;
 		}
 
 		public void Stop()
 		{
 			active_.Value = false;
+		}
+
+		public void StopLeft()
+		{
+			// todo
+			Stop();
+		}
+
+		public void StopRight()
+		{
+			// todo
+			Stop();
 		}
 
 		public void Update(float s)

@@ -170,7 +170,7 @@ namespace Cue
 					for (int j = 0; j < ts.Length; ++j)
 					{
 						parts_[i].value += ts[j].value;
-						parts_[i].specificModifier += pp.GetSpecificModifier(i, ts[j]);
+						parts_[i].specificModifier += pp.GetSpecificModifier(i, ts[j].sourcePartIndex);
 					}
 				}
 			}

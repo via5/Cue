@@ -120,13 +120,18 @@ namespace Cue
 									ss += ",";
 
 								ss += ts[j].ToString();
+
+								if (ts[j].forced)
+									ss += "(forced)";
 							}
 						}
+
+						bool triggered = (ts != null && ts.Length > 0);
 
 						w.triggering.Text = ss;
 
 						w.triggering.TextColor = (
-							(ts != null && ts.Length > 0) ?
+							triggered ?
 							Sys.Vam.U.ToUnity(Color.Green) :
 							VUI.Style.Theme.TextColor);
 					}

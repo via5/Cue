@@ -20,6 +20,34 @@ namespace Cue.Proc
 	}
 
 
+	class RootTargetGroup : ConcurrentTargetGroup
+	{
+		private Person p_ = null;
+
+		public RootTargetGroup()
+			: base("root", new NoSync())
+		{
+		}
+
+		public override ITarget Clone()
+		{
+			var s = new RootTargetGroup();
+			s.CopyFrom(this);
+			return s;
+		}
+
+		public void SetEnergySource(Person p)
+		{
+			p_ = p;
+		}
+
+		public override float MovementEnergy
+		{
+			get { return p_.Mood.MovementEnergy; }
+		}
+	}
+
+
 	class ConcurrentTargetGroup : BasicTargetGroup
 	{
 		private Person person_ = null;
@@ -83,10 +111,15 @@ namespace Cue.Proc
 				name_, new Duration(delay_), new Duration(maxDuration_),
 				forever_, Sync.Clone());
 
-			foreach (var c in targets_)
-				s.AddTarget(c.Clone());
+			s.CopyFrom(this);
 
 			return s;
+		}
+
+		protected void CopyFrom(ConcurrentTargetGroup o)
+		{
+			foreach (var c in o.targets_)
+				AddTarget(c.Clone());
 		}
 
 		public override List<ITarget> Targets
@@ -132,7 +165,7 @@ namespace Cue.Proc
 		{
 			allDone_ = false;
 
-			Sync.Energy = person_.Mood.MovementEnergy;
+			Sync.Energy = MovementEnergy;
 			Sync.FixedUpdate(s);
 
 			if (inDelay_)
@@ -298,7 +331,7 @@ namespace Cue.Proc
 
 		public override void FixedUpdate(float s)
 		{
-			Sync.Energy = person_.Mood.MovementEnergy;
+			Sync.Energy = MovementEnergy;
 			Sync.FixedUpdate(s);
 
 			if (targets_.Count == 0)

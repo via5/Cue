@@ -50,13 +50,13 @@
 			[
 				{
 					"bodyPart": "labia",
-					"sourceBodyPart": "lefthand",
+					"sourceBodyPart": "leftHand",
 					"modifier": 20
 				},
 
 				{
 					"bodyPart": "labia",
-					"sourceBodyPart": "righthand",
+					"sourceBodyPart": "rightHand",
 					"modifier": 20
 				},
 

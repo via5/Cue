@@ -184,7 +184,7 @@ namespace Cue
 
 		private bool ValidPerson(Person p)
 		{
-			return (p.IsInteresting && p != Cue.Instance.Player);
+			return p.IsInteresting;
 		}
 
 		public void ShowLeft()

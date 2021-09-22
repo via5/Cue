@@ -157,7 +157,7 @@ namespace Cue
 			return false;
 		}
 
-		public bool PlayTransition(int from, int to, int flags = 0)
+		public bool PlayTransition(int from, int to, object ps = null, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnyTransition(
 				from, to, person_.MovementStyle);
@@ -172,33 +172,14 @@ namespace Cue
 				return false;
 			}
 
-			return Play(a, flags);
+			return Play(a, ps, flags);
 		}
 
-		public bool PlaySex(int state, Person receiver, int flags = 0)
+		public bool PlayType(int type, object ps = null, int flags = 0)
 		{
-			var a = Resources.Animations.GetAnySex(
-				state, person_.MovementStyle);
-
-			if (a == null)
-			{
-				log_.Error(
-					$"no sex animation for " +
-					$"state {PersonState.StateToString(state)}");
-
+			if (IsPlayingType(type))
 				return false;
-			}
 
-			// todo
-			var pa = a.Real as Proc.BasicProcAnimation;
-			if (pa != null)
-				pa.Receiver = receiver;
-
-			return Play(a, flags);
-		}
-
-		public bool PlayType(int type, int flags = 0)
-		{
 			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
 			{
@@ -206,7 +187,7 @@ namespace Cue
 				return false;
 			}
 
-			return Play(a, flags);
+			return Play(a, ps, flags);
 		}
 
 		public bool PlayNeutral()
@@ -252,7 +233,7 @@ namespace Cue
 			return true;
 		}
 
-		public bool Play(Animation a, int flags = 0)
+		public bool Play(Animation a, object ps = null, int flags = 0)
 		{
 			log_.Info("playing " + a.ToString());
 
@@ -269,7 +250,7 @@ namespace Cue
 			{
 				var p = players_[i];
 
-				if (p.Play(a.Real, flags))
+				if (p.Play(a.Real, ps, flags))
 				{
 					playing_.Add(a);
 					a.SetPlayer(p);

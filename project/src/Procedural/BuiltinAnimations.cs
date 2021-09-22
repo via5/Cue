@@ -14,6 +14,8 @@ namespace Cue.Proc
 			list.Add(Smoke());
 			list.Add(Suck());
 			list.Add(Penetrated());
+			list.Add(LeftFinger());
+			list.Add(RightFinger());
 
 			return list;
 		}
@@ -74,6 +76,26 @@ namespace Cue.Proc
 
 			return new Animation(
 				Animations.Penetrated,
+				PersonState.None, PersonState.None,
+				PersonState.None, MovementStyles.Any, a);
+		}
+
+		private static Animation LeftFinger()
+		{
+			var a = new LeftFingerProcAnimation();
+
+			return new Animation(
+				Animations.LeftFinger,
+				PersonState.None, PersonState.None,
+				PersonState.None, MovementStyles.Any, a);
+		}
+
+		private static Animation RightFinger()
+		{
+			var a = new RightFingerProcAnimation();
+
+			return new Animation(
+				Animations.RightFinger,
 				PersonState.None, PersonState.None,
 				PersonState.None, MovementStyles.Any, a);
 		}

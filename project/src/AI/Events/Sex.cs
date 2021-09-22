@@ -63,7 +63,8 @@
 					{
 						if (person_.Animator.CanPlayType(Animations.Sex))
 						{
-							person_.Animator.PlaySex(person_.State.Current, receiver_);
+							person_.Animator.PlayType(
+								Animations.Sex, receiver_);
 						}
 					}
 				}

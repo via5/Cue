@@ -87,7 +87,7 @@ namespace Cue
 		bool UsesFrames { get; }
 
 		IAnimation[] GetPlaying();
-		bool Play(IAnimation a, int flags);
+		bool Play(IAnimation a, object ps, int flags);
 		void Stop(IAnimation a, bool rewind);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
@@ -168,8 +168,14 @@ namespace Cue
 
 		Person[] Targets { get; }
 
-		bool Start();
+		bool StartBoth(Person p);
+		bool StartLeft(Person p);
+		bool StartRight(Person p);
+
 		void Stop();
+		void StopLeft();
+		void StopRight();
+
 		void Update(float s);
 		void OnPluginState(bool b);
 		bool IsBusy(int bodyPart);

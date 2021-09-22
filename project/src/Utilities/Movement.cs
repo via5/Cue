@@ -27,6 +27,9 @@ namespace Cue
 			nextMax_ = nextMax;
 			windowSize_ = windowSize;
 			windowEasing_ = windowEasing;
+
+			SetWindow();
+			m_.Reset();
 		}
 
 		public SlidingMovement(SlidingMovement m) : this(

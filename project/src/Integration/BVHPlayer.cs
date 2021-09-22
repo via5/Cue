@@ -136,7 +136,7 @@ namespace Cue.BVH
             return s;
         }
 
-        public bool Play(IAnimation a, int flags)
+        public bool Play(IAnimation a, object ps, int flags)
         {
             var ba = a as Animation;
             if (ba == null)

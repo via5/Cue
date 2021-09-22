@@ -331,8 +331,6 @@ namespace Cue.Sys.Vam
 
 	class TriggerBodyPart : VamBodyPart
 	{
-		private const float TriggerCheckDelay = 1;
-
 		private CollisionTriggerEventHandler h_;
 		private Trigger trigger_;
 		private Rigidbody rb_;
@@ -341,7 +339,6 @@ namespace Cue.Sys.Vam
 		private Transform ignoreStop_ = null;
 		private Transform[] ignoreTransforms_ = new Transform[0];
 		private TriggerInfo[] triggers_ = null;
-		private float lastTriggerCheck_ = 0;
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
@@ -412,12 +409,7 @@ namespace Cue.Sys.Vam
 
 		public override TriggerInfo[] GetTriggers()
 		{
-			if (Time.realtimeSinceStartup >= (lastTriggerCheck_ + TriggerCheckDelay))
-			{
-				lastTriggerCheck_ = Time.realtimeSinceStartup;
-				UpdateTriggers();
-			}
-
+			UpdateTriggers();
 			return triggers_;
 		}
 

@@ -49,6 +49,7 @@ namespace Cue
 				windowSize_ = Math.Abs(max - min);
 
 			Next();
+			d_.Reset();
 		}
 
 		public SlidingDuration(SlidingDuration d) : this(

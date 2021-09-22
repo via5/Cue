@@ -156,6 +156,7 @@
     <Compile Include="src\Person\State.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\Finger.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Penetrated.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Sex.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Smoke.cs" />

@@ -27,6 +27,7 @@ namespace Cue.Proc
 
 		private float lastForceFactor_ = 0;
 		private Vector3 lastDir_ = Vector3.Zero;
+		private Person receiver_ = null;
 
 		public SexProcAnimation()
 			: base("procSex", false)
@@ -91,9 +92,12 @@ namespace Cue.Proc
 			return a;
 		}
 
-		public override bool Start(Person p)
+		public override bool Start(Person p, object ps)
 		{
-			base.Start(p);
+			if (!base.Start(p, ps))
+				return false;
+
+			receiver_ = ps as Person;
 
 			if (forces_ == null)
 			{
