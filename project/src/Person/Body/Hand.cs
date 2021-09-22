@@ -123,6 +123,11 @@
 			get { return name_; }
 		}
 
+		public Person Person
+		{
+			get { return person_; }
+		}
+
 		public Finger[] Fingers
 		{
 			get { return fingers_; }

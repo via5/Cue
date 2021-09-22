@@ -73,6 +73,20 @@ namespace Cue
 			}
 		}
 
+		public bool AnyInsidePersonalSpace()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_)
+					continue;
+
+				if (InsidePersonalSpace(p))
+					return true;
+			}
+
+			return false;
+		}
+
 		public bool InsidePersonalSpace(Person other)
 		{
 			var checkParts = BodyParts.PersonalSpaceParts;

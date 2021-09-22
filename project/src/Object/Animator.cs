@@ -146,6 +146,17 @@ namespace Cue
 			return playing_.Contains(a);
 		}
 
+		public bool IsPlayingType(int type)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].Type == type)
+					return true;
+			}
+
+			return false;
+		}
+
 		public bool PlayTransition(int from, int to, int flags = 0)
 		{
 			var a = Resources.Animations.GetAnyTransition(

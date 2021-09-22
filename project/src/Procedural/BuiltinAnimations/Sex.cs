@@ -91,7 +91,7 @@ namespace Cue.Proc
 			return a;
 		}
 
-		public override void Start(Person p)
+		public override bool Start(Person p)
 		{
 			base.Start(p);
 
@@ -103,6 +103,7 @@ namespace Cue.Proc
 			}
 
 			UpdateForces(true);
+			return true;
 		}
 
 		private void UpdateForces(bool alwaysUpdate = false)

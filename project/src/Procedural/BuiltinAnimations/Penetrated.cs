@@ -27,7 +27,7 @@
 			get { return (elapsed_ >= Time); }
 		}
 
-		public override void Start(Person p)
+		public override bool Start(Person p)
 		{
 			base.Start(p);
 
@@ -66,6 +66,8 @@
 					}
 				}
 			}
+
+			return true;
 		}
 
 		public override void Reset()

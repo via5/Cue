@@ -61,10 +61,11 @@ namespace Cue.Proc
 			get { return root_.Targets; }
 		}
 
-		public virtual void Start(Person p)
+		public virtual bool Start(Person p)
 		{
 			person_ = p;
 			root_.Start(p);
+			return true;
 		}
 
 		public virtual void Reset()

@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class SmokeEvent : BasicEvent
 	{
@@ -7,16 +9,18 @@
 		private bool enabled_ = false;
 		private IObject cig_ = null;
 		private ISmoke smoke_ = null;
-		private float checkElapsed_ = EnableCheckInterval;
+		private float checkElapsed_ = 0;
+		private Duration wait_;
 
 		public SmokeEvent(Person p)
 			: base("smoke", p)
 		{
-			CheckEnabled();
+			wait_ = new Duration(15, 30);
 		}
 
-		private void CheckEnabled()
+		private void CheckEnabled(float s)
 		{
+			checkElapsed_ += s;
 			if (checkElapsed_ < EnableCheckInterval)
 				return;
 
@@ -84,16 +88,73 @@
 
 		public override void Update(float s)
 		{
-			checkElapsed_ += s;
-			CheckEnabled();
-
+			CheckEnabled(s);
 			if (!enabled_)
 				return;
 
-			if (CanRun())
+			wait_.Update(s);
+
+			if (wait_.Finished && CanRun())
 			{
 				if (person_.Animator.CanPlayType(Animations.Smoke))
+				{
+					if (cig_ != null)
+						cig_.Visible = true;
+
 					person_.Animator.PlayType(Animations.Smoke);
+				}
+			}
+
+
+			if (cig_ != null)
+			{
+				if (!person_.Animator.IsPlayingType(Animations.Smoke))
+				{
+					if (person_.Body.Get(BP.RightHand).Busy)
+						cig_.Visible = false;
+
+					if (cig_.Visible)
+						SetCigaretteTransform(person_.Body.RightHand, cig_);
+				}
+			}
+		}
+
+		public static Vector3 MakeCigarettePosition(Hand hand)
+		{
+			var ia = hand.Index.Intermediate;
+			var ib = hand.Middle.Intermediate;
+			var ip = ia.Position + (ib.Position - ia.Position) / 2;
+
+			var da = hand.Index.Distal;
+			var db = hand.Middle.Distal;
+			var dp = da.Position + (db.Position - da.Position) / 2;
+
+			var p = ip + (dp - ip) / 2;
+			var r = hand.Middle.Intermediate.Rotation;
+
+			float vertOffset;
+
+			if (hand == hand.Person.Body.RightHand)
+				vertOffset = 0.02f;
+			else
+				vertOffset = -0.01f;
+
+			return p + r.Rotate(new Vector3(vertOffset, -0.025f, 0));
+		}
+
+		public static void SetCigaretteTransform(Hand hand, IObject cig)
+		{
+			var e = hand.Middle.Intermediate.Rotation.Euler;
+			var q = Quaternion.FromEuler(e.X, e.Y, e.Z + 10);
+
+			try
+			{
+				cig.Position = MakeCigarettePosition(hand);
+				cig.Rotation = q;
+			}
+			catch (Exception)
+			{
+				// eat them
 			}
 		}
 
@@ -104,6 +165,7 @@
 			var lips = b.Get(BP.Lips);
 
 			bool busy =
+				person_.Body.AnyInsidePersonalSpace() ||
 				person_.Body.Get(BP.RightHand).Busy ||
 				head.Busy || head.Triggered ||
 				lips.Busy || lips.Triggered;
@@ -156,6 +218,7 @@
 			cig_.Atom.Collisions = false;
 			cig_.Atom.Physics = false;
 			cig_.Atom.Hidden = true;
+			cig_.Visible = true;
 		}
 	}
 }

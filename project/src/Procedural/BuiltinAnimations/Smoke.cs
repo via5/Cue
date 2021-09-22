@@ -82,7 +82,7 @@ namespace Cue.Proc
 			return a;
 		}
 
-		public override void Start(Person p)
+		public override bool Start(Person p)
 		{
 			base.Start(p);
 
@@ -94,6 +94,9 @@ namespace Cue.Proc
 
 			unsafeCig_ = FindCigarette();
 			unsafeSmoke_ = FindSmoke();
+
+			if (unsafeCig_ == null)
+				return false;
 
 			if (DoRender)
 			{
@@ -109,6 +112,7 @@ namespace Cue.Proc
 			}
 
 			elapsed_ = 0;
+			return true;
 		}
 
 		public override void Reset()
@@ -205,7 +209,7 @@ namespace Cue.Proc
 				}
 			}
 
-			SetPosition();
+			SmokeEvent.SetCigaretteTransform(hand_, unsafeCig_);
 
 			if (DoRender)
 			{
@@ -224,7 +228,9 @@ namespace Cue.Proc
 				render_.targetHand.Position = targetPos_;
 				render_.targetHandMid.Position = targetMidPos_;
 				render_.targetCig.Position =
-					targetPos_ + targetRot_.Rotate(handPart_.Rotation.RotateInv(CigarettePosition() - handPart_.Position));
+					targetPos_ + targetRot_.Rotate(
+						handPart_.Rotation.RotateInv(
+							SmokeEvent.MakeCigarettePosition(hand_) - handPart_.Position));
 				render_.mouth.Position = mouth.Position;
 			}
 		}
@@ -255,7 +261,7 @@ namespace Cue.Proc
 			var mouth = person_.Body.Get(BP.Lips);
 
 			var d = handPart_.ControlRotation.RotateInv(
-				CigarettePosition() - handPart_.ControlPosition);
+				SmokeEvent.MakeCigarettePosition(hand_) - handPart_.ControlPosition);
 
 			targetRot_ = GetTargetRotation();
 
@@ -448,7 +454,7 @@ namespace Cue.Proc
 		private void Adjust(float s)
 		{
 			var mouth = person_.Body.Get(BP.Lips);
-			var cig = CigarettePosition();
+			var cig = SmokeEvent.MakeCigarettePosition(hand_);
 
 			{
 				float f = morphEasing_.Magnitude(U.Clamp(elapsed_ / MouthOpenTime, 0, 1));
@@ -623,45 +629,6 @@ namespace Cue.Proc
 			catch (Exception)
 			{
 				// eat it
-			}
-		}
-
-		private Vector3 CigarettePosition()
-		{
-			var ia = hand_.Index.Intermediate;
-			var ib = hand_.Middle.Intermediate;
-			var ip = ia.Position + (ib.Position - ia.Position) / 2;
-
-			var da = hand_.Index.Distal;
-			var db = hand_.Middle.Distal;
-			var dp = da.Position + (db.Position - da.Position) / 2;
-
-			var p = ip + (dp - ip) / 2;
-			var r = hand_.Middle.Intermediate.Rotation;
-
-			float vertOffset;
-
-			if (hand_ == person_.Body.RightHand)
-				vertOffset = 0.02f;
-			else
-				vertOffset = -0.01f;
-
-			return p + r.Rotate(new Vector3(vertOffset, -0.025f, 0));
-		}
-
-		private void SetPosition()
-		{
-			var e = hand_.Middle.Intermediate.Rotation.Euler;
-			var q = Quaternion.FromEuler(e.X, e.Y, e.Z + 10);
-
-			try
-			{
-				unsafeCig_.Position = CigarettePosition();
-				unsafeCig_.Rotation = q;
-			}
-			catch (Exception)
-			{
-				// eat them
 			}
 		}
 	}

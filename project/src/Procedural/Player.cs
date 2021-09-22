@@ -124,7 +124,8 @@ namespace Cue.Proc
 			var p = new Playing(proto, proto.Clone());
 
 			playing_.Add(p);
-			p.anim.Start(person_);
+			if (!p.anim.Start(person_))
+				return false;
 
 			log_.Info($"playing {a}");
 
