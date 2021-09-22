@@ -156,6 +156,10 @@
     <Compile Include="src\Person\State.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\Penetrated.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\Sex.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\Smoke.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\Suck.cs" />
     <Compile Include="src\Procedural\BuiltinExpressions.cs" />
     <Compile Include="src\Procedural\Controller.cs" />
     <Compile Include="src\Procedural\Expression.cs" />

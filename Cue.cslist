@@ -57,6 +57,10 @@ project\src\Procedural\Morph.cs
 project\src\Procedural\MorphGroup.cs
 project\src\Procedural\Player.cs
 project\src\Procedural\Sync.cs
+project\src\Procedural\BuiltinAnimations\Penetrated.cs
+project\src\Procedural\BuiltinAnimations\Sex.cs
+project\src\Procedural\BuiltinAnimations\Smoke.cs
+project\src\Procedural\BuiltinAnimations\Suck.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Objects.cs
 project\src\Resources\Personalities.cs
