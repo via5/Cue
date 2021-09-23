@@ -100,47 +100,6 @@ namespace VUI
 		}
 	}
 
-	public class IgnoreFlag
-	{
-		private bool ignore_ = false;
-
-		public static implicit operator bool(IgnoreFlag f)
-		{
-			return f.ignore_;
-		}
-
-		public void Do(Action a)
-		{
-			try
-			{
-				ignore_ = true;
-				a();
-			}
-			finally
-			{
-				ignore_ = false;
-			}
-		}
-	}
-
-	public class ScopedFlag : IDisposable
-	{
-		private readonly Action<bool> a_;
-		private readonly bool start_;
-
-		public ScopedFlag(Action<bool> a, bool start = true)
-		{
-			a_ = a;
-			start_ = start;
-
-			a_(start_);
-		}
-
-		public void Dispose()
-		{
-			a_(!start_);
-		}
-	}
 
 	public static class HashHelper
 	{
@@ -188,30 +147,27 @@ namespace VUI
 		public const string LockedSymbol = "U";//"\U0001F512";
 		public const string UnlockedSymbol = "L";//"\U0001F513";
 
-		public static void Handler(Action a)
+		public static float Clamp(float val, float min, float max)
 		{
-			try
-			{
-				a();
-			}
-			catch (Exception e)
-			{
-				Glue.LogError(e.ToString());
-			}
-		}
-
-		public static T Clamp<T>(T val, T min, T max)
-			where T : IComparable<T>
-		{
-			if (val.CompareTo(min) < 0)
+			if (val < min)
 				return min;
-			else if (val.CompareTo(max) > 0)
+			else if (val > max)
 				return max;
 			else
 				return val;
 		}
 
-		public static void TimeThis(string what, Action a)
+		public static int Clamp(int val, int min, int max)
+		{
+			if (val < min)
+				return min;
+			else if (val > max)
+				return max;
+			else
+				return val;
+		}
+
+		public static void DebugTimeThis(string what, Action a)
 		{
 			var start = Time.realtimeSinceStartup;
 			a();

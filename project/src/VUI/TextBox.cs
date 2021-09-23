@@ -22,26 +22,38 @@ namespace VUI
 
 		public override void OnPointerDown(PointerEventData data)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				HandleOnPointerDown(data);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public override void OnPointerUp(PointerEventData data)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				HandleOnPointerUp(data);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public override void OnDeselect(BaseEventData data)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				HandleOnDeselect(data);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public int CaretPosition(Vector2 pos)
@@ -157,7 +169,7 @@ namespace VUI
 		private string text_ = "";
 		private string placeholder_ = "";
 		private CustomInputField input_ = null;
-		private readonly IgnoreFlag ignore_ = new IgnoreFlag();
+		private bool ignore_ = false;
 		private int focusflags_ = Root.FocusDefault;
 
 		public TextBox(string t = "", string placeholder = "")
@@ -184,10 +196,15 @@ namespace VUI
 
 				if (input_ != null)
 				{
-					ignore_.Do(() =>
+					try
 					{
+						ignore_ = true;
 						input_.text = value;
-					});
+					}
+					finally
+					{
+						ignore_ = false;
+					}
 				}
 			}
 		}
@@ -309,10 +326,14 @@ namespace VUI
 
 		private void OnMouseDown(PointerEventData data)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				GetRoot().SetFocus(this, focusflags_);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		private void OnFocused(PointerEventData data)
@@ -365,19 +386,23 @@ namespace VUI
 			if (Validate != null)
 				return;
 
-			Utilities.Handler(() =>
+			try
 			{
 				if (ignore_)
 					return;
 
 				text_ = s;
 				Changed?.Invoke(s);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		private void OnEdited(string s)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (ignore_)
 					return;
@@ -414,7 +439,11 @@ namespace VUI
 
 				if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 					Submitted?.Invoke(text_);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 }

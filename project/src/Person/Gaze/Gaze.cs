@@ -193,7 +193,6 @@ namespace Cue
 
 			gazer_.Variance = picker_.CurrentTarget.Variance;
 			eyes_.LookAt(picker_.Position);
-
 			eyes_.Update(s);
 			gazer_.Update(s);
 		}

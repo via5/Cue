@@ -320,13 +320,16 @@ namespace Cue
 			get { return name_; }
 		}
 
-		public void Do(Action f)
+		public void Start()
 		{
 			updated_ = false;
 
 			w_.Reset();
 			w_.Start();
-			f();
+		}
+
+		public void End()
+		{
 			w_.Stop();
 
 			++calls_;
@@ -493,7 +496,7 @@ namespace Cue
 
 		public void Verbose(string s)
 		{
-			if (IsEnabled())
+			if (IsEnabled() && Cue.LogVerboseEnabled)
 				Cue.LogVerbose($"{Prefix}: {s}");
 		}
 

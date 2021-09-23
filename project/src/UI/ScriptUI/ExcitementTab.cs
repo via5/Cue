@@ -11,7 +11,7 @@ namespace Cue
 			private readonly VUI.Label value_;
 			private readonly VUI.CheckBox isForced_;
 			private readonly VUI.FloatTextSlider forced_;
-			private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
+			private bool ignore_ = false;
 
 			public ForceableFloatWidgets(ForceableFloat f, string caption)
 			{
@@ -37,10 +37,15 @@ namespace Cue
 				value_.Text = $"{f_}";
 				if (!isForced_.Checked)
 				{
-					ignore_.Do(() =>
+					try
 					{
+						ignore_ = true;
 						forced_.Value = f_.Value;
-					});
+					}
+					finally
+					{
+						ignore_ = false;
+					}
 				}
 			}
 

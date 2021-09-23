@@ -65,10 +65,11 @@ namespace VUI
 
 				if (slider_ != null)
 				{
-					SetValue(value);
-
-					if (!ignore_)
-						ValueChanged?.Invoke(value);
+					if (SetValue(value))
+					{
+						if (!ignore_)
+							ValueChanged?.Invoke(value);
+					}
 				}
 			}
 		}
@@ -219,7 +220,7 @@ namespace VUI
 		}
 
 		protected abstract T GetValue();
-		protected abstract void SetValue(T v);
+		protected abstract bool SetValue(T v);
 
 		protected abstract T GetMinimum();
 		protected abstract void SetMinimum(T v);
@@ -268,9 +269,15 @@ namespace VUI
 			return slider_.slider.value;
 		}
 
-		protected override void SetValue(float v)
+		protected override bool SetValue(float v)
 		{
-			slider_.slider.value = v;
+			if (slider_.slider.value != v)
+			{
+				slider_.slider.value = v;
+				return true;
+			}
+
+			return false;
 		}
 
 		protected override float GetMinimum()
@@ -330,9 +337,15 @@ namespace VUI
 			return (int)slider_.slider.value;
 		}
 
-		protected override void SetValue(int v)
+		protected override bool SetValue(int v)
 		{
-			slider_.slider.value = v;
+			if (slider_.slider.value != v)
+			{
+				slider_.slider.value = v;
+				return true;
+			}
+
+			return false;
 		}
 
 		protected override int GetMinimum()
@@ -480,9 +493,14 @@ namespace VUI
 
 			T f = FromString(s);
 
-			using (new ScopedFlag((b) => changingText_ = b))
+			try
 			{
+				changingText_ = true;
 				slider_.Value = f;
+			}
+			finally
+			{
+				changingText_ = false;
 			}
 		}
 

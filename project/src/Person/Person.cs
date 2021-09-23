@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
@@ -268,11 +269,18 @@ namespace Cue
 				ai_.FixedUpdate(s);
 		}
 
+		private void UpdateGaze(float s)
+		{
+			if (Cue.Instance.Player != this)
+				gaze_.Update(s);
+		}
+
 		public override void Update(float s)
 		{
 			base.Update(s);
 
-			I.Do(I.UpdatePersonTransitions, () =>
+
+			I.Start(I.UpdatePersonTransitions);
 			{
 				CheckNavState();
 
@@ -299,54 +307,71 @@ namespace Cue
 						SetState(ds);
 					}
 				}
-			});
+			}
+			I.End();
 
-			I.Do(I.UpdatePersonActions, () =>
+
+			I.Start(I.UpdatePersonActions);
 			{
 				actions_.Tick(s);
-			});
+			}
+			I.End();
 
-			I.Do(I.UpdatePersonGaze, () =>
+
+
+			I.Start(I.UpdatePersonGaze);
 			{
-				if (Cue.Instance.Player != this)
-					gaze_.Update(s);
-			});
+				UpdateGaze(s);
+			}
+			I.End();
 
-			I.Do(I.UpdatePersonEvents, () =>
+
+			I.Start(I.UpdatePersonEvents);
 			{
 				Kisser.Update(s);
 				Handjob.Update(s);
 				Blowjob.Update(s);
-			});
+			}
+			I.End();
+
 
 			if (this != Cue.Instance.Player)
 			{
-				I.Do(I.UpdatePersonExcitement, () =>
+				I.Start(I.UpdatePersonExcitement);
 				{
 					excitement_.Update(s);
-				});
+				}
+				I.End();
 
-				I.Do(I.UpdatePersonPersonality, () =>
+
+				I.Start(I.UpdatePersonPersonality);
 				{
 					personality_.Update(s);
-				});
+				}
+				I.End();
 
-				I.Do(I.UpdatePersonMood, () =>
+
+				I.Start(I.UpdatePersonMood);
 				{
 					mood_.Update(s);
-				});
+				}
+				I.End();
 
-				I.Do(I.UpdatePersonBody, () =>
+
+				I.Start(I.UpdatePersonBody);
 				{
 					body_.Update(s);
-				});
+				}
+				I.End();
 			}
 
-			I.Do(I.UpdatePersonAI, () =>
+
+			I.Start(I.UpdatePersonAI);
 			{
 				if (ai_ != null && !Atom.Teleporting)
 					ai_.Update(s);
-			});
+			}
+			I.End();
 		}
 
 		public override void OnPluginState(bool b)

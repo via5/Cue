@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -279,8 +280,10 @@ namespace VUI
 			if (popup_ == null)
 				return;
 
-			using (new ScopedFlag((b) => updatingChoices_ = b))
+			try
 			{
+				updatingChoices_ = true;
+
 				popup_.popup.numPopupValues = items_.Count;
 				for (int i = 0; i < items_.Count; ++i)
 				{
@@ -288,6 +291,10 @@ namespace VUI
 					popup_.popup.setDisplayPopupValue(i, item.Text);
 					popup_.popup.setPopupValue(i, item.GetHashCode().ToString());
 				}
+			}
+			finally
+			{
+				updatingChoices_ = false;
 			}
 		}
 
@@ -318,7 +325,7 @@ namespace VUI
 			if (updatingChoices_)
 				return;
 
-			Utilities.Handler(() =>
+			try
 			{
 				int sel = -1;
 
@@ -335,7 +342,11 @@ namespace VUI
 					Glue.LogError("combobox: selected item '" + s + "' not found");
 
 				Select(sel);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 }

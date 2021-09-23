@@ -8,7 +8,7 @@ namespace Cue
 		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
 		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
 		private VUI.TextBox traits_ = new VUI.TextBox();
-		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
+		private bool ignore_ = false;
 
 		public PersonSettingsTab(Person person)
 			: base("Settings", false)
@@ -38,20 +38,28 @@ namespace Cue
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 
-			ignore_.Do(() =>
+			try
 			{
+				ignore_ = true;
+
 				voicePitch_.Set(
 					person_.Personality.Voice.GetNormalPitch(person_),
 					0, 1);
 
 				traits_.Text = string.Join(" ", person_.Traits);
-			});
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		protected override void DoUpdate(float s)
 		{
-			ignore_.Do(() =>
+			try
 			{
+				ignore_ = true;
+
 				if (personality_.Count == 0)
 				{
 					personality_.SetItems(
@@ -63,7 +71,11 @@ namespace Cue
 					if (personality_.Selected != person_.Personality.Name)
 						personality_.Select(person_.Personality.Name);
 				}
-			});
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		private void OnPersonality(string name)

@@ -30,7 +30,84 @@ namespace Cue
 
 	class PluginGone : Exception { }
 
-	class I
+
+	class Instrumentation
+	{
+		private Ticker[] tickers_ = new Ticker[I.TickerCount];
+		private int[] depth_ = new int[I.TickerCount]
+		{
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
+		};
+		private int[] stack_ = new int[3];
+		private int current_ = 0;
+
+		public Instrumentation()
+		{
+			tickers_[I.Update] = new Ticker("Update");
+			tickers_[I.UpdateInput] = new Ticker("Input");
+			tickers_[I.UpdateObjects] = new Ticker("Objects");
+			tickers_[I.UpdateObjectsAtoms] = new Ticker("Atoms");
+			tickers_[I.UpdateObjectsMove] = new Ticker("Move");
+			tickers_[I.UpdatePersonTransitions] = new Ticker("Transitions");
+			tickers_[I.UpdatePersonActions] = new Ticker("Actions");
+			tickers_[I.UpdatePersonGaze] = new Ticker("Gaze");
+			tickers_[I.UpdatePersonEvents] = new Ticker("Events");
+			tickers_[I.UpdatePersonExcitement] = new Ticker("Excitement");
+			tickers_[I.UpdatePersonPersonality] = new Ticker("Personality");
+			tickers_[I.UpdatePersonMood] = new Ticker("Mood");
+			tickers_[I.UpdatePersonBody] = new Ticker("Body");
+			tickers_[I.UpdatePersonAI] = new Ticker("AI");
+			tickers_[I.UpdateUi] = new Ticker("UI");
+			tickers_[I.FixedUpdate] = new Ticker("Fixed update");
+		}
+
+		public bool Updated
+		{
+			get { return tickers_[I.Update].Updated; }
+		}
+
+		public void Start(int i)
+		{
+			stack_[current_] = i;
+			++current_;
+
+			tickers_[i].Start();
+		}
+
+		public void End()
+		{
+			--current_;
+
+			int i = stack_[current_];
+			stack_[current_] = -1;
+
+			tickers_[i].End();
+		}
+
+		public int Depth(int i)
+		{
+			return depth_[i];
+		}
+
+		public string Name(int i)
+		{
+			return tickers_[i].Name;
+		}
+
+		public Ticker Get(int i)
+		{
+			return tickers_[i];
+		}
+
+		public void UpdateTickers(float s)
+		{
+			for (int i = 0; i < tickers_.Length; ++i)
+				tickers_[i].Update(s);
+		}
+	}
+
+
+	static class I
 	{
 		public const int Update = 0;
 		public const int UpdateInput = 1;
@@ -50,69 +127,23 @@ namespace Cue
 		public const int FixedUpdate = 15;
 		public const int TickerCount = 16;
 
-		private Ticker[] tickers_ = new Ticker[TickerCount];
-		private int[] depth_ = new int[TickerCount]
-		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
-		};
 
 
-		private static I instance_ = new I();
+		private static Instrumentation instance_ = new Instrumentation();
 
-		private I()
-		{
-			tickers_[Update] = new Ticker("Update");
-			tickers_[UpdateInput] = new Ticker("Input");
-			tickers_[UpdateObjects] = new Ticker("Objects");
-			tickers_[UpdateObjectsAtoms] = new Ticker("Atoms");
-			tickers_[UpdateObjectsMove] = new Ticker("Move");
-			tickers_[UpdatePersonTransitions] = new Ticker("Transitions");
-			tickers_[UpdatePersonActions] = new Ticker("Actions");
-			tickers_[UpdatePersonGaze] = new Ticker("Gaze");
-			tickers_[UpdatePersonEvents] = new Ticker("Events");
-			tickers_[UpdatePersonExcitement] = new Ticker("Excitement");
-			tickers_[UpdatePersonPersonality] = new Ticker("Personality");
-			tickers_[UpdatePersonMood] = new Ticker("Mood");
-			tickers_[UpdatePersonBody] = new Ticker("Body");
-			tickers_[UpdatePersonAI] = new Ticker("AI");
-			tickers_[UpdateUi] = new Ticker("UI");
-			tickers_[FixedUpdate] = new Ticker("Fixed update");
-		}
-
-		public static I Instance
+		public static Instrumentation Instance
 		{
 			get { return instance_; }
 		}
 
-		public static bool Updated
+		public static void Start(int i)
 		{
-			get { return instance_.tickers_[Update].Updated; }
+			instance_.Start(i);
 		}
 
-		public static void Do(int i, Action f)
+		public static void End()
 		{
-			instance_.tickers_[i].Do(f);
-		}
-
-		public static int Depth(int i)
-		{
-			return instance_.depth_[i];
-		}
-
-		public static string Name(int i)
-		{
-			return instance_.tickers_[i].Name;
-		}
-
-		public static Ticker Get(int i)
-		{
-			return instance_.tickers_[i];
-		}
-
-		public static void UpdateTickers(float s)
-		{
-			for (int i = 0; i < instance_.tickers_.Length; ++i)
-				instance_.tickers_[i].Update(s);
+			instance_.End();
 		}
 	}
 
@@ -426,7 +457,12 @@ namespace Cue
 				return;
 
 			++frame_;
-			I.Do(I.FixedUpdate, () => DoFixedUpdate(s));
+
+			I.Start(I.FixedUpdate);
+			{
+				DoFixedUpdate(s);
+			}
+			I.End();
 		}
 
 		private void DoFixedUpdate(float s)
@@ -437,16 +473,37 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			I.Do(I.Update, () => DoUpdate(s));
-			I.UpdateTickers(s);
+			I.Start(I.Update);
+			{
+				DoUpdate(s);
+			}
+			I.End();
+
+			I.Instance.UpdateTickers(s);
 			ui_.PostUpdate();
 		}
 
 		private void DoUpdate(float s)
 		{
-			I.Do(I.UpdateInput, () => DoUpdateInput(s));
-			I.Do(I.UpdateObjects, () => DoUpdateObjects(s));
-			I.Do(I.UpdateUi, () => DoUpdateUI(s));
+			I.Start(I.UpdateInput);
+			{
+				DoUpdateInput(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdateObjects);
+			{
+				DoUpdateObjects(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdateUi);
+			{
+				DoUpdateUI(s);
+			}
+			I.End();
 		}
 
 		private void DoUpdateInput(float s)
@@ -532,9 +589,15 @@ namespace Cue
 			LogVerbose($"cue: plugin state {b} finished");
 		}
 
+		static public bool LogVerboseEnabled
+		{
+			get { return false; }
+		}
+
 		static public void LogVerbose(string s)
 		{
-			//Instance.Sys.Log(s, W.LogLevels.Verbose);
+			if (LogVerboseEnabled)
+				Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Verbose);
 		}
 
 		static public void LogInfo(string s)

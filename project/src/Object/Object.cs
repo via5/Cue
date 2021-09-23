@@ -279,12 +279,14 @@ namespace Cue
 
 		public virtual void Update(float s)
 		{
-			I.Do(I.UpdateObjectsAtoms, () =>
+			I.Start(I.UpdateObjectsAtoms);
 			{
 				Atom.Update(s);
-			});
+			}
+			I.End();
 
-			I.Do(I.UpdateObjectsMove, () =>
+
+			I.Start(I.UpdateObjectsMove);
 			{
 				if (moveState_ == TentativeMoveState)
 				{
@@ -303,7 +305,8 @@ namespace Cue
 						Atom.NavStop("nav state is none");
 					}
 				}
-			});
+			}
+			I.End();
 		}
 
 		public virtual void Load(JSONClass r)

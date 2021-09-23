@@ -67,7 +67,7 @@ namespace Cue
 
 		public void UpdateTickers()
 		{
-			if (I.Updated)
+			if (I.Instance.Updated)
 				misc_.UpdateTickers();
 		}
 

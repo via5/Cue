@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VUI
 {
@@ -188,12 +189,16 @@ namespace VUI
 
 		private void OnClicked()
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				GetRoot().SetFocus(this);
 				Clicked?.Invoke();
 				button_.button.OnDeselect(new UnityEngine.EventSystems.BaseEventData(null));
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 

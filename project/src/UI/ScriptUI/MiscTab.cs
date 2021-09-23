@@ -65,11 +65,12 @@ namespace Cue
 			gl.HorizontalSpacing = 40;
 
 			var p = new VUI.Panel(gl);
+			var inst = I.Instance;
 
 			for (int i = 0; i < I.TickerCount; ++i)
 			{
 				tickers_[i] = new VUI.Label();
-				p.Add(new VUI.Label(new string(' ', I.Depth(i) * 2) + I.Name(i)));
+				p.Add(new VUI.Label(new string(' ', inst.Depth(i) * 2) + inst.Name(i)));
 				p.Add(tickers_[i]);
 			}
 
@@ -82,8 +83,10 @@ namespace Cue
 		{
 			if (IsVisibleOnScreen())
 			{
+				var inst = I.Instance;
+
 				for (int i = 0; i < I.TickerCount; ++i)
-					tickers_[i].Text = I.Get(i).ToString();
+					tickers_[i].Text = inst.Get(i).ToString();
 			}
 		}
 	}

@@ -495,7 +495,7 @@ namespace VUI
 		private int topItemIndex_ = 0;
 		private int itemCount_ = 0;
 		private int visibleCount_ = 0;
-		private IgnoreFlag ignoreVScroll_ = new IgnoreFlag();
+		private bool ignoreVScroll_ = false;
 		private Node hovered_ = null;
 		private Item selected_ = null;
 
@@ -697,10 +697,15 @@ namespace VUI
 
 		private bool OnWheel(WheelEvent e)
 		{
-			ignoreVScroll_.Do(() =>
+			try
 			{
+				ignoreVScroll_ = true;
 				SetTopItem(topItemIndex_ + (int)-e.Delta.Y, true);
-			});
+			}
+			finally
+			{
+				ignoreVScroll_ = false;
+			}
 
 			return false;
 		}

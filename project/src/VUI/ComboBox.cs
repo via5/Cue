@@ -142,11 +142,15 @@ namespace VUI
 			var h = Popup.popup.topButton.gameObject.AddComponent<MouseHandler>();
 			h.Clicked += (data) =>
 			{
-				Utilities.Handler(() =>
+				try
 				{
 					if (Popup.popup.visible)
 						OnOpen();
-				});
+				}
+				catch (Exception e)
+				{
+					Glue.LogErrorST(e.ToString());
+				}
 			};
 
 			arrowObject_ = new GameObject("ComboBoxArrow");

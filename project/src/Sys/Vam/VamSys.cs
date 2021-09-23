@@ -474,37 +474,59 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
-		private JSONStorable FindStorable(Atom a, string name)
+		private const int CheckPluginCount = 20;
+
+		public static string[] MakeStorableNamesCache(string name)
+		{
+			var c = new string[CheckPluginCount];
+
+			for (int i = 0; i < CheckPluginCount; ++i)
+				c[i] = $"plugin#{i}_{name}";
+
+			return c;
+		}
+
+		private JSONStorable FindStorable(
+			Atom a, string name, string[] storableNamesCache)
 		{
 			var s = a.GetStorableByID(name);
-			if (s != null)
-				return s;
 
-			string p = "";
-			for (int i = 0; i < 20; ++i)
+			if (s == null)
 			{
-				p = $"plugin#{i}_{name}";
-				s = a.GetStorableByID(p);
-				if (s != null)
-					return s;
+				for (int i = 0; i < CheckPluginCount; ++i)
+				{
+					string p;
+
+					if (storableNamesCache == null)
+						p = $"plugin#{i}_{name}";
+					else
+						p = storableNamesCache[i];
+
+					s = a.GetStorableByID(p);
+					if (s != null)
+						break;
+				}
 			}
 
-			return null;
+			return s;
 		}
 
 		public JSONStorableFloat GetFloatParameter(
-			IObject o, string storable, string param)
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetFloatParameter((o as VamAtom)?.Atom, storable, param);
+			return GetFloatParameter(
+				(o as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableFloat GetFloatParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -515,18 +537,21 @@ namespace Cue.Sys.Vam
 		}
 
 		public JSONStorableBool GetBoolParameter(
-			IObject o, string storable, string param)
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetBoolParameter((o.Atom as VamAtom)?.Atom, storable, param);
+			return GetBoolParameter(
+				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableBool GetBoolParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -537,18 +562,21 @@ namespace Cue.Sys.Vam
 		}
 
 		public JSONStorableString GetStringParameter(
-			IObject o, string storable, string param)
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetStringParameter((o.Atom as VamAtom)?.Atom, storable, param);
+			return GetStringParameter(
+				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableString GetStringParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -560,18 +588,21 @@ namespace Cue.Sys.Vam
 
 
 		public JSONStorableStringChooser GetStringChooserParameter(
-			IObject o, string storable, string param)
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetStringChooserParameter((o.Atom as VamAtom)?.Atom, storable, param);
+			return GetStringChooserParameter(
+				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableStringChooser GetStringChooserParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -583,18 +614,21 @@ namespace Cue.Sys.Vam
 
 
 		public JSONStorableColor GetColorParameter(
-		IObject o, string storable, string param)
+		IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetColorParameter((o.Atom as VamAtom)?.Atom, storable, param);
+			return GetColorParameter(
+				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableColor GetColorParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -606,18 +640,21 @@ namespace Cue.Sys.Vam
 
 
 		public JSONStorableAction GetActionParameter(
-			IObject o, string storable, string param)
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
 		{
-			return GetActionParameter((o.Atom as VamAtom)?.Atom, storable, param);
+			return GetActionParameter(
+				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableAction GetActionParameter(
-			Atom a, string storable, string param)
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
 		{
 			if (a == null)
 				return null;
 
-			var st = FindStorable(a, storable);
+			var st = FindStorable(a, storable, storableNamesCache);
 			if (st == null)
 			{
 				//Cue.LogError($"{a.uid}: no storable {storable}");
@@ -1071,19 +1108,18 @@ namespace Cue.Sys.Vam
 			return hsv;
 		}
 
+		private static UnityEngine.Plane[] cached_ = new UnityEngine.Plane[6];
+
 		public static bool TestPlanesAABB(Plane[] planes, Box box)
 		{
-			var ps = new UnityEngine.Plane[]
-			{
-				ToUnity(planes[0]).flipped,
-				ToUnity(planes[1]).flipped,
-				ToUnity(planes[2]).flipped,
-				ToUnity(planes[3]).flipped,
-				ToUnity(planes[4]).flipped,
-				ToUnity(planes[5]).flipped,
-			};
+			cached_[0] = ToUnity(planes[0]).flipped;
+			cached_[1] = ToUnity(planes[1]).flipped;
+			cached_[2] = ToUnity(planes[2]).flipped;
+			cached_[3] = ToUnity(planes[3]).flipped;
+			cached_[4] = ToUnity(planes[4]).flipped;
+			cached_[5] = ToUnity(planes[5]).flipped;
 
-			return GeometryUtility.TestPlanesAABB(ps, ToUnity(box));
+			return GeometryUtility.TestPlanesAABB(cached_, ToUnity(box));
 		}
 	}
 

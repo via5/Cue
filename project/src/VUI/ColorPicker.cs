@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VUI
 {
@@ -130,10 +131,14 @@ namespace VUI
 
 		private void OnChanged(Color color)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				Changed?.Invoke(color);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 }

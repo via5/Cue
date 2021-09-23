@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VUI
 {
@@ -96,12 +97,16 @@ namespace VUI
 
 		private void OnClicked(bool b)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				GetRoot().SetFocus(this);
 				checked_ = b;
 				Changed?.Invoke(b);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 }

@@ -16,7 +16,9 @@ namespace Cue
 
 		private IObject sel_ = null;
 		private IObject hov_ = null;
-		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
+		private bool ignore_ = false;
+		private bool selChanged_ = true;
+		private bool hovChanged_ = true;
 
 		public void Create()
 		{
@@ -55,6 +57,9 @@ namespace Cue
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
 			root_.Visible = visible_;
+
+			selChanged_ = true;
+			hovChanged_ = true;
 		}
 
 		public bool Visible
@@ -81,15 +86,30 @@ namespace Cue
 
 			set
 			{
-				sel_ = value;
-				OnSelected(value);
+				if (sel_ != value)
+				{
+					sel_ = value;
+					selChanged_ = true;
+					OnSelected(value);
+				}
 			}
 		}
 
 		public IObject Hovered
 		{
-			get { return hov_; }
-			set { hov_ = value; }
+			get
+			{
+				return hov_;
+			}
+
+			set
+			{
+				if (hov_ != value)
+				{
+					hov_ = value;
+					hovChanged_ = true;
+				}
+			}
 		}
 
 		public void Destroy()
@@ -107,15 +127,20 @@ namespace Cue
 		{
 			if (name_ != null)
 			{
-				string s = "";
+				if (selChanged_ || hovChanged_)
+				{
+					string s = "";
 
-				if (sel_ != null)
-					s += sel_.ID;
+					if (sel_ != null)
+						s += sel_.ID;
 
-				if (hov_ != null)
-					s += " (" + hov_.ID + ")";
+					if (hov_ != null)
+						s += " (" + hov_.ID + ")";
 
-				name_.Text = s;
+					name_.Text = s;
+					selChanged_ = false;
+					hovChanged_ = false;
+				}
 			}
 
 			if (fps_ != null)
@@ -123,6 +148,7 @@ namespace Cue
 
 			for (int i = 0; i < items_.Count; ++i)
 				items_[i].Update();
+
 
 			UpdateWidgets();
 			root_?.Update();
@@ -140,8 +166,10 @@ namespace Cue
 
 		private void UpdateWidgets()
 		{
-			ignore_.Do(() =>
+			try
 			{
+				ignore_ = true;
+
 				var p = sel_ as Person;
 
 				if (p != null)
@@ -152,7 +180,11 @@ namespace Cue
 					if (excitement_ != null)
 						excitement_.Value = p.Mood.FlatExcitementValue.Value;
 				}
-			});
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		private void OnReload()

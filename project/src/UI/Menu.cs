@@ -81,7 +81,7 @@ namespace Cue
 		{
 			private Action<Person, bool> f_;
 			private Func<Person, bool> check_;
-			private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
+			private bool ignore_ = false;
 
 			public CheckBoxItem(
 				string caption,
@@ -99,8 +99,10 @@ namespace Cue
 			{
 				base.Update();
 
-				ignore_.Do(() =>
+				try
 				{
+					ignore_ = true;
+
 					if (Person == null)
 					{
 						if (check_ != null)
@@ -111,7 +113,11 @@ namespace Cue
 						if (check_ != null)
 							Widget.Checked = check_(Person);
 					}
-				});
+				}
+				finally
+				{
+					ignore_ = false;
+				}
 			}
 
 			public override void Activate()

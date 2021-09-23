@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VUI
 {
@@ -87,10 +88,14 @@ namespace VUI
 
 		public void Fire()
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				callback_?.Invoke();
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 
 			if (Bits.IsSet(flags_, Repeat))
 				Restart();

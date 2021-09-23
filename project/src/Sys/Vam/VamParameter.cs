@@ -9,14 +9,17 @@ namespace Cue.Sys.Vam
 		private bool stale_ = true;
 		protected bool checkedOnce_ = false;
 		private int backoff_ = 0;
+		protected string[] storableNamesCache_;
 
-		public ParameterChecker(float interval = -1)
+		public ParameterChecker(string storableId, float interval = -1)
 		{
 			// so they don't all check on the same frame
 			interval_ = (interval < 0 ? U.RandomFloat(1.5f, 2.5f) : interval);
 
 			// force check the first time
 			elapsed_ = interval_ + 1;
+
+			storableNamesCache_ = VamSys.MakeStorableNamesCache(storableId);
 		}
 
 		public void MakeStale()
@@ -26,7 +29,7 @@ namespace Cue.Sys.Vam
 
 		public bool Check(bool force = false)
 		{
-			if (!DeadCheck())
+			if (CheckIfDead())
 			{
 				stale_ = true;
 				elapsed_ = interval_ + 1;
@@ -38,7 +41,7 @@ namespace Cue.Sys.Vam
 				elapsed_ += Cue.Instance.Sys.DeltaTime;
 				if (elapsed_ > (interval_ + backoff_) || force)
 				{
-					if (StaleCheck())
+					if (GetParameter())
 					{
 						stale_ = false;
 						backoff_ = 0;
@@ -57,8 +60,8 @@ namespace Cue.Sys.Vam
 			return !stale_;
 		}
 
-		protected abstract bool DeadCheck();
-		protected abstract bool StaleCheck();
+		protected abstract bool CheckIfDead();
+		protected abstract bool GetParameter();
 	}
 
 
@@ -72,6 +75,7 @@ namespace Cue.Sys.Vam
 		protected NativeType dummyValue_;
 
 		public BasicParameterRO(IAtom a, string s, string name)
+			: base(s)
 		{
 			atom_ = (a as VamAtom)?.Atom;
 			storableID_ = s;
@@ -97,51 +101,53 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		protected bool Wrap(string what, Action f)
-		{
-			if (atom_ == null || !Check())
-				return false;
-
-			try
-			{
-				f();
-				return true;
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(
-					$"{atom_.uid}: can't {what} " +
-					$"for '{storableID_}' '{paramName_}': " +
-					e.ToString());
-
-				param_ = null;
-				MakeStale();
-
-				return false;
-			}
-		}
-
 		protected NativeType GetValue()
 		{
-			NativeType v = default(NativeType);
+			if (Check())
+			{
+				try
+				{
+					return DoGetValue();
+				}
+				catch (Exception e)
+				{
+					Cue.LogError(
+						$"{atom_.uid}: can't get value" +
+						$"for '{storableID_}' '{paramName_}': " +
+						e.ToString());
 
-			if (Wrap("get val", () => { v = DoGetValue(); }))
-				return v;
-			else
-				return dummyValue_;
+					param_ = null;
+					MakeStale();
+				}
+			}
+
+			return dummyValue_;
 		}
 
 		protected NativeType GetDefaultValue()
 		{
-			NativeType v = default(NativeType);
+			if (Check())
+			{
+				try
+				{
+					return DoGetDefaultValue();
+				}
+				catch (Exception e)
+				{
+					Cue.LogError(
+						$"{atom_.uid}: can't get default value" +
+						$"for '{storableID_}' '{paramName_}': " +
+						e.ToString());
 
-			if (Wrap("get def val", () => { v = DoGetDefaultValue(); }))
-				return v;
-			else
-				return dummyValue_;
+					param_ = null;
+					MakeStale();
+				}
+			}
+
+			return dummyValue_;
 		}
 
-		protected override bool DeadCheck()
+		protected override bool CheckIfDead()
 		{
 			if (atom_ == null)
 				return false;
@@ -150,26 +156,19 @@ namespace Cue.Sys.Vam
 			{
 				if (param_.storable == null)
 				{
-					if (StaleCheck())
-					{
-						// ok
-						return true;
-					}
-					else
-					{
-						Cue.LogInfo(
-							$"{atom_.uid}: param " +
-							$"{storableID_} {paramName_} is dead");
+					Cue.LogInfo(
+						$"{atom_.uid}: param " +
+						$"{storableID_} {paramName_} is dead");
 
-						param_ = null;
-					}
+					param_ = null;
+					return true;
 				}
 			}
 
 			return false;
 		}
 
-		protected override bool StaleCheck()
+		protected override bool GetParameter()
 		{
 			if (atom_ == null)
 				return false;
@@ -229,22 +228,22 @@ namespace Cue.Sys.Vam
 		{
 			dummyValue_ = v;
 
-			if (!Check())
-				return;
-
-			try
+			if (Check())
 			{
-				DoSetValue(v);
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(
-					$"{atom_.uid}: can't set val " +
-					$"for '{storableID_}' '{paramName_}': " +
-					e.ToString());
+				try
+				{
+					DoSetValue(v);
+				}
+				catch (Exception e)
+				{
+					Cue.LogError(
+						$"{atom_.uid}: can't set val " +
+						$"for '{storableID_}' '{paramName_}': " +
+						e.ToString());
 
-				param_ = null;
-				MakeStale();
+					param_ = null;
+					MakeStale();
+				}
 			}
 		}
 
@@ -267,7 +266,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableBool DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetBoolParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override bool DoGetValue()
@@ -297,7 +296,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableBool DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetBoolParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override bool DoGetValue()
@@ -333,9 +332,25 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				float v = 0;
-				Wrap("get min", () => { v = param_.min; });
-				return v;
+				if (Check())
+				{
+					try
+					{
+						return param_.min;
+					}
+					catch (Exception e)
+					{
+						Cue.LogError(
+							$"{atom_.uid}: can't get minimum value" +
+							$"for '{storableID_}' '{paramName_}': " +
+							e.ToString());
+
+						param_ = null;
+						MakeStale();
+					}
+				}
+
+				return dummyValue_;
 			}
 		}
 
@@ -343,16 +358,32 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				float v = 0;
-				Wrap("get max", () => { v = param_.max; });
-				return v;
+				if (Check())
+				{
+					try
+					{
+						return param_.max;
+					}
+					catch (Exception e)
+					{
+						Cue.LogError(
+							$"{atom_.uid}: can't get maximum value" +
+							$"for '{storableID_}' '{paramName_}': " +
+							e.ToString());
+
+						param_ = null;
+						MakeStale();
+					}
+				}
+
+				return dummyValue_;
 			}
 		}
 
 		protected override JSONStorableFloat DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetFloatParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override float DoGetValue()
@@ -383,9 +414,25 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				float v = 0;
-				Wrap("get min", () => { v = param_.min; });
-				return v;
+				if (Check())
+				{
+					try
+					{
+						return param_.min;
+					}
+					catch (Exception e)
+					{
+						Cue.LogError(
+							$"{atom_.uid}: can't get minimum value" +
+							$"for '{storableID_}' '{paramName_}': " +
+							e.ToString());
+
+						param_ = null;
+						MakeStale();
+					}
+				}
+
+				return dummyValue_;
 			}
 		}
 
@@ -393,9 +440,25 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				float v = 0;
-				Wrap("get max", () => { v = param_.max; });
-				return v;
+				if (Check())
+				{
+					try
+					{
+						return param_.max;
+					}
+					catch (Exception e)
+					{
+						Cue.LogError(
+							$"{atom_.uid}: can't get maximum value" +
+							$"for '{storableID_}' '{paramName_}': " +
+							e.ToString());
+
+						param_ = null;
+						MakeStale();
+					}
+				}
+
+				return dummyValue_;
 			}
 		}
 
@@ -424,7 +487,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableFloat DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetFloatParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override float DoGetValue()
@@ -459,7 +522,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableStringChooser DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetStringChooserParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override string DoGetValue()
@@ -494,7 +557,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableStringChooser DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetStringChooserParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override string DoGetValue()
@@ -524,7 +587,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableString DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetStringParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override string DoGetValue()
@@ -559,7 +622,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableString DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetStringParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override string DoGetValue()
@@ -589,7 +652,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableColor DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetColorParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override Color DoGetValue()
@@ -624,7 +687,7 @@ namespace Cue.Sys.Vam
 		protected override JSONStorableColor DoGetParameter()
 		{
 			return Cue.Instance.VamSys?.GetColorParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
 		protected override Color DoGetValue()
@@ -653,6 +716,7 @@ namespace Cue.Sys.Vam
 		}
 
 		public ActionParameter(Atom a, string s, string name)
+			: base(s)
 		{
 			atom_ = a;
 			storableID_ = s;
@@ -680,36 +744,31 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		protected override bool DeadCheck()
+		protected override bool CheckIfDead()
 		{
+			if (atom_ == null)
+				return false;
+
 			if (param_ != null)
 			{
 				if (param_.storable == null)
 				{
-					if (StaleCheck())
-					{
-						// ok
-						return true;
-					}
-					else
-					{
-						Cue.LogInfo(
-							$"{atom_.uid}: action param " +
-							$"{storableID_} {paramName_} is dead");
+					Cue.LogInfo(
+						$"{atom_.uid}: action param " +
+						$"{storableID_} {paramName_} is dead");
 
-						param_ = null;
-						return false;
-					}
+					param_ = null;
+					return true;
 				}
 			}
 
-			return true;
+			return false;
 		}
 
-		protected override bool StaleCheck()
+		protected override bool GetParameter()
 		{
 			param_ = Cue.Instance.VamSys?.GetActionParameter(
-				atom_, storableID_, paramName_);
+				atom_, storableID_, paramName_, storableNamesCache_);
 
 			return (param_ != null);
 		}

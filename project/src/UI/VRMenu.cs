@@ -11,7 +11,6 @@ namespace Cue
 		private int personSel_ = -1;
 		private bool visible_ = false;
 		private bool left_ = false;
-		private VUI.IgnoreFlag ignore_ = new VUI.IgnoreFlag();
 
 		public void Create(bool debugDesktop)
 		{

@@ -242,6 +242,7 @@ namespace Cue
 		{
 			controls_?.Update();
 			vrMenu_?.Update();
+
 			desktopMenu_?.Update();
 			sui_.Update(s);
 		}

@@ -1,5 +1,6 @@
 ﻿using UnityEngine.EventSystems;
 using UnityEngine;
+using System;
 
 namespace VUI
 {
@@ -18,86 +19,122 @@ namespace VUI
 
 		public void OnPointerEnter(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnPointerEnterInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnPointerExit(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnPointerExitInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnPointerDown(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnPointerDownInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnPointerUp(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnPointerUpInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnPointerClick(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnPointerClickInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnScroll(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (d.scrollDelta != Vector2.zero)
 				{
 					if (widget_ != null)
 						widget_.OnWheelInternal(d);
 				}
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnBeginDrag(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnBeginDragInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnDrag(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnDragInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 
 		public void OnEndDrag(PointerEventData d)
 		{
-			Utilities.Handler(() =>
+			try
 			{
 				if (widget_ != null)
 					widget_.OnEndDragInternal(d);
-			});
+			}
+			catch (Exception e)
+			{
+				Glue.LogErrorST(e.ToString());
+			}
 		}
 	}
 
