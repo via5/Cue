@@ -66,7 +66,7 @@ namespace Cue.Sys.Vam
 		private IEasing sweatEasing_ = new CubicInEasing();
 
 		private float flush_ = 0;
-		private IEasing flushEasing_ = new CubicInEasing();
+		private IEasing flushEasing_ = new SineInEasing();
 
 		public VamBody(VamAtom a)
 		{
@@ -540,17 +540,27 @@ namespace Cue.Sys.Vam
 			set
 			{
 				flush_ = value;
-				LerpColor(Color.Red, flush_ * 0.35f);
+				LerpColor(Color.Red, flush_);
 			}
 		}
 
 		private void LerpColor(Color target, float f)
 		{
 			var p = color_.Parameter;
+
 			if (p != null)
 			{
-				var c = Color.Lerp(initialColor_, target, flushEasing_.Magnitude(f));
-				p.val = U.ToHSV(c);
+				var c = Color.Lerp(
+					initialColor_, target, flushEasing_.Magnitude(f) * 0.07f);
+
+				var cd = Color.Distance(c, U.FromHSV(p.val));
+
+				// changing body colours seem to allocate memory to update
+				// textures, avoid for small changes
+				if (cd >= 0.02f)
+				{
+					p.val = U.ToHSV(c);
+				}
 			}
 		}
 

@@ -595,6 +595,20 @@ namespace Cue
 				a.b + (b.b - a.b) * f,
 				a.a + (b.a - a.a) * f);
 		}
+
+		public static float Distance(Color c1, Color c2)
+		{
+			return
+				Math.Abs(c2.r - c1.r) +
+				Math.Abs(c2.g - c1.g) +
+				Math.Abs(c2.b - c1.b) +
+				Math.Abs(c2.a - c1.a);
+		}
+
+		public override string ToString()
+		{
+			return $"rgba({r:0.00},{g:0.00},{b:0.00},{a:0.00})";
+		}
 	}
 
 

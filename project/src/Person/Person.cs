@@ -279,7 +279,6 @@ namespace Cue
 		{
 			base.Update(s);
 
-
 			I.Start(I.UpdatePersonTransitions);
 			{
 				CheckNavState();
@@ -316,7 +315,6 @@ namespace Cue
 				actions_.Tick(s);
 			}
 			I.End();
-
 
 
 			I.Start(I.UpdatePersonGaze);

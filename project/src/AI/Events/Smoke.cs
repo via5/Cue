@@ -11,6 +11,7 @@ namespace Cue
 		private ISmoke smoke_ = null;
 		private float checkElapsed_ = 0;
 		private Duration wait_;
+		private bool cleanedUp_ = false;
 
 		public SmokeEvent(Person p)
 			: base("smoke", p)
@@ -56,14 +57,19 @@ namespace Cue
 				smoke_ = null;
 			}
 
-			// cleanup leftovers
-			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
-			if (a != null)
-				a.Destroy();
+			if (!cleanedUp_)
+			{
+				// cleanup leftovers
+				var a = Cue.Instance.Sys.GetAtom(CigaretteID);
+				if (a != null)
+					a.Destroy();
 
-			a = Cue.Instance.Sys.GetAtom(SmokeID);
-			if (a != null)
-				a.Destroy();
+				a = Cue.Instance.Sys.GetAtom(SmokeID);
+				if (a != null)
+					a.Destroy();
+
+				cleanedUp_ = true;
+			}
 		}
 
 		public static string MakeCigaretteID(Person p)
