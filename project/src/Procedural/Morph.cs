@@ -300,22 +300,8 @@ namespace Cue.Proc
 			if (morph_ == null)
 				return;
 
-			float v;
-
-			//if (forceType_ == NoForceTarget)
-				v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
-			//else
-			//	v = forceTarget_;
-
+			float v = Mathf.Lerp(last_, r_, easing_.Magnitude(mag_));
 			SetValue(s, v, remaining);
-
-			//if (forceType_ != NoForceTarget)
-			//{
-			//	if (Math.Abs(forceTarget_ - zero) < 0.0001f)
-			//	{
-			//		forceType_ = ForceIgnore;
-			//	}
-			//}
 		}
 
 		private void SetValue(float s, float rawV, float[] remaining)
@@ -373,9 +359,9 @@ namespace Cue.Proc
 
 			if (limitHit_ && timeActive_ >= 10)
 			{
-				Cue.LogVerbose(
-					$"{person_.ID} {morphId_}: active for {timeActive_:0.00}, " +
-					$"too long, forcing to 0");
+				//Cue.LogVerbose(
+				//	$"{person_.ID} {morphId_}: active for {timeActive_:0.00}, " +
+				//	$"too long, forcing to 0");
 
 				// force a reset to allow other morphs to take over the prio
 				r_ = mid_;

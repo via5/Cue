@@ -260,6 +260,7 @@ namespace Cue
 		public override void FixedUpdate(float s)
 		{
 			base.FixedUpdate(s);
+
 			animator_.FixedUpdate(s);
 
 			if (this != Cue.Instance.Player)

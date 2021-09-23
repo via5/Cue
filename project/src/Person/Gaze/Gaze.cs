@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Cue
 {
@@ -45,7 +46,7 @@ namespace Cue
 		private bool gazerEnabledBeforeEmergency_ = false;
 
 		// debug
-		private string lastString_ = "";
+		private readonly StringBuilder lastString_ = new StringBuilder();
 		private int forceLook_ = ForceLooks.None;
 
 
@@ -61,7 +62,7 @@ namespace Cue
 		public IEyes Eyes { get { return eyes_; } }
 		public IGazer Gazer { get { return gazer_; } }
 		public GazeTargets Targets { get { return targets_; } }
-		public string LastString { get { return lastString_; } }
+		public string LastString { get { return lastString_.ToString(); } }
 
 		public void Init()
 		{
@@ -200,7 +201,7 @@ namespace Cue
 		public void Clear()
 		{
 			targets_.Clear();
-			lastString_ = "";
+			lastString_.Length = 0;
 		}
 
 		private int UpdateEmergencyTargets()
@@ -218,7 +219,7 @@ namespace Cue
 						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
 						gazerEnabled_ = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
 						gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
-						lastString_ += "emergency ";
+						lastString_.Append("emergency ");
 					}
 
 					return i;
@@ -251,19 +252,19 @@ namespace Cue
 
 
 			if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
-				lastString_ += "exclusive ";
+				lastString_.Append("exclusive ");
 
 			if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
-				lastString_ += "nogazer ";
+				lastString_.Append("nogazer ");
 
 			if (Bits.IsSet(flags, BasicGazeEvent.NoRandom))
-				lastString_ += "norandom ";
+				lastString_.Append("norandom ");
 
 			if (Bits.IsSet(flags, BasicGazeEvent.Busy))
-				lastString_ += "busy ";
+				lastString_.Append("busy ");
 
-			if (lastString_ == "")
-				lastString_ = "no flags ";
+			if (lastString_.Length == 0)
+				lastString_.Append("no flags ");
 		}
 
 		public bool ShouldAvoidPlayer()

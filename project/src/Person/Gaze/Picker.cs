@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Text;
+
+namespace Cue
 {
 	class GazeTargetPicker
 	{
@@ -34,8 +36,8 @@
 		private IGazeLookat currentTarget_ = null;
 		private IGazeLookat forcedTarget_ = null;
 		private bool emergency_ = false;
-		private string lastString_ = "";
-		private string avoidString_ = "";
+		private readonly StringBuilder lastString_ = new StringBuilder();
+		private readonly StringBuilder avoidString_ = new StringBuilder();
 		private float timeSinceLastAvoid_ = 0;
 
 		public GazeTargetPicker(Person p)
@@ -86,12 +88,12 @@
 
 		public string LastString
 		{
-			get { return lastString_; }
+			get { return lastString_.ToString(); }
 		}
 
 		public string AvoidString
 		{
-			get { return avoidString_; }
+			get { return avoidString_.ToString(); }
 		}
 
 		public FrustumInfo GetFrustum(int i)
@@ -166,7 +168,7 @@
 
 			// so it's displayed in the ui for more than a frame
 			if (timeSinceLastAvoid_ > 2)
-				avoidString_ = "";
+				avoidString_.Length = 0;
 
 			bool needsTarget = false;
 
@@ -218,12 +220,12 @@
 						needsTarget = true;
 						delay_.Reset();
 						timeSinceLastAvoid_ = 0;
-						avoidString_ = "avoiding";
+						avoidString_.Append("avoiding");
 					}
 					else
 					{
 						var left = AvoidInterval - timeSinceLastAvoid_;
-						avoidString_ = $"will avoid in {left:0.00}s";
+						avoidString_.AppendFormat("will avoid in {0:F2}s", left);
 					}
 				}
 			}
@@ -251,31 +253,35 @@
 		public void NextTarget()
 		{
 			delay_.SetRange(person_.Personality.LookAtRandomInterval);
-			lastString_ = "";
+			lastString_.Length = 0;
 
 			float total = 0;
 			for (int i = 0; i < targets_.Length; ++i)
 				total += targets_[i].Weight;
 
-			lastString_ += $"tw={total}";
+			lastString_.Append("tw=");
+			lastString_.Append(total);
 
 			for (int i = 0; i < 10; ++i)
 			{
 				var r = U.RandomFloat(0, total);
-				lastString_ += $" r={r}";
+				lastString_.Append(" r=");
+				lastString_.Append(r);
 
 				for (int j = 0; j < targets_.Length; ++j)
 				{
 					if (r < targets_[j].Weight)
 					{
-						log_.Verbose($"trying {targets_[j]}");
+						//log_.Verbose($"trying {targets_[j]}");
 
 						if (targets_[j].Next())
 						{
 							if (CanLookAtPoint(targets_[j].Position))
 							{
-								lastString_ += $" target=#{j}";
-								log_.Verbose($"picked {targets_[j]}");
+								lastString_.Append(" target=#");
+								lastString_.Append(j);
+
+								//log_.Verbose($"picked {targets_[j]}");
 								currentTarget_ = targets_[j];
 								return;
 							}
@@ -289,7 +295,10 @@
 							targets_[j].SetFailed("next");
 						}
 
-						lastString_ += $" {j}=X";
+						lastString_.Append(" ");
+						lastString_.Append(j);
+						lastString_.Append("=X");
+
 						break;
 					}
 
@@ -297,7 +306,7 @@
 				}
 			}
 
-			lastString_ += $" NONE";
+			lastString_.Append(" NONE");
 		}
 
 		private void UpdateFrustums()
