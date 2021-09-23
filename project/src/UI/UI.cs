@@ -140,7 +140,6 @@ namespace Cue
 			if (sys_.Input.ShowLeftMenu || VRMenuAlwaysOpened)
 			{
 				vrMenu_.ShowLeft();
-				vrMenu_.Selected = lh.o as Person;
 
 				if (!(rh.o is Person))
 				{
@@ -151,7 +150,6 @@ namespace Cue
 			else if (sys_.Input.ShowRightMenu)
 			{
 				vrMenu_.ShowRight();
-				vrMenu_.Selected = lh.o as Person;
 
 				if (!(lh.o is Person))
 				{
@@ -228,7 +226,6 @@ namespace Cue
 			if (sys_.Input.Select)
 			{
 				desktopMenu_.Selected = h.o as Person;
-				vrMenu_.Selected = h.o as Person;
 			}
 
 			desktopMenu_.Hovered = h.o;

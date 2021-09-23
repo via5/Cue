@@ -77,7 +77,12 @@ namespace Cue
 		public void Update()
 		{
 			if (root_?.Visible ?? false)
+			{
 				CheckInput();
+
+				for (int i = 0; i < items_.Count; ++i)
+					items_[i].Update();
+			}
 
 			root_?.Update();
 		}
@@ -86,6 +91,12 @@ namespace Cue
 		{
 			CheckItemInput();
 			CheckPersonInput();
+
+			if (Cue.Instance.Sys.Input.MenuSelect)
+			{
+				if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
+					items_[widgetSel_].Activate();
+			}
 		}
 
 		private void CheckItemInput()
@@ -120,30 +131,15 @@ namespace Cue
 			int newSel = personSel_;
 
 			if (Cue.Instance.Sys.Input.MenuRight)
-			{
 				newSel = NextPerson(personSel_, +1);
-				//Cue.LogInfo($"vrmenu: menuright {personSel_} {newSel}");
-			}
 			else if (Cue.Instance.Sys.Input.MenuLeft)
-			{
 				newSel = NextPerson(personSel_, -1);
-				//Cue.LogInfo($"vrmenu: menuleft {personSel_} {newSel}");
-			}
 
 			if (newSel >= Cue.Instance.ActivePersons.Length)
 				newSel = -1;
 
 			if (newSel != personSel_)
 				SetPerson(newSel);
-
-			if (Cue.Instance.Sys.Input.MenuSelect)
-			{
-				if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
-					items_[widgetSel_].Activate();
-			}
-
-			for (int i = 0; i < items_.Count; ++i)
-				items_[i].Update();
 		}
 
 		private int NextPerson(int current, int dir)
@@ -241,18 +237,10 @@ namespace Cue
 				else
 					return Cue.Instance.ActivePersons[personSel_];
 			}
-
-			set
-			{
-				if ((value as Person) != null)
-					SetPerson((value as Person).PersonIndex);
-			}
 		}
 
 		private void SetPerson(int index)
 		{
-			//Cue.LogInfo($"vrmenu: {index}");
-
 			personSel_ = index;
 
 			Person p = Selected as Person;

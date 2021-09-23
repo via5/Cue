@@ -357,6 +357,21 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
+			if (scui.openUIButton == null)
+			{
+				SuperController.LogError("no openUIButton");
+				return;
+			}
+
+			if (scui.openUIButton.onClick == null)
+			{
+				SuperController.LogError("openUIButton.onClick is null");
+				return;
+			}
+
+			SuperController.singleton.SelectController(
+				script_.containingAtom.mainController);
+
 			scui.openUIButton?.onClick?.Invoke();
 		}
 

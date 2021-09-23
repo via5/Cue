@@ -359,7 +359,7 @@ namespace Cue
 
 			if (close != wasClose_)
 			{
-				person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
+				//person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
 				DoSetClose(close);
 				wasClose_ = close;
 			}
