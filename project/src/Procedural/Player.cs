@@ -66,6 +66,7 @@ namespace Cue.Proc
 		class Playing
 		{
 			public BasicProcAnimation proto, anim;
+			public bool forceStop = false;
 
 			public Playing(BasicProcAnimation proto, BasicProcAnimation anim)
 			{
@@ -170,18 +171,11 @@ namespace Cue.Proc
 
 		public void FixedUpdate(float s)
 		{
-			int i = 0;
-
-			while (i < playing_.Count)
+			for (int i = 0; i < playing_.Count; ++i)
 			{
 				try
 				{
 					playing_[i].anim.FixedUpdate(s);
-
-					if (playing_[i].anim.Done)
-						playing_.RemoveAt(i);
-					else
-						++i;
 				}
 				catch (Exception e)
 				{
@@ -191,13 +185,22 @@ namespace Cue.Proc
 						$"proc: exception during animation " +
 						$"{playing_[i].anim}, stopping");
 
-					DoStop(i);
+					playing_[i].forceStop = true;
 				}
 			}
 		}
 
 		public void Update(float s)
 		{
+			int i = 0;
+
+			while (i < playing_.Count)
+			{
+				if (playing_[i].anim.Done || playing_[i].forceStop)
+					playing_.RemoveAt(i);
+				else
+					++i;
+			}
 		}
 
 		public override string ToString()

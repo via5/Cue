@@ -256,14 +256,14 @@ namespace Cue.Sys.Vam
 			DoSet(f, maxDelta);
 		}
 
-		public void DoSet(float f, float maxDelta, string parentName = "")
+		public void DoSet(float f, float maxDelta)
 		{
 			if (m_ == null)
 				return;
 
 			if (subMorphs_.Count > 0)
 			{
-				SetSubMorphs(f, maxDelta, parentName);
+				SetSubMorphs(f, maxDelta);
 				return;
 			}
 
@@ -356,18 +356,12 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		private void SetSubMorphs(float f, float maxDelta, string parentName)
+		private void SetSubMorphs(float f, float maxDelta)
 		{
-			string name = parentName;
-			if (name != "")
-				name += ".";
-
-			name = id_;
-
 			for (int i = 0; i < subMorphs_.Count; ++i)
 			{
 				float smf = f * subMorphs_[i].multiplier_;
-				subMorphs_[i].DoSet(smf, maxDelta, name);
+				subMorphs_[i].DoSet(smf, maxDelta);
 			}
 		}
 	}

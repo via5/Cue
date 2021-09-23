@@ -144,8 +144,8 @@ namespace Cue
 
 		public static float Distance(Vector3 a, Vector3 b)
 		{
-			// todo
-			return Sys.Vam.U.Distance(a, b);
+			Vector3 d = new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+			return (float)Math.Sqrt(d.X * d.X + d.Y * d.Y + d.Z * d.Z);
 		}
 
 		public static float Angle(Vector3 a, Vector3 b)
@@ -172,8 +172,12 @@ namespace Cue
 
 		public static Vector3 Lerp(Vector3 a, Vector3 b, float p)
 		{
-			// todo
-			return Sys.Vam.U.Lerp(a, b, p);
+			p = U.Clamp(p, 0, 1);
+
+			return new Vector3(
+				a.X + (b.X - a.X) * p,
+				a.Y + (b.Y - a.Y) * p,
+				a.Z + (b.Z - a.Z) * p);
 		}
 	}
 
@@ -583,8 +587,13 @@ namespace Cue
 
 		public static Color Lerp(Color a, Color b, float f)
 		{
-			// todo
-			return Sys.Vam.U.Lerp(a, b, f);
+			f = U.Clamp(f, 0, 1);
+
+			return new Color(
+				a.r + (b.r - a.r) * f,
+				a.g + (b.g - a.g) * f,
+				a.b + (b.b - a.b) * f,
+				a.a + (b.a - a.a) * f);
 		}
 	}
 

@@ -151,12 +151,11 @@ namespace Cue
 			}
 		}
 
-		public static T Clamp<T>(T val, T min, T max)
-			where T : IComparable<T>
+		public static float Clamp(float val, float min, float max)
 		{
-			if (val.CompareTo(min) < 0)
+			if (val < min)
 				return min;
-			else if (val.CompareTo(max) > 0)
+			else if (val > max)
 				return max;
 			else
 				return val;

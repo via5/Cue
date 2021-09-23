@@ -186,7 +186,7 @@ namespace Cue
 				case BP.Head:
 				case BP.Lips:
 				case BP.Mouth:
-					return Active;
+					return wasKissing_;
 
 				default:
 					return false;
@@ -469,6 +469,9 @@ namespace Cue
 
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
+		private bool wasActive_ = false;
+		private bool leftUsed_ = false;
+		private bool rightUsed_ = false;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -499,37 +502,19 @@ namespace Cue
 
 		public bool LeftUsed
 		{
-			get
-			{
-				if (Active)
-				{
-					if (hand_.Value == "Left" || hand_.Value == "Both")
-						return true;
-				}
-
-				return false;
-			}
+			get { return (wasActive_ && leftUsed_); }
 		}
 
 		public bool RightUsed
 		{
-			get
-			{
-				if (Active)
-				{
-					if (hand_.Value == "Right" || hand_.Value == "Both")
-						return true;
-				}
-
-				return false;
-			}
+			get { return (wasActive_ && rightUsed_); }
 		}
 
 		public Person[] Targets
 		{
 			get
 			{
-				if (Active)
+				if (wasActive_)
 				{
 					var id = male_.Value;
 					if (id != "")
@@ -551,12 +536,12 @@ namespace Cue
 				case BP.LeftArm:
 				case BP.LeftForearm:
 				case BP.LeftHand:
-					return Active && person_.Handjob.LeftUsed;
+					return wasActive_ && LeftUsed;
 
 				case BP.RightArm:
 				case BP.RightForearm:
 				case BP.RightHand:
-					return Active && person_.Handjob.RightUsed;
+					return wasActive_ && RightUsed;
 
 				default:
 					return false;
@@ -566,6 +551,9 @@ namespace Cue
 		public bool StartBoth(Person p)
 		{
 			StartCommon(p, "Both");
+
+			leftUsed_ = true;
+			rightUsed_ = true;
 
 			zStrokeMax_.Value = 10;
 			hand2Side_.Value = -0.05f;
@@ -579,6 +567,10 @@ namespace Cue
 		{
 			StartCommon(p, "Left");
 			StartSingleHandCommon(p);
+
+			leftUsed_ = true;
+			rightUsed_ = false;
+
 			return true;
 		}
 
@@ -586,6 +578,10 @@ namespace Cue
 		{
 			StartCommon(p, "Right");
 			StartSingleHandCommon(p);
+
+			leftUsed_ = false;
+			rightUsed_ = true;
+
 			return true;
 		}
 
@@ -631,7 +627,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (!Active)
+			wasActive_ = Active;
+			if (!wasActive_)
 				return;
 
 			if (!closedHand_)
@@ -688,6 +685,8 @@ namespace Cue
 		private Sys.Vam.FloatParameter speedMax_ = null;
 		private Sys.Vam.FloatParameter topOnlyChance_ = null;
 		private Sys.Vam.FloatParameter mouthOpenMax_ = null;
+
+		private bool wasActive_ = false;
 
 		private const float MaxDistanceToStart = 0.4f;
 
@@ -754,7 +753,7 @@ namespace Cue
 				case BP.Lips:
 				case BP.Mouth:
 				case BP.Eyes:   // cw also handles eyes
-					return Active;
+					return wasActive_;
 
 				default:
 					return false;
@@ -802,7 +801,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (!Active)
+			wasActive_ = Active;
+			if (!wasActive_)
 				return;
 
 			// speed
