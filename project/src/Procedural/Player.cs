@@ -141,18 +141,29 @@ namespace Cue.Proc
 
 		public void Stop(IAnimation a, bool rewind)
 		{
+			log_.Verbose(
+				$"stopping animation {a} rewind={rewind}, " +
+				$"looking for proto, count={playing_.Count}");
+
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				if (playing_[i].proto == a)
 				{
+					log_.Verbose($"found animation at {i}");
 					DoStop(i);
 					return;
 				}
 			}
+
+			log_.Error($"no animation found for this proto");
 		}
 
 		private void DoStop(int i)
 		{
+			log_.Verbose(
+				$"stopping {i}, proto is {playing_[i].proto}, " +
+				$"anim is {playing_[i].anim}");
+
 			playing_[i].anim.Reset();
 			playing_.RemoveAt(i);
 		}

@@ -194,6 +194,8 @@ namespace Cue
 			{
 				if (p.Mood.FlatExcitementValue.IsForced)
 					p.Mood.FlatExcitementValue.SetForced(f);
+				else
+					p.Mood.FlatExcitementValue.Value = f;
 			}
 		}
 	}

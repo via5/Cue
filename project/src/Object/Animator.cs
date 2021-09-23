@@ -11,8 +11,6 @@ namespace Cue
 		private readonly int style_ = MovementStyles.Any;
 		private readonly IAnimation anim_ = null;
 
-		private IPlayer player_ = null;
-
 		public Animation(int type, int from, int to, int state, int ms, IAnimation anim)
 		{
 			type_ = type;
@@ -30,16 +28,6 @@ namespace Cue
 		public int MovementStyle { get { return style_; } }
 		public bool HasMovement { get { return anim_.HasMovement; } }
 		public IAnimation Real { get { return anim_; } }
-
-		public IPlayer Player
-		{
-			get { return player_; }
-		}
-
-		public void SetPlayer(IPlayer p)
-		{
-			player_ = p;
-		}
 
 		public override string ToString()
 		{
@@ -78,6 +66,18 @@ namespace Cue
 
 	class Animator
 	{
+		class PlayingAnimation
+		{
+			public Animation anim;
+			public IPlayer player;
+
+			public PlayingAnimation(Animation a, IPlayer p)
+			{
+				anim = a;
+				player = p;
+			}
+		}
+
 		public const int Loop = 0x01;
 		public const int Reverse = 0x02;
 		public const int Rewind = 0x04;
@@ -86,7 +86,7 @@ namespace Cue
 		private Person person_;
 		private Logger log_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
-		private readonly List<Animation> playing_ = new List<Animation>();
+		private readonly List<PlayingAnimation> playing_ = new List<PlayingAnimation>();
 		//private IPlayer currentPlayer_ = null;
 		//private Animation currentAnimation_ = null;
 		private int activeFlags_ = 0;
@@ -109,9 +109,9 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (a.Type == Animations.Transition)
+				if (a.anim.Type == Animations.Transition)
 				{
-					if (a.TransitionTo == state)
+					if (a.anim.TransitionTo == state)
 						return true;
 				}
 			}
@@ -125,7 +125,7 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (a.Type == Animations.Transition)
+				if (a.anim.Type == Animations.Transition)
 					return true;
 			}
 
@@ -143,14 +143,20 @@ namespace Cue
 
 		public bool IsPlaying(Animation a)
 		{
-			return playing_.Contains(a);
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim == a)
+					return true;
+			}
+
+			return false;
 		}
 
 		public bool IsPlayingType(int type)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
-				if (playing_[i].Type == type)
+				if (playing_[i].anim.Type == type)
 					return true;
 			}
 
@@ -252,8 +258,7 @@ namespace Cue
 
 				if (p.Play(a.Real, ps, flags))
 				{
-					playing_.Add(a);
-					a.SetPlayer(p);
+					playing_.Add(new PlayingAnimation(a, p));
 					activeFlags_ = flags;
 					return true;
 				}
@@ -268,9 +273,7 @@ namespace Cue
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				var a = playing_[i];
-
-				a.Player.Stop(a.Real, Bits.IsSet(activeFlags_, Rewind));
-				a.SetPlayer(null);
+				a.player.Stop(a.anim.Real, Bits.IsSet(activeFlags_, Rewind));
 			}
 
 			playing_.Clear();
@@ -279,21 +282,36 @@ namespace Cue
 
 		public void StopType(int type)
 		{
+			log_.Info($"stopping animation type {type}");
 			int i = 0;
+			int removed = 0;
 
 			while (i < playing_.Count)
 			{
 				var a = playing_[i];
 
-				if (a.Type == type)
+				if (a.anim.Type == type)
 				{
-					a.Player.Stop(a.Real, Bits.IsSet(activeFlags_, Rewind));
+					log_.Info($"stopping animation {a}");
+					a.player.Stop(a.anim.Real, Bits.IsSet(activeFlags_, Rewind));
 					playing_.RemoveAt(i);
+					++removed;
 				}
 				else
 				{
 					++i;
 				}
+			}
+
+			if (removed == 0)
+			{
+				log_.Error(
+					$"no animation type {type} found to stop, " +
+					$"count={playing_.Count}");
+			}
+			else
+			{
+				log_.Info($"stopped {removed} animations");
 			}
 		}
 
@@ -321,7 +339,7 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (!a.Player.IsPlaying(a.Real))
+				if (!a.player.IsPlaying(a.anim.Real))
 					playing_.RemoveAt(i);
 				else
 					++i;

@@ -80,18 +80,12 @@ namespace Cue.Sys.Vam
 				logText_.resizeTextForBestFit = false;
 				logText_.font = f;
 				logText_.fontSize = f.fontSize;
-
-				logStyle_.fontSize = f.fontSize;
-				logStyle_.UpdateStyle();
 			}
 			else
 			{
 				logText_.resizeTextForBestFit = true;
 				logText_.font = oldLogFont_;
 				logText_.fontSize = oldLogFontSize_;
-
-				logStyle_.fontSize = oldLogFontSize_;
-				logStyle_.UpdateStyle();
 			}
 		}
 	}

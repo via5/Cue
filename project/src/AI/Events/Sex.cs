@@ -44,15 +44,17 @@
 					receiver_ = FindReceiver();
 
 					if (receiver_ == null)
-						person_.Log.Info($"no valid receiver");
+						log_.Info($"no valid receiver");
 					else
 						log_.Info($"starting sex, receiver={receiver_.ID}");
 
-					person_.Clothing.GenitalsVisible = true;
-					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
-
 					if (receiver_ != null)
+					{
+						person_.Clothing.GenitalsVisible = true;
 						receiver_.Clothing.GenitalsVisible = true;
+					}
+
+					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
 
 					running_ = true;
 				}
@@ -73,6 +75,7 @@
 			{
 				if (running_)
 				{
+					log_.Verbose($"thrust: stopping");
 					person_.Animator.StopType(Animations.Sex);
 					running_ = false;
 					receiver_ = null;
