@@ -121,7 +121,7 @@ namespace VUI
 		{
 			Spacing = spacing;
 			expand_ = expand;
-			align_ = align;
+			align_ = MakeAlign(align);
 		}
 
 		public bool Expand
@@ -133,7 +133,18 @@ namespace VUI
 		public int Alignment
 		{
 			get { return align_; }
-			set { align_ = value; }
+			set { align_ = MakeAlign(value); }
+		}
+
+		protected int MakeAlign(int a)
+		{
+			if ((a & (AlignTop | AlignVCenter | AlignBottom)) == 0)
+				a |= AlignTop;
+
+			if ((a & (AlignLeft | AlignCenter | AlignRight)) == 0)
+				a |= AlignLeft;
+
+			return a;
 		}
 	}
 
@@ -142,7 +153,7 @@ namespace VUI
 	{
 		public override string TypeName { get { return "horflow"; } }
 
-		public HorizontalFlow(int spacing = 0, int align = AlignLeft|AlignVCenter)
+		public HorizontalFlow(int spacing = 0, int align = AlignLeft| AlignTop)
 			: base(spacing, align, false)
 		{
 		}

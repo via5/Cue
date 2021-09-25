@@ -13,6 +13,7 @@ namespace VUI
 		private string text_ = null;
 		private Color color_ = Color.white;
 		private UIDynamicColorPicker picker_ = null;
+		private bool ignore_ = false;
 
 		public ColorPicker(string text = null, ColorCallback callback = null)
 		{
@@ -45,14 +46,23 @@ namespace VUI
 
 		protected override void DoCreate()
 		{
-			picker_ = WidgetObject.GetComponent<UIDynamicColorPicker>();
-			picker_.colorPicker.onColorChangedHandlers = OnChanged;
-			SetColor();
+			try
+			{
+				ignore_ = true;
 
-			if (text_ != null)
-				picker_.label = text_;
+				picker_ = WidgetObject.GetComponent<UIDynamicColorPicker>();
+				picker_.colorPicker.onColorChangedHandlers = OnChanged;
+				SetColor();
 
-			Style.Setup(this);
+				if (text_ != null)
+					picker_.label = text_;
+
+				Style.Setup(this);
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		private void SetColor()
@@ -99,17 +109,26 @@ namespace VUI
 		{
 			base.UpdateBounds();
 
-			// color has to be set again here because the bounds of the
-			// saturation image have changed and the handle needs to be moved
-			// back in bounds
+			try
+			{
+				ignore_ = true;
 
-			// force a change by setting the color to something that's
-			// guaranteed to be different
-			var different = HSVColorPicker.RGBToHSV(
-				1.0f - color_.r, color_.g, color_.b);
-			picker_.colorPicker.SetHSV(different);
+				// color has to be set again here because the bounds of the
+				// saturation image have changed and the handle needs to be moved
+				// back in bounds
 
-			SetColor();
+				// force a change by setting the color to something that's
+				// guaranteed to be different
+				var different = HSVColorPicker.RGBToHSV(
+					1.0f - color_.r, color_.g, color_.b);
+				picker_.colorPicker.SetHSV(different);
+
+				SetColor();
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		protected override Size DoGetPreferredSize(
@@ -131,6 +150,8 @@ namespace VUI
 
 		private void OnChanged(Color color)
 		{
+			if (ignore_) return;
+
 			try
 			{
 				Changed?.Invoke(color);

@@ -244,6 +244,17 @@ namespace VUI
 		{
 		}
 
+		public FloatSlider(float min, float max, ValueCallback changed = null)
+			: this(min, min ,max, changed)
+		{
+		}
+
+		public FloatSlider(float value, float min, float max, ValueCallback changed = null)
+			: this(changed)
+		{
+			Set(value, min, max);
+		}
+
 		public bool WholeNumbers
 		{
 			get
@@ -331,6 +342,17 @@ namespace VUI
 		public IntSlider(ValueCallback changed = null)
 			: base(1, 10, changed)
 		{
+		}
+
+		public IntSlider(int min, int max, ValueCallback changed = null)
+			: this(min, min, max, changed)
+		{
+		}
+
+		public IntSlider(int value, int min, int max, ValueCallback changed = null)
+			: this(changed)
+		{
+			Set(value, min, max);
 		}
 
 		protected override int GetValue()
@@ -533,6 +555,11 @@ namespace VUI
 		{
 		}
 
+		public FloatTextSlider(float min, float max, ValueCallback valueChanged = null)
+			: this(min, min, max, valueChanged)
+		{
+		}
+
 		public FloatTextSlider(float value, float min, float max, ValueCallback valueChanged = null)
 			: base(new FloatSlider(), value, min, max, valueChanged)
 		{
@@ -580,6 +607,11 @@ namespace VUI
 	{
 		public IntTextSlider(ValueCallback valueChanged = null)
 			: this(0, 0, 1, valueChanged)
+		{
+		}
+
+		public IntTextSlider(int min, int max, ValueCallback valueChanged = null)
+			: this(min, min, max, valueChanged)
 		{
 		}
 

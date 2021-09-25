@@ -325,7 +325,8 @@ namespace VUI
 			float maxWidth, float maxHeight)
 		{
 			return new Size(
-				Root.TextLength(Font, FontSize, text_) + 20, 40);
+				Math.Max(Root.TextLength(Font, FontSize, text_) + 20, 200),
+				40);
 		}
 
 		protected override Size DoGetMinimumSize()

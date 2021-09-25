@@ -100,6 +100,12 @@ namespace VUI
 			}
 		}
 
+		protected override void SetDirty(bool b, string why = "")
+		{
+			base.SetDirty(b, why);
+			dirty_ = b;
+		}
+
 		public override Root GetRoot()
 		{
 			return root_;
@@ -112,11 +118,13 @@ namespace VUI
 	}
 
 
+	class BadInit : Exception { }
+
+
 	class Root
 	{
 		public const int FocusDefault = 0x0;
 		public const int FocusKeepPopup = 0x01;
-
 
 		private IRootSupport support_ = null;
 		private bool ready_ = false;
@@ -128,7 +136,7 @@ namespace VUI
 		private RootPanel content_;
 		private RootPanel floating_;
 		private Overlay overlay_ = null;
-		private readonly TooltipManager tooltips_;
+		private TooltipManager tooltips_;
 		private bool visible_ = true;
 		private GameObject rootObject_ = null;
 
@@ -149,16 +157,43 @@ namespace VUI
 		}
 
 		public Root(MVRScript s)
-			: this(new ScriptUIRootSupport(s))
 		{
+			CheckInit(s);
+			Create(new ScriptUIRootSupport(s));
 		}
 
 		public Root(MVRScriptUI sui)
-			: this(new ScriptUIRootSupport(sui))
 		{
+			CheckInit(null);
+			Create(new ScriptUIRootSupport(sui));
 		}
 
 		public Root(IRootSupport support)
+		{
+			CheckInit(null);
+			Create(support);
+		}
+
+		private void CheckInit(MVRScript s)
+		{
+			if (Glue.Initialized)
+				return;
+
+			if (s == null)
+			{
+				SuperController.LogError(
+					"vui: must call Init() manually when Root is not created " +
+					"from a MVRScript or a MVRScriptUI");
+
+				throw new BadInit();
+			}
+			else
+			{
+				Init(s);
+			}
+		}
+
+		private void Create(IRootSupport support)
 		{
 			if (TimerManager.Instance == null)
 				ownTm_ = new TimerManager();
@@ -168,6 +203,11 @@ namespace VUI
 			tooltips_ = new TooltipManager(this);
 
 			AttachTo(support);
+		}
+
+		public static void Init(MVRScript script)
+		{
+			Glue.InitInternal(() => script.manager);
 		}
 
 		public IRootSupport RootSupport

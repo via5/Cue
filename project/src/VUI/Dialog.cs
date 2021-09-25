@@ -43,6 +43,11 @@
 			get { return result_; }
 		}
 
+		public override Root GetRoot()
+		{
+			return root_;
+		}
+
 		public void RunDialog(CloseHandler h = null)
 		{
 			root_.OverlayVisible = true;

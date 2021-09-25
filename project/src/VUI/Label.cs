@@ -189,7 +189,7 @@ namespace VUI
 
 			return new Rect(
 				ar.Left - rb.Width / 2 - 2,
-				rb.Height - ar.Top - ar.Height,
+				rb.Height - ar.Top + ar.Height,
 				ar.Width, ar.Height + 3);
 		}
 

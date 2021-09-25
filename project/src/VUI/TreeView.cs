@@ -585,7 +585,7 @@ namespace VUI
 				else if (item_?.Selected ?? false)
 					panel_.BackgroundColor = Style.Theme.SelectionBackgroundColor;
 				else
-					panel_.BackgroundColor = Style.Theme.BackgroundColor;
+					panel_.BackgroundColor = new Color(0, 0, 0, 0);
 			}
 
 			private void OnToggle()
@@ -907,17 +907,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return base.DoGetPreferredSize(maxWidth, maxHeight);
-		}
-
-		protected override Size DoGetMinimumSize()
-		{
-			return base.DoGetMinimumSize();
-		}
-
-		protected override void DoSetRender(bool b)
-		{
-			base.DoSetRender(b);
+			return new Size(300, 200);
 		}
 
 		private bool OnWheel(WheelEvent e)

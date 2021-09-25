@@ -773,7 +773,7 @@ namespace VUI
 				SetDirty(true, TypeName + ": " + why);
 		}
 
-		private void SetDirty(bool b, string why = "")
+		protected virtual void SetDirty(bool b, string why = "")
 		{
 			dirty_ = b;
 

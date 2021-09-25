@@ -13,12 +13,17 @@ namespace VUI
 		public delegate void LogDelegate(string s);
 		private static LogDelegate logInfo_, logWarning_, logError_, logVerbose_;
 
-		public static void Set(
+		private static bool inited_ = false;
+
+		public static void InitInternal(
 			PluginManagerDelegate getPluginManager,
-			StringDelegate getString,
-			LogDelegate logVerbose, LogDelegate logInfo,
-			LogDelegate logWarning, LogDelegate logError)
+			StringDelegate getString = null,
+			LogDelegate logVerbose = null,
+			LogDelegate logInfo = null,
+			LogDelegate logWarning = null,
+			LogDelegate logError = null)
 		{
+			inited_ = true;
 			getPluginManager_ = getPluginManager;
 			getString_ = getString;
 			logVerbose_ = logVerbose;
@@ -27,44 +32,69 @@ namespace VUI
 			logError_ = logError;
 		}
 
+		public static bool Initialized
+		{
+			get { return inited_; }
+		}
+
 		public static MVRPluginManager PluginManager
 		{
-			get { return getPluginManager_(); }
+			get
+			{
+				if (getPluginManager_ == null)
+					return null;
+				else
+					return getPluginManager_();
+			}
 		}
 
 		public static string GetString(string s, params object[] ps)
 		{
-			return getString_(s, ps);
+			if (getString_ == null)
+				return string.Format(s, ps);
+			else
+				return getString_(s, ps);
 		}
 
 		public static void LogVerbose(string s)
 		{
-			logVerbose_(s);
+			// disabled by default
+			if (logVerbose_ != null)
+				logVerbose_(s);
 		}
 
 		public static void LogInfo(string s)
 		{
-			logInfo_(s);
+			if (logInfo_ == null)
+				SuperController.LogError(s);
+			else
+				logInfo_(s);
 		}
 
 		public static void LogWarning(string s)
 		{
-			logWarning_(s);
+			if (logWarning_ == null)
+				SuperController.LogError(s);
+			else
+				logWarning_(s);
 		}
 
 		public static void LogWarningST(string s)
 		{
-			logWarning_(s + "\n" + new StackTrace(1).ToString());
+			LogWarning(s + "\n" + new StackTrace(1).ToString());
 		}
 
 		public static void LogError(string s)
 		{
-			logError_(s);
+			if (logError_ == null)
+				SuperController.LogError(s);
+			else
+				logError_(s);
 		}
 
 		public static void LogErrorST(string s)
 		{
-			logError_(s + "\n" + new StackTrace(1).ToString());
+			LogError(s + "\n" + new StackTrace(1).ToString());
 		}
 	}
 }
