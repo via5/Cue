@@ -714,8 +714,6 @@ namespace VUI
 
 		protected virtual void DoSetRender(bool b)
 		{
-			foreach (var cr in widgetObject_.GetComponentsInChildren<CanvasRenderer>())
-				cr.cull = !b;
 		}
 
 		private void SetMainObjectBounds()

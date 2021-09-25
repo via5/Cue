@@ -202,7 +202,6 @@ namespace VUI
 	{
 		private static Theme theme_ = new Theme();
 		private static Metrics metrics_ = new Metrics();
-		private static Color originalBackground_ = new Color();
 
 		private class Info
 		{
@@ -393,6 +392,18 @@ namespace VUI
 			f(c);
 		}
 
+		private static void ForChildRecursiveOpt(Component parent, string name, Action<GameObject> f)
+		{
+			if (parent == null)
+				return;
+
+			var c = Utilities.FindChildRecursive(parent, name);
+			if (c == null)
+				return;
+
+			f(c);
+		}
+
 		private static GameObject RequireChildRecursive(Component parent, string name)
 		{
 			if (parent == null)
@@ -431,32 +442,72 @@ namespace VUI
 		}
 
 
-		public static void SetupRoot(Component scriptUI)
+		public class RootRestore
 		{
-			ForChildRecursive(scriptUI, "Scroll View", (scrollView) =>
-			{
-				// clamp the whole script ui
-				ClampScrollView(scrollView);
+			public Color originalBg;
 
-				// main background color
-				ForComponent<Image>(scrollView, (bg) =>
-				{
-					originalBackground_ = bg.color;
-					bg.color = theme_.BackgroundColor;
-				});
-			});
+			public RootRestore()
+			{
+			}
 		}
 
-		public static void RevertRoot(Component scriptUI)
-		{
-			ForChildRecursive(scriptUI, "Scroll View", (scrollView) =>
-			{
-				// unclamp the whole script ui
-				UnclampScrollView(scrollView);
 
-				// main background color
-				scrollView.GetComponent<Image>().color = originalBackground_;
-			});
+		public static RootRestore SetupRoot(Transform t)
+		{
+			RootRestore rr = new RootRestore();
+
+			if (t.GetComponent<MVRScriptUI>() != null)
+			{
+				ForChildRecursive(t, "Scroll View", (scrollView) =>
+				{
+					// clamp the whole script ui
+					ClampScrollView(scrollView);
+
+					// main background color
+					ForComponent<Image>(scrollView, (bg) =>
+					{
+						rr.originalBg = bg.color;
+						bg.color = theme_.BackgroundColor;
+					});
+				});
+			}
+			else
+			{
+				var bg = t.GetComponent<Image>();
+				if (bg != null)
+				{
+					rr.originalBg = bg.color;
+					bg.color = theme_.BackgroundColor;
+				}
+			}
+
+			return rr;
+		}
+
+		public static void RevertRoot(Transform t, RootRestore rr)
+		{
+			if (t.GetComponent<MVRScriptUI>() != null)
+			{
+				ForChildRecursive(t, "Scroll View", (scrollView) =>
+				{
+					// unclamp the whole script ui
+					UnclampScrollView(scrollView);
+
+					// main background color
+					if (rr != null)
+					{
+						var bg = scrollView.GetComponent<Image>();
+						if (bg != null)
+							bg.color = rr.originalBg;
+					}
+				});
+			}
+			else
+			{
+				var bg = t.GetComponent<Image>();
+				if (bg != null)
+					bg.color = rr.originalBg;
+			}
 		}
 
 

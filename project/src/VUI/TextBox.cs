@@ -171,6 +171,7 @@ namespace VUI
 		private CustomInputField input_ = null;
 		private bool ignore_ = false;
 		private int focusflags_ = Root.FocusDefault;
+		private Insets textMargins_ = Insets.Zero;
 
 		public TextBox(string t = "", string placeholder = "")
 		{
@@ -195,17 +196,7 @@ namespace VUI
 				text_ = value;
 
 				if (input_ != null)
-				{
-					try
-					{
-						ignore_ = true;
-						input_.text = value;
-					}
-					finally
-					{
-						ignore_ = false;
-					}
-				}
+					input_.text = value;
 			}
 		}
 
@@ -231,6 +222,20 @@ namespace VUI
 			set { focusflags_ = value; }
 		}
 
+		public Insets TextMargins
+		{
+			get
+			{
+				return textMargins_;
+			}
+
+			set
+			{
+				textMargins_ = value;
+				UpdateTextRect();
+			}
+		}
+
 		protected override void DoFocus()
 		{
 			input_.ActivateInputField();
@@ -247,13 +252,7 @@ namespace VUI
 		{
 			var field = new GameObject("TextBoxInputField");
 			field.transform.SetParent(WidgetObject.transform, false);
-
-			var rt = field.AddComponent<RectTransform>();
-			rt.anchorMin = new Vector2(0, 0);
-			rt.anchorMax = new Vector2(1, 1);
-			rt.offsetMin = new Vector2(5, 0);
-			rt.offsetMax = new Vector2(0, 0);
-
+			field.AddComponent<RectTransform>();
 
 			var text = field.AddComponent<Text>();
 			text.color = Style.Theme.TextColor;
@@ -284,7 +283,7 @@ namespace VUI
 			text.horizontalOverflow = HorizontalWrapMode.Overflow;
 			text.raycastTarget = false;
 
-			rt = text.rectTransform;
+			var rt = text.rectTransform;
 			rt.anchorMin = new Vector2(0, 0);
 			rt.anchorMax = new Vector2(1, 1);
 			rt.offsetMin = new Vector2(5, 0);
@@ -294,6 +293,21 @@ namespace VUI
 			input_.placeholder.GetComponent<Text>().text = placeholder_;
 
 			Style.Setup(this);
+			UpdateTextRect();
+		}
+
+		private void UpdateTextRect()
+		{
+			if (input_ != null)
+			{
+				var rt = input_.GetComponent<RectTransform>();
+
+				rt.anchorMin = new Vector2(0, 0);
+				rt.anchorMax = new Vector2(1, 1);
+
+				rt.offsetMin = new Vector2(textMargins_.Left + 5, textMargins_.Top);
+				rt.offsetMax = new Vector2(-textMargins_.Right, -textMargins_.Bottom);
+			}
 		}
 
 		protected override void DoSetEnabled(bool b)

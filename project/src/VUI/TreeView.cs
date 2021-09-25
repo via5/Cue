@@ -201,6 +201,7 @@ namespace VUI
 			private string text_;
 			private List<Item> children_ = null;
 			private bool expanded_ = false;
+			private bool visible_ = true;
 
 			public Item(string text = "")
 			{
@@ -227,12 +228,26 @@ namespace VUI
 			public string Text
 			{
 				get { return text_; }
-				set { text_ = value; }
+				set { text_ = value ?? ""; }
+			}
+
+			public bool Visible
+			{
+				get
+				{
+					return visible_;
+				}
+
+				set
+				{
+					visible_ = value;
+					VisibilityChanged();
+				}
 			}
 
 			public List<Item> Children
 			{
-				get{ return children_; }
+				get { return children_; }
 			}
 
 			public bool Expanded
@@ -245,7 +260,7 @@ namespace VUI
 				set
 				{
 					expanded_ = value;
-					TreeView?.ItemExpandedInternal(this);
+					NodesChanged();
 				}
 			}
 
@@ -265,6 +280,104 @@ namespace VUI
 			public void Toggle()
 			{
 				Expanded = !Expanded;
+			}
+
+			public void ExpandAll()
+			{
+				SetExpandedRecursive(true, false);
+				NodesChanged();
+			}
+
+			public void ExpandAllVisible()
+			{
+				SetExpandedRecursive(true, true);
+				NodesChanged();
+			}
+
+			public void SetAllVisible(bool b)
+			{
+				SetVisibleRecursiveInternal(b);
+				VisibilityChanged();
+			}
+
+			public void SetVisibleRecursiveInternal(bool b)
+			{
+				visible_ = b;
+
+				if (children_ != null)
+				{
+					for (int i = 0; i < children_.Count; ++i)
+						children_[i].SetVisibleRecursiveInternal(b);
+				}
+			}
+
+			private void NodesChanged()
+			{
+				TreeView?.NodesChangedInternal(this);
+			}
+
+			private void VisibilityChanged()
+			{
+				TreeView?.VisibilityChangedInternal(this);
+			}
+
+			private void SetExpandedRecursive(bool b, bool visibleOnly)
+			{
+				expanded_ = b;
+
+				if (children_ != null)
+				{
+					for (int i = 0; i < children_.Count; ++i)
+					{
+						if (!visibleOnly || children_[i].Visible)
+							children_[i].SetExpandedRecursive(b, visibleOnly);
+					}
+				}
+			}
+
+			public bool ShouldBeVisible(Func<Item, bool> matches)
+			{
+				// check user override first
+				if (!visible_)
+					return false;
+
+				// todo: cache this, and it's really inefficient, keeps going
+				// up and down
+
+				if (matches == null)
+				{
+					// no filtering, always visible
+					return true;
+				}
+
+				if (matches(this))
+				{
+					// item itself matches
+					return true;
+				}
+
+				// item doesn't match, but show if any child matches
+				if (children_ != null)
+				{
+					for (int i = 0; i < children_.Count; ++i)
+					{
+						if (children_[i].ShouldBeVisible(matches))
+							return true;
+					}
+				}
+
+				// item doesn't match, nor its children, but it might be visible
+				// because its parent has to be
+				var p = Parent;
+				while (p != null)
+				{
+					if (matches(p))
+						return true;
+
+					p = p.Parent;
+				}
+
+				return false;
 			}
 
 			public virtual bool HasChildren
@@ -290,6 +403,20 @@ namespace VUI
 
 					children_.Clear();
 				}
+			}
+
+			public string DebugString()
+			{
+				string s = "";
+
+				if (HasChildren)
+					s += $"cs={children_.Count}";
+				else
+					s += $"cs=0";
+
+				s += $" ex={expanded_} t='{text_}'";
+
+				return s;
 			}
 		}
 
@@ -482,11 +609,10 @@ namespace VUI
 		public delegate void ItemCallback(Item i);
 		public event ItemCallback SelectionChanged;
 
-
 		private const int InternalPadding = 5;
 		private const int ItemHeight = 35;
 		private const int ItemPadding = 2;
-		private const int IndentSize = 50;
+		private const int IndentSize = 35;
 		private const int ScrollBarWidth = 40;
 
 		private readonly InternalRootItem root_;
@@ -498,6 +624,9 @@ namespace VUI
 		private bool ignoreVScroll_ = false;
 		private Node hovered_ = null;
 		private Item selected_ = null;
+		private Timer staleTimer_ = null;
+		private string filterString_ = "";
+		private Func<Item, bool> filterFunc_ = null;
 
 		public TreeView()
 		{
@@ -523,9 +652,9 @@ namespace VUI
 			SetTopItem((int)(v / (ItemHeight + ItemPadding)), false);
 		}
 
-		private void SetTopItem(int index, bool updateSb)
+		private void SetTopItem(int index, bool updateSb, bool rebuild = true)
 		{
-			topItemIndex_ = Utilities.Clamp(index, 0, itemCount_ - visibleCount_);
+			topItemIndex_ = Utilities.Clamp(index, 0, Math.Max(itemCount_ - visibleCount_, 0));
 
 			if (updateSb)
 			{
@@ -536,8 +665,8 @@ namespace VUI
 				vsb_.Value = v;
 			}
 
-			UpdateNodes();
-			base.UpdateBounds();
+			if (rebuild)
+				Rebuild();
 		}
 
 		public Item RootItem
@@ -550,10 +679,92 @@ namespace VUI
 			get { return selected_; }
 		}
 
-		public void ItemExpandedInternal(Item i)
+		public string Filter
+		{
+			get
+			{
+				return filterString_;
+			}
+
+			set
+			{
+				if (filterString_ != value)
+				{
+					filterString_ = value ?? "";
+					VisibilityChangedInternal(null);
+				}
+			}
+		}
+
+		public Func<Item, bool> FilterFunc
+		{
+			get
+			{
+				return filterFunc_;
+			}
+
+			set
+			{
+				filterFunc_ = value;
+				VisibilityChangedInternal(null);
+			}
+		}
+
+		public void ItemsChanged()
+		{
+			NodesChangedInternal(null);
+		}
+
+		public void NodesChangedInternal(Item i)
+		{
+			if (staleTimer_ == null && WidgetObject != null)
+				staleTimer_ = Timer.Create(Timer.Immediate, OnStale);
+		}
+
+		public void VisibilityChangedInternal(Item i)
+		{
+			if (staleTimer_ == null && WidgetObject != null)
+				staleTimer_ = Timer.Create(Timer.Immediate, OnStale);
+		}
+
+		private void OnStale()
+		{
+			if (staleTimer_ != null)
+			{
+				staleTimer_.Destroy();
+				staleTimer_ = null;
+			}
+
+			Rebuild();
+		}
+
+		private void Rebuild()
 		{
 			UpdateNodes();
 			base.UpdateBounds();
+
+			if (topItemIndex_ > 0 && topItemIndex_ + itemCount_ < visibleCount_)
+			{
+				SetTopItem(topItemIndex_, true, false);
+				UpdateNodes();
+				base.UpdateBounds();
+			}
+			else
+			{
+				SetTopItem(topItemIndex_, true, false);
+			}
+		}
+
+		private Func<Item, bool> GetFilterFunc()
+		{
+			Func<Item, bool> f = null;
+
+			if (filterFunc_ == null && filterString_ != "")
+				f = (i) => i.Text.ToLower().Contains(filterString_.ToLower());
+			else
+				f = filterFunc_;
+
+			return f;
 		}
 
 		public void SetSelectedInternal(Item item, bool b)
@@ -576,52 +787,66 @@ namespace VUI
 
 		private void UpdateNodes()
 		{
-			var cx = new NodeContext();
-			cx.av = AbsoluteClientBounds;
-			cx.nodeIndex = 0;
-			cx.itemIndex = 0;
-			cx.x = cx.av.Left + InternalPadding;
-			cx.y = cx.av.Top + InternalPadding;
-			cx.indent = 0;
-
-			int nodeCount = (int)(cx.av.Height / (ItemHeight + ItemPadding));
-
-			while (nodes_.Count < nodeCount)
-				nodes_.Add(new Node(this));
-
-			while (nodes_.Count > nodeCount)
-				nodes_.RemoveAt(nodes_.Count - 1);
-
-
-			UpdateNode(root_, cx);
-
-			for (int i = cx.nodeIndex; i < nodes_.Count; ++i)
-				nodes_[i].Clear();
-
-			DoLayout();
-
-			itemCount_ = cx.itemIndex;
-			visibleCount_ = (int)(cx.av.Height / (ItemHeight + ItemPadding));
-
-			float requiredHeight = (itemCount_ + 1) * (ItemHeight + ItemPadding);
-			float missingHeight = requiredHeight - cx.av.Height;
-
-			if (missingHeight <= 0)
+			try
 			{
-				vsb_.Visible = false;
+				var filter = GetFilterFunc();
+
+				var cx = new NodeContext();
+				cx.av = AbsoluteClientBounds;
+				cx.nodeIndex = 0;
+				cx.itemIndex = 0;
+				cx.x = cx.av.Left + InternalPadding;
+				cx.y = cx.av.Top + InternalPadding;
+				cx.indent = 0;
+
+				int nodeCount = (int)(cx.av.Height / (ItemHeight + ItemPadding));
+
+				while (nodes_.Count < nodeCount)
+					nodes_.Add(new Node(this));
+
+				while (nodes_.Count > nodeCount)
+					nodes_.RemoveAt(nodes_.Count - 1);
+
+
+				UpdateNode(root_, cx, filter);
+
+				for (int i = cx.nodeIndex; i < nodes_.Count; ++i)
+					nodes_[i].Clear();
+
+				DoLayout();
+
+				itemCount_ = cx.itemIndex;
+				visibleCount_ = (int)(cx.av.Height / (ItemHeight + ItemPadding));
+
+				float requiredHeight = (itemCount_) * (ItemHeight + ItemPadding);
+				float missingHeight = requiredHeight - cx.av.Height;
+
+				if (missingHeight <= 0)
+				{
+					vsb_.Visible = false;
+					vsb_.Range = 0;
+				}
+				else
+				{
+					vsb_.Visible = true;
+					vsb_.Range = missingHeight + ItemHeight;
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				vsb_.Visible = true;
-				vsb_.Range = missingHeight;
+				Glue.LogError("TreeView: exception thrown while updating nodes");
+				Glue.LogError(e.ToString());
 			}
 		}
 
-		private void UpdateNode(Item item, NodeContext cx)
+		private void UpdateNode(Item item, NodeContext cx, Func<Item, bool> filter)
 		{
 			for (int i = 0; i < item.Children?.Count; ++i)
 			{
 				var child = item.Children[i];
+
+				if (!child.ShouldBeVisible(filter))
+					continue;
 
 				if (cx.itemIndex >= topItemIndex_)
 				{
@@ -646,10 +871,10 @@ namespace VUI
 
 				++cx.itemIndex;
 
-				if (child.Expanded)
+				if (child.Expanded || filter != null)
 				{
 					++cx.indent;
-					UpdateNode(child, cx);
+					UpdateNode(child, cx, filter);
 					--cx.indent;
 				}
 			}

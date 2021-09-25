@@ -129,6 +129,8 @@ namespace VUI
 		private RootPanel floating_;
 		private Overlay overlay_ = null;
 		private readonly TooltipManager tooltips_;
+		private bool visible_ = true;
+		private GameObject rootObject_ = null;
 
 		private UIPopup openedPopup_ = null;
 		private Widget focused_ = null;
@@ -175,7 +177,7 @@ namespace VUI
 
 		public Transform WidgetParentTransform
 		{
-			get { return support_.RootParent; }
+			get { return rootObject_.transform; }
 		}
 
 		public void SetOpenedPopup(UIPopup p)
@@ -234,19 +236,16 @@ namespace VUI
 
 		private void OnSupportReady()
 		{
-			//if (support_.ScriptUI == null)
-			//{
-			//	var rt = support_.RootParent.GetComponent<RectTransform>();
-			//
-			//	topOffset_ = rt.offsetMin.y - rt.offsetMax.y;
-			//
-			//	bounds_ = Rectangle.FromPoints(
-			//		0, 0, rt.rect.width, rt.rect.height);
-			//}
-
 			ready_ = true;
 
-			bounds_ = support_.Bounds;
+			rootObject_ = new GameObject("RootObject");
+			rootObject_.transform.SetParent(support_.RootParent, false);
+
+			var rt = rootObject_.AddComponent<RectTransform>();
+			Utilities.SetRectTransform(rootObject_, support_.Bounds);
+			rootObject_.AddComponent<LayoutElement>().ignoreLayout = true;
+
+			bounds_ = new Rectangle(0, 0, support_.Bounds.Size);
 			Glue.LogVerbose($"root: bounds {bounds_}");
 
 			content_.SetBounds(bounds_);
@@ -304,16 +303,23 @@ namespace VUI
 		{
 			get
 			{
-				return support_.RootParent.gameObject.activeInHierarchy;
+				return visible_;
 			}
 
 			set
 			{
-				if (value != Visible)
+				if (visible_ != value)
 				{
-					support_.RootParent.gameObject.SetActive(value);
-					content_.NeedsLayout("root visibility changed");
-					floating_.NeedsLayout("root visibility changed");
+					visible_ = value;
+
+					support_.SetActive(visible_);
+					rootObject_?.SetActive(visible_);
+
+					if (visible_)
+					{
+						content_.NeedsLayout("root visibility changed");
+						floating_.NeedsLayout("root visibility changed");
+					}
 				}
 			}
 		}

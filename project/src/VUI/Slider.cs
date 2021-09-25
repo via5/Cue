@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using UnityEngine;
 
 namespace VUI
@@ -422,6 +423,7 @@ namespace VUI
 		protected readonly SliderTextBox<T> text_;
 
 		private bool changingText_ = false;
+		private readonly StringBuilder sb_ = new StringBuilder();
 
 
 		protected BasicTextSlider(
@@ -512,23 +514,19 @@ namespace VUI
 
 		private void UpdateText()
 		{
-			text_.Text = ToString(slider_.Value);
+			sb_.Length = 0;
+			ToString(slider_.Value, sb_);
+			text_.Text = sb_.ToString();
 		}
 
 		protected abstract T FromString(string s);
-		protected abstract string ToString(T v);
+		protected abstract void ToString(T v, StringBuilder sb);
 	}
 
 
 	class FloatTextSlider : BasicTextSlider<float>
 	{
-		private string format_ = "0.00";
-
-		public FloatTextSlider(string format)
-			: this()
-		{
-			format_ = format;
-		}
+		private uint decimals_ = 2;
 
 		public FloatTextSlider(ValueCallback valueChanged = null)
 			: this(0, 0, 1, valueChanged)
@@ -546,6 +544,12 @@ namespace VUI
 			set { ((FloatSlider)slider_).WholeNumbers = value; }
 		}
 
+		public int Decimals
+		{
+			get { return (int)decimals_; }
+			set { decimals_ = (uint)value; }
+		}
+
 		protected override float FromString(string s)
 		{
 			float f;
@@ -555,12 +559,19 @@ namespace VUI
 			return 0;
 		}
 
-		protected override string ToString(float v)
+		protected override void ToString(float v, StringBuilder sb)
 		{
 			if (WholeNumbers)
-				return ((int)Math.Round(v)).ToString();
+			{
+				sb.Append((int)Math.Round(v));
+			}
 			else
-				return v.ToString(format_);
+			{
+				if (v < 0)
+					sb.Append("-");
+
+				sb.Concat(v, decimals_);
+			}
 		}
 	}
 
@@ -586,9 +597,9 @@ namespace VUI
 			return 0;
 		}
 
-		protected override string ToString(int v)
+		protected override void ToString(int v, StringBuilder sb)
 		{
-			return v.ToString();
+			sb.Append(v);
 		}
 	}
 }

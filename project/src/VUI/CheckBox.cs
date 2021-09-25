@@ -95,6 +95,12 @@ namespace VUI
 			Style.Polish(this);
 		}
 
+		protected override void DoSetRender(bool b)
+		{
+			if (toggle_ != null)
+				toggle_.gameObject.SetActive(b);
+		}
+
 		private void OnClicked(bool b)
 		{
 			try

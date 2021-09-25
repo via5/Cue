@@ -1,5 +1,6 @@
 ﻿using UnityEngine.UI;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace VUI
 {
@@ -7,6 +8,7 @@ namespace VUI
 	{
 		bool Init();
 		void Destroy();
+		void SetActive(bool b);
 
 		Rectangle Bounds { get; }
 		Transform RootParent { get; }
@@ -53,6 +55,7 @@ namespace VUI
 		public abstract Transform RootParent { get; }
 
 		public abstract void Destroy();
+		public abstract void SetActive(bool b);
 
 		public bool Init()
 		{
@@ -95,6 +98,7 @@ namespace VUI
 	{
 		private MVRScript s_ = null;
 		private MVRScriptUI sui_ = null;
+		private Style.RootRestore rr_ = null;
 
 		public ScriptUIRootSupport(MVRScript s)
 		{
@@ -143,7 +147,7 @@ namespace VUI
 
 			Glue.LogVerbose("scriptui support: ready, initing");
 
-			Style.SetupRoot(sui_);
+			rr_ = Style.SetupRoot(sui_.transform);
 
 			var bounds = Rectangle.FromPoints(
 					1, 1,
@@ -158,12 +162,98 @@ namespace VUI
 		public override void Destroy()
 		{
 			if (sui_ != null)
-				Style.RevertRoot(sui_);
+				Style.RevertRoot(sui_.transform, rr_);
+		}
+
+		public override void SetActive(bool b)
+		{
+			if (sui_ != null)
+			{
+				if (b)
+					rr_ = Style.SetupRoot(sui_.transform);
+				else
+					Style.RevertRoot(sui_.transform, rr_);
+			}
 		}
 
 		protected override Canvas GetCanvas()
 		{
 			return sui_?.GetComponentInChildren<Image>()?.canvas;
+		}
+	}
+
+
+	class TransformUIRootSupport : BasicRootSupport
+	{
+		private Transform t_;
+		private List<Transform> restore_ = new List<Transform>();
+		private Style.RootRestore rr_ = null;
+
+		public TransformUIRootSupport(Transform t)
+		{
+			t_ = t;
+		}
+
+		public override Transform RootParent
+		{
+			get { return t_; }
+		}
+
+		protected override InitResults DoInit()
+		{
+			var rt = t_.GetComponent<RectTransform>();
+
+			var bounds = Rectangle.FromPoints(
+				1, 1,
+				rt.rect.width - 3,
+				rt.rect.height - 3);
+
+			var topOffset = 0;// scrollViewRT.offsetMin.y - scrollViewRT.offsetMax.y;
+
+			restore_.Clear();
+			foreach (Transform t in t_)
+			{
+				if (t.gameObject.activeSelf)
+					restore_.Add(t);
+			}
+
+			SetActive(true);
+
+			return new InitResults(bounds, topOffset);
+		}
+
+		public override void Destroy()
+		{
+			SetActive(false);
+		}
+
+		public override void SetActive(bool b)
+		{
+			if (t_ != null)
+			{
+				if (b)
+				{
+					foreach (Transform t in t_)
+					{
+						if (t.gameObject.activeSelf)
+							t.gameObject.SetActive(false);
+					}
+
+					rr_ = Style.SetupRoot(t_);
+				}
+				else
+				{
+					foreach (Transform t in restore_)
+						t.gameObject.SetActive(true);
+
+					Style.RevertRoot(t_, rr_);
+				}
+			}
+		}
+
+		protected override Canvas GetCanvas()
+		{
+			return t_?.GetComponentInChildren<Image>()?.canvas;
 		}
 	}
 
@@ -212,6 +302,11 @@ namespace VUI
 
 			Object.Destroy(fullscreenPanel_);
 			fullscreenPanel_ = null;
+		}
+
+		public override void SetActive(bool b)
+		{
+			// todo
 		}
 
 		private void CreateFullscreenPanel(Transform parent)
@@ -346,6 +441,11 @@ namespace VUI
 
 			Object.Destroy(fullscreenPanel_);
 			fullscreenPanel_ = null;
+		}
+
+		public override void SetActive(bool b)
+		{
+			// todo
 		}
 
 		public void Attach(int hand)
@@ -498,6 +598,11 @@ namespace VUI
 				Object.Destroy(panel_);
 				panel_ = null;
 			}
+		}
+
+		public override void SetActive(bool b)
+		{
+			// todo
 		}
 
 		protected override Canvas GetCanvas()

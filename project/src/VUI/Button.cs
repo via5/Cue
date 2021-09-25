@@ -187,6 +187,12 @@ namespace VUI
 			return Size.Max(s, Style.Metrics.ButtonMinimumSize);
 		}
 
+		protected override void DoSetRender(bool b)
+		{
+			if (button_ != null)
+				button_.gameObject.SetActive(b);
+		}
+
 		private void OnClicked()
 		{
 			try

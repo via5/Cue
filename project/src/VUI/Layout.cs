@@ -299,8 +299,8 @@ namespace VUI
 	{
 		public override string TypeName { get { return "verflow"; } }
 
-		public VerticalFlow(int spacing = 0, bool expand = true)
-			: base(spacing, AlignLeft | AlignTop, expand)
+		public VerticalFlow(int spacing = 0, bool expand = true, int align = AlignLeft | AlignTop)
+			: base(spacing, align, expand)
 		{
 		}
 
