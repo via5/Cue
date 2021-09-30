@@ -187,7 +187,7 @@ namespace Cue
 			for (int i = 0; i < avoid_.Length; ++i)
 			{
 				if (avoid_[i].avoid)
-					list.Add($"{Cue.Instance.Everything[i]}, {avoid_[i].why}");
+					list.Add($"{Cue.Instance.Everything[i]} ({avoid_[i].why})");
 			}
 
 			return list;

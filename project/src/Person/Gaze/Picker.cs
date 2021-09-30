@@ -289,7 +289,7 @@ namespace Cue
 							}
 							else
 							{
-								targets_[j].SetFailed("can't look");
+								targets_[j].SetFailed("can't look at this point");
 							}
 						}
 						else

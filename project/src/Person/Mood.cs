@@ -162,7 +162,7 @@ namespace Cue
 		{
 			get
 			{
-				return (Excitement < person_.Personality.Get(PSE.IdleMaxExcitement));
+				return (Excitement <= person_.Personality.Get(PSE.IdleMaxExcitement));
 			}
 		}
 
