@@ -301,7 +301,15 @@ namespace VUI
 				i + $"offsetMax: {rt.offsetMax}\n" +
 				i + $"anchorMin: {rt.anchorMin}\n" +
 				i + $"anchorMax: {rt.anchorMax}\n" +
-				i + $"anchorPos: {rt.anchoredPosition}\n";
+				i + $"anchoredPosition: {rt.anchoredPosition}\n" +
+				i + $"anchoredPosition3D: {rt.anchoredPosition3D}\n" +
+				i + $"sizeDelta: {rt.sizeDelta}\n" +
+				i + $"pivot: {rt.pivot}\n";
+		}
+
+		public static void DumpComponents(Transform t, int indent = 0)
+		{
+			DumpComponents(t.gameObject, indent);
 		}
 
 		public static void DumpComponents(GameObject o, int indent = 0)

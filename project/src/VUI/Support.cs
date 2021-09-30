@@ -11,6 +11,7 @@ namespace VUI
 		void SetActive(bool b);
 
 		Rectangle Bounds { get; }
+		float TopOffset { get; }
 		Transform RootParent { get; }
 
 		Point ToLocal(Vector2 v);
@@ -51,6 +52,12 @@ namespace VUI
 		{
 			get { return bounds_; }
 		}
+
+		public float TopOffset
+		{
+			get { return topOffset_; }
+		}
+
 
 		public abstract Transform RootParent { get; }
 
@@ -445,7 +452,7 @@ namespace VUI
 
 		public override void SetActive(bool b)
 		{
-			// todo
+			fullscreenPanel_?.SetActive(b);
 		}
 
 		public void Attach(int hand)

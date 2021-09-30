@@ -215,6 +215,8 @@ namespace Cue
 					// character isn't just immediately avoiding gaze like a
 					// whack-a-mole
 
+					avoidString_.Length = 0;
+
 					if (timeSinceLastAvoid_ > AvoidInterval)
 					{
 						needsTarget = true;

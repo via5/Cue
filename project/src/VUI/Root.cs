@@ -210,6 +210,19 @@ namespace VUI
 			Glue.InitInternal(() => script.manager);
 		}
 
+		public static void Init(
+			Glue.PluginManagerDelegate getPluginManager,
+			Glue.StringDelegate getString = null,
+			Glue.LogDelegate logVerbose = null,
+			Glue.LogDelegate logInfo = null,
+			Glue.LogDelegate logWarning = null,
+			Glue.LogDelegate logError = null)
+		{
+			Glue.InitInternal(
+				getPluginManager, getString,
+				logVerbose, logInfo, logWarning, logError);
+		}
+
 		public IRootSupport RootSupport
 		{
 			get { return support_; }
@@ -303,8 +316,6 @@ namespace VUI
 			}
 
 			Update(true);
-
-			content_.Dump();
 		}
 
 		public void Destroy()

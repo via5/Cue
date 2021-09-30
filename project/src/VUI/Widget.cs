@@ -213,7 +213,7 @@ namespace VUI
 			}
 		}
 
-		private void UpdateActiveState()
+		protected virtual void UpdateActiveState()
 		{
 			if (mainObject_ != null)
 				mainObject_.SetActive(render_ && visible_);

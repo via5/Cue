@@ -246,7 +246,7 @@ namespace Cue
 		{
 			LogVerbose($"cue: init (token {CueMain.Instance.Token})");
 
-			VUI.Glue.Set(
+			VUI.Root.Init(
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => LogVerbose(s),

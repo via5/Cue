@@ -177,20 +177,20 @@ namespace VUI
 			UpdateClip();
 		}
 
-		private Rect MakeClipRect()
+		private Rectangle MakeClipRect()
 		{
 			var root = GetRoot();
 			if (root == null)
-				return Rect.zero;
+				return Rectangle.Zero;
 
 			var rb = root.RootSupport.Bounds;
-
 			var ar = AbsoluteClientBounds;
 
-			return new Rect(
+			return Rectangle.FromSize(
 				ar.Left - rb.Width / 2 - 2,
-				rb.Height - ar.Top + ar.Height,
-				ar.Width, ar.Height + 3);
+				rb.Bottom - ar.Top - ar.Height + root.RootSupport.TopOffset,
+				ar.Width,
+				ar.Height);
 		}
 
 		private void UpdateClip()
@@ -198,18 +198,24 @@ namespace VUI
 			if (textObject_ == null)
 				return;
 
+			if (!IsVisibleOnScreen())
+			{
+				ClearClip();
+				return;
+			}
+
 			switch (wrap_)
 			{
 				case Wrap:
 				case Overflow:
 				{
-					textObject_.SetClipRect(Rect.zero, false);
+					ClearClip();
 					break;
 				}
 
 				case Clip:
 				{
-					textObject_.SetClipRect(MakeClipRect(), true);
+					SetClip(MakeClipRect());
 					break;
 				}
 
@@ -220,9 +226,9 @@ namespace VUI
 						var ellipsisSize = Root.TextSize(Font, FontSize, "...");
 
 						var cr = MakeClipRect();
-						cr.width -= (ellipsisSize.Width + 5);
+						cr.Width -= (ellipsisSize.Width + 5);
 
-						textObject_.SetClipRect(cr, true);
+						SetClip(cr);
 
 						if (ellipsis_ == null)
 							CreateEllipsis();
@@ -245,12 +251,22 @@ namespace VUI
 						if (ellipsis_ != null)
 							ellipsis_.gameObject.SetActive(false);
 
-						textObject_.SetClipRect(Rect.zero, false);
+						ClearClip();
 					}
 
 					break;
 				}
 			}
+		}
+
+		private void ClearClip()
+		{
+			textObject_.SetClipRect(Rect.zero, false);
+		}
+
+		private void SetClip(Rectangle r)
+		{
+			textObject_.SetClipRect(r.ToRect(), true);
 		}
 
 		private void CreateEllipsis()
@@ -289,11 +305,21 @@ namespace VUI
 
 		protected override void DoSetRender(bool b)
 		{
+			base.DoSetRender(b);
+
 			if (textObject_ != null)
 				textObject_.gameObject.SetActive(b);
 
 			if (ellipsis_ != null)
 				ellipsis_.gameObject.SetActive(b);
+
+			UpdateClip();
+		}
+
+		protected override void UpdateActiveState()
+		{
+			base.UpdateActiveState();
+			UpdateClip();
 		}
 
 		private bool TextTooLong()
