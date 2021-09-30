@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -98,6 +99,11 @@ namespace Cue
 		public bool HasMovement
 		{
 			get { return false; }
+		}
+
+		public List<string> GetAllForcesDebug()
+		{
+			return null;
 		}
 
 		public override string ToString()

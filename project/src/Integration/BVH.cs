@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System.Collections.Generic;
 using UnityEngine;
 
 // Original script by ElkVR
@@ -112,6 +113,11 @@ namespace Cue.BVH
                 (o.HasKey("useHead") ? o["useHead"].AsBool : true));
         }
 
+        public string Name
+        {
+            get { return file_.Name; }
+        }
+
         public File File
         {
             get { return file_; }
@@ -170,6 +176,11 @@ namespace Cue.BVH
         public bool UseHead
         {
             get { return useHead_; }
+        }
+
+        public List<string> GetAllForcesDebug()
+        {
+            return null;
         }
 
         public override string ToString()

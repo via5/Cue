@@ -17,6 +17,13 @@ namespace Cue.Proc
 		}
 
 		public abstract List<ITarget> Targets { get; }
+
+		public override void GetAllForcesDebug(List<string> list)
+		{
+			var ts = Targets;
+			for (int i = 0; i < ts.Count; ++i)
+				ts[i].GetAllForcesDebug(list);
+		}
 	}
 
 

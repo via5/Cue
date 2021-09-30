@@ -84,6 +84,11 @@ namespace Cue
 			tickers_[i].End();
 		}
 
+		public void Reset()
+		{
+			current_ = 0;
+		}
+
 		public int Depth(int i)
 		{
 			return depth_[i];
@@ -458,6 +463,8 @@ namespace Cue
 
 			++frame_;
 
+			I.Instance.Reset();
+
 			I.Start(I.FixedUpdate);
 			{
 				DoFixedUpdate(s);
@@ -473,6 +480,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			I.Instance.Reset();
+
 			I.Start(I.Update);
 			{
 				DoUpdate(s);

@@ -32,6 +32,11 @@ namespace Cue
 			get { return true; }
 		}
 
+		public List<string> GetAllForcesDebug()
+		{
+			return null;
+		}
+
 		public override string ToString()
 		{
 			return "timeline " + name_;

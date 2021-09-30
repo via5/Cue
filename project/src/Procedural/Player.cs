@@ -15,6 +15,8 @@ namespace Cue.Proc
 		void Reset();
 		void Start(Person p);
 		void FixedUpdate(float s);
+
+		void GetAllForcesDebug(List<string> list);
 		string ToDetailedString();
 	}
 
@@ -53,6 +55,11 @@ namespace Cue.Proc
 		public abstract void FixedUpdate(float s);
 		public abstract void Start(Person p);
 		public abstract string ToDetailedString();
+
+		public virtual void GetAllForcesDebug(List<string> list)
+		{
+			// no-op
+		}
 
 		public virtual void Reset()
 		{

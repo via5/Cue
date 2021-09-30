@@ -454,6 +454,7 @@ namespace VUI
 		{
 			slider_ = s;
 			text_ = new SliderTextBox<T>(this);
+			text_.MaximumSize = new Size(100, DontCare);
 
 			Layout = new BorderLayout(5);
 			Add(slider_, BorderLayout.Center);

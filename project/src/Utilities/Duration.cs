@@ -329,7 +329,13 @@ namespace Cue
 
 		public float Progress
 		{
-			get { return U.Clamp(elapsed_ / current_, 0, 1); }
+			get
+			{
+				if (current_ <= 0)
+					return 1;
+
+				return U.Clamp(elapsed_ / current_, 0, 1);
+			}
 		}
 
 		public float Current

@@ -1,5 +1,54 @@
-﻿namespace Cue.Sys.Vam
+﻿using UnityEngine;
+
+namespace Cue.Sys.Vam
 {
+	class VamCorruptionDetector
+	{
+		public delegate void Handler();
+		public event Handler Corrupted;
+
+		private const float UICheckInterval = 1;
+
+		private Atom atom_;
+		private UnityEngine.UI.Slider slider_ = null;
+		private float elapsed_ = UICheckInterval;
+		private float last_ = 0;
+
+		public VamCorruptionDetector(Atom a, Handler h = null)
+		{
+			atom_ = a;
+
+			if (h != null)
+				Corrupted += h;
+		}
+
+		public void Update(float s)
+		{
+			if (slider_ == null)
+			{
+				elapsed_ += s;
+				if (elapsed_ >= UICheckInterval)
+				{
+					elapsed_ = 0;
+
+					var aui = atom_.UITransform
+						?.GetComponentInChildren<AtomUI>(includeInactive: true);
+
+					slider_ = aui?.resetPhysicsProgressSlider;
+				}
+
+				if (slider_ == null)
+					return;
+
+				last_ = slider_.value;
+			}
+
+			if (slider_.value > 0 && slider_.value != last_)
+				Corrupted?.Invoke();
+		}
+	}
+
+
 	class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
@@ -15,6 +64,7 @@
 		private BoolParameter physics_;
 		private FloatParameter scale_;
 		private BoolParameter blink_;
+		private VamCorruptionDetector cd_;
 
 		public VamAtom(Atom atom)
 		{
@@ -35,6 +85,7 @@
 			physics_ = new BoolParameter(this, "control", "physicsEnabled");
 			scale_ = new FloatParameter(this, "scale", "scale");
 			blink_ = new BoolParameter(this, "EyelidControl", "blinkEnabled");
+			cd_ = new VamCorruptionDetector(atom, OnCorruption);
 		}
 
 		public void Init()
@@ -274,6 +325,7 @@
 		{
 			nav_.Update(s);
 			hair_?.Update(s);
+			cd_.Update(s);
 		}
 
 		public void TeleportTo(Vector3 v, float bearing)
@@ -319,6 +371,18 @@
 				return;
 
 			head_ = Cue.Instance.VamSys.FindController(atom_, "headControl");
+		}
+
+		private void OnCorruption()
+		{
+			Cue.LogError(
+				"cue: VaM detected corruption, disabling plugin");
+
+			var p = Cue.Instance.FindPerson(ID);
+			if (p != null)
+				p.Animator.DumpAllForces();
+
+			Cue.Instance.DisablePlugin();
 		}
 	}
 }

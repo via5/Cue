@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Proc
@@ -245,6 +246,13 @@ namespace Cue.Proc
 				case AbsoluteTorque: return "torque";
 				default: return $"?{i}";
 			}
+		}
+
+		public override void GetAllForcesDebug(List<string> list)
+		{
+			list.Add(
+				$"{rbId_} ({BP.ToString(bodyPart_)}) " +
+				$"{TypeToString(type_)} {Sys.Vam.U.ToUnity(Lerped())}");
 		}
 
 		public override string ToString()

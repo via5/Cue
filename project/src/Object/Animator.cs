@@ -29,6 +29,17 @@ namespace Cue
 		public bool HasMovement { get { return anim_.HasMovement; } }
 		public IAnimation Real { get { return anim_; } }
 
+		public void GetAllForcesDebug(List<string> list)
+		{
+			var fs = anim_.GetAllForcesDebug();
+
+			if (fs != null)
+			{
+				for (int i = 0; i < fs.Count; ++i)
+					list.Add($"{anim_.Name}: {fs[i]}");
+			}
+		}
+
 		public override string ToString()
 		{
 			string s = Animations.ToString(type_) + " ";
@@ -369,6 +380,29 @@ namespace Cue
 			//	return currentPlayer_.ToString();
 			//else
 			//	return "(none)";
+		}
+
+		public void DumpAllForces()
+		{
+			var fs = GetAllForcesDebug();
+
+			if (fs != null && fs.Count > 0)
+			{
+				Cue.LogError("forces being applied right now:");
+
+				for (int i = 0; i < fs.Count; ++i)
+					Cue.LogError($"  - {fs[i]}");
+			}
+		}
+
+		private List<string> GetAllForcesDebug()
+		{
+			var list = new List<string>();
+
+			for (int i = 0; i < playing_.Count; ++i)
+				playing_[i].anim.GetAllForcesDebug(list);
+
+			return list;
 		}
 	}
 }

@@ -77,6 +77,13 @@ namespace Cue.Proc
 			root_.FixedUpdate(s);
 		}
 
+		public virtual List<string> GetAllForcesDebug()
+		{
+			var list = new List<string>();
+			root_.GetAllForcesDebug(list);
+			return list;
+		}
+
 		public override string ToString()
 		{
 			return name_ + " " + root_.ToString();

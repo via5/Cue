@@ -97,10 +97,12 @@ namespace Cue
 
 	interface IAnimation
 	{
+		string Name { get; }
 		float InitFrame{ get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
 		bool HasMovement { get; }
+		List<string> GetAllForcesDebug();
 		string ToDetailedString();
 	}
 
