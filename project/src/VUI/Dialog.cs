@@ -59,8 +59,6 @@
 				ps));
 
 			DoLayout();
-			Create();
-			UpdateBounds();
 			BringToTop();
 
 			if (h != null)

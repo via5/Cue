@@ -12,14 +12,16 @@ namespace VUI
 		private Color bgColor_ = new Color(0, 0, 0, 0);
 		private bool clickthrough_ = true;
 
-		public Panel(string name = "")
-			: base(name)
+		public Panel(Layout ly)
+			: this("", ly)
 		{
 		}
 
-		public Panel(Layout ly)
+		public Panel(string name = "", Layout ly = null)
+			: base(name)
 		{
-			Layout = ly;
+			if (ly != null)
+				Layout = ly;
 		}
 
 		public bool Clickthrough
@@ -81,7 +83,7 @@ namespace VUI
 			if (bgColor_.a == 0 && clickthrough_ && bgObject_ == null)
 				return;
 
-			if (bgColor_.a > 0 && bgObject_ == null)
+			if ((bgColor_.a > 0 || !clickthrough_) && bgObject_ == null)
 			{
 				bgObject_ = new GameObject("WidgetBackground");
 				bgObject_.transform.SetParent(MainObject.transform, false);

@@ -216,7 +216,7 @@ namespace VUI
 
 		public bool HandleWheelInternal(WheelEvent e)
 		{
-			DoTick((int)Math.Round(e.Delta.Y));
+			DoTick(Math.Sign(e.Delta.Y));
 			return false;
 		}
 
@@ -499,6 +499,19 @@ namespace VUI
 			set { slider_.Maximum = value; }
 		}
 
+		public T TickValue
+		{
+			get { return slider_.TickValue ; }
+			set { slider_.TickValue = value; }
+		}
+
+		public T PageValue
+		{
+			get { return slider_.PageValue; }
+			set { slider_.PageValue = value; }
+		}
+
+
 		public void Set(T value, T min, T max)
 		{
 			if (slider_.Set(value, min, max))
@@ -590,16 +603,9 @@ namespace VUI
 		protected override void ToString(float v, StringBuilder sb)
 		{
 			if (WholeNumbers)
-			{
 				sb.Append((int)Math.Round(v));
-			}
 			else
-			{
-				if (v < 0)
-					sb.Append("-");
-
-				sb.Concat(v, decimals_);
-			}
+				sb.AppendFloat(v, (int)decimals_);
 		}
 	}
 

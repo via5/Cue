@@ -109,7 +109,7 @@ namespace VUI
 			r.Bottom = r.Top + h;
 
 			handle_.SetBounds(r);
-			DoLayout();
+			DoLayoutImpl();
 
 			base.UpdateBounds();
 		}
@@ -142,7 +142,7 @@ namespace VUI
 			cb.Bottom = y + h;
 
 			handle_.SetBounds(cb);
-			DoLayout();
+			DoLayoutImpl();
 			base.UpdateBounds();
 
 			OnHandleMoved();
@@ -484,7 +484,7 @@ namespace VUI
 
 					UpdatePanel(r);
 
-					r.Left += indent * IndentSize;
+					r.Left += indent * Style.Metrics.TreeIndentSize;
 
 					if (item_.HasChildren)
 					{
@@ -513,7 +513,7 @@ namespace VUI
 			{
 				if (panel_ == null)
 				{
-					panel_ = new Panel(new AbsoluteLayout());
+					panel_ = new Panel("TreeViewNode", new AbsoluteLayout());
 					tree_.Add(panel_);
 					panel_.Create();
 					panel_.Events.PointerClick += (e) => true;
@@ -547,7 +547,7 @@ namespace VUI
 					toggle_.Text = "+";
 
 				var tr = r;
-				tr.Width = 30;
+				tr.Width = Style.Metrics.TreeToggleWidth;
 				toggle_.SetBounds(tr);
 				toggle_.Render = true;
 			}
@@ -570,7 +570,7 @@ namespace VUI
 					return;
 
 				var lr = r;
-				lr.Left += 35;
+				lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
 				label_.Text = item_.Text;
 				label_.SetBounds(lr);
 			}
@@ -608,12 +608,7 @@ namespace VUI
 
 		public delegate void ItemCallback(Item i);
 		public event ItemCallback SelectionChanged;
-
-		private const int InternalPadding = 5;
-		private const int ItemHeight = 35;
-		private const int ItemPadding = 2;
-		private const int IndentSize = 35;
-		private const int ScrollBarWidth = 40;
+		public event ItemCallback ItemClicked;
 
 		private readonly InternalRootItem root_;
 		private List<Node> nodes_ = new List<Node>();
@@ -646,10 +641,25 @@ namespace VUI
 			vsb_.ValueChanged += OnVerticalScroll;
 		}
 
+		private float FullItemHeight
+		{
+			get
+			{
+				return
+					Style.Metrics.TreeItemHeight +
+					Style.Metrics.TreeItemSpacing;
+			}
+		}
+
+		private float InternalPadding
+		{
+			get { return Style.Metrics.TreeInternalPadding; }
+		}
+
 		private void OnVerticalScroll(float v)
 		{
 			if (ignoreVScroll_) return;
-			SetTopItem((int)(v / (ItemHeight + ItemPadding)), false);
+			SetTopItem((int)(v / (FullItemHeight)), false);
 		}
 
 		private void SetTopItem(int index, bool updateSb, bool rebuild = true)
@@ -658,8 +668,8 @@ namespace VUI
 
 			if (updateSb)
 			{
-				float v = topItemIndex_ * (ItemHeight + ItemPadding);
-				if (v + (ItemHeight + ItemPadding) > vsb_.Range)
+				float v = topItemIndex_ * (FullItemHeight);
+				if (v + FullItemHeight > vsb_.Range)
 					v = vsb_.Range;
 
 				vsb_.Value = v;
@@ -799,7 +809,7 @@ namespace VUI
 				cx.y = cx.av.Top + InternalPadding;
 				cx.indent = 0;
 
-				int nodeCount = (int)(cx.av.Height / (ItemHeight + ItemPadding));
+				int nodeCount = (int)(cx.av.Height / FullItemHeight);
 
 				while (nodes_.Count < nodeCount)
 					nodes_.Add(new Node(this));
@@ -813,12 +823,12 @@ namespace VUI
 				for (int i = cx.nodeIndex; i < nodes_.Count; ++i)
 					nodes_[i].Clear();
 
-				DoLayout();
+				DoLayoutImpl();
 
 				itemCount_ = cx.itemIndex;
-				visibleCount_ = (int)(cx.av.Height / (ItemHeight + ItemPadding));
+				visibleCount_ = (int)(cx.av.Height / FullItemHeight);
 
-				float requiredHeight = (itemCount_) * (ItemHeight + ItemPadding);
+				float requiredHeight = (itemCount_) * FullItemHeight;
 				float missingHeight = requiredHeight - cx.av.Height;
 
 				if (missingHeight <= 0)
@@ -829,7 +839,7 @@ namespace VUI
 				else
 				{
 					vsb_.Visible = true;
-					vsb_.Range = missingHeight + ItemHeight;
+					vsb_.Range = missingHeight + Style.Metrics.TreeItemHeight;
 				}
 			}
 			catch (Exception e)
@@ -859,12 +869,12 @@ namespace VUI
 
 						var r = Rectangle.FromPoints(
 							x, y,
-							cx.av.Right - InternalPadding - ScrollBarWidth,
-							y + ItemHeight);
+							cx.av.Right - InternalPadding - Style.Metrics.ScrollBarWidth,
+							y + Style.Metrics.TreeItemHeight);
 
 						node.Set(child, r, cx.indent);
 
-						cx.y += ItemHeight + ItemPadding;
+						cx.y += FullItemHeight;
 						++cx.nodeIndex;
 					}
 				}
@@ -895,7 +905,7 @@ namespace VUI
 		public override void UpdateBounds()
 		{
 			var r = AbsoluteClientBounds;
-			r.Left = r.Right - ScrollBarWidth;
+			r.Left = r.Right - Style.Metrics.ScrollBarWidth;
 			vsb_.SetBounds(r);
 			//hsb_.Set(0, 0, 10);
 
@@ -928,13 +938,13 @@ namespace VUI
 		private Node NodeAt(Point p)
 		{
 			var r = AbsoluteClientBounds;
-			r.Right -= ScrollBarWidth;
+			r.Right -= Style.Metrics.ScrollBarWidth;
 
 			if (r.Contains(p))
 			{
 				var rp = p - r.TopLeft;
 
-				int nodeIndex = (int)(rp.Y / (ItemHeight + ItemPadding));
+				int nodeIndex = (int)(rp.Y / FullItemHeight);
 				if (nodeIndex >= 0 && nodeIndex < nodes_.Count)
 					return nodes_[nodeIndex];
 			}
@@ -962,7 +972,10 @@ namespace VUI
 			var n = NodeAt(e.Pointer);
 
 			if (n?.Item != null)
+			{
 				n.Item.Selected = true;
+				ItemClicked?.Invoke(n.Item);
+			}
 
 			return false;
 		}

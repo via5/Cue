@@ -58,7 +58,6 @@ namespace VUI
 			{
 				UpdateChildren();
 				DoLayout();
-				UpdateBounds();
 			}
 		}
 

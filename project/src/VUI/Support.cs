@@ -9,6 +9,7 @@ namespace VUI
 		bool Init();
 		void Destroy();
 		void SetActive(bool b);
+		void Update(float s);
 
 		Rectangle Bounds { get; }
 		float TopOffset { get; }
@@ -63,6 +64,11 @@ namespace VUI
 
 		public abstract void Destroy();
 		public abstract void SetActive(bool b);
+
+		public virtual void Update(float s)
+		{
+			// no-op
+		}
 
 		public bool Init()
 		{
@@ -192,9 +198,12 @@ namespace VUI
 
 	class TransformUIRootSupport : BasicRootSupport
 	{
+		private const float StyleCheckInterval = 1;
+
 		private Transform t_;
 		private List<Transform> restore_ = new List<Transform>();
 		private Style.RootRestore rr_ = null;
+		private float styleCheck_ = 0;
 
 		public TransformUIRootSupport(Transform t)
 		{
@@ -255,6 +264,17 @@ namespace VUI
 
 					Style.RevertRoot(t_, rr_);
 				}
+			}
+		}
+
+		public override void Update(float s)
+		{
+			styleCheck_ += s;
+
+			if (styleCheck_ >= StyleCheckInterval)
+			{
+				styleCheck_ = 0;
+				Style.CheckRoot(t_, rr_);
 			}
 		}
 

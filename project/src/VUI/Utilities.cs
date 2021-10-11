@@ -325,9 +325,9 @@ namespace VUI
 				string s = new string(' ', indent * 2) + c.ToString();
 
 				if (c is Image)
-				{
 					s += $" {(c as Image).color}";
-				}
+				else if (c is Text)
+					s += $" '{(c as Text).text}'";
 
 				Glue.LogError(s);
 			}
@@ -779,361 +779,228 @@ namespace VUI
 	}
 
 
-	// from https://www.gavpugh.com/2010/04/05/xnac-a-garbage-free-stringbuilder-format-method/
+	// adapted from https://github.com/mpaland/printf/blob/master/printf.c
 	//
 	public static partial class StringBuilderExtensions
 	{
-		// These digits are here in a static array to support hex with simple, easily-understandable code.
-		// Since A-Z don't sit next to 0-9 in the ascii table.
-		private static readonly char[] ms_digits = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		private static int PRINTF_FTOA_BUFFER_SIZE = 32;
+		private static double PRINTF_MAX_FLOAT = 1e9;
+		private static uint PRINTF_DEFAULT_FLOAT_PRECISION = 6;
+		private static char[] buf = new char[PRINTF_FTOA_BUFFER_SIZE];
 
-		private static readonly uint ms_default_decimal_places = 5; //< Matches standard .NET formatting dp's
-		private static readonly char ms_default_pad_char = '0';
-
-		//! Convert a given unsigned integer value to a string and concatenate onto the stringbuilder. Any base value allowed.
-		public static StringBuilder Concat(this StringBuilder string_builder, uint uint_val, uint pad_amount, char pad_char, uint base_val)
+		// powers of 10
+		private static double[] pow10 = new double[]
 		{
-			Debug.Assert(pad_amount >= 0);
-			Debug.Assert(base_val > 0 && base_val <= 16);
+			1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000
+		};
 
-			// Calculate length of integer when written out
-			uint length = 0;
-			uint length_calc = uint_val;
 
-			do
+		// internal flag definitions
+		private static uint FLAGS_ZEROPAD   = (1 <<  0);
+		private static uint FLAGS_LEFT      = (1 <<  1);
+		private static uint FLAGS_PLUS      = (1 <<  2);
+		private static uint FLAGS_SPACE     = (1 <<  3);
+		private static uint FLAGS_PRECISION = (1 << 10);
+
+		private static double DBL_MAX = double.MaxValue;
+
+		private static char[] nan_string = new char[] { 'n', 'a', 'n' };
+		private static char[] fni_minus_string = new char[] { 'f', 'n', 'i', '-' };
+		private static char[] fni_plus_string = new char[] { 'f', 'n', 'i', '+' };
+		private static char[] fni_string = new char[] { 'f', 'n', 'i' };
+
+		private static void out2(char character, char[] outbuf, uint idx, uint maxlen)
+		{
+			if (idx < maxlen)
 			{
-				length_calc /= base_val;
-				length++;
+				outbuf[idx] = character;
 			}
-			while (length_calc > 0);
+		}
 
-			// Pad out space for writing.
-			string_builder.Append(pad_char, (int)Math.Max(pad_amount, length));
+		// output the specified string in reverse, taking care of any zero-padding
 
-			int strpos = string_builder.Length;
+		private static uint _out_rev(char[] outbuf, uint idx, uint maxlen,
+			char[] buf, uint len, uint width, uint flags)
+		{
+		  uint start_idx = idx;
 
-			// We're writing backwards, one character at a time.
-			while (length > 0)
+		  // pad spaces up to given width
+		  if ((flags & FLAGS_LEFT) == 0 && (flags & FLAGS_ZEROPAD) == 0) {
+			for (uint i = len; i < width; i++) {
+			  out2(' ', outbuf, idx++, maxlen);
+			}
+		  }
+
+		  // reverse string
+		  while (len > 0) {
+			out2(buf[--len], outbuf, idx++, maxlen);
+		  }
+
+		  // append pad spaces up to given width
+		  if ((flags & FLAGS_LEFT) != 0) {
+			while (idx - start_idx < width) {
+			  out2(' ', outbuf, idx++, maxlen);
+			}
+		  }
+
+		  return idx;
+		}
+
+
+
+		// internal ftoa for fixed decimal floating point
+		private static uint _ftoa(char[] outbuf, uint idx, uint maxlen,
+			double value, uint prec, uint width, uint flags)
+		{
+			uint len = 0;
+			double diff = 0.0;
+
+			// test for special values
+			if (double.IsNaN(value))
+				return _out_rev(outbuf, idx, maxlen, nan_string, 3, width, flags);
+			if (value < -DBL_MAX)
+				return _out_rev(outbuf, idx, maxlen, fni_minus_string, 4, width, flags);
+			if (value > DBL_MAX)
+				return _out_rev(outbuf, idx, maxlen, ((flags & FLAGS_PLUS) != 0) ? fni_plus_string : fni_string, ((flags & FLAGS_PLUS) != 0) ? 4U : 3U, width, flags);
+
+			// test for very large values
+			// standard printf behavior is to print EVERY whole number digit -- which could be 100s of characters overflowing your buffers == bad
+			if ((value > PRINTF_MAX_FLOAT) || (value < -PRINTF_MAX_FLOAT))
 			{
-				strpos--;
-
-				// Lookup from static char array, to cover hex values too
-				string_builder[strpos] = ms_digits[uint_val % base_val];
-
-				uint_val /= base_val;
-				length--;
+				return 0U;
 			}
 
-			return string_builder;
-		}
-
-		//! Convert a given unsigned integer value to a string and concatenate onto the stringbuilder. Assume no padding and base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, uint uint_val)
-		{
-			string_builder.Concat(uint_val, 0, ms_default_pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given unsigned integer value to a string and concatenate onto the stringbuilder. Assume base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, uint uint_val, uint pad_amount)
-		{
-			string_builder.Concat(uint_val, pad_amount, ms_default_pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given unsigned integer value to a string and concatenate onto the stringbuilder. Assume base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, uint uint_val, uint pad_amount, char pad_char)
-		{
-			string_builder.Concat(uint_val, pad_amount, pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given signed integer value to a string and concatenate onto the stringbuilder. Any base value allowed.
-		public static StringBuilder Concat(this StringBuilder string_builder, int int_val, uint pad_amount, char pad_char, uint base_val)
-		{
-			Debug.Assert(pad_amount >= 0);
-			Debug.Assert(base_val > 0 && base_val <= 16);
-
-			// Deal with negative numbers
-			if (int_val < 0)
+			// test for negative
+			bool negative = false;
+			if (value < 0)
 			{
-				string_builder.Append('-');
-				uint uint_val = uint.MaxValue - ((uint)int_val) + 1; //< This is to deal with Int32.MinValue
-				string_builder.Concat(uint_val, pad_amount, pad_char, base_val);
+				negative = true;
+				value = 0 - value;
+			}
+
+			// set default precision, if not set explicitly
+			if ((flags & FLAGS_PRECISION) == 0)
+			{
+				prec = PRINTF_DEFAULT_FLOAT_PRECISION;
+			}
+			// limit precision to 9, cause a prec >= 10 can lead to overflow errors
+			while ((len < PRINTF_FTOA_BUFFER_SIZE) && (prec > 9U))
+			{
+				buf[len++] = '0';
+				prec--;
+			}
+
+			int whole = (int)value;
+			double tmp = (value - whole) * pow10[prec];
+			uint frac = (uint)tmp;
+			diff = tmp - frac;
+
+			if (diff > 0.5)
+			{
+				++frac;
+				// handle rollover, e.g. case 0.99 with prec 1 is 1.0
+				if (frac >= pow10[prec])
+				{
+					frac = 0;
+					++whole;
+				}
+			}
+			else if (diff < 0.5)
+			{
+			}
+			else if ((frac == 0) || ((frac & 1) != 0))
+			{
+				// if halfway, round up if odd OR if last digit is 0
+				++frac;
+			}
+
+			if (prec == 0U)
+			{
+				diff = value - (double)whole;
+				if ((!(diff < 0.5) || (diff > 0.5)) && ((whole & 1) != 0))
+				{
+					// exactly 0.5 and ODD, then round up
+					// 1.5 -> 2, but 2.5 -> 2
+					++whole;
+				}
 			}
 			else
 			{
-				string_builder.Concat((uint)int_val, pad_amount, pad_char, base_val);
-			}
-
-			return string_builder;
-		}
-
-		//! Convert a given signed integer value to a string and concatenate onto the stringbuilder. Assume no padding and base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, int int_val)
-		{
-			string_builder.Concat(int_val, 0, ms_default_pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given signed integer value to a string and concatenate onto the stringbuilder. Assume base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, int int_val, uint pad_amount)
-		{
-			string_builder.Concat(int_val, pad_amount, ms_default_pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given signed integer value to a string and concatenate onto the stringbuilder. Assume base ten.
-		public static StringBuilder Concat(this StringBuilder string_builder, int int_val, uint pad_amount, char pad_char)
-		{
-			string_builder.Concat(int_val, pad_amount, pad_char, 10);
-			return string_builder;
-		}
-
-		//! Convert a given float value to a string and concatenate onto the stringbuilder
-		public static StringBuilder Concat(this StringBuilder string_builder, float float_val, uint decimal_places, uint pad_amount, char pad_char)
-		{
-			Debug.Assert(pad_amount >= 0);
-
-			if (decimal_places == 0)
-			{
-				// No decimal places, just round up and print it as an int
-
-				// Agh, Math.Floor() just works on doubles/decimals. Don't want to cast! Let's do this the old-fashioned way.
-				int int_val;
-				if (float_val >= 0.0f)
+				uint count = prec;
+				// now do fractional part, as an unsigned number
+				while (len < PRINTF_FTOA_BUFFER_SIZE)
 				{
-					// Round up
-					int_val = (int)(float_val + 0.5f);
-				}
-				else
-				{
-					// Round down for negative numbers
-					int_val = (int)(float_val - 0.5f);
-				}
-
-				string_builder.Concat(int_val, pad_amount, pad_char, 10);
-			}
-			else
-			{
-				int int_part = (int)float_val;
-
-				// First part is easy, just cast to an integer
-				string_builder.Concat(int_part, pad_amount, pad_char, 10);
-
-				// Decimal point
-				string_builder.Append('.');
-
-				// Work out remainder we need to print after the d.p.
-				float remainder = Math.Abs(float_val - int_part);
-
-				// Multiply up to become an int that we can print
-				do
-				{
-					remainder *= 10;
-					decimal_places--;
-				}
-				while (decimal_places > 0);
-
-				// Round up. It's guaranteed to be a positive number, so no extra work required here.
-				remainder += 0.5f;
-
-				// All done, print that as an int!
-				string_builder.Concat((uint)remainder, 0, '0', 10);
-			}
-			return string_builder;
-		}
-
-		//! Convert a given float value to a string and concatenate onto the stringbuilder. Assumes five decimal places, and no padding.
-		public static StringBuilder Concat(this StringBuilder string_builder, float float_val)
-		{
-			string_builder.Concat(float_val, ms_default_decimal_places, 0, ms_default_pad_char);
-			return string_builder;
-		}
-
-		//! Convert a given float value to a string and concatenate onto the stringbuilder. Assumes no padding.
-		public static StringBuilder Concat(this StringBuilder string_builder, float float_val, uint decimal_places)
-		{
-			string_builder.Concat(float_val, decimal_places, 0, ms_default_pad_char);
-			return string_builder;
-		}
-
-		//! Convert a given float value to a string and concatenate onto the stringbuilder.
-		public static StringBuilder Concat(this StringBuilder string_builder, float float_val, uint decimal_places, uint pad_amount)
-		{
-			string_builder.Concat(float_val, decimal_places, pad_amount, ms_default_pad_char);
-			return string_builder;
-		}
-
-		//! Concatenate a formatted string with arguments
-		public static StringBuilder ConcatFormat<A>(this StringBuilder string_builder, String format_string, A arg1)
-			where A : IConvertible
-		{
-			return string_builder.ConcatFormat<A, int, int, int>(format_string, arg1, 0, 0, 0);
-		}
-
-		//! Concatenate a formatted string with arguments
-		public static StringBuilder ConcatFormat<A, B>(this StringBuilder string_builder, String format_string, A arg1, B arg2)
-			where A : IConvertible
-			where B : IConvertible
-		{
-			return string_builder.ConcatFormat<A, B, int, int>(format_string, arg1, arg2, 0, 0);
-		}
-
-		//! Concatenate a formatted string with arguments
-		public static StringBuilder ConcatFormat<A, B, C>(this StringBuilder string_builder, String format_string, A arg1, B arg2, C arg3)
-			where A : IConvertible
-			where B : IConvertible
-			where C : IConvertible
-		{
-			return string_builder.ConcatFormat<A, B, C, int>(format_string, arg1, arg2, arg3, 0);
-		}
-
-		//! Concatenate a formatted string with arguments
-		public static StringBuilder ConcatFormat<A, B, C, D>(this StringBuilder string_builder, String format_string, A arg1, B arg2, C arg3, D arg4)
-			where A : IConvertible
-			where B : IConvertible
-			where C : IConvertible
-			where D : IConvertible
-		{
-			int verbatim_range_start = 0;
-
-			for (int index = 0; index < format_string.Length; index++)
-			{
-				if (format_string[index] == '{')
-				{
-					// Formatting bit now, so make sure the last block of the string is written out verbatim.
-					if (verbatim_range_start < index)
+					--count;
+					buf[len++] = (char)(48U + (frac % 10U));
+					if ((frac /= 10U) == 0)
 					{
-						// Write out unformatted string portion
-						string_builder.Append(format_string, verbatim_range_start, index - verbatim_range_start);
+						break;
 					}
-
-					uint base_value = 10;
-					uint padding = 0;
-					uint decimal_places = 5; // Default decimal places in .NET libs
-
-					index++;
-					char format_char = format_string[index];
-					if (format_char == '{')
-					{
-						string_builder.Append('{');
-						index++;
-					}
-					else
-					{
-						index++;
-
-						if (format_string[index] == ':')
-						{
-							// Extra formatting. This is a crude first pass proof-of-concept. It's not meant to cover
-							// comprehensively what the .NET standard library Format() can do.
-							index++;
-
-							// Deal with padding
-							while (format_string[index] == '0')
-							{
-								index++;
-								padding++;
-							}
-
-							if (format_string[index] == 'X')
-							{
-								index++;
-
-								// Print in hex
-								base_value = 16;
-
-								// Specify amount of padding ( "{0:X8}" for example pads hex to eight characters
-								if ((format_string[index] >= '0') && (format_string[index] <= '9'))
-								{
-									padding = (uint)(format_string[index] - '0');
-									index++;
-								}
-							}
-							else if (format_string[index] == '.')
-							{
-								index++;
-
-								// Specify number of decimal places
-								decimal_places = 0;
-
-								while (format_string[index] == '0')
-								{
-									index++;
-									decimal_places++;
-								}
-							}
-						}
-
-
-						// Scan through to end bracket
-						while (format_string[index] != '}')
-						{
-							index++;
-						}
-
-						// Have any extended settings now, so just print out the particular argument they wanted
-						switch (format_char)
-						{
-							case '0': string_builder.ConcatFormatValue<A>(arg1, padding, base_value, decimal_places); break;
-							case '1': string_builder.ConcatFormatValue<B>(arg2, padding, base_value, decimal_places); break;
-							case '2': string_builder.ConcatFormatValue<C>(arg3, padding, base_value, decimal_places); break;
-							case '3': string_builder.ConcatFormatValue<D>(arg4, padding, base_value, decimal_places); break;
-							default: Debug.Assert(false, "Invalid parameter index"); break;
-						}
-					}
-
-					// Update the verbatim range, start of a new section now
-					verbatim_range_start = (index + 1);
+				}
+				// add extra 0s
+				while ((len < PRINTF_FTOA_BUFFER_SIZE) && (count-- > 0U))
+				{
+					buf[len++] = '0';
+				}
+				if (len < PRINTF_FTOA_BUFFER_SIZE)
+				{
+					// add decimal
+					buf[len++] = '.';
 				}
 			}
 
-			// Anything verbatim to write out?
-			if (verbatim_range_start < format_string.Length)
+			// do whole part, number is reversed
+			while (len < PRINTF_FTOA_BUFFER_SIZE)
 			{
-				// Write out unformatted string portion
-				string_builder.Append(format_string, verbatim_range_start, format_string.Length - verbatim_range_start);
+				buf[len++] = (char)(48 + (whole % 10));
+				if ((whole /= 10) == 0)
+				{
+					break;
+				}
 			}
 
-			return string_builder;
+			// pad leading zeros
+			if ((flags & FLAGS_LEFT) == 0 && (flags & FLAGS_ZEROPAD) != 0)
+			{
+				if (width != 0 && (negative || (flags & (FLAGS_PLUS | FLAGS_SPACE)) != 0))
+				{
+					width--;
+				}
+				while ((len < width) && (len < PRINTF_FTOA_BUFFER_SIZE))
+				{
+					buf[len++] = '0';
+				}
+			}
+
+			if (len < PRINTF_FTOA_BUFFER_SIZE)
+			{
+				if (negative)
+				{
+					buf[len++] = '-';
+				}
+				else if ((flags & FLAGS_PLUS) != 0)
+				{
+					buf[len++] = '+';  // ignore the space if the '+' exists
+				}
+				else if ((flags & FLAGS_SPACE) != 0)
+				{
+					buf[len++] = ' ';
+				}
+			}
+
+			return _out_rev(outbuf, idx, maxlen, buf, len, width, flags);
 		}
 
-		//! The worker method. This does a garbage-free conversion of a generic type, and uses the garbage-free Concat() to add to the stringbuilder
-		private static void ConcatFormatValue<T>(this StringBuilder string_builder, T arg, uint padding, uint base_value, uint decimal_places) where T : IConvertible
+
+
+		private static char[] outbuf = new char[32];
+
+		public static void AppendFloat(this StringBuilder string_builder, float value, int decimals)
 		{
-			switch (arg.GetTypeCode())
-			{
-				case System.TypeCode.UInt32:
-				{
-					string_builder.Concat(arg.ToUInt32(System.Globalization.NumberFormatInfo.CurrentInfo), padding, '0', base_value);
-					break;
-				}
+			uint n = _ftoa(outbuf, 0, 32, (double)value, (uint)decimals, 0, FLAGS_PRECISION);
 
-				case System.TypeCode.Int32:
-				{
-					string_builder.Concat(arg.ToInt32(System.Globalization.NumberFormatInfo.CurrentInfo), padding, '0', base_value);
-					break;
-				}
-
-				case System.TypeCode.Single:
-				{
-					string_builder.Concat(arg.ToSingle(System.Globalization.NumberFormatInfo.CurrentInfo), decimal_places, padding, '0');
-					break;
-				}
-
-				case System.TypeCode.String:
-				{
-					string_builder.Append(Convert.ToString(arg));
-					break;
-				}
-
-				default:
-				{
-					Debug.Assert(false, "Unknown parameter type");
-					break;
-				}
-			}
+			for (uint i = 0; i < n; ++i)
+				string_builder.Append(outbuf[i]);
 		}
 	}
 }

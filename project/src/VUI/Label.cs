@@ -307,13 +307,13 @@ namespace VUI
 		{
 			base.DoSetRender(b);
 
+			UpdateClip();
+
 			if (textObject_ != null)
 				textObject_.gameObject.SetActive(b);
 
 			if (ellipsis_ != null)
 				ellipsis_.gameObject.SetActive(b);
-
-			UpdateClip();
 		}
 
 		protected override void UpdateActiveState()

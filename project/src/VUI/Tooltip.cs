@@ -182,7 +182,6 @@ namespace VUI
 			widget_.Visible = true;
 			widget_.BringToTop();
 			widget_.DoLayout();
-			widget_.UpdateBounds();
 		}
 
 		public void Hide()
