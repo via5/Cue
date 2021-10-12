@@ -177,7 +177,7 @@ namespace Cue
 		{
 			return new List<IItem>
 			{
-				Hand(), BJ(), Thrust(), CanKiss(),
+				Hand(), BJ(), Thrust(), CanKiss(), Strapon(),
 				Genitals(), Breasts(), MovePlayer()
 			};
 		}
@@ -233,6 +233,19 @@ namespace Cue
 				},
 
 				(p) => p.Options.CanKiss);
+		}
+
+		public static IItem Strapon()
+		{
+			return new CheckBoxItem("Strapon",
+				(p, b) =>
+				{
+					if (p != null)
+						p.Body.Strapon = b;
+				},
+
+				(p) => p.Body.Strapon,
+				(p) => !p.Atom.IsMale);
 		}
 
 		public static IItem Genitals()

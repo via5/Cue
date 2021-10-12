@@ -12,6 +12,7 @@
 				"scale": 0.8
 			}
 		},
+
 		{
 			"name": "cigaretteSmoke",
 			"type": "cua",
@@ -19,6 +20,16 @@
 			{
 				"preset": "objects/cigaretteSmoke.json"
 			}
-		}
+		},
+
+		{
+			"name": "dildo",
+			"type": "atom",
+			"options":
+			{
+				"type": "Dildo",
+				"scale": 0.8
+			}
+		},
 	]
 }

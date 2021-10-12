@@ -114,43 +114,6 @@ namespace Cue
 
 	class U
 	{
-		private static float lastErrorTime_ = 0;
-		private static int errorCount_ = 0;
-		private const int MaxErrors = 3;
-
-		public static void Safe(Action a)
-		{
-			try
-			{
-				a();
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(e.ToString());
-
-				var now = Cue.Instance.Sys.RealtimeSinceStartup;
-
-				if (now - lastErrorTime_ < 1)
-				{
-					++errorCount_;
-					if (errorCount_ > MaxErrors)
-					{
-						Cue.LogError(
-							$"more than {MaxErrors} errors in the last " +
-							"second, disabling plugin");
-
-						Cue.Instance.DisablePlugin();
-					}
-				}
-				else
-				{
-					errorCount_ = 0;
-				}
-
-				lastErrorTime_ = now;
-			}
-		}
-
 		public static float Clamp(float val, float min, float max)
 		{
 			if (val < min)
@@ -433,7 +396,8 @@ namespace Cue
 		public const int All         = int.MaxValue;
 
 		private static int enabled_ =
-			Action | Event | AI | Command | Integration | Object | Animation;
+			Action | Event | AI | Command | Integration |
+			Object | Animation | Sys;
 
 		private int type_;
 		private Func<string> prefix_;

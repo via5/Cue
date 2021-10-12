@@ -309,6 +309,11 @@ namespace Cue
 			I.End();
 		}
 
+		public void LateUpdate(float s)
+		{
+			Atom.LateUpdate(s);
+		}
+
 		public virtual void Load(JSONClass r)
 		{
 			var ts = new List<string>();

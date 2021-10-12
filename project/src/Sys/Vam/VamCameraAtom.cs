@@ -151,6 +151,12 @@ namespace Cue.Sys.Vam
 			set { }
 		}
 
+		public override bool Strapon
+		{
+			get { return false; }
+			set { }
+		}
+
 		public override IBodyPart[] GetBodyParts()
 		{
 			return parts_;
@@ -296,6 +302,10 @@ namespace Cue.Sys.Vam
 		}
 
 		public void Update(float s)
+		{
+		}
+
+		public void LateUpdate(float s)
 		{
 		}
 

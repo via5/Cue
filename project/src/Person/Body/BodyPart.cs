@@ -73,12 +73,17 @@ namespace Cue
 
 		public bool Exists
 		{
-			get { return (part_ != null); }
+			get { return part_?.Exists ?? false; }
 		}
 
 		public string Name
 		{
 			get { return BP.ToString(type_); }
+		}
+
+		public string Source
+		{
+			get { return part_?.ToString() ?? ""; }
 		}
 
 		public int Type
@@ -88,14 +93,28 @@ namespace Cue
 
 		public bool CanTrigger
 		{
-			get { return part_?.CanTrigger ?? false; }
+			get
+			{
+				if (forcedTriggers_.Count > 0)
+					return true;
+
+				return part_?.CanTrigger ?? false;
+			}
+		}
+
+		public bool CanGrab
+		{
+			get { return part_?.CanGrab ?? false; }
 		}
 
 		public void AddForcedTrigger(
 			int sourcePersonIndex, int sourceBodyPart, float value = 1)
 		{
-			forcedTriggers_.Add(new Sys.TriggerInfo(
-				sourcePersonIndex, sourceBodyPart, value, true));
+			var ti = new Sys.TriggerInfo(
+				sourcePersonIndex, sourceBodyPart, value, true);
+
+			Person.Log.Info($"adding forced trigger for {this}: {ti}");
+			forcedTriggers_.Add(ti);
 		}
 
 		public void RemoveForcedTrigger(int sourcePersonIndex, int sourceBodyPart)
@@ -106,6 +125,7 @@ namespace Cue
 				{
 					if (forcedTriggers_[i].sourcePartIndex == sourceBodyPart)
 					{
+						Person.Log.Info($"removing forced trigger: {forcedTriggers_[i]}");
 						forcedTriggers_.RemoveAt(i);
 						return;
 					}

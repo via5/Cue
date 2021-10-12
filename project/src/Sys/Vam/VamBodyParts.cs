@@ -16,6 +16,7 @@ namespace Cue.Sys.Vam
 		}
 
 		public int Type { get { return type_; } }
+		public virtual bool Exists { get { return true; } }
 
 		public virtual Transform Transform { get { return null; } }
 		public virtual Rigidbody Rigidbody { get { return null; } }
@@ -332,59 +333,101 @@ namespace Cue.Sys.Vam
 	class TriggerBodyPart : VamBodyPart
 	{
 		private CollisionTriggerEventHandler h_;
-		private Trigger trigger_;
-		private Rigidbody rb_;
-		private FreeControllerV3 fc_;
-		private Transform t_;
+		private Trigger trigger_ = null;
+		private Rigidbody rb_ = null;
+		private FreeControllerV3 fc_ = null;
+		private Transform t_ = null;
 		private Transform ignoreStop_ = null;
 		private Transform[] ignoreTransforms_ = new Transform[0];
 		private TriggerInfo[] triggers_ = null;
+		private bool enabled_ = false;
+
+		protected TriggerBodyPart(VamAtom a, int type)
+			: base(a, type)
+		{
+		}
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
 			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
 				: base(a, type)
 		{
+			Init(h, fc, tr, ignoreTransforms);
+		}
+
+		public override bool Exists
+		{
+			get { return (h_ != null && enabled_); }
+		}
+
+		protected bool Enabled
+		{
+			get { return enabled_; }
+			set { enabled_ = value; }
+		}
+
+		protected void Init(
+			CollisionTriggerEventHandler h,
+			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
+		{
 			h_ = h;
-			trigger_ = h.collisionTrigger.trigger;
-			rb_ = h.thisRigidbody;
+			trigger_ = h?.collisionTrigger?.trigger;
+			rb_ = h?.thisRigidbody;
 			fc_ = fc;
 			t_ = tr;
+			ignoreTransforms_ = new Transform[0];
 
-			if (rb_ == null)
-				Cue.LogError($"{a.ID}: trigger {h.name}: no rb");
-
-			if (ignoreTransforms != null)
+			if (h_ == null)
 			{
-				var rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, "hip");
-				if (rb == null)
-					Cue.LogError($"{a.ID}: trigger {h.name}: no hip");
-				else
-					ignoreStop_ = rb.transform;
+				enabled_ = false;
+			}
+			else
+			{
+				enabled_ = true;
 
-				var list = new List<Transform>();
-				for (int i = 0; i < ignoreTransforms.Length; ++i)
+				if (ignoreTransforms != null)
+					FindIgnoreTransforms(ignoreTransforms);
+			}
+		}
+
+		private void FindIgnoreTransforms(string[] ignoreTransforms)
+		{
+			var rb = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "hip");
+			if (rb == null)
+				Cue.LogError($"{atom_.ID}: trigger {h_.name}: no hip");
+			else
+				ignoreStop_ = rb.transform;
+
+			var list = new List<Transform>();
+			for (int i = 0; i < ignoreTransforms.Length; ++i)
+			{
+				rb = Cue.Instance.VamSys.FindRigidbody(
+					atom_.Atom, ignoreTransforms[i]);
+
+				if (rb != null)
 				{
-					rb = Cue.Instance.VamSys.FindRigidbody(a.Atom, ignoreTransforms[i]);
-					if (rb != null)
+					list.Add(rb.transform);
+				}
+				else
+				{
+					var t = Cue.Instance.VamSys.FindChildRecursive(
+						atom_.Atom, ignoreTransforms[i])?.transform;
+
+					if (t != null)
 					{
-						list.Add(rb.transform);
+						list.Add(t);
 					}
 					else
 					{
-						var t = Cue.Instance.VamSys.FindChildRecursive(
-							a.Atom, ignoreTransforms[i])?.transform;
-
-						if (t != null)
-							list.Add(t);
-						else
-							Cue.LogError($"{a.ID}: trigger {h.name}: no ignore {ignoreTransforms[i]}");
+						Cue.LogError(
+							$"{atom_.ID}: trigger {h_.name}: " +
+							$"no ignore {ignoreTransforms[i]}");
 					}
 				}
-
-				if (list.Count > 0)
-					ignoreTransforms_ = list.ToArray();
 			}
+
+			if (list.Count > 0)
+				ignoreTransforms_ = list.ToArray();
 		}
 
 		public override Transform Transform
@@ -409,6 +452,9 @@ namespace Cue.Sys.Vam
 
 		public override TriggerInfo[] GetTriggers()
 		{
+			if (!Exists)
+				return null;
+
 			UpdateTriggers();
 			return triggers_;
 		}
@@ -562,7 +608,14 @@ namespace Cue.Sys.Vam
 
 		public override Quaternion ControlRotation
 		{
-			get { return U.FromUnity(rb_.rotation); }
+			get
+			{
+				if (rb_ == null)
+					return Quaternion.Zero;
+				else
+					return U.FromUnity(rb_.rotation);
+			}
+
 			set { Cue.LogError("cannot rotate triggers"); }
 		}
 
@@ -697,6 +750,232 @@ namespace Cue.Sys.Vam
 		public override string ToString()
 		{
 			return $"eyes {Position}";
+		}
+	}
+
+
+	class VamStraponBodyPart : TriggerBodyPart
+	{
+		private DAZCharacterSelector cs_ = null;
+		private IObject dildo_ = null;
+		private Collider anchor_ = null;
+
+		private float postCreateElapsed_ = 0;
+		private bool postCreate_ = false;
+
+		public VamStraponBodyPart(VamAtom a)
+			: base(a, BP.Penis)
+		{
+			Get();
+		}
+
+		private Logger Log
+		{
+			get { return atom_.Log; }
+		}
+
+		private string DildoID
+		{
+			get { return $"Dildo#{atom_.ID}"; }
+		}
+
+		private void Get()
+		{
+			cs_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
+			if (cs_ == null)
+			{
+				Log.Error("no DAZCharacterSelector");
+				return;
+			}
+
+			var anchorName = "pelvisF4/pelvisF4Joint";
+			anchor_ = Cue.Instance.VamSys.FindCollider(atom_.Atom, anchorName);
+			if (anchor_ == null)
+			{
+				Cue.LogError($"collider {anchorName} not found in {atom_.ID}");
+				return;
+			}
+
+			var d = SuperController.singleton.GetAtomByUid(DildoID);
+			if (d != null)
+			{
+				Log.Info("dildo already exists, taking");
+				SetDildo(new BasicObject(-1, new VamAtom(d)));
+			}
+		}
+
+		public void Set(bool b)
+		{
+			if (cs_ == null)
+				return;
+
+			if (Exists == b)
+				return;
+
+			if (b)
+			{
+				if (dildo_ == null)
+					Create();
+				else
+					dildo_.Visible = true;
+			}
+			else
+			{
+				if (dildo_ != null)
+					dildo_.Visible = false;
+			}
+		}
+
+		private void Create()
+		{
+			Log.Info("creating strapon");
+			AddDildo();
+		}
+
+		private void SetClothingActive(bool b)
+		{
+			var s = cs_.GetClothingItem("AmineKunai:Amine Belt Strapon");
+			if (s == null)
+			{
+				Log.Error("no strapon clothing item");
+				return;
+			}
+
+			cs_.SetActiveClothingItem(s, b);
+		}
+
+		private void AddDildo()
+		{
+			Log.Info("creating dildo");
+
+			var oc = Resources.Objects.Get("dildo");
+			if (oc == null)
+			{
+				Log.Error("no dildo object creator");
+				return;
+			}
+
+			oc.Create(DildoID, (o) =>
+			{
+				if (o == null)
+				{
+					Log.Error("failed to create dildo");
+					return;
+				}
+
+				SetDildo(o);
+			});
+		}
+
+		private void SetDildo(IObject a)
+		{
+			if (a == null)
+			{
+				Log.Info($"removing dildo");
+				dildo_ = null;
+				Init(null, null, null, null);
+				SetEnabled(false);
+			}
+			else
+			{
+				Log.Info($"setting dildo to {a.ID}");
+				dildo_ = a;
+				dildo_.Atom.Collisions = false;
+
+				postCreate_ = true;
+				postCreateElapsed_ = 0;
+
+				DoInit();
+				SetEnabled(true);
+			}
+		}
+
+		private void SetEnabled(bool b)
+		{
+			Enabled = b;
+			SetClothingActive(b);
+		}
+
+		public void LateUpdate(float s)
+		{
+			if (dildo_ == null || anchor_ == null)
+				return;
+
+			try
+			{
+				if (!dildo_.Visible && Enabled)
+				{
+					Log.Info($"dildo {dildo_.ID} turned off");
+					SetEnabled(false);
+				}
+				else if (dildo_.Visible && !Enabled)
+				{
+					Log.Info($"dildo {dildo_.ID} turned on");
+					SetEnabled(true);
+				}
+
+				if (!Enabled)
+					return;
+
+				var q = anchor_.transform.rotation;
+				var look = q * new UnityEngine.Vector3(0, 0, -1);
+
+				var v = U.FromUnity(anchor_.transform.position);
+				v.Y += 0.01f;
+				v.Z += 0.01f;
+
+				dildo_.Position = v;
+				dildo_.Rotation = U.FromUnity(UnityEngine.Quaternion.LookRotation(look));
+
+				if (postCreate_)
+				{
+					postCreateElapsed_ += s;
+					if (postCreateElapsed_ > 2)
+					{
+						postCreate_ = false;
+						dildo_.Atom.Collisions = true;
+					}
+				}
+			}
+			catch (Exception)
+			{
+				// dildo can get deleted at any time
+				Log.Error($"looks like dildo got deleted");
+				SetDildo(null);
+			}
+		}
+
+		public override string ToString()
+		{
+			if (!Exists)
+				return "";
+
+			return $"dildo (" + base.ToString() + ")";
+		}
+
+		private void DoInit()
+		{
+			var d = (dildo_.Atom as VamAtom).Atom;
+
+			var ct = d.GetComponentInChildren<CollisionTrigger>();
+			if (ct == null)
+			{
+				Cue.LogError($"{d.uid} has no collision trigger");
+				return;
+			}
+
+			var oldTriggerEnabled = ct.triggerEnabled;
+			ct.triggerEnabled = true;
+
+			var h = d.GetComponentInChildren<CollisionTriggerEventHandler>();
+			if (h == null)
+			{
+				Cue.LogError($"{d.uid} has no collision trigger handler");
+				ct.triggerEnabled = oldTriggerEnabled;
+				return;
+			}
+
+			Init(h, d.mainController, d.transform, null);
 		}
 	}
 }

@@ -42,6 +42,7 @@ namespace Cue.Sys.Vam
 		public abstract float Scale { get; }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }
+		public abstract bool Strapon { get; set; }
 
 		public abstract IBodyPart[] GetBodyParts();
 		public abstract Hand GetLeftHand();
@@ -54,6 +55,7 @@ namespace Cue.Sys.Vam
 	class VamBody : VamBasicBody
 	{
 		private VamAtom atom_;
+		private readonly VamStraponBodyPart strapon_;
 		private FloatParameter scale_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
@@ -71,6 +73,7 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 		{
 			atom_ = a;
+			strapon_ = new VamStraponBodyPart(a);
 
 			scale_ = new FloatParameter(a, "rescaleObject", "scale");
 			if (!scale_.Check(true))
@@ -88,9 +91,19 @@ namespace Cue.Sys.Vam
 			parts_ = CreateBodyParts();
 		}
 
+		public VamAtom Atom
+		{
+			get { return atom_; }
+		}
+
 		public override IBodyPart[] GetBodyParts()
 		{
 			return parts_;
+		}
+
+		public void LateUpdate(float s)
+		{
+			strapon_.LateUpdate(s);
 		}
 
 		public IBodyPart GetPart(int i)
@@ -127,33 +140,10 @@ namespace Cue.Sys.Vam
 			return -1;
 		}
 
-		private TriggerBodyPart CreateDildoTrigger(int bodyPart)
+		public override bool Strapon
 		{
-			var d = SuperController.singleton.GetAtomByUid($"Dildo#{atom_.ID}");
-			if (d == null || !d.on)
-				return null;
-
-			var ct = d.GetComponentInChildren<CollisionTrigger>();
-			if (ct == null)
-			{
-				Cue.LogError($"{d.uid} has no collision trigger");
-				return null;
-			}
-
-			var oldTriggerEnabled = ct.triggerEnabled;
-			ct.triggerEnabled = true;
-
-			var h = d.GetComponentInChildren<CollisionTriggerEventHandler>();
-			if (h == null)
-			{
-				Cue.LogError($"{d.uid} has no collision trigger handler");
-				ct.triggerEnabled = oldTriggerEnabled;
-				return null;
-			}
-
-			return new TriggerBodyPart(
-				atom_, bodyPart, h, d.mainController,
-				d.transform, null);
+			get { return strapon_.Exists; }
+			set { strapon_.Set(value); }
 		}
 
 		private IBodyPart[] CreateBodyParts()
@@ -378,21 +368,9 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				var dildo = CreateDildoTrigger(BP.Penis);
-
-				if (dildo == null)
-				{
-					add(BP.Pectorals, null);
-					add(BP.Penis, null);
-				}
-				else
-				{
-					Cue.LogInfo($"{atom_.ID} uses dildo {dildo.Transform.name}");
-					add(BP.Pectorals, null);
-					add(BP.Penis, dildo);
-				}
+				add(BP.Pectorals, null);
+				add(BP.Penis, strapon_);
 			}
-
 
 
 			var list = new List<IBodyPart>();

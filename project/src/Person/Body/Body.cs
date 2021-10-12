@@ -73,6 +73,12 @@ namespace Cue
 			}
 		}
 
+		public bool Strapon
+		{
+			get { return person_.Atom.Body.Strapon; }
+			set { person_.Atom.Body.Strapon = value; }
+		}
+
 		public bool AnyInsidePersonalSpace()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)

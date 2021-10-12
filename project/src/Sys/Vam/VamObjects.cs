@@ -5,6 +5,73 @@ using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
+	class VamAtomObjectCreator : IObjectCreator
+	{
+		private SuperController sc_;
+		private string name_;
+		private string type_;
+		private float scale_;
+		private bool creating_ = false;
+
+		public VamAtomObjectCreator(string name, JSONClass opts)
+		{
+			sc_ = SuperController.singleton;
+			name_ = name;
+			type_ = opts["type"].Value;
+			scale_ = opts["scale"].AsFloat;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public void Create(string id, Action<IObject> callback)
+		{
+			if (creating_)
+				return;
+
+			creating_ = true;
+
+			sc_.StartCoroutine(CreateObjectRoutine(
+				id, (o) =>
+				{
+					creating_ = false;
+					callback(o);
+				}));
+		}
+
+		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
+		{
+			Cue.LogInfo($"creating atom {id}");
+			yield return sc_.AddAtomByType(type_, id);
+
+			var atom = sc_.GetAtomByUid(id);
+			if (atom == null)
+			{
+				Cue.LogError($"failed to create atom '{id}'");
+				f(null);
+				yield break;
+			}
+
+			Cue.LogInfo($"atom {id} created");
+
+			var a = new VamAtom(atom);
+			a.Scale = scale_;
+
+			try
+			{
+				f(new BasicObject(-1, a));
+			}
+			catch (Exception e)
+			{
+				Cue.LogError($"exception while creating atom {id}");
+				Cue.LogError(e.ToString());
+			}
+		}
+	}
+
+
 	class VamCuaObjectCreator : IObjectCreator
 	{
 		private SuperController sc_;

@@ -190,6 +190,7 @@ namespace Cue.Sys
 	interface IBodyPart
 	{
 		int Type { get; }
+		bool Exists { get; }
 		bool CanTrigger { get; }
 		TriggerInfo[] GetTriggers();
 		bool CanGrab { get; }
@@ -241,6 +242,7 @@ namespace Cue.Sys
 		float Scale { get; }
 		float Sweat { get; set; }
 		float Flush { get; set; }
+		bool Strapon { get; set; }
 	}
 
 	static class BodyDamping
@@ -282,6 +284,7 @@ namespace Cue.Sys
 		void OnPluginState(bool b);
 
 		void Update(float s);
+		void LateUpdate(float s);
 		void TeleportTo(Vector3 p, float bearing);
 
 		bool NavEnabled { get; set; }

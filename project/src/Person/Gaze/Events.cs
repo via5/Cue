@@ -723,6 +723,9 @@ namespace Cue
 				if (p == Cue.Instance.Player && g_.ShouldAvoidPlayer())
 					continue;
 
+				if (!p.IsInteresting)
+					continue;
+
 				if (person_.Mood.GazeTiredness >= ps.Get(PSE.MaxTirednessForRandomGaze))
 				{
 					// doesn't do anything, just to get the why in the ui

@@ -198,9 +198,7 @@ namespace Cue
 
 			var p = Selected as Person;
 			if (p != null)
-				p.Mood.ForceOrgasm();
-				//p.Animator.PlayType(Animations.Penetrated);
-				//p.Clothing.Dump();
+				p.Body.Strapon = !p.Body.Strapon;
 		}
 
 		private void OnForceExcitement(bool b)

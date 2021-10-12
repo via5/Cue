@@ -11,8 +11,44 @@ namespace Cue
 		{
 			person_ = person;
 
+			AddSubTab(new PersonBodyStateTab(person_));
 			AddSubTab(new PersonBodyPartsTab(person_));
 			AddSubTab(new PersonHandsTab(person_));
+		}
+	}
+
+
+	class PersonBodyStateTab : Tab
+	{
+		private Person person_;
+
+		private VUI.Label hasPenis_ = new VUI.Label();
+
+		public PersonBodyStateTab(Person p)
+			: base("State", false)
+		{
+			person_ = p;
+
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalSpacing = 20;
+			gl.HorizontalStretch = new List<bool>() { false, true };
+
+			var state = new VUI.Panel(gl);
+			state.Add(new VUI.Label("Has penis"));
+			state.Add(hasPenis_);
+
+			Layout = new VUI.BorderLayout();
+			Add(state, VUI.BorderLayout.Top);
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			hasPenis_.Text = person_.Body.HasPenis.ToString();
+		}
+
+		private void OnClose(bool b)
+		{
+			person_.Personality.ForceSetClose(b, b);
 		}
 	}
 
@@ -77,7 +113,7 @@ namespace Cue
 				w.busy.FontSize = fontSize;
 				p.Add(w.busy);
 
-				w.source = new VUI.Label(bp.Sys?.ToString() ?? "");
+				w.source = new VUI.Label();
 				w.source.FontSize = fontSize;
 				p.Add(w.source);
 
@@ -105,66 +141,65 @@ namespace Cue
 			{
 				var w = widgets_[i];
 
-				if (w.part.Exists)
+				if (w.part.CanTrigger)
 				{
-					if (w.part.Sys.CanTrigger)
-					{
-						var ss = "";
+					var ss = "";
 
-						var ts = w.part.GetTriggers();
-						if (ts != null)
+					var ts = w.part.GetTriggers();
+					if (ts != null)
+					{
+						for (int j = 0; j < ts.Length; ++j)
 						{
-							for (int j = 0; j < ts.Length; ++j)
-							{
-								if (ss != "")
-									ss += ",";
+							if (ss != "")
+								ss += ",";
 
-								ss += ts[j].ToString();
+							ss += ts[j].ToString();
 
-								if (ts[j].forced)
-									ss += "(forced)";
-							}
+							if (ts[j].forced)
+								ss += "(forced)";
 						}
-
-						bool triggered = (ts != null && ts.Length > 0);
-
-						w.triggering.Text = ss;
-
-						w.triggering.TextColor = (
-							triggered ?
-							Sys.Vam.U.ToUnity(Color.Green) :
-							VUI.Style.Theme.TextColor);
-					}
-					else
-					{
-						w.triggering.Text = "";
 					}
 
-					if (w.part.Sys.CanGrab)
-					{
-						w.grab.Text = (w.part.Grabbed ? "grabbed" : "");
+					bool triggered = (ts != null && ts.Length > 0);
 
-						w.grab.TextColor = (
-							w.part.Grabbed ?
-							Sys.Vam.U.ToUnity(Color.Green) :
-							VUI.Style.Theme.TextColor);
-					}
-					else
-					{
-						w.grab.Text = "";
-					}
+					w.triggering.Text = ss;
 
-					w.busy.Text = (w.part.Busy ? "busy" : "");
-					w.busy.TextColor = (
-						w.part.Busy ?
+					w.triggering.TextColor = (
+						triggered ?
 						Sys.Vam.U.ToUnity(Color.Green) :
 						VUI.Style.Theme.TextColor);
+				}
+				else
+				{
+					w.triggering.Text = "";
+				}
 
-					if (Positions)
-					{
-						w.position.Text = w.part.Position.ToString();
-						w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
-					}
+				if (w.part.CanGrab)
+				{
+					w.grab.Text = (w.part.Grabbed ? "grabbed" : "");
+
+					w.grab.TextColor = (
+						w.part.Grabbed ?
+						Sys.Vam.U.ToUnity(Color.Green) :
+						VUI.Style.Theme.TextColor);
+				}
+				else
+				{
+					w.grab.Text = "";
+				}
+
+				w.busy.Text = (w.part.Busy ? "busy" : "");
+				w.busy.TextColor = (
+					w.part.Busy ?
+					Sys.Vam.U.ToUnity(Color.Green) :
+					VUI.Style.Theme.TextColor);
+
+				w.source.Text = w.part.Source;
+
+				if (Positions)
+				{
+					w.position.Text = w.part.Position.ToString();
+					w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
 				}
 			}
 		}

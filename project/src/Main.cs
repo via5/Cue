@@ -57,6 +57,7 @@ namespace Cue
 					sys_.Update(deltaTime);
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
+					cue_.LateUpdate(Time.deltaTime);
 				}
 
 				Thread.Sleep(1);
@@ -140,6 +141,10 @@ namespace Cue
 		private Cue cue_ = null;
 		private bool inited_ = false;
 
+		private static float lastErrorTime_ = 0;
+		private static int errorCount_ = 0;
+		private const int MaxErrors = 3;
+
 		public CueMain()
 		{
 			instance_ = this;
@@ -198,7 +203,7 @@ namespace Cue
 			{
 				SuperController.LogError("plugin disabled");
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
 				SuperController.LogError(e.ToString());
 				SuperController.LogError("cue: DoInit failed, disabling");
@@ -211,17 +216,18 @@ namespace Cue
 			if (!inited_)
 				return;
 
-			U.Safe(() =>
+			try
 			{
-				try
-				{
-					cue_.FixedUpdate(Time.deltaTime);
-				}
-				catch(PluginGone e)
-				{
-					SuperController.LogError("plugin disabled");
-				}
-			});
+				cue_.FixedUpdate(Time.deltaTime);
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
+			catch(Exception e)
+			{
+				OnException(e);
+			}
 		}
 
 		public void Update()
@@ -229,18 +235,38 @@ namespace Cue
 			if (!inited_)
 				return;
 
-			U.Safe(() =>
+			try
 			{
-				try
-				{
-					sys_.Update(Time.deltaTime);
-					cue_.Update(Time.deltaTime);
-				}
-				catch(PluginGone e)
-				{
-					SuperController.LogError("plugin disabled");
-				}
-			});
+				sys_.Update(Time.deltaTime);
+				cue_.Update(Time.deltaTime);
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
+			catch(Exception e)
+			{
+				OnException(e);
+			}
+		}
+
+		public void LateUpdate()
+		{
+			if (!inited_)
+				return;
+
+			try
+			{
+				cue_.LateUpdate(Time.deltaTime);
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
+			catch(Exception e)
+			{
+				OnException(e);
+			}
 		}
 
 		public void OnEnable()
@@ -248,18 +274,19 @@ namespace Cue
 			if (!inited_)
 				return;
 
-			U.Safe(() =>
+			try
 			{
-				try
-				{
-					if (cue_ != null)
-						cue_.OnPluginState(true);
-				}
-				catch(PluginGone e)
-				{
-					SuperController.LogError("plugin disabled");
-				}
-			});
+				if (cue_ != null)
+					cue_.OnPluginState(true);
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
+			catch(Exception e)
+			{
+				OnException(e);
+			}
 		}
 
 		public void OnDisable()
@@ -267,18 +294,19 @@ namespace Cue
 			if (!inited_)
 				return;
 
-			U.Safe(() =>
+			try
 			{
-				try
-				{
-					if (cue_ != null)
-						cue_.OnPluginState(false);
-				}
-				catch(PluginGone e)
-				{
-					SuperController.LogError("plugin disabled");
-				}
-			});
+				if (cue_ != null)
+					cue_.OnPluginState(false);
+			}
+			catch(PluginGone e)
+			{
+				SuperController.LogError("plugin disabled");
+			}
+			catch(Exception e)
+			{
+				OnException(e);
+			}
 		}
 
 		public MVRScriptUI MVRScriptUI
@@ -319,6 +347,32 @@ namespace Cue
 		{
 			enabledJSON.val = false;
 			throw new PluginGone();
+		}
+
+		private void OnException(Exception e)
+		{
+			Cue.LogError(e.ToString());
+
+			var now = Cue.Instance.Sys.RealtimeSinceStartup;
+
+			if (now - lastErrorTime_ < 1)
+			{
+				++errorCount_;
+				if (errorCount_ > MaxErrors)
+				{
+					Cue.LogError(
+						$"more than {MaxErrors} errors in the last " +
+						"second, disabling plugin");
+
+					Cue.Instance.DisablePlugin();
+				}
+			}
+			else
+			{
+				errorCount_ = 0;
+			}
+
+			lastErrorTime_ = now;
 		}
 	}
 #endif

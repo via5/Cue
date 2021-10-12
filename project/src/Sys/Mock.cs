@@ -413,6 +413,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void LateUpdate(float s)
+		{
+		}
+
 		public IMorph GetMorph(string id)
 		{
 			return null;

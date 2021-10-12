@@ -52,6 +52,11 @@
 					{
 						person_.Clothing.GenitalsVisible = true;
 						receiver_.Clothing.GenitalsVisible = true;
+
+						person_.Body.Get(person_.Body.GenitalsBodyPart)
+							.AddForcedTrigger(
+								receiver_.PersonIndex,
+								receiver_.Body.GenitalsBodyPart);
 					}
 
 					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
@@ -77,6 +82,15 @@
 				{
 					log_.Verbose($"thrust: stopping");
 					person_.Animator.StopType(Animations.Sex);
+
+					if (receiver_ != null)
+					{
+						person_.Body.Get(person_.Body.GenitalsBodyPart)
+							.RemoveForcedTrigger(
+								receiver_.PersonIndex,
+								receiver_.Body.GenitalsBodyPart);
+					}
+
 					running_ = false;
 					receiver_ = null;
 				}
@@ -147,7 +161,7 @@
 			{
 				elapsedNotPenetrated_ = 0;
 			//	person_.Animator.PlayType(Animations.Penetrated);
-				Cue.LogError("emote");
+			//	Cue.LogError("emote");
 			}
 		}
 

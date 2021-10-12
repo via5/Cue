@@ -110,13 +110,21 @@ namespace Cue
 				desktopMenu_?.Create();
 				desktopMenu_.Visible = true;
 
-				foreach (var p in Cue.Instance.ActivePersons)
+				var ps = Cue.Instance.ActivePersons;
+
+				if (ps.Length > 0)
 				{
-					if (p.Atom.Selected)
+					foreach (var p in Cue.Instance.ActivePersons)
 					{
-						desktopMenu_.Selected = p;
-						break;
+						if (p.Atom.Selected)
+						{
+							desktopMenu_.Selected = p;
+							break;
+						}
 					}
+
+					if (desktopMenu_.Selected == null)
+						desktopMenu_.Selected = ps[0];
 				}
 			}
 		}

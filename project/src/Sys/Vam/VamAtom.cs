@@ -291,7 +291,7 @@ namespace Cue.Sys.Vam
 
 		public void SetControlsForMoving(bool b)
 		{
-			SetControllerForMoving("chestControl", b);
+			SetControllerForMoving("chestControl", false);
 			SetControllerForMoving("hipControl", b);
 			SetControllerForMoving("lFootControl", b);
 			SetControllerForMoving("rFootControl", b);
@@ -326,6 +326,11 @@ namespace Cue.Sys.Vam
 			nav_.Update(s);
 			hair_?.Update(s);
 			cd_.Update(s);
+		}
+
+		public void LateUpdate(float s)
+		{
+			body_?.LateUpdate(s);
 		}
 
 		public void TeleportTo(Vector3 v, float bearing)

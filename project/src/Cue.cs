@@ -515,6 +515,12 @@ namespace Cue
 			I.End();
 		}
 
+		public void LateUpdate(float s)
+		{
+			for (int i = 0; i < activePersonsArray_.Length; ++i)
+				activePersonsArray_[i].LateUpdate(s);
+		}
+
 		private void DoUpdateInput(float s)
 		{
 			Sys.Input.Update(s);
