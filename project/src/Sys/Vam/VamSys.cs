@@ -250,6 +250,8 @@ namespace Cue.Sys.Vam
 				return new VamCuaObjectCreator(name, opts);
 			else if (type == "atom")
 				return new VamAtomObjectCreator(name, opts);
+			else if (type == "clothing")
+				return new VamClothingObjectCreator(name, opts);
 
 			Cue.LogError($"unknown object creator type '{type}'");
 			return null;

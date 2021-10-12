@@ -26,7 +26,7 @@ namespace Cue.Sys.Vam
 			get { return name_; }
 		}
 
-		public void Create(string id, Action<IObject> callback)
+		public void Create(IAtom user, string id, Action<IObject> callback)
 		{
 			if (creating_)
 				return;
@@ -39,6 +39,12 @@ namespace Cue.Sys.Vam
 					creating_ = false;
 					callback(o);
 				}));
+		}
+
+		public void Destroy(IAtom user, string id)
+		{
+			// todo
+			throw new NotImplementedException();
 		}
 
 		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
@@ -99,7 +105,7 @@ namespace Cue.Sys.Vam
 			get { return name_; }
 		}
 
-		public void Create(string id, Action<IObject> callback)
+		public void Create(IAtom user, string id, Action<IObject> callback)
 		{
 			if (creating_)
 				return;
@@ -112,6 +118,12 @@ namespace Cue.Sys.Vam
 					creating_ = false;
 					callback(o);
 				}));
+		}
+
+		public void Destroy(IAtom user, string id)
+		{
+			// todo
+			throw new NotImplementedException();
 		}
 
 		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
@@ -196,6 +208,57 @@ namespace Cue.Sys.Vam
 					}
 				}
 			}
+		}
+	}
+
+
+	class VamClothingObjectCreator : IObjectCreator
+	{
+		private SuperController sc_;
+		private string name_;
+		private string id_;
+
+		public VamClothingObjectCreator(string name, JSONClass opts)
+		{
+			sc_ = SuperController.singleton;
+			name_ = name;
+			id_ = opts["id"].Value;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public void Create(IAtom user, string unusedId, Action<IObject> callback)
+		{
+			SetActive(user, true);
+		}
+
+		public void Destroy(IAtom user, string unusedId)
+		{
+			SetActive(user, false);
+		}
+
+		private void SetActive(IAtom user, bool b)
+		{
+			var a = user as VamAtom;
+
+			var cs = a.Atom.GetComponentInChildren<DAZCharacterSelector>();
+			if (cs == null)
+			{
+				a.Log.Error("no DAZCharacterSelector");
+				return;
+			}
+
+			var s = cs.GetClothingItem(id_);
+			if (s == null)
+			{
+				a.Log.Error($"no strapon clothing item '{id_}'");
+				return;
+			}
+
+			cs.SetActiveClothingItem(s, b);
 		}
 	}
 }

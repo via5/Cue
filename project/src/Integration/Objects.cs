@@ -22,7 +22,7 @@
 			if (oc == null)
 				Cue.LogWarning("no cigarette smoke object creator");
 			else
-				oc.Create(id, (o) => { SetSmoke(o); });
+				oc.Create(null, id, (o) => { SetSmoke(o); });
 		}
 
 		public static VamSmoke Create(string id, bool existsOnly)

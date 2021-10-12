@@ -7,7 +7,8 @@ namespace Cue
 	interface IObjectCreator
 	{
 		string Name { get; }
-		void Create(string id, Action<IObject> callback);
+		void Create(Sys.IAtom user, string id, Action<IObject> callback);
+		void Destroy(Sys.IAtom user, string id);
 	}
 
 

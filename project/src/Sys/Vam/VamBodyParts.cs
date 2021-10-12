@@ -756,7 +756,6 @@ namespace Cue.Sys.Vam
 
 	class VamStraponBodyPart : TriggerBodyPart
 	{
-		private DAZCharacterSelector cs_ = null;
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
 
@@ -779,15 +778,13 @@ namespace Cue.Sys.Vam
 			get { return $"Dildo#{atom_.ID}"; }
 		}
 
+		private string StraponID
+		{
+			get { return $"Strapon#{atom_.ID}"; }
+		}
+
 		private void Get()
 		{
-			cs_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
-			if (cs_ == null)
-			{
-				Log.Error("no DAZCharacterSelector");
-				return;
-			}
-
 			var anchorName = "pelvisF4/pelvisF4Joint";
 			anchor_ = Cue.Instance.VamSys.FindCollider(atom_.Atom, anchorName);
 			if (anchor_ == null)
@@ -806,9 +803,6 @@ namespace Cue.Sys.Vam
 
 		public void Set(bool b)
 		{
-			if (cs_ == null)
-				return;
-
 			if (Exists == b)
 				return;
 
@@ -834,14 +828,29 @@ namespace Cue.Sys.Vam
 
 		private void SetClothingActive(bool b)
 		{
-			var s = cs_.GetClothingItem("AmineKunai:Amine Belt Strapon");
-			if (s == null)
+			// todo: this assumes clothing item, doesn't attempt to get the
+			//       object first, would need a generic way to figure this out
+			//       instead of using GetAtomByUid() in Get()
+
+			var oc = Resources.Objects.Get("strapon");
+
+			if (oc == null)
 			{
-				Log.Error("no strapon clothing item");
+				Log.Error("no strapon object creator");
 				return;
 			}
 
-			cs_.SetActiveClothingItem(s, b);
+			if (b)
+			{
+				oc.Create(atom_, StraponID, (o) =>
+				{
+					Log.Error("strapon created");
+				});
+			}
+			else
+			{
+				oc.Destroy(atom_, StraponID);
+			}
 		}
 
 		private void AddDildo()
@@ -855,7 +864,7 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			oc.Create(DildoID, (o) =>
+			oc.Create(atom_, DildoID, (o) =>
 			{
 				if (o == null)
 				{

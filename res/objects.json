@@ -31,5 +31,14 @@
 				"scale": 0.8
 			}
 		},
+
+		{
+			"name": "strapon",
+			"type": "clothing",
+			"options":
+			{
+				"id": "AmineKunai:Amine Belt Strapon"
+			}
+		}
 	]
 }
