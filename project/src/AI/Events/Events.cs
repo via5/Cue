@@ -258,6 +258,9 @@
 
 		public override void Update(float s)
 		{
+			if (person_ == Cue.Instance.Player)
+				return;
+
 			var leftHand = person_.Body.Get(BP.LeftHand);
 			var rightHand = person_.Body.Get(BP.RightHand);
 

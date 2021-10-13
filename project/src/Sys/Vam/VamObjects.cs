@@ -11,14 +11,38 @@ namespace Cue.Sys.Vam
 		private string name_;
 		private string type_;
 		private float scale_;
+		private string preset_;
+		private Vector3 posOffset_;
+		private bool hasPosOffset_;
 		private bool creating_ = false;
 
 		public VamAtomObjectCreator(string name, JSONClass opts)
+			: this(name, opts["type"].Value, opts)
+		{
+		}
+
+		protected VamAtomObjectCreator(string name, string type, JSONClass opts)
 		{
 			sc_ = SuperController.singleton;
 			name_ = name;
-			type_ = opts["type"].Value;
-			scale_ = opts["scale"].AsFloat;
+			type_ = type;
+
+			if (opts.HasKey("positionOffset"))
+			{
+				posOffset_ = Vector3.FromJSON(opts, "positionOffset");
+				hasPosOffset_ = true;
+			}
+			else
+			{
+				hasPosOffset_ = false;
+			}
+
+			if (opts.HasKey("scale"))
+				scale_ = opts["scale"].AsFloat;
+			else
+				scale_ = -1;
+
+			preset_ = opts["preset"].Value;
 		}
 
 		public string Name
@@ -62,8 +86,17 @@ namespace Cue.Sys.Vam
 
 			Cue.LogInfo($"atom {id} created");
 
+			if (!string.IsNullOrEmpty(preset_))
+			{
+				var path = Cue.Instance.Sys.GetResourcePath(preset_);
+				Cue.LogInfo($"atom {id} loading preset {path}");
+				atom.LoadPreset(path);
+			}
+
 			var a = new VamAtom(atom);
-			a.Scale = scale_;
+
+			yield return Setup(a, f);
+
 
 			try
 			{
@@ -75,76 +108,48 @@ namespace Cue.Sys.Vam
 				Cue.LogError(e.ToString());
 			}
 		}
+
+		protected virtual IEnumerator Setup(VamAtom a, Action<IObject> f)
+		{
+			if (scale_ >= 0)
+				a.Scale = scale_;
+
+			if (hasPosOffset_)
+			{
+				var o = a.Atom.transform.Find("reParentObject/object/rescaleObject");
+				if (o != null)
+					o.localPosition = U.ToUnity(posOffset_);
+			}
+
+			yield return null;
+		}
 	}
 
 
-	class VamCuaObjectCreator : IObjectCreator
+	class VamCuaObjectCreator : VamAtomObjectCreator
 	{
-		private SuperController sc_;
-		private string name_;
 		private string assetUrl_;
 		private string assetName_;
-		private Vector3 posOffset_;
-		private float scale_;
-		private string preset_;
-		private bool creating_ = false;
 
 		public VamCuaObjectCreator(string name, JSONClass opts)
+			: base(name, "CustomUnityAsset", opts)
 		{
-			sc_ = SuperController.singleton;
-			name_ = name;
 			assetUrl_ = opts["url"].Value;
 			assetName_ = opts["name"].Value;
-			posOffset_ = Vector3.FromJSON(opts, "positionOffset");
-			scale_ = opts["scale"].AsFloat;
-			preset_ = opts["preset"].Value;
 		}
 
-		public string Name
+		protected override IEnumerator Setup(VamAtom a, Action<IObject> f)
 		{
-			get { return name_; }
-		}
+			yield return base.Setup(a, f);
 
-		public void Create(IAtom user, string id, Action<IObject> callback)
-		{
-			if (creating_)
-				return;
+			var atom = a.Atom;
 
-			creating_ = true;
-
-			sc_.StartCoroutine(CreateObjectRoutine(
-				id, (o) =>
-				{
-					creating_ = false;
-					callback(o);
-				}));
-		}
-
-		public void Destroy(IAtom user, string id)
-		{
-			// todo
-			throw new NotImplementedException();
-		}
-
-		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
-		{
-			Cue.LogInfo($"creating cua {id}");
-			yield return sc_.AddAtomByType("CustomUnityAsset", id);
-
-			var atom = sc_.GetAtomByUid(id);
-			if (atom == null)
-			{
-				Cue.LogError($"failed to create cua '{id}'");
-				f(null);
-				yield break;
-			}
-
-			Cue.LogInfo($"cua {id} created, getting components");
+			Cue.LogInfo($"getting components");
 
 			var cua = atom.GetComponentInChildren<CustomUnityAssetLoader>();
 			if (cua == null)
 			{
-				Cue.LogError($"object '{id}' has no CustomUnityAssetLoader component");
+				Cue.LogError($"object '{atom.uid}' has no CustomUnityAssetLoader component");
 				f(null);
 				yield break;
 			}
@@ -152,7 +157,7 @@ namespace Cue.Sys.Vam
 			var asset = atom.GetStorableByID("asset");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{id}' has no asset storable");
+				Cue.LogError($"object '{atom.uid}' has no asset storable");
 				f(null);
 				yield break;
 			}
@@ -160,7 +165,7 @@ namespace Cue.Sys.Vam
 			var url = asset.GetUrlJSONParam("assetUrl");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{id}' asset has no assetUrl param");
+				Cue.LogError($"object '{atom.uid}' asset has no assetUrl param");
 				f(null);
 				yield break;
 			}
@@ -168,33 +173,20 @@ namespace Cue.Sys.Vam
 			var name = asset.GetStringChooserJSONParam("assetName");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{id}' asset has no assetName param");
+				Cue.LogError($"object '{atom.uid}' asset has no assetName param");
 				f(null);
 				yield break;
 			}
 
 
-			if (!string.IsNullOrEmpty(preset_))
-			{
-				atom.LoadPreset(Cue.Instance.Sys.GetResourcePath(preset_));
-				f(new BasicObject(-1, new VamAtom(atom)));
-			}
-			else
+			if (!string.IsNullOrEmpty(assetUrl_) && !string.IsNullOrEmpty(assetName_))
 			{
 				cua.RegisterAssetLoadedCallback(() =>
 				{
-					Cue.LogInfo($"object {id} done, name is {name.val}");
-
-					var a = new VamAtom(atom);
-
-					var o = atom.transform.Find("reParentObject/object/rescaleObject");
-					o.localPosition = U.ToUnity(posOffset_);
-					a.Scale = scale_;
-
-					f(new BasicObject(-1, a));
+					Cue.LogInfo($"object {atom.uid} done, name is {name.val}");
 				});
 
-				Cue.LogInfo($"object {id} loading url");
+				Cue.LogInfo($"object {atom.uid} loading url");
 				url.val = assetUrl_;
 
 				for (; ; )
@@ -202,7 +194,7 @@ namespace Cue.Sys.Vam
 					yield return new WaitForSeconds(0.25f);
 					if (name.choices.Count > 0)
 					{
-						Cue.LogInfo($"object {id} url loaded, setting name");
+						Cue.LogInfo($"object {atom.uid} url loaded, setting name");
 						name.val = assetName_;
 						yield break;
 					}

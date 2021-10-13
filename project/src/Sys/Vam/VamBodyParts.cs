@@ -926,15 +926,18 @@ namespace Cue.Sys.Vam
 				if (!Enabled)
 					return;
 
-				var q = anchor_.transform.rotation;
-				var look = q * new UnityEngine.Vector3(0, 0, -1);
+				var labia = (atom_.Body as VamBody)?.GetPart(BP.Labia);
+
+				var q = Quaternion.Zero;
+				if (labia != null)
+					q = labia.Rotation;
 
 				var v = U.FromUnity(anchor_.transform.position);
 				v.Y += 0.01f;
-				v.Z += 0.01f;
+				v.Z -= 0.01f;
 
 				dildo_.Position = v;
-				dildo_.Rotation = U.FromUnity(UnityEngine.Quaternion.LookRotation(look));
+				dildo_.Rotation = q;
 
 				if (postCreate_)
 				{

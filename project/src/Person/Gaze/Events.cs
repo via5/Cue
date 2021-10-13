@@ -343,7 +343,7 @@ namespace Cue
 
 			foreach (var t in Cue.Instance.ActivePersons)
 			{
-				if (t == person_)
+				if (t == person_ || !t.IsInteresting)
 					continue;
 
 				r |= CheckPerson(t);
@@ -406,27 +406,49 @@ namespace Cue
 			var ps = person_.Personality;
 
 			WeightInfo eyes = new WeightInfo();
-			WeightInfo selfChest = new WeightInfo();
+			WeightInfo ownChest = new WeightInfo();
 			WeightInfo otherChest = new WeightInfo();
-			WeightInfo genitals = new WeightInfo();
+			WeightInfo ownGenitals = new WeightInfo();
+			WeightInfo otherGenitals = new WeightInfo();
 
-			// check if being penetrated by this person
 			if (person_.Body.PenetratedBy(t))
 			{
-				eyes.Set(ps.Get(PSE.PenetrationEyesWeight), "penetrated");
+				// is being penetrated by this person
+
+				eyes.Set(ps.Get(PSE.PenetratedEyesWeight), "penetrated");
 
 				// todo
 				if (t.Gaze.Gazer is MacGruberGaze)
 				{
 					otherChest.Set(
-						ps.Get(PSE.PenetrationGenitalsWeight),
+						ps.Get(PSE.PenetratedGenitalsWeight),
 						"penetrated (mg's gaze fix)");
 				}
 				else
 				{
-					genitals.Set(
-						ps.Get(PSE.PenetrationGenitalsWeight),
+					ownGenitals.Set(
+						ps.Get(PSE.PenetratedGenitalsWeight),
 						"penetrated");
+				}
+			}
+			else if (t.Body.PenetratedBy(person_))
+			{
+				// is penetrating this person
+
+				eyes.Set(ps.Get(PSE.PenetratingEyesWeight), "penetrating");
+
+				// todo
+				if (t.Gaze.Gazer is MacGruberGaze)
+				{
+					otherChest.Set(
+						ps.Get(PSE.PenetratingGenitalsWeight),
+						"penetrating (mg's gaze fix)");
+				}
+				else
+				{
+					otherGenitals.Set(
+						ps.Get(PSE.PenetratingGenitalsWeight),
+						"penetrating");
 				}
 			}
 			else
@@ -436,23 +458,37 @@ namespace Cue
 				{
 					eyes.Set(ps.Get(PSE.GropedEyesWeight), "head groped");
 				}
+				else if (t.Body.GropedBy(person_, BP.Head))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping head");
+				}
 
 				// check if breasts being groped
 				if (person_.Body.GropedBy(t, BodyParts.BreastParts))
 				{
 					eyes.Set(ps.Get(PSE.GropedEyesWeight), "chest groped");
-					selfChest.Set(ps.Get(PSE.GropedTargetWeight), "chest groped");
+					ownChest.Set(ps.Get(PSE.GropedTargetWeight), "chest groped");
+				}
+				else if (t.Body.GropedBy(person_, BodyParts.BreastParts))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping chest");
+					otherChest.Set(ps.Get(PSE.GropedTargetWeight), "groping chest");
 				}
 
 				// check if genitals being groped
 				if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
 				{
 					eyes.Set(ps.Get(PSE.GropedEyesWeight), "genitals groped");
-					genitals.Set(ps.Get(PSE.GropedTargetWeight), "genitals groped");
+					ownGenitals.Set(ps.Get(PSE.GropedTargetWeight), "genitals groped");
+				}
+				else if (t.Body.GropedBy(person_, BodyParts.GenitalParts))
+				{
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping genitals");
+					otherGenitals.Set(ps.Get(PSE.GropedTargetWeight), "groping genitals");
 				}
 			}
 
-			if (eyes.set || selfChest.set || otherChest.set || genitals.set)
+			if (eyes.set || ownChest.set || otherChest.set || ownGenitals.set || otherGenitals.set)
 			{
 				// this character is being interacted with
 
@@ -468,11 +504,11 @@ namespace Cue
 							t, BP.Eyes, eyes.weight, eyes.why);
 					}
 
-					if (selfChest.set)
+					if (ownChest.set)
 					{
 						targets_.SetWeightIfZero(
 							person_, BP.Chest,
-							selfChest.weight, selfChest.why);
+							ownChest.weight, ownChest.why);
 					}
 
 					if (otherChest.set)
@@ -482,11 +518,18 @@ namespace Cue
 							otherChest.weight, otherChest.why);
 					}
 
-					if (genitals.set)
+					if (ownGenitals.set)
 					{
 						targets_.SetWeightIfZero(
 							person_, person_.Body.GenitalsBodyPart,
-							genitals.weight, genitals.why);
+							ownGenitals.weight, ownGenitals.why);
+					}
+
+					if (otherGenitals.set)
+					{
+						targets_.SetWeightIfZero(
+							t, t.Body.GenitalsBodyPart,
+							otherGenitals.weight, otherGenitals.why);
 					}
 				}
 
@@ -500,7 +543,7 @@ namespace Cue
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == t || p == person_)
+				if (p == t || p == person_ || !p.IsInteresting)
 					continue;
 
 				CheckOtherInteraction(p, t);

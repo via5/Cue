@@ -1,0 +1,35 @@
+{
+   "atoms" : [
+      {
+         "type" : "Dildo",
+         "storables" : [
+            {
+               "id" : "springControl",
+               "springStrength" : "1"
+            },
+            {
+               "id" : "scale",
+               "scale" : "0.8"
+            },
+            {
+               "id" : "materials",
+               "Diffuse Color" : {
+                  "h" : "0.644651",
+                  "s" : "0",
+                  "v" : "0.05076904"
+               },
+               "Specular Color" : {
+                  "h" : "0",
+                  "s" : "0",
+                  "v" : "0.6052433"
+               },
+               "Subsurface Color" : {
+                  "h" : "0",
+                  "s" : "0",
+                  "v" : "0.4941176"
+               }
+            }
+         ]
+      }
+   ]
+}

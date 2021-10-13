@@ -520,7 +520,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetFloatParameter(
-				(o as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableFloat GetFloatParameter(
@@ -545,7 +545,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetBoolParameter(
-				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableBool GetBoolParameter(
@@ -570,7 +570,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetStringParameter(
-				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableString GetStringParameter(
@@ -596,7 +596,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetStringChooserParameter(
-				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableStringChooser GetStringChooserParameter(
@@ -622,7 +622,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetColorParameter(
-				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableColor GetColorParameter(
@@ -648,7 +648,7 @@ namespace Cue.Sys.Vam
 			string[] storableNamesCache = null)
 		{
 			return GetActionParameter(
-				(o.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
 		}
 
 		public JSONStorableAction GetActionParameter(
@@ -670,7 +670,7 @@ namespace Cue.Sys.Vam
 
 		public Rigidbody FindRigidbody(IObject o, string name)
 		{
-			return FindRigidbody((o.Atom as VamAtom)?.Atom, name);
+			return FindRigidbody((o?.Atom as VamAtom)?.Atom, name);
 		}
 
 		public Rigidbody FindRigidbody(Atom a, string name)

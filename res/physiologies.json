@@ -30,11 +30,11 @@
 			"leftBreastFactor": 0.5,
 			"rightBreastFactor": 0.5,
 
-			"genitalsRate": 0.0005,
+			"genitalsRate": 0.0003,
 			"genitalsMax": 1.0,
 			"labiaFactor": 1.0,
 
-			"penetrationRate": 0.01,
+			"penetrationRate": 0.003,
 			"penetrationMax": 1.0,
 			"vaginaFactor": 0.3,
 			"deepVaginaFactor": 0.1,

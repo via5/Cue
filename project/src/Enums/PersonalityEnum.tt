@@ -158,13 +158,23 @@ V.Float("HandjobGenitalsWeight"),
 
 // if this character is being penetrated, looking at the other character's eyes
 // or genitals
-V.Float("PenetrationEyesWeight"),
-V.Float("PenetrationGenitalsWeight"),
+V.Float("PenetratedEyesWeight"),
+V.Float("PenetratedGenitalsWeight"),
+
+// if this character penetrating another, looking at the other character's eyes
+// or genitals
+V.Float("PenetratingEyesWeight"),
+V.Float("PenetratingGenitalsWeight"),
 
 // while being groped, looking at the other character's eyes or the body part
 // being groped
 V.Float("GropedEyesWeight"),
 V.Float("GropedTargetWeight"),
+
+// while groping another, looking at the other character's eyes or the body part
+// being groped
+V.Float("GropingEyesWeight"),
+V.Float("GropingTargetWeight"),
 
 // if another character is giving a BJ, looking at that character's eyes or the
 // target's eyes or genitals

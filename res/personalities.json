@@ -106,10 +106,14 @@
 				"blowjobGenitalsWeight": 5,
 				"handjobEyesWeight": 5,
 				"handjobGenitalsWeight": 2,
-				"penetrationEyesWeight": 5,
-				"penetrationGenitalsWeight": 2,
+				"penetratedEyesWeight": 5,
+				"penetratedGenitalsWeight": 2,
+				"penetratingEyesWeight": 5,
+				"penetratingGenitalsWeight": 2,
 				"gropedEyesWeight": 2,
 				"gropedTargetWeight": 0.5,
+				"gropingEyesWeight": 2,
+				"gropingTargetWeight": 0.5,
 
 				"otherBlowjobEyesWeight": 2,
 				"otherBlowjobTargetEyesWeight": 1,
@@ -132,7 +136,7 @@
 
 				"gazeEnergyTirednessFactor": 1,
 				"gazeTirednessFactor": 1,
-				"movementEnergyTirednessFactor": 1,
+				"movementEnergyTirednessFactor": 0,
 				"movementTirednessFactor": 0,
 				"expressionExcitementFactor": 1,
 				"expressionTirednessFactor": 1,
@@ -278,7 +282,7 @@
 				[
 					{
 						"type": "happy",
-						"maximum": 0.0
+						"maximum": 0.2
 					},
 
 					{
@@ -299,7 +303,7 @@
 				[
 					{
 						"type": "happy",
-						"maximum": 0.1
+						"maximum": 0.3
 					},
 
 					{

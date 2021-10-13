@@ -28,7 +28,7 @@
 			"options":
 			{
 				"type": "Dildo",
-				"scale": 0.8
+				"preset": "objects/dildo.json"
 			}
 		},
 

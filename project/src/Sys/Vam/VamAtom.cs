@@ -291,7 +291,7 @@ namespace Cue.Sys.Vam
 
 		public void SetControlsForMoving(bool b)
 		{
-			SetControllerForMoving("chestControl", false);
+			SetControllerForMoving("chestControl", true);
 			SetControllerForMoving("hipControl", b);
 			SetControllerForMoving("lFootControl", b);
 			SetControllerForMoving("rFootControl", b);

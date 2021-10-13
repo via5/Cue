@@ -40,36 +40,40 @@ namespace Cue
 		public const int BlowjobGenitalsWeight = 17;
 		public const int HandjobEyesWeight = 18;
 		public const int HandjobGenitalsWeight = 19;
-		public const int PenetrationEyesWeight = 20;
-		public const int PenetrationGenitalsWeight = 21;
-		public const int GropedEyesWeight = 22;
-		public const int GropedTargetWeight = 23;
-		public const int OtherBlowjobEyesWeight = 24;
-		public const int OtherBlowjobTargetEyesWeight = 25;
-		public const int OtherBlowjobTargetGenitalsWeight = 26;
-		public const int OtherHandjobEyesWeight = 27;
-		public const int OtherHandjobTargetEyesWeight = 28;
-		public const int OtherHandjobTargetGenitalsWeight = 29;
-		public const int OtherPenetrationEyesWeight = 30;
-		public const int OtherPenetrationSourceEyesWeight = 31;
-		public const int OtherPenetrationSourceGenitalsWeight = 32;
-		public const int OtherGropedEyesWeight = 33;
-		public const int OtherGropedSourceEyesWeight = 34;
-		public const int OtherGropedTargetWeight = 35;
-		public const int OtherSexExcitementRateFactor = 36;
-		public const int MaxOtherSexExcitement = 37;
-		public const int KissSpeedEnergyFactor = 38;
-		public const int IdleMaxExcitement = 39;
-		public const int TirednessExcitementRateFactor = 40;
-		public const int GazeEnergyTirednessFactor = 41;
-		public const int GazeTirednessFactor = 42;
-		public const int MovementEnergyTirednessFactor = 43;
-		public const int MovementTirednessFactor = 44;
-		public const int ExpressionExcitementFactor = 45;
-		public const int ExpressionTirednessFactor = 46;
+		public const int PenetratedEyesWeight = 20;
+		public const int PenetratedGenitalsWeight = 21;
+		public const int PenetratingEyesWeight = 22;
+		public const int PenetratingGenitalsWeight = 23;
+		public const int GropedEyesWeight = 24;
+		public const int GropedTargetWeight = 25;
+		public const int GropingEyesWeight = 26;
+		public const int GropingTargetWeight = 27;
+		public const int OtherBlowjobEyesWeight = 28;
+		public const int OtherBlowjobTargetEyesWeight = 29;
+		public const int OtherBlowjobTargetGenitalsWeight = 30;
+		public const int OtherHandjobEyesWeight = 31;
+		public const int OtherHandjobTargetEyesWeight = 32;
+		public const int OtherHandjobTargetGenitalsWeight = 33;
+		public const int OtherPenetrationEyesWeight = 34;
+		public const int OtherPenetrationSourceEyesWeight = 35;
+		public const int OtherPenetrationSourceGenitalsWeight = 36;
+		public const int OtherGropedEyesWeight = 37;
+		public const int OtherGropedSourceEyesWeight = 38;
+		public const int OtherGropedTargetWeight = 39;
+		public const int OtherSexExcitementRateFactor = 40;
+		public const int MaxOtherSexExcitement = 41;
+		public const int KissSpeedEnergyFactor = 42;
+		public const int IdleMaxExcitement = 43;
+		public const int TirednessExcitementRateFactor = 44;
+		public const int GazeEnergyTirednessFactor = 45;
+		public const int GazeTirednessFactor = 46;
+		public const int MovementEnergyTirednessFactor = 47;
+		public const int MovementTirednessFactor = 48;
+		public const int ExpressionExcitementFactor = 49;
+		public const int ExpressionTirednessFactor = 50;
 
-		public const int FloatCount = 47;
-		public int GetFloatCount() { return 47; }
+		public const int FloatCount = 51;
+		public int GetFloatCount() { return 51; }
 
 		// strings
 
@@ -170,10 +174,14 @@ namespace Cue
 			"blowjobGenitalsWeight",
 			"handjobEyesWeight",
 			"handjobGenitalsWeight",
-			"penetrationEyesWeight",
-			"penetrationGenitalsWeight",
+			"penetratedEyesWeight",
+			"penetratedGenitalsWeight",
+			"penetratingEyesWeight",
+			"penetratingGenitalsWeight",
 			"gropedEyesWeight",
 			"gropedTargetWeight",
+			"gropingEyesWeight",
+			"gropingTargetWeight",
 			"otherBlowjobEyesWeight",
 			"otherBlowjobTargetEyesWeight",
 			"otherBlowjobTargetGenitalsWeight",
@@ -288,10 +296,14 @@ namespace Cue
 			"blowjobGenitalsWeight",
 			"handjobEyesWeight",
 			"handjobGenitalsWeight",
-			"penetrationEyesWeight",
-			"penetrationGenitalsWeight",
+			"penetratedEyesWeight",
+			"penetratedGenitalsWeight",
+			"penetratingEyesWeight",
+			"penetratingGenitalsWeight",
 			"gropedEyesWeight",
 			"gropedTargetWeight",
+			"gropingEyesWeight",
+			"gropingTargetWeight",
 			"otherBlowjobEyesWeight",
 			"otherBlowjobTargetEyesWeight",
 			"otherBlowjobTargetGenitalsWeight",

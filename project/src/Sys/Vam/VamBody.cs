@@ -198,10 +198,12 @@ namespace Cue.Sys.Vam
 			// breasts
 			//
 			add(BP.LeftBreast, GetTrigger(
-				BP.LeftBreast, "lNippleControl", "lNippleTrigger", ""));
+				BP.LeftBreast, "lNippleControl", "lNippleTrigger", "",
+				new string[] { "lShldr" }));
 
 			add(BP.RightBreast, GetTrigger(
-				BP.RightBreast, "rNippleControl", "rNippleTrigger", ""));
+				BP.RightBreast, "rNippleControl", "rNippleTrigger", "",
+				new string[] { "rShldr" }));
 
 
 			// genitals

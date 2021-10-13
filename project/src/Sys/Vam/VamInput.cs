@@ -277,7 +277,8 @@ namespace Cue.Sys.Vam
 
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
-				ShowLeftMenu || ShowRightMenu || UI.VRMenuAlwaysOpened;
+				(ShowLeftMenu || ShowRightMenu || UI.VRMenuAlwaysOpened) &&
+				(sc_.gameMode == SuperController.GameMode.Play);
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
 			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
