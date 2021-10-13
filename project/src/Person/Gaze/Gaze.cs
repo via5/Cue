@@ -181,15 +181,15 @@ namespace Cue
 
 					lastEmergency_ = emergency;
 				}
-
-				if (picker_.HasTarget)
-				{
-					if (person_.Body.Get(BP.Head).Busy)
-						gazer_.Enabled = false;
-					else
-						gazer_.Enabled = gazerEnabled_;
-				}
 				// else ?
+			}
+
+			if (picker_.HasTarget)
+			{
+				if (person_.Body.Get(BP.Head).Busy)
+					gazer_.Enabled = false;
+				else
+					gazer_.Enabled = gazerEnabled_;
 			}
 
 			gazer_.Variance = picker_.CurrentTarget.Variance;
@@ -202,6 +202,12 @@ namespace Cue
 		{
 			targets_.Clear();
 			lastString_.Length = 0;
+		}
+
+		public string DebugString()
+		{
+			return
+				$"e={gazerEnabled_},ebe={gazerEnabledBeforeEmergency_}";
 		}
 
 		private int UpdateEmergencyTargets()

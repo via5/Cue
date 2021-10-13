@@ -262,6 +262,7 @@ namespace Cue
 		private VUI.Label gazerEnabled_ = new VUI.Label();
 		private VUI.Label gazerDuration_ = new VUI.Label();
 		private VUI.Label gazerVariance_ = new VUI.Label();
+		private VUI.Label debug_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
 		private VUI.Label targetEmergency_ = new VUI.Label();
 		private VUI.Label avoid_ = new VUI.Label();
@@ -311,6 +312,9 @@ namespace Cue
 			p.Add(new VUI.Label("Variance"));
 			p.Add(gazerVariance_);
 
+			p.Add(new VUI.Label("Debug"));
+			p.Add(debug_);
+
 
 			p.Add(new VUI.Spacer(20));
 			p.Add(new VUI.Spacer(20));
@@ -355,6 +359,7 @@ namespace Cue
 			gazerEnabled_.Text = $"{g.Gazer.Enabled}";
 			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
 			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}s";
+			debug_.Text = g.DebugString();
 
 			if (g.Picker.HasTarget)
 			{
@@ -369,6 +374,7 @@ namespace Cue
 
 			avoid_.Text = g.Picker.AvoidString;
 			next_.Text = $"{g.Picker.TimeBeforeNext:0.00}s";
+
 		}
 
 		private void OnRenderFrustums(bool b)

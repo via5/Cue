@@ -173,7 +173,21 @@ namespace Cue
 						targets_.SetWeight(t, BP.Eyes, 1, "kissing");
 					}
 
-					return Exclusive | NoGazer;
+					// don't use NoGazer:
+					//  - although the gazer does have to be disabled while
+					//    kissing, the head will become busy anyway, which is
+					//    checked in Gaze.Update()
+					//
+					//  - returning NoGazer would disable the gazer until a new
+					//    target is picked, which doesn't happen immediately
+					//    after kissing stops because the timer just continues
+					//    running
+					//
+					//    since it might take several seconds before a new
+					//    target is picked, the gazer would stay disabled and
+					//    the head would stay still for a while
+
+					return Exclusive;
 				}
 			}
 

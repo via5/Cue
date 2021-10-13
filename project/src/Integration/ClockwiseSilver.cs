@@ -46,8 +46,8 @@ namespace Cue
 		private const float StartHeadAngleZWithPlayer = 0;
 		private const float StartHeadAngleXLeader = -10;
 		private const float StartHeadAngleYLeader = 0;
-		private const float StartHeadAngleZLeader = -40;
-		private const float StartHeadAngleX = -10;
+		private const float StartHeadAngleZLeader = -20;
+		private const float StartHeadAngleX = -30;
 		private const float StartHeadAngleY = 0;
 		private const float StartHeadAngleZ = -40;
 		private const float StartLipDepthLeader = 0.02f;
