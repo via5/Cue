@@ -135,6 +135,7 @@ namespace Cue.Proc
 			}
 
 			UpdateForces(true);
+			Reset();
 
 			return true;
 		}

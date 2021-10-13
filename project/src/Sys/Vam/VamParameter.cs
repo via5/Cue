@@ -5,7 +5,7 @@ namespace Cue.Sys.Vam
 	abstract class ParameterChecker
 	{
 		private readonly float interval_;
-		private float elapsed_ = 0;
+		private float lastCheck_ = -1;
 		private bool stale_ = true;
 		protected bool checkedOnce_ = false;
 		private int backoff_ = 0;
@@ -15,9 +15,6 @@ namespace Cue.Sys.Vam
 		{
 			// so they don't all check on the same frame
 			interval_ = (interval < 0 ? U.RandomFloat(1.5f, 2.5f) : interval);
-
-			// force check the first time
-			elapsed_ = interval_ + 1;
 
 			storableNamesCache_ = VamSys.MakeStorableNamesCache(storableId);
 		}
@@ -32,14 +29,15 @@ namespace Cue.Sys.Vam
 			if (CheckIfDead())
 			{
 				stale_ = true;
-				elapsed_ = interval_ + 1;
+				lastCheck_ = -1;
 				backoff_ = 0;
 			}
 
 			if (stale_)
 			{
-				elapsed_ += Cue.Instance.Sys.DeltaTime;
-				if (elapsed_ > (interval_ + backoff_) || force)
+				var now = Cue.Instance.Sys.RealtimeSinceStartup;
+
+				if (TimeToCheck(now, force))
 				{
 					if (GetParameter())
 					{
@@ -51,7 +49,7 @@ namespace Cue.Sys.Vam
 						backoff_ = Math.Min(backoff_ + 1, 5);
 					}
 
-					elapsed_ = 0;
+					lastCheck_ = now;
 				}
 			}
 
@@ -60,8 +58,27 @@ namespace Cue.Sys.Vam
 			return !stale_;
 		}
 
+		private bool TimeToCheck(float now, bool force)
+		{
+			if (lastCheck_ < 0 || force)
+				return true;
+
+			var d = (now - lastCheck_);
+			if (d >= (interval_ + backoff_))
+				return true;
+
+			return false;
+		}
+
 		protected abstract bool CheckIfDead();
 		protected abstract bool GetParameter();
+
+		protected string DeadString()
+		{
+			var now = Cue.Instance.Sys.RealtimeSinceStartup;
+			var elapsed = now - lastCheck_;
+			return $"s={stale_},e={elapsed:0.00},bo={backoff_},i={interval_:0.00}";
+		}
 	}
 
 
@@ -193,7 +210,7 @@ namespace Cue.Sys.Vam
 			if (param_ == null)
 			{
 				if (checkedOnce_)
-					return "(dead)";
+					return $"(dead)";
 				else
 					return "(?)";
 			}

@@ -186,12 +186,8 @@ namespace Cue.Sys.Vam
 
 		public void Set(bool on)
 		{
-			var old = onFrame_;
 			onFrame_ = (on && !on_);
 			on_ = on;
-
-			if (old != onFrame_)
-				Cue.LogError($"{name_} {old} {onFrame_}");
 		}
 	}
 
