@@ -361,9 +361,6 @@
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == hand.Person)
-					continue;
-
 				var left = p.Body.Get(BP.LeftHand);
 				if (left.IsLinkedTo(hand))
 					left.Unlink();

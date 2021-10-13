@@ -74,14 +74,47 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamTransformBodyPart : VamBodyPart
+	class VamCameraHand : VamBodyPart
 	{
-		private Transform t_;
+		private Transform vrHand_, desktopHand_;
+		private Rigidbody desktopRb_;
 
-		public VamTransformBodyPart(int type, Transform t)
+		public VamCameraHand(int type, Transform vrHand, Transform desktopHand)
 			: base(null, type)
 		{
-			t_ = t;
+			vrHand_ = vrHand;
+			desktopHand_ = desktopHand;
+			desktopRb_ = desktopHand_?.GetComponent<Rigidbody>();
+		}
+
+		public override Transform Transform
+		{
+			get
+			{
+				if (Cue.Instance.VamSys.IsVR)
+					return vrHand_;
+				else
+					return desktopHand_;
+			}
+		}
+
+		public override Rigidbody Rigidbody
+		{
+			get
+			{
+				if (Cue.Instance.VamSys.IsVR)
+					return null; //; todo
+				else
+					return desktopRb_;
+			}
+		}
+
+		public override FreeControllerV3 Controller
+		{
+			get
+			{
+				return null;
+			}
 		}
 
 		public override Vector3 ControlPosition
@@ -98,17 +131,29 @@ namespace Cue.Sys.Vam
 
 		public override Vector3 Position
 		{
-			get { return U.FromUnity(t_.position); }
+			get
+			{
+				if (Transform == null)
+					return Vector3.Zero;
+				else
+					return U.FromUnity(Transform.position);
+			}
 		}
 
 		public override Quaternion Rotation
 		{
-			get { return U.FromUnity(t_.rotation); }
+			get
+			{
+				if (Transform == null)
+					return Quaternion.Zero;
+				else
+					return U.FromUnity(Transform.rotation);
+			}
 		}
 
 		public override string ToString()
 		{
-			return $"camera {t_.name}";
+			return $"cameraHand {Transform?.name}";
 		}
 	}
 
@@ -123,10 +168,15 @@ namespace Cue.Sys.Vam
 
 			parts_[BP.Head] = new VamCameraHead();
 			parts_[BP.Eyes] = new VamCameraEyes();
-			parts_[BP.LeftHand] = new VamTransformBodyPart(
-				BP.LeftHand, SuperController.singleton.leftHand);
-			parts_[BP.RightHand] = new VamTransformBodyPart(
-				BP.RightHand, SuperController.singleton.rightHand);
+			parts_[BP.LeftHand] = new VamCameraHand(
+				BP.LeftHand,
+				SuperController.singleton.leftHand,
+				null);
+
+			parts_[BP.RightHand] = new VamCameraHand(
+				BP.RightHand,
+				SuperController.singleton.rightHand,
+				SuperController.singleton.mouseGrab);
 		}
 
 		public override bool Exists
