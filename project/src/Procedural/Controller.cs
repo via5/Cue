@@ -38,7 +38,7 @@ namespace Cue.Proc
 			get { return done_; }
 		}
 
-		public override void Start(Person p)
+		protected override void DoStart(Person p)
 		{
 			fc_ = Cue.Instance.VamSys.FindController(p.VamAtom.Atom, cname_);
 			if (fc_ == null)

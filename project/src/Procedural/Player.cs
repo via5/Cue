@@ -25,6 +25,7 @@ namespace Cue.Proc
 
 	abstract class BasicTarget : ITarget
 	{
+		protected Person person_ = null;
 		private ITarget parent_ = null;
 		private ISync sync_;
 		private string name_ = "";
@@ -62,8 +63,15 @@ namespace Cue.Proc
 
 		public abstract ITarget Clone();
 		public abstract void FixedUpdate(float s);
-		public abstract void Start(Person p);
 		public abstract string ToDetailedString();
+
+		public void Start(Person p)
+		{
+			person_ = p;
+			DoStart(p);
+		}
+
+		protected abstract void DoStart(Person p);
 
 		public virtual void GetAllForcesDebug(List<string> list)
 		{

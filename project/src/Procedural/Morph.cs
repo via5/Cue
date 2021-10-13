@@ -11,7 +11,6 @@ namespace Cue.Proc
 		public const int ForceToRangePercent = 2;
 		public const int ForceIgnore = 3;
 
-		private Person person_ = null;
 		private int bodyPart_;
 		private string morphId_;
 		private float min_, max_, mid_;
@@ -146,9 +145,8 @@ namespace Cue.Proc
 			set { autoSet_ = value; }
 		}
 
-		public override void Start(Person p)
+		protected override void DoStart(Person p)
 		{
-			person_ = p;
 			morph_ = new Morph(person_.Atom.GetMorph(morphId_));
 
 			mid_ = Mid();

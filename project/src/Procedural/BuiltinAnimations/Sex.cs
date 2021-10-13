@@ -105,6 +105,7 @@ namespace Cue.Proc
 				return false;
 
 			receiver_ = ps as Person;
+			SetEnergySource(receiver_);
 
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)
@@ -133,8 +134,8 @@ namespace Cue.Proc
 				}
 			}
 
+			UpdateForces(true);
 
-				UpdateForces(true);
 			return true;
 		}
 

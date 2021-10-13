@@ -20,7 +20,6 @@ namespace Cue.Proc
 		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
 
 		private Rigidbody rb_ = null;
-		private Person person_ = null;
 		private bool wasBusy_ = false;
 		private bool oneFrameFinished_ = false;
 
@@ -127,10 +126,8 @@ namespace Cue.Proc
 			return f;
 		}
 
-		public override void Start(Person p)
+		protected override void DoStart(Person p)
 		{
-			person_ = p;
-
 			if (p.VamAtom != null)
 			{
 				rb_ = Cue.Instance.VamSys.FindRigidbody(p.VamAtom.Atom, rbId_);

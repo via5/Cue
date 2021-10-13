@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue.Proc
@@ -43,37 +44,8 @@ namespace Cue.Proc
 	}
 
 
-	class RootTargetGroup : ConcurrentTargetGroup
-	{
-		private Person p_ = null;
-
-		public RootTargetGroup()
-			: base("root", new NoSync())
-		{
-		}
-
-		public override ITarget Clone()
-		{
-			var s = new RootTargetGroup();
-			s.CopyFrom(this);
-			return s;
-		}
-
-		public void SetEnergySource(Person p)
-		{
-			p_ = p;
-		}
-
-		public override float MovementEnergy
-		{
-			get { return p_.Mood.MovementEnergy; }
-		}
-	}
-
-
 	class ConcurrentTargetGroup : BasicTargetGroup
 	{
-		private Person person_ = null;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private Duration delay_, maxDuration_;
 		private bool inDelay_ = false;
@@ -166,10 +138,8 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		public override void Start(Person p)
+		protected override void DoStart(Person p)
 		{
-			person_ = p;
-
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
 
@@ -253,7 +223,6 @@ namespace Cue.Proc
 
 		}
 
-		private Person person_ = null;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private readonly List<TargetInfo> targetInfos_ = new List<TargetInfo>();
 		private Duration delay_;
@@ -340,10 +309,8 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		public override void Start(Person p)
+		protected override void DoStart(Person p)
 		{
-			person_ = p;
-
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Start(p);
 		}
@@ -399,6 +366,45 @@ namespace Cue.Proc
 				$"seqgroup " +
 				$"{Name}, {targets_.Count} targets indelay={inDelay_} " +
 				$"i={i_} done={done_}";
+		}
+	}
+
+
+	class RootTargetGroup : ConcurrentTargetGroup
+	{
+		private Person energySource_ = null;
+
+		public RootTargetGroup()
+			: base("root", new NoSync())
+		{
+		}
+
+		public override ITarget Clone()
+		{
+			var s = new RootTargetGroup();
+			s.CopyFrom(this);
+			return s;
+		}
+
+		public void SetEnergySource(Person p)
+		{
+			energySource_ = p;
+		}
+
+		public override float MovementEnergy
+		{
+			get
+			{
+				float e = 0;
+
+				if (person_ != null)
+					e = Math.Max(e, person_.Mood.MovementEnergy);
+
+				if (energySource_ != null && energySource_ != person_)
+					e = Math.Max(e, energySource_.Mood.MovementEnergy);
+
+				return e;
+			}
 		}
 	}
 }
