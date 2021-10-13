@@ -93,9 +93,8 @@ namespace Cue.Sys.Vam
 
 		private void SetParentLink(FreeControllerV3 fc, Rigidbody rb)
 		{
-			fc.linkToRB = rb;
-			fc.currentPositionState = FreeControllerV3.PositionState.ParentLink;
-			fc.currentRotationState = FreeControllerV3.RotationState.ParentLink;
+			fc.SelectLinkToRigidbody(
+				rb, FreeControllerV3.SelectLinkState.PositionAndRotation);
 		}
 
 		private void SetOn(FreeControllerV3 fc)

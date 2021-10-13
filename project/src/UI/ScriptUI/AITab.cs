@@ -341,9 +341,18 @@ namespace Cue
 			Add(p);
 
 
-			p = new VUI.Panel(new VUI.VerticalFlow());
+			p = new VUI.Panel(new VUI.VerticalFlow(5));
 
-			p.Add(new VUI.CheckBox("Render frustums", OnRenderFrustums));
+			p.Add(new VUI.CheckBox(
+				"Render frustums",
+				(b) => person_.Gaze.Render.Frustums = b,
+				person_.Gaze.Render.Frustums));
+
+			p.Add(new VUI.CheckBox(
+				"Render front plane",
+				(b) => person_.Gaze.Render.FrontPlane = b,
+				person_.Gaze.Render.FrontPlane));
+
 			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
 			Add(p);
 		}
@@ -375,11 +384,6 @@ namespace Cue
 			avoid_.Text = g.Picker.AvoidString;
 			next_.Text = $"{g.Picker.TimeBeforeNext:0.00}s";
 
-		}
-
-		private void OnRenderFrustums(bool b)
-		{
-			person_.Gaze.Picker.Render = b;
 		}
 
 		private void OnForceLook(int s)

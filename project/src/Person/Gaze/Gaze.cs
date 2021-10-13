@@ -48,6 +48,7 @@ namespace Cue
 		// debug
 		private readonly StringBuilder lastString_ = new StringBuilder();
 		private int forceLook_ = ForceLooks.None;
+		private GazeRender render_;
 
 
 		public Gaze(Person p)
@@ -57,6 +58,12 @@ namespace Cue
 			gazer_ = Integration.CreateGazer(p);
 			targets_ = new GazeTargets(p);
 			picker_ = new GazeTargetPicker(p);
+			render_ = new GazeRender(p);
+		}
+
+		public GazeRender Render
+		{
+			get { return render_; }
 		}
 
 		public IEyes Eyes { get { return eyes_; } }
@@ -126,7 +133,7 @@ namespace Cue
 					case ForceLooks.Freeze:
 					{
 						person_.Gaze.Gazer.Enabled = false;
-						return;
+						break;
 					}
 				}
 
@@ -181,21 +188,25 @@ namespace Cue
 
 					lastEmergency_ = emergency;
 				}
-				// else ?
 			}
 
-			if (picker_.HasTarget)
+			if (forceLook_ != ForceLooks.Freeze)
 			{
-				if (person_.Body.Get(BP.Head).Busy)
-					gazer_.Enabled = false;
-				else
-					gazer_.Enabled = gazerEnabled_;
+				if (picker_.HasTarget)
+				{
+					if (person_.Body.Get(BP.Head).Busy)
+						gazer_.Enabled = false;
+					else
+						gazer_.Enabled = gazerEnabled_;
+				}
+
+				gazer_.Variance = picker_.CurrentTarget.Variance;
+				eyes_.LookAt(picker_.Position);
+				eyes_.Update(s);
+				gazer_.Update(s);
 			}
 
-			gazer_.Variance = picker_.CurrentTarget.Variance;
-			eyes_.LookAt(picker_.Position);
-			eyes_.Update(s);
-			gazer_.Update(s);
+			render_?.Update(s);
 		}
 
 		public void Clear()

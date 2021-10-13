@@ -1016,8 +1016,7 @@ namespace Cue.Sys.Vam
 
 		public static UnityEngine.Plane ToUnity(Plane p)
 		{
-			return new UnityEngine.Plane(
-				ToUnity(p.a), ToUnity(p.b), ToUnity(p.c));
+			return p.p_;
 		}
 
 

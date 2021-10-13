@@ -30,7 +30,6 @@ namespace Cue
 		private Logger log_;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
 		private Box[] avoidBoxes_ = new Box[0];
-		private RandomTargetGeneratorRenderer render_ = null;
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private IGazeLookat currentTarget_ = null;
@@ -50,25 +49,6 @@ namespace Cue
 
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
-		}
-
-		public bool Render
-		{
-			set
-			{
-				if (value)
-				{
-					if (render_ == null)
-						render_ = new RandomTargetGeneratorRenderer(this);
-
-					render_.Visible = value;
-				}
-				else
-				{
-					if (render_ != null)
-						render_.Visible = false;
-				}
-			}
 		}
 
 		public BodyPart ReferencePart
@@ -138,6 +118,16 @@ namespace Cue
 			}
 		}
 
+		public Plane FrontPlane
+		{
+			get
+			{
+				var chest = person_.Body.Get(BP.Chest);
+				var p = chest.Position + chest.Rotation.Rotate(new Vector3(0, 0, -0.3f));
+				return new Plane(p, chest.Rotation.Rotate(new Vector3(0, 0, 1)));
+			}
+		}
+
 		public Vector3 Position
 		{
 			get { return CurrentTarget?.Position ?? Vector3.Zero; }
@@ -155,11 +145,18 @@ namespace Cue
 
 		public bool CanLookAtPoint(Vector3 p)
 		{
-			if (emergency_)
-				return true;
+			// don't use avoidance for emergencies
+			if (!emergency_)
+			{
+				var f = FindFrustum(p);
+				if (f != null && f.avoid)
+					return false;
+			}
 
-			var f = FindFrustum(p);
-			return f == null || !f.avoid;
+			if (!FrontPlane.PointInFront(p))
+				return false;
+
+			return true;
 		}
 
 		public bool Update(float s)
@@ -231,8 +228,6 @@ namespace Cue
 					}
 				}
 			}
-
-			render_?.Update(s);
 
 			return needsTarget;
 		}
@@ -434,150 +429,6 @@ namespace Cue
 			}
 
 			return Frustum.Zero;
-		}
-	}
-
-
-	class RandomTargetGeneratorRenderer
-	{
-		private GazeTargetPicker r_;
-		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
-		private Sys.IGraphic[] avoid_ = new Sys.IGraphic[0];
-		private Sys.IGraphic lookAt_ = null;
-		private bool visible_ = false;
-
-		public RandomTargetGeneratorRenderer(GazeTargetPicker r)
-		{
-			r_ = r;
-		}
-
-		public bool Visible
-		{
-			get
-			{
-				return visible_;
-			}
-
-			set
-			{
-				visible_ = value;
-
-				if (value)
-				{
-					if (frustums_.Length == 0)
-						CreateFrustums();
-
-					if (lookAt_ == null)
-						CreateLookAt();
-				}
-
-				for (int i = 0; i < frustums_.Length; ++i)
-					frustums_[i].Visible = value;
-			}
-		}
-
-		public void Update(float s)
-		{
-			UpdateFrustums(s);
-			UpdateAvoidBoxes();
-			UpdateTargetBox();
-		}
-
-		private void UpdateFrustums(float s)
-		{
-			for (int i = 0; i < frustums_.Length; ++i)
-			{
-				var fi = r_.GetFrustum(i);
-
-				if (fi.avoid)
-					frustums_[i].Color = new Color(1, 0, 0, 0.1f);
-				else if (fi.selected)
-					frustums_[i].Color = new Color(1, 1, 1, 0.3f);
-				else
-					frustums_[i].Color = new Color(0, 1, 0, 0.1f);
-
-				frustums_[i].Update(s);
-			}
-		}
-
-		private void UpdateAvoidBoxes()
-		{
-			var boxes = r_.AvoidBoxes;
-
-			if (boxes.Length != avoid_.Length)
-			{
-				for (int i = 0; i < avoid_.Length; ++i)
-					avoid_[i].Destroy();
-
-				avoid_ = new Sys.IGraphic[boxes.Length];
-
-				for (int i = 0; i < boxes.Length; ++i)
-					avoid_[i] = CreateAvoid();
-			}
-
-
-			for (int i = 0; i < boxes.Length; ++i)
-			{
-				avoid_[i].Position =
-					r_.Person.Body.Get(BP.Eyes).Position +
-					r_.ReferencePart.Rotation.Rotate(boxes[i].center);
-
-				avoid_[i].Size = boxes[i].size;
-				avoid_[i].Visible = visible_;
-			}
-		}
-
-		private void UpdateTargetBox()
-		{
-			if (r_.HasTarget)
-			{
-				var b = r_.CurrentTargetAABox;
-
-				lookAt_.Visible = true;
-
-				lookAt_.Position =
-					r_.Person.Body.Get(BP.Eyes).Position +
-					r_.ReferencePart.Rotation.Rotate(b.center);
-
-				lookAt_.Size = b.size;
-			}
-			else
-			{
-				lookAt_.Visible = false;
-			}
-		}
-
-		private void CreateFrustums()
-		{
-			frustums_ = new FrustumRenderer[GazeTargetPicker.FrustumCount];
-			for (int i = 0; i < frustums_.Length; ++i)
-			{
-				frustums_[i] = new FrustumRenderer(
-					r_.Person, r_.GetFrustum(i).frustum,
-					BP.Head, BP.Chest);
-
-				frustums_[i].Visible = visible_;
-			}
-		}
-
-		private Sys.IGraphic CreateAvoid()
-		{
-			var g = Cue.Instance.Sys.CreateBoxGraphic(
-				"RandomTargetGenerator.AvoidRender",
-				Vector3.Zero, Vector3.Zero, new Color(1, 0, 0, 0.1f));
-
-			g.Visible = visible_;
-
-			return g;
-		}
-
-		private void CreateLookAt()
-		{
-			lookAt_ = Cue.Instance.Sys.CreateBoxGraphic(
-				"RandomTargetGenerator.LookAt",
-				Vector3.Zero, Vector3.Zero, new Color(0, 0, 1, 0.1f));
-
-			lookAt_.Visible = visible_;
 		}
 	}
 }

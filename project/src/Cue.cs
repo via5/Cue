@@ -649,9 +649,11 @@ namespace Cue
 
 		private void test()
 		{
-			var p = FindPerson("A");
+			var p = FindPerson("Person");
 			if (p != null)
 			{
+				//p.Gaze.Render.FrontPlane = true;
+				//p.Gaze.ForceLook = ForceLooks.Camera;
 				//p.Gaze.ForceLook = ForceLooks.Camera;
 				//p.Mood.FlatExcitementValue.SetForced(0);
 			}

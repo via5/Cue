@@ -45,6 +45,7 @@ project\src\Person\Body\Morph.cs
 project\src\Person\Gaze\Events.cs
 project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs
+project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
 project\src\Procedural\Animation.cs
 project\src\Procedural\BuiltinAnimations.cs

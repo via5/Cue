@@ -636,18 +636,49 @@ namespace Cue
 
 	struct Plane
 	{
-		public Vector3 a, b, c;
+		// todo
+		public UnityEngine.Plane p_;
 
 		public Plane(Vector3 a, Vector3 b, Vector3 c)
 		{
-			this.a = a;
-			this.b = b;
-			this.c = c;
+			p_ = new UnityEngine.Plane(
+				Sys.Vam.U.ToUnity(a),
+				Sys.Vam.U.ToUnity(b),
+				Sys.Vam.U.ToUnity(c));
+		}
+
+		public Plane(Vector3 point, Vector3 dir)
+		{
+			p_ = new UnityEngine.Plane(
+				Sys.Vam.U.ToUnity(dir), Sys.Vam.U.ToUnity(point));
+		}
+
+		public Vector3 Point
+		{
+			get
+			{
+				return Sys.Vam.U.FromUnity(
+					p_.ClosestPointOnPlane(UnityEngine.Vector3.zero));
+			}
+		}
+
+		public Quaternion Rotation
+		{
+			get
+			{
+				return Sys.Vam.U.FromUnity(
+					UnityEngine.Quaternion.LookRotation(p_.normal));
+			}
+		}
+
+		public bool PointInFront(Vector3 v)
+		{
+			return p_.GetSide(Sys.Vam.U.ToUnity(v));
 		}
 
 		public override string ToString()
 		{
-			return $"{a} {b} {c}";
+			return $"{p_}";
 		}
 	}
 

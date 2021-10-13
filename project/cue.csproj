@@ -148,6 +148,7 @@
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
+    <Compile Include="src\Person\Gaze\Render.cs" />
     <Compile Include="src\Person\Gaze\Targets.cs" />
     <Compile Include="src\Person\Mood.cs" />
     <Compile Include="src\Person\Person.cs" />
