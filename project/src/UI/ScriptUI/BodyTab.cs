@@ -154,9 +154,6 @@ namespace Cue
 								ss += ",";
 
 							ss += ts[j].ToString();
-
-							if (ts[j].forced)
-								ss += "(forced)";
 						}
 					}
 

@@ -175,15 +175,29 @@ namespace Cue.Sys
 		public override string ToString()
 		{
 			if (personIndex == -1 || sourcePartIndex == -1)
-				return "?";
-
-			var p = Cue.Instance.AllPersons[personIndex];
-			var bp = p.Body.Get(sourcePartIndex);
-
-			if (value == 1)
-				return $"{p.ID}.{bp.Name}";
+			{
+				if (forced)
+					return "forced";
+				else
+					return "?";
+			}
 			else
-				return $"{p.ID}.{bp.Name}/{value:0.0}";
+			{
+				var p = Cue.Instance.AllPersons[personIndex];
+				var bp = p.Body.Get(sourcePartIndex);
+
+				string s;
+
+				if (value == 1)
+					s = $"{p.ID}.{bp.Name}";
+				else
+					s = $"{p.ID}.{bp.Name}/{value:0.0}";
+
+				if (forced)
+					s += "(forced)";
+
+				return s;
+			}
 		}
 	}
 

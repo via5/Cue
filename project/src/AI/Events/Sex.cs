@@ -58,6 +58,12 @@
 								receiver_.PersonIndex,
 								receiver_.Body.GenitalsBodyPart);
 					}
+					else
+					{
+						// frottage
+						person_.Body.Get(person_.Body.GenitalsBodyPart)
+							.AddForcedTrigger(-1, -1);
+					}
 
 					person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
 
@@ -89,6 +95,12 @@
 							.RemoveForcedTrigger(
 								receiver_.PersonIndex,
 								receiver_.Body.GenitalsBodyPart);
+					}
+					else
+					{
+						// frottage
+						person_.Body.Get(person_.Body.GenitalsBodyPart)
+							.RemoveForcedTrigger(-1, -1);
 					}
 
 					running_ = false;
