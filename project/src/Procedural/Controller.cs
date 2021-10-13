@@ -6,7 +6,7 @@ namespace Cue.Proc
 
 	class Controller : BasicTarget
 	{
-		private readonly string name_;
+		private readonly string cname_;
 		private readonly UnityEngine.Vector3 pos_;
 		private readonly UnityEngine.Vector3 rot_;
 		private FreeControllerV3 fc_ = null;
@@ -16,10 +16,10 @@ namespace Cue.Proc
 		private Quaternion endRot_;
 		private bool done_ = false;
 
-		public Controller(string name, Vector3 pos, Vector3 rot, ISync sync)
-			: base(sync)
+		public Controller(string cname, Vector3 pos, Vector3 rot, ISync sync)
+			: base("", sync)
 		{
-			name_ = name;
+			cname_ = cname;
 			pos_ = Sys.Vam.U.ToUnity(pos);
 			rot_ = Sys.Vam.U.ToUnity(rot);
 		}
@@ -27,7 +27,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			return new Controller(
-				name_,
+				cname_,
 				Sys.Vam.U.FromUnity(pos_),
 				Sys.Vam.U.FromUnity(rot_),
 				Sync.Clone());
@@ -40,10 +40,10 @@ namespace Cue.Proc
 
 		public override void Start(Person p)
 		{
-			fc_ = Cue.Instance.VamSys.FindController(p.VamAtom.Atom, name_);
+			fc_ = Cue.Instance.VamSys.FindController(p.VamAtom.Atom, cname_);
 			if (fc_ == null)
 			{
-				Cue.LogError($"ProceduralStep: controller {name_} not found in {p}");
+				Cue.LogError($"ProceduralStep: controller {cname_} not found in {p}");
 				return;
 			}
 
@@ -52,7 +52,7 @@ namespace Cue.Proc
 			endPos_ = pos_ + new UnityEngine.Vector3(0, p.Clothing.HeelsHeight, 0);
 			startRot_ = fc_.transform.localRotation;
 
-			if (name_ == "lFootControl" || name_ == "rFootControl")
+			if (cname_ == "lFootControl" || cname_ == "rFootControl")
 			{
 				endRot_ = Quaternion.Euler(
 					rot_ + new UnityEngine.Vector3(p.Clothing.HeelsAngle, 0, 0));
@@ -114,7 +114,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"controller {name_} pos={pos_} rot={rot_}";
+			return $"controller {cname_} pos={pos_} rot={rot_}";
 		}
 
 		public override string ToDetailedString()

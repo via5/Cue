@@ -38,6 +38,9 @@ namespace Cue
 			var o = new JSONClass();
 			o["sui"] = sui;
 
+			if (desktopMenu_.Selected != null)
+				o["sel"] = desktopMenu_.Selected.ID;
+
 			return o;
 		}
 
@@ -45,6 +48,17 @@ namespace Cue
 		{
 			if (o != null && o.HasKey("sui"))
 				sui_.Load(o["sui"].AsObject);
+
+			if (o != null && o.HasKey("sel"))
+			{
+				var id = o["sel"].Value;
+				if (!string.IsNullOrEmpty(id))
+				{
+					var s = Cue.Instance.FindPerson(id);
+					if (s != null)
+						desktopMenu_.Selected = s;
+				}
+			}
 		}
 
 		public void CheckInput()
@@ -110,21 +124,24 @@ namespace Cue
 				desktopMenu_?.Create();
 				desktopMenu_.Visible = true;
 
-				var ps = Cue.Instance.ActivePersons;
-
-				if (ps.Length > 0)
+				if (desktopMenu_.Selected == null)
 				{
-					foreach (var p in Cue.Instance.ActivePersons)
-					{
-						if (p.Atom.Selected)
-						{
-							desktopMenu_.Selected = p;
-							break;
-						}
-					}
+					var ps = Cue.Instance.ActivePersons;
 
-					if (desktopMenu_.Selected == null)
-						desktopMenu_.Selected = ps[0];
+					if (ps.Length > 0)
+					{
+						foreach (var p in Cue.Instance.ActivePersons)
+						{
+							if (p.Atom.Selected)
+							{
+								desktopMenu_.Selected = p;
+								break;
+							}
+						}
+
+						if (desktopMenu_.Selected == null)
+							desktopMenu_.Selected = ps[0];
+					}
 				}
 			}
 		}
@@ -234,6 +251,7 @@ namespace Cue
 			if (sys_.Input.Select)
 			{
 				desktopMenu_.Selected = h.o as Person;
+				Cue.Instance.Save();
 			}
 
 			desktopMenu_.Hovered = h.o;

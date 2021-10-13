@@ -12,9 +12,15 @@ namespace Cue.Proc
 		private const float ForceChangeMaxAmount = 0.02f;
 
 		private float hipForceMin_ = 300;
-		private float hipForceMax_ = 1200;
+		private float hipForceMax_ = 1400;
+		private float hipAloneForceMin_ = 300;
+		private float hipAloneForceMax_ = 800;
 		private float hipTorqueMin_ = 0;
 		private float hipTorqueMax_ = -20;
+		private float hipTorqueWindow_ = 0;
+		private float hipAloneTorqueMin_ = -60;
+		private float hipAloneTorqueMax_ = -120;
+		private float hipAloneTorqueWindow_ = 20;
 		private float chestTorqueMin_ = -10;
 		private float chestTorqueMax_ = -50;
 		private float headTorqueMin_ = 0;
@@ -23,7 +29,8 @@ namespace Cue.Proc
 		private float durationMax_ = 0.1f;
 		private float durationWin_ = 0.15f;
 		private float durationInterval_ = 10;
-		private Force[] forces_ = null;
+		private Force hipForce_ = null;
+		private Force hipTorque_ = null;
 
 		private float lastForceFactor_ = 0;
 		private Vector3 lastDir_ = Vector3.Zero;
@@ -48,7 +55,7 @@ namespace Cue.Proc
 
 
 			g.AddTarget(new Force(
-				Force.AbsoluteForce, BP.Hips, "hip",
+				"hipForce", Force.AbsoluteForce, BP.Hips, "hip",
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
@@ -56,7 +63,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BP.Hips, "hip",
+				"hipTorque", Force.RelativeTorque, BP.Hips, "hip",
 				new SlidingMovement(
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
@@ -99,25 +106,44 @@ namespace Cue.Proc
 
 			receiver_ = ps as Person;
 
-			if (forces_ == null)
+			hipForce_ = FindTarget("hipForce") as Force;
+			if (hipForce_ == null)
+				Cue.LogError("hipForce not found");
+
+			hipTorque_ = FindTarget("hipTorque") as Force;
+			if (hipTorque_ == null)
 			{
-				var list = new List<Force>();
-				GatherForces(list, Targets);
-				forces_ = list.ToArray();
+				Cue.LogError("hipTorque not found");
+			}
+			else
+			{
+				if (receiver_ == null)
+				{
+					hipTorque_.Movement.SetRange(
+						new Vector3(hipAloneTorqueMin_, 0, 0),
+						new Vector3(hipAloneTorqueMax_, 0, 0),
+						new Vector3(hipAloneTorqueWindow_, 0, 0));
+				}
+				else
+				{
+					hipTorque_.Movement.SetRange(
+						new Vector3(hipTorqueMin_, 0, 0),
+						new Vector3(hipTorqueMax_, 0, 0),
+						new Vector3(hipTorqueWindow_, 0, 0));
+				}
 			}
 
-			UpdateForces(true);
+
+				UpdateForces(true);
 			return true;
 		}
 
 		private void UpdateForces(bool alwaysUpdate = false)
 		{
-			for (int i = 0; i < forces_.Length; ++i)
+			if (hipForce_ != null)
 			{
-				var f = forces_[i];
-
-				if (f.Done || alwaysUpdate)
-					UpdateForce(f);
+				if (hipForce_.Done || alwaysUpdate)
+					UpdateForce(hipForce_);
 			}
 		}
 
@@ -208,35 +234,23 @@ namespace Cue.Proc
 		private void UpdateForce(Force f)
 		{
 			var p = GetForceFactor();
-			var fmin = hipForceMin_ * p;
-			var fmax = hipForceMax_ * p;
+
+			float fmin, fmax;
+
+			if (receiver_ == null)
+			{
+				fmin = hipAloneForceMin_ * p;
+				fmax = hipAloneForceMax_ * p;
+			}
+			else
+			{
+				fmin = hipForceMin_ * p;
+				fmax = hipForceMax_ * p;
+			}
 
 			var dir = GetDirection();
 
 			f.Movement.SetRange(dir * fmin, dir * fmax);
-		}
-
-		private void GatherForces(List<Force> list, List<ITarget> targets)
-		{
-			for (int i = 0; i < targets.Count; ++i)
-			{
-				var t = targets[i];
-
-				if (t is ITargetGroup)
-				{
-					GatherForces(list, ((ITargetGroup)t).Targets);
-				}
-				else if (t is Force)
-				{
-					var f = (Force)t;
-
-					if (f.Type == Force.AbsoluteForce)
-					{
-						f.BeforeNextAction = () => UpdateForce(f);
-						list.Add(f);
-					}
-				}
-			}
 		}
 
 		public override string ToDetailedString()

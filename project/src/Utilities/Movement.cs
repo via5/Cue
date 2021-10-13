@@ -116,8 +116,14 @@ namespace Cue
 
 		public void SetRange(Vector3 min, Vector3 max)
 		{
+			SetRange(min, max, windowSize_);
+		}
+
+		public void SetRange(Vector3 min, Vector3 max, Vector3 window)
+		{
 			min_ = min;
 			max_ = max;
+			windowSize_ = window;
 			SetWindow();
 		}
 
@@ -159,7 +165,8 @@ namespace Cue
 			return
 				$"{m_}\n" +
 				$"/ws={windowSize_:0.00},f={f_:0.00}," +
-				$"e={windowEasing_?.GetShortName()}";
+				$"e={windowEasing_?.GetShortName()}\n" +
+				$"range={min_}/{max_}";
 		}
 
 		private void SetWindow()

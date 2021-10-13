@@ -60,6 +60,7 @@ namespace Cue
 
 			selChanged_ = true;
 			hovChanged_ = true;
+			OnSelected(sel_);
 		}
 
 		public bool Visible

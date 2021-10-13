@@ -54,6 +54,11 @@ namespace Cue.Proc
 			get { return root_.Targets; }
 		}
 
+		public ITarget FindTarget(string name)
+		{
+			return root_.FindTarget(name);
+		}
+
 		public virtual bool Start(Person p, object ps)
 		{
 			person_ = p;

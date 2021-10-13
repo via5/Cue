@@ -30,7 +30,17 @@ namespace Cue.Proc
 			int type, int bodyPart, string rbId,
 			SlidingMovement m, IEasing excitement, ISync sync,
 			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
-				: base(sync)
+				: this(
+					  "", type, bodyPart, rbId, m, excitement, sync,
+					  fwdDelayExcitement, bwdDelayExcitement)
+		{
+		}
+
+		public Force(
+			string name, int type, int bodyPart, string rbId,
+			SlidingMovement m, IEasing excitement, ISync sync,
+			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
+				: base(name, sync)
 		{
 			type_ = type;
 			bodyPart_ = bodyPart;
@@ -107,7 +117,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var f = new Force(
-				type_, bodyPart_, rbId_,
+				Name, type_, bodyPart_, rbId_,
 				new SlidingMovement(movement_), excitement_,
 				Sync.Clone(),
 				fwdDelayExcitement_, bwdDelayExcitement_);
@@ -263,7 +273,7 @@ namespace Cue.Proc
 		public override string ToDetailedString()
 		{
 			return
-				$"{TypeToString(type_)} {rbId_} ({BP.ToString(bodyPart_)})\n" +
+				$"{TypeToString(type_)} {Name} {rbId_} ({BP.ToString(bodyPart_)})\n" +
 				$"{movement_}\n" +
 				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";

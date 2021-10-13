@@ -11,8 +11,8 @@ namespace Cue.Proc
 
 	abstract class BasicTargetGroup : BasicTarget, ITargetGroup
 	{
-		protected BasicTargetGroup(ISync sync)
-			: base(sync)
+		protected BasicTargetGroup(string name, ISync sync)
+			: base(name, sync)
 		{
 		}
 
@@ -23,6 +23,22 @@ namespace Cue.Proc
 			var ts = Targets;
 			for (int i = 0; i < ts.Count; ++i)
 				ts[i].GetAllForcesDebug(list);
+		}
+
+		public override ITarget FindTarget(string name)
+		{
+			var t = base.FindTarget(name);
+			if (t != null)
+				return t;
+
+			for (int i = 0; i < Targets.Count; ++i)
+			{
+				t = Targets[i].FindTarget(name);
+				if (t != null)
+					return t;
+			}
+
+			return null;
 		}
 	}
 
@@ -58,7 +74,6 @@ namespace Cue.Proc
 	class ConcurrentTargetGroup : BasicTargetGroup
 	{
 		private Person person_ = null;
-		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private Duration delay_, maxDuration_;
 		private bool inDelay_ = false;
@@ -74,9 +89,8 @@ namespace Cue.Proc
 		public ConcurrentTargetGroup(
 			string name, Duration delay, Duration maxDuration,
 			bool forever, ISync sync)
-				: base(sync)
+				: base(name, sync)
 		{
-			name_ = name;
 			delay_ = delay;
 			maxDuration_ = maxDuration;
 			forever_ = forever;
@@ -115,7 +129,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var s = new ConcurrentTargetGroup(
-				name_, new Duration(delay_), new Duration(maxDuration_),
+				Name, new Duration(delay_), new Duration(maxDuration_),
 				forever_, Sync.Clone());
 
 			s.CopyFrom(this);
@@ -217,14 +231,14 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"congroup {name_}";
+			return $"congroup {Name}";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
 				$"congroup " +
-				$"{name_}, {targets_.Count} targets indelay={inDelay_} " +
+				$"{Name}, {targets_.Count} targets indelay={inDelay_} " +
 				$"done={allDone_} forever={forever_}";
 		}
 	}
@@ -240,7 +254,6 @@ namespace Cue.Proc
 		}
 
 		private Person person_ = null;
-		private string name_;
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private readonly List<TargetInfo> targetInfos_ = new List<TargetInfo>();
 		private Duration delay_;
@@ -254,9 +267,8 @@ namespace Cue.Proc
 		}
 
 		public SequentialTargetGroup(string name, Duration delay, ISync sync)
-			: base(sync)
+			: base(name, sync)
 		{
-			name_ = name;
 			delay_ = delay;
 		}
 
@@ -290,7 +302,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var s = new SequentialTargetGroup(
-				name_, new Duration(delay_), Sync.Clone());
+				Name, new Duration(delay_), Sync.Clone());
 
 			foreach (var t in targets_)
 			{
@@ -378,14 +390,14 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"seqgroup {name_}";
+			return $"seqgroup {Name}";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
 				$"seqgroup " +
-				$"{name_}, {targets_.Count} targets indelay={inDelay_} " +
+				$"{Name}, {targets_.Count} targets indelay={inDelay_} " +
 				$"i={i_} done={done_}";
 		}
 	}

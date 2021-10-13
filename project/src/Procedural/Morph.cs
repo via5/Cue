@@ -55,7 +55,7 @@ namespace Cue.Proc
 		public MorphTarget(
 			int bodyPart, string morphId, float min, float max,
 			ISync sync, IEasing easing = null)
-				: base(sync)
+				: base("", sync)
 		{
 			bodyPart_ = bodyPart;
 			morphId_ = morphId;

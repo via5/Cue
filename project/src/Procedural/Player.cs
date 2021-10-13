@@ -5,6 +5,7 @@ namespace Cue.Proc
 {
 	interface ITarget
 	{
+		string Name { get; }
 		ITarget Parent { get; set; }
 		ISync Sync { get; }
 		bool Done { get; }
@@ -18,6 +19,7 @@ namespace Cue.Proc
 
 		void GetAllForcesDebug(List<string> list);
 		string ToDetailedString();
+		ITarget FindTarget(string name);
 	}
 
 
@@ -25,11 +27,18 @@ namespace Cue.Proc
 	{
 		private ITarget parent_ = null;
 		private ISync sync_;
+		private string name_ = "";
 
-		protected BasicTarget(ISync sync)
+		protected BasicTarget(string name, ISync sync)
 		{
 			sync_ = sync;
 			sync_.Target = this;
+			name_ = name;
+		}
+
+		public string Name
+		{
+			get { return name_; }
 		}
 
 		public ITarget Parent
@@ -64,6 +73,14 @@ namespace Cue.Proc
 		public virtual void Reset()
 		{
 			sync_.Reset();
+		}
+
+		public virtual ITarget FindTarget(string name)
+		{
+			if (name_ == name)
+				return this;
+			else
+				return null;
 		}
 	}
 
