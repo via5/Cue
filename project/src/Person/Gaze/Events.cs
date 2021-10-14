@@ -472,38 +472,40 @@ namespace Cue
 			}
 			else
 			{
+				Body.PartResult pr;
+
 				// check if head being groped
-				if (person_.Body.GropedBy(t, BP.Head))
+				if (pr = person_.Body.GropedBy(t, BP.Head))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "head groped");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"head groped ({pr})");
 				}
-				else if (t.Body.GropedBy(person_, BP.Head))
+				else if (pr = t.Body.GropedBy(person_, BP.Head))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping head");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"groping head ({pr})");
 				}
 
 				// check if breasts being groped
-				if (person_.Body.GropedBy(t, BodyParts.BreastParts))
+				if (pr = person_.Body.GropedBy(t, BodyParts.BreastParts))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "chest groped");
-					ownChest.Set(ps.Get(PSE.GropedTargetWeight), "chest groped");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"chest groped ({pr})");
+					ownChest.Set(ps.Get(PSE.GropedTargetWeight), $"chest groped ({pr})");
 				}
-				else if (t.Body.GropedBy(person_, BodyParts.BreastParts))
+				else if (pr = t.Body.GropedBy(person_, BodyParts.BreastParts))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping chest");
-					otherChest.Set(ps.Get(PSE.GropedTargetWeight), "groping chest");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"groping chest ({pr})");
+					otherChest.Set(ps.Get(PSE.GropedTargetWeight), $"groping chest ({pr})");
 				}
 
 				// check if genitals being groped
-				if (person_.Body.GropedBy(t, BodyParts.GenitalParts))
+				if (pr = person_.Body.GropedBy(t, BodyParts.GenitalParts))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "genitals groped");
-					ownGenitals.Set(ps.Get(PSE.GropedTargetWeight), "genitals groped");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"genitals groped ({pr})");
+					ownGenitals.Set(ps.Get(PSE.GropedTargetWeight), $"genitals groped ({pr})");
 				}
-				else if (t.Body.GropedBy(person_, BodyParts.GenitalParts))
+				else if (pr = t.Body.GropedBy(person_, BodyParts.GenitalParts))
 				{
-					eyes.Set(ps.Get(PSE.GropedEyesWeight), "groping genitals");
-					otherGenitals.Set(ps.Get(PSE.GropedTargetWeight), "groping genitals");
+					eyes.Set(ps.Get(PSE.GropedEyesWeight), $"groping genitals ({pr})");
+					otherGenitals.Set(ps.Get(PSE.GropedTargetWeight), $"groping genitals ({pr})");
 				}
 			}
 
@@ -599,48 +601,50 @@ namespace Cue
 			}
 			else
 			{
+				Body.PartResult pr;
+
 				// check if head being groped
-				if (target.Body.GropedBy(source, BP.Head))
+				if (pr = target.Body.GropedBy(source, BP.Head))
 				{
 					targetEyes.Set(
 						ps.Get(PSE.OtherGropedEyesWeight),
-						$"head groped by {source.ID}");
+						$"head groped by {source.ID} ({pr})");
 
 					sourceEyes.Set(
 						ps.Get(PSE.OtherGropedSourceEyesWeight),
-						$"head groped by {source.ID}");
+						$"head groped by {source.ID} ({pr})");
 				}
 
 				// check if breasts being groped
-				if (target.Body.GropedBy(source, BodyParts.BreastParts))
+				if (pr = target.Body.GropedBy(source, BodyParts.BreastParts))
 				{
 					targetEyes.Set(
 						ps.Get(PSE.OtherGropedEyesWeight),
-						$"breasts groped by {source.ID}");
+						$"breasts groped by {source.ID} ({pr})");
 
 					sourceEyes.Set(
 						ps.Get(PSE.OtherGropedSourceEyesWeight),
-						$"breasts groped by {source.ID}");
+						$"breasts groped by {source.ID} ({pr})");
 
 					targetChest.Set(
 						ps.Get(PSE.OtherGropedTargetWeight),
-						$"breasts groped by {source.ID}");
+						$"breasts groped by {source.ID} ({pr})");
 				}
 
 				// check if genitals being groped
-				if (target.Body.GropedBy(source, BodyParts.GenitalParts))
+				if (pr = target.Body.GropedBy(source, BodyParts.GenitalParts))
 				{
 					targetEyes.Set(
 						ps.Get(PSE.OtherGropedEyesWeight),
-						$"genitals groped by {source.ID}");
+						$"genitals groped by {source.ID} ({pr})");
 
 					sourceEyes.Set(
 						ps.Get(PSE.OtherGropedSourceEyesWeight),
-						$"genitals groped by {source.ID}");
+						$"genitals groped by {source.ID} ({pr})");
 
 					targetGenitals.Set(
 						ps.Get(PSE.OtherGropedTargetWeight),
-						$"genitals groped by {source.ID}");
+						$"genitals groped by {source.ID} ({pr})");
 				}
 			}
 

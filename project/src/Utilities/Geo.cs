@@ -9,13 +9,15 @@ namespace Cue
 
 		public static Vector3 Zero
 		{
+			get { return new Vector3(0, 0, 0); }
+		}
+
+		public static Vector3 MaxValue
+		{
 			get
 			{
-				var v = new Vector3();
-				v.X = 0;
-				v.Y = 0;
-				v.Z = 0;
-				return v;
+				return new Vector3(
+					float.MaxValue, float.MaxValue, float.MaxValue);
 			}
 		}
 

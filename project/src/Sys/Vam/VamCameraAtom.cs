@@ -134,9 +134,22 @@ namespace Cue.Sys.Vam
 			get
 			{
 				if (Transform == null)
+				{
 					return Vector3.Zero;
+				}
+				else if (!Cue.Instance.VamSys.IsVR)
+				{
+					// on desktop, Transform is mouseGrab, which doesn't make
+					// much sense for this and can make random body parts end
+					// up being marked as groped depending on where the last
+					// click was with the mouse; returning MaxValue will make
+					// all distance checks fail
+					return Vector3.MaxValue;
+				}
 				else
+				{
 					return U.FromUnity(Transform.position);
+				}
 			}
 		}
 
@@ -145,6 +158,8 @@ namespace Cue.Sys.Vam
 			get
 			{
 				if (Transform == null)
+					return Quaternion.Zero;
+				else if (!Cue.Instance.VamSys.IsVR)  // see Position
 					return Quaternion.Zero;
 				else
 					return U.FromUnity(Transform.rotation);

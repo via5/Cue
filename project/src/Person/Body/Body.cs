@@ -4,6 +4,49 @@ namespace Cue
 {
 	class Body
 	{
+		public struct PartResult
+		{
+			public int ownBodyPart;
+			public int byBodyPart;
+			public int byObjectIndex;
+
+			public PartResult(int ownBodyPart, int byObjectIndex, int byBodyPart)
+			{
+				this.ownBodyPart = ownBodyPart;
+				this.byObjectIndex = byObjectIndex;
+				this.byBodyPart = byBodyPart;
+			}
+
+			public static PartResult None
+			{
+				get { return new PartResult(-1, -1, -1); }
+			}
+
+			public bool Valid
+			{
+				get { return (ownBodyPart != -1); }
+			}
+
+			public override string ToString()
+			{
+				string s = "";
+
+				s +=
+					$"{BP.ToString(ownBodyPart)} by " +
+					$"{Cue.Instance.GetObject(byObjectIndex)?.ID ?? "?"}" +
+					$"." +
+					$"{BP.ToString(byBodyPart)}";
+
+				return s;
+			}
+
+			public static implicit operator bool(PartResult pr)
+			{
+				return pr.Valid;
+			}
+		}
+
+
 		public const int CloseDelay = 2;
 
 		private Person person_;
@@ -145,31 +188,32 @@ namespace Cue
 			return false;
 		}
 
-		public bool GropedByAny(int triggerBodyPart)
+		public PartResult GropedByAny(int triggerBodyPart)
 		{
 			return GropedByAny(new int[] { triggerBodyPart });
 		}
 
-		public bool GropedByAny(int[] triggerBodyParts)
+		public PartResult GropedByAny(int[] triggerBodyParts)
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(p, triggerBodyParts))
-					return true;
+				var pr = GropedBy(p, triggerBodyParts);
+				if (pr.Valid)
+					return pr;
 			}
 
-			return false;
+			return PartResult.None;
 		}
 
-		public bool GropedBy(Person p, int triggerBodyPart)
+		public PartResult GropedBy(Person p, int triggerBodyPart)
 		{
 			return GropedBy(p, new int[] { triggerBodyPart });
 		}
 
-		public bool GropedBy(Person p, int[] triggerBodyParts)
+		public PartResult GropedBy(Person p, int[] triggerBodyParts)
 		{
 			if (p == person_)
-				return false;
+				return PartResult.None;
 
 			return CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
 		}
@@ -188,7 +232,7 @@ namespace Cue
 			return PenetratedBy(p) || p.Body.PenetratedBy(person_);
 		}
 
-		private bool CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
 			{
@@ -200,24 +244,28 @@ namespace Cue
 
 					if (triggerPart.CanTrigger)
 					{
-						if (TriggeredBy(triggerPart, byPart))
-							return true;
+						var pr = TriggeredBy(triggerPart, byPart);
+						if (pr.Valid)
+							return pr;
 					}
 					else
 					{
 						if (triggerPart.CloseTo(byPart))
-							return true;
+						{
+							return new PartResult(
+								triggerPart.Type, by.ObjectIndex, byPart.Type);
+						}
 					}
 				}
 			}
 
-			return false;
+			return PartResult.None;
 		}
 
-		private bool TriggeredBy(BodyPart p, BodyPart by)
+		private PartResult TriggeredBy(BodyPart p, BodyPart by)
 		{
 			if (!p.Exists || !by.Exists)
-				return false;
+				return PartResult.None;
 
 			var ts = p.GetTriggers();
 
@@ -231,12 +279,16 @@ namespace Cue
 						var bp = pp.Body.Get(ts[i].sourcePartIndex);
 
 						if (bp == by)
-							return true;
+						{
+							return new PartResult(
+								p.Type,
+								pp.ObjectIndex, ts[i].sourcePartIndex);
+						}
 					}
 				}
 			}
 
-			return false;
+			return PartResult.None;
 		}
 
 		public float Temperature

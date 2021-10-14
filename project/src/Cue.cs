@@ -231,9 +231,17 @@ namespace Cue
 			get { return player_; }
 		}
 
-		public Person GetPerson(int i)
+		public IObject GetObject(int objectIndex)
 		{
-			return persons_[i];
+			if (objectIndex < 0 || objectIndex >= everything_.Count)
+				return null;
+			else
+				return everything_[objectIndex];
+		}
+
+		public Person GetPerson(int personIndex)
+		{
+			return persons_[personIndex];
 		}
 
 		public Person FindPerson(string id)
