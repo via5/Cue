@@ -9,7 +9,7 @@ namespace Cue
 		public const float PlayerStopDistance = 0.15f;
 		public const float MinimumActiveTime = 3;
 		public const float MinWait = 2;
-		public const float MaxWait = 30;
+		public const float MaxWait = 40;
 		public const float MinDuration = 2;
 		public const float MaxDuration = 30;
 
@@ -79,8 +79,8 @@ namespace Cue
 
 		private void Next()
 		{
-			wait_ = U.RandomFloat(MinWait, MaxWait);
-			duration_ = U.RandomFloat(MinDuration, MaxDuration);
+			wait_ = U.RandomGaussian(MinWait, MaxWait);
+			duration_ = U.RandomGaussian(MinDuration, MaxDuration);
 			elapsed_ = 0;
 		}
 
@@ -110,7 +110,7 @@ namespace Cue
 					if (!OtherCanStart(target))
 						continue;
 
-					log_.Info($"starting for {person_} and {target}");
+					log_.Verbose($"starting for {person_} and {target}");
 
 					if (person_.Kisser.StartReciprocal(target))
 					{

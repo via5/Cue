@@ -22,11 +22,25 @@ namespace Cue.Sys.Mock
 	}
 
 
+	class MockLiveSaver : ILiveSaver
+	{
+		public JSONClass Load()
+		{
+			return null;
+		}
+
+		public void Save(JSONClass o)
+		{
+		}
+	}
+
+
 	class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
 		private readonly MockNav nav_ = new MockNav();
 		private readonly MockInput input_ = new MockInput();
+		private readonly Random rnd_ = new Random();
 
 		public MockSys()
 		{
@@ -49,6 +63,11 @@ namespace Cue.Sys.Mock
 		public JSONClass GetConfig()
 		{
 			return null;
+		}
+
+		public ILiveSaver CreateLiveSaver()
+		{
+			return new MockLiveSaver();
 		}
 
 		public void Log(string s, int level)
@@ -135,12 +154,12 @@ namespace Cue.Sys.Mock
 
 		public int RandomInt(int first, int last)
 		{
-			return 0;
+			return rnd_.Next(first, last);
 		}
 
 		public float RandomFloat(float first, float last)
 		{
-			return 0;
+			return (float)(rnd_.NextDouble() * (last - first) + first);
 		}
 
 		public void Update(float s)

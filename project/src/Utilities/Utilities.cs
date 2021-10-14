@@ -138,6 +138,33 @@ namespace Cue
 			return Cue.Instance.Sys.RandomFloat(first, last);
 		}
 
+		public static float RandomGaussian(float first, float last)
+		{
+			float u, v, S;
+			int tries = 0;
+
+			do
+			{
+				u = 2.0f * RandomFloat(0, 1) - 1.0f;
+				v = 2.0f * RandomFloat(0, 1) - 1.0f;
+				S = u * u + v * v;
+
+				++tries;
+				if (tries > 20)
+					return RandomFloat(first, last);
+			}
+			while (S >= 1.0f);
+
+			// Standard Normal Distribution
+			float std = (float)(u * Math.Sqrt(-2.0f * Math.Log(S) / S));
+
+			// Normal Distribution centered between the min and max value
+			// and clamped following the "three-sigma rule"
+			float mean = (first + last) / 2.0f;
+			float sigma = (last - mean) / 3.0f;
+			return Clamp(std * sigma + mean, first, last);
+		}
+
 		public static void NatSort(List<string> list)
 		{
 			list.Sort(new NaturalStringComparer());
@@ -396,8 +423,8 @@ namespace Cue
 		public const int All         = int.MaxValue;
 
 		private static int enabled_ =
-			Action | Event | AI | Command | Integration |
-			Object | Animation | Sys;
+			Action | Event | AI | Command |
+			Object | Animation;
 
 		private int type_;
 		private Func<string> prefix_;

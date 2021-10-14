@@ -124,7 +124,8 @@ namespace VUI
 
 		private IRootSupport support_ = null;
 		private bool ready_ = false;
-		static private TextGenerator tg_ = new TextGenerator();
+
+		static private TextGenerator tg_ = null;
 		static private TextGenerationSettings ts_ = new TextGenerationSettings();
 
 		private Rectangle bounds_;
@@ -477,9 +478,22 @@ namespace VUI
 			Tooltips.Hide();
 		}
 
+		static private TextGenerator GetTG()
+		{
+			if (tg_ == null)
+				tg_ = new TextGenerator();
+
+			return tg_;
+		}
+
+		static private TextGenerationSettings GetTS()
+		{
+			return ts_;
+		}
+
 		public static float TextLength(Font font, int fontSize, string s)
 		{
-			var ts = ts_;
+			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
 			ts.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -487,12 +501,12 @@ namespace VUI
 			ts.generateOutOfBounds = false;
 			ts.resizeTextForBestFit = false;
 
-			return tg_.GetPreferredWidth(s, ts);
+			return GetTG().GetPreferredWidth(s, ts);
 		}
 
 		public static Size TextSize(Font font, int fontSize, string s)
 		{
-			var ts = ts_;
+			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
 			ts.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -506,12 +520,12 @@ namespace VUI
 				if (size.Height > 0)
 					size.Height += 1;
 
-				size.Width = Math.Max(size.Width, tg_.GetPreferredWidth(line, ts));
+				size.Width = Math.Max(size.Width, GetTG().GetPreferredWidth(line, ts));
 
 				if (line == "")
-					size.Height += tg_.GetPreferredHeight("W", ts);
+					size.Height += GetTG().GetPreferredHeight("W", ts);
 				else
-					size.Height += tg_.GetPreferredHeight(line, ts);
+					size.Height += GetTG().GetPreferredHeight(line, ts);
 			}
 
 			return size;
@@ -519,7 +533,7 @@ namespace VUI
 
 		public static Size FitText(Font font, int fontSize, string s, Size maxSize)
 		{
-			var ts = ts_;
+			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
 
@@ -559,12 +573,12 @@ namespace VUI
 				if (size.Height > 0)
 					size.Height += 1;
 
-				size.Width = Math.Max(size.Width, tg_.GetPreferredWidth(line, ts));
+				size.Width = Math.Max(size.Width, GetTG().GetPreferredWidth(line, ts));
 
 				if (line == "")
-					size.Height += tg_.GetPreferredHeight("W", ts);
+					size.Height += GetTG().GetPreferredHeight("W", ts);
 				else
-					size.Height += tg_.GetPreferredHeight(line, ts);
+					size.Height += GetTG().GetPreferredHeight(line, ts);
 			}
 
 			if (maxSize.Width != Widget.DontCare)

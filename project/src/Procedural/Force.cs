@@ -20,10 +20,15 @@ namespace Cue.Proc
 		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
 
 		private Rigidbody rb_ = null;
-		private bool wasBusy_ = false;
 		private bool oneFrameFinished_ = false;
-
 		private Action beforeNext_ = null;
+
+		private bool wasBusy_ = false;
+		private Vector3 forceBeforeBusy_;
+		private float busyElapsed_ = 0;
+		private const float BusyResetTime = 1;
+		private IEasing busyResetEasing_ = new SinusoidalEasing();
+
 
 		public Force(
 			int type, int bodyPart, string rbId,
@@ -153,7 +158,21 @@ namespace Cue.Proc
 
 			if (bodyPart_ != BP.None && person_.Body.Get(bodyPart_).Busy)
 			{
+				if (wasBusy_)
+				{
+					busyElapsed_ += s;
+				}
+				else
+				{
+					forceBeforeBusy_ = Lerped();
+					busyElapsed_ = 0;
+				}
+
 				wasBusy_ = true;
+
+				var mag = busyResetEasing_.Magnitude(busyElapsed_ / BusyResetTime);
+				Apply(Vector3.Lerp(forceBeforeBusy_, Vector3.Zero, mag));
+
 				return;
 			}
 			else if (wasBusy_)
@@ -165,7 +184,7 @@ namespace Cue.Proc
 
 			movement_.Update(s);
 			int r = Sync.FixedUpdate(s);
-			Apply();
+			Apply(Lerped());
 
 			switch (r)
 			{
@@ -206,10 +225,8 @@ namespace Cue.Proc
 			}
 		}
 
-		private void Apply()
+		private void Apply(Vector3 v)
 		{
-			var v = Lerped();
-
 			switch (type_)
 			{
 				case RelativeForce:

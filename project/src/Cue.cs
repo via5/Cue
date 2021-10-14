@@ -194,13 +194,15 @@ namespace Cue
 		private bool paused_ = false;
 		private int frame_ = 0;
 
-		private Sys.ILiveSaver saver_ = new Sys.Vam.LiveSaver();
+		private Sys.ILiveSaver saver_;
 
 
 		public Cue()
 		{
 			instance_ = this;
 			LogVerbose("cue: ctor");
+
+			saver_ = Sys.CreateLiveSaver();
 
 			if (Sys.HasUI)
 				ui_ = new UI(Sys);
@@ -306,7 +308,11 @@ namespace Cue
 
 		private void CheckConfig()
 		{
-			Load(saver_.Load());
+			var o = saver_.Load();
+
+			if (o != null)
+				Load(o);
+
 			Save();
 		}
 
@@ -349,7 +355,7 @@ namespace Cue
 
 			json.Add("log", new JSONData(Logger.Enabled));
 
-			var ui = ui_.ToJSON();
+			var ui = ui_?.ToJSON();
 			if (ui != null)
 				json.Add("ui", ui);
 		}
@@ -497,7 +503,7 @@ namespace Cue
 			I.End();
 
 			I.Instance.UpdateTickers(s);
-			ui_.PostUpdate();
+			ui_?.PostUpdate();
 		}
 
 		private void DoUpdate(float s)

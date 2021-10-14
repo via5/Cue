@@ -58,6 +58,7 @@ namespace Cue.Sys
 		IGraphic CreateBoxGraphic(string name, Box box, Color c);
 		IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c);
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
+		ILiveSaver CreateLiveSaver();
 	}
 
 

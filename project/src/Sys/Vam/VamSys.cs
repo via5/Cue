@@ -60,6 +60,11 @@ namespace Cue.Sys.Vam
 			log_.Clear();
 		}
 
+		public ILiveSaver CreateLiveSaver()
+		{
+			return new LiveSaver();
+		}
+
 		public void Log(string s, int level)
 		{
 			log_.Log(s, level);

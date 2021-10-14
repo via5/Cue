@@ -57,7 +57,7 @@ namespace Cue
 					sys_.Update(deltaTime);
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
-					cue_.LateUpdate(Time.deltaTime);
+					cue_.LateUpdate(deltaTime);
 				}
 
 				Thread.Sleep(1);

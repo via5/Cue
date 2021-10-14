@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Cue
 {
@@ -20,10 +21,12 @@ namespace Cue
 		private Sys.Vam.FloatParameter morphDuration_ = null;
 		private Sys.Vam.FloatParameter morphSpeed_ = null;
 		private Sys.Vam.FloatParameter tongueLength_ = null;
+		private Sys.Vam.FloatParameter trackingSpeed_ = null;
 		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
 		private bool randomMovements_ = false;
 		private bool randomSpeeds_ = false;
+		private float elapsed_ = 0;
 
 
 		private const float MinDistance = 0.001f;
@@ -46,8 +49,13 @@ namespace Cue
 		private const float StartHeadAngleX = -30;
 		private const float StartHeadAngleY = 0;
 		private const float StartHeadAngleZ = -40;
-		private const float StartLipDepthLeader = 0.02f;
+		private const float StartLipDepthLeader = 0.03f;
 		private const float StartLipDepth = 0;
+
+		private const float StartTrackingSpeed = 0.1f;
+		private const float StopTrackingSpeed = 0.1f;
+		private const float TrackingSpeedTime = 3;
+
 
 		// this was trying to fix a probably non-existent problem, where lip
 		// triggers are not positioned properly after moving colliders with
@@ -139,6 +147,9 @@ namespace Cue
 			tongueLength_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Tongue Length");
 
+			trackingSpeed_ = new Sys.Vam.FloatParameter(
+				p, "ClockwiseSilver.Kiss", "Tracking Speed");
+
 			closeEyes_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "closeEyes");
 
@@ -184,6 +195,9 @@ namespace Cue
 			var k = running_.Value;
 			if (wasKissing_ != k)
 				SetActive(k);
+
+			if (k)
+				elapsed_ += s;
 
 			if (k && randomMovements_ && active_.Value && EnableRandomMovements)
 			{
@@ -251,6 +265,13 @@ namespace Cue
 					}
 				}
 			}
+
+			if (k)
+			{
+				trackingSpeed_.Value = Mathf.Lerp(
+					StartTrackingSpeed, trackingSpeed_.DefaultValue,
+					(elapsed_ / TrackingSpeedTime));
+			}
 		}
 
 		public void OnPluginState(bool b)
@@ -270,8 +291,11 @@ namespace Cue
 		{
 			if (active_.Value)
 			{
-				log_.Error("stopping");
+				log_.Info("stopping");
+
+				trackingSpeed_.Value = StopTrackingSpeed;
 				active_.Value = false;
+				elapsed_ = 0;
 			}
 		}
 
@@ -399,9 +423,11 @@ namespace Cue
 				randomSpeeds_ = true;
 			}
 
+			trackingSpeed_.Value = StartTrackingSpeed;
 			trackPos_.Value = leader;
 			trackRot_.Value = true;
 			active_.Value = true;
+			elapsed_ = 0;
 		}
 
 		private void SetActive(bool b)
