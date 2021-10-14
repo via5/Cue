@@ -4,8 +4,6 @@ namespace Cue
 {
 	class ClockwiseSilverKiss : IKisser
 	{
-		public const float Cooldown = 10;
-
 		private Logger log_;
 		private Person person_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -26,8 +24,6 @@ namespace Cue
 		private bool wasKissing_ = false;
 		private bool randomMovements_ = false;
 		private bool randomSpeeds_ = false;
-		private float elapsed_ = 0;
-		private float cooldownRemaining_ = 0;
 
 
 		private const float MinDistance = 0.001f;
@@ -154,16 +150,6 @@ namespace Cue
 			get { return running_.Value; }
 		}
 
-		public float Elapsed
-		{
-			get { return elapsed_; }
-		}
-
-		public bool OnCooldown
-		{
-			get { return cooldownRemaining_ > 0; }
-		}
-
 		public Person Target
 		{
 			get
@@ -195,14 +181,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			cooldownRemaining_ = Math.Max(cooldownRemaining_ - s, 0);
-
 			var k = running_.Value;
 			if (wasKissing_ != k)
 				SetActive(k);
-
-			if (k)
-				elapsed_ += s;
 
 			if (k && randomMovements_ && active_.Value && EnableRandomMovements)
 			{
@@ -291,36 +272,48 @@ namespace Cue
 			{
 				log_.Error("stopping");
 				active_.Value = false;
-				cooldownRemaining_ = Cooldown;
 			}
 		}
 
-		public void Start(Person target)
+		private bool CanStart()
 		{
+			if (!active_.Check())
+			{
+				log_.Error("can't start, plugin not found");
+				return false;
+			}
+
 			if (Active)
 			{
 				log_.Error("can't start, already active");
-				return;
+				return false;
 			}
 
-			DoKiss(target, true);
+			return true;
 		}
 
-		public void StartReciprocal(Person target)
+		public bool Start(Person target)
+		{
+			log_.Info($"starting with {target}");
+			if (!CanStart())
+				return false;
+
+			DoKiss(target, true);
+
+			return true;
+		}
+
+		public bool StartReciprocal(Person target)
 		{
 			log_.Info($"starting reciprocal with {target}");
-
-			if (Active)
-			{
-				log_.Error($"can't start reciprocal, already active");
-				return;
-			}
+			if (!CanStart())
+				return false;
 
 			var t = target.Kisser;
 			if (t != null && t.Active)
 			{
 				log_.Error($"can't start reciprocal, already active on {target}");
-				return;
+				return false;
 			}
 
 			bool leader = true;
@@ -346,6 +339,8 @@ namespace Cue
 					tcw.DoKiss(person_, !leader);
 				}
 			}
+
+			return true;
 		}
 
 		private void DoKiss(Person target, bool leader)
@@ -407,8 +402,6 @@ namespace Cue
 			trackPos_.Value = leader;
 			trackRot_.Value = true;
 			active_.Value = true;
-
-			elapsed_ = 0;
 		}
 
 		private void SetActive(bool b)

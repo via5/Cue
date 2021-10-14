@@ -149,11 +149,9 @@ namespace Cue
 	{
 		bool Active { get; }
 		Person Target { get; }
-		float Elapsed { get; }
-		bool OnCooldown { get; }
 
-		void Start(Person p);
-		void StartReciprocal(Person p);
+		bool Start(Person p);
+		bool StartReciprocal(Person p);
 		void StopSelf();
 		void Stop();
 		bool IsBusy(int bodyPart);

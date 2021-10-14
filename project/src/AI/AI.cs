@@ -5,6 +5,8 @@ namespace Cue
 	interface IAI
 	{
 		T GetEvent<T>() where T : class, IEvent;
+		List<IEvent> Events { get; }
+
 		bool InteractWith(IObject o);
 		void RunCommand(ICommand e);
 		void FixedUpdate(float s);
@@ -78,6 +80,11 @@ namespace Cue
 			}
 
 			return null;
+		}
+
+		public List<IEvent> Events
+		{
+			get { return events_; }
 		}
 
 		public ICommand ForcedCommand

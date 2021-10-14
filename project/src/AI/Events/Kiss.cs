@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class KissEvent : BasicEvent
 	{
@@ -6,51 +8,91 @@
 		public const float StopDistance = 0.1f;
 		public const float PlayerStopDistance = 0.15f;
 		public const float MinimumActiveTime = 3;
-		public const float MinimumStoppedTime = 2;
+		public const float MinWait = 2;
+		public const float MaxWait = 30;
+		public const float MinDuration = 2;
+		public const float MaxDuration = 30;
 
 		private float elapsed_ = 0;
+		private float wait_ = 0;
+		private float duration_ = 0;
+		private string lastResult_ = "";
 
 		public KissEvent(Person p)
 			: base("kiss", p)
 		{
 			person_ = p;
+			Next();
+		}
+
+		public override string[] Debug()
+		{
+			return new string[]
+			{
+				$"elapsed    {elapsed_:0.00}",
+				$"wait       {wait_:0.00}",
+				$"duration   {duration_:0.00}",
+				$"state      {(person_.Kisser.Active ? "active" : "waiting")}",
+				$"last       {lastResult_}"
+			};
 		}
 
 		public override void Update(float s)
 		{
+			if (!person_.Body.Exists)
+				return;
+
 			if (!person_.Options.CanKiss)
 			{
+				elapsed_ = 0;
 				if (person_.Kisser.Active)
 					person_.Kisser.Stop();
 
 				return;
 			}
 
-			if (person_.Body.Get(BP.Lips) == null)
-				return;
+
+			elapsed_ += s;
 
 			if (person_.Kisser.Active)
 			{
-				if (person_.Kisser.Elapsed >= MinimumActiveTime)
-					TryStop();
+				if (elapsed_ >= duration_ || MustStop())
+				{
+					Next();
+
+					var t = person_.Kisser.Target;
+					if (t != null)
+						t.AI.GetEvent<KissEvent>().Next();
+
+					person_.Kisser.Stop();
+				}
 			}
 			else
 			{
-				elapsed_ += s;
-				if (elapsed_ > 1)
+				if (elapsed_ > wait_)
 				{
+					Next();
 					TryStart();
-					elapsed_ = 0;
 				}
 			}
 		}
 
+		private void Next()
+		{
+			wait_ = U.RandomFloat(MinWait, MaxWait);
+			duration_ = U.RandomFloat(MinDuration, MaxDuration);
+			elapsed_ = 0;
+		}
+
 		private bool TryStart()
 		{
-			if (!CanStart(person_))
+			lastResult_ = "";
+
+			if (!SelfCanStart(person_))
 				return false;
 
 			var srcLips = person_.Body.Get(BP.Lips).Position;
+			bool foundClose = false;
 
 			foreach (var target in Cue.Instance.ActivePersons)
 			{
@@ -58,47 +100,92 @@
 					continue;
 
 				var targetLips = target.Body.Get(BP.Lips);
-
-				if (targetLips == null || target.Kisser.Active)
+				if (targetLips == null)
 					continue;
-
-				if (!CanStart(target))
-					continue;
-
-				// todo: check rotations
 
 				if (Vector3.Distance(srcLips, targetLips.Position) < StartDistance)
 				{
+					foundClose = true;
+
+					if (!OtherCanStart(target))
+						continue;
+
 					log_.Info($"starting for {person_} and {target}");
-					person_.Kisser.StartReciprocal(target);
-					return true;
+
+					if (person_.Kisser.StartReciprocal(target))
+					{
+						target.AI.GetEvent<KissEvent>().Next();
+						return true;
+					}
+					else
+					{
+						log_.Error($"kisser failed to start");
+					}
 				}
 			}
+
+			if (!foundClose)
+				lastResult_ = "nobody in range";
 
 			return false;
 		}
 
-		private bool CanStart(Person p)
+		private bool SelfCanStart(Person p)
 		{
 			if (!p.Options.CanKiss)
+			{
+				lastResult_ = "kissing disabled";
 				return false;
-
-			if (p.Kisser.OnCooldown)
-				return false;
+			}
 
 			if (!p.CanMoveHead)
+			{
+				lastResult_ = "can't move head";
 				return false;
+			}
 
-			if (p.State.Is(PersonState.Walking))
+			if (p.Kisser.Active)
+			{
+				lastResult_ = "kissing already active";
 				return false;
-
-			if (p.State.Transitioning)
-				return false;
+			}
 
 			return true;
 		}
 
-		private bool TryStop()
+		private bool OtherCanStart(Person p)
+		{
+			if (!p.Options.CanKiss)
+			{
+				if (lastResult_ != "")
+					lastResult_ += ",";
+				lastResult_ += $"{p.ID} kissing disabled";
+
+				return false;
+			}
+
+			if (!p.CanMoveHead)
+			{
+				if (lastResult_ != "")
+					lastResult_ += ",";
+				lastResult_ += $"{p.ID} can't move head";
+
+				return false;
+			}
+
+			if (p.Kisser.Active)
+			{
+				if (lastResult_ != "")
+					lastResult_ += ",";
+				lastResult_ += $"{p.ID} kissing already active";
+
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool MustStop()
 		{
 			var target = person_.Kisser.Target;
 			if (target == null)
@@ -118,14 +205,7 @@
 
 			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
 
-			if (d >= sd)
-			{
-				person_.Kisser.Stop();
-				target.Kisser.Stop();
-				return true;
-			}
-
-			return false;
+			return (d >= sd);
 		}
 	}
 }

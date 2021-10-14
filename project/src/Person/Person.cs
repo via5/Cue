@@ -197,7 +197,16 @@ namespace Cue
 		{
 			get
 			{
-				return !Kisser.Active && !Blowjob.Active;
+				if (Kisser.Active || Blowjob.Active)
+					return false;
+
+				if (State.Is(PersonState.Walking))
+					return false;
+
+				if (State.Transitioning)
+					return false;
+
+				return true;
 			}
 		}
 

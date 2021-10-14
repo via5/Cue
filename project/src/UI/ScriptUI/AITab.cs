@@ -16,7 +16,7 @@ namespace Cue
 			AddSubTab(new PersonAIPersonalityTab(person_));
 			AddSubTab(new PersonAIPhysiologyTab(person_));
 			AddSubTab(new PersonAIGazeTab(person_));
-			AddSubTab(new PersonAIExpressionTab(person_));
+			AddSubTab(new PersonAIEventsTab(person_));
 		}
 	}
 
@@ -394,37 +394,44 @@ namespace Cue
 
 
 
-	class PersonAIExpressionTab : Tab
+	class PersonAIEventsTab : Tab
 	{
 		private Person person_;
 
-		private VUI.ComboBox<Proc.IProceduralMorphGroup> expressions_ =
-			new VUI.ComboBox<Proc.IProceduralMorphGroup>();
+		private VUI.ComboBox<IEvent> events_;
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
-		private VUI.FloatTextSlider slider_ = new VUI.FloatTextSlider(0, 0, 1);
-
-		public PersonAIExpressionTab(Person person)
-			: base("Expression", false)
+		public PersonAIEventsTab(Person person)
+			: base("Events", false)
 		{
 			person_ = person;
-			Layout = new VUI.VerticalFlow();
 
-			Add(expressions_);
-			Add(slider_);
+			var es = person_.AI.Events;
+			U.NatSort(es);
 
-			var items = Proc.BuiltinExpressions.All(person_);
-			items.Insert(0, null);
-			expressions_.SetItems(items);
+			Layout = new VUI.BorderLayout(10);
+			events_ = new VUI.ComboBox<IEvent>(es, OnSelection);
+			list_.Font = VUI.Style.Theme.MonospaceFont;
 
-			expressions_.SelectionChanged += OnExpressionChanged;
-			slider_.ValueChanged += OnSliderChanged;
+			Add(events_, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
 		}
 
-		private void OnSliderChanged(float s)
+		protected override void DoUpdate(float s)
 		{
+			var d = events_.Selected?.Debug();
+
+			if (d == null)
+			{
+				list_.Clear();
+			}
+			else
+			{
+				list_.SetItems(d);
+			}
 		}
 
-		private void OnExpressionChanged(Proc.IProceduralMorphGroup e)
+		private void OnSelection(IEvent e)
 		{
 		}
 	}
