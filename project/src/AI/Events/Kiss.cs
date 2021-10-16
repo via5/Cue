@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class KissEvent : BasicEvent
 	{
@@ -10,11 +12,13 @@
 		public const float MaxWait = 40;
 		public const float MinDuration = 2;
 		public const float MaxDuration = 30;
+		public const float MinWaitAfterGrab = 30;
 
 		private float elapsed_ = 0;
 		private float wait_ = 0;
 		private float duration_ = 0;
 		private string lastResult_ = "";
+		private BodyPartLock[] locks_ = null;
 
 		public KissEvent(Person p)
 			: base("kiss", p)
@@ -56,40 +60,55 @@
 			{
 				if (elapsed_ >= duration_ || MustStop())
 				{
-					Next();
-
-					var t = person_.Kisser.Target;
-					if (t != null)
-						t.AI.GetEvent<KissEvent>().Next();
-
-					person_.Kisser.Stop();
+					Stop();
 				}
 			}
 			else
 			{
-				// todo: this always starts when a head is grabbed, which is
-				//       probably fine if the target is the player, but it makes
-				//       any head adjustments start kissing if there's a target
-				//       available
-				//
-				//       maybe keep the delay if the player is not in range?
+				var elapsed = (elapsed_ > wait_);
+				var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
+				var playerOnly = !elapsed && grabbed;
 
-				if (elapsed_ > wait_ || person_.Body.Get(BP.Head).GrabbedByPlayer)
+				if (elapsed || grabbed)
 				{
 					Next();
-					TryStart();
+					TryStart(playerOnly);
 				}
 			}
 		}
 
-		private void Next()
+		private void Stop()
+		{
+			var t = person_.Kisser.Target;
+
+			var wasGrabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
+			if (!wasGrabbed && t != null)
+				wasGrabbed = t.Body.Get(BP.Head).GrabbedByPlayer;
+
+			StopSelf(wasGrabbed);
+
+			if (t != null)
+				t.AI.GetEvent<KissEvent>().StopSelf(wasGrabbed);
+		}
+
+		private void StopSelf(bool wasGrabbed)
+		{
+			Unlock();
+			Next(wasGrabbed);
+			person_.Kisser.Stop();
+		}
+
+		private void Next(bool wasGrabbed = false)
 		{
 			wait_ = U.RandomGaussian(MinWait, MaxWait);
 			duration_ = U.RandomGaussian(MinDuration, MaxDuration);
 			elapsed_ = 0;
+
+			if (wasGrabbed)
+				wait_ = Math.Min(wait_, MinWaitAfterGrab);
 		}
 
-		private bool TryStart()
+		private bool TryStart(bool playerOnly)
 		{
 			lastResult_ = "";
 
@@ -104,28 +123,19 @@
 				if (target == person_)
 					continue;
 
-				var targetLips = target.Body.Get(BP.Lips);
-				if (targetLips == null)
+				if (playerOnly && target != Cue.Instance.Player)
 					continue;
 
-				if (Vector3.Distance(srcLips, targetLips.Position) < StartDistance)
+				var targetLips = target.Body.Get(BP.Lips);
+				if (targetLips == null)
+					return false;
+
+				if (Vector3.Distance(srcLips, targetLips.Position) <= StartDistance)
 				{
 					foundClose = true;
 
-					if (!OtherCanStart(target))
-						continue;
-
-					log_.Verbose($"starting for {person_} and {target}");
-
-					if (person_.Kisser.StartReciprocal(target))
-					{
-						target.AI.GetEvent<KissEvent>().Next();
+					if (TryStartWith(target))
 						return true;
-					}
-					else
-					{
-						log_.Error($"kisser failed to start");
-					}
 				}
 			}
 
@@ -133,6 +143,72 @@
 				lastResult_ = "nobody in range";
 
 			return false;
+		}
+
+		private bool TryStartWith(Person target)
+		{
+			log_.Verbose($"starting for {person_} and {target}");
+
+			if (!Lock())
+			{
+				lastResult_ = "self lock failed";
+				return false;
+			}
+
+			var sf = target.AI.GetEvent<KissEvent>().StartedFrom(person_);
+			if (sf != "")
+			{
+				lastResult_ = $"other failed to start: " + sf;
+				return false;
+			}
+
+			if (!person_.Kisser.StartReciprocal(target))
+			{
+				lastResult_ = $"kisser failed to start";
+				return false;
+			}
+
+			return true;
+		}
+
+		private string StartedFrom(Person initiator)
+		{
+			if (!person_.Options.CanKiss)
+				return $"target {person_.ID} kissing disabled";
+
+			if (!person_.CanMoveHead)
+				return $"target {person_.ID} can't move head";
+
+			if (person_.Kisser.Active)
+				return $"target {person_.ID} kissing already active";
+
+			if (!Lock())
+				return $"target {person_.ID} lock failed";
+
+			Next();
+
+			return "";
+		}
+
+		private bool Lock()
+		{
+			Unlock();
+			locks_ = person_.Body.LockMany(
+				new int[] { BP.Head, BP.Lips, BP.Mouth },
+				BodyPartLock.Anim);
+
+			return (locks_ != null);
+		}
+
+		private void Unlock()
+		{
+			if (locks_ != null)
+			{
+				for (int i = 0; i < locks_.Length; ++i)
+					locks_[i].Unlock();
+
+				locks_ = null;
+			}
 		}
 
 		private bool SelfCanStart(Person p)
@@ -152,38 +228,6 @@
 			if (p.Kisser.Active)
 			{
 				lastResult_ = "kissing already active";
-				return false;
-			}
-
-			return true;
-		}
-
-		private bool OtherCanStart(Person p)
-		{
-			if (!p.Options.CanKiss)
-			{
-				if (lastResult_ != "")
-					lastResult_ += ",";
-				lastResult_ += $"{p.ID} kissing disabled";
-
-				return false;
-			}
-
-			if (!p.CanMoveHead)
-			{
-				if (lastResult_ != "")
-					lastResult_ += ",";
-				lastResult_ += $"{p.ID} can't move head";
-
-				return false;
-			}
-
-			if (p.Kisser.Active)
-			{
-				if (lastResult_ != "")
-					lastResult_ += ",";
-				lastResult_ += $"{p.ID} kissing already active";
-
 				return false;
 			}
 
