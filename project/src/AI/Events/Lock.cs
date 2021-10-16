@@ -12,8 +12,8 @@ namespace Cue
 			public bool grabbed = false;
 		}
 
-		private HandInfo left_ = new HandInfo();
-		private HandInfo right_ = new HandInfo();
+		private readonly HandInfo left_ = new HandInfo();
+		private readonly HandInfo right_ = new HandInfo();
 
 		public HandLocker(Person p)
 			: base("handlocker", p)
@@ -52,6 +52,12 @@ namespace Cue
 				var close = FindClose(hand);
 				if (close != null)
 				{
+					if (info.lk != null)
+					{
+						info.lk.Unlock();
+						info.lk = null;
+					}
+
 					info.lk = hand.Lock(BodyPartLock.Move);
 					if (info.lk != null)
 					{

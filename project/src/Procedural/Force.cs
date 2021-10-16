@@ -171,8 +171,11 @@ namespace Cue.Proc
 
 				wasBusy_ = true;
 
-				var mag = busyResetEasing_.Magnitude(busyElapsed_ / BusyResetTime);
-				Apply(Vector3.Lerp(forceBeforeBusy_, Vector3.Zero, mag));
+				var p = U.Clamp(busyElapsed_ / BusyResetTime, 0, 1);
+				var mag = busyResetEasing_.Magnitude(p);
+				var v = Vector3.Lerp(forceBeforeBusy_, Vector3.Zero, mag);
+
+				Apply(v);
 
 				return;
 			}

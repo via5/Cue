@@ -70,6 +70,7 @@ namespace Cue
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float lastTriggerCheck_ = 0;
 		private List<BodyPartLock> locks_ = new List<BodyPartLock>();
+		private int currentLock_ = 0;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
@@ -333,7 +334,9 @@ namespace Cue
 				return null;
 
 			var lk = new BodyPartLock(this, lockType);
+
 			locks_.Add(lk);
+			currentLock_ |= lockType;
 
 			return lk;
 			// todo
@@ -345,27 +348,31 @@ namespace Cue
 
 		public void UnlockInternal(BodyPartLock lk)
 		{
+			int newLockType = 0;
+			int removeAt = -1;
+
 			for (int i = 0; i < locks_.Count; ++i)
 			{
 				if (locks_[i] == lk)
-				{
-					locks_.RemoveAt(i);
-					return;
-				}
+					removeAt = i;
+				else
+					newLockType |= locks_[i].Type;
 			}
 
-			person_.Log.Error($"can't unlock {lk}, not in list");
+			if (removeAt < 0 || removeAt >= locks_.Count)
+			{
+				person_.Log.Error($"can't unlock {lk}, not in list");
+			}
+			else
+			{
+				locks_.RemoveAt(removeAt);
+				currentLock_ = newLockType;
+			}
 		}
 
 		public bool LockedFor(int lockType)
 		{
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (locks_[i].Is(lockType))
-					return true;
-			}
-
-			return false;
+			return Bits.IsAnySet(currentLock_, lockType);
 		}
 
 		public string DebugLockString()
