@@ -28,7 +28,12 @@
 			"options":
 			{
 				"type": "Dildo",
-				"preset": "objects/dildo.json"
+				"preset": "objects/dildo.json",
+			},
+			"parameters":
+			{
+				"tip": "b3/_Collider6",
+				"anchor": "pelvisF4/pelvisF4Joint"
 			}
 		},
 

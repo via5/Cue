@@ -175,7 +175,7 @@ namespace Cue
 				return Cue.Instance.FindPerson(tid);
 			}
 		}
-
+		/*
 		public bool IsBusy(int bodyPart)
 		{
 			switch (bodyPart)
@@ -189,7 +189,7 @@ namespace Cue
 					return false;
 			}
 		}
-
+		*/
 		public void Update(float s)
 		{
 			var k = running_.Value;
@@ -502,8 +502,8 @@ namespace Cue
 		private float elapsed_ = 0;
 		private bool closedHand_ = false;
 		private bool wasActive_ = false;
-		private bool leftUsed_ = false;
-		private bool rightUsed_ = false;
+		private Person leftTarget_ = null;
+		private Person rightTarget_ = null;
 
 		public ClockwiseSilverHandjob(Person p)
 		{
@@ -534,12 +534,12 @@ namespace Cue
 
 		public bool LeftUsed
 		{
-			get { return (wasActive_ && leftUsed_); }
+			get { return (wasActive_ && (leftTarget_ != null)); }
 		}
 
 		public bool RightUsed
 		{
-			get { return (wasActive_ && rightUsed_); }
+			get { return (wasActive_ && (rightTarget_ != null)); }
 		}
 
 		public Person[] Targets
@@ -548,19 +548,18 @@ namespace Cue
 			{
 				if (wasActive_)
 				{
-					var id = male_.Value;
-					if (id != "")
-					{
-						var p = Cue.Instance.FindPerson(id);
-						if (p != null)
-							return new Person[] { p };
-					}
+					if (leftTarget_ != null && rightTarget_ != null)
+						return new Person[] { leftTarget_, rightTarget_ };
+					else if (leftTarget_ != null)
+						return new Person[] { leftTarget_ };
+					else if (rightTarget_ != null)
+						return new Person[] { rightTarget_ };
 				}
 
 				return null;
 			}
 		}
-
+		/*
 		public bool IsBusy(int bodyPart)
 		{
 			switch (bodyPart)
@@ -579,13 +578,14 @@ namespace Cue
 					return false;
 			}
 		}
-
+		*/
 		public bool StartBoth(Person p)
 		{
-			StartCommon(p, "Both");
+			if (!StartCommon(p, "Both"))
+				return false;
 
-			leftUsed_ = true;
-			rightUsed_ = true;
+			leftTarget_ = p;
+			rightTarget_ = p;
 
 			zStrokeMax_.Value = 10;
 			hand2Side_.Value = -0.05f;
@@ -597,31 +597,49 @@ namespace Cue
 
 		public bool StartLeft(Person p)
 		{
-			StartCommon(p, "Left");
+			if (!StartCommon(p, "Left"))
+				return false;
+
 			StartSingleHandCommon(p);
 
-			leftUsed_ = true;
-			rightUsed_ = false;
+			leftTarget_ = p;
+			rightTarget_ = null;
 
 			return true;
 		}
 
 		public bool StartRight(Person p)
 		{
-			StartCommon(p, "Right");
+			if (!StartCommon(p, "Right"))
+				return false;
+
 			StartSingleHandCommon(p);
 
-			leftUsed_ = false;
-			rightUsed_ = true;
+			leftTarget_ = null;
+			rightTarget_ = p;
 
 			return true;
 		}
 
-		private void StartCommon(Person p, string hand)
+		private bool StartCommon(Person target, string hand)
 		{
+			if (target.Atom.IsMale)
+			{
+				male_.Value = target.ID;
+			}
+			else if (target.Body.HasPenis)
+			{
+				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.VamStraponBodyPart;
+				male_.Value = s.Dildo.ID;
+			}
+			else
+			{
+				log_.Error("can't start, target is not male and has no dildo");
+				return false;
+			}
+
 			hand_.Value = hand;
 			enabled_.Value = true;
-			male_.Value = p.ID;
 
 			handX_.Value = 0;
 			handY_.Value = 0;
@@ -632,6 +650,8 @@ namespace Cue
 			closedHand_ = false;
 
 			active_.Value = true;
+
+			return true;
 		}
 
 		private void StartSingleHandCommon(Person p)
@@ -643,6 +663,8 @@ namespace Cue
 		public void Stop()
 		{
 			active_.Value = false;
+			leftTarget_ = null;
+			rightTarget_ = null;
 		}
 
 		public void StopLeft()
@@ -701,6 +723,8 @@ namespace Cue
 	{
 		private Person person_;
 		private Logger log_;
+		private Person target_ = null;
+
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
@@ -719,8 +743,6 @@ namespace Cue
 		private Sys.Vam.FloatParameter mouthOpenMax_ = null;
 
 		private bool wasActive_ = false;
-
-		private const float MaxDistanceToStart = 0.4f;
 
 		public ClockwiseSilverBlowjob(Person p)
 		{
@@ -758,70 +780,37 @@ namespace Cue
 			get { return running_.Value; }
 		}
 
-		public Person[] Targets
+		public Person Target
 		{
 			get
 			{
 				if (Active)
-				{
-					var id = male_.Value;
-					if (id != "")
-					{
-						var p = Cue.Instance.FindPerson(id);
-						if (p != null)
-							return new Person[] { p };
-					}
-				}
+					return target_;
 
 				return null;
 			}
 		}
 
-		public bool IsBusy(int bodyPart)
+		public bool Start(Person target)
 		{
-			switch (bodyPart)
+			if (target.Atom.IsMale)
 			{
-				case BP.Head:
-				case BP.Lips:
-				case BP.Mouth:
-				case BP.Eyes:   // cw also handles eyes
-					return wasActive_;
-
-				default:
-					return false;
+				male_.Value = target.ID;
 			}
-		}
-
-		private Person FindTarget()
-		{
-			var head = person_.Body.Get(BP.Head);
-
-			foreach (var p in Cue.Instance.ActivePersons)
+			else if (target.Body.HasPenis)
 			{
-				if (p == person_ || !p.Body.HasPenis)
-					continue;
-
-				var g = p.Body.Get(BP.Penis);
-				var d = Vector3.Distance(head.Position, g.Position);
-
-				Cue.LogInfo($"{person_.ID} {p.ID} {d}");
-
-				if (d < MaxDistanceToStart)
-					return p;
+				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.VamStraponBodyPart;
+				male_.Value = s.Dildo.ID;
 			}
-
-			return null;
-		}
-
-		public bool Start()
-		{
-			var p = FindTarget();
-			if (p == null)
+			else
+			{
+				log_.Error("can't start, target is not male and has no dildo");
 				return false;
+			}
 
 			enabled_.Value = true;
-			male_.Value = p.ID;
 			active_.Value = true;
+			target_ = target;
 
 			return true;
 		}
@@ -829,6 +818,7 @@ namespace Cue
 		public void Stop()
 		{
 			active_.Value = false;
+			target_ = null;
 		}
 
 		public void Update(float s)

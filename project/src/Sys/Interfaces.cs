@@ -4,6 +4,37 @@ using System.Collections.Generic;
 
 namespace Cue.Sys
 {
+	class ObjectParameters
+	{
+		private Dictionary<string, string> map_ = null;
+
+		public ObjectParameters(JSONClass o)
+		{
+			var keys = o?.Keys?.ToList();
+
+			if (keys != null && keys.Count > 0)
+			{
+				map_ = new Dictionary<string, string>();
+
+				for (int i = 0; i < keys.Count; ++i)
+					map_.Add(keys[i], o[keys[i]].Value);
+			}
+		}
+
+		public string Get(string key)
+		{
+			if (map_ != null)
+			{
+				string v;
+				if (map_.TryGetValue(key, out v))
+					return v;
+			}
+
+			return "";
+		}
+	}
+
+
 	class LogLevels
 	{
 		public const int Error = 0;
@@ -54,10 +85,11 @@ namespace Cue.Sys
 		string Fps { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
-		IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts);
+		IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts, ObjectParameters ps);
 		IGraphic CreateBoxGraphic(string name, Box box, Color c);
 		IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c);
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
+		IGraphic CreateCapsuleGraphic(string name, Color c);
 		ILiveSaver CreateLiveSaver();
 	}
 

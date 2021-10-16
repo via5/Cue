@@ -38,6 +38,8 @@ namespace Cue
 
 		JSONNode ToJSON();
 		void Load(JSONClass r);
+
+		string GetParameter(string key);
 	}
 
 
@@ -52,6 +54,7 @@ namespace Cue
 		private readonly int objectIndex_;
 		private readonly Sys.IAtom atom_;
 		protected readonly Logger log_;
+		private Sys.ObjectParameters ps_ = null;
 
 		private Vector3 targetPos_ = Vector3.Zero;
 		private float targetBearing_ = NoBearing;
@@ -65,12 +68,13 @@ namespace Cue
 		private string[] traits_ = new string[0];
 
 
-		public BasicObject(int index, Sys.IAtom atom)
+		public BasicObject(int index, Sys.IAtom atom, Sys.ObjectParameters ps = null)
 		{
 			objectIndex_ = index;
 			atom_ = atom;
 			log_ = new Logger(Logger.Object, this, "");
 			slots_ = new Slots(this);
+			ps_ = ps;
 		}
 
 		public static BasicObject TryCreateFromSlot(int index, Sys.IAtom a)
@@ -95,6 +99,14 @@ namespace Cue
 			//o.Slots.Add(type);
 			//
 			//return o;
+		}
+
+		public string GetParameter(string key)
+		{
+			if (ps_ == null)
+				return "";
+			else
+				return ps_.Get(key);
 		}
 
 		public void Destroy()

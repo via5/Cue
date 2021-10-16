@@ -89,14 +89,14 @@ namespace Cue.Sys.Vam
 
 		public Vector3 Position
 		{
-			get { return U.FromUnity(object_.transform.position); }
-			set { object_.transform.position = U.ToUnity(value); }
+			get { return U.FromUnity(object_.transform.localPosition); }
+			set { object_.transform.localPosition = U.ToUnity(value); }
 		}
 
 		public Quaternion Rotation
 		{
-			get { return U.FromUnity(object_.transform.rotation); }
-			set { object_.transform.rotation = U.ToUnity(value); }
+			get { return U.FromUnity(object_.transform.localRotation); }
+			set { object_.transform.localRotation = U.ToUnity(value); }
 		}
 
 		public Vector3 Size
@@ -152,6 +152,15 @@ namespace Cue.Sys.Vam
 				new UnityEngine.Vector3(radius, radius, radius);
 
 			object_.transform.position = U.ToUnity(pos);
+		}
+	}
+
+
+	class VamCapsuleGraphic : VamGraphic
+	{
+		public VamCapsuleGraphic(string name, Color c)
+			: base(name, PrimitiveType.Capsule, c)
+		{
 		}
 	}
 }

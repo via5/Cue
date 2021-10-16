@@ -5,10 +5,30 @@ using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
-	class VamAtomObjectCreator : IObjectCreator
+	abstract class VamBasicObjectCreator : IObjectCreator
+	{
+		private string name_;
+		protected ObjectParameters ps_;
+
+		protected VamBasicObjectCreator(string name, ObjectParameters ps)
+		{
+			name_ = name;
+			ps_ = ps;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public abstract void Create(IAtom user, string id, Action<IObject> callback);
+		public abstract void Destroy(IAtom user, string id);
+	}
+
+
+	class VamAtomObjectCreator : VamBasicObjectCreator
 	{
 		private SuperController sc_;
-		private string name_;
 		private string type_;
 		private float scale_;
 		private string preset_;
@@ -16,15 +36,15 @@ namespace Cue.Sys.Vam
 		private bool hasPosOffset_;
 		private bool creating_ = false;
 
-		public VamAtomObjectCreator(string name, JSONClass opts)
-			: this(name, opts["type"].Value, opts)
+		public VamAtomObjectCreator(string name, JSONClass opts, ObjectParameters ps)
+			: this(name, opts["type"].Value, opts, ps)
 		{
 		}
 
-		protected VamAtomObjectCreator(string name, string type, JSONClass opts)
+		protected VamAtomObjectCreator(string name, string type, JSONClass opts, ObjectParameters ps)
+			: base(name, ps)
 		{
 			sc_ = SuperController.singleton;
-			name_ = name;
 			type_ = type;
 
 			if (opts.HasKey("positionOffset"))
@@ -45,12 +65,7 @@ namespace Cue.Sys.Vam
 			preset_ = opts["preset"].Value;
 		}
 
-		public string Name
-		{
-			get { return name_; }
-		}
-
-		public void Create(IAtom user, string id, Action<IObject> callback)
+		public override void Create(IAtom user, string id, Action<IObject> callback)
 		{
 			if (creating_)
 				return;
@@ -65,7 +80,7 @@ namespace Cue.Sys.Vam
 				}));
 		}
 
-		public void Destroy(IAtom user, string id)
+		public override void Destroy(IAtom user, string id)
 		{
 			// todo
 			throw new NotImplementedException();
@@ -73,18 +88,28 @@ namespace Cue.Sys.Vam
 
 		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
 		{
-			Cue.LogInfo($"creating atom {id}");
-			yield return sc_.AddAtomByType(type_, id);
-
 			var atom = sc_.GetAtomByUid(id);
-			if (atom == null)
-			{
-				Cue.LogError($"failed to create atom '{id}'");
-				f(null);
-				yield break;
-			}
 
-			Cue.LogInfo($"atom {id} created");
+			if (atom != null)
+			{
+				Cue.LogInfo($"atom {id} already exists, taking it");
+			}
+			else
+			{
+				Cue.LogInfo($"creating atom {id}");
+
+				yield return sc_.AddAtomByType(type_, id);
+
+				atom = sc_.GetAtomByUid(id);
+				if (atom == null)
+				{
+					Cue.LogError($"failed to create atom '{id}'");
+					f(null);
+					yield break;
+				}
+
+				Cue.LogInfo($"atom {id} created");
+			}
 
 			if (!string.IsNullOrEmpty(preset_))
 			{
@@ -100,7 +125,7 @@ namespace Cue.Sys.Vam
 
 			try
 			{
-				f(new BasicObject(-1, a));
+				f(new BasicObject(-1, a, ps_));
 			}
 			catch (Exception e)
 			{
@@ -131,8 +156,8 @@ namespace Cue.Sys.Vam
 		private string assetUrl_;
 		private string assetName_;
 
-		public VamCuaObjectCreator(string name, JSONClass opts)
-			: base(name, "CustomUnityAsset", opts)
+		public VamCuaObjectCreator(string name, JSONClass opts, ObjectParameters ps)
+			: base(name, "CustomUnityAsset", opts, ps)
 		{
 			assetUrl_ = opts["url"].Value;
 			assetName_ = opts["name"].Value;
@@ -204,30 +229,24 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamClothingObjectCreator : IObjectCreator
+	class VamClothingObjectCreator : VamBasicObjectCreator
 	{
 		private SuperController sc_;
-		private string name_;
 		private string id_;
 
-		public VamClothingObjectCreator(string name, JSONClass opts)
+		public VamClothingObjectCreator(string name, JSONClass opts, ObjectParameters ps)
+			: base(name, ps)
 		{
 			sc_ = SuperController.singleton;
-			name_ = name;
 			id_ = opts["id"].Value;
 		}
 
-		public string Name
-		{
-			get { return name_; }
-		}
-
-		public void Create(IAtom user, string unusedId, Action<IObject> callback)
+		public override void Create(IAtom user, string unusedId, Action<IObject> callback)
 		{
 			SetActive(user, true);
 		}
 
-		public void Destroy(IAtom user, string unusedId)
+		public override void Destroy(IAtom user, string unusedId)
 		{
 			SetActive(user, false);
 		}

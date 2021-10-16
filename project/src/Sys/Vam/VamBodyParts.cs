@@ -757,6 +757,7 @@ namespace Cue.Sys.Vam
 	{
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
+		private Collider tip_ = null;
 
 		private float postCreateElapsed_ = 0;
 		private bool postCreate_ = false;
@@ -764,7 +765,8 @@ namespace Cue.Sys.Vam
 		public VamStraponBodyPart(VamAtom a)
 			: base(a, BP.Penis)
 		{
-			Get();
+			if (Cue.Instance.Sys.GetAtom(DildoID) != null)
+				Set(true);
 		}
 
 		private Logger Log
@@ -782,22 +784,41 @@ namespace Cue.Sys.Vam
 			get { return $"Strapon#{atom_.ID}"; }
 		}
 
-		private void Get()
+		public IObject Dildo
 		{
-			var anchorName = "pelvisF4/pelvisF4Joint";
-			anchor_ = Cue.Instance.VamSys.FindCollider(atom_.Atom, anchorName);
-			if (anchor_ == null)
-			{
-				Cue.LogError($"collider {anchorName} not found in {atom_.ID}");
-				return;
-			}
+			get { return dildo_; }
+		}
 
-			var d = SuperController.singleton.GetAtomByUid(DildoID);
-			if (d != null)
+		public override Vector3 ControlPosition
+		{
+			get
 			{
-				Log.Info("dildo already exists, taking");
-				SetDildo(new BasicObject(-1, new VamAtom(d)));
+				if (tip_ == null)
+					return base.ControlPosition;
+				else
+					return U.FromUnity(tip_.transform.position);
 			}
+		}
+
+		public override Quaternion ControlRotation
+		{
+			get
+			{
+				if (tip_ == null)
+					return base.ControlRotation;
+				else
+					return U.FromUnity(tip_.transform.rotation);
+			}
+		}
+
+		public override Vector3 Position
+		{
+			get { return ControlPosition; }
+		}
+
+		public override Quaternion Rotation
+		{
+			get { return ControlRotation; }
 		}
 
 		public void Set(bool b)
@@ -827,10 +848,6 @@ namespace Cue.Sys.Vam
 
 		private void SetClothingActive(bool b)
 		{
-			// todo: this assumes clothing item, doesn't attempt to get the
-			//       object first, would need a generic way to figure this out
-			//       instead of using GetAtomByUid() in Get()
-
 			var oc = Resources.Objects.Get("strapon");
 
 			if (oc == null)
@@ -892,6 +909,42 @@ namespace Cue.Sys.Vam
 
 				postCreate_ = true;
 				postCreateElapsed_ = 0;
+
+
+				var tipName = dildo_.GetParameter("tip");
+				if (tipName == "")
+				{
+					Cue.LogWarning("dildo is missing tip parameter");
+				}
+				else
+				{
+					tip_ = Cue.Instance.VamSys.FindCollider(
+							(dildo_.Atom as VamAtom).Atom,
+							tipName);
+
+					if (tip_ == null)
+						Cue.LogError($"dildo tip {tipName} not found in {dildo_.ID}");
+					else
+						Cue.LogInfo($"dildo tip: {tip_}");
+				}
+
+
+				var anchorName = dildo_.GetParameter("anchor");
+				if (anchorName == "")
+				{
+					Cue.LogWarning("dildo is missing anchor parameteR");
+				}
+				else
+				{
+					anchor_ = Cue.Instance.VamSys.FindCollider(
+						atom_.Atom, anchorName);
+
+					if (anchor_ == null)
+						Cue.LogError($"dildo anchor {tipName} not found in {atom_.ID}");
+					else
+						Cue.LogInfo($"dildo anchor: {anchor_}");
+				}
+
 
 				DoInit();
 				SetEnabled(true);

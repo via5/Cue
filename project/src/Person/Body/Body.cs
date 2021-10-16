@@ -122,6 +122,25 @@ namespace Cue
 			set { person_.Atom.Body.Strapon = value; }
 		}
 
+		public BodyPartLock[] LockMany(int[] bodyParts, int lockType)
+		{
+			List<BodyPartLock> list = null;
+
+			for (int i = 0; i < bodyParts.Length; ++i)
+			{
+				var lk = Get(bodyParts[i]).Lock(lockType);
+				if (lk == null)
+					return null;
+
+				if (list == null)
+					list = new List<BodyPartLock>();
+
+				list.Add(lk);
+			}
+
+			return list.ToArray();
+		}
+
 		public bool AnyInsidePersonalSpace()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)

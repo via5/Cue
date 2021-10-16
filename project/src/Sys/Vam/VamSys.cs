@@ -9,6 +9,117 @@ namespace Cue.Sys.Vam
 {
 	class VamSys : ISys
 	{
+		interface IRender
+		{
+			void Destroy();
+			bool Update(float s);
+		}
+
+
+		class BoxRender : IRender
+		{
+			private Transform t_;
+			private IGraphic g_;
+
+			public BoxRender(Transform t)
+			{
+				t_ = t;
+				g_ = Cue.Instance.Sys.CreateBoxGraphic(
+					$"cue!DebugRender.{t.name}",
+					Vector3.Zero, new Vector3(0.1f, 0.1f, 0.1f),
+					new Color(0, 0, 1, 0.1f));
+			}
+
+			public void Destroy()
+			{
+				if (g_ != null)
+				{
+					g_.Destroy();
+					g_ = null;
+				}
+			}
+
+			public bool Update(float s)
+			{
+				try
+				{
+					if (g_ == null)
+						return false;
+
+					g_.Position = U.FromUnity(t_.position);
+					g_.Rotation = U.FromUnity(t_.rotation);
+
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+
+		class ColliderRender : IRender
+		{
+			private CapsuleCollider cc_;
+			private Transform parent_;
+			private VamGraphic g_;
+
+			public ColliderRender(Collider c)
+			{
+				cc_ = c as CapsuleCollider;
+
+				parent_ = new GameObject().transform;
+				parent_.SetParent(Cue.Instance.VamSys.RootTransform, false);
+
+				g_ = Cue.Instance.Sys.CreateCapsuleGraphic(
+					$"cue!DebugRender.{c.transform.name}",
+					new Color(0, 0, 1, 0.1f)) as VamGraphic;
+
+				g_.Transform.SetParent(parent_, false);
+			}
+
+			public void Destroy()
+			{
+				if (g_ != null)
+				{
+					g_.Destroy();
+					g_ = null;
+				}
+			}
+
+			public bool Update(float s)
+			{
+				try
+				{
+					if (g_ == null)
+						return false;
+
+					float size = cc_.radius * 2;
+					float height = cc_.height / 2;
+
+					parent_.position = cc_.transform.parent.position;
+					parent_.rotation = cc_.transform.parent.rotation;
+
+					g_.Size = new Vector3(size, height, size);
+
+					if (cc_.direction == 0)
+						g_.Rotation = U.FromUnity(UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.forward));
+					else if (cc_.direction == 2)
+						g_.Rotation = U.FromUnity(UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.right));
+
+					g_.Position = U.FromUnity(cc_.center);
+
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+
 		private static VamSys instance_ = null;
 		private readonly MVRScript script_ = null;
 		private readonly VamLog log_ = new VamLog();
@@ -19,6 +130,7 @@ namespace Cue.Sys.Vam
 		private VamCameraAtom cameraAtom_ = new VamCameraAtom();
 		private bool wasVR_ = false;
 		private PerfMon perf_ = null;
+		private List<IRender> renders_ = null;
 
 		public VamSys(MVRScript s)
 		{
@@ -48,6 +160,24 @@ namespace Cue.Sys.Vam
 			root_.transform.SetParent(vamroot, false);
 
 			VamFixes.Run();
+		}
+
+		public void AddRender(Transform t)
+		{
+			AddRender(new BoxRender(t));
+		}
+
+		public void AddRender(Collider c)
+		{
+			AddRender(new ColliderRender(c));
+		}
+
+		private void AddRender(IRender r)
+		{
+			if (renders_ == null)
+				renders_ = new List<IRender>();
+
+			renders_.Add(r);
 		}
 
 		static public VamSys Instance
@@ -249,14 +379,15 @@ namespace Cue.Sys.Vam
 			return UnityEngine.Random.Range(first, last);
 		}
 
-		public IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts)
+		public IObjectCreator CreateObjectCreator(
+			string name, string type, JSONClass opts, Sys.ObjectParameters ps)
 		{
 			if (type == "cua")
-				return new VamCuaObjectCreator(name, opts);
+				return new VamCuaObjectCreator(name, opts, ps);
 			else if (type == "atom")
-				return new VamAtomObjectCreator(name, opts);
+				return new VamAtomObjectCreator(name, opts, ps);
 			else if (type == "clothing")
-				return new VamClothingObjectCreator(name, opts);
+				return new VamClothingObjectCreator(name, opts, ps);
 
 			Cue.LogError($"unknown object creator type '{type}'");
 			return null;
@@ -278,6 +409,11 @@ namespace Cue.Sys.Vam
 			return new VamSphereGraphic(name, pos, radius, c);
 		}
 
+		public IGraphic CreateCapsuleGraphic(string name, Color c)
+		{
+			return new VamCapsuleGraphic(name, c);
+		}
+
 		public void Update(float s)
 		{
 			bool vr = IsVR;
@@ -286,6 +422,23 @@ namespace Cue.Sys.Vam
 			{
 				wasVR_ = vr;
 				//SuperController.singleton.commonHandModelControl.useCollision = true;
+			}
+
+			if (renders_ != null)
+			{
+				int i = 0;
+				while (i < renders_.Count)
+				{
+					if (renders_[i].Update(s))
+					{
+						++i;
+					}
+					else
+					{
+						renders_[i].Destroy();
+						renders_.RemoveAt(i);
+					}
+				}
 			}
 		}
 

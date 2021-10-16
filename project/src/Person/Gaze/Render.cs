@@ -103,6 +103,11 @@
 							new Color(0, 0, 1, 0.1f));
 					}
 				}
+				else
+				{
+					if (plane_ != null)
+						plane_.Visible = false;
+				}
 
 				enabled_ = value;
 			}

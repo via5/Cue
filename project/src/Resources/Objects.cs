@@ -79,7 +79,12 @@ namespace Cue
 			var type = o["type"].Value;
 			var opts = o["options"].AsObject;
 
-			return Cue.Instance.Sys.CreateObjectCreator(name, type, opts);
+			var pso = o["parameters"].AsObject;
+			Sys.ObjectParameters ps = null;
+			if (pso != null && pso.Count > 0)
+				ps = new Sys.ObjectParameters(pso);
+
+			return Cue.Instance.Sys.CreateObjectCreator(name, type, opts, ps);
 		}
 
 		private void Add(IObjectCreator o)

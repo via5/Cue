@@ -222,7 +222,8 @@ namespace Cue.Sys.Mock
 			return Path.Combine(ResPath(), path);
 		}
 
-		public IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts)
+		public IObjectCreator CreateObjectCreator(
+			string name, string type, JSONClass opts, Sys.ObjectParameters ps)
 		{
 			return null;
 		}
@@ -238,6 +239,11 @@ namespace Cue.Sys.Mock
 		}
 
 		public IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c)
+		{
+			return new MockGraphic();
+		}
+
+		public IGraphic CreateCapsuleGraphic(string name, Color c)
 		{
 			return new MockGraphic();
 		}
