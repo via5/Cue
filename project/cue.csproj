@@ -98,10 +98,12 @@
     <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Events\Events.cs" />
+    <Compile Include="src\AI\Events\Hand.cs" />
     <Compile Include="src\AI\Events\Kiss.cs" />
+    <Compile Include="src\AI\Events\Lock.cs" />
+    <Compile Include="src\AI\Events\Mouth.cs" />
     <Compile Include="src\AI\Events\Sex.cs" />
     <Compile Include="src\AI\Events\Smoke.cs" />
-    <Compile Include="src\AI\Events\Suck.cs" />
     <Compile Include="src\Commands\Command.cs" />
     <Compile Include="src\Commands\Lying.cs" />
     <Compile Include="src\Commands\Sex.cs" />

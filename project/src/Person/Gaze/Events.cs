@@ -122,18 +122,12 @@ namespace Cue
 		{
 			var head = person_.Body.Get(BP.Head);
 
-			if (head.Grabbed)
+			if (head.GrabbedByPlayer)
 			{
-				var p = Cue.Instance.Player;
+				person_.Gaze.Clear();
+				targets_.SetWeight(Cue.Instance.Player, BP.Eyes, 1, "head grabbed");
 
-				if (head.IsLinkedTo(p.Body.Get(BP.LeftHand)) ||
-					head.IsLinkedTo(p.Body.Get(BP.RightHand)))
-				{
-					person_.Gaze.Clear();
-					targets_.SetWeight(p, BP.Eyes, 1, "head grabbed");
-
-					return Exclusive | NoGazer;
-				}
+				return Exclusive | NoGazer;
 			}
 
 			return Continue;

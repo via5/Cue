@@ -49,7 +49,7 @@ namespace Cue
 		private const float StartHeadAngleX = -30;
 		private const float StartHeadAngleY = 0;
 		private const float StartHeadAngleZ = -40;
-		private const float StartLipDepthLeader = 0.03f;
+		private const float StartLipDepthLeader = 0.02f;
 		private const float StartLipDepth = 0;
 
 		private const float StartTrackingSpeed = 0.1f;
@@ -340,9 +340,22 @@ namespace Cue
 				return false;
 			}
 
+			// this person leads by default
 			bool leader = true;
+
 			if (person_ == Cue.Instance.Player)
+			{
+				// player never leads
 				leader = false;
+			}
+			else if (person_.Body.Get(BP.Head).Grabbed && target != Cue.Instance.Player)
+			{
+				// this person's head is grabbed and being moved towards a
+				// target that's not the player, make the target the leader
+				// instead; the target might also be grabbed, but it doesn't
+				// matter
+				leader = false;
+			}
 
 			DoKiss(target, leader);
 

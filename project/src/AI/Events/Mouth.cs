@@ -1,11 +1,11 @@
 ﻿namespace Cue
 {
-	class SuckEvent : BasicEvent
+	class MouthEvent : BasicEvent
 	{
 		private bool busy_ = false;
 
-		public SuckEvent(Person p)
-			: base("suck", p)
+		public MouthEvent(Person p)
+			: base("mouth", p)
 		{
 		}
 

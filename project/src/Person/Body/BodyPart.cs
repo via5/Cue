@@ -203,6 +203,23 @@ namespace Cue
 			get { return part_?.Grabbed ?? false; }
 		}
 
+		public bool GrabbedByPlayer
+		{
+			get
+			{
+				if (Grabbed)
+				{
+					var p = Cue.Instance.Player;
+
+					return
+						IsLinkedTo(p.Body.Get(BP.LeftHand)) ||
+						IsLinkedTo(p.Body.Get(BP.RightHand));
+				}
+
+				return false;
+			}
+		}
+
 		public bool CloseTo(BodyPart other)
 		{
 			if (!Exists || !other.Exists)

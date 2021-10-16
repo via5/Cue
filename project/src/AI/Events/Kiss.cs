@@ -69,7 +69,14 @@ namespace Cue
 			}
 			else
 			{
-				if (elapsed_ > wait_)
+				// todo: this always starts when a head is grabbed, which is
+				//       probably fine if the target is the player, but it makes
+				//       any head adjustments start kissing if there's a target
+				//       available
+				//
+				//       maybe keep the delay if the player is not in range?
+
+				if (elapsed_ > wait_ || person_.Body.Get(BP.Head).GrabbedByPlayer)
 				{
 					Next();
 					TryStart();
