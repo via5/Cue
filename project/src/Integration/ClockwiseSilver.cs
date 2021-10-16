@@ -175,21 +175,7 @@ namespace Cue
 				return Cue.Instance.FindPerson(tid);
 			}
 		}
-		/*
-		public bool IsBusy(int bodyPart)
-		{
-			switch (bodyPart)
-			{
-				case BP.Head:
-				case BP.Lips:
-				case BP.Mouth:
-					return wasKissing_;
 
-				default:
-					return false;
-			}
-		}
-		*/
 		public void Update(float s)
 		{
 			var k = running_.Value;
@@ -559,26 +545,7 @@ namespace Cue
 				return null;
 			}
 		}
-		/*
-		public bool IsBusy(int bodyPart)
-		{
-			switch (bodyPart)
-			{
-				case BP.LeftArm:
-				case BP.LeftForearm:
-				case BP.LeftHand:
-					return wasActive_ && LeftUsed;
 
-				case BP.RightArm:
-				case BP.RightForearm:
-				case BP.RightHand:
-					return wasActive_ && RightUsed;
-
-				default:
-					return false;
-			}
-		}
-		*/
 		public bool StartBoth(Person p)
 		{
 			if (!StartCommon(p, "Both"))

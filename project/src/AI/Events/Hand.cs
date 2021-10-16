@@ -10,11 +10,11 @@
 
 		private Person leftTarget_ = null;
 		private bool leftGroped_ = false;
-		private BodyPartLock leftLock_ = null;
+		private BodyPartLock[] leftLock_ = null;
 
 		private Person rightTarget_ = null;
 		private bool rightGroped_ = false;
-		private BodyPartLock rightLock_ = null;
+		private BodyPartLock[] rightLock_ = null;
 
 
 		public HandEvent(Person p)
@@ -56,12 +56,7 @@
 					leftGroped_ = false;
 				}
 
-				if (leftLock_ != null)
-				{
-					leftLock_.Unlock();
-					leftLock_ = null;
-				}
-
+				UnlockLeft();
 				leftTarget_ = null;
 			}
 
@@ -75,12 +70,7 @@
 					rightGroped_ = false;
 				}
 
-				if (rightLock_ != null)
-				{
-					rightLock_.Unlock();
-					rightLock_ = null;
-				}
-
+				UnlockRight();
 				rightTarget_ = null;
 			}
 		}
@@ -88,7 +78,11 @@
 		public override void Update(float s)
 		{
 			if (!active_)
+			{
+				UnlockLeft();
+				UnlockRight();
 				return;
+			}
 
 			checkElapsed_ += s;
 			if (checkElapsed_ >= CheckTargetsInterval)
@@ -98,6 +92,28 @@
 
 				if (leftTarget_ == null && rightTarget_ == null)
 					active_ = false;
+			}
+		}
+
+		private void UnlockLeft()
+		{
+			if (leftLock_ != null)
+			{
+				for (int i = 0; i < leftLock_.Length; ++i)
+					leftLock_[i].Unlock();
+
+				leftLock_ = null;
+			}
+		}
+
+		private void UnlockRight()
+		{
+			if (rightLock_ != null)
+			{
+				for (int i = 0; i < rightLock_.Length; ++i)
+					rightLock_[i].Unlock();
+
+				rightLock_ = null;
 			}
 		}
 
@@ -118,15 +134,11 @@
 				{
 					Cue.LogError($"double hj");
 
-					leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
-						BodyPartLock.Anim);
-
+					leftLock_ = LockLeft();
 					if (leftLock_ != null)
 						leftTarget_ = leftTarget.Person;
 
-					rightLock_ = person_.Body.Get(BP.RightHand).Lock(
-						BodyPartLock.Anim);
-
+					rightLock_ = LockRight();
 					if (rightLock_ != null)
 						rightTarget_ = rightTarget.Person;
 				}
@@ -141,9 +153,7 @@
 						{
 							Cue.LogError($"left hj");
 
-							leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
-								BodyPartLock.Anim);
-
+							leftLock_ = LockLeft();
 							if (leftLock_ != null)
 								leftTarget_ = leftTarget.Person;
 						}
@@ -154,8 +164,7 @@
 						{
 							Cue.LogError($"left finger");
 
-							leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
-								BodyPartLock.Anim);
+							leftLock_ = LockLeft();
 
 							if (leftLock_ != null)
 							{
@@ -176,9 +185,7 @@
 						{
 							Cue.LogError($"right hj");
 
-							rightLock_ = person_.Body.Get(BP.RightHand).Lock(
-								BodyPartLock.Anim);
-
+							rightLock_ = LockRight();
 							if (rightLock_ != null)
 								rightTarget_ = rightTarget.Person;
 						}
@@ -189,8 +196,7 @@
 						{
 							Cue.LogError($"right finger");
 
-							rightLock_ = person_.Body.Get(BP.RightHand).Lock(
-								BodyPartLock.Anim);
+							rightLock_ = LockRight();
 
 							if (rightLock_ != null)
 							{
@@ -204,6 +210,20 @@
 					}
 				}
 			}
+		}
+
+		private BodyPartLock[] LockLeft()
+		{
+			return person_.Body.LockMany(
+				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
+				BodyPartLock.Anim);
+		}
+
+		private BodyPartLock[] LockRight()
+		{
+			return person_.Body.LockMany(
+				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
+				BodyPartLock.Anim);
 		}
 
 		private BodyPart FindTarget(int handPart)
