@@ -8,7 +8,7 @@ namespace Cue
 	{
 		class HandInfo
 		{
-			public bool locked = false;
+			public BodyPartLock lk = null;
 			public bool grabbed = false;
 		}
 
@@ -52,18 +52,23 @@ namespace Cue
 				var close = FindClose(hand);
 				if (close != null)
 				{
-					if (!hand.Busy)
+					info.lk = hand.Lock(BodyPartLock.Move);
+					if (info.lk != null)
 					{
 						Cue.LogInfo($"linking {hand} with {close}");
 						hand.LinkTo(close);
-						hand.ForceBusy(true);
 					}
 				}
 				else
 				{
 					//Cue.LogInfo($"unlinking {thisHand}");
 					hand.Unlink();
-					hand.ForceBusy(false);
+
+					if (info.lk != null)
+					{
+						info.lk.Unlock();
+						info.lk = null;
+					}
 				}
 			}
 		}

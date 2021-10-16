@@ -135,7 +135,7 @@ namespace Cue.Sys.Vam
 			{
 				if (Transform == null)
 				{
-					return Vector3.Zero;
+					return Vector3.MaxValue;
 				}
 				else if (!Cue.Instance.VamSys.IsVR)
 				{

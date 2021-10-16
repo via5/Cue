@@ -19,6 +19,19 @@ namespace Cue
 			wait_ = new Duration(15, 40);
 		}
 
+		public override string[] Debug()
+		{
+			return new string[]
+			{
+				$"enabled       {enabled_}",
+				$"cig           {cig_}",
+				$"smoke         {smoke_}",
+				$"checkElapsed  {checkElapsed_:0.00}",
+				$"wait          {wait_.ToLiveString()}",
+				$"canRun        {CanRun()}"
+			};
+		}
+
 		private void CheckEnabled(float s)
 		{
 			checkElapsed_ += s;
@@ -116,7 +129,7 @@ namespace Cue
 			{
 				if (!person_.Animator.IsPlayingType(Animations.Smoke))
 				{
-					if (person_.Body.Get(BP.RightHand).Busy)
+					if (person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim))
 						cig_.Visible = false;
 
 					if (cig_.Visible)
@@ -172,9 +185,9 @@ namespace Cue
 
 			bool busy =
 				person_.Body.AnyInsidePersonalSpace() ||
-				person_.Body.Get(BP.RightHand).Busy ||
-				head.Busy || head.Triggered ||
-				lips.Busy || lips.Triggered;
+				person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim) ||
+				head.LockedFor(BodyPartLock.Move) || head.Triggered ||
+				lips.LockedFor(BodyPartLock.Morph) || lips.Triggered;
 
 			if (busy)
 				return false;

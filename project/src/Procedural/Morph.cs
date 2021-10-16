@@ -160,8 +160,11 @@ namespace Cue.Proc
 
 			if (morph_ != null)
 			{
-				if (bodyPart_ == BP.None || !person_.Body.Get(bodyPart_).Busy)
+				if (bodyPart_ == BP.None ||
+					!person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Morph))
+				{
 					morph_.Reset();
+				}
 			}
 		}
 
@@ -319,7 +322,8 @@ namespace Cue.Proc
 
 			var d = v - mid_;
 
-			if (bodyPart_ == BP.None || !person_.Body.Get(bodyPart_).Busy)
+			if (bodyPart_ == BP.None ||
+				!person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Morph))
 			{
 				if (forceType_ != ForceIgnore)
 					morph_.Value = v;

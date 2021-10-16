@@ -2,7 +2,7 @@
 {
 	class MouthEvent : BasicEvent
 	{
-		private bool busy_ = false;
+		private BodyPartLock lock_ = null;
 
 		public MouthEvent(Person p)
 			: base("mouth", p)
@@ -14,16 +14,17 @@
 			var mouthTriggered = person_.Body.Get(BP.Mouth).Triggered;
 			var head = person_.Body.Get(BP.Head);
 
-			if (!busy_ && mouthTriggered && !head.Busy)
+			if (lock_ == null && mouthTriggered)
 			{
-				busy_ = true;
-				head.ForceBusy(true);
-				person_.Animator.PlayType(Animations.Suck, Animator.Loop);
+				lock_ = head.Lock(BodyPartLock.Morph);
+
+				if (lock_ != null)
+					person_.Animator.PlayType(Animations.Suck, Animator.Loop);
 			}
-			else if (busy_ && !mouthTriggered)
+			else if (lock_ != null && !mouthTriggered)
 			{
-				busy_ = false;
-				head.ForceBusy(false);
+				lock_.Unlock();
+				lock_ = null;
 				person_.Animator.StopType(Animations.Suck);
 			}
 		}

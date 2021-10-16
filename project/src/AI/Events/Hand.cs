@@ -14,9 +14,12 @@ namespace Cue
 
 		private Person leftTarget_ = null;
 		private bool leftGroped_ = false;
+		private BodyPartLock leftLock_ = null;
 
 		private Person rightTarget_ = null;
 		private bool rightGroped_ = false;
+		private BodyPartLock rightLock_ = null;
+
 
 		public HandEvent(Person p)
 			: base("hand", p)
@@ -57,7 +60,12 @@ namespace Cue
 					leftGroped_ = false;
 				}
 
-				person_.Body.Get(BP.LeftHand).ForceBusy(false);
+				if (leftLock_ != null)
+				{
+					leftLock_.Unlock();
+					leftLock_ = null;
+				}
+
 				leftTarget_ = null;
 			}
 
@@ -71,7 +79,12 @@ namespace Cue
 					rightGroped_ = false;
 				}
 
-				person_.Body.Get(BP.RightHand).ForceBusy(false);
+				if (rightLock_ != null)
+				{
+					rightLock_.Unlock();
+					rightLock_ = null;
+				}
+
 				rightTarget_ = null;
 			}
 		}
@@ -109,11 +122,17 @@ namespace Cue
 				{
 					Cue.LogError($"double hj");
 
-					leftTarget_ = leftTarget.Person;
-					person_.Body.Get(BP.LeftHand).ForceBusy(true);
+					leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
+						BodyPartLock.Anim);
 
-					rightTarget_ = rightTarget.Person;
-					person_.Body.Get(BP.RightHand).ForceBusy(true);
+					if (leftLock_ != null)
+						leftTarget_ = leftTarget.Person;
+
+					rightLock_ = person_.Body.Get(BP.RightHand).Lock(
+						BodyPartLock.Anim);
+
+					if (rightLock_ != null)
+						rightTarget_ = rightTarget.Person;
 				}
 			}
 			else
@@ -125,8 +144,12 @@ namespace Cue
 						if (person_.Handjob.StartLeft(leftTarget.Person))
 						{
 							Cue.LogError($"left hj");
-							leftTarget_ = leftTarget.Person;
-							person_.Body.Get(BP.LeftHand).ForceBusy(true);
+
+							leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
+								BodyPartLock.Anim);
+
+							if (leftLock_ != null)
+								leftTarget_ = leftTarget.Person;
 						}
 					}
 					else if (leftTarget.Type == BP.Labia)
@@ -134,13 +157,17 @@ namespace Cue
 						if (person_.Animator.PlayType(Animations.LeftFinger, leftTarget.Person))
 						{
 							Cue.LogError($"left finger");
-							leftTarget_ = leftTarget.Person;
-							leftGroped_ = true;
 
-							leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
-								.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+							leftLock_ = person_.Body.Get(BP.LeftHand).Lock(
+								BodyPartLock.Anim);
 
-							person_.Body.Get(BP.LeftHand).ForceBusy(true);
+							if (leftLock_ != null)
+							{
+								leftTarget_ = leftTarget.Person;
+								leftGroped_ = true;
+								leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+									.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+							}
 						}
 					}
 				}
@@ -152,8 +179,12 @@ namespace Cue
 						if (person_.Handjob.StartRight(rightTarget.Person))
 						{
 							Cue.LogError($"right hj");
-							rightTarget_ = rightTarget.Person;
-							person_.Body.Get(BP.RightHand).ForceBusy(true);
+
+							rightLock_ = person_.Body.Get(BP.RightHand).Lock(
+								BodyPartLock.Anim);
+
+							if (rightLock_ != null)
+								rightTarget_ = rightTarget.Person;
 						}
 					}
 					else if (rightTarget.Type == BP.Labia)
@@ -161,13 +192,18 @@ namespace Cue
 						if (person_.Animator.PlayType(Animations.RightFinger, rightTarget.Person))
 						{
 							Cue.LogError($"right finger");
-							rightTarget_ = rightTarget.Person;
-							rightGroped_ = true;
 
-							rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-								.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
+							rightLock_ = person_.Body.Get(BP.RightHand).Lock(
+								BodyPartLock.Anim);
 
-							person_.Body.Get(BP.RightHand).ForceBusy(true);
+							if (rightLock_ != null)
+							{
+								rightTarget_ = rightTarget.Person;
+								rightGroped_ = true;
+
+								rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
+									.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
+							}
 						}
 					}
 				}

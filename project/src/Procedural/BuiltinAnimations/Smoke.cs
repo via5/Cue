@@ -72,10 +72,13 @@ namespace Cue.Proc
 		private Render render_ = new Render();
 		private float startFist_ = 0;
 		private float targetFist_ = 0;
-		private bool busySet_ = false;
 
 		private Morph mouthOpen_;
 		private Morph lipsPucker_, mouthNarrow_, lipsPart_, lipsPuckerWide_;
+
+		private BodyPartLock headLock_ = null;
+		private BodyPartLock mouthLock_ = null;
+		private BodyPartLock handLock_ = null;
 
 		private IEasing moveToMouthEasing_ = new SinusoidalEasing();
 		private IEasing moveBackEasing_ = new SinusoidalEasing();
@@ -136,8 +139,7 @@ namespace Cue.Proc
 		{
 			base.Reset();
 
-			if (busySet_)
-				SetBusy(false);
+			SetPartsLocked(false);
 
 			mouthOpen_?.Reset();
 			lipsPucker_?.Reset();
@@ -310,15 +312,42 @@ namespace Cue.Proc
 			elapsed_ = 0;
 			state_ = MovingToMouth;
 
-			SetBusy(true);
+			SetPartsLocked(true);
 		}
 
-		private void SetBusy(bool b)
+		private void SetPartsLocked(bool b)
 		{
-			person_.Body.Get(BP.Head)?.ForceBusy(b);
-			person_.Body.Get(BP.Mouth)?.ForceBusy(b);
-			handPart_?.ForceBusy(b);
-			busySet_ = b;
+			if (b)
+			{
+				if (headLock_ == null)
+					headLock_ = person_.Body.Get(BP.Head).Lock(BodyPartLock.Move);
+
+				if (mouthLock_ == null)
+					mouthLock_ = person_.Body.Get(BP.Mouth).Lock(BodyPartLock.Morph);
+
+				if (handLock_ == null)
+					handLock_ = handPart_.Lock(BodyPartLock.Anim);
+			}
+			else
+			{
+				if (headLock_ != null)
+				{
+					headLock_.Unlock();
+					headLock_ = null;
+				}
+
+				if (mouthLock_ != null)
+				{
+					mouthLock_.Unlock();
+					mouthLock_ = null;
+				}
+
+				if (handLock_ != null)
+				{
+					handLock_.Unlock();
+					handLock_ = null;
+				}
+			}
 		}
 
 		public static Vector3 Bezier(
@@ -595,7 +624,7 @@ namespace Cue.Proc
 
 			if (elapsed_ >= ExhaleTime && elapsed_ >= MoveTime && elapsed_ >= RotationTime && elapsed_ >= HeadUpTime)
 			{
-				SetBusy(false);
+				SetPartsLocked(false);
 				StartReset();
 			}
 		}

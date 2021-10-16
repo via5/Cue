@@ -194,7 +194,7 @@ namespace Cue
 			{
 				if (picker_.HasTarget)
 				{
-					if (person_.Body.Get(BP.Head).Busy)
+					if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
 						gazer_.Enabled = false;
 					else
 						gazer_.Enabled = gazerEnabled_;

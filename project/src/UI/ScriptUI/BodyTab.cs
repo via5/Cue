@@ -58,7 +58,7 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, grab, busy, source;
+			public VUI.Label name, triggering, grab, lk, source;
 			public VUI.Label position, direction;
 		}
 
@@ -79,7 +79,7 @@ namespace Cue
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Busy", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
 
 			if (Positions)
@@ -109,9 +109,10 @@ namespace Cue
 				w.grab.FontSize = fontSize;
 				p.Add(w.grab);
 
-				w.busy = new VUI.Label();
-				w.busy.FontSize = fontSize;
-				p.Add(w.busy);
+				w.lk = new VUI.Label();
+				w.lk.FontSize = fontSize;
+				w.lk.TextColor = Sys.Vam.U.ToUnity(Color.Green);
+				p.Add(w.lk);
 
 				w.source = new VUI.Label();
 				w.source.FontSize = fontSize;
@@ -185,12 +186,7 @@ namespace Cue
 					w.grab.Text = "";
 				}
 
-				w.busy.Text = (w.part.Busy ? "busy" : "");
-				w.busy.TextColor = (
-					w.part.Busy ?
-					Sys.Vam.U.ToUnity(Color.Green) :
-					VUI.Style.Theme.TextColor);
-
+				w.lk.Text = w.part.DebugLockString();
 				w.source.Text = w.part.Source;
 
 				if (Positions)

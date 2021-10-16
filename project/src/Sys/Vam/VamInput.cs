@@ -294,7 +294,7 @@ namespace Cue.Sys.Vam
 
 		public string VRInfo()
 		{
-			return $"ovr={sc_.isOVR} openvr={sc_.isOpenVR}";
+			return $"isVR={Cue.Instance.Sys.IsVR} ovr={sc_.isOVR} openvr={sc_.isOpenVR}";
 		}
 
 		public bool HardReset

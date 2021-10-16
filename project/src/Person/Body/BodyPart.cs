@@ -2,6 +2,62 @@
 
 namespace Cue
 {
+	class BodyPartLock
+	{
+		public const int Move = 0x01;
+		public const int Morph = 0x02;
+		public const int Anim = Move | Morph;
+
+		private BodyPart bp_;
+		private int type_;
+
+		public BodyPartLock(BodyPart bp, int type)
+		{
+			bp_ = bp;
+			type_ = type;
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
+		public bool Is(int type)
+		{
+			return Bits.IsAnySet(type_, type);
+		}
+
+		public void Unlock()
+		{
+			bp_.UnlockInternal(this);
+		}
+
+		public static string TypeToString(int type)
+		{
+			if (type == 0)
+				return "";
+
+			var list = new List<string>();
+
+			if (Bits.IsSet(type, Move))
+				list.Add("move");
+
+			if (Bits.IsSet(type, Morph))
+				list.Add("morph");
+
+			if (list.Count == 0)
+				return $"?{type}";
+
+			return string.Join("|", list.ToArray());
+		}
+
+		public override string ToString()
+		{
+			return $"{bp_}/{TypeToString(type_)}";
+		}
+	}
+
+
 	class BodyPart
 	{
 		private const float TriggerCheckDelay = 1;
@@ -9,11 +65,11 @@ namespace Cue
 		private Person person_;
 		private int type_;
 		private Sys.IBodyPart part_;
-		private bool forceBusy_ = false;
 		private Sys.IGraphic render_ = null;
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float lastTriggerCheck_ = 0;
+		private List<BodyPartLock> locks_ = new List<BodyPartLock>();
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
@@ -236,11 +292,6 @@ namespace Cue
 			return Sys.DistanceToSurface(other.Sys);
 		}
 
-		public void ForceBusy(bool b)
-		{
-			forceBusy_ = b;
-		}
-
 		public void LinkTo(BodyPart other)
 		{
 			if (!Exists)
@@ -276,19 +327,58 @@ namespace Cue
 			return Sys.IsLinkedTo(other.Sys);
 		}
 
-		public bool Busy
+		public BodyPartLock Lock(int lockType)
 		{
-			get
-			{
-				if (forceBusy_)
-					return true;
+			if (LockedFor(lockType))
+				return null;
 
-				// todo
-				return
-					person_.Kisser.IsBusy(type_) ||
-					person_.Blowjob.IsBusy(type_) ||
-					person_.Handjob.IsBusy(type_);
+			var lk = new BodyPartLock(this, lockType);
+			locks_.Add(lk);
+
+			return lk;
+			// todo
+			//return
+			//	person_.Kisser.IsBusy(type_) ||
+			//	person_.Blowjob.IsBusy(type_) ||
+			//	person_.Handjob.IsBusy(type_);
+		}
+
+		public void UnlockInternal(BodyPartLock lk)
+		{
+			for (int i = 0; i < locks_.Count; ++i)
+			{
+				if (locks_[i] == lk)
+				{
+					locks_.RemoveAt(i);
+					return;
+				}
 			}
+
+			person_.Log.Error($"can't unlock {lk}, not in list");
+		}
+
+		public bool LockedFor(int lockType)
+		{
+			for (int i = 0; i < locks_.Count; ++i)
+			{
+				if (locks_[i].Is(lockType))
+					return true;
+			}
+
+			return false;
+		}
+
+		public string DebugLockString()
+		{
+			int lockType = 0;
+
+			for (int i = 0; i < locks_.Count; ++i)
+				lockType |= locks_[i].Type;
+
+			if (lockType == 0 && locks_.Count > 0)
+				return "?";
+
+			return BodyPartLock.TypeToString(lockType);
 		}
 
 		public Vector3 ControlPosition

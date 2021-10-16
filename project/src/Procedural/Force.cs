@@ -156,7 +156,8 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
-			if (bodyPart_ != BP.None && person_.Body.Get(bodyPart_).Busy)
+			if (bodyPart_ != BP.None &&
+				person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Move))
 			{
 				if (wasBusy_)
 				{
