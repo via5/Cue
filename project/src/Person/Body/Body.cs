@@ -122,14 +122,23 @@ namespace Cue
 			set { person_.Atom.Body.Strapon = value; }
 		}
 
-		public BodyPartLock[] LockMany(int[] bodyParts, int lockType)
+		public void DebugAllLocks(List<string> list)
+		{
+			list.Clear();
+
+			for (int i = 0; i < all_.Length; ++i)
+				all_[i].DebugAllLocks(list);
+		}
+
+		public BodyPartLock[] LockMany(
+			int[] bodyParts, int lockType, string why, bool strong = true)
 		{
 			List<BodyPartLock> list = null;
 			bool failed = false;
 
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
-				var lk = Get(bodyParts[i]).Lock(lockType);
+				var lk = Get(bodyParts[i]).Lock(lockType, why, strong);
 				if (lk == null)
 				{
 					failed = true;

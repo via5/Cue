@@ -153,7 +153,7 @@
 			{
 				Cue.LogError($"double hj");
 
-				if (LockBoth())
+				if (LockBoth("double hj"))
 				{
 					if (person_.Handjob.StartBoth(leftTarget.Person))
 					{
@@ -170,7 +170,7 @@
 					{
 						Cue.LogError($"left hj");
 
-						if (LockLeft())
+						if (LockLeft("left hj"))
 						{
 							if (person_.Handjob.StartLeft(leftTarget.Person))
 								leftTarget_ = leftTarget.Person;
@@ -180,7 +180,7 @@
 					{
 						Cue.LogError($"left finger");
 
-						if (LockLeft())
+						if (LockLeft("left fingering"))
 						{
 							if (person_.Animator.PlayType(Animations.LeftFinger, leftTarget.Person))
 							{
@@ -199,7 +199,7 @@
 					{
 						Cue.LogError($"right hj");
 
-						if (LockRight())
+						if (LockRight("right hj"))
 						{
 							if (person_.Handjob.StartRight(rightTarget.Person))
 								rightTarget_ = rightTarget.Person;
@@ -209,7 +209,7 @@
 					{
 						Cue.LogError($"right finger");
 
-						if (LockRight())
+						if (LockRight("right fingering"))
 						{
 							if (person_.Animator.PlayType(Animations.RightFinger, rightTarget.Person))
 							{
@@ -225,25 +225,25 @@
 			}
 		}
 
-		private bool LockBoth()
+		private bool LockBoth(string why)
 		{
-			return LockLeft() && LockRight();
+			return LockLeft(why) && LockRight(why);
 		}
 
-		private bool LockLeft()
+		private bool LockLeft(string why)
 		{
 			leftLock_ = person_.Body.LockMany(
 				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
-				BodyPartLock.Anim);
+				BodyPartLock.Anim, why);
 
 			return (leftLock_ != null);
 		}
 
-		private bool LockRight()
+		private bool LockRight(string why)
 		{
 			rightLock_ = person_.Body.LockMany(
 				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
-				BodyPartLock.Anim);
+				BodyPartLock.Anim, why);
 
 			return (rightLock_ != null);
 		}

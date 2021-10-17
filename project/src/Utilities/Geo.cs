@@ -266,6 +266,30 @@ namespace Cue
 		{
 			return q_.ToString();
 		}
+
+		public override bool Equals(object o)
+		{
+			if (!(o is Quaternion))
+				return false;
+
+			var r = (Quaternion)o;
+			return (this == r);
+		}
+
+		public override int GetHashCode()
+		{
+			return q_.GetHashCode();
+		}
+
+		public static bool operator ==(Quaternion a, Quaternion b)
+		{
+			return (a.q_ == b.q_);
+		}
+
+		public static bool operator !=(Quaternion a, Quaternion b)
+		{
+			return !(a == b);
+		}
 	}
 
 	struct Point

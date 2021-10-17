@@ -99,7 +99,7 @@ namespace Cue.Sys.Vam
 
 		private void SetOn(FreeControllerV3 fc)
 		{
-			fc.linkToRB = null;
+			fc.SelectLinkToRigidbody(null);
 			fc.currentPositionState = FreeControllerV3.PositionState.On;
 			fc.currentRotationState = FreeControllerV3.RotationState.On;
 		}

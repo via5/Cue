@@ -364,6 +364,11 @@ namespace Cue.Sys.Mock
 			get { return false; }
 		}
 
+		public bool Grabbed
+		{
+			get { return false; }
+		}
+
 		public Vector3 Position
 		{
 			get { return Vector3.Zero; }

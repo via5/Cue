@@ -87,7 +87,7 @@
 
 			if (mouthLock_ == null && mouthTriggered)
 			{
-				mouthLock_ = head.Lock(BodyPartLock.Morph);
+				mouthLock_ = head.Lock(BodyPartLock.Morph, "SuckFinger");
 
 				if (mouthLock_ != null)
 					person_.Animator.PlayType(Animations.Suck, Animator.Loop);
@@ -112,7 +112,7 @@
 
 			bjLocks_ = person_.Body.LockMany(
 				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Eyes },
-				BodyPartLock.Anim);
+				BodyPartLock.Anim, "bj");
 
 			if (bjLocks_ != null)
 			{

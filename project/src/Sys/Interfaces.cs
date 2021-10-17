@@ -307,6 +307,7 @@ namespace Cue.Sys
 		bool Teleporting { get; }
 		bool Possessed { get; }
 		bool Selected { get; }
+		bool Grabbed { get; }
 
 		bool Collisions { get; set; }
 		bool Physics { get; set; }

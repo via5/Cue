@@ -223,6 +223,11 @@ namespace Cue
 			get { return Body.Exists; }
 		}
 
+		public bool Grabbed
+		{
+			get { return Atom.Grabbed; }
+		}
+
 		public void PushAction(IAction a)
 		{
 			actions_.Push(a);

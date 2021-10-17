@@ -311,6 +311,11 @@ namespace Cue.Sys.Vam
 			get { return false; }
 		}
 
+		public bool Grabbed
+		{
+			get { return false; }
+		}
+
 		public IBody Body { get { return body_; } }
 		public IHair Hair { get { return hair_; } }
 

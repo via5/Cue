@@ -4,17 +4,23 @@ namespace Cue
 {
 	class BodyPartLock
 	{
+		public const int NoLock = 0x00;
 		public const int Move = 0x01;
 		public const int Morph = 0x02;
 		public const int Anim = Move | Morph;
 
 		private BodyPart bp_;
 		private int type_;
+		private bool strong_;
+		private bool expired_ = false;
+		private string why_;
 
-		public BodyPartLock(BodyPart bp, int type)
+		public BodyPartLock(BodyPart bp, int type, bool strong, string why)
 		{
 			bp_ = bp;
 			type_ = type;
+			strong_ = strong;
+			why_ = why;
 		}
 
 		public int Type
@@ -22,14 +28,40 @@ namespace Cue
 			get { return type_; }
 		}
 
-		public bool Is(int type)
+		public bool Prevents(int type)
 		{
-			return Bits.IsAnySet(type_, type);
+			if (Bits.IsAnySet(type_, type) && strong_)
+				return true;
+			else
+				return false;
+		}
+
+		public bool IsWeakFor(int type)
+		{
+			if (Bits.IsAnySet(type_, type) && !strong_)
+				return true;
+			else
+				return false;
+		}
+
+		public bool Expired
+		{
+			get { return expired_; }
+		}
+
+		public void SetExpired()
+		{
+			expired_ = true;
 		}
 
 		public void Unlock()
 		{
 			bp_.UnlockInternal(this);
+		}
+
+		public string Why
+		{
+			get { return Why; }
 		}
 
 		public static string TypeToString(int type)
@@ -51,6 +83,21 @@ namespace Cue
 			return string.Join("|", list.ToArray());
 		}
 
+		public string ToDetailedString()
+		{
+			string s = "";
+
+			s += $"{bp_.Name}: {TypeToString(type_)}, ";
+			s += $"{(strong_ ? "strong" : "weak")}";
+
+			if (expired_)
+				s += ", expired";
+
+			s += $" ({ why_})";
+
+			return s;
+		}
+
 		public override string ToString()
 		{
 			return $"{bp_}/{TypeToString(type_)}";
@@ -70,7 +117,6 @@ namespace Cue
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float lastTriggerCheck_ = 0;
 		private List<BodyPartLock> locks_ = new List<BodyPartLock>();
-		private int currentLock_ = 0;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
@@ -309,6 +355,20 @@ namespace Cue
 			LinkTo(null);
 		}
 
+		public void UnlinkFrom(Person to)
+		{
+			var toParts = to.Body.Parts;
+
+			for (int i = 0; i < toParts.Length; ++i)
+			{
+				if (IsLinkedTo(toParts[i]))
+				{
+					Unlink();
+					return;
+				}
+			}
+		}
+
 		public bool Linked
 		{
 			get
@@ -328,51 +388,48 @@ namespace Cue
 			return Sys.IsLinkedTo(other.Sys);
 		}
 
-		public BodyPartLock Lock(int lockType)
+		public BodyPartLock Lock(int lockType, string why, bool strong = true)
 		{
-			if (LockedFor(lockType))
-				return null;
+			for (int i = 0; i < locks_.Count; ++i)
+			{
+				if (locks_[i].Prevents(lockType))
+					return null;
+			}
 
-			var lk = new BodyPartLock(this, lockType);
+			for (int i = 0; i < locks_.Count; ++i)
+			{
+				if (locks_[i].IsWeakFor(lockType))
+					locks_[i].SetExpired();
+			}
 
+			var lk = new BodyPartLock(this, lockType, strong, why);
 			locks_.Add(lk);
-			currentLock_ |= lockType;
-
 			return lk;
-			// todo
-			//return
-			//	person_.Kisser.IsBusy(type_) ||
-			//	person_.Blowjob.IsBusy(type_) ||
-			//	person_.Handjob.IsBusy(type_);
 		}
 
 		public void UnlockInternal(BodyPartLock lk)
 		{
-			int newLockType = 0;
-			int removeAt = -1;
-
 			for (int i = 0; i < locks_.Count; ++i)
 			{
 				if (locks_[i] == lk)
-					removeAt = i;
-				else
-					newLockType |= locks_[i].Type;
+				{
+					locks_.RemoveAt(i);
+					return;
+				}
 			}
 
-			if (removeAt < 0 || removeAt >= locks_.Count)
-			{
-				person_.Log.Error($"can't unlock {lk}, not in list");
-			}
-			else
-			{
-				locks_.RemoveAt(removeAt);
-				currentLock_ = newLockType;
-			}
+			person_.Log.Error($"can't unlock {lk}, not in list");
 		}
 
 		public bool LockedFor(int lockType)
 		{
-			return Bits.IsAnySet(currentLock_, lockType);
+			for (int i = 0; i < locks_.Count; ++i)
+			{
+				if (locks_[i].Prevents(lockType))
+					return true;
+			}
+
+			return false;
 		}
 
 		public string DebugLockString()
@@ -380,12 +437,21 @@ namespace Cue
 			int lockType = 0;
 
 			for (int i = 0; i < locks_.Count; ++i)
-				lockType |= locks_[i].Type;
+			{
+				if (!locks_[i].Expired)
+					lockType |= locks_[i].Type;
+			}
 
 			if (lockType == 0 && locks_.Count > 0)
 				return "?";
 
 			return BodyPartLock.TypeToString(lockType);
+		}
+
+		public void DebugAllLocks(List<string> list)
+		{
+			for (int i = 0; i < locks_.Count; ++i)
+				list.Add(locks_[i].ToDetailedString());
 		}
 
 		public Vector3 ControlPosition

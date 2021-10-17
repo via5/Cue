@@ -320,13 +320,22 @@ namespace Cue.Proc
 			if (b)
 			{
 				if (headLock_ == null)
-					headLock_ = person_.Body.Get(BP.Head).Lock(BodyPartLock.Move);
+				{
+					headLock_ = person_.Body.Get(BP.Head)
+						.Lock(BodyPartLock.Move, "smoke");
+				}
 
 				if (mouthLock_ == null)
-					mouthLock_ = person_.Body.Get(BP.Mouth).Lock(BodyPartLock.Morph);
+				{
+					mouthLock_ = person_.Body.Get(BP.Mouth)
+						.Lock(BodyPartLock.Morph, "smoke");
+				}
 
 				if (handLock_ == null)
-					handLock_ = handPart_.Lock(BodyPartLock.Anim);
+				{
+					handLock_ = handPart_
+						.Lock(BodyPartLock.Anim, "smoke");
+				}
 			}
 			else
 			{

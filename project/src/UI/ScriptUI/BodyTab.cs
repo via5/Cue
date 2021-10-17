@@ -13,7 +13,8 @@ namespace Cue
 
 			AddSubTab(new PersonBodyStateTab(person_));
 			AddSubTab(new PersonBodyPartsTab(person_));
-			AddSubTab(new PersonHandsTab(person_));
+			AddSubTab(new PersonBodyFingersTab(person_));
+			AddSubTab(new PersonBodyLocksTab(person_));
 		}
 	}
 
@@ -199,7 +200,7 @@ namespace Cue
 	}
 
 
-	class PersonHandsTab : Tab
+	class PersonBodyFingersTab : Tab
 	{
 		struct BoneWidgets
 		{
@@ -210,7 +211,7 @@ namespace Cue
 		private readonly Person person_;
 		private readonly List<BoneWidgets> widgets_ = new List<BoneWidgets>();
 
-		public PersonHandsTab(Person ps)
+		public PersonBodyFingersTab(Person ps)
 			: base("Fingers", false)
 		{
 			person_ = ps;
@@ -273,6 +274,30 @@ namespace Cue
 					w.direction.Text = w.bone.Rotation.ToString();
 				}
 			}
+		}
+	}
+
+
+	class PersonBodyLocksTab : Tab
+	{
+		private Person person_;
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private List<string> strings_ = new List<string>();
+
+		public PersonBodyLocksTab(Person person)
+			: base("Locks", false)
+		{
+			person_ = person;
+
+			Layout = new VUI.BorderLayout(10);
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			Add(list_, VUI.BorderLayout.Center);
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			person_.Body.DebugAllLocks(strings_);
+			list_.SetItems(strings_);
 		}
 	}
 }

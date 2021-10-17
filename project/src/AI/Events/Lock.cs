@@ -4,16 +4,35 @@
 	{
 		class HandInfo
 		{
+			public BodyPart hand;
 			public BodyPartLock lk = null;
 			public bool grabbed = false;
+
+			public HandInfo(BodyPart h)
+			{
+				hand = h;
+			}
+
+			public void Unlink()
+			{
+				if (lk != null)
+				{
+					lk.Unlock();
+					lk = null;
+					hand.Unlink();
+				}
+			}
 		}
 
-		private readonly HandInfo left_ = new HandInfo();
-		private readonly HandInfo right_ = new HandInfo();
+		private readonly HandInfo left_;
+		private readonly HandInfo right_;
+		private bool grabbingPerson_ = false;
 
 		public HandLocker(Person p)
 			: base("handlocker", p)
 		{
+			left_ = new HandInfo(person_.Body.Get(BP.LeftHand));
+			right_ = new HandInfo(person_.Body.Get(BP.RightHand));
 		}
 
 		public override void Update(float s)
@@ -21,15 +40,40 @@
 			if (person_ == Cue.Instance.Player)
 				return;
 
-			var leftHand = person_.Body.Get(BP.LeftHand);
-			var rightHand = person_.Body.Get(BP.RightHand);
+			if (person_.Grabbed)
+			{
+				if (!grabbingPerson_)
+				{
+					grabbingPerson_ = true;
 
-			Check(leftHand, left_);
-			Check(rightHand, right_);
+					left_.Unlink();
+					right_.Unlink();
+
+					foreach (var p in Cue.Instance.ActivePersons)
+					{
+						if (p == person_)
+							continue;
+
+						p.Body.Get(BP.LeftHand).UnlinkFrom(person_);
+						p.Body.Get(BP.RightHand).UnlinkFrom(person_);
+					}
+				}
+			}
+			else
+			{
+				grabbingPerson_ = false;
+
+				Check(left_);
+				Check(right_);
+			}
 		}
 
-		private void Check(BodyPart hand, HandInfo info)
+		private void Check(HandInfo info)
 		{
+			if (info.lk != null && info.lk.Expired)
+				info.Unlink();
+
+			var hand = info.hand;
 			bool grabbed = hand.Grabbed;
 
 			if (grabbed && !info.grabbed)
@@ -54,7 +98,7 @@
 						info.lk = null;
 					}
 
-					info.lk = hand.Lock(BodyPartLock.Move);
+					info.lk = hand.Lock(BodyPartLock.Move, "HandLocker", false);
 					if (info.lk != null)
 					{
 						Cue.LogInfo($"linking {hand} with {close}");

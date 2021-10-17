@@ -157,6 +157,11 @@ namespace Cue.Sys.Vam
 			get { return nav_.Teleporting; }
 		}
 
+		public bool Grabbed
+		{
+			get { return atom_.mainController.isGrabbing; }
+		}
+
 		public Vector3 Position
 		{
 			get { return U.FromUnity(atom_.mainController.transform.position); }
