@@ -8,6 +8,7 @@ namespace Cue
 	{
 		int ObjectIndex { get; }
 		string ID { get; }
+		bool IsPlayer { get; }
 		bool Visible { get; set; }
 		Sys.IAtom Atom { get; }
 		Vector3 Position { get; set; }
@@ -137,6 +138,11 @@ namespace Cue
 		public string ID
 		{
 			get { return atom_.ID; }
+		}
+
+		public bool IsPlayer
+		{
+			get { return (this == Cue.Instance.Player); }
 		}
 
 		public bool Visible

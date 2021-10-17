@@ -133,7 +133,7 @@ namespace Cue
 				log_.Info($"this is a sit slot");
 				person_.MakeIdle();
 
-				if (person_ == Cue.Instance.Player)
+				if (person_.IsPlayer)
 				{
 					person_.PushAction(new SitAction(person_, slot));
 					person_.PushAction(new MoveAction(
@@ -151,7 +151,7 @@ namespace Cue
 				log_.Info($"this is a stand slot");
 				person_.MakeIdle();
 
-				if (person_ == Cue.Instance.Player)
+				if (person_.IsPlayer)
 				{
 					person_.PushAction(new MakeIdleAction(person_));
 					person_.PushAction(new MoveAction(

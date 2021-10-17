@@ -329,12 +329,12 @@ namespace Cue
 			// this person leads by default
 			bool leader = true;
 
-			if (person_ == Cue.Instance.Player)
+			if (person_.IsPlayer)
 			{
 				// player never leads
 				leader = false;
 			}
-			else if (person_.Body.Get(BP.Head).Grabbed && target != Cue.Instance.Player)
+			else if (person_.Body.Get(BP.Head).Grabbed && !target.IsPlayer)
 			{
 				// this person's head is grabbed and being moved towards a
 				// target that's not the player, make the target the leader
@@ -376,7 +376,7 @@ namespace Cue
 			atom_.Value = target.ID;
 			target_.Value = "LipTrigger";
 
-			if (target == Cue.Instance.Player)
+			if (target.IsPlayer)
 			{
 				headAngleX_.Value = StartHeadAngleXWithPlayer;
 				headAngleY_.Value = StartHeadAngleYWithPlayer;

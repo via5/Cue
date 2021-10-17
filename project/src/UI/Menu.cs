@@ -199,7 +199,7 @@ namespace Cue
 			return new CheckBoxItem("Mouth",
 				(p, b) =>
 				{
-					if (p != null && p != Cue.Instance.Player)
+					if (p != null && !p.IsPlayer)
 						p.AI.GetEvent<MouthEvent>().Active = b;
 				},
 

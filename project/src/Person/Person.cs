@@ -87,7 +87,7 @@ namespace Cue
 			Body.Init();
 			gaze_.Init();
 
-			if (this == Cue.Instance.Player)
+			if (IsPlayer)
 			{
 				AI.CommandsEnabled = false;
 				AI.EventsEnabled = false;
@@ -277,7 +277,7 @@ namespace Cue
 
 			animator_.FixedUpdate(s);
 
-			if (this != Cue.Instance.Player)
+			if (!IsPlayer)
 				expression_.FixedUpdate(s);
 
 			if (ai_ != null && !Atom.Teleporting)
@@ -286,7 +286,7 @@ namespace Cue
 
 		private void UpdateGaze(float s)
 		{
-			if (Cue.Instance.Player != this)
+			if (!IsPlayer)
 				gaze_.Update(s);
 		}
 
@@ -348,7 +348,7 @@ namespace Cue
 			I.End();
 
 
-			if (this != Cue.Instance.Player)
+			if (!IsPlayer)
 			{
 				I.Start(I.UpdatePersonExcitement);
 				{

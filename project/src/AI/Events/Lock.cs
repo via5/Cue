@@ -37,7 +37,7 @@
 
 		public override void Update(float s)
 		{
-			if (person_ == Cue.Instance.Player)
+			if (person_.IsPlayer)
 				return;
 
 			if (person_.Grabbed)
@@ -132,6 +132,9 @@
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
+				if (p.IsPlayer)
+					continue;
+
 				foreach (var bp in p.Body.Parts)
 				{
 					if (bp == hand)

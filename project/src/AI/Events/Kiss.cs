@@ -123,7 +123,7 @@ namespace Cue
 				if (target == person_)
 					continue;
 
-				if (playerOnly && target != Cue.Instance.Player)
+				if (playerOnly && !target.IsPlayer)
 					continue;
 
 				var targetLips = target.Body.Get(BP.Lips);
@@ -255,11 +255,7 @@ namespace Cue
 				return false;
 
 			var d = Vector3.Distance(srcLips.Position, targetLips.Position);
-
-			var hasPlayer = (
-				person_ == Cue.Instance.Player ||
-				target == Cue.Instance.Player);
-
+			var hasPlayer = (person_.IsPlayer || target.IsPlayer);
 			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
 
 			return (d >= sd);

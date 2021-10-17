@@ -361,7 +361,7 @@ namespace Cue
 			var ps = person_.Personality;
 
 			// check player avoidance
-			if (t == Cue.Instance.Player && g_.ShouldAvoidPlayer())
+			if (t.IsPlayer && g_.ShouldAvoidPlayer())
 			{
 				targets_.SetShouldAvoid(t, true, "avoid player");
 				return Continue;
@@ -771,7 +771,7 @@ namespace Cue
 				if (p == person_)
 					continue;
 
-				if (p == Cue.Instance.Player && g_.ShouldAvoidPlayer())
+				if (p.IsPlayer && g_.ShouldAvoidPlayer())
 					continue;
 
 				if (!p.IsInteresting)

@@ -216,7 +216,7 @@ namespace Cue
 				{
 					Cue.LogInfo($"{src}: hit on {hit.pos}");
 
-					if (src == Cue.Instance.Player && src.Possessed)
+					if (src.IsPlayer && src.Possessed)
 					{
 						Cue.LogInfo("refusing to move the player");
 						return true;
