@@ -48,7 +48,7 @@ namespace Cue
 			{
 				elapsed_ = 0;
 				if (person_.Kisser.Active)
-					person_.Kisser.Stop();
+					Stop();
 
 				return;
 			}

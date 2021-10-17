@@ -128,11 +128,20 @@ V.Float("IdleNaturalRandomWeight"),
 // looking at a random point when not busy and scene is not idle
 V.Float("NaturalRandomWeight"),
 
-// looking at a random person when not busy; see also otherEyesExcitementWeight
+// looking at a random person when not busy; see also OtherEyesExcitementWeight
 V.Float("NaturalOtherEyesWeight"),
 
-// looking at a random person when busy; see also otherEyesExcitementWeight
+// looking at a random person when busy; see also OtherEyesExcitementWeight
 V.Float("BusyOtherEyesWeight"),
+
+// looking at the player randomly when not busy, used instead of
+// NaturalOtherEyesWeight for the player (allows for randomly looking at the
+// player more often)
+V.Float("NaturalPlayerEyesWeight"),
+
+// looking at the player randomly when busy, used instead of BusyOtherEyesWeight
+// for the player (allows for randomly looking at the player more often)
+V.Float("BusyPlayerEyesWeight"),
 
 // tiredness value above which random points and targets are disabled
 V.Float("MaxTirednessForRandomGaze", new Limit(0, 1)),

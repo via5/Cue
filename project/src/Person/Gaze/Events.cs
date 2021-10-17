@@ -787,10 +787,20 @@ namespace Cue
 				{
 					float w = 0;
 
-					if (Bits.IsSet(flags, Busy))
-						w = ps.Get(PSE.BusyOtherEyesWeight);
+					if (p.IsPlayer)
+					{
+						if (Bits.IsSet(flags, Busy))
+							w = ps.Get(PSE.BusyPlayerEyesWeight);
+						else
+							w = ps.Get(PSE.NaturalPlayerEyesWeight);
+					}
 					else
-						w = ps.Get(PSE.NaturalOtherEyesWeight);
+					{
+						if (Bits.IsSet(flags, Busy))
+							w = ps.Get(PSE.BusyOtherEyesWeight);
+						else
+							w = ps.Get(PSE.NaturalOtherEyesWeight);
+					}
 
 					w += p.Mood.GazeEnergy * ps.Get(PSE.OtherEyesExcitementWeight);
 

@@ -33,47 +33,49 @@ namespace Cue
 		public const int NaturalRandomWeight = 10;
 		public const int NaturalOtherEyesWeight = 11;
 		public const int BusyOtherEyesWeight = 12;
-		public const int MaxTirednessForRandomGaze = 13;
-		public const int OtherEyesExcitementWeight = 14;
-		public const int OtherEyesOrgasmWeight = 15;
-		public const int BlowjobEyesWeight = 16;
-		public const int BlowjobGenitalsWeight = 17;
-		public const int HandjobEyesWeight = 18;
-		public const int HandjobGenitalsWeight = 19;
-		public const int PenetratedEyesWeight = 20;
-		public const int PenetratedGenitalsWeight = 21;
-		public const int PenetratingEyesWeight = 22;
-		public const int PenetratingGenitalsWeight = 23;
-		public const int GropedEyesWeight = 24;
-		public const int GropedTargetWeight = 25;
-		public const int GropingEyesWeight = 26;
-		public const int GropingTargetWeight = 27;
-		public const int OtherBlowjobEyesWeight = 28;
-		public const int OtherBlowjobTargetEyesWeight = 29;
-		public const int OtherBlowjobTargetGenitalsWeight = 30;
-		public const int OtherHandjobEyesWeight = 31;
-		public const int OtherHandjobTargetEyesWeight = 32;
-		public const int OtherHandjobTargetGenitalsWeight = 33;
-		public const int OtherPenetrationEyesWeight = 34;
-		public const int OtherPenetrationSourceEyesWeight = 35;
-		public const int OtherPenetrationSourceGenitalsWeight = 36;
-		public const int OtherGropedEyesWeight = 37;
-		public const int OtherGropedSourceEyesWeight = 38;
-		public const int OtherGropedTargetWeight = 39;
-		public const int OtherSexExcitementRateFactor = 40;
-		public const int MaxOtherSexExcitement = 41;
-		public const int KissSpeedEnergyFactor = 42;
-		public const int IdleMaxExcitement = 43;
-		public const int TirednessExcitementRateFactor = 44;
-		public const int GazeEnergyTirednessFactor = 45;
-		public const int GazeTirednessFactor = 46;
-		public const int MovementEnergyTirednessFactor = 47;
-		public const int MovementTirednessFactor = 48;
-		public const int ExpressionExcitementFactor = 49;
-		public const int ExpressionTirednessFactor = 50;
+		public const int NaturalPlayerEyesWeight = 13;
+		public const int BusyPlayerEyesWeight = 14;
+		public const int MaxTirednessForRandomGaze = 15;
+		public const int OtherEyesExcitementWeight = 16;
+		public const int OtherEyesOrgasmWeight = 17;
+		public const int BlowjobEyesWeight = 18;
+		public const int BlowjobGenitalsWeight = 19;
+		public const int HandjobEyesWeight = 20;
+		public const int HandjobGenitalsWeight = 21;
+		public const int PenetratedEyesWeight = 22;
+		public const int PenetratedGenitalsWeight = 23;
+		public const int PenetratingEyesWeight = 24;
+		public const int PenetratingGenitalsWeight = 25;
+		public const int GropedEyesWeight = 26;
+		public const int GropedTargetWeight = 27;
+		public const int GropingEyesWeight = 28;
+		public const int GropingTargetWeight = 29;
+		public const int OtherBlowjobEyesWeight = 30;
+		public const int OtherBlowjobTargetEyesWeight = 31;
+		public const int OtherBlowjobTargetGenitalsWeight = 32;
+		public const int OtherHandjobEyesWeight = 33;
+		public const int OtherHandjobTargetEyesWeight = 34;
+		public const int OtherHandjobTargetGenitalsWeight = 35;
+		public const int OtherPenetrationEyesWeight = 36;
+		public const int OtherPenetrationSourceEyesWeight = 37;
+		public const int OtherPenetrationSourceGenitalsWeight = 38;
+		public const int OtherGropedEyesWeight = 39;
+		public const int OtherGropedSourceEyesWeight = 40;
+		public const int OtherGropedTargetWeight = 41;
+		public const int OtherSexExcitementRateFactor = 42;
+		public const int MaxOtherSexExcitement = 43;
+		public const int KissSpeedEnergyFactor = 44;
+		public const int IdleMaxExcitement = 45;
+		public const int TirednessExcitementRateFactor = 46;
+		public const int GazeEnergyTirednessFactor = 47;
+		public const int GazeTirednessFactor = 48;
+		public const int MovementEnergyTirednessFactor = 49;
+		public const int MovementTirednessFactor = 50;
+		public const int ExpressionExcitementFactor = 51;
+		public const int ExpressionTirednessFactor = 52;
 
-		public const int FloatCount = 51;
-		public int GetFloatCount() { return 51; }
+		public const int FloatCount = 53;
+		public int GetFloatCount() { return 53; }
 
 		// strings
 
@@ -167,6 +169,8 @@ namespace Cue
 			"naturalRandomWeight",
 			"naturalOtherEyesWeight",
 			"busyOtherEyesWeight",
+			"naturalPlayerEyesWeight",
+			"busyPlayerEyesWeight",
 			"maxTirednessForRandomGaze",
 			"otherEyesExcitementWeight",
 			"otherEyesOrgasmWeight",
@@ -289,6 +293,8 @@ namespace Cue
 			"naturalRandomWeight",
 			"naturalOtherEyesWeight",
 			"busyOtherEyesWeight",
+			"naturalPlayerEyesWeight",
+			"busyPlayerEyesWeight",
 			"maxTirednessForRandomGaze",
 			"otherEyesExcitementWeight",
 			"otherEyesOrgasmWeight",

@@ -98,6 +98,8 @@
 				"naturalRandomWeight": 0,
 				"naturalOtherEyesWeight": 0.2,
 				"busyOtherEyesWeight": 0.1,
+				"naturalPlayerEyesWeight": 1.5,
+				"busyPlayerEyesWeight": 1,
 				"otherEyesExcitementWeight": 1.0,
 				"maxTirednessForRandomGaze": 0.5,
 				"otherEyesOrgasmWeight": 10,

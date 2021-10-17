@@ -70,6 +70,7 @@ namespace Cue.Sys.Vam
 			DisableAutoExpressions(a);
 			EnableAudioJawDriving(a);
 			FixTriggers(a);
+			SetEyes(a);
 		}
 
 		private static void DisableFreezeWhenGrabbed(Atom a)
@@ -142,6 +143,15 @@ namespace Cue.Sys.Vam
 			//
 			//Cue.LogError($"FixTriggers: moving lip trigger from {t.position} to {c.bounds.center} for {a.uid}");
 			////t.position = c.bounds.center;
+		}
+
+		private static void SetEyes(Atom a)
+		{
+			var v = Cue.Instance.VamSys.GetFloatParameter(
+				a, "Eyes", "maxLeft");
+
+			if (v != null)
+				v.val = 35.0f;
 		}
 	}
 }
