@@ -191,6 +191,7 @@ namespace Cue
 		private readonly Options options_ = new Options();
 
 		private Person player_ = null;
+		private Person forcedPlayer_ = null;
 		private bool paused_ = false;
 		private int frame_ = 0;
 
@@ -230,7 +231,25 @@ namespace Cue
 
 		public Person Player
 		{
-			get { return player_; }
+			get { return forcedPlayer_ ?? player_; }
+		}
+
+		public Person ForcedPlayer
+		{
+			get
+			{
+				return forcedPlayer_;
+			}
+
+			set
+			{
+				if (value == null)
+					LogInfo($"unforcing player");
+				else
+					LogInfo($"forcing player to {value}");
+
+				forcedPlayer_ = value;
+			}
 		}
 
 		public IObject GetObject(int objectIndex)
@@ -563,7 +582,8 @@ namespace Cue
 					everythingActive_[i].SetPaused(Sys.Paused);
 			}
 
-			CheckPossess(s);
+			if (forcedPlayer_ == null)
+				CheckPossess(s);
 
 			if (!Sys.Paused)
 			{

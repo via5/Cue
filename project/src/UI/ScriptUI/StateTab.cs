@@ -25,6 +25,7 @@ namespace Cue
 		private VUI.Label clothing_ = new VUI.Label();
 
 		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
+		private VUI.CheckBox forcePlayer_ = new VUI.CheckBox("Force as player");
 
 		public PersonStateTab(Person p)
 			: base("State", false)
@@ -63,9 +64,6 @@ namespace Cue
 			state.Add(new VUI.Label("Gaze"));
 			state.Add(gaze_);
 
-			state.Add(new VUI.Button("Force state", OnForceState));
-			state.Add(states_);
-
 			state.Add(new VUI.Spacer(20));
 			state.Add(new VUI.Spacer(20));
 
@@ -94,11 +92,24 @@ namespace Cue
 			state.Add(new VUI.Label("Clothing"));
 			state.Add(clothing_);
 
-			Layout = new VUI.BorderLayout();
-			Add(state, VUI.BorderLayout.Top);
 
+			var buttons = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			var pp = new VUI.Panel(new VUI.HorizontalFlow(5));
+			pp.Add(new VUI.Button("Force state", OnForceState));
+			pp.Add(states_);
+
+			buttons.Add(pp);
+			buttons.Add(forcePlayer_);
+
+			Layout = new VUI.VerticalFlow();
+			Add(state);
+			Add(new VUI.Spacer(30));
+			Add(buttons);
 
 			states_.SetItems(PersonState.GetNames().ToList());
+
+			forcePlayer_.Changed += OnForcePlayer;
 		}
 
 		protected override void DoUpdate(float s)
@@ -121,6 +132,16 @@ namespace Cue
 			handjob_.Text = person_.Handjob.ToString();
 			blowjob_.Text = person_.Blowjob.ToString();
 			clothing_.Text = person_.Clothing.ToString();
+
+			forcePlayer_.Checked = (Cue.Instance.ForcedPlayer == person_);
+		}
+
+		private void OnForcePlayer(bool b)
+		{
+			if (b)
+				Cue.Instance.ForcedPlayer = person_;
+			else if (Cue.Instance.ForcedPlayer == person_)
+				Cue.Instance.ForcedPlayer = null;
 		}
 
 		private void OnForceState()

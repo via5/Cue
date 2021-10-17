@@ -198,9 +198,10 @@ namespace Cue
 						gazer_.Enabled = false;
 					else
 						gazer_.Enabled = gazerEnabled_;
+
+					gazer_.Variance = picker_.CurrentTarget.Variance;
 				}
 
-				gazer_.Variance = picker_.CurrentTarget.Variance;
 				eyes_.LookAt(picker_.Position);
 				eyes_.Update(s);
 				gazer_.Update(s);

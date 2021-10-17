@@ -9,10 +9,10 @@ namespace Cue
 		public const float PlayerStopDistance = 0.15f;
 		public const float MinimumActiveTime = 3;
 		public const float MinWait = 2;
-		public const float MaxWait = 60;
+		public const float MaxWait = 120;
 		public const float MinDuration = 2;
 		public const float MaxDuration = 30;
-		public const float MinWaitAfterGrab = 30;
+		public const float WaitWhenFailed = 1;
 
 		private float elapsed_ = 0;
 		private float wait_ = 0;
@@ -57,22 +57,45 @@ namespace Cue
 			elapsed_ += s;
 
 			if (person_.Kisser.Active)
-			{
-				if (elapsed_ >= duration_ || MustStop())
-				{
-					Stop();
-				}
-			}
+				UpdateActive();
 			else
-			{
-				var elapsed = (elapsed_ > wait_);
-				var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
-				var playerOnly = !elapsed && grabbed;
+				UpdateInactive();
+		}
 
-				if (elapsed || grabbed)
+		private void UpdateActive()
+		{
+			var target = person_.Kisser.Target;
+
+			bool tooLong = false;
+
+			// never stop with player
+			if (target == null || !target.IsPlayer)
+				tooLong = (elapsed_ >= duration_);
+
+			if (tooLong || MustStop())
+				Stop();
+		}
+
+		private void UpdateInactive()
+		{
+			if (TryStart(true))
+			{
+				Next();
+				return;
+			}
+
+			var elapsed = (elapsed_ > wait_);
+			var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
+
+			if (elapsed || grabbed)
+			{
+				lastResult_ = "";
+
+				if (SelfCanStart(person_))
 				{
 					Next();
-					TryStart(playerOnly);
+					if (!TryStart(false))
+						wait_ = WaitWhenFailed;
 				}
 			}
 		}
@@ -81,40 +104,28 @@ namespace Cue
 		{
 			var t = person_.Kisser.Target;
 
-			var wasGrabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
-			if (!wasGrabbed && t != null)
-				wasGrabbed = t.Body.Get(BP.Head).GrabbedByPlayer;
-
-			StopSelf(wasGrabbed);
+			StopSelf();
 
 			if (t != null)
-				t.AI.GetEvent<KissEvent>().StopSelf(wasGrabbed);
+				t.AI.GetEvent<KissEvent>().StopSelf();
 		}
 
-		private void StopSelf(bool wasGrabbed)
+		private void StopSelf()
 		{
 			Unlock();
-			Next(wasGrabbed);
+			Next();
 			person_.Kisser.Stop();
 		}
 
-		private void Next(bool wasGrabbed = false)
+		private void Next()
 		{
 			wait_ = U.RandomGaussian(MinWait, MaxWait);
 			duration_ = U.RandomGaussian(MinDuration, MaxDuration);
 			elapsed_ = 0;
-
-			if (wasGrabbed)
-				wait_ = Math.Min(wait_, MinWaitAfterGrab);
 		}
 
 		private bool TryStart(bool playerOnly)
 		{
-			lastResult_ = "";
-
-			if (!SelfCanStart(person_))
-				return false;
-
 			var srcLips = person_.Body.Get(BP.Lips).Position;
 			bool foundClose = false;
 

@@ -101,7 +101,7 @@
 					info.lk = hand.Lock(BodyPartLock.Move, "HandLocker", false);
 					if (info.lk != null)
 					{
-						Cue.LogInfo($"linking {hand} with {close}");
+						//Cue.LogInfo($"linking {hand} with {close}");
 						hand.LinkTo(close);
 					}
 				}
