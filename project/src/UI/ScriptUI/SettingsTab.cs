@@ -34,7 +34,7 @@ namespace Cue
 
 			personality_.SelectionChanged += OnPersonality;
 			voicePitch_.ValueChanged += OnVoicePitch;
-			traits_.Submitted += OnTraits;
+			traits_.Edited += OnTraits;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 

@@ -125,17 +125,32 @@ namespace Cue
 		public BodyPartLock[] LockMany(int[] bodyParts, int lockType)
 		{
 			List<BodyPartLock> list = null;
+			bool failed = false;
 
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
 				var lk = Get(bodyParts[i]).Lock(lockType);
 				if (lk == null)
-					return null;
+				{
+					failed = true;
+					break;
+				}
 
 				if (list == null)
 					list = new List<BodyPartLock>();
 
 				list.Add(lk);
+			}
+
+			if (failed)
+			{
+				if (list != null)
+				{
+					for (int i = 0; i < list.Count; ++i)
+						list[i].Unlock();
+				}
+
+				return null;
 			}
 
 			return list.ToArray();

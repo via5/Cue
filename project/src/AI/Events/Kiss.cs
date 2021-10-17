@@ -136,6 +136,8 @@ namespace Cue
 
 					if (TryStartWith(target))
 						return true;
+
+					Unlock();
 				}
 			}
 
@@ -155,7 +157,7 @@ namespace Cue
 				return false;
 			}
 
-			var sf = target.AI.GetEvent<KissEvent>().StartedFrom(person_);
+			var sf = target.AI.GetEvent<KissEvent>().TryStartFrom(person_);
 			if (sf != "")
 			{
 				lastResult_ = $"other failed to start: " + sf;
@@ -165,13 +167,16 @@ namespace Cue
 			if (!person_.Kisser.StartReciprocal(target))
 			{
 				lastResult_ = $"kisser failed to start";
+				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
 			}
+
+			target.AI.GetEvent<KissEvent>().StartedFrom(person_);
 
 			return true;
 		}
 
-		private string StartedFrom(Person initiator)
+		private string TryStartFrom(Person initiator)
 		{
 			if (!person_.Options.CanKiss)
 				return $"target {person_.ID} kissing disabled";
@@ -185,9 +190,12 @@ namespace Cue
 			if (!Lock())
 				return $"target {person_.ID} lock failed";
 
-			Next();
-
 			return "";
+		}
+
+		private void StartedFrom(Person initiator)
+		{
+			Next();
 		}
 
 		private bool Lock()

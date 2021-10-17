@@ -22,6 +22,21 @@
 		{
 		}
 
+		public override string[] Debug()
+		{
+			return new string[]
+			{
+				$"active        {active_}",
+				$"elapsed       {checkElapsed_:0.00}",
+				$"left target   {leftTarget_}",
+				$"left groped   {leftGroped_}",
+				$"left lock     {leftLock_?.ToString() ?? ""}",
+				$"right target  {rightTarget_}",
+				$"right groped  {rightGroped_}",
+				$"right lock    {rightLock_?.ToString() ?? ""}"
+			};
+		}
+
 		public bool Active
 		{
 			get
@@ -90,6 +105,12 @@
 				checkElapsed_ = 0;
 				Check();
 
+				if (leftTarget_ == null)
+					UnlockLeft();
+
+				if (rightTarget_ == null)
+					UnlockRight();
+
 				if (leftTarget_ == null && rightTarget_ == null)
 					active_ = false;
 			}
@@ -130,17 +151,15 @@
 				(leftTarget != null && leftTarget.Type == BP.Penis) &&
 				(leftTarget.Person == rightTarget.Person))
 			{
-				if (person_.Handjob.StartBoth(leftTarget.Person))
+				Cue.LogError($"double hj");
+
+				if (LockBoth())
 				{
-					Cue.LogError($"double hj");
-
-					leftLock_ = LockLeft();
-					if (leftLock_ != null)
+					if (person_.Handjob.StartBoth(leftTarget.Person))
+					{
 						leftTarget_ = leftTarget.Person;
-
-					rightLock_ = LockRight();
-					if (rightLock_ != null)
 						rightTarget_ = rightTarget.Person;
+					}
 				}
 			}
 			else
@@ -149,24 +168,21 @@
 				{
 					if (leftTarget.Type == BP.Penis)
 					{
-						if (person_.Handjob.StartLeft(leftTarget.Person))
-						{
-							Cue.LogError($"left hj");
+						Cue.LogError($"left hj");
 
-							leftLock_ = LockLeft();
-							if (leftLock_ != null)
+						if (LockLeft())
+						{
+							if (person_.Handjob.StartLeft(leftTarget.Person))
 								leftTarget_ = leftTarget.Person;
 						}
 					}
 					else if (leftTarget.Type == BP.Labia)
 					{
-						if (person_.Animator.PlayType(Animations.LeftFinger, leftTarget.Person))
+						Cue.LogError($"left finger");
+
+						if (LockLeft())
 						{
-							Cue.LogError($"left finger");
-
-							leftLock_ = LockLeft();
-
-							if (leftLock_ != null)
+							if (person_.Animator.PlayType(Animations.LeftFinger, leftTarget.Person))
 							{
 								leftTarget_ = leftTarget.Person;
 								leftGroped_ = true;
@@ -181,24 +197,21 @@
 				{
 					if (rightTarget.Type == BP.Penis)
 					{
-						if (person_.Handjob.StartRight(rightTarget.Person))
-						{
-							Cue.LogError($"right hj");
+						Cue.LogError($"right hj");
 
-							rightLock_ = LockRight();
-							if (rightLock_ != null)
+						if (LockRight())
+						{
+							if (person_.Handjob.StartRight(rightTarget.Person))
 								rightTarget_ = rightTarget.Person;
 						}
 					}
 					else if (rightTarget.Type == BP.Labia)
 					{
-						if (person_.Animator.PlayType(Animations.RightFinger, rightTarget.Person))
+						Cue.LogError($"right finger");
+
+						if (LockRight())
 						{
-							Cue.LogError($"right finger");
-
-							rightLock_ = LockRight();
-
-							if (rightLock_ != null)
+							if (person_.Animator.PlayType(Animations.RightFinger, rightTarget.Person))
 							{
 								rightTarget_ = rightTarget.Person;
 								rightGroped_ = true;
@@ -212,18 +225,27 @@
 			}
 		}
 
-		private BodyPartLock[] LockLeft()
+		private bool LockBoth()
 		{
-			return person_.Body.LockMany(
-				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
-				BodyPartLock.Anim);
+			return LockLeft() && LockRight();
 		}
 
-		private BodyPartLock[] LockRight()
+		private bool LockLeft()
 		{
-			return person_.Body.LockMany(
+			leftLock_ = person_.Body.LockMany(
+				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
+				BodyPartLock.Anim);
+
+			return (leftLock_ != null);
+		}
+
+		private bool LockRight()
+		{
+			rightLock_ = person_.Body.LockMany(
 				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
 				BodyPartLock.Anim);
+
+			return (rightLock_ != null);
 		}
 
 		private BodyPart FindTarget(int handPart)
