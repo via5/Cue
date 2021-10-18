@@ -2,6 +2,203 @@
 
 namespace Cue.Sys.Vam
 {
+	static class Parameters
+	{
+		private const int CheckPluginCount = 20;
+
+		public static string[] MakeStorableNamesCache(string name)
+		{
+			var c = new string[CheckPluginCount];
+
+			for (int i = 0; i < CheckPluginCount; ++i)
+				c[i] = $"plugin#{i}_{name}";
+
+			return c;
+		}
+
+		private static JSONStorable FindStorable(
+			Atom a, string name, string[] storableNamesCache)
+		{
+			var s = a.GetStorableByID(name);
+
+			if (s == null)
+			{
+				for (int i = 0; i < CheckPluginCount; ++i)
+				{
+					string p;
+
+					if (storableNamesCache == null)
+						p = $"plugin#{i}_{name}";
+					else
+						p = storableNamesCache[i];
+
+					s = a.GetStorableByID(p);
+					if (s != null)
+						break;
+				}
+			}
+
+			return s;
+		}
+
+		public static JSONStorableFloat GetFloat(
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetFloat(
+				(o?.Atom as VamAtom)?.Atom,
+				storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableFloat GetFloat(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetFloatJSONParam(param);
+		}
+
+		public static JSONStorableBool GetBool(
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetBool(
+				(o?.Atom as VamAtom)?.Atom,
+				storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableBool GetBool(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetBoolJSONParam(param);
+		}
+
+		public static JSONStorableString GetString(
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetString(
+				(o?.Atom as VamAtom)?.Atom,
+				storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableString GetString(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetStringJSONParam(param);
+		}
+
+
+		public static JSONStorableStringChooser GetStringChooser(
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetStringChooser(
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableStringChooser GetStringChooser(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetStringChooserJSONParam(param);
+		}
+
+
+		public static JSONStorableColor GetColor(
+		IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetColor(
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableColor GetColor(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetColorJSONParam(param);
+		}
+
+
+		public static JSONStorableAction GetAction(
+			IObject o, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			return GetAction(
+				(o?.Atom as VamAtom)?.Atom, storable, param, storableNamesCache);
+		}
+
+		public static JSONStorableAction GetAction(
+			Atom a, string storable, string param,
+			string[] storableNamesCache = null)
+		{
+			if (a == null)
+				return null;
+
+			var st = FindStorable(a, storable, storableNamesCache);
+			if (st == null)
+			{
+				//Cue.LogError($"{a.uid}: no storable {storable}");
+				return null;
+			}
+
+			return st.GetAction(param);
+		}
+	}
+
+
 	abstract class ParameterChecker
 	{
 		private readonly float interval_;
@@ -16,7 +213,7 @@ namespace Cue.Sys.Vam
 			// so they don't all check on the same frame
 			interval_ = (interval < 0 ? U.RandomFloat(1.5f, 2.5f) : interval);
 
-			storableNamesCache_ = VamSys.MakeStorableNamesCache(storableId);
+			storableNamesCache_ = Parameters.MakeStorableNamesCache(storableId);
 		}
 
 		public void MakeStale()
@@ -282,7 +479,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableBool DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetBoolParameter(
+			return Parameters.GetBool(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -312,7 +509,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableBool DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetBoolParameter(
+			return Parameters.GetBool(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -399,7 +596,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableFloat DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetFloatParameter(
+			return Parameters.GetFloat(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -503,7 +700,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableFloat DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetFloatParameter(
+			return Parameters.GetFloat(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -538,7 +735,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableStringChooser DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetStringChooserParameter(
+			return Parameters.GetStringChooser(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -573,7 +770,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableStringChooser DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetStringChooserParameter(
+			return Parameters.GetStringChooser(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -603,7 +800,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableString DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetStringParameter(
+			return Parameters.GetString(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -638,7 +835,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableString DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetStringParameter(
+			return Parameters.GetString(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -668,7 +865,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableColor DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetColorParameter(
+			return Parameters.GetColor(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -703,7 +900,7 @@ namespace Cue.Sys.Vam
 
 		protected override JSONStorableColor DoGetParameter()
 		{
-			return Cue.Instance.VamSys?.GetColorParameter(
+			return Parameters.GetColor(
 				atom_, storableID_, paramName_, storableNamesCache_);
 		}
 
@@ -784,7 +981,7 @@ namespace Cue.Sys.Vam
 
 		protected override bool GetParameter()
 		{
-			param_ = Cue.Instance.VamSys?.GetActionParameter(
+			param_ = Parameters.GetAction(
 				atom_, storableID_, paramName_, storableNamesCache_);
 
 			return (param_ != null);

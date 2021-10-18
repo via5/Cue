@@ -251,7 +251,7 @@ namespace Cue.Proc
 
 		public void DumpActive()
 		{
-			var mui = Cue.Instance.VamSys.GetMUI(person_.VamAtom.Atom);
+			var mui = Sys.Vam.U.GetMUI(person_.VamAtom.Atom);
 
 			foreach (var m in mui.GetMorphs())
 			{

@@ -270,7 +270,7 @@ namespace Cue.Sys.Vam
 				rot = 5;
 			}
 
-			var c = Cue.Instance.VamSys.FindController(atom_, cn);
+			var c = U.FindController(atom_, cn);
 			if (c == null)
 			{
 				log_.Error($"SetStrongerDamping: controller '{cn}' not found");
@@ -283,7 +283,7 @@ namespace Cue.Sys.Vam
 
 		void SetControllerForMoving(string id, bool b)
 		{
-			var fc = Cue.Instance.VamSys.FindController(atom_, id);
+			var fc = U.FindController(atom_, id);
 
 			fc.currentPositionState = (b ?
 				FreeControllerV3.PositionState.Off :
@@ -367,7 +367,7 @@ namespace Cue.Sys.Vam
 			if (head_ != null)
 				return;
 
-			head_ = Cue.Instance.VamSys.FindController(atom_, "headControl");
+			head_ = U.FindController(atom_, "headControl");
 		}
 
 		private void OnCorruption()

@@ -63,7 +63,7 @@ namespace Cue.Sys.Vam
 
 		private void FindIgnoreTransforms(string[] ignoreTransforms)
 		{
-			var rb = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "hip");
+			var rb = U.FindRigidbody(atom_.Atom, "hip");
 			if (rb == null)
 				Cue.LogError($"{atom_.ID}: trigger {h_.name}: no hip");
 			else
@@ -72,8 +72,7 @@ namespace Cue.Sys.Vam
 			var list = new List<Transform>();
 			for (int i = 0; i < ignoreTransforms.Length; ++i)
 			{
-				rb = Cue.Instance.VamSys.FindRigidbody(
-					atom_.Atom, ignoreTransforms[i]);
+				rb = U.FindRigidbody(atom_.Atom, ignoreTransforms[i]);
 
 				if (rb != null)
 				{
@@ -81,7 +80,7 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					var t = Cue.Instance.VamSys.FindChildRecursive(
+					var t = U.FindChildRecursive(
 						atom_.Atom, ignoreTransforms[i])?.transform;
 
 					if (t != null)

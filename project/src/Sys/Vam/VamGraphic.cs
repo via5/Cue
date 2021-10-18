@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
@@ -42,7 +44,7 @@ namespace Cue.Sys.Vam
 				{
 					// was opaque, now transparent
 					if (material_)
-						Object.Destroy(material_);
+						UnityEngine.Object.Destroy(material_);
 
 					material_ = CreateTransparentMaterial();
 				}
@@ -50,7 +52,7 @@ namespace Cue.Sys.Vam
 				{
 					// was transparent, now opaque
 					if (material_)
-						Object.Destroy(material_);
+						UnityEngine.Object.Destroy(material_);
 
 					material_ = CreateOpaqueMaterial();
 				}
@@ -127,7 +129,7 @@ namespace Cue.Sys.Vam
 			if (object_ == null)
 				return;
 
-			Object.Destroy(object_);
+			UnityEngine.Object.Destroy(object_);
 		}
 	}
 
@@ -161,6 +163,162 @@ namespace Cue.Sys.Vam
 		public VamCapsuleGraphic(string name, Color c)
 			: base(name, PrimitiveType.Capsule, c)
 		{
+		}
+	}
+
+
+
+	class VamDebugRenderer
+	{
+		interface IRender
+		{
+			void Destroy();
+			bool Update(float s);
+		}
+
+
+		class BoxRender : IRender
+		{
+			private Transform t_;
+			private IGraphic g_;
+
+			public BoxRender(Transform t)
+			{
+				t_ = t;
+				g_ = Cue.Instance.Sys.CreateBoxGraphic(
+					$"cue!DebugRender.{t.name}",
+					Vector3.Zero, new Vector3(0.1f, 0.1f, 0.1f),
+					new Color(0, 0, 1, 0.1f));
+			}
+
+			public void Destroy()
+			{
+				if (g_ != null)
+				{
+					g_.Destroy();
+					g_ = null;
+				}
+			}
+
+			public bool Update(float s)
+			{
+				try
+				{
+					if (g_ == null)
+						return false;
+
+					g_.Position = U.FromUnity(t_.position);
+					g_.Rotation = U.FromUnity(t_.rotation);
+
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+
+		class ColliderRender : IRender
+		{
+			private CapsuleCollider cc_;
+			private Transform parent_;
+			private VamGraphic g_;
+
+			public ColliderRender(Collider c)
+			{
+				cc_ = c as CapsuleCollider;
+
+				parent_ = new GameObject().transform;
+				parent_.SetParent(Cue.Instance.VamSys.RootTransform, false);
+
+				g_ = Cue.Instance.Sys.CreateCapsuleGraphic(
+					$"cue!DebugRender.{c.transform.name}",
+					new Color(0, 0, 1, 0.1f)) as VamGraphic;
+
+				g_.Transform.SetParent(parent_, false);
+			}
+
+			public void Destroy()
+			{
+				if (g_ != null)
+				{
+					g_.Destroy();
+					g_ = null;
+				}
+			}
+
+			public bool Update(float s)
+			{
+				try
+				{
+					if (g_ == null)
+						return false;
+
+					float size = cc_.radius * 2;
+					float height = cc_.height / 2;
+
+					parent_.position = cc_.transform.parent.position;
+					parent_.rotation = cc_.transform.parent.rotation;
+
+					g_.Size = new Vector3(size, height, size);
+
+					if (cc_.direction == 0)
+						g_.Rotation = U.FromUnity(UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.forward));
+					else if (cc_.direction == 2)
+						g_.Rotation = U.FromUnity(UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.right));
+
+					g_.Position = U.FromUnity(cc_.center);
+
+					return true;
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+			}
+		}
+
+
+		private List<IRender> renders_ = null;
+
+		public void AddRender(Transform t)
+		{
+			AddRender(new BoxRender(t));
+		}
+
+		public void AddRender(Collider c)
+		{
+			AddRender(new ColliderRender(c));
+		}
+
+		private void AddRender(IRender r)
+		{
+			if (renders_ == null)
+				renders_ = new List<IRender>();
+
+			renders_.Add(r);
+		}
+
+		public void Update(float s)
+		{
+			if (renders_ != null)
+			{
+				int i = 0;
+				while (i < renders_.Count)
+				{
+					if (renders_[i].Update(s))
+					{
+						++i;
+					}
+					else
+					{
+						renders_[i].Destroy();
+						renders_.RemoveAt(i);
+					}
+				}
+			}
 		}
 	}
 }

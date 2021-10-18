@@ -45,7 +45,7 @@ namespace Cue
 			upDownAngle_ = new Sys.Vam.FloatParameter(p, "Eyes", "upDownAngleAdjust");
 			blink_ = new Sys.Vam.BoolParameter(p, "EyelidControl", "blinkEnabled");
 
-			eyes_ = Cue.Instance.VamSys?.FindRigidbody(person_, "eyeTargetControl");
+			eyes_ = Sys.Vam.U.FindRigidbody(person_, "eyeTargetControl");
 
 			if (eyes_ == null)
 			{

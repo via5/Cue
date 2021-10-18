@@ -402,7 +402,7 @@ namespace Cue.Sys.Vam
 			DAZMorph m;
 
 			if (bank == null)
-				m = Cue.Instance.VamSys.FindMorph(atom.Atom, morphId);
+				m = U.FindMorph(atom.Atom, morphId);
 			else
 				m = bank.GetMorph(morphId);
 

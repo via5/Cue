@@ -40,7 +40,7 @@ namespace Cue.Proc
 
 		protected override void DoStart(Person p)
 		{
-			fc_ = Cue.Instance.VamSys.FindController(p.VamAtom.Atom, cname_);
+			fc_ = Sys.Vam.U.FindController(p.VamAtom.Atom, cname_);
 			if (fc_ == null)
 			{
 				Cue.LogError($"ProceduralStep: controller {cname_} not found in {p}");

@@ -81,12 +81,14 @@ project\src\Sys\Vam\VamFixes.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamHair.cs
 project\src\Sys\Vam\VamInput.cs
+project\src\Sys\Vam\VamLiveSaver.cs
 project\src\Sys\Vam\VamLog.cs
 project\src\Sys\Vam\VamMorphs.cs
 project\src\Sys\Vam\VamNav.cs
 project\src\Sys\Vam\VamObjects.cs
 project\src\Sys\Vam\VamParameter.cs
 project\src\Sys\Vam\VamSys.cs
+project\src\Sys\Vam\VamUtilities.cs
 project\src\Sys\Vam\BodyParts\ColliderBodyPart.cs
 project\src\Sys\Vam\BodyParts\EyesBodyPart.cs
 project\src\Sys\Vam\BodyParts\RigidbodyBodyPart.cs

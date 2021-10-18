@@ -20,7 +20,7 @@ namespace Cue.Sys.Vam
 			var cs = new List<Collider>();
 			foreach (var cn in colliders)
 			{
-				var c = Cue.Instance.VamSys.FindCollider(a.Atom, cn);
+				var c = U.FindCollider(a.Atom, cn);
 				if (c == null)
 				{
 					Cue.LogError($"collider {cn} not found");

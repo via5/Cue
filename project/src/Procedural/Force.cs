@@ -135,7 +135,7 @@ namespace Cue.Proc
 		{
 			if (p.VamAtom != null)
 			{
-				rb_ = Cue.Instance.VamSys.FindRigidbody(p.VamAtom.Atom, rbId_);
+				rb_ = Sys.Vam.U.FindRigidbody(p.VamAtom.Atom, rbId_);
 				if (rb_ == null)
 				{
 					Cue.LogError($"Force: rigidbody {rbId_} not found");

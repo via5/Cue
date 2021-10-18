@@ -96,22 +96,20 @@ namespace Cue.Sys.Vam
 
 		private static void DisableAutoExpressions(Atom a)
 		{
-			var b = Cue.Instance.VamSys.GetBoolParameter(
-				a, "AutoExpressions", "enabled");
-
+			var b = Parameters.GetBool(a, "AutoExpressions", "enabled");
 			if (b != null)
 				b.val = false;
 		}
 
 		private static void EnableAudioJawDriving(Atom a)
 		{
-			var p = Cue.Instance.VamSys.GetBoolParameter(
+			var p = Parameters.GetBool(
 				a, "JawControl", "driveXRotationFromAudioSource");
 
 			if (p != null)
 				p.val = true;
 
-			var v = Cue.Instance.VamSys.GetFloatParameter(
+			var v = Parameters.GetFloat(
 				a, "JawControl", "driveXRotationFromAudioSourceMultiplier");
 
 			v.val = v.max;
@@ -147,7 +145,7 @@ namespace Cue.Sys.Vam
 
 		private static void SetEyes(Atom a)
 		{
-			var v = Cue.Instance.VamSys.GetFloatParameter(
+			var v = Parameters.GetFloat(
 				a, "Eyes", "maxLeft");
 
 			if (v != null)

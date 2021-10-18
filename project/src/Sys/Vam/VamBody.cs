@@ -410,7 +410,7 @@ namespace Cue.Sys.Vam
 			for (int i = 0; i < 5; ++i)
 				bones[i] = new IBone[3];
 
-			var hand = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, $"{s}Hand");
+			var hand = U.FindRigidbody(atom_.Atom, $"{s}Hand");
 
 			bones[0][0] = FindFingerBone(hand, s, $"{s}Thumb1");
 			bones[0][1] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2");
@@ -574,14 +574,14 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var rb = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, name);
+			var rb = U.FindRigidbody(atom_.Atom, name);
 			if (rb == null)
 				Cue.LogError($"rb {name} not found in {atom_.ID}");
 
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = Cue.Instance.VamSys.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, controller);
 				if (fc == null)
 					Cue.LogError($"rb {name} has no controller {controller} in {atom_.ID}");
 			}
@@ -597,7 +597,7 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var o = Cue.Instance.VamSys.FindChildRecursive(atom_.Atom.transform, name);
+			var o = U.FindChildRecursive(atom_.Atom.transform, name);
 			if (o == null)
 			{
 				Cue.LogError($"trigger {name} not found in {atom_.ID}");
@@ -620,7 +620,7 @@ namespace Cue.Sys.Vam
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = Cue.Instance.VamSys.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, controller);
 				if (fc == null)
 					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.ID}");
 			}
@@ -637,7 +637,7 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var c = Cue.Instance.VamSys.FindCollider(atom_.Atom, name);
+			var c = U.FindCollider(atom_.Atom, name);
 			if (c == null)
 			{
 				Cue.LogError($"collider {name} not found in {atom_.ID}");
@@ -647,7 +647,7 @@ namespace Cue.Sys.Vam
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = Cue.Instance.VamSys.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, controller);
 				if (fc == null)
 					Cue.LogError($"collider {name} has no controller {controller} in {atom_.ID}");
 			}
@@ -655,7 +655,7 @@ namespace Cue.Sys.Vam
 			Rigidbody rb = null;
 			if (closestRb != "")
 			{
-				rb = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, closestRb);
+				rb = U.FindRigidbody(atom_.Atom, closestRb);
 				if (rb == null)
 					Cue.LogError($"collider {name} has no rb {closestRb} in {atom_.ID}");
 			}

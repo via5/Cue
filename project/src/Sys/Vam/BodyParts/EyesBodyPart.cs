@@ -28,7 +28,7 @@ namespace Cue.Sys.Vam
 			if (rEye_ == null)
 				Cue.LogError($"{a.ID} has no right eye");
 
-			head_ = Cue.Instance.VamSys.FindRigidbody(atom_.Atom, "head");
+			head_ = U.FindRigidbody(atom_.Atom, "head");
 			if (head_ == null)
 				Cue.LogError($"{a.ID} has no head");
 		}
