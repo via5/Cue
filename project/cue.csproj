@@ -180,6 +180,11 @@
     <Compile Include="src\Resources\Resources.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
+    <Compile Include="src\Sys\Vam\BodyParts\ColliderBodyPart.cs" />
+    <Compile Include="src\Sys\Vam\BodyParts\EyesBodyPart.cs" />
+    <Compile Include="src\Sys\Vam\BodyParts\RigidbodyBodyPart.cs" />
+    <Compile Include="src\Sys\Vam\BodyParts\StraponBodyPart.cs" />
+    <Compile Include="src\Sys\Vam\BodyParts\TriggerBodyPart.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
     <Compile Include="src\Sys\Vam\VamAtomNav.cs" />
     <Compile Include="src\Sys\Vam\VamBody.cs" />

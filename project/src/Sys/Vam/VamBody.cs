@@ -55,7 +55,7 @@ namespace Cue.Sys.Vam
 	class VamBody : VamBasicBody
 	{
 		private VamAtom atom_;
-		private readonly VamStraponBodyPart strapon_;
+		private readonly StraponBodyPart strapon_;
 		private FloatParameter scale_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
@@ -73,7 +73,7 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 		{
 			atom_ = a;
-			strapon_ = new VamStraponBodyPart(a);
+			strapon_ = new StraponBodyPart(a);
 
 			scale_ = new FloatParameter(a, "rescaleObject", "scale");
 			if (!scale_.Check(true))

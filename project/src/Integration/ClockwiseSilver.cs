@@ -596,7 +596,7 @@ namespace Cue
 			}
 			else if (target.Body.HasPenis)
 			{
-				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.VamStraponBodyPart;
+				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.StraponBodyPart;
 				male_.Value = s.Dildo.ID;
 			}
 			else
@@ -766,7 +766,7 @@ namespace Cue
 			}
 			else if (target.Body.HasPenis)
 			{
-				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.VamStraponBodyPart;
+				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.StraponBodyPart;
 				male_.Value = s.Dildo.ID;
 			}
 			else

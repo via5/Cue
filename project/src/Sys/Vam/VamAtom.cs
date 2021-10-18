@@ -309,19 +309,6 @@ namespace Cue.Sys.Vam
 
 		public void OnPluginState(bool b)
 		{
-			// this would prevent both grabbing with a possessed hand and
-			// grabbing	from a distance with the pointer, there doesn't seem to
-			// be a way to only disable the latter
-			//
-			//foreach (var rb in atom_.rigidbodies)
-			//{
-			//	var fc = rb.GetComponent<FreeControllerV3>();
-			//	if (fc != null)
-			//		fc.interactableInPlayMode = !b;
-			//}
-			//
-			//atom_.mainController.interactableInPlayMode = !b;
-
 			body_?.OnPluginState(b);
 			hair_?.OnPluginState(b);
 		}
