@@ -237,6 +237,10 @@ namespace Cue.Sys.Vam
 					{
 						postCreate_ = false;
 						dildo_.Atom.Collisions = true;
+
+						if ((dildo_.Atom as VamAtom).Atom.type == "Dildo")
+							VamFixes.FixDildo((dildo_.Atom as VamAtom).Atom);
+
 					}
 				}
 			}
@@ -278,11 +282,7 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			var rb = d.GetComponentInChildren<Rigidbody>();
-			if (rb == null)
-				Cue.LogWarning($"{d.uid} has no rigidbody");
-
-			Init(h, d.mainController, d.transform, null, rb);
+			Init(h, d.mainController, d.transform, null);
 		}
 	}
 }

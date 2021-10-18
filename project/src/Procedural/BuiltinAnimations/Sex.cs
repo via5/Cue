@@ -110,6 +110,8 @@ namespace Cue.Proc
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)
 				Cue.LogError("hipForce not found");
+			else
+				hipForce_.BeforeNextAction = () => UpdateForce(hipForce_);
 
 			hipTorque_ = FindTarget("hipTorque") as Force;
 			if (hipTorque_ == null)

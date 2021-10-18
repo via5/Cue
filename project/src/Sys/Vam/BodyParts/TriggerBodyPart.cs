@@ -7,7 +7,6 @@ namespace Cue.Sys.Vam
 	{
 		private CollisionTriggerEventHandler h_;
 		private Trigger trigger_ = null;
-		private Rigidbody rb_ = null;
 		private FreeControllerV3 fc_ = null;
 		private Transform t_ = null;
 		private Transform ignoreStop_ = null;
@@ -41,12 +40,10 @@ namespace Cue.Sys.Vam
 
 		protected void Init(
 			CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms,
-			Rigidbody rb = null)
+			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
 		{
 			h_ = h;
 			trigger_ = h?.collisionTrigger?.trigger;
-			rb_ = rb ?? h?.thisRigidbody;
 			fc_ = fc;
 			t_ = tr;
 			ignoreTransforms_ = new Transform[0];
@@ -111,7 +108,7 @@ namespace Cue.Sys.Vam
 
 		public override Rigidbody Rigidbody
 		{
-			get { return rb_; }
+			get { return h_.thisRigidbody; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -271,10 +268,10 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (rb_ == null)
+				if (h_.thisRigidbody == null)
 					return Vector3.Zero;
 				else
-					return U.FromUnity(rb_.position);
+					return U.FromUnity(h_.thisRigidbody.position);
 			}
 
 			set { Cue.LogError("cannot move triggers"); }
@@ -284,10 +281,10 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (rb_ == null)
+				if (h_.thisRigidbody == null)
 					return Quaternion.Zero;
 				else
-					return U.FromUnity(rb_.rotation);
+					return U.FromUnity(h_.thisRigidbody.rotation);
 			}
 
 			set { Cue.LogError("cannot rotate triggers"); }

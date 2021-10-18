@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
@@ -21,7 +19,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		private static void FixDildo(Atom a)
+		public static void FixDildo(Atom a)
 		{
 			// looks like the CollisionTriggerEventHandler on the main object
 			// never receives the OnCollision* callbacks, but there's a bunch
@@ -35,30 +33,32 @@ namespace Cue.Sys.Vam
 			// there's no CollisionTriggerEventHandler without this
 			ct.triggerEnabled = true;
 
-			var h = a.GetComponentInChildren<CollisionTriggerEventHandler>();
-			var d1 = a.transform
+			var o = a.transform
 				.Find("reParentObject")
-				.Find("object")
+				.Find("object");
+
+			var d1 = o
 				.Find("rescaleObject")
 				.Find("quick_test_subdiv1_correct")
 				.Find("dildo1");
 
+			var root = d1.Find("root");
+			var h = o.GetComponent<CollisionTriggerEventHandler>();
+
 			// rb isn't set
-			h.thisRigidbody = h.gameObject.GetComponent<Rigidbody>();
+			h.thisRigidbody = o.GetComponent<Rigidbody>();
 
 			foreach (var rb in d1.GetComponentsInChildren<Rigidbody>())
 			{
-				var old = rb.gameObject.GetComponent<CollisionTriggerEventHandler>();
-				if (old == null)
-				{
-					var cc = rb.gameObject.AddComponent<CollisionTriggerEventHandler>();
+				var cc = rb.gameObject.GetComponent<CollisionTriggerEventHandler>();
+				if (cc == null)
+					cc = rb.gameObject.AddComponent<CollisionTriggerEventHandler>();
 
-					// forward to main handler
-					cc.collisionTrigger = h.collisionTrigger;
-					cc.collidingWithDictionary = h.collidingWithDictionary;
-					cc.collidingWithButFailedVelocityTestDictionary = h.collidingWithButFailedVelocityTestDictionary;
-					cc.collidingWith = h.collidingWith;
-				}
+				// forward to main handler
+				cc.collisionTrigger = h.collisionTrigger;
+				cc.collidingWithDictionary = h.collidingWithDictionary;
+				cc.collidingWithButFailedVelocityTestDictionary = h.collidingWithButFailedVelocityTestDictionary;
+				cc.collidingWith = h.collidingWith;
 			}
 
 			h.Reset();
