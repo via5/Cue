@@ -1,7 +1,4 @@
-﻿using Cue.Sys;
-using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	class ClothingManager : IClothing
 	{

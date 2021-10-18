@@ -258,7 +258,7 @@
 					continue;
 
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
-				var d = Vector3.Distance(hand.Position, g.Position);
+				var d = hand.DistanceToSurface(g);
 
 				if (d < MaxDistanceToStart)
 					return g;

@@ -34,6 +34,8 @@ namespace Cue
 			"smoke",
 			"suck",
 			"penetrated",
+			"rightFinger",
+			"leftFinger",
 		};
 
 		public static int FromString(string s)

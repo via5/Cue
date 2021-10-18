@@ -489,20 +489,42 @@ namespace Cue
 			CueMain.Instance.DisablePlugin();
 		}
 
+		//private long gcStart_ = 0;
+
+		private void GCStart()
+		{
+			//gcStart_ = GC.GetTotalMemory(false);
+		}
+
+		private void GCEnd()
+		{
+			//var end = GC.GetTotalMemory(false);
+			//var d = end - gcStart_;
+			//
+			//if (d != 0)
+			//{
+			//	Cue.LogError($"{d}");
+			//}
+		}
+
 		public void FixedUpdate(float s)
 		{
-			if (Sys.Paused)
-				return;
+			GCStart();
 
-			++frame_;
-
-			I.Instance.Reset();
-
-			I.Start(I.FixedUpdate);
+			if (!Sys.Paused)
 			{
-				DoFixedUpdate(s);
+				++frame_;
+
+				I.Instance.Reset();
+
+				I.Start(I.FixedUpdate);
+				{
+					DoFixedUpdate(s);
+				}
+				I.End();
 			}
-			I.End();
+
+			GCEnd();
 		}
 
 		private void DoFixedUpdate(float s)
@@ -513,6 +535,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			GCStart();
+
 			I.Instance.Reset();
 
 			I.Start(I.Update);
@@ -523,6 +547,8 @@ namespace Cue
 
 			I.Instance.UpdateTickers(s);
 			ui_?.PostUpdate();
+
+			GCEnd();
 		}
 
 		private void DoUpdate(float s)
@@ -550,8 +576,12 @@ namespace Cue
 
 		public void LateUpdate(float s)
 		{
+			GCStart();
+
 			for (int i = 0; i < activePersonsArray_.Length; ++i)
 				activePersonsArray_[i].LateUpdate(s);
+
+			GCEnd();
 		}
 
 		private void DoUpdateInput(float s)

@@ -293,7 +293,7 @@ namespace Cue
 
 		public void StopType(int type)
 		{
-			log_.Info($"stopping animation type {type}");
+			log_.Info($"stopping animation {Animations.ToString(type)}");
 			int i = 0;
 			int removed = 0;
 
@@ -317,7 +317,7 @@ namespace Cue
 			if (removed == 0)
 			{
 				log_.Error(
-					$"no animation type {type} found to stop, " +
+					$"no animation {Animations.ToString(type)} found to stop, " +
 					$"count={playing_.Count}");
 			}
 			else

@@ -249,7 +249,7 @@ namespace Cue.Sys
 		bool Linked { get; }
 		void LinkTo(IBodyPart other);
 		bool IsLinkedTo(IBodyPart other);
-		float DistanceToSurface(IBodyPart other);
+		float DistanceToSurface(IBodyPart other, bool debug = false);
 		void AddRelativeForce(Vector3 v);
 		void AddRelativeTorque(Vector3 v);
 	}

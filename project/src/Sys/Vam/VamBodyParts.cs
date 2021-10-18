@@ -104,9 +104,160 @@ namespace Cue.Sys.Vam
 			fc.currentRotationState = FreeControllerV3.RotationState.On;
 		}
 
-		public virtual float DistanceToSurface(IBodyPart other)
+		public float DistanceToSurface(IBodyPart other, bool debug)
 		{
-			return Vector3.Distance(other.Position, Position);
+			var thisColliders = GetColliders();
+			var otherColliders = (other as VamBodyPart).GetColliders();
+
+			var thisPos = Position;
+			var thisPosU = U.ToUnity(thisPos);
+			var otherPos = other.Position;
+			var otherPosU = U.ToUnity(otherPos);
+
+			bool thisCollidersValid = (thisColliders != null && thisColliders.Length > 0);
+			bool otherCollidersValid = (otherColliders != null && otherColliders.Length > 0);
+
+
+			if (thisCollidersValid && otherCollidersValid)
+			{
+				float closest = float.MaxValue;
+
+				Collider thisDebug = null;
+				Collider otherDebug = null;
+
+				try
+				{
+					for (int i = 0; i < thisColliders.Length; ++i)
+					{
+						for (int j = 0; j < otherColliders.Length; ++j)
+						{
+							var thisPoint = thisColliders[i].ClosestPointOnBounds(
+								otherColliders[j].transform.position);
+
+							var otherPoint = otherColliders[j].ClosestPointOnBounds(
+								thisColliders[i].transform.position);
+
+							var d = UnityEngine.Vector3.Distance(thisPoint, otherPoint);
+
+							if (d < closest)
+							{
+								if (debug)
+								{
+									thisDebug = thisColliders[i];
+									otherDebug = otherColliders[j];
+								}
+
+								closest = d;
+							}
+						}
+					}
+
+					var dp = Vector3.Distance(thisPos, otherPos);
+
+					if (dp < closest)
+					{
+						if (debug)
+							Cue.LogError($"both valid, closest is position, {thisPos} {otherPos} {dp}");
+
+						closest = dp;
+					}
+					else
+					{
+						if (debug)
+						{
+							Cue.LogError($"both valid, closest is {thisDebug} {otherDebug} {closest}");
+						}
+					}
+				}
+				catch (Exception)
+				{
+					Cue.LogError($"t={thisColliders} o={otherColliders?.Length}");
+				}
+
+				return closest;
+			}
+			else if (thisCollidersValid)
+			{
+				float closest = float.MaxValue;
+				Collider c = null;
+
+				try
+				{
+					for (int i = 0; i < thisColliders.Length; ++i)
+					{
+						var p = thisColliders[i].ClosestPointOnBounds(otherPosU);
+						var d = Vector3.Distance(otherPos, U.FromUnity(p));
+
+						if (d < closest)
+						{
+							if (debug)
+								c = thisColliders[i];
+
+							closest = d;
+						}
+					}
+
+					if (debug)
+					{
+						Cue.LogError(
+							$"this valid, " +
+							$"closest is {other} at {otherPos}, " +
+							$"this is {this} {c} at {c.transform.position}, d={closest}");
+					}
+				}
+				catch (Exception)
+				{
+					Cue.LogError("2");
+				}
+
+
+				return closest;
+			}
+			else if (otherCollidersValid)
+			{
+				float closest = float.MaxValue;
+				Collider c = null;
+
+				try
+				{
+					for (int i = 0; i < otherColliders.Length; ++i)
+					{
+						var p = otherColliders[i].ClosestPointOnBounds(thisPosU);
+						var d = Vector3.Distance(thisPos, U.FromUnity(p));
+
+						if (d < closest)
+						{
+							if (debug)
+								c = otherColliders[i];
+
+							closest = d;
+						}
+					}
+
+					if (debug)
+						Cue.LogError($"other valid, closest is {thisPos} {c} {closest}");
+				}
+				catch (Exception)
+				{
+					Cue.LogError("1");
+				}
+
+				return closest;
+			}
+			else
+			{
+				float d = Vector3.Distance(thisPos, other.Position);
+
+				if (debug)
+					Cue.LogError($"neither valid, {thisPos} {other.Position} {d}");
+
+				return d;
+			}
+		}
+
+		protected virtual Collider[] GetColliders()
+		{
+			return null;
 		}
 
 		public virtual void AddRelativeForce(Vector3 v)
@@ -198,19 +349,9 @@ namespace Cue.Sys.Vam
 			get { return U.FromUnity(rb_.rotation); }
 		}
 
-		public override float DistanceToSurface(IBodyPart other)
+		protected override Collider[] GetColliders()
 		{
-			float closest = float.MaxValue;
-			var op = U.ToUnity(other.Position);
-
-			for (int i = 0; i < colliders_.Length; ++i)
-			{
-				var p = colliders_[i].ClosestPoint(op);
-				var d = Vector3.Distance(other.Position, U.FromUnity(p));
-				closest = Math.Min(closest, d);
-			}
-
-			return closest;
+			return colliders_;
 		}
 
 		public override void AddRelativeForce(Vector3 v)
@@ -233,6 +374,7 @@ namespace Cue.Sys.Vam
 	class ColliderBodyPart : VamBodyPart
 	{
 		private Collider c_;
+		private Collider[] colliders_;
 		private FreeControllerV3 fc_;
 		private Rigidbody rb_;
 
@@ -242,6 +384,7 @@ namespace Cue.Sys.Vam
 				: base(a, type)
 		{
 			c_ = c;
+			colliders_ = new Collider[] { c };
 			fc_ = fc;
 			rb_ = closestRb;
 		}
@@ -293,10 +436,9 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override float DistanceToSurface(IBodyPart other)
+		protected override Collider[] GetColliders()
 		{
-			var p = c_.ClosestPoint(U.ToUnity(other.Position));
-			return Vector3.Distance(other.Position, U.FromUnity(p));
+			return colliders_;
 		}
 
 		public override string ToString()
@@ -367,11 +509,12 @@ namespace Cue.Sys.Vam
 
 		protected void Init(
 			CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
+			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms,
+			Rigidbody rb = null)
 		{
 			h_ = h;
 			trigger_ = h?.collisionTrigger?.trigger;
-			rb_ = h?.thisRigidbody;
+			rb_ = rb ?? h?.thisRigidbody;
 			fc_ = fc;
 			t_ = tr;
 			ignoreTransforms_ = new Transform[0];
@@ -757,7 +900,7 @@ namespace Cue.Sys.Vam
 	{
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
-		private Collider tip_ = null;
+		private Collider[] colliders_ = null;
 
 		private float postCreateElapsed_ = 0;
 		private bool postCreate_ = false;
@@ -787,38 +930,6 @@ namespace Cue.Sys.Vam
 		public IObject Dildo
 		{
 			get { return dildo_; }
-		}
-
-		public override Vector3 ControlPosition
-		{
-			get
-			{
-				if (tip_ == null)
-					return base.ControlPosition;
-				else
-					return U.FromUnity(tip_.transform.position);
-			}
-		}
-
-		public override Quaternion ControlRotation
-		{
-			get
-			{
-				if (tip_ == null)
-					return base.ControlRotation;
-				else
-					return U.FromUnity(tip_.transform.rotation);
-			}
-		}
-
-		public override Vector3 Position
-		{
-			get { return ControlPosition; }
-		}
-
-		public override Quaternion Rotation
-		{
-			get { return ControlRotation; }
 		}
 
 		public void Set(bool b)
@@ -910,29 +1021,44 @@ namespace Cue.Sys.Vam
 				postCreate_ = true;
 				postCreateElapsed_ = 0;
 
-
-				var tipName = dildo_.GetParameter("tip");
-				if (tipName == "")
+				var collidersString = dildo_.GetParameter("colliders");
+				if (collidersString == "")
 				{
-					Cue.LogWarning("dildo is missing tip parameter");
+					Cue.LogWarning("dildo is missing collidersString parameter");
 				}
 				else
 				{
-					tip_ = Cue.Instance.VamSys.FindCollider(
-							(dildo_.Atom as VamAtom).Atom,
-							tipName);
+					var colliderNames = collidersString.Split(';');
 
-					if (tip_ == null)
-						Cue.LogError($"dildo tip {tipName} not found in {dildo_.ID}");
-					else
-						Cue.LogInfo($"dildo tip: {tip_}");
+					var cs = new List<Collider>();
+					foreach (var cn in colliderNames)
+					{
+						var c = Cue.Instance.VamSys.FindCollider(
+							(dildo_.Atom as VamAtom).Atom, cn.Trim());
+
+						if (c == null)
+						{
+							Cue.LogError($"collider {cn} not found");
+							continue;
+						}
+
+						cs.Add(c);
+					}
+
+					colliders_ = cs.ToArray();
+
+					var names = new List<string>();
+					foreach (var c in colliders_)
+						names.Add(c.name);
+
+					Cue.LogInfo($"dildo colliders: {string.Join(", ", names.ToArray())}");
 				}
 
 
 				var anchorName = dildo_.GetParameter("anchor");
 				if (anchorName == "")
 				{
-					Cue.LogWarning("dildo is missing anchor parameteR");
+					Cue.LogWarning("dildo is missing anchor parameter");
 				}
 				else
 				{
@@ -940,7 +1066,7 @@ namespace Cue.Sys.Vam
 						atom_.Atom, anchorName);
 
 					if (anchor_ == null)
-						Cue.LogError($"dildo anchor {tipName} not found in {atom_.ID}");
+						Cue.LogError($"dildo anchor {anchor_} not found in {atom_.ID}");
 					else
 						Cue.LogInfo($"dildo anchor: {anchor_}");
 				}
@@ -949,6 +1075,11 @@ namespace Cue.Sys.Vam
 				DoInit();
 				SetEnabled(true);
 			}
+		}
+
+		protected override Collider[] GetColliders()
+		{
+			return colliders_;
 		}
 
 		private void SetEnabled(bool b)
@@ -1039,7 +1170,11 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			Init(h, d.mainController, d.transform, null);
+			var rb = d.GetComponentInChildren<Rigidbody>();
+			if (rb == null)
+				Cue.LogWarning($"{d.uid} has no rigidbody");
+
+			Init(h, d.mainController, d.transform, null, rb);
 		}
 	}
 }

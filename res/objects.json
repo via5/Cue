@@ -32,7 +32,7 @@
 			},
 			"parameters":
 			{
-				"tip": "b3/_Collider6",
+				"colliders": "b3/_Collider6",
 				"anchor": "pelvisF4/pelvisF4Joint"
 			}
 		},

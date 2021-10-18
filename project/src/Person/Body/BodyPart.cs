@@ -331,12 +331,12 @@ namespace Cue
 			return DistanceToSurface(other) < 0.1f;
 		}
 
-		public float DistanceToSurface(BodyPart other)
+		public float DistanceToSurface(BodyPart other, bool debug = false)
 		{
 			if (!Exists || !other.Exists)
 				return float.MaxValue;
 
-			return Sys.DistanceToSurface(other.Sys);
+			return Sys.DistanceToSurface(other.Sys, debug);
 		}
 
 		public void LinkTo(BodyPart other)
