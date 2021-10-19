@@ -122,6 +122,7 @@ namespace Cue.Sys.Vam
 
 			yield return Setup(a, f);
 
+			VamFixes.FixKnownAtom(atom);
 
 			try
 			{
@@ -142,8 +143,12 @@ namespace Cue.Sys.Vam
 			if (hasPosOffset_)
 			{
 				var o = a.Atom.transform.Find("reParentObject/object/rescaleObject");
+
 				if (o != null)
-					o.localPosition = U.ToUnity(posOffset_);
+				{
+					foreach (Transform t in o)
+						t.localPosition = U.ToUnity(posOffset_);
+				}
 			}
 
 			yield return null;
@@ -206,22 +211,32 @@ namespace Cue.Sys.Vam
 
 			if (!string.IsNullOrEmpty(assetUrl_) && !string.IsNullOrEmpty(assetName_))
 			{
-				cua.RegisterAssetLoadedCallback(() =>
-				{
-					Cue.LogInfo($"object {atom.uid} done, name is {name.val}");
-				});
-
 				Cue.LogInfo($"object {atom.uid} loading url");
+
+				bool loadingUrl = true;
+
 				url.val = assetUrl_;
 
 				for (; ; )
 				{
 					yield return new WaitForSeconds(0.25f);
-					if (name.choices.Count > 0)
+
+					if (loadingUrl)
 					{
-						Cue.LogInfo($"object {atom.uid} url loaded, setting name");
-						name.val = assetName_;
-						yield break;
+						if (name.choices.Count > 0)
+						{
+							Cue.LogInfo($"object {atom.uid} url loaded, setting name");
+							name.val = assetName_;
+							loadingUrl = false;
+						}
+					}
+					else
+					{
+						if (cua.isAssetLoaded)
+						{
+							Cue.LogInfo($"object {atom.uid} asset loaded, done");
+							yield break;
+						}
 					}
 				}
 			}

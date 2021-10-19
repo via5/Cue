@@ -20,6 +20,11 @@ namespace Cue.Sys.Vam
 				Cue.LogError("bone has no configurable joint");
 		}
 
+		public Transform Transform
+		{
+			get { return bone_.transform; }
+		}
+
 		public Vector3 Position
 		{
 			get { return U.FromUnity(bone_.transform.position); }
@@ -39,7 +44,6 @@ namespace Cue.Sys.Vam
 	abstract class VamBasicBody : IBody
 	{
 		public virtual bool Exists { get { return true; } }
-		public abstract float Scale { get; }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }
 		public abstract bool Strapon { get; set; }
@@ -56,7 +60,6 @@ namespace Cue.Sys.Vam
 	{
 		private VamAtom atom_;
 		private readonly StraponBodyPart strapon_;
-		private FloatParameter scale_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
 		private Color initialColor_;
@@ -74,10 +77,6 @@ namespace Cue.Sys.Vam
 		{
 			atom_ = a;
 			strapon_ = new StraponBodyPart(a);
-
-			scale_ = new FloatParameter(a, "rescaleObject", "scale");
-			if (!scale_.Check(true))
-				atom_.Log.Error("no scale parameter");
 
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
@@ -481,11 +480,6 @@ namespace Cue.Sys.Vam
 		{
 			if (!b)
 				Reset();
-		}
-
-		public override float Scale
-		{
-			get { return scale_?.Value ?? 1; }
 		}
 
 		public override float Sweat

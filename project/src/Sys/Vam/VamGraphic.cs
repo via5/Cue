@@ -182,12 +182,12 @@ namespace Cue.Sys.Vam
 			private Transform t_;
 			private IGraphic g_;
 
-			public BoxRender(Transform t)
+			public BoxRender(Transform t, Vector3 scale)
 			{
 				t_ = t;
 				g_ = Cue.Instance.Sys.CreateBoxGraphic(
 					$"cue!DebugRender.{t.name}",
-					Vector3.Zero, new Vector3(0.1f, 0.1f, 0.1f),
+					Vector3.Zero, scale,
 					new Color(0, 0, 1, 0.1f));
 			}
 
@@ -285,7 +285,12 @@ namespace Cue.Sys.Vam
 
 		public void AddRender(Transform t)
 		{
-			AddRender(new BoxRender(t));
+			AddRender(t, new Vector3(0.1f, 0.1f, 0.1f));
+		}
+
+		public void AddRender(Transform t, Vector3 scale)
+		{
+			AddRender(new BoxRender(t, scale));
 		}
 
 		public void AddRender(Collider c)

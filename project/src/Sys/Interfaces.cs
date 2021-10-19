@@ -286,7 +286,6 @@ namespace Cue.Sys
 		Hand GetLeftHand();
 		Hand GetRightHand();
 		bool Exists { get; }
-		float Scale { get; }
 		float Sweat { get; set; }
 		float Flush { get; set; }
 		bool Strapon { get; set; }

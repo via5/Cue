@@ -199,11 +199,6 @@ namespace Cue.Sys.Vam
 			get { return false; }
 		}
 
-		public override float Scale
-		{
-			get { return 1; }
-		}
-
 		public override float Sweat
 		{
 			get { return 0; }

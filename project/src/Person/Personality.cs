@@ -32,7 +32,7 @@ namespace Cue
 				if (pitch_ < 0)
 				{
 					float neutral = p.Physiology.Get(PE.NeutralVoicePitch);
-					float scale = p.Atom.Body.Scale;
+					float scale = p.Atom.Scale;
 					SetPitch(neutral + (1 - scale));
 				}
 

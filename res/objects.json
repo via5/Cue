@@ -7,9 +7,7 @@
 			"options":
 			{
 				"url": "Custom/Assets/cigarette.assetbundle",
-				"name": "Assets/New Folder/Cigarette.unity",
-				"positionOffset": [0, 0.025, -0.012],
-				"scale": 0.8
+				"name": "Assets/New Folder/Cigarette.unity"
 			}
 		},
 

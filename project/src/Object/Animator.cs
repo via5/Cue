@@ -351,9 +351,14 @@ namespace Cue
 				var a = playing_[i];
 
 				if (!a.player.IsPlaying(a.anim.Real))
+				{
+					a.player.Stop(a.anim.Real, false);
 					playing_.RemoveAt(i);
+				}
 				else
+				{
 					++i;
+				}
 			}
 
 			if (playing_.Count == 0)

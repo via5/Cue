@@ -50,7 +50,12 @@ namespace Cue.Proc
 		private const float ExhaleMouthNarrowMin = 0;
 		private const float ExhaleMouthNarrowMax = 0.15f;
 
-		private const float MidPointDistance = 0.3f;
+		private const float MidPointRangeShort = 0.2f;
+		private const float MidPointRangeTall = 0.3f;
+		private const float AdjustDistanceRangeShort = 0.01f;
+		private const float AdjustDistanceRangeTall = 0.03f;
+		private const float DistanceFromMouthShort = 0.02f;
+		private const float DistanceFromMouthTall = 0;
 
 		private const float HeadUpTorque = -15;
 		private const float HeadUpTime = 1;
@@ -72,6 +77,8 @@ namespace Cue.Proc
 		private Render render_ = new Render();
 		private float startFist_ = 0;
 		private float targetFist_ = 0;
+		private float adjustStopDistance_ = 0;
+		private float midPointDistance_ = 0;
 
 		private Morph mouthOpen_;
 		private Morph lipsPucker_, mouthNarrow_, lipsPart_, lipsPuckerWide_;
@@ -122,13 +129,19 @@ namespace Cue.Proc
 			{
 				var b = new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f));
 
-				render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, new Color(0, 0, 1, 0.5f));
-				render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, new Color(0, 1, 0, 0.5f));
-				render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, new Color(1, 0, 0, 0.5f));
-				render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, new Color(0, 1, 0, 0.5f));
+				var red = new Color(1, 0, 0, 0.5f);
+				var green = new Color(0, 1, 0, 0.5f);
+				var blue = new Color(0, 0, 1, 0.5f);
+				var cyan = new Color(0, 1, 1, 0.5f);
+				var magenta = new Color(1, 0, 1, 0.5f);
 
-				render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, new Color(1, 0, 1, 0.5f));
-				render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, new Color(0, 1, 1, 0.5f));
+				render_.hand = Cue.Instance.Sys.CreateBoxGraphic("smokingHand", b, blue);
+				render_.cig = Cue.Instance.Sys.CreateBoxGraphic("smokingCig", b, green);
+				render_.targetHand = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHand", b, red);
+				render_.targetHandMid = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetHandMid", b, green);
+
+				render_.targetCig = Cue.Instance.Sys.CreateBoxGraphic("smokingTargetCig", b, magenta);
+				render_.mouth = Cue.Instance.Sys.CreateBoxGraphic("smokingMouth", b, cyan);
 			}
 
 			elapsed_ = 0;
@@ -146,6 +159,19 @@ namespace Cue.Proc
 			mouthNarrow_?.Reset();
 			lipsPart_?.Reset();
 			lipsPuckerWide_?.Reset();
+
+			if (render_.hand != null)
+			{
+				render_.hand.Destroy();
+				render_.cig.Destroy();
+				render_.targetHand.Destroy();
+				render_.targetHandMid.Destroy();
+
+				render_.targetCig.Destroy();
+				render_.mouth.Destroy();
+
+				render_ = new Render();
+			}
 		}
 
 		private IObject FindCigarette()
@@ -233,7 +259,7 @@ namespace Cue.Proc
 
 			SmokeEvent.SetCigaretteTransform(hand_, unsafeCig_);
 
-			if (DoRender)
+			if (DoRender && render_.hand != null)
 			{
 				var mouth = person_.Body.Get(BP.Lips);
 				render_.hand.Position = handPart_.Position;
@@ -285,11 +311,18 @@ namespace Cue.Proc
 			var d = handPart_.ControlRotation.RotateInv(
 				SmokeEvent.MakeCigarettePosition(hand_) - handPart_.ControlPosition);
 
+			var mouthDistance = U.Lerp(
+				DistanceFromMouthShort, DistanceFromMouthTall,
+				person_.Atom.Scale);
+
 			targetRot_ = GetTargetRotation();
 
 			targetPos_ =
 				mouth.Position - targetRot_.Rotate(d) +
-				head.Rotation.Rotate(new Vector3(0, 0, 0.005f));
+				head.Rotation.Rotate(new Vector3(0, 0, mouthDistance));
+
+			midPointDistance_ = U.Lerp(
+				MidPointRangeShort, MidPointRangeTall, person_.Atom.Scale);
 		}
 
 		private void StartMoveToMouth()
@@ -305,7 +338,7 @@ namespace Cue.Proc
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
-				chest.Rotation.Rotate(new Vector3(0, 0, MidPointDistance));
+				chest.Rotation.Rotate(new Vector3(0, 0, midPointDistance_));
 
 			targetFist_ = 0;
 
@@ -506,6 +539,9 @@ namespace Cue.Proc
 		{
 			elapsed_ = 0;
 			state_ = Adjusting;
+			adjustStopDistance_ = U.Lerp(
+				AdjustDistanceRangeShort, AdjustDistanceRangeTall,
+				person_.Atom.Scale);
 		}
 
 		private void Adjust(float s)
@@ -519,7 +555,7 @@ namespace Cue.Proc
 			}
 
 			var d = Vector3.Distance(cig, mouth.Position);
-			if (d <= 0.003f || elapsed_ >= AdjustTime)
+			if (d <= adjustStopDistance_ || elapsed_ >= AdjustTime)
 			{
 				StartPull();
 				return;
@@ -586,7 +622,7 @@ namespace Cue.Proc
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
-				chest.Rotation.Rotate(new Vector3(0, 0, MidPointDistance));
+				chest.Rotation.Rotate(new Vector3(0, 0, midPointDistance_));
 
 			elapsed_ = 0;
 			state_ = Exhaling;

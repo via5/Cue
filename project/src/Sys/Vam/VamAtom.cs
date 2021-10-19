@@ -83,9 +83,17 @@ namespace Cue.Sys.Vam
 
 			collisions_ = new BoolParameter(this, "AtomControl", "collisionEnabled");
 			physics_ = new BoolParameter(this, "control", "physicsEnabled");
-			scale_ = new FloatParameter(this, "scale", "scale");
+			scale_ = FindScale();
 			blink_ = new BoolParameter(this, "EyelidControl", "blinkEnabled");
 			cd_ = new VamCorruptionDetector(atom, OnCorruption);
+		}
+
+		private FloatParameter FindScale()
+		{
+			if (IsPerson)
+				return new FloatParameter(this, "rescaleObject", "scale");
+			else
+				return new FloatParameter(this, "scale", "scale");
 		}
 
 		public void Init()

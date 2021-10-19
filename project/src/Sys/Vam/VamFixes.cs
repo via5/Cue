@@ -7,19 +7,48 @@ namespace Cue.Sys.Vam
 	{
 		public static void Run()
 		{
-			FixDildos();
+			FixKnownAtoms();
 		}
 
-		private static void FixDildos()
+		private static void FixKnownAtoms()
 		{
 			foreach (var a in SuperController.singleton.GetAtoms())
+				FixKnownAtom(a);
+		}
+
+		public static void FixKnownAtom(Atom a)
+		{
+			if (a.type == "Dildo")
 			{
-				if (a.on && a.type == "Dildo")
-					FixDildo(a);
+				FixDildo(a);
+			}
+			else if (IsCUA(a, "Cigarette.unity"))
+			{
+				FixCigarette(a);
 			}
 		}
 
-		public static void FixDildo(Atom a)
+		private static bool IsCUA(Atom a, string assetName)
+		{
+			if (a.type != "CustomUnityAsset")
+				return false;
+
+			var cua = a.GetComponentInChildren<CustomUnityAssetLoader>();
+			if (cua == null)
+				return false;
+
+			var asset = a.GetStorableByID("asset");
+			if (asset == null)
+				return false;
+
+			var name = asset.GetStringChooserJSONParam("assetName");
+			if (asset == null)
+				return false;
+
+			return (name.val == assetName);
+		}
+
+		private static void FixDildo(Atom a)
 		{
 			// looks like the CollisionTriggerEventHandler on the main object
 			// never receives the OnCollision* callbacks, but there's a bunch
@@ -62,6 +91,19 @@ namespace Cue.Sys.Vam
 			}
 
 			h.Reset();
+		}
+
+		private static void FixCigarette(Atom a)
+		{
+			U.ForEachChildRecursive(a.transform, (c) =>
+			{
+				if (c.name.StartsWith("Cylinder") || c.name.StartsWith("Particle"))
+				{
+					var v = c.localPosition;
+					v.z = 0;
+					c.localPosition = v;
+				}
+			});
 		}
 
 		public static void Run(Atom a)

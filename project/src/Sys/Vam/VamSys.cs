@@ -9,8 +9,6 @@ namespace Cue.Sys.Vam
 {
 	class VamSys : ISys
 	{
-
-
 		private static VamSys instance_ = null;
 		private readonly MVRScript script_ = null;
 		private readonly VamLog log_ = new VamLog();

@@ -5,22 +5,22 @@ namespace Cue.Sys.Vam
 {
 	class U : global::Cue.U
 	{
-		public static void ForEachChild(Component c, Action<Transform> f)
+		public static void ForEachChildRecursive(Component c, Action<Transform> f)
 		{
-			ForEachChild(c.transform, f);
+			ForEachChildRecursive(c.transform, f);
 		}
 
-		public static void ForEachChild(GameObject o, Action<Transform> f)
+		public static void ForEachChildRecursive(GameObject o, Action<Transform> f)
 		{
-			ForEachChild(o.transform, f);
+			ForEachChildRecursive(o.transform, f);
 		}
 
-		public static void ForEachChild(Transform t, Action<Transform> f)
+		public static void ForEachChildRecursive(Transform t, Action<Transform> f)
 		{
 			f(t);
 
 			foreach (Transform c in t)
-				ForEachChild(c, f);
+				ForEachChildRecursive(c, f);
 		}
 
 		public static GameObject FindChildRecursive(Component c, string name)
@@ -271,6 +271,11 @@ namespace Cue.Sys.Vam
 			var parent = o?.transform?.parent?.gameObject;
 			if (parent != null)
 				DumpComponentsAndUp(parent);
+		}
+
+		public static void DumpComponentsAndDown(IObject o, bool dumpRt = false)
+		{
+			DumpComponentsAndDown((o.Atom as VamAtom).Atom.transform, dumpRt);
 		}
 
 		public static void DumpComponentsAndDown(Component c, bool dumpRt = false)

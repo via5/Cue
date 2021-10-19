@@ -129,6 +129,16 @@ namespace Cue
 				return val;
 		}
 
+		public static float Lerp(float min, float max, float t)
+		{
+			t = Clamp(t, 0, 1);
+
+			if (min < max)
+				return min + (max - min) * t;
+			else
+				return min - (min - max) * t;
+		}
+
 		// [first, last]
 		//
 		public static int RandomInt(int first, int last)

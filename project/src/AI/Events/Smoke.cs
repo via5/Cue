@@ -149,16 +149,8 @@ namespace Cue
 			var dp = da.Position + (db.Position - da.Position) / 2;
 
 			var p = ip + (dp - ip) / 2;
-			var r = hand.Middle.Intermediate.Rotation;
 
-			float vertOffset;
-
-			if (hand == hand.Person.Body.RightHand)
-				vertOffset = 0.02f;
-			else
-				vertOffset = -0.01f;
-
-			return p + r.Rotate(new Vector3(vertOffset, -0.025f, 0));
+			return p;
 		}
 
 		public static void SetCigaretteTransform(Hand hand, IObject cig)
@@ -200,35 +192,23 @@ namespace Cue
 
 		private void CreateCigarette()
 		{
-			var a = Cue.Instance.Sys.GetAtom(CigaretteID);
-
-			if (a != null)
+			var oc = Resources.Objects.Get("cigarette");
+			if (oc == null)
 			{
-				person_.Log.Info("cig already exists, taking");
-				SetCigarette(new BasicObject(-1, a));
+				person_.Log.Error("no cigarette object creator");
+				return;
 			}
-			else
-			{
-				person_.Log.Info("creating cigarette");
 
-				var oc = Resources.Objects.Get("cigarette");
-				if (oc == null)
+			oc.Create(person_.Atom, CigaretteID, (o) =>
+			{
+				if (o == null)
 				{
-					person_.Log.Error("no cigarette object creator");
+					person_.Log.Error("failed to create cigarette");
 					return;
 				}
 
-				oc.Create(person_.Atom, CigaretteID, (o) =>
-				{
-					if (o == null)
-					{
-						person_.Log.Error("failed to create cigarette");
-						return;
-					}
-
-					SetCigarette(o);
-				});
-			}
+				SetCigarette(o);
+			});
 		}
 
 		private void SetCigarette(IObject o)
@@ -238,6 +218,8 @@ namespace Cue
 			cig_.Atom.Physics = false;
 			cig_.Atom.Hidden = true;
 			cig_.Visible = true;
+
+			o.Atom.Scale = person_.Atom.Scale * 0.8f;
 		}
 	}
 }

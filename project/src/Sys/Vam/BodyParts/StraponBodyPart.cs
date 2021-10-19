@@ -123,8 +123,10 @@ namespace Cue.Sys.Vam
 			else
 			{
 				Log.Info($"setting dildo to {a.ID}");
+
 				dildo_ = a;
 				dildo_.Atom.Collisions = false;
+				dildo_.Atom.Scale = atom_.Scale;
 
 				postCreate_ = true;
 				postCreateElapsed_ = 0;
@@ -236,10 +238,6 @@ namespace Cue.Sys.Vam
 					{
 						postCreate_ = false;
 						dildo_.Atom.Collisions = true;
-
-						if ((dildo_.Atom as VamAtom).Atom.type == "Dildo")
-							VamFixes.FixDildo((dildo_.Atom as VamAtom).Atom);
-
 					}
 				}
 			}
