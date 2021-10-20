@@ -1,6 +1,5 @@
 project\src\Cue.cs
 project\src\Main.cs
-project\src\Actions\Action.cs
 project\src\AI\AI.cs
 project\src\AI\Events\Events.cs
 project\src\AI\Events\Hand.cs

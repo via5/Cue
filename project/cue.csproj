@@ -95,7 +95,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\Actions\Action.cs" />
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Events\Events.cs" />
     <Compile Include="src\AI\Events\Hand.cs" />

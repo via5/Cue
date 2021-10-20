@@ -170,36 +170,6 @@ namespace Cue
 			return list;
 		}
 
-		public List<Animation> GetAllIdles(int style)
-		{
-			var list = new List<Animation>();
-
-			for (int i = 0; i < anims_.Count; ++i)
-			{
-				if (anims_[i].Type == Animations.Idle)
-				{
-					if (MovementStyles.Match(anims_[i].MovementStyle, style))
-						list.Add(anims_[i]);
-				}
-			}
-
-			return list;
-		}
-
-		public Animation GetAnySex(int style)
-		{
-			for (int i = 0; i < anims_.Count; ++i)
-			{
-				if (anims_[i].Type == Animations.Sex)
-				{
-					if (MovementStyles.Match(anims_[i].MovementStyle, style))
-						return anims_[i];
-				}
-			}
-
-			return null;
-		}
-
 		private void Add(Animation a)
 		{
 			log_.Info(a.ToString());

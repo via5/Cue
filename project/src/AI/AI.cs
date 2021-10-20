@@ -20,18 +20,16 @@ namespace Cue
 		private Logger log_;
 		private bool eventsEnabled_ = true;
 		private readonly List<IEvent> events_ = new List<IEvent>();
-		private readonly RootAction actions_;
 
 		public PersonAI(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "AI");
-			actions_ = new RootAction(person_);
 
 			events_.AddRange(BasicEvent.All(p));
 
-			actions_.Push(new RandomAnimationAction(person_,
-				Resources.Animations.GetAllIdles(person_.MovementStyle)));
+			person_.Animator.Play(Resources.Animations.GetAny(
+				Animations.Idle, person_.MovementStyle));
 		}
 
 		public bool EventsEnabled
@@ -72,23 +70,12 @@ namespace Cue
 				for (int i = 0; i < events_.Count; ++i)
 					events_[i].Update(s);
 			}
-
-			I.Start(I.UpdatePersonActions);
-			{
-				actions_.Tick(s);
-			}
-			I.End();
 		}
 
 		public void OnPluginState(bool b)
 		{
 			for (int i = 0; i < events_.Count; ++i)
 				events_[i].OnPluginState(b);
-		}
-
-		private void Stop()
-		{
-			actions_.Clear();
 		}
 	}
 }
