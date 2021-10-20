@@ -23,12 +23,6 @@ namespace Cue
 	class Person : BasicObject
 	{
 		private readonly int personIndex_;
-		private readonly RootAction actions_;
-		private PersonState state_;
-		private bool deferredTransition_ = false;
-		private int deferredState_ = PersonState.None;
-		private int lastNavState_ = Sys.NavStates.None;
-		private Vector3 uprightPos_ = new Vector3();
 
 		private PersonOptions options_;
 		private Animator animator_;
@@ -47,7 +41,6 @@ namespace Cue
 		private IHandjob handjob_;
 		private IBlowjob blowjob_;
 		private IClothing clothing_;
-		private IExpression expression_;
 
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
@@ -55,8 +48,6 @@ namespace Cue
 		{
 			personIndex_ = personIndex;
 
-			actions_ = new RootAction(this);
-			state_ = new PersonState(this);
 			options_ = new PersonOptions(this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
@@ -75,23 +66,17 @@ namespace Cue
 			handjob_ = Integration.CreateHandjob(this);
 			blowjob_ = Integration.CreateBlowjob(this);
 			clothing_ = Integration.CreateClothing(this);
-			expression_ = Integration.CreateExpression(this);
 
 			Atom.SetDefaultControls("init");
 		}
 
 		public void Init()
 		{
-			SetState(PersonState.Standing);
-
 			Body.Init();
 			gaze_.Init();
 
 			if (IsPlayer)
-			{
-				AI.CommandsEnabled = false;
 				AI.EventsEnabled = false;
-			}
 
 			Atom.Init();
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
@@ -114,9 +99,6 @@ namespace Cue
 
 				personality_.Load(po);
 			}
-
-			if (r.HasKey("commands"))
-				ai_.CommandsEnabled = r["commands"].AsBool;
 		}
 
 		public override JSONNode ToJSON()
@@ -138,19 +120,8 @@ namespace Cue
 			get { return personIndex_; }
 		}
 
-		public bool Idle
-		{
-			get { return actions_.IsIdle; }
-		}
-
-		public Vector3 UprightPosition
-		{
-			get { return uprightPos_; }
-		}
-
 		public PersonOptions Options { get { return options_; } }
 		public Animator Animator { get { return animator_; } }
-		public PersonState State { get { return state_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
 		public Gaze Gaze { get { return gaze_; } }
@@ -158,7 +129,6 @@ namespace Cue
 		public Mood Mood { get { return mood_; } }
 		public IAI AI { get { return ai_; } }
 		public IClothing Clothing { get { return clothing_; } }
-		public RootAction Actions { get { return actions_; } }
 
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
@@ -166,7 +136,6 @@ namespace Cue
 		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
 		public IBlowjob Blowjob { get { return blowjob_; } }
-		public IExpression Expression { get { return expression_; } }
 
 		public int MovementStyle
 		{
@@ -193,31 +162,6 @@ namespace Cue
 			set { personality_ = value; }
 		}
 
-		public bool CanMoveHead
-		{
-			get
-			{
-				if (Kisser.Active || Blowjob.Active)
-					return false;
-
-				if (State.Is(PersonState.Walking))
-					return false;
-
-				if (State.Transitioning)
-					return false;
-
-				return true;
-			}
-		}
-
-		public bool CanMove
-		{
-			get
-			{
-				return !Kisser.Active && !Blowjob.Active && !Handjob.Active;
-			}
-		}
-
 		public bool IsInteresting
 		{
 			get
@@ -234,60 +178,12 @@ namespace Cue
 			get { return Atom.Grabbed; }
 		}
 
-		public void PushAction(IAction a)
-		{
-			actions_.Push(a);
-		}
-
-		public void PopAction()
-		{
-			actions_.Pop();
-		}
-
-		public override void MakeIdle()
-		{
-			Kisser.Stop();
-			Handjob.Stop();
-			Blowjob.Stop();
-
-			actions_.Clear();
-			animator_.Stop();
-
-			Atom.SetDefaultControls("make idle");
-		}
-
-		public override void MakeIdleForMove()
-		{
-			if (state_.IsCurrently(PersonState.Walking))
-				state_.CancelTransition();
-
-			Kisser.Stop();
-			Handjob.Stop();
-			Blowjob.Stop();
-
-			actions_.Clear();
-			ai_.MakeIdle();
-		}
-
-		public override bool InteractWith(IObject o)
-		{
-			if (ai_ == null)
-				return false;
-
-			return ai_.InteractWith(o);
-		}
-
 		public override void FixedUpdate(float s)
 		{
 			base.FixedUpdate(s);
 
 			animator_.FixedUpdate(s);
-
-			if (!IsPlayer)
-				expression_.FixedUpdate(s);
-
-			if (ai_ != null && !Atom.Teleporting)
-				ai_.FixedUpdate(s);
+			ai_.FixedUpdate(s);
 		}
 
 		private void UpdateGaze(float s)
@@ -300,40 +196,9 @@ namespace Cue
 		{
 			base.Update(s);
 
-			I.Start(I.UpdatePersonTransitions);
+			I.Start(I.UpdatePersonAnimator);
 			{
-				CheckNavState();
-
-				if (deferredTransition_)
-				{
-					if (StartTransition())
-						PlayTransition();
-				}
-
-				if (State.IsUpright)
-					uprightPos_ = Position;
-
 				animator_.Update(s);
-
-				if (!deferredTransition_ && !animator_.IsPlayingTransition())
-				{
-					state_.FinishTransition();
-					if (deferredState_ != PersonState.None)
-					{
-						log_.Info("animation finished, setting deferred state");
-
-						var ds = deferredState_;
-						deferredState_ = PersonState.None;
-						SetState(ds);
-					}
-				}
-			}
-			I.End();
-
-
-			I.Start(I.UpdatePersonActions);
-			{
-				actions_.Tick(s);
 			}
 			I.End();
 
@@ -387,8 +252,7 @@ namespace Cue
 
 			I.Start(I.UpdatePersonAI);
 			{
-				if (ai_ != null && !Atom.Teleporting)
-					ai_.Update(s);
+				ai_.Update(s);
 			}
 			I.End();
 		}
@@ -397,10 +261,7 @@ namespace Cue
 		{
 			base.OnPluginState(b);
 
-			Atom.NavEnabled = b;
-
 			animator_.OnPluginState(b);
-			expression_.OnPluginState(b);
 			Kisser.OnPluginState(b);
 			Handjob.OnPluginState(b);
 			Blowjob.OnPluginState(b);
@@ -408,184 +269,9 @@ namespace Cue
 			ai_.OnPluginState(b);
 		}
 
-		public override void SetPaused(bool b)
-		{
-			base.SetPaused(b);
-			Atom.NavPaused = b;
-		}
-
-		public void SetState(int s)
-		{
-			if (state_.Next == s || deferredState_ == s)
-			{
-				// already transitioning to that state
-				return;
-			}
-
-			deferredState_ = PersonState.None;
-			state_.StartTransition(s);
-
-			if (!StartTransition())
-			{
-				deferredTransition_ = true;
-				return;
-			}
-
-			animator_.Stop();
-			PlayTransition();
-		}
-
-		private void PlayTransition()
-		{
-			deferredTransition_ = false;
-
-			if (!animator_.PlayTransition(state_.Current, state_.Next, Animator.Exclusive))
-			{
-				// no animation for this transition, stand first if not already
-				// trying to stand
-				if (state_.Next != PersonState.Standing)
-				{
-					log_.Info(
-						$"no animation for transition " +
-						$"{PersonState.StateToString(state_.Current)}->" +
-						$"{PersonState.StateToString(state_.Next)}, standing first");
-
-					deferredState_ = state_.Next;
-					state_.StartTransition(PersonState.Standing);
-
-					animator_.PlayTransition(
-						state_.Current, PersonState.Standing,
-						Animator.Exclusive);
-				}
-				else
-				{
-					// no animation, just finish transition
-					state_.FinishTransition();
-				}
-			}
-		}
-
 		public virtual void Say(string s)
 		{
 			speech_.Say(s);
-		}
-
-		protected bool StartTransition()
-		{
-			bool canStart = true;
-
-			if (Kisser.Active)
-			{
-				Kisser.Stop();
-				canStart = false;
-			}
-
-			if (Handjob.Active)
-			{
-				Handjob.Stop();
-				canStart = false;
-			}
-
-			if (Blowjob.Active)
-			{
-				Blowjob.Stop();
-				canStart = false;
-			}
-
-			return canStart;
-		}
-
-		protected override bool StartMove()
-		{
-			if (!StartTransition())
-				return false;
-
-			if (!State.IsUpright)
-			{
-				SetState(PersonState.Standing);
-				return false;
-			}
-
-			return true;
-		}
-
-		private void CheckNavState()
-		{
-			var navState = Atom.NavState;
-
-			switch (navState)
-			{
-				case Sys.NavStates.None:
-				{
-					if (lastNavState_ != Sys.NavStates.None)
-					{
-						// force the state to standing first, there are no
-						// animations for walk->stand
-						state_.Set(PersonState.Standing);
-
-						// must stop manually, it's exclusive
-						animator_.Stop();
-
-						SetState(PersonState.Standing);
-					}
-
-					break;
-				}
-
-				case Sys.NavStates.Calculating:
-				{
-					// wait
-					break;
-				}
-
-				case Sys.NavStates.Moving:
-				{
-					state_.Set(PersonState.Walking);
-
-					if ((
-							lastNavState_ != Sys.NavStates.Moving &&
-							lastNavState_ != Sys.NavStates.Calculating
-						)
-						|| !animator_.IsPlayingTransition())
-					{
-						animator_.PlayType(
-							Animations.Walk,
-							Animator.Loop | Animator.Exclusive);
-					}
-
-					break;
-				}
-
-				case Sys.NavStates.TurningLeft:
-				{
-					if (lastNavState_ != Sys.NavStates.TurningLeft || !animator_.IsPlayingTransition())
-					{
-						if (CanMove)
-						{
-							animator_.PlayType(
-								Animations.TurnLeft, Animator.Exclusive);
-						}
-					}
-
-					break;
-				}
-
-				case Sys.NavStates.TurningRight:
-				{
-					if (lastNavState_ != Sys.NavStates.TurningRight || !animator_.IsPlayingTransition())
-					{
-						if (CanMove)
-						{
-							animator_.PlayType(
-								Animations.TurnRight, Animator.Exclusive);
-						}
-					}
-
-					break;
-				}
-			}
-
-			lastNavState_ = navState;
 		}
 	}
 }

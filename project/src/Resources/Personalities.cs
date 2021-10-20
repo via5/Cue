@@ -180,14 +180,6 @@ namespace Cue
 		private void ParseState(Personality.State s, JSONClass o, bool inherited)
 		{
 			Resources.LoadEnumValues(s, o, inherited);
-
-			foreach (JSONClass en in o["expressions"].AsArray.Childs)
-			{
-				int type = Expressions.FromString(J.ReqString(en, "type"));
-				float maximum = J.ReqFloat(en, "maximum");
-
-				s.SetMaximum(type, maximum);
-			}
 		}
 
 		private void ParseVoice(Voice v, JSONClass o, bool inherited)

@@ -36,9 +36,9 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 1, 1
 		};
-		private int[] stack_ = new int[3];
+		private int[] stack_ = new int[4];
 		private int current_ = 0;
 
 		public Instrumentation()
@@ -47,8 +47,7 @@ namespace Cue
 			tickers_[I.UpdateInput] = new Ticker("Input");
 			tickers_[I.UpdateObjects] = new Ticker("Objects");
 			tickers_[I.UpdateObjectsAtoms] = new Ticker("Atoms");
-			tickers_[I.UpdateObjectsMove] = new Ticker("Move");
-			tickers_[I.UpdatePersonTransitions] = new Ticker("Transitions");
+			tickers_[I.UpdatePersonAnimator] = new Ticker("Animator");
 			tickers_[I.UpdatePersonActions] = new Ticker("Actions");
 			tickers_[I.UpdatePersonGaze] = new Ticker("Gaze");
 			tickers_[I.UpdatePersonEvents] = new Ticker("Events");
@@ -68,6 +67,18 @@ namespace Cue
 
 		public void Start(int i)
 		{
+			if (current_ < 0 || current_ >= stack_.Length)
+			{
+				Cue.LogErrorST($"bad current {current_}");
+				Cue.Instance.DisablePlugin();
+			}
+
+			if (i < 0 || i >= tickers_.Length)
+			{
+				Cue.LogErrorST($"bad index {i}");
+				Cue.Instance.DisablePlugin();
+			}
+
 			stack_[current_] = i;
 			++current_;
 
@@ -118,19 +129,18 @@ namespace Cue
 		public const int UpdateInput = 1;
 		public const int UpdateObjects = 2;
 		public const int UpdateObjectsAtoms = 3;
-		public const int UpdateObjectsMove = 4;
-		public const int UpdatePersonTransitions = 5;
-		public const int UpdatePersonActions = 6;
-		public const int UpdatePersonGaze = 7;
-		public const int UpdatePersonEvents = 8;
-		public const int UpdatePersonExcitement = 9;
-		public const int UpdatePersonPersonality = 10;
-		public const int UpdatePersonMood = 11;
-		public const int UpdatePersonBody = 12;
-		public const int UpdatePersonAI = 13;
-		public const int UpdateUi = 14;
-		public const int FixedUpdate = 15;
-		public const int TickerCount = 16;
+		public const int UpdatePersonAnimator = 4;
+		public const int UpdatePersonActions = 5;
+		public const int UpdatePersonGaze = 6;
+		public const int UpdatePersonEvents = 7;
+		public const int UpdatePersonExcitement = 8;
+		public const int UpdatePersonPersonality = 9;
+		public const int UpdatePersonMood = 10;
+		public const int UpdatePersonBody = 11;
+		public const int UpdatePersonAI = 12;
+		public const int UpdateUi = 13;
+		public const int FixedUpdate = 14;
+		public const int TickerCount = 15;
 
 
 
@@ -192,7 +202,6 @@ namespace Cue
 
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
-		private bool paused_ = false;
 		private int frame_ = 0;
 
 		private Sys.ILiveSaver saver_;
@@ -293,9 +302,6 @@ namespace Cue
 
 			LogVerbose("cue: loading resources");
 			Resources.LoadAll();
-
-			LogVerbose("cue: updating nav");
-			Sys.Nav.Update();
 
 			LogVerbose("cue: finding objects");
 			FindObjects();
@@ -404,15 +410,7 @@ namespace Cue
 			foreach (var a in Sys.GetAtoms())
 			{
 				if (a.IsPerson)
-				{
 					AddPerson(a);
-				}
-				else
-				{
-					var o = BasicObject.TryCreateFromSlot(everything_.Count, a);
-					if (o != null)
-						AddObject(o);
-				}
 			}
 
 			activePersonsArray_ = activePersons_.ToArray();
@@ -422,26 +420,8 @@ namespace Cue
 
 		private void InitPersons()
 		{
-			var spawnPoints = new List<Slot>();
-			foreach (var o in objects_)
-				spawnPoints.AddRange(o.Slots.GetAll(Slot.Spawn));
-
 			for (int i = 0; i < persons_.Count; ++i)
-			{
-				var p = persons_[i];
-
-				if (Options.AllowMovement)
-				{
-					if (i < spawnPoints.Count)
-					{
-						p.TeleportTo(
-							spawnPoints[i].Position,
-							spawnPoints[i].Rotation.Bearing);
-					}
-				}
-
-				p.Init();
-			}
+				persons_[i].Init();
 		}
 
 		private void AddPerson(Sys.IAtom a)
@@ -605,13 +585,6 @@ namespace Cue
 
 		private void DoUpdateObjects(float s)
 		{
-			if (Sys.Paused != paused_)
-			{
-				paused_ = Sys.Paused;
-				for (int i = 0; i < everythingActive_.Count; ++i)
-					everythingActive_[i].SetPaused(Sys.Paused);
-			}
-
 			if (forcedPlayer_ == null)
 				CheckPossess(s);
 

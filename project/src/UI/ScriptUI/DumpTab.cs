@@ -15,7 +15,6 @@ namespace Cue
 			Layout = new VUI.BorderLayout(10);
 
 			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
-			p.Add(new VUI.Button("Expression", DumpExpression));
 			p.Add(new VUI.Button("Animation", DumpAnimation));
 			p.Add(new VUI.Button("Gaze", DumpGaze));
 			p.Add(new VUI.Button("Morphs", DumpMorphs));
@@ -27,48 +26,6 @@ namespace Cue
 		private string I(int i)
 		{
 			return new string(' ', i * 4);
-		}
-
-		private void DumpExpression()
-		{
-			var pex = person_.Expression as Proc.Expression;
-			if (pex == null)
-			{
-				list_.Clear();
-				list_.AddItem("not procedural");
-				return;
-			}
-
-			var items = new List<string>();
-
-			foreach (var e in pex.All)
-			{
-				items.Add(I(1) + e.ToString());
-
-				foreach (var g in e.Groups)
-				{
-					items.Add(I(2) + g.ToString());
-
-					foreach (var m in g.Morphs)
-					{
-						items.Add(I(3) + m.ToString());
-
-						{
-							var syncLines = m.Sync.ToDetailedString().Split('\n');
-							if (syncLines.Length > 0)
-								items.Add(I(4) + "sync: " + syncLines[0]);
-
-							for (int i = 1; i < syncLines.Length; ++i)
-								items.Add(I(5) + syncLines[i]);
-						}
-
-						foreach (var line in m.ToDetailedString().Split('\n'))
-							items.Add(I(4) + line);
-					}
-				}
-			}
-
-			list_.SetItems(items);
 		}
 
 		private void DumpAnimation()

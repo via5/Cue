@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace Cue.Proc
-{
+{/*
 	using BE = BuiltinExpressions;
 
 	class ExpressionType
@@ -259,5 +259,5 @@ namespace Cue.Proc
 					Cue.LogInfo($"name='{m.morphName}' dname='{m.displayName}'");
 			}
 		}
-	}
+	}*/
 }

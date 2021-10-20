@@ -54,7 +54,6 @@ namespace Cue.Sys.Vam
 		private readonly Atom atom_;
 		private Logger log_;
 		private ActionParameter setOnlyKeyJointsOn_;
-		private VamAtomNav nav_;
 		private FreeControllerV3 head_ = null;
 		private DAZCharacter char_ = null;
 		private VamBody body_ = null;
@@ -72,7 +71,6 @@ namespace Cue.Sys.Vam
 			log_ = new Logger(Logger.Sys, this, "VamAtom");
 			setOnlyKeyJointsOn_ = new ActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
-			nav_ = new VamAtomNav(this);
 
 			char_ = atom_.GetComponentInChildren<DAZCharacter>();
 			if (char_ != null)
@@ -158,11 +156,6 @@ namespace Cue.Sys.Vam
 		public IHair Hair
 		{
 			get { return hair_; }
-		}
-
-		public bool Teleporting
-		{
-			get { return nav_.Teleporting; }
 		}
 
 		public bool Grabbed
@@ -323,7 +316,6 @@ namespace Cue.Sys.Vam
 
 		public void Update(float s)
 		{
-			nav_.Update(s);
 			hair_?.Update(s);
 			cd_.Update(s);
 		}
@@ -331,43 +323,6 @@ namespace Cue.Sys.Vam
 		public void LateUpdate(float s)
 		{
 			body_?.LateUpdate(s);
-		}
-
-		public void TeleportTo(Vector3 v, float bearing)
-		{
-			nav_.TeleportTo(v, bearing);
-		}
-
-		public VamAtomNav VamAtomNav
-		{
-			get { return nav_; }
-		}
-
-		public bool NavEnabled
-		{
-			get { return nav_.Enabled; }
-			set { nav_.Enabled = value; }
-		}
-
-		public bool NavPaused
-		{
-			get { return nav_.Paused; }
-			set { nav_.Paused = value; }
-		}
-
-		public void NavTo(Vector3 v, float bearing, float stoppingDistance)
-		{
-			nav_.MoveTo(v, bearing, stoppingDistance);
-		}
-
-		public void NavStop(string why)
-		{
-			nav_.Stop(why);
-		}
-
-		public int NavState
-		{
-			get { return nav_.State; }
 		}
 
 		private void GetHead()

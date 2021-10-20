@@ -5,29 +5,21 @@ namespace Cue
 	class Animations
 	{
 		public const int None = -1;
-		public const int Walk = 0;
-		public const int TurnLeft = 1;
-		public const int TurnRight = 2;
-		public const int Transition = 3;
-		public const int Sex = 4;
-		public const int Idle = 5;
-		public const int Orgasm = 6;
-		public const int Smoke = 7;
-		public const int Suck = 8;
-		public const int Penetrated = 9;
-		public const int RightFinger = 10;
-		public const int LeftFinger = 11;
+		public const int Sex = 0;
+		public const int Idle = 1;
+		public const int Orgasm = 2;
+		public const int Smoke = 3;
+		public const int Suck = 4;
+		public const int Penetrated = 5;
+		public const int RightFinger = 6;
+		public const int LeftFinger = 7;
 
-		public const int Count = 12;
-		public int GetCount() { return 12; }
+		public const int Count = 8;
+		public int GetCount() { return 8; }
 
 
 		private static string[] names_ = new string[]
 		{
-			"walk",
-			"turnLeft",
-			"turnRight",
-			"transition",
 			"sex",
 			"idle",
 			"orgasm",

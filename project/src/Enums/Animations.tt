@@ -3,10 +3,6 @@ var vars = new V[]
 {
 
 V.Value("None", -1),
-V.Value("Walk"),
-V.Value("TurnLeft"),
-V.Value("TurnRight"),
-V.Value("Transition"),
 V.Value("Sex"),
 V.Value("Idle"),
 V.Value("Orgasm"),

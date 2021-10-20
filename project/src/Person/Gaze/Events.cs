@@ -35,7 +35,6 @@ namespace Cue
 				new GazeAbove(p),
 				new GazeGrabbed(p),
 				new GazeKissing(p),
-				new GazeMoving(p),
 				new GazeBJ(p),
 				new GazeHJ(p),
 				new GazeInteractions(p),
@@ -191,40 +190,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return "kissing";
-		}
-	}
-
-
-	class GazeMoving : BasicGazeEvent
-	{
-		public GazeMoving(Person p)
-			: base(p)
-		{
-		}
-
-		protected override int DoCheck(int flags)
-		{
-			if (person_.HasTarget)
-			{
-				if (person_.MoveTarget != null)
-				{
-					targets_.SetObjectWeight(
-						person_.MoveTarget, 1, "moving to");
-				}
-				else
-				{
-					targets_.SetFrontWeight(1, "moving to pos");
-				}
-
-				return Exclusive;
-			}
-
-			return Continue;
-		}
-
-		public override string ToString()
-		{
-			return "moving";
 		}
 	}
 

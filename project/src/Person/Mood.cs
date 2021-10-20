@@ -224,7 +224,6 @@ namespace Cue
 
 			UpdateTiredness(s);
 			UpdateExcitement(s);
-			UpdateExpressions();
 		}
 
 		private void UpdateTiredness(float s)
@@ -295,20 +294,6 @@ namespace Cue
 			return rate - (rate * tirednessFactor);
 		}
 
-		private void UpdateExpressions()
-		{
-			for (int i = 0; i < Expressions.Count; ++i)
-			{
-				if (i == Expressions.Pleasure)
-					person_.Expression.SetIntensity(i, ExpressionExcitement);
-
-				if (i == Expressions.Tired)
-					person_.Expression.SetIntensity(i, ExpressionTiredness);
-				else
-					person_.Expression.SetDampen(i, ExpressionTiredness);
-			}
-		}
-
 		private void DoOrgasm()
 		{
 			person_.Log.Info("orgasm");
@@ -318,7 +303,6 @@ namespace Cue
 			person_.Animator.PlayType(Animations.Orgasm);
 
 			flatExcitement_.Value = 1;
-			person_.Expression.ForceChange();
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
 		}

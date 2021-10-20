@@ -1,5 +1,5 @@
 ﻿namespace Cue.Proc
-{
+{/*
 	class PenetratedAnimation : BasicProcAnimation
 	{
 		private const float RampUpTime = 0.5f;
@@ -120,5 +120,5 @@
 				}
 			}
 		}
-	}
+	}*/
 }

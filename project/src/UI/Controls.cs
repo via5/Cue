@@ -61,8 +61,6 @@ namespace Cue
 		{
 			if (hovered_)
 				graphic_.Color = new Color(0, 1, 0, 0.3f);
-			else if (object_.Slots.AnyLocked)
-				graphic_.Color = new Color(1, 0, 0, 0.1f);
 			else
 				graphic_.Color = new Color(0, 0, 1, 0.1f);
 		}
@@ -159,7 +157,7 @@ namespace Cue
 		{
 			for (int i = 0; i < controls_.Count; ++i)
 			{
-				if (controls_[i].Object == o && o.Slots.AnyInteractable)
+				if (controls_[i].Object == o)
 				{
 					controls_[i].Hovered = true;
 					controls_[i].Visible = true;

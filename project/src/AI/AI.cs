@@ -7,15 +7,9 @@ namespace Cue
 		T GetEvent<T>() where T : class, IEvent;
 		List<IEvent> Events { get; }
 
-		bool InteractWith(IObject o);
-		void RunCommand(ICommand e);
 		void FixedUpdate(float s);
 		void Update(float s);
-		void MakeIdle();
-		bool CommandsEnabled { get; set; }
 		bool EventsEnabled { get; set; }
-		ICommand ForcedCommand { get; }
-		ICommand Command { get; }
 		void OnPluginState(bool b);
 	}
 
@@ -24,45 +18,20 @@ namespace Cue
 	{
 		private Person person_ = null;
 		private Logger log_;
-		private int i_ = -1;
-		private readonly List<ICommand> commands_ = new List<ICommand>();
-		private bool commandsEnabled_ = true;
 		private bool eventsEnabled_ = true;
-		private ICommand forced_ = null;
 		private readonly List<IEvent> events_ = new List<IEvent>();
+		private readonly RootAction actions_;
 
 		public PersonAI(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "AI");
+			actions_ = new RootAction(person_);
 
-			//foreach (var o in Cue.Instance.Objects)
-			//{
-			//	if (o.Slots.Has(Slot.Sit))
-			//		commands_.Add(new SitCommand(person_, o));
-			//	if (o.Slots.Has(Slot.Lie))
-			//		commands_.Add(new LieDownCommand(person_, o));
-			//	if (o.Slots.Has(Slot.Stand))
-			//		commands_.Add(new StandCommand(person_, o));
-			//}
-
-			commands_.Add(new StandCommand(p));
 			events_.AddRange(BasicEvent.All(p));
-		}
 
-		public bool CommandsEnabled
-		{
-			get
-			{
-				return commandsEnabled_;
-			}
-
-			set
-			{
-				commandsEnabled_ = value;
-				if (!commandsEnabled_)
-					Stop();
-			}
+			actions_.Push(new RandomAnimationAction(person_,
+				Resources.Animations.GetAllIdles(person_.MovementStyle)));
 		}
 
 		public bool EventsEnabled
@@ -87,116 +56,6 @@ namespace Cue
 			get { return events_; }
 		}
 
-		public ICommand ForcedCommand
-		{
-			get
-			{
-				return forced_;
-			}
-		}
-
-		public ICommand Command
-		{
-			get
-			{
-				if (i_ >= 0 && i_ < commands_.Count && commandsEnabled_)
-					return commands_[i_];
-				else
-					return null;
-			}
-		}
-
-		public bool InteractWith(IObject o)
-		{
-			//if (o is Person)
-			//{
-			//	log_.Info("target is person, calling");
-			//	person_.UnlockSlot();
-			//	person_.MakeIdle();
-			//	person_.PushAction(new CallAction(person_, o as Person));
-			//	return true;
-			//}
-
-			if (!person_.TryLockSlot(o))
-			{
-				// can't lock the given object
-				log_.Info($"can't lock any slot in {person_}");
-				return false;
-			}
-
-
-			var slot = person_.LockedSlot;
-			log_.Info($"locked slot {slot}");
-
-			if (slot.Type == Slot.Sit)
-			{
-				log_.Info($"this is a sit slot");
-				person_.MakeIdle();
-
-				if (person_.IsPlayer)
-				{
-					person_.PushAction(new SitAction(person_, slot));
-					person_.PushAction(new MoveAction(
-						slot.ParentObject, person_, slot.Position, slot.Rotation.Bearing));
-				}
-				else
-				{
-					RunCommand(new SitCommand(person_, slot));
-				}
-
-				return true;
-			}
-			else if (slot.Type == Slot.Stand)
-			{
-				log_.Info($"this is a stand slot");
-				person_.MakeIdle();
-
-				if (person_.IsPlayer)
-				{
-					person_.PushAction(new MakeIdleAction(person_));
-					person_.PushAction(new MoveAction(
-						slot.ParentObject, person_, slot.Position, slot.Rotation.Bearing));
-				}
-				else
-				{
-					RunCommand(new StandCommand(person_, slot));
-				}
-
-				return true;
-			}
-			else
-			{
-				log_.Info($"can't interact with {slot}, unlocking");
-			}
-
-			slot.Unlock(person_);
-
-			return false;
-		}
-
-		public void MakeIdle()
-		{
-			Stop();
-			RunCommand(null);
-		}
-
-		public void RunCommand(ICommand e)
-		{
-			if (forced_ != null)
-			{
-				log_.Info($"stopping current forced command {forced_}");
-				forced_.Stop();
-			}
-
-			forced_ = e;
-
-			if (forced_ != null)
-			{
-				log_.Info($"stop to run forced command {forced_}");
-				Stop();
-			}
-		}
-
 		public void FixedUpdate(float s)
 		{
 			if (eventsEnabled_)
@@ -208,42 +67,17 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (forced_ != null)
-			{
-				if (!forced_.Update(s))
-				{
-					log_.Info("forced command finished, stopping");
-					forced_.Stop();
-					forced_ = null;
-				}
-			}
-			else if (commandsEnabled_)
-			{
-				if (commands_.Count > 0)
-				{
-					if (i_ == -1)
-					{
-						i_ = 0;
-					}
-					else
-					{
-						if (!commands_[i_].Update(s))
-						{
-							commands_[i_].Stop();
-
-							++i_;
-							if (i_ >= commands_.Count)
-								i_ = 0;
-						}
-					}
-				}
-			}
-
 			if (eventsEnabled_)
 			{
 				for (int i = 0; i < events_.Count; ++i)
 					events_[i].Update(s);
 			}
+
+			I.Start(I.UpdatePersonActions);
+			{
+				actions_.Tick(s);
+			}
+			I.End();
 		}
 
 		public void OnPluginState(bool b)
@@ -254,13 +88,7 @@ namespace Cue
 
 		private void Stop()
 		{
-			if (i_ >= 0 && i_ < commands_.Count)
-			{
-				commands_[i_].Stop();
-				i_ = -1;
-			}
-
-			person_.Actions.Clear();
+			actions_.Clear();
 		}
 	}
 }

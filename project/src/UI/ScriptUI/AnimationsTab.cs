@@ -22,13 +22,6 @@ namespace Cue
 			var top = new VUI.Panel(new VUI.VerticalFlow());
 
 			var p = new VUI.Panel(new VUI.HorizontalFlow());
-			p.Add(new VUI.Button("Stand", () => person_.SetState(PersonState.Standing)));
-			p.Add(new VUI.Button("Sit", () => person_.SetState(PersonState.Sitting)));
-			p.Add(new VUI.Button("Crouch", () => person_.SetState(PersonState.Crouching)));
-			p.Add(new VUI.Button("Straddle sit", () => person_.SetState(PersonState.SittingStraddling)));
-			top.Add(p);
-
-			p = new VUI.Panel(new VUI.HorizontalFlow());
 			p.Add(new VUI.Button("Play", OnPlay));
 			p.Add(new VUI.Button("Stop", OnStop));
 			p.Add(paused_);

@@ -155,56 +155,14 @@ namespace Cue
 		public const int StateCount = 2;
 
 
-		public class ExpressionMaximum
-		{
-			public int type = -1;
-			public float maximum = 0;
-
-			public ExpressionMaximum(int type)
-			{
-				this.type = type;
-			}
-
-			public ExpressionMaximum(ExpressionMaximum o)
-			{
-				type = o.type;
-				maximum = o.maximum;
-			}
-		}
-
-
 		public class State : EnumValueManager
 		{
 			public readonly string name;
-
-			private ExpressionMaximum[] maximums_;
 
 			public State(int stateIndex)
 				: base(new PSE())
 			{
 				name = StateToString(stateIndex);
-
-				maximums_ = new ExpressionMaximum[Expressions.Count];
-				for (int i = 0; i < maximums_.Length; i++)
-					maximums_[i] = new ExpressionMaximum(i);
-			}
-
-			public ExpressionMaximum[] Maximums
-			{
-				get{ return maximums_; }
-			}
-
-			public void SetMaximum(int type, float max)
-			{
-				maximums_[type].maximum = max;
-			}
-
-			public void CopyFrom(State s)
-			{
-				base.CopyFrom(s);
-
-				for (int i = 0; i < s.maximums_.Length; ++i)
-					maximums_[i] = new ExpressionMaximum(s.maximums_[i]);
 			}
 		}
 
@@ -403,15 +361,6 @@ namespace Cue
 				s = states_[CloseState];
 			else
 				s = states_[IdleState];
-
-			foreach (var m in s.Maximums)
-				person_.Expression.SetMaximum(m.type, m.maximum);
-
-			// todo
-			person_.Expression.SetIntensity(Expressions.Common, 1);
-			person_.Expression.SetIntensity(Expressions.Happy, 1);
-			person_.Expression.SetIntensity(Expressions.Mischievous, 1);
-			person_.Expression.SetIntensity(Expressions.Angry, 1);
 		}
 
 		public void ForceSetClose(bool enabled, bool close)

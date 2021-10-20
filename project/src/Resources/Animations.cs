@@ -71,32 +71,8 @@ namespace Cue
 			if (type == Animations.None)
 				return null;
 
-			int from = PersonState.None;
-			int to = PersonState.None;
-			int state = PersonState.None;
-
 			switch (type)
 			{
-				case Animations.Transition:
-				{
-					if (!o.HasKey("from"))
-					{
-						log_.Error("transition animation missing 'from");
-						return null;
-					}
-
-					if (!o.HasKey("to"))
-					{
-						log_.Error("transition animation missing 'from");
-						return null;
-					}
-
-					from = PersonState.StateFromString(o["from"]);
-					to = PersonState.StateFromString(o["to"]);
-
-					break;
-				}
-
 				case Animations.Sex:
 				case Animations.Idle:
 				{
@@ -106,7 +82,6 @@ namespace Cue
 						return null;
 					}
 
-					state = PersonState.StateFromString(o["state"]);
 					break;
 				}
 			}
@@ -117,7 +92,7 @@ namespace Cue
 			else if (o.HasKey("style"))
 				ms = MovementStyles.FromString(o["style"]);
 
-			return new Animation(type, from, to, state, ms, a);
+			return new Animation(type, ms, a);
 		}
 
 		private IAnimation CreateIntegrationAnimation(JSONClass o)
@@ -195,7 +170,7 @@ namespace Cue
 			return list;
 		}
 
-		public List<Animation> GetAllIdles(int state, int style)
+		public List<Animation> GetAllIdles(int style)
 		{
 			var list = new List<Animation>();
 
@@ -203,46 +178,22 @@ namespace Cue
 			{
 				if (anims_[i].Type == Animations.Idle)
 				{
-					if (anims_[i].State == state)
-					{
-						if (MovementStyles.Match(anims_[i].MovementStyle, style))
-							list.Add(anims_[i]);
-					}
+					if (MovementStyles.Match(anims_[i].MovementStyle, style))
+						list.Add(anims_[i]);
 				}
 			}
 
 			return list;
 		}
 
-		public Animation GetAnyTransition(int from, int to, int style)
-		{
-			for (int i = 0; i < anims_.Count; ++i)
-			{
-				if (anims_[i].Type == Animations.Transition)
-				{
-					if (anims_[i].TransitionFrom == from &&
-						anims_[i].TransitionTo == to)
-					{
-						if (MovementStyles.Match(anims_[i].MovementStyle, style))
-							return anims_[i];
-					}
-				}
-			}
-
-			return null;
-		}
-
-		public Animation GetAnySex(int state, int style)
+		public Animation GetAnySex(int style)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
 				if (anims_[i].Type == Animations.Sex)
 				{
-					if (anims_[i].State == state || anims_[i].State == PersonState.None)
-					{
-						if (MovementStyles.Match(anims_[i].MovementStyle, style))
-							return anims_[i];
-					}
+					if (MovementStyles.Match(anims_[i].MovementStyle, style))
+						return anims_[i];
 				}
 			}
 

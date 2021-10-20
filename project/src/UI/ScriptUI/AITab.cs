@@ -28,7 +28,6 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
-		private VUI.Label command_ = new VUI.Label();
 		private VUI.CheckBox close_ = new VUI.CheckBox();
 
 
@@ -49,9 +48,6 @@ namespace Cue
 			state.Add(new VUI.Label("Traits"));
 			state.Add(traits_);
 
-			state.Add(new VUI.Label("Command"));
-			state.Add(command_);
-
 			state.Add(new VUI.Label("Force close"));
 			state.Add(close_);
 
@@ -66,14 +62,6 @@ namespace Cue
 		{
 			string es = "";
 
-			if (ai_.CommandsEnabled)
-			{
-				if (es != "")
-					es += "|";
-
-				es += "commands";
-			}
-
 			if (ai_.EventsEnabled)
 			{
 				if (es != "")
@@ -87,10 +75,6 @@ namespace Cue
 
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
-
-			command_.Text =
-				(ai_.Command == null ? "(none)" : ai_.Command.ToString()) + " " +
-				(ai_.ForcedCommand == null ? "(forced: none)" : $"(forced: {ai_.ForcedCommand})");
 		}
 
 		private void OnClose(bool b)
@@ -227,15 +211,6 @@ namespace Cue
 			var st = ps.GetState(currentState_);
 
 			var exps = new List<string[]>();
-			var maxs = st.Maximums;
-			for (int i = 0; i < maxs.Length; ++i)
-			{
-				var m = maxs[i];
-
-				exps.Add(new string[] {
-					Expressions.ToString(m.type),
-					m.maximum.ToString() });
-			}
 
 			var v = ps.Voice;
 			exps.Add(new string[] { "orgasm ds", v.OrgasmDataset.Name });

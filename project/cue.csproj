@@ -104,11 +104,6 @@
     <Compile Include="src\AI\Events\Mouth.cs" />
     <Compile Include="src\AI\Events\Sex.cs" />
     <Compile Include="src\AI\Events\Smoke.cs" />
-    <Compile Include="src\Commands\Command.cs" />
-    <Compile Include="src\Commands\Lying.cs" />
-    <Compile Include="src\Commands\Sex.cs" />
-    <Compile Include="src\Commands\Sitting.cs" />
-    <Compile Include="src\Commands\Standing.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Enums\Animations.cs">
       <AutoGen>True</AutoGen>
@@ -156,7 +151,6 @@
     <Compile Include="src\Person\Person.cs" />
     <Compile Include="src\Person\Personality.cs" />
     <Compile Include="src\Person\Physiology.cs" />
-    <Compile Include="src\Person\State.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Finger.cs" />
@@ -186,7 +180,6 @@
     <Compile Include="src\Sys\Vam\BodyParts\StraponBodyPart.cs" />
     <Compile Include="src\Sys\Vam\BodyParts\TriggerBodyPart.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
-    <Compile Include="src\Sys\Vam\VamAtomNav.cs" />
     <Compile Include="src\Sys\Vam\VamBody.cs" />
     <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
@@ -197,7 +190,6 @@
     <Compile Include="src\Sys\Vam\VamLiveSaver.cs" />
     <Compile Include="src\Sys\Vam\VamLog.cs" />
     <Compile Include="src\Sys\Vam\VamMorphs.cs" />
-    <Compile Include="src\Sys\Vam\VamNav.cs" />
     <Compile Include="src\Sys\Vam\VamObjects.cs" />
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />

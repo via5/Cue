@@ -24,7 +24,6 @@ namespace Cue
 		private VUI.Label blowjob_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 
-		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
 		private VUI.CheckBox forcePlayer_ = new VUI.CheckBox("Force as player");
 
 		public PersonStateTab(Person p)
@@ -94,20 +93,12 @@ namespace Cue
 
 
 			var buttons = new VUI.Panel(new VUI.VerticalFlow(10));
-
-			var pp = new VUI.Panel(new VUI.HorizontalFlow(5));
-			pp.Add(new VUI.Button("Force state", OnForceState));
-			pp.Add(states_);
-
-			buttons.Add(pp);
 			buttons.Add(forcePlayer_);
 
 			Layout = new VUI.VerticalFlow();
 			Add(state);
 			Add(new VUI.Spacer(30));
 			Add(buttons);
-
-			states_.SetItems(PersonState.GetNames().ToList());
 
 			forcePlayer_.Changed += OnForcePlayer;
 		}
@@ -118,9 +109,6 @@ namespace Cue
 			pos_.Text = person_.Position.ToString();
 			dir_.Text = person_.Rotation.ToString();
 			bearing_.Text = person_.Rotation.Bearing.ToString();
-			action_.Text = person_.Actions.ToString();
-			nav_.Text = person_.MoveStateString();
-			state_.Text = person_.State.ToString() + " " + (person_.Idle ? "(idle)" : "(not idle)");
 			gaze_.Text = person_.Gaze.ToString();
 			anim_.Text = person_.Animator.ToString();
 
@@ -142,11 +130,6 @@ namespace Cue
 				Cue.Instance.ForcedPlayer = person_;
 			else if (Cue.Instance.ForcedPlayer == person_)
 				Cue.Instance.ForcedPlayer = null;
-		}
-
-		private void OnForceState()
-		{
-			person_.State.Set(PersonState.StateFromString(states_.Selected));
 		}
 	}
 }

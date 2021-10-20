@@ -203,30 +203,7 @@ namespace Cue
 
 		private bool DoAction(IObject src, Sys.HoveredInfo hit)
 		{
-			if (Cue.Instance.Options.AllowMovement)
-			{
-				if (src != null && hit.o != null && hit.o != src)
-				{
-					Cue.LogInfo($"{src}: interacting with {hit.o}");
-					if (src.InteractWith(hit.o))
-						return true;
-				}
-
-				if (src != null && hit.hit)
-				{
-					Cue.LogInfo($"{src}: hit on {hit.pos}");
-
-					if (src.IsPlayer && src.Possessed)
-					{
-						Cue.LogInfo("refusing to move the player");
-						return true;
-					}
-
-					src.MoveToManual(null, hit.pos, Vector3.Bearing(hit.pos - src.Position));
-					return true;
-				}
-			}
-
+			// no-op for now
 			return false;
 		}
 

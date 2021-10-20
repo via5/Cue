@@ -38,7 +38,6 @@ namespace Cue.Sys.Mock
 	class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
-		private readonly MockNav nav_ = new MockNav();
 		private readonly MockInput input_ = new MockInput();
 		private readonly Random rnd_ = new Random();
 
@@ -74,11 +73,6 @@ namespace Cue.Sys.Mock
 		{
 			foreach (var line in s.Split('\n'))
 				Console.WriteLine("[" + LogLevels.ToShortString(level) + "] " + s);
-		}
-
-		public INav Nav
-		{
-			get { return nav_; }
 		}
 
 		public IInput Input
@@ -479,24 +473,6 @@ namespace Cue.Sys.Mock
 
 		public void NavStop(string why)
 		{
-		}
-	}
-
-	class MockNav : INav
-	{
-		public void Update()
-		{
-		}
-
-		public List<Vector3> Calculate(Vector3 from, Vector3 to)
-		{
-			return new List<Vector3>();
-		}
-
-		public bool Render
-		{
-			get { return false; }
-			set { }
 		}
 	}
 }

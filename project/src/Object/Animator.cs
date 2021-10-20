@@ -5,26 +5,17 @@ namespace Cue
 	class Animation
 	{
 		private readonly int type_ = Animations.None;
-		private readonly int from_ = PersonState.None;
-		private readonly int to_ = PersonState.None;
-		private readonly int state_ = PersonState.None;
 		private readonly int style_ = MovementStyles.Any;
 		private readonly IAnimation anim_ = null;
 
-		public Animation(int type, int from, int to, int state, int ms, IAnimation anim)
+		public Animation(int type, int ms, IAnimation anim)
 		{
 			type_ = type;
-			from_ = from;
-			to_ = to;
-			state_ = state;
 			style_ = ms;
 			anim_ = anim;
 		}
 
 		public int Type { get { return type_; } }
-		public int TransitionFrom { get { return from_; } }
-		public int TransitionTo { get { return to_; } }
-		public int State { get { return state_; } }
 		public int MovementStyle { get { return style_; } }
 		public bool HasMovement { get { return anim_.HasMovement; } }
 		public IAnimation Real { get { return anim_; } }
@@ -43,30 +34,6 @@ namespace Cue
 		public override string ToString()
 		{
 			string s = Animations.ToString(type_) + " ";
-
-			switch (type_)
-			{
-				case Animations.Transition:
-				{
-					s +=
-						PersonState.StateToString(from_) + "->" +
-						PersonState.StateToString(to_) + " ";
-
-					break;
-				}
-
-				case Animations.Sex:
-				case Animations.Idle:
-				{
-					s += PersonState.StateToString(state_) + " ";
-					break;
-				}
-
-				default:
-				{
-					break;
-				}
-			}
 
 			s += "ms=" + MovementStyles.ToString(style_) + " " + anim_.ToString();
 
@@ -114,41 +81,9 @@ namespace Cue
 			get { return players_; }
 		}
 
-		public bool IsPlayingTransitionTo(int state)
-		{
-			for (int i = 0; i < playing_.Count; ++i)
-			{
-				var a = playing_[i];
-
-				if (a.anim.Type == Animations.Transition)
-				{
-					if (a.anim.TransitionTo == state)
-						return true;
-				}
-			}
-
-			return false;
-		}
-
-		public bool IsPlayingTransition()
-		{
-			for (int i = 0; i < playing_.Count; ++i)
-			{
-				var a = playing_[i];
-
-				if (a.anim.Type == Animations.Transition)
-					return true;
-			}
-
-			return false;
-		}
-
 		public bool CanPlayType(int type)
 		{
 			// todo
-			if (IsPlayingTransition())
-				return false;
-
 			return true;
 		}
 
@@ -174,24 +109,6 @@ namespace Cue
 			return false;
 		}
 
-		public bool PlayTransition(int from, int to, object ps = null, int flags = 0)
-		{
-			var a = Resources.Animations.GetAnyTransition(
-				from, to, person_.MovementStyle);
-
-			if (a == null)
-			{
-				log_.Error(
-					$"no transition animation from " +
-					$"from {PersonState.StateToString(from)} " +
-					$"to {PersonState.StateToString(to)}");
-
-				return false;
-			}
-
-			return Play(a, ps, flags);
-		}
-
 		public bool PlayType(int type, object ps = null, int flags = 0)
 		{
 			if (IsPlayingType(type))
@@ -207,25 +124,8 @@ namespace Cue
 			return Play(a, ps, flags);
 		}
 
-		public bool PlayNeutral()
-		{
-			if (person_.State.IsCurrently(PersonState.Standing))
-			{
-				return PlayTransition(
-					PersonState.Standing, PersonState.Standing);
-			}
-
-			return true;
-		}
-
 		public bool CanPlay(Animation a, int flags = 0, bool silent = true)
 		{
-			if (a.Type == Animations.Transition)
-			{
-				if (IsPlayingTransition())
-					return false;
-			}
-
 			if (Bits.IsSet(activeFlags_, Exclusive))
 			{
 				if (Bits.IsSet(flags, Exclusive))

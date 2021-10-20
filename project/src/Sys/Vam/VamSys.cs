@@ -12,7 +12,6 @@ namespace Cue.Sys.Vam
 		private static VamSys instance_ = null;
 		private readonly MVRScript script_ = null;
 		private readonly VamLog log_ = new VamLog();
-		private readonly VamNav nav_ = new VamNav();
 		private readonly VamInput input_;
 		private string pluginPath_ = "";
 		private GameObject root_;
@@ -116,11 +115,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return null;
-		}
-
-		public INav Nav
-		{
-			get { return nav_; }
 		}
 
 		public IInput Input
@@ -308,7 +302,6 @@ namespace Cue.Sys.Vam
 		{
 			root_.SetActive(b);
 
-			nav_.OnPluginState(b);
 			log_.OnPluginState(b);
 
 			for (int i = 0; i < 32; ++i)

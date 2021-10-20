@@ -9,11 +9,6 @@ project\src\AI\Events\Lock.cs
 project\src\AI\Events\Mouth.cs
 project\src\AI\Events\Sex.cs
 project\src\AI\Events\Smoke.cs
-project\src\Commands\Command.cs
-project\src\Commands\Lying.cs
-project\src\Commands\Sex.cs
-project\src\Commands\Sitting.cs
-project\src\Commands\Standing.cs
 project\src\Enums\Animations.cs
 project\src\Enums\BodyPartsEnum.cs
 project\src\Enums\EnumValues.cs
@@ -38,7 +33,6 @@ project\src\Person\Mood.cs
 project\src\Person\Person.cs
 project\src\Person\Personality.cs
 project\src\Person\Physiology.cs
-project\src\Person\State.cs
 project\src\Person\Body\Body.cs
 project\src\Person\Body\BodyPart.cs
 project\src\Person\Body\BodyParts.cs
@@ -73,7 +67,6 @@ project\src\Resources\Resources.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
-project\src\Sys\Vam\VamAtomNav.cs
 project\src\Sys\Vam\VamBody.cs
 project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
@@ -84,7 +77,6 @@ project\src\Sys\Vam\VamInput.cs
 project\src\Sys\Vam\VamLiveSaver.cs
 project\src\Sys\Vam\VamLog.cs
 project\src\Sys\Vam\VamMorphs.cs
-project\src\Sys\Vam\VamNav.cs
 project\src\Sys\Vam\VamObjects.cs
 project\src\Sys\Vam\VamParameter.cs
 project\src\Sys\Vam\VamSys.cs

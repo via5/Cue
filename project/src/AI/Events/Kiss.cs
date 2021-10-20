@@ -192,9 +192,6 @@ namespace Cue
 			if (!person_.Options.CanKiss)
 				return $"target {person_.ID} kissing disabled";
 
-			if (!person_.CanMoveHead)
-				return $"target {person_.ID} can't move head";
-
 			if (person_.Kisser.Active)
 				return $"target {person_.ID} kissing already active";
 
@@ -235,12 +232,6 @@ namespace Cue
 			if (!p.Options.CanKiss)
 			{
 				lastResult_ = "kissing disabled";
-				return false;
-			}
-
-			if (!p.CanMoveHead)
-			{
-				lastResult_ = "can't move head";
 				return false;
 			}
 

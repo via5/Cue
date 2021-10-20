@@ -70,11 +70,6 @@ namespace Cue
 			return new ClothingManager(p);
 		}
 
-		public static IExpression CreateExpression(Person p)
-		{
-			return new Proc.Expression(p);
-		}
-
 		public static ISmoke CreateSmoke(string id, bool existsOnly = false)
 		{
 			return VamSmoke.Create(id, existsOnly);
@@ -215,53 +210,6 @@ namespace Cue
 			return $"{first} {second}";
 		}
 	}
-
-
-	class Expressions
-	{
-		public const int Common = 0;
-		public const int Happy = 1;
-		public const int Mischievous = 2;
-		public const int Pleasure = 3;
-		public const int Angry = 4;
-		public const int Tired = 5;
-		public const int Count = 6;
-
-		private static string[] names_ = new string[]
-		{
-			"common", "happy", "mischievous", "pleasure", "angry", "tired"
-		};
-
-		public static int FromString(string s)
-		{
-			for (int i = 0; i < names_.Length; ++i)
-			{
-				if (names_[i] == s)
-					return i;
-			}
-
-			return -1;
-		}
-
-		public static string ToString(int i)
-		{
-			return names_[i];
-		}
-	}
-
-	interface IExpression
-	{
-		void MakeNeutral();
-		void SetMaximum(int type, float intensity);
-		void SetIntensity(int type, float intensity);
-		void SetDampen(int type, float intensity);
-		bool Enabled { get; set; }
-		void FixedUpdate(float s);
-		void OnPluginState(bool b);
-		void DumpActive();
-		void ForceChange();
-	}
-
 
 	interface ISmoke
 	{

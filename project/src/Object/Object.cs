@@ -23,19 +23,6 @@ namespace Cue
 		void FixedUpdate(float s);
 		void Update(float s);
 		void OnPluginState(bool b);
-		void SetPaused(bool b);
-
-		bool InteractWith(IObject o);
-		void MoveTo(IObject o, Vector3 to, float bearing);
-		void MoveToManual(IObject o, Vector3 to, float bearing);
-		void MakeIdle();
-		void MakeIdleForMove();
-
-		void TeleportTo(Vector3 to, float bearing);
-		bool HasTarget { get; }
-		IObject MoveTarget{ get; }
-
-		Slots Slots { get; }
 
 		JSONNode ToJSON();
 		void Load(JSONClass r);
@@ -48,24 +35,10 @@ namespace Cue
 	{
 		public const float NoBearing = float.MaxValue;
 
-		private const int NoMoveState = 0;
-		private const int TentativeMoveState = 1;
-		private const int MovingState = 2;
-
 		private readonly int objectIndex_;
 		private readonly Sys.IAtom atom_;
 		protected readonly Logger log_;
 		private Sys.ObjectParameters ps_ = null;
-
-		private Vector3 targetPos_ = Vector3.Zero;
-		private float targetBearing_ = NoBearing;
-		private float targetStoppingDistance_ = 0;
-		private int moveState_ = NoMoveState;
-		private IObject moveTarget_ = null;
-
-		private Slots slots_;
-		private Slot locked_ = null;
-
 		private string[] traits_ = new string[0];
 
 
@@ -74,32 +47,7 @@ namespace Cue
 			objectIndex_ = index;
 			atom_ = atom;
 			log_ = new Logger(Logger.Object, this, "");
-			slots_ = new Slots(this);
 			ps_ = ps;
-		}
-
-		public static BasicObject TryCreateFromSlot(int index, Sys.IAtom a)
-		{
-			return null;
-			//var re = new Regex(@"cue!([a-zA-Z]+)#?.*");
-			//var m = re.Match(a.ID);
-			//
-			//if (m == null || !m.Success)
-			//	return null;
-			//
-			//var typeName = m.Groups[1].Value;
-			//
-			//var type = Slot.TypeFromString(typeName);
-			//if (type == Slot.NoType)
-			//{
-			//	Cue.LogError("bad object type '" + typeName + "'");
-			//	return null;
-			//}
-			//
-			//BasicObject o = new BasicObject(index, a);
-			//o.Slots.Add(type);
-			//
-			//return o;
 		}
 
 		public string GetParameter(string key)
@@ -168,17 +116,6 @@ namespace Cue
 			get { return Position; }
 		}
 
-		public Slots Slots
-		{
-			get { return slots_; }
-		}
-
-		public Slot LockedSlot
-		{
-			get { return locked_; }
-			set { locked_ = value; }
-		}
-
 		public bool Possessed
 		{
 			get { return Atom.Possessed; }
@@ -209,120 +146,11 @@ namespace Cue
 			}
 		}
 
-		public bool TryLockSlot(IObject o)
-		{
-			Slot s = o.Slots.GetLockedBy(this);
-
-			// object is already locked by this person, reuse it
-			if (s != null)
-			{
-				log_.Info($"slot {s} already locked by self, reusing it");
-				return true;
-			}
-
-			if (o.Slots.AnyLocked)
-			{
-				// a slot is already locked, fail
-				log_.Info($"can't lock {o}, already has locked slot {o.Slots.AnyLocked}");
-				return false;
-			}
-
-			// take a random slot
-			s = o.Slots.RandomUnlocked();
-
-			if (s == null)
-			{
-				// no free slots
-				log_.Info($"can't lock {o}, no free slots");
-				return false;
-			}
-
-			return TryLockSlot(s);
-		}
-
-		public bool TryLockSlot(Slot s)
-		{
-			if (!s.Lock(this))
-			{
-				// this object can't lock this slot
-				log_.Info($"can't lock {s}");
-				return false;
-			}
-
-			// slot has been locked successfully, unlock the current slot,
-			// if any
-			if (locked_ != null)
-			{
-				log_.Info($"found slot to lock, unlocking current {locked_}");
-				locked_.Unlock(this);
-			}
-
-			log_.Info($"locked {s}");
-			locked_ = s;
-
-			return true;
-		}
-
-		public void UnlockSlot()
-		{
-			if (locked_ != null)
-			{
-				log_.Info($"unlocking {locked_}");
-				locked_.Unlock(this);
-				locked_ = null;
-			}
-		}
-
-		public virtual bool InteractWith(IObject o)
-		{
-			// no-op
-			return false;
-		}
-
-		public string MoveStateString()
-		{
-			switch (moveState_)
-			{
-				case TentativeMoveState:
-					return $"tentative to {targetPos_} {U.BearingToString(targetBearing_)}";
-
-				case MovingState:
-					return $"moving, nav {Sys.NavStates.ToString(Atom.NavState)}";
-
-				case NoMoveState:
-				default:
-					return "(none)";
-			}
-		}
-
 		public virtual void Update(float s)
 		{
 			I.Start(I.UpdateObjectsAtoms);
 			{
 				Atom.Update(s);
-			}
-			I.End();
-
-
-			I.Start(I.UpdateObjectsMove);
-			{
-				if (moveState_ == TentativeMoveState)
-				{
-					if (StartMove())
-					{
-						Atom.NavTo(targetPos_, targetBearing_, targetStoppingDistance_);
-						moveState_ = MovingState;
-					}
-				}
-
-				if (moveState_ == MovingState)
-				{
-					if (Atom.NavState == Sys.NavStates.None)
-					{
-						moveState_ = NoMoveState;
-						Atom.NavStop("nav state is none");
-					}
-				}
 			}
 			I.End();
 		}
@@ -366,68 +194,9 @@ namespace Cue
 			atom_.OnPluginState(b);
 		}
 
-		public virtual void SetPaused(bool b)
-		{
-		}
-
 		public override string ToString()
 		{
 			return atom_.ID;
-		}
-
-		public void MoveTo(IObject o, Vector3 to, float bearing)
-		{
-			moveTarget_ = o;
-			targetStoppingDistance_ = 0;
-			targetPos_ = to;
-
-			if (bearing == NoBearing)
-				targetBearing_ = NoBearing;
-			else
-				targetBearing_ = Quaternion.NormalizeAngle(bearing);
-
-			moveState_ = TentativeMoveState;
-		}
-
-		public void MoveToManual(IObject o, Vector3 to, float bearing)
-		{
-			UnlockSlot();
-			MakeIdleForMove();
-			MoveTo(o, to, bearing);
-
-			// todo
-			targetStoppingDistance_ = 0.1f;
-		}
-
-		public virtual void MakeIdle()
-		{
-			// no-op
-		}
-
-		public virtual void MakeIdleForMove()
-		{
-			// no-op
-		}
-
-		public void TeleportTo(Vector3 to, float bearing)
-		{
-			Atom.TeleportTo(to, bearing);
-		}
-
-		public bool HasTarget
-		{
-			get { return (moveState_ != NoMoveState); }
-		}
-
-		public IObject MoveTarget
-		{
-			get { return moveTarget_; }
-		}
-
-		protected virtual bool StartMove()
-		{
-			// no-op
-			return true;
 		}
 	}
 }

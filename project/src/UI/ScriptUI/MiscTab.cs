@@ -12,7 +12,6 @@ namespace Cue
 			: base("Misc", true)
 		{
 			input_ = AddSubTab(new MiscInputTab());
-			AddSubTab(new MiscNavTab());
 			times_ = AddSubTab(new MiscTimesTab());
 			AddSubTab(new MiscLogTab());
 		}
@@ -25,30 +24,6 @@ namespace Cue
 		public void UpdateInput(float s)
 		{
 			input_.UpdateInput(s);
-		}
-	}
-
-
-	class MiscNavTab : Tab
-	{
-		private VUI.CheckBox navmeshes_ = new VUI.CheckBox("Navmeshes");
-		private VUI.Button renav_ = new VUI.Button("Update nav");
-
-		public MiscNavTab()
-			: base("Nav", false)
-		{
-			Layout = new VUI.VerticalFlow(0, false);
-
-			Add(new VUI.Label("nav is disabled in this build"));
-			Add(new VUI.Spacer(20));
-			Add(navmeshes_);
-			Add(renav_);
-
-			navmeshes_.Enabled = false;
-			renav_.Enabled = false;
-
-			navmeshes_.Changed += (b) => Cue.Instance.Sys.Nav.Render = b;
-			renav_.Clicked += Cue.Instance.Sys.Nav.Update;
 		}
 	}
 

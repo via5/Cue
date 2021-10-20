@@ -63,7 +63,6 @@ namespace Cue.Sys
 		IAtom GetAtom(string id);
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
-		INav Nav { get; }
 		IInput Input { get; }
 		Vector3 CameraPosition { get; }
 		Vector3 InteractiveLeftHandPosition { get; }
@@ -303,7 +302,6 @@ namespace Cue.Sys
 		bool Visible { get; set; }
 		bool IsPerson { get; }
 		bool IsMale { get; }
-		bool Teleporting { get; }
 		bool Possessed { get; }
 		bool Selected { get; }
 		bool Grabbed { get; }
@@ -332,20 +330,6 @@ namespace Cue.Sys
 
 		void Update(float s);
 		void LateUpdate(float s);
-		void TeleportTo(Vector3 p, float bearing);
-
-		bool NavEnabled { get; set; }
-		bool NavPaused { get; set; }
-		int NavState { get; }
-		void NavTo(Vector3 v, float bearing, float stoppingDistance);
-		void NavStop(string why);
-	}
-
-	interface INav
-	{
-		void Update();
-		List<Vector3> Calculate(Vector3 from, Vector3 to);
-		bool Render { get; set; }
 	}
 
 	interface IGraphic
