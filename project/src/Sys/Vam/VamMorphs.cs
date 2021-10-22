@@ -153,7 +153,7 @@ namespace Cue.Sys.Vam
 		private int lastSetFrame_ = -1;
 		private float morphValueOnLastSet_ = -1;
 		private float targetOnLastSet_ = -1;
-		private bool limiterEnabled_ = true;
+		private bool limiterEnabled_ = false;
 
 		private static bool setFromCue_ = false;
 
@@ -321,6 +321,7 @@ namespace Cue.Sys.Vam
 			try
 			{
 				setFromCue_ = true;
+
 				m_.morphValue = f;
 
 				if (eyes_)

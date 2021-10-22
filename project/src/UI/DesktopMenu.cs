@@ -199,7 +199,7 @@ namespace Cue
 
 			var p = Selected as Person;
 			if (p != null)
-				p.Body.Strapon = !p.Body.Strapon;
+				p.Animator.PlayType(Animations.Penetrated);
 		}
 
 		private void OnForceExcitement(bool b)

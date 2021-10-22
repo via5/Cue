@@ -98,14 +98,16 @@
 	{
 		private Person person_;
 		private string name_;
+		private int bodyPart_;
 		private Finger[] fingers_;
 		private Morph fist_;
 		private Morph inOut_;
 
-		public Hand(Person p, string name, Sys.Hand h)
+		public Hand(Person p, string name, Sys.Hand h, int bodyPart)
 		{
 			person_ = p;
 			name_ = name;
+			bodyPart_ = bodyPart;
 
 			fingers_ = new Finger[5];
 			fingers_[0] = new Finger(this, "thumb", h.bones?[0]);
@@ -114,13 +116,18 @@
 			fingers_[3] = new Finger(this, "ring", h.bones?[3]);
 			fingers_[4] = new Finger(this, "little", h.bones?[4]);
 
-			fist_ = new Morph(h.fist);
-			inOut_ = new Morph(h.inOut);
+			fist_ = new Morph(person_, h.fist, bodyPart_);
+			inOut_ = new Morph(person_, h.inOut, bodyPart_);
 		}
 
 		public string Name
 		{
 			get { return name_; }
+		}
+
+		public int BodyPart
+		{
+			get { return bodyPart_; }
 		}
 
 		public Person Person

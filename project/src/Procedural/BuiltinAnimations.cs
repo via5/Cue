@@ -11,7 +11,7 @@ namespace Cue.Proc
 			list.Add(Sex());
 			list.Add(Smoke());
 			list.Add(Suck());
-			//list.Add(Penetrated());
+			list.Add(Penetrated());
 			list.Add(LeftFinger());
 			list.Add(RightFinger());
 
@@ -36,15 +36,11 @@ namespace Cue.Proc
 			return new Animation(Animations.Suck, MovementStyles.Any, a);
 		}
 
-		//private static Animation Penetrated()
-		//{
-		//	var a = new PenetratedAnimation();
-		//
-		//	return new Animation(
-		//		Animations.Penetrated,
-		//		PersonState.None, PersonState.None,
-		//		PersonState.None, MovementStyles.Any, a);
-		//}
+		private static Animation Penetrated()
+		{
+			var a = new PenetratedAnimation();
+			return new Animation(Animations.Penetrated, MovementStyles.Any, a);
+		}
 
 		private static Animation LeftFinger()
 		{

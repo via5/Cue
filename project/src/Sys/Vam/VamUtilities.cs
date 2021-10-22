@@ -116,6 +116,27 @@ namespace Cue.Sys.Vam
 			if (m != null)
 				return m;
 
+			if (mui.morphBank1 != null)
+			{
+				m = mui.morphBank1.GetMorph(morphUID);
+				if (m != null)
+					return m;
+			}
+
+			if (mui.morphBank2 != null)
+			{
+				m = mui.morphBank2.GetMorph(morphUID);
+				if (m != null)
+					return m;
+			}
+
+			if (mui.morphBank3 != null)
+			{
+				m = mui.morphBank3.GetMorph(morphUID);
+				if (m != null)
+					return m;
+			}
+
 			return null;
 		}
 

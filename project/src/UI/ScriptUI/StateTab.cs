@@ -108,7 +108,7 @@ namespace Cue
 			id_.Text = person_.ID;
 			pos_.Text = person_.Position.ToString();
 			dir_.Text = person_.Rotation.ToString();
-			bearing_.Text = person_.Rotation.Bearing.ToString();
+			bearing_.Text = $"{person_.Rotation.Bearing:0.00}";
 			gaze_.Text = person_.Gaze.ToString();
 			anim_.Text = person_.Animator.ToString();
 

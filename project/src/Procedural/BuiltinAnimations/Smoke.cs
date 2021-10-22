@@ -113,11 +113,11 @@ namespace Cue.Proc
 			hand_ = person_.Body.RightHand;
 			handPart_ = person_.Body.Get(BP.RightHand);
 
-			mouthOpen_ = new Morph(p.Atom.GetMorph("Mouth Open Wide"));
-			lipsPucker_ = new Morph(p.Atom.GetMorph("Lips Pucker"));
-			mouthNarrow_ = new Morph(p.Atom.GetMorph("Mouth Narrow"));
-			lipsPart_ = new Morph(p.Atom.GetMorph("Lips Part"));
-			lipsPuckerWide_ = new Morph(p.Atom.GetMorph("Lips Pucker Wide"));
+			mouthOpen_ = new Morph(p, "Mouth Open Wide", BP.Mouth);
+			lipsPucker_ = new Morph(p, "Lips Pucker", BP.Mouth);
+			mouthNarrow_ = new Morph(p, "Mouth Narrow", BP.Mouth);
+			lipsPart_ = new Morph(p, "Lips Part", BP.Mouth);
+			lipsPuckerWide_ = new Morph(p, "Lips Pucker Wide", BP.Mouth);
 
 			unsafeCig_ = FindCigarette();
 			unsafeSmoke_ = FindSmoke();

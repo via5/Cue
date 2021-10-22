@@ -115,13 +115,10 @@ namespace Cue
 
 			if (wait_.Finished && CanRun())
 			{
-				if (person_.Animator.CanPlayType(Animations.Smoke))
-				{
-					if (cig_ != null)
-						cig_.Visible = true;
+				if (cig_ != null)
+					cig_.Visible = true;
 
-					person_.Animator.PlayType(Animations.Smoke);
-				}
+				person_.Animator.PlayType(Animations.Smoke);
 			}
 
 

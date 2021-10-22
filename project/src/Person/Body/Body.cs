@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -48,12 +49,14 @@ namespace Cue
 
 
 		public const int CloseDelay = 2;
+		private const float MaxMorphs = 1.0f;
 
 		private Person person_;
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
 		private int renderingParts_ = 0;
+		private float[] morphsRemaining_ = new float[BP.Count];
 
 		public Body(Person p)
 		{
@@ -73,8 +76,8 @@ namespace Cue
 
 			all_ = all.ToArray();
 
-			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHand());
-			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHand());
+			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHand(), BP.LeftHand);
+			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHand(), BP.RightHand);
 		}
 
 		public void Init()
@@ -413,6 +416,38 @@ namespace Cue
 
 				return f;
 			}
+		}
+
+		public void ResetMorphLimits()
+		{
+			for (int i = 0; i < morphsRemaining_.Length; ++i)
+				morphsRemaining_[i] = 1;
+		}
+
+		public float UseMorphs(int[] bodyParts, float use)
+		{
+			if (bodyParts == null || bodyParts.Length == 0)
+				return use;
+
+			float smallestAv = float.MaxValue;
+
+			for (int i = 0; i < bodyParts.Length; ++i)
+			{
+				var bp = bodyParts[i];
+				if (bp != BP.None && morphsRemaining_[bp] < smallestAv)
+					smallestAv = morphsRemaining_[bp];
+			}
+
+			float av = Math.Min(use, smallestAv);
+
+			for (int i = 0; i < bodyParts.Length; ++i)
+			{
+				var bp = bodyParts[i];
+				if (bp != BP.None)
+					morphsRemaining_[bp] -= av;
+			}
+
+			return av;
 		}
 
 		public void Update(float s)

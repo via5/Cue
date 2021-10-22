@@ -81,12 +81,6 @@ namespace Cue
 			get { return players_; }
 		}
 
-		public bool CanPlayType(int type)
-		{
-			// todo
-			return true;
-		}
-
 		public bool IsPlaying(Animation a)
 		{
 			for (int i = 0; i < playing_.Count; ++i)

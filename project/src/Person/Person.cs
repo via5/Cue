@@ -196,6 +196,8 @@ namespace Cue
 		{
 			base.Update(s);
 
+			body_.ResetMorphLimits();
+
 			I.Start(I.UpdatePersonAnimator);
 			{
 				animator_.Update(s);

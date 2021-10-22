@@ -90,8 +90,6 @@ namespace Cue.Proc
 	{
 		private Person person_;
 		private bool enabled_ = true;
-		private const float MaxMorphs = 1.0f;
-		private float[] remaining_ = new float[BP.Count];
 
 		private readonly List<ExpressionType> expressions_ =
 			new List<ExpressionType>();

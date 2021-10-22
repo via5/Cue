@@ -147,7 +147,7 @@ namespace Cue.Proc
 
 		protected override void DoStart(Person p)
 		{
-			morph_ = new Morph(person_.Atom.GetMorph(morphId_));
+			morph_ = new Morph(person_, morphId_, bodyPart_);
 
 			mid_ = Mid();
 			last_ = mid_;
