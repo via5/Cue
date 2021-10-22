@@ -141,7 +141,7 @@ namespace Cue.Sys.Vam
 	class MorphInfo
 	{
 		// per second
-		public const float MaxChangeSpeed = 1.5f;
+		public const float MaxChangeSpeed = 8;
 
 		private VamAtom atom_;
 		private string id_;
@@ -153,7 +153,7 @@ namespace Cue.Sys.Vam
 		private int lastSetFrame_ = -1;
 		private float morphValueOnLastSet_ = -1;
 		private float targetOnLastSet_ = -1;
-		private bool limiterEnabled_ = false;
+		private bool limiterEnabled_ = true;
 
 		private static bool setFromCue_ = false;
 

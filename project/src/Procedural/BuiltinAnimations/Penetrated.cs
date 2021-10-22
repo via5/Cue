@@ -1,29 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue.Proc
 {
 	class PenetratedAnimation : BasicProcAnimation
 	{
+		struct Config
+		{
+			public float lookUpChance;
+			public float postReactionChance;
+			public Pair<float, float> reactionTimeRange;
+			public Pair<float, float> reactionHoldTimeRange;
+			public Pair<float, float> postReactionTimeRange;
+			public Pair<float, float> postReactionHoldTimeRange;
+			public Pair<float, float> resetTimeRange;
+		}
+
+		struct Settings
+		{
+			public bool lookUp;
+			public bool doPostReaction;
+			public float reactionTime;
+			public float reactionHoldTime;
+			public float postReactionTime;
+			public float postReactionHoldTime;
+			public float resetTime;
+			public Expression[] reaction;
+			public float[] reactionTargets;
+			public Expression[] postReaction;
+			public float[] postReactionTargets;
+		}
+
 		private const int NoState = 0;
-		private const int ReactionUpState = 1;
+		private const int ReactionState = 1;
 		private const int ReactionHoldState = 2;
-		private const int PostReactionUpState = 3;
+		private const int PostReactionState = 3;
 		private const int PostReactionHoldState = 4;
 		private const int ResetState = 5;
 		private const int DoneState = 6;
 
-		private const float ReactionUpTime = 0.2f;
-		private const float ReactionHoldTime = 1;
-		private const float PostReactionUpTime = 0.2f;
-		private const float PostReactionHoldTime = 1;
-		private const float ResetTime = 1;
-
 		private float elapsed_ = 0;
 		private int state_ = NoState;
-
-		private Expression pleasure_ = null;
-		private Expression smile_ = null;
+		private Config config_;
+		private Settings settings_;
+		private Expression[] expressions_ = null;
 
 		public PenetratedAnimation()
 			: base("procPenetrated", false)
@@ -47,36 +66,200 @@ namespace Cue.Proc
 			base.Start(p, ps);
 
 			elapsed_ = 0;
-			state_ = ReactionUpState;
+			state_ = ReactionState;
 			person_.Breathing.MouthEnabled = false;
 
-			pleasure_ = BuiltinExpressions.Pleasure(p);
-			smile_ = BuiltinExpressions.Smile(p);
+			expressions_ = new Expression[]
+			{
+				BuiltinExpressions.Smile(p),
+				BuiltinExpressions.Pleasure(p),
+				BuiltinExpressions.Pain(p),
+				BuiltinExpressions.Shock(p),
+				BuiltinExpressions.Scream(p),
+				BuiltinExpressions.Angry(p),
+				BuiltinExpressions.EyesClosed(p),
+			};
 
-			pleasure_.SetTarget(U.RandomFloat(0.7f, 1.0f), ReactionUpTime);
-			smile_.SetTarget(1 - pleasure_.Target, ReactionUpTime);
+			config_ = MakeConfig();
+			settings_ = MakeSettings(expressions_, config_);
+
+			Cue.LogInfo(
+				$"lookup: {settings_.lookUp} ({config_.lookUpChance})\n" +
+				$"doPostReaction: {settings_.doPostReaction} ({config_.postReactionChance})\n" +
+				$"reactionTime: {settings_.reactionTime} ({config_.reactionTimeRange})\n" +
+				$"reactionHoldTime: {settings_.reactionHoldTime} ({config_.reactionTimeRange})\n" +
+				$"postReactionTime: {settings_.postReactionTime} ({config_.postReactionTimeRange})\n" +
+				$"postReactionHoldTime: {settings_.postReactionHoldTime} ({config_.postReactionHoldTimeRange})\n" +
+				$"resetTime: {settings_.resetTime} ({config_.resetTimeRange})\n" +
+				$"reactions: {DebugExpressions(settings_.reaction, settings_.reactionTargets)}\n" +
+				$"postReactions: {DebugExpressions(settings_.postReaction, settings_.postReactionTargets)}");
+
+			StartLookUp();
+
+			for (int i = 0; i < settings_.reaction.Length; ++i)
+				settings_.reaction[i].SetTarget(settings_.reactionTargets[i], settings_.reactionTime);
 
 			return true;
+		}
+
+		private string DebugExpressions(Expression[] es, float[] targets)
+		{
+			string s = "";
+
+			for (int i = 0; i < es.Length; ++i)
+			{
+				if (s != "")
+					s += ",";
+
+				s += $"{es[i].Name}({targets[i]:0.00})";
+			}
+
+			return s;
+		}
+
+		private static Config MakeConfig()
+		{
+			Config c;
+
+			c.lookUpChance = 0.75f;
+			c.postReactionChance = 0.75f;
+			c.reactionTimeRange = new Pair<float, float>(0.2f, 1);
+			c.reactionHoldTimeRange = new Pair<float, float>(0.1f, 2);
+			c.postReactionTimeRange = new Pair<float, float>(0.5f, 1.5f);
+			c.postReactionHoldTimeRange = new Pair<float, float>(0, 1);
+			c.resetTimeRange = new Pair<float, float>(0.8f, 1.5f);
+
+			return c;
+		}
+
+		private static Settings MakeSettings(Expression[] expressions, Config c)
+		{
+			Settings s;
+
+			s.lookUp = U.RandomBool(c.lookUpChance);
+			s.doPostReaction = U.RandomBool(c.postReactionChance);
+			s.reactionTime = U.RandomFloat(c.reactionTimeRange);
+			s.reactionHoldTime = U.RandomFloat(c.reactionHoldTimeRange);
+			s.postReactionTime = U.RandomFloat(c.postReactionTimeRange);
+			s.postReactionHoldTime = U.RandomFloat(c.postReactionHoldTimeRange);
+			s.resetTime = U.RandomFloat(c.resetTimeRange);
+
+			U.Shuffle(expressions);
+
+			{
+				int av = s.doPostReaction ?
+					expressions.Length - 1 :
+					expressions.Length;
+
+				int count = U.RandomInt(1, av);
+
+				Cue.LogInfo($"r: {av} {count}");
+
+				s.reaction = new Expression[count];
+				s.reactionTargets = new float[count];
+
+				for (int i = 0; i < s.reaction.Length; ++i)
+					s.reaction[i] = expressions[i];
+
+				float remaining = 1;
+				for (int i = 0; i < s.reactionTargets.Length; ++i)
+				{
+					var f = U.RandomFloat(0, 1);
+					s.reactionTargets[i] = f;
+					remaining = U.Clamp(remaining - f, 0, 1);
+				}
+
+				s.reactionTargets[s.reactionTargets.Length - 1] += remaining;
+			}
+
+			if (s.doPostReaction)
+			{
+				int av = expressions.Length - s.reaction.Length;
+				int count = U.RandomInt(1, av);
+
+				Cue.LogInfo($"pr: {av} {count}");
+
+				s.postReaction = new Expression[count];
+				s.postReactionTargets = new float[count];
+
+				for (int i = 0; i < s.postReaction.Length; ++i)
+					s.postReaction[i] = expressions[s.reaction.Length + i];
+
+				float remaining = 1;
+				for (int i = 0; i < s.postReactionTargets.Length; ++i)
+				{
+					var f = U.RandomFloat(0, 1);
+					s.postReactionTargets[i] = f;
+					remaining = U.Clamp(remaining - f, 0, 1);
+				}
+
+				s.postReactionTargets[s.postReactionTargets.Length - 1] += remaining;
+			}
+			else
+			{
+				s.postReaction = new Expression[0];
+				s.postReactionTargets = new float[0];
+			}
+
+			return s;
+		}
+
+		private void StartLookUp()
+		{
+			if (settings_.lookUp)
+			{
+				person_.Gaze.Picker.ForcedTarget = person_.Gaze.Targets.LookatAbove;
+				person_.Gaze.Gazer.Duration = settings_.reactionTime;
+			}
+		}
+
+		private void StopLookUp()
+		{
+			if (settings_.lookUp)
+			{
+				person_.Gaze.Picker.ForcedTarget = null;
+				person_.Gaze.Gazer.Duration = settings_.resetTime;
+			}
 		}
 
 		public override void Reset()
 		{
 			base.Reset();
 			elapsed_ = 0;
+			StopLookUp();
+		}
+
+		private void StartPostReaction()
+		{
+			state_ = PostReactionState;
+
+			for (int i = 0; i < expressions_.Length; ++i)
+				expressions_[i].SetTarget(0, settings_.postReactionTime);
+
+			for (int i = 0; i < settings_.postReaction.Length; ++i)
+				settings_.postReaction[i].SetTarget(settings_.postReactionTargets[i], settings_.postReactionTime);
+		}
+
+		private void StartReset()
+		{
+			state_ = ResetState;
+
+			for (int i = 0; i < expressions_.Length; ++i)
+				expressions_[i].SetTarget(0, settings_.resetTime);
 		}
 
 		public override void FixedUpdate(float s)
 		{
 			elapsed_ += s;
 
-			pleasure_.Update(s);
-			smile_.Update(s);
+			for (int i = 0; i < expressions_.Length; ++i)
+				expressions_[i].Update(s);
 
 			switch (state_)
 			{
-				case ReactionUpState:
+				case ReactionState:
 				{
-					if (elapsed_ >= ReactionUpTime)
+					if (elapsed_ >= settings_.reactionTime)
 					{
 						elapsed_ = 0;
 						state_ = ReactionHoldState;
@@ -87,21 +270,24 @@ namespace Cue.Proc
 
 				case ReactionHoldState:
 				{
-					if (elapsed_ >= ReactionHoldTime)
+					if (elapsed_ >= settings_.reactionHoldTime)
 					{
 						elapsed_ = 0;
-						state_ = PostReactionUpState;
 
-						pleasure_.SetTarget(0, PostReactionUpTime);
-						smile_.SetTarget(1, PostReactionUpTime);
+						if (settings_.doPostReaction)
+							StartPostReaction();
+						else
+							StartReset();
+
+						StopLookUp();
 					}
 
 					break;
 				}
 
-				case PostReactionUpState:
+				case PostReactionState:
 				{
-					if (elapsed_ >= PostReactionUpTime)
+					if (elapsed_ >= settings_.postReactionTime)
 					{
 						elapsed_ = 0;
 						state_ = PostReactionHoldState;
@@ -112,12 +298,10 @@ namespace Cue.Proc
 
 				case PostReactionHoldState:
 				{
-					if (elapsed_ >= PostReactionHoldTime)
+					if (elapsed_ >= settings_.postReactionHoldTime)
 					{
 						elapsed_ = 0;
-						state_ = ResetState;
-
-						smile_.SetTarget(0, ResetTime);
+						StartReset();
 					}
 
 					break;
@@ -125,7 +309,7 @@ namespace Cue.Proc
 
 				case ResetState:
 				{
-					if (elapsed_ >= ResetTime)
+					if (elapsed_ >= settings_.resetTime)
 					{
 						elapsed_ = 0;
 						state_ = DoneState;

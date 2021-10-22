@@ -83,6 +83,24 @@ namespace Cue
 	}
 
 
+	struct Pair<First, Second>
+	{
+		public First first;
+		public Second second;
+
+		public Pair(First f, Second s)
+		{
+			first = f;
+			second = s;
+		}
+
+		public override string ToString()
+		{
+			return $"{first},{second}";
+		}
+	}
+
+
 	static class HashHelper
 	{
 		public static int GetHashCode<T1, T2>(T1 arg1, T2 arg2)
@@ -153,6 +171,13 @@ namespace Cue
 			return Cue.Instance.Sys.RandomFloat(first, last);
 		}
 
+		// inclusive
+		//
+		public static float RandomFloat(Pair<float, float> p)
+		{
+			return RandomFloat(p.first, p.second);
+		}
+
 		public static float RandomGaussian(float first, float last)
 		{
 			float u, v, S;
@@ -178,6 +203,16 @@ namespace Cue
 			float mean = (first + last) / 2.0f;
 			float sigma = (last - mean) / 3.0f;
 			return Clamp(std * sigma + mean, first, last);
+		}
+
+		public static bool RandomBool()
+		{
+			return RandomBool(0.5f);
+		}
+
+		public static bool RandomBool(float trueChance)
+		{
+			return (RandomFloat(0, 1) <= trueChance);
 		}
 
 		public static void NatSort(List<string> list)

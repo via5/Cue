@@ -24,6 +24,11 @@
 			g_ = g;
 		}
 
+		public string Name
+		{
+			get { return name_; }
+		}
+
 		public float Target
 		{
 			get { return target_.value; }
@@ -96,6 +101,13 @@
 		//}
 
 
+		/*public static IProceduralMorphGroup CornerSmile(Person p)
+		{
+			var g = new ConcurrentProceduralMorphGroup("cornerSmile");
+			g.Add(new MorphTarget(p, BP.Mouth, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
+			return g;
+		}*/
+
 		public static Expression Smile(Person p)
 		{
 			return new Expression("smile", new MorphGroup(
@@ -104,13 +116,6 @@
 					new MorphGroup.MorphInfo("Smile Open Full Face", 1, BP.None)
 				}));
 		}
-
-		/*public static IProceduralMorphGroup CornerSmile(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("cornerSmile");
-			g.Add(new MorphTarget(p, BP.Mouth, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
-			return g;
-		}*/
 
 		public static Expression Pleasure(Person p)
 		{
@@ -127,52 +132,63 @@
 					new MorphGroup.MorphInfo("CTRLTongueIn-Out", 0.012f, BP.None)
 				}));
 		}
+
+		public static Expression Pain(Person p)
+		{
+			return new Expression("pain", new MorphGroup(
+				p, "pain", new int[] { BP.Mouth, BP.Eyes },
+				new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Pain", 1, BP.None)
+				}));
+		}
+
+		public static Expression Shock(Person p)
+		{
+			return new Expression("shock", new MorphGroup(
+				p, "shock", BP.Mouth, new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Shock", 1, BP.None)
+				}));
+		}
+
+		public static Expression Scream(Person p)
+		{
+			return new Expression("scream", new MorphGroup(
+				p, "scream", new int[] { BP.Mouth, BP.Eyes },
+				new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Scream", 1, BP.None)
+				}));
+		}
+
+		public static Expression Angry(Person p)
+		{
+			return new Expression("angry", new MorphGroup(
+				p, "angry", BP.Mouth, new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Angry", 1, BP.None)
+				}));
+		}
+
+		//public static Expression EyesRollBack(Person p)
+		//{
+		//	return new Expression("eyesRollback", new MorphGroup(
+		//		p, "eyesRollback", BP.Mouth, new MorphGroup.MorphInfo[]
+		//		{
+		//			new MorphGroup.MorphInfo("Eye Roll Back_DD", 1, BP.None)
+		//		}));
+		//}
+
+		public static Expression EyesClosed(Person p)
+		{
+			return new Expression("eyesClosed", new MorphGroup(
+				p, "eyesClosed", BP.Eyes, new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Eyes Closed", 1, BP.None)
+				}));
+		}
 		/*
-		public static IProceduralMorphGroup Pain(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("pain");
-			g.Add(new MorphTarget(p, BP.Mouth, "Pain", 0, 0.5f, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup Shock(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("shock");
-			g.Add(new MorphTarget(p, BP.Mouth, "Shock", 0, 1, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup Scream(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("scream");
-			g.Add(new MorphTarget(p, BP.Mouth, "Scream", 0, 1, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup Angry(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("angry");
-			g.Add(new MorphTarget(p, BP.Mouth, "Angry", 0, 0.3f, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup EyesRollBack(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("eyesRollback");
-
-			if (p.MovementStyle == MovementStyles.Feminine)
-				g.Add(new MorphTarget(p, BP.Eyes, "Eye Roll Back_DD", 0, 0.4f, 1, 5, 2, 2));
-
-			return g;
-		}
-
-		public static IProceduralMorphGroup EyesClosed(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("eyesClosed");
-			g.Add(new MorphTarget(p, BP.Eyes, "Eyes Closed", 0, 1, 0.5f, 5, 2, 2));
-			return g;
-		}
-
 		public static IProceduralMorphGroup Swallow(Person p)
 		{
 			var g = new SequentialProceduralMorphGroup(

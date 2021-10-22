@@ -194,23 +194,6 @@ namespace Cue
 		void Dump();
 	}
 
-	struct Pair<First, Second>
-	{
-		public First first;
-		public Second second;
-
-		public Pair(First f, Second s)
-		{
-			first = f;
-			second = s;
-		}
-
-		public override string ToString()
-		{
-			return $"{first} {second}";
-		}
-	}
-
 	interface ISmoke
 	{
 		Vector3 Position { get; set; }

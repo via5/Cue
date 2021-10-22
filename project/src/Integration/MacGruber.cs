@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class MacGruberBreather : IBreather
 	{
@@ -323,7 +325,7 @@
 			if (Enabled)
 			{
 				UpdateVerticalOffset();
-				UpdateVariance();
+				UpdateVariance(s);
 			}
 		}
 
@@ -357,12 +359,24 @@
 			}
 		}
 
-		private void UpdateVariance()
+		private void UpdateVariance(float s)
 		{
 			maxAngleHor_.SetValueInRange(variance_);
 			rollAngleMin_.Value = -15 * variance_;
 			rollAngleMax_.Value = 15 * variance_;
-			headRotationSpring_.SetValueInRangeAboveDefault(1 - variance_);
+
+			var range = headRotationSpring_.Maximum - headRotationSpring_.DefaultValue;
+			var targetSpring = headRotationSpring_.DefaultValue + range * (1 - variance_);
+
+			var current = headRotationSpring_.Value;
+			float v;
+
+			if (current < targetSpring)
+				v = Math.Min(targetSpring, current + s * 2000);
+			else
+				v = Math.Max(targetSpring, current - s * 2000);
+
+			headRotationSpring_.Value = v;
 		}
 
 		private void SetParameter()
