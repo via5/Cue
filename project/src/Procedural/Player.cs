@@ -241,6 +241,12 @@ namespace Cue.Proc
 			}
 		}
 
+		public void OnPluginState(bool b)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+				playing_[i].anim.Reset();
+		}
+
 		public override string ToString()
 		{
 			return $"Procedural: {playing_.Count} anims";

@@ -47,11 +47,7 @@ namespace Cue
 
 			eyes_ = Sys.Vam.U.FindRigidbody(person_, "eyeTargetControl");
 
-			if (eyes_ == null)
-			{
-				Cue.LogError("atom " + p.ID + " has no eyeTargetControl");
-			}
-			else
+			if (eyes_ != null)
 			{
 				foreach (var c in eyes_.gameObject.GetComponents<Component>())
 				{

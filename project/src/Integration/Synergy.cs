@@ -65,6 +65,10 @@ namespace Cue
 		{
 		}
 
+		public void OnPluginState(bool b)
+		{
+		}
+
 		public override string ToString()
 		{
 			return "Synergy: " + (anim_ == null ? "(none)" : anim_.ToString());

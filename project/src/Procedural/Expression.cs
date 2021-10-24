@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Cue.Proc
+﻿namespace Cue.Proc
 {
 	class Expression
 	{
@@ -19,11 +17,13 @@ namespace Cue.Proc
 		private TargetInfo target_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
+		private float autoRange_ = 0.1f;
 
 		public Expression(string name, MorphGroup g)
 		{
 			name_ = name;
 			g_ = g;
+			target_.valid = false;
 		}
 
 		public string Name
@@ -36,6 +36,12 @@ namespace Cue.Proc
 			get { return target_.value; }
 		}
 
+		public float AutoRange
+		{
+			get { return autoRange_; }
+			set { autoRange_ = value; }
+		}
+
 		public void SetTarget(float t, float time, bool auto = false)
 		{
 			target_.start = g_.Value;
@@ -46,7 +52,12 @@ namespace Cue.Proc
 			target_.auto = auto;
 		}
 
-		public void Update(float s)
+		public void Reset()
+		{
+			g_.Reset();
+		}
+
+		public void FixedUpdate(float s)
 		{
 			if (target_.valid)
 			{
@@ -72,7 +83,10 @@ namespace Cue.Proc
 
 		private void NextAuto()
 		{
-			float v = U.RandomFloat(value_ - 0.1f, value_ + 0.1f);
+			if (autoRange_ <= 0)
+				return;
+
+			float v = U.RandomFloat(value_ - autoRange_, value_ + autoRange_);
 			v = U.Clamp(v, 0, 1);
 
 			float t = U.RandomFloat(0.5f, 2.0f);
@@ -81,116 +95,14 @@ namespace Cue.Proc
 		}
 	}
 	/*
-	using BE = BuiltinExpressions;
-
-	class ExpressionType
-	{
-		private readonly int type_;
-		private float max_ = 0;
-		private float intensity_ = 0;
-		private float dampen_ = 0;
-		private readonly List<IProceduralMorphGroup> groups_ =
-			new List<IProceduralMorphGroup>();
-
-		public ExpressionType(Person p, int type)
-		{
-			type_ = type;
-		}
-
-		public int Type
-		{
-			get { return type_; }
-		}
-
-		public float Maximum
-		{
-			get { return max_; }
-			set { max_ = value; }
-		}
-
-		public float Intensity
-		{
-			get { return intensity_; }
-			set { intensity_ = value; }
-		}
-
-		public float Dampen
-		{
-			get { return dampen_; }
-			set { dampen_ = value; }
-		}
-
-		public List<IProceduralMorphGroup> Groups
-		{
-			get { return groups_; }
-		}
-
-		public void Reset()
-		{
-			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Reset();
-		}
-
-		public void FixedUpdate(float s)
-		{
-			float intensity = max_ * intensity_ * (1 - dampen_);
-			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].FixedUpdate(s, intensity);
-		}
-
-		public void Set(float s, float[] remaining)
-		{
-			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Set(s, remaining);
-		}
-
-		public void Force(int type, float rangePercent)
-		{
-			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].Force(type, rangePercent);
-		}
-
-		public void ForceChange()
-		{
-			for (int i = 0; i < groups_.Count; ++i)
-				groups_[i].ForceChange();
-		}
-
-		public override string ToString()
-		{
-			return
-				$"{Expressions.ToString(type_)} " +
-				$"max={max_} int ={intensity_} damp={dampen_}";
-		}
-	}
-
 
 	class Expression : IExpression
 	{
-		private Person person_;
 		private bool enabled_ = true;
 
-		private readonly List<ExpressionType> expressions_ =
-			new List<ExpressionType>();
 
 		public Expression(Person p)
 		{
-			person_ = p;
-			expressions_.Add(CreateCommon(p));
-			expressions_.Add(CreateHappy(p));
-			expressions_.Add(CreateMischievous(p));
-			expressions_.Add(CreatePleasure(p));
-			expressions_.Add(CreateAngry(p));
-			expressions_.Add(CreateTired(p));
-
-			for (int i = 0; i < expressions_.Count; ++i)
-			{
-				if (expressions_[i].Type != i)
-					Cue.LogError("bad expression type/index");
-			}
-
-			if (expressions_.Count != Expressions.Count)
-				Cue.LogError("bad expression count");
 		}
 
 		public List<ExpressionType> All
@@ -203,70 +115,6 @@ namespace Cue.Proc
 			get { return MaxMorphs; }
 		}
 
-		private ExpressionType CreateCommon(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Common);
-			e.Intensity = 1;
-
-			e.Groups.Add(BE.Swallow(p));
-
-			return e;
-		}
-
-		private ExpressionType CreateHappy(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Happy);
-
-			e.Groups.Add(BE.Smile(p));
-
-			return e;
-		}
-
-		private ExpressionType CreateMischievous(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Mischievous);
-
-			e.Groups.Add(BE.CornerSmile(p));
-
-			return e;
-		}
-
-		private ExpressionType CreatePleasure(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Pleasure);
-
-			e.Groups.Add(BE.Pleasure(p));
-			e.Groups.Add(BE.Pain(p));
-			e.Groups.Add(BE.Shock(p));
-			e.Groups.Add(BE.Scream(p));
-			e.Groups.Add(BE.Angry(p));
-			e.Groups.Add(BE.EyesRollBack(p));
-			e.Groups.Add(BE.EyesClosed(p));
-
-			return e;
-		}
-
-		private ExpressionType CreateAngry(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Angry);
-
-			e.Groups.Add(BE.Frown(p));
-			e.Groups.Add(BE.Squint(p));
-			e.Groups.Add(BE.MouthFrown(p));
-
-			return e;
-		}
-
-		private ExpressionType CreateTired(Person p)
-		{
-			var e = new ExpressionType(p, Expressions.Tired);
-
-			e.Groups.Add(BE.Drooling(p));
-			e.Groups.Add(BE.EyesRollBack(p));
-			e.Groups.Add(BE.EyesClosedTired(p));
-
-			return e;
-		}
 
 		public void SetMaximum(int type, float max)
 		{
@@ -294,25 +142,11 @@ namespace Cue.Proc
 			Reset();
 		}
 
-		public void Reset()
-		{
-			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].Reset();
-		}
-
 		public void FixedUpdate(float s)
 		{
 			if (!enabled_)
 				return;
 
-			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].FixedUpdate(s);
-
-			for (int i = 0; i < remaining_.Length; ++i)
-				remaining_[i] = MaxMorphs;
-
-			for (int i = 0; i < expressions_.Count; ++i)
-				expressions_[i].Set(s, remaining_);
 		}
 
 		public void ForceChange()

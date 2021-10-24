@@ -7,21 +7,23 @@ namespace Cue
 		public const int None = -1;
 		public const int Sex = 0;
 		public const int Idle = 1;
-		public const int Orgasm = 2;
-		public const int Smoke = 3;
-		public const int Suck = 4;
-		public const int Penetrated = 5;
-		public const int RightFinger = 6;
-		public const int LeftFinger = 7;
+		public const int Expressions = 2;
+		public const int Orgasm = 3;
+		public const int Smoke = 4;
+		public const int Suck = 5;
+		public const int Penetrated = 6;
+		public const int RightFinger = 7;
+		public const int LeftFinger = 8;
 
-		public const int Count = 8;
-		public int GetCount() { return 8; }
+		public const int Count = 9;
+		public int GetCount() { return 9; }
 
 
 		private static string[] names_ = new string[]
 		{
 			"sex",
 			"idle",
+			"expressions",
 			"orgasm",
 			"smoke",
 			"suck",

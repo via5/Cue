@@ -2,28 +2,23 @@
 {
 	class BuiltinExpressions
 	{
-		/*public static IProceduralMorphGroup CornerSmile(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("cornerSmile");
-			g.Add(new MorphTarget(p, BP.Mouth, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
-			return g;
-		}*/
-
-		//public static Expression EyesRollBack(Person p)
-		//{
-		//	return new Expression("eyesRollback", new MorphGroup(
-		//		p, "eyesRollback", BP.Mouth, new MorphGroup.MorphInfo[]
-		//		{
-		//			new MorphGroup.MorphInfo("Eye Roll Back_DD", 1, BP.None)
-		//		}));
-		//}
-
 		public static Expression Smile(Person p)
 		{
 			return new Expression("smile", new MorphGroup(
 				p, "smile", BP.Mouth, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Smile Open Full Face", 1, BP.None)
+				}));
+		}
+
+		public static Expression CornerSmile(Person p)
+		{
+			return new Expression("cornerSmile", new MorphGroup(
+				p, "cornerSmile", BP.Mouth, new MorphGroup.MorphInfo[]
+				{
+					new MorphGroup.MorphInfo("Smile Open Full Face", 0.3f, BP.None),
+					new MorphGroup.MorphInfo("Mouth Smile Simple Left", 1.2f, BP.None),
+					new MorphGroup.MorphInfo("Eyes Squint", 0.15f, BP.None)
 				}));
 		}
 
@@ -89,6 +84,16 @@
 					new MorphGroup.MorphInfo("Eyes Closed", 1, BP.None)
 				}));
 		}
+
+		//public static Expression EyesRollBack(Person p)
+		//{
+		//	return new Expression("eyesRollback", new MorphGroup(
+		//		p, "eyesRollback", BP.Mouth, new MorphGroup.MorphInfo[]
+		//		{
+		//			new MorphGroup.MorphInfo("Eye Roll Back_DD", 1, BP.None)
+		//		}));
+		//}
+
 		/*
 		public static IProceduralMorphGroup Swallow(Person p)
 		{

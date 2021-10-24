@@ -136,6 +136,12 @@ namespace Cue.BVH
             return s;
         }
 
+        public void OnPluginState(bool b)
+        {
+            if (!b)
+                HideSkeleton();
+        }
+
         public bool Play(IAnimation a, int flags, AnimationContext cx)
         {
             var ba = a as Animation;

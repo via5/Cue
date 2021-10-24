@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace Cue.Proc
+﻿namespace Cue.Proc
 {
-	class PenetratedAnimation : BasicProcAnimation
+	class PenetratedProcAnimation : BasicProcAnimation
 	{
 		struct Config
 		{
@@ -44,14 +42,14 @@ namespace Cue.Proc
 		private Settings settings_;
 		private Expression[] expressions_ = null;
 
-		public PenetratedAnimation()
+		public PenetratedProcAnimation()
 			: base("procPenetrated", false)
 		{
 		}
 
 		public override BasicProcAnimation Clone()
 		{
-			var a = new PenetratedAnimation();
+			var a = new PenetratedProcAnimation();
 			a.CopyFrom(this);
 			return a;
 		}
@@ -63,7 +61,8 @@ namespace Cue.Proc
 
 		public override bool Start(Person p, AnimationContext cx)
 		{
-			base.Start(p, cx);
+			if (!base.Start(p, cx))
+				return false;
 
 			elapsed_ = 0;
 			state_ = ReactionState;
@@ -227,7 +226,7 @@ namespace Cue.Proc
 			elapsed_ += s;
 
 			for (int i = 0; i < expressions_.Length; ++i)
-				expressions_[i].Update(s);
+				expressions_[i].FixedUpdate(s);
 
 			switch (state_)
 			{

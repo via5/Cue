@@ -273,14 +273,8 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			if (!b)
-			{
-				foreach (var p in players_)
-				{
-					if (p is BVH.Player)
-						((BVH.Player)p).HideSkeleton();
-				}
-			}
+			foreach (var p in players_)
+				p.OnPluginState(b);
 		}
 
 		public override string ToString()

@@ -132,6 +132,10 @@ namespace Cue
 				current_ = null;
 		}
 
+		public void OnPluginState(bool b)
+		{
+		}
+
 		public override string ToString()
 		{
 			string s = "Timeline: ";

@@ -101,6 +101,7 @@ namespace Cue
 		void FixedUpdate(float s);
 		void Update(float s);
 		bool IsPlaying(IAnimation a);
+		void OnPluginState(bool b);
 	}
 
 	interface IAnimation
