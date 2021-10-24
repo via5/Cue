@@ -83,38 +83,12 @@ namespace Cue.Proc
 			config_ = MakeConfig();
 			settings_ = MakeSettings(expressions_, config_);
 
-			Cue.LogInfo(
-				$"lookup: {settings_.lookUp} ({config_.lookUpChance})\n" +
-				$"doPostReaction: {settings_.doPostReaction} ({config_.postReactionChance})\n" +
-				$"reactionTime: {settings_.reactionTime} ({config_.reactionTimeRange})\n" +
-				$"reactionHoldTime: {settings_.reactionHoldTime} ({config_.reactionTimeRange})\n" +
-				$"postReactionTime: {settings_.postReactionTime} ({config_.postReactionTimeRange})\n" +
-				$"postReactionHoldTime: {settings_.postReactionHoldTime} ({config_.postReactionHoldTimeRange})\n" +
-				$"resetTime: {settings_.resetTime} ({config_.resetTimeRange})\n" +
-				$"reactions: {DebugExpressions(settings_.reaction, settings_.reactionTargets)}\n" +
-				$"postReactions: {DebugExpressions(settings_.postReaction, settings_.postReactionTargets)}");
-
 			StartLookUp();
 
 			for (int i = 0; i < settings_.reaction.Length; ++i)
 				settings_.reaction[i].SetTarget(settings_.reactionTargets[i], settings_.reactionTime);
 
 			return true;
-		}
-
-		private string DebugExpressions(Expression[] es, float[] targets)
-		{
-			string s = "";
-
-			for (int i = 0; i < es.Length; ++i)
-			{
-				if (s != "")
-					s += ",";
-
-				s += $"{es[i].Name}({targets[i]:0.00})";
-			}
-
-			return s;
 		}
 
 		private static Config MakeConfig()
@@ -319,6 +293,50 @@ namespace Cue.Proc
 					break;
 				}
 			}
+		}
+
+		public override string[] Debug()
+		{
+			return new string[]
+			{
+				$"lookup            {DebugBool(settings_.lookUp, config_.lookUpChance)}",
+				$"doPostReaction    {DebugBool(settings_.doPostReaction, config_.postReactionChance)}",
+				$"reaction          {DebugTimes(settings_.reactionTime, config_.reactionTimeRange)}",
+				$"reactionHold      {DebugTimes(settings_.reactionHoldTime, config_.reactionTimeRange)}",
+				$"postReaction      {DebugTimes(settings_.postReactionTime, config_.postReactionTimeRange)}",
+				$"postReactionHold  {DebugTimes(settings_.postReactionHoldTime, config_.postReactionHoldTimeRange)}",
+				$"reset             {DebugTimes(settings_.resetTime, config_.resetTimeRange)}",
+				$"reactions         {DebugExpressions(settings_.reaction, settings_.reactionTargets)}",
+				$"postReactions     {DebugExpressions(settings_.postReaction, settings_.postReactionTargets)}"
+			};
+		}
+
+		private string DebugBool(bool b, float chance)
+		{
+			return $"{b} {(int)(chance * 100)}%";
+		}
+
+		private string DebugTimes(float time, Pair<float, float> range)
+		{
+			return $"{time:0.00}s ({range.first:0.00},{range.second:0.00})";
+		}
+
+		private string DebugExpressions(Expression[] es, float[] targets)
+		{
+			string s = "";
+
+			if (es != null)
+			{
+				for (int i = 0; i < es.Length; ++i)
+				{
+					if (s != "")
+						s += ",";
+
+					s += $"{es[i].Name}({targets[i]:0.00})";
+				}
+			}
+
+			return s;
 		}
 	}
 }

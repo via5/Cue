@@ -32,7 +32,12 @@ namespace Cue
 			get { return true; }
 		}
 
-		public List<string> GetAllForcesDebug()
+		public string[] GetAllForcesDebug()
+		{
+			return null;
+		}
+
+		public string[] Debug()
 		{
 			return null;
 		}

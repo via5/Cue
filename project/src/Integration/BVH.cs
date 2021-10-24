@@ -178,7 +178,12 @@ namespace Cue.BVH
             get { return useHead_; }
         }
 
-        public List<string> GetAllForcesDebug()
+        public string[] GetAllForcesDebug()
+        {
+            return null;
+        }
+
+        public string[] Debug()
         {
             return null;
         }

@@ -5,140 +5,105 @@ namespace Cue
 	class PersonAnimationsTab : Tab
 	{
 		private Person person_;
-		private VUI.ListView<Animation> anims_ = new VUI.ListView<Animation>();
-		private VUI.CheckBox loop_ = new VUI.CheckBox("Loop");
-		private VUI.CheckBox paused_ = new VUI.CheckBox("Paused");
-		private VUI.FloatTextSlider seek_ = new VUI.FloatTextSlider();
-		private IgnoreFlag ignore_ = new IgnoreFlag();
-		private Animation sel_ = null;
+		private VUI.ComboBox<IAnimation> anims_ = new VUI.ComboBox<IAnimation>();
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private List<IAnimation> oldList_ = new List<IAnimation>();
+		private VUI.CheckBox all_ = new VUI.CheckBox("All");
+		private bool ignore_ = false;
 
 		public PersonAnimationsTab(Person person)
-			: base("Animations", false)
+			: base("Anim", false)
 		{
 			person_ = person;
 
-			Layout = new VUI.BorderLayout();
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 
-			var top = new VUI.Panel(new VUI.VerticalFlow());
+			var top = new VUI.Panel(new VUI.BorderLayout(5));
+			top.Add(anims_, VUI.BorderLayout.Center);
+			top.Add(all_, VUI.BorderLayout.Right);
 
-			var p = new VUI.Panel(new VUI.HorizontalFlow());
-			p.Add(new VUI.Button("Play", OnPlay));
-			p.Add(new VUI.Button("Stop", OnStop));
-			p.Add(paused_);
-			p.Add(loop_);
-			top.Add(p);
-
-			p = new VUI.Panel(new VUI.BorderLayout());
-			p.Add(seek_, VUI.BorderLayout.Center);
-			top.Add(p);
-
-
+			Layout = new VUI.BorderLayout(10);
 			Add(top, VUI.BorderLayout.Top);
-			Add(anims_, VUI.BorderLayout.Center);
+			Add(list_, VUI.BorderLayout.Center);
 
-			var items = new List<Animation>();
-			foreach (var a in Resources.Animations.GetAll(Animations.None, person_.MovementStyle))
-				items.Add(a);
+			UpdateList();
 
-			anims_.SetItems(items);
+			list_.SelectionChanged += (s) => Changed();
+			all_.Changed += (b) => Changed();
+		}
 
-			paused_.Changed += OnPaused;
-			seek_.ValueChanged += OnSeek;
+		private void Changed()
+		{
+			try
+			{
+				ignore_ = true;
+				DoUpdate(0);
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		protected override void DoUpdate(float s)
-		{/*
-			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
-				return;
-
-			var p = person_.Animator.CurrentPlayer;
-
-			if (p != null && !p.Paused)
-			{
-				ignore_.Do(() =>
-				{
-					seek_.WholeNumbers = p.UsesFrames;
-					seek_.Set(
-						sel_.Real.FirstFrame, sel_.Real.FirstFrame,
-						sel_.Real.LastFrame);
-				});
-			}*/
-		}
-
-		private void OnPlay()
 		{
-			sel_ = anims_.Selected;
-			if (sel_ == null)
-				return;
+			if (ignore_) return;
 
-			PlaySelection();
+			UpdateList();
+
+			var d = anims_.Selected?.Debug();
+
+			if (d == null)
+			{
+				list_.Clear();
+			}
+			else
+			{
+				list_.SetItems(d);
+			}
 		}
 
-		private void PlaySelection(float frame = -1)
-		{/*
-			person_.Animator.Play(
-				sel_, (loop_.Checked ? Animator.Loop : 0) | Animator.Exclusive);
+		private void UpdateList()
+		{
+			if (ignore_) return;
 
-			var p = person_.Animator.CurrentPlayer;
-			if (p == null)
+			var items = new List<IAnimation>();
+			var oldSel = anims_.Selected;
+
+			if (all_.Checked)
 			{
-				// todo
-				return;
+				foreach (var a in Resources.Animations.GetAll())
+					items.Add(a.Sys);
+			}
+			else
+			{
+				foreach (var p in person_.Animator.Players)
+				{
+					foreach (var a in p.GetPlaying())
+						items.Add(a);
+				}
 			}
 
-			p.Paused = paused_.Checked;
-
-			if (paused_.Checked)
+			if (!ListsEqual(items, oldList_))
 			{
-				((BVH.Player)p).ShowSkeleton();
-				p.Seek(sel_.Real.InitFrame);
+				anims_.SetItems(items, oldSel);
+				oldList_ = items;
+			}
+		}
+
+		private bool ListsEqual(List<IAnimation> a, List<IAnimation> b)
+		{
+			if (a.Count != b.Count)
+				return false;
+
+			for (int i = 0; i < a.Count; ++i)
+			{
+				if (a[i] != b[i])
+					return false;
 			}
 
-			ignore_.Do(() =>
-			{
-				seek_.WholeNumbers = p.UsesFrames;
-
-				if (frame < 0)
-					frame = sel_.Real.InitFrame;
-
-				seek_.Set(frame, sel_.Real.InitFrame, sel_.Real.LastFrame);
-			});*/
-		}
-
-		private void OnStop()
-		{/*
-			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
-				return;
-
-			person_.Animator.Stop();*/
-		}
-
-		private void OnPaused(bool b)
-		{/*
-			if (sel_ == null || person_.Animator.CurrentAnimation != sel_)
-				return;
-
-			var p = person_.Animator.CurrentPlayer;
-			if (p != null)
-				p.Paused = b;*/
-		}
-
-		private void OnSeek(float f)
-		{/*
-			if (ignore_ || sel_ == null)
-				return;
-
-			if (person_.Animator.CurrentAnimation != sel_)
-				PlaySelection(f);
-
-			if (person_.Animator.CurrentPlayer == null)
-			{
-				Cue.LogError("no player");
-				return;
-			}
-
-			Cue.LogInfo($"seeking to {f}");
-			person_.Animator.CurrentPlayer.Seek(f);*/
+			return true;
 		}
 	}
 }

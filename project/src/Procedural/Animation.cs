@@ -82,11 +82,59 @@ namespace Cue.Proc
 			root_.FixedUpdate(s);
 		}
 
-		public virtual List<string> GetAllForcesDebug()
+		public virtual string[] GetAllForcesDebug()
 		{
 			var list = new List<string>();
 			root_.GetAllForcesDebug(list);
-			return list;
+			return list.ToArray();
+		}
+
+		private string I(int i)
+		{
+			return new string(' ', i * 4);
+		}
+
+		public virtual string[] Debug()
+		{
+			var items = new List<string>();
+
+			var ds = ToDetailedString().Split('\n');
+			if (ds.Length > 0)
+			{
+				items.Add(ds[0]);
+				for (int i = 1; i < ds.Length; ++i)
+					items.Add(I(1) + ds[i]);
+			}
+
+			foreach (var s in Targets)
+				DebugTarget(items, s, 1);
+
+			return items.ToArray();
+		}
+
+		private void DebugTarget(List<string> items, ITarget t, int indent)
+		{
+			var lines = t.ToDetailedString().Split('\n');
+			if (lines.Length > 0)
+				items.Add(I(indent) + lines[0]);
+
+			{
+				var syncLines = t.Sync.ToDetailedString().Split('\n');
+				if (syncLines.Length > 0)
+					items.Add(I(indent + 1) + "sync: " + syncLines[0]);
+
+				for (int i = 1; i < syncLines.Length; ++i)
+					items.Add(I(indent + 2) + syncLines[i]);
+			}
+
+			for (int i = 1; i < lines.Length; ++i)
+				items.Add(I(indent + 1) + lines[i]);
+
+			if (t is ITargetGroup)
+			{
+				foreach (var c in (t as ITargetGroup).Targets)
+					DebugTarget(items, c, indent + 1);
+			}
 		}
 
 		public override string ToString()

@@ -433,29 +433,6 @@ namespace Cue
 	}
 
 
-	public class IgnoreFlag
-	{
-		private bool ignore_ = false;
-
-		public static implicit operator bool(IgnoreFlag f)
-		{
-			return f.ignore_;
-		}
-
-		public void Do(Action a)
-		{
-			try
-			{
-				ignore_ = true;
-				a();
-			}
-			finally
-			{
-				ignore_ = false;
-			}
-		}
-	}
-
 	class Logger
 	{
 		public const int Animation   = 0x001;

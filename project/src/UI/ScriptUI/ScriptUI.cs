@@ -237,9 +237,8 @@ namespace Cue
 			AddSubTab(new PersonSettingsTab(person_));
 			AddSubTab(new PersonStateTab(person_));
 			AddSubTab(new PersonAITab(person_));
-			AddSubTab(new PersonExcitementTab(person_));
 			AddSubTab(new PersonBodyTab(person_));
-//			AddSubTab(new PersonAnimationsTab(person_));
+			AddSubTab(new PersonAnimationsTab(person_));
 			AddSubTab(new PersonDumpTab(person_));
 		}
 	}

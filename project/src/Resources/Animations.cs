@@ -151,9 +151,14 @@ namespace Cue
 			return null;
 		}
 
+		public List<Animation> GetAll()
+		{
+			return GetAll(Animations.None, MovementStyles.Any);
+		}
+
 		public List<Animation> GetAll(int type, int style)
 		{
-			if (type == Animations.None)
+			if (type == Animations.None && style == MovementStyles.Any)
 				return anims_;
 
 			var list = new List<Animation>();
@@ -162,8 +167,11 @@ namespace Cue
 			{
 				if (anims_[i].Type == type)
 				{
-					if (MovementStyles.Match(anims_[i].MovementStyle, style))
+					if (style == MovementStyles.Any ||
+						MovementStyles.Match(anims_[i].MovementStyle, style))
+					{
 						list.Add(anims_[i]);
+					}
 				}
 			}
 

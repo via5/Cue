@@ -101,7 +101,12 @@ namespace Cue
 			get { return false; }
 		}
 
-		public List<string> GetAllForcesDebug()
+		public string[] GetAllForcesDebug()
+		{
+			return null;
+		}
+
+		public string[] Debug()
 		{
 			return null;
 		}

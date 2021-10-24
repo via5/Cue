@@ -97,7 +97,8 @@ namespace Cue
 		float FirstFrame { get; }
 		float LastFrame { get; }
 		bool HasMovement { get; }
-		List<string> GetAllForcesDebug();
+		string[] GetAllForcesDebug();
+		string[] Debug();
 		string ToDetailedString();
 	}
 

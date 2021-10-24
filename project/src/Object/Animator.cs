@@ -18,7 +18,7 @@ namespace Cue
 		public int Type { get { return type_; } }
 		public int MovementStyle { get { return style_; } }
 		public bool HasMovement { get { return anim_.HasMovement; } }
-		public IAnimation Real { get { return anim_; } }
+		public IAnimation Sys { get { return anim_; } }
 
 		public void GetAllForcesDebug(List<string> list)
 		{
@@ -26,25 +26,26 @@ namespace Cue
 
 			if (fs != null)
 			{
-				for (int i = 0; i < fs.Count; ++i)
+				for (int i = 0; i < fs.Length; ++i)
 					list.Add($"{anim_.Name}: {fs[i]}");
 			}
 		}
 
+		public string[] Debug()
+		{
+			return anim_.Debug();
+		}
+
 		public override string ToString()
 		{
-			string s = Animations.ToString(type_) + " ";
-
-			s += "ms=" + MovementStyles.ToString(style_) + " " + anim_.ToString();
-
-			return s;
+			return $"{anim_.Name} ({Animations.ToString(type_)})";
 		}
 	}
 
 
 	class Animator
 	{
-		class PlayingAnimation
+		public class PlayingAnimation
 		{
 			public Animation anim;
 			public IPlayer player;
@@ -79,6 +80,16 @@ namespace Cue
 		public List<IPlayer> Players
 		{
 			get { return players_; }
+		}
+
+		public Animation[] GetPlaying()
+		{
+			var list = new List<Animation>();
+
+			for (int i = 0; i < playing_.Count; ++i)
+				list.Add(playing_[i].anim);
+
+			return list.ToArray();
 		}
 
 		public bool IsPlaying(Animation a)
@@ -161,7 +172,7 @@ namespace Cue
 			{
 				var p = players_[i];
 
-				if (p.Play(a.Real, ps, flags))
+				if (p.Play(a.Sys, ps, flags))
 				{
 					playing_.Add(new PlayingAnimation(a, p));
 					activeFlags_ = flags;
@@ -178,7 +189,7 @@ namespace Cue
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				var a = playing_[i];
-				a.player.Stop(a.anim.Real, Bits.IsSet(activeFlags_, Rewind));
+				a.player.Stop(a.anim.Sys, Bits.IsSet(activeFlags_, Rewind));
 			}
 
 			playing_.Clear();
@@ -198,7 +209,7 @@ namespace Cue
 				if (a.anim.Type == type)
 				{
 					log_.Info($"stopping animation {a}");
-					a.player.Stop(a.anim.Real, Bits.IsSet(activeFlags_, Rewind));
+					a.player.Stop(a.anim.Sys, Bits.IsSet(activeFlags_, Rewind));
 					playing_.RemoveAt(i);
 					++removed;
 				}
@@ -244,9 +255,9 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (!a.player.IsPlaying(a.anim.Real))
+				if (!a.player.IsPlaying(a.anim.Sys))
 				{
-					a.player.Stop(a.anim.Real, false);
+					a.player.Stop(a.anim.Sys, false);
 					playing_.RemoveAt(i);
 				}
 				else
