@@ -1,7 +1,6 @@
 ﻿using SimpleJSON;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Cue.Proc
 {
@@ -129,7 +128,7 @@ namespace Cue.Proc
 			return f;
 		}
 
-		protected override void DoStart(Person p)
+		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			if (p.VamAtom != null)
 			{
@@ -148,7 +147,7 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
-			if (bp_ != null && bp_.LockedFor(BodyPartLock.Move))
+			if (bp_ != null && bp_.LockedFor(BodyPartLock.Move, LockKey))
 			{
 				if (wasBusy_)
 				{

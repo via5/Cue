@@ -291,6 +291,7 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout(10);
 			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 			Add(list_, VUI.BorderLayout.Center);
 		}
 

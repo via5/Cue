@@ -2,7 +2,7 @@
 {
 	class HandEvent : BasicEvent
 	{
-		private const float MaxDistanceToStart = 0.2f;
+		private const float MaxDistanceToStart = 0.1f;
 		private const float CheckTargetsInterval = 2;
 
 		private bool active_ = false;
@@ -182,7 +182,10 @@
 
 						if (LockLeft("left fingering"))
 						{
-							if (person_.Animator.PlayType(Animations.LeftFinger, leftTarget.Person))
+							if (person_.Animator.PlayType(
+								Animations.LeftFinger,
+								new AnimationContext(
+									leftTarget.Person, leftLock_[0].Key)))
 							{
 								leftTarget_ = leftTarget.Person;
 								leftGroped_ = true;
@@ -211,7 +214,10 @@
 
 						if (LockRight("right fingering"))
 						{
-							if (person_.Animator.PlayType(Animations.RightFinger, rightTarget.Person))
+							if (person_.Animator.PlayType(
+								Animations.RightFinger,
+								new AnimationContext(
+									rightTarget.Person, rightLock_[0].Key)))
 							{
 								rightTarget_ = rightTarget.Person;
 								rightGroped_ = true;
@@ -254,9 +260,6 @@
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_)
-					continue;
-
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
 				var d = hand.DistanceToSurface(g);
 

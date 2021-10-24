@@ -90,7 +90,10 @@
 				mouthLock_ = head.Lock(BodyPartLock.Morph, "SuckFinger");
 
 				if (mouthLock_ != null)
-					person_.Animator.PlayType(Animations.Suck, Animator.Loop);
+				{
+					person_.Animator.PlayType(
+						Animations.Suck, new AnimationContext(mouthLock_.Key));
+				}
 			}
 			else if (mouthLock_ != null && !mouthTriggered)
 			{

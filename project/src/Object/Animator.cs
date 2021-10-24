@@ -114,21 +114,6 @@ namespace Cue
 			return false;
 		}
 
-		public bool PlayType(int type, object ps = null, int flags = 0)
-		{
-			if (IsPlayingType(type))
-				return false;
-
-			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
-			if (a == null)
-			{
-				log_.Error($"no animation for type {Animations.ToString(type)}");
-				return false;
-			}
-
-			return Play(a, ps, flags);
-		}
-
 		public bool CanPlay(Animation a, int flags = 0, bool silent = true)
 		{
 			if (Bits.IsSet(activeFlags_, Exclusive))
@@ -155,9 +140,25 @@ namespace Cue
 			return true;
 		}
 
-		public bool Play(Animation a, object ps = null, int flags = 0)
+		public bool PlayType(int type, AnimationContext cx = null)
+		{
+			if (IsPlayingType(type))
+				return false;
+
+			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
+			if (a == null)
+			{
+				log_.Error($"no animation for type {Animations.ToString(type)}");
+				return false;
+			}
+
+			return Play(a, cx);
+		}
+
+		public bool Play(Animation a, AnimationContext cx = null)
 		{
 			log_.Info("playing " + a.ToString());
+			int flags = 0;
 
 			if (!Cue.Instance.Options.AllowMovement && a.HasMovement)
 			{
@@ -172,7 +173,7 @@ namespace Cue
 			{
 				var p = players_[i];
 
-				if (p.Play(a.Sys, ps, flags))
+				if (p.Play(a.Sys, flags, cx))
 				{
 					playing_.Add(new PlayingAnimation(a, p));
 					activeFlags_ = flags;

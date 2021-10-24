@@ -138,10 +138,10 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		protected override void DoStart(Person p)
+		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			for (int i = 0; i < targets_.Count; ++i)
-				targets_[i].Start(p);
+				targets_[i].Start(p, cx);
 
 			done_ = new bool[targets_.Count];
 			maxDuration_.Reset();
@@ -309,10 +309,10 @@ namespace Cue.Proc
 				targets_[i].Reset();
 		}
 
-		protected override void DoStart(Person p)
+		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			for (int i = 0; i < targets_.Count; ++i)
-				targets_[i].Start(p);
+				targets_[i].Start(p, cx);
 		}
 
 		public override void FixedUpdate(float s)
@@ -373,6 +373,7 @@ namespace Cue.Proc
 	class RootTargetGroup : ConcurrentTargetGroup
 	{
 		private Person energySource_ = null;
+		private ulong key_ = BodyPartLock.NoKey;
 
 		public RootTargetGroup()
 			: base("root", new NoSync())
@@ -384,6 +385,12 @@ namespace Cue.Proc
 			var s = new RootTargetGroup();
 			s.CopyFrom(this);
 			return s;
+		}
+
+		protected override void DoStart(Person p, AnimationContext cx)
+		{
+			base.DoStart(p, cx);
+			key_ = cx?.key ?? BodyPartLock.NoKey;
 		}
 
 		public void SetEnergySource(Person p)
@@ -405,6 +412,21 @@ namespace Cue.Proc
 
 				return e;
 			}
+		}
+
+		public override ulong LockKey
+		{
+			get { return key_; }
+		}
+
+		public override string ToString()
+		{
+			string s = $"root {Name}";
+
+			if (key_ != BodyPartLock.NoKey)
+				s += $" key={key_}";
+
+			return s;
 		}
 	}
 }

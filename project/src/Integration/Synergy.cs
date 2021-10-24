@@ -41,7 +41,7 @@ namespace Cue
 			// todo
 		}
 
-		public bool Play(IAnimation a, object ps, int flags)
+		public bool Play(IAnimation a, int flags, AnimationContext cx)
 		{
 			anim_ = a as SynergyAnimation;
 			if (anim_ == null)

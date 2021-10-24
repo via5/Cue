@@ -139,9 +139,11 @@ namespace Cue
 			List<BodyPartLock> list = null;
 			bool failed = false;
 
+			ulong key = BodyPartLock.NextKey();
+
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
-				var lk = Get(bodyParts[i]).Lock(lockType, why, strong);
+				var lk = Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
 				if (lk == null)
 				{
 					failed = true;

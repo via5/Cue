@@ -38,7 +38,7 @@ namespace Cue.Proc
 			get { return done_; }
 		}
 
-		protected override void DoStart(Person p)
+		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			fc_ = Sys.Vam.U.FindController(p.VamAtom.Atom, cname_);
 			if (fc_ == null)

@@ -77,12 +77,25 @@ namespace Cue
 	}
 
 
+	class AnimationContext
+	{
+		public object ps;
+		public ulong key;
+
+		public AnimationContext(object ps, ulong key = BodyPartLock.NoKey)
+		{
+			this.ps = ps;
+			this.key = key;
+		}
+	}
+
+
 	interface IPlayer
 	{
 		bool UsesFrames { get; }
 
 		IAnimation[] GetPlaying();
-		bool Play(IAnimation a, object ps, int flags);
+		bool Play(IAnimation a, int flags, AnimationContext cx);
 		void Stop(IAnimation a, bool rewind);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);

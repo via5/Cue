@@ -105,9 +105,9 @@ namespace Cue.Proc
 			return a;
 		}
 
-		public override bool Start(Person p, object ps)
+		public override bool Start(Person p, AnimationContext cx)
 		{
-			if (!base.Start(p, ps))
+			if (!base.Start(p, cx))
 				return false;
 
 			hand_ = person_.Body.RightHand;

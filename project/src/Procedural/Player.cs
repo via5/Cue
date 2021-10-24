@@ -11,10 +11,11 @@ namespace Cue.Proc
 		bool Done { get; }
 
 		float MovementEnergy { get; }
+		ulong LockKey { get; }
 
 		ITarget Clone();
 		void Reset();
-		void Start(Person p);
+		void Start(Person p, AnimationContext cx);
 		void FixedUpdate(float s);
 
 		void GetAllForcesDebug(List<string> list);
@@ -59,19 +60,24 @@ namespace Cue.Proc
 			get { return parent_.MovementEnergy; }
 		}
 
+		public virtual ulong LockKey
+		{
+			get { return parent_.LockKey; }
+		}
+
 		public abstract bool Done { get; }
 
 		public abstract ITarget Clone();
 		public abstract void FixedUpdate(float s);
 		public abstract string ToDetailedString();
 
-		public void Start(Person p)
+		public void Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
-			DoStart(p);
+			DoStart(p, cx);
 		}
 
-		protected abstract void DoStart(Person p);
+		protected abstract void DoStart(Person p, AnimationContext cx);
 
 		public virtual void GetAllForcesDebug(List<string> list)
 		{
@@ -153,7 +159,7 @@ namespace Cue.Proc
 			// todo
 		}
 
-		public bool Play(IAnimation a, object ps, int flags)
+		public bool Play(IAnimation a, int flags, AnimationContext cx)
 		{
 			var proto = (a as BasicProcAnimation);
 			if (proto == null)
@@ -164,7 +170,7 @@ namespace Cue.Proc
 			var p = new Playing(proto, proto.Clone());
 
 			playing_.Add(p);
-			if (!p.anim.Start(person_, ps))
+			if (!p.anim.Start(person_, cx))
 				return false;
 
 			log_.Info($"playing {a}");

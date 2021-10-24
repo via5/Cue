@@ -11,7 +11,8 @@ namespace Cue.Proc
 		public const int ForceToRangePercent = 2;
 		public const int ForceIgnore = 3;
 
-		private int bodyPart_;
+		private int bodyPartType_;
+		private BodyPart bp_ = null;
 		private string morphId_;
 		private float min_, max_, mid_;
 		private Morph morph_ = null;
@@ -36,27 +37,11 @@ namespace Cue.Proc
 
 
 		public MorphTarget(
-			Person p, int bodyPart, string id, float start, float end,
-			float minTime, float maxTime, float delayOff, float delayOn,
-			bool resetBetween = false)
-				: this(bodyPart, id, start, end, new SlidingDurationSync(
-					new SlidingDuration(minTime, maxTime, 0, 0, 0, new LinearEasing()),
-					new SlidingDuration(minTime, maxTime, 0, 0, 0, new LinearEasing()),
-					new Duration(0, delayOn),
-					new Duration(0, delayOff),
-					(resetBetween ?
-						SlidingDurationSync.ResetBetween :
-						SlidingDurationSync.Loop)))
-		{
-			Start(p);
-		}
-
-		public MorphTarget(
 			int bodyPart, string morphId, float min, float max,
 			ISync sync, IEasing easing = null)
 				: base("", sync)
 		{
-			bodyPart_ = bodyPart;
+			bodyPartType_ = bodyPart;
 			morphId_ = morphId;
 			min_ = min;
 			max_ = max;
@@ -114,7 +99,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			return new MorphTarget(
-				bodyPart_, morphId_, min_, max_, Sync.Clone());
+				bodyPartType_, morphId_, min_, max_, Sync.Clone());
 		}
 
 		public IEasing Easing
@@ -145,9 +130,12 @@ namespace Cue.Proc
 			set { autoSet_ = value; }
 		}
 
-		protected override void DoStart(Person p)
+		protected override void DoStart(Person p, AnimationContext cx)
 		{
-			morph_ = new Morph(person_, morphId_, bodyPart_);
+			morph_ = new Morph(person_, morphId_, bodyPartType_);
+
+			if (bodyPartType_ != -1)
+				bp_ = person_.Body.Get(bodyPartType_);
 
 			mid_ = Mid();
 			last_ = mid_;
@@ -160,11 +148,8 @@ namespace Cue.Proc
 
 			if (morph_ != null)
 			{
-				if (bodyPart_ == BP.None ||
-					!person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Morph))
-				{
+				if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
 					morph_.Reset();
-				}
 			}
 		}
 
@@ -310,11 +295,11 @@ namespace Cue.Proc
 			float v = rawV;
 
 			limitHit_ = false;
-			if (remaining != null && bodyPart_ >= 0)
+			if (remaining != null && bodyPartType_ >= 0)
 			{
-				if (Math.Abs(rawV - mid_) > remaining[bodyPart_])
+				if (Math.Abs(rawV - mid_) > remaining[bodyPartType_])
 				{
-					limitedValue_ = Math.Sign(rawV) * remaining[bodyPart_];
+					limitedValue_ = Math.Sign(rawV) * remaining[bodyPartType_];
 					v = mid_ + limitedValue_;
 					limitHit_ = true;
 				}
@@ -322,8 +307,7 @@ namespace Cue.Proc
 
 			var d = v - mid_;
 
-			if (bodyPart_ == BP.None ||
-				!person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Morph))
+			if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
 			{
 				if (forceType_ != ForceIgnore)
 					morph_.Value = v;
@@ -347,8 +331,8 @@ namespace Cue.Proc
 
 			if (forceType_ != ForceIgnore)
 			{
-				if (remaining != null && bodyPart_ >= 0)
-					remaining[bodyPart_] -= d;
+				if (remaining != null && bodyPartType_ >= 0)
+					remaining[bodyPartType_] -= d;
 			}
 		}
 
@@ -383,13 +367,13 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"morph {morphId_} ({BP.ToString(bodyPart_)}) {forceTarget_}";
+			return $"morph {morphId_} ({BP.ToString(bodyPartType_)}) {forceTarget_}";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"morph {morphId_} ({BP.ToString(bodyPart_)})\n" +
+				$"morph {morphId_} ({BP.ToString(bodyPartType_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
 				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_} lv={limitedValue_}\n" +

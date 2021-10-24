@@ -75,7 +75,7 @@
 					if (person_.Mood.State == Mood.NormalState)
 					{
 						person_.Animator.PlayType(
-							Animations.Sex, receiver_);
+							Animations.Sex, new AnimationContext(receiver_));
 					}
 				}
 			}

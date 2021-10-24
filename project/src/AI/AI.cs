@@ -28,8 +28,7 @@ namespace Cue
 
 			events_.AddRange(BasicEvent.All(p));
 
-			person_.Animator.Play(Resources.Animations.GetAny(
-				Animations.Idle, person_.MovementStyle));
+			person_.Animator.PlayType(Animations.Idle);
 		}
 
 		public bool EventsEnabled

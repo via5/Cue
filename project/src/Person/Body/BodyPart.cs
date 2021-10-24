@@ -4,23 +4,34 @@ namespace Cue
 {
 	class BodyPartLock
 	{
+		public const ulong NoKey = 0;
+
 		public const int NoLock = 0x00;
 		public const int Move = 0x01;
 		public const int Morph = 0x02;
 		public const int Anim = Move | Morph;
+
+		private static ulong nextKey_ = 1;
 
 		private BodyPart bp_;
 		private int type_;
 		private bool strong_;
 		private bool expired_ = false;
 		private string why_;
+		private ulong key_;
 
-		public BodyPartLock(BodyPart bp, int type, bool strong, string why)
+		public BodyPartLock(BodyPart bp, int type, bool strong, string why, ulong key)
 		{
 			bp_ = bp;
 			type_ = type;
 			strong_ = strong;
 			why_ = why;
+			key_ = key;
+		}
+
+		public static ulong NextKey()
+		{
+			return nextKey_++;
 		}
 
 		public int Type
@@ -28,12 +39,20 @@ namespace Cue
 			get { return type_; }
 		}
 
-		public bool Prevents(int type)
+		public ulong Key
 		{
-			if (Bits.IsAnySet(type_, type) && strong_)
-				return true;
-			else
-				return false;
+			get { return key_; }
+		}
+
+		public bool Prevents(int type, ulong key)
+		{
+			if (key_ != key)
+			{
+				if (Bits.IsAnySet(type_, type) && strong_)
+					return true;
+			}
+
+			return false;
 		}
 
 		public bool IsWeakFor(int type)
@@ -94,6 +113,11 @@ namespace Cue
 				s += ", expired";
 
 			s += $" ({ why_})";
+
+			if (key_ != NoKey)
+				s += $" k={key_}";
+			else
+				s += $" k=X";
 
 			return s;
 		}
@@ -388,11 +412,12 @@ namespace Cue
 			return Sys.IsLinkedTo(other.Sys);
 		}
 
-		public BodyPartLock Lock(int lockType, string why, bool strong = true)
+		public BodyPartLock LockInternal(
+			int lockType, string why, bool strong, ulong key)
 		{
 			for (int i = 0; i < locks_.Count; ++i)
 			{
-				if (locks_[i].Prevents(lockType))
+				if (locks_[i].Prevents(lockType, BodyPartLock.NoKey))
 					return null;
 			}
 
@@ -402,9 +427,14 @@ namespace Cue
 					locks_[i].SetExpired();
 			}
 
-			var lk = new BodyPartLock(this, lockType, strong, why);
+			var lk = new BodyPartLock(this, lockType, strong, why, key);
 			locks_.Add(lk);
 			return lk;
+		}
+
+		public BodyPartLock Lock(int lockType, string why, bool strong = true)
+		{
+			return LockInternal(lockType, why, strong, BodyPartLock.NextKey());
 		}
 
 		public void UnlockInternal(BodyPartLock lk)
@@ -421,11 +451,11 @@ namespace Cue
 			person_.Log.Error($"can't unlock {lk}, not in list");
 		}
 
-		public bool LockedFor(int lockType)
+		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)
 		{
 			for (int i = 0; i < locks_.Count; ++i)
 			{
-				if (locks_[i].Prevents(lockType))
+				if (locks_[i].Prevents(lockType, key))
 					return true;
 			}
 

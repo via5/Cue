@@ -59,11 +59,11 @@ namespace Cue.Proc
 			return root_.FindTarget(name);
 		}
 
-		public virtual bool Start(Person p, object ps)
+		public virtual bool Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
 			SetEnergySource(p);
-			root_.Start(p);
+			root_.Start(p, cx);
 			return true;
 		}
 
@@ -139,7 +139,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return name_ + " " + root_.ToString();
+			return name_;
 		}
 
 		public virtual string ToDetailedString()

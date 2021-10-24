@@ -99,12 +99,12 @@ namespace Cue.Proc
 			return a;
 		}
 
-		public override bool Start(Person p, object ps)
+		public override bool Start(Person p, AnimationContext cx)
 		{
-			if (!base.Start(p, ps))
+			if (!base.Start(p, cx))
 				return false;
 
-			receiver_ = ps as Person;
+			receiver_ = cx.ps as Person;
 			SetEnergySource(receiver_);
 
 			hipForce_ = FindTarget("hipForce") as Force;

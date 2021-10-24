@@ -61,9 +61,9 @@ namespace Cue.Proc
 			get { return (state_ == DoneState); }
 		}
 
-		public override bool Start(Person p, object ps)
+		public override bool Start(Person p, AnimationContext cx)
 		{
-			base.Start(p, ps);
+			base.Start(p, cx);
 
 			elapsed_ = 0;
 			state_ = ReactionState;

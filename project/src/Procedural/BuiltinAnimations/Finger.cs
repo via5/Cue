@@ -54,13 +54,13 @@ namespace Cue.Proc
 			AddTarget(g);
 		}
 
-		public override bool Start(Person p, object ps)
+		public override bool Start(Person p, AnimationContext cx)
 		{
-			if (!base.Start(p, ps))
+			if (!base.Start(p, cx))
 				return false;
 
-			if (ps is Person)
-				SetEnergySource(ps as Person);
+			if (cx.ps is Person)
+				SetEnergySource(cx.ps as Person);
 
 			return true;
 		}
