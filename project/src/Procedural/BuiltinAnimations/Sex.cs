@@ -55,7 +55,7 @@ namespace Cue.Proc
 
 
 			g.AddTarget(new Force(
-				"hipForce", Force.AbsoluteForce, BP.Hips, "hip",
+				"hipForce", Force.AbsoluteForce, BP.Hips,
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
@@ -63,7 +63,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				"hipTorque", Force.RelativeTorque, BP.Hips, "hip",
+				"hipTorque", Force.RelativeTorque, BP.Hips,
 				new SlidingMovement(
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
@@ -72,7 +72,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BP.Chest, "chest",
+				Force.RelativeTorque, BP.Chest,
 				new SlidingMovement(
 					new Vector3(chestTorqueMin_, 0, 0),
 					new Vector3(chestTorqueMax_, 0, 0),
@@ -81,7 +81,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BP.Head, "head",
+				Force.RelativeTorque, BP.Head,
 				new SlidingMovement(
 					new Vector3(headTorqueMin_, 0, 0),
 					new Vector3(headTorqueMax_, 0, 0),

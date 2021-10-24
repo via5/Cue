@@ -13,13 +13,12 @@ namespace Cue.Proc
 		public const int AbsoluteTorque = 4;
 
 		private int type_;
-		private int bodyPart_;
-		private string rbId_;
+		private int bodyPartType_;
+		private BodyPart bp_ = null;
 		private SlidingMovement movement_;
 		private IEasing excitement_;
 		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
 
-		private Rigidbody rb_ = null;
 		private bool oneFrameFinished_ = false;
 		private Action beforeNext_ = null;
 
@@ -31,24 +30,23 @@ namespace Cue.Proc
 
 
 		public Force(
-			int type, int bodyPart, string rbId,
+			int type, int bodyPart,
 			SlidingMovement m, IEasing excitement, ISync sync,
 			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
 				: this(
-					  "", type, bodyPart, rbId, m, excitement, sync,
+					  "", type, bodyPart, m, excitement, sync,
 					  fwdDelayExcitement, bwdDelayExcitement)
 		{
 		}
 
 		public Force(
-			string name, int type, int bodyPart, string rbId,
+			string name, int type, int bodyPart,
 			SlidingMovement m, IEasing excitement, ISync sync,
 			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
 				: base(name, sync)
 		{
 			type_ = type;
-			bodyPart_ = bodyPart;
-			rbId_ = rbId;
+			bodyPartType_ = bodyPart;
 			movement_ = m;
 			excitement_ = excitement;
 			fwdDelayExcitement_ = fwdDelayExcitement;
@@ -84,7 +82,7 @@ namespace Cue.Proc
 					sync = new ParentTargetSync();
 
 				return new Force(
-					type, bodyPart, o["rigidbody"],
+					type, bodyPart,
 					SlidingMovement.FromJSON(o, "movement", true),
 					EasingFromJson(o, "excitement"),
 					sync,
@@ -121,7 +119,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var f = new Force(
-				Name, type_, bodyPart_, rbId_,
+				Name, type_, bodyPartType_,
 				new SlidingMovement(movement_), excitement_,
 				Sync.Clone(),
 				fwdDelayExcitement_, bwdDelayExcitement_);
@@ -135,13 +133,7 @@ namespace Cue.Proc
 		{
 			if (p.VamAtom != null)
 			{
-				rb_ = Sys.Vam.U.FindRigidbody(p.VamAtom.Atom, rbId_);
-				if (rb_ == null)
-				{
-					Cue.LogError($"Force: rigidbody {rbId_} not found");
-					return;
-				}
-
+				bp_ = p.Body.Get(bodyPartType_);
 				Reset();
 			}
 		}
@@ -156,8 +148,7 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
-			if (bodyPart_ != BP.None &&
-				person_.Body.Get(bodyPart_).LockedFor(BodyPartLock.Move))
+			if (bp_ != null && bp_.LockedFor(BodyPartLock.Move))
 			{
 				if (wasBusy_)
 				{
@@ -235,25 +226,25 @@ namespace Cue.Proc
 			{
 				case RelativeForce:
 				{
-					rb_?.AddRelativeForce(Sys.Vam.U.ToUnity(v));
+					bp_?.AddRelativeForce(v);
 					break;
 				}
 
 				case RelativeTorque:
 				{
-					rb_?.AddRelativeTorque(Sys.Vam.U.ToUnity(v));
+					bp_?.AddRelativeTorque(v);
 					break;
 				}
 
 				case AbsoluteForce:
 				{
-					rb_?.AddForce(Sys.Vam.U.ToUnity(v));
+					bp_?.AddForce(v);
 					break;
 				}
 
 				case AbsoluteTorque:
 				{
-					rb_?.AddTorque(Sys.Vam.U.ToUnity(v));
+					bp_?.AddTorque(v);
 					break;
 				}
 			}
@@ -279,19 +270,19 @@ namespace Cue.Proc
 		public override void GetAllForcesDebug(List<string> list)
 		{
 			list.Add(
-				$"{rbId_} ({BP.ToString(bodyPart_)}) " +
+				$"{bp_} ({BP.ToString(bodyPartType_)}) " +
 				$"{TypeToString(type_)} {Sys.Vam.U.ToUnity(Lerped())}");
 		}
 
 		public override string ToString()
 		{
-			return $"{rbId_} ({BP.ToString(bodyPart_)})";
+			return $"{BP.ToString(bodyPartType_)}";
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"{TypeToString(type_)} {Name} {rbId_} ({BP.ToString(bodyPart_)})\n" +
+				$"{TypeToString(type_)} {Name} {bp_} ({BP.ToString(bodyPartType_)})\n" +
 				$"{movement_}\n" +
 				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";

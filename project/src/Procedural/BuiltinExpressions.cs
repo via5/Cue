@@ -1,112 +1,22 @@
 ﻿namespace Cue.Proc
 {
-	class Expression
-	{
-		struct TargetInfo
-		{
-			public float value;
-			public float time;
-			public float start;
-			public float elapsed;
-			public bool valid;
-			public bool auto;
-		}
-
-		private string name_;
-		private MorphGroup g_;
-		private TargetInfo target_;
-		private IEasing easing_ = new SinusoidalEasing();
-		private float value_ = 0;
-
-		public Expression(string name, MorphGroup g)
-		{
-			name_ = name;
-			g_ = g;
-		}
-
-		public string Name
-		{
-			get { return name_; }
-		}
-
-		public float Target
-		{
-			get { return target_.value; }
-		}
-
-		public void SetTarget(float t, float time, bool auto = false)
-		{
-			target_.start = g_.Value;
-			target_.value = t;
-			target_.time = time;
-			target_.elapsed = 0;
-			target_.valid = true;
-			target_.auto = auto;
-		}
-
-		public void Update(float s)
-		{
-			if (target_.valid)
-			{
-				target_.elapsed += s;
-
-				float p = U.Clamp(target_.elapsed / target_.time, 0, 1);
-				float t = easing_.Magnitude(p);
-				float v = U.Lerp(target_.start, target_.value, t);
-
-				g_.Value = v;
-
-				if (!target_.auto)
-					value_ = v;
-
-				if (p >= 1)
-					NextAuto();
-			}
-			else
-			{
-				NextAuto();
-			}
-		}
-
-		private void NextAuto()
-		{
-			float v = U.RandomFloat(value_ - 0.1f, value_ + 0.1f);
-			v = U.Clamp(v, 0, 1);
-
-			float t = U.RandomFloat(0.5f, 2.0f);
-
-			SetTarget(v, t, true);
-		}
-	}
-
 	class BuiltinExpressions
 	{
-		//public static List<IProceduralMorphGroup> All(Person p)
-		//{
-		//	var list = new List<IProceduralMorphGroup>();
-		//
-		//	list.Add(Smile(p));
-		//	list.Add(CornerSmile(p));
-		//	list.Add(Pleasure(p));
-		//	list.Add(EyesRollBack(p));
-		//	list.Add(EyesClosed(p));
-		//	list.Add(Swallow(p));
-		//	list.Add(Frown(p));
-		//	list.Add(Squint(p));
-		//	list.Add(MouthFrown(p));
-		//	list.Add(Drooling(p));
-		//	list.Add(EyesClosedTired(p));
-		//
-		//	return list;
-		//}
-
-
 		/*public static IProceduralMorphGroup CornerSmile(Person p)
 		{
 			var g = new ConcurrentProceduralMorphGroup("cornerSmile");
 			g.Add(new MorphTarget(p, BP.Mouth, "Mouth Smile Simple Left", 0, 1, 1, 5, 2, 2));
 			return g;
 		}*/
+
+		//public static Expression EyesRollBack(Person p)
+		//{
+		//	return new Expression("eyesRollback", new MorphGroup(
+		//		p, "eyesRollback", BP.Mouth, new MorphGroup.MorphInfo[]
+		//		{
+		//			new MorphGroup.MorphInfo("Eye Roll Back_DD", 1, BP.None)
+		//		}));
+		//}
 
 		public static Expression Smile(Person p)
 		{
@@ -170,15 +80,6 @@
 					new MorphGroup.MorphInfo("Angry", 1, BP.None)
 				}));
 		}
-
-		//public static Expression EyesRollBack(Person p)
-		//{
-		//	return new Expression("eyesRollback", new MorphGroup(
-		//		p, "eyesRollback", BP.Mouth, new MorphGroup.MorphInfo[]
-		//		{
-		//			new MorphGroup.MorphInfo("Eye Roll Back_DD", 1, BP.None)
-		//		}));
-		//}
 
 		public static Expression EyesClosed(Person p)
 		{

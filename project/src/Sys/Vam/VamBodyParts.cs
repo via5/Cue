@@ -268,5 +268,15 @@ namespace Cue.Sys.Vam
 		{
 			// no-op
 		}
+
+		public virtual void AddForce(Vector3 v)
+		{
+			// no-op
+		}
+
+		public virtual void AddTorque(Vector3 v)
+		{
+			// no-op
+		}
 	}
 }

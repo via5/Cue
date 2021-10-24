@@ -16,7 +16,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "hips",
-					"rigidbody": "hip",
 					"movement":
 					{
 						"min": [-50, 0, -50],
@@ -36,7 +35,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "chest",
-					"rigidbody": "chest",
 					"movement":
 					{
 						"min": [-50, 0, -50],
@@ -56,7 +54,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "leftHand",
-					"rigidbody": "lHand",
 					"movement":
 					{
 						"min": [-50, 0, -50],
@@ -76,7 +73,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "rightHand",
-					"rigidbody": "rHand",
 					"movement":
 					{
 						"min": [-50, 0, -50],
@@ -98,7 +94,6 @@
 				{
 					"type": "rtorque",
 					"bodyPart": "hips",
-					"rigidbody": "hip",
 					"movement":
 					{
 						"min": [-5, -5, -5],
@@ -118,7 +113,6 @@
 				{
 					"type": "rtorque",
 					"bodyPart": "chest",
-					"rigidbody": "chest",
 					"movement":
 					{
 						"min": [-5, -5, -5],
@@ -138,7 +132,6 @@
 				{
 					"type": "rtorque",
 					"bodyPart": "leftHand",
-					"rigidbody": "lHand",
 					"movement":
 					{
 						"min": [-5, -5, -5],
@@ -158,7 +151,6 @@
 				{
 					"type": "rtorque",
 					"bodyPart": "rightHand",
-					"rigidbody": "rHand",
 					"movement":
 					{
 						"min": [-5, -5, -5],
@@ -180,7 +172,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "head",
-					"rigidbody": "head",
 					"movement":
 					{
 						"min": [-40, 0, -40],

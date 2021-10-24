@@ -95,6 +95,16 @@ namespace Cue.Sys.Vam
 			rb_.AddRelativeTorque(U.ToUnity(v));
 		}
 
+		public override void AddForce(Vector3 v)
+		{
+			rb_.AddForce(U.ToUnity(v));
+		}
+
+		public override void AddTorque(Vector3 v)
+		{
+			rb_.AddTorque(U.ToUnity(v));
+		}
+
 		public override string ToString()
 		{
 			return $"rb {rb_.name}";

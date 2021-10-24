@@ -251,6 +251,8 @@ namespace Cue.Sys
 		float DistanceToSurface(IBodyPart other, bool debug = false);
 		void AddRelativeForce(Vector3 v);
 		void AddRelativeTorque(Vector3 v);
+		void AddForce(Vector3 v);
+		void AddTorque(Vector3 v);
 	}
 
 	interface IBone

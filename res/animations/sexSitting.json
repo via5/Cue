@@ -13,7 +13,6 @@
 				{
 					"type": "rforce",
 					"bodyPart": "hips",
-					"rigidbody": "hip",
 					"movement":
 					{
 						"min": [0, 0, -300],

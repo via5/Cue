@@ -18,7 +18,7 @@ namespace Cue.Proc
 		private float forceWin_ = 100;
 
 		public FingerProcAnimation(
-			string name, string handName, Vector3 torqueDir, Vector3 forceDir)
+			string name, int bodyPart, Vector3 torqueDir, Vector3 forceDir)
 				: base(name, false)
 		{
 			var g = new ConcurrentTargetGroup(
@@ -36,7 +36,7 @@ namespace Cue.Proc
 					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, BP.None, handName,
+				Force.RelativeTorque, bodyPart,
 				new SlidingMovement(
 					torqueMin_ * torqueDir, torqueMax_ * torqueDir,
 					0, 0, torqueWin_ * torqueDir, new LinearEasing()),
@@ -44,7 +44,7 @@ namespace Cue.Proc
 				new LinearEasing(), new LinearEasing()));
 
 			g.AddTarget(new Force(
-				Force.RelativeForce, BP.None, handName,
+				Force.RelativeForce, bodyPart,
 				new SlidingMovement(
 					forceMin_ * forceDir, forceMax_ * forceDir,
 					0, 0, forceWin_ * forceDir, new LinearEasing()),
@@ -71,7 +71,7 @@ namespace Cue.Proc
 	{
 		public LeftFingerProcAnimation()
 			: base(
-				  "procLeftFinger", "lHand",
+				  "procLeftFinger", BP.LeftHand,
 				  new Vector3(0, 0, 1), new Vector3(-1, 0, 0))
 		{
 		}
@@ -89,7 +89,7 @@ namespace Cue.Proc
 	{
 		public RightFingerProcAnimation()
 			: base(
-				  "procRightFinger", "rHand",
+				  "procRightFinger", BP.RightHand,
 				  new Vector3(0, 0, -1), new Vector3(1, 0, 0))
 		{
 		}
