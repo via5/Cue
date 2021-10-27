@@ -78,6 +78,8 @@ namespace Cue
 			if (IsPlayer)
 				AI.EventsEnabled = false;
 
+			ai_.Init();
+
 			Atom.Init();
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
 		}

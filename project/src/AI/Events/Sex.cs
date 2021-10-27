@@ -43,13 +43,17 @@
 				{
 					receiver_ = FindReceiver();
 
-					if (receiver_ == null)
-						log_.Info($"no valid receiver");
-					else
-						log_.Info($"starting sex, receiver={receiver_.ID}");
-
-					if (receiver_ != null)
+					if (receiver_ == null && person_.Body.HasPenis)
 					{
+						log_.Info($"no valid receiver");
+						active_ = false;
+						return;
+
+					}
+					else if (receiver_ != null)
+					{
+						log_.Info($"starting sex with {receiver_.ID}");
+
 						person_.Clothing.GenitalsVisible = true;
 						receiver_.Clothing.GenitalsVisible = true;
 
@@ -60,7 +64,8 @@
 					}
 					else
 					{
-						// frottage
+						log_.Info($"starting frottage");
+
 						person_.Body.Get(person_.Body.GenitalsBodyPart)
 							.AddForcedTrigger(-1, -1);
 					}

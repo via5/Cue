@@ -140,6 +140,7 @@ namespace Cue.Proc
 		public override void Reset()
 		{
 			base.Reset();
+			movement_.WindowMagnitude = MovementEnergy;
 			movement_.Reset();
 		}
 
@@ -283,16 +284,7 @@ namespace Cue.Proc
 			return
 				$"{TypeToString(type_)} {Name} {bp_} ({BP.ToString(bodyPartType_)})\n" +
 				$"{movement_}\n" +
-				$"en={EnergyFactor():0.00}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";
-		}
-
-		private float EnergyFactor()
-		{
-			if (person_ == null)
-				return 0;
-
-			return excitement_.Magnitude(MovementEnergy);
 		}
 
 		private void Next()

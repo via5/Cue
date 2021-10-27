@@ -339,7 +339,11 @@ namespace Cue.Proc
 		{
 			set
 			{
-				CurrentDuration().Energy = value;
+				if (fwdDuration_ != null)
+					fwdDuration_.Energy = value;
+
+				if (bwdDuration_ != null)
+					bwdDuration_.Energy = value;
 			}
 		}
 
@@ -356,7 +360,7 @@ namespace Cue.Proc
 			}
 		}
 
-		private IDuration CurrentDuration()
+		public IDuration CurrentDuration()
 		{
 			switch (State)
 			{

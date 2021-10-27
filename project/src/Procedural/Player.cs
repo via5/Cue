@@ -86,6 +86,7 @@ namespace Cue.Proc
 
 		public virtual void Reset()
 		{
+			sync_.Energy = MovementEnergy;
 			sync_.Reset();
 		}
 

@@ -165,6 +165,7 @@ namespace Cue
 
 		public void Reset()
 		{
+			Next();
 			d_.Reset();
 			finished_ = false;
 		}

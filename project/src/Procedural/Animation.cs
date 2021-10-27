@@ -34,6 +34,11 @@ namespace Cue.Proc
 			get { return root_.Done; }
 		}
 
+		public RootTargetGroup RootGroup
+		{
+			get { return root_; }
+		}
+
 		// todo
 		public float InitFrame { get { return -1; } }
 		public float FirstFrame { get { return -1; } }

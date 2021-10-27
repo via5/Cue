@@ -7,6 +7,7 @@ namespace Cue
 		T GetEvent<T>() where T : class, IEvent;
 		List<IEvent> Events { get; }
 
+		void Init();
 		void FixedUpdate(float s);
 		void Update(float s);
 		bool EventsEnabled { get; set; }
@@ -27,7 +28,10 @@ namespace Cue
 			log_ = new Logger(Logger.AI, person_, "AI");
 
 			events_.AddRange(BasicEvent.All(p));
+		}
 
+		public void Init()
+		{
 			person_.Animator.PlayType(Animations.Idle);
 			person_.Animator.PlayType(Animations.Expressions);
 		}
