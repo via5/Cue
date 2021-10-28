@@ -34,6 +34,11 @@ namespace Cue
 			set { SetValue(value); }
 		}
 
+		public Sys.IMorph Sys
+		{
+			get { return m_; }
+		}
+
 		private void SetValue(float value)
 		{
 			if (m_ == null)
@@ -99,7 +104,8 @@ namespace Cue
 
 			public void Set(float v)
 			{
-				m_.Value = v * multiplier_;
+				if (m_.Sys != null)
+					m_.Sys.Value = v * multiplier_;
 			}
 
 			public void Reset()
@@ -142,18 +148,19 @@ namespace Cue
 			set { SetValue(value); }
 		}
 
-		private void SetValue(float value)
+		private void SetValue(float requestedValue)
 		{
 			// assume default of 0
-			float use = Math.Abs(value);
+			float use = Math.Abs(requestedValue);
 			float available = person_.Body.UseMorphs(bodyParts_, use);
 
-			if (value < 0)
-				value = -available;
+			float allowedValue;
+			if (requestedValue < 0)
+				allowedValue = -available;
 			else
-				value = available;
+				allowedValue = available;
 
-			value_ = value;
+			value_ = allowedValue;
 
 			for (int i = 0; i < morphs_.Length; ++i)
 				morphs_[i].Set(value_);

@@ -184,6 +184,7 @@ namespace Cue
 		{
 			base.FixedUpdate(s);
 
+			body_.ResetMorphLimits();
 			animator_.FixedUpdate(s);
 			ai_.FixedUpdate(s);
 		}
@@ -197,8 +198,6 @@ namespace Cue
 		public override void Update(float s)
 		{
 			base.Update(s);
-
-			body_.ResetMorphLimits();
 
 			I.Start(I.UpdatePersonAnimator);
 			{

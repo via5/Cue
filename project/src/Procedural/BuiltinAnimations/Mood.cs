@@ -6,17 +6,16 @@ namespace Cue.Proc
 
 	class Moods
 	{
-		public const int Common = 0;
-		public const int Happy = 1;
-		public const int Mischievous = 2;
-		public const int Excited = 3;
-		public const int Angry = 4;
-		public const int Tired = 5;
-		public const int Count = 6;
+		public const int Happy = 0;
+		public const int Mischievous = 1;
+		public const int Excited = 2;
+		public const int Angry = 3;
+		public const int Tired = 4;
+		public const int Count = 5;
 
-		private static string[] names_ = new string[]
+		private static string[] names_ = new string[Count]
 		{
-			"common", "happy", "mischievous", "excited", "angry", "tired"
+			"happy", "mischievous", "excited", "angry", "tired"
 		};
 
 		public static int FromString(string s)
@@ -146,7 +145,6 @@ namespace Cue.Proc
 			if (!base.Start(p, cx))
 				return false;
 
-			moods_.Add(CreateCommon(p));
 			moods_.Add(CreateHappy(p));
 			moods_.Add(CreateMischievous(p));
 			moods_.Add(CreateExcited(p));
@@ -163,10 +161,11 @@ namespace Cue.Proc
 				Cue.LogError("bad mood count");
 
 
-			moods_[Moods.Common].Intensity = 1;
-			moods_[Moods.Happy].Intensity = 0;
-			moods_[Moods.Mischievous].Intensity = 1;
-			moods_[Moods.Angry].Intensity = 0;
+			for (int i = 0; i < moods_.Count; ++i)
+				moods_[i].Intensity = 0;
+			moods_[Moods.Happy].Intensity = 1;
+			//moods_[Moods.Mischievous].Intensity = 1;
+			//moods_[Moods.Angry].Intensity = 0;
 
 			return true;
 		}
@@ -185,16 +184,6 @@ namespace Cue.Proc
 
 			for (int i = 0; i < moods_.Count; ++i)
 				moods_[i].FixedUpdate(s);
-		}
-
-		private Mood CreateCommon(Person p)
-		{
-			var e = new Mood(p, Moods.Common);
-			e.Intensity = 1;
-
-			//e.Groups.Add(BE.Swallow(p));
-
-			return e;
 		}
 
 		private Mood CreateHappy(Person p)
