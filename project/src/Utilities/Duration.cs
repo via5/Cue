@@ -33,6 +33,11 @@ namespace Cue
 		{
 		}
 
+		public SlidingDuration(float min, float max, float windowSize, IEasing windowEasing=null)
+			: this(min, max, 0, 0, windowSize, windowEasing ?? new LinearEasing())
+		{
+		}
+
 		public SlidingDuration(
 			float min, float max, float nextMin, float nextMax,
 			float windowSize, IEasing windowEasing)

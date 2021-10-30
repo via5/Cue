@@ -21,93 +21,118 @@
 				//Squint(p),
 				//MouthFrown(p),
 
-				//Drooling(p),
-				//EyesRollBack(p),
-				//EyesClosedTired(p)
+				Drooling(p),
 			};
 		}
 
 		public static Expression Smile(Person p)
 		{
-			return new Expression("smile", Expressions.Happy, new MorphGroup(
-				p, "smile", BP.Mouth, new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Smile Open Full Face", 1, BP.None)
-				}));
+			return new Expression("smile",
+				Expressions.Happy,
+				new MorphGroup(
+					p, "smile", BP.Mouth, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Smile Open Full Face", 1, BP.None)
+					}));
 		}
 
 		public static Expression CornerSmile(Person p)
 		{
-			return new Expression("cornerSmile", Expressions.Happy, new MorphGroup(
-				p, "cornerSmile", BP.Mouth, new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Smile Open Full Face", 0.3f, BP.None),
-					new MorphGroup.MorphInfo("Mouth Smile Simple Left", 1.2f, BP.None),
-					new MorphGroup.MorphInfo("Eyes Squint", 0.15f, BP.None)
-				}));
+			return new Expression("cornerSmile",
+				Expressions.Happy,
+				new MorphGroup(
+					p, "cornerSmile", BP.Mouth, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Smile Open Full Face", 0.3f, BP.None),
+						new MorphGroup.MorphInfo("Mouth Smile Simple Left", 1.2f, BP.None),
+						new MorphGroup.MorphInfo("Eyes Squint", 0.15f, BP.None)
+					}));
 		}
 
 		public static Expression Pleasure(Person p)
 		{
-			return new Expression("pleasure", Expressions.Excited, new MorphGroup(
-				p, "pleasure", new int[] { BP.Mouth, BP.Eyes },
-				new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("CTRLTongueRaise-Lower", 0.13f, BP.None),
-					new MorphGroup.MorphInfo("CTRLBrowInnerUp", 0.7f, BP.None),
-					new MorphGroup.MorphInfo("PHMMouthSmile", 0.46f, BP.None),
-					new MorphGroup.MorphInfo("PHMMouthOpenWide", 1.7f, BP.None),
-					new MorphGroup.MorphInfo("PHMMouthCornerUpDown", -0.37f, BP.None),
-					new MorphGroup.MorphInfo("CTRLEyesClosed", 0.66f, BP.None),
-					new MorphGroup.MorphInfo("CTRLTongueIn-Out", 0.012f, BP.None)
-				}));
+			return new Expression("pleasure",
+				Expressions.Excited,
+				new MorphGroup(
+					p, "pleasure", new int[] { BP.Mouth, BP.Eyes },
+					new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("CTRLTongueRaise-Lower", 0.13f, BP.None),
+						new MorphGroup.MorphInfo("CTRLBrowInnerUp", 0.7f, BP.None),
+						new MorphGroup.MorphInfo("PHMMouthSmile", 0.46f, BP.None),
+						new MorphGroup.MorphInfo("PHMMouthOpenWide", 1.7f, BP.None),
+						new MorphGroup.MorphInfo("PHMMouthCornerUpDown", -0.37f, BP.None),
+						new MorphGroup.MorphInfo("CTRLEyesClosed", 0.66f, BP.None),
+						new MorphGroup.MorphInfo("CTRLTongueIn-Out", 0.012f, BP.None)
+					}));
 		}
 
 		public static Expression Pain(Person p)
 		{
-			return new Expression("pain", Expressions.Excited, new MorphGroup(
-				p, "pain", new int[] { BP.Mouth, BP.Eyes },
-				new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Pain", 1, BP.None)
-				}));
+			return new Expression("pain",
+				Expressions.Excited,
+				new MorphGroup(
+					p, "pain", new int[] { BP.Mouth, BP.Eyes },
+					new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Pain", 1, BP.None)
+					}));
 		}
 
 		public static Expression Shock(Person p)
 		{
-			return new Expression("shock", Expressions.Excited, new MorphGroup(
-				p, "shock", BP.Mouth, new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Shock", 1, BP.None)
-				}));
+			return new Expression("shock",
+				Expressions.Excited,
+				new MorphGroup(
+					p, "shock", BP.Mouth, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Shock", 1, BP.None)
+					}));
 		}
 
 		public static Expression Scream(Person p)
 		{
-			return new Expression("scream", Expressions.Excited, new MorphGroup(
-				p, "scream", new int[] { BP.Mouth, BP.Eyes },
-				new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Scream", 1, BP.None)
-				}));
+			return new Expression("scream",
+				Expressions.Excited,
+				new MorphGroup(
+					p, "scream", new int[] { BP.Mouth, BP.Eyes },
+					new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Scream", 1, BP.None)
+					}));
 		}
 
 		public static Expression Angry(Person p)
 		{
-			return new Expression("angry", Expressions.Excited, new MorphGroup(
-				p, "angry", BP.Mouth, new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Angry", 1, BP.None)
-				}));
+			return new Expression("angry",
+				Expressions.Excited,
+				new MorphGroup(
+					p, "angry", BP.Mouth, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Angry", 1, BP.None)
+					}));
 		}
 
 		public static Expression EyesClosed(Person p)
 		{
-			return new Expression("eyesClosed", Expressions.Excited, new MorphGroup(
-				p, "eyesClosed", BP.Eyes, new MorphGroup.MorphInfo[]
-				{
-					new MorphGroup.MorphInfo("Eyes Closed", 1, BP.None)
-				}));
+			return new Expression("eyesClosed",
+				Expressions.Excited | Expressions.Tired,
+				new MorphGroup(
+					p, "eyesClosed", BP.Eyes, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Eyes Closed", 1, BP.None)
+					}));
+		}
+
+		public static Expression Drooling(Person p)
+		{
+			return new Expression("drooling",
+				Expressions.Tired,
+				new MorphGroup(
+					p, "drooling", BP.Eyes, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Mouth Open", 1, BP.None)
+					}));
 		}
 
 		//public static Expression EyesRollBack(Person p)
@@ -170,19 +195,6 @@
 			g.Add(new MorphTarget(p, BP.None, "Lip Top Up", 0, 0.3f, 1, 5, 2, 2));
 			return g;
 		}
-
-		public static IProceduralMorphGroup Drooling(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("drooling");
-			g.Add(new MorphTarget(p, BP.Mouth, "Mouth Open", 0, 1, 2, 5, 3, 3));
-			return g;
-		}
-
-		public static IProceduralMorphGroup EyesClosedTired(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("eyesClosedTired");
-			g.Add(new MorphTarget(p, BP.Eyes, "Eyes Closed", 0.2f, 1, 2, 5, 3, 3));
-			return g;
-		}*/
+		*/
 	}
 }

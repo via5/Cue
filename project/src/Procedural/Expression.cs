@@ -76,13 +76,28 @@
 			}
 		}
 
+		struct AutoInfo
+		{
+			public float range;
+			public float minTime;
+			public float maxTime;
+
+			public AutoInfo(float range, float minTime, float maxTime)
+			{
+				this.range = range;
+				this.minTime = minTime;
+				this.maxTime = maxTime;
+			}
+		}
+
+
 		private string name_;
 		private int type_;
 		private MorphGroup g_;
 		private TargetInfo target_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
-		private float autoRange_ = 0.1f;
+		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
 
 		public Expression(string name, int type, MorphGroup g)
 		{
@@ -94,7 +109,10 @@
 
 		public override string ToString()
 		{
-			return $"{name_} {Expressions.ToString(type_)} {target_}";
+			return
+				$"{name_} {Expressions.ToString(type_)} " +
+				$"{g_.Value:0.00}=>{target_:0.00} " +
+				$"{target_.elapsed:0.00}/{target_.time:0.00}";
 		}
 
 		public string Name
@@ -107,15 +125,21 @@
 			get { return target_.value; }
 		}
 
-		public float AutoRange
+		public void SetAuto(float range, float minTime, float maxTime)
 		{
-			get { return autoRange_; }
-			set { autoRange_ = value; }
+			auto_.range = range;
+			auto_.minTime = minTime;
+			auto_.maxTime = maxTime;
 		}
 
 		public bool Finished
 		{
 			get { return (!target_.valid || target_.auto || target_.elapsed >= target_.time); }
+		}
+
+		public int Type
+		{
+			get { return type_; }
 		}
 
 		public bool IsType(int t)
@@ -164,13 +188,13 @@
 
 		private void NextAuto()
 		{
-			if (autoRange_ <= 0)
+			if (auto_.range <= 0)
 				return;
 
-			float v = U.RandomFloat(value_ - autoRange_, value_ + autoRange_);
+			float v = U.RandomFloat(value_ - auto_.range, value_ + auto_.range);
 			v = U.Clamp(v, 0, 1);
 
-			float t = U.RandomFloat(0.5f, 2.0f);
+			float t = U.RandomFloat(auto_.minTime, auto_.maxTime);
 
 			SetTarget(v, t);
 			target_.auto = true;

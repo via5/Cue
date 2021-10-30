@@ -1,112 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace Cue.Proc
-{/*
-	class Mood
-	{
-		private readonly int type_;
-		private float max_ = 0;
-		private float intensity_ = 0;
-		private float dampen_ = 0;
-		private readonly List<Expression> exps_ = new List<Expression>();
-		private SlidingDuration wait_;
-
-		public Mood(Person p, int type)
-		{
-			type_ = type;
-			wait_ = new SlidingDuration(0.5f, 4);
-		}
-
-		public int Type
-		{
-			get { return type_; }
-		}
-
-		public float Maximum
-		{
-			get { return max_; }
-			set { max_ = value; }
-		}
-
-		public float Intensity
-		{
-			get
-			{
-				return intensity_;
-			}
-
-			set
-			{
-				if (intensity_ != value)
-				{
-					intensity_ = value;
-
-					for (int i = 0; i < exps_.Count; ++i)
-						exps_[i].AutoRange = intensity_ * 0.05f;
-				}
-			}
-		}
-
-		public float Dampen
-		{
-			get { return dampen_; }
-			set { dampen_ = value; }
-		}
-
-		public void Add(Expression e)
-		{
-			e.AutoRange = 0;
-			exps_.Add(e);
-		}
-
-		public Expression[] Expressions
-		{
-			get { return exps_.ToArray(); }
-		}
-
-		public void Reset()
-		{
-			for (int i = 0; i < exps_.Count; ++i)
-				exps_[i].Reset();
-		}
-
-		public void FixedUpdate(float s)
-		{
-			wait_.Update(s);
-
-			if (wait_.Finished)
-			{
-				//float intensity = max_ * intensity_ * (1 - dampen_);
-				float target = U.RandomFloat(0, 1) * intensity_;
-				for (int i = 0; i < exps_.Count; ++i)
-					exps_[i].SetTarget(target, U.RandomFloat(0.4f, 2));
-			}
-
-			for (int i = 0; i < exps_.Count; ++i)
-				exps_[i].FixedUpdate(s);
-		}
-
-		public override string ToString()
-		{
-			return "";
-				//$"{Moods.ToString(type_)} " +
-				//$"max={max_} int ={intensity_} damp={dampen_}";
-		}
-	}*/
-
-
+{
 	class WeightedExpression
 	{
+		private float FastTimeMin = 0.4f;
+		private float FastTimeMax = 2.0f;
+		private float SlowTimeMin = 3.0f;
+		private float SlowTimeMax = 5.0f;
+
 		private const int InactiveState = 0;
 		private const int RampUpState = 1;
 		private const int HoldState = 2;
 		private const int FinishedState = 3;
 
 		private readonly Expression e_;
-		private float weight_ = 0;
 		private int state_ = InactiveState;
 
-		private Duration holdTime_ = new Duration(0, 2);
+		private float weight_ = 0;
+		private float intensity_ = 0;
+		private float speed_ = 0;
+
+		private Duration holdTime_ = new Duration(0, 3);
+
 
 		public WeightedExpression(Expression e)
 		{
@@ -121,7 +37,23 @@ namespace Cue.Proc
 		public float Weight
 		{
 			get { return weight_; }
-			set { weight_ = value; }
+		}
+
+		public float Intensity
+		{
+			get { return intensity_; }
+		}
+
+		public float Speed
+		{
+			get { return speed_; }
+		}
+
+		public void Set(float weight, float intensity, float speed)
+		{
+			weight_ = weight;
+			intensity_ = intensity;
+			speed_ = speed;
 		}
 
 		public bool Active
@@ -136,6 +68,7 @@ namespace Cue.Proc
 
 		public void Activate()
 		{
+			e_.SetAuto(0.1f, MinRandomTime(), MaxRandomTime());
 			e_.SetTarget(RandomTarget(), RandomTargetTime());
 			state_ = RampUpState;
 		}
@@ -181,31 +114,60 @@ namespace Cue.Proc
 			e_.Reset();
 		}
 
+		public string ToDetailedString()
+		{
+			return
+				$"{e_} w={weight_:0.00} i={intensity_:0.00} " +
+				$"s={speed_:0.00} {StateToString(state_)}";
+		}
+
+		private static string StateToString(int state)
+		{
+			switch (state)
+			{
+				case InactiveState: return "inactive";
+				case RampUpState: return "rampup";
+				case HoldState: return "hold";
+				case FinishedState: return "finished";
+				default: return $"?{state}";
+			}
+		}
+
 		public override string ToString()
 		{
-			return $"{e_} w={weight_:0.00} state={state_}";
+			return $"{e_.Name} ({Expressions.ToString(e_.Type)}) w={weight_:0.00}";
 		}
 
 		private float RandomTarget()
 		{
-			return U.RandomFloat(0, 1) * U.Clamp(weight_, 0, 1);
+			return U.RandomFloat(0, 1) * U.Clamp(intensity_, 0, 1);
+		}
+
+		private float MinRandomTime()
+		{
+			return FastTimeMin + (SlowTimeMin - FastTimeMin) * (1 - speed_);
+		}
+
+		private float MaxRandomTime()
+		{
+			return FastTimeMax + (SlowTimeMax - FastTimeMax) * (1 - speed_);
 		}
 
 		private float RandomTargetTime()
 		{
-			return U.RandomFloat(0.4f, 2);
+			return U.RandomFloat(MinRandomTime(), MaxRandomTime());
 		}
 
 		private float RandomResetTime()
 		{
-			return U.RandomFloat(0.4f, 2);
+			return RandomTargetTime();
 		}
 	}
 
 
 	class MoodProcAnimation : BasicProcAnimation
 	{
-		private const int MaxActive = 2;
+		private const int MaxActive = 4;
 		private const float MoreCheckInterval = 1;
 
 		private WeightedExpression[] exps_ = new WeightedExpression[0];
@@ -219,9 +181,20 @@ namespace Cue.Proc
 
 		public override string[] Debug()
 		{
-			var s = new string[exps_.Length + 2];
+			var s = new string[MaxActive + 1 + exps_.Length + 2];
 
 			int i = 0;
+
+			for (int j = 0; j < exps_.Length; ++j)
+			{
+				if (exps_[j].Active)
+					s[i++] = $"{exps_[j].ToDetailedString()}";
+			}
+
+			while (i < MaxActive)
+				s[i++] = "none";
+
+			s[i++] = "";
 
 			for (int j=0; j< exps_.Length;++j)
 				s[i++] = $"{exps_[j]}";
@@ -316,7 +289,7 @@ namespace Cue.Proc
 
 		private bool NextActive()
 		{
-			UpdateWeights();
+			UpdateExpressions();
 
 			float totalWeight = 0;
 			for (int i = 0; i < exps_.Length; ++i)
@@ -349,22 +322,49 @@ namespace Cue.Proc
 			return false;
 		}
 
-		private void UpdateWeights()
+		private void UpdateExpressions()
 		{
 			for (int i = 0; i < exps_.Length; ++i)
 			{
 				var we = exps_[i];
 				var e = we.Expression;
 
-				float w = 0;
+				float weight = 0;
+				float intensity = 0;
+
 
 				if (e.IsType(Expressions.Happy))
-					w += 1;
+				{
+					weight += 1;
+					intensity = Math.Max(intensity, 1);
+				}
 
 				if (e.IsType(Expressions.Excited))
-					w += person_.Mood.ExpressionExcitement;
+				{
+					weight += person_.Mood.ExpressionExcitement * 2;
+					intensity = Math.Max(intensity, person_.Mood.ExpressionExcitement);
+				}
 
-				we.Weight = w;
+				if (e.IsType(Expressions.Angry))
+				{
+					// todo
+				}
+
+				if (e.IsType(Expressions.Tired))
+				{
+					weight += person_.Mood.ExpressionTiredness;
+					intensity = Math.Max(intensity, person_.Mood.ExpressionTiredness);
+				}
+
+
+				if (!e.IsType(Expressions.Tired))
+				{
+					weight *= Math.Max(1 - person_.Mood.ExpressionTiredness, 0.05f);
+				}
+
+				float speed = 1 - person_.Mood.ExpressionTiredness;
+
+				we.Set(weight, intensity, speed);
 			}
 		}
 
