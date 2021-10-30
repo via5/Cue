@@ -366,13 +366,14 @@ namespace Cue
 		private WeightedExpression[] exps_ = new WeightedExpression[0];
 		private bool needsMore_ = false;
 		private float moreElapsed_ = 0;
+		private Personality lastPersonality_ = null;
 
 		public ExpressionManager(Person p)
 		{
 			person_ = p;
 		}
 
-		public void Init()
+		private void Init()
 		{
 			var all = person_.Personality.GetExpressions();
 			exps_ = new WeightedExpression[all.Length];
@@ -385,10 +386,15 @@ namespace Cue
 
 			for (int i = 0; i < MaxActive; ++i)
 				NextActive();
+
+			lastPersonality_ = person_.Personality;
 		}
 
 		public void FixedUpdate(float s)
 		{
+			if (lastPersonality_ != person_.Personality)
+				Init();
+
 			int finished = 0;
 			int activeCount = 0;
 

@@ -7,7 +7,8 @@ namespace Cue
 	class PersonalityResources
 	{
 		private Logger log_;
-		private readonly List<Personality> ps_ = new List<Personality>();
+		private readonly List<Personality> all_ = new List<Personality>();
+		private readonly List<Personality> valid_ = new List<Personality>();
 
 		public PersonalityResources()
 		{
@@ -18,7 +19,7 @@ namespace Cue
 		{
 			try
 			{
-				ps_.Clear();
+				all_.Clear();
 				LoadFromFile();
 				return true;
 			}
@@ -31,7 +32,7 @@ namespace Cue
 
 		public Personality Clone(string name, Person p)
 		{
-			foreach (var ps in ps_)
+			foreach (var ps in valid_)
 			{
 				if (ps.Name == name)
 					return ps.Clone(null, p);
@@ -43,14 +44,14 @@ namespace Cue
 
 		public List<Personality> All
 		{
-			get { return new List<Personality>(ps_); }
+			get { return new List<Personality>(valid_); }
 		}
 
 		public List<string> AllNames()
 		{
 			var names = new List<string>();
 
-			foreach (var p in ps_)
+			foreach (var p in valid_)
 				names.Add(p.Name);
 
 			return names;
@@ -74,7 +75,7 @@ namespace Cue
 					var p = ParsePersonality(an.AsObject);
 
 					if (p != null)
-						Add(p);
+						Add(p, J.OptBool(an.AsObject, "abstract", false));
 				}
 				catch (LoadFailed e)
 				{
@@ -91,7 +92,7 @@ namespace Cue
 
 			if (o.HasKey("inherit"))
 			{
-				foreach (var ps in ps_)
+				foreach (var ps in all_)
 				{
 					if (ps.Name == o["inherit"].Value)
 					{
@@ -121,6 +122,9 @@ namespace Cue
 			{
 				var es = new List<Expression>();
 
+				if (inherited)
+					es.AddRange(p.GetExpressions());
+
 				foreach (JSONClass en in o["expressions"].AsArray)
 				{
 					var morphs = new List<MorphGroup.MorphInfo>();
@@ -141,6 +145,8 @@ namespace Cue
 							BP.FromStringMany(en["bodyParts"].Value),
 							morphs.ToArray())));
 				}
+
+				U.NatSort(es, (e) => e.Name);
 
 				p.SetExpressions(es.ToArray());
 			}
@@ -191,10 +197,13 @@ namespace Cue
 			v.Set(dss, orgasmDs);
 		}
 
-		private void Add(Personality p)
+		private void Add(Personality p, bool abst)
 		{
 			log_.Info(p.ToString());
-			ps_.Add(p);
+			all_.Add(p);
+
+			if (!abst)
+				valid_.Add(p);
 		}
 	}
 }

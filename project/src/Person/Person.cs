@@ -81,7 +81,6 @@ namespace Cue
 				AI.EventsEnabled = false;
 
 			ai_.Init();
-			expression_.Init();
 
 			Atom.Init();
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);

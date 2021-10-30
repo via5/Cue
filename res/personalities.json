@@ -2,7 +2,8 @@
 	"personalities":
 	[
 		{
-			"name": "standard",
+			"name": "base",
+			"abstract": true,
 
 			"voice":
 			{
@@ -33,18 +34,6 @@
 
 			"expressions":
 			[
-				{
-					"name": "smile",
-					"moods": "happy",
-					"bodyParts": "mouth",
-					"morphs":
-					[
-						{
-							"id": "Smile Open Full Face"
-						}
-					]
-				},
-
 				{
 					"name": "pleasure",
 					"moods": "excited",
@@ -279,11 +268,57 @@
 			"expressionTirednessFactor": 1,
 		},
 
+		{
+			"name": "standard",
+			"inherit": "base",
+
+			"expressions":
+			[
+				{
+					"name": "smile",
+					"moods": "happy",
+					"bodyParts": "mouth",
+					"morphs":
+					[
+						{
+							"id": "Smile Open Full Face"
+						}
+					]
+				},
+			]
+		}
+
 
 		{
 			"name": "quirky",
-			"inherit": "standard",
-		},
+			"inherit": "base",
+
+			"expressions":
+			[
+				{
+					"name": "cornerSmile",
+					"moods": "happy",
+					"bodyParts": "mouth",
+					"morphs":
+					[
+						{
+							"id": "Smile Open Full Face",
+							"max": 0.3
+						},
+
+						{
+							"id": "Mouth Smile Simple Left",
+							"max": 1.2
+						},
+
+						{
+							"id": "Eyes Squint",
+							"max": 0.15
+						},
+					]
+				},
+			]
+	},
 
 
 		{

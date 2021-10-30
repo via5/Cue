@@ -78,5 +78,13 @@ namespace Cue
 			b = o[key].AsBool;
 			return true;
 		}
+
+		public static bool OptBool(JSONClass o, string key, bool def)
+		{
+			if (!o.HasKey(key))
+				return def;
+
+			return o[key].AsBool;
+		}
 	}
 }

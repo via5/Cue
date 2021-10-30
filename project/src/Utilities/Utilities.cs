@@ -220,9 +220,9 @@ namespace Cue
 			list.Sort(new NaturalStringComparer());
 		}
 
-		public static void NatSort<T>(List<T> list)
+		public static void NatSort<T>(List<T> list, Func<T, string> stringify = null)
 		{
-			list.Sort(new GenericNaturalStringComparer<T>());
+			list.Sort(new GenericNaturalStringComparer<T>(stringify));
 		}
 
 		public static string BearingToString(float b)
@@ -310,10 +310,27 @@ namespace Cue
 		private static readonly Regex _re =
 			new Regex(@"(?<=\D)(?=\d)|(?<=\d)(?=\D)", RegexOptions.Compiled);
 
+		private Func<T, string> stringify_;
+
+		public GenericNaturalStringComparer(Func<T, string> stringify = null)
+		{
+			stringify_ = stringify;
+		}
+
 		public int Compare(T xt, T yt)
 		{
-			string x = xt.ToString();
-			string y = yt.ToString();
+			string x, y;
+
+			if (stringify_ == null)
+			{
+				x = xt.ToString();
+				y = yt.ToString();
+			}
+			else
+			{
+				x = stringify_(xt);
+				y = stringify_(yt);
+			}
 
 			x = x.ToLower();
 			y = y.ToLower();
