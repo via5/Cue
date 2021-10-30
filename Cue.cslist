@@ -28,6 +28,7 @@ project\src\Object\Animator.cs
 project\src\Object\Object.cs
 project\src\Object\Slots.cs
 project\src\Person\Excitement.cs
+project\src\Person\Expression.cs
 project\src\Person\Mood.cs
 project\src\Person\Person.cs
 project\src\Person\Personality.cs
@@ -46,7 +47,6 @@ project\src\Procedural\Animation.cs
 project\src\Procedural\BuiltinAnimations.cs
 project\src\Procedural\BuiltinExpressions.cs
 project\src\Procedural\Controller.cs
-project\src\Procedural\Expression.cs
 project\src\Procedural\Force.cs
 project\src\Procedural\Group.cs
 project\src\Procedural\Morph.cs
@@ -54,7 +54,6 @@ project\src\Procedural\MorphGroup.cs
 project\src\Procedural\Player.cs
 project\src\Procedural\Sync.cs
 project\src\Procedural\BuiltinAnimations\Finger.cs
-project\src\Procedural\BuiltinAnimations\Mood.cs
 project\src\Procedural\BuiltinAnimations\Penetrated.cs
 project\src\Procedural\BuiltinAnimations\Sex.cs
 project\src\Procedural\BuiltinAnimations\Smoke.cs

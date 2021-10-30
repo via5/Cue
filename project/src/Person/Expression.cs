@@ -1,7 +1,193 @@
 ﻿using System;
 
-namespace Cue.Proc
+namespace Cue
 {
+	class Expressions
+	{
+		public const int Happy = 0x01;
+		public const int Excited = 0x02;
+		public const int Angry = 0x04;
+		public const int Tired = 0x08;
+
+		public static string ToString(int i)
+		{
+			string s = "";
+
+			if (Bits.IsSet(i, Happy))
+			{
+				if (s != "") s += "|";
+				s += "happy";
+			}
+
+			if (Bits.IsSet(i, Excited))
+			{
+				if (s != "") s += "|";
+				s += "excited";
+			}
+
+			if (Bits.IsSet(i, Angry))
+			{
+				if (s != "") s += "|";
+				s += "angry";
+			}
+
+			if (Bits.IsSet(i, Tired))
+			{
+				if (s != "") s += "|";
+				s += "tired";
+			}
+
+			return s;
+		}
+	}
+
+
+	class Expression
+	{
+		struct TargetInfo
+		{
+			public float value;
+			public float time;
+			public float start;
+			public float elapsed;
+			public bool valid;
+			public bool auto;
+
+			public override string ToString()
+			{
+				if (!valid)
+					return "-";
+
+				return $"{value:0.00}";
+			}
+		}
+
+		struct AutoInfo
+		{
+			public float range;
+			public float minTime;
+			public float maxTime;
+
+			public AutoInfo(float range, float minTime, float maxTime)
+			{
+				this.range = range;
+				this.minTime = minTime;
+				this.maxTime = maxTime;
+			}
+		}
+
+
+		private string name_;
+		private int type_;
+		private MorphGroup g_;
+		private TargetInfo target_;
+		private IEasing easing_ = new SinusoidalEasing();
+		private float value_ = 0;
+		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
+
+		public Expression(string name, int type, MorphGroup g)
+		{
+			name_ = name;
+			type_ = type;
+			g_ = g;
+			target_.valid = false;
+		}
+
+		public override string ToString()
+		{
+			return
+				$"{name_} {Expressions.ToString(type_)} " +
+				$"{g_.Value:0.00}=>{target_:0.00} " +
+				$"{target_.elapsed:0.00}/{target_.time:0.00}";
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public float Target
+		{
+			get { return target_.value; }
+		}
+
+		public void SetAuto(float range, float minTime, float maxTime)
+		{
+			auto_.range = range;
+			auto_.minTime = minTime;
+			auto_.maxTime = maxTime;
+		}
+
+		public bool Finished
+		{
+			get { return (!target_.valid || target_.auto || target_.elapsed >= target_.time); }
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
+		public bool IsType(int t)
+		{
+			return Bits.IsSet(type_, t);
+		}
+
+		public void SetTarget(float t, float time)
+		{
+			target_.start = g_.Value;
+			target_.value = t;
+			target_.time = time;
+			target_.elapsed = 0;
+			target_.valid = true;
+			target_.auto = false;
+		}
+
+		public void Reset()
+		{
+			g_.Reset();
+		}
+
+		public void FixedUpdate(float s)
+		{
+			if (target_.valid)
+			{
+				target_.elapsed += s;
+
+				float p = U.Clamp(target_.elapsed / target_.time, 0, 1);
+				float t = easing_.Magnitude(p);
+				float v = U.Lerp(target_.start, target_.value, t);
+
+				g_.Value = v;
+
+				if (!target_.auto)
+					value_ = v;
+
+				if (p >= 1)
+					NextAuto();
+			}
+			else
+			{
+				NextAuto();
+			}
+		}
+
+		private void NextAuto()
+		{
+			if (auto_.range <= 0)
+				return;
+
+			float v = U.RandomFloat(value_ - auto_.range, value_ + auto_.range);
+			v = U.Clamp(v, 0, 1);
+
+			float t = U.RandomFloat(auto_.minTime, auto_.maxTime);
+
+			SetTarget(v, t);
+			target_.auto = true;
+		}
+	}
+
+
 	class WeightedExpression
 	{
 		private float FastTimeMin = 0.4f;
@@ -165,59 +351,24 @@ namespace Cue.Proc
 	}
 
 
-	class MoodProcAnimation : BasicProcAnimation
+	class ExpressionManager
 	{
 		private const int MaxActive = 4;
 		private const float MoreCheckInterval = 1;
 
+		private Person person_;
 		private WeightedExpression[] exps_ = new WeightedExpression[0];
 		private bool needsMore_ = false;
 		private float moreElapsed_ = 0;
 
-		public MoodProcAnimation()
-			: base("procMood", false)
+		public ExpressionManager(Person p)
 		{
+			person_ = p;
 		}
 
-		public override string[] Debug()
+		public void Init()
 		{
-			var s = new string[MaxActive + 1 + exps_.Length + 2];
-
-			int i = 0;
-
-			for (int j = 0; j < exps_.Length; ++j)
-			{
-				if (exps_[j].Active)
-					s[i++] = $"{exps_[j].ToDetailedString()}";
-			}
-
-			while (i < MaxActive)
-				s[i++] = "none";
-
-			s[i++] = "";
-
-			for (int j=0; j< exps_.Length;++j)
-				s[i++] = $"{exps_[j]}";
-
-			s[i++] = "";
-			s[i++] = (needsMore_ ? "needs more" : "");
-
-			return s;
-		}
-
-		public override BasicProcAnimation Clone()
-		{
-			var a = new MoodProcAnimation();
-			a.CopyFrom(this);
-			return a;
-		}
-
-		public override bool Start(Person p, AnimationContext cx)
-		{
-			if (!base.Start(p, cx))
-				return false;
-
-			var all = BuiltinExpressions.All(p);
+			var all = Proc.BuiltinExpressions.All(person_);
 			exps_ = new WeightedExpression[all.Length];
 
 			for (int i = 0; i < all.Length; ++i)
@@ -225,11 +376,9 @@ namespace Cue.Proc
 
 			for (int i = 0; i < MaxActive; ++i)
 				NextActive();
-
-			return true;
 		}
 
-		public override void FixedUpdate(float s)
+		public void FixedUpdate(float s)
 		{
 			int finished = 0;
 			int activeCount = 0;
@@ -368,12 +517,39 @@ namespace Cue.Proc
 			}
 		}
 
-		public override void Reset()
+		public void OnPluginState(bool b)
 		{
-			base.Reset();
-
-			for (int i = 0; i < exps_.Length; ++i)
-				exps_[i].Reset();
+			if (!b)
+			{
+				for (int i = 0; i < exps_.Length; ++i)
+					exps_[i].Reset();
+			}
 		}
+
+		//public override string[] Debug()
+		//{
+		//	var s = new string[MaxActive + 1 + exps_.Length + 2];
+		//
+		//	int i = 0;
+		//
+		//	for (int j = 0; j < exps_.Length; ++j)
+		//	{
+		//		if (exps_[j].Active)
+		//			s[i++] = $"{exps_[j].ToDetailedString()}";
+		//	}
+		//
+		//	while (i < MaxActive)
+		//		s[i++] = "none";
+		//
+		//	s[i++] = "";
+		//
+		//	for (int j = 0; j < exps_.Length; ++j)
+		//		s[i++] = $"{exps_[j]}";
+		//
+		//	s[i++] = "";
+		//	s[i++] = (needsMore_ ? "needs more" : "");
+		//
+		//	return s;
+		//}
 	}
 }

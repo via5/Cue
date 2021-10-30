@@ -8,7 +8,6 @@ namespace Cue.Proc
 		{
 			var list = new List<Animation>();
 
-			list.Add(Mood());
 			list.Add(Sex());
 			list.Add(Smoke());
 			list.Add(Suck());
@@ -17,12 +16,6 @@ namespace Cue.Proc
 			list.Add(RightFinger());
 
 			return list;
-		}
-
-		private static Animation Mood()
-		{
-			var a = new MoodProcAnimation();
-			return new Animation(Animations.Expressions, MovementStyles.Any, a);
 		}
 
 		private static Animation Sex()

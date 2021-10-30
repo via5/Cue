@@ -33,6 +33,7 @@ namespace Cue
 		private Mood mood_;
 		private IAI ai_ = null;
 		private Personality personality_;
+		private ExpressionManager expression_;
 
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
@@ -58,6 +59,7 @@ namespace Cue
 			ai_ = new PersonAI(this);
 
 			Personality = Resources.Personalities.Clone(Resources.DefaultPersonality, this);
+			expression_ = new ExpressionManager(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -79,6 +81,7 @@ namespace Cue
 				AI.EventsEnabled = false;
 
 			ai_.Init();
+			expression_.Init();
 
 			Atom.Init();
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
@@ -187,6 +190,7 @@ namespace Cue
 			body_.ResetMorphLimits();
 			animator_.FixedUpdate(s);
 			ai_.FixedUpdate(s);
+			expression_.FixedUpdate(s);
 		}
 
 		private void UpdateGaze(float s)
@@ -270,6 +274,7 @@ namespace Cue
 			Blowjob.OnPluginState(b);
 
 			ai_.OnPluginState(b);
+			expression_.OnPluginState(b);
 		}
 
 		public virtual void Say(string s)

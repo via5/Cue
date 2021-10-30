@@ -141,6 +141,7 @@
     <Compile Include="src\Person\Body\Hand.cs" />
     <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement.cs" />
+    <Compile Include="src\Person\Expression.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
@@ -152,7 +153,6 @@
     <Compile Include="src\Person\Physiology.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Mood.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Finger.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Penetrated.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Sex.cs" />
@@ -160,7 +160,6 @@
     <Compile Include="src\Procedural\BuiltinAnimations\Suck.cs" />
     <Compile Include="src\Procedural\BuiltinExpressions.cs" />
     <Compile Include="src\Procedural\Controller.cs" />
-    <Compile Include="src\Procedural\Expression.cs" />
     <Compile Include="src\Procedural\Force.cs" />
     <Compile Include="src\Procedural\Group.cs" />
     <Compile Include="src\Procedural\Morph.cs" />

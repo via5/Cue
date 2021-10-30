@@ -33,7 +33,6 @@ namespace Cue
 		public void Init()
 		{
 			person_.Animator.PlayType(Animations.Idle);
-			person_.Animator.PlayType(Animations.Expressions);
 		}
 
 		public bool EventsEnabled

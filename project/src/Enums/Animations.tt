@@ -5,7 +5,6 @@ var vars = new V[]
 V.Value("None", -1),
 V.Value("Sex"),
 V.Value("Idle"),
-V.Value("Expressions"),
 V.Value("Orgasm"),
 V.Value("Smoke"),
 V.Value("Suck"),
