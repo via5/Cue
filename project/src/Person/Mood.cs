@@ -198,15 +198,51 @@ namespace Cue
 
 			UpdateTiredness(s);
 			UpdateExcitement(s);
+
+			// this needs to be after tiredness and excitement, it depends on it
 			UpdateMoods();
 		}
 
 		private void UpdateMoods()
 		{
-			moods_[Moods.Happy].Value = 1;
-			moods_[Moods.Excited].Value = excitementEasing_.Magnitude(flatExcitement_);
-			moods_[Moods.Angry].Value = 0;
-			moods_[Moods.Tired].Value = tiredness_.Value;
+			var ps = person_.Personality;
+			var anger = ps.Get(PSE.AngerWhenPlayerInteracts);
+
+			if (anger > 0 && person_.Body.InteractingWith(Cue.Instance.Player))
+			{
+				var ex = Get(Moods.Excited);
+				var happyMaxEx = ps.Get(PSE.AngerMaxExcitementForHappiness);
+				var angerMaxEx = ps.Get(PSE.AngerMaxExcitementForAnger);
+
+				if (ex < angerMaxEx)
+				{
+					moods_[Moods.Angry].Value = anger;
+				}
+				else
+				{
+					var exInRange = (ex - angerMaxEx) / angerMaxEx;
+					var v = anger - (exInRange * ps.Get(PSE.AngerExcitementFactorForAnger));
+
+					moods_[Moods.Angry].Value = U.Clamp(v, 0, 1);
+				}
+
+				if (ex < happyMaxEx)
+				{
+					moods_[Moods.Happy].Value = 0;
+				}
+				else
+				{
+					var exInRange = (ex - happyMaxEx) / happyMaxEx;
+					var v = (exInRange * ps.Get(PSE.AngerExcitementFactorForHappiness));
+
+					moods_[Moods.Happy].Value = U.Clamp(v, 0, 1);
+				}
+			}
+			else
+			{
+				moods_[Moods.Happy].Value = 1;
+				moods_[Moods.Angry].Value = 0;
+			}
 		}
 
 		private void UpdateTiredness(float s)
@@ -234,6 +270,7 @@ namespace Cue
 			}
 
 			tiredness_.Update(s);
+			moods_[Moods.Tired].Value = tiredness_.Value;
 		}
 
 		private void UpdateExcitement(float s)
@@ -262,6 +299,8 @@ namespace Cue
 					flatExcitement_ + rate * s,
 					0, ex.Max);
 			}
+
+			moods_[Moods.Excited].Value = excitementEasing_.Magnitude(flatExcitement_);
 		}
 
 		private float GetRate()

@@ -266,6 +266,12 @@
 			"movementTirednessFactor": 0,
 			"expressionExcitementFactor": 1,
 			"expressionTirednessFactor": 1,
+
+			"angerWhenPlayerInteracts": 0,
+			"angerMaxExcitementForAnger": 0,
+			"angerMaxExcitementForHappiness": 0,
+			"angerExcitementFactorForAnger": 0,
+			"angerExcitementFactorForHappiness": 0
 		},
 
 		{
@@ -318,7 +324,7 @@
 					]
 				},
 			]
-	},
+		},
 
 
 		{
@@ -328,7 +334,13 @@
 			"avoidGazeInsidePersonalSpace": true,
 			"avoidGazeDuringSex": true,
 			"maxExcitementForAvoid": 0.6,
-			"avoidDelayAfterOrgasm": 15
+			"avoidDelayAfterOrgasm": 15,
+
+			"angerWhenPlayerInteracts": 0.8,
+			"angerMaxExcitementForAnger": 0.5,
+			"angerExcitementFactorForAnger": 2,
+			"angerMaxExcitementForHappiness": 0.5,
+			"angerExcitementFactorForHappiness": 1
 		},
 
 		{

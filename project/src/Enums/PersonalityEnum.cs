@@ -73,9 +73,14 @@ namespace Cue
 		public const int GazeTirednessFactor = 48;
 		public const int MovementEnergyTirednessFactor = 49;
 		public const int ExpressionTirednessFactor = 50;
+		public const int AngerWhenPlayerInteracts = 51;
+		public const int AngerMaxExcitementForAnger = 52;
+		public const int AngerMaxExcitementForHappiness = 53;
+		public const int AngerExcitementFactorForAnger = 54;
+		public const int AngerExcitementFactorForHappiness = 55;
 
-		public const int FloatCount = 51;
-		public int GetFloatCount() { return 51; }
+		public const int FloatCount = 56;
+		public int GetFloatCount() { return 56; }
 
 		// strings
 
@@ -245,6 +250,11 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"angerWhenPlayerInteracts",
+			"angerMaxExcitementForAnger",
+			"angerMaxExcitementForHappiness",
+			"angerExcitementFactorForAnger",
+			"angerExcitementFactorForHappiness",
 		};
 
 		public static int FloatFromString(string s)
@@ -405,6 +415,11 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"angerWhenPlayerInteracts",
+			"angerMaxExcitementForAnger",
+			"angerMaxExcitementForHappiness",
+			"angerExcitementFactorForAnger",
+			"angerExcitementFactorForHappiness",
 		};
 
 		public static string[] AllNames

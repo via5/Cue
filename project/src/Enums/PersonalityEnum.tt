@@ -280,6 +280,49 @@ V.Float("MovementEnergyTirednessFactor"),
 V.Float("ExpressionTirednessFactor"),
 
 
+// Anger
+// =====
+// Controls the anger mood, which is normally always at 0
+
+// anger value when the player is interacting with this character; as soon as
+// interaction starts, anger is set to this value and hapiness to 0
+//
+// if this is 0, none of the stuff below applies
+V.Float("AngerWhenPlayerInteracts"),
+
+// excitement value above which this character starts being less angry; while
+// excitement is below this, anger is always at AngerWhenPlayerInteracts
+V.Float("AngerMaxExcitementForAnger"),
+
+// excitement value above which this character starts getting happier; while
+// excitement is below this, happiness is always at 0
+V.Float("AngerMaxExcitementForHappiness"),
+
+// impact of excitement on anger above AngerMaxExcitementForAnger
+//
+// anger is always at max when excitement is below AngerMaxExcitementForAnger,
+// this determines how fast anger drops as excitement keeps rising
+//
+// for example:
+// - a value of 1.0 would make anger drop to zero when excitement is at max
+// - a value of 2.0 would make anger drop to zero when excitement is halfway
+//   between AngerMaxExcitementForAnger and max
+V.Float("AngerExcitementFactorForAnger"),
+
+// impact of excitement on happiness above AngerMaxExcitementForHappiness
+//
+// happiness is always at zero when excitement is below
+// AngerMaxExcitementForHappiness, this determines how fast happiness rises with
+// excitement
+//
+// for example:
+// - a value of 1.0 would set happiness to max when excitement is at max
+// - a value of 2.0 would set happiness to max when excitement is halfway
+//   between AngerMaxExcitementForHappiness and max
+V.Float("AngerExcitementFactorForHappiness"),
+
+
+
 // Voices
 // ======
 // Controls datasets and pitches depending on intensities; only applies to

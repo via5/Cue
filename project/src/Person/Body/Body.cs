@@ -203,6 +203,25 @@ namespace Cue
 			return false;
 		}
 
+		public bool InteractingWith(Person other)
+		{
+			if (InsidePersonalSpace(other) || PenetratedBy(other) || GropedBy(other))
+				return true;
+
+			// special case for unpossessed, because it's just the camera and
+			// the mouse pointer grab is not handled
+			if (!other.Body.Exists && other.IsPlayer)
+			{
+				for (int i = 0; i < all_.Length; ++i)
+				{
+					if (all_[i].GrabbedByPlayer)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		public bool Groped()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
@@ -251,6 +270,11 @@ namespace Cue
 			}
 
 			return PartResult.None;
+		}
+
+		public PartResult GropedBy(Person p)
+		{
+			return GropedBy(p, BodyParts.GropedParts);
 		}
 
 		public PartResult GropedBy(Person p, int triggerBodyPart)
