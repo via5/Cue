@@ -273,15 +273,6 @@ V.Float("GazeTirednessFactor"),
 // movement energy is `excitement - (tiredness * this)`, clamped [0, 1]
 V.Float("MovementEnergyTirednessFactor"),
 
-// impact of tiredness on movement; unused for now
-V.Float("MovementTirednessFactor"),
-
-// impact of excitement on expressions; affects range of morph values and rate
-// of change
-//
-// expression excitement is `excitement * this`, clamped [0, 1]
-V.Float("ExpressionExcitementFactor"),
-
 // impact of tiredness on expressions; affects range of morph values and rate
 // of change for tired expressions, and dampens the other expressions
 //

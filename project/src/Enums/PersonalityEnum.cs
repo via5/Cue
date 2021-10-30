@@ -70,12 +70,10 @@ namespace Cue
 		public const int GazeEnergyTirednessFactor = 47;
 		public const int GazeTirednessFactor = 48;
 		public const int MovementEnergyTirednessFactor = 49;
-		public const int MovementTirednessFactor = 50;
-		public const int ExpressionExcitementFactor = 51;
-		public const int ExpressionTirednessFactor = 52;
+		public const int ExpressionTirednessFactor = 50;
 
-		public const int FloatCount = 53;
-		public int GetFloatCount() { return 53; }
+		public const int FloatCount = 51;
+		public int GetFloatCount() { return 51; }
 
 		// strings
 
@@ -206,8 +204,6 @@ namespace Cue
 			"gazeEnergyTirednessFactor",
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
-			"movementTirednessFactor",
-			"expressionExcitementFactor",
 			"expressionTirednessFactor",
 		};
 
@@ -330,8 +326,6 @@ namespace Cue
 			"gazeEnergyTirednessFactor",
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
-			"movementTirednessFactor",
-			"expressionExcitementFactor",
 			"expressionTirednessFactor",
 		};
 

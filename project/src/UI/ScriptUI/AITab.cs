@@ -116,18 +116,19 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
-			AddForceable(p, person_.Mood.FlatExcitementValue, "Excitement");
-			AddForceable(p, person_.Mood.TirednessValue, "Tiredness");
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
 
-			p.Add(new VUI.Label("Rate"));
-			p.Add(rate_);
+
+			p.Add(new VUI.Label("Moods", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
-			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
+			for (int i=0; i<Moods.Count; ++i)
+				AddForceable(p, person_.Mood.GetValue(i), $"    {Moods.ToString(i)}");
 
 
 
@@ -160,6 +161,16 @@ namespace Cue
 
 			p.Add(new VUI.Label("Total rate"));
 			p.Add(total_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Rate"));
+			p.Add(rate_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
+			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 

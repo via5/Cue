@@ -198,17 +198,16 @@ namespace Cue
 			public void Update(float s)
 			{
 				value_.Text = $"{f_}";
-				if (!isForced_.Checked)
+
+				try
 				{
-					try
-					{
-						ignore_ = true;
-						forced_.Value = f_.Value;
-					}
-					finally
-					{
-						ignore_ = false;
-					}
+					ignore_ = true;
+					isForced_.Checked = f_.IsForced;
+					forced_.Value = f_.Value;
+				}
+				finally
+				{
+					ignore_ = false;
 				}
 			}
 

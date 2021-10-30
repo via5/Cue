@@ -11,6 +11,7 @@ project\src\AI\Events\Smoke.cs
 project\src\Enums\Animations.cs
 project\src\Enums\BodyPartsEnum.cs
 project\src\Enums\EnumValues.cs
+project\src\Enums\Moods.cs
 project\src\Enums\PersonalityEnum.cs
 project\src\Enums\PhysiologyEnum.cs
 project\src\Integration\BVH.cs

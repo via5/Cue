@@ -466,6 +466,7 @@ namespace VUI
 
 			text_.Edited += OnTextChanged;
 			slider_.ValueChanged += OnValueChanged;
+			slider_.Created += UpdateText;
 
 			if (valueChanged != null)
 				ValueChanged += valueChanged;

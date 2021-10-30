@@ -15,16 +15,21 @@ namespace Cue
 		private float elapsed_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 
-		private ForceableFloat flatExcitement_ = new ForceableFloat();
+		private float flatExcitement_ = 0;
 		private IEasing excitementEasing_ = new SineOutEasing();
 
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 
+		private ForceableFloat[] moods_ = new ForceableFloat[Moods.Count];
+
 
 		public Mood(Person p)
 		{
 			person_ = p;
+
+			for (int i = 0; i < moods_.Length; ++i)
+				moods_[i] = new ForceableFloat();
 		}
 
 		public int State
@@ -74,20 +79,16 @@ namespace Cue
 			get { return timeSinceLastOrgasm_; }
 		}
 
-		public float Excitement
+		public float Get(int i)
 		{
-			get { return excitementEasing_.Magnitude(flatExcitement_.Value); }
+			return moods_[i].Value;
 		}
 
-		public ForceableFloat FlatExcitementValue
+		public ForceableFloat GetValue(int i)
 		{
-			get { return flatExcitement_; }
+			return moods_[i];
 		}
 
-		public float Tiredness
-		{
-			get { return tiredness_.Value; }
-		}
 
 		public DampedFloat TirednessValue
 		{
@@ -109,7 +110,7 @@ namespace Cue
 			get
 			{
 				var tf = person_.Personality.Get(PSE.GazeEnergyTirednessFactor);
-				return U.Clamp(Excitement - (Tiredness * tf), 0, 1);
+				return U.Clamp(Get(Moods.Excited) - (Get(Moods.Tired) * tf), 0, 1);
 			}
 		}
 
@@ -118,7 +119,7 @@ namespace Cue
 			get
 			{
 				var tf = person_.Personality.Get(PSE.GazeTirednessFactor);
-				return U.Clamp(Tiredness * tf, 0, 1);
+				return U.Clamp(Get(Moods.Tired) * tf, 0, 1);
 			}
 		}
 
@@ -127,34 +128,7 @@ namespace Cue
 			get
 			{
 				var tf = person_.Personality.Get(PSE.MovementEnergyTirednessFactor);
-				return U.Clamp(Excitement - (Tiredness * tf), 0, 1);
-			}
-		}
-
-		public float MovementTiredness
-		{
-			get
-			{
-				var tf = person_.Personality.Get(PSE.MovementTirednessFactor);
-				return U.Clamp(Tiredness * tf, 0, 1);
-			}
-		}
-
-		public float ExpressionExcitement
-		{
-			get
-			{
-				var tf = person_.Personality.Get(PSE.ExpressionExcitementFactor);
-				return U.Clamp(Excitement * tf, 0, 1);
-			}
-		}
-
-		public float ExpressionTiredness
-		{
-			get
-			{
-				var tf = person_.Personality.Get(PSE.ExpressionTirednessFactor);
-				return U.Clamp(Tiredness * tf, 0, 1);
+				return U.Clamp(Get(Moods.Excited) - (Get(Moods.Tired) * tf), 0, 1);
 			}
 		}
 
@@ -162,7 +136,7 @@ namespace Cue
 		{
 			get
 			{
-				return (Excitement <= person_.Personality.Get(PSE.IdleMaxExcitement));
+				return (Get(Moods.Excited) <= person_.Personality.Get(PSE.IdleMaxExcitement));
 			}
 		}
 
@@ -182,7 +156,7 @@ namespace Cue
 				{
 					timeSinceLastOrgasm_ += s;
 
-					if (!flatExcitement_.IsForced && flatExcitement_.Value >= 1)
+					if (!moods_[Moods.Excited].IsForced && moods_[Moods.Excited].Value >= 1)
 						DoOrgasm();
 
 					break;
@@ -215,7 +189,7 @@ namespace Cue
 					if (elapsed_ > pp.Get(PE.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						flatExcitement_.Value = pp.Get(PE.ExcitementPostOrgasm);
+						flatExcitement_ = pp.Get(PE.ExcitementPostOrgasm);
 					}
 
 					break;
@@ -224,6 +198,15 @@ namespace Cue
 
 			UpdateTiredness(s);
 			UpdateExcitement(s);
+			UpdateMoods();
+		}
+
+		private void UpdateMoods()
+		{
+			moods_[Moods.Happy].Value = 1;
+			moods_[Moods.Excited].Value = excitementEasing_.Magnitude(flatExcitement_);
+			moods_[Moods.Angry].Value = 0;
+			moods_[Moods.Tired].Value = tiredness_.Value;
 		}
 
 		private void UpdateTiredness(float s)
@@ -234,7 +217,7 @@ namespace Cue
 			{
 				if (timeSinceLastOrgasm_ > pp.Get(PE.DelayAfterOrgasmUntilTirednessDecay))
 				{
-					if (Excitement < pp.Get(PE.TirednessMaxExcitementForBaseDecay))
+					if (Get(Moods.Excited) < pp.Get(PE.TirednessMaxExcitementForBaseDecay))
 					{
 						baseTiredness_ = U.Clamp(
 							baseTiredness_ - s * pp.Get(PE.TirednessBaseDecayRate),
@@ -259,24 +242,24 @@ namespace Cue
 			var ps = person_.Personality;
 			var ex = person_.Excitement;
 
-			if (flatExcitement_.Value > ex.Max)
+			if (flatExcitement_ > ex.Max)
 			{
-				flatExcitement_.Value = Math.Max(
-					flatExcitement_.Value + pp.Get(PE.ExcitementDecayRate) * s,
+				flatExcitement_ = Math.Max(
+					flatExcitement_ + pp.Get(PE.ExcitementDecayRate) * s,
 					ex.Max);
 			}
 			else
 			{
 				var rate = ex.TotalRate;
 				var tirednessFactor =
-					Tiredness * ps.Get(PSE.TirednessExcitementRateFactor);
+					Get(Moods.Tired) * ps.Get(PSE.TirednessExcitementRateFactor);
 
 				rate = rate - (rate * tirednessFactor);
 
 				rate *= pp.Get(PE.RateAdjustment);
 
-				flatExcitement_.Value = U.Clamp(
-					flatExcitement_.Value + rate * s,
+				flatExcitement_ = U.Clamp(
+					flatExcitement_ + rate * s,
 					0, ex.Max);
 			}
 		}
@@ -289,7 +272,7 @@ namespace Cue
 			var rate = ex.TotalRate;
 
 			var tirednessFactor =
-				Tiredness * ps.Get(PSE.TirednessExcitementRateFactor);
+				Get(Moods.Tired) * ps.Get(PSE.TirednessExcitementRateFactor);
 
 			return rate - (rate * tirednessFactor);
 		}
@@ -302,7 +285,7 @@ namespace Cue
 			person_.Animator.StopType(Animations.Sex);
 			person_.Animator.PlayType(Animations.Orgasm);
 
-			flatExcitement_.Value = 1;
+			flatExcitement_ = 1;
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
 		}

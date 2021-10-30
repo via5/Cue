@@ -89,7 +89,7 @@ namespace Cue
 			}
 			else
 			{
-				if (person_.Mood.Excitement >= ps.Get(PSE.LookAboveMinExcitement))
+				if (person_.Mood.Get(Moods.Excited) >= ps.Get(PSE.LookAboveMinExcitement))
 				{
 					if (person_.Excitement.PhysicalRate >= ps.Get(PSE.LookAboveMinPhysicalRate))
 					{

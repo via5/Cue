@@ -456,11 +456,11 @@ namespace Cue
 		{
 			var pp = person_.Physiology;
 
-			temperature_.UpRate = person_.Mood.Excitement * pp.Get(PE.TemperatureExcitementRate);
+			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * pp.Get(PE.TemperatureExcitementRate);
 			temperature_.DownRate = pp.Get(PE.TemperatureDecayRate);
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.Excitement / pp.Get(PE.TemperatureExcitementMax),
+				person_.Mood.Get(Moods.Excited) / pp.Get(PE.TemperatureExcitementMax),
 				0, 1);
 
 			temperature_.Update(s);

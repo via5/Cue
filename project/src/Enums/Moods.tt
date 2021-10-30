@@ -1,0 +1,12 @@
+﻿<#@ include file="Enums.tt" #><#
+var vars = new V[]
+{
+
+V.Value("Happy"),
+V.Value("Excited"),
+V.Value("Angry"),
+V.Value("Tired"),
+
+};
+
+#><#= Generate(vars, "Moods", "Moods", false) #>

@@ -176,10 +176,10 @@ namespace Cue
 				if (p != null)
 				{
 					if (forceExcitement_ != null)
-						forceExcitement_.Checked = p.Mood.FlatExcitementValue.IsForced;
+						forceExcitement_.Checked = p.Mood.GetValue(Moods.Excited).IsForced;
 
 					if (excitement_ != null)
-						excitement_.Value = p.Mood.FlatExcitementValue.Value;
+						excitement_.Value = p.Mood.GetValue(Moods.Excited).Value;
 				}
 			}
 			finally
@@ -210,9 +210,9 @@ namespace Cue
 			if (p != null)
 			{
 				if (b)
-					p.Mood.FlatExcitementValue.SetForced(excitement_.Value);
+					p.Mood.GetValue(Moods.Excited).SetForced(excitement_.Value);
 				else
-					p.Mood.FlatExcitementValue.UnsetForced();
+					p.Mood.GetValue(Moods.Excited).UnsetForced();
 			}
 		}
 
@@ -223,10 +223,10 @@ namespace Cue
 			var p = Selected as Person;
 			if (p != null)
 			{
-				if (p.Mood.FlatExcitementValue.IsForced)
-					p.Mood.FlatExcitementValue.SetForced(f);
+				if (p.Mood.GetValue(Moods.Excited).IsForced)
+					p.Mood.GetValue(Moods.Excited).SetForced(f);
 				else
-					p.Mood.FlatExcitementValue.Value = f;
+					p.Mood.GetValue(Moods.Excited).Value = f;
 			}
 		}
 	}

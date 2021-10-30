@@ -17,9 +17,9 @@
 				//EyesRollBack(p),
 				EyesClosed(p),
 
-				//Frown(p),
-				//Squint(p),
-				//MouthFrown(p),
+				Frown(p),
+				Squint(p),
+				MouthFrown(p),
 
 				Drooling(p),
 			};
@@ -28,7 +28,7 @@
 		public static Expression Smile(Person p)
 		{
 			return new Expression("smile",
-				Expressions.Happy,
+				Moods.Happy,
 				new MorphGroup(
 					p, "smile", BP.Mouth, new MorphGroup.MorphInfo[]
 					{
@@ -39,7 +39,7 @@
 		public static Expression CornerSmile(Person p)
 		{
 			return new Expression("cornerSmile",
-				Expressions.Happy,
+				Moods.Happy,
 				new MorphGroup(
 					p, "cornerSmile", BP.Mouth, new MorphGroup.MorphInfo[]
 					{
@@ -52,7 +52,7 @@
 		public static Expression Pleasure(Person p)
 		{
 			return new Expression("pleasure",
-				Expressions.Excited,
+				Moods.Excited,
 				new MorphGroup(
 					p, "pleasure", new int[] { BP.Mouth, BP.Eyes },
 					new MorphGroup.MorphInfo[]
@@ -70,7 +70,7 @@
 		public static Expression Pain(Person p)
 		{
 			return new Expression("pain",
-				Expressions.Excited,
+				Moods.Excited,
 				new MorphGroup(
 					p, "pain", new int[] { BP.Mouth, BP.Eyes },
 					new MorphGroup.MorphInfo[]
@@ -82,7 +82,7 @@
 		public static Expression Shock(Person p)
 		{
 			return new Expression("shock",
-				Expressions.Excited,
+				Moods.Excited,
 				new MorphGroup(
 					p, "shock", BP.Mouth, new MorphGroup.MorphInfo[]
 					{
@@ -93,7 +93,7 @@
 		public static Expression Scream(Person p)
 		{
 			return new Expression("scream",
-				Expressions.Excited,
+				Moods.Excited,
 				new MorphGroup(
 					p, "scream", new int[] { BP.Mouth, BP.Eyes },
 					new MorphGroup.MorphInfo[]
@@ -105,7 +105,7 @@
 		public static Expression Angry(Person p)
 		{
 			return new Expression("angry",
-				Expressions.Excited,
+				new int[] { Moods.Excited, Moods.Angry },
 				new MorphGroup(
 					p, "angry", BP.Mouth, new MorphGroup.MorphInfo[]
 					{
@@ -116,7 +116,7 @@
 		public static Expression EyesClosed(Person p)
 		{
 			return new Expression("eyesClosed",
-				Expressions.Excited | Expressions.Tired,
+				new int[] { Moods.Excited, Moods.Tired },
 				new MorphGroup(
 					p, "eyesClosed", BP.Eyes, new MorphGroup.MorphInfo[]
 					{
@@ -127,11 +127,46 @@
 		public static Expression Drooling(Person p)
 		{
 			return new Expression("drooling",
-				Expressions.Tired,
+				Moods.Tired,
 				new MorphGroup(
-					p, "drooling", BP.Eyes, new MorphGroup.MorphInfo[]
+					p, "drooling", BP.Mouth, new MorphGroup.MorphInfo[]
 					{
 						new MorphGroup.MorphInfo("Mouth Open", 1, BP.None)
+					}));
+		}
+
+		public static Expression Frown(Person p)
+		{
+			return new Expression("frown",
+				Moods.Angry,
+				new MorphGroup(
+					p, "frown", BP.Eyes, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Brow Down", 1, BP.None)
+					}));
+		}
+
+		public static Expression Squint(Person p)
+		{
+			return new Expression("squint",
+				Moods.Angry,
+				new MorphGroup(
+					p, "squint", BP.Eyes, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Eyes Squint", 1, BP.None),
+						new MorphGroup.MorphInfo("Nose Wrinkle", 1, BP.None)
+					}));
+		}
+
+		public static Expression MouthFrown(Person p)
+		{
+			return new Expression("mouthFrown",
+				Moods.Angry,
+				new MorphGroup(
+					p, "mouthFrown", BP.Mouth, new MorphGroup.MorphInfo[]
+					{
+						new MorphGroup.MorphInfo("Mouth Corner Up-Down", -0.5f, BP.None),
+						new MorphGroup.MorphInfo("Lip Top Up", 0.3f, BP.None)
 					}));
 		}
 
@@ -170,29 +205,6 @@
 
 			g.Add(m);
 
-			return g;
-		}
-
-		public static IProceduralMorphGroup Frown(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("frown");
-			g.Add(new MorphTarget(p, BP.None, "Brow Down", 0, 1, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup Squint(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("squint");
-			g.Add(new MorphTarget(p, BP.None, "Eyes Squint", 0, 1, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.None, "Nose Wrinkle", 0, 1, 1, 5, 2, 2));
-			return g;
-		}
-
-		public static IProceduralMorphGroup MouthFrown(Person p)
-		{
-			var g = new ConcurrentProceduralMorphGroup("mouthFrown");
-			g.Add(new MorphTarget(p, BP.None, "Mouth Corner Up-Down", 0, -0.5f, 1, 5, 2, 2));
-			g.Add(new MorphTarget(p, BP.None, "Lip Top Up", 0, 0.3f, 1, 5, 2, 2));
 			return g;
 		}
 		*/

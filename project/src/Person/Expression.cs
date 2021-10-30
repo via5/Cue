@@ -2,46 +2,6 @@
 
 namespace Cue
 {
-	class Expressions
-	{
-		public const int Happy = 0x01;
-		public const int Excited = 0x02;
-		public const int Angry = 0x04;
-		public const int Tired = 0x08;
-
-		public static string ToString(int i)
-		{
-			string s = "";
-
-			if (Bits.IsSet(i, Happy))
-			{
-				if (s != "") s += "|";
-				s += "happy";
-			}
-
-			if (Bits.IsSet(i, Excited))
-			{
-				if (s != "") s += "|";
-				s += "excited";
-			}
-
-			if (Bits.IsSet(i, Angry))
-			{
-				if (s != "") s += "|";
-				s += "angry";
-			}
-
-			if (Bits.IsSet(i, Tired))
-			{
-				if (s != "") s += "|";
-				s += "tired";
-			}
-
-			return s;
-		}
-	}
-
-
 	class Expression
 	{
 		struct TargetInfo
@@ -78,25 +38,32 @@ namespace Cue
 
 
 		private string name_;
-		private int type_;
+		private bool[] moods_ = new bool[Moods.Count];
 		private MorphGroup g_;
 		private TargetInfo target_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
 		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
 
-		public Expression(string name, int type, MorphGroup g)
+		public Expression(string name, int mood, MorphGroup g)
+			: this(name, new int[] { mood }, g)
+		{
+		}
+
+		public Expression(string name, int[] moods, MorphGroup g)
 		{
 			name_ = name;
-			type_ = type;
 			g_ = g;
 			target_.valid = false;
+
+			for (int i = 0; i < moods.Length; ++i)
+				moods_[moods[i]] = true;
 		}
 
 		public override string ToString()
 		{
 			return
-				$"{name_} {Expressions.ToString(type_)} " +
+				$"{name_} {MoodString()} " +
 				$"{g_.Value:0.00}=>{target_:0.00} " +
 				$"{target_.elapsed:0.00}/{target_.time:0.00}";
 		}
@@ -123,14 +90,27 @@ namespace Cue
 			get { return (!target_.valid || target_.auto || target_.elapsed >= target_.time); }
 		}
 
-		public int Type
+		public string MoodString()
 		{
-			get { return type_; }
+			string s = "";
+
+			for (int i = 0; i < moods_.Length; ++i)
+			{
+				if (moods_[i])
+				{
+					if (s != "")
+						s += "|";
+
+					s += Moods.ToString(i);
+				}
+			}
+
+			return s;
 		}
 
 		public bool IsType(int t)
 		{
-			return Bits.IsSet(type_, t);
+			return moods_[t];
 		}
 
 		public void SetTarget(float t, float time)
@@ -213,6 +193,7 @@ namespace Cue
 		public WeightedExpression(Expression e)
 		{
 			e_ = e;
+			Deactivate();
 		}
 
 		public Expression Expression
@@ -261,6 +242,7 @@ namespace Cue
 
 		public void Deactivate()
 		{
+			e_.SetAuto(0, 0, 0);
 			e_.SetTarget(0, RandomResetTime());
 			state_ = InactiveState;
 		}
@@ -321,7 +303,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{e_.Name} ({Expressions.ToString(e_.Type)}) w={weight_:0.00}";
+			return $"{e_.Name} ({e_.MoodString()}) w={weight_:0.00}";
 		}
 
 		private float RandomTarget()
@@ -473,6 +455,14 @@ namespace Cue
 
 		private void UpdateExpressions()
 		{
+			var m = person_.Mood;
+			var ps = person_.Personality;
+
+			float expressionTiredness = U.Clamp(
+				m.Get(Moods.Tired) * ps.Get(PSE.ExpressionTirednessFactor),
+				0, 1);
+
+
 			for (int i = 0; i < exps_.Length; ++i)
 			{
 				var we = exps_[i];
@@ -482,36 +472,37 @@ namespace Cue
 				float intensity = 0;
 
 
-				if (e.IsType(Expressions.Happy))
+				if (e.IsType(Moods.Happy))
 				{
-					weight += 1;
-					intensity = Math.Max(intensity, 1);
+					weight += m.Get(Moods.Happy);
+					intensity = Math.Max(intensity, m.Get(Moods.Happy));
 				}
 
-				if (e.IsType(Expressions.Excited))
+				if (e.IsType(Moods.Excited))
 				{
-					weight += person_.Mood.ExpressionExcitement * 2;
-					intensity = Math.Max(intensity, person_.Mood.ExpressionExcitement);
+					weight += m.Get(Moods.Excited) * 2;
+					intensity = Math.Max(intensity, m.Get(Moods.Excited));
 				}
 
-				if (e.IsType(Expressions.Angry))
+				if (e.IsType(Moods.Angry))
 				{
-					// todo
+					weight += m.Get(Moods.Angry);
+					intensity = Math.Max(intensity, m.Get(Moods.Angry));
 				}
 
-				if (e.IsType(Expressions.Tired))
+				if (e.IsType(Moods.Tired))
 				{
-					weight += person_.Mood.ExpressionTiredness;
-					intensity = Math.Max(intensity, person_.Mood.ExpressionTiredness);
+					weight += expressionTiredness;
+					intensity = Math.Max(intensity, expressionTiredness);
 				}
 
 
-				if (!e.IsType(Expressions.Tired))
+				if (!e.IsType(Moods.Tired))
 				{
-					weight *= Math.Max(1 - person_.Mood.ExpressionTiredness, 0.05f);
+					weight *= Math.Max(1 - expressionTiredness, 0.05f);
 				}
 
-				float speed = 1 - person_.Mood.ExpressionTiredness;
+				float speed = 1 - expressionTiredness;
 
 				we.Set(weight, intensity, speed);
 			}
