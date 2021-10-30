@@ -235,12 +235,12 @@ namespace Cue
 					var exInRange = (ex - happyMaxEx) / happyMaxEx;
 					var v = (exInRange * ps.Get(PSE.AngerExcitementFactorForHappiness));
 
-					moods_[Moods.Happy].Value = U.Clamp(v, 0, 1);
+					moods_[Moods.Happy].Value = U.Clamp(v, 0, ps.Get(PSE.MaxHappiness));
 				}
 			}
 			else
 			{
-				moods_[Moods.Happy].Value = 1;
+				moods_[Moods.Happy].Value = ps.Get(PSE.MaxHappiness);
 				moods_[Moods.Angry].Value = 0;
 			}
 		}

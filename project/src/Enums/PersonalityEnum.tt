@@ -322,6 +322,12 @@ V.Float("AngerExcitementFactorForAnger"),
 V.Float("AngerExcitementFactorForHappiness"),
 
 
+// Mood
+// ====
+
+// happiness will never rise above this value
+V.Float("MaxHappiness"),
+
 
 // Voices
 // ======

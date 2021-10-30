@@ -78,9 +78,10 @@ namespace Cue
 		public const int AngerMaxExcitementForHappiness = 53;
 		public const int AngerExcitementFactorForAnger = 54;
 		public const int AngerExcitementFactorForHappiness = 55;
+		public const int MaxHappiness = 56;
 
-		public const int FloatCount = 56;
-		public int GetFloatCount() { return 56; }
+		public const int FloatCount = 57;
+		public int GetFloatCount() { return 57; }
 
 		// strings
 
@@ -255,6 +256,7 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
+			"maxHappiness",
 		};
 
 		public static int FloatFromString(string s)
@@ -420,6 +422,7 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
+			"maxHappiness",
 		};
 
 		public static string[] AllNames

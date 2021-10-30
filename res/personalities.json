@@ -271,7 +271,8 @@
 			"angerMaxExcitementForAnger": 0,
 			"angerMaxExcitementForHappiness": 0,
 			"angerExcitementFactorForAnger": 0,
-			"angerExcitementFactorForHappiness": 0
+			"angerExcitementFactorForHappiness": 0,
+			"maxHappiness": 1
 		},
 
 		{
@@ -340,12 +341,14 @@
 			"angerMaxExcitementForAnger": 0.5,
 			"angerExcitementFactorForAnger": 2,
 			"angerMaxExcitementForHappiness": 0.5,
-			"angerExcitementFactorForHappiness": 1
+			"angerExcitementFactorForHappiness": 1,
+			"maxHappiness": 0.5
 		},
 
 		{
 			"name": "shy",
 			"inherit": "standard",
+			"maxHappiness": 0.1
 		},
 	]
 }
