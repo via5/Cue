@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -132,7 +133,7 @@ namespace Cue
 			return s;
 		}
 
-		public bool IsType(int t)
+		public bool IsMood(int t)
 		{
 			return moods_[t];
 		}
@@ -367,10 +368,43 @@ namespace Cue
 		private bool needsMore_ = false;
 		private float moreElapsed_ = 0;
 		private Personality lastPersonality_ = null;
+		private bool enabled_ = true;
 
 		public ExpressionManager(Person p)
 		{
 			person_ = p;
+		}
+
+		public Expression[] GetExpressionsForMood(int mood)
+		{
+			var list = new List<Expression>();
+
+			for (int i = 0; i < exps_.Length; ++i)
+			{
+				if (exps_[i].Expression.IsMood(mood))
+					list.Add(exps_[i].Expression);
+			}
+
+			return list.ToArray();
+		}
+
+		public void Enable()
+		{
+			for (int i = 0; i < exps_.Length; ++i)
+				exps_[i].Deactivate();
+
+			enabled_ = true;
+
+			for (int i = 0; i < MaxActive; ++i)
+				NextActive();
+		}
+
+		public void Disable()
+		{
+			for (int i = 0; i < exps_.Length; ++i)
+				exps_[i].Deactivate();
+
+			enabled_ = false;
 		}
 
 		private void Init()
@@ -415,6 +449,9 @@ namespace Cue
 					}
 				}
 			}
+
+			if (!enabled_)
+				return;
 
 			for (int i = 0; i < finished; ++i)
 			{
@@ -505,32 +542,32 @@ namespace Cue
 				float intensity = 0;
 
 
-				if (e.IsType(Moods.Happy))
+				if (e.IsMood(Moods.Happy))
 				{
 					weight += m.Get(Moods.Happy);
 					intensity = Math.Max(intensity, m.Get(Moods.Happy));
 				}
 
-				if (e.IsType(Moods.Excited))
+				if (e.IsMood(Moods.Excited))
 				{
 					weight += m.Get(Moods.Excited) * 2;
 					intensity = Math.Max(intensity, m.Get(Moods.Excited));
 				}
 
-				if (e.IsType(Moods.Angry))
+				if (e.IsMood(Moods.Angry))
 				{
 					weight += m.Get(Moods.Angry);
 					intensity = Math.Max(intensity, m.Get(Moods.Angry));
 				}
 
-				if (e.IsType(Moods.Tired))
+				if (e.IsMood(Moods.Tired))
 				{
 					weight += expressionTiredness;
 					intensity = Math.Max(intensity, expressionTiredness);
 				}
 
 
-				if (!e.IsType(Moods.Tired))
+				if (!e.IsMood(Moods.Tired))
 				{
 					weight *= Math.Max(1 - expressionTiredness, 0.05f);
 				}

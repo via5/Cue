@@ -10,7 +10,6 @@
 			public Pair<float, float> reactionHoldTimeRange;
 			public Pair<float, float> postReactionTimeRange;
 			public Pair<float, float> postReactionHoldTimeRange;
-			public Pair<float, float> resetTimeRange;
 		}
 
 		struct Settings
@@ -21,7 +20,6 @@
 			public float reactionHoldTime;
 			public float postReactionTime;
 			public float postReactionHoldTime;
-			public float resetTime;
 			public Expression[] reaction;
 			public float[] reactionTargets;
 			public Expression[] postReaction;
@@ -33,8 +31,7 @@
 		private const int ReactionHoldState = 2;
 		private const int PostReactionState = 3;
 		private const int PostReactionHoldState = 4;
-		private const int ResetState = 5;
-		private const int DoneState = 6;
+		private const int DoneState = 5;
 
 		private float elapsed_ = 0;
 		private int state_ = NoState;
@@ -68,19 +65,12 @@
 			state_ = ReactionState;
 			person_.Breathing.MouthEnabled = false;
 
-			expressions_ = new Expression[]
-			{
-				//BuiltinExpressions.Smile(p),
-				//BuiltinExpressions.Pleasure(p),
-				//BuiltinExpressions.Pain(p),
-				//BuiltinExpressions.Shock(p),
-				//BuiltinExpressions.Scream(p),
-				//BuiltinExpressions.Angry(p),
-				//BuiltinExpressions.EyesClosed(p),
-			};
+			expressions_ = person_.Expression.GetExpressionsForMood(Moods.Excited);
 
 			config_ = MakeConfig();
 			settings_ = MakeSettings(expressions_, config_);
+
+			person_.Expression.Disable();
 
 			StartLookUp();
 
@@ -100,7 +90,6 @@
 			c.reactionHoldTimeRange = new Pair<float, float>(0.1f, 2);
 			c.postReactionTimeRange = new Pair<float, float>(0.5f, 1.5f);
 			c.postReactionHoldTimeRange = new Pair<float, float>(0, 1);
-			c.resetTimeRange = new Pair<float, float>(0.8f, 1.5f);
 
 			return c;
 		}
@@ -115,7 +104,6 @@
 			s.reactionHoldTime = U.RandomFloat(c.reactionHoldTimeRange);
 			s.postReactionTime = U.RandomFloat(c.postReactionTimeRange);
 			s.postReactionHoldTime = U.RandomFloat(c.postReactionHoldTimeRange);
-			s.resetTime = U.RandomFloat(c.resetTimeRange);
 
 			U.Shuffle(expressions);
 
@@ -191,8 +179,14 @@
 			if (settings_.lookUp)
 			{
 				person_.Gaze.Picker.ForcedTarget = null;
-				person_.Gaze.Gazer.Duration = settings_.resetTime;
+				person_.Gaze.Gazer.Duration = settings_.postReactionTime;
 			}
+		}
+
+		private void Restore()
+		{
+			person_.Breathing.MouthEnabled = true;
+			person_.Expression.Enable();
 		}
 
 		public override void Reset()
@@ -200,6 +194,14 @@
 			base.Reset();
 			elapsed_ = 0;
 			StopLookUp();
+			Restore();
+		}
+
+		private void Finish()
+		{
+			elapsed_ = 0;
+			state_ = DoneState;
+			Restore();
 		}
 
 		private void StartPostReaction()
@@ -211,14 +213,6 @@
 
 			for (int i = 0; i < settings_.postReaction.Length; ++i)
 				settings_.postReaction[i].SetTarget(settings_.postReactionTargets[i], settings_.postReactionTime);
-		}
-
-		private void StartReset()
-		{
-			state_ = ResetState;
-
-			for (int i = 0; i < expressions_.Length; ++i)
-				expressions_[i].SetTarget(0, settings_.resetTime);
 		}
 
 		public override void FixedUpdate(float s)
@@ -250,7 +244,7 @@
 						if (settings_.doPostReaction)
 							StartPostReaction();
 						else
-							StartReset();
+							Finish();
 
 						StopLookUp();
 					}
@@ -274,19 +268,7 @@
 					if (elapsed_ >= settings_.postReactionHoldTime)
 					{
 						elapsed_ = 0;
-						StartReset();
-					}
-
-					break;
-				}
-
-				case ResetState:
-				{
-					if (elapsed_ >= settings_.resetTime)
-					{
-						elapsed_ = 0;
-						state_ = DoneState;
-						person_.Breathing.MouthEnabled = true;
+						Finish();
 					}
 
 					break;
@@ -304,7 +286,6 @@
 				$"reactionHold      {DebugTimes(settings_.reactionHoldTime, config_.reactionTimeRange)}",
 				$"postReaction      {DebugTimes(settings_.postReactionTime, config_.postReactionTimeRange)}",
 				$"postReactionHold  {DebugTimes(settings_.postReactionHoldTime, config_.postReactionHoldTimeRange)}",
-				$"reset             {DebugTimes(settings_.resetTime, config_.resetTimeRange)}",
 				$"reactions         {DebugExpressions(settings_.reaction, settings_.reactionTargets)}",
 				$"postReactions     {DebugExpressions(settings_.postReaction, settings_.postReactionTargets)}"
 			};
