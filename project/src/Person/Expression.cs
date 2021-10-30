@@ -51,13 +51,37 @@ namespace Cue
 		}
 
 		public Expression(string name, int[] moods, MorphGroup g)
+			: this(name)
 		{
-			name_ = name;
 			g_ = g;
-			target_.valid = false;
-
 			for (int i = 0; i < moods.Length; ++i)
 				moods_[moods[i]] = true;
+		}
+
+		private Expression(string name)
+		{
+			name_ = name;
+			target_.valid = false;
+		}
+
+		public Expression Clone()
+		{
+			var e = new Expression(name_);
+			e.CopyFrom(this);
+			return e;
+		}
+
+		private void CopyFrom(Expression e)
+		{
+			moods_ = new bool[e.moods_.Length];
+			e.moods_.CopyTo(moods_, 0);
+			g_ = e.g_.Clone();
+			easing_ = e.easing_.Clone();
+		}
+
+		public void Init(Person p)
+		{
+			g_.Init(p);
 		}
 
 		public override string ToString()
@@ -350,11 +374,14 @@ namespace Cue
 
 		public void Init()
 		{
-			var all = Proc.BuiltinExpressions.All(person_);
+			var all = person_.Personality.GetExpressions();
 			exps_ = new WeightedExpression[all.Length];
 
 			for (int i = 0; i < all.Length; ++i)
+			{
+				all[i].Init(person_);
 				exps_[i] = new WeightedExpression(all[i]);
+			}
 
 			for (int i = 0; i < MaxActive; ++i)
 				NextActive();

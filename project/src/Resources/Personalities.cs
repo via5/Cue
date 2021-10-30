@@ -87,7 +87,6 @@ namespace Cue
 		private Personality ParsePersonality(JSONClass o)
 		{
 			Personality p = null;
-			Personality.State[] states = null;
 			bool inherited = false;
 
 			if (o.HasKey("inherit"))
@@ -106,80 +105,47 @@ namespace Cue
 						$"base personality '{o["inherit"].Value}' not found");
 				}
 
-				states = p.States;
 				inherited = true;
 			}
 			else
 			{
 				p = new Personality(J.ReqString(o, "name"));
-				states = new Personality.State[Personality.StateCount];
-
-				for (int si = 0; si < Personality.StateCount; ++si)
-					states[si] = new Personality.State(si);
 			}
 
 
-			for (int si = 0; si < Personality.StateCount; ++si)
-			{
-				var s = states[si];
-
-				if (!o.HasKey(s.name))
-					throw new LoadFailed($"missing state {s.name}");
-
-				try
-				{
-					var so = o[s.name].AsObject;
-					bool stateInherited = false;
-
-					if (so.HasKey("inherit"))
-					{
-						stateInherited = true;
-
-						if (so["inherit"].Value == s.name)
-						{
-							throw new LoadFailed(
-								$"state {s.name} inheriting from itself");
-						}
-
-						bool found = false;
-						for (int ssi = 0; ssi < si; ++ssi)
-						{
-							if (states[ssi].name == so["inherit"].Value)
-							{
-								s.CopyFrom(states[ssi]);
-								found = true;
-								break;
-							}
-						}
-
-						if (!found)
-						{
-							throw new LoadFailed(
-								$"state {s.name} inherits from non existing " +
-								$"state {so["inherit"].Value}");
-						}
-					}
-
-					ParseState(s, so, inherited || stateInherited);
-				}
-				catch (LoadFailed e)
-				{
-					log_.Error($"failed to load personality state '{s.name}'");
-					throw e;
-				}
-			}
-
-			p.Set(states);
-
-
+			Resources.LoadEnumValues(p, o, inherited);
 			ParseVoice(p.Voice, o, inherited);
 
-			return p;
-		}
 
-		private void ParseState(Personality.State s, JSONClass o, bool inherited)
-		{
-			Resources.LoadEnumValues(s, o, inherited);
+			if (o.HasKey("expressions"))
+			{
+				var es = new List<Expression>();
+
+				foreach (JSONClass en in o["expressions"].AsArray)
+				{
+					var morphs = new List<MorphGroup.MorphInfo>();
+
+					foreach (JSONClass mn in en["morphs"].AsArray)
+					{
+						morphs.Add(new MorphGroup.MorphInfo(
+							mn["id"].Value,
+							J.OptFloat(mn, "max", 1.0f),
+							BP.None));
+					}
+
+					es.Add(new Expression(
+						en["name"].Value,
+						Moods.FromStringMany(en["moods"].Value),
+						new MorphGroup(
+							en["name"].Value,
+							BP.FromStringMany(en["bodyParts"].Value),
+							morphs.ToArray())));
+				}
+
+				p.SetExpressions(es.ToArray());
+			}
+
+			return p;
 		}
 
 		private void ParseVoice(Voice v, JSONClass o, bool inherited)

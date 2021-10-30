@@ -108,7 +108,7 @@ public string Generate3(
 	if (slidingDurations.Length > 0 || generateEmpty)
 	{
 		defs +=
-			$"\t\t// sliding durations\r\n" +
+			$"		// sliding durations\r\n" +
 			MakeEnum(slidingDurations, "SlidingDurationCount");
 
 		names += MakeNames(slidingDurations, "sliding duration", allNames);
@@ -124,7 +124,7 @@ public string Generate3(
 		}
 
 		defs +=
-			$"\t\t// bools\r\n" +
+			$"		// bools\r\n" +
 			MakeEnum(bools, "BoolCount");
 
 		names += MakeNames(bools, "bool", allNames);
@@ -140,7 +140,7 @@ public string Generate3(
 		}
 
 		defs +=
-			$"\t\t// floats\r\n" +
+			$"		// floats\r\n" +
 			MakeEnum(floats, "FloatCount");
 
 		names += MakeNames(floats, "float", allNames);
@@ -156,7 +156,7 @@ public string Generate3(
 		}
 
 		defs +=
-			$"\t\t// strings\r\n" +
+			$"		// strings\r\n" +
 			MakeEnum(strings, "StringCount");
 
 		names += MakeNames(strings, "string", allNames);
@@ -168,23 +168,23 @@ public string Generate3(
 	if (sectionCount > 1)
 	{
 		allNamesArray +=
-			$"\t\tprivate static string[] allNames_ = new string[] {{\r\n";
+			$"		private static string[] allNames_ = new string[] {{\r\n";
 
 		foreach (var n in allNames)
-			allNamesArray += $"\t\t\t\"{n}\",\r\n";
+			allNamesArray += $"			\"{n}\",\r\n";
 
 		allNamesArray +=
-			$"\t\t}};\r\n" +
+			$"		}};\r\n" +
 			$"\r\n" +
-			$"\t\tpublic static string[] AllNames\r\n" +
-			$"\t\t{{\r\n" +
-			$"\t\t\tget {{ return allNames_; }}\r\n" +
-			$"\t\t}}\r\n" +
+			$"		public static string[] AllNames\r\n" +
+			$"		{{\r\n" +
+			$"			get {{ return allNames_; }}\r\n" +
+			$"		}}\r\n" +
 			$"\r\n" +
-			$"\t\tpublic string[] GetAllNames()\r\n" +
-			$"\t\t{{\r\n" +
-			$"\t\t\treturn AllNames;\r\n" +
-			$"\t\t}}";
+			$"		public string[] GetAllNames()\r\n" +
+			$"		{{\r\n" +
+			$"			return AllNames;\r\n" +
+			$"		}}";
 
 		allNamesArray = "\r\n\r\n" + allNamesArray + "\r\n";
 	}
@@ -192,13 +192,15 @@ public string Generate3(
 	string s =
 		$"// auto generated from {file}Enums.tt\r\n" +
 		$"\r\n" +
+		$"using System.Collections.Generic;\r\n" +
+		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"\tclass {name}{(generateEmpty ? " : IEnumValues" : "")}\r\n" +
-		$"\t{{\r\n" +
+		$"	class {name}{(generateEmpty ? " : IEnumValues" : "")}\r\n" +
+		$"	{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
 		names + "\r\n" + allNamesArray +
-		$"\t}}\r\n" +
+		$"	}}\r\n" +
 		$"}}";
 
 	return s;
@@ -223,13 +225,13 @@ public string MakeEnum(V[] names, string count)
 			++nextValue;
 		}
 
-		s += $"\t\tpublic const int {names[i].name} = {v};\r\n";
+		s += $"		public const int {names[i].name} = {v};\r\n";
 	}
 
 	s +=
 		$"\r\n" +
-		$"\t\tpublic const int {count} = {nextValue};\r\n" +
-		$"\t\tpublic int Get{count}() {{ return {nextValue}; }}";
+		$"		public const int {count} = {nextValue};\r\n" +
+		$"		public int Get{count}() {{ return {nextValue}; }}";
 
 	return s;
 }
@@ -265,8 +267,8 @@ public string MakeNames(V[] names, string name, List<string> allNames)
 	}
 
 	string s =
-		$"\t\tprivate static string[] {var} = new string[]\r\n" +
-		$"\t\t{{\r\n";
+		$"		private static string[] {var} = new string[]\r\n" +
+		$"		{{\r\n";
 
 	foreach (var v in names)
 	{
@@ -275,41 +277,60 @@ public string MakeNames(V[] names, string name, List<string> allNames)
 
 		var ename = CamelCase(v.name, false);
 
-		s += $"\t\t\t\"{ename}\",\r\n";
+		s += $"			\"{ename}\",\r\n";
 		allNames.Add(ename);
 	}
 
 	s +=
-		$"\t\t}};\r\n" +
+		$"		}};\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static int {ccName}FromString(string s)\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\tfor (int i = 0; i<{var}.Length; ++i)\r\n" +
-		$"\t\t\t{{\r\n" +
-		$"\t\t\t\tif ({var}[i] == s)\r\n" +
-		$"\t\t\t\t\treturn i;\r\n" +
-		$"\t\t\t}}\r\n" +
+		$"		public static int {ccName}FromString(string s)\r\n" +
+		$"		{{\r\n" +
+		$"			for (int i = 0; i<{var}.Length; ++i)\r\n" +
+		$"			{{\r\n" +
+		$"				if ({var}[i] == s)\r\n" +
+		$"					return i;\r\n" +
+		$"			}}\r\n" +
 		$"\r\n" +
-		$"\t\t\treturn -1;\r\n" +
-		$"\t\t}}\r\n" +
+		$"			return -1;\r\n" +
+		$"		}}\r\n" +
 		$"\r\n" +
-		$"\t\tpublic string Get{ccName}Name(int i)\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\treturn {ccName}ToString(i);\r\n" +
-		$"\t\t}}\r\n" +
+		$"		public static int[] {ccName}FromStringMany(string s)\r\n" +
+		$"		{{\r\n" +
+		$"			var list = new List<int>();\r\n" +
+		$"			var ss = s.Split(' ');\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static string {ccName}ToString(int i)\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\tif (i >= 0 && i < {var}.Length)\r\n" +
-		$"\t\t\t\treturn {var}[i];\r\n" +
-		$"\t\t\telse\r\n" +
-		$"\t\t\t\treturn $\"?{{i}}\";\r\n" +
-		$"\t\t}}\r\n" +
+		$"			foreach (string p in ss)\r\n" +
+		$"			{{\r\n" +
+		$"				string tp = p.Trim();\r\n" +
+		$"				if (tp == \"\")\r\n" +
+		$"					continue;\r\n" +
 		$"\r\n" +
-		$"\t\tpublic static string[] {ccName}Names\r\n" +
-		$"\t\t{{\r\n" +
-		$"\t\t\tget {{ return {var}; }}\r\n" +
-		$"\t\t}}";
+		$"				var i = {ccName}FromString(tp);\r\n" +
+		$"				if (i != -1)\r\n" +
+		$"					list.Add(i);\r\n" +
+		$"			}}\r\n" +
+		$"\r\n" +
+		$"			return list.ToArray();\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public string Get{ccName}Name(int i)\r\n" +
+		$"		{{\r\n" +
+		$"			return {ccName}ToString(i);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public static string {ccName}ToString(int i)\r\n" +
+		$"		{{\r\n" +
+		$"			if (i >= 0 && i < {var}.Length)\r\n" +
+		$"				return {var}[i];\r\n" +
+		$"			else\r\n" +
+		$"				return $\"?{{i}}\";\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public static string[] {ccName}Names\r\n" +
+		$"		{{\r\n" +
+		$"			get {{ return {var}; }}\r\n" +
+		$"		}}";
 
 	return s;
 }

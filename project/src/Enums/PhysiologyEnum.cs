@@ -1,5 +1,7 @@
 ﻿// auto generated from PhysiologyEnums.tt
 
+using System.Collections.Generic;
+
 namespace Cue
 {
 	class PE : IEnumValues
@@ -73,6 +75,25 @@ namespace Cue
 			return -1;
 		}
 
+		public static int[] SlidingDurationFromStringMany(string s)
+		{
+			var list = new List<int>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = SlidingDurationFromString(tp);
+				if (i != -1)
+					list.Add(i);
+			}
+
+			return list.ToArray();
+		}
+
 		public string GetSlidingDurationName(int i)
 		{
 			return SlidingDurationToString(i);
@@ -104,6 +125,25 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public static int[] BoolFromStringMany(string s)
+		{
+			var list = new List<int>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = BoolFromString(tp);
+				if (i != -1)
+					list.Add(i);
+			}
+
+			return list.ToArray();
 		}
 
 		public string GetBoolName(int i)
@@ -172,6 +212,25 @@ namespace Cue
 			return -1;
 		}
 
+		public static int[] FloatFromStringMany(string s)
+		{
+			var list = new List<int>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = FloatFromString(tp);
+				if (i != -1)
+					list.Add(i);
+			}
+
+			return list.ToArray();
+		}
+
 		public string GetFloatName(int i)
 		{
 			return FloatToString(i);
@@ -203,6 +262,25 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public static int[] StringFromStringMany(string s)
+		{
+			var list = new List<int>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = StringFromString(tp);
+				if (i != -1)
+					list.Add(i);
+			}
+
+			return list.ToArray();
 		}
 
 		public string GetStringName(int i)

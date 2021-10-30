@@ -97,7 +97,12 @@ namespace Cue
 				bodyPart_ = bodyPart;
 			}
 
-			public void Start(Person p)
+			public MorphInfo Clone()
+			{
+				return new MorphInfo(id_, multiplier_, bodyPart_);
+			}
+
+			public void Init(Person p)
 			{
 				m_ = new Morph(p, id_, bodyPart_);
 			}
@@ -115,26 +120,52 @@ namespace Cue
 		}
 
 
-		private Person person_;
+		private Person person_ = null;
 		private string name_;
 		private MorphInfo[] morphs_;
 		private int[] bodyParts_ = null;
 		private float value_ = 0;
 
-		public MorphGroup(Person p, string name, int bodyPart, MorphInfo[] morphs)
-			: this(p, name, new int[] { bodyPart }, morphs)
+		public MorphGroup(string name, int bodyPart, MorphInfo[] morphs)
+			: this(name, new int[] { bodyPart }, morphs)
 		{
 		}
 
-		public MorphGroup(Person p, string name, int[] bodyParts, MorphInfo[] morphs)
+		public MorphGroup(string name, int[] bodyParts, MorphInfo[] morphs)
+			: this(name)
 		{
-			person_ = p;
-			name_ = name;
 			morphs_ = morphs;
 			bodyParts_ = FixedBodyParts(bodyParts);
+		}
+
+		private MorphGroup(string name)
+		{
+			name_ = name;
+		}
+
+		public MorphGroup Clone()
+		{
+			var g = new MorphGroup(name_);
+			g.CopyFrom(this);
+			return g;
+		}
+
+		private void CopyFrom(MorphGroup g)
+		{
+			morphs_ = new MorphInfo[g.morphs_.Length];
+			for (int i = 0; i < g.morphs_.Length; ++i)
+				morphs_[i] = g.morphs_[i].Clone();
+
+			bodyParts_ = new int[g.bodyParts_.Length];
+			g.bodyParts_.CopyTo(bodyParts_, 0);
+		}
+
+		public void Init(Person p)
+		{
+			person_ = p;
 
 			for (int i = 0; i < morphs_.Length; ++i)
-				morphs_[i].Start(p);
+				morphs_[i].Init(p);
 		}
 
 		public string Name

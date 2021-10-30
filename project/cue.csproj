@@ -163,7 +163,6 @@
     <Compile Include="src\Procedural\BuiltinAnimations\Sex.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Smoke.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Suck.cs" />
-    <Compile Include="src\Procedural\BuiltinExpressions.cs" />
     <Compile Include="src\Procedural\Controller.cs" />
     <Compile Include="src\Procedural\Force.cs" />
     <Compile Include="src\Procedural\Group.cs" />

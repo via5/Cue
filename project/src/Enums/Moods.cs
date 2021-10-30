@@ -1,5 +1,7 @@
 ﻿// auto generated from MoodsEnums.tt
 
+using System.Collections.Generic;
+
 namespace Cue
 {
 	class Moods
@@ -30,6 +32,25 @@ namespace Cue
 			}
 
 			return -1;
+		}
+
+		public static int[] FromStringMany(string s)
+		{
+			var list = new List<int>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = FromString(tp);
+				if (i != -1)
+					list.Add(i);
+			}
+
+			return list.ToArray();
 		}
 
 		public string GetName(int i)

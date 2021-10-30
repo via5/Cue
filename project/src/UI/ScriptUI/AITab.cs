@@ -294,9 +294,7 @@ namespace Cue
 	{
 		private Person person_;
 
-		private VUI.ComboBox<string> states_ = new VUI.ComboBox<string>();
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
-		private int currentState_ = -1;
 
 		public PersonAIPersonalityTab(Person p)
 			: base("Personality", false)
@@ -304,23 +302,14 @@ namespace Cue
 			person_ = p;
 
 			Layout = new VUI.BorderLayout();
-			Add(states_, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
 
-			states_.SetItems(Personality.StateNames);
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 		}
 
 		protected override void DoUpdate(float s)
 		{
-			if (currentState_ == states_.SelectedIndex)
-				return;
-
-			currentState_ = states_.SelectedIndex;
-
 			var ps = person_.Personality;
-			var st = ps.GetState(currentState_);
-
 			var exps = new List<string[]>();
 
 			var v = ps.Voice;
@@ -333,7 +322,7 @@ namespace Cue
 					$"[{ds.intensityMin}, {ds.intensityMax}]" });
 			}
 
-			list_.SetItems(PersonAIPhysiologyTab.MakeTable(st, exps.ToArray()));
+			list_.SetItems(PersonAIPhysiologyTab.MakeTable(ps, exps.ToArray()));
 		}
 	}
 

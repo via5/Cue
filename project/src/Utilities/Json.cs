@@ -48,6 +48,20 @@ namespace Cue
 			return true;
 		}
 
+		public static float OptFloat(JSONClass o, string key, float def)
+		{
+			if (!o.HasKey(key))
+				return def;
+
+			var v = o[key].Value;
+
+			float f;
+			if (!float.TryParse(v, out f))
+				throw new LoadFailed($"bad float '{v}' for key '{key}'");
+
+			return f;
+		}
+
 		public static bool ReqBool(JSONClass o, string key)
 		{
 			if (!o.HasKey(key))

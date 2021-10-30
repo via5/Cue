@@ -148,25 +148,8 @@ namespace Cue
 	}
 
 
-	class Personality
+	class Personality : EnumValueManager
 	{
-		public const int IdleState = 0;
-		public const int CloseState = 1;
-		public const int StateCount = 2;
-
-
-		public class State : EnumValueManager
-		{
-			public readonly string name;
-
-			public State(int stateIndex)
-				: base(new PSE())
-			{
-				name = StateToString(stateIndex);
-			}
-		}
-
-
 		private readonly string name_;
 		private Person person_;
 
@@ -175,28 +158,37 @@ namespace Cue
 		private bool forcedClose_ = false;
 		private bool isCloseForced_ = false;
 
-		private State[] states_ = new State[StateCount];
 		private Voice voice_ = new Voice();
+		private Expression[] exps_ = new Expression[0];
 
 		public Personality(string name, Person p = null)
+			: base(new PSE())
 		{
 			name_ = name;
 			person_ = p;
-
-			for (int i = 0; i < StateCount; ++i)
-				states_[i] = new State(i);
 		}
 
 		public Personality Clone(string newName, Person p)
 		{
 			var ps = new Personality(newName ?? name_, p);
-
-			for (int si = 0; si < states_.Length; ++si)
-				ps.states_[si].CopyFrom(states_[si]);
-
-			ps.voice_.CopyFrom(voice_);
-
+			ps.CopyFrom(this);
 			return ps;
+		}
+
+		private void CopyFrom(Personality ps)
+		{
+			base.CopyFrom(ps);
+
+			exps_ = new Expression[ps.exps_.Length];
+			for (int i = 0; i < ps.exps_.Length; i++)
+				exps_[i] = ps.exps_[i].Clone();
+
+			voice_.CopyFrom(ps.voice_);
+		}
+
+		public void SetExpressions(Expression[] exps)
+		{
+			exps_ = exps;
 		}
 
 		public void Load(JSONClass o)
@@ -232,30 +224,16 @@ namespace Cue
 			get { return name_; }
 		}
 
-		public State[] States
-		{
-			get { return states_; }
-		}
-
-		public State GetState(int i)
-		{
-			return states_[i];
-		}
-
 		public Voice Voice
 		{
 			get { return voice_; }
 		}
 
-		private State CurrentState
+		public Expression[] GetExpressions()
 		{
-			get
-			{
-				if (wasClose_)
-					return states_[CloseState];
-				else
-					return states_[IdleState];
-			}
+			var e = new Expression[exps_.Length];
+			exps_.CopyTo(e, 0);
+			return e;
 		}
 
 		public Pair<float, float> LookAtRandomInterval
@@ -271,31 +249,6 @@ namespace Cue
 		public float GazeDuration
 		{
 			get { return GetSlidingDuration(PSE.GazeDuration).Current; }
-		}
-
-		public void Set(State[] ss)
-		{
-			states_ = ss;
-		}
-
-		public SlidingDuration GetSlidingDuration(int i)
-		{
-			return CurrentState.GetSlidingDuration(i);
-		}
-
-		public bool GetBool(int i)
-		{
-			return CurrentState.GetBool(i);
-		}
-
-		public float Get(int i)
-		{
-			return CurrentState.Get(i);
-		}
-
-		public string GetString(int i)
-		{
-			return CurrentState.GetString(i);
 		}
 
 		public virtual void Update(float s)
@@ -334,20 +287,6 @@ namespace Cue
 			return $"{Name}";
 		}
 
-		public static string StateToString(int s)
-		{
-			if (s < 0 || s >= StateCount)
-				return $"?{s}";
-
-			return StateNames[s];
-		}
-
-		public static string[] StateNames
-		{
-			get { return new string[] { "idleState", "closeState" }; }
-		}
-
-
 		private void Init()
 		{
 			SetClose(false);
@@ -355,12 +294,12 @@ namespace Cue
 
 		private void SetClose(bool b)
 		{
-			State s;
-
-			if (b)
-				s = states_[CloseState];
-			else
-				s = states_[IdleState];
+			//State s;
+			//
+			//if (b)
+			//	s = states_[CloseState];
+			//else
+			//	s = states_[IdleState];
 		}
 
 		public void ForceSetClose(bool enabled, bool close)

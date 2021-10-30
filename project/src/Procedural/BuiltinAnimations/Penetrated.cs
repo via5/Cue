@@ -70,13 +70,13 @@
 
 			expressions_ = new Expression[]
 			{
-				BuiltinExpressions.Smile(p),
-				BuiltinExpressions.Pleasure(p),
-				BuiltinExpressions.Pain(p),
-				BuiltinExpressions.Shock(p),
-				BuiltinExpressions.Scream(p),
-				BuiltinExpressions.Angry(p),
-				BuiltinExpressions.EyesClosed(p),
+				//BuiltinExpressions.Smile(p),
+				//BuiltinExpressions.Pleasure(p),
+				//BuiltinExpressions.Pain(p),
+				//BuiltinExpressions.Shock(p),
+				//BuiltinExpressions.Scream(p),
+				//BuiltinExpressions.Angry(p),
+				//BuiltinExpressions.EyesClosed(p),
 			};
 
 			config_ = MakeConfig();

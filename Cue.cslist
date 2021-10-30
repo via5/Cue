@@ -46,7 +46,6 @@ project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
 project\src\Procedural\Animation.cs
 project\src\Procedural\BuiltinAnimations.cs
-project\src\Procedural\BuiltinExpressions.cs
 project\src\Procedural\Controller.cs
 project\src\Procedural\Force.cs
 project\src\Procedural\Group.cs
