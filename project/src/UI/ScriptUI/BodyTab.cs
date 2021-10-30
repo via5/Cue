@@ -25,26 +25,57 @@ namespace Cue
 
 		private VUI.Label hasPenis_ = new VUI.Label();
 
-		public PersonBodyStateTab(Person p)
+		private VUI.Label sweat_ = new VUI.Label();
+		private VUI.Label flush_ = new VUI.Label();
+		private VUI.Label hairLoose_ = new VUI.Label();
+
+
+		public PersonBodyStateTab(Person person)
 			: base("State", false)
 		{
-			person_ = p;
+			person_ = person;
 
-			var gl = new VUI.GridLayout(2);
+			var gl = new VUI.GridLayout(4);
 			gl.HorizontalSpacing = 20;
-			gl.HorizontalStretch = new List<bool>() { false, true };
+			gl.HorizontalStretch = new List<bool>() { false, true, false, false };
+			var p = new VUI.Panel(gl);
 
-			var state = new VUI.Panel(gl);
-			state.Add(new VUI.Label("Has penis"));
-			state.Add(hasPenis_);
+
+			p.Add(new VUI.Label("Has penis"));
+			p.Add(hasPenis_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			AddForceable(p, person_.Body.DampedTemperature, "Temperature");
+
+			p.Add(new VUI.Label("Sweat"));
+			p.Add(sweat_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Flush"));
+			p.Add(flush_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Hair loose"));
+			p.Add(hairLoose_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+
 
 			Layout = new VUI.BorderLayout();
-			Add(state, VUI.BorderLayout.Top);
+			Add(p, VUI.BorderLayout.Top);
 		}
 
 		protected override void DoUpdate(float s)
 		{
 			hasPenis_.Text = person_.Body.HasPenis.ToString();
+
+			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
+			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
+			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
 		}
 
 		private void OnClose(bool b)

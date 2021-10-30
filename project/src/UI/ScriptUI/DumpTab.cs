@@ -4,8 +4,14 @@ namespace Cue
 {
 	class PersonDumpTab : Tab
 	{
+		private const int None = 0;
+		private const int Gaze = 1;
+		private const int Morphs = 2;
+		private const int Expression = 3;
+
 		private Person person_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private int what_ = None;
 
 		public PersonDumpTab(Person person)
 			: base("Dump", false)
@@ -15,16 +21,48 @@ namespace Cue
 			Layout = new VUI.BorderLayout(10);
 
 			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
-			p.Add(new VUI.Button("Gaze", DumpGaze));
-			p.Add(new VUI.Button("Morphs", DumpMorphs));
+			p.Add(new VUI.Button("None", () => what_ = None));
+			p.Add(new VUI.Button("Gaze", () => what_ = Gaze));
+			p.Add(new VUI.Button("Morphs", () => what_ = Morphs));
+			p.Add(new VUI.Button("Expressions", () => what_ = Expression));
 
 			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 		}
 
-		private string I(int i)
+		protected override void DoUpdate(float s)
 		{
-			return new string(' ', i * 4);
+			switch (what_)
+			{
+				case None:
+				{
+					if (list_.Count > 0)
+						list_.Clear();
+
+					break;
+				}
+
+				case Gaze:
+				{
+					DumpGaze();
+					break;
+				}
+
+				case Morphs:
+				{
+					DumpMorphs();
+					break;
+				}
+
+				case Expression:
+				{
+					DumpExpression();
+					break;
+				}
+			}
 		}
 
 		private void DumpGaze()
@@ -66,6 +104,11 @@ namespace Cue
 				items.Add(m.ToString());
 
 			list_.SetItems(items);
+		}
+
+		private void DumpExpression()
+		{
+			list_.SetItems(person_.Expression.Debug());
 		}
 	}
 }

@@ -526,30 +526,30 @@ namespace Cue
 			}
 		}
 
-		//public override string[] Debug()
-		//{
-		//	var s = new string[MaxActive + 1 + exps_.Length + 2];
-		//
-		//	int i = 0;
-		//
-		//	for (int j = 0; j < exps_.Length; ++j)
-		//	{
-		//		if (exps_[j].Active)
-		//			s[i++] = $"{exps_[j].ToDetailedString()}";
-		//	}
-		//
-		//	while (i < MaxActive)
-		//		s[i++] = "none";
-		//
-		//	s[i++] = "";
-		//
-		//	for (int j = 0; j < exps_.Length; ++j)
-		//		s[i++] = $"{exps_[j]}";
-		//
-		//	s[i++] = "";
-		//	s[i++] = (needsMore_ ? "needs more" : "");
-		//
-		//	return s;
-		//}
+		public string[] Debug()
+		{
+			var s = new string[MaxActive + 1 + exps_.Length + 2];
+
+			int i = 0;
+
+			for (int j = 0; j < exps_.Length; ++j)
+			{
+				if (exps_[j].Active)
+					s[i++] = $"{exps_[j].ToDetailedString()}";
+			}
+
+			while (i < MaxActive)
+				s[i++] = "none";
+
+			s[i++] = "";
+
+			for (int j = 0; j < exps_.Length; ++j)
+				s[i++] = $"{exps_[j]}";
+
+			s[i++] = "";
+			s[i++] = (needsMore_ ? "needs more" : "");
+
+			return s;
+		}
 	}
 }

@@ -58,21 +58,44 @@ namespace Cue.Sys.Vam
 			// changes the various references to point to the main handler
 
 			var ct = a.GetComponentInChildren<CollisionTrigger>();
+			if (ct == null)
+			{
+				SuperController.LogError($"dildo {a.uid} has no CollisionTrigger");
+				return;
+			}
 
 			// there's no CollisionTriggerEventHandler without this
 			ct.triggerEnabled = true;
 
 			var o = a.transform
-				.Find("reParentObject")
-				.Find("object");
+				?.Find("reParentObject")
+				?.Find("object");
+
+			if (o == null)
+			{
+				SuperController.LogError($"dildo {a.uid} has no object");
+				return;
+			}
 
 			var d1 = o
-				.Find("rescaleObject")
-				.Find("quick_test_subdiv1_correct")
-				.Find("dildo1");
+				?.Find("rescaleObject")
+				?.Find("quick_test_subdiv1_correct")
+				?.Find("dildo1");
+
+			if (d1 == null)
+			{
+				SuperController.LogError($"dildo {a.uid} has no dildo1");
+				return;
+			}
 
 			var root = d1.Find("root");
 			var h = o.GetComponent<CollisionTriggerEventHandler>();
+
+			if (h == null)
+			{
+				SuperController.LogError($"dildo {a.uid} has no CollisionTriggerEventHandler");
+				return;
+			}
 
 			// rb isn't set
 			h.thisRigidbody = o.GetComponent<Rigidbody>();

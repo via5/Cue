@@ -167,8 +167,78 @@ namespace Cue
 
 	abstract class Tab : VUI.Panel
 	{
+		class ForceableFloatWidgets
+		{
+			private readonly ForceableFloat f_;
+			private readonly VUI.Label caption_;
+			private readonly VUI.Label value_;
+			private readonly VUI.CheckBox isForced_;
+			private readonly VUI.FloatTextSlider forced_;
+			private bool ignore_ = false;
+
+			public ForceableFloatWidgets(ForceableFloat f, string caption)
+			{
+				f_ = f;
+				caption_ = new VUI.Label(caption);
+				value_ = new VUI.Label();
+				isForced_ = new VUI.CheckBox("Force");
+				forced_ = new VUI.FloatTextSlider();
+
+				forced_.MaximumSize = new VUI.Size(200, DontCare);
+
+				isForced_.Changed += OnForceChecked;
+				forced_.ValueChanged += OnForceChanged;
+			}
+
+			public VUI.Label Caption { get { return caption_; } }
+			public VUI.Label Value { get { return value_; } }
+			public VUI.CheckBox IsForced { get { return isForced_; } }
+			public VUI.FloatTextSlider Forced { get { return forced_; } }
+
+			public void Update(float s)
+			{
+				value_.Text = $"{f_}";
+				if (!isForced_.Checked)
+				{
+					try
+					{
+						ignore_ = true;
+						forced_.Value = f_.Value;
+					}
+					finally
+					{
+						ignore_ = false;
+					}
+				}
+			}
+
+			private void OnForceChecked(bool b)
+			{
+				if (ignore_) return;
+
+				if (b)
+					f_.SetForced(forced_.Value);
+				else
+					f_.UnsetForced();
+			}
+
+			private void OnForceChanged(float f)
+			{
+				if (ignore_) return;
+
+				if (isForced_.Checked)
+					f_.SetForced(forced_.Value);
+				else
+					f_.Value = forced_.Value;
+			}
+		}
+
+
 		private string title_;
 		private SubTabs subTabs_ = null;
+
+		private List<ForceableFloatWidgets> forceables_ =
+			new List<ForceableFloatWidgets>();
 
 		protected Tab(string title, bool hasSubTabs)
 		{
@@ -197,12 +267,27 @@ namespace Cue
 			return subTabs_.AddTab(t);
 		}
 
+		protected void AddForceable(VUI.Panel p, ForceableFloat v, string caption)
+		{
+			var w = new ForceableFloatWidgets(v, caption);
+
+			p.Add(w.Caption);
+			p.Add(w.Value);
+			p.Add(w.IsForced);
+			p.Add(w.Forced);
+
+			forceables_.Add(w);
+		}
+
 		public void Update(float s)
 		{
 			if (subTabs_ != null)
 				subTabs_.Update(s);
 
 			DoUpdate(s);
+
+			for (int i = 0; i < forceables_.Count; ++i)
+				forceables_[i].Update(s);
 		}
 
 		protected virtual void DoUpdate(float s)

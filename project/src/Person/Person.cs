@@ -167,6 +167,11 @@ namespace Cue
 			set { personality_ = value; }
 		}
 
+		public ExpressionManager Expression
+		{
+			get { return expression_; }
+		}
+
 		public bool IsInteresting
 		{
 			get
