@@ -1,5 +1,61 @@
 ﻿namespace Cue.Proc
 {
+	class Expressions
+	{
+		public const int Happy = 0x01;
+		public const int Excited = 0x02;
+		public const int Angry = 0x04;
+		public const int Tired = 0x08;
+
+		//private static string[] names_ = new string[Count]
+		//{
+		//	"happy", "excited", "angry", "tired"
+		//};
+
+		//public static int FromString(string s)
+		//{
+		//	for (int i = 0; i < names_.Length; ++i)
+		//	{
+		//		if (names_[i] == s)
+		//			return i;
+		//	}
+		//
+		//	return -1;
+		//}
+
+		public static string ToString(int i)
+		{
+			string s = "";
+
+			if (Bits.IsSet(i, Happy))
+			{
+				if (s != "") s += "|";
+				s += "happy";
+			}
+
+			if (Bits.IsSet(i, Excited))
+			{
+				if (s != "") s += "|";
+				s += "excited";
+			}
+
+			if (Bits.IsSet(i, Angry))
+			{
+				if (s != "") s += "|";
+				s += "angry";
+			}
+
+			if (Bits.IsSet(i, Tired))
+			{
+				if (s != "") s += "|";
+				s += "tired";
+			}
+
+			return s;
+		}
+	}
+
+
 	class Expression
 	{
 		struct TargetInfo
@@ -10,20 +66,35 @@
 			public float elapsed;
 			public bool valid;
 			public bool auto;
+
+			public override string ToString()
+			{
+				if (!valid)
+					return "-";
+
+				return $"{value:0.00}";
+			}
 		}
 
 		private string name_;
+		private int type_;
 		private MorphGroup g_;
 		private TargetInfo target_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
 		private float autoRange_ = 0.1f;
 
-		public Expression(string name, MorphGroup g)
+		public Expression(string name, int type, MorphGroup g)
 		{
 			name_ = name;
+			type_ = type;
 			g_ = g;
 			target_.valid = false;
+		}
+
+		public override string ToString()
+		{
+			return $"{name_} {Expressions.ToString(type_)} {target_}";
 		}
 
 		public string Name
@@ -42,14 +113,24 @@
 			set { autoRange_ = value; }
 		}
 
-		public void SetTarget(float t, float time, bool auto = false)
+		public bool Finished
+		{
+			get { return (!target_.valid || target_.auto || target_.elapsed >= target_.time); }
+		}
+
+		public bool IsType(int t)
+		{
+			return Bits.IsSet(type_, t);
+		}
+
+		public void SetTarget(float t, float time)
 		{
 			target_.start = g_.Value;
 			target_.value = t;
 			target_.time = time;
 			target_.elapsed = 0;
 			target_.valid = true;
-			target_.auto = auto;
+			target_.auto = false;
 		}
 
 		public void Reset()
@@ -91,7 +172,8 @@
 
 			float t = U.RandomFloat(0.5f, 2.0f);
 
-			SetTarget(v, t, true);
+			SetTarget(v, t);
+			target_.auto = true;
 		}
 	}
 	/*

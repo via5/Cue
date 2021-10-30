@@ -204,9 +204,23 @@ namespace VUI
 
 	class PointerEvent : MouseEvent
 	{
+		public const int NoButton = -1;
+		public const int LeftButton = 0;
+		public const int RightButton = 1;
+		public const int MiddleButton = 2;
+
+		private int button_ = NoButton;
+
 		public PointerEvent(Widget w, PointerEventData d)
 			: base(w, d)
 		{
+			if (d != null)
+				button_ = (int)d.button;
+		}
+
+		public int Button
+		{
+			get { return button_; }
 		}
 	}
 

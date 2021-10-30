@@ -233,6 +233,20 @@ namespace Cue
 				return b.ToString("0.0");
 		}
 
+		public static void Shuffle<T>(T[] list)
+		{
+			int n = list.Length;
+
+			while (n > 1)
+			{
+				n--;
+				int k = RandomInt(0, n);
+				T value = list[k];
+				list[k] = list[n];
+				list[n] = value;
+			}
+		}
+
 		public static void Shuffle<T>(IList<T> list)
 		{
 			int n = list.Count;

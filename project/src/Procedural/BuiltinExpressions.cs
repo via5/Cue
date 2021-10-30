@@ -2,9 +2,34 @@
 {
 	class BuiltinExpressions
 	{
+		public static Expression[] All(Person p)
+		{
+			return new Expression[]
+			{
+				Smile(p),
+				//CornerSmile(p),
+
+				Pleasure(p),
+				Pain(p),
+				Shock(p),
+				Scream(p),
+				Angry(p),
+				//EyesRollBack(p),
+				EyesClosed(p),
+
+				//Frown(p),
+				//Squint(p),
+				//MouthFrown(p),
+
+				//Drooling(p),
+				//EyesRollBack(p),
+				//EyesClosedTired(p)
+			};
+		}
+
 		public static Expression Smile(Person p)
 		{
-			return new Expression("smile", new MorphGroup(
+			return new Expression("smile", Expressions.Happy, new MorphGroup(
 				p, "smile", BP.Mouth, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Smile Open Full Face", 1, BP.None)
@@ -13,7 +38,7 @@
 
 		public static Expression CornerSmile(Person p)
 		{
-			return new Expression("cornerSmile", new MorphGroup(
+			return new Expression("cornerSmile", Expressions.Happy, new MorphGroup(
 				p, "cornerSmile", BP.Mouth, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Smile Open Full Face", 0.3f, BP.None),
@@ -24,7 +49,7 @@
 
 		public static Expression Pleasure(Person p)
 		{
-			return new Expression("pleasure", new MorphGroup(
+			return new Expression("pleasure", Expressions.Excited, new MorphGroup(
 				p, "pleasure", new int[] { BP.Mouth, BP.Eyes },
 				new MorphGroup.MorphInfo[]
 				{
@@ -40,7 +65,7 @@
 
 		public static Expression Pain(Person p)
 		{
-			return new Expression("pain", new MorphGroup(
+			return new Expression("pain", Expressions.Excited, new MorphGroup(
 				p, "pain", new int[] { BP.Mouth, BP.Eyes },
 				new MorphGroup.MorphInfo[]
 				{
@@ -50,7 +75,7 @@
 
 		public static Expression Shock(Person p)
 		{
-			return new Expression("shock", new MorphGroup(
+			return new Expression("shock", Expressions.Excited, new MorphGroup(
 				p, "shock", BP.Mouth, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Shock", 1, BP.None)
@@ -59,7 +84,7 @@
 
 		public static Expression Scream(Person p)
 		{
-			return new Expression("scream", new MorphGroup(
+			return new Expression("scream", Expressions.Excited, new MorphGroup(
 				p, "scream", new int[] { BP.Mouth, BP.Eyes },
 				new MorphGroup.MorphInfo[]
 				{
@@ -69,7 +94,7 @@
 
 		public static Expression Angry(Person p)
 		{
-			return new Expression("angry", new MorphGroup(
+			return new Expression("angry", Expressions.Excited, new MorphGroup(
 				p, "angry", BP.Mouth, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Angry", 1, BP.None)
@@ -78,7 +103,7 @@
 
 		public static Expression EyesClosed(Person p)
 		{
-			return new Expression("eyesClosed", new MorphGroup(
+			return new Expression("eyesClosed", Expressions.Excited, new MorphGroup(
 				p, "eyesClosed", BP.Eyes, new MorphGroup.MorphInfo[]
 				{
 					new MorphGroup.MorphInfo("Eyes Closed", 1, BP.None)
