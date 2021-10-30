@@ -181,8 +181,18 @@ namespace Cue
 					var ts = w.part.GetTriggers();
 					if (ts != null)
 					{
+						bool sawUnknown = false;
+
 						for (int j = 0; j < ts.Length; ++j)
 						{
+							if (!ts[j].IsPerson())
+							{
+								if (sawUnknown)
+									continue;
+								else
+									sawUnknown = true;
+							}
+
 							if (ss != "")
 								ss += ",";
 

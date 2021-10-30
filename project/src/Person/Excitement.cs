@@ -166,9 +166,18 @@ namespace Cue
 				else
 				{
 					parts_[i].value = 0;
+					bool sawUnknown = false;
 
 					for (int j = 0; j < ts.Length; ++j)
 					{
+						if (!ts[j].IsPerson())
+						{
+							if (sawUnknown)
+								continue;
+							else
+								sawUnknown = true;
+						}
+
 						parts_[i].value += ts[j].value;
 						parts_[i].specificModifier += pp.GetSpecificModifier(i, ts[j].sourcePartIndex);
 					}

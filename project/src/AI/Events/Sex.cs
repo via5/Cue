@@ -6,6 +6,9 @@
 		private const int TentativePenetration = 1;
 		private const int Penetrated = 2;
 
+		private const float TentativeTime = 0.2f;
+		private const float Cooldown = 10;
+
 		public const int NoState = 0;
 		public const int PlayState = 1;
 
@@ -121,7 +124,6 @@
 					{
 						penetration_ = TentativePenetration;
 						elapsedTentative_ = 0;
-						Cue.LogVerbose("tentative in");
 					}
 					else
 					{
@@ -133,21 +135,18 @@
 
 				case TentativePenetration:
 				{
-					var p = person_.Body.PenetratedBy();
-
-					if (p != null)
+					if (person_.Body.Penetrated())
 					{
 						elapsedTentative_ += s;
 
-						if (elapsedTentative_ > 1)
+						if (elapsedTentative_ > TentativeTime)
 						{
 							penetration_ = Penetrated;
-							OnIn(p);
+							OnIn();
 						}
 					}
 					else
 					{
-						Cue.LogVerbose("tentative out");
 						penetration_ = NotPenetrated;
 					}
 
@@ -167,21 +166,17 @@
 			}
 		}
 
-		private void OnIn(Person by)
+		private void OnIn()
 		{
-			Cue.LogVerbose("in");
-
-			//if (elapsedNotPenetrated_ > 10)
+			if (elapsedNotPenetrated_ > Cooldown)
 			{
 				elapsedNotPenetrated_ = 0;
-			//	person_.Animator.PlayType(Animations.Penetrated);
-			//	Cue.LogError("emote");
+				person_.Animator.PlayType(Animations.Penetrated);
 			}
 		}
 
 		private void OnOut()
 		{
-			Cue.LogVerbose("out");
 		}
 
 		private Person FindReceiver()

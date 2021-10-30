@@ -252,6 +252,9 @@ namespace Cue
 					return true;
 			}
 
+			if (Get(BP.Vagina).Triggered)
+				return true;
+
 			return false;
 		}
 
