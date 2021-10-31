@@ -92,6 +92,11 @@ namespace Cue.Proc
 			root_.FixedUpdate(s);
 		}
 
+		public virtual void Update(float s)
+		{
+			// no-op
+		}
+
 		public virtual string[] GetAllForcesDebug()
 		{
 			var list = new List<string>();

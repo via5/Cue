@@ -29,8 +29,6 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
-		private VUI.CheckBox close_ = new VUI.CheckBox();
-
 
 		public PersonAIStateTab(Person p)
 			: base("State", false)
@@ -49,14 +47,8 @@ namespace Cue
 			state.Add(new VUI.Label("Traits"));
 			state.Add(traits_);
 
-			state.Add(new VUI.Label("Force close"));
-			state.Add(close_);
-
-
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
-
-			close_.Changed += OnClose;
 		}
 
 		protected override void DoUpdate(float s)
@@ -76,11 +68,6 @@ namespace Cue
 
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
-		}
-
-		private void OnClose(bool b)
-		{
-			person_.Personality.ForceSetClose(b, b);
 		}
 	}
 

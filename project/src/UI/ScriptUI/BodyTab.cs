@@ -77,11 +77,6 @@ namespace Cue
 			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
 		}
-
-		private void OnClose(bool b)
-		{
-			person_.Personality.ForceSetClose(b, b);
-		}
 	}
 
 

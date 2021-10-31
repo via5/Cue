@@ -149,10 +149,11 @@ namespace Cue
 		protected override int DoCheck(int flags)
 		{
 			var ps = person_.Personality;
+			var k = person_.AI.GetEvent<KissEvent>();
 
-			if (person_.Kisser.Active)
+			if (k.Active)
 			{
-				var t = person_.Kisser.Target;
+				var t = k.Target;
 
 				if (t != null)
 				{

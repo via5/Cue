@@ -14,6 +14,7 @@ namespace Cue.Proc
 			list.Add(Penetrated());
 			list.Add(LeftFinger());
 			list.Add(RightFinger());
+			list.Add(Kiss());
 
 			return list;
 		}
@@ -52,6 +53,12 @@ namespace Cue.Proc
 		{
 			var a = new RightFingerProcAnimation();
 			return new Animation(Animations.RightFinger, MovementStyles.Any, a);
+		}
+
+		private static Animation Kiss()
+		{
+			var a = new ClockwiseKissAnimation();
+			return new Animation(Animations.Kiss, MovementStyles.Any, a);
 		}
 	}
 }

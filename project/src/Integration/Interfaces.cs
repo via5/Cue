@@ -50,11 +50,6 @@ namespace Cue
 			return new MacGruberGaze(p);
 		}
 
-		public static IKisser CreateKisser(Person p)
-		{
-			return new ClockwiseSilverKiss(p);
-		}
-
 		public static IHandjob CreateHandjob(Person p)
 		{
 			return new ClockwiseSilverHandjob(p);
@@ -154,20 +149,6 @@ namespace Cue
 	interface ISpeaker
 	{
 		void Say(string s);
-	}
-
-	interface IKisser
-	{
-		bool Active { get; }
-		Person Target { get; }
-
-		bool Start(Person p);
-		bool StartReciprocal(Person p);
-		void StopSelf();
-		void Stop();
-
-		void Update(float s);
-		void OnPluginState(bool b);
 	}
 
 	interface IHandjob

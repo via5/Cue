@@ -153,11 +153,6 @@ namespace Cue
 		private readonly string name_;
 		private Person person_;
 
-		private bool wasClose_ = false;
-		private bool inited_ = false;
-		private bool forcedClose_ = false;
-		private bool isCloseForced_ = false;
-
 		private Voice voice_ = new Voice();
 		private Expression[] exps_ = new Expression[0];
 
@@ -253,29 +248,6 @@ namespace Cue
 
 		public virtual void Update(float s)
 		{
-			if (!inited_)
-			{
-				Init();
-				inited_ = true;
-			}
-
-			bool close = false;
-
-			if (Cue.Instance.Player != null)
-			{
-				close =
-					person_.Body.InsidePersonalSpace(Cue.Instance.Player) ||
-					person_.Kisser.Target == Cue.Instance.Player;
-			}
-
-			if (close != wasClose_)
-			{
-				//person_.Log.Info("Personality: " + (close ? "now close" : "now far"));
-				DoSetClose(close);
-				wasClose_ = close;
-			}
-
-
 			// todo
 			Cue.Assert(PSE.SlidingDurationCount == 1);
 			GetSlidingDuration(PSE.GazeDuration).WindowMagnitude = person_.Mood.GazeEnergy;
@@ -285,36 +257,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return $"{Name}";
-		}
-
-		private void Init()
-		{
-			SetClose(false);
-		}
-
-		private void SetClose(bool b)
-		{
-			//State s;
-			//
-			//if (b)
-			//	s = states_[CloseState];
-			//else
-			//	s = states_[IdleState];
-		}
-
-		public void ForceSetClose(bool enabled, bool close)
-		{
-			isCloseForced_ = enabled;
-			forcedClose_ = close;
-			DoSetClose(close);
-		}
-
-		private void DoSetClose(bool b)
-		{
-			if (isCloseForced_)
-				SetClose(forcedClose_);
-			else
-				SetClose(b);
 		}
 	}
 }

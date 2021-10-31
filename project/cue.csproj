@@ -166,6 +166,7 @@
     <Compile Include="src\Procedural\Controller.cs" />
     <Compile Include="src\Procedural\Force.cs" />
     <Compile Include="src\Procedural\Group.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseKiss.cs" />
     <Compile Include="src\Procedural\Morph.cs" />
     <Compile Include="src\Procedural\MorphGroup.cs" />
     <Compile Include="src\Procedural\Player.cs" />

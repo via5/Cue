@@ -180,8 +180,6 @@ namespace Cue.Proc
 			if (proto == null)
 				return false;
 
-			person_.Atom.SetDefaultControls("playing proc anim");
-
 			var p = new Playing(proto, proto.Clone());
 
 			playing_.Add(p);
@@ -208,8 +206,6 @@ namespace Cue.Proc
 					return;
 				}
 			}
-
-			log_.Error($"no animation found for this proto");
 		}
 
 		public void RequestStop(IAnimation a)
@@ -227,8 +223,6 @@ namespace Cue.Proc
 					return;
 				}
 			}
-
-			log_.Error($"no animation found for this proto");
 		}
 
 		private void DoStopNow(int i)
@@ -263,7 +257,7 @@ namespace Cue.Proc
 					Cue.LogError(e.ToString());
 
 					Cue.LogError(
-						$"proc: exception during animation " +
+						$"proc: exception during FixedUpdate " +
 						$"{playing_[i].anim}, stopping");
 
 					playing_[i].forceStop = true;
@@ -277,6 +271,21 @@ namespace Cue.Proc
 
 			while (i < playing_.Count)
 			{
+				try
+				{
+					playing_[i].anim.Update(s);
+				}
+				catch (Exception e)
+				{
+					Cue.LogError(e.ToString());
+
+					Cue.LogError(
+						$"proc: exception during Update " +
+						$"{playing_[i].anim}, stopping");
+
+					playing_[i].forceStop = true;
+				}
+
 				if (playing_[i].anim.Done || playing_[i].forceStop)
 					playing_.RemoveAt(i);
 				else

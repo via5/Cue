@@ -15,9 +15,10 @@ namespace Cue
 		public const int Penetrated = 5;
 		public const int RightFinger = 6;
 		public const int LeftFinger = 7;
+		public const int Kiss = 8;
 
-		public const int Count = 8;
-		public int GetCount() { return 8; }
+		public const int Count = 9;
+		public int GetCount() { return 9; }
 
 
 		private static string[] names_ = new string[]
@@ -30,6 +31,7 @@ namespace Cue
 			"penetrated",
 			"rightFinger",
 			"leftFinger",
+			"kiss",
 		};
 
 		public static int FromString(string s)

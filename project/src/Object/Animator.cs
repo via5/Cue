@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -142,10 +143,18 @@ namespace Cue
 			{
 				var p = players_[i];
 
-				if (p.Play(a.Sys, flags, cx))
+				try
 				{
-					playing_.Add(new PlayingAnimation(a, p));
-					return true;
+					if (p.Play(a.Sys, flags, cx))
+					{
+						playing_.Add(new PlayingAnimation(a, p));
+						return true;
+					}
+				}
+				catch (Exception e)
+				{
+					log_.Error($"exception while trying to play {a} with player {p}:");
+					log_.Error(e.ToString());
 				}
 			}
 

@@ -38,7 +38,6 @@ namespace Cue
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
 		private ISpeaker speech_;
-		private IKisser kisser_;
 		private IHandjob handjob_;
 		private IBlowjob blowjob_;
 		private IClothing clothing_;
@@ -64,7 +63,6 @@ namespace Cue
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
 			speech_ = Integration.CreateSpeaker(this);
-			kisser_ = Integration.CreateKisser(this);
 			handjob_ = Integration.CreateHandjob(this);
 			blowjob_ = Integration.CreateBlowjob(this);
 			clothing_ = Integration.CreateClothing(this);
@@ -137,7 +135,6 @@ namespace Cue
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
 		public ISpeaker Speech { get { return speech_; } }
-		public IKisser Kisser { get { return kisser_; } }
 		public IHandjob Handjob { get { return handjob_; } }
 		public IBlowjob Blowjob { get { return blowjob_; } }
 
@@ -223,7 +220,6 @@ namespace Cue
 
 			I.Start(I.UpdatePersonEvents);
 			{
-				Kisser.Update(s);
 				Handjob.Update(s);
 				Blowjob.Update(s);
 			}
@@ -273,7 +269,6 @@ namespace Cue
 			base.OnPluginState(b);
 
 			animator_.OnPluginState(b);
-			Kisser.OnPluginState(b);
 			Handjob.OnPluginState(b);
 			Blowjob.OnPluginState(b);
 

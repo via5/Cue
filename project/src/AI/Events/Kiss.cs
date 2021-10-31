@@ -19,12 +19,23 @@ namespace Cue
 		private float duration_ = 0;
 		private string lastResult_ = "";
 		private BodyPartLock[] locks_ = null;
+		private Person target_ = null;
 
 		public KissEvent(Person p)
 			: base("kiss", p)
 		{
 			person_ = p;
 			Next();
+		}
+
+		public bool Active
+		{
+			get { return target_ != null; }
+		}
+
+		public Person Target
+		{
+			get { return target_; }
 		}
 
 		public override string[] Debug()
@@ -34,7 +45,7 @@ namespace Cue
 				$"elapsed    {elapsed_:0.00}",
 				$"wait       {wait_:0.00}",
 				$"duration   {duration_:0.00}",
-				$"state      {(person_.Kisser.Active ? "active" : "waiting")}",
+				$"state      {(Active ? "active" : "waiting")}",
 				$"last       {lastResult_}"
 			};
 		}
@@ -47,7 +58,7 @@ namespace Cue
 			if (!person_.Options.CanKiss)
 			{
 				elapsed_ = 0;
-				if (person_.Kisser.Active)
+				if (Active)
 					Stop();
 
 				return;
@@ -56,20 +67,24 @@ namespace Cue
 
 			elapsed_ += s;
 
-			if (person_.Kisser.Active)
-				UpdateActive();
+			if (Active)
+			{
+				if (elapsed_ >= MinWait)
+					UpdateActive();
+			}
 			else
-				UpdateInactive();
+			{
+				if (elapsed_ >= MinWait)
+					UpdateInactive();
+			}
 		}
 
 		private void UpdateActive()
 		{
-			var target = person_.Kisser.Target;
-
 			bool tooLong = false;
 
 			// never stop with player
-			if (target == null || !target.IsPlayer)
+			if (target_ == null || !target_.IsPlayer)
 				tooLong = (elapsed_ >= duration_);
 
 			if (tooLong || MustStop())
@@ -102,19 +117,18 @@ namespace Cue
 
 		private void Stop()
 		{
-			var t = person_.Kisser.Target;
+			if (target_ != null)
+				target_.AI.GetEvent<KissEvent>().StopSelf();
 
 			StopSelf();
-
-			if (t != null)
-				t.AI.GetEvent<KissEvent>().StopSelf();
 		}
 
 		private void StopSelf()
 		{
 			Unlock();
 			Next();
-			person_.Kisser.Stop();
+			person_.Animator.StopType(Animations.Kiss);
+			target_ = null;
 		}
 
 		private void Next()
@@ -141,7 +155,9 @@ namespace Cue
 				if (targetLips == null)
 					return false;
 
-				if (Vector3.Distance(srcLips, targetLips.Position) <= StartDistance)
+				var d = Vector3.Distance(srcLips, targetLips.Position);
+
+				if (d <= StartDistance)
 				{
 					foundClose = true;
 
@@ -175,14 +191,23 @@ namespace Cue
 				return false;
 			}
 
-			if (!person_.Kisser.StartReciprocal(target))
+			if (!person_.Animator.PlayType(
+				Animations.Kiss, new AnimationContext(target, locks_[0].Key)))
 			{
-				lastResult_ = $"kisser failed to start";
+				lastResult_ = $"kiss animation failed to start";
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
 			}
 
-			target.AI.GetEvent<KissEvent>().StartedFrom(person_);
+			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_))
+			{
+				lastResult_ = $"kiss animation failed to start anim";
+				person_.Animator.StopType(Animations.Kiss);
+				target.AI.GetEvent<KissEvent>().Unlock();
+				return false;
+			}
+
+			target_ = target;
 
 			return true;
 		}
@@ -192,7 +217,7 @@ namespace Cue
 			if (!person_.Options.CanKiss)
 				return $"target {person_.ID} kissing disabled";
 
-			if (person_.Kisser.Active)
+			if (target_ != null)
 				return $"target {person_.ID} kissing already active";
 
 			if (!Lock())
@@ -201,9 +226,17 @@ namespace Cue
 			return "";
 		}
 
-		private void StartedFrom(Person initiator)
+		private bool StartedFrom(Person initiator)
 		{
+			if (!person_.Animator.PlayType(
+				Animations.Kiss, new AnimationContext(initiator, locks_[0].Key)))
+			{
+				lastResult_ = $"kiss animation failed to start";
+				return false;
+			}
+
 			Next();
+			return true;
 		}
 
 		private bool Lock()
@@ -235,7 +268,7 @@ namespace Cue
 				return false;
 			}
 
-			if (p.Kisser.Active)
+			if (Active)
 			{
 				lastResult_ = "kissing already active";
 				return false;
@@ -246,21 +279,32 @@ namespace Cue
 
 		private bool MustStop()
 		{
-			var target = person_.Kisser.Target;
-			if (target == null)
-				return false;
+			if (!person_.Animator.IsPlayingType(Animations.Kiss))
+			{
+				log_.Info("must stop: animation is not playing");
+				return true;
+			}
 
 			var srcLips = person_.Body.Get(BP.Lips);
-			var targetLips = target.Body.Get(BP.Lips);
+			var targetLips = target_.Body.Get(BP.Lips);
 
 			if (srcLips == null || targetLips == null)
-				return false;
+			{
+				log_.Info("must stop: no lips");
+				return true;
+			}
 
 			var d = Vector3.Distance(srcLips.Position, targetLips.Position);
-			var hasPlayer = (person_.IsPlayer || target.IsPlayer);
+			var hasPlayer = (person_.IsPlayer || target_.IsPlayer);
 			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
 
-			return (d >= sd);
+			if (d >= sd)
+			{
+				log_.Info($"must stop: too far, {d}");
+				return true;
+			}
+
+			return false;
 		}
 	}
 }
