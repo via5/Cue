@@ -57,7 +57,8 @@ namespace Cue.Proc
 				"hipForce", Force.AbsoluteForce, BP.Hips,
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
-					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+					durationInterval_, durationInterval_,
+					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
@@ -65,7 +66,8 @@ namespace Cue.Proc
 				new SlidingMovement(
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
-					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+					durationInterval_, durationInterval_,
+					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
@@ -73,7 +75,8 @@ namespace Cue.Proc
 				new SlidingMovement(
 					new Vector3(chestTorqueMin_, 0, 0),
 					new Vector3(chestTorqueMax_, 0, 0),
-					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+					durationInterval_, durationInterval_,
+					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
@@ -81,7 +84,8 @@ namespace Cue.Proc
 				new SlidingMovement(
 					new Vector3(headTorqueMin_, 0, 0),
 					new Vector3(headTorqueMax_, 0, 0),
-					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
+					durationInterval_, durationInterval_,
+					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
 			AddTarget(g);

@@ -269,7 +269,7 @@ namespace Cue.Proc
 		public override string ToDetailedString()
 		{
 			return
-				$"{TypeToString(type_)} {Name} {bp_} ({BP.ToString(bodyPartType_)})\n" +
+				$"{TypeToString(type_)} {Name} {bp_}\n" +
 				$"{movement_}\n" +
 				$"lerped={Lerped()} busy={wasBusy_}";
 		}

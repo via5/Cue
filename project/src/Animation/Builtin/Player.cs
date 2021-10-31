@@ -42,7 +42,7 @@ namespace Cue
 
 		public virtual bool Start(Person p, AnimationContext cx)
 		{
-			// no-op
+			person_ = p;
 			return true;
 		}
 
