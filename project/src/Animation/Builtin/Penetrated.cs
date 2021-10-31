@@ -1,6 +1,6 @@
-﻿namespace Cue.Proc
+﻿namespace Cue
 {
-	class PenetratedProcAnimation : BuiltinAnimation
+	class PenetratedAnimation : BuiltinAnimation
 	{
 		struct Config
 		{
@@ -39,14 +39,14 @@
 		private Settings settings_;
 		private Expression[] expressions_ = null;
 
-		public PenetratedProcAnimation()
+		public PenetratedAnimation()
 			: base("procPenetrated", false)
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new PenetratedProcAnimation();
+			var a = new PenetratedAnimation();
 			a.CopyFrom(this);
 			return a;
 		}

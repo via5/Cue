@@ -119,7 +119,6 @@
     <Compile Include="src\Animation\Integration\Synergy.cs" />
     <Compile Include="src\Animation\Integration\Timeline.cs" />
     <Compile Include="src\Animation\Procedural\Animation.cs" />
-    <Compile Include="src\Animation\Procedural\BuiltinAnimations.cs" />
     <Compile Include="src\Animation\Procedural\Controller.cs" />
     <Compile Include="src\Animation\Procedural\Force.cs" />
     <Compile Include="src\Animation\Procedural\Group.cs" />

@@ -3,6 +3,38 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	class BuiltinAnimations
+	{
+		public static List<Animation> Get()
+		{
+			var list = new List<Animation>();
+
+			list.Add(Create<SmokeAnimation>(Animations.Smoke));
+			list.Add(Create<PenetratedAnimation>(Animations.Penetrated));
+
+			list.Add(Create<ClockwiseKissAnimation>(Animations.Kiss));
+			list.Add(Create<ClockwiseBJAnimation>(Animations.BJ));
+			list.Add(Create<ClockwiseHJBothAnimation>(Animations.HJBoth));
+			list.Add(Create<ClockwiseHJLeftAnimation>(Animations.HJLeft));
+			list.Add(Create<ClockwiseHJRightAnimation>(Animations.HJRight));
+
+			list.Add(Create<Proc.SexProcAnimation>(Animations.Sex));
+			list.Add(Create<Proc.SuckProcAnimation>(Animations.Suck));
+			list.Add(Create<Proc.LeftFingerProcAnimation>(Animations.LeftFinger));
+			list.Add(Create<Proc.RightFingerProcAnimation>(Animations.RightFinger));
+
+			return list;
+		}
+
+		private static Animation Create<T>(int type)
+			where T : BuiltinAnimation, new()
+		{
+			var a = new T();
+			return new Animation(type, MovementStyles.Any, a);
+		}
+	}
+
+
 	class AnimationContext
 	{
 		public object ps;

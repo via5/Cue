@@ -24,7 +24,6 @@ project\src\Animation\Integration\ClockwiseKiss.cs
 project\src\Animation\Integration\Synergy.cs
 project\src\Animation\Integration\Timeline.cs
 project\src\Animation\Procedural\Animation.cs
-project\src\Animation\Procedural\BuiltinAnimations.cs
 project\src\Animation\Procedural\Controller.cs
 project\src\Animation\Procedural\Force.cs
 project\src\Animation\Procedural\Group.cs

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Cue.Proc
+﻿namespace Cue.Proc
 {
 	abstract class FingerProcAnimation : BasicProcAnimation
 	{

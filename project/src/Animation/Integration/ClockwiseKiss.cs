@@ -1,6 +1,6 @@
-﻿namespace Cue.Proc
+﻿namespace Cue
 {
-	class ClockwiseKiss : BuiltinAnimation
+	class ClockwiseKissAnimation : BuiltinAnimation
 	{
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -85,14 +85,14 @@
 			Sys.Vam.Parameters.MakeStorableNamesCache("ClockwiseSilver.Kiss");
 
 
-		public ClockwiseKiss()
+		public ClockwiseKissAnimation()
 			: base("cwKiss", false)
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ClockwiseKiss();
+			var a = new ClockwiseKissAnimation();
 			a.CopyFrom(this);
 			return a;
 		}

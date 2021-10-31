@@ -1,6 +1,6 @@
-﻿namespace Cue.Proc
+﻿namespace Cue
 {
-	abstract class ClockwiseHJ : BuiltinAnimation
+	abstract class ClockwiseHJAnimation : BuiltinAnimation
 	{
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -24,7 +24,7 @@
 		protected Person leftTarget_ = null;
 		protected Person rightTarget_ = null;
 
-		protected ClockwiseHJ(string name)
+		protected ClockwiseHJAnimation(string name)
 			: base(name, false)
 		{
 		}
@@ -172,16 +172,16 @@
 	}
 
 
-	class ClockwiseHJBoth : ClockwiseHJ
+	class ClockwiseHJBothAnimation : ClockwiseHJAnimation
 	{
-		public ClockwiseHJBoth()
+		public ClockwiseHJBothAnimation()
 			: base("cwHJboth")
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ClockwiseHJBoth();
+			var a = new ClockwiseHJBothAnimation();
 			a.CopyFrom(this);
 			return a;
 		}
@@ -206,16 +206,16 @@
 	}
 
 
-	class ClockwiseHJLeft : ClockwiseHJ
+	class ClockwiseHJLeftAnimation : ClockwiseHJAnimation
 	{
-		public ClockwiseHJLeft()
+		public ClockwiseHJLeftAnimation()
 			: base("cwHJleft")
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ClockwiseHJLeft();
+			var a = new ClockwiseHJLeftAnimation();
 			a.CopyFrom(this);
 			return a;
 		}
@@ -235,16 +235,16 @@
 	}
 
 
-	class ClockwiseHJRight : ClockwiseHJ
+	class ClockwiseHJRightAnimation : ClockwiseHJAnimation
 	{
-		public ClockwiseHJRight()
+		public ClockwiseHJRightAnimation()
 			: base("cwHJright")
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ClockwiseHJRight();
+			var a = new ClockwiseHJRightAnimation();
 			a.CopyFrom(this);
 			return a;
 		}

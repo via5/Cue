@@ -130,7 +130,7 @@ namespace Cue
 
 		private void LoadBuiltin()
 		{
-			foreach (var a in Proc.BuiltinAnimations.Get())
+			foreach (var a in BuiltinAnimations.Get())
 			{
 				if (a != null)
 					Add(a);

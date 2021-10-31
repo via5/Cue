@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Cue.Proc
+namespace Cue
 {
-	class SmokeProcAnimation : BuiltinAnimation
+	class SmokeAnimation : BuiltinAnimation
 	{
 		struct Render
 		{
@@ -93,14 +93,14 @@ namespace Cue.Proc
 
 		private bool DoRender = false;
 
-		public SmokeProcAnimation()
+		public SmokeAnimation()
 			: base("smoking", false)
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new SmokeProcAnimation();
+			var a = new SmokeAnimation();
 			a.CopyFrom(this);
 			return a;
 		}
