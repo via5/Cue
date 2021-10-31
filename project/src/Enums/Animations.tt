@@ -15,6 +15,7 @@ V.Value("Kiss"),
 V.Value("HJBoth"),
 V.Value("HJLeft"),
 V.Value("HJRight"),
+V.Value("BJ"),
 
 };
 

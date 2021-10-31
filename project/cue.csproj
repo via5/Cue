@@ -158,6 +158,7 @@
     <Compile Include="src\Person\Physiology.cs" />
     <Compile Include="src\Procedural\Animation.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations.cs" />
+    <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseBJ.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseHJ.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Finger.cs" />
     <Compile Include="src\Procedural\BuiltinAnimations\Penetrated.cs" />

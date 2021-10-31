@@ -1,6 +1,6 @@
 ﻿namespace Cue.Proc
 {
-	class ClockwiseKissAnimation : BasicProcAnimation
+	class ClockwiseKiss : BasicProcAnimation
 	{
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -81,15 +81,18 @@
 				new Pair<float, float>(0, 5),
 				new Pair<float, float>(1, 3));
 
+		private string[] targetStorableCache_ =
+			Sys.Vam.Parameters.MakeStorableNamesCache("ClockwiseSilver.Kiss");
 
-		public ClockwiseKissAnimation()
+
+		public ClockwiseKiss()
 			: base("cwKiss", false)
 		{
 		}
 
 		public override BasicProcAnimation Clone()
 		{
-			var a = new ClockwiseKissAnimation();
+			var a = new ClockwiseKiss();
 			a.CopyFrom(this);
 			return a;
 		}
@@ -116,21 +119,6 @@
 			return true;
 		}
 
-
-		class ClockwiseKissContext : AnimationContext
-		{
-			public Person initiator;
-			public bool leader;
-
-			public ClockwiseKissContext(Person initiator, bool leader)
-				: base(null)
-			{
-				this.initiator = initiator;
-				this.leader = leader;
-			}
-		}
-
-
 		public override bool Start(Person p, AnimationContext cx)
 		{
 			if (!base.Start(p, cx))
@@ -144,21 +132,7 @@
 
 			Init(p);
 
-			if (cx is ClockwiseKissContext)
-			{
-				var cwcx = cx as ClockwiseKissContext;
-				log_.Info($"starting with {cwcx.initiator}");
-
-				if (!CanStart())
-					return false;
-
-				DoKiss(cwcx.initiator, cwcx.leader);
-				return true;
-			}
-			else
-			{
-				return StartReciprocal(p, cx.ps as Person);
-			}
+			return StartReciprocal(p, cx.ps as Person);
 		}
 
 		private bool StartReciprocal(Person p, Person target)
@@ -190,12 +164,34 @@
 				leader = false;
 			}
 
+			if (leader && TargetIsLeading(target))
+			{
+				// target is already started and leads
+				leader = false;
+			}
+
 			DoKiss(target, leader);
 
-			//target.Animator.PlayType(
-			//	Animations.Kiss, new ClockwiseKissContext(person_, !leader));
-
 			return true;
+		}
+
+		private bool TargetIsLeading(Person target)
+		{
+			var active = Sys.Vam.Parameters.GetBool(
+				target.VamAtom.Atom, "ClockwiseSilver.Kiss", "isActive",
+				targetStorableCache_);
+
+			if (active != null && active.val)
+			{
+				var trackPos = Sys.Vam.Parameters.GetBool(
+					target.VamAtom.Atom, "ClockwiseSilver.Kiss", "trackPosition",
+					targetStorableCache_);
+
+				if (trackPos != null)
+					return trackPos.val;
+			}
+
+			return false;
 		}
 
 		private void Init(Person p)

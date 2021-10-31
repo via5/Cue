@@ -205,10 +205,11 @@ namespace Cue
 		protected override int DoCheck(int flags)
 		{
 			var ps = person_.Personality;
+			var e = person_.AI.GetEvent<MouthEvent>();
 
-			if (person_.Blowjob.Active)
+			if (e.Active)
 			{
-				var t = person_.Blowjob.Target;
+				var t = e.Target;
 
 				if (t != null)
 				{

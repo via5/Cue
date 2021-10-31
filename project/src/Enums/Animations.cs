@@ -19,9 +19,10 @@ namespace Cue
 		public const int HJBoth = 9;
 		public const int HJLeft = 10;
 		public const int HJRight = 11;
+		public const int BJ = 12;
 
-		public const int Count = 12;
-		public int GetCount() { return 12; }
+		public const int Count = 13;
+		public int GetCount() { return 13; }
 
 
 		private static string[] names_ = new string[]
@@ -38,6 +39,7 @@ namespace Cue
 			"hJBoth",
 			"hJLeft",
 			"hJRight",
+			"bJ",
 		};
 
 		public static int FromString(string s)

@@ -235,7 +235,9 @@ namespace Cue
 				return false;
 			}
 
+			target_ = initiator;
 			Next();
+
 			return true;
 		}
 

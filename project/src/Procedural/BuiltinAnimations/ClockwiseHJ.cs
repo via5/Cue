@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Cue.Proc
+﻿namespace Cue.Proc
 {
 	abstract class ClockwiseHJ : BasicProcAnimation
 	{

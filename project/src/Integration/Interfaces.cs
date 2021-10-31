@@ -50,11 +50,6 @@ namespace Cue
 			return new MacGruberGaze(p);
 		}
 
-		public static IBlowjob CreateBlowjob(Person p)
-		{
-			return new ClockwiseSilverBlowjob(p);
-		}
-
 		public static IClothing CreateClothing(Person p)
 		{
 			return new ClothingManager(p);
@@ -146,17 +141,6 @@ namespace Cue
 	interface ISpeaker
 	{
 		void Say(string s);
-	}
-
-	interface IBlowjob
-	{
-		bool Active { get; }
-		Person Target { get; }
-
-		bool Start(Person target);
-		void Stop();
-		void Update(float s);
-		void OnPluginState(bool b);
 	}
 
 	interface IClothing

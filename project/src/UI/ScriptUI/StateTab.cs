@@ -19,7 +19,6 @@ namespace Cue
 		private VUI.Label eyes_ = new VUI.Label();
 		private VUI.Label gazer_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
-		private VUI.Label blowjob_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 
 		private VUI.CheckBox forcePlayer_ = new VUI.CheckBox("Force as player");
@@ -77,9 +76,6 @@ namespace Cue
 			state.Add(new VUI.Label("Speech"));
 			state.Add(speech_);
 
-			state.Add(new VUI.Label("Blowjob"));
-			state.Add(blowjob_);
-
 			state.Add(new VUI.Label("Clothing"));
 			state.Add(clothing_);
 
@@ -108,7 +104,6 @@ namespace Cue
 			eyes_.Text = person_.Gaze.Eyes.ToString();
 			gazer_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();
-			blowjob_.Text = person_.Blowjob.ToString();
 			clothing_.Text = person_.Clothing.ToString();
 
 			forcePlayer_.Checked = (Cue.Instance.ForcedPlayer == person_);

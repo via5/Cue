@@ -38,7 +38,6 @@ namespace Cue
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
 		private ISpeaker speech_;
-		private IBlowjob blowjob_;
 		private IClothing clothing_;
 
 
@@ -62,7 +61,6 @@ namespace Cue
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
 			speech_ = Integration.CreateSpeaker(this);
-			blowjob_ = Integration.CreateBlowjob(this);
 			clothing_ = Integration.CreateClothing(this);
 
 			Atom.SetDefaultControls("init");
@@ -133,7 +131,6 @@ namespace Cue
 		public IBreather Breathing { get { return breathing_; } }
 		public IOrgasmer Orgasmer { get { return orgasmer_; } }
 		public ISpeaker Speech { get { return speech_; } }
-		public IBlowjob Blowjob { get { return blowjob_; } }
 
 		public int MovementStyle
 		{
@@ -215,13 +212,6 @@ namespace Cue
 			I.End();
 
 
-			I.Start(I.UpdatePersonEvents);
-			{
-				Blowjob.Update(s);
-			}
-			I.End();
-
-
 			if (!IsPlayer)
 			{
 				I.Start(I.UpdatePersonExcitement);
@@ -265,8 +255,6 @@ namespace Cue
 			base.OnPluginState(b);
 
 			animator_.OnPluginState(b);
-			Blowjob.OnPluginState(b);
-
 			ai_.OnPluginState(b);
 			expression_.OnPluginState(b);
 		}

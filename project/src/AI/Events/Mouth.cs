@@ -48,7 +48,19 @@
 			}
 		}
 
+		public Person Target
+		{
+			get { return bjTarget_; }
+		}
+
 		private void Stop()
+		{
+			UnlockBJ();
+			bjTarget_ = null;
+			person_.Animator.StopType(Animations.BJ);
+		}
+
+		private void UnlockBJ()
 		{
 			if (bjLocks_ != null)
 			{
@@ -57,9 +69,6 @@
 
 				bjLocks_ = null;
 			}
-
-			bjTarget_ = null;
-			person_.Blowjob.Stop();
 		}
 
 		public override void Update(float s)
@@ -119,8 +128,14 @@
 
 			if (bjLocks_ != null)
 			{
+				if (!person_.Animator.PlayType(
+					Animations.BJ, new AnimationContext(t, bjLocks_[0].Key)))
+				{
+					UnlockBJ();
+					return;
+				}
+
 				bjTarget_ = t;
-				person_.Blowjob.Start(t);
 			}
 		}
 

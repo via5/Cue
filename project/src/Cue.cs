@@ -36,7 +36,7 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 1, 1
 		};
 		private int[] stack_ = new int[4];
 		private int current_ = 0;
@@ -49,7 +49,6 @@ namespace Cue
 			tickers_[I.UpdateObjectsAtoms] = new Ticker("Atoms");
 			tickers_[I.UpdatePersonAnimator] = new Ticker("Animator");
 			tickers_[I.UpdatePersonGaze] = new Ticker("Gaze");
-			tickers_[I.UpdatePersonEvents] = new Ticker("Events");
 			tickers_[I.UpdatePersonExcitement] = new Ticker("Excitement");
 			tickers_[I.UpdatePersonPersonality] = new Ticker("Personality");
 			tickers_[I.UpdatePersonMood] = new Ticker("Mood");
@@ -130,15 +129,14 @@ namespace Cue
 		public const int UpdateObjectsAtoms = 3;
 		public const int UpdatePersonAnimator = 4;
 		public const int UpdatePersonGaze = 5;
-		public const int UpdatePersonEvents = 6;
-		public const int UpdatePersonExcitement = 7;
-		public const int UpdatePersonPersonality = 8;
-		public const int UpdatePersonMood = 9;
-		public const int UpdatePersonBody = 10;
-		public const int UpdatePersonAI = 11;
-		public const int UpdateUi = 12;
-		public const int FixedUpdate = 13;
-		public const int TickerCount = 14;
+		public const int UpdatePersonExcitement = 6;
+		public const int UpdatePersonPersonality = 7;
+		public const int UpdatePersonMood = 8;
+		public const int UpdatePersonBody = 9;
+		public const int UpdatePersonAI = 10;
+		public const int UpdateUi = 11;
+		public const int FixedUpdate = 12;
+		public const int TickerCount = 13;
 
 
 

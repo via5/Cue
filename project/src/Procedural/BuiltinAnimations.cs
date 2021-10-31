@@ -15,7 +15,8 @@ namespace Cue.Proc
 			list.Add(Create<LeftFingerProcAnimation>(Animations.LeftFinger));
 			list.Add(Create<RightFingerProcAnimation>(Animations.RightFinger));
 
-			list.Add(Create<ClockwiseKissAnimation>(Animations.Kiss));
+			list.Add(Create<ClockwiseKiss>(Animations.Kiss));
+			list.Add(Create<ClockwiseBJ>(Animations.BJ));
 			list.Add(Create<ClockwiseHJBoth>(Animations.HJBoth));
 			list.Add(Create<ClockwiseHJLeft>(Animations.HJLeft));
 			list.Add(Create<ClockwiseHJRight>(Animations.HJRight));
