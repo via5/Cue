@@ -153,8 +153,6 @@
     <Compile Include="src\Integration\Objects.cs" />
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Main.cs" />
-    <Compile Include="src\Object\Object.cs" />
-    <Compile Include="src\Object\Slots.cs" />
     <Compile Include="src\Person\Body\Body.cs" />
     <Compile Include="src\Person\Body\BodyPart.cs" />
     <Compile Include="src\Person\Body\BodyParts.cs" />
@@ -168,6 +166,7 @@
     <Compile Include="src\Person\Gaze\Render.cs" />
     <Compile Include="src\Person\Gaze\Targets.cs" />
     <Compile Include="src\Person\Mood.cs" />
+    <Compile Include="src\Person\Object.cs" />
     <Compile Include="src\Person\Person.cs" />
     <Compile Include="src\Person\Personality.cs" />
     <Compile Include="src\Person\Physiology.cs" />
