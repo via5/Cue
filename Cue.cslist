@@ -28,9 +28,8 @@ project\src\Animation\Procedural\Controller.cs
 project\src\Animation\Procedural\Force.cs
 project\src\Animation\Procedural\Group.cs
 project\src\Animation\Procedural\Morph.cs
-project\src\Animation\Procedural\MorphGroup.cs
-project\src\Animation\Procedural\Player.cs
 project\src\Animation\Procedural\Sync.cs
+project\src\Animation\Procedural\Target.cs
 project\src\Enums\Animations.cs
 project\src\Enums\BodyPartsEnum.cs
 project\src\Enums\EnumValues.cs

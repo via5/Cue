@@ -123,9 +123,8 @@
     <Compile Include="src\Animation\Procedural\Force.cs" />
     <Compile Include="src\Animation\Procedural\Group.cs" />
     <Compile Include="src\Animation\Procedural\Morph.cs" />
-    <Compile Include="src\Animation\Procedural\MorphGroup.cs" />
-    <Compile Include="src\Animation\Procedural\Player.cs" />
     <Compile Include="src\Animation\Procedural\Sync.cs" />
+    <Compile Include="src\Animation\Procedural\Target.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Enums\Animations.cs">
       <AutoGen>True</AutoGen>
