@@ -8,7 +8,7 @@
 		private float durationInterval_ = 5;
 
 		public SuckProcAnimation()
-			: base("procSuck", false)
+			: base("procSuck")
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,

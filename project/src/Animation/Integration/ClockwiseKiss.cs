@@ -86,7 +86,7 @@
 
 
 		public ClockwiseKissAnimation()
-			: base("cwKiss", false)
+			: base("cwKiss")
 		{
 		}
 

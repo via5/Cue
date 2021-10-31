@@ -7,6 +7,7 @@ namespace Cue.Proc
 	interface ITargetGroup : ITarget
 	{
 		List<ITarget> Targets { get; }
+		void AddTarget(ITarget t);
 	}
 
 
@@ -26,6 +27,7 @@ namespace Cue.Proc
 		}
 
 		public abstract List<ITarget> Targets { get; }
+		public abstract void AddTarget(ITarget t);
 
 		public override void GetAllForcesDebug(List<string> list)
 		{
@@ -128,7 +130,7 @@ namespace Cue.Proc
 			get { return targets_; }
 		}
 
-		public void AddTarget(ITarget t)
+		public override void AddTarget(ITarget t)
 		{
 			targets_.Add(t);
 			t.Parent = this;
@@ -223,7 +225,7 @@ namespace Cue.Proc
 			return
 				$"congroup " +
 				$"{Name}, {targets_.Count} targets indelay={inDelay_} " +
-				$"done={allDone_} forever={forever_}";
+				$"done={allDone_} forever={forever_} maxD={maxDuration_.Enabled}";
 		}
 	}
 
@@ -301,7 +303,7 @@ namespace Cue.Proc
 			get { return targets_; }
 		}
 
-		public void AddTarget(ITarget t)
+		public override void AddTarget(ITarget t)
 		{
 			targets_.Add(t);
 			t.Parent = this;

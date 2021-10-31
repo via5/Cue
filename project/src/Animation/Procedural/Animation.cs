@@ -7,8 +7,8 @@ namespace Cue.Proc
 	{
 		private RootTargetGroup root_;
 
-		public BasicProcAnimation(string name, bool hasMovement = true)
-			: base(name, hasMovement)
+		public BasicProcAnimation(string name)
+			: base(name)
 		{
 			root_ = new RootTargetGroup();
 		}
@@ -131,9 +131,10 @@ namespace Cue.Proc
 
 	class ProcAnimation : BasicProcAnimation
 	{
-		public ProcAnimation(string name, bool hasMovement=true)
-			: base(name, hasMovement)
+		public ProcAnimation(string name, bool hasMovement)
+			: base(name)
 		{
+			HasMovement = hasMovement;
 		}
 
 		public static ProcAnimation Create(JSONClass o)

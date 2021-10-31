@@ -25,7 +25,7 @@
 		protected Person rightTarget_ = null;
 
 		protected ClockwiseHJAnimation(string name)
-			: base(name, false)
+			: base(name)
 		{
 		}
 

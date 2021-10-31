@@ -16,6 +16,11 @@ namespace Cue
 		{
 		}
 
+		public SlidingMovement(Vector3 min, Vector3 max)
+			: this(min, max, 0, 0, Vector3.Zero, null)
+		{
+		}
+
 		public SlidingMovement(
 			Vector3 min, Vector3 max, float nextMin, float nextMax,
 			Vector3 windowSize, IEasing windowEasing)

@@ -36,7 +36,7 @@ namespace Cue.Proc
 		private Person receiver_ = null;
 
 		public SexProcAnimation()
-			: base("procSex", false)
+			: base("procSex")
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
@@ -58,8 +58,7 @@ namespace Cue.Proc
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
 				"hipTorque", Force.RelativeTorque, BP.Hips,
@@ -67,8 +66,7 @@ namespace Cue.Proc
 					new Vector3(hipTorqueMin_, 0, 0),
 					new Vector3(hipTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
 				Force.RelativeTorque, BP.Chest,
@@ -76,8 +74,7 @@ namespace Cue.Proc
 					new Vector3(chestTorqueMin_, 0, 0),
 					new Vector3(chestTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
 				Force.RelativeTorque, BP.Head,
@@ -85,8 +82,7 @@ namespace Cue.Proc
 					new Vector3(headTorqueMin_, 0, 0),
 					new Vector3(headTorqueMax_, 0, 0),
 					0, 0, new Vector3(0, 0, 0), new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			AddTarget(g);
 		}

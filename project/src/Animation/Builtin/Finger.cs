@@ -17,7 +17,7 @@
 
 		public FingerProcAnimation(
 			string name, int bodyPart, Vector3 torqueDir, Vector3 forceDir)
-				: base(name, false)
+				: base(name)
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
@@ -38,16 +38,14 @@
 				new SlidingMovement(
 					torqueMin_ * torqueDir, torqueMax_ * torqueDir,
 					0, 0, torqueWin_ * torqueDir, new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			g.AddTarget(new Force(
 				Force.RelativeForce, bodyPart,
 				new SlidingMovement(
 					forceMin_ * forceDir, forceMax_ * forceDir,
 					0, 0, forceWin_ * forceDir, new LinearEasing()),
-				new LinearEasing(), new ParentTargetSync(),
-				new LinearEasing(), new LinearEasing()));
+				new ParentTargetSync()));
 
 			AddTarget(g);
 		}

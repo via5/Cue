@@ -25,7 +25,7 @@
 		private bool wasActive_ = false;
 
 		public ClockwiseBJAnimation()
-			: base("cwBJ", false)
+			: base("cwBJ")
 		{
 		}
 

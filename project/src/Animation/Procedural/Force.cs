@@ -15,8 +15,6 @@ namespace Cue.Proc
 		private int bodyPartType_;
 		private BodyPart bp_ = null;
 		private SlidingMovement movement_;
-		private IEasing excitement_;
-		private IEasing fwdDelayExcitement_, bwdDelayExcitement_;
 
 		private bool oneFrameFinished_ = false;
 		private Action beforeNext_ = null;
@@ -30,26 +28,19 @@ namespace Cue.Proc
 
 		public Force(
 			int type, int bodyPart,
-			SlidingMovement m, IEasing excitement, ISync sync,
-			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
-				: this(
-					  "", type, bodyPart, m, excitement, sync,
-					  fwdDelayExcitement, bwdDelayExcitement)
+			SlidingMovement m, ISync sync)
+				: this("", type, bodyPart, m, sync)
 		{
 		}
 
 		public Force(
 			string name, int type, int bodyPart,
-			SlidingMovement m, IEasing excitement, ISync sync,
-			IEasing fwdDelayExcitement, IEasing bwdDelayExcitement)
+			SlidingMovement m, ISync sync)
 				: base(name, sync)
 		{
 			type_ = type;
 			bodyPartType_ = bodyPart;
 			movement_ = m;
-			excitement_ = excitement;
-			fwdDelayExcitement_ = fwdDelayExcitement;
-			bwdDelayExcitement_ = bwdDelayExcitement;
 
 			Next();
 		}
@@ -83,10 +74,7 @@ namespace Cue.Proc
 				return new Force(
 					type, bodyPart,
 					SlidingMovement.FromJSON(o, "movement", true),
-					EasingFromJson(o, "excitement"),
-					sync,
-					EasingFromJson(o, "fwdDelayExcitement"),
-					EasingFromJson(o, "bwdDelayExcitement"));
+					sync);
 			}
 			catch (LoadFailed e)
 			{
@@ -119,9 +107,8 @@ namespace Cue.Proc
 		{
 			var f = new Force(
 				Name, type_, bodyPartType_,
-				new SlidingMovement(movement_), excitement_,
-				Sync.Clone(),
-				fwdDelayExcitement_, bwdDelayExcitement_);
+				new SlidingMovement(movement_),
+				Sync.Clone());
 
 			f.beforeNext_ = beforeNext_;
 

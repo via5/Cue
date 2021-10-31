@@ -9,10 +9,10 @@ namespace Cue
 		private bool hasMovement_;
 		protected Person person_ = null;
 
-		protected BuiltinAnimation(string name, bool hasMovement = true)
+		protected BuiltinAnimation(string name)
 		{
 			name_ = name;
-			hasMovement_ = hasMovement;
+			hasMovement_ = false;
 		}
 
 		public string Name
@@ -28,6 +28,7 @@ namespace Cue
 		public bool HasMovement
 		{
 			get { return hasMovement_; }
+			set { hasMovement_ = value; }
 		}
 
 		public abstract bool Done { get; }
