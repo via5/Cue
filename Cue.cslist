@@ -9,11 +9,11 @@ project\src\AI\Events\Mouth.cs
 project\src\AI\Events\Sex.cs
 project\src\AI\Events\Smoke.cs
 project\src\Animation\Animator.cs
-project\src\Animation\Synergy.cs
-project\src\Animation\Timeline.cs
 project\src\Animation\BVH\BVH.cs
 project\src\Animation\BVH\BVHFile.cs
 project\src\Animation\BVH\BVHPlayer.cs
+project\src\Animation\Integration\Synergy.cs
+project\src\Animation\Integration\Timeline.cs
 project\src\Animation\Procedural\Animation.cs
 project\src\Animation\Procedural\BuiltinAnimations.cs
 project\src\Animation\Procedural\Controller.cs

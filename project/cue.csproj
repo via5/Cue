@@ -107,6 +107,8 @@
     <Compile Include="src\Animation\BVH\BVH.cs" />
     <Compile Include="src\Animation\BVH\BVHFile.cs" />
     <Compile Include="src\Animation\BVH\BVHPlayer.cs" />
+    <Compile Include="src\Animation\Integration\Synergy.cs" />
+    <Compile Include="src\Animation\Integration\Timeline.cs" />
     <Compile Include="src\Animation\Procedural\Animation.cs" />
     <Compile Include="src\Animation\Procedural\BuiltinAnimations.cs" />
     <Compile Include="src\Animation\Procedural\BuiltinAnimations\ClockwiseBJ.cs" />
@@ -124,8 +126,6 @@
     <Compile Include="src\Animation\Procedural\MorphGroup.cs" />
     <Compile Include="src\Animation\Procedural\Player.cs" />
     <Compile Include="src\Animation\Procedural\Sync.cs" />
-    <Compile Include="src\Animation\Synergy.cs" />
-    <Compile Include="src\Animation\Timeline.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Enums\Animations.cs">
       <AutoGen>True</AutoGen>

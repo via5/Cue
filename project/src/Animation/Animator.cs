@@ -3,6 +3,48 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	class AnimationContext
+	{
+		public object ps;
+		public ulong key;
+
+		public AnimationContext(object ps, ulong key = BodyPartLock.NoKey)
+		{
+			this.ps = ps;
+			this.key = key;
+		}
+	}
+
+	interface IPlayer
+	{
+		string Name { get; }
+		bool UsesFrames { get; }
+
+		IAnimation[] GetPlaying();
+		bool CanPlay(IAnimation a);
+		bool Play(IAnimation a, int flags, AnimationContext cx);
+		void RequestStop(IAnimation a);
+		void StopNow(IAnimation a);
+		void Seek(IAnimation a, float where);
+		void FixedUpdate(float s);
+		void Update(float s);
+		bool IsPlaying(IAnimation a);
+		void OnPluginState(bool b);
+	}
+
+	interface IAnimation
+	{
+		string Name { get; }
+		float InitFrame { get; }
+		float FirstFrame { get; }
+		float LastFrame { get; }
+		bool HasMovement { get; }
+		string[] GetAllForcesDebug();
+		string[] Debug();
+		string ToDetailedString();
+	}
+
+
 	class Animation
 	{
 		private readonly int type_ = Animations.None;
@@ -73,7 +115,18 @@ namespace Cue
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Animation, p, "Animator");
-			players_.AddRange(Integration.CreateAnimationPlayers(p));
+			players_.AddRange(CreatePlayers(p));
+		}
+
+		public static List<IPlayer> CreatePlayers(Person p)
+		{
+			return new List<IPlayer>()
+			{
+				new BVH.Player(p),
+				new TimelinePlayer(p),
+				new Proc.Player(p),
+				new SynergyPlayer(p)
+			};
 		}
 
 		public List<IPlayer> Players
