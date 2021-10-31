@@ -96,7 +96,8 @@ namespace Cue
 
 		IAnimation[] GetPlaying();
 		bool Play(IAnimation a, int flags, AnimationContext cx);
-		void Stop(IAnimation a, bool rewind);
+		void RequestStop(IAnimation a);
+		void StopNow(IAnimation a);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
 		void Update(float s);

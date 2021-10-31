@@ -72,6 +72,11 @@ namespace Cue.Proc
 			return true;
 		}
 
+		public virtual void RequestStop()
+		{
+			root_.RequestStop();
+		}
+
 		protected void SetEnergySource(Person p)
 		{
 			root_.SetEnergySource(p);

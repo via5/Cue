@@ -15,6 +15,7 @@ namespace Cue.Proc
 		float Magnitude { get; }
 		float Energy { set; }
 
+		void RequestStop();
 		void Reset();
 		int FixedUpdate(float s);
 		string ToDetailedString();
@@ -93,6 +94,11 @@ namespace Cue.Proc
 		public abstract float Magnitude { get; }
 		public abstract float Energy { set; }
 		public abstract bool Finished { get; }
+
+		public virtual void RequestStop()
+		{
+			// no-op
+		}
 
 		public virtual void Reset()
 		{
@@ -270,12 +276,17 @@ namespace Cue.Proc
 		public const int NoFlags = 0x00;
 		public const int Loop = 0x01;
 		public const int ResetBetween = 0x02;
+		public const int StartFast = 0x04;
+
+		private const float StopTime = 1;
 
 		private SlidingDuration fwdDuration_, bwdDuration_;
 		private Duration fwdDelay_, bwdDelay_;
-		private IEasing fwdEasing_ = new SinusoidalEasing();
-		private IEasing bwdEasing_ = new SinusoidalEasing();
+		private IEasing fwdEasing_ = new LinearEasing();
+		private IEasing bwdEasing_ = new LinearEasing();
 		private int flags_;
+		private bool stopping_ = false;
+		private float stoppingElapsed_ = 0;
 
 		public SlidingDurationSync(
 			SlidingDuration fwdDuration, SlidingDuration bwdDuration,
@@ -331,7 +342,10 @@ namespace Cue.Proc
 		{
 			get
 			{
-				return (State == FinishedState) || CurrentDuration().Finished;
+				return
+					(State == FinishedState) ||
+					CurrentDuration().Finished ||
+					(stopping_ && stoppingElapsed_ >= StopTime);
 			}
 		}
 
@@ -351,6 +365,9 @@ namespace Cue.Proc
 		{
 			get
 			{
+				if (stopping_)
+					return (stoppingElapsed_ / StopTime);
+
 				var p = CurrentDuration().Progress;
 
 				if (State == BackwardsState && !Bits.IsSet(flags_, ResetBetween))
@@ -399,15 +416,33 @@ namespace Cue.Proc
 		public override void Reset()
 		{
 			base.Reset();
+
+			stopping_ = false;
 			SetState(ForwardsState);
-			fwdDuration_?.Reset();
+			fwdDuration_?.Reset(Bits.IsSet(flags_, StartFast));
 			bwdDuration_?.Reset();
 			fwdDelay_?.Reset();
 			bwdDelay_?.Reset();
 		}
 
+		public override void RequestStop()
+		{
+			stopping_ = true;
+			stoppingElapsed_ = 0;
+		}
+
 		protected override int DoFixedUpdate(float s)
 		{
+			if (stopping_)
+			{
+				stoppingElapsed_ += s;
+
+				if (stoppingElapsed_ >= StopTime)
+					return SyncFinished;
+				else
+					return Working;
+			}
+
 			switch (State)
 			{
 				case ForwardsState:
@@ -435,7 +470,7 @@ namespace Cue.Proc
 				$"bdur={bwdDuration_?.ToLiveString()}\n" +
 				$"fdel={fwdDelay_?.ToLiveString()} bdel={bwdDelay_?.ToLiveString()}\n" +
 				$"p={CurrentDuration()?.Progress:0.00} mag={Magnitude:0.00}\n" +
-				$"state={State}";
+				$"state={State} finished={Finished} stopping={stopping_} stopelapsed={stoppingElapsed_:0.00}";
 		}
 
 		private int DoForwards(float s)

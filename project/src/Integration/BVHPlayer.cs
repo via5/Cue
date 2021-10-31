@@ -113,6 +113,15 @@ namespace Cue.BVH
             get { return true; }
         }
 
+        private bool Reverse
+        {
+            get
+            {
+                //return flags_ & Animator.Reverse;
+                return false;
+            }
+        }
+
         public override string ToString()
         {
             string s = "bvh ";
@@ -122,7 +131,7 @@ namespace Cue.BVH
             else
                 s += $"{frame_}/{anim_.LastFrame}";
 
-            if ((flags_ & Animator.Reverse) != 0)
+            if (Reverse)
                 s += " rev";
 
             if ((flags_ & Animator.Loop) != 0)
@@ -148,14 +157,6 @@ namespace Cue.BVH
             if (ba == null)
                 return false;
 
-            if (ba.Reverse)
-            {
-                if (Bits.IsSet(flags, Animator.Reverse))
-                    flags &= ~Animator.Reverse;
-                else
-                    flags |= Animator.Reverse;
-            }
-
             anim_ = ba;
             anim_.File.Init();
 
@@ -178,44 +179,19 @@ namespace Cue.BVH
             return true;
         }
 
-        public void Stop(IAnimation a, bool rewind)
+        public void StopNow(IAnimation a)
         {
             if (anim_ == null)
                 return;
 
-            if (rewind)
-            {
-                if (Bits.IsSet(flags_, Animator.Reverse))
-                    flags_ &= ~Animator.Reverse;
-                else
-                    flags_ |= Animator.Reverse;
-
-                flags_ &= ~Animator.Loop;
-
-                int fs = 0;
-                int max = anim_.File.FrameCount * 2;
-
-                while (playing_)
-                {
-                    FixedUpdate(frameTime_);
-                    ++fs;
-
-                    if (fs >= max)
-                    {
-                        log_.Error(
-                            $"bvh: failed to rewind, " +
-                            $"fs={fs} n={anim_.File.FrameCount} " +
-                            $"ft={frameTime_} max={max} " +
-                            $"f={frame_}");
-
-                        break;
-                    }
-                }
-            }
-
             person_.Atom.SetDefaultControls("playing bvh");
             playing_ = false;
             anim_ = null;
+        }
+
+        public void RequestStop(IAnimation a)
+        {
+            StopNow(a);
         }
 
         void CreateControllerMap()
@@ -481,7 +457,7 @@ namespace Cue.BVH
                 {
                     frameTimeElapsed_ = 0;
 
-                    if (Bits.IsSet(flags_, Animator.Reverse))
+                    if (Reverse)
                         --frame_;
                     else
                         frame_++;
@@ -498,7 +474,7 @@ namespace Cue.BVH
 
         private bool CheckAtEnd()
         {
-            if (Bits.IsSet(flags_, Animator.Reverse))
+            if (Reverse)
             {
                 if (frame_ > anim_.InitFrame)
                     frame_ = (int)anim_.InitFrame;
@@ -530,7 +506,7 @@ namespace Cue.BVH
 
         private void UpdateModel()
         {
-            if (Bits.IsSet(flags_, Animator.Reverse))
+            if (Reverse)
             {
                 if (frame_ <= anim_.FirstFrame + 1)
                 {

@@ -16,6 +16,7 @@ namespace Cue.Proc
 		ITarget Clone();
 		void Reset();
 		void Start(Person p, AnimationContext cx);
+		void RequestStop();
 		void FixedUpdate(float s);
 
 		void GetAllForcesDebug(List<string> list);
@@ -30,6 +31,7 @@ namespace Cue.Proc
 		private ITarget parent_ = null;
 		private ISync sync_;
 		private string name_ = "";
+		private bool stopping_ = false;
 
 		protected BasicTarget(string name, ISync sync)
 		{
@@ -67,6 +69,11 @@ namespace Cue.Proc
 
 		public abstract bool Done { get; }
 
+		public bool Stopping
+		{
+			get { return stopping_; }
+		}
+
 		public abstract ITarget Clone();
 		public abstract void FixedUpdate(float s);
 		public abstract string ToDetailedString();
@@ -74,10 +81,17 @@ namespace Cue.Proc
 		public void Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
+			sync_.Reset();
 			DoStart(p, cx);
 		}
 
 		protected abstract void DoStart(Person p, AnimationContext cx);
+
+		public virtual void RequestStop()
+		{
+			stopping_ = true;
+			sync_.RequestStop();
+		}
 
 		public virtual void GetAllForcesDebug(List<string> list)
 		{
@@ -179,10 +193,10 @@ namespace Cue.Proc
 			return true;
 		}
 
-		public void Stop(IAnimation a, bool rewind)
+		public void StopNow(IAnimation a)
 		{
 			log_.Verbose(
-				$"stopping animation {a} rewind={rewind}, " +
+				$"stopping animation now {a}, " +
 				$"looking for proto, count={playing_.Count}");
 
 			for (int i = 0; i < playing_.Count; ++i)
@@ -190,7 +204,7 @@ namespace Cue.Proc
 				if (playing_[i].proto == a)
 				{
 					log_.Verbose($"found animation at {i}");
-					DoStop(i);
+					DoStopNow(i);
 					return;
 				}
 			}
@@ -198,14 +212,42 @@ namespace Cue.Proc
 			log_.Error($"no animation found for this proto");
 		}
 
-		private void DoStop(int i)
+		public void RequestStop(IAnimation a)
 		{
 			log_.Verbose(
-				$"stopping {i}, proto is {playing_[i].proto}, " +
+				$"requesting stop for animation {a}, " +
+				$"looking for proto, count={playing_.Count}");
+
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+				{
+					log_.Verbose($"found animation at {i}");
+					DoRequestStop(i);
+					return;
+				}
+			}
+
+			log_.Error($"no animation found for this proto");
+		}
+
+		private void DoStopNow(int i)
+		{
+			log_.Verbose(
+				$"stopping now {i}, proto is {playing_[i].proto}, " +
 				$"anim is {playing_[i].anim}");
 
 			playing_[i].anim.Reset();
 			playing_.RemoveAt(i);
+		}
+
+		private void DoRequestStop(int i)
+		{
+			log_.Verbose(
+				$"requesting stop for {i}, proto is {playing_[i].proto}, " +
+				$"anim is {playing_[i].anim}");
+
+			playing_[i].anim.RequestStop();
 		}
 
 		public void FixedUpdate(float s)

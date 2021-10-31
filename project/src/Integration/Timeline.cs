@@ -115,10 +115,15 @@ namespace Cue
 			return true;
 		}
 
-		public void Stop(IAnimation a, bool rewind)
+		public void StopNow(IAnimation a)
 		{
 			stop_.Fire();
 			play_ = null;
+		}
+
+		public void RequestStop(IAnimation a)
+		{
+			StopNow(a);
 		}
 
 		public void FixedUpdate(float s)
@@ -143,9 +148,6 @@ namespace Cue
 			if (current_ != null)
 			{
 				s += current_.ToString();
-
-				if ((flags_ & Animator.Reverse) != 0)
-					s += " rev";
 
 				if ((flags_ & Animator.Loop) != 0)
 					s += " loop";

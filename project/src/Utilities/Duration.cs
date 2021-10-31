@@ -168,10 +168,10 @@ namespace Cue
 			set { f_ = value; }
 		}
 
-		public void Reset()
+		public void Reset(bool forceFast = false)
 		{
 			Next();
-			d_.Reset();
+			d_.Reset(forceFast);
 			finished_ = false;
 		}
 
@@ -195,28 +195,28 @@ namespace Cue
 				finished_ = true;
 		}
 
-		public void Next()
+		private void Next(bool forceFast = false)
 		{
-			if (windowEasing_ != null)
-			{
-				var range = max_ - min_;
+			if (windowEasing_ == null)
+				return;
 
-				if (min_ < max_)
-					range -= windowSize_;
-				else
-					range += windowSize_;
+			var range = max_ - min_;
 
-				var wmin = min_ + range * windowEasing_.Magnitude(f_);
+			if (min_ < max_)
+				range -= windowSize_;
+			else
+				range += windowSize_;
 
-				float wmax;
+			var wmin = min_ + range * windowEasing_.Magnitude(f_);
 
-				if (min_ < max_)
-					wmax = wmin + windowSize_;
-				else
-					wmax = wmin - windowSize_;
+			float wmax;
 
-				d_.SetRange(wmin, wmax);
-			}
+			if (min_ < max_)
+				wmax = wmin + windowSize_;
+			else
+				wmax = wmin - windowSize_;
+
+			d_.SetRange(wmin, wmax);
 		}
 
 		public string ToLiveString()
@@ -354,12 +354,12 @@ namespace Cue
 			get { return current_ - elapsed_; }
 		}
 
-		public void Reset()
+		public void Reset(bool forceFast = false)
 		{
 			elapsed_ = 0;
 			nextElapsed_ = 0;
 			finished_ = false;
-			Next();
+			Next(forceFast);
 		}
 
 		public void Restart()
@@ -415,9 +415,13 @@ namespace Cue
 			return $"[{min_:0.##},{max_:0.##}]";
 		}
 
-		private void Next()
+		private void Next(bool forceFast = false)
 		{
-			current_ = U.RandomFloat(min_, max_);
+			if (forceFast)
+				current_ = min_;
+			else
+				current_ = U.RandomFloat(min_, max_);
+
 			next_ = U.RandomFloat(nextMin_, nextMax_);
 		}
 	}

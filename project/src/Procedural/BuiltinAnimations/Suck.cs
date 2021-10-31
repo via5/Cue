@@ -22,11 +22,15 @@
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),
 					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop));
+					SlidingDurationSync.Loop | SlidingDurationSync.StartFast));
 
 			g.AddTarget(new MorphTarget(
 				BP.Lips, "Lips Pucker",
-				0, 1, new ParentTargetSync()));
+				0.3f, 1, new ParentTargetSync(), null, MorphTarget.StartHigh));
+
+			g.AddTarget(new MorphTarget(
+				BP.Mouth, "Mouth Open",
+				0, 1, new ParentTargetSync(), null));
 
 			AddTarget(g);
 		}

@@ -17,6 +17,14 @@ namespace Cue.Proc
 		{
 		}
 
+		public override void RequestStop()
+		{
+			base.RequestStop();
+
+			foreach (var t in Targets)
+				t.RequestStop();
+		}
+
 		public abstract List<ITarget> Targets { get; }
 
 		public override void GetAllForcesDebug(List<string> list)
@@ -149,7 +157,13 @@ namespace Cue.Proc
 
 		public override bool Done
 		{
-			get { return !forever_ && allDone_; }
+			get
+			{
+				if (Stopping)
+					return allDone_;
+				else
+					return !forever_ && allDone_;
+			}
 		}
 
 		public override void FixedUpdate(float s)
@@ -171,7 +185,7 @@ namespace Cue.Proc
 
 				for (int i = 0; i < targets_.Count; ++i)
 				{
-					if (!done_[i] || forever_)
+					if (!done_[i] || (forever_ && !Stopping))
 					{
 						targets_[i].FixedUpdate(s);
 						if (targets_[i].Done)

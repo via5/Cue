@@ -6,6 +6,9 @@ namespace Cue.Proc
 {
 	class MorphTarget : BasicTarget
 	{
+		public const int NoFlags = 0x00;
+		public const int StartHigh = 0x01;
+
 		public const int NoForceTarget = 0;
 		public const int ForceToZero = 1;
 		public const int ForceToRangePercent = 2;
@@ -29,18 +32,19 @@ namespace Cue.Proc
 		private float intensity_ = 1;
 		private bool limitHit_ = false;
 		private float limitedValue_ = 0;
+		private int flags_;
 
 		public MorphTarget(
 			int bodyPart, string morphId, float min, float max,
-			ISync sync, IEasing easing = null)
+			ISync sync, IEasing easing = null, int flags = NoFlags)
 				: base("", sync)
 		{
 			bodyPartType_ = bodyPart;
 			morphId_ = morphId;
 			min_ = min;
 			max_ = max;
-
 			easing_ = easing ?? new SinusoidalEasing();
+			flags_ = flags;
 		}
 
 		public static MorphTarget Create(JSONClass o)
@@ -93,7 +97,8 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			return new MorphTarget(
-				bodyPartType_, morphId_, min_, max_, Sync.Clone());
+				bodyPartType_, morphId_, min_, max_,
+				Sync.Clone(), easing_.Clone(), flags_);
 		}
 
 		public IEasing Easing
@@ -133,6 +138,13 @@ namespace Cue.Proc
 
 			mid_ = Mid();
 			last_ = mid_;
+			Next(false, Bits.IsSet(flags_, StartHigh));
+		}
+
+		public override void RequestStop()
+		{
+			base.RequestStop();
+			last_ = morph_.Value;
 			r_ = mid_;
 		}
 
@@ -259,7 +271,7 @@ namespace Cue.Proc
 				remaining[bodyPartType_] -= d;
 		}
 
-		private void Next(bool resetBetween)
+		private void Next(bool resetBetween, bool forceHigh = false)
 		{
 			if (resetBetween)
 				last_ = mid_;
@@ -279,7 +291,12 @@ namespace Cue.Proc
 			else
 			{
 				float range = Math.Abs(max_ - min_) * intensity_;
-				var r = U.RandomFloat(0, range);
+				float r;
+
+				if (forceHigh)
+					r = range;
+				else
+					r = U.RandomFloat(0, range);
 
 				if (min_ < max_)
 					r_ = min_ + r;

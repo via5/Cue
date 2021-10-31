@@ -47,8 +47,10 @@ namespace Cue
 	{
 		public class PlayingAnimation
 		{
-			public Animation anim;
-			public IPlayer player;
+			public readonly Animation anim;
+			public readonly IPlayer player;
+			public bool stopping = false;
+			public float stopElapsed = 0;
 
 			public PlayingAnimation(Animation a, IPlayer p)
 			{
@@ -58,17 +60,13 @@ namespace Cue
 		}
 
 		public const int Loop = 0x01;
-		public const int Reverse = 0x02;
-		public const int Rewind = 0x04;
-		public const int Exclusive = 0x08;
+
+		private const float StopGracePeriod = 5;
 
 		private Person person_;
 		private Logger log_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private readonly List<PlayingAnimation> playing_ = new List<PlayingAnimation>();
-		//private IPlayer currentPlayer_ = null;
-		//private Animation currentAnimation_ = null;
-		private int activeFlags_ = 0;
 
 		public Animator(Person p)
 		{
@@ -114,32 +112,6 @@ namespace Cue
 			return false;
 		}
 
-		public bool CanPlay(Animation a, int flags = 0, bool silent = true)
-		{
-			if (Bits.IsSet(activeFlags_, Exclusive))
-			{
-				if (Bits.IsSet(flags, Exclusive))
-				{
-					// allow exclusive to override exclusive, happens for walk
-					// and turn, for example
-					return true;
-				}
-				else
-				{
-					if (!silent)
-					{
-						log_.Error(
-							$"cannot play {a}, " +
-							$"current animation is exclusive");
-					}
-
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		public bool PlayType(int type, AnimationContext cx = null)
 		{
 			if (IsPlayingType(type))
@@ -166,9 +138,6 @@ namespace Cue
 				return false;
 			}
 
-			if (!CanPlay(a, flags, false))
-				return false;
-
 			for (int i=0; i<players_.Count;++i)
 			{
 				var p = players_[i];
@@ -176,7 +145,6 @@ namespace Cue
 				if (p.Play(a.Sys, flags, cx))
 				{
 					playing_.Add(new PlayingAnimation(a, p));
-					activeFlags_ = flags;
 					return true;
 				}
 			}
@@ -185,42 +153,38 @@ namespace Cue
 			return false;
 		}
 
-		public void Stop()
+		public void StopNow()
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				var a = playing_[i];
-				a.player.Stop(a.anim.Sys, Bits.IsSet(activeFlags_, Rewind));
+				a.player.StopNow(a.anim.Sys);
 			}
 
 			playing_.Clear();
-			activeFlags_ = 0;
 		}
 
 		public void StopType(int type)
 		{
 			log_.Info($"stopping animation {Animations.ToString(type)}");
-			int i = 0;
-			int removed = 0;
 
-			while (i < playing_.Count)
+			int stopped = 0;
+
+			for (int i=0; i<playing_.Count;++i)
 			{
 				var a = playing_[i];
 
 				if (a.anim.Type == type)
 				{
 					log_.Info($"stopping animation {a}");
-					a.player.Stop(a.anim.Sys, Bits.IsSet(activeFlags_, Rewind));
-					playing_.RemoveAt(i);
-					++removed;
-				}
-				else
-				{
-					++i;
+					a.stopping = true;
+					a.stopElapsed = 0;
+					a.player.RequestStop(a.anim.Sys);
+					++stopped;
 				}
 			}
 
-			if (removed == 0)
+			if (stopped == 0)
 			{
 				log_.Error(
 					$"no animation {Animations.ToString(type)} found to stop, " +
@@ -228,7 +192,7 @@ namespace Cue
 			}
 			else
 			{
-				log_.Info($"stopped {removed} animations");
+				log_.Info($"stopped {stopped} animations");
 			}
 		}
 
@@ -236,8 +200,6 @@ namespace Cue
 		{
 			for (int i = 0; i < players_.Count; ++i)
 				players_[i].FixedUpdate(s);
-
-			RemoveFinished();
 		}
 
 		public void Update(float s)
@@ -245,20 +207,39 @@ namespace Cue
 			for (int i = 0; i < players_.Count; ++i)
 				players_[i].Update(s);
 
-			RemoveFinished();
+			RemoveFinished(s);
 		}
 
-		private void RemoveFinished()
+		private void RemoveFinished(float s)
 		{
 			int i = 0;
 
 			while (i < playing_.Count)
 			{
 				var a = playing_[i];
+				bool remove = false;
 
 				if (!a.player.IsPlaying(a.anim.Sys))
 				{
-					a.player.Stop(a.anim.Sys, false);
+					remove = true;
+				}
+				else if (a.stopping)
+				{
+					a.stopElapsed += s;
+
+					if (a.stopElapsed >= StopGracePeriod)
+					{
+						log_.Error(
+							$"force stopping animation {a.anim}, took too " +
+							$"long to stop by itself");
+
+						remove = true;
+					}
+				}
+
+				if (remove)
+				{
+					a.player.StopNow(a.anim.Sys);
 					playing_.RemoveAt(i);
 				}
 				else
@@ -266,9 +247,6 @@ namespace Cue
 					++i;
 				}
 			}
-
-			if (playing_.Count == 0)
-				activeFlags_ = 0;
 		}
 
 		public void OnPluginState(bool b)
@@ -280,11 +258,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return $"playing {playing_.Count} anims";
-
-			//if (currentPlayer_ != null)
-			//	return currentPlayer_.ToString();
-			//else
-			//	return "(none)";
 		}
 
 		public void DumpAllForces()

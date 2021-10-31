@@ -1,6 +1,4 @@
 ﻿using SimpleJSON;
-using System;
-using System.Collections.Generic;
 
 namespace Cue
 {
@@ -51,10 +49,15 @@ namespace Cue
 			return true;
 		}
 
-		public void Stop(IAnimation a, bool rewind)
+		public void StopNow(IAnimation a)
 		{
 			step_.Value = "";
 			anim_ = null;
+		}
+
+		public void RequestStop(IAnimation a)
+		{
+			StopNow(a);
 		}
 
 		public void FixedUpdate(float s)
