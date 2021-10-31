@@ -82,6 +82,11 @@ namespace Cue
 				return new IAnimation[0];
 		}
 
+		public string Name
+		{
+			get { return "timeline"; }
+		}
+
 		public bool UsesFrames
 		{
 			get { return false; }
@@ -90,6 +95,11 @@ namespace Cue
 		public void Seek(IAnimation a, float f)
 		{
 			// todo
+		}
+
+		public bool CanPlay(IAnimation a)
+		{
+			return (a is TimelineAnimation);
 		}
 
 		public bool Play(IAnimation a, int flags, AnimationContext cx)

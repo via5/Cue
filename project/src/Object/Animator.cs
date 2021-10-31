@@ -143,18 +143,25 @@ namespace Cue
 			{
 				var p = players_[i];
 
-				try
+				if (p.CanPlay(a.Sys))
 				{
-					if (p.Play(a.Sys, flags, cx))
+					try
 					{
-						playing_.Add(new PlayingAnimation(a, p));
-						return true;
+						if (p.Play(a.Sys, flags, cx))
+						{
+							playing_.Add(new PlayingAnimation(a, p));
+							return true;
+						}
+
+						log_.Error($"player '{p.Name}' failed to start {a}");
+						return false;
 					}
-				}
-				catch (Exception e)
-				{
-					log_.Error($"exception while trying to play {a} with player {p}:");
-					log_.Error(e.ToString());
+					catch (Exception e)
+					{
+						log_.Error($"exception while trying to play {a} with player {p}:");
+						log_.Error(e.ToString());
+						return false;
+					}
 				}
 			}
 

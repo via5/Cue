@@ -108,6 +108,11 @@ namespace Cue.BVH
                 return new IAnimation[0];
         }
 
+        public string Name
+        {
+            get { return "bvh"; }
+        }
+
         public bool UsesFrames
         {
             get { return true; }
@@ -149,6 +154,11 @@ namespace Cue.BVH
         {
             if (!b)
                 HideSkeleton();
+        }
+
+        public bool CanPlay(IAnimation a)
+        {
+            return (a is Animation);
         }
 
         public bool Play(IAnimation a, int flags, AnimationContext cx)

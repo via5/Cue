@@ -16,6 +16,11 @@ namespace Cue
 			step_ = new Sys.Vam.StringParameter(p, "Synergy.Synergy", "Force Play Step");
 		}
 
+		public string Name
+		{
+			get { return "synergy"; }
+		}
+
 		public bool UsesFrames
 		{
 			get { return false; }
@@ -37,6 +42,11 @@ namespace Cue
 		public void Seek(IAnimation a, float f)
 		{
 			// todo
+		}
+
+		public bool CanPlay(IAnimation a)
+		{
+			return (a is SynergyAnimation);
 		}
 
 		public bool Play(IAnimation a, int flags, AnimationContext cx)
@@ -74,7 +84,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "Synergy: " + (anim_ == null ? "(none)" : anim_.ToString());
+			return $"{Name}: {(anim_ == null ? "(none)" : anim_.ToString())}";
 		}
 	}
 

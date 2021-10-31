@@ -55,9 +55,21 @@
 			}
 		}
 
+		public Person LeftTarget
+		{
+			get { return leftTarget_; }
+		}
+
+		public Person RightTarget
+		{
+			get { return rightTarget_; }
+		}
+
 		private void Stop()
 		{
-			person_.Handjob.Stop();
+			person_.Animator.StopType(Animations.HJBoth);
+			person_.Animator.StopType(Animations.HJLeft);
+			person_.Animator.StopType(Animations.HJRight);
 			person_.Animator.StopType(Animations.RightFinger);
 			person_.Animator.StopType(Animations.LeftFinger);
 
@@ -155,7 +167,9 @@
 
 				if (LockBoth("double hj"))
 				{
-					if (person_.Handjob.StartBoth(leftTarget.Person))
+					if (person_.Animator.PlayType(
+						Animations.HJBoth, new AnimationContext(
+							leftTarget.Person, leftLock_[0].Key)))
 					{
 						leftTarget_ = leftTarget.Person;
 						rightTarget_ = rightTarget.Person;
@@ -172,8 +186,12 @@
 
 						if (LockLeft("left hj"))
 						{
-							if (person_.Handjob.StartLeft(leftTarget.Person))
+							if (person_.Animator.PlayType(
+								Animations.HJLeft, new AnimationContext(
+									leftTarget.Person, leftLock_[0].Key)))
+							{
 								leftTarget_ = leftTarget.Person;
+							}
 						}
 					}
 					else if (leftTarget.Type == BP.Labia)
@@ -204,8 +222,12 @@
 
 						if (LockRight("right hj"))
 						{
-							if (person_.Handjob.StartRight(rightTarget.Person))
+							if (person_.Animator.PlayType(
+								Animations.HJRight, new AnimationContext(
+									rightTarget.Person, rightLock_[0].Key)))
+							{
 								rightTarget_ = rightTarget.Person;
+							}
 						}
 					}
 					else if (rightTarget.Type == BP.Labia)

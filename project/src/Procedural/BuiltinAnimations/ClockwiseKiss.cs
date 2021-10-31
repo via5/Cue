@@ -107,7 +107,7 @@
 				return false;
 			}
 
-			if (Active)
+			if (running_.Value)
 			{
 				log_.Error("can't start, already active");
 				return false;
@@ -354,26 +354,6 @@
 				trackingSpeed_.Value = StopTrackingSpeed;
 				active_.Value = false;
 				elapsed_ = 0;
-			}
-		}
-
-		private bool Active
-		{
-			get { return running_.Value; }
-		}
-
-		private Person Target
-		{
-			get
-			{
-				if (!Active)
-					return null;
-
-				var tid = atom_.Value;
-				if (tid == "")
-					return null;
-
-				return Cue.Instance.FindPerson(tid);
 			}
 		}
 

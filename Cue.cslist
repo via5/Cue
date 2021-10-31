@@ -53,6 +53,7 @@ project\src\Procedural\Morph.cs
 project\src\Procedural\MorphGroup.cs
 project\src\Procedural\Player.cs
 project\src\Procedural\Sync.cs
+project\src\Procedural\BuiltinAnimations\ClockwiseHJ.cs
 project\src\Procedural\BuiltinAnimations\ClockwiseKiss.cs
 project\src\Procedural\BuiltinAnimations\Finger.cs
 project\src\Procedural\BuiltinAnimations\Penetrated.cs

@@ -19,7 +19,6 @@ namespace Cue
 		private VUI.Label eyes_ = new VUI.Label();
 		private VUI.Label gazer_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
-		private VUI.Label handjob_ = new VUI.Label();
 		private VUI.Label blowjob_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 
@@ -78,9 +77,6 @@ namespace Cue
 			state.Add(new VUI.Label("Speech"));
 			state.Add(speech_);
 
-			state.Add(new VUI.Label("Handjob"));
-			state.Add(handjob_);
-
 			state.Add(new VUI.Label("Blowjob"));
 			state.Add(blowjob_);
 
@@ -112,7 +108,6 @@ namespace Cue
 			eyes_.Text = person_.Gaze.Eyes.ToString();
 			gazer_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();
-			handjob_.Text = person_.Handjob.ToString();
 			blowjob_.Text = person_.Blowjob.ToString();
 			clothing_.Text = person_.Clothing.ToString();
 

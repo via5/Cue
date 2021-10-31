@@ -149,6 +149,11 @@ namespace Cue.Proc
 			return null;
 		}
 
+		public string Name
+		{
+			get { return "proc"; }
+		}
+
 		public bool UsesFrames
 		{
 			get { return false; }
@@ -172,6 +177,11 @@ namespace Cue.Proc
 		public void Seek(IAnimation a, float f)
 		{
 			// todo
+		}
+
+		public bool CanPlay(IAnimation a)
+		{
+			return (a is BasicProcAnimation);
 		}
 
 		public bool Play(IAnimation a, int flags, AnimationContext cx)

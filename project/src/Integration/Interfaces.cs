@@ -50,11 +50,6 @@ namespace Cue
 			return new MacGruberGaze(p);
 		}
 
-		public static IHandjob CreateHandjob(Person p)
-		{
-			return new ClockwiseSilverHandjob(p);
-		}
-
 		public static IBlowjob CreateBlowjob(Person p)
 		{
 			return new ClockwiseSilverBlowjob(p);
@@ -87,9 +82,11 @@ namespace Cue
 
 	interface IPlayer
 	{
+		string Name { get; }
 		bool UsesFrames { get; }
 
 		IAnimation[] GetPlaying();
+		bool CanPlay(IAnimation a);
 		bool Play(IAnimation a, int flags, AnimationContext cx);
 		void RequestStop(IAnimation a);
 		void StopNow(IAnimation a);
@@ -149,26 +146,6 @@ namespace Cue
 	interface ISpeaker
 	{
 		void Say(string s);
-	}
-
-	interface IHandjob
-	{
-		bool Active { get; }
-		bool LeftUsed { get; }
-		bool RightUsed { get; }
-
-		Person[] Targets { get; }
-
-		bool StartBoth(Person p);
-		bool StartLeft(Person p);
-		bool StartRight(Person p);
-
-		void Stop();
-		void StopLeft();
-		void StopRight();
-
-		void Update(float s);
-		void OnPluginState(bool b);
 	}
 
 	interface IBlowjob

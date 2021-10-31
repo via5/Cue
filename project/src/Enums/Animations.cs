@@ -16,9 +16,12 @@ namespace Cue
 		public const int RightFinger = 6;
 		public const int LeftFinger = 7;
 		public const int Kiss = 8;
+		public const int HJBoth = 9;
+		public const int HJLeft = 10;
+		public const int HJRight = 11;
 
-		public const int Count = 9;
-		public int GetCount() { return 9; }
+		public const int Count = 12;
+		public int GetCount() { return 12; }
 
 
 		private static string[] names_ = new string[]
@@ -32,6 +35,9 @@ namespace Cue
 			"rightFinger",
 			"leftFinger",
 			"kiss",
+			"hJBoth",
+			"hJLeft",
+			"hJRight",
 		};
 
 		public static int FromString(string s)

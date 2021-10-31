@@ -253,44 +253,46 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
-			var ps = person_.Personality;
+			var e = person_.AI.GetEvent<HandEvent>();
 
-			if (person_.Handjob.Active)
+			if (e.Active)
 			{
-				var ts = person_.Handjob.Targets;
+				int ret = 0;
 
-				if (ts != null && ts.Length > 0)
-				{
-					int ret = 0;
+				if (e.LeftTarget != null && e.LeftTarget == e.RightTarget)
+					ret |= CheckTarget(e.LeftTarget);
+				else if (e.LeftTarget != null)
+					ret |= CheckTarget(e.LeftTarget);
+				else if (e.RightTarget != null)
+					ret |= CheckTarget(e.RightTarget);
 
-					for (int i = 0; i < ts.Length; ++i)
-					{
-						var t = ts[i];
-
-						if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
-						{
-							targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
-							ret |= Continue | Busy;
-						}
-						else
-						{
-							targets_.SetWeight(
-								t, BP.Eyes,
-								ps.Get(PSE.HandjobEyesWeight), "hj");
-
-							targets_.SetWeight(
-								t, BP.Penis,
-								ps.Get(PSE.HandjobGenitalsWeight), "hj");
-
-							ret |= Continue | Busy | NoRandom;
-						}
-					}
-
-					return ret;
-				}
+				return ret;
 			}
 
 			return Continue;
+		}
+
+		private int CheckTarget(Person t)
+		{
+			var ps = person_.Personality;
+
+			if (ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
+			{
+				targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
+				return Continue | Busy;
+			}
+			else
+			{
+				targets_.SetWeight(
+					t, BP.Eyes,
+					ps.Get(PSE.HandjobEyesWeight), "hj");
+
+				targets_.SetWeight(
+					t, BP.Penis,
+					ps.Get(PSE.HandjobGenitalsWeight), "hj");
+
+				return Continue | Busy | NoRandom;
+			}
 		}
 
 		public override string ToString()

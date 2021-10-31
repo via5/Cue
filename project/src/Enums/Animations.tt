@@ -11,7 +11,10 @@ V.Value("Suck"),
 V.Value("Penetrated"),
 V.Value("RightFinger"),
 V.Value("LeftFinger"),
-V.Value("Kiss")
+V.Value("Kiss"),
+V.Value("HJBoth"),
+V.Value("HJLeft"),
+V.Value("HJRight"),
 
 };
 

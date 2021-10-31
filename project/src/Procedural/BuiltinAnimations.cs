@@ -8,57 +8,26 @@ namespace Cue.Proc
 		{
 			var list = new List<Animation>();
 
-			list.Add(Sex());
-			list.Add(Smoke());
-			list.Add(Suck());
-			list.Add(Penetrated());
-			list.Add(LeftFinger());
-			list.Add(RightFinger());
-			list.Add(Kiss());
+			list.Add(Create<SexProcAnimation>(Animations.Sex));
+			list.Add(Create<SmokeProcAnimation>(Animations.Smoke));
+			list.Add(Create<SuckProcAnimation>(Animations.Suck));
+			list.Add(Create<PenetratedProcAnimation>(Animations.Penetrated));
+			list.Add(Create<LeftFingerProcAnimation>(Animations.LeftFinger));
+			list.Add(Create<RightFingerProcAnimation>(Animations.RightFinger));
+
+			list.Add(Create<ClockwiseKissAnimation>(Animations.Kiss));
+			list.Add(Create<ClockwiseHJBoth>(Animations.HJBoth));
+			list.Add(Create<ClockwiseHJLeft>(Animations.HJLeft));
+			list.Add(Create<ClockwiseHJRight>(Animations.HJRight));
 
 			return list;
 		}
 
-		private static Animation Sex()
+		private static Animation Create<T>(int type)
+			where T : BasicProcAnimation, new()
 		{
-			var a = new SexProcAnimation();
-			return new Animation(Animations.Sex, MovementStyles.Any, a);
-		}
-
-		private static Animation Smoke()
-		{
-			var a = new SmokeProcAnimation();
-			return new Animation(Animations.Smoke, MovementStyles.Any, a);
-		}
-
-		private static Animation Suck()
-		{
-			var a = new SuckProcAnimation();
-			return new Animation(Animations.Suck, MovementStyles.Any, a);
-		}
-
-		private static Animation Penetrated()
-		{
-			var a = new PenetratedProcAnimation();
-			return new Animation(Animations.Penetrated, MovementStyles.Any, a);
-		}
-
-		private static Animation LeftFinger()
-		{
-			var a = new LeftFingerProcAnimation();
-			return new Animation(Animations.LeftFinger, MovementStyles.Any, a);
-		}
-
-		private static Animation RightFinger()
-		{
-			var a = new RightFingerProcAnimation();
-			return new Animation(Animations.RightFinger, MovementStyles.Any, a);
-		}
-
-		private static Animation Kiss()
-		{
-			var a = new ClockwiseKissAnimation();
-			return new Animation(Animations.Kiss, MovementStyles.Any, a);
+			var a = new T();
+			return new Animation(type, MovementStyles.Any, a);
 		}
 	}
 }
