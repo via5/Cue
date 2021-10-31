@@ -3,33 +3,23 @@ using System.Collections.Generic;
 
 namespace Cue.Proc
 {
-	abstract class BasicProcAnimation : IAnimation
+	abstract class BasicProcAnimation : BuiltinAnimation
 	{
-		private readonly string name_;
-		private bool hasMovement_;
 		private RootTargetGroup root_;
-		protected Person person_ = null;
 
 		public BasicProcAnimation(string name, bool hasMovement = true)
+			: base(name, hasMovement)
 		{
-			name_ = name;
-			hasMovement_ = hasMovement;
 			root_ = new RootTargetGroup();
 		}
 
-		public abstract BasicProcAnimation Clone();
-
-		protected virtual void CopyFrom(BasicProcAnimation o)
+		protected void CopyFrom(BasicProcAnimation o)
 		{
+			base.CopyFrom(o);
 			root_ = (RootTargetGroup)o.root_.Clone();
 		}
 
-		public string Name
-		{
-			get { return name_; }
-		}
-
-		public virtual bool Done
+		public override bool Done
 		{
 			get { return root_.Done; }
 		}
@@ -37,16 +27,6 @@ namespace Cue.Proc
 		public RootTargetGroup RootGroup
 		{
 			get { return root_; }
-		}
-
-		// todo
-		public float InitFrame { get { return -1; } }
-		public float FirstFrame { get { return -1; } }
-		public float LastFrame { get { return -1; } }
-
-		public bool HasMovement
-		{
-			get { return hasMovement_; }
 		}
 
 		public void AddTarget(ITarget t)
@@ -64,7 +44,7 @@ namespace Cue.Proc
 			return root_.FindTarget(name);
 		}
 
-		public virtual bool Start(Person p, AnimationContext cx)
+		public override bool Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
 			SetEnergySource(p);
@@ -72,7 +52,7 @@ namespace Cue.Proc
 			return true;
 		}
 
-		public virtual void RequestStop()
+		public override void RequestStop()
 		{
 			root_.RequestStop();
 		}
@@ -82,22 +62,17 @@ namespace Cue.Proc
 			root_.SetEnergySource(p);
 		}
 
-		public virtual void Reset()
+		public override void Reset()
 		{
 			root_.Reset();
 		}
 
-		public virtual void FixedUpdate(float s)
+		public override void FixedUpdate(float s)
 		{
 			root_.FixedUpdate(s);
 		}
 
-		public virtual void Update(float s)
-		{
-			// no-op
-		}
-
-		public virtual string[] GetAllForcesDebug()
+		public override string[] GetAllForcesDebug()
 		{
 			var list = new List<string>();
 			root_.GetAllForcesDebug(list);
@@ -109,7 +84,7 @@ namespace Cue.Proc
 			return new string(' ', i * 4);
 		}
 
-		public virtual string[] Debug()
+		public override string[] Debug()
 		{
 			var items = new List<string>();
 
@@ -150,16 +125,6 @@ namespace Cue.Proc
 				foreach (var c in (t as ITargetGroup).Targets)
 					DebugTarget(items, c, indent + 1);
 			}
-		}
-
-		public override string ToString()
-		{
-			return name_;
-		}
-
-		public virtual string ToDetailedString()
-		{
-			return ToString();
 		}
 	}
 
@@ -220,7 +185,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new ProcAnimation(Name, HasMovement);
 			a.CopyFrom(this);

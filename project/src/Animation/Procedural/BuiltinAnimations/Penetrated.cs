@@ -1,6 +1,6 @@
 ﻿namespace Cue.Proc
 {
-	class PenetratedProcAnimation : BasicProcAnimation
+	class PenetratedProcAnimation : BuiltinAnimation
 	{
 		struct Config
 		{
@@ -44,7 +44,7 @@
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new PenetratedProcAnimation();
 			a.CopyFrom(this);

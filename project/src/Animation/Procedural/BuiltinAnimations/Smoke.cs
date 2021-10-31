@@ -2,7 +2,7 @@
 
 namespace Cue.Proc
 {
-	class SmokeProcAnimation : BasicProcAnimation
+	class SmokeProcAnimation : BuiltinAnimation
 	{
 		struct Render
 		{
@@ -98,7 +98,7 @@ namespace Cue.Proc
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new SmokeProcAnimation();
 			a.CopyFrom(this);

@@ -25,7 +25,7 @@ namespace Cue.Proc
 		}
 
 		private static Animation Create<T>(int type)
-			where T : BasicProcAnimation, new()
+			where T : BuiltinAnimation, new()
 		{
 			var a = new T();
 			return new Animation(type, MovementStyles.Any, a);

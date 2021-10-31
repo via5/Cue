@@ -92,7 +92,7 @@ namespace Cue.Proc
 			AddTarget(g);
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new SexProcAnimation();
 			a.CopyFrom(this);

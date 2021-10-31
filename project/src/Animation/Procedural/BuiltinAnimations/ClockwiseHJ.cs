@@ -1,6 +1,6 @@
 ﻿namespace Cue.Proc
 {
-	abstract class ClockwiseHJ : BasicProcAnimation
+	abstract class ClockwiseHJ : BuiltinAnimation
 	{
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -179,7 +179,7 @@
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseHJBoth();
 			a.CopyFrom(this);
@@ -213,7 +213,7 @@
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseHJLeft();
 			a.CopyFrom(this);
@@ -242,7 +242,7 @@
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseHJRight();
 			a.CopyFrom(this);

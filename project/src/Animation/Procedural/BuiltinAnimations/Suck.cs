@@ -35,7 +35,7 @@
 			AddTarget(g);
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new SuckProcAnimation();
 			a.CopyFrom(this);

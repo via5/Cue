@@ -122,9 +122,9 @@ namespace Cue
 		{
 			return new List<IPlayer>()
 			{
+				new BuiltinPlayer(p),
 				new BVH.Player(p),
 				new TimelinePlayer(p),
-				new Proc.Player(p),
 				new SynergyPlayer(p)
 			};
 		}

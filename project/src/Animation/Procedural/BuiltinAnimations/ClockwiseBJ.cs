@@ -1,6 +1,6 @@
 ﻿namespace Cue.Proc
 {
-	class ClockwiseBJ : BasicProcAnimation
+	class ClockwiseBJ : BuiltinAnimation
 	{
 		private Logger log_;
 		private Person target_ = null;
@@ -29,7 +29,7 @@
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseBJ();
 			a.CopyFrom(this);

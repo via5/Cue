@@ -9,6 +9,7 @@ project\src\AI\Events\Mouth.cs
 project\src\AI\Events\Sex.cs
 project\src\AI\Events\Smoke.cs
 project\src\Animation\Animator.cs
+project\src\Animation\BuiltinPlayer.cs
 project\src\Animation\BVH\BVH.cs
 project\src\Animation\BVH\BVHFile.cs
 project\src\Animation\BVH\BVHPlayer.cs

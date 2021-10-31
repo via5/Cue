@@ -76,7 +76,7 @@ namespace Cue.Proc
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new LeftFingerProcAnimation();
 			a.CopyFrom(this);
@@ -94,7 +94,7 @@ namespace Cue.Proc
 		{
 		}
 
-		public override BasicProcAnimation Clone()
+		public override BuiltinAnimation Clone()
 		{
 			var a = new RightFingerProcAnimation();
 			a.CopyFrom(this);
