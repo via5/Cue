@@ -103,6 +103,29 @@
     <Compile Include="src\AI\Events\Mouth.cs" />
     <Compile Include="src\AI\Events\Sex.cs" />
     <Compile Include="src\AI\Events\Smoke.cs" />
+    <Compile Include="src\Animation\Animator.cs" />
+    <Compile Include="src\Animation\BVH\BVH.cs" />
+    <Compile Include="src\Animation\BVH\BVHFile.cs" />
+    <Compile Include="src\Animation\BVH\BVHPlayer.cs" />
+    <Compile Include="src\Animation\Procedural\Animation.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\ClockwiseBJ.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\ClockwiseHJ.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\ClockwiseKiss.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\Finger.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\Penetrated.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\Sex.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\Smoke.cs" />
+    <Compile Include="src\Animation\Procedural\BuiltinAnimations\Suck.cs" />
+    <Compile Include="src\Animation\Procedural\Controller.cs" />
+    <Compile Include="src\Animation\Procedural\Force.cs" />
+    <Compile Include="src\Animation\Procedural\Group.cs" />
+    <Compile Include="src\Animation\Procedural\Morph.cs" />
+    <Compile Include="src\Animation\Procedural\MorphGroup.cs" />
+    <Compile Include="src\Animation\Procedural\Player.cs" />
+    <Compile Include="src\Animation\Procedural\Sync.cs" />
+    <Compile Include="src\Animation\Synergy.cs" />
+    <Compile Include="src\Animation\Timeline.cs" />
     <Compile Include="src\Cue.cs" />
     <Compile Include="src\Enums\Animations.cs">
       <AutoGen>True</AutoGen>
@@ -125,19 +148,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>PhysiologyEnum.tt</DependentUpon>
     </Compile>
-    <Compile Include="src\Integration\BVH.cs" />
-    <Compile Include="src\Integration\BVHFile.cs" />
-    <Compile Include="src\Integration\BVHPlayer.cs" />
-    <Compile Include="src\Integration\ClockwiseSilver.cs" />
     <Compile Include="src\Integration\ClothingManager.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
     <Compile Include="src\Integration\Objects.cs" />
-    <Compile Include="src\Integration\Synergy.cs" />
-    <Compile Include="src\Integration\Timeline.cs" />
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Main.cs" />
-    <Compile Include="src\Object\Animator.cs" />
     <Compile Include="src\Object\Object.cs" />
     <Compile Include="src\Object\Slots.cs" />
     <Compile Include="src\Person\Body\Body.cs" />
@@ -156,23 +172,6 @@
     <Compile Include="src\Person\Person.cs" />
     <Compile Include="src\Person\Personality.cs" />
     <Compile Include="src\Person\Physiology.cs" />
-    <Compile Include="src\Procedural\Animation.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseBJ.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseHJ.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Finger.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Penetrated.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Sex.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Smoke.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\Suck.cs" />
-    <Compile Include="src\Procedural\Controller.cs" />
-    <Compile Include="src\Procedural\Force.cs" />
-    <Compile Include="src\Procedural\Group.cs" />
-    <Compile Include="src\Procedural\BuiltinAnimations\ClockwiseKiss.cs" />
-    <Compile Include="src\Procedural\Morph.cs" />
-    <Compile Include="src\Procedural\MorphGroup.cs" />
-    <Compile Include="src\Procedural\Player.cs" />
-    <Compile Include="src\Procedural\Sync.cs" />
     <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Resources\Personalities.cs" />
