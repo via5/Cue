@@ -199,7 +199,12 @@ namespace Cue
 
 			var p = Selected as Person;
 			if (p != null)
-				p.Animator.PlayType(Animations.Penetrated);
+			{
+				if (p.Animator.IsPlayingType(Animations.Suck))
+					p.Animator.StopType(Animations.Suck);
+				else
+					p.Animator.PlayType(Animations.Suck);
+			}
 		}
 
 		private void OnForceExcitement(bool b)

@@ -10,9 +10,6 @@ namespace Cue.Proc
 		void Reset();
 		void FixedUpdate(float s, float intensity);
 		void Set(float s, float[] remaining);
-
-		void ForceChange();
-		void Force(int type, float rangePercent);
 	}
 
 
@@ -47,9 +44,6 @@ namespace Cue.Proc
 		}
 
 		public abstract void FixedUpdate(float s, float intensity);
-		public abstract void ForceChange();
-		public abstract void Force(int type, float rangePercent);
-
 		public abstract void Set(float s, float[] remaining);
 	}
 
@@ -59,12 +53,6 @@ namespace Cue.Proc
 		public ConcurrentProceduralMorphGroup(string name)
 			: base(name)
 		{
-		}
-
-		public override void Force(int type, float rangePercent)
-		{
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].Force(type, rangePercent);
 		}
 
 		public override void FixedUpdate(float s, float intensity)
@@ -93,12 +81,6 @@ namespace Cue.Proc
 					++i;
 				}
 			}
-		}
-
-		public override void ForceChange()
-		{
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].ForceChange();
 		}
 
 		public override void Set(float s, float[] remaining)
@@ -156,24 +138,6 @@ namespace Cue.Proc
 			state_ = ActiveState;
 		}
 
-		public override void Force(int type, float rangePercent)
-		{
-			if (morphs_.Count == 0)
-				return;
-
-			if (type == MorphTarget.ForceToZero || type == MorphTarget.NoForceTarget)
-			{
-				foreach (var m in morphs_)
-					morphs_[i_].Force(type, rangePercent);
-
-				if (state_ == DelayState)
-				{
-					state_ = ActiveState;
-					delay_.Reset();
-				}
-			}
-		}
-
 		public override void FixedUpdate(float s, float intensity)
 		{
 			if (morphs_.Count == 0)
@@ -218,12 +182,6 @@ namespace Cue.Proc
 					break;
 				}
 			}
-		}
-
-		public override void ForceChange()
-		{
-			for (int i = 0; i < morphs_.Count; ++i)
-				morphs_[i].ForceChange();
 		}
 
 		public override void Set(float s, float[] remaining)

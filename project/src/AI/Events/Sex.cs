@@ -7,7 +7,7 @@
 		private const int Penetrated = 2;
 
 		private const float TentativeTime = 0.2f;
-		private const float Cooldown = 10;
+		private const float Cooldown = 30;
 
 		public const int NoState = 0;
 		public const int PlayState = 1;

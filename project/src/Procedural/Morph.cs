@@ -30,12 +30,6 @@ namespace Cue.Proc
 		private bool limitHit_ = false;
 		private float limitedValue_ = 0;
 
-		private int forceType_ = NoForceTarget;
-		private float forceRangePercent_ = 0;
-		private float forceTarget_ = 0;
-		private ISync oldSync_ = null;
-
-
 		public MorphTarget(
 			int bodyPart, string morphId, float min, float max,
 			ISync sync, IEasing easing = null)
@@ -153,54 +147,6 @@ namespace Cue.Proc
 			}
 		}
 
-		public void ForceChange()
-		{
-			Sync.Reset();
-			finished_ = false;
-			timeActive_ = 0;
-			Next(false);
-		}
-
-		public void Force(int type, float rangePercent, ISync newSync = null)
-		{
-			bool wasForced = (forceType_ != NoForceTarget);
-
-			forceType_ = type;
-			forceRangePercent_ = rangePercent;
-
-			if (forceType_ == ForceToZero)
-			{
-				forceTarget_ = morph_.DefaultValue;
-			}
-			else if (forceType_ == ForceToRangePercent)
-			{
-				var range = Math.Abs(max_ - min_);
-
-				if (min_ < max_)
-					forceTarget_ = min_ + range * forceRangePercent_;
-				else
-					forceTarget_ = min_ - range * forceRangePercent_;
-			}
-
-			if (forceType_ != NoForceTarget)
-			{
-				last_ = morph_.Value;
-				r_ = forceTarget_;
-				morph_.LimiterEnabled = false;
-
-				if (newSync != null)
-				{
-					oldSync_ = Sync;
-					Sync = newSync;
-					Sync.Reset();
-				}
-			}
-			else if (wasForced)
-			{
-				StopForced();
-			}
-		}
-
 		public override void FixedUpdate(float s)
 		{
 			if (morph_ == null)
@@ -246,9 +192,6 @@ namespace Cue.Proc
 
 				case BasicSync.SyncFinished:
 				{
-					if (forceType_ != NoForceTarget)
-						forceType_ = ForceIgnore;
-
 					finished_ = true;
 					break;
 				}
@@ -256,20 +199,6 @@ namespace Cue.Proc
 
 			if (autoSet_)
 				Set(s, null);
-		}
-
-		private void StopForced()
-		{
-			if (oldSync_ != null)
-			{
-				Sync = oldSync_;
-				oldSync_ = null;
-			}
-
-			morph_.LimiterEnabled = true;
-			mag_ = 0;
-			Next(false);
-			Sync.Reset();
 		}
 
 		private float Mid()
@@ -308,10 +237,7 @@ namespace Cue.Proc
 			var d = v - mid_;
 
 			if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
-			{
-				if (forceType_ != ForceIgnore)
-					morph_.Value = v;
-			}
+				morph_.Value = v;
 
 
 			d = Math.Abs(d);
@@ -329,11 +255,8 @@ namespace Cue.Proc
 				awayFromMid_ = true;
 			}
 
-			if (forceType_ != ForceIgnore)
-			{
-				if (remaining != null && bodyPartType_ >= 0)
-					remaining[bodyPartType_] -= d;
-			}
+			if (remaining != null && bodyPartType_ >= 0)
+				remaining[bodyPartType_] -= d;
 		}
 
 		private void Next(bool resetBetween)
@@ -367,7 +290,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"morph {morphId_} ({BP.ToString(bodyPartType_)}) {forceTarget_}";
+			return $"morph {morphId_} ({BP.ToString(bodyPartType_)})";
 		}
 
 		public override string ToDetailedString()
@@ -377,8 +300,7 @@ namespace Cue.Proc
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
 				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_} lv={limitedValue_}\n" +
-				$"morph={morph_}\n" +
-				$"force={forceType_} rp={forceRangePercent_} t={forceTarget_}";
+				$"morph={morph_}";
 		}
 	}
 }
