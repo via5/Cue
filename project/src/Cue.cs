@@ -281,6 +281,17 @@ namespace Cue
 			return null;
 		}
 
+		public Person PersonForAtom(Sys.IAtom a)
+		{
+			for (int i = 0; i < persons_.Count; ++i)
+			{
+				if (persons_[i].Atom == a)
+					return persons_[i];
+			}
+
+			return null;
+		}
+
 		public void Init()
 		{
 			LogVerbose($"cue: init (token {CueMain.Instance.Token})");

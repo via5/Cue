@@ -43,6 +43,18 @@ namespace Cue.Sys.Vam
 
 	abstract class VamBasicBody : IBody
 	{
+		private VamAtom atom_;
+
+		protected VamBasicBody(VamAtom a)
+		{
+			atom_ = a;
+		}
+
+		public VamAtom Atom
+		{
+			get { return atom_; }
+		}
+
 		public virtual bool Exists { get { return true; } }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }
@@ -52,20 +64,19 @@ namespace Cue.Sys.Vam
 		public abstract Hand GetLeftHand();
 		public abstract Hand GetRightHand();
 
-		public abstract int BodyPartForCollider(Collider c);
+		public abstract IBodyPart BodyPartForTransform(Atom a, Transform t);
 	}
 
 
 	class VamBody : VamBasicBody
 	{
-		private VamAtom atom_;
 		private readonly StraponBodyPart strapon_;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
 		private Color initialColor_;
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
-		private Dictionary<Collider, int> partMap_ = new Dictionary<Collider, int>();
+		private Dictionary<Transform, int> partMap_ = new Dictionary<Transform, int>();
 
 		private float sweat_ = 0;
 		private IEasing sweatEasing_ = new CubicInEasing();
@@ -74,25 +85,20 @@ namespace Cue.Sys.Vam
 		private IEasing flushEasing_ = new SineInEasing();
 
 		public VamBody(VamAtom a)
+			: base(a)
 		{
-			atom_ = a;
 			strapon_ = new StraponBodyPart(a);
 
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
-				atom_.Log.Error("no skin gloss parameter");
+				Atom.Log.Error("no skin gloss parameter");
 
 			color_ = new ColorParameter(a, "skin", "Skin Color");
 			if (!color_.Check(true))
-				atom_.Log.Error("no skin color parameter");
+				Atom.Log.Error("no skin color parameter");
 
 			initialColor_ = color_.Value;
 			parts_ = CreateBodyParts();
-		}
-
-		public VamAtom Atom
-		{
-			get { return atom_; }
 		}
 
 		public override IBodyPart[] GetBodyParts()
@@ -110,33 +116,63 @@ namespace Cue.Sys.Vam
 			return parts_[i];
 		}
 
-		public override int BodyPartForCollider(Collider c)
+		public override IBodyPart BodyPartForTransform(Atom a, Transform tt)
 		{
-			int p;
-			if (partMap_.TryGetValue(c, out p))
-				return p;
+			// see VamSys.BodyPartForTransform()
 
-			var t = c.transform;
+			// a cleaner way would be to add something like a
+			// ContainsTransform() on each body part and call that instead of
+			// the specific `vp.Transform == p` check below, which would handle
+			// the vr hands and dildo stuff that's manually done in the else
+			//
+			// but that would require a loop every time this is called, which
+			// can be bypassed with the `Atom == a` check at the top most of the
+			// time, basically just for the strapon check, which would affect
+			// performance (no idea by how much, this might be a non issue)
 
-			while (t != null)
+			// transforms are cached in partMap_ for faster lookup
+
+			if (Atom.Atom == a)
 			{
-				for (int i = 0; i < parts_.Length; ++i)
+				int bp;
+				if (partMap_.TryGetValue(tt, out bp))
+					return parts_[bp];
+
+				// check this transform and all of its parents to see if they
+				// match any body part
+
+				var p = tt;
+
+				while (p != null)
 				{
-					var vp = (VamBodyPart)parts_[i];
-					if (vp != null && vp.Transform == t)
+					for (int i = 0; i < parts_.Length; ++i)
 					{
-						partMap_.Add(c, i);
-						return i;
+						var vp = (VamBodyPart)parts_[i];
+						if (vp != null && vp.Transform == p)
+						{
+							partMap_.Add(tt, i);
+							return vp;
+						}
 					}
+
+					// stop at the atom, no use going above that
+					if (p.GetComponent<Atom>() != null)
+						break;
+
+					p = p.parent;
 				}
+			}
+			else
+			{
+				// this is not even the same atom as the one this body part
+				// is for, which can happen for the dildo
 
-				if (t.GetComponent<Atom>() != null)
-					break;
-
-				t = t.parent;
+				var pn = GetBodyParts()[BP.Penis] as TriggerBodyPart;
+				if (pn != null && a != null && pn.Transform == a.transform)
+					return pn;
 			}
 
-			return -1;
+			return null;
 		}
 
 		public override bool Strapon
@@ -232,7 +268,7 @@ namespace Cue.Sys.Vam
 				BP.Chest, new string[] { "chest1/chest1Joint" },
 				"chestControl", "chest"));
 
-			if (atom_.IsMale)
+			if (Atom.IsMale)
 			{
 				add(BP.Belly, GetRigidbody(
 					BP.Belly, new string[] {
@@ -350,12 +386,12 @@ namespace Cue.Sys.Vam
 
 			// eyes
 			//
-			add(BP.Eyes, new EyesBodyPart(atom_));
+			add(BP.Eyes, new EyesBodyPart(Atom));
 
 
 			// male parts
 			//
-			if (atom_.IsMale)
+			if (Atom.IsMale)
 			{
 				add(BP.Pectorals, GetRigidbody(
 					BP.Pectorals, new string[] {
@@ -386,8 +422,8 @@ namespace Cue.Sys.Vam
 		{
 			var h = new Hand();
 			h.bones = GetHandBones("l");
-			h.fist = new VamMorph(atom_, "Left Fingers Fist");
-			h.inOut = new VamMorph(atom_, "Left Fingers In-Out");
+			h.fist = new VamMorph(Atom, "Left Fingers Fist");
+			h.inOut = new VamMorph(Atom, "Left Fingers In-Out");
 
 			return h;
 		}
@@ -396,8 +432,8 @@ namespace Cue.Sys.Vam
 		{
 			var h = new Hand();
 			h.bones = GetHandBones("r");
-			h.fist = new VamMorph(atom_, "Right Fingers Fist");
-			h.inOut = new VamMorph(atom_, "Right Fingers In-Out");
+			h.fist = new VamMorph(Atom, "Right Fingers Fist");
+			h.inOut = new VamMorph(Atom, "Right Fingers In-Out");
 
 			return h;
 		}
@@ -409,7 +445,7 @@ namespace Cue.Sys.Vam
 			for (int i = 0; i < 5; ++i)
 				bones[i] = new IBone[3];
 
-			var hand = U.FindRigidbody(atom_.Atom, $"{s}Hand");
+			var hand = U.FindRigidbody(Atom.Atom, $"{s}Hand");
 
 			bones[0][0] = FindFingerBone(hand, s, $"{s}Thumb1");
 			bones[0][1] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2");
@@ -438,7 +474,7 @@ namespace Cue.Sys.Vam
 		{
 			if (hipBone_ == null)
 			{
-				foreach (var bb in atom_.Atom.GetComponentsInChildren<DAZBone>())
+				foreach (var bb in Atom.Atom.GetComponentsInChildren<DAZBone>())
 				{
 					if (bb.name == "hip")
 					{
@@ -449,7 +485,7 @@ namespace Cue.Sys.Vam
 
 				if (hipBone_ == null)
 				{
-					Cue.LogError($"{atom_.ID} can't find hip bone");
+					Cue.LogError($"{Atom.ID} can't find hip bone");
 					return null;
 				}
 			}
@@ -462,14 +498,14 @@ namespace Cue.Sys.Vam
 			var t = hipBone_.transform.Find(id);
 			if (t == null)
 			{
-				Cue.LogError($"{atom_.ID}: no finger bone {id}");
+				Cue.LogError($"{Atom.ID}: no finger bone {id}");
 				return null;
 			}
 
 			var b = t.GetComponent<DAZBone>();
 			if (b == null)
 			{
-				Cue.LogError($"{atom_.ID}: no DAZBone in {id}");
+				Cue.LogError($"{Atom.ID}: no DAZBone in {id}");
 				return null;
 			}
 
@@ -549,7 +585,7 @@ namespace Cue.Sys.Vam
 
 		private string MakeName(string nameFemale, string nameMale)
 		{
-			if (!atom_.IsMale)
+			if (!Atom.IsMale)
 				return nameFemale;
 
 			if (nameMale == "")
@@ -568,19 +604,19 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var rb = U.FindRigidbody(atom_.Atom, name);
+			var rb = U.FindRigidbody(Atom.Atom, name);
 			if (rb == null)
-				Cue.LogError($"rb {name} not found in {atom_.ID}");
+				Cue.LogError($"rb {name} not found in {Atom.ID}");
 
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"rb {name} has no controller {controller} in {atom_.ID}");
+					Cue.LogError($"rb {name} has no controller {controller} in {Atom.ID}");
 			}
 
-			return new RigidbodyBodyPart(atom_, id, rb, fc, colliders);
+			return new RigidbodyBodyPart(Atom, id, rb, fc, colliders);
 		}
 
 		private IBodyPart GetTrigger(
@@ -591,36 +627,36 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var o = U.FindChildRecursive(atom_.Atom.transform, name);
+			var o = U.FindChildRecursive(Atom.Atom.transform, name);
 			if (o == null)
 			{
-				Cue.LogError($"trigger {name} not found in {atom_.ID}");
+				Cue.LogError($"trigger {name} not found in {Atom.ID}");
 				return null;
 			}
 
 			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (t == null)
 			{
-				Cue.LogError($"trigger {name} has no event handler in {atom_.ID}");
+				Cue.LogError($"trigger {name} has no event handler in {Atom.ID}");
 				return null;
 			}
 
 			if (t.thisRigidbody == null)
 			{
-				Cue.LogError($"trigger {name} has no rb in {atom_.ID}");
+				Cue.LogError($"trigger {name} has no rb in {Atom.ID}");
 				return null;
 			}
 
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"trigger {name} has no controller {controller} in {atom_.ID}");
+					Cue.LogError($"trigger {name} has no controller {controller} in {Atom.ID}");
 			}
 
 			return new TriggerBodyPart(
-				atom_, id, t, fc, t.thisRigidbody.transform, ignoreTransforms);
+				Atom, id, t, fc, t.thisRigidbody.transform, ignoreTransforms);
 		}
 
 		private IBodyPart GetCollider(
@@ -631,30 +667,30 @@ namespace Cue.Sys.Vam
 			if (name == "")
 				return null;
 
-			var c = U.FindCollider(atom_.Atom, name);
+			var c = U.FindCollider(Atom.Atom, name);
 			if (c == null)
 			{
-				Cue.LogError($"collider {name} not found in {atom_.ID}");
+				Cue.LogError($"collider {name} not found in {Atom.ID}");
 				return null;
 			}
 
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"collider {name} has no controller {controller} in {atom_.ID}");
+					Cue.LogError($"collider {name} has no controller {controller} in {Atom.ID}");
 			}
 
 			Rigidbody rb = null;
 			if (closestRb != "")
 			{
-				rb = U.FindRigidbody(atom_.Atom, closestRb);
+				rb = U.FindRigidbody(Atom.Atom, closestRb);
 				if (rb == null)
-					Cue.LogError($"collider {name} has no rb {closestRb} in {atom_.ID}");
+					Cue.LogError($"collider {name} has no rb {closestRb} in {Atom.ID}");
 			}
 
-			return new ColliderBodyPart(atom_, id, c, fc, rb);
+			return new ColliderBodyPart(Atom, id, c, fc, rb);
 		}
 	}
 }

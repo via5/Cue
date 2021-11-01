@@ -4,8 +4,8 @@ namespace Cue.Sys.Vam
 {
 	class VamCameraEyes : VamBodyPart
 	{
-		public VamCameraEyes()
-			: base(null, BP.Eyes)
+		public VamCameraEyes(IAtom a)
+			: base(a, BP.Eyes)
 		{
 		}
 
@@ -40,8 +40,8 @@ namespace Cue.Sys.Vam
 
 	class VamCameraHead : VamBodyPart
 	{
-		public VamCameraHead()
-			: base(null, BP.Head)
+		public VamCameraHead(IAtom a)
+			: base(a, BP.Head)
 		{
 		}
 
@@ -78,13 +78,38 @@ namespace Cue.Sys.Vam
 	{
 		private Transform vrHand_, desktopHand_;
 		private Rigidbody desktopRb_;
+		private MeshVR.Hands.HandOutput.Hand handOutputType_;
 
-		public VamCameraHand(int type, Transform vrHand, Transform desktopHand)
-			: base(null, type)
+		public VamCameraHand(
+			IAtom a, int bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
+			Transform vrHand, Transform desktopHand)
+				: base(a, bodyPart)
 		{
 			vrHand_ = vrHand;
 			desktopHand_ = desktopHand;
 			desktopRb_ = desktopHand_?.GetComponent<Rigidbody>();
+			handOutputType_ = handOutputType;
+		}
+
+		public bool ContainsTransform(Transform t)
+		{
+			if (t == desktopHand_)
+				return true;
+
+			if (Cue.Instance.VamSys.IsVRHand(t, Type))
+				return true;
+
+			var ho = t.GetComponentInParent<MeshVR.Hands.HandOutput>();
+			if (ho != null)
+			{
+				if (ho.hand == handOutputType_)
+				{
+					Cue.LogInfo($"{t}");
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		public override Transform Transform
@@ -176,22 +201,29 @@ namespace Cue.Sys.Vam
 	class VamCameraBody : VamBasicBody
 	{
 		private IBodyPart[] parts_;
+		private VamCameraHand left_, right_;
 
 		public VamCameraBody(VamCameraAtom a)
+			: base(null)
 		{
 			parts_ = new IBodyPart[BP.Count];
 
-			parts_[BP.Head] = new VamCameraHead();
-			parts_[BP.Eyes] = new VamCameraEyes();
-			parts_[BP.LeftHand] = new VamCameraHand(
-				BP.LeftHand,
+			left_ = new VamCameraHand(
+				a, BP.LeftHand,
+				MeshVR.Hands.HandOutput.Hand.Left,
 				SuperController.singleton.leftHand,
 				null);
 
-			parts_[BP.RightHand] = new VamCameraHand(
-				BP.RightHand,
+			right_ = new VamCameraHand(
+				a, BP.RightHand,
+				MeshVR.Hands.HandOutput.Hand.Right,
 				SuperController.singleton.rightHand,
 				SuperController.singleton.mouseGrab);
+
+			parts_[BP.Head] = new VamCameraHead(a);
+			parts_[BP.Eyes] = new VamCameraEyes(a);
+			parts_[BP.LeftHand] = left_;
+			parts_[BP.RightHand] = right_;
 		}
 
 		public override bool Exists
@@ -232,18 +264,16 @@ namespace Cue.Sys.Vam
 			return new Hand();
 		}
 
-		public override int BodyPartForCollider(Collider c)
+		public override IBodyPart BodyPartForTransform(Atom a, Transform t)
 		{
-			var ho = c.GetComponentInParent<MeshVR.Hands.HandOutput>();
-			if (ho == null)
-				return -1;
+			// see VamSys.BodyPartForTransform()
 
-			if (ho.hand == MeshVR.Hands.HandOutput.Hand.Left)
-				return BP.LeftHand;
-			else if (ho.hand == MeshVR.Hands.HandOutput.Hand.Right)
-				return BP.RightHand;
+			if (left_.ContainsTransform(t))
+				return left_;
+			else if (right_.ContainsTransform(t))
+				return right_;
 			else
-				return -1;
+				return null;
 		}
 	}
 

@@ -85,7 +85,7 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, grab, lk, source;
+			public VUI.Label name, triggering, grabbed, lk, source;
 			public VUI.Label position, direction;
 		}
 
@@ -105,7 +105,7 @@ namespace Cue
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Grab", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Grabbed", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
 
@@ -132,9 +132,9 @@ namespace Cue
 				w.triggering.FontSize = fontSize;
 				p.Add(w.triggering);
 
-				w.grab = new VUI.Label();
-				w.grab.FontSize = fontSize;
-				p.Add(w.grab);
+				w.grabbed = new VUI.Label();
+				w.grabbed.FontSize = fontSize;
+				p.Add(w.grabbed);
 
 				w.lk = new VUI.Label();
 				w.lk.FontSize = fontSize;
@@ -211,16 +211,29 @@ namespace Cue
 
 				if (w.part.CanGrab)
 				{
-					w.grab.Text = (w.part.Grabbed ? "grabbed" : "");
+					var gs = w.part.GetGrabs();
 
-					w.grab.TextColor = (
-						w.part.Grabbed ?
-						Sys.Vam.U.ToUnity(Color.Green) :
-						VUI.Style.Theme.TextColor);
+					if (gs == null || gs.Length == 0)
+					{
+						w.grabbed.Text = "";
+					}
+					else
+					{
+						string ss = "";
+						for (int j = 0; j < gs.Length; ++j)
+						{
+							if (ss != "") ss += ",";
+							ss += gs[j].ToString();
+							Cue.LogInfo($"{gs[j]}");
+						}
+
+						w.grabbed.Text = ss;
+						w.grabbed.TextColor = Sys.Vam.U.ToUnity(Color.Green);
+					}
 				}
 				else
 				{
-					w.grab.Text = "";
+					w.grabbed.Text = "";
 				}
 
 				w.lk.Text = w.part.DebugLockString();

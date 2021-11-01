@@ -310,6 +310,12 @@ namespace Cue
 			return triggers_;
 		}
 
+		public Sys.GrabInfo[] GetGrabs()
+		{
+			// todo, cache it
+			return part_?.GetGrabs();
+		}
+
 		public bool Triggered
 		{
 			get

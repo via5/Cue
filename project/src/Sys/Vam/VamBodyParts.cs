@@ -1,17 +1,29 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
 	abstract class VamBodyPart : IBodyPart
 	{
-		protected VamAtom atom_;
+		private IAtom atom_;
 		private int type_;
+		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 
-		protected VamBodyPart(VamAtom a, int t)
+		protected VamBodyPart(IAtom a, int t)
 		{
 			atom_ = a;
 			type_ = t;
+		}
+
+		public IAtom Atom
+		{
+			get { return atom_; }
+		}
+
+		public VamAtom VamAtom
+		{
+			get { return atom_ as VamAtom; }
 		}
 
 		public int Type { get { return type_; } }
@@ -87,7 +99,45 @@ namespace Cue.Sys.Vam
 			if (Controller == null || o.Rigidbody == null)
 				return false;
 
-			return (Controller.linkToRB == o.Rigidbody);
+			if (Controller.linkToRB == o.Rigidbody)
+				return true;
+
+			// todo: should probably use BodyPartForTransform()
+
+			var sys = Cue.Instance.VamSys;
+
+			if (o.Type == BP.LeftHand)
+				return sys.IsVRHand(Controller.linkToRB?.transform, BP.LeftHand);
+			else if (o.Type == BP.RightHand)
+				return sys.IsVRHand(Controller.linkToRB?.transform, BP.RightHand);
+
+			return false;
+		}
+
+		public virtual GrabInfo[] GetGrabs()
+		{
+			if (!Grabbed)
+				return null;
+
+			var rb = Controller?.linkToRB;
+			if (rb == null)
+				return null;
+
+			grabCache_.Clear();
+
+			var bp = Cue.Instance.VamSys.BodyPartForTransform(rb.transform);
+			if (bp == null)
+			{
+				grabCache_.Add(GrabInfo.None);
+			}
+			else
+			{
+				grabCache_.Add(new GrabInfo(
+					Cue.Instance.PersonForAtom(bp.Atom).PersonIndex,
+					bp.Type));
+			}
+
+			return grabCache_.ToArray();
 		}
 
 		private void SetParentLink(FreeControllerV3 fc, Rigidbody rb)

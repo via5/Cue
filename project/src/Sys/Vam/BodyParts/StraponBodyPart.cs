@@ -22,17 +22,17 @@ namespace Cue.Sys.Vam
 
 		private Logger Log
 		{
-			get { return atom_.Log; }
+			get { return VamAtom.Log; }
 		}
 
 		private string DildoID
 		{
-			get { return $"Dildo#{atom_.ID}"; }
+			get { return $"Dildo#{Atom.ID}"; }
 		}
 
 		private string StraponID
 		{
-			get { return $"Strapon#{atom_.ID}"; }
+			get { return $"Strapon#{Atom.ID}"; }
 		}
 
 		public IObject Dildo
@@ -77,14 +77,14 @@ namespace Cue.Sys.Vam
 
 			if (b)
 			{
-				oc.Create(atom_, StraponID, (o) =>
+				oc.Create(Atom, StraponID, (o) =>
 				{
 					Log.Error("strapon created");
 				});
 			}
 			else
 			{
-				oc.Destroy(atom_, StraponID);
+				oc.Destroy(Atom, StraponID);
 			}
 		}
 
@@ -99,7 +99,7 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			oc.Create(atom_, DildoID, (o) =>
+			oc.Create(Atom, DildoID, (o) =>
 			{
 				if (o == null)
 				{
@@ -126,7 +126,7 @@ namespace Cue.Sys.Vam
 
 				dildo_ = a;
 				dildo_.Atom.Collisions = false;
-				dildo_.Atom.Scale = atom_.Scale;
+				dildo_.Atom.Scale = Atom.Scale;
 
 				postCreate_ = true;
 				postCreateElapsed_ = 0;
@@ -172,10 +172,10 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					anchor_ = U.FindCollider(atom_.Atom, anchorName);
+					anchor_ = U.FindCollider(VamAtom.Atom, anchorName);
 
 					if (anchor_ == null)
-						Cue.LogError($"dildo anchor {anchor_} not found in {atom_.ID}");
+						Cue.LogError($"dildo anchor {anchor_} not found in {Atom.ID}");
 					else
 						Cue.LogInfo($"dildo anchor: {anchor_}");
 				}
@@ -218,7 +218,7 @@ namespace Cue.Sys.Vam
 				if (!Enabled)
 					return;
 
-				var labia = (atom_.Body as VamBody)?.GetPart(BP.Labia);
+				var labia = (Atom.Body as VamBody)?.GetPart(BP.Labia);
 
 				var q = Quaternion.Zero;
 				if (labia != null)

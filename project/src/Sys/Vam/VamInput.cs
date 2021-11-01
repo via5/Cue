@@ -6,6 +6,9 @@ namespace Cue.Sys.Vam
 {
 	interface IVRInput
 	{
+		bool IsAtomVRHands(Atom a);
+		bool IsTransformVRHand(Transform t, bool left);
+
 		Transform LeftController { get; }
 		Transform RightController { get; }
 
@@ -14,21 +17,71 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class SteamVRInput : IVRInput
+	abstract class BasicVRInput : IVRInput
 	{
-		private SuperController sc_ = SuperController.singleton;
+		protected SuperController sc_ = SuperController.singleton;
 
-		public Transform LeftController
+		private bool got_ = false;
+		private Atom cameraRig_ = null;
+		private Transform leftHandAnchor_ = null;
+		private Transform rightHandAnchor_ = null;
+
+		public abstract Transform LeftController { get; }
+		public abstract Transform RightController { get; }
+		public abstract Vector2 LeftJoystick { get; }
+		public abstract Vector2 RightJoystick { get; }
+
+		public virtual bool IsAtomVRHands(Atom a)
+		{
+			Get();
+			return (a == cameraRig_);
+		}
+
+		public virtual bool IsTransformVRHand(Transform t, bool left)
+		{
+			Get();
+
+			if (left)
+				return (t == leftHandAnchor_);
+			else
+				return (t == rightHandAnchor_);
+		}
+
+		private void Get()
+		{
+			if (got_)
+				return;
+
+			got_ = true;
+
+			cameraRig_ = sc_.GetAtomByUid("[CameraRig]");
+			if (cameraRig_ == null)
+				Cue.LogError("no camera rig");
+
+			leftHandAnchor_ = U.FindChildRecursive(cameraRig_, "LeftHandAnchor")?.transform;
+			if (leftHandAnchor_ == null)
+				Cue.LogError("camera rig has no left hand anchor");
+
+			rightHandAnchor_ = U.FindChildRecursive(cameraRig_, "RightHandAnchor")?.transform;
+			if (rightHandAnchor_ == null)
+				Cue.LogError("camera rig has no right hand anchor");
+		}
+	}
+
+
+	class SteamVRInput : BasicVRInput
+	{
+		public override Transform LeftController
 		{
 			get { return sc_.viveObjectLeft; }
 		}
 
-		public Transform RightController
+		public override Transform RightController
 		{
 			get { return sc_.viveObjectRight; }
 		}
 
-		public Vector2 LeftJoystick
+		public override Vector2 LeftJoystick
 		{
 			get
 			{
@@ -37,7 +90,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public Vector2 RightJoystick
+		public override Vector2 RightJoystick
 		{
 			get
 			{
@@ -295,6 +348,11 @@ namespace Cue.Sys.Vam
 		public string VRInfo()
 		{
 			return $"isVR={Cue.Instance.Sys.IsVR} ovr={sc_.isOVR} openvr={sc_.isOpenVR}";
+		}
+
+		public IVRInput VRInput
+		{
+			get { return vr_; }
 		}
 
 		public bool HardReset

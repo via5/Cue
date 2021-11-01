@@ -93,7 +93,7 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			id_.Text = person_.ID;
+			id_.Text = $"{person_.ID}{(person_.IsPlayer ? " (player)" : "")}";
 			pos_.Text = person_.Position.ToString();
 			dir_.Text = person_.Rotation.ToString();
 			bearing_.Text = $"{person_.Rotation.Bearing:0.00}";

@@ -156,9 +156,14 @@ namespace Cue.Sys.Vam
 			get { return root_.transform; }
 		}
 
-		public bool IsVRHands(Atom a)
+		public bool IsAtomVRHands(Atom a)
 		{
-			return (a.uid == "[CameraRig]");
+			return input_.VRInput.IsAtomVRHands(a);
+		}
+
+		public bool IsVRHand(Transform t, int hand)
+		{
+			return input_.VRInput.IsTransformVRHand(t, (hand == BP.LeftHand));
 		}
 
 		public IAtom ContainingAtom
@@ -326,6 +331,81 @@ namespace Cue.Sys.Vam
 				SuperController.singleton.onSceneLoadedHandlers -= OnSceneLoaded;
 				SuperController.singleton.StartCoroutine(DeferredInit());
 			}
+		}
+
+		public IBodyPart BodyPartForTransform(Transform t)
+		{
+			// all Persons in the scene are a VamAtom and have a VamBody, but
+			// there's also the special VamCameraAtom, which isn't an Atom at
+			// all, which has a VamCameraBody instead
+			//
+			// normal VamAtoms will look up the transforms within their body
+			// parts (see VamBody.BodyPartForTransform())
+			//
+			// things get complicated with hands, because there are many cases
+			// handled in cue:
+			//
+			//  1) the mouse cursor (grab only)
+			//  2) vr hands (grab and touch)
+			//  3) hands of a possessed atom (grab and touch)
+			//
+			// there's also a special case for strapons, because the dildo is
+			// a different atom, but should match the person wearing it (see
+			// VamBody.BodyPartForTransform())
+			//
+			//
+			// mouse grab:
+			//   handled in VamCameraBody, where the VamCameraHand for the
+			//   right hand will also check the mouseGrab transform
+			//
+			// vr or possessed hands for grab
+			//   when grabbing something in vr, the camera rig is always used;
+			//   it contains two transforms LeftHandAnchor and RightHandAnchor,
+			//   to which the grabbed body part links to as a parent link
+			//
+			//   this happens even for a possessed atom: the possessed atom's
+			//   hands are not used for linking, it's still the anchors from the
+			//   camera rig
+			//
+			//   in the loop below, when grabbing in vr, the pseudo camera atom
+			//   will always report as being the one that contains this
+			//   transform because it handles the camera rig and cannot know
+			//   that something is possessed
+			//
+			//   so if the atom found is the camera atom, just return the same
+			//   body part for the current player instead (which might still be
+			//   the camera anyway if there's no possession, but will be a
+			//   different atom during possession)
+			//
+			// vr hands for touch
+			//   the vr hands themselves are different from the anchors used
+			//   when grabbing, but all the colliders are children of an object
+			//   that has the HandOutput component, which is checked in
+			//   VamCameraHand.ContainsTransform()
+			//
+			// possessed hands for touch
+			//   this uses the actual hands of the possessed atoms, so they
+			//   don't need special handling
+
+
+			// find the parent atom for this transform, can be CoreControl for
+			// some, like mouse grab, or null
+			var a = t.GetComponentInParent<Atom>();
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				var bp = (p.Atom.Body as VamBasicBody).BodyPartForTransform(a, t);
+
+				if (bp != null)
+				{
+					if (p.Atom is VamCameraAtom)
+						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
+					else
+						return bp;
+				}
+			}
+
+			return null;
 		}
 
 		private IEnumerator DeferredInit()

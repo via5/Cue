@@ -11,7 +11,7 @@ namespace Cue.Sys.Vam
 		public EyesBodyPart(VamAtom a)
 			: base(a, BP.Eyes)
 		{
-			foreach (var t in a.Atom.GetComponentsInChildren<DAZBone>())
+			foreach (var t in VamAtom.Atom.GetComponentsInChildren<DAZBone>())
 			{
 				if (t.name == "lEye")
 					lEye_ = t.transform;
@@ -28,7 +28,7 @@ namespace Cue.Sys.Vam
 			if (rEye_ == null)
 				Cue.LogError($"{a.ID} has no right eye");
 
-			head_ = U.FindRigidbody(atom_.Atom, "head");
+			head_ = U.FindRigidbody(VamAtom.Atom, "head");
 			if (head_ == null)
 				Cue.LogError($"{a.ID} has no head");
 		}
@@ -50,7 +50,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (atom_.Possessed)
+				if (Atom.Possessed)
 					return Cue.Instance.Sys.CameraPosition;
 				else if (lEye_ != null && rEye_ != null)
 					return U.FromUnity((lEye_.position + rEye_.position) / 2);

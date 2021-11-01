@@ -191,12 +191,17 @@ namespace Cue.Sys
 		public float value;
 		public bool forced;
 
-		public TriggerInfo(int sourcePersonIndex, int sourceBodyPart, float v, bool forced=false)
+		public TriggerInfo(int sourcePersonIndex, int sourceBodyPart, float v, bool forced = false)
 		{
 			personIndex = sourcePersonIndex;
 			sourcePartIndex = sourceBodyPart;
 			value = v;
 			this.forced = forced;
+		}
+
+		public static TriggerInfo None
+		{
+			get { return new TriggerInfo(-1, BP.None, 1.0f); }
 		}
 
 		public bool IsPerson()
@@ -233,12 +238,57 @@ namespace Cue.Sys
 		}
 	}
 
+	struct GrabInfo
+	{
+		public int personIndex;
+		public int sourcePartIndex;
+
+		public GrabInfo(int personIndex, int sourcePartIndex)
+		{
+			this.personIndex = personIndex;
+			this.sourcePartIndex = sourcePartIndex;
+		}
+
+		public static GrabInfo None
+		{
+			get { return new GrabInfo(-1, BP.None); }
+		}
+
+		public override string ToString()
+		{
+			string s = "";
+			Person p = null;
+
+			if (personIndex == -1)
+			{
+				s += "?";
+			}
+			else
+			{
+				p = Cue.Instance.AllPersons[personIndex];
+				s += p.ID;
+			}
+
+			s += ".";
+
+
+			if (sourcePartIndex == -1)
+				s += "?";
+			else
+				s += BP.ToString(sourcePartIndex);
+
+			return s;
+		}
+	}
+
 	interface IBodyPart
 	{
+		IAtom Atom { get; }
 		int Type { get; }
 		bool Exists { get; }
 		bool CanTrigger { get; }
 		TriggerInfo[] GetTriggers();
+		GrabInfo[] GetGrabs();
 		bool CanGrab { get; }
 		bool Grabbed { get; }
 		Vector3 ControlPosition { get; set; }

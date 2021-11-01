@@ -14,6 +14,9 @@ namespace Cue.Sys.Vam
 		private TriggerInfo[] triggers_ = null;
 		private bool enabled_ = false;
 
+		private List<TriggerInfo> triggerCache_ = null;
+		private List<string> foundOtherCache_ = null;
+
 		protected TriggerBodyPart(VamAtom a, int type)
 			: base(a, type)
 		{
@@ -63,16 +66,16 @@ namespace Cue.Sys.Vam
 
 		private void FindIgnoreTransforms(string[] ignoreTransforms)
 		{
-			var rb = U.FindRigidbody(atom_.Atom, "hip");
+			var rb = U.FindRigidbody(VamAtom.Atom, "hip");
 			if (rb == null)
-				Cue.LogError($"{atom_.ID}: trigger {h_.name}: no hip");
+				Cue.LogError($"{Atom.ID}: trigger {h_.name}: no hip");
 			else
 				ignoreStop_ = rb.transform;
 
 			var list = new List<Transform>();
 			for (int i = 0; i < ignoreTransforms.Length; ++i)
 			{
-				rb = U.FindRigidbody(atom_.Atom, ignoreTransforms[i]);
+				rb = U.FindRigidbody(VamAtom.Atom, ignoreTransforms[i]);
 
 				if (rb != null)
 				{
@@ -81,7 +84,7 @@ namespace Cue.Sys.Vam
 				else
 				{
 					var t = U.FindChildRecursive(
-						atom_.Atom, ignoreTransforms[i])?.transform;
+						VamAtom.Atom, ignoreTransforms[i])?.transform;
 
 					if (t != null)
 					{
@@ -90,7 +93,7 @@ namespace Cue.Sys.Vam
 					else
 					{
 						Cue.LogError(
-							$"{atom_.ID}: trigger {h_.name}: " +
+							$"{Atom.ID}: trigger {h_.name}: " +
 							$"no ignore {ignoreTransforms[i]}");
 					}
 				}
@@ -137,10 +140,13 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			List<TriggerInfo> list = null;
+			if (triggerCache_ != null)
+				triggerCache_.Clear();
+
+			if (foundOtherCache_ != null)
+				foundOtherCache_.Clear();
 
 			var found = new bool[Cue.Instance.AllPersons.Count, BP.Count];
-			List<string> foundOther = null;
 
 			foreach (var kv in h_.collidingWithDictionary)
 			{
@@ -150,55 +156,53 @@ namespace Cue.Sys.Vam
 				if (!ValidTrigger(kv.Key))
 					continue;
 
-				if (list == null)
-					list = new List<TriggerInfo>();
+				if (triggerCache_ == null)
+					triggerCache_ = new List<TriggerInfo>();
 
-				var p = PersonForCollider(kv.Key);
-				if (p == null)
+				var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform);
+
+				if (bp == null)
 				{
 					bool skip = false;
 
-					if (foundOther == null)
-						foundOther = new List<string>();
-					else if (foundOther.Contains(kv.Key.name))
+					if (foundOtherCache_ == null)
+						foundOtherCache_ = new List<string>();
+					else if (foundOtherCache_.Contains(kv.Key.name))
 						skip = true;
 					else
-						foundOther.Add(kv.Key.name);
+						foundOtherCache_.Add(kv.Key.name);
 
 					if (!skip)
-						list.Add(new TriggerInfo(-1, -1, 1.0f));
+						triggerCache_.Add(TriggerInfo.None);
 				}
 				else
 				{
-					var bp = ((VamBasicBody)p.Atom.Body).BodyPartForCollider(kv.Key);
+					var p = Cue.Instance.PersonForAtom(bp.Atom);
+					var personIndex = p.PersonIndex;
 
-					if (bp == -1)
+					if (!found[personIndex, bp.Type])
 					{
-						//Cue.LogError($"no body part for {kv.Key.name} in {p.ID}");
-					}
-					else if (!found[p.PersonIndex, bp])
-					{
-						if (!ValidCollision(p, bp))
+						if (!ValidCollision(p, bp.Type))
 							continue;
 
 						//Cue.LogInfo($"{kv.Key}");
 
-						found[p.PersonIndex, bp] = true;
-						list.Add(new TriggerInfo(p.PersonIndex, bp, 1.0f));
+						found[p.PersonIndex, bp.Type] = true;
+						triggerCache_.Add(new TriggerInfo(p.PersonIndex, bp.Type, 1.0f));
 					}
 				}
 			}
 
-			if (list == null)
+			if (triggerCache_ == null)
 				triggers_ = null;
 			else
-				triggers_ = list.ToArray();
+				triggers_ = triggerCache_.ToArray();
 		}
 
 		private bool ValidCollision(Person p, int bp)
 		{
 			// self collision
-			if (p.VamAtom == atom_)
+			if (p.VamAtom == VamAtom)
 			{
 				if (bp == BP.Penis)
 				{
@@ -219,38 +223,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return true;
-		}
-
-		private Person PersonForCollider(Collider c)
-		{
-			var a = c.transform.GetComponentInParent<Atom>();
-			if (a == null)
-				return null;
-
-			if (Cue.Instance.VamSys.IsVRHands(a))
-			{
-				foreach (var p in Cue.Instance.ActivePersons)
-				{
-					if (p.Atom == Cue.Instance.VamSys.CameraAtom)
-						return p;
-				}
-
-				return null;
-			}
-
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (p.VamAtom?.Atom == a)
-					return p;
-
-				// todo, handles dildos separately because the trigger is not
-				// part of the person itself, it's a different atom
-				var pn = p.Body.Get(BP.Penis).VamSys as TriggerBodyPart;
-				if (pn != null && pn.Transform == a.transform)
-					return p;
-			}
-
-			return null;
 		}
 
 		public override bool CanGrab
@@ -303,7 +275,7 @@ namespace Cue.Sys.Vam
 		{
 			string s = "";
 
-			if (fc_?.containingAtom != null && atom_?.Atom != fc_.containingAtom)
+			if (fc_?.containingAtom != null && VamAtom?.Atom != fc_.containingAtom)
 				s += fc_.containingAtom.uid;
 
 			if (trigger_ != null && trigger_.displayName != "")
