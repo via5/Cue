@@ -78,14 +78,7 @@
 					running_ = true;
 				}
 
-				if (!person_.Animator.IsPlayingType(Animations.Sex))
-				{
-					if (person_.Mood.State == Mood.NormalState)
-					{
-						person_.Animator.PlayType(
-							Animations.Sex, new AnimationContext(receiver_));
-					}
-				}
+				CheckAnim();
 			}
 			else
 			{
@@ -110,6 +103,29 @@
 
 					running_ = false;
 					receiver_ = null;
+				}
+			}
+		}
+
+		private void CheckAnim()
+		{
+			int state = person_.Animator.PlayingStatus(Animations.Sex);
+
+			if (state == Animator.Playing)
+			{
+				if (person_.Mood.State == Mood.OrgasmState ||
+					(receiver_ != null && receiver_.Mood.State == Mood.OrgasmState))
+				{
+					person_.Animator.StopType(Animations.Sex);
+				}
+			}
+			else if (state == Animator.NotPlaying)
+			{
+				if (person_.Mood.State == Mood.NormalState &&
+					(receiver_ == null || receiver_.Mood.State == Mood.NormalState))
+				{
+					person_.Animator.PlayType(
+						Animations.Sex, new AnimationContext(receiver_));
 				}
 			}
 		}
