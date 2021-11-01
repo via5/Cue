@@ -20,10 +20,10 @@ namespace Cue.Proc
 
 		public override void RequestStop()
 		{
-			base.RequestStop();
-
 			foreach (var t in Targets)
 				t.RequestStop();
+
+			base.RequestStop();
 		}
 
 		public abstract List<ITarget> Targets { get; }
@@ -418,16 +418,45 @@ namespace Cue.Proc
 		{
 			get
 			{
-				float e = 0;
+				// this takes into account the excitement and tiredness of both
+				// characters involved
+				//
+				// this allows for an unexcited character to have high energy
+				// if interacting with an exicted character, or an excited
+				// character to have low energy if interacting with a tired
+				// character
+
+				Person excited = null;
+				Person tired = null;
 
 				if (person_ != null)
-					e = Math.Max(e, person_.Mood.MovementEnergy);
+				{
+					excited = HighestValue(excited, person_, Moods.Excited);
+					tired = HighestValue(tired, person_, Moods.Tired);
+				}
 
 				if (energySource_ != null && energySource_ != person_)
-					e = Math.Max(e, energySource_.Mood.MovementEnergy);
+				{
+					excited = HighestValue(excited, energySource_, Moods.Excited);
+					tired = HighestValue(tired, energySource_, Moods.Tired);
+				}
 
-				return e;
+				if (excited == null || tired == null)
+					return 1;
+
+				return tired.Mood.MovementEnergyForExcitement(
+					excited.Mood.Get(Moods.Excited));
 			}
+		}
+
+		private Person HighestValue(Person current, Person check, int what)
+		{
+			if (current == null)
+				return check;
+			else if (check.Mood.Get(what) > current.Mood.Get(what))
+				return check;
+			else
+				return current;
 		}
 
 		public override ulong LockKey

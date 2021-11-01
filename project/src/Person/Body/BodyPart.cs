@@ -240,7 +240,7 @@ namespace Cue
 			var ti = new Sys.TriggerInfo(
 				sourcePersonIndex, sourceBodyPart, value, true);
 
-			Person.Log.Info($"adding forced trigger for {this}: {ti}");
+			Person.Log.Verbose($"adding forced trigger for {this}: {ti}");
 			forcedTriggers_.Add(ti);
 		}
 
@@ -252,7 +252,7 @@ namespace Cue
 				{
 					if (forcedTriggers_[i].sourcePartIndex == sourceBodyPart)
 					{
-						Person.Log.Info($"removing forced trigger: {forcedTriggers_[i]}");
+						Person.Log.Verbose($"removing forced trigger: {forcedTriggers_[i]}");
 						forcedTriggers_.RemoveAt(i);
 						return;
 					}

@@ -73,15 +73,16 @@ namespace Cue
 		public const int GazeTirednessFactor = 48;
 		public const int MovementEnergyTirednessFactor = 49;
 		public const int ExpressionTirednessFactor = 50;
-		public const int AngerWhenPlayerInteracts = 51;
-		public const int AngerMaxExcitementForAnger = 52;
-		public const int AngerMaxExcitementForHappiness = 53;
-		public const int AngerExcitementFactorForAnger = 54;
-		public const int AngerExcitementFactorForHappiness = 55;
-		public const int MaxHappiness = 56;
+		public const int MovementEnergyRampUpAfterOrgasm = 51;
+		public const int AngerWhenPlayerInteracts = 52;
+		public const int AngerMaxExcitementForAnger = 53;
+		public const int AngerMaxExcitementForHappiness = 54;
+		public const int AngerExcitementFactorForAnger = 55;
+		public const int AngerExcitementFactorForHappiness = 56;
+		public const int MaxHappiness = 57;
 
-		public const int FloatCount = 57;
-		public int GetFloatCount() { return 57; }
+		public const int FloatCount = 58;
+		public int GetFloatCount() { return 58; }
 
 		// strings
 
@@ -251,6 +252,7 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"movementEnergyRampUpAfterOrgasm",
 			"angerWhenPlayerInteracts",
 			"angerMaxExcitementForAnger",
 			"angerMaxExcitementForHappiness",
@@ -417,6 +419,7 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"movementEnergyRampUpAfterOrgasm",
 			"angerWhenPlayerInteracts",
 			"angerMaxExcitementForAnger",
 			"angerMaxExcitementForHappiness",

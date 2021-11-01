@@ -269,6 +269,8 @@
 			"expressionExcitementFactor": 1,
 			"expressionTirednessFactor": 1,
 
+			"movementEnergyRampUpAfterOrgasm": 20,
+
 			"angerWhenPlayerInteracts": 0,
 			"angerMaxExcitementForAnger": 0,
 			"angerMaxExcitementForHappiness": 0,

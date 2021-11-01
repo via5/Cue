@@ -131,6 +131,14 @@ namespace Cue.Proc
 			movement_.Reset();
 		}
 
+		public override void RequestStop()
+		{
+			base.RequestStop();
+
+			movement_.SetNext(Lerped());
+			movement_.SetNext(Vector3.Zero);
+		}
+
 		public override void FixedUpdate(float s)
 		{
 			oneFrameFinished_ = false;

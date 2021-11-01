@@ -81,7 +81,7 @@ namespace Cue.Proc
 		public void Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
-			sync_.Reset();
+			Reset();
 			DoStart(p, cx);
 		}
 

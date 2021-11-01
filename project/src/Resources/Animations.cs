@@ -71,21 +71,6 @@ namespace Cue
 			if (type == Animations.None)
 				return null;
 
-			switch (type)
-			{
-				case Animations.Sex:
-				case Animations.Idle:
-				{
-					if (!o.HasKey("state"))
-					{
-						log_.Error("sex animation missing 'state'");
-						return null;
-					}
-
-					break;
-				}
-			}
-
 			int ms = MovementStyles.Any;
 			if (o.HasKey("sex"))
 				ms = MovementStyles.FromString(o["sex"]);

@@ -132,9 +132,18 @@ namespace Cue
 				anim = a;
 				player = p;
 			}
+
+			public override string ToString()
+			{
+				return anim.ToString();
+			}
 		}
 
 		public const int Loop = 0x01;
+
+		public const int NotPlaying = 0;
+		public const int Playing = 1;
+		public const int Stopping = 2;
 
 		private const float StopGracePeriod = 5;
 
@@ -176,11 +185,27 @@ namespace Cue
 			return list.ToArray();
 		}
 
+		public int PlayingStatus(int type)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim.Type == type)
+				{
+					if (playing_[i].stopping)
+						return Stopping;
+					else
+						return Playing;
+				}
+			}
+
+			return NotPlaying;
+		}
+
 		public bool IsPlaying(Animation a)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
-				if (playing_[i].anim == a)
+				if (playing_[i].anim == a && !playing_[i].stopping)
 					return true;
 			}
 
@@ -191,7 +216,7 @@ namespace Cue
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
-				if (playing_[i].anim.Type == type)
+				if (playing_[i].anim.Type == type && !playing_[i].stopping)
 					return true;
 			}
 
@@ -273,7 +298,7 @@ namespace Cue
 
 		public void StopType(int type)
 		{
-			log_.Info($"stopping animation {Animations.ToString(type)}");
+			log_.Verbose($"stopping animation {Animations.ToString(type)}");
 
 			int stopped = 0;
 
@@ -281,7 +306,7 @@ namespace Cue
 			{
 				var a = playing_[i];
 
-				if (a.anim.Type == type)
+				if (a.anim.Type == type && !a.stopping)
 				{
 					log_.Info($"stopping animation {a}");
 					a.stopping = true;
@@ -293,13 +318,13 @@ namespace Cue
 
 			if (stopped == 0)
 			{
-				log_.Error(
+				log_.Verbose(
 					$"no animation {Animations.ToString(type)} found to stop, " +
 					$"count={playing_.Count}");
 			}
 			else
 			{
-				log_.Info($"stopped {stopped} animations");
+				log_.Verbose($"stopped {stopped} animations");
 			}
 		}
 

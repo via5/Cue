@@ -100,11 +100,6 @@ namespace Cue
 			get { return baseTiredness_; }
 		}
 
-		public bool OrgasmJustStarted
-		{
-			get { return state_ == OrgasmState && elapsed_ == 0; }
-		}
-
 		public float GazeEnergy
 		{
 			get
@@ -127,9 +122,20 @@ namespace Cue
 		{
 			get
 			{
-				var tf = person_.Personality.Get(PSE.MovementEnergyTirednessFactor);
-				return U.Clamp(Get(Moods.Excited) - (Get(Moods.Tired) * tf), 0, 1);
+				return MovementEnergyForExcitement(Get(Moods.Excited));
 			}
+		}
+
+		public float MovementEnergyForExcitement(float e)
+		{
+			float max = float.MaxValue;
+
+			var rampUpTime = person_.Personality.Get(PSE.MovementEnergyRampUpAfterOrgasm);
+			if (rampUpTime > 0)
+				max = U.Clamp(timeSinceLastOrgasm_ / rampUpTime, 0, 1);
+
+			var tf = person_.Personality.Get(PSE.MovementEnergyTirednessFactor);
+			return U.Clamp(e - (Get(Moods.Tired) * tf), 0, max);
 		}
 
 		public bool IsIdle
@@ -321,7 +327,6 @@ namespace Cue
 			person_.Log.Info("orgasm");
 			person_.Orgasmer.Orgasm();
 
-			person_.Animator.StopType(Animations.Sex);
 			person_.Animator.PlayType(Animations.Orgasm);
 
 			flatExcitement_ = 1;

@@ -279,6 +279,12 @@ V.Float("MovementEnergyTirednessFactor"),
 // expression tiredness is `tiredness * this`, clamped [0, 1]
 V.Float("ExpressionTirednessFactor"),
 
+// time in seconds after post-orgasm until movement energy can be at its
+// maximum again; if greater than 0, movement energy will be forced to 0 after
+// post-orgasm and ramp up over time, which makes animations restart smoothly
+// instead of being very fast right after orgasm
+V.Float("MovementEnergyRampUpAfterOrgasm"),
+
 
 // Anger
 // =====

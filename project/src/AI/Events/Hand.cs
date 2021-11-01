@@ -11,10 +11,12 @@
 		private Person leftTarget_ = null;
 		private bool leftGroped_ = false;
 		private BodyPartLock[] leftLock_ = null;
+		private int leftAnim_ = Animations.None;
 
 		private Person rightTarget_ = null;
 		private bool rightGroped_ = false;
 		private BodyPartLock[] rightLock_ = null;
+		private int rightAnim_ = Animations.None;
 
 
 		public HandEvent(Person p)
@@ -67,11 +69,17 @@
 
 		private void Stop()
 		{
-			person_.Animator.StopType(Animations.HJBoth);
-			person_.Animator.StopType(Animations.HJLeft);
-			person_.Animator.StopType(Animations.HJRight);
-			person_.Animator.StopType(Animations.RightFinger);
-			person_.Animator.StopType(Animations.LeftFinger);
+			if (leftAnim_ != Animations.None)
+			{
+				person_.Animator.StopType(leftAnim_);
+				leftAnim_ = Animations.None;
+			}
+
+			if (rightAnim_ != Animations.None)
+			{
+				person_.Animator.StopType(rightAnim_);
+				rightAnim_ = Animations.None;
+			}
 
 			if (leftTarget_ != null)
 			{
@@ -110,6 +118,8 @@
 				UnlockRight();
 				return;
 			}
+
+			CheckAnim();
 
 			checkElapsed_ += s;
 			if (checkElapsed_ >= CheckTargetsInterval)
@@ -150,6 +160,38 @@
 			}
 		}
 
+		private void CheckAnim()
+		{
+			CheckAnim(leftAnim_, leftTarget_, leftLock_);
+			CheckAnim(rightAnim_, rightTarget_, rightLock_);
+		}
+
+		private void CheckAnim(int anim, Person target, BodyPartLock[] locks)
+		{
+			if (anim != Animations.None)
+			{
+				int state = person_.Animator.PlayingStatus(anim);
+
+				if (state == Animator.Playing)
+				{
+					if (person_.Mood.State == Mood.OrgasmState ||
+						target.Mood.State == Mood.OrgasmState)
+					{
+						person_.Animator.StopType(anim);
+					}
+				}
+				else if (state == Animator.NotPlaying)
+				{
+					if (person_.Mood.State == Mood.NormalState &&
+						target.Mood.State == Mood.NormalState)
+					{
+						person_.Animator.PlayType(
+							anim, new AnimationContext(target, locks[0].Key));
+					}
+				}
+			}
+		}
+
 		private void Check()
 		{
 			// todo, make it dynamic
@@ -167,13 +209,11 @@
 
 				if (LockBoth("double hj"))
 				{
-					if (person_.Animator.PlayType(
-						Animations.HJBoth, new AnimationContext(
-							leftTarget.Person, leftLock_[0].Key)))
-					{
-						leftTarget_ = leftTarget.Person;
-						rightTarget_ = rightTarget.Person;
-					}
+					leftTarget_ = leftTarget.Person;
+					leftAnim_ = Animations.HJBoth;
+
+					rightTarget_ = rightTarget.Person;
+					rightAnim_ = Animations.None;
 				}
 			}
 			else if (leftTarget == null && rightTarget == null)
@@ -190,12 +230,8 @@
 
 						if (LockLeft("left hj"))
 						{
-							if (person_.Animator.PlayType(
-								Animations.HJLeft, new AnimationContext(
-									leftTarget.Person, leftLock_[0].Key)))
-							{
-								leftTarget_ = leftTarget.Person;
-							}
+							leftTarget_ = leftTarget.Person;
+							leftAnim_ = Animations.HJLeft;
 						}
 					}
 					else if (leftTarget.Type == BP.Labia)
@@ -204,16 +240,11 @@
 
 						if (LockLeft("left fingering"))
 						{
-							if (person_.Animator.PlayType(
-								Animations.LeftFinger,
-								new AnimationContext(
-									leftTarget.Person, leftLock_[0].Key)))
-							{
-								leftTarget_ = leftTarget.Person;
-								leftGroped_ = true;
-								leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
-									.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
-							}
+							leftTarget_ = leftTarget.Person;
+							leftAnim_ = Animations.LeftFinger;
+							leftGroped_ = true;
+							leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+								.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 						}
 					}
 				}
@@ -226,12 +257,8 @@
 
 						if (LockRight("right hj"))
 						{
-							if (person_.Animator.PlayType(
-								Animations.HJRight, new AnimationContext(
-									rightTarget.Person, rightLock_[0].Key)))
-							{
-								rightTarget_ = rightTarget.Person;
-							}
+							rightTarget_ = rightTarget.Person;
+							rightAnim_ = Animations.HJRight;
 						}
 					}
 					else if (rightTarget.Type == BP.Labia)
@@ -240,17 +267,12 @@
 
 						if (LockRight("right fingering"))
 						{
-							if (person_.Animator.PlayType(
-								Animations.RightFinger,
-								new AnimationContext(
-									rightTarget.Person, rightLock_[0].Key)))
-							{
-								rightTarget_ = rightTarget.Person;
-								rightGroped_ = true;
+							rightTarget_ = rightTarget.Person;
+							rightAnim_ = Animations.RightFinger;
+							rightGroped_ = true;
 
-								rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-									.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
-							}
+							rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
+								.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 						}
 					}
 				}
