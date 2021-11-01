@@ -160,6 +160,8 @@
     <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement.cs" />
     <Compile Include="src\Person\Expression\Expression.cs" />
+    <Compile Include="src\Person\Expression\Manager.cs" />
+    <Compile Include="src\Person\Expression\WeightedExpression.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
