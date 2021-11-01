@@ -159,7 +159,7 @@
     <Compile Include="src\Person\Body\Hand.cs" />
     <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement.cs" />
-    <Compile Include="src\Person\Expression.cs" />
+    <Compile Include="src\Person\Expression\Expression.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
