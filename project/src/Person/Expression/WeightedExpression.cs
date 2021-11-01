@@ -18,6 +18,8 @@
 		private float weight_ = 0;
 		private float intensity_ = 0;
 		private float speed_ = 0;
+		private float min_ = 0;
+		private float max_ = 1;
 
 		private Duration holdTime_ = new Duration(0, 3);
 
@@ -50,9 +52,18 @@
 
 		public void Set(float weight, float intensity, float speed)
 		{
+			Set(weight, intensity, speed, 0, 1);
+		}
+
+		public void Set(
+			float weight, float intensity, float speed,
+			float min, float max)
+		{
 			weight_ = weight;
 			intensity_ = intensity;
 			speed_ = speed;
+			min_ = min;
+			max_ = max;
 		}
 
 		public bool Active
@@ -145,7 +156,7 @@
 
 		private float RandomTarget()
 		{
-			return U.RandomFloat(0, 1) * U.Clamp(intensity_, 0, 1);
+			return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);
 		}
 
 		private float MinRandomTime()

@@ -6,6 +6,7 @@ namespace Cue
 	class ExpressionManager
 	{
 		private const int MaxActive = 4;
+		private const int MaxEmergency = 1;
 		private const float MoreCheckInterval = 1;
 
 		private Person person_;
@@ -79,8 +80,34 @@ namespace Cue
 			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
 			{
 				isOrgasming_ = true;
+				bool foundActive = false;
+
 				for (int i = 0; i < exps_.Length; ++i)
-					exps_[i].Deactivate();
+				{
+					if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(Moods.Orgasm))
+					{
+						foundActive = true;
+						exps_[i].Set(1, 1, 1, 0.9f, 1.0f);
+						exps_[i].Activate(1.0f, 0.2f);
+					}
+					else if (exps_[i].Active)
+					{
+						exps_[i].Deactivate();
+					}
+				}
+
+				if (!foundActive)
+				{
+					for (int i = 0; i < exps_.Length; ++i)
+					{
+						if (exps_[i].Expression.IsMood(Moods.Orgasm))
+						{
+							exps_[i].Set(1, 1, 1, 0.9f, 1.0f);
+							exps_[i].Activate(1.0f, 0.2f);
+							break;
+						}
+					}
+				}
 			}
 			else if (isOrgasming_ && person_.Mood.State != Mood.OrgasmState)
 			{
@@ -199,6 +226,7 @@ namespace Cue
 
 				float weight = 0;
 				float intensity = 0;
+				float min = 0, max = 1;
 
 
 				if (isOrgasming_)
@@ -207,6 +235,8 @@ namespace Cue
 					{
 						weight += 1;
 						intensity = 1;
+						min = 0.8f;
+						max = 1.0f;
 					}
 				}
 				else
@@ -245,7 +275,7 @@ namespace Cue
 
 				float speed = 1 - expressionTiredness;
 
-				we.Set(weight, intensity, speed);
+				we.Set(weight, intensity, speed, min, max);
 			}
 		}
 
@@ -260,7 +290,7 @@ namespace Cue
 
 		public string[] Debug()
 		{
-			var s = new string[MaxActive + 1 + exps_.Length + 2];
+			var s = new string[MaxActive + MaxEmergency + 1 + exps_.Length + 2];
 
 			int i = 0;
 
@@ -272,6 +302,9 @@ namespace Cue
 
 			while (i < MaxActive)
 				s[i++] = "none";
+
+			while (i < (MaxEmergency + MaxActive))
+				s[i++] = "none (emergency)";
 
 			s[i++] = "";
 
