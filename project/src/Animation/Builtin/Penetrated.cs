@@ -160,6 +160,7 @@
 			{
 				s.postReaction = new Expression[0];
 				s.postReactionTargets = new float[0];
+				s.reactionHoldTime = c.reactionHoldTimeRange.second;
 			}
 
 			return s;

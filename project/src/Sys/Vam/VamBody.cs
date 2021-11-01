@@ -360,8 +360,6 @@ namespace Cue.Sys.Vam
 				BP.RightForearm, "rElbowControl", "rHand",
 				"rForeArm/_Collider2"));
 
-			//U.DumpComponentsAndDown(U.FindCollider(Atom.Atom, "rHand/_Collider").transform.parent);
-
 			add(BP.RightHand, GetRigidbody(
 				BP.RightHand, new string[]
 				{

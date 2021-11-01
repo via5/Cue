@@ -110,7 +110,7 @@ namespace Cue.Sys.Vam
 
 		public override Rigidbody Rigidbody
 		{
-			get { return h_.thisRigidbody; }
+			get { return h_?.thisRigidbody; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -239,7 +239,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (h_.thisRigidbody == null)
+				if (h_?.thisRigidbody == null)
 					return Vector3.Zero;
 				else
 					return U.FromUnity(h_.thisRigidbody.position);
@@ -252,7 +252,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (h_.thisRigidbody == null)
+				if (h_?.thisRigidbody == null)
 					return Quaternion.Zero;
 				else
 					return U.FromUnity(h_.thisRigidbody.rotation);

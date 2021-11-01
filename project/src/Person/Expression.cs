@@ -260,8 +260,13 @@ namespace Cue
 
 		public void Activate()
 		{
+			Activate(RandomTarget(), RandomTargetTime());
+		}
+
+		public void Activate(float target, float time)
+		{
 			e_.SetAuto(0.1f, MinRandomTime(), MaxRandomTime());
-			e_.SetTarget(RandomTarget(), RandomTargetTime());
+			e_.SetTarget(target, time);
 			state_ = RampUpState;
 		}
 
@@ -369,6 +374,7 @@ namespace Cue
 		private float moreElapsed_ = 0;
 		private Personality lastPersonality_ = null;
 		private bool enabled_ = true;
+		private bool isOrgasming_ = false;
 
 		public ExpressionManager(Person p)
 		{
@@ -428,6 +434,19 @@ namespace Cue
 		{
 			if (lastPersonality_ != person_.Personality)
 				Init();
+
+
+			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
+			{
+				isOrgasming_ = true;
+				for (int i = 0; i < exps_.Length; ++i)
+					exps_[i].Deactivate();
+			}
+			else if (isOrgasming_ && person_.Mood.State != Mood.OrgasmState)
+			{
+				isOrgasming_ = false;
+			}
+
 
 			int finished = 0;
 			int activeCount = 0;
@@ -542,28 +561,39 @@ namespace Cue
 				float intensity = 0;
 
 
-				if (e.IsMood(Moods.Happy))
+				if (isOrgasming_)
 				{
-					weight += m.Get(Moods.Happy);
-					intensity = Math.Max(intensity, m.Get(Moods.Happy));
+					if (e.IsMood(Moods.Orgasm))
+					{
+						weight += 1;
+						intensity = 1;
+					}
 				}
-
-				if (e.IsMood(Moods.Excited))
+				else
 				{
-					weight += m.Get(Moods.Excited) * 2;
-					intensity = Math.Max(intensity, m.Get(Moods.Excited));
-				}
+					if (e.IsMood(Moods.Happy))
+					{
+						weight += m.Get(Moods.Happy);
+						intensity = Math.Max(intensity, m.Get(Moods.Happy));
+					}
 
-				if (e.IsMood(Moods.Angry))
-				{
-					weight += m.Get(Moods.Angry);
-					intensity = Math.Max(intensity, m.Get(Moods.Angry));
-				}
+					if (e.IsMood(Moods.Excited))
+					{
+						weight += m.Get(Moods.Excited) * 2;
+						intensity = Math.Max(intensity, m.Get(Moods.Excited));
+					}
 
-				if (e.IsMood(Moods.Tired))
-				{
-					weight += expressionTiredness;
-					intensity = Math.Max(intensity, expressionTiredness);
+					if (e.IsMood(Moods.Angry))
+					{
+						weight += m.Get(Moods.Angry);
+						intensity = Math.Max(intensity, m.Get(Moods.Angry));
+					}
+
+					if (e.IsMood(Moods.Tired))
+					{
+						weight += expressionTiredness;
+						intensity = Math.Max(intensity, expressionTiredness);
+					}
 				}
 
 
@@ -571,6 +601,7 @@ namespace Cue
 				{
 					weight *= Math.Max(1 - expressionTiredness, 0.05f);
 				}
+
 
 				float speed = 1 - expressionTiredness;
 

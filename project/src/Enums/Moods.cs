@@ -10,9 +10,10 @@ namespace Cue
 		public const int Excited = 1;
 		public const int Angry = 2;
 		public const int Tired = 3;
+		public const int Orgasm = 4;
 
-		public const int Count = 4;
-		public int GetCount() { return 4; }
+		public const int Count = 5;
+		public int GetCount() { return 5; }
 
 
 		private static string[] names_ = new string[]
@@ -21,6 +22,7 @@ namespace Cue
 			"excited",
 			"angry",
 			"tired",
+			"orgasm",
 		};
 
 		public static int FromString(string s)

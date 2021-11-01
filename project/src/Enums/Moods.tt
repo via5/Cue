@@ -6,6 +6,7 @@ V.Value("Happy"),
 V.Value("Excited"),
 V.Value("Angry"),
 V.Value("Tired"),
+V.Value("Orgasm")
 
 };
 
