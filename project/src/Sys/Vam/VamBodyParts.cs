@@ -104,12 +104,15 @@ namespace Cue.Sys.Vam
 
 			// todo: should probably use BodyPartForTransform()
 
-			var sys = Cue.Instance.VamSys;
+			if (other.Atom.Possessed)
+			{
+				var sys = Cue.Instance.VamSys;
 
-			if (o.Type == BP.LeftHand)
-				return sys.IsVRHand(Controller.linkToRB?.transform, BP.LeftHand);
-			else if (o.Type == BP.RightHand)
-				return sys.IsVRHand(Controller.linkToRB?.transform, BP.RightHand);
+				if (o.Type == BP.LeftHand)
+					return sys.IsVRHand(Controller.linkToRB?.transform, BP.LeftHand);
+				else if (o.Type == BP.RightHand)
+					return sys.IsVRHand(Controller.linkToRB?.transform, BP.RightHand);
+			}
 
 			return false;
 		}
