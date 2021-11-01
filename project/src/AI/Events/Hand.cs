@@ -176,6 +176,10 @@
 					}
 				}
 			}
+			else if (leftTarget == null && rightTarget == null)
+			{
+				Cue.LogError("no target");
+			}
 			else
 			{
 				if (leftTarget != null)

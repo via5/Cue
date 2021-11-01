@@ -332,7 +332,18 @@ namespace Cue.Sys.Vam
 				"lForeArm/_Collider2"));
 
 			add(BP.LeftHand, GetRigidbody(
-				BP.LeftHand, new string[] { "lHand/_Collider" },
+				BP.LeftHand, new string[]
+				{
+					"lHand/_Collider",           // near wrist
+					"lHand/lCarpal1/Collider3",  // middle of the palm
+
+					// finger tips
+					"lHand/lCarpal1/lIndex1/lIndex2/lIndex3/Collider",
+					"lHand/lCarpal1/lMid1/lMid2/lMid3/Collider",
+					"lHand/lCarpal2/lPinky1/lPinky2/lPinky3/Collider",
+					"lHand/lCarpal2/lRing1/lRing2/lRing3/Collider",
+					"lThumb1/lThumb2/lThumb3/Collider",
+				},
 				"lHandControl", "lHand"));
 
 
@@ -349,8 +360,21 @@ namespace Cue.Sys.Vam
 				BP.RightForearm, "rElbowControl", "rHand",
 				"rForeArm/_Collider2"));
 
+			//U.DumpComponentsAndDown(U.FindCollider(Atom.Atom, "rHand/_Collider").transform.parent);
+
 			add(BP.RightHand, GetRigidbody(
-				BP.RightHand, new string[] { "rHand/_Collider" },
+				BP.RightHand, new string[]
+				{
+					"rHand/_Collider",           // near wrist
+					"rHand/rCarpal1/Collider3",  // middle of the palm
+
+					// finger tips
+					"rHand/rCarpal1/rIndex1/rIndex2/rIndex3/Collider",
+					"rHand/rCarpal1/rMid1/rMid2/rMid3/Collider",
+					"rHand/rCarpal2/rPinky1/rPinky2/rPinky3/Collider",
+					"rHand/rCarpal2/rRing1/rRing2/rRing3/Collider",
+					"rThumb1/rThumb2/rThumb3/Collider",
+				},
 				"rHandControl", "rHand"));
 
 

@@ -85,24 +85,42 @@ namespace Cue.Sys.Vam
 			return colliders_;
 		}
 
+		private bool CanApplyForce()
+		{
+			if (fc_ != null)
+			{
+				if (fc_.currentPositionState != FreeControllerV3.PositionState.On ||
+					fc_.currentRotationState != FreeControllerV3.RotationState.On)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		public override void AddRelativeForce(Vector3 v)
 		{
-			rb_.AddRelativeForce(U.ToUnity(v));
+			if (CanApplyForce())
+				rb_.AddRelativeForce(U.ToUnity(v));
 		}
 
 		public override void AddRelativeTorque(Vector3 v)
 		{
-			rb_.AddRelativeTorque(U.ToUnity(v));
+			if (CanApplyForce())
+				rb_.AddRelativeTorque(U.ToUnity(v));
 		}
 
 		public override void AddForce(Vector3 v)
 		{
-			rb_.AddForce(U.ToUnity(v));
+			if (CanApplyForce())
+				rb_.AddForce(U.ToUnity(v));
 		}
 
 		public override void AddTorque(Vector3 v)
 		{
-			rb_.AddTorque(U.ToUnity(v));
+			if (CanApplyForce())
+				rb_.AddTorque(U.ToUnity(v));
 		}
 
 		public override string ToString()

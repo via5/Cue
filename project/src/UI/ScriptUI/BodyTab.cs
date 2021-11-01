@@ -224,7 +224,6 @@ namespace Cue
 						{
 							if (ss != "") ss += ",";
 							ss += gs[j].ToString();
-							Cue.LogInfo($"{gs[j]}");
 						}
 
 						w.grabbed.Text = ss;

@@ -221,6 +221,9 @@ namespace Cue.Sys.Vam
 			if (cn == "StandardColliders" + pathstring)
 				return true;
 
+			if (cn == "_" + pathstring)
+				return true;
+
 			return false;
 		}
 

@@ -78,7 +78,8 @@
 					"morphs":
 					[
 						{
-							"id": "Pain"
+							"id": "Pain",
+							"max": 0.5
 						}
 					]
 				},
@@ -114,7 +115,8 @@
 					"morphs":
 					[
 						{
-							"id": "Angry"
+							"id": "Angry",
+							"max": 0.5
 						}
 					]
 				},

@@ -126,7 +126,10 @@ namespace Cue
 				person_.Gaze.Clear();
 				targets_.SetWeight(Cue.Instance.Player, BP.Eyes, 1, "head grabbed");
 
-				return Exclusive | NoGazer;
+				// don't disable gazer, mg won't affect the head while it's
+				// being grabbed, and it snaps the head back to its original
+				// position when it's re-enabled
+				return Exclusive;
 			}
 
 			return Continue;

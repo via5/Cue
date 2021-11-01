@@ -104,7 +104,7 @@ namespace Cue.Sys.Vam
 
 			// todo: should probably use BodyPartForTransform()
 
-			if (other.Atom.Possessed)
+			if (other.Atom.Possessed || other.Atom is VamCameraAtom)
 			{
 				var sys = Cue.Instance.VamSys;
 
@@ -254,7 +254,8 @@ namespace Cue.Sys.Vam
 						Cue.LogError(
 							$"this valid, " +
 							$"closest is {other} at {otherPos}, " +
-							$"this is {this} {c} at {c.transform.position}, d={closest}");
+							$"this is {this} {c.transform.parent.name}.{c.name} " +
+							$"at {c.transform.position}, d={closest}");
 					}
 				}
 				catch (Exception)
@@ -287,7 +288,11 @@ namespace Cue.Sys.Vam
 					}
 
 					if (debug)
-						Cue.LogError($"other valid, closest is {thisPos} {c} {closest}");
+					{
+						Cue.LogError(
+							$"other valid, closest is {thisPos} " +
+							$"{c.transform.parent.name}.{c.name} {closest}");
+					}
 				}
 				catch (Exception)
 				{
