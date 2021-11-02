@@ -163,6 +163,9 @@ namespace Cue.Proc
 
 				Apply(v);
 
+				if (p >= 1)
+					oneFrameFinished_ = true;
+
 				return;
 			}
 			else if (wasBusy_)

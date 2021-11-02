@@ -366,7 +366,7 @@ namespace Cue.Proc
 			get
 			{
 				if (stopping_)
-					return (stoppingElapsed_ / StopTime);
+					return U.Clamp(stoppingElapsed_ / StopTime, 0, 1);
 
 				var p = CurrentDuration().Progress;
 
