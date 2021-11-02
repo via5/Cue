@@ -210,7 +210,7 @@
 				if (LockBoth("double hj"))
 				{
 					leftTarget_ = leftTarget.Person;
-					leftAnim_ = Animations.HJBoth;
+					leftAnim_ = Animations.HandjobBoth;
 
 					rightTarget_ = rightTarget.Person;
 					rightAnim_ = Animations.None;
@@ -231,7 +231,7 @@
 						if (LockLeft("left hj"))
 						{
 							leftTarget_ = leftTarget.Person;
-							leftAnim_ = Animations.HJLeft;
+							leftAnim_ = Animations.HandjobLeft;
 						}
 					}
 					else if (leftTarget.Type == BP.Labia)
@@ -258,7 +258,7 @@
 						if (LockRight("right hj"))
 						{
 							rightTarget_ = rightTarget.Person;
-							rightAnim_ = Animations.HJRight;
+							rightAnim_ = Animations.HandjobRight;
 						}
 					}
 					else if (rightTarget.Type == BP.Labia)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class PSE : IEnumValues
+	class PS : IEnumValues
 	{
 		// sliding durations
 		public const int GazeDuration = 0;

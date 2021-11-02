@@ -5,32 +5,32 @@ namespace Cue
 {
 	class BuiltinAnimations
 	{
-		public static List<Animation> Get()
+		private static List<IAnimation> list_ = new List<IAnimation>()
 		{
-			var list = new List<Animation>();
+			new SmokeAnimation(),
+			new PenetratedAnimation(),
+			new ClockwiseKissAnimation(),
+			new ClockwiseBJAnimation(),
+			new ClockwiseHJBothAnimation(),
+			new ClockwiseHJLeftAnimation(),
+			new ClockwiseHJRightAnimation(),
+			new Proc.SexProcAnimation(),
+			new Proc.SuckFingerProcAnimation(),
+			new Proc.LeftFingerProcAnimation(),
+			new Proc.RightFingerProcAnimation(),
+		};
 
-			list.Add(Create<SmokeAnimation>(Animations.Smoke));
-			list.Add(Create<PenetratedAnimation>(Animations.Penetrated));
-
-			list.Add(Create<ClockwiseKissAnimation>(Animations.Kiss));
-			list.Add(Create<ClockwiseBJAnimation>(Animations.BJ));
-			list.Add(Create<ClockwiseHJBothAnimation>(Animations.HJBoth));
-			list.Add(Create<ClockwiseHJLeftAnimation>(Animations.HJLeft));
-			list.Add(Create<ClockwiseHJRightAnimation>(Animations.HJRight));
-
-			list.Add(Create<Proc.SexProcAnimation>(Animations.Sex));
-			list.Add(Create<Proc.SuckProcAnimation>(Animations.Suck));
-			list.Add(Create<Proc.LeftFingerProcAnimation>(Animations.LeftFinger));
-			list.Add(Create<Proc.RightFingerProcAnimation>(Animations.RightFinger));
-
-			return list;
-		}
-
-		private static Animation Create<T>(int type)
-			where T : BuiltinAnimation, new()
+		public static IAnimation Get(string name)
 		{
-			var a = new T();
-			return new Animation(type, MovementStyles.Any, a);
+			foreach (var a in list_)
+			{
+				if (a.Name == name)
+					return a;
+			}
+
+			Cue.LogError($"builtin animation '{name}' not found");
+
+			return null;
 		}
 	}
 
@@ -151,6 +151,7 @@ namespace Cue
 		private Logger log_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private readonly List<PlayingAnimation> playing_ = new List<PlayingAnimation>();
+		private List<int> failed_ = new List<int>();
 
 		public Animator(Person p)
 		{
@@ -231,7 +232,12 @@ namespace Cue
 			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
 			{
-				log_.Error($"no animation for type {Animations.ToString(type)}");
+				if (!failed_.Contains(type))
+				{
+					failed_.Add(type);
+					log_.Error($"no animation for type {Animations.ToString(type)}");
+				}
+
 				return false;
 			}
 

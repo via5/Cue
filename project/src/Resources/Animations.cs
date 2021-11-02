@@ -19,10 +19,7 @@ namespace Cue
 			try
 			{
 				anims_.Clear();
-
 				LoadFromFile();
-				LoadBuiltin();
-
 				return true;
 			}
 			catch (Exception e)
@@ -67,9 +64,12 @@ namespace Cue
 				return null;
 			}
 
-			int type = Animations.FromString(o["animation"]);
+			int type = Animations.FromString(o["animation"].Value);
 			if (type == Animations.None)
+			{
+				log_.Error($"bad animation type '{o["animation"].Value}'");
 				return null;
+			}
 
 			int ms = MovementStyles.Any;
 			if (o.HasKey("sex"))
@@ -107,19 +107,12 @@ namespace Cue
 				a = SynergyAnimation.Create(options);
 			else if (type == "proc")
 				a = Proc.ProcAnimation.Create(options);
+			else if (type == "internal")
+				a = BuiltinAnimations.Get(options["name"].Value);
 			else
 				log_.Error($"unknown animation type '{type}'");
 
 			return a;
-		}
-
-		private void LoadBuiltin()
-		{
-			foreach (var a in BuiltinAnimations.Get())
-			{
-				if (a != null)
-					Add(a);
-			}
 		}
 
 		public Animation GetAny(int type, int style)

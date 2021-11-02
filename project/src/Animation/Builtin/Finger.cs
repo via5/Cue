@@ -67,7 +67,7 @@
 	{
 		public LeftFingerProcAnimation()
 			: base(
-				  "procLeftFinger", BP.LeftHand,
+				  "cueLeftFinger", BP.LeftHand,
 				  new Vector3(0, 0, 1), new Vector3(-1, 0, 0))
 		{
 		}
@@ -85,7 +85,7 @@
 	{
 		public RightFingerProcAnimation()
 			: base(
-				  "procRightFinger", BP.RightHand,
+				  "cueRightFinger", BP.RightHand,
 				  new Vector3(0, 0, -1), new Vector3(1, 0, 0))
 		{
 		}

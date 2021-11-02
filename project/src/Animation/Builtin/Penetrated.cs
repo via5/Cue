@@ -40,7 +40,7 @@
 		private Expression[] expressions_ = null;
 
 		public PenetratedAnimation()
-			: base("procPenetrated")
+			: base("cuePenetrated")
 		{
 		}
 

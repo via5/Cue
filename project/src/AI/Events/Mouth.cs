@@ -57,7 +57,7 @@
 		{
 			UnlockBJ();
 			bjTarget_ = null;
-			person_.Animator.StopType(Animations.BJ);
+			person_.Animator.StopType(Animations.Blowjob);
 		}
 
 		private void UnlockBJ()
@@ -101,14 +101,15 @@
 				if (mouthLock_ != null)
 				{
 					person_.Animator.PlayType(
-						Animations.Suck, new AnimationContext(mouthLock_.Key));
+						Animations.SuckFinger,
+						new AnimationContext(mouthLock_.Key));
 				}
 			}
 			else if (mouthLock_ != null && !mouthTriggered)
 			{
 				mouthLock_.Unlock();
 				mouthLock_ = null;
-				person_.Animator.StopType(Animations.Suck);
+				person_.Animator.StopType(Animations.SuckFinger);
 			}
 		}
 
@@ -129,7 +130,8 @@
 			if (bjLocks_ != null)
 			{
 				if (!person_.Animator.PlayType(
-					Animations.BJ, new AnimationContext(t, bjLocks_[0].Key)))
+					Animations.Blowjob,
+					new AnimationContext(t, bjLocks_[0].Key)))
 				{
 					UnlockBJ();
 					return;

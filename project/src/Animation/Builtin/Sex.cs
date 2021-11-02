@@ -36,7 +36,7 @@ namespace Cue.Proc
 		private Person receiver_ = null;
 
 		public SexProcAnimation()
-			: base("procSex")
+			: base("cueSex")
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,

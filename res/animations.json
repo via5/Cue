@@ -2,6 +2,24 @@
 	"animations":
 	[
 		{
+			"animation": "idle",
+			"type": "proc",
+			"options":
+			{
+				"file": "animations/standIdle.json"
+			}
+		},
+
+		{
+			"animation": "sex",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueSex"
+			}
+		},
+
+		{
 			"animation": "orgasm",
 			"type": "proc",
 			"options":
@@ -11,11 +29,92 @@
 		},
 
 		{
-			"animation": "idle",
-			"type": "proc",
+			"animation": "smoke",
+			"type": "internal",
 			"options":
 			{
-				"file": "animations/standIdle.json"
+				"name": "cueSmoke"
+			}
+		},
+
+		{
+			"animation": "suckFinger",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueSuckFinger"
+			}
+		},
+
+		{
+			"animation": "penetrated",
+			"type": "internal",
+			"options":
+			{
+				"name": "cuePenetrated"
+			}
+		},
+
+		{
+			"animation": "rightFinger",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueRightFinger"
+			}
+		},
+
+		{
+			"animation": "leftFinger",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueLeftFinger"
+			}
+		},
+
+		{
+			"animation": "kiss",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwKiss"
+			}
+		},
+
+		{
+			"animation": "handjobBoth",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwHJboth"
+			}
+		},
+
+		{
+			"animation": "handjobLeft",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwHJleft"
+			}
+		},
+
+		{
+			"animation": "handjobRight",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwHJright"
+			}
+		},
+
+		{
+			"animation": "blowjob",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwBJ"
 			}
 		}
 	]

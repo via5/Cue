@@ -533,4 +533,4 @@ V.Float("RateAdjustment"),
 
 };
 
-#><#= Generate(vars, "PSE", "Personality") #>
+#><#= Generate(vars, "PS", "Personality") #>

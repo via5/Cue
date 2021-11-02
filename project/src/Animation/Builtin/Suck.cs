@@ -1,14 +1,14 @@
 ﻿namespace Cue.Proc
 {
-	class SuckProcAnimation : BasicProcAnimation
+	class SuckFingerProcAnimation : BasicProcAnimation
 	{
 		private float durationMin_ = 0.8f;
 		private float durationMax_ = 1.5f;
 		private float durationWin_ = 0;
 		private float durationInterval_ = 5;
 
-		public SuckProcAnimation()
-			: base("procSuck")
+		public SuckFingerProcAnimation()
+			: base("cueSuckFinger")
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
@@ -37,7 +37,7 @@
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new SuckProcAnimation();
+			var a = new SuckFingerProcAnimation();
 			a.CopyFrom(this);
 			return a;
 		}

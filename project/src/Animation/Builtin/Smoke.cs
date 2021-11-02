@@ -94,7 +94,7 @@ namespace Cue
 		private bool DoRender = false;
 
 		public SmokeAnimation()
-			: base("smoking")
+			: base("cueSmoke")
 		{
 		}
 
