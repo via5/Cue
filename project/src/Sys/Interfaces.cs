@@ -73,6 +73,7 @@ namespace Cue.Sys
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
+		List<string> GetFilenames(string path, string pattern);
 		void HardReset();
 		void ReloadPlugin();
 		void OpenScriptUI();

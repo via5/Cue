@@ -1,0 +1,5 @@
+{
+	"name": "shy",
+	"inherit": "standard",
+	"maxHappiness": 0.1
+}

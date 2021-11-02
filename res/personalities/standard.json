@@ -1,0 +1,19 @@
+{
+	"name": "standard",
+	"inherit": "base",
+
+	"expressions":
+	[
+		{
+			"name": "smile",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Smile Open Full Face"
+				}
+			]
+		},
+	]
+}

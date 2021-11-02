@@ -1,0 +1,30 @@
+{
+	"name": "quirky",
+	"inherit": "base",
+
+	"expressions":
+	[
+		{
+			"name": "cornerSmile",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Smile Open Full Face",
+					"max": 0.3
+				},
+
+				{
+					"id": "Mouth Smile Simple Left",
+					"max": 1.2
+				},
+
+				{
+					"id": "Eyes Squint",
+					"max": 0.15
+				},
+			]
+		},
+	]
+}

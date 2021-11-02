@@ -1,4 +1,5 @@
 ﻿using MeshVR;
+using MVR.FileManagementSecure;
 using SimpleJSON;
 using System;
 using System.Collections;
@@ -526,12 +527,40 @@ namespace Cue.Sys.Vam
 			if (pluginPath_ == "")
 				pluginPath_ = CueMain.Instance.PluginPath;
 
-			path = path.Replace('/', '\\');
-
-			if (path.StartsWith("\\"))
-				return pluginPath_ + "\\res" + path;
+			if (path.StartsWith("/"))
+				return pluginPath_ + "/res" + path;
 			else
-				return pluginPath_ + "\\res\\" + path;
+				return pluginPath_ + "/res/" + path;
+		}
+
+		public List<string> GetFilenames(string path, string pattern)
+		{
+			var list = new List<string>();
+
+			GetFilenames(list, "Custom/PluginData/Cue/" + path, pattern);
+			GetFilenames(list, CueMain.Instance.PluginPath + "/res/" + path, pattern);
+
+			for (int i = 0; i < list.Count; ++i)
+				list[i] = list[i].Replace('\\', '/');
+
+			list.Sort();
+
+			return list;
+		}
+
+		private void GetFilenames(List<string> list, string path, string pattern)
+		{
+			var scs = FileManagerSecure.GetShortCutsForDirectory(path);
+
+			foreach (var s in scs)
+			{
+				var fs = FileManagerSecure.GetFiles(s.path, pattern);
+				if (fs.Length == 0)
+					continue;
+
+				foreach (var f in fs)
+					list.Add(f);
+			}
 		}
 	}
 }

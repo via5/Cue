@@ -216,6 +216,11 @@ namespace Cue.Sys.Mock
 			return Path.Combine(ResPath(), path);
 		}
 
+		public List<string> GetFilenames(string path, string pattern)
+		{
+			return new List<string>();
+		}
+
 		public IObjectCreator CreateObjectCreator(
 			string name, string type, JSONClass opts, Sys.ObjectParameters ps)
 		{

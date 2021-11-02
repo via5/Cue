@@ -1,7 +1,17 @@
 ﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue
 {
+	class ResourceFile
+	{
+		public JSONNode root = null;
+		public string name = "";
+		public string inherit = "";
+		public int prio = 0;
+	}
+
+
 	class Resources
 	{
 		private static AnimationResources animations_ = new AnimationResources();
@@ -38,6 +48,90 @@ namespace Cue
 		public static PersonalityResources Personalities
 		{
 			get { return personalities_; }
+		}
+
+
+		public static List<ResourceFile> LoadFiles(
+			string rootPath, string pattern = "*.json")
+		{
+			var files = new Dictionary<string, ResourceFile>();
+
+			foreach (var path in Cue.Instance.Sys.GetFilenames(rootPath, pattern))
+			{
+				var f = LoadResourceFile(path);
+				if (f != null)
+					files.Add(f.name, f);
+			}
+
+			FixPriorities(files);
+
+			var sorted = new List<ResourceFile>(files.Values);
+
+			sorted.Sort((a, b) =>
+			{
+				if (a.prio > b.prio)
+					return -1;
+				else if (a.prio < b.prio)
+					return 1;
+				else
+					return 0;
+			});
+
+			return sorted;
+		}
+
+		private static ResourceFile LoadResourceFile(string path)
+		{
+			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(path));
+
+			if (doc == null)
+			{
+				Cue.LogError($"failed to parse file {path}");
+				return null;
+			}
+
+			var f = new ResourceFile();
+			f.root = doc;
+			f.name = doc.AsObject["name"].Value;
+			f.inherit = doc.AsObject["inherit"].Value;
+
+			return f;
+		}
+
+		private static void FixPriorities(Dictionary<string, ResourceFile> files)
+		{
+			// just to avoid infinite loops if there's a bug somewhere
+			int getOut = 0;
+
+			var seen = new List<string>();
+
+			foreach (var p in files)
+			{
+				var f = files[p.Key];
+				var inherit = f.inherit;
+
+				seen.Clear();
+				++getOut;
+
+				while (inherit != "")
+				{
+					++getOut;
+					if (getOut > 1000)
+						throw new LoadFailed("bailing out");
+
+					if (seen.Contains(inherit))
+						throw new LoadFailed($"cyclic dependency, '{inherit}'");
+
+					seen.Add(inherit);
+
+					ResourceFile parent;
+					if (!files.TryGetValue(inherit, out parent))
+						throw new LoadFailed($"parent '{inherit}' of '{f.name}' not found");
+
+					++parent.prio;
+					inherit = parent.inherit;
+				}
+			}
 		}
 
 

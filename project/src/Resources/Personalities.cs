@@ -20,7 +20,7 @@ namespace Cue
 			try
 			{
 				all_.Clear();
-				LoadFromFile();
+				LoadFiles();
 				return true;
 			}
 			catch (Exception e)
@@ -38,7 +38,7 @@ namespace Cue
 					return ps.Clone(null, p);
 			}
 
-			Cue.LogError($"personality '{name}' not found");
+			Cue.LogError($"can't clone personality '{name}', not found");
 			return null;
 		}
 
@@ -57,31 +57,27 @@ namespace Cue
 			return names;
 		}
 
-		private void LoadFromFile()
+		private void LoadFiles()
 		{
-			var meta = Cue.Instance.Sys.GetResourcePath("personalities.json");
-			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(meta));
+			foreach (var f in Resources.LoadFiles("personalities", "*.json"))
+				LoadFile(f.name, f.root.AsObject);
+		}
 
-			if (doc == null)
+		private void LoadFile(string name, JSONClass root)
+		{
+			log_.Info($"loading personality '{name}'");
+
+			try
 			{
-				log_.Error("failed to parse personalities");
-				return;
+				var p = ParsePersonality(root.AsObject);
+
+				if (p != null)
+					Add(p, J.OptBool(root.AsObject, "abstract", false));
 			}
-
-			foreach (var an in doc.AsObject["personalities"].AsArray.Childs)
+			catch (LoadFailed e)
 			{
-				try
-				{
-					var p = ParsePersonality(an.AsObject);
-
-					if (p != null)
-						Add(p, J.OptBool(an.AsObject, "abstract", false));
-				}
-				catch (LoadFailed e)
-				{
-					log_.Error($"failed to load personality '{an["name"].Value}'");
-					log_.Error(e.ToString());
-				}
+				log_.Error($"failed to load personality '{name}'");
+				log_.Error(e.ToString());
 			}
 		}
 
