@@ -123,7 +123,7 @@ namespace Cue
 
 			if (head.GrabbedByPlayer)
 			{
-				person_.Gaze.Clear();
+				g_.Clear();
 				targets_.SetWeight(Cue.Instance.Player, BP.Eyes, 1, "head grabbed");
 
 				// don't disable gazer, mg won't affect the head while it's
@@ -160,10 +160,10 @@ namespace Cue
 
 				if (t != null)
 				{
-					if (ps.GetBool(PS.AvoidGazeInsidePersonalSpace))
+					if (g_.ShouldAvoidInsidePersonalSpace(t))
 					{
 						targets_.SetRandomWeight(1, $"kissing {t.ID}, but avoid in ps");
-						targets_.SetShouldAvoid(t, true, $"kissing, but avoid in ps");
+						targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), $"kissing, but avoid in ps");
 					}
 					else
 					{
@@ -216,10 +216,10 @@ namespace Cue
 
 				if (t != null)
 				{
-					if (ps.GetBool(PS.AvoidGazeInsidePersonalSpace))
+					if (g_.ShouldAvoidInsidePersonalSpace(t))
 					{
 						targets_.SetShouldAvoid(
-							t, true, $"bj, but avoid in ps");
+							t, true, g_.AvoidWeight(t), $"bj, but avoid in ps");
 
 						return Continue | NoGazer | Busy;
 					}
@@ -280,9 +280,9 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (ps.GetBool(PS.AvoidGazeInsidePersonalSpace))
+			if (g_.ShouldAvoidInsidePersonalSpace(t))
 			{
-				targets_.SetShouldAvoid(t, true, "hj, but avoid in ps");
+				targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "hj, but avoid in ps");
 				return Continue | Busy;
 			}
 			else
@@ -308,6 +308,21 @@ namespace Cue
 
 	class GazeInteractions : BasicGazeEvent
 	{
+		struct WeightInfo
+		{
+			public float weight;
+			public string why;
+			public bool set;
+
+			public void Set(float w, string why)
+			{
+				weight = w;
+				this.why = why;
+				set = true;
+			}
+		}
+
+
 		public GazeInteractions(Person p)
 			: base(p)
 		{
@@ -332,21 +347,14 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			// check player avoidance
-			if (t.IsPlayer && g_.ShouldAvoidPlayer())
-			{
-				targets_.SetShouldAvoid(t, true, "avoid player");
-				return Continue;
-			}
-
 			if (person_.Body.InsidePersonalSpace(t))
 			{
 				// person is close
 
 				// check avoidance for closeness
-				if (g_.ShouldAvoidInsidePersonalSpace())
+				if (g_.ShouldAvoidInsidePersonalSpace(t))
 				{
-					targets_.SetShouldAvoid(t, true, "avoid in ps");
+					targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "avoid in ps");
 					return Continue;
 				}
 
@@ -361,20 +369,6 @@ namespace Cue
 			CheckNotInteracting(t);
 
 			return Continue;
-		}
-
-		struct WeightInfo
-		{
-			public float weight;
-			public string why;
-			public bool set;
-
-			public void Set(float w, string why)
-			{
-				weight = w;
-				this.why = why;
-				set = true;
-			}
 		}
 
 		private bool CheckInsidePS(Person t)
@@ -470,9 +464,9 @@ namespace Cue
 			{
 				// this character is being interacted with
 
-				if (g_.ShouldAvoidDuringSex())
+				if (g_.ShouldAvoidDuringSex(t))
 				{
-					targets_.SetShouldAvoid(t, true, "avoid during sex");
+					targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "avoid during sex");
 				}
 				else
 				{
@@ -610,10 +604,42 @@ namespace Cue
 			{
 				// this character is being interacted with by someone else
 
-				if (g_.ShouldAvoidOthersDuringSex())
+				if (g_.ShouldAvoidUninvolvedHavingSex(source))
 				{
-					targets_.SetShouldAvoid(source, true, "avoid others during sex");
-					targets_.SetShouldAvoid(target, true, "avoid others during sex");
+					targets_.SetShouldAvoid(
+						source, true, g_.AvoidWeight(source),
+						"avoid others during sex");
+				}
+				else
+				{
+					if (sourceEyes.set)
+					{
+						targets_.SetWeightIfZero(
+							source, BP.Eyes,
+							sourceEyes.weight, sourceEyes.why);
+					}
+
+					if (sourceChest.set)
+					{
+						targets_.SetWeightIfZero(
+							source, BP.Chest,
+							sourceChest.weight, sourceChest.why);
+					}
+
+					if (sourceGenitals.set)
+					{
+						targets_.SetWeightIfZero(
+							source, source.Body.GenitalsBodyPart,
+							sourceGenitals.weight, sourceGenitals.why);
+					}
+				}
+
+
+				if (g_.ShouldAvoidUninvolvedHavingSex(target))
+				{
+					targets_.SetShouldAvoid(
+						target, true, g_.AvoidWeight(target),
+						"avoid others during sex");
 				}
 				else
 				{
@@ -636,28 +662,6 @@ namespace Cue
 						targets_.SetWeightIfZero(
 							target, target.Body.GenitalsBodyPart,
 							targetGenitals.weight, targetGenitals.why);
-					}
-
-
-					if (sourceEyes.set)
-					{
-						targets_.SetWeightIfZero(
-							source, BP.Eyes,
-							sourceEyes.weight, sourceEyes.why);
-					}
-
-					if (sourceChest.set)
-					{
-						targets_.SetWeightIfZero(
-							source, BP.Chest,
-							sourceChest.weight, sourceChest.why);
-					}
-
-					if (sourceGenitals.set)
-					{
-						targets_.SetWeightIfZero(
-							source, source.Body.GenitalsBodyPart,
-							sourceGenitals.weight, sourceGenitals.why);
 					}
 				}
 			}
@@ -695,8 +699,16 @@ namespace Cue
 				{
 					if (IsSceneIdle())
 					{
-						targets_.SetRandomWeightIfZero(
-							ps.Get(PS.IdleNaturalRandomWeight), "random scene idle");
+						if (IsSceneEmpty())
+						{
+							targets_.SetRandomWeightIfZero(
+								ps.Get(PS.IdleEmptyRandomWeight), "random, scene idle and empty");
+						}
+						else
+						{
+							targets_.SetRandomWeightIfZero(
+								ps.Get(PS.IdleNaturalRandomWeight), "random, scene idle");
+						}
 					}
 					else
 					{
@@ -720,6 +732,11 @@ namespace Cue
 			return true;
 		}
 
+		private bool IsSceneEmpty()
+		{
+			return (Cue.Instance.ActivePersons.Length == 2);
+		}
+
 		public override string ToString()
 		{
 			return "random";
@@ -740,16 +757,14 @@ namespace Cue
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_)
+				if (p == person_ || !p.IsInteresting)
 					continue;
 
-				if (p.IsPlayer && g_.ShouldAvoidPlayer())
-					continue;
-
-				if (!p.IsInteresting)
-					continue;
-
-				if (person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze))
+				if (g_.ShouldAvoid(p))
+				{
+					targets_.SetShouldAvoid(p, true, g_.AvoidWeight(p), "avoid");
+				}
+				else if (person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze))
 				{
 					// doesn't do anything, just to get the why in the ui
 					targets_.SetWeightIfZero(
@@ -795,7 +810,7 @@ namespace Cue
 
 				if (p.Mood.State == Mood.OrgasmState)
 				{
-					if (!ps.GetBool(PS.AvoidGazeDuringSexOthers))
+					if (!g_.ShouldAvoid(p))
 					{
 						person_.Gaze.Clear();
 

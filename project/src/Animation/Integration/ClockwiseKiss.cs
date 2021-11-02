@@ -50,6 +50,7 @@
 
 		private const float StartTrackingSpeed = 0.1f;
 		private const float StopTrackingSpeed = 0.1f;
+		private const float DefaultTrackingSpeed = 1.5f;
 		private const float TrackingSpeedTime = 3;
 
 
@@ -266,8 +267,6 @@
 				headAngleZ_.Value = StartHeadAngleZWithPlayer;
 				lipDepth_.Value = 0;
 
-				closeEyes_.Value = !person_.Personality.GetBool(PS.AvoidGazePlayer);
-
 				randomMovements_ = false;
 				randomSpeeds_ = true;
 			}
@@ -294,8 +293,6 @@
 				headAngleZ_.Value = startAngleZ_;
 				lipDepth_.Value = startLipDepth_;
 
-				closeEyes_.Value = true;
-
 				randomHeadAngleX_.Reset();
 				randomHeadAngleY_.Reset();
 				randomHeadAngleZ_.Reset();
@@ -304,6 +301,8 @@
 				randomMovements_ = leader;
 				randomSpeeds_ = true;
 			}
+
+			closeEyes_.Value = !person_.Gaze.ShouldAvoid(target);
 
 			trackingSpeed_.Value = StartTrackingSpeed;
 			trackPos_.Value = leader;
@@ -385,7 +384,7 @@
 			if (k)
 			{
 				trackingSpeed_.Value = U.Lerp(
-					StartTrackingSpeed, trackingSpeed_.DefaultValue,
+					StartTrackingSpeed, DefaultTrackingSpeed,
 					(elapsed_ / TrackingSpeedTime));
 			}
 		}

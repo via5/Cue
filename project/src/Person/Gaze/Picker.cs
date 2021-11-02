@@ -33,6 +33,7 @@ namespace Cue
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private IGazeLookat currentTarget_ = null;
+		private bool currentTargetReluctant_ = false;
 		private IGazeLookat forcedTarget_ = null;
 		private bool emergency_ = false;
 		private readonly StringBuilder lastString_ = new StringBuilder();
@@ -97,6 +98,11 @@ namespace Cue
 			set { forcedTarget_ = value; }
 		}
 
+		public bool CurrentTargetReluctant
+		{
+			get { return currentTargetReluctant_; }
+		}
+
 		public bool HasTarget
 		{
 			get { return (CurrentTarget != null); }
@@ -143,17 +149,24 @@ namespace Cue
 			get { return targets_; }
 		}
 
-		public bool CanLookAtPoint(Vector3 p)
+		public bool CanLookAtTarget(IGazeLookat t)
 		{
 			// don't use avoidance for emergencies
 			if (!emergency_)
 			{
-				var f = FindFrustum(p);
-				if (f != null && f.avoid)
+				if (t.Weight < 0)
+				{
 					return false;
+				}
+				else if (t.Idling)
+				{
+					var f = FindFrustum(t.Position);
+					if (f != null && f.avoid)
+						return false;
+				}
 			}
 
-			if (!FrontPlane.PointInFront(p))
+			if (!FrontPlane.PointInFront(t.Position))
 				return false;
 
 			return true;
@@ -183,7 +196,7 @@ namespace Cue
 			}
 			else if (HasTarget)
 			{
-				if (!CanLookAtPoint(CurrentTarget.Position))
+				if (!CanLookAtTarget(CurrentTarget))
 				{
 					// can't look at the current point anymore, must pick a new
 					// target
@@ -273,13 +286,18 @@ namespace Cue
 
 						if (targets_[j].Next())
 						{
-							if (CanLookAtPoint(targets_[j].Position))
+							if (CanLookAtTarget(targets_[j]))
 							{
 								lastString_.Append(" target=#");
 								lastString_.Append(j);
 
 								//log_.Verbose($"picked {targets_[j]}");
 								currentTarget_ = targets_[j];
+
+								currentTargetReluctant_ =
+									(targets_[j].Object != null) &&
+									person_.Gaze.Targets.ShouldAvoid(targets_[j].Object);
+
 								return;
 							}
 							else

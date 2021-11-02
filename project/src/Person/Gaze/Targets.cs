@@ -8,13 +8,42 @@ namespace Cue
 	{
 		struct AvoidInfo
 		{
-			public bool avoid;
-			public string why;
+			private bool avoid_;
+			private float weight_;
+			private string why_;
+
+			public bool Avoid
+			{
+				get { return avoid_; }
+			}
+
+			public bool ShouldLookAway
+			{
+				get { return (avoid_ && weight_ < 0); }
+			}
+
+			public float Weight
+			{
+				get { return weight_; }
+			}
+
+			public string Why
+			{
+				get { return why_; }
+			}
+
+			public void Set(bool avoid, float weight, string why)
+			{
+				avoid_ = avoid;
+				weight_ = weight;
+				why_ = why;
+			}
 
 			public void Clear()
 			{
-				avoid = false;
-				why = "";
+				avoid_ = false;
+				weight_ = 0;
+				why_ = "";
 			}
 		}
 
@@ -125,13 +154,15 @@ namespace Cue
 
 		public bool ShouldAvoid(IObject o)
 		{
-			return avoid_[o.ObjectIndex].avoid;
+			return avoid_[o.ObjectIndex].Avoid;
 		}
 
-		public void SetShouldAvoid(IObject o, bool b, string why)
+		public void SetShouldAvoid(IObject o, bool b, float weight, string why)
 		{
-			avoid_[o.ObjectIndex].avoid = b;
-			avoid_[o.ObjectIndex].why = why;
+			avoid_[o.ObjectIndex].Set(b, weight, why);
+
+			if (o is Person && weight > 0)
+				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from avoid)");
 		}
 
 		public void SetWeightIfZero(Person p, int bodyPart, float w, string why)
@@ -186,8 +217,12 @@ namespace Cue
 
 			for (int i = 0; i < avoid_.Length; ++i)
 			{
-				if (avoid_[i].avoid)
-					list.Add($"{Cue.Instance.Everything[i]} ({avoid_[i].why})");
+				if (avoid_[i].Avoid)
+				{
+					list.Add(
+						$"{Cue.Instance.Everything[i]} w={avoid_[i].Weight} " +
+						$"({avoid_[i].Why})");
+				}
 			}
 
 			return list;
@@ -201,6 +236,9 @@ namespace Cue
 		string Why { get; }
 		string Failure { get; }
 		bool WasSet { get; }
+
+		IObject Object { get; }
+		bool Idling { get; }
 
 		bool HasPosition { get; }
 		Vector3 Position { get; }
@@ -244,6 +282,11 @@ namespace Cue
 			get { return set_; }
 		}
 
+		public virtual bool Idling
+		{
+			get { return false; }
+		}
+
 		public void Clear()
 		{
 			weight_ = 0;
@@ -262,6 +305,11 @@ namespace Cue
 			weight_ = f;
 			why_ = why;
 			set_ = true;
+		}
+
+		public virtual IObject Object
+		{
+			get { return null; }
 		}
 
 		public abstract bool HasPosition { get; }
@@ -349,6 +397,11 @@ namespace Cue
 			object_ = o;
 		}
 
+		public override IObject Object
+		{
+			get { return object_; }
+		}
+
 		public override bool HasPosition
 		{
 			get { return (object_ != null); }
@@ -357,11 +410,6 @@ namespace Cue
 		public override Vector3 Position
 		{
 			get { return object_.EyeInterest; }
-		}
-
-		public IObject Object
-		{
-			get { return object_; }
 		}
 
 		public override string ToString()
@@ -383,6 +431,11 @@ namespace Cue
 		{
 			person_ = p;
 			bodyPart_ = p.Body.Get(bodyPart);
+		}
+
+		public override IObject Object
+		{
+			get { return person_; }
 		}
 
 		public BodyPart BodyPart
@@ -484,6 +537,11 @@ namespace Cue
 		public LookatRandomPoint(Person p)
 		{
 			person_ = p;
+		}
+
+		public override bool Idling
+		{
+			get { return true; }
 		}
 
 		public override bool HasPosition

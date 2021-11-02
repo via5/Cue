@@ -293,6 +293,7 @@ namespace Cue
 		private VUI.Label debug_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
 		private VUI.Label targetEmergency_ = new VUI.Label();
+		private VUI.Label targetReluctant_ = new VUI.Label();
 		private VUI.Label avoid_ = new VUI.Label();
 		private VUI.Label next_ = new VUI.Label();
 
@@ -357,6 +358,9 @@ namespace Cue
 			p.Add(new VUI.Label("Emergency"));
 			p.Add(targetEmergency_);
 
+			p.Add(new VUI.Label("Reluctant"));
+			p.Add(targetReluctant_);
+
 			p.Add(new VUI.Label("Avoid"));
 			p.Add(avoid_);
 
@@ -402,11 +406,13 @@ namespace Cue
 			{
 				targetType_.Text = $"{g.Picker.CurrentTarget}";
 				targetEmergency_.Text = $"{g.IsEmergency}";
+				targetReluctant_.Text = $"{g.Picker.CurrentTargetReluctant}";
 			}
 			else
 			{
 				targetType_.Text = "none";
 				targetEmergency_.Text = "no";
+				targetReluctant_.Text = "no";
 			}
 
 			avoid_.Text = g.Picker.AvoidString;

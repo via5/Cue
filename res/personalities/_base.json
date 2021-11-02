@@ -202,11 +202,6 @@
 
 	"emergencyGazeDuration": 0.2,
 
-	"avoidGazePlayer": false,
-	"avoidGazeInsidePersonalSpace": false,
-	"avoidGazeDuringSex": false,
-	"avoidGazeDuringSexOthers": false,
-
 	"gazeRandomIntervalMinimum": 10,
 	"gazeRandomIntervalMaximum": 1,
 
@@ -219,6 +214,7 @@
 	"lookAboveMinPhysicalRate": 0.001,
 
 	"idleNaturalRandomWeight": 0.05,
+	"idleEmptyRandomWeight": 0.05,
 	"naturalRandomWeight": 0,
 	"naturalOtherEyesWeight": 0.2,
 	"busyOtherEyesWeight": 0.1,
@@ -269,6 +265,21 @@
 
 	"movementEnergyRampUpAfterOrgasm": 20,
 
+	"avoidGazePlayer": 0,
+	"avoidGazePlayerInsidePersonalSpace": 0,
+	"avoidGazePlayerDuringSex": 0,
+	"avoidGazePlayerDelayAfterOrgasm": 0,
+	"avoidGazePlayerWeight": 0,
+
+	"avoidGazeOthers": 0,
+	"avoidGazeOthersInsidePersonalSpace": 0,
+	"avoidGazeOthersDuringSex": 0,
+	"avoidGazeOthersDelayAfterOrgasm": 0,
+	"avoidGazeOthersWeight": 0,
+
+	"avoidGazeUninvolvedHavingSex": 0,
+
+	"avoidGazeAnger": 0,
 	"angerWhenPlayerInteracts": 0,
 	"angerMaxExcitementForAnger": 0,
 	"angerMaxExcitementForHappiness": 0,

@@ -1,14 +1,26 @@
 {
 	"name": "tsundere",
 	"inherit": "standard",
-	"avoidGazePlayer": true,
-	"avoidGazeInsidePersonalSpace": true,
-	"avoidGazeDuringSex": true,
-	"maxExcitementForAvoid": 0.6,
-	"avoidDelayAfterOrgasm": 15,
 
+	"idleEmptyRandomWeight": 1,
+
+	"avoidGazePlayer": 0.4,
+	"avoidGazePlayerInsidePersonalSpace": 0.4,
+	"avoidGazePlayerDuringSex": 0.4,
+	"avoidGazePlayerDelayAfterOrgasm": 15,
+	"avoidGazePlayerWeight": 0.1,
+
+	"avoidGazeOthers": 0,
+	"avoidGazeOthersInsidePersonalSpace": 0,
+	"avoidGazeOthersDuringSex": 0,
+	"avoidGazeOthersDelayAfterOrgasm": 0,
+	"avoidGazeOthersWeight": 0.1,
+
+	"avoidGazeUninvolvedHavingSex": 0.4,
+
+	"avoidGazeAnger": 0.5,
 	"angerWhenPlayerInteracts": 0.8,
-	"angerMaxExcitementForAnger": 0.5,
+	"angerMaxExcitementForAnger": 0.6,
 	"angerExcitementFactorForAnger": 2,
 	"angerMaxExcitementForHappiness": 0.5,
 	"angerExcitementFactorForHappiness": 1,

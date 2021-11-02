@@ -76,28 +76,55 @@ V.Float("EmergencyGazeDuration"),
 // Avoidance
 // ---------
 
-// whether to avoid looking at the player at all times (see also
-// maxExcitementForAvoid)
-V.Bool("AvoidGazePlayer"),
+// excitement value below which the character avoids looking at the player
+V.Float("AvoidGazePlayer"),
 
-// whether to avoid looking at the player when inside personal space (see also
-// maxExcitementForAvoid)
-V.Bool("AvoidGazeInsidePersonalSpace"),
+// excitement value below which the character avoids looking at the player when
+// inside personal space
+V.Float("AvoidGazePlayerInsidePersonalSpace"),
 
-// whether to avoid looking at the characters involved in sex with this
-// character
-V.Bool("AvoidGazeDuringSex"),
+// excitement value below which the character avoids looking at the player
+// when involved in sex
+V.Float("AvoidGazePlayerDuringSex"),
 
-// whether to avoid looking at other characters having sex but not involved with
-// this character
-V.Bool("AvoidGazeDuringSexOthers"),
+// time after orgasm during which avoidance with player is disabled, starts
+// after the post-orgasm state (seconds)
+V.Float("AvoidGazePlayerDelayAfterOrgasm"),
 
-// excitement value above which avoidance is disabled
-V.Float("MaxExcitementForAvoid", new Limit(0, 1)),
+// when the player is being avoided, weight of the player's eyes for gaze; set
+// to -1 to actively avoid the player by picking a different target if the
+// player gets into view
+//
+// see also AvoidGazeAnger
+V.Float("AvoidGazePlayerWeight"),
 
-// time after orgasm during which avoidable is disabled, starts after the
-// post-orgasm state (seconds)
-V.Float("AvoidDelayAfterOrgasm"),
+
+// excitement value below which the character avoids looking at other characters
+V.Float("AvoidGazeOthers"),
+
+// excitement value below which the character avoids looking at other
+// characters when they're inside personal space
+V.Float("AvoidGazeOthersInsidePersonalSpace"),
+
+// excitement value below which the character avoids looking at other characters
+// when involved in sex with this one
+V.Float("AvoidGazeOthersDuringSex"),
+
+// time after orgasm during which avoidable with others is disabled, starts
+// after the post-orgasm state (seconds)
+V.Float("AvoidGazeOthersDelayAfterOrgasm"),
+
+// when other characters are being avoided, weight of the characters' eyes for
+// gaze; set to -1 to actively avoid other characters by picking a different
+// target if they get into view
+//
+// see also AvoidGazeAnger
+V.Float("AvoidGazeOthersWeight"),
+
+
+// excitement value below which this character avoids looking at other
+// characters having sex with someone else
+V.Float("AvoidGazeUninvolvedHavingSex"),
 
 
 // Weights
@@ -124,6 +151,10 @@ V.Float("LookAboveMinPhysicalRate"),
 
 // looking at a random point when not busy and scene is idle
 V.Float("IdleNaturalRandomWeight"),
+
+// looking at a random point when not busy and scene is idle, and there is only
+// this character and the player in the scene
+V.Float("IdleEmptyRandomWeight"),
 
 // looking at a random point when not busy and scene is not idle
 V.Float("NaturalRandomWeight"),
@@ -286,9 +317,13 @@ V.Float("ExpressionTirednessFactor"),
 V.Float("MovementEnergyRampUpAfterOrgasm"),
 
 
-// Anger
+// Mood
 // =====
-// Controls the anger mood, which is normally always at 0
+// Controls the various moods
+
+// anger value when the character is currently looking at something it doesn't
+// like; see AvoidGazePlayerWeight and AvoidGazeOthersWeight
+V.Float("AvoidGazeAnger"),
 
 // anger value when the player is interacting with this character; as soon as
 // interaction starts, anger is set to this value and hapiness to 0
@@ -326,10 +361,6 @@ V.Float("AngerExcitementFactorForAnger"),
 // - a value of 2.0 would set happiness to max when excitement is halfway
 //   between AngerMaxExcitementForHappiness and max
 V.Float("AngerExcitementFactorForHappiness"),
-
-
-// Mood
-// ====
 
 // happiness will never rise above this value
 V.Float("MaxHappiness"),

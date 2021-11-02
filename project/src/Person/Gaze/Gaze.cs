@@ -285,57 +285,73 @@ namespace Cue
 				lastString_.Append("no flags ");
 		}
 
-		public bool ShouldAvoidPlayer()
+		public bool ShouldAvoid(Person p)
 		{
-			var ps = person_.Personality;
-
-			if (!ps.GetBool(PS.AvoidGazePlayer))
-				return false;
-
-			return IsBored();
+			return ShouldAvoidImpl(p, PS.AvoidGazePlayer, PS.AvoidGazeOthers);
 		}
 
-		public bool IsBored()
+		public float AvoidWeight(Person p)
 		{
+			if (!ShouldAvoid(p))
+			{
+				Cue.LogError("AvoidWeight called when ShouldAvoid is false");
+				return 0;
+			}
+
 			var ps = person_.Personality;
 
-			if (person_.Mood.Get(Moods.Excited) >= ps.Get(PS.MaxExcitementForAvoid))
-				return false;
-
-			if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidDelayAfterOrgasm))
-				return false;
-
-			return true;
+			if (p != null && p.IsPlayer)
+				return ps.Get(PS.AvoidGazePlayerWeight);
+			else
+				return ps.Get(PS.AvoidGazeOthersWeight);
 		}
 
-		public bool ShouldAvoidInsidePersonalSpace()
+		public bool ShouldAvoidInsidePersonalSpace(Person p)
 		{
-			var ps = person_.Personality;
-
-			if (!ps.GetBool(PS.AvoidGazeInsidePersonalSpace))
-				return false;
-
-			return IsBored();
+			return ShouldAvoidImpl(p,
+				PS.AvoidGazePlayerInsidePersonalSpace,
+				PS.AvoidGazeOthersInsidePersonalSpace);
 		}
 
-		public bool ShouldAvoidDuringSex()
+		public bool ShouldAvoidDuringSex(Person p)
 		{
-			var ps = person_.Personality;
-
-			if (!ps.GetBool(PS.AvoidGazeDuringSex))
-				return false;
-
-			return IsBored();
+			return ShouldAvoidImpl(p,
+				PS.AvoidGazePlayerDuringSex,
+				PS.AvoidGazeOthersDuringSex);
 		}
 
-		public bool ShouldAvoidOthersDuringSex()
+		public bool ShouldAvoidUninvolvedHavingSex(Person p)
+		{
+			return ShouldAvoidImpl(p,
+				PS.AvoidGazePlayerDuringSex,
+				PS.AvoidGazeUninvolvedHavingSex);
+		}
+
+		private bool ShouldAvoidImpl(Person p, int avoidPlayer, int avoidOthers)
 		{
 			var ps = person_.Personality;
+			float ex = person_.Mood.Get(Moods.Excited);
 
-			if (!ps.GetBool(PS.AvoidGazeDuringSexOthers))
-				return false;
+			if (p != null && p.IsPlayer)
+			{
+				if (ex >= ps.Get(avoidPlayer))
+					return false;
 
-			return IsBored();
+				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazePlayerDelayAfterOrgasm))
+					return false;
+
+				return true;
+			}
+			else
+			{
+				if (ex >= ps.Get(avoidOthers))
+					return false;
+
+				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazeOthersDelayAfterOrgasm))
+					return false;
+
+				return true;
+			}
 		}
 
 		public override string ToString()
