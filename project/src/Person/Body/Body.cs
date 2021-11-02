@@ -481,13 +481,13 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			var pp = person_.Physiology;
+			var ps = person_.Personality;
 
-			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * pp.Get(PE.TemperatureExcitementRate);
-			temperature_.DownRate = pp.Get(PE.TemperatureDecayRate);
+			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * ps.Get(PS.TemperatureExcitementRate);
+			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.Get(Moods.Excited) / pp.Get(PE.TemperatureExcitementMax),
+				person_.Mood.Get(Moods.Excited) / ps.Get(PS.TemperatureExcitementMax),
 				0, 1);
 
 			temperature_.Update(s);
@@ -503,10 +503,10 @@ namespace Cue
 
 		private void OnTemperatureChanged(float f)
 		{
-			var pp = person_.Physiology;
+			var ps = person_.Personality;
 
-			person_.Atom.Body.Sweat = f * pp.Get(PE.MaxSweat);
-			person_.Atom.Body.Flush = f * pp.Get(PE.MaxFlush);
+			person_.Atom.Body.Sweat = f * ps.Get(PS.MaxSweat);
+			person_.Atom.Body.Flush = f * ps.Get(PS.MaxFlush);
 			person_.Atom.Hair.Loose = f;
 		}
 	}

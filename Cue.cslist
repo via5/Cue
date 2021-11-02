@@ -35,7 +35,6 @@ project\src\Enums\BodyPartsEnum.cs
 project\src\Enums\EnumValues.cs
 project\src\Enums\Moods.cs
 project\src\Enums\PersonalityEnum.cs
-project\src\Enums\PhysiologyEnum.cs
 project\src\Integration\ClothingManager.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
@@ -46,7 +45,6 @@ project\src\Person\Mood.cs
 project\src\Person\Object.cs
 project\src\Person\Person.cs
 project\src\Person\Personality.cs
-project\src\Person\Physiology.cs
 project\src\Person\Body\Body.cs
 project\src\Person\Body\BodyPart.cs
 project\src\Person\Body\BodyParts.cs
@@ -63,7 +61,6 @@ project\src\Person\Gaze\Targets.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Objects.cs
 project\src\Resources\Personalities.cs
-project\src\Resources\Physiologies.cs
 project\src\Resources\Resources.cs
 project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs

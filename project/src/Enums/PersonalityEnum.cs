@@ -80,9 +80,42 @@ namespace Cue
 		public const int AngerExcitementFactorForAnger = 55;
 		public const int AngerExcitementFactorForHappiness = 56;
 		public const int MaxHappiness = 57;
+		public const int MaxSweat = 58;
+		public const int MaxFlush = 59;
+		public const int TemperatureExcitementMax = 60;
+		public const int TemperatureExcitementRate = 61;
+		public const int TemperatureDecayRate = 62;
+		public const int TirednessRateDuringPostOrgasm = 63;
+		public const int TirednessBaseDecayRate = 64;
+		public const int TirednessBackToBaseRate = 65;
+		public const int DelayAfterOrgasmUntilTirednessDecay = 66;
+		public const int TirednessMaxExcitementForBaseDecay = 67;
+		public const int OrgasmBaseTirednessIncrease = 68;
+		public const int NeutralVoicePitch = 69;
+		public const int MouthRate = 70;
+		public const int MouthMax = 71;
+		public const int LipsFactor = 72;
+		public const int MouthFactor = 73;
+		public const int BreastsRate = 74;
+		public const int BreastsMax = 75;
+		public const int LeftBreastFactor = 76;
+		public const int RightBreastFactor = 77;
+		public const int GenitalsRate = 78;
+		public const int GenitalsMax = 79;
+		public const int LabiaFactor = 80;
+		public const int PenetrationRate = 81;
+		public const int PenetrationMax = 82;
+		public const int VaginaFactor = 83;
+		public const int DeepVaginaFactor = 84;
+		public const int DeeperVaginaFactor = 85;
+		public const int ExcitementDecayRate = 86;
+		public const int ExcitementPostOrgasm = 87;
+		public const int OrgasmTime = 88;
+		public const int PostOrgasmTime = 89;
+		public const int RateAdjustment = 90;
 
-		public const int FloatCount = 58;
-		public int GetFloatCount() { return 58; }
+		public const int FloatCount = 91;
+		public int GetFloatCount() { return 91; }
 
 		// strings
 
@@ -259,6 +292,39 @@ namespace Cue
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
 			"maxHappiness",
+			"maxSweat",
+			"maxFlush",
+			"temperatureExcitementMax",
+			"temperatureExcitementRate",
+			"temperatureDecayRate",
+			"tirednessRateDuringPostOrgasm",
+			"tirednessBaseDecayRate",
+			"tirednessBackToBaseRate",
+			"delayAfterOrgasmUntilTirednessDecay",
+			"tirednessMaxExcitementForBaseDecay",
+			"orgasmBaseTirednessIncrease",
+			"neutralVoicePitch",
+			"mouthRate",
+			"mouthMax",
+			"lipsFactor",
+			"mouthFactor",
+			"breastsRate",
+			"breastsMax",
+			"leftBreastFactor",
+			"rightBreastFactor",
+			"genitalsRate",
+			"genitalsMax",
+			"labiaFactor",
+			"penetrationRate",
+			"penetrationMax",
+			"vaginaFactor",
+			"deepVaginaFactor",
+			"deeperVaginaFactor",
+			"excitementDecayRate",
+			"excitementPostOrgasm",
+			"orgasmTime",
+			"postOrgasmTime",
+			"rateAdjustment",
 		};
 
 		public static int FloatFromString(string s)
@@ -426,6 +492,39 @@ namespace Cue
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
 			"maxHappiness",
+			"maxSweat",
+			"maxFlush",
+			"temperatureExcitementMax",
+			"temperatureExcitementRate",
+			"temperatureDecayRate",
+			"tirednessRateDuringPostOrgasm",
+			"tirednessBaseDecayRate",
+			"tirednessBackToBaseRate",
+			"delayAfterOrgasmUntilTirednessDecay",
+			"tirednessMaxExcitementForBaseDecay",
+			"orgasmBaseTirednessIncrease",
+			"neutralVoicePitch",
+			"mouthRate",
+			"mouthMax",
+			"lipsFactor",
+			"mouthFactor",
+			"breastsRate",
+			"breastsMax",
+			"leftBreastFactor",
+			"rightBreastFactor",
+			"genitalsRate",
+			"genitalsMax",
+			"labiaFactor",
+			"penetrationRate",
+			"penetrationMax",
+			"vaginaFactor",
+			"deepVaginaFactor",
+			"deeperVaginaFactor",
+			"excitementDecayRate",
+			"excitementPostOrgasm",
+			"orgasmTime",
+			"postOrgasmTime",
+			"rateAdjustment",
 		};
 
 		public static string[] AllNames

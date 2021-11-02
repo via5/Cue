@@ -29,7 +29,6 @@ namespace Cue
 		private Excitement excitement_;
 		private Body body_;
 		private Gaze gaze_;
-		private Physiology physiology_;
 		private Mood mood_;
 		private IAI ai_ = null;
 		private Personality personality_;
@@ -51,7 +50,6 @@ namespace Cue
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
 			gaze_ = new Gaze(this);
-			physiology_ = Resources.Physiologies.Clone(Resources.DefaultPhysiology, this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
 
@@ -123,7 +121,6 @@ namespace Cue
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
 		public Gaze Gaze { get { return gaze_; } }
-		public Physiology Physiology { get { return physiology_; } }
 		public Mood Mood { get { return mood_; } }
 		public IAI AI { get { return ai_; } }
 		public IClothing Clothing { get { return clothing_; } }

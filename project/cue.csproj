@@ -142,11 +142,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Moods.tt</DependentUpon>
     </Compile>
-    <Compile Include="src\Enums\PhysiologyEnum.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PhysiologyEnum.tt</DependentUpon>
-    </Compile>
     <Compile Include="src\Integration\ClothingManager.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
@@ -171,11 +166,9 @@
     <Compile Include="src\Person\Object.cs" />
     <Compile Include="src\Person\Person.cs" />
     <Compile Include="src\Person\Personality.cs" />
-    <Compile Include="src\Person\Physiology.cs" />
     <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Resources\Personalities.cs" />
-    <Compile Include="src\Resources\Physiologies.cs" />
     <Compile Include="src\Resources\Resources.cs" />
     <Compile Include="src\Sys\Interfaces.cs" />
     <Compile Include="src\Sys\Mock.cs" />
@@ -269,10 +262,6 @@
     <Content Include="src\Enums\Moods.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Moods.cs</LastGenOutput>
-    </Content>
-    <Content Include="src\Enums\PhysiologyEnum.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>PhysiologyEnum.cs</LastGenOutput>
     </Content>
     <Content Include="src\Utilities\Easings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

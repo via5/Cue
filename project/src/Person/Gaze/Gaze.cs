@@ -236,7 +236,7 @@ namespace Cue
 						// new emergency
 						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
 						gazerEnabled_ = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
-						gazer_.Duration = person_.Personality.Get(PSE.EmergencyGazeDuration);
+						gazer_.Duration = person_.Personality.Get(PS.EmergencyGazeDuration);
 						lastString_.Append("emergency ");
 					}
 
@@ -289,7 +289,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.GetBool(PSE.AvoidGazePlayer))
+			if (!ps.GetBool(PS.AvoidGazePlayer))
 				return false;
 
 			return IsBored();
@@ -299,10 +299,10 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.Get(Moods.Excited) >= ps.Get(PSE.MaxExcitementForAvoid))
+			if (person_.Mood.Get(Moods.Excited) >= ps.Get(PS.MaxExcitementForAvoid))
 				return false;
 
-			if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PSE.AvoidDelayAfterOrgasm))
+			if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidDelayAfterOrgasm))
 				return false;
 
 			return true;
@@ -312,7 +312,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.GetBool(PSE.AvoidGazeInsidePersonalSpace))
+			if (!ps.GetBool(PS.AvoidGazeInsidePersonalSpace))
 				return false;
 
 			return IsBored();
@@ -322,7 +322,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.GetBool(PSE.AvoidGazeDuringSex))
+			if (!ps.GetBool(PS.AvoidGazeDuringSex))
 				return false;
 
 			return IsBored();
@@ -332,7 +332,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (!ps.GetBool(PSE.AvoidGazeDuringSexOthers))
+			if (!ps.GetBool(PS.AvoidGazeDuringSexOthers))
 				return false;
 
 			return IsBored();

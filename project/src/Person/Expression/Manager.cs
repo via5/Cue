@@ -215,7 +215,7 @@ namespace Cue
 			var ps = person_.Personality;
 
 			float expressionTiredness = U.Clamp(
-				m.Get(Moods.Tired) * ps.Get(PSE.ExpressionTirednessFactor),
+				m.Get(Moods.Tired) * ps.Get(PS.ExpressionTirednessFactor),
 				0, 1);
 
 

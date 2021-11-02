@@ -112,6 +112,7 @@ namespace Cue
 
 			Resources.LoadEnumValues(p, o, inherited);
 			ParseVoice(p.Voice, o, inherited);
+			ParseSpecificModifiers(p, o);
 
 
 			if (o.HasKey("expressions"))
@@ -191,6 +192,34 @@ namespace Cue
 			}
 
 			v.Set(dss, orgasmDs);
+		}
+
+		private void ParseSpecificModifiers(Personality p, JSONClass o)
+		{
+			var sms = new List<Personality.SpecificModifier>();
+
+			if (o.HasKey("specificModifiers"))
+			{
+				foreach (JSONClass smn in o.AsObject["specificModifiers"].AsArray.Childs)
+				{
+					var sm = new Personality.SpecificModifier();
+
+					var s = J.ReqString(smn, "bodyPart");
+					sm.bodyPart = BP.FromString(s);
+					if (sm.bodyPart == -1 && s != "unknown")
+						log_.Error($"{p}: bad bodyPart {s}");
+
+					s = J.ReqString(smn, "sourceBodyPart");
+					sm.sourceBodyPart = BP.FromString(s);
+					if (sm.sourceBodyPart == -1 && s != "unknown")
+						log_.Error($"{p}: bad sourceBodyPart {s}");
+
+					sm.modifier = J.ReqFloat(smn, "modifier");
+					sms.Add(sm);
+				}
+			}
+
+			p.SetSpecificModifiers(sms.ToArray());
 		}
 
 		private void Add(Personality p, bool abst)

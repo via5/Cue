@@ -150,7 +150,7 @@ namespace Cue
 
 		private void UpdateParts(float s)
 		{
-			var pp = person_.Physiology;
+			var ps = person_.Personality;
 
 			for (int i = 0; i < BP.Count; ++i)
 			{
@@ -179,7 +179,7 @@ namespace Cue
 						}
 
 						parts_[i].value += ts[j].value;
-						parts_[i].specificModifier += pp.GetSpecificModifier(i, ts[j].sourcePartIndex);
+						parts_[i].specificModifier += ps.GetSpecificModifier(i, ts[j].sourcePartIndex);
 					}
 				}
 			}
@@ -188,11 +188,10 @@ namespace Cue
 		private void UpdateReasonValues(float s)
 		{
 			var ps = person_.Personality;
-			var pg = person_.Physiology;
 
 			reasons_[Mouth].Value =
-				parts_[BP.Lips].value * pg.Get(PE.LipsFactor) +
-				parts_[BP.Mouth].value * pg.Get(PE.MouthFactor);
+				parts_[BP.Lips].value * ps.Get(PS.LipsFactor) +
+				parts_[BP.Mouth].value * ps.Get(PS.MouthFactor);
 
 			reasons_[Mouth].SpecificSensitivityModifier =
 				parts_[BP.Lips].specificModifier +
@@ -200,8 +199,8 @@ namespace Cue
 
 
 			reasons_[Breasts].Value =
-				parts_[BP.LeftBreast].value * pg.Get(PE.LeftBreastFactor) +
-				parts_[BP.RightBreast].value * pg.Get(PE.RightBreastFactor);
+				parts_[BP.LeftBreast].value * ps.Get(PS.LeftBreastFactor) +
+				parts_[BP.RightBreast].value * ps.Get(PS.RightBreastFactor);
 
 			reasons_[Breasts].SpecificSensitivityModifier =
 				parts_[BP.LeftBreast].specificModifier +
@@ -209,7 +208,7 @@ namespace Cue
 
 
 			reasons_[Genitals].Value =
-				parts_[BP.Labia].value * pg.Get(PE.LabiaFactor);
+				parts_[BP.Labia].value * ps.Get(PS.LabiaFactor);
 
 			reasons_[Genitals].SpecificSensitivityModifier =
 				parts_[BP.Labia].specificModifier;
@@ -217,8 +216,8 @@ namespace Cue
 
 			reasons_[Penetration].Value =
 				GetFixedPenetrationValue() +
-				parts_[BP.DeepVagina].value * pg.Get(PE.DeepVaginaFactor) +
-				parts_[BP.DeeperVagina].value * pg.Get(PE.DeeperVaginaFactor);
+				parts_[BP.DeepVagina].value * ps.Get(PS.DeepVaginaFactor) +
+				parts_[BP.DeeperVagina].value * ps.Get(PS.DeeperVaginaFactor);
 
 			reasons_[Penetration].SpecificSensitivityModifier =
 				parts_[BP.Vagina].specificModifier +
@@ -240,13 +239,13 @@ namespace Cue
 
 		private float GetFixedPenetrationValue()
 		{
-			var pg = person_.Physiology;
+			var ps = person_.Personality;
 
 			if (parts_[BP.Vagina].value > 0)
 			{
 				return
 					parts_[BP.Vagina].value *
-					pg.Get(PE.VaginaFactor);
+					ps.Get(PS.VaginaFactor);
 			}
 
 			if (parts_[BP.Penis].value > 0)
@@ -254,7 +253,7 @@ namespace Cue
 				// todo
 				return
 					parts_[BP.Penis].value *
-					pg.Get(PE.VaginaFactor);
+					ps.Get(PS.VaginaFactor);
 			}
 
 			// if penetration is shallow, the vagina trigger doesn't activate
@@ -271,7 +270,7 @@ namespace Cue
 					{
 						return
 							parts_[BP.Labia].value *
-							pg.Get(PE.VaginaFactor);
+							ps.Get(PS.VaginaFactor);
 					}
 				}
 			}
@@ -281,20 +280,19 @@ namespace Cue
 
 		private void UpdateReasonRates(float s)
 		{
-			var pp = person_.Physiology;
 			var ps = person_.Personality;
 
-			reasons_[Mouth].GlobalSensitivityRate = pp.Get(PE.MouthRate);
-			reasons_[Breasts].GlobalSensitivityRate = pp.Get(PE.BreastsRate);
-			reasons_[Genitals].GlobalSensitivityRate = pp.Get(PE.GenitalsRate);
-			reasons_[Penetration].GlobalSensitivityRate = pp.Get(PE.PenetrationRate);
-			reasons_[OtherSex].GlobalSensitivityRate = ps.Get(PSE.OtherSexExcitementRateFactor);
+			reasons_[Mouth].GlobalSensitivityRate = ps.Get(PS.MouthRate);
+			reasons_[Breasts].GlobalSensitivityRate = ps.Get(PS.BreastsRate);
+			reasons_[Genitals].GlobalSensitivityRate = ps.Get(PS.GenitalsRate);
+			reasons_[Penetration].GlobalSensitivityRate = ps.Get(PS.PenetrationRate);
+			reasons_[OtherSex].GlobalSensitivityRate = ps.Get(PS.OtherSexExcitementRateFactor);
 
-			reasons_[Mouth].SensitivityMax = pp.Get(PE.MouthMax);
-			reasons_[Breasts].SensitivityMax = pp.Get(PE.BreastsMax);
-			reasons_[Genitals].SensitivityMax = pp.Get(PE.GenitalsMax);
-			reasons_[Penetration].SensitivityMax = pp.Get(PE.PenetrationMax);
-			reasons_[OtherSex].SensitivityMax = ps.Get(PSE.MaxOtherSexExcitement);
+			reasons_[Mouth].SensitivityMax = ps.Get(PS.MouthMax);
+			reasons_[Breasts].SensitivityMax = ps.Get(PS.BreastsMax);
+			reasons_[Genitals].SensitivityMax = ps.Get(PS.GenitalsMax);
+			reasons_[Penetration].SensitivityMax = ps.Get(PS.PenetrationMax);
+			reasons_[OtherSex].SensitivityMax = ps.Get(PS.MaxOtherSexExcitement);
 
 			physicalRate_.Value = 0;
 			emotionalRate_.Value = 0;
@@ -315,7 +313,7 @@ namespace Cue
 			totalRate_ = physicalRate_.Value + emotionalRate_.Value;
 
 			if (totalRate_ == 0)
-				totalRate_ = pp.Get(PE.ExcitementDecayRate);
+				totalRate_ = ps.Get(PS.ExcitementDecayRate);
 		}
 
 		private void UpdateMax(float s)

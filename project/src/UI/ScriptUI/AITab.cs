@@ -15,7 +15,6 @@ namespace Cue
 			AddSubTab(new PersonAIStateTab(person_));
 			AddSubTab(new PersonAIMoodTab(person_));
 			AddSubTab(new PersonAIPersonalityTab(person_));
-			AddSubTab(new PersonAIPhysiologyTab(person_));
 			AddSubTab(new PersonAIGazeTab(person_));
 			AddSubTab(new PersonAIEventsTab(person_));
 		}
@@ -182,19 +181,16 @@ namespace Cue
 	}
 
 
-	class PersonAIPhysiologyTab : Tab
+	class PersonAIPersonalityTab : Tab
 	{
 		private Person person_;
-		private Physiology pp_;
 
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
-		private bool inited_ = false;
 
-		public PersonAIPhysiologyTab(Person p)
-			: base("Physiology", false)
+		public PersonAIPersonalityTab(Person p)
+			: base("Personality", false)
 		{
 			person_ = p;
-			pp_ = p.Physiology;
 
 			Layout = new VUI.BorderLayout();
 			Add(list_, VUI.BorderLayout.Center);
@@ -204,25 +200,32 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			if (inited_)
-				return;
+			var ps = person_.Personality;
+			var exps = new List<string[]>();
 
-			inited_ = true;
-
-			var sms = new List<string[]>();
-			for (int i = 0; i < pp_.SpecificModifiers.Length; ++i)
+			for (int i = 0; i < ps.SpecificModifiers.Length; ++i)
 			{
-				var sm = pp_.SpecificModifiers[i];
+				var sm = ps.SpecificModifiers[i];
 
-				sms.Add(new string[]{
+				exps.Add(new string[]{
 					$"{BP.ToString(sm.bodyPart)}=>{BP.ToString(sm.sourceBodyPart)}",
 					$"{sm.modifier}" });
 			}
 
-			list_.SetItems(MakeTable(pp_, sms.ToArray()));
+			var v = ps.Voice;
+			exps.Add(new string[] { "orgasm ds", v.OrgasmDataset.Name });
+
+			foreach (var ds in v.Datasets)
+			{
+				exps.Add(new string[] {
+					ds.dataset.Name,
+					$"[{ds.intensityMin}, {ds.intensityMax}]" });
+			}
+
+			list_.SetItems(MakeTable(ps, exps.ToArray()));
 		}
 
-		public static List<string> MakeTable(EnumValueManager v, string[][] more)
+		private static List<string> MakeTable(EnumValueManager v, string[][] more)
 		{
 			int longest = 0;
 
@@ -273,43 +276,6 @@ namespace Cue
 			}
 
 			return items;
-		}
-	}
-
-
-	class PersonAIPersonalityTab : Tab
-	{
-		private Person person_;
-
-		private VUI.ListView<string> list_ = new VUI.ListView<string>();
-
-		public PersonAIPersonalityTab(Person p)
-			: base("Personality", false)
-		{
-			person_ = p;
-
-			Layout = new VUI.BorderLayout();
-			Add(list_, VUI.BorderLayout.Center);
-
-			list_.Font = VUI.Style.Theme.MonospaceFont;
-		}
-
-		protected override void DoUpdate(float s)
-		{
-			var ps = person_.Personality;
-			var exps = new List<string[]>();
-
-			var v = ps.Voice;
-			exps.Add(new string[] { "orgasm ds", v.OrgasmDataset.Name });
-
-			foreach (var ds in v.Datasets)
-			{
-				exps.Add(new string[] {
-					ds.dataset.Name,
-					$"[{ds.intensityMin}, {ds.intensityMax}]" });
-			}
-
-			list_.SetItems(PersonAIPhysiologyTab.MakeTable(ps, exps.ToArray()));
 		}
 	}
 

@@ -31,7 +31,7 @@ namespace Cue
 			{
 				if (pitch_ < 0)
 				{
-					float neutral = p.Physiology.Get(PE.NeutralVoicePitch);
+					float neutral = p.Personality.Get(PS.NeutralVoicePitch);
 					float scale = p.Atom.Scale;
 					SetPitch(neutral + (1 - scale));
 				}
@@ -150,14 +150,30 @@ namespace Cue
 
 	class Personality : EnumValueManager
 	{
+		public struct SpecificModifier
+		{
+			public int bodyPart;
+			public int sourceBodyPart;
+			public float modifier;
+
+			public override string ToString()
+			{
+				return
+					$"{BP.ToString(bodyPart)}=>" +
+					$"{BP.ToString(sourceBodyPart)}   " +
+					$"{modifier}";
+			}
+		}
+
 		private readonly string name_;
 		private Person person_;
 
 		private Voice voice_ = new Voice();
 		private Expression[] exps_ = new Expression[0];
+		private SpecificModifier[] specificModifiers_ = new SpecificModifier[0];
 
 		public Personality(string name, Person p = null)
-			: base(new PSE())
+			: base(new PS())
 		{
 			name_ = name;
 			person_ = p;
@@ -179,11 +195,17 @@ namespace Cue
 				exps_[i] = ps.exps_[i].Clone();
 
 			voice_.CopyFrom(ps.voice_);
+			specificModifiers_ = ps.specificModifiers_;
 		}
 
 		public void SetExpressions(Expression[] exps)
 		{
 			exps_ = exps;
+		}
+
+		public void SetSpecificModifiers(SpecificModifier[] sms)
+		{
+			specificModifiers_ = sms;
 		}
 
 		public void Load(JSONClass o)
@@ -231,27 +253,44 @@ namespace Cue
 			return e;
 		}
 
+		public float GetSpecificModifier(int part, int sourcePart)
+		{
+			for (int i = 0; i < specificModifiers_.Length; ++i)
+			{
+				var sm = specificModifiers_[i];
+				if (sm.bodyPart == part && sm.sourceBodyPart == sourcePart)
+					return sm.modifier;
+			}
+
+			return 0;
+		}
+
+		public SpecificModifier[] SpecificModifiers
+		{
+			get { return specificModifiers_; }
+		}
+
 		public Pair<float, float> LookAtRandomInterval
 		{
 			get
 			{
 				return new Pair<float, float>(
-					Get(PSE.GazeRandomIntervalMinimum),
-					Get(PSE.GazeRandomIntervalMaximum));
+					Get(PS.GazeRandomIntervalMinimum),
+					Get(PS.GazeRandomIntervalMaximum));
 			}
 		}
 
 		public float GazeDuration
 		{
-			get { return GetSlidingDuration(PSE.GazeDuration).Current; }
+			get { return GetSlidingDuration(PS.GazeDuration).Current; }
 		}
 
 		public virtual void Update(float s)
 		{
 			// todo
-			Cue.Assert(PSE.SlidingDurationCount == 1);
-			GetSlidingDuration(PSE.GazeDuration).WindowMagnitude = person_.Mood.GazeEnergy;
-			GetSlidingDuration(PSE.GazeDuration).Update(s);
+			Cue.Assert(PS.SlidingDurationCount == 1);
+			GetSlidingDuration(PS.GazeDuration).WindowMagnitude = person_.Mood.GazeEnergy;
+			GetSlidingDuration(PS.GazeDuration).Update(s);
 		}
 
 		public override string ToString()

@@ -189,6 +189,7 @@
 		},
 	]
 
+
 	"gazeDuration":
 	{
 		"min": 0.8,
@@ -273,5 +274,70 @@
 	"angerMaxExcitementForHappiness": 0,
 	"angerExcitementFactorForAnger": 0,
 	"angerExcitementFactorForHappiness": 0,
-	"maxHappiness": 1
+	"maxHappiness": 1,
+
+
+	"maxSweat": 1,
+	"maxFlush": 1,
+
+	"temperatureExcitementRate": 0.015,
+	"temperatureDecayRate": 0.005,
+	"temperatureExcitementMax": 0.8,
+
+	"tirednessRateDuringPostOrgasm": 0.3,
+	"tirednessBaseDecayRate": 0.005,
+	"tirednessBackToBaseRate": 0.02,
+	"delayAfterOrgasmUntilTirednessDecay": 10,
+	"tirednessMaxExcitementForBaseDecay": 0.5,
+	"orgasmBaseTirednessIncrease": 0.2,
+
+	"neutralVoicePitch": 0.5,
+	"voicePitch": -1,
+
+	"mouthRate": 0.0001,
+	"mouthMax": 0.3,
+	"lipsFactor": 0.1,
+	"mouthFactor": 0.9,
+
+	"breastsRate": 0.0003,
+	"breastsMax": 0.4,
+	"leftBreastFactor": 0.5,
+	"rightBreastFactor": 0.5,
+
+	"genitalsRate": 0.0003,
+	"genitalsMax": 1.0,
+	"labiaFactor": 1.0,
+
+	"penetrationRate": 0.003,
+	"penetrationMax": 1.0,
+	"vaginaFactor": 0.3,
+	"deepVaginaFactor": 0.1,
+	"deeperVaginaFactor": 0.1,
+
+	"excitementDecayRate": -0.01,
+	"excitementPostOrgasm": 0.3,
+	"orgasmTime": 8,
+	"postOrgasmTime": 10,
+	"rateAdjustment": 1,
+
+	"specificModifiers":
+	[
+		{
+			"bodyPart": "labia",
+			"sourceBodyPart": "leftHand",
+			"modifier": 20
+		},
+
+		{
+			"bodyPart": "labia",
+			"sourceBodyPart": "rightHand",
+			"modifier": 20
+		},
+
+		{
+			"bodyPart": "labia",
+			"sourceBodyPart": "unknown",
+			"modifier": 20
+		},
+	]
 }

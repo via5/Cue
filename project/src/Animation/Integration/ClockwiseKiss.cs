@@ -266,7 +266,7 @@
 				headAngleZ_.Value = StartHeadAngleZWithPlayer;
 				lipDepth_.Value = 0;
 
-				closeEyes_.Value = !person_.Personality.GetBool(PSE.AvoidGazePlayer);
+				closeEyes_.Value = !person_.Personality.GetBool(PS.AvoidGazePlayer);
 
 				randomMovements_ = false;
 				randomSpeeds_ = true;
