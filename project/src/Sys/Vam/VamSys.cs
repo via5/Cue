@@ -11,7 +11,6 @@ namespace Cue.Sys.Vam
 	{
 		private static VamSys instance_ = null;
 		private readonly MVRScript script_ = null;
-		private readonly VamLog log_ = new VamLog();
 		private readonly VamInput input_;
 		private string pluginPath_ = "";
 		private GameObject root_;
@@ -63,7 +62,7 @@ namespace Cue.Sys.Vam
 
 		public void ClearLog()
 		{
-			log_.Clear();
+			SuperController.singleton.ClearErrors();
 		}
 
 		public ILiveSaver CreateLiveSaver()
@@ -73,7 +72,16 @@ namespace Cue.Sys.Vam
 
 		public void Log(string s, int level)
 		{
-			log_.Log(s, level);
+			var t = DateTime.Now.ToString("hh:mm:ss.fff");
+			string p = LogLevels.ToShortString(level);
+
+			foreach (var line in s.Split('\n'))
+			{
+				if (level == LogLevels.Error)
+					SuperController.LogError($"{t} !![{p}] {line}");
+				else
+					SuperController.LogError($"{t}   [{p}] {line}");
+			}
 		}
 
 		public JSONClass GetConfig()
@@ -306,8 +314,6 @@ namespace Cue.Sys.Vam
 		public void OnPluginState(bool b)
 		{
 			root_.SetActive(b);
-
-			log_.OnPluginState(b);
 
 			for (int i = 0; i < 32; ++i)
 				Physics.IgnoreLayerCollision(i, VamBoxGraphic.Layer, b);
