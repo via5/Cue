@@ -20,6 +20,7 @@ namespace Cue
 		private string lastResult_ = "";
 		private BodyPartLock[] locks_ = null;
 		private Person target_ = null;
+		private bool wasGrabbed_ = false;
 
 		public KissEvent(Person p)
 			: base("kiss", p)
@@ -102,7 +103,7 @@ namespace Cue
 			var elapsed = (elapsed_ > wait_);
 			var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
 
-			if (elapsed || grabbed)
+			if (elapsed || (wasGrabbed_ && !grabbed))
 			{
 				lastResult_ = "";
 
@@ -113,6 +114,8 @@ namespace Cue
 						wait_ = WaitWhenFailed;
 				}
 			}
+
+			wasGrabbed_ = grabbed;
 		}
 
 		private void Stop()
