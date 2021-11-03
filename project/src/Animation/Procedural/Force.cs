@@ -15,6 +15,7 @@ namespace Cue.Proc
 		private int bodyPartType_;
 		private BodyPart bp_ = null;
 		private SlidingMovement movement_;
+		private IEasing easing_;
 
 		private bool oneFrameFinished_ = false;
 		private Action beforeNext_ = null;
@@ -28,33 +29,22 @@ namespace Cue.Proc
 
 		public Force(
 			int type, int bodyPart,
-			SlidingMovement m, ISync sync)
-				: this("", type, bodyPart, m, sync)
+			SlidingMovement m, ISync sync, IEasing easing=  null)
+				: this("", type, bodyPart, m, sync, easing)
 		{
 		}
 
 		public Force(
 			string name, int type, int bodyPart,
-			SlidingMovement m, ISync sync)
+			SlidingMovement m, ISync sync, IEasing easing = null)
 				: base(name, sync)
 		{
 			type_ = type;
 			bodyPartType_ = bodyPart;
 			movement_ = m;
+			easing_ = easing ?? new SinusoidalEasing();
 
 			Next();
-		}
-
-		public static IEasing EasingFromJson(JSONClass o, string key)
-		{
-			if (!o.HasKey(key) || o[key].Value == "")
-				return new ConstantOneEasing();
-
-			var e = EasingFactory.FromString(o[key]);
-			if (e == null)
-				throw new LoadFailed($"easing type {o[key].Value} not found");
-
-			return e;
 		}
 
 		public static Force Create(int type, JSONClass o)
@@ -250,7 +240,7 @@ namespace Cue.Proc
 
 		private Vector3 Lerped()
 		{
-			return movement_.Lerped(Sync.Magnitude);
+			return movement_.Lerped(easing_.Magnitude(Sync.Magnitude));
 		}
 
 		public static string TypeToString(int i)

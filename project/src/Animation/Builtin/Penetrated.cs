@@ -114,8 +114,6 @@
 
 				int count = U.RandomInt(1, av);
 
-				Cue.LogInfo($"r: {av} {count}");
-
 				s.reaction = new Expression[count];
 				s.reactionTargets = new float[count];
 
@@ -137,8 +135,6 @@
 			{
 				int av = expressions.Length - s.reaction.Length;
 				int count = U.RandomInt(1, av);
-
-				Cue.LogInfo($"pr: {av} {count}");
 
 				s.postReaction = new Expression[count];
 				s.postReactionTargets = new float[count];

@@ -24,6 +24,7 @@ namespace Cue.Proc
 
 	abstract class BasicSync : ISync
 	{
+		private const int NoState = 0;
 		public const int ForwardsState = 1;
 		public const int ForwardsDelayState = 2;
 		public const int BackwardsState = 3;
@@ -39,6 +40,7 @@ namespace Cue.Proc
 
 		private ITarget target_ = null;
 		private int state_ = ForwardsState;
+		private int nextState_ = NoState;
 		private int updateResult_ = Working;
 
 
@@ -81,7 +83,7 @@ namespace Cue.Proc
 			set { target_ = value; }
 		}
 
-		public int State
+		public virtual int State
 		{
 			get { return state_; }
 		}
@@ -103,12 +105,19 @@ namespace Cue.Proc
 		public virtual void Reset()
 		{
 			state_ = ForwardsState;
+			nextState_ = NoState;
 		}
 
 		public abstract string ToDetailedString();
 
 		public int FixedUpdate(float s)
 		{
+			if (nextState_ != NoState)
+			{
+				state_ = nextState_;
+				nextState_ = NoState;
+			}
+
 			updateResult_ = DoFixedUpdate(s);
 			return updateResult_;
 		}
@@ -117,7 +126,7 @@ namespace Cue.Proc
 
 		protected void SetState(int s)
 		{
-			state_ = s;
+			nextState_ = s;
 		}
 	}
 
@@ -154,6 +163,11 @@ namespace Cue.Proc
 	{
 		public ParentTargetSync()
 		{
+		}
+
+		public override int State
+		{
+			get { return Target?.Parent?.Sync.State ?? base.State; }
 		}
 
 		public override float Magnitude
