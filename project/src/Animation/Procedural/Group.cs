@@ -223,8 +223,7 @@ namespace Cue.Proc
 		public override string ToDetailedString()
 		{
 			return
-				$"congroup " +
-				$"{Name}, {targets_.Count} targets indelay={inDelay_} " +
+				$"{this}, {targets_.Count} targets indelay={inDelay_} " +
 				$"done={allDone_} forever={forever_} maxD={maxDuration_.Enabled}";
 		}
 	}
@@ -391,14 +390,14 @@ namespace Cue.Proc
 		private Person energySource_ = null;
 		private ulong key_ = BodyPartLock.NoKey;
 
-		public RootTargetGroup()
-			: base("root", new NoSync())
+		public RootTargetGroup(ISync sync = null)
+			: base("root", sync ?? new NoSync())
 		{
 		}
 
 		public override ITarget Clone()
 		{
-			var s = new RootTargetGroup();
+			var s = new RootTargetGroup(Sync.Clone());
 			s.CopyFrom(this);
 			return s;
 		}
@@ -407,6 +406,11 @@ namespace Cue.Proc
 		{
 			base.DoStart(p, cx);
 			key_ = cx?.key ?? BodyPartLock.NoKey;
+		}
+
+		public override void FixedUpdate(float s)
+		{
+			base.FixedUpdate(s);
 		}
 
 		public void SetEnergySource(Person p)

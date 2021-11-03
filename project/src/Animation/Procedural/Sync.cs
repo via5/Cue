@@ -88,6 +88,11 @@ namespace Cue.Proc
 			get { return state_; }
 		}
 
+		public int NextState
+		{
+			get { return nextState_; }
+		}
+
 		public int UpdateResult
 		{
 			get { return updateResult_; }
@@ -205,6 +210,73 @@ namespace Cue.Proc
 			return "parent";
 		}
 	}
+
+
+	class SyncOther : BasicSync
+	{
+		private BasicSync other_;
+		private bool waiting_ = true;
+		private float mag_ = 0;
+
+		public SyncOther(ISync sync)
+		{
+			other_ = sync as BasicSync;
+		}
+
+		public override int State
+		{
+			get { return other_.State; }
+		}
+
+		public override float Magnitude
+		{
+			get { return mag_; }
+		}
+
+		public override float Energy
+		{
+			set { }
+		}
+
+		public override bool Finished
+		{
+			get { return other_.Finished; }
+		}
+
+		public override ISync Clone()
+		{
+			return null;
+		}
+
+		protected override int DoFixedUpdate(float s)
+		{
+			if (waiting_)
+			{
+				if (other_.UpdateResult == Looping && other_.NextState == ForwardsState)
+				{
+					waiting_ = false;
+					mag_ = 0;
+					return Working;
+				}
+			}
+
+			if (waiting_)
+			{
+				return Working;
+			}
+			else
+			{
+				mag_ = other_.Magnitude;
+				return other_.UpdateResult;
+			}
+		}
+
+		public override string ToDetailedString()
+		{
+			return $"sync other {other_}";
+		}
+	}
+
 
 
 	class ElapsedSync : BasicSync

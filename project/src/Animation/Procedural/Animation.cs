@@ -6,6 +6,8 @@ namespace Cue.Proc
 	abstract class BasicProcAnimation : BuiltinAnimation
 	{
 		private RootTargetGroup root_;
+		private ISync oldSync_ = null;
+		private bool mainSync_ = false;
 
 		public BasicProcAnimation(string name)
 			: base(name)
@@ -27,6 +29,46 @@ namespace Cue.Proc
 		public RootTargetGroup RootGroup
 		{
 			get { return root_; }
+		}
+
+		public void SetAsMainSync(Person other = null)
+		{
+			if (other != null)
+			{
+				if (other.Animator.MainSync == null)
+				{
+					other.Log.Info($"no main sync");
+				}
+				else
+				{
+					person_.Log.Info($"{this}: syncing with {other.Animator.MainSync}");
+					oldSync_ = root_.Sync;
+					root_.Sync = new SyncOther(other.Animator.MainSync);
+				}
+			}
+
+			if (person_.Animator.MainSync != null)
+			{
+				person_.Log.Error($"{this}: already has a main sync");
+			}
+			else
+			{
+				person_.Log.Info($"{this} is main sync");
+				person_.Animator.SetMainSync(root_.Sync);
+				mainSync_ = true;
+			}
+		}
+
+		public void MainSyncStopping(ISync s)
+		{
+			if (mainSync_ && oldSync_ == null)
+			{
+				// this is the reason for the call, ignore it
+				return;
+			}
+
+			if (oldSync_ != null)
+				root_.Sync = oldSync_;
 		}
 
 		public void AddTarget(ITarget t)
@@ -54,7 +96,21 @@ namespace Cue.Proc
 
 		public override void RequestStop()
 		{
+			if (oldSync_ != null)
+			{
+				root_.Sync = oldSync_;
+				oldSync_ = null;
+			}
+
 			root_.RequestStop();
+		}
+
+		public override void Stopped()
+		{
+			base.Stopped();
+
+			if (mainSync_)
+				person_.Animator.SetMainSync(null);
 		}
 
 		protected void SetEnergySource(Person p)
@@ -96,8 +152,7 @@ namespace Cue.Proc
 					items.Add(I(1) + ds[i]);
 			}
 
-			foreach (var s in Targets)
-				DebugTarget(items, s, 1);
+			DebugTarget(items, root_, 1);
 
 			return items.ToArray();
 		}

@@ -20,6 +20,15 @@
 		},
 
 		{
+			"animation": "frottage",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueFrottage"
+			}
+		},
+
+		{
 			"animation": "orgasm",
 			"type": "proc",
 			"options":

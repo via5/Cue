@@ -9,26 +9,28 @@ namespace Cue
 		public const int None = -1;
 		public const int Idle = 0;
 		public const int Sex = 1;
-		public const int Orgasm = 2;
-		public const int Smoke = 3;
-		public const int SuckFinger = 4;
-		public const int Penetrated = 5;
-		public const int RightFinger = 6;
-		public const int LeftFinger = 7;
-		public const int Kiss = 8;
-		public const int HandjobBoth = 9;
-		public const int HandjobLeft = 10;
-		public const int HandjobRight = 11;
-		public const int Blowjob = 12;
+		public const int Frottage = 2;
+		public const int Orgasm = 3;
+		public const int Smoke = 4;
+		public const int SuckFinger = 5;
+		public const int Penetrated = 6;
+		public const int RightFinger = 7;
+		public const int LeftFinger = 8;
+		public const int Kiss = 9;
+		public const int HandjobBoth = 10;
+		public const int HandjobLeft = 11;
+		public const int HandjobRight = 12;
+		public const int Blowjob = 13;
 
-		public const int Count = 13;
-		public int GetCount() { return 13; }
+		public const int Count = 14;
+		public int GetCount() { return 14; }
 
 
 		private static string[] names_ = new string[]
 		{
 			"idle",
 			"sex",
+			"frottage",
 			"orgasm",
 			"smoke",
 			"suckFinger",

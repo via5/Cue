@@ -35,8 +35,7 @@ namespace Cue.Proc
 
 		protected BasicTarget(string name, ISync sync)
 		{
-			sync_ = sync;
-			sync_.Target = this;
+			Sync = sync;
 			name_ = name;
 		}
 
@@ -53,8 +52,16 @@ namespace Cue.Proc
 
 		public ISync Sync
 		{
-			get { return sync_; }
-			set { sync_ = value; }
+			get
+			{
+				return sync_;
+			}
+
+			set
+			{
+				sync_ = value;
+				sync_.Target = this;
+			}
 		}
 
 		public virtual float MovementEnergy

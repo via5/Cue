@@ -2,24 +2,23 @@
 
 namespace Cue.Proc
 {
-	class SexProcAnimation : BasicProcAnimation
+	abstract class ThrustProcAnimation : BasicProcAnimation
 	{
+		protected struct Config
+		{
+			public float hipForceMin;
+			public float hipForceMax;
+			public Vector3 hipTorqueMin;
+			public Vector3 hipTorqueMax;
+			public Vector3 hipTorqueWin;
+		}
+
 		private const float DirectionChangeMaxDistance = 0.05f;
 		private const float ForceFarDistance = 0.07f;
 		private const float ForceCloseDistance = 0.04f;
 		private const float MinimumForce = 1;//0.4f;
 		private const float ForceChangeMaxAmount = 0.02f;
 
-		private float hipForceMin_ = 300;
-		private float hipForceMax_ = 1400;
-		private float hipAloneForceMin_ = 300;
-		private float hipAloneForceMax_ = 800;
-		private float hipTorqueMin_ = 0;
-		private float hipTorqueMax_ = -20;
-		private float hipTorqueWindow_ = 0;
-		private float hipAloneTorqueMin_ = -60;
-		private float hipAloneTorqueMax_ = -120;
-		private float hipAloneTorqueWindow_ = 20;
 		private float chestTorqueMin_ = -10;
 		private float chestTorqueMax_ = -50;
 		private float headTorqueMin_ = 0;
@@ -34,26 +33,25 @@ namespace Cue.Proc
 		private float lastForceFactor_ = 0;
 		private Vector3 lastDir_ = Vector3.Zero;
 		private Person receiver_ = null;
+		private Config config_;
 
-		public SexProcAnimation()
-			: base("cueSex")
+		protected ThrustProcAnimation(string name)
+			: base(name)
 		{
-			var g = new ConcurrentTargetGroup(
-				"g", new Duration(), new Duration(), true,
-				new SlidingDurationSync(
-					new SlidingDuration(
-						durationMin_, durationMax_,
-						durationInterval_, durationInterval_,
-						durationWin_, new CubicOutEasing()),
-					new SlidingDuration(
-						durationMin_, durationMax_,
-						durationInterval_, durationInterval_,
-						durationWin_, new CubicOutEasing()),
-					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
+			RootGroup.Sync = new SlidingDurationSync(
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new CubicOutEasing()),
+				new SlidingDuration(
+					durationMin_, durationMax_,
+					durationInterval_, durationInterval_,
+					durationWin_, new CubicOutEasing()),
+				new Duration(0, 0), new Duration(0, 0),
+				SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween);
 
 
-			g.AddTarget(new Force(
+			RootGroup.AddTarget(new Force(
 				"hipForce", Force.AbsoluteForce, BP.Hips,
 				new SlidingMovement(
 					Vector3.Zero, Vector3.Zero,
@@ -61,16 +59,15 @@ namespace Cue.Proc
 					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
-			g.AddTarget(new Force(
+			RootGroup.AddTarget(new Force(
 				"hipTorque", Force.RelativeTorque, BP.Hips,
 				new SlidingMovement(
-					new Vector3(hipTorqueMin_, 0, 0),
-					new Vector3(hipTorqueMax_, 0, 0),
+					Vector3.Zero, Vector3.Zero,
 					durationInterval_, durationInterval_,
 					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
-			g.AddTarget(new Force(
+			RootGroup.AddTarget(new Force(
 				Force.RelativeTorque, BP.Chest,
 				new SlidingMovement(
 					new Vector3(chestTorqueMin_, 0, 0),
@@ -79,7 +76,7 @@ namespace Cue.Proc
 					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
 
-			g.AddTarget(new Force(
+			RootGroup.AddTarget(new Force(
 				Force.RelativeTorque, BP.Head,
 				new SlidingMovement(
 					new Vector3(headTorqueMin_, 0, 0),
@@ -87,15 +84,11 @@ namespace Cue.Proc
 					durationInterval_, durationInterval_,
 					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
-
-			AddTarget(g);
 		}
 
-		public override BuiltinAnimation Clone()
+		protected Person Receiver
 		{
-			var a = new SexProcAnimation();
-			a.CopyFrom(this);
-			return a;
+			get { return receiver_; }
 		}
 
 		public override bool Start(Person p, AnimationContext cx)
@@ -104,42 +97,44 @@ namespace Cue.Proc
 				return false;
 
 			receiver_ = cx.ps as Person;
+
 			SetEnergySource(receiver_);
+			SetAsMainSync(receiver_);
 
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)
+			{
 				Cue.LogError("hipForce not found");
-			else
-				hipForce_.BeforeNextAction = () => UpdateForce(hipForce_);
+				return false;
+			}
+
+			hipForce_.BeforeNextAction = () => UpdateForce(hipForce_);
 
 			hipTorque_ = FindTarget("hipTorque") as Force;
 			if (hipTorque_ == null)
 			{
 				Cue.LogError("hipTorque not found");
+				return false;
 			}
-			else
-			{
-				if (receiver_ == null)
-				{
-					hipTorque_.Movement.SetRange(
-						new Vector3(hipAloneTorqueMin_, 0, 0),
-						new Vector3(hipAloneTorqueMax_, 0, 0),
-						new Vector3(hipAloneTorqueWindow_, 0, 0));
-				}
-				else
-				{
-					hipTorque_.Movement.SetRange(
-						new Vector3(hipTorqueMin_, 0, 0),
-						new Vector3(hipTorqueMax_, 0, 0),
-						new Vector3(hipTorqueWindow_, 0, 0));
-				}
-			}
+
+			if (!DoStart())
+				return false;
+
+			config_ = GetConfig();
+
+			hipTorque_.Movement.SetRange(
+				config_.hipTorqueMin,
+				config_.hipTorqueMax,
+				config_.hipTorqueWin);
 
 			UpdateForces(true);
 			Reset();
 
 			return true;
 		}
+
+		protected abstract bool DoStart();
+		protected abstract Config GetConfig();
 
 		private void UpdateForces(bool alwaysUpdate = false)
 		{
@@ -237,21 +232,10 @@ namespace Cue.Proc
 		private void UpdateForce(Force f)
 		{
 			var p = GetForceFactor();
-
-			float fmin, fmax;
-
-			if (receiver_ == null)
-			{
-				fmin = hipAloneForceMin_ * p;
-				fmax = hipAloneForceMax_ * p;
-			}
-			else
-			{
-				fmin = hipForceMin_ * p;
-				fmax = hipForceMax_ * p;
-			}
-
 			var dir = GetDirection();
+
+			float fmin = config_.hipForceMin * p;
+			float fmax = config_.hipForceMax * p;
 
 			f.Movement.SetRange(dir * fmin, dir * fmax);
 		}
@@ -261,6 +245,94 @@ namespace Cue.Proc
 			return
 				base.ToDetailedString() + "\n" +
 				$"ff={lastForceFactor_} dir={lastDir_}";
+		}
+	}
+
+
+	class SexProcAnimation : ThrustProcAnimation
+	{
+		private float hipForceMin_ = 300;
+		private float hipForceMax_ = 1400;
+		private float hipTorqueMin_ = 0;
+		private float hipTorqueMax_ = -20;
+		private float hipTorqueWindow_ = 0;
+
+		public SexProcAnimation()
+			: base("cueSex")
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new SexProcAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		protected override bool DoStart()
+		{
+			if (Receiver == null)
+			{
+				Cue.LogError("no receiver");
+				return false;
+			}
+
+			return true;
+		}
+
+		protected override Config GetConfig()
+		{
+			var c = new Config();
+
+			c.hipForceMin = hipForceMin_;
+			c.hipForceMax = hipForceMax_;
+
+			c.hipTorqueMin = new Vector3(hipTorqueMin_, 0, 0);
+			c.hipTorqueMax = new Vector3(hipTorqueMax_, 0, 0);
+			c.hipTorqueWin = new Vector3(hipTorqueWindow_, 0, 0);
+
+			return c;
+		}
+	}
+
+
+	class FrottageProcAnimation : ThrustProcAnimation
+	{
+		private float hipAloneForceMin_ = 300;
+		private float hipAloneForceMax_ = 800;
+		private float hipAloneTorqueMin_ = -60;
+		private float hipAloneTorqueMax_ = -120;
+		private float hipAloneTorqueWindow_ = 20;
+
+		public FrottageProcAnimation()
+			: base("cueFrottage")
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new FrottageProcAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		protected override bool DoStart()
+		{
+			return true;
+		}
+
+		protected override Config GetConfig()
+		{
+			var c = new Config();
+
+			c.hipForceMin = hipAloneForceMin_;
+			c.hipForceMax = hipAloneForceMax_;
+
+			c.hipTorqueMin = new Vector3(hipAloneTorqueMin_, 0, 0);
+			c.hipTorqueMax = new Vector3(hipAloneTorqueMax_, 0, 0);
+			c.hipTorqueWin = new Vector3(hipAloneTorqueWindow_, 0, 0);
+
+			return c;
 		}
 	}
 }

@@ -56,6 +56,11 @@ namespace Cue
 			// no-op
 		}
 
+		public virtual void Stopped()
+		{
+			// no-op
+		}
+
 		public virtual void FixedUpdate(float s)
 		{
 			// no-op
@@ -166,10 +171,10 @@ namespace Cue
 
 			var p = new Playing(proto, proto.Clone());
 
-			playing_.Add(p);
 			if (!p.anim.Start(person_, cx))
 				return false;
 
+			playing_.Add(p);
 			log_.Info($"playing {a}");
 
 			return true;
@@ -207,16 +212,6 @@ namespace Cue
 					return;
 				}
 			}
-		}
-
-		private void DoStopNow(int i)
-		{
-			log_.Verbose(
-				$"stopping now {i}, proto is {playing_[i].proto}, " +
-				$"anim is {playing_[i].anim}");
-
-			playing_[i].anim.Reset();
-			playing_.RemoveAt(i);
 		}
 
 		private void DoRequestStop(int i)
@@ -271,10 +266,20 @@ namespace Cue
 				}
 
 				if (playing_[i].anim.Done || playing_[i].forceStop)
-					playing_.RemoveAt(i);
+					DoStopNow(i);
 				else
 					++i;
 			}
+		}
+
+		private void DoStopNow(int i)
+		{
+			log_.Verbose(
+				$"stopping now {i}, proto is {playing_[i].proto}, " +
+				$"anim is {playing_[i].anim}");
+
+			playing_[i].anim.Stopped();
+			playing_.RemoveAt(i);
 		}
 
 		public void OnPluginState(bool b)

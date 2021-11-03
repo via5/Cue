@@ -15,6 +15,7 @@ namespace Cue
 			new ClockwiseHJLeftAnimation(),
 			new ClockwiseHJRightAnimation(),
 			new Proc.SexProcAnimation(),
+			new Proc.FrottageProcAnimation(),
 			new Proc.SuckFingerProcAnimation(),
 			new Proc.LeftFingerProcAnimation(),
 			new Proc.RightFingerProcAnimation(),
@@ -152,6 +153,7 @@ namespace Cue
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private readonly List<PlayingAnimation> playing_ = new List<PlayingAnimation>();
 		private List<int> failed_ = new List<int>();
+		private Proc.ISync sync_ = null;
 
 		public Animator(Person p)
 		{
@@ -174,6 +176,26 @@ namespace Cue
 		public List<IPlayer> Players
 		{
 			get { return players_; }
+		}
+
+		public Proc.ISync MainSync
+		{
+			get { return sync_; }
+		}
+
+		public void SetMainSync(Proc.ISync s)
+		{
+			if (s == null)
+			{
+				for (int i = 0; i < playing_.Count; ++i)
+				{
+					var pa = playing_[i].anim.Sys as Proc.BasicProcAnimation;
+					if (pa != null)
+						pa.MainSyncStopping(sync_);
+				}
+			}
+
+			sync_ = s;
 		}
 
 		public Animation[] GetPlaying()
