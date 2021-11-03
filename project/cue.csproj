@@ -98,8 +98,8 @@
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Events.cs" />
     <Compile Include="src\AI\Events\Hand.cs" />
+    <Compile Include="src\AI\Events\HandLinker.cs" />
     <Compile Include="src\AI\Events\Kiss.cs" />
-    <Compile Include="src\AI\Events\Lock.cs" />
     <Compile Include="src\AI\Events\Mouth.cs" />
     <Compile Include="src\AI\Events\Penetrated.cs" />
     <Compile Include="src\AI\Events\Smoke.cs" />

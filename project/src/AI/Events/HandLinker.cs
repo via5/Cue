@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class HandLocker : BasicEvent
+	class HandLinker : BasicEvent
 	{
 		class HandInfo
 		{
@@ -28,8 +28,8 @@
 		private readonly HandInfo right_;
 		private bool grabbingPerson_ = false;
 
-		public HandLocker(Person p)
-			: base("handlocker", p)
+		public HandLinker(Person p)
+			: base("handLinker", p)
 		{
 			left_ = new HandInfo(person_.Body.Get(BP.LeftHand));
 			right_ = new HandInfo(person_.Body.Get(BP.RightHand));

@@ -36,7 +36,7 @@
 				new KissEvent(p),
 				new SmokeEvent(p),
 				new ThrustEvent(p),
-				new HandLocker(p),
+				new HandLinker(p),
 				new HandEvent(p),
 				new PenetratedEvent(p),
 				new SuckFingerEvent(p)
