@@ -1,13 +1,13 @@
 ﻿namespace Cue
 {
-	class SexEvent : BasicEvent
+	class ThrustEvent : BasicEvent
 	{
 		private Person receiver_ = null;
 		private bool active_ = false;
 		private bool running_ = false;
 
-		public SexEvent(Person p)
-			: base("sex", p)
+		public ThrustEvent(Person p)
+			: base("thrust", p)
 		{
 		}
 

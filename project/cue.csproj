@@ -102,9 +102,9 @@
     <Compile Include="src\AI\Events\Lock.cs" />
     <Compile Include="src\AI\Events\Mouth.cs" />
     <Compile Include="src\AI\Events\Penetrated.cs" />
-    <Compile Include="src\AI\Events\Sex.cs" />
     <Compile Include="src\AI\Events\Smoke.cs" />
     <Compile Include="src\AI\Events\SuckFinger.cs" />
+    <Compile Include="src\AI\Events\Thrust.cs" />
     <Compile Include="src\Animation\Animator.cs" />
     <Compile Include="src\Animation\Builtin\Finger.cs" />
     <Compile Include="src\Animation\Builtin\Penetrated.cs" />

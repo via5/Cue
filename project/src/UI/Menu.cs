@@ -212,10 +212,10 @@ namespace Cue
 				(p, b) =>
 				{
 					if (p != null)
-						p.AI.GetEvent<SexEvent>().Active = b;
+						p.AI.GetEvent<ThrustEvent>().Active = b;
 				},
 
-				(p) => p.AI.GetEvent<SexEvent>()?.Active ?? false);
+				(p) => p.AI.GetEvent<ThrustEvent>()?.Active ?? false);
 		}
 
 		public static IItem CanKiss()
