@@ -7,7 +7,6 @@
 
 		private bool active_ = false;
 		private float checkElapsed_ = CheckTargetsInterval;
-		private BodyPartLock mouthLock_ = null;
 
 		private Person bjTarget_ = null;
 		private BodyPartLock[] bjLocks_ = null;
@@ -24,7 +23,6 @@
 			{
 				$"active     {active_}",
 				$"elapsed    {checkElapsed_:0.00}",
-				$"mouthLock  {mouthLock_}",
 				$"bjTarget   {bjTarget_}",
 				$"bjLocks    {bjLocks_?.ToString() ?? ""}"
 			};
@@ -73,8 +71,6 @@
 
 		public override void Update(float s)
 		{
-			CheckSuckFinger();
-
 			if (active_)
 			{
 				checkElapsed_ += s;
@@ -86,30 +82,6 @@
 					if (bjTarget_ == null)
 						active_ = false;
 				}
-			}
-		}
-
-		private void CheckSuckFinger()
-		{
-			var mouthTriggered = person_.Body.Get(BP.Mouth).Triggered;
-			var head = person_.Body.Get(BP.Head);
-
-			if (mouthLock_ == null && mouthTriggered)
-			{
-				mouthLock_ = head.Lock(BodyPartLock.Anim, "SuckFinger");
-
-				if (mouthLock_ != null)
-				{
-					person_.Animator.PlayType(
-						Animations.SuckFinger,
-						new AnimationContext(mouthLock_.Key));
-				}
-			}
-			else if (mouthLock_ != null && !mouthTriggered)
-			{
-				mouthLock_.Unlock();
-				mouthLock_ = null;
-				person_.Animator.StopType(Animations.SuckFinger);
 			}
 		}
 

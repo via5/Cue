@@ -1,13 +1,15 @@
 project\src\Cue.cs
 project\src\Main.cs
 project\src\AI\AI.cs
-project\src\AI\Events\Events.cs
+project\src\AI\Events.cs
 project\src\AI\Events\Hand.cs
 project\src\AI\Events\Kiss.cs
 project\src\AI\Events\Lock.cs
 project\src\AI\Events\Mouth.cs
+project\src\AI\Events\Penetrated.cs
 project\src\AI\Events\Sex.cs
 project\src\AI\Events\Smoke.cs
+project\src\AI\Events\SuckFinger.cs
 project\src\Animation\Animator.cs
 project\src\Animation\Builtin\Finger.cs
 project\src\Animation\Builtin\Penetrated.cs

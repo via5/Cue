@@ -37,7 +37,9 @@
 				new SmokeEvent(p),
 				new SexEvent(p),
 				new HandLocker(p),
-				new HandEvent(p)
+				new HandEvent(p),
+				new PenetratedEvent(p),
+				new SuckFingerEvent(p)
 			};
 		}
 
