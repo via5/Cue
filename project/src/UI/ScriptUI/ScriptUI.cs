@@ -10,17 +10,12 @@ namespace Cue
 		private VUI.Panel panel_ = new VUI.Panel();
 		private MiscTab misc_;
 		private SubTabs tabs_ = new SubTabs();
-		private bool inited_ = false;
 		private string initialSelection_ = "";
 
-		public void Init()
+		public ScriptUI()
 		{
-			if (inited_)
-				return;
-
 			tabs_.UpdateInterval = 0.3f;
 
-			inited_ = true;
 			misc_ = new MiscTab();
 
 			foreach (var p in Cue.Instance.AllPersons)
@@ -42,9 +37,6 @@ namespace Cue
 
 		public JSONClass ToJSON()
 		{
-			if (!inited_)
-				return null;
-
 			var o = new JSONClass();
 
 			o["tab"] = tabs_.GetSelectedString();

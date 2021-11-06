@@ -193,7 +193,6 @@
     <Compile Include="src\Sys\Vam\VamParameter.cs" />
     <Compile Include="src\Sys\Vam\VamSys.cs" />
     <Compile Include="src\Sys\Vam\VamUtilities.cs" />
-    <Compile Include="src\UI\Controls.cs" />
     <Compile Include="src\UI\DesktopMenu.cs" />
     <Compile Include="src\UI\Menu.cs" />
     <Compile Include="src\UI\ScriptUI\AITab.cs" />

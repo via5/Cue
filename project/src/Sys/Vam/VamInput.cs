@@ -326,7 +326,7 @@ namespace Cue.Sys.Vam
 
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
-				(ShowLeftMenu || ShowRightMenu || UI.VRMenuAlwaysOpened) &&
+				(ShowLeftMenu || ShowRightMenu) &&
 				(sc_.gameMode == SuperController.GameMode.Play);
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
@@ -499,10 +499,6 @@ namespace Cue.Sys.Vam
 			if (h.hit)
 				return h;
 
-			h = HitObject();
-			if (h.hit)
-				return h;
-
 			return HitScene();
 		}
 
@@ -546,31 +542,6 @@ namespace Cue.Sys.Vam
 		{
 			// todo
 			return false;
-		}
-
-		private HoveredInfo HitObject()
-		{
-			RaycastHit hit;
-
-			bool b = Physics.Raycast(
-				ray_, out hit, float.MaxValue, Bits.Bit(VamGraphic.Layer));
-
-			if (!b)
-				return HoveredInfo.None;
-
-			// todo
-			var cs = Cue.Instance.UI.Controls.All;
-			for (int i = 0; i < cs.Count; ++i)
-			{
-				var g = cs[i].Graphic as VamBoxGraphic;
-				if (g.Transform == hit.transform)
-				{
-					return new HoveredInfo(
-						cs[i].Object, U.FromUnity(hit.point), true);
-				}
-			}
-
-			return HoveredInfo.None;
 		}
 
 		private HoveredInfo HitPerson()

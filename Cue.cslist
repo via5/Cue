@@ -85,7 +85,6 @@ project\src\Sys\Vam\BodyParts\EyesBodyPart.cs
 project\src\Sys\Vam\BodyParts\RigidbodyBodyPart.cs
 project\src\Sys\Vam\BodyParts\StraponBodyPart.cs
 project\src\Sys\Vam\BodyParts\TriggerBodyPart.cs
-project\src\UI\Controls.cs
 project\src\UI\DesktopMenu.cs
 project\src\UI\Menu.cs
 project\src\UI\UI.cs

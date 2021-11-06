@@ -193,8 +193,9 @@ namespace Cue
 		private readonly List<IObject> everythingActive_ = new List<IObject>();
 		private IObject[] everythingActiveArray_ = new IObject[0];
 
-		private readonly UI ui_;
+		private UI ui_;
 		private readonly Options options_ = new Options();
+		private bool loaded_ = false;
 
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
@@ -209,9 +210,6 @@ namespace Cue
 			LogVerbose("cue: ctor");
 
 			saver_ = Sys.CreateLiveSaver();
-
-			if (Sys.HasUI)
-				ui_ = new UI(Sys);
 		}
 
 		public static Cue Instance { get { return instance_; } }
@@ -316,11 +314,14 @@ namespace Cue
 			LogVerbose("cue: initializing persons");
 			InitPersons();
 
-			LogVerbose("cue: checking config");
-			CheckConfig();
+			if (Sys.HasUI)
+				ui_ = new UI(Sys);
 
 			LogVerbose("cue: enabling plugin state");
 			OnPluginState(true);
+
+			LogVerbose("cue: checking config");
+			CheckConfig();
 
 			if (Sys.GetAtom("cue!test") != null)
 			{
@@ -350,6 +351,9 @@ namespace Cue
 
 		public void Save()
 		{
+			if (!loaded_)
+				return;
+
 			var oo = new JSONClass();
 			Save(oo);
 			saver_.Save(oo);
@@ -394,6 +398,8 @@ namespace Cue
 
 		private void Load(JSONClass c)
 		{
+			loaded_ = true;
+
 			var objects = c["objects"].AsArray;
 
 			foreach (var o in everything_)

@@ -2,32 +2,37 @@
 
 namespace Cue
 {
-	class VRMenu
+	class VRMenu : BasicMenu
 	{
-		private VUI.Root root_ = null;
-		private VUI.Label name_ = null;
-		private List<UIActions.IItem> items_ = new List<UIActions.IItem>();
-		private int widgetSel_ = -1;
-		private int personSel_ = -1;
-		private bool visible_ = false;
-		private bool left_ = false;
+		private const int Hidden = 0;
+		private const int Left = 1;
+		private const int Right = 2;
 
-		public void Create(bool debugDesktop)
+		private readonly Sys.ISys sys_;
+		private VUI.Label name_ = null;
+		private int widgetSel_ = -1;
+		private int state_ = Hidden;
+		private VUI.VRHandRootSupport vrSupport_ = null;
+
+		public VRMenu(bool debugDesktop)
 		{
-			foreach (var i in UIActions.All())
-				items_.Add(i);
+			sys_ = Cue.Instance.Sys;
+
+			VUI.Root root;
 
 			if (debugDesktop)
 			{
-				root_ = new VUI.Root(new VUI.OverlayRootSupport(10, 300, 350));
+				root = new VUI.Root(new VUI.OverlayRootSupport(10, 300, 400));
 			}
 			else
 			{
-				root_ = new VUI.Root(new VUI.VRHandRootSupport(
+				vrSupport_ = new VUI.VRHandRootSupport(
 					VUI.VRHandRootSupport.LeftHand,
 					new UnityEngine.Vector3(0, 0.1f, 0),
 					new UnityEngine.Vector2(0, 0),
-					new UnityEngine.Vector2(300, 350)));
+					new UnityEngine.Vector2(300, 350));
+
+				root = new VUI.Root(vrSupport_);
 			}
 
 			var ly = new VUI.VerticalFlow();
@@ -39,7 +44,7 @@ namespace Cue
 
 			p.Add(new VUI.Spacer(10));
 
-			foreach (var i in items_)
+			foreach (var i in Items)
 				p.Add(i.Panel);
 
 			if (UI.VRMenuDebug)
@@ -52,208 +57,157 @@ namespace Cue
 				p.Add(dp);
 			}
 
-			root_.ContentPanel.Layout = new VUI.BorderLayout();
-			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
+			root.ContentPanel.Layout = new VUI.BorderLayout();
+			root.ContentPanel.Add(p, VUI.BorderLayout.Center);
+
+			p.Events.Wheel += (w) =>
+			{
+				if (w.Delta.Y > 0)
+					PreviousWidget();
+				else if (w.Delta.Y < 0)
+					NextWidget();
+
+				return true;
+			};
+
+			SetRoot(root);
+
 			UpdateVisibility();
-
-			if (Cue.Instance.ActivePersons.Length == 0)
-				SetPerson(-1);
-			else if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
-				SetPerson(NextPerson(-1, +1));
+			PersonChanged();
 		}
 
-		public void Destroy()
+		public override void CheckInput()
 		{
-			if (root_ != null)
+			if (sys_.IsPlayMode)
 			{
-				root_.Destroy();
-				root_ = null;
+				var lh = sys_.Input.GetLeftHovered();
+				var rh = sys_.Input.GetRightHovered();
+
+				if (sys_.Input.ShowLeftMenu)
+					ShowLeft();
+				else if (sys_.Input.ShowRightMenu)
+					ShowRight();
+				else
+					Hide();
+			}
+			else
+			{
+				Hide();
 			}
 
-			items_.Clear();
-		}
 
-		public void Update()
-		{
-			if (root_?.Visible ?? false)
-			{
-				CheckInput();
-
-				for (int i = 0; i < items_.Count; ++i)
-					items_[i].Update();
-			}
-
-			root_?.Update();
-		}
-
-		private void CheckInput()
-		{
 			CheckItemInput();
 			CheckPersonInput();
 
 			if (Cue.Instance.Sys.Input.MenuSelect)
 			{
-				if (widgetSel_ >= 0 && widgetSel_ < items_.Count)
-					items_[widgetSel_].Activate();
+				if (widgetSel_ >= 0 && widgetSel_ < Items.Count)
+					Items[widgetSel_].Activate();
 			}
 		}
 
 		private void CheckItemInput()
 		{
+			if (Cue.Instance.Sys.Input.MenuDown)
+				NextWidget();
+			else if (Cue.Instance.Sys.Input.MenuUp)
+				PreviousWidget();
+		}
+
+		public void NextWidget()
+		{
+			ChangeWidget(+1);
+		}
+
+		public void PreviousWidget()
+		{
+			ChangeWidget(-1);
+		}
+
+		public void ChangeWidget(int dir)
+		{
 			var old = widgetSel_;
 
-			if (Cue.Instance.Sys.Input.MenuDown)
-			{
-				++widgetSel_;
-				if (widgetSel_ >= items_.Count)
-					widgetSel_ = 0;
-			}
-			else if (Cue.Instance.Sys.Input.MenuUp)
-			{
-				--widgetSel_;
-				if (widgetSel_ < 0)
-					widgetSel_ = items_.Count - 1;
-			}
+			widgetSel_ += dir;
+			if (widgetSel_ >= Items.Count)
+				widgetSel_ = 0;
+			else if (widgetSel_ < 0)
+				widgetSel_ = Items.Count - 1;
 
 			if (widgetSel_ == -1)
 				widgetSel_ = 0;
 
 			if (widgetSel_ != old)
 			{
-				for (int i = 0; i < items_.Count; ++i)
-					items_[i].Selected = (i == widgetSel_);
+				for (int i = 0; i < Items.Count; ++i)
+					Items[i].Selected = (i == widgetSel_);
 			}
 		}
 
 		private void CheckPersonInput()
 		{
-			int newSel = personSel_;
-
 			if (Cue.Instance.Sys.Input.MenuRight)
-				newSel = NextPerson(personSel_, +1);
+				NextPerson();
 			else if (Cue.Instance.Sys.Input.MenuLeft)
-				newSel = NextPerson(personSel_, -1);
-
-			if (newSel >= Cue.Instance.ActivePersons.Length)
-				newSel = -1;
-
-			if (newSel != personSel_)
-				SetPerson(newSel);
-		}
-
-		private int NextPerson(int current, int dir)
-		{
-			var ps = Cue.Instance.ActivePersons;
-
-			int s = current;
-
-			if (s < 0 || s >= ps.Length)
-			{
-				current = 0;
-				s = 0;
-			}
-			else
-			{
-				s += dir;
-			}
-
-
-			for (; ; )
-			{
-				if (s < 0)
-					s = ps.Length - 1;
-				else if (s >= ps.Length)
-					s = 0;
-
-				if (s == current)
-					break;
-
-				if (ValidPerson(ps[s]))
-					return s;
-
-				s += dir;
-			}
-
-			return current;
-		}
-
-		private bool ValidPerson(Person p)
-		{
-			return p.IsInteresting;
+				PreviousPerson();
 		}
 
 		public void ShowLeft()
 		{
-			left_ = true;
-			visible_ = true;
+			state_ = Left;
 			UpdateVisibility();
 		}
 
 		public void ShowRight()
 		{
-			left_ = false;
-			visible_ = true;
+			state_ = Right;
 			UpdateVisibility();
 		}
 
 		public void Hide()
 		{
-			visible_ = false;
+			state_ = Hidden;
 			UpdateVisibility();
 		}
 
 		private void UpdateVisibility()
 		{
-			if (root_ != null)
+			if (UI.VRMenuDebug)
+				state_ = Left;
+
+			switch (state_)
 			{
-				if (visible_)
+				case Hidden:
 				{
-					root_.Visible = true;
-
-					var s = root_.RootSupport as VUI.VRHandRootSupport;
-
-					if (s != null)
-					{
-						if (left_)
-							s.Attach(VUI.VRHandRootSupport.LeftHand);
-						else
-							s.Attach(VUI.VRHandRootSupport.RightHand);
-					}
+					Visible = false;
+					break;
 				}
-				else
+
+				case Left:
 				{
-					root_.Visible = false;
+					Visible = true;
+
+					if (vrSupport_ != null)
+						vrSupport_.Attach(VUI.VRHandRootSupport.LeftHand);
+
+					break;
+				}
+
+				case Right:
+				{
+					Visible = true;
+
+					if (vrSupport_ != null)
+						vrSupport_.Attach(VUI.VRHandRootSupport.RightHand);
+
+					break;
 				}
 			}
 		}
 
-		public IObject Selected
+		protected override void PersonChanged()
 		{
-			get
-			{
-				if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
-					return null;
-				else
-					return Cue.Instance.ActivePersons[personSel_];
-			}
-		}
-
-		private void SetPerson(int index)
-		{
-			personSel_ = index;
-
-			Person p = Selected as Person;
-
-			if (name_ != null)
-			{
-				if (p != null)
-					name_.Text = p.ID;
-				else
-					name_.Text = "";
-			}
-
-			for (int i = 0; i < items_.Count; ++i)
-				items_[i].Person = p;
+			name_.Text = SelectedPerson?.ID ?? "";
 		}
 	}
 }

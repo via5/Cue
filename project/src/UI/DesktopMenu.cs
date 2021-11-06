@@ -2,42 +2,49 @@
 
 namespace Cue
 {
-	class DesktopMenu
+	class DesktopMenu : BasicMenu
 	{
-		private bool visible_ = false;
-		private VUI.Root root_ = null;
-		private VUI.Label name_ = null;
+		private readonly Sys.ISys sys_;
 
+		private VUI.Label name_ = null;
 		private VUI.Panel selButtons_ = null;
-		private List<UIActions.IItem> items_ = new List<UIActions.IItem>();
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
 		private VUI.Label fps_ = null;
-
-		private IObject sel_ = null;
-		private IObject hov_ = null;
 		private bool ignore_ = false;
-		private bool selChanged_ = true;
-		private bool hovChanged_ = true;
 
-		public void Create()
+		public DesktopMenu()
 		{
-			foreach (var i in UIActions.All())
-				items_.Add(i);
+			sys_ = Cue.Instance.Sys;
 
-			root_ = new VUI.Root(new VUI.OverlayRootSupport(10, 1000, 220));
+			var root = new VUI.Root(new VUI.OverlayRootSupport(10, 1200, 220));
 
 			var p = new VUI.Panel(new VUI.VerticalFlow(10));
 
-			name_ = p.Add(new VUI.Label(
-				"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
-				UnityEngine.FontStyle.Bold));
+			{
+				var top = new VUI.Panel(new VUI.BorderLayout());
+
+				top.Add(
+					new VUI.ToolButton("<", PreviousPerson),
+					VUI.BorderLayout.Left);
+
+				name_ = top.Add(new VUI.Label(
+					"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
+					UnityEngine.FontStyle.Bold),
+					VUI.BorderLayout.Center);
+
+				top.Add(
+					new VUI.ToolButton(">", NextPerson),
+					VUI.BorderLayout.Right);
+
+				p.Add(top);
+			}
 
 			// sel row
 			{
 				selButtons_ = new VUI.Panel(new VUI.HorizontalFlow());
 
-				foreach (var i in items_)
+				foreach (var i in Items)
 					selButtons_.Add(i.Panel);
 
 				p.Add(selButtons_);
@@ -54,115 +61,42 @@ namespace Cue
 				p.Add(tools);
 			}
 
-			root_.ContentPanel.Layout = new VUI.BorderLayout();
-			root_.ContentPanel.Add(p, VUI.BorderLayout.Center);
-			root_.Visible = visible_;
+			root.ContentPanel.Layout = new VUI.BorderLayout();
+			root.ContentPanel.Add(p, VUI.BorderLayout.Center);
 
-			selChanged_ = true;
-			hovChanged_ = true;
-			OnSelected(sel_);
+			SetRoot(root);
+			PersonChanged();
 		}
 
-		public bool Visible
+		public override void CheckInput()
 		{
-			get
+			if (sys_.Input.Select)
 			{
-				return visible_;
-			}
-
-			set
-			{
-				visible_ = value;
-				if (root_ != null)
-					root_.Visible = visible_;
-			}
-		}
-
-		public IObject Selected
-		{
-			get
-			{
-				return sel_;
-			}
-
-			set
-			{
-				if (sel_ != value)
+				var o = sys_.Input.GetMouseHovered().o as Person;
+				if (o != null)
 				{
-					sel_ = value;
-					selChanged_ = true;
-					OnSelected(value);
+					SelectedPerson = o;
+					Cue.Instance.Save();
 				}
 			}
 		}
 
-		public IObject Hovered
+		public override void Update()
 		{
-			get
-			{
-				return hov_;
-			}
-
-			set
-			{
-				if (hov_ != value)
-				{
-					hov_ = value;
-					hovChanged_ = true;
-				}
-			}
-		}
-
-		public void Destroy()
-		{
-			if (root_ != null)
-			{
-				root_.Destroy();
-				root_ = null;
-			}
-
-			items_.Clear();
-		}
-
-		public void Update()
-		{
-			if (name_ != null)
-			{
-				if (selChanged_ || hovChanged_)
-				{
-					string s = "";
-
-					if (sel_ != null)
-						s += sel_.ID;
-
-					if (hov_ != null)
-						s += " (" + hov_.ID + ")";
-
-					name_.Text = s;
-					selChanged_ = false;
-					hovChanged_ = false;
-				}
-			}
-
 			if (fps_ != null)
-				fps_.Text = Cue.Instance.Sys.Fps;
-
-			for (int i = 0; i < items_.Count; ++i)
-				items_[i].Update();
-
+				fps_.Text = sys_.Fps;
 
 			UpdateWidgets();
-			root_?.Update();
+
+			base.Update();
 		}
 
-		private void OnSelected(IObject o)
+		protected override void PersonChanged()
 		{
-			var p = o as Person;
-			if (selButtons_ != null)
-				selButtons_.Visible = (p != null);
+			var p = SelectedPerson;
 
-			foreach (var i in items_)
-				i.Person = p;
+			name_.Text = p?.ID ?? "";
+			selButtons_.Visible = (p != null);
 		}
 
 		private void UpdateWidgets()
@@ -171,7 +105,7 @@ namespace Cue
 			{
 				ignore_ = true;
 
-				var p = sel_ as Person;
+				var p = SelectedPerson;
 
 				if (p != null)
 				{
@@ -197,7 +131,7 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			var p = Selected as Person;
+			var p = SelectedPerson;
 			if (p != null)
 				p.Mood.ForceOrgasm();
 		}
@@ -206,7 +140,7 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			var p = Selected as Person;
+			var p = SelectedPerson;
 			if (p != null)
 			{
 				if (b)
@@ -220,7 +154,7 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			var p = Selected as Person;
+			var p = SelectedPerson;
 			if (p != null)
 			{
 				if (p.Mood.GetValue(Moods.Excited).IsForced)
