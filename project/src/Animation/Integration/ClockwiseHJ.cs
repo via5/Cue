@@ -12,7 +12,8 @@
 		protected Sys.Vam.FloatParameter handY_ = null;
 		protected Sys.Vam.FloatParameter handZ_ = null;
 		protected Sys.Vam.FloatParameter closeMax_ = null;
-		protected Sys.Vam.FloatParameter speed_ = null;
+		protected Sys.Vam.FloatParameter speedMin_ = null;
+		protected Sys.Vam.FloatParameter speedMax_ = null;
 		protected Sys.Vam.FloatParameter zStrokeMax_ = null;
 		protected Sys.Vam.FloatParameter hand2Side_ = null;
 		protected Sys.Vam.FloatParameter hand2UpDown_ = null;
@@ -99,11 +100,21 @@
 
 			// speed
 			{
-				// not too fast
-				var range = (speed_.Maximum - speed_.DefaultValue) * 0.9f;
+				var minRangeMin = 1.0f;
+				var minRangeMax = 4.0f;
 
-				var v = speed_.DefaultValue + range * person_.Mood.MovementEnergy;
-				speed_.Value = v;
+				var maxRangeMin = 4.0f;
+				var maxRangeMax = 8.0f;
+
+				var minRange = minRangeMax - minRangeMin;
+				var maxRange = maxRangeMax - maxRangeMin;
+
+				var e = Mood.MultiMovementEnergy(person_, leftTarget_, rightTarget_);
+				var minSpeed = minRangeMin + minRange * e;
+				var maxSpeed = maxRangeMin + maxRange * e;
+
+				speedMin_.Value = minSpeed;
+				speedMax_.Value = maxSpeed;
 			}
 		}
 
@@ -119,7 +130,8 @@
 			handY_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Fwd/Bkwd");
 			handZ_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Shift Up/Down");
 			closeMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand Close Max");
-			speed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Overall Speed");
+			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Min");
+			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Max");
 			zStrokeMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Z Stroke Max");
 			hand2Side_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand2 Side/Side");
 			hand2UpDown_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Hand2 Shift Up/Down");

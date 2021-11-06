@@ -32,6 +32,55 @@ namespace Cue
 				moods_[i] = new ForceableFloat();
 		}
 
+		public static float MultiMovementEnergy(
+			Person a, Person b = null, Person c = null)
+		{
+			// this takes into account the excitement and tiredness of both
+			// characters involved
+			//
+			// this allows for an unexcited character to have high energy
+			// if interacting with an exicted character, or an excited
+			// character to have low energy if interacting with a tired
+			// character
+
+			Person mostExcited = null;
+			Person mostTired = null;
+
+			if (a != null)
+			{
+				mostExcited = HighestValue(mostExcited, a, Moods.Excited);
+				mostTired = HighestValue(mostTired, a, Moods.Tired);
+			}
+
+			if (b != null && b != a)
+			{
+				mostExcited = HighestValue(mostExcited, b, Moods.Excited);
+				mostTired = HighestValue(mostTired, b, Moods.Tired);
+			}
+
+			if (c != null && c != b)
+			{
+				mostExcited = HighestValue(mostExcited, c, Moods.Excited);
+				mostTired = HighestValue(mostTired, c, Moods.Tired);
+			}
+
+			if (mostExcited == null || mostTired == null)
+				return 1;
+
+			return mostTired.Mood.MovementEnergyForExcitement(
+					mostExcited.Mood.Get(Moods.Excited));
+		}
+
+		private static Person HighestValue(Person current, Person check, int what)
+		{
+			if (current == null)
+				return check;
+			else if (check.Mood.Get(what) > current.Mood.Get(what))
+				return check;
+			else
+				return current;
+		}
+
 		public int State
 		{
 			get { return state_; }

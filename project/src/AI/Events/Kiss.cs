@@ -9,9 +9,9 @@ namespace Cue
 		public const float PlayerStopDistance = 0.15f;
 		public const float MinimumActiveTime = 3;
 		public const float MinWait = 2;
-		public const float MaxWait = 200;
+		public const float MaxWait = 120;
 		public const float MinDuration = 2;
-		public const float MaxDuration = 200;
+		public const float MaxDuration = 120;
 		public const float WaitWhenFailed = 1;
 
 		private float elapsed_ = 0;
