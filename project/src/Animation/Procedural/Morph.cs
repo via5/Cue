@@ -69,16 +69,8 @@ namespace Cue.Proc
 				var delay = Duration.FromJSON(o, "delay");
 
 				var sync = new SlidingDurationSync(
-					new SlidingDuration(
-						duration.Minimum, duration.Maximum,
-						duration.NextMin, duration.NextMax,
-						0, new LinearEasing()),
-					new SlidingDuration(
-						duration.Minimum, duration.Maximum,
-						duration.NextMin, duration.NextMax,
-						0, new LinearEasing()),
-					new Duration(delay),
-					new Duration(delay),
+					duration.Clone(), duration.Clone(),
+					delay.Clone(), delay.Clone(),
 					SlidingDurationSync.Loop);
 
 				return new MorphTarget(bodyPart, id, min, max, sync);

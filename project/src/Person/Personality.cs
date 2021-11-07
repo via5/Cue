@@ -270,29 +270,6 @@ namespace Cue
 			get { return specificModifiers_; }
 		}
 
-		public Pair<float, float> LookAtRandomInterval
-		{
-			get
-			{
-				return new Pair<float, float>(
-					Get(PS.GazeRandomIntervalMinimum),
-					Get(PS.GazeRandomIntervalMaximum));
-			}
-		}
-
-		public float GazeDuration
-		{
-			get { return GetSlidingDuration(PS.GazeDuration).Current; }
-		}
-
-		public virtual void Update(float s)
-		{
-			// todo
-			Cue.Assert(PS.SlidingDurationCount == 1);
-			GetSlidingDuration(PS.GazeDuration).WindowMagnitude = person_.Mood.GazeEnergy;
-			GetSlidingDuration(PS.GazeDuration).Update(s);
-		}
-
 		public override string ToString()
 		{
 			return $"{Name}";

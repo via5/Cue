@@ -136,8 +136,8 @@ namespace Cue
 
 		private void Next()
 		{
-			wait_ = U.RandomGaussian(MinWait, MaxWait);
-			duration_ = U.RandomGaussian(MinDuration, MaxDuration);
+			wait_ = U.RandomNormal(MinWait, MaxWait);
+			duration_ = U.RandomNormal(MinDuration, MaxDuration);
 			elapsed_ = 0;
 		}
 

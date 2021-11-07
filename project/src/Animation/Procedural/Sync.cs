@@ -366,7 +366,7 @@ namespace Cue.Proc
 
 		private const float StopTime = 1;
 
-		private SlidingDuration fwdDuration_, bwdDuration_;
+		private Duration fwdDuration_, bwdDuration_;
 		private Duration fwdDelay_, bwdDelay_;
 		private IEasing fwdEasing_ = new LinearEasing();
 		private IEasing bwdEasing_ = new LinearEasing();
@@ -375,7 +375,7 @@ namespace Cue.Proc
 		private float stoppingElapsed_ = 0;
 
 		public SlidingDurationSync(
-			SlidingDuration fwdDuration, SlidingDuration bwdDuration,
+			Duration fwdDuration, Duration bwdDuration,
 			Duration fwdDelay, Duration bwdDelay, int flags)
 		{
 			fwdDuration_ = fwdDuration;
@@ -387,17 +387,17 @@ namespace Cue.Proc
 
 		public new static SlidingDurationSync Create(JSONClass o)
 		{
-			SlidingDuration fwd, bwd;
+			Duration fwd, bwd;
 
 			if (o.HasKey("duration"))
 			{
-				fwd = SlidingDuration.FromJSON(o, "duration");
+				fwd = Duration.FromJSON(o, "duration");
 				bwd = null;
 			}
 			else
 			{
-				fwd = SlidingDuration.FromJSON(o, "fwdDuration");
-				bwd = SlidingDuration.FromJSON(o, "bwdDuration");
+				fwd = Duration.FromJSON(o, "fwdDuration");
+				bwd = Duration.FromJSON(o, "bwdDuration");
 			}
 
 			var fwdD = Duration.FromJSON(o, "fwdDelay");
@@ -417,10 +417,10 @@ namespace Cue.Proc
 		public override ISync Clone()
 		{
 			return new SlidingDurationSync(
-				new SlidingDuration(fwdDuration_),
-				bwdDuration_ == null ? null : new SlidingDuration(bwdDuration_),
-				new Duration(fwdDelay_),
-				new Duration(bwdDelay_),
+				fwdDuration_.Clone(),
+				bwdDuration_?.Clone(),
+				fwdDelay_.Clone(),
+				bwdDelay_.Clone(),
 				flags_);
 		}
 
@@ -440,10 +440,10 @@ namespace Cue.Proc
 			set
 			{
 				if (fwdDuration_ != null)
-					fwdDuration_.Energy = value;
+					fwdDuration_.Magnitude = value;
 
 				if (bwdDuration_ != null)
-					bwdDuration_.Energy = value;
+					bwdDuration_.Magnitude = value;
 			}
 		}
 
@@ -463,7 +463,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public IDuration CurrentDuration()
+		public Duration CurrentDuration()
 		{
 			switch (State)
 			{

@@ -218,13 +218,6 @@ namespace Cue
 				I.End();
 
 
-				I.Start(I.UpdatePersonPersonality);
-				{
-					personality_.Update(s);
-				}
-				I.End();
-
-
 				I.Start(I.UpdatePersonMood);
 				{
 					mood_.Update(s);

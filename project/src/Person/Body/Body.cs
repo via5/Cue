@@ -450,7 +450,7 @@ namespace Cue
 		public void ResetMorphLimits()
 		{
 			for (int i = 0; i < morphsRemaining_.Length; ++i)
-				morphsRemaining_[i] = 1;
+				morphsRemaining_[i] = 1.1f;
 		}
 
 		public float UseMorphs(int[] bodyParts, float use)

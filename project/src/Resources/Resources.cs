@@ -130,18 +130,18 @@ namespace Cue
 		public static void LoadEnumValues(
 			EnumValueManager v, JSONClass o, bool inherited)
 		{
-			for (int i = 0; i < v.Values.GetSlidingDurationCount(); ++i)
+			for (int i = 0; i < v.Values.GetDurationCount(); ++i)
 			{
-				string key = v.Values.GetSlidingDurationName(i);
+				string key = v.Values.GetDurationName(i);
 
 				if (inherited)
 				{
 					if (o.HasKey(key))
-						v.SetSlidingDuration(i, SlidingDuration.FromJSON(o, key, false));
+						v.SetDuration(i, Duration.FromJSON(o, key, false));
 				}
 				else
 				{
-					v.SetSlidingDuration(i, SlidingDuration.FromJSON(o, key, true));
+					v.SetDuration(i, Duration.FromJSON(o, key, true));
 				}
 			}
 

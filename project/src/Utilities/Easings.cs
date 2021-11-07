@@ -61,6 +61,7 @@ namespace Cue
 
 	public interface IEasing
 	{
+		int GetIndex();
 		string GetDisplayName();
 		string GetShortName();
 		IEasing Clone(int cloneFlags = 0);
@@ -70,6 +71,7 @@ namespace Cue
 
 	public abstract class BasicEasing : IEasing
 	{
+		public abstract int GetIndex();
 		public abstract string GetDisplayName();
 		public abstract string GetShortName();
 		public abstract float Magnitude(float f);
@@ -105,6 +107,11 @@ namespace Cue
 			get { return "constantzero"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 1;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -136,6 +143,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "constantone"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 2;
 		}
 
 		public override string GetDisplayName()
@@ -171,6 +183,11 @@ namespace Cue
 			get { return "linear"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 3;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -202,6 +219,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "sinusoidal"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 4;
 		}
 
 		public override string GetDisplayName()
@@ -237,6 +259,11 @@ namespace Cue
 			get { return "quadin"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 5;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -268,6 +295,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "quadout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 6;
 		}
 
 		public override string GetDisplayName()
@@ -303,6 +335,11 @@ namespace Cue
 			get { return "quadinout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 7;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -334,6 +371,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "cubicin"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 8;
 		}
 
 		public override string GetDisplayName()
@@ -369,6 +411,11 @@ namespace Cue
 			get { return "cubicout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 9;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -400,6 +447,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "cubicinout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 10;
 		}
 
 		public override string GetDisplayName()
@@ -435,6 +487,11 @@ namespace Cue
 			get { return "quartin"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 11;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -466,6 +523,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "quartout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 12;
 		}
 
 		public override string GetDisplayName()
@@ -501,6 +563,11 @@ namespace Cue
 			get { return "quartinout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 13;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -532,6 +599,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "quintin"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 14;
 		}
 
 		public override string GetDisplayName()
@@ -567,6 +639,11 @@ namespace Cue
 			get { return "quintout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 15;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -598,6 +675,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "quintinout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 16;
 		}
 
 		public override string GetDisplayName()
@@ -633,6 +715,11 @@ namespace Cue
 			get { return "sinein"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 17;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -664,6 +751,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "sineout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 18;
 		}
 
 		public override string GetDisplayName()
@@ -699,6 +791,11 @@ namespace Cue
 			get { return "sineinout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 19;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -730,6 +827,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "expoin"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 20;
 		}
 
 		public override string GetDisplayName()
@@ -765,6 +867,11 @@ namespace Cue
 			get { return "expoout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 21;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -796,6 +903,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "expoinout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 22;
 		}
 
 		public override string GetDisplayName()
@@ -831,6 +943,11 @@ namespace Cue
 			get { return "circin"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 23;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -862,6 +979,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "circout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 24;
 		}
 
 		public override string GetDisplayName()
@@ -897,6 +1019,11 @@ namespace Cue
 			get { return "circinout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 25;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -928,6 +1055,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "backin"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 26;
 		}
 
 		public override string GetDisplayName()
@@ -963,6 +1095,11 @@ namespace Cue
 			get { return "backout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 27;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -994,6 +1131,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "backinout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 28;
 		}
 
 		public override string GetDisplayName()
@@ -1029,6 +1171,11 @@ namespace Cue
 			get { return "elasticin"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 29;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -1060,6 +1207,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "elasticout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 30;
 		}
 
 		public override string GetDisplayName()
@@ -1095,6 +1247,11 @@ namespace Cue
 			get { return "elasticinout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 31;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -1126,6 +1283,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "bouncein"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 32;
 		}
 
 		public override string GetDisplayName()
@@ -1161,6 +1323,11 @@ namespace Cue
 			get { return "bounceout"; }
 		}
 
+		public override int GetIndex()
+		{
+			return 33;
+		}
+
 		public override string GetDisplayName()
 		{
 			return DisplayName;
@@ -1192,6 +1359,11 @@ namespace Cue
 		public static string ShortName
 		{
 			get { return "bounceinout"; }
+		}
+
+		public override int GetIndex()
+		{
+			return 34;
 		}
 
 		public override string GetDisplayName()

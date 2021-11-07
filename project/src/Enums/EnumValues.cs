@@ -4,8 +4,8 @@
 	{
 		string[] GetAllNames();
 
-		string GetSlidingDurationName(int i);
-		int GetSlidingDurationCount();
+		string GetDurationName(int i);
+		int GetDurationCount();
 
 		string GetBoolName(int i);
 		int GetBoolCount();
@@ -21,7 +21,7 @@
 	class EnumValueManager
 	{
 		private IEnumValues values_;
-		private SlidingDuration[] slidingDurations_;
+		private Duration[] durations_;
 		private bool[] bools_;
 		private float[] floats_;
 		private string[] strings_;
@@ -29,13 +29,13 @@
 		public EnumValueManager(IEnumValues e)
 		{
 			values_ = e;
-			slidingDurations_ = new SlidingDuration[e.GetSlidingDurationCount()];
+			durations_ = new Duration[e.GetDurationCount()];
 			bools_ = new bool[e.GetBoolCount()];
 			floats_ = new float[e.GetFloatCount()];
 			strings_ = new string[e.GetStringCount()];
 
-			for (int i = 0; i < slidingDurations_.Length; i++)
-				slidingDurations_[i] = new SlidingDuration();
+			for (int i = 0; i < durations_.Length; i++)
+				durations_[i] = new Duration();
 		}
 
 		public IEnumValues Values
@@ -45,8 +45,8 @@
 
 		public void CopyFrom(EnumValueManager v)
 		{
-			for (int i = 0; i < v.slidingDurations_.Length; ++i)
-				slidingDurations_[i] = new SlidingDuration(v.slidingDurations_[i]);
+			for (int i = 0; i < v.durations_.Length; ++i)
+				durations_[i] = v.durations_[i].Clone();
 
 			for (int i = 0; i < v.bools_.Length; ++i)
 				bools_[i] = v.bools_[i];
@@ -58,14 +58,14 @@
 				strings_[i] = v.strings_[i];
 		}
 
-		public virtual SlidingDuration GetSlidingDuration(int i)
+		public virtual Duration GetDuration(int i)
 		{
-			return slidingDurations_[i];
+			return durations_[i];
 		}
 
-		public virtual void SetSlidingDuration(int i, SlidingDuration d)
+		public virtual void SetDuration(int i, Duration d)
 		{
-			slidingDurations_[i] = d;
+			durations_[i] = d;
 		}
 
 		public bool GetBool(int i)

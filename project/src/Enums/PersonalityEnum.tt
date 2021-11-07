@@ -61,16 +61,66 @@ var vars = new V[]
 
 // Durations
 // ---------
+// These are highly configurable durations that can have their min/max change
+// depending on excitement.
+//
+// A duration can be a simple array with two floats: the minimum and maximum in
+// seconds. The duration is a random number generated between the min and max,
+// regenerated every time the duration elapses.
+//
+// A duration can also have a sliding window, which is a smaller window within
+// the min and max that moves towards the max as excitement goes up.
+//
+// For these sliding durations, the duration is an object with the following
+// values:
+//
+//     min, max      minimum and maximum durations (seconds, required)
+//
+//     window        duration range from the minimum, slides towards max as
+//                   excitement goes up (optional, seconds, defaults to full
+//                   range)
+//
+//     windowEasing  the easing used for the sliding window (optional, default
+//                   "linear", see Easings.cs)
+//
+//     nextMinTime,  range of the random interval until a new duration is
+//     nextMaxTime   randomly generated (optional, seconds, defaults to
+//                   regenerating each time the duration finishes)
+//
+//     rng           random generation algorithm (optional, defaults to
+//                   "uniform")
+//
+// As an example, a sliding duration with a min/max of [1.0, 2.0] and a window
+// of 0.2 would generate durations between [1.0, 1.2] if excitement is 0.0 and
+// between [1.8, 2.0] if excitement is 1.0
+//
+// The 'rng' value can be a string "uniform" or "normal". It can also be an
+// object with a 'type' value with the same strings. If the 'type' is "normal",
+// these additional values are supported:
+//
+//     centerMin,   range of the center of the distribution, both [0, 1],
+//     centerMax    defaults to 0.5 for both; as excitement goes up, the center
+//                  goes towards the max
+//
+//                  (this is used for the mean, as `(min + max) * center)`)
+//
+//     widthMin,    range of the width of the distribution; as excitement goes,
+//     widthMax     up, the width goes towards the max
+//
+//                  values above 1.0 make a flatter curve, values below 1.0 make
+//                  a higher peak around the center, defaults to 1.0 for both
+//
+//                  (this is used for the sigma, as `3.0/width`)
+
 
 // time it takes to move the head to follow the eyes
-V.SlidingDuration("GazeDuration"),
+V.Duration("GazeDuration"),
 
-// time to wait before picking the next target (seconds)
-V.Float("GazeRandomIntervalMinimum"),
-V.Float("GazeRandomIntervalMaximum"),
+// time to wait before picking the next target
+V.Duration("GazeRandomInterval"),
 
 // time it takes to move the head when looking at an emergency
-V.Float("EmergencyGazeDuration"),
+V.Duration("EmergencyGazeDuration"),
 
 
 // Avoidance

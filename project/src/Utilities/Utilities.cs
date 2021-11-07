@@ -178,7 +178,8 @@ namespace Cue
 			return RandomFloat(p.first, p.second);
 		}
 
-		public static float RandomGaussian(float first, float last)
+		public static float RandomNormal(
+			float first, float last, float center = 0.5f, float width = 1.0f)
 		{
 			float u, v, S;
 			int tries = 0;
@@ -200,8 +201,8 @@ namespace Cue
 
 			// Normal Distribution centered between the min and max value
 			// and clamped following the "three-sigma rule"
-			float mean = (first + last) / 2.0f;
-			float sigma = (last - mean) / 3.0f;
+			float mean = (first + last) * center;
+			float sigma = (last - mean) / (3.0f / width);
 			return Clamp(std * sigma + mean, first, last);
 		}
 

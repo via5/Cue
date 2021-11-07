@@ -31,9 +31,9 @@ public class V
 		return new V(name, "value", true, forced);
 	}
 
-	public static V SlidingDuration(string name)
+	public static V Duration(string name)
 	{
-		return new V(name, "slidingDuration");
+		return new V(name, "duration");
 	}
 
 	public static V Bool(string name)
@@ -61,15 +61,15 @@ public class V
 public string Generate(V[] vars, string name, string file, bool generateEmpty = true)
 {
 	var values = new List<V>();
-	var slidingDurations = new List<V>();
+	var durations = new List<V>();
 	var bools = new List<V>();
 	var floats = new List<V>();
 	var strings = new List<V>();
 
 	foreach (var v in vars)
 	{
-		if (v.type == "slidingDuration")
-			slidingDurations.Add(v);
+		if (v.type == "duration")
+			durations.Add(v);
 		else if (v.type == "bool")
 			bools.Add(v);
 		else if (v.type == "float")
@@ -83,14 +83,14 @@ public string Generate(V[] vars, string name, string file, bool generateEmpty = 
 	}
 
 	return Generate3(
-		values.ToArray(), slidingDurations.ToArray(), bools.ToArray(),
+		values.ToArray(), durations.ToArray(), bools.ToArray(),
 		floats.ToArray(), strings.ToArray(),
 		name, file, generateEmpty);
 }
 
 public string Generate3(
 	V[] values,
-	V[] slidingDurations, V[] bools, V[] floats,
+	V[] durations, V[] bools, V[] floats,
 	V[] strings, string name, string file, bool generateEmpty)
 {
 	string defs = "";
@@ -105,13 +105,13 @@ public string Generate3(
 		++sectionCount;
 	}
 
-	if (slidingDurations.Length > 0 || generateEmpty)
+	if (durations.Length > 0 || generateEmpty)
 	{
 		defs +=
-			$"		// sliding durations\r\n" +
-			MakeEnum(slidingDurations, "SlidingDurationCount");
+			$"		// durations\r\n" +
+			MakeEnum(durations, "DurationCount");
 
-		names += MakeNames(slidingDurations, "sliding duration", allNames);
+		names += MakeNames(durations, "duration", allNames);
 		++sectionCount;
 	}
 

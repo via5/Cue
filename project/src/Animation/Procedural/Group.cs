@@ -111,7 +111,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var s = new ConcurrentTargetGroup(
-				Name, new Duration(delay_), new Duration(maxDuration_),
+				Name, delay_.Clone(), maxDuration_.Clone(),
 				forever_, Sync.Clone());
 
 			s.CopyFrom(this);
@@ -286,7 +286,7 @@ namespace Cue.Proc
 		public override ITarget Clone()
 		{
 			var s = new SequentialTargetGroup(
-				Name, new Duration(delay_), Sync.Clone());
+				Name, delay_.Clone(), Sync.Clone());
 
 			foreach (var t in targets_)
 			{

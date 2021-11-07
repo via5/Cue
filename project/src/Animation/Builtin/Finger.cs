@@ -22,11 +22,11 @@
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
 				new SlidingDurationSync(
-					new SlidingDuration(
+					new Duration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),
-					new SlidingDuration(
+					new Duration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),

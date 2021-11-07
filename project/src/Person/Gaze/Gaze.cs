@@ -41,6 +41,8 @@ namespace Cue
 		// whether the gazer is enabled; overriden if the head becomes busy
 		private bool gazerEnabled_ = false;
 
+		private Duration gazeDuration_ = new Duration();
+
 		// index of last emergency event, if any
 		private int lastEmergency_ = -1;
 		private bool gazerEnabledBeforeEmergency_ = false;
@@ -76,6 +78,8 @@ namespace Cue
 			targets_.Init();
 			picker_.SetTargets(targets_.All);
 			events_ = BasicGazeEvent.All(person_);
+			gazeDuration_.CopyParametersFrom(
+				person_.Personality.GetDuration(PS.GazeDuration));
 		}
 
 		public GazeTargetPicker Picker
@@ -107,6 +111,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			gazeDuration_.Update(s);
+
 			if (forceLook_ != ForceLooks.None)
 			{
 				Clear();
@@ -156,7 +162,7 @@ namespace Cue
 
 						// restore gazer state
 						gazerEnabled_ = gazerEnabledBeforeEmergency_;
-						gazer_.Duration = person_.Personality.GazeDuration;
+						gazer_.Duration = gazeDuration_.Current;
 
 						// force a next target
 						//
@@ -173,7 +179,9 @@ namespace Cue
 					{
 						UpdateTargets();
 						picker_.NextTarget();
-						gazer_.Duration = person_.Personality.GazeDuration;
+						gazer_.Duration = gazeDuration_.Current;
+						gazeDuration_.CopyParametersFrom(
+							person_.Personality.GetDuration(PS.GazeDuration));
 					}
 				}
 				else if (lastEmergency_ != emergency)

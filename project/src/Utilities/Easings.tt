@@ -109,6 +109,7 @@ namespace Cue
 
 	public interface IEasing
 	{
+		int GetIndex();
 		string GetDisplayName();
 		string GetShortName();
 		IEasing Clone(int cloneFlags = 0);
@@ -118,6 +119,7 @@ namespace Cue
 
 	public abstract class BasicEasing : IEasing
 	{
+		public abstract int GetIndex();
 		public abstract string GetDisplayName();
 		public abstract string GetShortName();
 		public abstract float Magnitude(float f);
@@ -141,6 +143,7 @@ namespace Cue
 	}
 
 <#
+int index = 1;
 foreach (var e in easings)
 {
 	var className = ClassName(e.Item1);
@@ -160,6 +163,11 @@ foreach (var e in easings)
 		public static string ShortName
 		{
 			get { return "<#= shortName #>"; }
+		}
+
+		public override int GetIndex()
+		{
+			return <#= index #>;
 		}
 
 		public override string GetDisplayName()
@@ -183,6 +191,8 @@ foreach (var e in easings)
 		}
 	}
 <#
+
+	++index;
 }
 #>
 }

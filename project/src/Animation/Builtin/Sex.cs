@@ -39,11 +39,11 @@ namespace Cue.Proc
 			: base(name)
 		{
 			RootGroup.Sync = new SlidingDurationSync(
-				new SlidingDuration(
+				new Duration(
 					durationMin_, durationMax_,
 					durationInterval_, durationInterval_,
 					durationWin_, new CubicOutEasing()),
-				new SlidingDuration(
+				new Duration(
 					durationMin_, durationMax_,
 					durationInterval_, durationInterval_,
 					durationWin_, new CubicOutEasing()),

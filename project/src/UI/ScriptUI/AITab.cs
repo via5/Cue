@@ -235,12 +235,12 @@ namespace Cue
 
 			var items = new List<string>();
 
-			for (int i = 0; i < v.Values.GetSlidingDurationCount(); ++i)
+			for (int i = 0; i < v.Values.GetDurationCount(); ++i)
 			{
 				items.Add(
-					v.Values.GetSlidingDurationName(i).PadRight(longest) +
+					v.Values.GetDurationName(i).PadRight(longest) +
 					"   " +
-					v.GetSlidingDuration(i).ToString());
+					v.GetDuration(i).ToString());
 			}
 
 			for (int i = 0; i < v.Values.GetBoolCount(); ++i)
@@ -399,7 +399,7 @@ namespace Cue
 			gazerType_.Text = $"{g.Gazer.Name}";
 			gazerEnabled_.Text = $"{g.Gazer.Enabled}";
 			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
-			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}s";
+			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}";
 			debug_.Text = g.DebugString();
 
 			if (g.Picker.HasTarget)
@@ -416,7 +416,9 @@ namespace Cue
 			}
 
 			avoid_.Text = g.Picker.AvoidString;
-			next_.Text = $"{g.Picker.TimeBeforeNext:0.00}s";
+			next_.Text =
+				$"{g.Picker.NextInterval.Remaining:0.0} " +
+				$"({g.Picker.NextInterval.Minimum:0.0}-{g.Picker.NextInterval.Maximum:0.0})";
 
 		}
 

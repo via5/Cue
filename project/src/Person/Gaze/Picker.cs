@@ -108,9 +108,9 @@ namespace Cue
 			get { return (CurrentTarget != null); }
 		}
 
-		public float TimeBeforeNext
+		public Duration NextInterval
 		{
-			get { return delay_.Remaining; }
+			get { return delay_; }
 		}
 
 		public Box CurrentTargetAABox
@@ -262,7 +262,9 @@ namespace Cue
 
 		public void NextTarget()
 		{
-			delay_.SetRange(person_.Personality.LookAtRandomInterval);
+			delay_.CopyParametersFrom(
+				person_.Personality.GetDuration(PS.GazeRandomInterval));
+
 			lastString_.Length = 0;
 
 			float total = 0;
