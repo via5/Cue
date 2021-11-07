@@ -23,7 +23,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -42,7 +42,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -61,7 +61,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -80,7 +80,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -101,7 +101,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -120,7 +120,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -139,7 +139,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -158,7 +158,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],
@@ -179,7 +179,7 @@
 					},
 					"sync":
 					{
-						"type": "sliding",
+						"type": "duration",
 						"fwdDuration": [1, 6],
 						"bwdDuration": [1, 6],
 						"fwdDelay": [0, 6],

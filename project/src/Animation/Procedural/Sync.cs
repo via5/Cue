@@ -55,11 +55,8 @@ namespace Cue.Proc
 			var type = o["type"].Value;
 			switch (type)
 			{
-				//case "duration":
-				//	return DurationSync.Create(o);
-
-				case "sliding":
-					return SlidingDurationSync.Create(o);
+				case "duration":
+					return DurationSync.Create(o);
 
 				case "nosync":
 					return NoSync.Create(o);
@@ -357,7 +354,7 @@ namespace Cue.Proc
 
 
 
-	class SlidingDurationSync : BasicSync
+	class DurationSync : BasicSync
 	{
 		public const int NoFlags = 0x00;
 		public const int Loop = 0x01;
@@ -374,7 +371,7 @@ namespace Cue.Proc
 		private bool stopping_ = false;
 		private float stoppingElapsed_ = 0;
 
-		public SlidingDurationSync(
+		public DurationSync(
 			Duration fwdDuration, Duration bwdDuration,
 			Duration fwdDelay, Duration bwdDelay, int flags)
 		{
@@ -385,7 +382,7 @@ namespace Cue.Proc
 			flags_ = flags;
 		}
 
-		public new static SlidingDurationSync Create(JSONClass o)
+		public new static DurationSync Create(JSONClass o)
 		{
 			Duration fwd, bwd;
 
@@ -411,12 +408,12 @@ namespace Cue.Proc
 			if (o["resetBetween"].AsBool)
 				flags |= ResetBetween;
 
-			return new SlidingDurationSync(fwd, bwd, fwdD, bwdD, flags);
+			return new DurationSync(fwd, bwd, fwdD, bwdD, flags);
 		}
 
 		public override ISync Clone()
 		{
-			return new SlidingDurationSync(
+			return new DurationSync(
 				fwdDuration_.Clone(),
 				bwdDuration_?.Clone(),
 				fwdDelay_.Clone(),

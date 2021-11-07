@@ -38,7 +38,7 @@ namespace Cue.Proc
 		protected ThrustProcAnimation(string name)
 			: base(name)
 		{
-			RootGroup.Sync = new SlidingDurationSync(
+			RootGroup.Sync = new DurationSync(
 				new Duration(
 					durationMin_, durationMax_,
 					durationInterval_, durationInterval_,
@@ -48,7 +48,7 @@ namespace Cue.Proc
 					durationInterval_, durationInterval_,
 					durationWin_, new CubicOutEasing()),
 				new Duration(0, 0), new Duration(0, 0),
-				SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween);
+				DurationSync.Loop | DurationSync.ResetBetween);
 
 
 			RootGroup.AddTarget(new Force(

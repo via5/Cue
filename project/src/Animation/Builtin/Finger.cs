@@ -21,7 +21,7 @@
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
-				new SlidingDurationSync(
+				new DurationSync(
 					new Duration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
@@ -31,7 +31,7 @@
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),
 					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.ResetBetween));
+					DurationSync.Loop | DurationSync.ResetBetween));
 
 			g.AddTarget(new Force(
 				Force.RelativeTorque, bodyPart,

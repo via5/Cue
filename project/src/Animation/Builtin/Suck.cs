@@ -12,7 +12,7 @@
 		{
 			var g = new ConcurrentTargetGroup(
 				"g", new Duration(), new Duration(), true,
-				new SlidingDurationSync(
+				new DurationSync(
 					new Duration(
 						durationMin_, durationMax_,
 						durationInterval_, durationInterval_,
@@ -22,7 +22,7 @@
 						durationInterval_, durationInterval_,
 						durationWin_, new CubicOutEasing()),
 					new Duration(0, 0), new Duration(0, 0),
-					SlidingDurationSync.Loop | SlidingDurationSync.StartFast));
+					DurationSync.Loop | DurationSync.StartFast));
 
 			g.AddTarget(new MorphTarget(
 				BP.Lips, "Lips Pucker",

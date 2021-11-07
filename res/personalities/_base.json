@@ -192,18 +192,23 @@
 
 	"gazeDuration":
 	{
-		"min": 0.8,
-		"max": 0.2,
-		"nextMinTime": 0,
-		"nextMaxTime": 0,
-		"window": 0.3,
-		"windowEasing": "cubicin"
+		"range":
+		{
+			"min": 0.8,
+			"max": 0.2,
+			"window": 0.3,
+			"windowEasing": "cubicin"
+		}
 	},
 
 	"gazeRandomInterval":
 	{
-		"min": 1,
-		"max": 10,
+		"range":
+		{
+			"min": 1,
+			"max": 10
+		},
+
 		"rng":
 		{
 			"type": "normal",
