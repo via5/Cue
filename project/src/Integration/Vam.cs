@@ -35,7 +35,10 @@ namespace Cue
 		private VamEyesBehaviour eyesImpl_ = null;
 		private Vector3 pos_ = Vector3.Zero;
 		private float minDistance_ = 0.5f;
-		private bool update_ = false;
+		private bool updatePosition_ = false;
+
+		private bool saccade_ = true;
+		private Duration saccadeDuration_ = null;
 
 		public VamEyes(Person p)
 		{
@@ -57,12 +60,35 @@ namespace Cue
 
 				eyesImpl_ = eyes_.gameObject.AddComponent<VamEyesBehaviour>();
 			}
+
+			ResetSaccade();
+
+			person_.PersonalityChanged += OnPersonalityChanged;
 		}
 
 		public bool Blink
 		{
 			get { return blink_.Value; }
 			set { blink_.Value = value; }
+		}
+
+		public bool Saccade
+		{
+			get
+			{
+				return saccade_;
+			}
+
+			set
+			{
+				if (saccade_ != value)
+				{
+					if (!value)
+						ResetSaccade();
+
+					saccade_ = value;
+				}
+			}
 		}
 
 		public Vector3 TargetPosition
@@ -80,20 +106,52 @@ namespace Cue
 		{
 			pos_ = p;
 			lookMode_.Value = "Target";
-			update_ = true;
+			updatePosition_ = true;
 			eyesImpl_?.SetPosition(p);
 		}
 
 		public void LookAtNothing()
 		{
 			lookMode_.Value = "None";
-			update_ = false;
+			updatePosition_ = false;
 		}
 
 		public void Update(float s)
 		{
-			if (update_)
+			if (updatePosition_)
 				eyesImpl_?.SetPosition(AdjustedPosition());
+
+			if (saccade_)
+				UpdateSaccade(s);
+		}
+
+		private void ResetSaccade()
+		{
+			leftRightAngle_.Value = leftRightAngle_.DefaultValue;
+			upDownAngle_.Value = upDownAngle_.DefaultValue;
+		}
+
+		private void UpdateSaccade(float s)
+		{
+			if (saccadeDuration_ == null)
+				OnPersonalityChanged();
+
+			saccadeDuration_.Update(s, person_.Mood.GazeEnergy);
+
+			if (saccadeDuration_.Finished)
+			{
+				float range = person_.Personality.Get(PS.GazeSaccadeMovementRange);
+
+				leftRightAngle_.Value = U.RandomFloat(-range, +range);
+				upDownAngle_.Value = U.RandomFloat(-range, +range);
+			}
+		}
+
+		private void OnPersonalityChanged()
+		{
+			Saccade = person_.Personality.GetBool(PS.GazeSaccade);
+			saccadeDuration_ = person_.Personality.GetDuration(
+				PS.GazeSaccadeInterval);
 		}
 
 		private Vector3 AdjustedPosition()
@@ -118,7 +176,7 @@ namespace Cue
 		{
 			string s = $"vam: blink={blink_} mode={lookMode_} ";
 
-			if (update_)
+			if (updatePosition_)
 				s += $"pos={pos_}";
 			else
 				s += $"pos=N/A";

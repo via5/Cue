@@ -218,6 +218,20 @@
 		}
 	},
 
+	"gazeSaccade": true,
+
+	"gazeSaccadeInterval":
+	{
+		"range":
+		{
+			"min": 3,
+			"max": 0.2,
+			"window": 2
+		}
+	},
+
+	"gazeSaccadeMovementRange": 4,
+
 	"emergencyGazeDuration": 0.2,
 
 	"maxExcitementForAvoid": 0,

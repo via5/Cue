@@ -75,6 +75,7 @@ namespace Cue
 	interface IEyes
 	{
 		bool Blink { get; set; }
+		bool Saccade { get; set; }
 		Vector3 TargetPosition { get; }
 
 		void LookAt(Vector3 p);

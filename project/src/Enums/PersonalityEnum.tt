@@ -51,14 +51,7 @@
 //     something characters should be looking at immediately, such as another
 //     character orgasming or the player's eyes when grabbing the head
 //
-
-var vars = new V[]
-{
-
-// Gaze
-// ====
-// Controls what characters are looking at.
-
+//
 // Durations
 // ---------
 // These are configurable durations that can have their min/max change
@@ -123,6 +116,13 @@ var vars = new V[]
 //                  (this is used for the sigma, as `3.0/width`)
 
 
+var vars = new V[]
+{
+
+// Gaze
+// ====
+// Controls what characters are looking at.
+
 // time it takes to move the head to follow the eyes
 V.Duration("GazeDuration"),
 
@@ -131,6 +131,17 @@ V.Duration("GazeRandomInterval"),
 
 // time it takes to move the head when looking at an emergency
 V.Duration("EmergencyGazeDuration"),
+
+
+// whether saccades are enabled
+V.Bool("GazeSaccade"),
+
+// time between saccades
+V.Duration("GazeSaccadeInterval"),
+
+// saccade movement range; a random value between [-this, +this] is picked for
+// both horizontal and vertical offsets
+V.Float("GazeSaccadeMovementRange"),
 
 
 // Avoidance
