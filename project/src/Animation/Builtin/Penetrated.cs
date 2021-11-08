@@ -86,10 +86,10 @@
 
 			c.lookUpChance = 0.75f;
 			c.postReactionChance = 0.75f;
-			c.reactionTimeRange = new Pair<float, float>(0.2f, 1);
-			c.reactionHoldTimeRange = new Pair<float, float>(0.1f, 2);
-			c.postReactionTimeRange = new Pair<float, float>(0.5f, 1.5f);
-			c.postReactionHoldTimeRange = new Pair<float, float>(0, 1);
+			c.reactionTimeRange = new Pair<float, float>(0.5f, 1.5f);
+			c.reactionHoldTimeRange = new Pair<float, float>(0.5f, 3);
+			c.postReactionTimeRange = new Pair<float, float>(0.5f, 2);
+			c.postReactionHoldTimeRange = new Pair<float, float>(0.5f, 2);
 
 			return c;
 		}
