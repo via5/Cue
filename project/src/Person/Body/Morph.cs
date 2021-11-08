@@ -39,20 +39,21 @@ namespace Cue
 			get { return m_; }
 		}
 
-		private void SetValue(float value)
+		private void SetValue(float originalValue)
 		{
 			if (m_ == null)
 				return;
 
-			float use = Math.Abs(value - m_.DefaultValue);
+			float use = Math.Abs(originalValue - m_.DefaultValue);
 			float available = person_.Body.UseMorphs(bodyParts_, use);
 
-			if (value < 0)
-				value = -available;
+			float fixedValue;
+			if (originalValue < m_.DefaultValue)
+				fixedValue = m_.DefaultValue  - available;
 			else
-				value = available;
+				fixedValue = m_.DefaultValue + available;
 
-			m_.Value = value;
+			m_.Value = fixedValue;
 		}
 
 		public float DefaultValue

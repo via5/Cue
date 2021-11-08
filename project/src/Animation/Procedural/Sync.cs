@@ -371,6 +371,7 @@ namespace Cue.Proc
 		private bool stopping_ = false;
 		private float stoppingElapsed_ = 0;
 		private float energy_ = 0;
+		private bool needsRestart_ = false;
 
 		public DurationSync(
 			Duration fwdDuration, Duration bwdDuration,
@@ -417,8 +418,8 @@ namespace Cue.Proc
 			return new DurationSync(
 				fwdDuration_.Clone(),
 				bwdDuration_?.Clone(),
-				fwdDelay_.Clone(),
-				bwdDelay_.Clone(),
+				fwdDelay_?.Clone(),
+				bwdDelay_?.Clone(),
 				flags_);
 		}
 
@@ -500,6 +501,7 @@ namespace Cue.Proc
 			bwdDuration_?.Reset();
 			fwdDelay_?.Reset();
 			bwdDelay_?.Reset();
+			needsRestart_ = false;
 		}
 
 		public override void RequestStop()
@@ -545,19 +547,26 @@ namespace Cue.Proc
 				$"sliding\n" +
 				$"fdur={fwdDuration_?.ToLiveString()}\n" +
 				$"bdur={bwdDuration_?.ToLiveString()}\n" +
-				$"fdel={fwdDelay_?.ToLiveString()} bdel={bwdDelay_?.ToLiveString()}\n" +
+				$"fdel={fwdDelay_?.ToLiveString()}\n" +
+				$"bdel={bwdDelay_?.ToLiveString()}\n" +
 				$"p={CurrentDuration()?.Progress:0.00} mag={Magnitude:0.00}\n" +
 				$"state={State} finished={Finished} stopping={stopping_} stopelapsed={stoppingElapsed_:0.00}";
 		}
 
 		private int DoForwards(float s)
 		{
+			if (needsRestart_)
+			{
+				fwdDuration_.Restart();
+				needsRestart_ = false;
+			}
+
 			fwdDuration_.Update(s, energy_);
 
 			if (fwdDuration_.Finished)
 			{
 				if (bwdDuration_ == null)
-					fwdDuration_.Restart();
+					needsRestart_ = true;
 
 				if (fwdDelay_?.Enabled ?? false)
 				{

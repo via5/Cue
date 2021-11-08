@@ -223,7 +223,7 @@ namespace Cue.Proc
 		public override string ToDetailedString()
 		{
 			return
-				$"{this}, {targets_.Count} targets indelay={inDelay_} " +
+				$"{this} indelay={inDelay_} " +
 				$"done={allDone_} forever={forever_} maxD={maxDuration_.Enabled}";
 		}
 	}
@@ -387,12 +387,19 @@ namespace Cue.Proc
 
 	class RootTargetGroup : ConcurrentTargetGroup
 	{
+		private BasicProcAnimation anim_ = null;
 		private Person energySource_ = null;
 		private ulong key_ = BodyPartLock.NoKey;
 
 		public RootTargetGroup(ISync sync = null)
 			: base("root", sync ?? new NoSync())
 		{
+		}
+
+		public BasicProcAnimation ParentAnimation
+		{
+			get { return anim_; }
+			set { anim_ = value; }
 		}
 
 		public override ITarget Clone()

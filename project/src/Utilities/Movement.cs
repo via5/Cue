@@ -169,7 +169,7 @@ namespace Cue
 		{
 			return
 				$"{m_}\n" +
-				$"/ws={windowSize_:0.00},f={f_:0.00}," +
+				$"ws={windowSize_:0.00},f={f_:0.00}," +
 				$"e={windowEasing_?.GetShortName()}\n" +
 				$"range={min_}/{max_}";
 		}
@@ -333,7 +333,8 @@ namespace Cue
 		{
 			return
 				$"min={min_} max={max_}\n" +
-				$"last={last_} current={current_} next={nextElapsed_:0.00}/{next_:0.00}";
+				$"last={last_} current={current_}\n" +
+				$"next={nextElapsed_:0.00}/{next_:0.00}";
 		}
 	}
 }

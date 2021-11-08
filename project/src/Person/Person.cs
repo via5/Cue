@@ -42,6 +42,8 @@ namespace Cue
 		private ISpeaker speech_;
 		private IClothing clothing_;
 
+		private bool hasBody_ = false;
+
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
 			: base(objectIndex, atom)
@@ -65,14 +67,14 @@ namespace Cue
 			clothing_ = Integration.CreateClothing(this);
 
 			Atom.SetDefaultControls("init");
-
-			Cue.LogError(Personality.GetDuration(PS.GazeRandomInterval).ToDetailedString());
 		}
 
 		public void Init()
 		{
 			Body.Init();
 			gaze_.Init();
+
+			hasBody_ = body_.Exists;
 
 			if (IsPlayer)
 				AI.EventsEnabled = false;
@@ -192,34 +194,38 @@ namespace Cue
 		{
 			base.FixedUpdate(s);
 
-			body_.ResetMorphLimits();
-			animator_.FixedUpdate(s);
-			ai_.FixedUpdate(s);
-			expression_.FixedUpdate(s);
-		}
+			if (hasBody_)
+			{
+				body_.ResetMorphLimits();
+				animator_.FixedUpdate(s);
+			}
 
-		private void UpdateGaze(float s)
-		{
-			if (!IsPlayer)
-				gaze_.Update(s);
+			ai_.FixedUpdate(s);
+
+			if (hasBody_)
+				expression_.FixedUpdate(s);
 		}
 
 		public override void Update(float s)
 		{
 			base.Update(s);
 
-			I.Start(I.UpdatePersonAnimator);
+			if (hasBody_)
 			{
-				animator_.Update(s);
-			}
-			I.End();
+				I.Start(I.UpdatePersonAnimator);
+				{
+					animator_.Update(s);
+				}
+				I.End();
 
 
-			I.Start(I.UpdatePersonGaze);
-			{
-				UpdateGaze(s);
+				I.Start(I.UpdatePersonGaze);
+				{
+					if (!IsPlayer)
+						gaze_.Update(s);
+				}
+				I.End();
 			}
-			I.End();
 
 
 			if (!IsPlayer)

@@ -19,7 +19,6 @@ namespace Cue.Proc
 		private string morphId_;
 		private float min_, max_, mid_;
 		private Morph morph_ = null;
-		private bool autoSet_ = true;
 
 		private float r_ = 0;
 		private float mag_ = 0;
@@ -65,13 +64,11 @@ namespace Cue.Proc
 				if (!float.TryParse(o["max"], out max))
 					throw new LoadFailed("max is not a number");
 
-				var duration = Duration.FromJSON(o, "duration");
-				var delay = Duration.FromJSON(o, "delay");
-
-				var sync = new DurationSync(
-					duration.Clone(), duration.Clone(),
-					delay.Clone(), delay.Clone(),
-					DurationSync.Loop);
+				ISync sync = null;
+				if (o.HasKey("sync"))
+					sync = BasicSync.Create(o["sync"].AsObject);
+				else
+					sync = new ParentTargetSync();
 
 				return new MorphTarget(bodyPart, id, min, max, sync);
 			}
@@ -113,12 +110,6 @@ namespace Cue.Proc
 		{
 			get { return intensity_; }
 			set { intensity_ = value; }
-		}
-
-		public bool AutoSet
-		{
-			get { return autoSet_; }
-			set { autoSet_ = value; }
 		}
 
 		protected override void DoStart(Person p, AnimationContext cx)
@@ -201,8 +192,7 @@ namespace Cue.Proc
 				}
 			}
 
-			if (autoSet_)
-				Set(s, null);
+			Set(s, null);
 		}
 
 		private float Mid()
@@ -213,7 +203,7 @@ namespace Cue.Proc
 			return morph_.DefaultValue;
 		}
 
-		public void Set(float s, float[] remaining)
+		private void Set(float s, float[] remaining)
 		{
 			closeToMid_ = false;
 			if (morph_ == null)
@@ -243,7 +233,6 @@ namespace Cue.Proc
 			if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
 				morph_.Value = v;
 
-
 			d = Math.Abs(d);
 
 			if (d < 0.01f)
@@ -272,10 +261,6 @@ namespace Cue.Proc
 
 			if (limitHit_ && timeActive_ >= 10)
 			{
-				//Cue.LogVerbose(
-				//	$"{person_.ID} {morphId_}: active for {timeActive_:0.00}, " +
-				//	$"too long, forcing to 0");
-
 				// force a reset to allow other morphs to take over the prio
 				r_ = mid_;
 				timeActive_ = 0;
@@ -308,7 +293,7 @@ namespace Cue.Proc
 				$"morph {morphId_} ({BP.ToString(bodyPartType_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
-				$"intensity={intensity_} limitHit={limitHit_} autoset={autoSet_} lv={limitedValue_}\n" +
+				$"intensity={intensity_} limitHit={limitHit_} lv={limitedValue_}\n" +
 				$"morph={morph_}";
 		}
 	}

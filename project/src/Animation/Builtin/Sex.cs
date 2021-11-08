@@ -84,6 +84,27 @@ namespace Cue.Proc
 					durationInterval_, durationInterval_,
 					new Vector3(0, 0, 0), new LinearEasing()),
 				new ParentTargetSync()));
+
+
+			RootGroup.AddTarget(new Force(
+				Force.RelativeForce, BP.Chest,
+				new SlidingMovement(
+					new Vector3(0, 0, -300),
+					new Vector3(0, 0, 300)),
+				new DurationSync(
+					new Duration(0.5f, 3), null,
+					new Duration(0, 3), null,
+					DurationSync.Loop)));
+
+			RootGroup.AddTarget(new Force(
+				Force.RelativeForce, BP.Head,
+				new SlidingMovement(
+					new Vector3(0, 0, -100),
+					new Vector3(0, 0, 100)),
+				new DurationSync(
+					new Duration(0.5f, 3), null,
+					new Duration(0, 3), null,
+					DurationSync.Loop)));
 		}
 
 		protected Person Receiver
@@ -105,16 +126,10 @@ namespace Cue.Proc
 			if (hipForce_ == null)
 			{
 				Cue.LogError("hipForce not found");
-				return false;
 			}
-
-			hipForce_.BeforeNextAction = () => UpdateForce(hipForce_);
-
-			hipTorque_ = FindTarget("hipTorque") as Force;
-			if (hipTorque_ == null)
+			else
 			{
-				Cue.LogError("hipTorque not found");
-				return false;
+				hipForce_.BeforeNextAction = () => UpdateForce(hipForce_);
 			}
 
 			if (!DoStart())
@@ -122,10 +137,18 @@ namespace Cue.Proc
 
 			config_ = GetConfig();
 
-			hipTorque_.Movement.SetRange(
-				config_.hipTorqueMin,
-				config_.hipTorqueMax,
-				config_.hipTorqueWin);
+			hipTorque_ = FindTarget("hipTorque") as Force;
+			if (hipTorque_ == null)
+			{
+				Cue.LogError("hipTorque not found");
+			}
+			else
+			{
+				hipTorque_.Movement.SetRange(
+					config_.hipTorqueMin,
+					config_.hipTorqueMax,
+					config_.hipTorqueWin);
+			}
 
 			UpdateForces(true);
 			Reset();

@@ -13,12 +13,14 @@ namespace Cue.Proc
 			: base(name)
 		{
 			root_ = new RootTargetGroup();
+			root_.ParentAnimation = this;
 		}
 
 		protected void CopyFrom(BasicProcAnimation o)
 		{
 			base.CopyFrom(o);
 			root_ = (RootTargetGroup)o.root_.Clone();
+			root_.ParentAnimation = this;
 		}
 
 		public override bool Done
