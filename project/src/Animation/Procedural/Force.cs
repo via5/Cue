@@ -123,10 +123,9 @@ namespace Cue.Proc
 
 		public override void RequestStop()
 		{
-			base.RequestStop();
-
 			movement_.SetNext(Lerped());
 			movement_.SetNext(Vector3.Zero);
+			base.RequestStop();
 		}
 
 		public override void FixedUpdate(float s)
