@@ -10,16 +10,25 @@ namespace Cue
 			public float min, max;
 			public float window;
 			public IEasing windowEasing;
+			public IRandom rng;
 
-			public Range(float min, float max, float window, IEasing windowEasing)
+			public Range(float min, float max, float window, IEasing windowEasing, IRandom rng)
 			{
 				this.min = min;
 				this.max = max;
 				this.window = window;
 				this.windowEasing = windowEasing ?? new LinearEasing();
+				this.rng = rng ?? new UniformRandom();
 
 				if (this.window == 0)
 					this.window = Math.Abs(this.max - this.min);
+			}
+
+			public string ToDetailedString()
+			{
+				return
+					$"min={min:0.00} max={max:0.00} win={window} " +
+					$"easing={windowEasing} rng={rng}";
 			}
 
 			public static Range FromJSON(string key, string rangeName, JSONClass o)
@@ -48,22 +57,27 @@ namespace Cue
 						throw new LoadFailed($"duration '{key}': range '{rangeName}' bad easing name");
 				}
 
-				return new Range(min, max, window, windowEasing);
+				IRandom rnd;
+
+				try
+				{
+					if (o.HasKey("rng"))
+						rnd = BasicRandom.FromJSON(o["rng"].AsObject);
+					else
+						rnd = new UniformRandom();
+				}
+				catch (LoadFailed e)
+				{
+					throw new LoadFailed($"duration '{key}': range '{rangeName}': {e.Message}");
+				}
+
+				return new Range(min, max, window, windowEasing, rnd);
 			}
 
 			public Range Clone()
 			{
-				return new Range(min, max, window, windowEasing.Clone());
-			}
-
-			public void CopyFrom(Range r)
-			{
-				min = r.min;
-				max = r.max;
-				window = r.window;
-
-				if (windowEasing.GetIndex() != r.windowEasing.GetIndex())
-					windowEasing = r.windowEasing.Clone();
+				return new Range(
+					min, max, window, windowEasing.Clone(), rng.Clone());
 			}
 		}
 
@@ -101,8 +115,8 @@ namespace Cue
 			float min, float max, float nextMin, float nextMax,
 			float windowSize, IEasing windowEasing)
 				: this(
-					  new Range(min, max, windowSize, windowEasing),
-					  new Range(nextMin, nextMax, 0, null))
+					  new Range(min, max, windowSize, windowEasing, null),
+					  new Range(nextMin, nextMax, 0, null, null))
 		{
 		}
 
@@ -117,12 +131,6 @@ namespace Cue
 		public Duration Clone()
 		{
 			return new Duration(fullRange_.Clone(), nextTimeRange_.Clone());
-		}
-
-		public void CopyParametersFrom(Duration d)
-		{
-			fullRange_.CopyFrom(d.fullRange_);
-			nextTimeRange_.CopyFrom(d.nextTimeRange_);
 		}
 
 		public static Duration FromJSON(
@@ -174,7 +182,7 @@ namespace Cue
 			if (oo.HasKey("nextTimeRange"))
 				nextTimeRange = Range.FromJSON(key, "nextTime", oo["nextTime"].AsObject);
 			else
-				nextTimeRange = new Range(0, 0, 0, null);
+				nextTimeRange = new Range(0, 0, 0, null, null);
 
 			return new Duration(fullRange, nextTimeRange);
 		}
@@ -229,11 +237,6 @@ namespace Cue
 			}
 		}
 
-		public float Magnitude
-		{
-			set { magnitude_ = value; }
-		}
-
 		public float Current
 		{
 			get { return current_; }
@@ -260,8 +263,10 @@ namespace Cue
 			finished_ = false;
 		}
 
-		public void Update(float s)
+		public void Update(float s, float magnitude)
 		{
+			magnitude_ = magnitude;
+
 			if (finished_)
 			{
 				finished_ = false;
@@ -319,9 +324,10 @@ namespace Cue
 			if (forceFast)
 				current_ = min_;
 			else
-				current_ = U.RandomFloat(min_, max_);
+				current_ = fullRange_.rng.RandomFloat(min_, max_, magnitude_);
 
-			nextTime_ = U.RandomFloat(nextTimeRange_.min, nextTimeRange_.max);
+			nextTime_ = nextTimeRange_.rng.RandomFloat(
+				nextTimeRange_.min, nextTimeRange_.max, magnitude_);
 		}
 
 		public string ToLiveString()
@@ -335,6 +341,15 @@ namespace Cue
 		public override string ToString()
 		{
 			return $"[{min_:0.##},{max_:0.##}]/ws={fullRange_.window:0.00}";
+		}
+
+		public string ToDetailedString()
+		{
+			return
+				$"fullRange: {fullRange_.ToDetailedString()}\n" +
+				$"nextTimeRange: {nextTimeRange_.ToDetailedString()}\n" +
+				$"mag={magnitude_:0.00} min={min_:0.00} max={max_:0.00} finished={finished_}\n" +
+				$"elapsed={elapsed_:0.00}/{current_:0.00} next={nextTime_:0.00}/{nextElapsed_:0.00}";
 		}
 	}
 }

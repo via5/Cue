@@ -22,16 +22,19 @@ namespace Cue
 
 	class Person : BasicObject
 	{
+		public delegate void Callback();
+		public event Callback PersonalityChanged;
+
 		private readonly int personIndex_;
 
 		private PersonOptions options_;
+		private Personality personality_;
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
 		private Gaze gaze_;
 		private Mood mood_;
 		private IAI ai_ = null;
-		private Personality personality_;
 		private ExpressionManager expression_;
 
 		private IBreather breathing_;
@@ -46,6 +49,7 @@ namespace Cue
 			personIndex_ = personIndex;
 
 			options_ = new PersonOptions(this);
+			personality_ = Resources.Personalities.Clone(Resources.DefaultPersonality, this);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
@@ -53,7 +57,6 @@ namespace Cue
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
 
-			Personality = Resources.Personalities.Clone(Resources.DefaultPersonality, this);
 			expression_ = new ExpressionManager(this);
 
 			breathing_ = Integration.CreateBreather(this);
@@ -62,6 +65,8 @@ namespace Cue
 			clothing_ = Integration.CreateClothing(this);
 
 			Atom.SetDefaultControls("init");
+
+			Cue.LogError(Personality.GetDuration(PS.GazeRandomInterval).ToDetailedString());
 		}
 
 		public void Init()
@@ -150,8 +155,16 @@ namespace Cue
 
 		public Personality Personality
 		{
-			get { return personality_; }
-			set { personality_ = value; }
+			get
+			{
+				return personality_;
+			}
+
+			set
+			{
+				personality_ = value;
+				PersonalityChanged?.Invoke();
+			}
 		}
 
 		public ExpressionManager Expression

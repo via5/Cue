@@ -111,7 +111,7 @@ namespace Cue
 			if (!enabled_)
 				return;
 
-			wait_.Update(s);
+			wait_.Update(s, 0);
 
 			if (wait_.Finished && CanRun())
 			{

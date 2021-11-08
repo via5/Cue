@@ -61,7 +61,7 @@ var vars = new V[]
 
 // Durations
 // ---------
-// These are highly configurable durations that can have their min/max change
+// These are configurable durations that can have their min/max change
 // depending on excitement.
 //
 // A duration can be a simple array with two floats: the minimum and maximum in
@@ -71,8 +71,12 @@ var vars = new V[]
 // A duration can also have a sliding window, which is a smaller window within
 // the min and max that moves towards the max as excitement goes up.
 //
-// For these sliding durations, the duration is an object with the following
-// values:
+// For these sliding durations, the duration is an object with two subobjects:
+// "range" and "nextTimeRange". Both are Range objects, described below. The
+// "range" object is for the duration itself, the "nextTimeRange" object is for
+// the interval after which the current range is regenerated.
+//
+// A Range object has these values:
 //
 //     min, max      minimum and maximum durations (seconds, required)
 //
@@ -83,16 +87,22 @@ var vars = new V[]
 //     windowEasing  the easing used for the sliding window (optional, default
 //                   "linear", see Easings.cs)
 //
-//     nextMinTime,  range of the random interval until a new duration is
-//     nextMaxTime   randomly generated (optional, seconds, defaults to
-//                   regenerating each time the duration finishes)
-//
 //     rng           random generation algorithm (optional, defaults to
-//                   "uniform")
+//                   "uniform"); see below
 //
 // As an example, a sliding duration with a min/max of [1.0, 2.0] and a window
 // of 0.2 would generate durations between [1.0, 1.2] if excitement is 0.0 and
-// between [1.8, 2.0] if excitement is 1.0
+// between [1.8, 2.0] if excitement is 1.0. The json would be like this:
+//
+//     "someDuration":
+//     {
+//         "range":
+//         {
+//             "min": 1.0,
+//             "max": 2.0,
+//             "window": 0.2
+//         }
+//     }
 //
 // The 'rng' value can be a string "uniform" or "normal". It can also be an
 // object with a 'type' value with the same strings. If the 'type' is "normal",

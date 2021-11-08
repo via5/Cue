@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -131,6 +132,138 @@ namespace Cue
 				hash = 31 * hash + arg3.GetHashCode();
 				return 31 * hash + arg4.GetHashCode();
 			}
+		}
+	}
+
+
+	interface IRandom
+	{
+		IRandom Clone();
+		float RandomFloat(float first, float last, float magnitude);
+	}
+
+
+	abstract class BasicRandom : IRandom
+	{
+		public static IRandom FromJSON(JSONClass o)
+		{
+			if (!o.HasKey("type"))
+				throw new LoadFailed("missing 'type'");
+
+			var type = o["type"].Value;
+
+			if (type == "uniform")
+				return UniformRandom.FromJSON(o);
+			else if (type == "normal")
+				return NormalRandom.FromJSON(o);
+			else
+				throw new LoadFailed($"unknown type '{type}'");
+		}
+
+		public abstract IRandom Clone();
+		public abstract float RandomFloat(float first, float last, float magnitude);
+	}
+
+
+	class UniformRandom : BasicRandom
+	{
+		public new static UniformRandom FromJSON(JSONClass o)
+		{
+			return new UniformRandom();
+		}
+
+		public override IRandom Clone()
+		{
+			return new UniformRandom();
+		}
+
+		public override float RandomFloat(float first, float last, float magnitude)
+		{
+			return U.RandomFloat(first, last);
+		}
+
+		public override string ToString()
+		{
+			return "uniform";
+		}
+	}
+
+
+	class NormalRandom : BasicRandom
+	{
+		private readonly float centerMin_;
+		private readonly float centerMax_;
+		private readonly float widthMin_;
+		private readonly float widthMax_;
+
+		public NormalRandom(float centerMin, float centerMax, float widthMin, float widthMax)
+		{
+			centerMin_ = centerMin;
+			centerMax_ = centerMax;
+			widthMin_ = widthMin;
+			widthMax_ = widthMax;
+		}
+
+		public override string ToString()
+		{
+			return $"normal:c=({centerMin_},{centerMax_}),w=({widthMin_},{widthMax_})";
+		}
+
+		public new static NormalRandom FromJSON(JSONClass o)
+		{
+			float centerMin = 0.5f;
+			if (o.HasKey("centerMin"))
+			{
+				if (!float.TryParse(o["centerMin"].Value, out centerMin))
+					throw new LoadFailed($"centerMin is not a float");
+			}
+
+			float centerMax = 0.5f;
+			if (o.HasKey("centerMax"))
+			{
+				if (!float.TryParse(o["centerMax"].Value, out centerMax))
+					throw new LoadFailed($"centerMax is not a float");
+			}
+
+			float widthMin = 1.0f;
+			if (o.HasKey("widthMin"))
+			{
+				if (!float.TryParse(o["widthMin"].Value, out widthMin))
+					throw new LoadFailed($"widthMin is not a float");
+			}
+
+			float widthMax = 1.0f;
+			if (o.HasKey("widthMax"))
+			{
+				if (!float.TryParse(o["widthMax"].Value, out widthMax))
+					throw new LoadFailed($"widthMax is not a float");
+			}
+
+			return new NormalRandom(centerMin, centerMax, widthMin, widthMax);
+		}
+
+		public override IRandom Clone()
+		{
+			return new NormalRandom(centerMin_, centerMax_, widthMin_, widthMax_);
+		}
+
+		public override float RandomFloat(float first, float last, float magnitude)
+		{
+			float center;
+
+			if (centerMin_ < centerMax_)
+				center = centerMin_ + (centerMax_ - centerMin_) * magnitude;
+			else
+				center = centerMax_ + (centerMin_ - centerMax_) * magnitude;
+
+			float width;
+
+			if (widthMin_ < widthMax_)
+				width = widthMin_ + (widthMax_ - widthMin_) * magnitude;
+			else
+				width = widthMax_ + (widthMin_ - widthMax_) * magnitude;
+
+			return U.RandomNormal(first, last, center, width);
 		}
 	}
 

@@ -205,17 +205,16 @@
 	{
 		"range":
 		{
-			"min": 1,
-			"max": 10
-		},
-
-		"rng":
-		{
-			"type": "normal",
-			"centerMin": 0.5,
-			"centerMax": 0.4,
-			"widthMin": 1.0,
-			"widthMax": 0.75
+			"min": 0.5,
+			"max": 10,
+			"rng":
+			{
+				"type": "normal",
+				"centerMin": 0.5,
+				"centerMax": 0.4,
+				"widthMin": 1.0,
+				"widthMax": 0.75
+			}
 		}
 	},
 

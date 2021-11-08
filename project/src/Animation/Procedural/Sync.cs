@@ -370,6 +370,7 @@ namespace Cue.Proc
 		private int flags_;
 		private bool stopping_ = false;
 		private float stoppingElapsed_ = 0;
+		private float energy_ = 0;
 
 		public DurationSync(
 			Duration fwdDuration, Duration bwdDuration,
@@ -434,14 +435,7 @@ namespace Cue.Proc
 
 		public override float Energy
 		{
-			set
-			{
-				if (fwdDuration_ != null)
-					fwdDuration_.Magnitude = value;
-
-				if (bwdDuration_ != null)
-					bwdDuration_.Magnitude = value;
-			}
+			set { energy_ = value; }
 		}
 
 		public override float Magnitude
@@ -558,7 +552,7 @@ namespace Cue.Proc
 
 		private int DoForwards(float s)
 		{
-			fwdDuration_.Update(s);
+			fwdDuration_.Update(s, energy_);
 
 			if (fwdDuration_.Finished)
 			{
@@ -591,7 +585,7 @@ namespace Cue.Proc
 
 		private int DoForwardsDelay(float s)
 		{
-			fwdDelay_.Update(s);
+			fwdDelay_.Update(s, energy_);
 
 			if (fwdDelay_.Finished)
 			{
@@ -619,7 +613,7 @@ namespace Cue.Proc
 		{
 			var d = CurrentDuration();
 
-			d.Update(s);
+			d.Update(s, energy_);
 
 			if (d.Finished)
 			{
@@ -645,7 +639,7 @@ namespace Cue.Proc
 
 		private int DoBackwardsDelay(float s)
 		{
-			bwdDelay_.Update(s);
+			bwdDelay_.Update(s, energy_);
 
 			if (bwdDelay_.Finished)
 			{

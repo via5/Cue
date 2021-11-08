@@ -50,6 +50,9 @@ namespace Cue
 
 			for (int i = 0; i < fs.Length; ++i)
 				frustums_[i] = new FrustumInfo(p, fs[i]);
+
+			OnPersonalityChanged();
+			person_.PersonalityChanged += OnPersonalityChanged;
 		}
 
 		public BodyPart ReferencePart
@@ -184,7 +187,7 @@ namespace Cue
 
 			UpdateAvoidBoxes();
 			UpdateFrustums();
-			delay_.Update(s);
+			delay_.Update(s, 0);
 
 			if (delay_.Finished || !HasTarget)
 			{
@@ -262,9 +265,6 @@ namespace Cue
 
 		public void NextTarget()
 		{
-			delay_.CopyParametersFrom(
-				person_.Personality.GetDuration(PS.GazeRandomInterval));
-
 			lastString_.Length = 0;
 
 			float total = 0;
@@ -324,6 +324,11 @@ namespace Cue
 			}
 
 			lastString_.Append(" NONE");
+		}
+
+		private void OnPersonalityChanged()
+		{
+			delay_ = person_.Personality.GetDuration(PS.GazeRandomInterval).Clone();
 		}
 
 		private void UpdateFrustums()

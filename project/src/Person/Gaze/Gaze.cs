@@ -61,6 +61,8 @@ namespace Cue
 			targets_ = new GazeTargets(p);
 			picker_ = new GazeTargetPicker(p);
 			render_ = new GazeRender(p);
+
+			person_.PersonalityChanged += OnPersonalityChanged;
 		}
 
 		public GazeRender Render
@@ -78,8 +80,7 @@ namespace Cue
 			targets_.Init();
 			picker_.SetTargets(targets_.All);
 			events_ = BasicGazeEvent.All(person_);
-			gazeDuration_.CopyParametersFrom(
-				person_.Personality.GetDuration(PS.GazeDuration));
+			gazeDuration_ = person_.Personality.GetDuration(PS.GazeDuration).Clone();
 		}
 
 		public GazeTargetPicker Picker
@@ -111,7 +112,7 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			gazeDuration_.Update(s);
+			gazeDuration_.Update(s, person_.Mood.GazeEnergy);
 
 			if (forceLook_ != ForceLooks.None)
 			{
@@ -180,8 +181,6 @@ namespace Cue
 						UpdateTargets();
 						picker_.NextTarget();
 						gazer_.Duration = gazeDuration_.Current;
-						gazeDuration_.CopyParametersFrom(
-							person_.Personality.GetDuration(PS.GazeDuration));
 					}
 				}
 				else if (lastEmergency_ != emergency)
@@ -216,6 +215,11 @@ namespace Cue
 			}
 
 			render_?.Update(s);
+		}
+
+		private void OnPersonalityChanged()
+		{
+			gazeDuration_ = person_.Personality.GetDuration(PS.GazeDuration).Clone();
 		}
 
 		public void Clear()

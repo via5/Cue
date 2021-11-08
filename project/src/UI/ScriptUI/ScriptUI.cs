@@ -10,7 +10,6 @@ namespace Cue
 		private VUI.Panel panel_ = new VUI.Panel();
 		private MiscTab misc_;
 		private SubTabs tabs_ = new SubTabs();
-		private string initialSelection_ = "";
 
 		public ScriptUI()
 		{
@@ -30,9 +29,6 @@ namespace Cue
 
 			panel_.Layout = new VUI.BorderLayout();
 			panel_.Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
-
-			if (initialSelection_ != "")
-				tabs_.SetSelectionFromString(initialSelection_);
 		}
 
 		public JSONClass ToJSON()
@@ -47,7 +43,7 @@ namespace Cue
 		public void Load(JSONClass o)
 		{
 			if (o != null && o.HasKey("tab"))
-				initialSelection_ = o["tab"].Value;
+				tabs_.SetSelectionFromString(o["tab"].Value);
 		}
 
 		public void Update(float s)

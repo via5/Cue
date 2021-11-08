@@ -196,6 +196,7 @@ namespace Cue
 			Add(list_, VUI.BorderLayout.Center);
 
 			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 		}
 
 		protected override void DoUpdate(float s)

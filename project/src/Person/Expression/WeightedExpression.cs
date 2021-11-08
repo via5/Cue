@@ -116,7 +116,7 @@
 
 				case HoldState:
 				{
-					holdTime_.Update(s);
+					holdTime_.Update(s, 0);
 					if (holdTime_.Finished)
 						state_ = FinishedState;
 

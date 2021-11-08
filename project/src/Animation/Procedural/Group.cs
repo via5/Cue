@@ -177,7 +177,7 @@ namespace Cue.Proc
 
 			if (inDelay_)
 			{
-				delay_.Update(s);
+				delay_.Update(s, MovementEnergy);
 				if (delay_.Finished)
 					inDelay_ = false;
 			}
@@ -199,7 +199,7 @@ namespace Cue.Proc
 
 				if (maxDuration_.Enabled)
 				{
-					maxDuration_.Update(s);
+					maxDuration_.Update(s, MovementEnergy);
 					if (maxDuration_.Finished)
 						allDone_ = true;
 				}
@@ -348,7 +348,7 @@ namespace Cue.Proc
 
 			if (inDelay_)
 			{
-				delay_.Update(s);
+				delay_.Update(s, 0);
 				if (delay_.Finished)
 					inDelay_ = false;
 			}

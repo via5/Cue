@@ -131,6 +131,11 @@ namespace Cue
 		{
 			return (float)(0);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class ConstantOneEasing : BasicEasing
@@ -168,6 +173,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(1);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -207,6 +217,11 @@ namespace Cue
 		{
 			return (float)(x);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class SinusoidalEasing : BasicEasing
@@ -244,6 +259,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(-(Cos(PI * x) - 1) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -283,6 +303,11 @@ namespace Cue
 		{
 			return (float)(x * x);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class QuadOutEasing : BasicEasing
@@ -320,6 +345,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(1 - (1 - x) * (1 - x));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -359,6 +389,11 @@ namespace Cue
 		{
 			return (float)(x < 0.5 ? 2 * x * x : 1 - Pow(-2 * x + 2, 2) / 2);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class CubicInEasing : BasicEasing
@@ -396,6 +431,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x * x * x);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -435,6 +475,11 @@ namespace Cue
 		{
 			return (float)(1 - Pow(1 - x, 3));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class CubicInOutEasing : BasicEasing
@@ -472,6 +517,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x < 0.5 ? 4 * x * x * x : 1 - Pow(-2 * x + 2, 3) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -511,6 +561,11 @@ namespace Cue
 		{
 			return (float)(x * x * x * x);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class QuartOutEasing : BasicEasing
@@ -548,6 +603,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(1 - Pow(1 - x, 4));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -587,6 +647,11 @@ namespace Cue
 		{
 			return (float)(x < 0.5 ? 8 * x * x * x * x : 1 - Pow(-2 * x + 2, 4) / 2);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class QuintInEasing : BasicEasing
@@ -624,6 +689,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x * x * x * x * x);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -663,6 +733,11 @@ namespace Cue
 		{
 			return (float)(1 - Pow(1 - x, 5));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class QuintInOutEasing : BasicEasing
@@ -700,6 +775,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x < 0.5 ? 16 * x * x * x * x * x : 1 - Pow(-2 * x + 2, 5) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -739,6 +819,11 @@ namespace Cue
 		{
 			return (float)(1 - Cos((x * PI) / 2));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class SineOutEasing : BasicEasing
@@ -776,6 +861,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(Sin((x * PI) / 2));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -815,6 +905,11 @@ namespace Cue
 		{
 			return (float)(-(Cos(PI * x) - 1) / 2);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class ExpoInEasing : BasicEasing
@@ -852,6 +947,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x == 0 ? 0 : Pow(2, 10 * x - 10));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -891,6 +991,11 @@ namespace Cue
 		{
 			return (float)(x == 1 ? 1 : 1 - Pow(2, -10 * x));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class ExpoInOutEasing : BasicEasing
@@ -928,6 +1033,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x == 0 ? 0 : x == 1 ? 1 : x < 0.5 ? Pow(2, 20 * x - 10) / 2 : (2 - Pow(2, -20 * x + 10)) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -967,6 +1077,11 @@ namespace Cue
 		{
 			return (float)(1 - Sqrt(1 - Pow(x, 2)));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class CircOutEasing : BasicEasing
@@ -1004,6 +1119,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(Sqrt(1 - Pow(x - 1, 2)));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -1043,6 +1163,11 @@ namespace Cue
 		{
 			return (float)(x < 0.5 ? (1 - Sqrt(1 - Pow(2 * x, 2))) / 2 : (Sqrt(1 - Pow(-2 * x + 2, 2)) + 1) / 2);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class BackInEasing : BasicEasing
@@ -1080,6 +1205,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(2.70158f * x * x * x - 1.70158f * x * x);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -1119,6 +1249,11 @@ namespace Cue
 		{
 			return (float)(1 + 2.70158f * Pow(x - 1, 3) + 1.70158f * Pow(x - 1, 2));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class BackInOutEasing : BasicEasing
@@ -1156,6 +1291,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x < 0.5 ? (Pow(2 * x, 2) * ((2.5949f + 1) * 2 * x - 2.5949f)) / 2 : (Pow(2 * x - 2, 2) * ((2.5949f + 1) * (x * 2 - 2) + 2.5949f) + 2) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -1195,6 +1335,11 @@ namespace Cue
 		{
 			return (float)(x == 0 ? 0 : x == 1 ? 1 : -Pow(2, 10 * x - 10) * Sin((x * 10 - 10.75) * 2.0944f));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class ElasticOutEasing : BasicEasing
@@ -1232,6 +1377,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x == 0 ? 0 : x == 1 ? 1 : Pow(2, -10 * x) * Sin((x * 10 - 0.75) * 2.0944f) + 1);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -1271,6 +1421,11 @@ namespace Cue
 		{
 			return (float)(x == 0 ? 0 : x == 1 ? 1 : x < 0.5 ? -(Pow(2, 20 * x - 10) * Sin((20 * x - 11.125) * 1.3963f)) / 2 : (Pow(2, -20 * x + 10) * Sin((20 * x - 11.125) * 1.3963f)) / 2 + 1);
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class BounceInEasing : BasicEasing
@@ -1308,6 +1463,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(1 - BounceOut(1 - x));
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 
@@ -1347,6 +1507,11 @@ namespace Cue
 		{
 			return (float)(BounceOut(x));
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 
 	public class BounceInOutEasing : BasicEasing
@@ -1384,6 +1549,11 @@ namespace Cue
 		public override float Magnitude(float x)
 		{
 			return (float)(x < 0.5 ? (1 - BounceOut(1 - 2 * x)) / 2 : (1 + BounceOut(2 * x - 1)) / 2);
+		}
+
+		public override string ToString()
+		{
+			return ShortName;
 		}
 	}
 }
