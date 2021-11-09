@@ -76,7 +76,22 @@
 			if (elapsedNotPenetrated_ > Cooldown)
 			{
 				elapsedNotPenetrated_ = 0;
-				person_.Animator.PlayType(Animations.Penetrated);
+
+				// disabled for now
+				//
+				// this used to play the penetrated animation, but it's not
+				// great:
+				//
+				//  - alignment is manual, so the player is not typically
+				//    looking at the character during penetration, making the
+				//    animation useless
+				//
+				//  - it can trigger at weird moments, it's difficult to
+				//    determine the player's intention
+				//
+				// the animation has been moved to the Thrust event instead
+
+				//person_.Animator.PlayType(Animations.Penetrated);
 			}
 		}
 

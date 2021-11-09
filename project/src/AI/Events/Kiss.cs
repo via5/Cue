@@ -231,12 +231,12 @@ namespace Cue
 
 		private bool StartedFrom(Person initiator)
 		{
-			// animations will always fail on player
-			if (!person_.IsPlayer)
+			if (!person_.Animator.PlayType(
+				Animations.Kiss, new AnimationContext(
+					initiator, locks_[0].Key)))
 			{
-				if (!person_.Animator.PlayType(
-					Animations.Kiss, new AnimationContext(
-						initiator, locks_[0].Key)))
+				// animations can fail on player
+				if (!person_.IsPlayer)
 				{
 					lastResult_ = $"kiss animation failed to start";
 					return false;
@@ -289,10 +289,10 @@ namespace Cue
 
 		private bool MustStop()
 		{
-			// animations are never playing on player
-			if (!person_.IsPlayer)
+			if (!person_.Animator.IsPlayingType(Animations.Kiss))
 			{
-				if (!person_.Animator.IsPlayingType(Animations.Kiss))
+				// not all animations can run on player
+				if (!person_.IsPlayer)
 				{
 					log_.Info("must stop: animation is not playing");
 					return true;

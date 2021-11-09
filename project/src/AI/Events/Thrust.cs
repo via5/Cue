@@ -97,6 +97,11 @@
 						receiver_.PersonIndex,
 						receiver_.Body.GenitalsBodyPart);
 
+				// play the penetrated animation now, don't bother if it can't
+				// start; see also Penetrated.OnIn()
+				person_.Animator.PlayType(Animations.Penetrated);
+				receiver_.Animator.PlayType(Animations.Penetrated);
+
 				anim_ = Animations.Sex;
 			}
 			else

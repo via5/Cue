@@ -268,12 +268,6 @@ namespace Cue
 
 		public bool Play(Animation a, AnimationContext cx = null)
 		{
-			if (person_.IsPlayer)
-			{
-				log_.Verbose("not playing " + a.ToString() + " on player");
-				return false;
-			}
-
 			log_.Info("playing " + a.ToString());
 			int flags = 0;
 
