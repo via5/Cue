@@ -54,6 +54,7 @@ namespace Cue
 			{
 				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
 				tools.Add(new VUI.ToolButton("Reload", OnReload));
+				tools.Add(new VUI.ToolButton("ui", Cue.Instance.OpenScriptUI));
 				forceExcitement_ = tools.Add(new VUI.CheckBox("Ex", OnForceExcitement));
 				excitement_ = tools.Add(new VUI.FloatTextSlider(OnExcitement));
 				tools.Add(new VUI.ToolButton("test", OnTest));

@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="src\AI\AI.cs" />
     <Compile Include="src\AI\Events.cs" />
+    <Compile Include="src\AI\Events\Grab.cs" />
     <Compile Include="src\AI\Events\Hand.cs" />
     <Compile Include="src\AI\Events\HandLinker.cs" />
     <Compile Include="src\AI\Events\Kiss.cs" />

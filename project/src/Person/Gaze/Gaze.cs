@@ -165,14 +165,6 @@ namespace Cue
 						gazerEnabled_ = gazerEnabledBeforeEmergency_;
 						gazer_.Duration = gazeDuration_.Current;
 
-						// force a next target
-						//
-						// todo: this is necessary to handle cases where characters
-						// need to immediately look away, but a better system based
-						// on the type of emergency and personality would be better
-						UpdateTargets();
-						picker_.ForceNextTarget(false);
-
 						lastEmergency_ = -1;
 					}
 

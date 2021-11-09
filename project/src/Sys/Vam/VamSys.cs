@@ -452,6 +452,24 @@ namespace Cue.Sys.Vam
 			if (pui == null)
 				return;
 
+			var atomUI = script_.containingAtom.UITransform
+				?.GetComponentInChildren<AtomUI>();
+
+			if (atomUI == null)
+			{
+				SuperController.LogError("no AtomUI");
+				return;
+			}
+
+			var tabs = atomUI.GetComponentInChildren<UITabSelector>();
+			if (tabs == null)
+			{
+				SuperController.LogError("no UITabSelector");
+				return;
+			}
+
+			tabs.SetActiveTab("Plugins");
+
 			var scui = pui.GetComponentInChildren<MVRScriptControllerUI>();
 			if (scui == null)
 			{

@@ -536,6 +536,14 @@ namespace Cue
 			}
 		}
 
+		public bool CanApplyForce()
+		{
+			if (part_ == null)
+				return true;
+			else
+				return part_.CanApplyForce();
+		}
+
 		public void AddRelativeForce(Vector3 v)
 		{
 			part_?.AddRelativeForce(v);

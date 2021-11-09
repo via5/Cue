@@ -109,9 +109,15 @@ namespace Cue.Sys.Vam
 				var sys = Cue.Instance.VamSys;
 
 				if (o.Type == BP.LeftHand)
+				{
 					return sys.IsVRHand(Controller.linkToRB?.transform, BP.LeftHand);
+				}
 				else if (o.Type == BP.RightHand)
-					return sys.IsVRHand(Controller.linkToRB?.transform, BP.RightHand);
+				{
+					return
+						sys.IsVRHand(Controller.linkToRB?.transform, BP.RightHand) ||
+						(Controller.linkToRB == SuperController.singleton.mouseGrab.GetComponent<Rigidbody>());
+				}
 			}
 
 			return false;
@@ -315,6 +321,11 @@ namespace Cue.Sys.Vam
 		protected virtual Collider[] GetColliders()
 		{
 			return null;
+		}
+
+		public virtual bool CanApplyForce()
+		{
+			return true;
 		}
 
 		public virtual void AddRelativeForce(Vector3 v)

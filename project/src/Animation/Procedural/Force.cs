@@ -128,11 +128,25 @@ namespace Cue.Proc
 			base.RequestStop();
 		}
 
+		private bool CanAppyForce()
+		{
+			if (bp_ != null)
+			{
+				if (bp_.LockedFor(BodyPartLock.Move, LockKey))
+					return false;
+
+				if (!bp_.CanApplyForce())
+					return false;
+			}
+
+			return true;
+		}
+
 		public override void FixedUpdate(float s)
 		{
 			oneFrameFinished_ = false;
 
-			if (bp_ != null && bp_.LockedFor(BodyPartLock.Move, LockKey))
+			if (!CanAppyForce())
 			{
 				if (wasBusy_)
 				{

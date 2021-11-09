@@ -2,6 +2,7 @@ project\src\Cue.cs
 project\src\Main.cs
 project\src\AI\AI.cs
 project\src\AI\Events.cs
+project\src\AI\Events\Grab.cs
 project\src\AI\Events\Hand.cs
 project\src\AI\Events\HandLinker.cs
 project\src\AI\Events\Kiss.cs

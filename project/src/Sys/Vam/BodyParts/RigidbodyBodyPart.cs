@@ -85,7 +85,7 @@ namespace Cue.Sys.Vam
 			return colliders_;
 		}
 
-		private bool CanApplyForce()
+		public override bool CanApplyForce()
 		{
 			if (fc_ != null)
 			{
@@ -101,26 +101,22 @@ namespace Cue.Sys.Vam
 
 		public override void AddRelativeForce(Vector3 v)
 		{
-			if (CanApplyForce())
-				rb_.AddRelativeForce(U.ToUnity(v));
+			rb_.AddRelativeForce(U.ToUnity(v));
 		}
 
 		public override void AddRelativeTorque(Vector3 v)
 		{
-			if (CanApplyForce())
-				rb_.AddRelativeTorque(U.ToUnity(v));
+			rb_.AddRelativeTorque(U.ToUnity(v));
 		}
 
 		public override void AddForce(Vector3 v)
 		{
-			if (CanApplyForce())
-				rb_.AddForce(U.ToUnity(v));
+			rb_.AddForce(U.ToUnity(v));
 		}
 
 		public override void AddTorque(Vector3 v)
 		{
-			if (CanApplyForce())
-				rb_.AddTorque(U.ToUnity(v));
+			rb_.AddTorque(U.ToUnity(v));
 		}
 
 		public override string ToString()

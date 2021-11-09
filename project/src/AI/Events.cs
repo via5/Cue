@@ -39,7 +39,8 @@
 				new HandLinker(p),
 				new HandEvent(p),
 				new PenetratedEvent(p),
-				new SuckFingerEvent(p)
+				new SuckFingerEvent(p),
+				new GrabEvent(p)
 			};
 		}
 

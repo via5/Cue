@@ -300,6 +300,8 @@ namespace Cue.Sys
 		void LinkTo(IBodyPart other);
 		bool IsLinkedTo(IBodyPart other);
 		float DistanceToSurface(IBodyPart other, bool debug = false);
+
+		bool CanApplyForce();
 		void AddRelativeForce(Vector3 v);
 		void AddRelativeTorque(Vector3 v);
 		void AddForce(Vector3 v);
