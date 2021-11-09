@@ -5,16 +5,16 @@ namespace Cue.Sys.Vam
 {
 	class RigidbodyBodyPart : VamBodyPart
 	{
-		private Rigidbody rb_;
+		private Rigidbody[] rbs_;
 		private FreeControllerV3 fc_ = null;
 		private Collider[] colliders_;
 
 		public RigidbodyBodyPart(
-			VamAtom a, int type, Rigidbody rb, FreeControllerV3 fc,
+			VamAtom a, int type, Rigidbody[] rbs, FreeControllerV3 fc,
 			string[] colliders)
 				: base(a, type)
 		{
-			rb_ = rb;
+			rbs_ = rbs;
 			fc_ = fc;
 
 			var cs = new List<Collider>();
@@ -33,14 +33,9 @@ namespace Cue.Sys.Vam
 			colliders_ = cs.ToArray();
 		}
 
-		public override Transform Transform
-		{
-			get { return rb_.transform; }
-		}
-
 		public override Rigidbody Rigidbody
 		{
-			get { return rb_; }
+			get { return rbs_[0]; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -72,12 +67,23 @@ namespace Cue.Sys.Vam
 
 		public override Vector3 Position
 		{
-			get { return U.FromUnity(rb_.position); }
+			get { return U.FromUnity(rbs_[0].position); }
 		}
 
 		public override Quaternion Rotation
 		{
-			get { return U.FromUnity(rb_.rotation); }
+			get { return U.FromUnity(rbs_[0].rotation); }
+		}
+
+		public override bool ContainsTransform(Transform t)
+		{
+			for (int i = 0; i < rbs_.Length; ++i)
+			{
+				if (rbs_[i].transform == t)
+					return true;
+			}
+
+			return false;
 		}
 
 		protected override Collider[] GetColliders()
@@ -101,27 +107,27 @@ namespace Cue.Sys.Vam
 
 		public override void AddRelativeForce(Vector3 v)
 		{
-			rb_.AddRelativeForce(U.ToUnity(v));
+			rbs_[0].AddRelativeForce(U.ToUnity(v));
 		}
 
 		public override void AddRelativeTorque(Vector3 v)
 		{
-			rb_.AddRelativeTorque(U.ToUnity(v));
+			rbs_[0].AddRelativeTorque(U.ToUnity(v));
 		}
 
 		public override void AddForce(Vector3 v)
 		{
-			rb_.AddForce(U.ToUnity(v));
+			rbs_[0].AddForce(U.ToUnity(v));
 		}
 
 		public override void AddTorque(Vector3 v)
 		{
-			rb_.AddTorque(U.ToUnity(v));
+			rbs_[0].AddTorque(U.ToUnity(v));
 		}
 
 		public override string ToString()
 		{
-			return $"rb {rb_.name}";
+			return $"rb {rbs_[0].name}";
 		}
 	}
 }

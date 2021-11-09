@@ -44,6 +44,7 @@ namespace Cue.Sys.Vam
 	abstract class VamBasicBody : IBody
 	{
 		private VamAtom atom_;
+		private Dictionary<Transform, int> partMap_ = new Dictionary<Transform, int>();
 
 		protected VamBasicBody(VamAtom a)
 		{
@@ -64,7 +65,22 @@ namespace Cue.Sys.Vam
 		public abstract Hand GetLeftHand();
 		public abstract Hand GetRightHand();
 
-		public abstract IBodyPart BodyPartForTransform(Atom a, Transform t);
+
+		public virtual IBodyPart BodyPartForTransformCached(Transform t)
+		{
+			int bp;
+			if (partMap_.TryGetValue(t, out bp))
+				return GetBodyParts()[bp];
+
+			return null;
+		}
+
+		public abstract IBodyPart BodyPartForTransform(Transform t, Transform stop);
+
+		protected void AddBodyPartCache(Transform t, int bodyPart)
+		{
+			partMap_.Add(t, bodyPart);
+		}
 	}
 
 
@@ -76,7 +92,6 @@ namespace Cue.Sys.Vam
 		private Color initialColor_;
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
-		private Dictionary<Transform, int> partMap_ = new Dictionary<Transform, int>();
 
 		private float sweat_ = 0;
 		private IEasing sweatEasing_ = new CubicInEasing();
@@ -116,60 +131,30 @@ namespace Cue.Sys.Vam
 			return parts_[i];
 		}
 
-		public override IBodyPart BodyPartForTransform(Atom a, Transform tt)
+		public override IBodyPart BodyPartForTransform(Transform t, Transform stop)
 		{
 			// see VamSys.BodyPartForTransform()
 
-			// a cleaner way would be to add something like a
-			// ContainsTransform() on each body part and call that instead of
-			// the specific `vp.Transform == p` check below, which would handle
-			// the vr hands and dildo stuff that's manually done in the else
-			//
-			// but that would require a loop every time this is called, which
-			// can be bypassed with the `Atom == a` check at the top most of the
-			// time, basically just for the strapon check, which would affect
-			// performance (no idea by how much, this might be a non issue)
-
-			// transforms are cached in partMap_ for faster lookup
-
-			if (Atom.Atom == a)
+			var check = t;
+			while (check != null && check != stop)
 			{
-				int bp;
-				if (partMap_.TryGetValue(tt, out bp))
-					return parts_[bp];
-
-				// check this transform and all of its parents to see if they
-				// match any body part
-
-				var p = tt;
-
-				while (p != null)
+				for (int i = 0; i < parts_.Length; ++i)
 				{
-					for (int i = 0; i < parts_.Length; ++i)
+					var vp = parts_[i] as VamBodyPart;
+					if (vp == null)
+						continue;
+
+					// check this transform and all of its parents to see if they
+					// match any body part
+
+					if (vp.ContainsTransform(check))
 					{
-						var vp = (VamBodyPart)parts_[i];
-						if (vp != null && vp.Transform == p)
-						{
-							partMap_.Add(tt, i);
-							return vp;
-						}
+						AddBodyPartCache(t, i);
+						return vp;
 					}
-
-					// stop at the atom, no use going above that
-					if (p.GetComponent<Atom>() != null)
-						break;
-
-					p = p.parent;
 				}
-			}
-			else
-			{
-				// this is not even the same atom as the one this body part
-				// is for, which can happen for the dildo
 
-				var pn = GetBodyParts()[BP.Penis] as TriggerBodyPart;
-				if (pn != null && a != null && pn.Transform == a.transform)
-					return pn;
+				check = check.parent;
 			}
 
 			return null;
@@ -282,12 +267,12 @@ namespace Cue.Sys.Vam
 
 				add(BP.Hips, GetRigidbody(
 					BP.Hips, new string[] {
-					"pelvisF7/pelvisF7Joint",
-					"pelvisFL3/pelvisFL3Joint",
-					"pelvisFR3/pelvisFR3Joint",
-					"pelvisL1/pelvisL1Joint",
-					"pelvisR1/pelvisR1Joint"
-					}, "hipControl", "abdomen"));
+						"pelvisF7/pelvisF7Joint",
+						"pelvisFL3/pelvisFL3Joint",
+						"pelvisFR3/pelvisFR3Joint",
+						"pelvisL1/pelvisL1Joint",
+						"pelvisR1/pelvisR1Joint"
+					}, "hipControl", new string[] { "abdomen", "pelvis" }));
 			}
 			else
 			{
@@ -308,7 +293,7 @@ namespace Cue.Sys.Vam
 					"pelvisFR8/pelvisFR8Joint",
 					"pelvisL1/pelvisL1Joint",
 					"pelvisR1/pelvisR1Joint"
-					}, "hipControl", "abdomen"));
+					}, "hipControl", new string[] { "abdomen", "pelvis" }));
 			}
 
 			add(BP.LeftGlute, GetCollider(
@@ -605,6 +590,14 @@ namespace Cue.Sys.Vam
 				color_.Parameter.val = U.ToHSV(initialColor_);
 		}
 
+		private string MakeName(string[] namesFemale, string[] namesMale, int i)
+		{
+			if (namesMale == null)
+				return MakeName(namesFemale[i], null);
+			else
+				return MakeName(namesFemale[i], namesMale[i]);
+		}
+
 		private string MakeName(string nameFemale, string nameMale)
 		{
 			if (!Atom.IsMale)
@@ -616,6 +609,36 @@ namespace Cue.Sys.Vam
 				return nameFemale;
 			else
 				return nameMale;
+		}
+
+		private IBodyPart GetRigidbody(
+			int id, string[] colliders, string controller,
+			string[] namesFemale, string[] namesMale = null)
+		{
+			var rbs = new List<Rigidbody>();
+
+			for (int i = 0; i < namesFemale.Length; ++i)
+			{
+				string name = MakeName(namesFemale, namesMale, i);
+				if (name == "")
+					return null;
+
+				var rb = U.FindRigidbody(Atom.Atom, name);
+				if (rb == null)
+					Cue.LogError($"rb {name} not found in {Atom.ID}");
+
+				rbs.Add(rb);
+			}
+
+			FreeControllerV3 fc = null;
+			if (controller != "")
+			{
+				fc = U.FindController(Atom.Atom, controller);
+				if (fc == null)
+					Cue.LogError($"rb {rbs[0].name} has no controller {controller} in {Atom.ID}");
+			}
+
+			return new RigidbodyBodyPart(Atom, id, rbs.ToArray(), fc, colliders);
 		}
 
 		private IBodyPart GetRigidbody(
@@ -638,7 +661,7 @@ namespace Cue.Sys.Vam
 					Cue.LogError($"rb {name} has no controller {controller} in {Atom.ID}");
 			}
 
-			return new RigidbodyBodyPart(Atom, id, rb, fc, colliders);
+			return new RigidbodyBodyPart(Atom, id, new Rigidbody[] { rb }, fc, colliders);
 		}
 
 		private IBodyPart GetTrigger(

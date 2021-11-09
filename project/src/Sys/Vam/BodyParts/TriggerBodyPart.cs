@@ -103,11 +103,6 @@ namespace Cue.Sys.Vam
 				ignoreTransforms_ = list.ToArray();
 		}
 
-		public override Transform Transform
-		{
-			get { return t_; }
-		}
-
 		public override Rigidbody Rigidbody
 		{
 			get { return h_?.thisRigidbody; }
@@ -121,6 +116,11 @@ namespace Cue.Sys.Vam
 		public override bool CanTrigger
 		{
 			get { return true; }
+		}
+
+		public override bool ContainsTransform(Transform t)
+		{
+			return (t_ == t);
 		}
 
 		public override TriggerInfo[] GetTriggers()
@@ -184,8 +184,6 @@ namespace Cue.Sys.Vam
 					{
 						if (!ValidCollision(p, bp.Type))
 							continue;
-
-						//Cue.LogInfo($"{kv.Key}");
 
 						found[p.PersonIndex, bp.Type] = true;
 						triggerCache_.Add(new TriggerInfo(p.PersonIndex, bp.Type, 1.0f));

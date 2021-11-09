@@ -33,11 +33,6 @@ namespace Cue.Sys.Vam
 				Cue.LogError($"{a.ID} has no head");
 		}
 
-		public override Transform Transform
-		{
-			get { return lEye_; }
-		}
-
 		public override Rigidbody Rigidbody
 		{
 			get { return head_; }
@@ -77,6 +72,11 @@ namespace Cue.Sys.Vam
 		public override Quaternion Rotation
 		{
 			get { return ControlRotation; }
+		}
+
+		public override bool ContainsTransform(Transform t)
+		{
+			return (t == lEye_ || t == rEye_);
 		}
 
 		public override string ToString()

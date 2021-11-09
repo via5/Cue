@@ -20,11 +20,6 @@ namespace Cue.Sys.Vam
 			rb_ = closestRb;
 		}
 
-		public override Transform Transform
-		{
-			get { return c_.transform; }
-		}
-
 		public override Rigidbody Rigidbody
 		{
 			get { return rb_; }
@@ -65,6 +60,11 @@ namespace Cue.Sys.Vam
 		public override Quaternion Rotation
 		{
 			get { return ControlRotation; }
+		}
+
+		public override bool ContainsTransform(Transform t)
+		{
+			return (c_.transform == t);
 		}
 
 		protected override Collider[] GetColliders()

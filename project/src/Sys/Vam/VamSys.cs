@@ -394,18 +394,37 @@ namespace Cue.Sys.Vam
 			//   this uses the actual hands of the possessed atoms, so they
 			//   don't need special handling
 
+			var ps = Cue.Instance.ActivePersons;
 
-			// find the parent atom for this transform, can be CoreControl for
-			// some, like mouse grab, or null
-			var a = t.GetComponentInParent<Atom>();
 
-			foreach (var p in Cue.Instance.ActivePersons)
+			// start by looking for a cached value in all persons
+			for (int i = 0; i < ps.Length; ++i)
 			{
-				var bp = (p.Atom.Body as VamBasicBody).BodyPartForTransform(a, t);
+				var bp = (ps[i].Atom.Body as VamBasicBody).BodyPartForTransformCached(t);
+				if (bp != null)
+				{
+					if (ps[i].Atom is VamCameraAtom)
+						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
+					else
+						return bp;
+				}
+			}
+
+
+			// not found, do a more expensive search
+
+
+			// find the parent atom for this transform, used to stop going up
+			// the transform's parent chain
+			var stop = t.GetComponentInParent<Atom>()?.transform;
+
+			for (int i=0; i<ps.Length; ++i)
+			{
+				var bp = (ps[i].Atom.Body as VamBasicBody).BodyPartForTransform(t, stop);
 
 				if (bp != null)
 				{
-					if (p.Atom is VamCameraAtom)
+					if (ps[i].Atom is VamCameraAtom)
 						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
 					else
 						return bp;
@@ -488,6 +507,8 @@ namespace Cue.Sys.Vam
 				SuperController.LogError("openUIButton.onClick is null");
 				return;
 			}
+
+			SuperController.singleton.gameMode = SuperController.GameMode.Edit;
 
 			SuperController.singleton.SelectController(
 				script_.containingAtom.mainController);

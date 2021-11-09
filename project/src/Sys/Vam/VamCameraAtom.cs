@@ -31,6 +31,11 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
+		public override bool ContainsTransform(Transform t)
+		{
+			return false;
+		}
+
 		public override string ToString()
 		{
 			return $"camera eyes";
@@ -67,6 +72,11 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
+		public override bool ContainsTransform(Transform t)
+		{
+			return false;
+		}
+
 		public override string ToString()
 		{
 			return $"camera head";
@@ -91,7 +101,7 @@ namespace Cue.Sys.Vam
 			handOutputType_ = handOutputType;
 		}
 
-		public bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t)
 		{
 			if (t == desktopHand_)
 				return true;
@@ -112,7 +122,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public override Transform Transform
+		private Transform ActiveTransform
 		{
 			get
 			{
@@ -158,7 +168,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (Transform == null)
+				if (ActiveTransform == null)
 				{
 					return Vector3.MaxValue;
 				}
@@ -173,7 +183,7 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					return U.FromUnity(Transform.position);
+					return U.FromUnity(ActiveTransform.position);
 				}
 			}
 		}
@@ -182,18 +192,18 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				if (Transform == null)
+				if (ActiveTransform == null)
 					return Quaternion.Zero;
 				else if (!Cue.Instance.VamSys.IsVR)  // see Position
 					return Quaternion.Zero;
 				else
-					return U.FromUnity(Transform.rotation);
+					return U.FromUnity(ActiveTransform.rotation);
 			}
 		}
 
 		public override string ToString()
 		{
-			return $"cameraHand {Transform?.name}";
+			return $"cameraHand {ActiveTransform?.name}";
 		}
 	}
 
@@ -264,7 +274,7 @@ namespace Cue.Sys.Vam
 			return new Hand();
 		}
 
-		public override IBodyPart BodyPartForTransform(Atom a, Transform t)
+		public override IBodyPart BodyPartForTransform(Transform t, Transform stop)
 		{
 			// see VamSys.BodyPartForTransform()
 

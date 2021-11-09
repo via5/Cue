@@ -29,7 +29,6 @@ namespace Cue.Sys.Vam
 		public int Type { get { return type_; } }
 		public virtual bool Exists { get { return true; } }
 
-		public virtual Transform Transform { get { return null; } }
 		public virtual Rigidbody Rigidbody { get { return null; } }
 		public virtual FreeControllerV3 Controller { get { return null; } }
 
@@ -317,6 +316,8 @@ namespace Cue.Sys.Vam
 				return d;
 			}
 		}
+
+		public abstract bool ContainsTransform(Transform t);
 
 		protected virtual Collider[] GetColliders()
 		{
