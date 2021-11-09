@@ -296,12 +296,6 @@ namespace Cue
 
 		public float AvoidWeight(Person p)
 		{
-			if (!ShouldAvoid(p))
-			{
-				Cue.LogError("AvoidWeight called when ShouldAvoid is false");
-				return 0;
-			}
-
 			var ps = person_.Personality;
 
 			if (p != null && p.IsPlayer)
