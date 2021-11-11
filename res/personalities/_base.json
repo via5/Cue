@@ -251,7 +251,7 @@
 	"busyPlayerEyesWeight": 1,
 	"otherEyesExcitementWeight": 1.0,
 	"maxTirednessForRandomGaze": 0.5,
-	"otherEyesOrgasmWeight": 10,
+	"otherEyesOrgasmWeight": 20,
 
 	"blowjobEyesWeight": 0.5,
 	"blowjobGenitalsWeight": 5,

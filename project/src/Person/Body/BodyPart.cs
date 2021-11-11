@@ -358,7 +358,7 @@ namespace Cue
 			if (!Exists || !other.Exists)
 				return false;
 
-			return DistanceToSurface(other) < 0.1f;
+			return DistanceToSurface(other) <= BodyParts.CloseToDistance;
 		}
 
 		public float DistanceToSurface(BodyPart other, bool debug = false)

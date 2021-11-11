@@ -5,17 +5,16 @@ namespace Cue
 	interface IGazeEvent
 	{
 		int Check(int flags);
-		int CheckEmergency();
+		bool HasEmergency();
 	}
 
 
 	abstract class BasicGazeEvent : IGazeEvent
 	{
 		public const int Continue = 0x00;
-		public const int Exclusive = 0x01;
-		public const int NoGazer = 0x02;
-		public const int NoRandom = 0x04;
-		public const int Busy = 0x08;
+		public const int NoGazer = 0x01;
+		public const int NoRandom = 0x02;
+		public const int Busy = 0x04;
 
 		protected Person person_;
 		protected Gaze g_;
@@ -48,22 +47,19 @@ namespace Cue
 			return DoCheck(flags);
 		}
 
-		public int CheckEmergency()
-		{
-			if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
-				return Continue;
-
-			return DoCheckEmergency();
-		}
-
 		protected virtual int DoCheck(int flags)
 		{
 			return Continue;
 		}
 
-		protected virtual int DoCheckEmergency()
+		public bool HasEmergency()
 		{
-			return Continue;
+			return DoHasEmergency();
+		}
+
+		protected virtual bool DoHasEmergency()
+		{
+			return false;
 		}
 
 		public override abstract string ToString();
@@ -112,27 +108,33 @@ namespace Cue
 
 	class GazeGrabbed : BasicGazeEvent
 	{
+		private BodyPart head_;
+
 		public GazeGrabbed(Person p)
 			: base(p)
 		{
+			head_ = person_.Body.Get(BP.Head);
 		}
 
-		protected override int DoCheckEmergency()
+		protected override int DoCheck(int flags)
 		{
-			var head = person_.Body.Get(BP.Head);
-
-			if (head.GrabbedByPlayer)
+			if (head_.GrabbedByPlayer)
 			{
-				g_.Clear();
-				targets_.SetWeight(Cue.Instance.Player, BP.Eyes, 1, "head grabbed");
+				targets_.SetWeight(
+					Cue.Instance.Player, BP.Eyes,
+					GazeTargets.ExclusiveWeight, "head grabbed");
 
 				// don't disable gazer, mg won't affect the head while it's
 				// being grabbed, and it snaps the head back to its original
 				// position when it's re-enabled
-				return Exclusive;
 			}
 
 			return Continue;
+		}
+
+		protected override bool DoHasEmergency()
+		{
+			return head_.GrabbedByPlayer;
 		}
 
 		public override string ToString()
@@ -162,12 +164,17 @@ namespace Cue
 				{
 					if (g_.ShouldAvoidInsidePersonalSpace(t))
 					{
-						targets_.SetRandomWeight(1, $"kissing {t.ID}, but avoid in ps");
-						targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), $"kissing, but avoid in ps");
+						targets_.SetRandomWeight(
+							1, $"kissing {t.ID}, but avoid in ps");
+
+						targets_.SetShouldAvoid(
+							t, true, g_.AvoidWeight(t),
+							$"kissing, but avoid in ps");
 					}
 					else
 					{
-						targets_.SetWeight(t, BP.Eyes, 1, "kissing");
+						targets_.SetWeight(
+							t, BP.Eyes, GazeTargets.ExclusiveWeight, "kissing");
 					}
 
 					// don't use NoGazer:
@@ -183,8 +190,6 @@ namespace Cue
 					//    since it might take several seconds before a new
 					//    target is picked, the gazer would stay disabled and
 					//    the head would stay still for a while
-
-					return Exclusive;
 				}
 			}
 
@@ -770,6 +775,14 @@ namespace Cue
 					targets_.SetWeightIfZero(
 						p, BP.Eyes, 0, "random person, but tired");
 				}
+				else if (p.Mood.State == Mood.OrgasmState)
+				{
+					person_.Gaze.Clear();
+
+					targets_.SetWeightIfZero(
+						p, BP.Eyes,
+						ps.Get(PS.OtherEyesOrgasmWeight), "orgasming");
+				}
 				else
 				{
 					float w = 0;
@@ -799,31 +812,24 @@ namespace Cue
 			return Continue;
 		}
 
-		protected override int DoCheckEmergency()
+		protected override bool DoHasEmergency()
 		{
 			var ps = person_.Personality;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_)
+				if (p == person_ || !p.IsInteresting)
 					continue;
 
-				if (p.Mood.State == Mood.OrgasmState)
+				if (!g_.ShouldAvoid(p) &&
+					person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze) &&
+					p.Mood.State == Mood.OrgasmState)
 				{
-					if (!g_.ShouldAvoid(p))
-					{
-						person_.Gaze.Clear();
-
-						targets_.SetWeightIfZero(
-							p, BP.Eyes,
-							ps.Get(PS.OtherEyesOrgasmWeight), "orgasming");
-
-						return Exclusive;
-					}
+					return true;
 				}
 			}
 
-			return Continue;
+			return false;
 		}
 
 		public override string ToString()

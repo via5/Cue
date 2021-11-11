@@ -116,47 +116,33 @@ namespace Cue
 
 			if (forceLook_ != ForceLooks.None)
 			{
-				Clear();
-
-				switch (forceLook_)
-				{
-					case ForceLooks.Camera:
-					{
-						targets_.SetWeight(
-							Cue.Instance.FindPerson("Camera"),
-							BP.Eyes, 1, "forced");
-
-						person_.Gaze.Gazer.Enabled = true;
-						break;
-					}
-
-					case ForceLooks.Up:
-					{
-						targets_.SetAboveWeight(1, "forced");
-						person_.Gaze.Gazer.Enabled = true;
-						break;
-					}
-
-					case ForceLooks.Freeze:
-					{
-						person_.Gaze.Gazer.Enabled = false;
-						break;
-					}
-				}
-
-				picker_.ForceNextTarget(false);
+				UpdateForced(s);
 			}
 			else
 			{
-				var emergency = UpdateEmergencyTargets();
+				int emergency = CheckEmergency();
 
-				if (emergency == -1)
+				if (emergency >= 0)
 				{
-					// no emergency
+					if (lastEmergency_ != emergency)
+					{
+						// new emergency
+						person_.Log.Info(
+							$"gaze emergency: {events_[emergency]}, " +
+							$"gazer was {gazerEnabledBeforeEmergency_}");
 
+						UpdateTargets();
+						picker_.ForceNextTarget(true);
+						lastEmergency_ = emergency;
+					}
+
+					picker_.Update(s);
+				}
+				else
+				{
 					if (lastEmergency_ != -1)
 					{
-						// but one has just terminated
+						// an emergency has just terminated
 						person_.Log.Info(
 							$"gaze emergency finished: {events_[lastEmergency_]}, " +
 							$"gazer now {gazerEnabledBeforeEmergency_}");
@@ -175,38 +161,62 @@ namespace Cue
 						gazer_.Duration = gazeDuration_.Current;
 					}
 				}
-				else if (lastEmergency_ != emergency)
-				{
-					// new emergency
-					person_.Log.Info(
-						$"gaze emergency: {events_[emergency]}, " +
-						$"gazer was {gazerEnabledBeforeEmergency_}");
-
-					picker_.ForceNextTarget(true);
-					picker_.Update(s);
-
-					lastEmergency_ = emergency;
-				}
 			}
 
 			if (forceLook_ != ForceLooks.Freeze)
-			{
-				if (picker_.HasTarget)
-				{
-					if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
-						gazer_.Enabled = false;
-					else
-						gazer_.Enabled = gazerEnabled_;
-
-					gazer_.Variance = picker_.CurrentTarget.Variance;
-				}
-
-				eyes_.LookAt(picker_.Position);
-				eyes_.Update(s);
-				gazer_.Update(s);
-			}
+				UpdatePostTarget(s);
 
 			render_?.Update(s);
+		}
+
+		private void UpdateForced(float s)
+		{
+			Clear();
+
+			switch (forceLook_)
+			{
+				case ForceLooks.Camera:
+				{
+					targets_.SetWeight(
+						Cue.Instance.FindPerson("Camera"),
+						BP.Eyes, 1, "forced");
+
+					person_.Gaze.Gazer.Enabled = true;
+					break;
+				}
+
+				case ForceLooks.Up:
+				{
+					targets_.SetAboveWeight(1, "forced");
+					person_.Gaze.Gazer.Enabled = true;
+					break;
+				}
+
+				case ForceLooks.Freeze:
+				{
+					person_.Gaze.Gazer.Enabled = false;
+					break;
+				}
+			}
+
+			picker_.ForceNextTarget(false);
+		}
+
+		private void UpdatePostTarget(float s)
+		{
+			if (picker_.HasTarget)
+			{
+				if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
+					gazer_.Enabled = false;
+				else
+					gazer_.Enabled = gazerEnabled_;
+
+				gazer_.Variance = picker_.CurrentTarget.Variance;
+			}
+
+			eyes_.LookAt(picker_.Position);
+			eyes_.Update(s);
+			gazer_.Update(s);
 		}
 
 		private void OnPersonalityChanged()
@@ -226,26 +236,12 @@ namespace Cue
 				$"e={gazerEnabled_},ebe={gazerEnabledBeforeEmergency_}";
 		}
 
-		private int UpdateEmergencyTargets()
+		private int CheckEmergency()
 		{
 			for (int i = 0; i < events_.Length; ++i)
 			{
-				var e = events_[i];
-				int flags = e.CheckEmergency();
-
-				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
-				{
-					if (i != lastEmergency_)
-					{
-						// new emergency
-						gazerEnabledBeforeEmergency_ = gazer_.Enabled;
-						gazerEnabled_ = !Bits.IsSet(flags, BasicGazeEvent.NoGazer);
-						gazer_.Duration = person_.Personality.Get(PS.EmergencyGazeDuration);
-						lastString_.Append("emergency ");
-					}
-
+				if (events_[i].HasEmergency())
 					return i;
-				}
 			}
 
 			return -1;
@@ -267,14 +263,8 @@ namespace Cue
 
 				if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
 					gazerEnabled_ = false;
-
-				if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
-					break;
 			}
 
-
-			if (Bits.IsSet(flags, BasicGazeEvent.Exclusive))
-				lastString_.Append("exclusive ");
 
 			if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
 				lastString_.Append("nogazer ");

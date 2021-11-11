@@ -6,6 +6,8 @@ namespace Cue
 	//
 	class GazeTargets
 	{
+		public const float ExclusiveWeight = -1;
+
 		struct AvoidInfo
 		{
 			private bool avoid_;
@@ -52,12 +54,6 @@ namespace Cue
 		// per body part, per person
 		private LookatPart[,] bodyParts_ = new LookatPart[0, 0];
 
-		// used mostly when moving
-		private LookatFront front_;
-
-		// no-op
-		private LookatNothing nothing_;
-
 		// picks a random point
 		private LookatRandomPoint random_;
 
@@ -77,8 +73,6 @@ namespace Cue
 		public GazeTargets(Person p)
 		{
 			person_ = p;
-			front_ = new LookatFront(p);
-			nothing_ = new LookatNothing(p);
 			random_ = new LookatRandomPoint(p);
 			above_ = new LookatAbove(p);
 		}
@@ -98,7 +92,7 @@ namespace Cue
 				var p = Cue.Instance.AllPersons[pi];
 
 				for (int bi = 0; bi < BP.Count; ++bi)
-					bodyParts_[pi, bi] = new LookatPart(p, bi);
+					bodyParts_[pi, bi] = new LookatPart(person_, p.Body.Get(bi));
 			}
 
 			objects_ = new LookatObject[Cue.Instance.Everything.Count];
@@ -118,8 +112,6 @@ namespace Cue
 		{
 			var all = new IGazeLookat[
 				bodyParts_.Length +
-				1 +  // front
-				1 +  // nothing
 				1 +  // random
 				1 +  // above
 				objects_.Length];
@@ -132,8 +124,6 @@ namespace Cue
 					all[i++] = bodyParts_[pi, bi];
 			}
 
-			all[i++] = front_;
-			all[i++] = nothing_;
 			all[i++] = random_;
 			all[i++] = above_;
 
@@ -206,11 +196,6 @@ namespace Cue
 			Cue.LogError($"SetObjectWeight: {o} not in list");
 		}
 
-		public void SetFrontWeight(float w, string why)
-		{
-			front_.SetWeight(w, why);
-		}
-
 		public List<string> GetAllAvoidForDebug()
 		{
 			var list = new List<string>();
@@ -244,22 +229,25 @@ namespace Cue
 		Vector3 Position { get; }
 		float Variance { get; }
 
+		bool Reluctant { get; }
+
 		void Clear();
 		void SetWeight(float f, string why);
 		void SetFailed(string why);
 		bool Next();
-		void Update(Person p, float s);
 	}
 
 
 	abstract class BasicGazeLookat : IGazeLookat
 	{
+		protected Person person_;
 		private float weight_ = 0;
 		private string why_, failure_;
 		private bool set_ = false;
 
-		protected BasicGazeLookat()
+		protected BasicGazeLookat(Person p)
 		{
+			person_ = p;
 		}
 
 		public float Weight
@@ -320,70 +308,21 @@ namespace Cue
 			get { return 1; }
 		}
 
+		public virtual bool Reluctant
+		{
+			get
+			{
+				if (Object != null)
+					return person_.Gaze.Targets.ShouldAvoid(Object);
+
+				return false;
+			}
+		}
+
 		public virtual bool Next()
 		{
 			// no-op
 			return true;
-		}
-
-		public virtual void Update(Person p, float s)
-		{
-			// no-op
-		}
-	}
-
-
-	class LookatNothing : BasicGazeLookat
-	{
-		public LookatNothing(Person p)
-		{
-		}
-
-		public override bool HasPosition
-		{
-			get { return false; }
-		}
-
-		public override Vector3 Position
-		{
-			get { return Vector3.Zero; }
-		}
-
-		public override string ToString()
-		{
-			return "look at nothing";
-		}
-	}
-
-
-	class LookatFront : BasicGazeLookat
-	{
-		private Vector3 pos_ = Vector3.Zero;
-
-		public LookatFront(Person p)
-		{
-		}
-
-		public override bool HasPosition
-		{
-			get { return true; }
-		}
-
-		public override Vector3 Position
-		{
-			get { return pos_; }
-		}
-
-		public override void Update(Person p, float s)
-		{
-			pos_ =
-				p.Body.Get(BP.Eyes).Position +
-				p.Rotation.Rotate(new Vector3(0, 0, 1));
-		}
-
-		public override string ToString()
-		{
-			return "look in front";
 		}
 	}
 
@@ -393,6 +332,7 @@ namespace Cue
 		private IObject object_ = null;
 
 		public LookatObject(Person p, IObject o)
+			: base(p)
 		{
 			object_ = o;
 		}
@@ -424,18 +364,17 @@ namespace Cue
 
 	class LookatPart : BasicGazeLookat
 	{
-		private Person person_;
 		private BodyPart bodyPart_;
 
-		public LookatPart(Person p, int bodyPart)
+		public LookatPart(Person p, BodyPart bp)
+			: base(p)
 		{
-			person_ = p;
-			bodyPart_ = p.Body.Get(bodyPart);
+			bodyPart_ = bp;
 		}
 
 		public override IObject Object
 		{
-			get { return person_; }
+			get { return bodyPart_.Person; }
 		}
 
 		public BodyPart BodyPart
@@ -458,18 +397,16 @@ namespace Cue
 			if (bodyPart_ == null)
 				return "bodypart (null)";
 			else
-				return $"bodypart {bodyPart_.Person.ID} {bodyPart_}";
+				return $"bodypart {bodyPart_.Person.ID}.{bodyPart_.Name}";
 		}
 	}
 
 
 	class LookatAbove : BasicGazeLookat
 	{
-		private Person person_;
-
 		public LookatAbove(Person p)
+			: base(p)
 		{
-			person_ = p;
 		}
 
 		public override bool HasPosition
@@ -507,6 +444,7 @@ namespace Cue
 		private Vector3 pos_;
 
 		public LookatPosition(Person p, Vector3 pos)
+			: base(p)
 		{
 			pos_ = pos;
 		}
@@ -530,13 +468,12 @@ namespace Cue
 
 	class LookatRandomPoint : BasicGazeLookat
 	{
-		private Person person_;
 		private Vector3 pos_ = Vector3.Zero;
 		private bool hasPos_ = false;
 
 		public LookatRandomPoint(Person p)
+			: base(p)
 		{
-			person_ = p;
 		}
 
 		public override bool Idling

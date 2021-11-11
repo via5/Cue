@@ -295,12 +295,17 @@ namespace Cue
 			}
 			else
 			{
-				moods_[Moods.Happy].Value = ps.Get(PS.MaxHappiness);
 
-				if (person_.Gaze.Picker.CurrentTargetReluctant)
+				if (person_.Gaze.Picker.CurrentTarget?.Reluctant ?? false)
+				{
+					moods_[Moods.Happy].Value = 0;
 					moods_[Moods.Angry].Value = ps.Get(PS.AvoidGazeAnger);
+				}
 				else
+				{
+					moods_[Moods.Happy].Value = ps.Get(PS.MaxHappiness);
 					moods_[Moods.Angry].Value = 0;
+				}
 			}
 		}
 

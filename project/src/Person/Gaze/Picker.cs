@@ -33,7 +33,6 @@ namespace Cue
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private IGazeLookat currentTarget_ = null;
-		private bool currentTargetReluctant_ = false;
 		private IGazeLookat forcedTarget_ = null;
 		private bool emergency_ = false;
 		private readonly StringBuilder lastString_ = new StringBuilder();
@@ -99,11 +98,6 @@ namespace Cue
 		{
 			get { return forcedTarget_; }
 			set { forcedTarget_ = value; }
-		}
-
-		public bool CurrentTargetReluctant
-		{
-			get { return currentTargetReluctant_; }
 		}
 
 		public bool HasTarget
@@ -269,7 +263,19 @@ namespace Cue
 
 			float total = 0;
 			for (int i = 0; i < targets_.Length; ++i)
+			{
+				if (targets_[i].Weight == GazeTargets.ExclusiveWeight)
+				{
+					lastString_.Append(" target=#");
+					lastString_.Append(i);
+					lastString_.Append(" (emergency)");
+
+					currentTarget_ = targets_[i];
+					return;
+				}
+
 				total += targets_[i].Weight;
+			}
 
 			lastString_.Append("tw=");
 			lastString_.Append(total);
@@ -293,12 +299,7 @@ namespace Cue
 								lastString_.Append(" target=#");
 								lastString_.Append(j);
 
-								//log_.Verbose($"picked {targets_[j]}");
 								currentTarget_ = targets_[j];
-
-								currentTargetReluctant_ =
-									(targets_[j].Object != null) &&
-									person_.Gaze.Targets.ShouldAvoid(targets_[j].Object);
 
 								return;
 							}

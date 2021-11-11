@@ -28,6 +28,7 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
+		private VUI.Label ps_ = new VUI.Label();
 
 		public PersonAIStateTab(Person p)
 			: base("State", false)
@@ -45,6 +46,9 @@ namespace Cue
 
 			state.Add(new VUI.Label("Traits"));
 			state.Add(traits_);
+
+			state.Add(new VUI.Label("Player close"));
+			state.Add(ps_);
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
@@ -67,6 +71,11 @@ namespace Cue
 
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
+
+			if (person_.IsPlayer)
+				ps_.Text = "(this is the player)";
+			else
+				ps_.Text = person_.Body.InsidePersonalSpace(Cue.Instance.Player) ? "yes" : "no";
 		}
 	}
 
@@ -407,7 +416,7 @@ namespace Cue
 			{
 				targetType_.Text = $"{g.Picker.CurrentTarget}";
 				targetEmergency_.Text = $"{g.IsEmergency}";
-				targetReluctant_.Text = $"{g.Picker.CurrentTargetReluctant}";
+				targetReluctant_.Text = $"{g.Picker.CurrentTarget.Reluctant}";
 			}
 			else
 			{
