@@ -242,6 +242,9 @@
 	"lookAboveMinExcitement": 0.35,
 	"lookAboveMinPhysicalRate": 0.001,
 
+	"lookAtPlayerOnGrabWeight": -1,
+	"lookAtPlayerTimeAfterGrab": 5,
+
 	"idleNaturalRandomWeight": 0.05,
 	"idleEmptyRandomWeight": 0.05,
 	"naturalRandomWeight": 0,

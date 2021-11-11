@@ -5,7 +5,7 @@ namespace Cue
 	interface IGazeEvent
 	{
 		int Check(int flags);
-		bool HasEmergency();
+		bool HasEmergency(float s);
 	}
 
 
@@ -52,12 +52,12 @@ namespace Cue
 			return Continue;
 		}
 
-		public bool HasEmergency()
+		public bool HasEmergency(float s)
 		{
-			return DoHasEmergency();
+			return DoHasEmergency(s);
 		}
 
-		protected virtual bool DoHasEmergency()
+		protected virtual bool DoHasEmergency(float s)
 		{
 			return false;
 		}
@@ -109,6 +109,8 @@ namespace Cue
 	class GazeGrabbed : BasicGazeEvent
 	{
 		private BodyPart head_;
+		private bool active_ = false;
+		private float activeElapsed_ = 0;
 
 		public GazeGrabbed(Person p)
 			: base(p)
@@ -118,11 +120,13 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
-			if (head_.GrabbedByPlayer)
+			var ps = person_.Personality;
+
+			if (active_)
 			{
 				targets_.SetWeight(
 					Cue.Instance.Player, BP.Eyes,
-					GazeTargets.ExclusiveWeight, "head grabbed");
+					ps.Get(PS.LookAtPlayerOnGrabWeight), "head grabbed");
 
 				// don't disable gazer, mg won't affect the head while it's
 				// being grabbed, and it snaps the head back to its original
@@ -132,9 +136,27 @@ namespace Cue
 			return Continue;
 		}
 
-		protected override bool DoHasEmergency()
+		protected override bool DoHasEmergency(float s)
 		{
-			return head_.GrabbedByPlayer;
+			var ps = person_.Personality;
+
+			if (ps.Get(PS.LookAtPlayerOnGrabWeight) != 0)
+			{
+				if (head_.GrabbedByPlayer)
+				{
+					active_ = true;
+					activeElapsed_ = 0;
+				}
+				else if (active_)
+				{
+					activeElapsed_ += s;
+
+					if (activeElapsed_ > ps.Get(PS.LookAtPlayerTimeAfterGrab))
+						active_ = false;
+				}
+			}
+
+			return active_;
 		}
 
 		public override string ToString()
@@ -812,7 +834,7 @@ namespace Cue
 			return Continue;
 		}
 
-		protected override bool DoHasEmergency()
+		protected override bool DoHasEmergency(float s)
 		{
 			var ps = person_.Personality;
 

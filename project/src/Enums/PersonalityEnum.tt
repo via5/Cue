@@ -30,6 +30,8 @@
 //     weight divided by the sum of the weight of all targets (that is, the
 //     higher the weight, the more chances a target has of getting picked)
 //
+//     a weight of -1 makes that target exclusive
+//
 // personal space
 //     a character is inside another character's personal space when certain
 //     body parts are close enough (this is an expensive check, so only some
@@ -310,6 +312,15 @@ V.Float("OtherPenetrationSourceGenitalsWeight"),
 V.Float("OtherGropedEyesWeight"),
 V.Float("OtherGropedSourceEyesWeight"),
 V.Float("OtherGropedTargetWeight"),
+
+
+// if the character's head is being grabbed by the player, looking at the player
+V.Bool("LookAtPlayerOnGrabWeight"),
+
+// minimum time to keep looking at the player after the head grab has been
+// released; the actual time might be longer since there might be a delay
+// before the next target is picked
+V.Float("LookAtPlayerTimeAfterGrab"),
 
 
 

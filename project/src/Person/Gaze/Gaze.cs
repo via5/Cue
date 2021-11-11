@@ -120,7 +120,7 @@ namespace Cue
 			}
 			else
 			{
-				int emergency = CheckEmergency();
+				int emergency = CheckEmergency(s);
 
 				if (emergency >= 0)
 				{
@@ -236,11 +236,11 @@ namespace Cue
 				$"e={gazerEnabled_},ebe={gazerEnabledBeforeEmergency_}";
 		}
 
-		private int CheckEmergency()
+		private int CheckEmergency(float s)
 		{
 			for (int i = 0; i < events_.Length; ++i)
 			{
-				if (events_[i].HasEmergency())
+				if (events_[i].HasEmergency(s))
 					return i;
 			}
 
