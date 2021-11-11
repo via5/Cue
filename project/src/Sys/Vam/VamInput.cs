@@ -224,12 +224,18 @@ namespace Cue.Sys.Vam
 	class Latched
 	{
 		private readonly string name_;
-		private bool on_ = false;
+		private float valueOn_;
+		private float resetThreshold_;
+
+		private float highest_ = 0;
+		private bool wasOn_ = false;
 		private bool onFrame_ = false;
 
-		public Latched(string name)
+		public Latched(string name, float valueOn, float resetThreshold)
 		{
 			name_ = name;
+			valueOn_ = valueOn;
+			resetThreshold_ = resetThreshold;
 		}
 
 		public bool OnFrame
@@ -237,13 +243,99 @@ namespace Cue.Sys.Vam
 			get { return onFrame_; }
 		}
 
-		public void Set(bool on)
+		public void Update(float value)
 		{
-			onFrame_ = (on && !on_);
-			on_ = on;
+			onFrame_ = false;
+
+			if (Math.Abs(value) < 0.01f)
+			{
+				highest_ = 0;
+				wasOn_ = false;
+				return;
+			}
+
+			if (valueOn_ < 0)
+				UpdateNegative(value);
+			else
+				UpdatePositive(value);
+		}
+
+		private void UpdateNegative(float value)
+		{
+			if (wasOn_)
+			{
+				if (value < highest_)
+				{
+					highest_ = value;
+				}
+				else
+				{
+					var d = Math.Abs(highest_ - value);
+
+					if (d > resetThreshold_)
+						wasOn_ = false;
+				}
+			}
+			else if (highest_ < 0)
+			{
+				if (Math.Abs(highest_ - value) < 0.05f)
+				{
+					onFrame_ = true;
+					wasOn_ = true;
+					highest_ = value;
+				}
+			}
+			else
+			{
+				bool on = (value <= valueOn_);
+
+				if (on)
+				{
+					onFrame_ = true;
+					wasOn_ = true;
+					highest_ = value;
+				}
+			}
+		}
+
+		private void UpdatePositive(float value)
+		{
+			if (wasOn_)
+			{
+				if (value > highest_)
+				{
+					highest_ = value;
+				}
+				else
+				{
+					var d = Math.Abs(highest_ - value);
+
+					if (d > resetThreshold_)
+						wasOn_ = false;
+				}
+			}
+			else if (highest_ > 0)
+			{
+				if (Math.Abs(highest_ - value) < 0.05f)
+				{
+					onFrame_ = true;
+					wasOn_ = true;
+					highest_ = value;
+				}
+			}
+			else
+			{
+				bool on = (value >= valueOn_);
+
+				if (on)
+				{
+					onFrame_ = true;
+					wasOn_ = true;
+					highest_ = value;
+				}
+			}
 		}
 	}
-
 
 
 	class VamInput : IInput
@@ -263,15 +355,15 @@ namespace Cue.Sys.Vam
 		private bool rightMenu_ = false;
 		private bool rightMenuSticky_ = false;
 
-		private Latched leftMenuUp_ = new Latched("leftMenuUp");
-		private Latched leftMenuDown_ = new Latched("leftMenuDown");
-		private Latched leftMenuLeft_ = new Latched("leftMenuLeft");
-		private Latched leftMenuRight_ = new Latched("leftMenuRight");
+		private Latched leftMenuUp_ = new Latched("leftMenuUp", 0.5f, 0.2f);
+		private Latched leftMenuDown_ = new Latched("leftMenuDown", -0.5f, 0.2f);
+		private Latched leftMenuLeft_ = new Latched("leftMenuLeft", -0.8f, 0.3f);
+		private Latched leftMenuRight_ = new Latched("leftMenuRight", 0.8f, 0.3f);
 
-		private Latched rightMenuUp_ = new Latched("rightMenuUp");
-		private Latched rightMenuDown_ = new Latched("rightMenuDown");
-		private Latched rightMenuLeft_ = new Latched("rightMenuLeft");
-		private Latched rightMenuRight_ = new Latched("rightMenuRight");
+		private Latched rightMenuUp_ = new Latched("rightMenuUp", 0.5f, 0.2f);
+		private Latched rightMenuDown_ = new Latched("rightMenuDown", -0.5f, 0.2f);
+		private Latched rightMenuLeft_ = new Latched("rightMenuLeft", -0.8f, 0.3f);
+		private Latched rightMenuRight_ = new Latched("rightMenuRight", 0.8f, 0.3f);
 
 		public VamInput(VamSys sys)
 		{
@@ -327,15 +419,15 @@ namespace Cue.Sys.Vam
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation = DisableNav();
 
-			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
-			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
-			leftMenuLeft_.Set(vr_.LeftJoystick.x <= -0.5f);
-			leftMenuRight_.Set(vr_.LeftJoystick.x >= 0.5f);
+			leftMenuUp_.Update(vr_.LeftJoystick.y);
+			leftMenuDown_.Update(vr_.LeftJoystick.y);
+			leftMenuLeft_.Update(vr_.LeftJoystick.x);
+			leftMenuRight_.Update(vr_.LeftJoystick.x);
 
-			rightMenuUp_.Set(vr_.RightJoystick.y >= 0.5f);
-			rightMenuDown_.Set(vr_.RightJoystick.y <= -0.5f);
-			rightMenuLeft_.Set(vr_.RightJoystick.x <= -0.5f);
-			rightMenuRight_.Set(vr_.RightJoystick.x >= 0.5f);
+			rightMenuUp_.Update(vr_.RightJoystick.y);
+			rightMenuDown_.Update(vr_.RightJoystick.y);
+			rightMenuLeft_.Update(vr_.RightJoystick.x);
+			rightMenuRight_.Update(vr_.RightJoystick.x);
 		}
 
 		private bool DisableNav()
