@@ -325,9 +325,7 @@ namespace Cue.Sys.Vam
 			}
 
 
-			MeshVR.GlobalSceneOptions.singleton.disableNavigation =
-				(ShowLeftMenu || ShowRightMenu) &&
-				(sc_.gameMode == SuperController.GameMode.Play);
+			MeshVR.GlobalSceneOptions.singleton.disableNavigation = DisableNav();
 
 			leftMenuUp_.Set(vr_.LeftJoystick.y >= 0.5f);
 			leftMenuDown_.Set(vr_.LeftJoystick.y <= -0.5f);
@@ -338,6 +336,14 @@ namespace Cue.Sys.Vam
 			rightMenuDown_.Set(vr_.RightJoystick.y <= -0.5f);
 			rightMenuLeft_.Set(vr_.RightJoystick.x <= -0.5f);
 			rightMenuRight_.Set(vr_.RightJoystick.x >= 0.5f);
+		}
+
+		private bool DisableNav()
+		{
+			if (sc_.gameMode == SuperController.GameMode.Play || UI.VRMenuDebug)
+				return (ShowLeftMenu || ShowRightMenu);
+
+			return false;
 		}
 
 		public string DebugString()

@@ -5,6 +5,7 @@ namespace Cue
 	class UI
 	{
 		public static readonly bool VRMenuDebug = false;
+		public static readonly bool VRMenuAlwaysVisible = false;
 
 		private Sys.ISys sys_;
 		private ScriptUI sui_ = new ScriptUI();

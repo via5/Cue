@@ -960,19 +960,31 @@ namespace Cue
 	}
 
 
-	class CircularIndex
+	class CircularIndex<T>
+		where T : class
 	{
 		private int i_ = -1;
-		protected IList e_;
+		private IList<T> e_;
+		private Func<T, bool> valid_;
 
-		public CircularIndex(IList e)
+		public CircularIndex(IList<T> e, Func<T, bool> valid = null)
 		{
 			e_ = e;
+			valid_ = valid;
+			Next(+1);
 		}
 
-		public virtual int Index
+		public int Index
 		{
-			get { return i_; }
+			get
+			{
+				return i_;
+			}
+
+			set
+			{
+				i_ = value;
+			}
 		}
 
 		public bool HasIndex
@@ -980,130 +992,67 @@ namespace Cue
 			get { return i_ >= 0 && i_ < e_.Count; }
 		}
 
+		public T Value
+		{
+			get
+			{
+				if (HasIndex)
+					return e_[i_];
+				else
+					return null;
+			}
+		}
+
 		public void Reset()
 		{
 			i_ = -1;
 		}
 
-		public virtual void Next(Func<int, bool> f)
+		public void Next(int dir)
 		{
+			if (dir == 0)
+				return;
+
+			dir = (dir < 0) ? -1 : 1;
+
 			int count = e_.Count;
 
 			if (count == 0)
 			{
 				i_ = -1;
-			}
-			else
-			{
-				if (i_ == -1)
-				{
-					i_ = 0;
-				}
-				else
-				{
-					++i_;
-					if (i_ >= count)
-					{
-						WentAround();
-						i_ = 0;
-					}
-				}
-
-
-				var start = i_;
-				bool wentAround = false;
-
-				for (; ; )
-				{
-					if (f(i_))
-						break;
-
-					++i_;
-					if (i_ >= count)
-					{
-						i_ = 0;
-						WentAround();
-						wentAround = true;
-					}
-
-					if (i_ >= start && wentAround)
-					{
-						i_ = -1;
-						break;
-					}
-				}
-			}
-		}
-
-		protected virtual void WentAround()
-		{
-			// no-op
-		}
-	}
-
-
-	class ShuffledIndex : CircularIndex
-	{
-		private List<int> order_ = new List<int>();
-
-		public ShuffledIndex(IList e)
-			: base(e)
-		{
-		}
-
-		public override int Index
-		{
-			get
-			{
-				if (HasIndex)
-					return order_[base.Index];
-				else
-					return -1;
-			}
-		}
-
-		public override void Next(Func<int, bool> f)
-		{
-			if (order_.Count != e_.Count)
-				Shuffle();
-
-			base.Next((i) => f(order_[i]));
-		}
-
-		public static void Shuffle(List<int> list, int count)
-		{
-			if (count == 0)
-			{
-				list.Clear();
 				return;
 			}
 
-			var last = -1;
-			if (list.Count > 0)
-				last = list[list.Count - 1];
+			var start = i_;
+			if (start < 0)
+				start = 0;
 
-			list.Clear();
-			for (int i = 0; i < count; ++i)
-				list.Add(i);
+			bool wentAround = false;
 
-			U.Shuffle(list);
-
-			if (list[0] == last)
+			for (; ; )
 			{
-				var mid = list.Count / 2;
-				list[0] = list[mid];
-				list[mid] = last;
+				i_ += dir;
+
+				if (i_ < 0)
+				{
+					i_ = count - 1;
+					wentAround = true;
+				}
+				else if (i_ >= count)
+				{
+					i_ = 0;
+					wentAround = true;
+				}
+
+				if (valid_ == null || valid_(e_[i_]))
+					break;
+
+				if (wentAround && i_ == start)
+				{
+					i_ = -1;
+					break;
+				}
 			}
-		}
-
-		public void Shuffle()
-		{
-			Shuffle(order_, e_.Count);
-		}
-
-		protected override void WentAround()
-		{
-			Shuffle();
 		}
 	}
 }

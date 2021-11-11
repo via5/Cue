@@ -289,7 +289,7 @@ namespace Cue
 	abstract class BasicMenu : IMenu
 	{
 		private List<UIActions.IItem> items_ = new List<UIActions.IItem>();
-		private int personSel_ = -1;
+		private CircularIndex<Person> personSel_;
 		private VUI.Root root_ = null;
 
 		public BasicMenu()
@@ -297,28 +297,23 @@ namespace Cue
 			foreach (var i in UIActions.All())
 				items_.Add(i);
 
-			if (Cue.Instance.ActivePersons.Length == 0)
-				SetPerson(-1, false);
-			else if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
-				SetPerson(GetPerson(-1, +1), false);
+			personSel_ = new CircularIndex<Person>(
+				Cue.Instance.ActivePersons, (p) => p.Body.Exists);
+
+			SetPerson(personSel_.Index, false);
 		}
 
 		public Person SelectedPerson
 		{
 			get
 			{
-				if (personSel_ < 0 || personSel_ >= Cue.Instance.ActivePersons.Length)
-					return null;
-				else
-					return Cue.Instance.ActivePersons[personSel_] as Person;
+				return personSel_.Value;
 			}
 
 			set
 			{
-				if (value == null)
-					SetPerson(-1);
-				else
-					SetPerson(value.PersonIndex);
+				personSel_.Index = (value?.PersonIndex ?? -1) ;
+				SetPerson(personSel_.Index);
 			}
 		}
 
@@ -370,73 +365,18 @@ namespace Cue
 
 		public void NextPerson()
 		{
-			DoChangePerson(+1);
+			personSel_.Next(+1);
+			SetPerson(personSel_.Index);
 		}
 
 		public void PreviousPerson()
 		{
-			DoChangePerson(-1);
-		}
-
-		private void DoChangePerson(int dir)
-		{
-			if (dir == 0)
-				return;
-
-			int newSel = GetPerson(personSel_, dir);
-
-			if (newSel >= Cue.Instance.ActivePersons.Length)
-				newSel = -1;
-
-			if (newSel != personSel_)
-				SetPerson(newSel);
-		}
-
-		private int GetPerson(int current, int dir)
-		{
-			var ps = Cue.Instance.ActivePersons;
-
-			int s = current;
-
-			if (s < 0 || s >= ps.Length)
-			{
-				current = 0;
-				s = 0;
-			}
-			else
-			{
-				s += dir;
-			}
-
-
-			for (; ; )
-			{
-				if (s < 0)
-					s = ps.Length - 1;
-				else if (s >= ps.Length)
-					s = 0;
-
-				if (s == current)
-					break;
-
-				if (ValidPerson(ps[s]))
-					return s;
-
-				s += dir;
-			}
-
-			return current;
-		}
-
-		private bool ValidPerson(Person p)
-		{
-			return p.Body.Exists;
+			personSel_.Next(-1);
+			SetPerson(personSel_.Index);
 		}
 
 		private void SetPerson(int index, bool fire = true)
 		{
-			personSel_ = index;
-
 			var p = SelectedPerson;
 			for (int i = 0; i < items_.Count; ++i)
 				items_[i].Person = p;

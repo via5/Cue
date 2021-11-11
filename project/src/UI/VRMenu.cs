@@ -10,13 +10,14 @@ namespace Cue
 
 		private readonly Sys.ISys sys_;
 		private VUI.Label name_ = null;
-		private int widgetSel_ = -1;
+		private CircularIndex<UIActions.IItem> widgetSel_;
 		private int state_ = Hidden;
 		private VUI.VRHandRootSupport vrSupport_ = null;
 
 		public VRMenu(bool debugDesktop)
 		{
 			sys_ = Cue.Instance.Sys;
+			widgetSel_ = new CircularIndex<UIActions.IItem>(Items);
 
 			VUI.Root root;
 
@@ -73,12 +74,13 @@ namespace Cue
 			SetRoot(root);
 
 			UpdateVisibility();
+			SetWidget(widgetSel_.Index);
 			PersonChanged();
 		}
 
 		public override void CheckInput()
 		{
-			if (sys_.IsPlayMode)
+			if (sys_.IsPlayMode || UI.VRMenuDebug)
 			{
 				var lh = sys_.Input.GetLeftHovered();
 				var rh = sys_.Input.GetRightHovered();
@@ -100,10 +102,7 @@ namespace Cue
 			CheckPersonInput();
 
 			if (Cue.Instance.Sys.Input.MenuSelect)
-			{
-				if (widgetSel_ >= 0 && widgetSel_ < Items.Count)
-					Items[widgetSel_].Activate();
-			}
+				widgetSel_.Value?.Activate();
 		}
 
 		private void CheckItemInput()
@@ -116,32 +115,20 @@ namespace Cue
 
 		public void NextWidget()
 		{
-			ChangeWidget(+1);
+			widgetSel_.Next(+1);
+			SetWidget(widgetSel_.Index);
 		}
 
 		public void PreviousWidget()
 		{
-			ChangeWidget(-1);
+			widgetSel_.Next(-1);
+			SetWidget(widgetSel_.Index);
 		}
 
-		public void ChangeWidget(int dir)
+		public void SetWidget(int index)
 		{
-			var old = widgetSel_;
-
-			widgetSel_ += dir;
-			if (widgetSel_ >= Items.Count)
-				widgetSel_ = 0;
-			else if (widgetSel_ < 0)
-				widgetSel_ = Items.Count - 1;
-
-			if (widgetSel_ == -1)
-				widgetSel_ = 0;
-
-			if (widgetSel_ != old)
-			{
-				for (int i = 0; i < Items.Count; ++i)
-					Items[i].Selected = (i == widgetSel_);
-			}
+			for (int i = 0; i < Items.Count; ++i)
+				Items[i].Selected = (i == index);
 		}
 
 		private void CheckPersonInput()
@@ -172,7 +159,7 @@ namespace Cue
 
 		private void UpdateVisibility()
 		{
-			if (UI.VRMenuDebug)
+			if (UI.VRMenuAlwaysVisible)
 				state_ = Left;
 
 			switch (state_)

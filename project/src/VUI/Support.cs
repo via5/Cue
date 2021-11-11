@@ -629,7 +629,8 @@ namespace VUI
 
 		public override void SetActive(bool b)
 		{
-			// todo
+			if (panel_ != null)
+				panel_.SetActive(b);
 		}
 
 		protected override Canvas GetCanvas()
