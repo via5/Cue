@@ -55,8 +55,7 @@ namespace Cue
 
 		public void UpdateTickers()
 		{
-			if (I.Instance.Updated)
-				misc_.UpdateTickers();
+			misc_.UpdateTickers();
 		}
 
 		public void OnPluginState(bool b)

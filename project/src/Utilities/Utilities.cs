@@ -1,8 +1,6 @@
 ﻿using SimpleJSON;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Cue
@@ -495,105 +493,6 @@ namespace Cue
 			if (int.TryParse(x, out a) && int.TryParse(y, out b))
 				return a.CompareTo(b);
 			return x.CompareTo(y);
-		}
-	}
-
-
-	class Ticker
-	{
-		private readonly string name_;
-		private Stopwatch w_ = new Stopwatch();
-		private long freq_ = Stopwatch.Frequency;
-		private long ticks_ = 0;
-		private long calls_ = 0;
-
-		private float elapsed_ = 0;
-		private long avg_ = 0;
-		private long peak_ = 0;
-
-		private long lastPeak_ = 0;
-		private long lastCalls_ = 0;
-		private bool updated_ = false;
-
-		public Ticker(string name = "")
-		{
-			name_ = name;
-		}
-
-		public string Name
-		{
-			get { return name_; }
-		}
-
-		public void Start()
-		{
-			updated_ = false;
-
-			w_.Reset();
-			w_.Start();
-		}
-
-		public void End()
-		{
-			w_.Stop();
-
-			++calls_;
-			ticks_ += w_.ElapsedTicks;
-			peak_ = Math.Max(peak_, w_.ElapsedTicks);
-		}
-
-		public void Update(float s)
-		{
-			elapsed_ += s;
-			if (elapsed_ >= 1)
-			{
-				if (calls_ <= 0)
-					avg_ = 0;
-				else
-					avg_ = ticks_ / calls_;
-
-				lastPeak_ = peak_;
-				lastCalls_ = calls_;
-
-				ticks_ = 0;
-				calls_ = 0;
-				elapsed_ = 0;
-				peak_ = 0;
-				updated_ = true;
-			}
-		}
-
-		public bool Updated
-		{
-			get { return updated_; }
-		}
-
-		public float AverageMs
-		{
-			get
-			{
-				return ToMs(avg_);
-			}
-		}
-
-		public float PeakMS
-		{
-			get { return ToMs(lastPeak_); }
-		}
-
-		private float ToMs(long ticks)
-		{
-			return (float)((((double)ticks) / freq_) * 1000);
-		}
-
-		public long Calls
-		{
-			get { return lastCalls_; }
-		}
-
-		public override string ToString()
-		{
-			return $"calls={Calls} avg={AverageMs:0.000} peak={PeakMS:0.000}";
 		}
 	}
 

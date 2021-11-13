@@ -1,4 +1,5 @@
 project\src\Cue.cs
+project\src\Instrumentation.cs
 project\src\Main.cs
 project\src\AI\AI.cs
 project\src\AI\Events.cs

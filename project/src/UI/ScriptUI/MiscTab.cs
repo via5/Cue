@@ -44,9 +44,18 @@ namespace Cue
 
 			for (int i = 0; i < I.TickerCount; ++i)
 			{
-				tickers_[i] = new VUI.Label();
-				p.Add(new VUI.Label(new string(' ', inst.Depth(i) * 2) + inst.Name(i)));
-				p.Add(tickers_[i]);
+				var name = new VUI.Label(new string(' ', inst.Depth(i) * 2) + inst.Name(i));
+				name.Font = VUI.Style.Theme.MonospaceFont;
+				name.FontSize = 22;
+
+				var ticker = new VUI.Label();
+				ticker.Font = VUI.Style.Theme.MonospaceFont;
+				ticker.FontSize = 22;
+
+				p.Add(name);
+				p.Add(ticker);
+
+				tickers_[i] = ticker;
 			}
 
 
@@ -59,9 +68,13 @@ namespace Cue
 			if (IsVisibleOnScreen())
 			{
 				var inst = I.Instance;
+				inst.Enabled = true;
 
-				for (int i = 0; i < I.TickerCount; ++i)
-					tickers_[i].Text = inst.Get(i).ToString();
+				if (I.Instance.Updated)
+				{
+					for (int i = 0; i < I.TickerCount; ++i)
+						tickers_[i].Text = inst.Get(i).ToString();
+				}
 			}
 		}
 	}

@@ -105,6 +105,7 @@ namespace Cue
 
 		public void PostUpdate()
 		{
+			I.Instance.Enabled = false;
 			sui_.UpdateTickers();
 		}
 	}

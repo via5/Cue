@@ -145,6 +145,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Moods.tt</DependentUpon>
     </Compile>
+    <Compile Include="src\Instrumentation.cs" />
     <Compile Include="src\Integration\ClothingManager.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
