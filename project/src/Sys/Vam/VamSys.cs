@@ -11,6 +11,8 @@ namespace Cue.Sys.Vam
 	class VamSys : ISys
 	{
 		private static VamSys instance_ = null;
+
+		private Logger log_ = new Logger(Logger.Sys, "vamSys");
 		private readonly MVRScript script_ = null;
 		private readonly VamInput input_;
 		private string pluginPath_ = "";
@@ -43,12 +45,17 @@ namespace Cue.Sys.Vam
 				.GetComponentInChildren<PerfMon>();
 
 			if (perf_ == null)
-				Cue.LogError("no perfmon");
+				Log.Error("no perfmon");
 
 			root_ = new GameObject("CueRoot");
 			root_.transform.SetParent(vamroot, false);
 
 			VamFixes.Run();
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public VamDebugRenderer DebugRenderer
@@ -71,7 +78,7 @@ namespace Cue.Sys.Vam
 			return new LiveSaver();
 		}
 
-		public void Log(string s, int level)
+		public void LogLines(string s, int level)
 		{
 			var t = DateTime.Now.ToString("hh:mm:ss.fff");
 			string p = LogLevels.ToShortString(level);
@@ -83,47 +90,6 @@ namespace Cue.Sys.Vam
 				else
 					SuperController.LogError($"{t}   [{p}] {line}");
 			}
-		}
-
-		public JSONClass GetConfig()
-		{
-			var a = SuperController.singleton.GetAtomByUid("cueconfig");
-			if (a == null)
-				return null;
-
-			var t = a.GetStorableByID("Text");
-			if (t == null)
-			{
-				Cue.LogError($"cueconfig has no Text storable");
-				return null;
-			}
-
-			var p = t.GetStringJSONParam("text");
-			if (p == null)
-			{
-				Cue.LogError($"cueconfig Text storable has no text parameter");
-				return null;
-			}
-
-			Cue.LogVerbose($"found cueconfig");
-
-			try
-			{
-				var doc = JSON.Parse(p.val);
-				if (doc == null)
-				{
-					Cue.LogError("cueconfig bad json");
-					return null;
-				}
-
-				return doc.AsObject;
-			}
-			catch (Exception e)
-			{
-				Cue.LogError("cueconfig bad json, " + e.Message);
-			}
-
-			return null;
 		}
 
 		public IInput Input
@@ -274,7 +240,7 @@ namespace Cue.Sys.Vam
 			else if (type == "clothing")
 				return new VamClothingObjectCreator(name, opts, ps);
 
-			Cue.LogError($"unknown object creator type '{type}'");
+			Log.Error($"unknown object creator type '{type}'");
 			return null;
 		}
 
@@ -329,12 +295,12 @@ namespace Cue.Sys.Vam
 
 			if (SuperController.singleton.isLoading)
 			{
-				Cue.LogVerbose("scene loading, waiting to init");
+				Log.Verbose("scene loading, waiting to init");
 				return;
 			}
 			else
 			{
-				Cue.LogVerbose("scene already loaded, running deferred init on next frame");
+				Log.Verbose("scene already loaded, running deferred init on next frame");
 				SuperController.singleton.onSceneLoadedHandlers -= OnSceneLoaded;
 				SuperController.singleton.StartCoroutine(DeferredInit());
 			}
@@ -437,14 +403,14 @@ namespace Cue.Sys.Vam
 		private IEnumerator DeferredInit()
 		{
 			yield return new WaitForEndOfFrame();
-			Cue.LogVerbose("running deferred init");
+			Log.Verbose("running deferred init");
 			deferredInit_?.Invoke();
 			deferredInit_ = null;
 		}
 
 		private void OnSceneLoaded()
 		{
-			Cue.LogVerbose("scene loaded, running deferred init on next frame");
+			Log.Verbose("scene loaded, running deferred init on next frame");
 			SuperController.singleton.onSceneLoadedHandlers -= OnSceneLoaded;
 			SuperController.singleton.StartCoroutine(DeferredInit());
 		}
@@ -556,7 +522,7 @@ namespace Cue.Sys.Vam
 			}
 			catch (Exception e)
 			{
-				Cue.LogError("failed to read '" + path + "', " + e.Message);
+				Log.Error("failed to read '" + path + "', " + e.Message);
 				return "";
 			}
 		}

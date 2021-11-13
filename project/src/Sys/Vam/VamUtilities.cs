@@ -83,15 +83,7 @@ namespace Cue.Sys.Vam
 			if (nm != null)
 				return nm;
 
-			nm = mui.GetMorphByDisplayName(m.displayName);
-			if (nm != null)
-				return nm;
-
-			Cue.LogWarning(
-				"morph '" + m.displayName + "' doesn't " +
-				"exist in " + atom.uid);
-
-			return null;
+			return mui.GetMorphByDisplayName(m.displayName);
 		}
 
 		public static DAZMorph FindMorph(Atom atom, string morphUID)

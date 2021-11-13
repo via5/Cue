@@ -71,7 +71,6 @@ namespace Cue
 		float InitFrame { get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
-		bool HasMovement { get; }
 		string[] GetAllForcesDebug();
 		string[] Debug();
 		string ToDetailedString();
@@ -93,7 +92,6 @@ namespace Cue
 
 		public int Type { get { return type_; } }
 		public int MovementStyle { get { return style_; } }
-		public bool HasMovement { get { return anim_.HasMovement; } }
 		public IAnimation Sys { get { return anim_; } }
 
 		public void GetAllForcesDebug(List<string> list)
@@ -275,12 +273,6 @@ namespace Cue
 		{
 			Log.Info("playing " + a.ToString());
 			int flags = 0;
-
-			if (!Cue.Instance.Options.AllowMovement && a.HasMovement)
-			{
-				Log.Info("not playing animation, movement not allowed");
-				return false;
-			}
 
 			for (int i=0; i<players_.Count;++i)
 			{

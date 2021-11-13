@@ -31,24 +31,6 @@ namespace Cue
 	class PluginGone : Exception { }
 
 
-	class Options
-	{
-		private bool allowMovement_ = false;
-
-		public void Init(JSONClass r)
-		{
-			var o = r["options"].AsObject;
-
-			allowMovement_ = o["allowMovement"].AsBool;
-		}
-
-		public bool AllowMovement
-		{
-			get { return allowMovement_; }
-		}
-	}
-
-
 	class Cue
 	{
 		private static Cue instance_ = null;
@@ -66,7 +48,6 @@ namespace Cue
 		private IObject[] everythingActiveArray_ = new IObject[0];
 
 		private UI ui_;
-		private readonly Options options_ = new Options();
 		private bool loaded_ = false;
 
 		private Person player_ = null;
@@ -98,9 +79,7 @@ namespace Cue
 		public List<IObject> Everything { get { return everything_; } }
 		public IObject[] EverythingActive { get { return everythingActiveArray_; } }
 
-
 		public UI UI { get { return ui_; } }
-		public Options Options { get { return options_; } }
 
 		public int Frame { get { return frame_; } }
 
@@ -173,9 +152,6 @@ namespace Cue
 				(s) => LogInfo(s),
 				(s) => LogWarning(s),
 				(s) => LogError(s));
-
-			var conf = Sys.GetConfig() ?? new JSONClass();
-			options_.Init(conf);
 
 			LogVerbose("cue: loading resources");
 			Resources.LoadAll();
@@ -504,27 +480,27 @@ namespace Cue
 		static public void LogVerbose(string s)
 		{
 			if (LogVerboseEnabled)
-				Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Verbose);
+				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Verbose);
 		}
 
 		static public void LogInfo(string s)
 		{
-			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Info);
+			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Info);
 		}
 
 		static public void LogWarning(string s)
 		{
-			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Warning);
+			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Warning);
 		}
 
 		static public void LogError(string s)
 		{
-			Instance.Sys.Log(s, global::Cue.Sys.LogLevels.Error);
+			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Error);
 		}
 
 		static public void LogErrorST(string s)
 		{
-			Instance.Sys.Log(
+			Instance.Sys.LogLines(
 				s + "\n" + new StackTrace(1).ToString(),
 				global::Cue.Sys.LogLevels.Error);
 		}

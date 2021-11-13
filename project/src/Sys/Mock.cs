@@ -59,17 +59,12 @@ namespace Cue.Sys.Mock
 		{
 		}
 
-		public JSONClass GetConfig()
-		{
-			return null;
-		}
-
 		public ILiveSaver CreateLiveSaver()
 		{
 			return new MockLiveSaver();
 		}
 
-		public void Log(string s, int level)
+		public void LogLines(string s, int level)
 		{
 			foreach (var line in s.Split('\n'))
 				Console.WriteLine("[" + LogLevels.ToShortString(level) + "] " + s);

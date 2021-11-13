@@ -58,8 +58,7 @@ namespace Cue.Sys
 	interface ISys
 	{
 		void ClearLog();
-		void Log(string s, int level);
-		JSONClass GetConfig();
+		void LogLines(string s, int level);
 		IAtom GetAtom(string id);
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
