@@ -102,10 +102,14 @@ project\src\UI\ScriptUI\StateTab.cs
 project\src\UI\ScriptUI\UnityTab.cs
 project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
+project\src\Utilities\Floats.cs
 project\src\Utilities\Geo.cs
 project\src\Utilities\GeoRender.cs
 project\src\Utilities\Json.cs
+project\src\Utilities\Log.cs
 project\src\Utilities\Movement.cs
+project\src\Utilities\NatSort.cs
+project\src\Utilities\Random.cs
 project\src\Utilities\Utilities.cs
 project\src\VUI\BorderLayout.cs
 project\src\VUI\Button.cs

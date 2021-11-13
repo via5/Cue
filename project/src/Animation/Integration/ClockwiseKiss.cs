@@ -20,21 +20,7 @@
 		private Sys.Vam.FloatParameter trackingSpeed_ = null;
 		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
-		private bool randomMovements_ = false;
-		private bool randomSpeeds_ = false;
 		private float elapsed_ = 0;
-
-
-		private const float MinDistance = 0.001f;
-		private const float MaxDistance = 0.008f;
-		private const float MaxLipDepth = 0.14f;
-
-		private const float HeadAngleXMin = -10;
-		private const float HeadAngleXMax = 10;
-		private const float HeadAngleYMin = -10;
-		private const float HeadAngleYMax = 10;
-		private const float HeadAngleZMin = -10;
-		private const float HeadAngleZMax = 10;
 
 		private const float StartHeadAngleXWithPlayer = -45;
 		private const float StartHeadAngleYWithPlayer = 0;
@@ -52,35 +38,6 @@
 		private const float StopTrackingSpeed = 0.1f;
 		private const float DefaultTrackingSpeed = 1.5f;
 		private const float TrackingSpeedTime = 3;
-
-
-		private float startAngleX_ = 0;
-		private InterpolatedRandomRange randomHeadAngleX_ =
-			new InterpolatedRandomRange(
-				new Pair<float, float>(HeadAngleXMin, HeadAngleXMax),
-				new Pair<float, float>(0, 5),
-				new Pair<float, float>(1, 3));
-
-		private float startAngleY_ = 0;
-		private InterpolatedRandomRange randomHeadAngleY_ =
-			new InterpolatedRandomRange(
-				new Pair<float, float>(HeadAngleYMin, HeadAngleYMax),
-				new Pair<float, float>(0, 5),
-				new Pair<float, float>(1, 3));
-
-		private float startAngleZ_ = 0;
-		private InterpolatedRandomRange randomHeadAngleZ_ =
-			new InterpolatedRandomRange(
-				new Pair<float, float>(HeadAngleZMin, HeadAngleZMax),
-				new Pair<float, float>(0, 5),
-				new Pair<float, float>(1, 3));
-
-		private float startLipDepth_ = 0;
-		private InterpolatedRandomRange randomLipDepth_ =
-			new InterpolatedRandomRange(
-				new Pair<float, float>(0, 0.02f),
-				new Pair<float, float>(0, 5),
-				new Pair<float, float>(1, 3));
 
 		private string[] targetStorableCache_ =
 			Sys.Vam.Parameters.MakeStorableNamesCache("ClockwiseSilver.Kiss");
@@ -266,40 +223,23 @@
 				headAngleY_.Value = StartHeadAngleYWithPlayer;
 				headAngleZ_.Value = StartHeadAngleZWithPlayer;
 				lipDepth_.Value = 0;
-
-				randomMovements_ = false;
-				randomSpeeds_ = true;
 			}
 			else
 			{
 				if (leader)
 				{
-					startLipDepth_ = StartLipDepthLeader;
-					startAngleX_ = StartHeadAngleXLeader;
-					startAngleY_ = StartHeadAngleYLeader;
-					startAngleZ_ = StartHeadAngleZLeader;
+					lipDepth_.Value = StartLipDepthLeader;
+					headAngleX_.Value = StartHeadAngleXLeader;
+					headAngleY_.Value = StartHeadAngleYLeader;
+					headAngleZ_.Value = StartHeadAngleZLeader;
 				}
 				else
 				{
-					startLipDepth_ = StartLipDepth;
-					startAngleX_ = StartHeadAngleX;
-					startAngleY_ = StartHeadAngleY;
-					startAngleZ_ = StartHeadAngleZ;
+					lipDepth_.Value = StartLipDepth;
+					headAngleX_.Value = StartHeadAngleX;
+					headAngleY_.Value = StartHeadAngleY;
+					headAngleZ_.Value = StartHeadAngleZ;
 				}
-
-
-				headAngleX_.Value = startAngleX_;
-				headAngleY_.Value = startAngleY_;
-				headAngleZ_.Value = startAngleZ_;
-				lipDepth_.Value = startLipDepth_;
-
-				randomHeadAngleX_.Reset();
-				randomHeadAngleY_.Reset();
-				randomHeadAngleZ_.Reset();
-				randomLipDepth_.Reset();
-
-				randomMovements_ = leader;
-				randomSpeeds_ = true;
 			}
 
 			closeEyes_.Value = !person_.Gaze.ShouldAvoid(target);
@@ -363,7 +303,7 @@
 			if (k)
 				elapsed_ += s;
 
-			if (k && randomSpeeds_ && active_.Value)
+			if (k && active_.Value)
 			{
 				var ps = person_.Personality;
 
