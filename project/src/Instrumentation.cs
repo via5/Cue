@@ -67,7 +67,9 @@ namespace Cue
 				lastPeak_ = peak_;
 				lastCalls_ = calls_;
 				lastGc_ = gc_;
-				gcTotal_ += gc_;
+
+				if (gc_ > 0)
+					gcTotal_ += gc_;
 
 				ticks_ = 0;
 				calls_ = 0;
@@ -128,7 +130,7 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1
 		};
 		private int[] stack_ = new int[4];
 		private int current_ = 0;

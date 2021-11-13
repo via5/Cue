@@ -792,15 +792,14 @@ namespace Cue
 		private float target_;
 		private float up_;
 		private float down_;
+		private float old_;
 
-		private Action<float> set_;
-
-		public DampedFloat(Action<float> set=null, float upFactor = 0.1f, float downFactor = 0.1f)
+		public DampedFloat(float upFactor = 0.1f, float downFactor = 0.1f)
 		{
 			target_ = 0;
-			set_ = set;
 			up_ = upFactor;
 			down_ = downFactor;
+			old_ = Value;
 		}
 
 		public float Target
@@ -837,14 +836,17 @@ namespace Cue
 			}
 		}
 
-		public void Update(float s)
+		public bool Update(float s)
 		{
 			if (target_ > Value)
 				base.Value = U.Clamp(Value + s * up_, 0, target_);
 			else
 				base.Value = U.Clamp(Value - s * down_, target_, 1);
 
-			set_?.Invoke(Value);
+			bool changed = (old_ != Value);
+			old_ = Value;
+
+			return changed;
 		}
 
 		public override string ToString()

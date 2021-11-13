@@ -61,7 +61,7 @@ namespace Cue
 		public Body(Person p)
 		{
 			person_ = p;
-			temperature_ = new DampedFloat(OnTemperatureChanged);
+			temperature_ = new DampedFloat();
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
@@ -510,7 +510,8 @@ namespace Cue
 				person_.Mood.Get(Moods.Excited) / ps.Get(PS.TemperatureExcitementMax),
 				0, 1);
 
-			temperature_.Update(s);
+			if (temperature_.Update(s))
+				OnTemperatureChanged(temperature_.Value);
 
 			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
 
