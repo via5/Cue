@@ -245,7 +245,7 @@ namespace Cue
 
 			var items = new List<string>();
 
-			for (int i = 0; i < v.Values.GetDurationCount(); ++i)
+			foreach (var i in v.Values.GetDurationIndexes())
 			{
 				items.Add(
 					v.Values.GetDurationName(i).PadRight(longest) +
@@ -253,7 +253,7 @@ namespace Cue
 					v.GetDuration(i).ToString());
 			}
 
-			for (int i = 0; i < v.Values.GetBoolCount(); ++i)
+			foreach (var i in v.Values.GetBoolIndexes())
 			{
 				items.Add(
 					v.Values.GetBoolName(i).PadRight(longest) +
@@ -261,7 +261,7 @@ namespace Cue
 					v.GetBool(i).ToString());
 			}
 
-			for (int i = 0; i < v.Values.GetFloatCount(); ++i)
+			foreach (var i in v.Values.GetFloatIndexes())
 			{
 				items.Add(
 					v.Values.GetFloatName(i).PadRight(longest) +
@@ -269,7 +269,7 @@ namespace Cue
 					v.Get(i).ToString());
 			}
 
-			for (int i = 0; i < v.Values.GetStringCount(); ++i)
+			foreach (var i in v.Values.GetStringIndexes())
 			{
 				items.Add(
 					v.Values.GetStringName(i).PadRight(longest) +

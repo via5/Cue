@@ -100,8 +100,8 @@ public string Generate3(
 
 	if (values.Length > 0)
 	{
-		defs += MakeEnum(values, "Count");
-		names += MakeNames(values, "", allNames);
+		defs += MakeEnum(values, "Count", "int", generateEmpty);
+		names += MakeNames(values, "", allNames, "int", generateEmpty);
 		++sectionCount;
 	}
 
@@ -109,9 +109,9 @@ public string Generate3(
 	{
 		defs +=
 			$"		// durations\r\n" +
-			MakeEnum(durations, "DurationCount");
+			MakeEnum(durations, "DurationCount", "DurationIndex", generateEmpty);
 
-		names += MakeNames(durations, "duration", allNames);
+		names += MakeNames(durations, "duration", allNames, "DurationIndex", generateEmpty);
 		++sectionCount;
 	}
 
@@ -125,9 +125,9 @@ public string Generate3(
 
 		defs +=
 			$"		// bools\r\n" +
-			MakeEnum(bools, "BoolCount");
+			MakeEnum(bools, "BoolCount", "BoolIndex", generateEmpty);
 
-		names += MakeNames(bools, "bool", allNames);
+		names += MakeNames(bools, "bool", allNames, "BoolIndex", generateEmpty);
 		++sectionCount;
 	}
 
@@ -141,9 +141,9 @@ public string Generate3(
 
 		defs +=
 			$"		// floats\r\n" +
-			MakeEnum(floats, "FloatCount");
+			MakeEnum(floats, "FloatCount", "FloatIndex", generateEmpty);
 
-		names += MakeNames(floats, "float", allNames);
+		names += MakeNames(floats, "float", allNames, "FloatIndex", generateEmpty);
 		++sectionCount;
 	}
 
@@ -157,9 +157,9 @@ public string Generate3(
 
 		defs +=
 			$"		// strings\r\n" +
-			MakeEnum(strings, "StringCount");
+			MakeEnum(strings, "StringCount", "StringIndex", generateEmpty);
 
-		names += MakeNames(strings, "string", allNames);
+		names += MakeNames(strings, "string", allNames, "StringIndex", generateEmpty);
 		++sectionCount;
 	}
 
@@ -181,7 +181,7 @@ public string Generate3(
 			$"			get {{ return allNames_; }}\r\n" +
 			$"		}}\r\n" +
 			$"\r\n" +
-			$"		public string[] GetAllNames()\r\n" +
+			$"		public {(generateEmpty ? "override " : "")}string[] GetAllNames()\r\n" +
 			$"		{{\r\n" +
 			$"			return AllNames;\r\n" +
 			$"		}}";
@@ -196,7 +196,7 @@ public string Generate3(
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"	class {name}{(generateEmpty ? " : IEnumValues" : "")}\r\n" +
+		$"	class {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
 		$"	{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
 		names + "\r\n" + allNamesArray +
@@ -206,7 +206,7 @@ public string Generate3(
 	return s;
 }
 
-public string MakeEnum(V[] names, string count)
+public string MakeEnum(V[] names, string count, string indexType, bool generateEmpty)
 {
 	string s = "";
 	int nextValue = 0;
@@ -225,13 +225,18 @@ public string MakeEnum(V[] names, string count)
 			++nextValue;
 		}
 
-		s += $"		public const int {names[i].name} = {v};\r\n";
+		if (indexType == "int")
+			s += $"		public const {indexType} {names[i].name} = {v}";
+		else
+			s += $"		public static readonly {indexType} {names[i].name} = new {indexType}({v})";
+
+		s += $";\r\n";
 	}
 
 	s +=
 		$"\r\n" +
 		$"		public const int {count} = {nextValue};\r\n" +
-		$"		public int Get{count}() {{ return {nextValue}; }}";
+		$"		public {(generateEmpty ? "override " : "")}int Get{count}() {{ return {nextValue}; }}";
 
 	return s;
 }
@@ -251,7 +256,9 @@ public string CamelCase(string s, bool firstUpper)
 	return s;
 }
 
-public string MakeNames(V[] names, string name, List<string> allNames)
+public string MakeNames(
+	V[] names, string name, List<string> allNames, string indexType,
+	bool generateEmpty)
 {
 	string var, ccName;
 
@@ -280,6 +287,13 @@ public string MakeNames(V[] names, string name, List<string> allNames)
 		s += $"			\"{ename}\",\r\n";
 		allNames.Add(ename);
 	}
+
+	string getIndex;
+
+	if (indexType == "int")
+		getIndex = "i";
+	else
+		getIndex = "i.index";
 
 	s +=
 		$"		}};\r\n" +
@@ -314,17 +328,17 @@ public string MakeNames(V[] names, string name, List<string> allNames)
 		$"			return list.ToArray();\r\n" +
 		$"		}}\r\n" +
 		$"\r\n" +
-		$"		public string Get{ccName}Name(int i)\r\n" +
+		$"		public {(generateEmpty ? "override " : "")}string Get{ccName}Name({indexType} i)\r\n" +
 		$"		{{\r\n" +
 		$"			return {ccName}ToString(i);\r\n" +
 		$"		}}\r\n" +
 		$"\r\n" +
-		$"		public static string {ccName}ToString(int i)\r\n" +
+		$"		public static string {ccName}ToString({indexType} i)\r\n" +
 		$"		{{\r\n" +
-		$"			if (i >= 0 && i < {var}.Length)\r\n" +
-		$"				return {var}[i];\r\n" +
+		$"			if ({getIndex} >= 0 && {getIndex} < {var}.Length)\r\n" +
+		$"				return {var}[{getIndex}];\r\n" +
 		$"			else\r\n" +
-		$"				return $\"?{{i}}\";\r\n" +
+		$"				return $\"?{{{getIndex}}}\";\r\n" +
 		$"		}}\r\n" +
 		$"\r\n" +
 		$"		public static string[] {ccName}Names\r\n" +

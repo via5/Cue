@@ -130,7 +130,7 @@ namespace Cue
 		public static void LoadEnumValues(
 			EnumValueManager v, JSONClass o, bool inherited)
 		{
-			for (int i = 0; i < v.Values.GetDurationCount(); ++i)
+			foreach (var i in v.Values.GetDurationIndexes())
 			{
 				string key = v.Values.GetDurationName(i);
 
@@ -146,7 +146,7 @@ namespace Cue
 			}
 
 
-			for (int i = 0; i < v.Values.GetBoolCount();  ++i)
+			foreach (var i in v.Values.GetBoolIndexes())
 			{
 				string key = v.Values.GetBoolName(i);
 
@@ -163,7 +163,7 @@ namespace Cue
 			}
 
 
-			for (int i = 0; i < v.Values.GetFloatCount(); ++i)
+			foreach (var i in v.Values.GetFloatIndexes())
 			{
 				string key = v.Values.GetFloatName(i);
 
@@ -180,7 +180,7 @@ namespace Cue
 			}
 
 
-			for (int i = 0; i < v.Values.GetStringCount(); ++i)
+			foreach (var i in v.Values.GetStringIndexes())
 			{
 				string key = v.Values.GetStringName(i);
 

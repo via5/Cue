@@ -315,7 +315,10 @@ namespace Cue
 				PS.AvoidGazeUninvolvedHavingSex);
 		}
 
-		private bool ShouldAvoidImpl(Person p, int avoidPlayer, int avoidOthers)
+		private bool ShouldAvoidImpl(
+			Person p,
+			BasicEnumValues.FloatIndex avoidPlayer,
+			BasicEnumValues.FloatIndex avoidOthers)
 		{
 			var ps = person_.Personality;
 			float ex = person_.Mood.Get(Moods.Excited);

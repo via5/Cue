@@ -4,134 +4,134 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class PS : IEnumValues
+	class PS : BasicEnumValues
 	{
 		// durations
-		public const int GazeDuration = 0;
-		public const int GazeRandomInterval = 1;
-		public const int EmergencyGazeDuration = 2;
-		public const int GazeSaccadeInterval = 3;
+		public static readonly DurationIndex GazeDuration = new DurationIndex(0);
+		public static readonly DurationIndex GazeRandomInterval = new DurationIndex(1);
+		public static readonly DurationIndex EmergencyGazeDuration = new DurationIndex(2);
+		public static readonly DurationIndex GazeSaccadeInterval = new DurationIndex(3);
 
 		public const int DurationCount = 4;
-		public int GetDurationCount() { return 4; }
+		public override int GetDurationCount() { return 4; }
 
 		// bools
-		public const int GazeSaccade = 0;
+		public static readonly BoolIndex GazeSaccade = new BoolIndex(0);
 
 		public const int BoolCount = 1;
-		public int GetBoolCount() { return 1; }
+		public override int GetBoolCount() { return 1; }
 
 		// floats
-		public const int GazeSaccadeMovementRange = 0;
-		public const int AvoidGazePlayer = 1;
-		public const int AvoidGazePlayerInsidePersonalSpace = 2;
-		public const int AvoidGazePlayerDuringSex = 3;
-		public const int AvoidGazePlayerDelayAfterOrgasm = 4;
-		public const int AvoidGazePlayerWeight = 5;
-		public const int AvoidGazeOthers = 6;
-		public const int AvoidGazeOthersInsidePersonalSpace = 7;
-		public const int AvoidGazeOthersDuringSex = 8;
-		public const int AvoidGazeOthersDelayAfterOrgasm = 9;
-		public const int AvoidGazeOthersWeight = 10;
-		public const int AvoidGazeUninvolvedHavingSex = 11;
-		public const int LookAboveMaxWeight = 12;
-		public const int LookAboveMaxWeightOrgasm = 13;
-		public const int LookAboveMinExcitement = 14;
-		public const int LookAboveMinPhysicalRate = 15;
-		public const int IdleNaturalRandomWeight = 16;
-		public const int IdleEmptyRandomWeight = 17;
-		public const int NaturalRandomWeight = 18;
-		public const int NaturalOtherEyesWeight = 19;
-		public const int BusyOtherEyesWeight = 20;
-		public const int NaturalPlayerEyesWeight = 21;
-		public const int BusyPlayerEyesWeight = 22;
-		public const int MaxTirednessForRandomGaze = 23;
-		public const int OtherEyesExcitementWeight = 24;
-		public const int OtherEyesOrgasmWeight = 25;
-		public const int BlowjobEyesWeight = 26;
-		public const int BlowjobGenitalsWeight = 27;
-		public const int HandjobEyesWeight = 28;
-		public const int HandjobGenitalsWeight = 29;
-		public const int PenetratedEyesWeight = 30;
-		public const int PenetratedGenitalsWeight = 31;
-		public const int PenetratingEyesWeight = 32;
-		public const int PenetratingGenitalsWeight = 33;
-		public const int GropedEyesWeight = 34;
-		public const int GropedTargetWeight = 35;
-		public const int GropingEyesWeight = 36;
-		public const int GropingTargetWeight = 37;
-		public const int OtherBlowjobEyesWeight = 38;
-		public const int OtherBlowjobTargetEyesWeight = 39;
-		public const int OtherBlowjobTargetGenitalsWeight = 40;
-		public const int OtherHandjobEyesWeight = 41;
-		public const int OtherHandjobTargetEyesWeight = 42;
-		public const int OtherHandjobTargetGenitalsWeight = 43;
-		public const int OtherPenetrationEyesWeight = 44;
-		public const int OtherPenetrationSourceEyesWeight = 45;
-		public const int OtherPenetrationSourceGenitalsWeight = 46;
-		public const int OtherGropedEyesWeight = 47;
-		public const int OtherGropedSourceEyesWeight = 48;
-		public const int OtherGropedTargetWeight = 49;
-		public const int LookAtPlayerOnGrabWeight = 50;
-		public const int LookAtPlayerTimeAfterGrab = 51;
-		public const int OtherSexExcitementRateFactor = 52;
-		public const int MaxOtherSexExcitement = 53;
-		public const int KissSpeedEnergyFactor = 54;
-		public const int IdleMaxExcitement = 55;
-		public const int TirednessExcitementRateFactor = 56;
-		public const int GazeEnergyTirednessFactor = 57;
-		public const int GazeTirednessFactor = 58;
-		public const int MovementEnergyTirednessFactor = 59;
-		public const int ExpressionTirednessFactor = 60;
-		public const int MovementEnergyRampUpAfterOrgasm = 61;
-		public const int AvoidGazeAnger = 62;
-		public const int AngerWhenPlayerInteracts = 63;
-		public const int AngerMaxExcitementForAnger = 64;
-		public const int AngerMaxExcitementForHappiness = 65;
-		public const int AngerExcitementFactorForAnger = 66;
-		public const int AngerExcitementFactorForHappiness = 67;
-		public const int MaxHappiness = 68;
-		public const int MaxSweat = 69;
-		public const int MaxFlush = 70;
-		public const int TemperatureExcitementMax = 71;
-		public const int TemperatureExcitementRate = 72;
-		public const int TemperatureDecayRate = 73;
-		public const int TirednessRateDuringPostOrgasm = 74;
-		public const int TirednessBaseDecayRate = 75;
-		public const int TirednessBackToBaseRate = 76;
-		public const int DelayAfterOrgasmUntilTirednessDecay = 77;
-		public const int TirednessMaxExcitementForBaseDecay = 78;
-		public const int OrgasmBaseTirednessIncrease = 79;
-		public const int NeutralVoicePitch = 80;
-		public const int MouthRate = 81;
-		public const int MouthMax = 82;
-		public const int LipsFactor = 83;
-		public const int MouthFactor = 84;
-		public const int BreastsRate = 85;
-		public const int BreastsMax = 86;
-		public const int LeftBreastFactor = 87;
-		public const int RightBreastFactor = 88;
-		public const int GenitalsRate = 89;
-		public const int GenitalsMax = 90;
-		public const int LabiaFactor = 91;
-		public const int PenetrationRate = 92;
-		public const int PenetrationMax = 93;
-		public const int VaginaFactor = 94;
-		public const int DeepVaginaFactor = 95;
-		public const int DeeperVaginaFactor = 96;
-		public const int ExcitementDecayRate = 97;
-		public const int ExcitementPostOrgasm = 98;
-		public const int OrgasmTime = 99;
-		public const int PostOrgasmTime = 100;
-		public const int RateAdjustment = 101;
+		public static readonly FloatIndex GazeSaccadeMovementRange = new FloatIndex(0);
+		public static readonly FloatIndex AvoidGazePlayer = new FloatIndex(1);
+		public static readonly FloatIndex AvoidGazePlayerInsidePersonalSpace = new FloatIndex(2);
+		public static readonly FloatIndex AvoidGazePlayerDuringSex = new FloatIndex(3);
+		public static readonly FloatIndex AvoidGazePlayerDelayAfterOrgasm = new FloatIndex(4);
+		public static readonly FloatIndex AvoidGazePlayerWeight = new FloatIndex(5);
+		public static readonly FloatIndex AvoidGazeOthers = new FloatIndex(6);
+		public static readonly FloatIndex AvoidGazeOthersInsidePersonalSpace = new FloatIndex(7);
+		public static readonly FloatIndex AvoidGazeOthersDuringSex = new FloatIndex(8);
+		public static readonly FloatIndex AvoidGazeOthersDelayAfterOrgasm = new FloatIndex(9);
+		public static readonly FloatIndex AvoidGazeOthersWeight = new FloatIndex(10);
+		public static readonly FloatIndex AvoidGazeUninvolvedHavingSex = new FloatIndex(11);
+		public static readonly FloatIndex LookAboveMaxWeight = new FloatIndex(12);
+		public static readonly FloatIndex LookAboveMaxWeightOrgasm = new FloatIndex(13);
+		public static readonly FloatIndex LookAboveMinExcitement = new FloatIndex(14);
+		public static readonly FloatIndex LookAboveMinPhysicalRate = new FloatIndex(15);
+		public static readonly FloatIndex IdleNaturalRandomWeight = new FloatIndex(16);
+		public static readonly FloatIndex IdleEmptyRandomWeight = new FloatIndex(17);
+		public static readonly FloatIndex NaturalRandomWeight = new FloatIndex(18);
+		public static readonly FloatIndex NaturalOtherEyesWeight = new FloatIndex(19);
+		public static readonly FloatIndex BusyOtherEyesWeight = new FloatIndex(20);
+		public static readonly FloatIndex NaturalPlayerEyesWeight = new FloatIndex(21);
+		public static readonly FloatIndex BusyPlayerEyesWeight = new FloatIndex(22);
+		public static readonly FloatIndex MaxTirednessForRandomGaze = new FloatIndex(23);
+		public static readonly FloatIndex OtherEyesExcitementWeight = new FloatIndex(24);
+		public static readonly FloatIndex OtherEyesOrgasmWeight = new FloatIndex(25);
+		public static readonly FloatIndex BlowjobEyesWeight = new FloatIndex(26);
+		public static readonly FloatIndex BlowjobGenitalsWeight = new FloatIndex(27);
+		public static readonly FloatIndex HandjobEyesWeight = new FloatIndex(28);
+		public static readonly FloatIndex HandjobGenitalsWeight = new FloatIndex(29);
+		public static readonly FloatIndex PenetratedEyesWeight = new FloatIndex(30);
+		public static readonly FloatIndex PenetratedGenitalsWeight = new FloatIndex(31);
+		public static readonly FloatIndex PenetratingEyesWeight = new FloatIndex(32);
+		public static readonly FloatIndex PenetratingGenitalsWeight = new FloatIndex(33);
+		public static readonly FloatIndex GropedEyesWeight = new FloatIndex(34);
+		public static readonly FloatIndex GropedTargetWeight = new FloatIndex(35);
+		public static readonly FloatIndex GropingEyesWeight = new FloatIndex(36);
+		public static readonly FloatIndex GropingTargetWeight = new FloatIndex(37);
+		public static readonly FloatIndex OtherBlowjobEyesWeight = new FloatIndex(38);
+		public static readonly FloatIndex OtherBlowjobTargetEyesWeight = new FloatIndex(39);
+		public static readonly FloatIndex OtherBlowjobTargetGenitalsWeight = new FloatIndex(40);
+		public static readonly FloatIndex OtherHandjobEyesWeight = new FloatIndex(41);
+		public static readonly FloatIndex OtherHandjobTargetEyesWeight = new FloatIndex(42);
+		public static readonly FloatIndex OtherHandjobTargetGenitalsWeight = new FloatIndex(43);
+		public static readonly FloatIndex OtherPenetrationEyesWeight = new FloatIndex(44);
+		public static readonly FloatIndex OtherPenetrationSourceEyesWeight = new FloatIndex(45);
+		public static readonly FloatIndex OtherPenetrationSourceGenitalsWeight = new FloatIndex(46);
+		public static readonly FloatIndex OtherGropedEyesWeight = new FloatIndex(47);
+		public static readonly FloatIndex OtherGropedSourceEyesWeight = new FloatIndex(48);
+		public static readonly FloatIndex OtherGropedTargetWeight = new FloatIndex(49);
+		public static readonly FloatIndex LookAtPlayerOnGrabWeight = new FloatIndex(50);
+		public static readonly FloatIndex LookAtPlayerTimeAfterGrab = new FloatIndex(51);
+		public static readonly FloatIndex OtherSexExcitementRateFactor = new FloatIndex(52);
+		public static readonly FloatIndex MaxOtherSexExcitement = new FloatIndex(53);
+		public static readonly FloatIndex KissSpeedEnergyFactor = new FloatIndex(54);
+		public static readonly FloatIndex IdleMaxExcitement = new FloatIndex(55);
+		public static readonly FloatIndex TirednessExcitementRateFactor = new FloatIndex(56);
+		public static readonly FloatIndex GazeEnergyTirednessFactor = new FloatIndex(57);
+		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(58);
+		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(59);
+		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(60);
+		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(61);
+		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(62);
+		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(63);
+		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(64);
+		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(65);
+		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(66);
+		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(67);
+		public static readonly FloatIndex MaxHappiness = new FloatIndex(68);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(69);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(70);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(71);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(72);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(73);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(74);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(75);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(76);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(77);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(78);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(79);
+		public static readonly FloatIndex NeutralVoicePitch = new FloatIndex(80);
+		public static readonly FloatIndex MouthRate = new FloatIndex(81);
+		public static readonly FloatIndex MouthMax = new FloatIndex(82);
+		public static readonly FloatIndex LipsFactor = new FloatIndex(83);
+		public static readonly FloatIndex MouthFactor = new FloatIndex(84);
+		public static readonly FloatIndex BreastsRate = new FloatIndex(85);
+		public static readonly FloatIndex BreastsMax = new FloatIndex(86);
+		public static readonly FloatIndex LeftBreastFactor = new FloatIndex(87);
+		public static readonly FloatIndex RightBreastFactor = new FloatIndex(88);
+		public static readonly FloatIndex GenitalsRate = new FloatIndex(89);
+		public static readonly FloatIndex GenitalsMax = new FloatIndex(90);
+		public static readonly FloatIndex LabiaFactor = new FloatIndex(91);
+		public static readonly FloatIndex PenetrationRate = new FloatIndex(92);
+		public static readonly FloatIndex PenetrationMax = new FloatIndex(93);
+		public static readonly FloatIndex VaginaFactor = new FloatIndex(94);
+		public static readonly FloatIndex DeepVaginaFactor = new FloatIndex(95);
+		public static readonly FloatIndex DeeperVaginaFactor = new FloatIndex(96);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(97);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(98);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(99);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(100);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(101);
 
 		public const int FloatCount = 102;
-		public int GetFloatCount() { return 102; }
+		public override int GetFloatCount() { return 102; }
 
 		// strings
 
 		public const int StringCount = 0;
-		public int GetStringCount() { return 0; }
+		public override int GetStringCount() { return 0; }
 
 
 		private static string[] durationNames_ = new string[]
@@ -172,17 +172,17 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetDurationName(int i)
+		public override string GetDurationName(DurationIndex i)
 		{
 			return DurationToString(i);
 		}
 
-		public static string DurationToString(int i)
+		public static string DurationToString(DurationIndex i)
 		{
-			if (i >= 0 && i < durationNames_.Length)
-				return durationNames_[i];
+			if (i.index >= 0 && i.index < durationNames_.Length)
+				return durationNames_[i.index];
 			else
-				return $"?{i}";
+				return $"?{i.index}";
 		}
 
 		public static string[] DurationNames
@@ -225,17 +225,17 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetBoolName(int i)
+		public override string GetBoolName(BoolIndex i)
 		{
 			return BoolToString(i);
 		}
 
-		public static string BoolToString(int i)
+		public static string BoolToString(BoolIndex i)
 		{
-			if (i >= 0 && i < boolNames_.Length)
-				return boolNames_[i];
+			if (i.index >= 0 && i.index < boolNames_.Length)
+				return boolNames_[i.index];
 			else
-				return $"?{i}";
+				return $"?{i.index}";
 		}
 
 		public static string[] BoolNames
@@ -379,17 +379,17 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetFloatName(int i)
+		public override string GetFloatName(FloatIndex i)
 		{
 			return FloatToString(i);
 		}
 
-		public static string FloatToString(int i)
+		public static string FloatToString(FloatIndex i)
 		{
-			if (i >= 0 && i < floatNames_.Length)
-				return floatNames_[i];
+			if (i.index >= 0 && i.index < floatNames_.Length)
+				return floatNames_[i.index];
 			else
-				return $"?{i}";
+				return $"?{i.index}";
 		}
 
 		public static string[] FloatNames
@@ -431,17 +431,17 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetStringName(int i)
+		public override string GetStringName(StringIndex i)
 		{
 			return StringToString(i);
 		}
 
-		public static string StringToString(int i)
+		public static string StringToString(StringIndex i)
 		{
-			if (i >= 0 && i < stringNames_.Length)
-				return stringNames_[i];
+			if (i.index >= 0 && i.index < stringNames_.Length)
+				return stringNames_[i.index];
 			else
-				return $"?{i}";
+				return $"?{i.index}";
 		}
 
 		public static string[] StringNames
@@ -565,7 +565,7 @@ namespace Cue
 			get { return allNames_; }
 		}
 
-		public string[] GetAllNames()
+		public override string[] GetAllNames()
 		{
 			return AllNames;
 		}

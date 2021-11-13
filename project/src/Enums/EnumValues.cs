@@ -4,17 +4,109 @@
 	{
 		string[] GetAllNames();
 
-		string GetDurationName(int i);
+		string GetDurationName(BasicEnumValues.DurationIndex i);
 		int GetDurationCount();
+		BasicEnumValues.DurationIndex[] GetDurationIndexes();
 
-		string GetBoolName(int i);
+		string GetBoolName(BasicEnumValues.BoolIndex i);
 		int GetBoolCount();
+		BasicEnumValues.BoolIndex[] GetBoolIndexes();
 
-		string GetFloatName(int i);
+		string GetFloatName(BasicEnumValues.FloatIndex i);
 		int GetFloatCount();
+		BasicEnumValues.FloatIndex[] GetFloatIndexes();
 
-		string GetStringName(int i);
+		string GetStringName(BasicEnumValues.StringIndex i);
 		int GetStringCount();
+		BasicEnumValues.StringIndex[] GetStringIndexes();
+	}
+
+
+	abstract class BasicEnumValues : IEnumValues
+	{
+		public struct DurationIndex
+		{
+			public int index;
+
+			public DurationIndex(int index)
+			{
+				this.index = index;
+			}
+		}
+
+		public struct BoolIndex
+		{
+			public int index;
+
+			public BoolIndex(int index)
+			{
+				this.index = index;
+			}
+		}
+
+		public struct FloatIndex
+		{
+			public int index;
+
+			public FloatIndex(int index)
+			{
+				this.index = index;
+			}
+		}
+
+		public struct StringIndex
+		{
+			public int index;
+
+			public StringIndex(int index)
+			{
+				this.index = index;
+			}
+		}
+
+
+		public abstract string[] GetAllNames();
+
+		public abstract string GetDurationName(DurationIndex i);
+		public abstract int GetDurationCount();
+
+		public BasicEnumValues.DurationIndex[] GetDurationIndexes()
+		{
+			var indexes = new BasicEnumValues.DurationIndex[GetDurationCount()];
+			for (int i = 0; i < indexes.Length; ++i)
+				indexes[i] = new BasicEnumValues.DurationIndex(i);
+			return indexes;
+		}
+
+		public abstract string GetBoolName(BoolIndex i);
+		public abstract int GetBoolCount();
+		public BasicEnumValues.BoolIndex[] GetBoolIndexes()
+		{
+			var indexes = new BasicEnumValues.BoolIndex[GetBoolCount()];
+			for (int i = 0; i < indexes.Length; ++i)
+				indexes[i] = new BasicEnumValues.BoolIndex(i);
+			return indexes;
+		}
+
+		public abstract string GetFloatName(FloatIndex i);
+		public abstract int GetFloatCount();
+		public BasicEnumValues.FloatIndex[] GetFloatIndexes()
+		{
+			var indexes = new BasicEnumValues.FloatIndex[GetFloatCount()];
+			for (int i = 0; i < indexes.Length; ++i)
+				indexes[i] = new BasicEnumValues.FloatIndex(i);
+			return indexes;
+		}
+
+		public abstract string GetStringName(StringIndex i);
+		public abstract int GetStringCount();
+		public BasicEnumValues.StringIndex[] GetStringIndexes()
+		{
+			var indexes = new BasicEnumValues.StringIndex[GetStringCount()];
+			for (int i = 0; i < indexes.Length; ++i)
+				indexes[i] = new BasicEnumValues.StringIndex(i);
+			return indexes;
+		}
 	}
 
 
@@ -58,44 +150,44 @@
 				strings_[i] = v.strings_[i];
 		}
 
-		public virtual Duration GetDuration(int i)
+		public virtual Duration GetDuration(BasicEnumValues.DurationIndex i)
 		{
-			return durations_[i];
+			return durations_[i.index];
 		}
 
-		public virtual void SetDuration(int i, Duration d)
+		public virtual void SetDuration(BasicEnumValues.DurationIndex i, Duration d)
 		{
-			durations_[i] = d;
+			durations_[i.index] = d;
 		}
 
-		public bool GetBool(int i)
+		public bool GetBool(BasicEnumValues.BoolIndex i)
 		{
-			return bools_[i];
+			return bools_[i.index];
 		}
 
-		public void SetBool(int i, bool b)
+		public void SetBool(BasicEnumValues.BoolIndex i, bool b)
 		{
-			bools_[i] = b;
+			bools_[i.index] = b;
 		}
 
-		public virtual float Get(int i)
+		public virtual float Get(BasicEnumValues.FloatIndex i)
 		{
-			return floats_[i];
+			return floats_[i.index];
 		}
 
-		public virtual void Set(int i, float f)
+		public virtual void Set(BasicEnumValues.FloatIndex i, float f)
 		{
-			floats_[i] = f;
+			floats_[i.index] = f;
 		}
 
-		public virtual string GetString(int i)
+		public virtual string GetString(BasicEnumValues.StringIndex i)
 		{
-			return strings_[i];
+			return strings_[i.index];
 		}
 
-		public virtual void SetString(int i, string s)
+		public virtual void SetString(BasicEnumValues.StringIndex i, string s)
 		{
-			strings_[i] = s;
+			strings_[i.index] = s;
 		}
 	}
 }
