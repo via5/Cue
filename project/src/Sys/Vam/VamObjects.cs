@@ -8,17 +8,24 @@ namespace Cue.Sys.Vam
 	abstract class VamBasicObjectCreator : IObjectCreator
 	{
 		private string name_;
+		private Logger log_;
 		protected ObjectParameters ps_;
 
 		protected VamBasicObjectCreator(string name, ObjectParameters ps)
 		{
 			name_ = name;
+			log_ = new Logger(Logger.Sys, $"objectCreator.{name}");
 			ps_ = ps;
 		}
 
 		public string Name
 		{
 			get { return name_; }
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public abstract void Create(IAtom user, string id, Action<IObject> callback);
@@ -92,29 +99,29 @@ namespace Cue.Sys.Vam
 
 			if (atom != null)
 			{
-				Cue.LogInfo($"atom {id} already exists, taking it");
+				Log.Info($"atom {id} already exists, taking it");
 			}
 			else
 			{
-				Cue.LogInfo($"creating atom {id}");
+				Log.Info($"creating atom {id}");
 
 				yield return sc_.AddAtomByType(type_, id);
 
 				atom = sc_.GetAtomByUid(id);
 				if (atom == null)
 				{
-					Cue.LogError($"failed to create atom '{id}'");
+					Log.Error($"failed to create atom '{id}'");
 					f(null);
 					yield break;
 				}
 
-				Cue.LogInfo($"atom {id} created");
+				Log.Info($"atom {id} created");
 			}
 
 			if (!string.IsNullOrEmpty(preset_))
 			{
 				var path = Cue.Instance.Sys.GetResourcePath(preset_);
-				Cue.LogInfo($"atom {id} loading preset {path}");
+				Log.Info($"atom {id} loading preset {path}");
 				atom.LoadPreset(path);
 			}
 
@@ -130,8 +137,8 @@ namespace Cue.Sys.Vam
 			}
 			catch (Exception e)
 			{
-				Cue.LogError($"exception while creating atom {id}");
-				Cue.LogError(e.ToString());
+				Log.Error($"exception while creating atom {id}");
+				Log.Error(e.ToString());
 			}
 		}
 
@@ -174,12 +181,12 @@ namespace Cue.Sys.Vam
 
 			var atom = a.Atom;
 
-			Cue.LogInfo($"getting components");
+			Log.Info($"getting components");
 
 			var cua = atom.GetComponentInChildren<CustomUnityAssetLoader>();
 			if (cua == null)
 			{
-				Cue.LogError($"object '{atom.uid}' has no CustomUnityAssetLoader component");
+				Log.Error($"object '{atom.uid}' has no CustomUnityAssetLoader component");
 				f(null);
 				yield break;
 			}
@@ -187,7 +194,7 @@ namespace Cue.Sys.Vam
 			var asset = atom.GetStorableByID("asset");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{atom.uid}' has no asset storable");
+				Log.Error($"object '{atom.uid}' has no asset storable");
 				f(null);
 				yield break;
 			}
@@ -195,7 +202,7 @@ namespace Cue.Sys.Vam
 			var url = asset.GetUrlJSONParam("assetUrl");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{atom.uid}' asset has no assetUrl param");
+				Log.Error($"object '{atom.uid}' asset has no assetUrl param");
 				f(null);
 				yield break;
 			}
@@ -203,7 +210,7 @@ namespace Cue.Sys.Vam
 			var name = asset.GetStringChooserJSONParam("assetName");
 			if (asset == null)
 			{
-				Cue.LogError($"object '{atom.uid}' asset has no assetName param");
+				Log.Error($"object '{atom.uid}' asset has no assetName param");
 				f(null);
 				yield break;
 			}
@@ -211,7 +218,7 @@ namespace Cue.Sys.Vam
 
 			if (!string.IsNullOrEmpty(assetUrl_) && !string.IsNullOrEmpty(assetName_))
 			{
-				Cue.LogInfo($"object {atom.uid} loading url");
+				Log.Info($"object {atom.uid} loading url");
 
 				bool loadingUrl = true;
 
@@ -225,7 +232,7 @@ namespace Cue.Sys.Vam
 					{
 						if (name.choices.Count > 0)
 						{
-							Cue.LogInfo($"object {atom.uid} url loaded, setting name");
+							Log.Info($"object {atom.uid} url loaded, setting name");
 							name.val = assetName_;
 							loadingUrl = false;
 						}
@@ -234,7 +241,7 @@ namespace Cue.Sys.Vam
 					{
 						if (cua.isAssetLoaded)
 						{
-							Cue.LogInfo($"object {atom.uid} asset loaded, done");
+							Log.Info($"object {atom.uid} asset loaded, done");
 							yield break;
 						}
 					}
@@ -273,14 +280,14 @@ namespace Cue.Sys.Vam
 			var cs = a.Atom.GetComponentInChildren<DAZCharacterSelector>();
 			if (cs == null)
 			{
-				a.Log.Error("no DAZCharacterSelector");
+				Log.Error($"{a.ID}: no DAZCharacterSelector");
 				return;
 			}
 
 			var s = cs.GetClothingItem(id_);
 			if (s == null)
 			{
-				a.Log.Error($"no strapon clothing item '{id_}'");
+				Log.Error($"{a.ID}: no strapon clothing item '{id_}'");
 				return;
 			}
 

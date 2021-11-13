@@ -9,6 +9,19 @@ namespace Cue.Sys.Vam
 		private const float ValuePongOffset = 0.087654321f;
 		private const float ValueUninstallOffset = 0.045612378f;
 
+		private static Logger log_ = null;
+
+		public static Logger Log
+		{
+			get
+			{
+				if (log_ == null)
+					log_ = new Logger(Logger.Sys, "hijacker");
+
+				return log_;
+			}
+		}
+
 		private static float ValuePing(DAZMorph m)
 		{
 			if (m.min < m.max)
@@ -35,15 +48,15 @@ namespace Cue.Sys.Vam
 
 		public static void Install(MorphInfo m)
 		{
-			Cue.LogVerbose($"{m.ID}: installing (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.ID}: installing (tk={CueMain.Instance.Token})");
 
 			bool hadOld = DoUninstall(m);
 			DoInstall(m);
 
 			if (hadOld)
-				Cue.LogVerbose($"hijacked {m.ID} (replaced old)");
+				Log.Verbose($"hijacked {m.ID} (replaced old)");
 			else
-				Cue.LogVerbose($"hijacked {m.ID} (new)");
+				Log.Verbose($"hijacked {m.ID} (new)");
 		}
 
 		public static bool Uninstall(MorphInfo m)
@@ -51,7 +64,7 @@ namespace Cue.Sys.Vam
 			bool found = DoUninstall(m);
 
 			if (found)
-				Cue.LogVerbose($"restored {m.ID}");
+				Log.Verbose($"restored {m.ID}");
 
 			return found;
 		}
@@ -61,14 +74,14 @@ namespace Cue.Sys.Vam
 			var st = m.DAZMorph?.jsonFloat;
 			if (st == null)
 			{
-				Cue.LogError($"{m.ID}: can't hijack, no jsonFloat");
+				Log.Error($"{m.ID}: can't hijack, no jsonFloat");
 				return;
 			}
 
 			var old = st.setCallbackFunction;
 			st.setCallbackFunction = (v) => Callback(m, v, st, old);
 
-			Cue.LogVerbose($"{m.ID}: installed (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.ID}: installed (tk={CueMain.Instance.Token})");
 		}
 
 		private static bool DoUninstall(MorphInfo mi)
@@ -76,15 +89,15 @@ namespace Cue.Sys.Vam
 			var m = mi?.DAZMorph;
 			if (m?.jsonFloat == null)
 			{
-				Cue.LogError($"{m.uid}: can't restore, no jsonFloat");
+				Log.Error($"{m.uid}: can't restore, no jsonFloat");
 				return false;
 			}
 
 			var oldValue = m.jsonFloat.val;
 
-			Cue.LogVerbose($"{m.uid}: trying to uninstall, old value {oldValue} (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.uid}: trying to uninstall, old value {oldValue} (tk={CueMain.Instance.Token})");
 
-			Cue.LogVerbose($"{m.uid}: pinging (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.uid}: pinging (tk={CueMain.Instance.Token})");
 
 			bool hadOld = false;
 			m.jsonFloat.val = ValuePing(m);
@@ -93,18 +106,18 @@ namespace Cue.Sys.Vam
 			{
 				if (m.jsonFloat.val == ValuePong(m))
 				{
-					Cue.LogVerbose($"{m.uid}: pong received, uninstalling (tk={CueMain.Instance.Token})");
+					Log.Verbose($"{m.uid}: pong received, uninstalling (tk={CueMain.Instance.Token})");
 					hadOld = true;
 					m.jsonFloat.val = ValueUninstall(m);
 				}
 				else
 				{
-					Cue.LogVerbose($"{m.uid}: no answer ({m.jsonFloat.val}), not installed (tk={CueMain.Instance.Token})");
+					Log.Verbose($"{m.uid}: no answer ({m.jsonFloat.val}), not installed (tk={CueMain.Instance.Token})");
 				}
 			}
 			finally
 			{
-				Cue.LogVerbose($"{m.uid}: restoring old value {oldValue} (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: restoring old value {oldValue} (tk={CueMain.Instance.Token})");
 				m.jsonFloat.val = oldValue;
 			}
 
@@ -117,15 +130,15 @@ namespace Cue.Sys.Vam
 
 			if (f == ValuePing(m))
 			{
-				Cue.LogVerbose($"{m.uid}: ping received, sending pong (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: ping received, sending pong (tk={CueMain.Instance.Token})");
 				st.valNoCallback = ValuePong(m);
 				return;
 			}
 			else if (f == ValueUninstall(m))
 			{
-				Cue.LogVerbose($"{m.uid}: uninstall received, uninstalling (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: uninstall received, uninstalling (tk={CueMain.Instance.Token})");
 				st.setCallbackFunction = old;
-				Cue.LogVerbose($"{m.uid}: uninstalled (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: uninstalled (tk={CueMain.Instance.Token})");
 			}
 			else
 			{
@@ -375,9 +388,16 @@ namespace Cue.Sys.Vam
 		private Dictionary<string, MorphInfo> map_ =
 			new Dictionary<string, MorphInfo>();
 
+		private Logger log_ = new Logger(Logger.Sys, "morphManager");
+
 		public static VamMorphManager Instance
 		{
 			get { return instance_; }
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public MorphInfo[] GetAll()
@@ -408,7 +428,7 @@ namespace Cue.Sys.Vam
 				m = bank.GetMorph(morphId);
 
 			if (m == null)
-				Cue.LogError($"{atom.ID}: morph '{morphId}' not found");
+				Log.Error($"{atom.ID}: morph '{morphId}' not found");
 
 			mi = new MorphInfo(atom, morphId, m);
 			map_.Add(key, mi);

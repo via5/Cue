@@ -9,14 +9,21 @@ namespace Cue.Sys.Vam
 	{
 		private const string AtomID = "cue!config";
 
+		private Logger log_;
 		private Atom atom_ = null;
 		private JSONStorableString p_ = null;
 		private JSONClass save_ = null;
 
 		public LiveSaver()
 		{
+			log_ = new Logger(Logger.Sys, "liveSaver");
 			FindAtom();
 			CheckAtom();
+		}
+
+		Logger Log
+		{
+			get { return log_; }
 		}
 
 		public void Save(JSONClass o)
@@ -56,7 +63,7 @@ namespace Cue.Sys.Vam
 					}
 					catch (Exception e)
 					{
-						Cue.LogError($"livesaver: failed to parse json, {e}");
+						Log.Error($"failed to parse json, {e}");
 					}
 				}
 			}
@@ -91,7 +98,7 @@ namespace Cue.Sys.Vam
 			var st = atom_.GetStorableByID("Text");
 			if (st == null)
 			{
-				Cue.LogError($"lifesaver: atom {atom_.uid} has no Text storable");
+				Log.Error($"atom {atom_.uid} has no Text storable");
 				return null;
 			}
 
@@ -105,27 +112,27 @@ namespace Cue.Sys.Vam
 				atom_ = GetAtom();
 				if (atom_ == null)
 				{
-					Cue.LogInfo($"livesaver: creating atom {AtomID}");
+					Log.Info($"creating atom {AtomID}");
 					yield return DoCreateAtom();
 				}
 
-				Cue.LogInfo($"livesaver: looking for atom");
+				Log.Info($"looking for atom");
 
 				for (int tries = 0; tries < 10; ++tries)
 				{
 					atom_ = GetAtom();
 					if (atom_ != null)
 					{
-						Cue.LogInfo($"livesaver: atom created");
+						Log.Info($"atom created");
 						break;
 					}
 
-					Cue.LogInfo($"livesaver: waiting");
+					Log.Info($"waiting");
 					yield return new WaitForSeconds(0.5f);
 				}
 
 				if (atom_ == null)
-					Cue.LogError("lifesaver: failed to create live saver atom");
+					Log.Error("failed to create live saver atom");
 			}
 
 			if (atom_ != null && p_ == null)
@@ -133,7 +140,7 @@ namespace Cue.Sys.Vam
 				p_ = GetParameter();
 				if (p_ == null)
 				{
-					Cue.LogError($"lifesaver: storable has no text parameter");
+					Log.Error($"storable has no text parameter");
 					yield break;
 				}
 			}

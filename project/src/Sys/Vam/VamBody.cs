@@ -10,14 +10,14 @@ namespace Cue.Sys.Vam
 		private DAZBone bone_;
 		private ConfigurableJoint joint_;
 
-		public VamBone(Rigidbody parent, DAZBone b)
+		public VamBone(VamBody body, Rigidbody parent, DAZBone b)
 		{
 			parent_ = parent;
 			bone_ = b;
 			joint_ = b.GetComponent<ConfigurableJoint>();
 
 			if (joint_ == null)
-				Cue.LogError("bone has no configurable joint");
+				body.Log.Error($"bone '{b.name}' has no configurable joint");
 		}
 
 		public Transform Transform
@@ -54,6 +54,11 @@ namespace Cue.Sys.Vam
 		public VamAtom Atom
 		{
 			get { return atom_; }
+		}
+
+		public Logger Log
+		{
+			get { return atom_.Log; }
 		}
 
 		public virtual bool Exists { get { return true; } }
@@ -106,11 +111,11 @@ namespace Cue.Sys.Vam
 
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
-				Atom.Log.Error("no skin gloss parameter");
+				Log.Error("no skin gloss parameter");
 
 			color_ = new ColorParameter(a, "skin", "Skin Color");
 			if (!color_.Check(true))
-				Atom.Log.Error("no skin color parameter");
+				Log.Error("no skin color parameter");
 
 			initialColor_ = color_.Value;
 			parts_ = CreateBodyParts();
@@ -496,7 +501,7 @@ namespace Cue.Sys.Vam
 
 				if (hipBone_ == null)
 				{
-					Cue.LogError($"{Atom.ID} can't find hip bone");
+					Log.Error($"can't find hip bone");
 					return null;
 				}
 			}
@@ -509,18 +514,18 @@ namespace Cue.Sys.Vam
 			var t = hipBone_.transform.Find(id);
 			if (t == null)
 			{
-				Cue.LogError($"{Atom.ID}: no finger bone {id}");
+				Log.Error($"no finger bone {id}");
 				return null;
 			}
 
 			var b = t.GetComponent<DAZBone>();
 			if (b == null)
 			{
-				Cue.LogError($"{Atom.ID}: no DAZBone in {id}");
+				Log.Error($"no DAZBone in {id}");
 				return null;
 			}
 
-			return new VamBone(hand, b);
+			return new VamBone(this, hand, b);
 		}
 
 		public void OnPluginState(bool b)
@@ -628,7 +633,7 @@ namespace Cue.Sys.Vam
 
 				var rb = U.FindRigidbody(Atom.Atom, name);
 				if (rb == null)
-					Cue.LogError($"{Atom.ID}: rb {name} not found");
+					Log.Error($"rb {name} not found");
 
 				rbs.Add(rb);
 			}
@@ -638,7 +643,7 @@ namespace Cue.Sys.Vam
 			{
 				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"{Atom.ID}: rb {rbs[0].name} has no controller {controller}");
+					Log.Error($"rb {rbs[0].name} has no controller {controller}");
 			}
 
 			return new RigidbodyBodyPart(Atom, id, rbs.ToArray(), fc, colliders);
@@ -654,14 +659,14 @@ namespace Cue.Sys.Vam
 
 			var rb = U.FindRigidbody(Atom.Atom, name);
 			if (rb == null)
-				Cue.LogError($"{Atom.ID}: rb {name} not found");
+				Log.Error($"rb {name} not found");
 
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
 				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"{Atom.ID}: rb {name} has no controller {controller} ");
+					Log.Error($"rb {name} has no controller {controller} ");
 			}
 
 			return new RigidbodyBodyPart(Atom, id, new Rigidbody[] { rb }, fc, colliders);
@@ -678,20 +683,20 @@ namespace Cue.Sys.Vam
 			var o = U.FindChildRecursive(Atom.Atom.transform, name);
 			if (o == null)
 			{
-				Cue.LogError($"{Atom.ID}: trigger {name} not found");
+				Log.Error($"trigger {name} not found");
 				return null;
 			}
 
 			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (t == null)
 			{
-				Cue.LogError($"{Atom.ID}: trigger {name} has no event handler");
+				Log.Error($"trigger {name} has no event handler");
 				return null;
 			}
 
 			if (t.thisRigidbody == null)
 			{
-				Cue.LogError($"{Atom.ID}: trigger {name} has no rb");
+				Log.Error($"trigger {name} has no rb");
 				return null;
 			}
 
@@ -700,7 +705,7 @@ namespace Cue.Sys.Vam
 			{
 				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"trigger {name} has no controller {controller}");
+					Log.Error($"trigger {name} has no controller {controller}");
 			}
 
 			return new TriggerBodyPart(
@@ -718,7 +723,7 @@ namespace Cue.Sys.Vam
 			var c = U.FindCollider(Atom.Atom, name);
 			if (c == null)
 			{
-				Cue.LogError($"{Atom.ID}: collider {name} not found");
+				Log.Error($"collider {name} not found");
 				return null;
 			}
 
@@ -727,7 +732,7 @@ namespace Cue.Sys.Vam
 			{
 				fc = U.FindController(Atom.Atom, controller);
 				if (fc == null)
-					Cue.LogError($"{Atom.ID}: collider {name} has no controller {controller}");
+					Log.Error($"collider {name} has no controller {controller}");
 			}
 
 			Rigidbody rb = null;
@@ -735,7 +740,7 @@ namespace Cue.Sys.Vam
 			{
 				rb = U.FindRigidbody(Atom.Atom, closestRb);
 				if (rb == null)
-					Cue.LogError($"{Atom.ID}: collider {name} has no rb {closestRb}");
+					Log.Error($"collider {name} has no rb {closestRb}");
 			}
 
 			return new ColliderBodyPart(Atom, id, c, fc, rb);

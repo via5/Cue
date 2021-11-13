@@ -47,6 +47,11 @@ namespace Cue.Sys.Vam
 				return (t == rightHandAnchor_);
 		}
 
+		public Logger Log
+		{
+			get { return (Cue.Instance.VamSys.Input as VamInput).Log; }
+		}
+
 		private void Get()
 		{
 			if (got_)
@@ -56,15 +61,15 @@ namespace Cue.Sys.Vam
 
 			cameraRig_ = sc_.GetAtomByUid("[CameraRig]");
 			if (cameraRig_ == null)
-				Cue.LogError("no camera rig");
+				Log.Error("no camera rig");
 
 			leftHandAnchor_ = U.FindChildRecursive(cameraRig_, "LeftHandAnchor")?.transform;
 			if (leftHandAnchor_ == null)
-				Cue.LogError("camera rig has no left hand anchor");
+				Log.Error("camera rig has no left hand anchor");
 
 			rightHandAnchor_ = U.FindChildRecursive(cameraRig_, "RightHandAnchor")?.transform;
 			if (rightHandAnchor_ == null)
-				Cue.LogError("camera rig has no right hand anchor");
+				Log.Error("camera rig has no right hand anchor");
 		}
 	}
 
@@ -184,7 +189,6 @@ namespace Cue.Sys.Vam
 			{
 				if (getUp_())
 				{
-					//Cue.LogInfo($"{name_} up");
 					down_ = false;
 					trigger_ = false;
 					triggered_ = false;
@@ -196,7 +200,6 @@ namespace Cue.Sys.Vam
 
 					if (elapsed_ > 2 && !triggered_)
 					{
-						//Cue.LogInfo($"{name_} triggering");
 						triggered_ = true;
 						trigger_ = true;
 					}
@@ -206,7 +209,6 @@ namespace Cue.Sys.Vam
 			{
 				if (getDown_())
 				{
-					//Cue.LogInfo($"{name_} down");
 					elapsed_ = 0;
 					down_ = true;
 				}
@@ -342,6 +344,7 @@ namespace Cue.Sys.Vam
 	{
 		private SuperController sc_ = SuperController.singleton;
 		private VamSys sys_;
+		private Logger log_;
 		private Ray ray_ = new Ray();
 		private VamButton left_ = new VamButton(0);
 		private VamButton right_ = new VamButton(1);
@@ -368,6 +371,7 @@ namespace Cue.Sys.Vam
 		public VamInput(VamSys sys)
 		{
 			sys_ = sys;
+			log_ = new Logger(Logger.Sys, "vamInput");
 
 			leftAction_ = new VamDelayedAction(
 				() => sc_.GetLeftGrab(),
@@ -378,6 +382,11 @@ namespace Cue.Sys.Vam
 				() => sc_.GetRightGrab(),
 				() => sc_.GetRightGrabRelease(),
 				"rightgrab");
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public void Update(float s)

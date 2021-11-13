@@ -11,17 +11,17 @@ namespace Cue.Sys.Vam
 			private JSONStorableFloat styleCling_;
 			private JSONStorableFloat rigidityRolloff_;
 
-			public HairItem(HairSimControl c)
+			public HairItem(VamHair h, HairSimControl c)
 			{
 				c_ = c;
 
 				styleCling_ = c_.GetFloatJSONParam("cling");
 				if (styleCling_ == null)
-					Cue.LogInfo("cling not found");
+					h.Log.Info("cling not found");
 
 				rigidityRolloff_ = c_.GetFloatJSONParam("rigidityRolloffPower");
 				if (rigidityRolloff_ == null)
-					Cue.LogInfo("rigidityRolloffPower not found");
+					h.Log.Info("rigidityRolloffPower not found");
 			}
 
 			public void Reset()
@@ -82,16 +82,25 @@ namespace Cue.Sys.Vam
 		private DAZCharacterSelector char_;
 		private float loose_ = 0;
 		private List<HairItem> list_ = new List<HairItem>();
+		private Logger log_;
 
 		public VamHair(VamAtom a)
 		{
 			atom_ = a;
+
 			if (atom_ == null)
+			{
+				log_ = new Logger(Logger.Sys, "vamHair");
 				return;
+			}
+			else
+			{
+				log_ = new Logger(Logger.Sys, atom_, "vamHair");
+			}
 
 			char_ = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
 			if (char_ == null)
-				atom_.Log.Error("no DAZCharacterSelector for hair");
+				Log.Error("no DAZCharacterSelector for hair");
 
 			foreach (var g in char_.hairItems)
 			{
@@ -100,8 +109,13 @@ namespace Cue.Sys.Vam
 
 				var h = g.GetComponentInChildren<HairSimControl>();
 				if (h != null)
-					list_.Add(new HairItem(h));
+					list_.Add(new HairItem(this, h));
 			}
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public void OnPluginState(bool b)

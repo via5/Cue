@@ -70,7 +70,7 @@ namespace Cue.Sys.Vam
 		{
 			if (Controller == null)
 			{
-				Cue.LogError($"cannot link {this} to {other}, no controller");
+				Log.Error($"cannot link {this} to {other}, no controller");
 				return;
 			}
 
@@ -83,13 +83,13 @@ namespace Cue.Sys.Vam
 				var o = other as VamBodyPart;
 				if (o?.Rigidbody == null)
 				{
-					Cue.LogError($"cannot link {this} to {other}, not an rb");
+					Log.Error($"cannot link {this} to {other}, not an rb");
 				}
 				else
 				{
 					if (o.Controller?.linkToRB == Rigidbody)
 					{
-						Cue.LogError(
+						Log.Error(
 							$"cannot link {this} to {other}, would be " +
 							$"reciprocal");
 					}
@@ -226,7 +226,7 @@ namespace Cue.Sys.Vam
 					if (dp < closest)
 					{
 						if (debug)
-							Cue.LogError($"both valid, closest is position, {thisPos} {otherPos} {dp}");
+							Log.Info($"both valid, closest is position, {thisPos} {otherPos} {dp}");
 
 						closest = dp;
 					}
@@ -234,13 +234,14 @@ namespace Cue.Sys.Vam
 					{
 						if (debug)
 						{
-							Cue.LogError($"both valid, closest is {thisDebug} {otherDebug} {closest}");
+							Log.Info($"both valid, closest is {thisDebug} {otherDebug} {closest}");
 						}
 					}
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					Cue.LogError($"t={thisColliders} o={otherColliders?.Length}");
+					Log.Error($"ex1 t={thisColliders} o={otherColliders?.Length}");
+					Log.Error(e.ToString());
 				}
 
 				return closest;
@@ -268,16 +269,17 @@ namespace Cue.Sys.Vam
 
 					if (debug)
 					{
-						Cue.LogError(
+						Log.Info(
 							$"this valid, " +
 							$"closest is {other} at {otherPos}, " +
 							$"this is {this} {c.transform.parent.name}.{c.name} " +
 							$"at {c.transform.position}, d={closest}");
 					}
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					Cue.LogError("2");
+					Log.Error("ex2");
+					Log.Error(e.ToString());
 				}
 
 
@@ -306,14 +308,15 @@ namespace Cue.Sys.Vam
 
 					if (debug)
 					{
-						Cue.LogError(
+						Log.Info(
 							$"other valid, closest is {thisPos} " +
 							$"{c.transform.parent.name}.{c.name} {closest}");
 					}
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					Cue.LogError("1");
+					Log.Error("ex3");
+					Log.Error(e.ToString());
 				}
 
 				return closest;
@@ -323,7 +326,7 @@ namespace Cue.Sys.Vam
 				float d = Vector3.Distance(thisPos, other.Position);
 
 				if (debug)
-					Cue.LogError($"neither valid, {thisPos} {other.Position} {d}");
+					Log.Info($"neither valid, {thisPos} {other.Position} {d}");
 
 				return d;
 			}

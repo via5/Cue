@@ -70,7 +70,7 @@ namespace Cue.Sys.Vam
 			atom_ = atom;
 			log_ = new Logger(Logger.Sys, this, "vamAtom");
 			setOnlyKeyJointsOn_ = new ActionParameter(
-				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
+				this, "AllJointsControl", "SetOnlyKeyJointsOn");
 
 			char_ = atom_.GetComponentInChildren<DAZCharacter>();
 			if (char_ != null)
@@ -335,7 +335,7 @@ namespace Cue.Sys.Vam
 
 		private void OnCorruption()
 		{
-			Cue.LogError(
+			Log.Error(
 				"cue: VaM detected corruption, disabling plugin");
 
 			var p = Cue.Instance.FindPerson(ID);

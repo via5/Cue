@@ -114,7 +114,7 @@ namespace Cue.Sys.Vam
 			{
 				if (ho.hand == handOutputType_)
 				{
-					Cue.LogInfo($"{t}");
+					Log.Info($"{t}");
 					return true;
 				}
 			}

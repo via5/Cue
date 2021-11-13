@@ -134,7 +134,6 @@ namespace Cue.Sys.Vam
 			DisableFreezeWhenGrabbed(a);
 			DisableAutoExpressions(a);
 			EnableAudioJawDriving(a);
-			FixTriggers(a);
 			SetEyes(a);
 		}
 
@@ -178,34 +177,6 @@ namespace Cue.Sys.Vam
 				a, "JawControl", "driveXRotationFromAudioSourceMultiplier");
 
 			v.val = v.max;
-		}
-
-		private static void FixTriggers(Atom a)
-		{
-			// not sure that's necessary, the trigger seems updated on reload
-
-			//var c = Cue.Instance.VamSys.FindCollider(
-			//	a, "AutoColliderAutoCollidersFaceCentral2Hard");
-			//
-			//if (c == null)
-			//{
-			//	Cue.LogError($"FixTriggers: lip collider not found in {a.uid}");
-			//	return;
-			//}
-			//
-			//var o = Cue.Instance.VamSys.FindChildRecursive(a.transform, "LipTrigger")
-			//	?.GetComponentInChildren<CollisionTriggerEventHandler>();
-			//
-			//if (o == null)
-			//{
-			//	Cue.LogError($"FixTriggers: lip trigger not found in {a.uid}");
-			//	return;
-			//}
-			//
-			//var t = o.collisionTrigger.transform;
-			//
-			//Cue.LogError($"FixTriggers: moving lip trigger from {t.position} to {c.bounds.center} for {a.uid}");
-			////t.position = c.bounds.center;
 		}
 
 		private static void SetEyes(Atom a)
