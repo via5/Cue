@@ -11,7 +11,7 @@ namespace Cue
 
 		public AnimationResources()
 		{
-			log_ = new Logger(Logger.Resources, "AnimRes");
+			log_ = new Logger(Logger.Resources, "resAnim");
 		}
 
 		public bool Load()

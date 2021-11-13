@@ -12,7 +12,12 @@ namespace Cue
 
 		public PersonalityResources()
 		{
-			log_ = new Logger(Logger.Resources, "PersRes");
+			log_ = new Logger(Logger.Resources, "resPs");
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public bool Load()
@@ -25,7 +30,7 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				log_.Error("failed to load personalities, " + e.ToString());
+				Log.Error("failed to load personalities, " + e.ToString());
 				return false;
 			}
 		}
@@ -38,7 +43,7 @@ namespace Cue
 					return ps.Clone(null, p);
 			}
 
-			Cue.LogError($"can't clone personality '{name}', not found");
+			Log.Error($"can't clone personality '{name}', not found");
 			return null;
 		}
 
@@ -65,7 +70,7 @@ namespace Cue
 
 		private void LoadFile(string name, JSONClass root)
 		{
-			log_.Info($"loading personality '{name}'");
+			Log.Info($"loading personality '{name}'");
 
 			try
 			{
@@ -76,8 +81,8 @@ namespace Cue
 			}
 			catch (LoadFailed e)
 			{
-				log_.Error($"failed to load personality '{name}'");
-				log_.Error(e.ToString());
+				Log.Error($"failed to load personality '{name}'");
+				Log.Error(e.ToString());
 			}
 		}
 
@@ -207,12 +212,12 @@ namespace Cue
 					var s = J.ReqString(smn, "bodyPart");
 					sm.bodyPart = BP.FromString(s);
 					if (sm.bodyPart == -1 && s != "unknown")
-						log_.Error($"{p}: bad bodyPart {s}");
+						Log.Error($"{p}: bad bodyPart {s}");
 
 					s = J.ReqString(smn, "sourceBodyPart");
 					sm.sourceBodyPart = BP.FromString(s);
 					if (sm.sourceBodyPart == -1 && s != "unknown")
-						log_.Error($"{p}: bad sourceBodyPart {s}");
+						Log.Error($"{p}: bad sourceBodyPart {s}");
 
 					sm.modifier = J.ReqFloat(smn, "modifier");
 					sms.Add(sm);
@@ -224,7 +229,7 @@ namespace Cue
 
 		private void Add(Personality p, bool abst)
 		{
-			log_.Info(p.ToString());
+			Log.Info(p.ToString());
 			all_.Add(p);
 
 			if (!abst)

@@ -248,7 +248,7 @@ namespace Cue
 		public MacGruberGaze(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Integration, p, "MacGruberGaze");
+			log_ = new Logger(Logger.Integration, p, "mgGaze");
 
 			headRotationSpring_ = new Sys.Vam.FloatParameter(
 				p, "headControl", "holdRotationSpring");

@@ -468,7 +468,6 @@ namespace Cue.Proc
 					return bwdDuration_ == null ? fwdDuration_ : bwdDuration_;
 
 				default:
-					//Cue.LogError($"??{State}");
 					return fwdDuration_;
 			}
 		}
@@ -486,7 +485,6 @@ namespace Cue.Proc
 					return bwdEasing_;
 
 				default:
-					//Cue.LogError($"??{State}");
 					return null;
 			}
 		}

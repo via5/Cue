@@ -158,8 +158,13 @@ namespace Cue
 		public Animator(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Animation, p, "Animator");
+			log_ = new Logger(Logger.Animation, p, "animator");
 			players_.AddRange(CreatePlayers(p));
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public static List<IPlayer> CreatePlayers(Person p)
@@ -257,7 +262,7 @@ namespace Cue
 				if (!failed_.Contains(type))
 				{
 					failed_.Add(type);
-					log_.Error($"no animation for type {Animations.ToString(type)}");
+					Log.Error($"no animation for type {Animations.ToString(type)}");
 				}
 
 				return false;
@@ -268,12 +273,12 @@ namespace Cue
 
 		public bool Play(Animation a, AnimationContext cx = null)
 		{
-			log_.Info("playing " + a.ToString());
+			Log.Info("playing " + a.ToString());
 			int flags = 0;
 
 			if (!Cue.Instance.Options.AllowMovement && a.HasMovement)
 			{
-				log_.Info("not playing animation, movement not allowed");
+				Log.Info("not playing animation, movement not allowed");
 				return false;
 			}
 
@@ -291,19 +296,19 @@ namespace Cue
 							return true;
 						}
 
-						log_.Error($"player '{p.Name}' failed to start {a}");
+						Log.Error($"player '{p.Name}' failed to start {a}");
 						return false;
 					}
 					catch (Exception e)
 					{
-						log_.Error($"exception while trying to play {a} with player {p}:");
-						log_.Error(e.ToString());
+						Log.Error($"exception while trying to play {a} with player {p}:");
+						Log.Error(e.ToString());
 						return false;
 					}
 				}
 			}
 
-			log_.Error("no player can play " + a.ToString());
+			Log.Error("no player can play " + a.ToString());
 			return false;
 		}
 
@@ -320,7 +325,7 @@ namespace Cue
 
 		public void StopType(int type)
 		{
-			log_.Verbose($"stopping animation {Animations.ToString(type)}");
+			Log.Verbose($"stopping animation {Animations.ToString(type)}");
 
 			int stopped = 0;
 
@@ -330,7 +335,7 @@ namespace Cue
 
 				if (a.anim.Type == type && !a.stopping)
 				{
-					log_.Info($"stopping animation {a}");
+					Log.Info($"stopping animation {a}");
 					a.stopping = true;
 					a.stopElapsed = 0;
 					a.player.RequestStop(a.anim.Sys);
@@ -340,13 +345,13 @@ namespace Cue
 
 			if (stopped == 0)
 			{
-				log_.Verbose(
+				Log.Verbose(
 					$"no animation {Animations.ToString(type)} found to stop, " +
 					$"count={playing_.Count}");
 			}
 			else
 			{
-				log_.Verbose($"stopped {stopped} animations");
+				Log.Verbose($"stopped {stopped} animations");
 			}
 		}
 
@@ -383,7 +388,7 @@ namespace Cue
 
 					if (a.stopElapsed >= StopGracePeriod)
 					{
-						log_.Error(
+						Log.Error(
 							$"force stopping animation {a.anim}, took too " +
 							$"long to stop by itself");
 
@@ -420,10 +425,10 @@ namespace Cue
 
 			if (fs != null && fs.Count > 0)
 			{
-				Cue.LogError("forces being applied right now:");
+				Log.Info("forces being applied right now:");
 
 				for (int i = 0; i < fs.Count; ++i)
-					Cue.LogError($"  - {fs[i]}");
+					Log.Info($"  - {fs[i]}");
 			}
 		}
 

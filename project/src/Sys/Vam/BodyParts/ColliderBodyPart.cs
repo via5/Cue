@@ -43,13 +43,13 @@ namespace Cue.Sys.Vam
 		public override Vector3 ControlPosition
 		{
 			get { return U.FromUnity(c_.bounds.center); }
-			set { Cue.LogError("cannot move colliders"); }
+			set { Log.Error("cannot move colliders"); }
 		}
 
 		public override Quaternion ControlRotation
 		{
 			get { return U.FromUnity(c_.transform.rotation); }
-			set { Cue.LogError("cannot rotate colliders"); }
+			set { Log.Error("cannot rotate colliders"); }
 		}
 
 		public override Vector3 Position

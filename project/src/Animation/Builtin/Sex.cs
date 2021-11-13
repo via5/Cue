@@ -125,7 +125,7 @@ namespace Cue.Proc
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)
 			{
-				Cue.LogError("hipForce not found");
+				Log.Error("hipForce not found");
 			}
 			else
 			{
@@ -140,7 +140,7 @@ namespace Cue.Proc
 			hipTorque_ = FindTarget("hipTorque") as Force;
 			if (hipTorque_ == null)
 			{
-				Cue.LogError("hipTorque not found");
+				Log.Error("hipTorque not found");
 			}
 			else
 			{
@@ -296,7 +296,7 @@ namespace Cue.Proc
 		{
 			if (Receiver == null)
 			{
-				Cue.LogError("no receiver");
+				Log.Error("no receiver");
 				return false;
 			}
 

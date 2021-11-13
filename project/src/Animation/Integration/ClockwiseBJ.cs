@@ -123,7 +123,7 @@
 
 		private void Init(Person p)
 		{
-			log_ = new Logger(Logger.Integration, p, "ClockwiseBJ");
+			log_ = new Logger(Logger.Integration, p, "cwbj");
 			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "enabled");
 			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
 			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");

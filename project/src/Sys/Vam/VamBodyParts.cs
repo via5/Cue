@@ -9,11 +9,23 @@ namespace Cue.Sys.Vam
 		private IAtom atom_;
 		private int type_;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
+		private Logger log_ = null;
 
 		protected VamBodyPart(IAtom a, int t)
 		{
 			atom_ = a;
 			type_ = t;
+		}
+
+		public Logger Log
+		{
+			get
+			{
+				if (log_ == null)
+					log_ = new Logger(Logger.Sys, atom_, ToString());
+
+				return log_;
+			}
 		}
 
 		public IAtom Atom

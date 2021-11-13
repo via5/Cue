@@ -22,6 +22,7 @@ namespace Cue
 	class Gaze
 	{
 		private Person person_;
+		private Logger log_;
 
 		// controls where the eyes are looking at
 		private IEyes eyes_;
@@ -56,6 +57,8 @@ namespace Cue
 		public Gaze(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Object, p, "gaze");
+
 			eyes_ = Integration.CreateEyes(p);
 			gazer_ = Integration.CreateGazer(p);
 			targets_ = new GazeTargets(p);
@@ -63,6 +66,11 @@ namespace Cue
 			render_ = new GazeRender(p);
 
 			person_.PersonalityChanged += OnPersonalityChanged;
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public GazeRender Render
@@ -127,7 +135,7 @@ namespace Cue
 					if (lastEmergency_ != emergency)
 					{
 						// new emergency
-						person_.Log.Info(
+						Log.Info(
 							$"gaze emergency: {events_[emergency]}, " +
 							$"gazer was {gazerEnabledBeforeEmergency_}");
 
@@ -143,7 +151,7 @@ namespace Cue
 					if (lastEmergency_ != -1)
 					{
 						// an emergency has just terminated
-						person_.Log.Info(
+						Log.Info(
 							$"gaze emergency finished: {events_[lastEmergency_]}, " +
 							$"gazer now {gazerEnabledBeforeEmergency_}");
 

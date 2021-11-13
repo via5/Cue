@@ -217,7 +217,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"congroup {Name}";
+			return $"congroup" + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()
@@ -372,7 +372,7 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"seqgroup {Name}";
+			return $"seqgroup" + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()

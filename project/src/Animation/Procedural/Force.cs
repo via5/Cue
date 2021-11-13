@@ -277,7 +277,9 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"{BP.ToString(bodyPartType_)}";
+			return
+				$"{TypeToString(type_)}.{BP.ToString(bodyPartType_)}" +
+				(Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()

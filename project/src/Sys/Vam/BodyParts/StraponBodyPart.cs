@@ -20,11 +20,6 @@ namespace Cue.Sys.Vam
 				Set(true);
 		}
 
-		private Logger Log
-		{
-			get { return VamAtom.Log; }
-		}
-
 		private string DildoID
 		{
 			get { return $"Dildo#{Atom.ID}"; }
@@ -134,7 +129,7 @@ namespace Cue.Sys.Vam
 				var collidersString = dildo_.GetParameter("colliders");
 				if (collidersString == "")
 				{
-					Cue.LogWarning("dildo is missing collidersString parameter");
+					Log.Warning("dildo is missing collidersString parameter");
 				}
 				else
 				{
@@ -148,7 +143,7 @@ namespace Cue.Sys.Vam
 
 						if (c == null)
 						{
-							Cue.LogError($"{Atom.ID}: dildo collider {cn} not found");
+							Log.Error($"{Atom.ID}: dildo collider {cn} not found");
 							continue;
 						}
 
@@ -161,23 +156,23 @@ namespace Cue.Sys.Vam
 					foreach (var c in colliders_)
 						names.Add(c.name);
 
-					Cue.LogInfo($"dildo colliders: {string.Join(", ", names.ToArray())}");
+					Log.Info($"dildo colliders: {string.Join(", ", names.ToArray())}");
 				}
 
 
 				var anchorName = dildo_.GetParameter("anchor");
 				if (anchorName == "")
 				{
-					Cue.LogWarning("dildo is missing anchor parameter");
+					Log.Warning("dildo is missing anchor parameter");
 				}
 				else
 				{
 					anchor_ = U.FindCollider(VamAtom.Atom, anchorName);
 
 					if (anchor_ == null)
-						Cue.LogError($"dildo anchor {anchor_} not found in {Atom.ID}");
+						Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
 					else
-						Cue.LogInfo($"dildo anchor: {anchor_}");
+						Log.Info($"dildo anchor: {anchor_}");
 				}
 
 
@@ -264,7 +259,7 @@ namespace Cue.Sys.Vam
 			var ct = d.GetComponentInChildren<CollisionTrigger>();
 			if (ct == null)
 			{
-				Cue.LogError($"{d.uid} has no collision trigger");
+				Log.Error($"{d.uid} has no collision trigger");
 				return;
 			}
 
@@ -274,7 +269,7 @@ namespace Cue.Sys.Vam
 			var h = d.GetComponentInChildren<CollisionTriggerEventHandler>();
 			if (h == null)
 			{
-				Cue.LogError($"{d.uid} has no collision trigger handler");
+				Log.Error($"{d.uid} has no collision trigger handler");
 				ct.triggerEnabled = oldTriggerEnabled;
 				return;
 			}

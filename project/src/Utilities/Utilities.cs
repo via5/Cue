@@ -535,13 +535,18 @@ namespace Cue
 		public Logger(int type, IObject o, string prefix)
 		{
 			type_ = type;
-			prefix_ = () => o.ID + (prefix == "" ? "" : " " + prefix);
+			prefix_ = () => o.ID + (prefix == "" ? "" : "." + prefix);
 		}
 
 		public Logger(int type, Sys.IAtom a, string prefix)
 		{
 			type_ = type;
-			prefix_ = () => a.ID + (prefix == "" ? "" : " " + prefix);
+			prefix_ = () => a.ID + (prefix == "" ? "" : "." + prefix);
+		}
+
+		public void Set(IObject o, string prefix)
+		{
+			prefix_ = () => o.ID + (prefix == "" ? "" : "." + prefix);
 		}
 
 		public static int Enabled

@@ -6,6 +6,7 @@
 		private const string Hidden = "hidden";
 
 		private readonly Person person_;
+		private readonly Logger log_;
 		private Sys.Vam.FloatParameterRO heelsAngle_;
 		private Sys.Vam.FloatParameterRO heelsHeight_;
 		private Sys.Vam.StringChooserParameter genitalsState_;
@@ -14,6 +15,7 @@
 		public ClothingManager(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Integration, p, "cm");
 
 			heelsAngle_ = new Sys.Vam.FloatParameterRO(
 				p, "via5.ClothingManager", "Heels angle");
@@ -26,6 +28,11 @@
 
 			breastsState_ = new Sys.Vam.StringChooserParameter(
 				p, "via5.ClothingManager", "Breasts state");
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public float HeelsAngle
@@ -66,7 +73,7 @@
 				foreach (var c in cs.clothingItems)
 				{
 					if (c.isActiveAndEnabled)
-						Cue.LogInfo($"{GetID(c)}");
+						Log.Info($"{GetID(c)}");
 				}
 			}
 		}

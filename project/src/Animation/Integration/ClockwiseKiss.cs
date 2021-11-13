@@ -197,7 +197,7 @@
 
 		private void Init(Person p)
 		{
-			log_ = new Logger(Logger.Integration, p, "ClockwiseKiss");
+			log_ = new Logger(Logger.Integration, p, "cwkiss");
 
 			enabled_ = new Sys.Vam.BoolParameter(
 				p, "ClockwiseSilver.Kiss", "enabled");

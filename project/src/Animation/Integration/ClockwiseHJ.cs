@@ -120,7 +120,7 @@
 
 		private void Init(Person p)
 		{
-			log_ = new Logger(Logger.Integration, p, "ClockwiseHJ");
+			log_ = new Logger(Logger.Integration, p, "cwhj");
 			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "enabled");
 			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
 			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");

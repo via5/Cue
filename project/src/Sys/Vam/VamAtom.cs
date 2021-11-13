@@ -68,7 +68,7 @@ namespace Cue.Sys.Vam
 		public VamAtom(Atom atom)
 		{
 			atom_ = atom;
-			log_ = new Logger(Logger.Sys, this, "VamAtom");
+			log_ = new Logger(Logger.Sys, this, "vamAtom");
 			setOnlyKeyJointsOn_ = new ActionParameter(
 				atom_, "AllJointsControl", "SetOnlyKeyJointsOn");
 

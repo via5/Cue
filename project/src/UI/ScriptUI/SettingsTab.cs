@@ -43,7 +43,7 @@ namespace Cue
 				ignore_ = true;
 
 				voicePitch_.Set(
-					person_.Personality.Voice.GetNormalPitch(person_),
+					person_.Personality.Voice.GetNormalPitch(),
 					0, 1);
 
 				traits_.Text = string.Join(" ", person_.Traits);

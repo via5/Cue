@@ -351,7 +351,7 @@ namespace Cue
 
 		private void OnException(Exception e)
 		{
-			Cue.LogError(e.ToString());
+			SuperController.LogError(e.ToString());
 
 			var now = Cue.Instance.Sys.RealtimeSinceStartup;
 
@@ -360,7 +360,7 @@ namespace Cue
 				++errorCount_;
 				if (errorCount_ > MaxErrors)
 				{
-					Cue.LogError(
+					SuperController.LogError(
 						$"more than {MaxErrors} errors in the last " +
 						"second, disabling plugin");
 

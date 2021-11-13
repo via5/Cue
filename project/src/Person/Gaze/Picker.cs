@@ -42,7 +42,7 @@ namespace Cue
 		public GazeTargetPicker(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.AI, person_, "GazeTargetPicker");
+			log_ = new Logger(Logger.AI, person_, "gaze.picker");
 
 			var main = new Frustum(Near, Far);
 			var fs = main.Split(XCount, YCount);

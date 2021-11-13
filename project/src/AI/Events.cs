@@ -14,13 +14,18 @@
 	{
 		private string name_;
 		protected Person person_;
-		protected Logger log_;
+		private Logger log_;
 
 		protected BasicEvent(string name, Person p)
 		{
 			name_ = name;
 			person_ = p;
-			log_ = new Logger(Logger.Event, p, "int." + name);
+			log_ = new Logger(Logger.Event, p, "event." + name);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public string Name

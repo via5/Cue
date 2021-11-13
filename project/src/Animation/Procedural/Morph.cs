@@ -284,7 +284,9 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"morph {morphId_} ({BP.ToString(bodyPartType_)})";
+			return
+				$"morph.{morphId_} ({BP.ToString(bodyPartType_)})"
+				 + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()

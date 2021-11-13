@@ -179,7 +179,7 @@ namespace Cue
 
 		private bool TryStartWith(Person target)
 		{
-			log_.Verbose($"starting for {person_} and {target}");
+			Log.Verbose($"starting for {person_} and {target}");
 
 			if (!Lock())
 			{
@@ -294,7 +294,7 @@ namespace Cue
 				// not all animations can run on player
 				if (!person_.IsPlayer)
 				{
-					log_.Info("must stop: animation is not playing");
+					Log.Info("must stop: animation is not playing");
 					return true;
 				}
 			}
@@ -304,7 +304,7 @@ namespace Cue
 
 			if (srcLips == null || targetLips == null)
 			{
-				log_.Info("must stop: no lips");
+				Log.Info("must stop: no lips");
 				return true;
 			}
 
@@ -314,7 +314,7 @@ namespace Cue
 
 			if (d >= sd)
 			{
-				log_.Info($"must stop: too far, {d}");
+				Log.Info($"must stop: too far, {d}");
 				return true;
 			}
 

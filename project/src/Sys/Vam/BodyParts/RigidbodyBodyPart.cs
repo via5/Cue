@@ -23,7 +23,7 @@ namespace Cue.Sys.Vam
 				var c = U.FindCollider(a.Atom, cn);
 				if (c == null)
 				{
-					Cue.LogError($"{a.ID}: collider {cn} not found");
+					Log.Error($"{a.ID}: collider {cn} not found");
 					continue;
 				}
 

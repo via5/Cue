@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Cue.BVH
 {
@@ -16,11 +15,18 @@ namespace Cue.BVH
         private string path_;
         private string name_;
         private bool inited_ = false;
+        private Logger log_;
 
         public File(string _path)
         {
             path_ = _path;
+            log_ = new Logger(Logger.Animation, "bvhFile " + _path);
             Load(path_);
+        }
+
+        Logger Log
+        {
+            get { return log_; }
         }
 
         public string Name
@@ -68,7 +74,7 @@ namespace Cue.BVH
             char[] delims = { '\r', '\n' };
             var rawText = Cue.Instance.Sys.ReadFileIntoString(path);
             if (rawText.Length == 0)
-                Cue.LogError("bvh: empty file " + path);
+                Log.Error("bvh: empty file " + path);
 
             var raw = rawText.Split(delims, System.StringSplitOptions.RemoveEmptyEntries);
 
@@ -168,7 +174,7 @@ namespace Cue.BVH
                     }
                     else
                     {
-                        Cue.LogError(string.Format("Unexpect number of channels in BVH Hierarchy {1} {0}", nChannels, current.name));
+                        Log.Error(string.Format("Unexpect number of channels in BVH Hierarchy {1} {0}", nChannels, current.name));
                     }
                 }
                 if (parts.Length >= 2 && parts[0] == "End" && parts[1] == "Site")
@@ -204,7 +210,7 @@ namespace Cue.BVH
         public BvhTransform[] ReadFrame(int frame)
         {
             if (frame >= frames_.Length)
-                Cue.LogError($"bad frame {frame} >= {frames_.Length}");
+                Log.Error($"bad frame {frame} >= {frames_.Length}");
 
             try
             {
@@ -213,7 +219,7 @@ namespace Cue.BVH
                 for (var i = 0; i < bones_.Length; i++)
                 {
                     if (i >= bones_.Length)
-                        Cue.LogError($"bad bone {i} >= {bones_.Length}");
+                        Log.Error($"bad bone {i} >= {bones_.Length}");
 
                     var tf = new BvhTransform();
                     var bone = bones_[i];
@@ -221,7 +227,7 @@ namespace Cue.BVH
                     var offset = bone.frameOffset;
 
                     if ((offset + 2) >= data.Length)
-                        Cue.LogError($"bad offset {offset}+2 >= {data.Length}");
+                        Log.Error($"bad offset {offset}+2 >= {data.Length}");
 
                     if (bone.hasPosition)
                     {
@@ -278,7 +284,7 @@ namespace Cue.BVH
             }
             catch (Exception e)
             {
-                Cue.LogError($"ReadFrame: frame={frame}, {e}");
+                Log.Error($"ReadFrame: frame={frame}, {e}");
                 return new BvhTransform[0];
             }
         }

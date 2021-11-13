@@ -48,7 +48,7 @@ namespace Cue.BVH
         public Player(Person p)
         {
             person_ = p;
-            log_ = new Logger(Logger.Animation, p, "BVH.Player");
+            log_ = new Logger(Logger.Animation, p, "bvhPlayer");
 
             CreateMappings();
 

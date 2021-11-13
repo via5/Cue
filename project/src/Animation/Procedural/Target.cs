@@ -32,11 +32,23 @@ namespace Cue.Proc
 		private ISync sync_;
 		private string name_ = "";
 		private bool stopping_ = false;
+		private Logger log_ = null;
 
 		protected BasicTarget(string name, ISync sync)
 		{
 			Sync = sync;
 			name_ = name;
+		}
+
+		public Logger Log
+		{
+			get
+			{
+				if (log_ == null)
+					SetLog();
+
+				return log_;
+			}
 		}
 
 		public string Name
@@ -83,11 +95,17 @@ namespace Cue.Proc
 
 		public abstract ITarget Clone();
 		public abstract void FixedUpdate(float s);
+
+		public override abstract string ToString();
 		public abstract string ToDetailedString();
 
 		public void Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
+
+			if (log_ != null)
+				SetLog();
+
 			Reset();
 			DoStart(p, cx);
 		}
@@ -117,6 +135,22 @@ namespace Cue.Proc
 				return this;
 			else
 				return null;
+		}
+
+		private void SetLog()
+		{
+			if (log_ == null)
+			{
+				if (person_ == null)
+					log_ = new Logger(Logger.Animation, ToString() + " (not started)");
+				else
+					log_ = new Logger(Logger.Animation, person_, ToString());
+			}
+			else
+			{
+				if (person_ != null)
+					log_.Set(person_, ToString());
+			}
 		}
 	}
 }

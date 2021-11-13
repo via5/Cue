@@ -43,7 +43,7 @@ namespace Cue.Proc
 			fc_ = Sys.Vam.U.FindController(p.VamAtom.Atom, cname_);
 			if (fc_ == null)
 			{
-				Cue.LogError($"ProceduralStep: controller {cname_} not found in {p}");
+				Log.Error($"controller {cname_} not found in {p}");
 				return;
 			}
 
@@ -114,12 +114,12 @@ namespace Cue.Proc
 
 		public override string ToString()
 		{
-			return $"controller {cname_} pos={pos_} rot={rot_}";
+			return $"controller.{cname_}" + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()
 		{
-			return ToString();
+			return $"{ToString()} {Name} pos={pos_} rot={rot_}";
 		}
 	}
 }

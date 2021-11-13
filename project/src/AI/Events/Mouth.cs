@@ -125,8 +125,6 @@
 				var g = p.Body.Get(BP.Penis);
 				var d = Vector3.Distance(head.Position, g.Position);
 
-				Cue.LogInfo($"{person_.ID} {p.ID} {d}");
-
 				if (d < MaxDistanceToStart)
 					return p;
 			}

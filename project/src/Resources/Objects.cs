@@ -20,7 +20,7 @@ namespace Cue
 
 		public ObjectResources()
 		{
-			log_ = new Logger(Logger.Resources, "ObjectsRes");
+			log_ = new Logger(Logger.Resources, "resObject");
 		}
 
 		public bool Load()

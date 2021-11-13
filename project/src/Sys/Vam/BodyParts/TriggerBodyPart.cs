@@ -68,7 +68,7 @@ namespace Cue.Sys.Vam
 		{
 			var rb = U.FindRigidbody(VamAtom.Atom, "hip");
 			if (rb == null)
-				Cue.LogError($"{Atom.ID}: trigger {h_.name}: no hip");
+				Log.Error($"{Atom.ID}: trigger {h_.name}: no hip");
 			else
 				ignoreStop_ = rb.transform;
 
@@ -92,7 +92,7 @@ namespace Cue.Sys.Vam
 					}
 					else
 					{
-						Cue.LogError(
+						Log.Error(
 							$"{Atom.ID}: trigger {h_.name}: " +
 							$"no ignore {ignoreTransforms[i]}");
 					}
@@ -243,7 +243,7 @@ namespace Cue.Sys.Vam
 					return U.FromUnity(h_.thisRigidbody.position);
 			}
 
-			set { Cue.LogError("cannot move triggers"); }
+			set { Log.Error("cannot move triggers"); }
 		}
 
 		public override Quaternion ControlRotation
@@ -256,7 +256,7 @@ namespace Cue.Sys.Vam
 					return U.FromUnity(h_.thisRigidbody.rotation);
 			}
 
-			set { Cue.LogError("cannot rotate triggers"); }
+			set { Log.Error("cannot rotate triggers"); }
 		}
 
 		public override Vector3 Position

@@ -53,6 +53,7 @@ namespace Cue
 		}
 	}
 
+
 	class TimelinePlayer : IPlayer
 	{
 		private readonly Person person_;
@@ -61,12 +62,19 @@ namespace Cue
 		private TimelineAnimation current_ = null;
 		private Sys.Vam.ActionParameter play_ = null;
 		private int flags_ = 0;
+		private Logger log_;
 
 		public TimelinePlayer(Person p)
 		{
 			person_ = p;
 			stop_ = new Sys.Vam.ActionParameter(p, "VamTimeline.AtomPlugin", "Stop");
 			playing_ = new Sys.Vam.BoolParameter(p, "VamTimeline.AtomPlugin", "Is Playing");
+			log_ = new Logger(Logger.Animation, p, "timeline");
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public bool IsPlaying(IAnimation a)
@@ -116,7 +124,7 @@ namespace Cue
 
 			if (!play_.Check(true))
 			{
-				Cue.LogError("timeline animation '" + current_.Name + "' not found");
+				Log.Error("timeline animation '" + current_.Name + "' not found");
 				play_ = null;
 				return true;
 			}
@@ -225,7 +233,7 @@ namespace Cue
 			}
 
 			foreach (var c in notFound)
-				Cue.LogError("timeline: controller '" + c + "' not found");
+				Log.Error("timeline: controller '" + c + "' not found");
 		}
 	}
 }

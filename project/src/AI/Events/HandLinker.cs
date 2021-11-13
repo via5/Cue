@@ -101,13 +101,13 @@
 					info.lk = hand.Lock(BodyPartLock.Move, "HandLocker", false);
 					if (info.lk != null)
 					{
-						//Cue.LogInfo($"linking {hand} with {close}");
+						Log.Verbose($"linking {hand} with {close}");
 						hand.LinkTo(close);
 					}
 				}
 				else
 				{
-					//Cue.LogInfo($"unlinking {thisHand}");
+					Log.Verbose($"unlinking {hand}");
 					hand.Unlink();
 
 					if (info.lk != null)
@@ -169,8 +169,6 @@
 					}
 				}
 			}
-
-			//	Cue.LogError($"{closest} {closestDistance}");
 
 			return closest;
 		}

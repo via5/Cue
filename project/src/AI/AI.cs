@@ -25,7 +25,7 @@ namespace Cue
 		public PersonAI(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.AI, person_, "AI");
+			log_ = new Logger(Logger.AI, person_, "ai");
 
 			events_.AddRange(BasicEvent.All(p));
 		}

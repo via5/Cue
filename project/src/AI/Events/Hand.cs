@@ -171,7 +171,7 @@
 
 			if (leftTarget == null && rightTarget == null)
 			{
-				Cue.LogError("no target");
+				Log.Info("no target");
 				return;
 			}
 
@@ -203,7 +203,7 @@
 
 		private void StartDoubleHJ(Person left, Person right)
 		{
-			Cue.LogError($"double hj");
+			Log.Verbose($"double hj");
 
 			if (LockBoth("double hj"))
 			{
@@ -217,7 +217,7 @@
 
 		private void StartLeftHJ(Person target)
 		{
-			Cue.LogError($"left hj");
+			Log.Verbose($"left hj");
 
 			if (LockLeft("left hj"))
 			{
@@ -228,7 +228,7 @@
 
 		private void StartLeftFinger(Person target)
 		{
-			Cue.LogError($"left finger");
+			Log.Verbose($"left finger");
 
 			if (LockLeft("left fingering"))
 			{
@@ -242,7 +242,7 @@
 
 		private void StartRightHJ(Person target)
 		{
-			Cue.LogError($"right hj");
+			Log.Verbose($"right hj");
 
 			if (LockRight("right hj"))
 			{
@@ -253,7 +253,7 @@
 
 		private void StartRightFinger(Person target)
 		{
-			Cue.LogError($"right finger");
+			Log.Verbose($"right finger");
 
 			if (LockRight("right fingering"))
 			{

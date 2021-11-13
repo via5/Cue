@@ -77,6 +77,11 @@ namespace Cue
 			above_ = new LookatAbove(p);
 		}
 
+		public Logger Log
+		{
+			get { return person_.Gaze.Log; }
+		}
+
 		public IGazeLookat LookatAbove
 		{
 			get { return above_; }
@@ -193,7 +198,7 @@ namespace Cue
 				}
 			}
 
-			Cue.LogError($"SetObjectWeight: {o} not in list");
+			Log.Error($"SetObjectWeight: {o} not in list");
 		}
 
 		public List<string> GetAllAvoidForDebug()
@@ -248,6 +253,11 @@ namespace Cue
 		protected BasicGazeLookat(Person p)
 		{
 			person_ = p;
+		}
+
+		public Logger Log
+		{
+			get { return person_.Gaze.Log; }
 		}
 
 		public float Weight
@@ -496,7 +506,7 @@ namespace Cue
 			var f = person_.Gaze.Picker.RandomAvailableFrustum();
 			if (f.Empty)
 			{
-				person_.Log.Verbose($"lookat random: no available frustrums");
+				Log.Verbose($"lookat random: no available frustrums");
 				return false;
 			}
 

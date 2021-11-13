@@ -60,7 +60,7 @@
 			if (receiver_ == null && person_.Body.HasPenis)
 			{
 				// don't allow frottage from characters that can penetrate
-				log_.Info($"no valid receiver");
+				Log.Info($"no valid receiver");
 				active_ = false;
 				anim_ = Animations.None;
 				return false;
@@ -76,7 +76,7 @@
 			if (receiver_ == null)
 			{
 				// frottage with nobody
-				log_.Info($"starting frottage with nobody");
+				Log.Info($"starting frottage with nobody");
 
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(-1, -1);
@@ -87,7 +87,7 @@
 			{
 				// penetration
 
-				log_.Info($"starting sex with {receiver_.ID}");
+				Log.Info($"starting sex with {receiver_.ID}");
 
 				person_.Clothing.GenitalsVisible = true;
 				receiver_.Clothing.GenitalsVisible = true;
@@ -108,7 +108,7 @@
 			{
 				// frottage
 
-				log_.Info($"starting frottage with {receiver_.ID}");
+				Log.Info($"starting frottage with {receiver_.ID}");
 
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(-1, -1);
@@ -124,7 +124,7 @@
 
 		private void Stop()
 		{
-			log_.Verbose($"thrust: stopping");
+			Log.Verbose($"thrust: stopping");
 			person_.Animator.StopType(anim_);
 
 			if (receiver_ != null && (person_.Body.HasPenis ||receiver_.Body.HasPenis))

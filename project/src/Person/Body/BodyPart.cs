@@ -188,6 +188,11 @@ namespace Cue
 			get { return person_; }
 		}
 
+		public Logger Log
+		{
+			get { return person_.Body.Log; }
+		}
+
 		public Sys.IBodyPart Sys
 		{
 			get { return part_; }
@@ -240,7 +245,7 @@ namespace Cue
 			var ti = new Sys.TriggerInfo(
 				sourcePersonIndex, sourceBodyPart, value, true);
 
-			Person.Log.Verbose($"adding forced trigger for {this}: {ti}");
+			Log.Verbose($"adding forced trigger for {this}: {ti}");
 			forcedTriggers_.Add(ti);
 		}
 
@@ -252,15 +257,15 @@ namespace Cue
 				{
 					if (forcedTriggers_[i].sourcePartIndex == sourceBodyPart)
 					{
-						Person.Log.Verbose($"removing forced trigger: {forcedTriggers_[i]}");
+						Log.Verbose($"removing forced trigger: {forcedTriggers_[i]}");
 						forcedTriggers_.RemoveAt(i);
 						return;
 					}
 				}
 			}
 
-			Cue.LogError(
-				$"{this} RemoveForcedTrigger: not found for " +
+			Log.Error(
+				$"{this}: RemoveForcedTrigger: not found for " +
 				$"pi={sourcePersonIndex} bp={sourceBodyPart}");
 		}
 
@@ -454,7 +459,7 @@ namespace Cue
 				}
 			}
 
-			person_.Log.Error($"can't unlock {lk}, not in list");
+			Log.Error($"can't unlock {lk}, not in list");
 		}
 
 		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)

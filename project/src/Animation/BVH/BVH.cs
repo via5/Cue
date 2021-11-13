@@ -22,6 +22,7 @@ namespace Cue.BVH
         private bool localRotations_ = true;
         private bool localPositions_ = true;
         public bool useHead_ = true;
+        private Logger log_;
 
         public Animation(
             string path, bool rootXZ, bool rootY, bool reverse,
@@ -39,33 +40,26 @@ namespace Cue.BVH
             localRotations_ = localRot;
             localPositions_ = localPos;
             useHead_ = useHead;
+            log_ = new Logger(Logger.Animation, "bvhAnim " + file_.Path);
 
             if (end_ < 0)
                 end_ = file_.FrameCount - 1;
 
             if (start_ > file_.FrameCount)
             {
-                Cue.LogError(
-                    $"bvh {file_.Name}: start too big, " +
-                    "{start_} >= {file_.FrameCount}");
-
+                Log.Error($"start too big, {start_} >= {file_.FrameCount}");
                 start_ = 0;
             }
 
             if (end_ > file_.FrameCount)
             {
-                Cue.LogError(
-                    $"bvh {file_.Name}: end too big, " +
-                    "{end_} >= {file_.FrameCount}");
-
+                Log.Error($"end too big, {end_} >= {file_.FrameCount}");
                 end_ = -1;
             }
 
             if (start_ > end_)
             {
-                Cue.LogError(
-                    $"bvh {file_.Name}: start {start_} " +
-                    "after end {end_}, swapping");
+                Log.Error($"start {start_} after end {end_}, swapping");
 
                 int temp = start_;
                 start_ = end_;
@@ -82,12 +76,17 @@ namespace Cue.BVH
 
             if (reverse_ && init_ < end_)
             {
-                Cue.LogError(
-                    $"bvh {file_.Name}: anim is reverse but " +
-                    $"init {init_} is before {end_}, will be ignored");
+                Log.Error(
+                    $"anim is reverse but init {init_} is before {end_}, " +
+                    $"will be ignored");
 
                 init_ = end_;
             }
+        }
+
+        public Logger Log
+        {
+            get { return log_; }
         }
 
         public static Animation Create(JSONClass o)

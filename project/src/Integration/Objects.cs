@@ -8,21 +8,34 @@
 		private Quaternion rot_ = Quaternion.Zero;
 		private float smokeOpacity_ = 0;
 		private bool destroy_ = false;
+		private Logger log_;
+
+		private VamSmoke()
+		{
+			log_ = new Logger(Logger.Integration, "smoke");
+		}
 
 		private VamSmoke(IObject o)
+			: this()
 		{
 			SetSmoke(o);
 		}
 
 		private VamSmoke(string id)
+			: this()
 		{
-			Cue.LogInfo("creating smoke");
+			Log.Info("creating smoke");
 
 			var oc = Resources.Objects.Get("cigaretteSmoke");
 			if (oc == null)
-				Cue.LogWarning("no cigarette smoke object creator");
+				Log.Warning("no cigarette smoke object creator");
 			else
 				oc.Create(null, id, (o) => { SetSmoke(o); });
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public static VamSmoke Create(string id, bool existsOnly)
@@ -30,14 +43,9 @@
 			var a = Cue.Instance.Sys.GetAtom(id);
 
 			if (a != null)
-			{
-				Cue.LogInfo("smoke already exists, taking");
 				return new VamSmoke(new BasicObject(-1, a));
-			}
 			else if (existsOnly)
-			{
 				return null;
-			}
 
 			return new VamSmoke(id);
 		}
@@ -98,7 +106,7 @@
 		{
 			if (o == null)
 			{
-				Cue.LogWarning("failed to create cigarette smoke");
+				Log.Warning("failed to create cigarette smoke");
 				return;
 			}
 

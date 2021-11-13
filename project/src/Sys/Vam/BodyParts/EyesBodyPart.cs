@@ -23,14 +23,14 @@ namespace Cue.Sys.Vam
 			}
 
 			if (lEye_ == null)
-				Cue.LogError($"{a.ID} has no left eye");
+				Log.Error($"{a.ID} has no left eye");
 
 			if (rEye_ == null)
-				Cue.LogError($"{a.ID} has no right eye");
+				Log.Error($"{a.ID} has no right eye");
 
 			head_ = U.FindRigidbody(VamAtom.Atom, "head");
 			if (head_ == null)
-				Cue.LogError($"{a.ID} has no head");
+				Log.Error($"{a.ID} has no head");
 		}
 
 		public override Rigidbody Rigidbody
@@ -55,13 +55,13 @@ namespace Cue.Sys.Vam
 					return Vector3.Zero;
 			}
 
-			set { Cue.LogError("cannot move eyes"); }
+			set { Log.Error("cannot move eyes"); }
 		}
 
 		public override Quaternion ControlRotation
 		{
 			get { return U.FromUnity(head_.rotation); }
-			set { Cue.LogError("cannot rotate eyes"); }
+			set { Log.Error("cannot rotate eyes"); }
 		}
 
 		public override Vector3 Position

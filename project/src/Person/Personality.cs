@@ -66,11 +66,24 @@ namespace Cue
 			}
 		}
 
+
+		private Person person_;
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
 		private Dataset orgasm_ = new Dataset("", -1);
 		private Dataset dummy_ = new Dataset("", -1);
 		private bool warned_ = false;
 		private float forcedPitch_ = -1;
+
+
+		public Voice(Person p)
+		{
+			person_ = p;
+		}
+
+		public Logger Log
+		{
+			get { return person_.Log; }
+		}
 
 		public void Set(List<DatasetForIntensity> dss, Dataset orgasm)
 		{
@@ -105,9 +118,9 @@ namespace Cue
 			get { return forcedPitch_; }
 		}
 
-		public float GetNormalPitch(Person p)
+		public float GetNormalPitch()
 		{
-			return GetDatasetForIntensity(0).GetPitch(p);
+			return GetDatasetForIntensity(0).GetPitch(person_);
 		}
 
 		public void ForcePitch(float f)
@@ -133,7 +146,7 @@ namespace Cue
 
 			if (!warned_)
 			{
-				Cue.LogError(
+				Log.Error(
 					$"personality missing voice for excitement " +
 					$"{e}");
 
@@ -168,13 +181,14 @@ namespace Cue
 		private readonly string name_;
 		private Person person_;
 
-		private Voice voice_ = new Voice();
+		private Voice voice_;
 		private Expression[] exps_ = new Expression[0];
 		private SpecificModifier[] specificModifiers_ = new SpecificModifier[0];
 
 		public Personality(string name, Person p = null)
 			: base(new PS())
 		{
+			voice_ = new Voice(p);
 			name_ = name;
 			person_ = p;
 		}

@@ -52,6 +52,7 @@ namespace Cue
 		private const float MaxMorphs = 1.0f;
 
 		private Person person_;
+		private Logger log_;
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
@@ -61,6 +62,7 @@ namespace Cue
 		public Body(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Object, p, $"body");
 			temperature_ = new DampedFloat();
 
 			var parts = p.Atom.Body.GetBodyParts();
@@ -69,7 +71,7 @@ namespace Cue
 			for (int i = 0; i < BP.Count; ++i)
 			{
 				if (parts[i] != null && parts[i].Type != i)
-					Cue.LogError($"mismatched body part type {parts[i].Type} {i}");
+					Log.Error($"mismatched body part type {parts[i].Type} {i}");
 
 				all.Add(new BodyPart(person_, i, parts[i]));
 			}
@@ -78,6 +80,11 @@ namespace Cue
 
 			leftHand_ = new Hand(p, "left", p.Atom.Body.GetLeftHand(), BP.LeftHand);
 			rightHand_ = new Hand(p, "right", p.Atom.Body.GetRightHand(), BP.RightHand);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public void Init()
@@ -160,16 +167,16 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				Cue.LogError(
+				Log.Error(
 					$"{this}: exception while locking body parts, " +
 					$"unlocking all; was locking:");
 
 				for (int i = 0; i < bodyParts.Length; ++i)
-					Cue.LogError($"  - {BP.ToString(bodyParts[i])}");
+					Log.Error($"  - {BP.ToString(bodyParts[i])}");
 
-				Cue.LogError($"lockType={lockType}, why={why}, strong={strong}");
-				Cue.LogError($"exception:");
-				Cue.LogError(e.ToString());
+				Log.Error($"lockType={lockType}, why={why}, strong={strong}");
+				Log.Error($"exception:");
+				Log.Error(e.ToString());
 
 				failed = true;
 			}
@@ -400,7 +407,7 @@ namespace Cue
 		{
 			if (type < 0 || type >= all_.Length)
 			{
-				Cue.LogError($"bad part type {type}");
+				Log.Error($"bad part type {type}");
 				return null;
 			}
 

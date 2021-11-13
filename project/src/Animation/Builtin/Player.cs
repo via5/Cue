@@ -8,11 +8,18 @@ namespace Cue
 		private readonly string name_;
 		private bool hasMovement_;
 		protected Person person_ = null;
+		private Logger log_;
 
 		protected BuiltinAnimation(string name)
 		{
 			name_ = name;
 			hasMovement_ = false;
+			log_ = new Logger(Logger.Animation, "builtinAnim." + name);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public string Name
@@ -114,7 +121,12 @@ namespace Cue
 		public BuiltinPlayer(Person p)
 		{
 			person_ = p;
-			log_ = new Logger(Logger.Animation, person_, "ProcPlayer");
+			log_ = new Logger(Logger.Animation, person_, "builtinPlayer");
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		private BuiltinAnimation Find(IAnimation a)
@@ -175,14 +187,14 @@ namespace Cue
 				return false;
 
 			playing_.Add(p);
-			log_.Info($"playing {a}");
+			Log.Info($"playing {a}");
 
 			return true;
 		}
 
 		public void StopNow(IAnimation a)
 		{
-			log_.Verbose(
+			Log.Verbose(
 				$"stopping animation now {a}, " +
 				$"looking for proto, count={playing_.Count}");
 
@@ -190,7 +202,7 @@ namespace Cue
 			{
 				if (playing_[i].proto == a)
 				{
-					log_.Verbose($"found animation at {i}");
+					Log.Verbose($"found animation at {i}");
 					DoStopNow(i);
 					return;
 				}
@@ -199,7 +211,7 @@ namespace Cue
 
 		public void RequestStop(IAnimation a)
 		{
-			log_.Verbose(
+			Log.Verbose(
 				$"requesting stop for animation {a}, " +
 				$"looking for proto, count={playing_.Count}");
 
@@ -207,7 +219,7 @@ namespace Cue
 			{
 				if (playing_[i].proto == a)
 				{
-					log_.Verbose($"found animation at {i}");
+					Log.Verbose($"found animation at {i}");
 					DoRequestStop(i);
 					return;
 				}
@@ -216,7 +228,7 @@ namespace Cue
 
 		private void DoRequestStop(int i)
 		{
-			log_.Verbose(
+			Log.Verbose(
 				$"requesting stop for {i}, proto is {playing_[i].proto}, " +
 				$"anim is {playing_[i].anim}");
 
@@ -233,9 +245,9 @@ namespace Cue
 				}
 				catch (Exception e)
 				{
-					Cue.LogError(e.ToString());
+					Log.Error(e.ToString());
 
-					Cue.LogError(
+					Log.Error(
 						$"proc: exception during FixedUpdate " +
 						$"{playing_[i].anim}, stopping");
 
@@ -256,9 +268,9 @@ namespace Cue
 				}
 				catch (Exception e)
 				{
-					Cue.LogError(e.ToString());
+					Log.Error(e.ToString());
 
-					Cue.LogError(
+					Log.Error(
 						$"proc: exception during Update " +
 						$"{playing_[i].anim}, stopping");
 
@@ -274,7 +286,7 @@ namespace Cue
 
 		private void DoStopNow(int i)
 		{
-			log_.Verbose(
+			Log.Verbose(
 				$"stopping now {i}, proto is {playing_[i].proto}, " +
 				$"anim is {playing_[i].anim}");
 
