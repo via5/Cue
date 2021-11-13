@@ -18,6 +18,9 @@ namespace Cue.Sys.Vam
 
 		public static void FixKnownAtom(Atom a)
 		{
+			if (!a.on)
+				return;
+
 			if (a.type == "Dildo")
 			{
 				FixDildo(a);

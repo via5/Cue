@@ -117,64 +117,14 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				Log.Info($"setting dildo to {a.ID}");
-
+				Log.Info($"setting dildo to {a.ID}" + (a.Visible ? "" : " (but off)"));
 				dildo_ = a;
-				dildo_.Atom.Collisions = false;
-				dildo_.Atom.Scale = Atom.Scale;
 
-				postCreate_ = true;
-				postCreateElapsed_ = 0;
-
-				var collidersString = dildo_.GetParameter("colliders");
-				if (collidersString == "")
+				if (!dildo_.Visible)
 				{
-					Log.Warning("dildo is missing collidersString parameter");
+					SetEnabled(false);
+					return;
 				}
-				else
-				{
-					var colliderNames = collidersString.Split(';');
-
-					var cs = new List<Collider>();
-					foreach (var cn in colliderNames)
-					{
-						var c = U.FindCollider(
-							(dildo_.Atom as VamAtom).Atom, cn.Trim());
-
-						if (c == null)
-						{
-							Log.Error($"{Atom.ID}: dildo collider {cn} not found");
-							continue;
-						}
-
-						cs.Add(c);
-					}
-
-					colliders_ = cs.ToArray();
-
-					var names = new List<string>();
-					foreach (var c in colliders_)
-						names.Add(c.name);
-
-					Log.Info($"dildo colliders: {string.Join(", ", names.ToArray())}");
-				}
-
-
-				var anchorName = dildo_.GetParameter("anchor");
-				if (anchorName == "")
-				{
-					Log.Warning("dildo is missing anchor parameter");
-				}
-				else
-				{
-					anchor_ = U.FindCollider(VamAtom.Atom, anchorName);
-
-					if (anchor_ == null)
-						Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
-					else
-						Log.Info($"dildo anchor: {anchor_}");
-				}
-
 
 				DoInit();
 				SetEnabled(true);
@@ -194,7 +144,7 @@ namespace Cue.Sys.Vam
 
 		public void LateUpdate(float s)
 		{
-			if (dildo_ == null || anchor_ == null)
+			if (dildo_ == null)
 				return;
 
 			try
@@ -207,10 +157,14 @@ namespace Cue.Sys.Vam
 				else if (dildo_.Visible && !Enabled)
 				{
 					Log.Info($"dildo {dildo_.ID} turned on");
+
+					if (Rigidbody == null)
+						DoInit();
+
 					SetEnabled(true);
 				}
 
-				if (!Enabled)
+				if (!Enabled || anchor_ == null)
 					return;
 
 				var labia = (Atom.Body as VamBody)?.GetPart(BP.Labia);
@@ -254,6 +208,62 @@ namespace Cue.Sys.Vam
 
 		private void DoInit()
 		{
+			dildo_.Atom.Collisions = false;
+			dildo_.Atom.Scale = Atom.Scale;
+
+			postCreate_ = true;
+			postCreateElapsed_ = 0;
+
+			var collidersString = dildo_.GetParameter("colliders");
+			if (collidersString == "")
+			{
+				Log.Warning("dildo is missing collidersString parameter");
+			}
+			else
+			{
+				var colliderNames = collidersString.Split(';');
+
+				var cs = new List<Collider>();
+				foreach (var cn in colliderNames)
+				{
+					var c = U.FindCollider(
+						(dildo_.Atom as VamAtom).Atom, cn.Trim());
+
+					if (c == null)
+					{
+						Log.Error($"{Atom.ID}: dildo collider {cn} not found");
+						continue;
+					}
+
+					cs.Add(c);
+				}
+
+				colliders_ = cs.ToArray();
+
+				var names = new List<string>();
+				foreach (var c in colliders_)
+					names.Add(c.name);
+
+				Log.Info($"dildo colliders: {string.Join(", ", names.ToArray())}");
+			}
+
+
+			var anchorName = dildo_.GetParameter("anchor");
+			if (anchorName == "")
+			{
+				Log.Warning("dildo is missing anchor parameter");
+			}
+			else
+			{
+				anchor_ = U.FindCollider(VamAtom.Atom, anchorName);
+
+				if (anchor_ == null)
+					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
+				else
+					Log.Info($"dildo anchor: {anchor_}");
+			}
+
+
 			var d = (dildo_.Atom as VamAtom).Atom;
 
 			var ct = d.GetComponentInChildren<CollisionTrigger>();
