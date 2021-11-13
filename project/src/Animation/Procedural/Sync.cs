@@ -495,10 +495,10 @@ namespace Cue.Proc
 
 			stopping_ = false;
 			SetState(ForwardsState);
-			fwdDuration_?.Reset(Bits.IsSet(flags_, StartFast));
-			bwdDuration_?.Reset();
-			fwdDelay_?.Reset();
-			bwdDelay_?.Reset();
+			fwdDuration_?.Reset(energy_, Bits.IsSet(flags_, StartFast));
+			bwdDuration_?.Reset(energy_);
+			fwdDelay_?.Reset(energy_);
+			bwdDelay_?.Reset(energy_);
 			needsRestart_ = false;
 		}
 

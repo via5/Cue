@@ -94,7 +94,17 @@ namespace Cue.Proc
 		}
 
 		public abstract ITarget Clone();
-		public abstract void FixedUpdate(float s);
+
+		public void FixedUpdate(float s)
+		{
+			Sync.Energy = MovementEnergy;
+			Sync.FixedUpdate(s);
+
+			DoFixedUpdate(s);
+		}
+
+		protected abstract void DoFixedUpdate(float s);
+
 
 		public override abstract string ToString();
 		public abstract string ToDetailedString();

@@ -141,8 +141,8 @@ namespace Cue.Proc
 			base.Reset();
 
 			inDelay_ = false;
-			delay_.Reset();
-			maxDuration_.Reset();
+			delay_.Reset(MovementEnergy);
+			maxDuration_.Reset(MovementEnergy);
 
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Reset();
@@ -154,7 +154,7 @@ namespace Cue.Proc
 				targets_[i].Start(p, cx);
 
 			done_ = new bool[targets_.Count];
-			maxDuration_.Reset();
+			maxDuration_.Reset(MovementEnergy);
 		}
 
 		public override bool Done
@@ -168,12 +168,9 @@ namespace Cue.Proc
 			}
 		}
 
-		public override void FixedUpdate(float s)
+		protected override void DoFixedUpdate(float s)
 		{
 			allDone_ = false;
-
-			Sync.Energy = MovementEnergy;
-			Sync.FixedUpdate(s);
 
 			if (inDelay_)
 			{
@@ -318,7 +315,7 @@ namespace Cue.Proc
 			base.Reset();
 
 			inDelay_ = false;
-			delay_.Reset();
+			delay_.Reset(MovementEnergy);
 
 			for (int i = 0; i < targets_.Count; ++i)
 				targets_[i].Reset();
@@ -330,11 +327,8 @@ namespace Cue.Proc
 				targets_[i].Start(p, cx);
 		}
 
-		public override void FixedUpdate(float s)
+		protected override void DoFixedUpdate(float s)
 		{
-			Sync.Energy = MovementEnergy;
-			Sync.FixedUpdate(s);
-
 			if (targets_.Count == 0)
 			{
 				done_ = true;
@@ -413,11 +407,6 @@ namespace Cue.Proc
 		{
 			base.DoStart(p, cx);
 			key_ = cx?.key ?? BodyPartLock.NoKey;
-		}
-
-		public override void FixedUpdate(float s)
-		{
-			base.FixedUpdate(s);
 		}
 
 		public void SetEnergySource(Person p)

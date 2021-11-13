@@ -141,7 +141,7 @@ namespace Cue.Sys.Vam
 			// see VamSys.BodyPartForTransform()
 
 			var check = t;
-			while (check != null && check != stop)
+			while (check != null)
 			{
 				for (int i = 0; i < parts_.Length; ++i)
 				{
@@ -158,6 +158,9 @@ namespace Cue.Sys.Vam
 						return vp;
 					}
 				}
+
+				if (check == stop)
+					break;
 
 				check = check.parent;
 			}

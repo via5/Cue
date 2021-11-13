@@ -43,64 +43,46 @@ namespace Cue.Proc
 					durationMin_, durationMax_,
 					durationInterval_, durationInterval_,
 					durationWin_, new CubicOutEasing()),
-				new Duration(
-					durationMin_, durationMax_,
-					durationInterval_, durationInterval_,
-					durationWin_, new CubicOutEasing()),
-				new Duration(0, 0), new Duration(0, 0),
+				null, null, null,
 				DurationSync.Loop | DurationSync.ResetBetween);
 
 
 			RootGroup.AddTarget(new Force(
 				"hipForce", Force.AbsoluteForce, BP.Hips,
-				new SlidingMovement(
-					Vector3.Zero, Vector3.Zero,
-					durationInterval_, durationInterval_,
-					new Vector3(0, 0, 0), new LinearEasing()),
+				Vector3.Zero, Vector3.Zero, durationInterval_, Vector3.Zero,
 				new ParentTargetSync()));
 
 			RootGroup.AddTarget(new Force(
 				"hipTorque", Force.RelativeTorque, BP.Hips,
-				new SlidingMovement(
-					Vector3.Zero, Vector3.Zero,
-					durationInterval_, durationInterval_,
-					new Vector3(0, 0, 0), new LinearEasing()),
+				Vector3.Zero, Vector3.Zero, durationInterval_, Vector3.Zero,
 				new ParentTargetSync()));
 
 			RootGroup.AddTarget(new Force(
-				Force.RelativeTorque, BP.Chest,
-				new SlidingMovement(
-					new Vector3(chestTorqueMin_, 0, 0),
-					new Vector3(chestTorqueMax_, 0, 0),
-					durationInterval_, durationInterval_,
-					new Vector3(0, 0, 0), new LinearEasing()),
+				"", Force.RelativeTorque, BP.Chest,
+				new Vector3(chestTorqueMin_, 0, 0),
+				new Vector3(chestTorqueMax_, 0, 0),
+				durationInterval_, Vector3.Zero,
 				new ParentTargetSync()));
 
 			RootGroup.AddTarget(new Force(
-				Force.RelativeTorque, BP.Head,
-				new SlidingMovement(
-					new Vector3(headTorqueMin_, 0, 0),
-					new Vector3(headTorqueMax_, 0, 0),
-					durationInterval_, durationInterval_,
-					new Vector3(0, 0, 0), new LinearEasing()),
+				"", Force.RelativeTorque, BP.Head,
+				new Vector3(headTorqueMin_, 0, 0),
+				new Vector3(headTorqueMax_, 0, 0),
+				durationInterval_, Vector3.Zero,
 				new ParentTargetSync()));
 
 
 			RootGroup.AddTarget(new Force(
-				Force.RelativeForce, BP.Chest,
-				new SlidingMovement(
-					new Vector3(0, 0, -300),
-					new Vector3(0, 0, 300)),
+				"", Force.RelativeForce, BP.Chest,
+				new Vector3(0, 0, -300), new Vector3(0, 0, 300), null, Vector3.Zero,
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
 					DurationSync.Loop)));
 
 			RootGroup.AddTarget(new Force(
-				Force.RelativeForce, BP.Head,
-				new SlidingMovement(
-					new Vector3(0, 0, -100),
-					new Vector3(0, 0, 100)),
+				"", Force.RelativeForce, BP.Head,
+				new Vector3(0, 0, -100), new Vector3(0, 0, 100), null, Vector3.Zero,
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
@@ -144,7 +126,7 @@ namespace Cue.Proc
 			}
 			else
 			{
-				hipTorque_.Movement.SetRange(
+				hipTorque_.SetRange(
 					config_.hipTorqueMin,
 					config_.hipTorqueMax,
 					config_.hipTorqueWin);
@@ -260,7 +242,7 @@ namespace Cue.Proc
 			float fmin = config_.hipForceMin * p;
 			float fmax = config_.hipForceMax * p;
 
-			f.Movement.SetRange(dir * fmin, dir * fmax);
+			f.SetRange(dir * fmin, dir * fmax, Vector3.Zero);
 		}
 
 		public override string ToDetailedString()

@@ -21,6 +21,11 @@ namespace Cue
 			}
 		}
 
+		public static Vector3 Abs(Vector3 v)
+		{
+			return new Vector3(Math.Abs(v.X), Math.Abs(v.Y), Math.Abs(v.Z));
+		}
+
 		public Vector3(float x, float y, float z)
 		{
 			X = x;

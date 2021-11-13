@@ -34,18 +34,14 @@
 					DurationSync.Loop | DurationSync.ResetBetween));
 
 			g.AddTarget(new Force(
-				Force.RelativeTorque, bodyPart,
-				new SlidingMovement(
-					torqueMin_ * torqueDir, torqueMax_ * torqueDir,
-					0, 0, torqueWin_ * torqueDir, new LinearEasing()),
-				new ParentTargetSync()));
+				"", Force.RelativeTorque, bodyPart,
+				torqueMin_ * torqueDir, torqueMax_ * torqueDir,
+				null, torqueWin_ * torqueDir, new ParentTargetSync()));
 
 			g.AddTarget(new Force(
-				Force.RelativeForce, bodyPart,
-				new SlidingMovement(
-					forceMin_ * forceDir, forceMax_ * forceDir,
-					0, 0, forceWin_ * forceDir, new LinearEasing()),
-				new ParentTargetSync()));
+				"", Force.RelativeForce, bodyPart,
+				forceMin_ * forceDir, forceMax_ * forceDir,
+				null, forceWin_ * forceDir, new ParentTargetSync()));
 
 			AddTarget(g);
 		}

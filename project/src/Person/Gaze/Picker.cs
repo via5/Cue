@@ -227,7 +227,7 @@ namespace Cue
 					if (timeSinceLastAvoid_ > AvoidInterval)
 					{
 						needsTarget = true;
-						delay_.Reset();
+						delay_.Reset(0);
 						timeSinceLastAvoid_ = 0;
 						avoidString_.Append("avoiding");
 					}
@@ -253,7 +253,7 @@ namespace Cue
 		public void ForceNextTarget(bool emergency)
 		{
 			emergency_ = emergency;
-			delay_.Reset();
+			delay_.Reset(0);
 			NextTarget();
 		}
 

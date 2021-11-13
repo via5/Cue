@@ -80,10 +80,8 @@ namespace Cue.Proc
 			return rt * rt * s + 2 * rt * t * p + t * t * e;
 		}
 
-		public override void FixedUpdate(float s)
+		protected override void DoFixedUpdate(float s)
 		{
-			Sync.FixedUpdate(s);
-
 			if (fc_ == null)
 			{
 				done_ = true;

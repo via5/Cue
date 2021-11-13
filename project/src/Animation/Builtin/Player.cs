@@ -296,8 +296,11 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			for (int i = 0; i < playing_.Count; ++i)
-				playing_[i].anim.Reset();
+			if (!b)
+			{
+				for (int i = 0; i < playing_.Count; ++i)
+					playing_[i].anim.Reset();
+			}
 		}
 
 		public override string ToString()

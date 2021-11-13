@@ -142,7 +142,7 @@ namespace Cue.Proc
 			}
 		}
 
-		public override void FixedUpdate(float s)
+		protected override void DoFixedUpdate(float s)
 		{
 			if (morph_ == null)
 			{
@@ -153,9 +153,7 @@ namespace Cue.Proc
 			finished_ = false;
 			timeActive_ += s;
 
-			int r = Sync.FixedUpdate(s);
-
-			switch (r)
+			switch (Sync.UpdateResult)
 			{
 				case BasicSync.Working:
 				{

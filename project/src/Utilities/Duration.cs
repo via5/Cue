@@ -96,8 +96,8 @@ namespace Cue
 		private bool finished_ = false;
 
 
-		public Duration()
-			: this(0, 0, 0, 0, 0, null)
+		public Duration(float time = 0)
+			: this(time, time, 0, 0, 0, null)
 		{
 		}
 
@@ -125,7 +125,7 @@ namespace Cue
 			fullRange_ = fullRange;
 			nextTimeRange_ = nextTimeRange;
 
-			Reset();
+			Reset(0);
 		}
 
 		public Duration Clone()
@@ -247,8 +247,9 @@ namespace Cue
 			get { return Math.Max(current_ - elapsed_, 0); }
 		}
 
-		public void Reset(bool forceFast = false)
+		public void Reset(float magnitude, bool forceFast = false)
 		{
+			magnitude_ = magnitude;
 			NextRange();
 
 			elapsed_ = 0;
