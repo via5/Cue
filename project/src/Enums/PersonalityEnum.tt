@@ -315,7 +315,7 @@ V.Float("OtherGropedTargetWeight"),
 
 
 // if the character's head is being grabbed by the player, looking at the player
-V.Bool("LookAtPlayerOnGrabWeight"),
+V.Float("LookAtPlayerOnGrabWeight"),
 
 // minimum time to keep looking at the player after the head grab has been
 // released; the actual time might be longer since there might be a delay

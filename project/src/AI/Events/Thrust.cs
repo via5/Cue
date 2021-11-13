@@ -127,7 +127,7 @@
 			log_.Verbose($"thrust: stopping");
 			person_.Animator.StopType(anim_);
 
-			if (receiver_ != null)
+			if (receiver_ != null && (person_.Body.HasPenis ||receiver_.Body.HasPenis))
 			{
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.RemoveForcedTrigger(

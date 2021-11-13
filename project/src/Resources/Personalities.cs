@@ -196,10 +196,10 @@ namespace Cue
 
 		private void ParseSpecificModifiers(Personality p, JSONClass o)
 		{
-			var sms = new List<Personality.SpecificModifier>();
-
 			if (o.HasKey("specificModifiers"))
 			{
+				var sms = new List<Personality.SpecificModifier>();
+
 				foreach (JSONClass smn in o.AsObject["specificModifiers"].AsArray.Childs)
 				{
 					var sm = new Personality.SpecificModifier();
@@ -217,9 +217,9 @@ namespace Cue
 					sm.modifier = J.ReqFloat(smn, "modifier");
 					sms.Add(sm);
 				}
-			}
 
-			p.SetSpecificModifiers(sms.ToArray());
+				p.SetSpecificModifiers(sms.ToArray());
+			}
 		}
 
 		private void Add(Personality p, bool abst)

@@ -554,8 +554,8 @@ namespace Cue.Sys.Vam
 			get
 			{
 				return
-					(ShowLeftMenu && sc_.GetLeftRemoteHoldGrab()) ||
-					(ShowRightMenu && sc_.GetRightRemoteHoldGrab());
+					sc_.GetLeftRemoteHoldGrab() ||
+					sc_.GetRightRemoteHoldGrab();
 			}
 		}
 

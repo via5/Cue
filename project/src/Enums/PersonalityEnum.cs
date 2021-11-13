@@ -17,10 +17,9 @@ namespace Cue
 
 		// bools
 		public const int GazeSaccade = 0;
-		public const int LookAtPlayerOnGrabWeight = 1;
 
-		public const int BoolCount = 2;
-		public int GetBoolCount() { return 2; }
+		public const int BoolCount = 1;
+		public int GetBoolCount() { return 1; }
 
 		// floats
 		public const int GazeSaccadeMovementRange = 0;
@@ -73,60 +72,61 @@ namespace Cue
 		public const int OtherGropedEyesWeight = 47;
 		public const int OtherGropedSourceEyesWeight = 48;
 		public const int OtherGropedTargetWeight = 49;
-		public const int LookAtPlayerTimeAfterGrab = 50;
-		public const int OtherSexExcitementRateFactor = 51;
-		public const int MaxOtherSexExcitement = 52;
-		public const int KissSpeedEnergyFactor = 53;
-		public const int IdleMaxExcitement = 54;
-		public const int TirednessExcitementRateFactor = 55;
-		public const int GazeEnergyTirednessFactor = 56;
-		public const int GazeTirednessFactor = 57;
-		public const int MovementEnergyTirednessFactor = 58;
-		public const int ExpressionTirednessFactor = 59;
-		public const int MovementEnergyRampUpAfterOrgasm = 60;
-		public const int AvoidGazeAnger = 61;
-		public const int AngerWhenPlayerInteracts = 62;
-		public const int AngerMaxExcitementForAnger = 63;
-		public const int AngerMaxExcitementForHappiness = 64;
-		public const int AngerExcitementFactorForAnger = 65;
-		public const int AngerExcitementFactorForHappiness = 66;
-		public const int MaxHappiness = 67;
-		public const int MaxSweat = 68;
-		public const int MaxFlush = 69;
-		public const int TemperatureExcitementMax = 70;
-		public const int TemperatureExcitementRate = 71;
-		public const int TemperatureDecayRate = 72;
-		public const int TirednessRateDuringPostOrgasm = 73;
-		public const int TirednessBaseDecayRate = 74;
-		public const int TirednessBackToBaseRate = 75;
-		public const int DelayAfterOrgasmUntilTirednessDecay = 76;
-		public const int TirednessMaxExcitementForBaseDecay = 77;
-		public const int OrgasmBaseTirednessIncrease = 78;
-		public const int NeutralVoicePitch = 79;
-		public const int MouthRate = 80;
-		public const int MouthMax = 81;
-		public const int LipsFactor = 82;
-		public const int MouthFactor = 83;
-		public const int BreastsRate = 84;
-		public const int BreastsMax = 85;
-		public const int LeftBreastFactor = 86;
-		public const int RightBreastFactor = 87;
-		public const int GenitalsRate = 88;
-		public const int GenitalsMax = 89;
-		public const int LabiaFactor = 90;
-		public const int PenetrationRate = 91;
-		public const int PenetrationMax = 92;
-		public const int VaginaFactor = 93;
-		public const int DeepVaginaFactor = 94;
-		public const int DeeperVaginaFactor = 95;
-		public const int ExcitementDecayRate = 96;
-		public const int ExcitementPostOrgasm = 97;
-		public const int OrgasmTime = 98;
-		public const int PostOrgasmTime = 99;
-		public const int RateAdjustment = 100;
+		public const int LookAtPlayerOnGrabWeight = 50;
+		public const int LookAtPlayerTimeAfterGrab = 51;
+		public const int OtherSexExcitementRateFactor = 52;
+		public const int MaxOtherSexExcitement = 53;
+		public const int KissSpeedEnergyFactor = 54;
+		public const int IdleMaxExcitement = 55;
+		public const int TirednessExcitementRateFactor = 56;
+		public const int GazeEnergyTirednessFactor = 57;
+		public const int GazeTirednessFactor = 58;
+		public const int MovementEnergyTirednessFactor = 59;
+		public const int ExpressionTirednessFactor = 60;
+		public const int MovementEnergyRampUpAfterOrgasm = 61;
+		public const int AvoidGazeAnger = 62;
+		public const int AngerWhenPlayerInteracts = 63;
+		public const int AngerMaxExcitementForAnger = 64;
+		public const int AngerMaxExcitementForHappiness = 65;
+		public const int AngerExcitementFactorForAnger = 66;
+		public const int AngerExcitementFactorForHappiness = 67;
+		public const int MaxHappiness = 68;
+		public const int MaxSweat = 69;
+		public const int MaxFlush = 70;
+		public const int TemperatureExcitementMax = 71;
+		public const int TemperatureExcitementRate = 72;
+		public const int TemperatureDecayRate = 73;
+		public const int TirednessRateDuringPostOrgasm = 74;
+		public const int TirednessBaseDecayRate = 75;
+		public const int TirednessBackToBaseRate = 76;
+		public const int DelayAfterOrgasmUntilTirednessDecay = 77;
+		public const int TirednessMaxExcitementForBaseDecay = 78;
+		public const int OrgasmBaseTirednessIncrease = 79;
+		public const int NeutralVoicePitch = 80;
+		public const int MouthRate = 81;
+		public const int MouthMax = 82;
+		public const int LipsFactor = 83;
+		public const int MouthFactor = 84;
+		public const int BreastsRate = 85;
+		public const int BreastsMax = 86;
+		public const int LeftBreastFactor = 87;
+		public const int RightBreastFactor = 88;
+		public const int GenitalsRate = 89;
+		public const int GenitalsMax = 90;
+		public const int LabiaFactor = 91;
+		public const int PenetrationRate = 92;
+		public const int PenetrationMax = 93;
+		public const int VaginaFactor = 94;
+		public const int DeepVaginaFactor = 95;
+		public const int DeeperVaginaFactor = 96;
+		public const int ExcitementDecayRate = 97;
+		public const int ExcitementPostOrgasm = 98;
+		public const int OrgasmTime = 99;
+		public const int PostOrgasmTime = 100;
+		public const int RateAdjustment = 101;
 
-		public const int FloatCount = 101;
-		public int GetFloatCount() { return 101; }
+		public const int FloatCount = 102;
+		public int GetFloatCount() { return 102; }
 
 		// strings
 
@@ -193,7 +193,6 @@ namespace Cue
 		private static string[] boolNames_ = new string[]
 		{
 			"gazeSaccade",
-			"lookAtPlayerOnGrabWeight",
 		};
 
 		public static int BoolFromString(string s)
@@ -296,6 +295,7 @@ namespace Cue
 			"otherGropedEyesWeight",
 			"otherGropedSourceEyesWeight",
 			"otherGropedTargetWeight",
+			"lookAtPlayerOnGrabWeight",
 			"lookAtPlayerTimeAfterGrab",
 			"otherSexExcitementRateFactor",
 			"maxOtherSexExcitement",
@@ -456,7 +456,6 @@ namespace Cue
 			"emergencyGazeDuration",
 			"gazeSaccadeInterval",
 			"gazeSaccade",
-			"lookAtPlayerOnGrabWeight",
 			"gazeSaccadeMovementRange",
 			"avoidGazePlayer",
 			"avoidGazePlayerInsidePersonalSpace",
@@ -507,6 +506,7 @@ namespace Cue
 			"otherGropedEyesWeight",
 			"otherGropedSourceEyesWeight",
 			"otherGropedTargetWeight",
+			"lookAtPlayerOnGrabWeight",
 			"lookAtPlayerTimeAfterGrab",
 			"otherSexExcitementRateFactor",
 			"maxOtherSexExcitement",

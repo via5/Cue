@@ -98,11 +98,14 @@ namespace Cue
 			}
 
 
-			CheckItemInput();
-			CheckPersonInput();
+			if (state_ != Hidden)
+			{
+				CheckItemInput();
+				CheckPersonInput();
 
-			if (Cue.Instance.Sys.Input.MenuSelect)
-				widgetSel_.Value?.Activate();
+				if (Cue.Instance.Sys.Input.MenuSelect)
+					widgetSel_.Value?.Activate();
+			}
 		}
 
 		private void CheckItemInput()
@@ -111,6 +114,14 @@ namespace Cue
 				NextWidget();
 			else if (Cue.Instance.Sys.Input.MenuUp)
 				PreviousWidget();
+		}
+
+		private void CheckPersonInput()
+		{
+			if (Cue.Instance.Sys.Input.MenuRight)
+				NextPerson();
+			else if (Cue.Instance.Sys.Input.MenuLeft)
+				PreviousPerson();
 		}
 
 		public void NextWidget()
@@ -129,14 +140,6 @@ namespace Cue
 		{
 			for (int i = 0; i < Items.Count; ++i)
 				Items[i].Selected = (i == index);
-		}
-
-		private void CheckPersonInput()
-		{
-			if (Cue.Instance.Sys.Input.MenuRight)
-				NextPerson();
-			else if (Cue.Instance.Sys.Input.MenuLeft)
-				PreviousPerson();
 		}
 
 		public void ShowLeft()

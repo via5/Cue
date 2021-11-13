@@ -139,22 +139,41 @@ namespace Cue
 			List<BodyPartLock> list = null;
 			bool failed = false;
 
-			ulong key = BodyPartLock.NextKey();
-
-			for (int i = 0; i < bodyParts.Length; ++i)
+			try
 			{
-				var lk = Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
-				if (lk == null)
+				ulong key = BodyPartLock.NextKey();
+
+				for (int i = 0; i < bodyParts.Length; ++i)
 				{
-					failed = true;
-					break;
+					var lk = Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
+					if (lk == null)
+					{
+						failed = true;
+						break;
+					}
+
+					if (list == null)
+						list = new List<BodyPartLock>();
+
+					list.Add(lk);
 				}
-
-				if (list == null)
-					list = new List<BodyPartLock>();
-
-				list.Add(lk);
 			}
+			catch (Exception e)
+			{
+				Cue.LogError(
+					$"{this}: exception while locking body parts, " +
+					$"unlocking all; was locking:");
+
+				for (int i = 0; i < bodyParts.Length; ++i)
+					Cue.LogError($"  - {BP.ToString(bodyParts[i])}");
+
+				Cue.LogError($"lockType={lockType}, why={why}, strong={strong}");
+				Cue.LogError($"exception:");
+				Cue.LogError(e.ToString());
+
+				failed = true;
+			}
+
 
 			if (failed)
 			{
@@ -167,7 +186,8 @@ namespace Cue
 				return null;
 			}
 
-			return list.ToArray();
+
+			return list?.ToArray();
 		}
 
 		public bool AnyInsidePersonalSpace()

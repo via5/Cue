@@ -148,7 +148,7 @@ namespace Cue.Sys.Vam
 
 						if (c == null)
 						{
-							Cue.LogError($"collider {cn} not found");
+							Cue.LogError($"{Atom.ID}: dildo collider {cn} not found");
 							continue;
 						}
 

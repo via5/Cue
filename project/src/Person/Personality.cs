@@ -195,7 +195,10 @@ namespace Cue
 				exps_[i] = ps.exps_[i].Clone();
 
 			voice_.CopyFrom(ps.voice_);
-			specificModifiers_ = ps.specificModifiers_;
+
+			specificModifiers_ = new SpecificModifier[ps.specificModifiers_.Length];
+			for (int i = 0; i < ps.specificModifiers_.Length; ++i)
+				specificModifiers_[i] = ps.specificModifiers_[i];
 		}
 
 		public void SetExpressions(Expression[] exps)
