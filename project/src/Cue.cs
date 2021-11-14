@@ -88,6 +88,11 @@ namespace Cue
 			get { return forcedPlayer_ ?? player_; }
 		}
 
+		public bool IsPlayer(int personIndex)
+		{
+			return (Player.PersonIndex == personIndex);
+		}
+
 		public Person ForcedPlayer
 		{
 			get

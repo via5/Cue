@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -75,6 +76,8 @@ namespace Cue
 		{
 			public float value;
 			public float specificModifier;
+			public float fromPenisValue;
+			public bool fromPenisOnly;
 		}
 
 
@@ -94,6 +97,10 @@ namespace Cue
 		private float totalRate_ = 0;
 		private float max_ = 0;
 
+		private List<string> debug_ = new List<string>();
+		private bool debugEnabled_ = false;
+
+
 		public Excitement(Person p)
 		{
 			person_ = p;
@@ -103,6 +110,16 @@ namespace Cue
 			reasons_[Genitals] = new Reason("Genitals", true);
 			reasons_[Penetration] = new Reason("Penetration", true);
 			reasons_[OtherSex] = new Reason("Other sex", false);
+		}
+
+		public bool DebugEnabled
+		{
+			set { debugEnabled_ = value; }
+		}
+
+		public List<string> Debug
+		{
+			get { return debug_; }
 		}
 
 		public float Max
@@ -142,88 +159,265 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (debugEnabled_)
+				debug_.Clear();
+
 			UpdateParts(s);
 			UpdateReasonValues(s);
 			UpdateReasonRates(s);
 			UpdateMax(s);
+
+			debugEnabled_ = false;
 		}
 
 		private void UpdateParts(float s)
 		{
+			if (debugEnabled_)
+				debug_.Add("parts:");
+
 			var ps = person_.Personality;
 
 			for (int i = 0; i < BP.Count; ++i)
 			{
 				var ts = person_.Body.Get(i).GetTriggers();
+				string debug = null;
 
-				parts_[i].specificModifier = 1;
+				parts_[i].specificModifier = 0;
+				parts_[i].fromPenisValue = 0;
+				parts_[i].fromPenisOnly = false;
 
 				if (ts == null || ts.Length == 0)
 				{
 					// todo, decay
-					parts_[i].value = Math.Max(parts_[i].value - s, 0);
+					if (parts_[i].value > 0)
+					{
+						parts_[i].value = Math.Max(parts_[i].value - s, 0);
+
+						if (debugEnabled_)
+							debug = $"  {BP.ToString(i)}: {parts_[i].value:0.0} (decaying)";
+					}
 				}
 				else
 				{
 					parts_[i].value = 0;
 					bool sawUnknown = false;
 
+					parts_[i].fromPenisValue = 0;
+					parts_[i].fromPenisOnly = true;
+
 					for (int j = 0; j < ts.Length; ++j)
 					{
 						if (!ts[j].IsPerson())
 						{
 							if (sawUnknown)
+							{
 								continue;
+							}
 							else
+							{
 								sawUnknown = true;
+								parts_[i].fromPenisOnly = false;
+							}
 						}
 
+						if (ts[j].sourcePartIndex == BP.Penis)
+							parts_[i].fromPenisValue += ts[j].value;
+						else
+							parts_[i].fromPenisOnly = false;
+
+						float mod = ps.GetSpecificModifier(
+							ts[j].personIndex, ts[j].sourcePartIndex,
+							person_.PersonIndex, i);
+
 						parts_[i].value += ts[j].value;
-						parts_[i].specificModifier += ps.GetSpecificModifier(i, ts[j].sourcePartIndex);
+						parts_[i].specificModifier += mod;
+
+						if (debugEnabled_)
+						{
+							if (debug == null)
+								debug = $"  {BP.ToString(i)}: ";
+							else
+								debug += " ";
+
+							debug += $"+{ts[j]}@{ts[j].value:0.0}";
+
+							if (mod > 0)
+								debug += $"*{mod}";
+						}
 					}
+
+					if (debugEnabled_ && debug != null)
+						debug_.Add(debug);
+				}
+			}
+		}
+
+		private float GetReasonValue(
+			int reason, int part,
+			BasicEnumValues.FloatIndex factor, ref string debug)
+		{
+			if (part == BP.Vagina)
+			{
+				return GetFixedPenetrationValue(ref debug);
+			}
+			else
+			{
+				float value = parts_[part].value;
+				bool allIgnored = false;
+				bool someIgnored = false;
+
+				if (reason == Genitals && value > 0)
+				{
+					value -= parts_[part].fromPenisValue;
+
+					if (Math.Abs(value) < 0.001f)
+					{
+						allIgnored = true;
+						value = 0;
+					}
+					else
+					{
+						someIgnored = true;
+					}
+				}
+
+				if (debugEnabled_)
+				{
+					var p = parts_[part];
+
+					if (p.value > 0)
+					{
+						var f = person_.Personality.Get(factor);
+						debug += $"{BP.ToString(part)}={value:0.0}*{f}*{p.specificModifier}";
+
+						if (allIgnored)
+							debug += "(ignored)";
+						else if (someIgnored)
+							debug += "(some ignored)";
+
+						debug += " ";
+					}
+				}
+
+				return value * person_.Personality.Get(factor);
+			}
+		}
+
+		private void SetReason(
+			int reason,
+			int part1, BasicEnumValues.FloatIndex factor1)
+		{
+			string debug = null;
+			if (debugEnabled_)
+				debug = "";
+
+			reasons_[reason].Value =
+				GetReasonValue(reason, part1, factor1, ref debug);
+
+			reasons_[reason].SpecificSensitivityModifier =
+				parts_[part1].specificModifier;
+
+			if (reasons_[reason].SpecificSensitivityModifier == 0)
+				reasons_[reason].SpecificSensitivityModifier = 1;
+
+			if (debugEnabled_)
+			{
+				if (parts_[part1].value > 0)
+				{
+					var r = reasons_[reason];
+					string s = $"  {r.Name}: {debug}";
+					debug_.Add(s);
+				}
+			}
+		}
+
+		private void SetReason(
+			int reason,
+			int part1, BasicEnumValues.FloatIndex factor1,
+			int part2, BasicEnumValues.FloatIndex factor2)
+		{
+			string debug = null;
+			if (debugEnabled_)
+				debug = "";
+
+			reasons_[reason].Value =
+				GetReasonValue(reason, part1, factor1, ref debug) +
+				GetReasonValue(reason, part2, factor2, ref debug);
+
+			reasons_[reason].SpecificSensitivityModifier =
+				parts_[part1].specificModifier +
+				parts_[part2].specificModifier;
+
+			if (reasons_[reason].SpecificSensitivityModifier == 0)
+				reasons_[reason].SpecificSensitivityModifier = 1;
+
+			if (debugEnabled_)
+			{
+				if (parts_[part1].value > 0 || parts_[part2].value > 0)
+				{
+					debug = $"  {reasons_[reason].Name}: " + debug;
+					debug_.Add(debug);
+				}
+			}
+		}
+
+		private void SetReason(
+			int reason,
+			int part1, BasicEnumValues.FloatIndex factor1,
+			int part2, BasicEnumValues.FloatIndex factor2,
+			int part3, BasicEnumValues.FloatIndex factor3)
+		{
+			string debug = null;
+			if (debugEnabled_)
+				debug = "";
+
+			reasons_[reason].Value =
+				GetReasonValue(reason, part1, factor1, ref debug) +
+				GetReasonValue(reason, part2, factor2, ref debug) +
+				GetReasonValue(reason, part3, factor3, ref debug);
+
+			reasons_[reason].SpecificSensitivityModifier =
+				parts_[part1].specificModifier +
+				parts_[part2].specificModifier +
+				parts_[part3].specificModifier;
+
+			if (reasons_[reason].SpecificSensitivityModifier == 0)
+				reasons_[reason].SpecificSensitivityModifier = 1;
+
+			if (debugEnabled_)
+			{
+				if (parts_[part1].value > 0 || parts_[part2].value > 0 || parts_[part3].value > 0)
+				{
+					debug = $"  {reasons_[reason].Name}: " + debug;
+					debug_.Add(debug);
 				}
 			}
 		}
 
 		private void UpdateReasonValues(float s)
 		{
+			if (debugEnabled_)
+				debug_.Add("reasons:");
+
 			var ps = person_.Personality;
 
-			reasons_[Mouth].Value =
-				parts_[BP.Lips].value * ps.Get(PS.LipsFactor) +
-				parts_[BP.Mouth].value * ps.Get(PS.MouthFactor);
+			SetReason(
+				Mouth,
+				BP.Lips, PS.LipsFactor,
+				BP.Mouth, PS.MouthFactor);
 
-			reasons_[Mouth].SpecificSensitivityModifier =
-				parts_[BP.Lips].specificModifier +
-				parts_[BP.Mouth].specificModifier;
+			SetReason(
+				Breasts,
+				BP.LeftBreast, PS.LeftBreastFactor,
+				BP.RightBreast, PS.RightBreastFactor);
 
+			SetReason(Genitals,
+				BP.Labia, PS.LabiaFactor);
 
-			reasons_[Breasts].Value =
-				parts_[BP.LeftBreast].value * ps.Get(PS.LeftBreastFactor) +
-				parts_[BP.RightBreast].value * ps.Get(PS.RightBreastFactor);
-
-			reasons_[Breasts].SpecificSensitivityModifier =
-				parts_[BP.LeftBreast].specificModifier +
-				parts_[BP.RightBreast].specificModifier;
-
-
-			reasons_[Genitals].Value =
-				parts_[BP.Labia].value * ps.Get(PS.LabiaFactor);
-
-			reasons_[Genitals].SpecificSensitivityModifier =
-				parts_[BP.Labia].specificModifier;
-
-
-			reasons_[Penetration].Value =
-				GetFixedPenetrationValue() +
-				parts_[BP.DeepVagina].value * ps.Get(PS.DeepVaginaFactor) +
-				parts_[BP.DeeperVagina].value * ps.Get(PS.DeeperVaginaFactor);
-
-			reasons_[Penetration].SpecificSensitivityModifier =
-				parts_[BP.Vagina].specificModifier +
-				parts_[BP.DeepVagina].specificModifier +
-				parts_[BP.DeeperVagina].specificModifier;
-
+			SetReason(Penetration,
+				BP.Vagina, PS.VaginaFactor,
+				BP.DeepVagina, PS.DeepVaginaFactor,
+				BP.DeeperVagina, PS.DeeperVaginaFactor);
 
 			reasons_[OtherSex].Value = 0;
 			reasons_[OtherSex].SpecificSensitivityModifier = 1;
@@ -233,16 +427,28 @@ namespace Cue
 				if (p == person_ || p.Body.HavingSexWith(person_))
 					continue;
 
+				if (debugEnabled_)
+				{
+					if (p.Excitement.physicalRate_.Value > 0)
+						debug_.Add($"  other physical: {p.ID}@{p.Excitement.physicalRate_.Value}");
+				}
+
 				reasons_[OtherSex].Value += p.Excitement.physicalRate_.Value;
 			}
 		}
 
-		private float GetFixedPenetrationValue()
+		private float GetFixedPenetrationValue(ref string debug)
 		{
 			var ps = person_.Personality;
 
 			if (parts_[BP.Vagina].value > 0)
 			{
+				if (debugEnabled_)
+				{
+					var p = parts_[BP.Vagina];
+					debug += $"vagina={p.value:0.0}*{ps.Get(PS.VaginaFactor)}*{p.specificModifier} ";
+				}
+
 				return
 					parts_[BP.Vagina].value *
 					ps.Get(PS.VaginaFactor);
@@ -250,6 +456,12 @@ namespace Cue
 
 			if (parts_[BP.Penis].value > 0)
 			{
+				if (debugEnabled_)
+				{
+					var p = parts_[BP.Penis];
+					debug += $"penis={p.value:0.0}*{ps.Get(PS.VaginaFactor)}*{p.specificModifier} ";
+				}
+
 				// todo
 				return
 					parts_[BP.Penis].value *
@@ -261,59 +473,117 @@ namespace Cue
 			//
 			// if the labia is triggered by a genital, assume penetration
 
-			var ts = person_.Body.Get(BP.Labia).GetTriggers();
-			if (ts != null)
+			if (parts_[BP.Labia].fromPenisValue > 0)
 			{
-				for (int i = 0; i < ts.Length; i++)
-				{
-					if (ts[i].sourcePartIndex == BP.Penis)
-					{
-						return
-							parts_[BP.Labia].value *
-							ps.Get(PS.VaginaFactor);
-					}
-				}
+				if (debugEnabled_)
+					debug += $"vagina={parts_[BP.Labia].value:0.0}*{ps.Get(PS.VaginaFactor)}(guess) ";
+
+				return
+					parts_[BP.Labia].value *
+					ps.Get(PS.VaginaFactor);
 			}
 
 			return 0;
 		}
 
+		private void SetReasonPersonalitySettings(
+			int reason,
+			BasicEnumValues.FloatIndex rate, BasicEnumValues.FloatIndex max)
+		{
+			reasons_[reason].GlobalSensitivityRate = person_.Personality.Get(rate);
+			reasons_[reason].SensitivityMax = person_.Personality.Get(max);
+		}
+
+		private void SetReasonRate(int reason)
+		{
+			reasons_[reason].Rate =
+				reasons_[reason].Value *
+				reasons_[reason].GlobalSensitivityRate *
+				reasons_[reason].SpecificSensitivityModifier;
+
+			if (reason != Penetration)
+			{
+				if (reasons_[Penetration].Rate > 0)
+					reasons_[reason].Rate *= person_.Personality.Get(PS.PenetrationDamper);
+			}
+
+			if (reasons_[reason].Physical)
+				physicalRate_.Value += reasons_[reason].Rate;
+			else
+				emotionalRate_.Value += reasons_[reason].Rate;
+
+			if (debugEnabled_ && reasons_[reason].Value > 0)
+			{
+				var r = reasons_[reason];
+
+				string s = $"  {r.Name}: " +
+					$"v={r.Value} " +
+					$"mod={r.GlobalSensitivityRate} ";
+
+				if (r.SpecificSensitivityModifier != 1)
+					s += $"smod={r.SpecificSensitivityModifier} ";
+
+				if (reason != Penetration && reasons_[Penetration].Rate > 0)
+					s += $"pdamp={person_.Personality.Get(PS.PenetrationDamper)} ";
+
+				s +=
+					$"rate={r.Rate} " +
+					$"max={r.SensitivityMax} ";
+
+				debug_.Add(s);
+			}
+		}
+
 		private void UpdateReasonRates(float s)
 		{
+			if (debugEnabled_)
+				debug_.Add("rates:");
+
 			var ps = person_.Personality;
 
-			reasons_[Mouth].GlobalSensitivityRate = ps.Get(PS.MouthRate);
-			reasons_[Breasts].GlobalSensitivityRate = ps.Get(PS.BreastsRate);
-			reasons_[Genitals].GlobalSensitivityRate = ps.Get(PS.GenitalsRate);
-			reasons_[Penetration].GlobalSensitivityRate = ps.Get(PS.PenetrationRate);
-			reasons_[OtherSex].GlobalSensitivityRate = ps.Get(PS.OtherSexExcitementRateFactor);
-
-			reasons_[Mouth].SensitivityMax = ps.Get(PS.MouthMax);
-			reasons_[Breasts].SensitivityMax = ps.Get(PS.BreastsMax);
-			reasons_[Genitals].SensitivityMax = ps.Get(PS.GenitalsMax);
-			reasons_[Penetration].SensitivityMax = ps.Get(PS.PenetrationMax);
-			reasons_[OtherSex].SensitivityMax = ps.Get(PS.MaxOtherSexExcitement);
+			// penetration must be first, it's used by the other reasons to
+			// check for the damper
+			SetReasonPersonalitySettings(Penetration, PS.PenetrationRate, PS.PenetrationMax);
+			SetReasonPersonalitySettings(Mouth, PS.MouthRate, PS.MouthMax);
+			SetReasonPersonalitySettings(Breasts, PS.BreastsRate, PS.BreastsMax);
+			SetReasonPersonalitySettings(Genitals, PS.GenitalsRate, PS.GenitalsMax);
+			SetReasonPersonalitySettings(OtherSex, PS.OtherSexExcitementRateFactor, PS.MaxOtherSexExcitement);
 
 			physicalRate_.Value = 0;
 			emotionalRate_.Value = 0;
 
 			for (int i = 0; i < ReasonCount; ++i)
-			{
-				reasons_[i].Rate =
-					reasons_[i].Value *
-					reasons_[i].GlobalSensitivityRate *
-					reasons_[i].SpecificSensitivityModifier;
+				SetReasonRate(i);
 
-				if (reasons_[i].Physical)
-					physicalRate_.Value += reasons_[i].Rate;
-				else
-					emotionalRate_.Value += reasons_[i].Rate;
+			float subtotal = physicalRate_.Value + emotionalRate_.Value;
+
+			if (debugEnabled_)
+			{
+				debug_.Add("total rates:");
+				debug_.Add($"  physical: {physicalRate_.Value:0.00000}");
+				debug_.Add($"  emotional: {emotionalRate_.Value:0.00000}");
+				debug_.Add($"  subtotal: {subtotal:0.00000}");
+
+				if (ps.Get(PS.RateAdjustment) != 1)
+				{
+					debug_.Add($"  rate adjustement: {ps.Get(PS.RateAdjustment)}");
+				}
 			}
 
-			totalRate_ = physicalRate_.Value + emotionalRate_.Value;
+			totalRate_ = subtotal * ps.Get(PS.RateAdjustment);
 
 			if (totalRate_ == 0)
+			{
 				totalRate_ = ps.Get(PS.ExcitementDecayRate);
+
+				if (debugEnabled_)
+					debug_.Add($"  total: {totalRate_:0.00000} (decaying)");
+			}
+			else
+			{
+				if (debugEnabled_)
+					debug_.Add($"  total: {totalRate_:0.00000} (rising)");
+			}
 		}
 
 		private void UpdateMax(float s)

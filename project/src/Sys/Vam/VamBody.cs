@@ -238,7 +238,7 @@ namespace Cue.Sys.Vam
 			//
 			add(BP.Labia, GetTrigger(
 				BP.Labia, "", "LabiaTrigger", "",
-				genitalsIgnore));
+				genitalsIgnore, new string[] { "pelvisF1/pelvisF1Joint" }));
 
 			add(BP.Vagina, GetTrigger(
 				BP.Vagina, "", "VaginaTrigger", "",
@@ -677,7 +677,8 @@ namespace Cue.Sys.Vam
 
 		private IBodyPart GetTrigger(
 			int id, string controller,
-			string nameFemale, string nameMale = "same", string[] ignoreTransforms=null)
+			string nameFemale, string nameMale = "same",
+			string[] ignoreTransforms=null, string[] colliders = null)
 		{
 			string name = MakeName(nameFemale, nameMale);
 			if (name == "")
@@ -712,7 +713,8 @@ namespace Cue.Sys.Vam
 			}
 
 			return new TriggerBodyPart(
-				Atom, id, t, fc, t.thisRigidbody.transform, ignoreTransforms);
+				Atom, id, t, fc, t.thisRigidbody.transform,
+				ignoreTransforms, colliders);
 		}
 
 		private IBodyPart GetCollider(

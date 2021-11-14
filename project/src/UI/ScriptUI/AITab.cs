@@ -14,6 +14,7 @@ namespace Cue
 
 			AddSubTab(new PersonAIStateTab(person_));
 			AddSubTab(new PersonAIMoodTab(person_));
+			AddSubTab(new PersonAIExcitementTab(person_));
 			AddSubTab(new PersonAIPersonalityTab(person_));
 			AddSubTab(new PersonAIGazeTab(person_));
 			AddSubTab(new PersonAIEventsTab(person_));
@@ -190,6 +191,34 @@ namespace Cue
 	}
 
 
+	class PersonAIExcitementTab : Tab
+	{
+		private Person person_;
+
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+
+		public PersonAIExcitementTab(Person p)
+			: base("Excitement", false)
+		{
+			person_ = p;
+
+			Layout = new VUI.BorderLayout();
+			Add(list_, VUI.BorderLayout.Center);
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			// will be picked up on next frame
+			person_.Excitement.DebugEnabled = true;
+
+			list_.SetItems(person_.Excitement.Debug);
+		}
+	}
+
+
 	class PersonAIPersonalityTab : Tab
 	{
 		private Person person_;
@@ -216,10 +245,7 @@ namespace Cue
 			for (int i = 0; i < ps.SpecificModifiers.Length; ++i)
 			{
 				var sm = ps.SpecificModifiers[i];
-
-				exps.Add(new string[]{
-					$"{BP.ToString(sm.bodyPart)}=>{BP.ToString(sm.sourceBodyPart)}",
-					$"{sm.modifier}" });
+				exps.Add(new string[] { sm.ToString(), "" });
 			}
 
 			var v = ps.Voice;

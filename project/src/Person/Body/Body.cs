@@ -285,6 +285,20 @@ namespace Cue
 			return false;
 		}
 
+		public bool Penetrating()
+		{
+			if (!HasPenis)
+				return false;
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p.Body.PenetratedBy(person_))
+					return true;
+			}
+
+			return false;
+		}
+
 		public PartResult GropedByAny(int triggerBodyPart)
 		{
 			return GropedByAny(new int[] { triggerBodyPart });

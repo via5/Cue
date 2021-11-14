@@ -7,30 +7,14 @@ namespace Cue.Sys.Vam
 	{
 		private Rigidbody[] rbs_;
 		private FreeControllerV3 fc_ = null;
-		private Collider[] colliders_;
 
 		public RigidbodyBodyPart(
 			VamAtom a, int type, Rigidbody[] rbs, FreeControllerV3 fc,
 			string[] colliders)
-				: base(a, type)
+				: base(a, type, colliders)
 		{
 			rbs_ = rbs;
 			fc_ = fc;
-
-			var cs = new List<Collider>();
-			foreach (var cn in colliders)
-			{
-				var c = U.FindCollider(a.Atom, cn);
-				if (c == null)
-				{
-					Log.Error($"{a.ID}: collider {cn} not found");
-					continue;
-				}
-
-				cs.Add(c);
-			}
-
-			colliders_ = cs.ToArray();
 		}
 
 		public override Rigidbody Rigidbody
@@ -84,11 +68,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return false;
-		}
-
-		protected override Collider[] GetColliders()
-		{
-			return colliders_;
 		}
 
 		public override bool CanApplyForce()

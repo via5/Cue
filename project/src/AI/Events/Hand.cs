@@ -2,7 +2,7 @@
 {
 	class HandEvent : BasicEvent
 	{
-		private const float MaxDistanceToStart = 0.1f;
+		private const float MaxDistanceToStart = 0.05f;
 		private const float CheckTargetsInterval = 2;
 
 		private bool active_ = false;
@@ -324,6 +324,7 @@
 		private BodyPart FindTarget(int handPart)
 		{
 			var hand = person_.Body.Get(handPart);
+			BodyPart tentative = null;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -331,10 +332,37 @@
 				var d = hand.DistanceToSurface(g);
 
 				if (d < MaxDistanceToStart)
-					return g;
+				{
+					if (BetterTarget(tentative, g))
+						tentative = g;
+				}
 			}
 
-			return null;
+			return tentative;
+		}
+
+		private bool BetterTarget(BodyPart tentative, BodyPart check)
+		{
+			if (tentative == null)
+			{
+				// first
+				return true;
+			}
+
+			if (tentative.Person == person_)
+			{
+				// prioritize others
+				return true;
+			}
+
+			if (tentative.Person.Body.Penetrating())
+			{
+				// prioritize genitals that are not currently
+				// penetrating
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

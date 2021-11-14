@@ -8,13 +8,32 @@ namespace Cue.Sys.Vam
 	{
 		private IAtom atom_;
 		private int type_;
+		private Collider[] colliders_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 		private Logger log_ = null;
 
-		protected VamBodyPart(IAtom a, int t)
+		protected VamBodyPart(IAtom a, int t, string[] colliders = null)
 		{
 			atom_ = a;
 			type_ = t;
+
+			if (colliders != null)
+			{
+				var cs = new List<Collider>();
+				foreach (var cn in colliders)
+				{
+					var c = U.FindCollider((a as VamAtom).Atom, cn);
+					if (c == null)
+					{
+						Log.Error($"{a.ID}: collider {cn} not found");
+						continue;
+					}
+
+					cs.Add(c);
+				}
+
+				colliders_ = cs.ToArray();
+			}
 		}
 
 		public Logger Log
@@ -226,7 +245,7 @@ namespace Cue.Sys.Vam
 					if (dp < closest)
 					{
 						if (debug)
-							Log.Info($"both valid, closest is position, {thisPos} {otherPos} {dp}");
+							Log.Error($"both valid, closest is position, {thisPos} {otherPos} {dp}");
 
 						closest = dp;
 					}
@@ -234,7 +253,7 @@ namespace Cue.Sys.Vam
 					{
 						if (debug)
 						{
-							Log.Info($"both valid, closest is {thisDebug} {otherDebug} {closest}");
+							Log.Error($"both valid, closest is {U.FullName(thisDebug)} {U.FullName(otherDebug)} {closest}");
 						}
 					}
 				}
@@ -269,10 +288,10 @@ namespace Cue.Sys.Vam
 
 					if (debug)
 					{
-						Log.Info(
+						Log.Error(
 							$"this valid, " +
 							$"closest is {other} at {otherPos}, " +
-							$"this is {this} {c.transform.parent.name}.{c.name} " +
+							$"this is {this} {U.FullName(c)} " +
 							$"at {c.transform.position}, d={closest}");
 					}
 				}
@@ -308,9 +327,9 @@ namespace Cue.Sys.Vam
 
 					if (debug)
 					{
-						Log.Info(
+						Log.Error(
 							$"other valid, closest is {thisPos} " +
-							$"{c.transform.parent.name}.{c.name} {closest}");
+							$"{U.FullName(c)} {closest}");
 					}
 				}
 				catch (Exception e)
@@ -326,7 +345,7 @@ namespace Cue.Sys.Vam
 				float d = Vector3.Distance(thisPos, other.Position);
 
 				if (debug)
-					Log.Info($"neither valid, {thisPos} {other.Position} {d}");
+					Log.Error($"neither valid, {thisPos} {other.Position} {d}");
 
 				return d;
 			}
@@ -336,7 +355,7 @@ namespace Cue.Sys.Vam
 
 		protected virtual Collider[] GetColliders()
 		{
-			return null;
+			return colliders_;
 		}
 
 		public virtual bool CanApplyForce()

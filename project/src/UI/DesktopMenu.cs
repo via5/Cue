@@ -75,10 +75,7 @@ namespace Cue
 			{
 				var o = sys_.Input.GetMouseHovered().o as Person;
 				if (o != null)
-				{
 					SelectedPerson = o;
-					Cue.Instance.Save();
-				}
 			}
 		}
 

@@ -165,16 +165,63 @@ namespace Cue
 	{
 		public struct SpecificModifier
 		{
-			public int bodyPart;
+			public bool sourcePlayer;
 			public int sourceBodyPart;
+
+			public bool targetPlayer;
+			public int targetBodyPart;
+
 			public float modifier;
+
+
+			public bool AppliesTo(
+				int sourcePersonIndex, int sourceBodyPart,
+				int targetPersonIndex, int targetBodyPart)
+			{
+				if (this.sourcePlayer && !Cue.Instance.IsPlayer(sourcePersonIndex))
+					return false;
+
+				if (this.sourceBodyPart != sourceBodyPart)
+					return false;
+
+				if (this.targetPlayer && !Cue.Instance.IsPlayer(targetPersonIndex))
+					return false;
+
+				if (this.targetBodyPart != targetBodyPart)
+					return false;
+
+				return true;
+			}
 
 			public override string ToString()
 			{
-				return
-					$"{BP.ToString(bodyPart)}=>" +
-					$"{BP.ToString(sourceBodyPart)}   " +
-					$"{modifier}";
+				string s = "";
+
+				if (sourcePlayer)
+					s += "player.";
+				else
+					s += "any.";
+
+				if (sourceBodyPart == BP.None)
+					s += "any";
+				else
+					s += BP.ToString(sourceBodyPart);
+
+				s += "=>";
+
+				if (targetPlayer)
+					s += "player.";
+				else
+					s += "any.";
+
+				if (targetBodyPart == BP.None)
+					s += "any";
+				else
+					s += BP.ToString(targetBodyPart);
+
+				s += $"   {modifier}";
+
+				return s;
 			}
 		}
 
@@ -270,13 +317,20 @@ namespace Cue
 			return e;
 		}
 
-		public float GetSpecificModifier(int part, int sourcePart)
+		public float GetSpecificModifier(
+			int sourcePersonIndex, int sourceBodyPart,
+			int targetPersonIndex, int targetBodyPart)
 		{
 			for (int i = 0; i < specificModifiers_.Length; ++i)
 			{
 				var sm = specificModifiers_[i];
-				if (sm.bodyPart == part && sm.sourceBodyPart == sourcePart)
+
+				if (sm.AppliesTo(
+						sourcePersonIndex, sourceBodyPart,
+						targetPersonIndex, targetBodyPart))
+				{
 					return sm.modifier;
+				}
 			}
 
 			return 0;

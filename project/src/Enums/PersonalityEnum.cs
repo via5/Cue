@@ -124,9 +124,10 @@ namespace Cue
 		public static readonly FloatIndex OrgasmTime = new FloatIndex(99);
 		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(100);
 		public static readonly FloatIndex RateAdjustment = new FloatIndex(101);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(102);
 
-		public const int FloatCount = 102;
-		public override int GetFloatCount() { return 102; }
+		public const int FloatCount = 103;
+		public override int GetFloatCount() { return 103; }
 
 		// strings
 
@@ -347,6 +348,7 @@ namespace Cue
 			"orgasmTime",
 			"postOrgasmTime",
 			"rateAdjustment",
+			"penetrationDamper",
 		};
 
 		public static int FloatFromString(string s)
@@ -558,6 +560,7 @@ namespace Cue
 			"orgasmTime",
 			"postOrgasmTime",
 			"rateAdjustment",
+			"penetrationDamper",
 		};
 
 		public static string[] AllNames

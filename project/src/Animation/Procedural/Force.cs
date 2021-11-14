@@ -219,8 +219,9 @@ namespace Cue.Proc
 		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			bp_ = p.Body.Get(bodyPartType_);
+			vtarget_.Reset();
+			dtarget_.Reset();
 			needsNewsTarget_ = true;
-
 			Next();
 		}
 

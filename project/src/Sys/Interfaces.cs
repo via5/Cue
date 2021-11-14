@@ -223,12 +223,7 @@ namespace Cue.Sys
 				var p = Cue.Instance.AllPersons[personIndex];
 				var bp = p.Body.Get(sourcePartIndex);
 
-				string s;
-
-				if (value == 1)
-					s = $"{p.ID}.{bp.Name}";
-				else
-					s = $"{p.ID}.{bp.Name}/{value:0.0}";
+				string s = $"{p.ID}.{bp.Name}";
 
 				if (forced)
 					s += "(forced)";

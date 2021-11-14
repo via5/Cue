@@ -575,9 +575,6 @@ V.Float("NeutralVoicePitch"),
 //
 // clamped between [0, mouthMax]. Both `lipsTrigger` and `mouthTrigger` can be
 // either 0 or 1 depending on whether the trigger is active in VaM.
-//
-// Note that some excitement values are controlled by the personality, see
-// PersonalityEnum.tt
 
 
 // rate at which excitement goes up when the lips or mouth are being
@@ -643,6 +640,41 @@ V.Float("PostOrgasmTime"),
 // can be changed to globally increase or decrease the rate at which
 // excitement changes
 V.Float("RateAdjustment"),
+
+// this is like RateAdjustement, but it only applies while this character is
+// being penetrated or is penetrating another; this is used to increase the time
+// between orgasm during sex regardless of interactions while still allowing
+// quicker orgasms for more ad hoc interactions
+//
+// this is applied to all the individual rates above, except for PenetrationRate
+V.Float("PenetrationDamper"),
+
+
+// Specific modifiers
+// ==================
+// allows for changing rates when specific body parts and characters are
+// interacting
+//
+// the target is the character whose excitement is currently being calculated;
+// the source is the other character that is touching this one; they both might
+// be the same
+//
+// note that `source` and `target` only support "" and "player" for now, not
+// specific character names
+//
+//
+//   source           if empty, applies to any source character; if "player",
+//                    only applies if the source body part is from the player
+//
+//   sourceBodyPart   name of the source body part (see BodyPartEnum.cs)
+//
+//   target           if empty, applies to any target character; if "player",
+//                    only applies if the target body part is on the player
+//
+//   targetBodyPart   name of the target body part
+//
+// for now, this feature is only used to increase the rates when the player is
+// touching genitals, because the player is awesome
 
 };
 

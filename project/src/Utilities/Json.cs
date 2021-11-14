@@ -21,6 +21,14 @@ namespace Cue
 			return true;
 		}
 
+		public static string OptString(JSONClass o, string key, string def = "")
+		{
+			if (!o.HasKey(key))
+				return def;
+
+			return o[key].Value;
+		}
+
 		public static float ReqFloat(JSONClass o, string key)
 		{
 			if (!o.HasKey(key))

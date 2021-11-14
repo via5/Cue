@@ -353,8 +353,6 @@ namespace Cue
 
 				rate = rate - (rate * tirednessFactor);
 
-				rate *= ps.Get(PS.RateAdjustment);
-
 				moods_[Moods.Excited].Value = U.Clamp(
 					moods_[Moods.Excited].Value + rate * s,
 					0, ex.Max);

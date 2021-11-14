@@ -383,6 +383,8 @@ namespace Cue
 
 			if (fire)
 				PersonChanged();
+
+			Cue.Instance.Save();
 		}
 
 		protected abstract void PersonChanged();

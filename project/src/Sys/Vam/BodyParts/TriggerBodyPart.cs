@@ -24,8 +24,9 @@ namespace Cue.Sys.Vam
 
 		public TriggerBodyPart(
 			VamAtom a, int type, CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
-				: base(a, type)
+			FreeControllerV3 fc, Transform tr,
+			string[] ignoreTransforms, string[] colliders)
+				: base(a, type, colliders)
 		{
 			Init(h, fc, tr, ignoreTransforms);
 		}
