@@ -91,7 +91,6 @@ namespace Cue.Proc
 		public override bool Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
-			SetEnergySource(p);
 			root_.Start(p, cx);
 			return true;
 		}

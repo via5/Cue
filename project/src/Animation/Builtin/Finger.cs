@@ -48,11 +48,11 @@
 
 		public override bool Start(Person p, AnimationContext cx)
 		{
-			if (!base.Start(p, cx))
-				return false;
-
 			if (cx.ps is Person)
 				SetEnergySource(cx.ps as Person);
+
+			if (!base.Start(p, cx))
+				return false;
 
 			return true;
 		}

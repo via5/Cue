@@ -307,7 +307,8 @@
 	"expressionExcitementFactor": 1,
 	"expressionTirednessFactor": 1,
 
-	"movementEnergyRampUpAfterOrgasm": 20,
+	"movementEnergyRampUpAfterOrgasm": 30,
+	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
 
 	"avoidGazePlayer": 0,
 	"avoidGazePlayerInsidePersonalSpace": 0,

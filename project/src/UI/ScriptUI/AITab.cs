@@ -86,12 +86,9 @@ namespace Cue
 		private readonly Person person_;
 
 		private VUI.Label state_ = new VUI.Label();
-		private VUI.Label rate_ = new VUI.Label();
-
-		private VUI.Label exMax_ = new VUI.Label();
-		private VUI.Label[] reasons_ = new VUI.Label[Excitement.ReasonCount];
-		private VUI.Label total_ = new VUI.Label();
-
+		private VUI.Label gazeEnergy_ = new VUI.Label();
+		private VUI.Label gazeTiredness_ = new VUI.Label();
+		private VUI.Label movementEnergy_ = new VUI.Label();
 
 		public PersonAIMoodTab(Person person)
 			: base("Mood", false)
@@ -112,6 +109,21 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
+			p.Add(new VUI.Label("Gaze energy"));
+			p.Add(gazeEnergy_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Gaze tiredness"));
+			p.Add(gazeTiredness_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+			p.Add(new VUI.Label("Movement energy"));
+			p.Add(movementEnergy_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
@@ -126,44 +138,10 @@ namespace Cue
 			for (int i=0; i<Moods.Count; ++i)
 				AddForceable(p, person_.Mood.GetValue(i), $"    {Moods.ToString(i)}");
 
-
-
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
-
-			p.Add(new VUI.Label("Excitement", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-
-			p.Add(new VUI.Label("Max"));
-			p.Add(exMax_);
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-
-			for (int i = 0; i < Excitement.ReasonCount; ++i)
-			{
-				reasons_[i] = new VUI.Label();
-				p.Add(new VUI.Label(person_.Excitement.GetReason(i).Name));
-				p.Add(reasons_[i]);
-				p.Add(new VUI.Spacer(0));
-				p.Add(new VUI.Spacer(0));
-			}
-
-			AddForceable(p, person_.Excitement.ForceablePhysicalRate, "Physical rate");
-			AddForceable(p, person_.Excitement.ForceableEmotionalRate, "Emotional rate");
-
-			p.Add(new VUI.Label("Total rate"));
-			p.Add(total_);
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
-
-			p.Add(new VUI.Label("Rate"));
-			p.Add(rate_);
-			p.Add(new VUI.Spacer(0));
-			p.Add(new VUI.Spacer(0));
 
 			p.Add(new VUI.Button("Orgasm", () => { person_.Mood.ForceOrgasm(); }));
 			p.Add(new VUI.Spacer(0));
@@ -177,16 +155,9 @@ namespace Cue
 		protected override void DoUpdate(float s)
 		{
 			state_.Text = person_.Mood.StateString;
-			rate_.Text = person_.Mood.RateString;
-
-			var e = person_.Excitement;
-
-			exMax_.Text = $"{e.Max:0.000000}";
-
-			for (int i = 0; i < reasons_.Length; ++i)
-				reasons_[i].Text = e.GetReason(i).ToString();
-
-			total_.Text = $"{e.TotalRate:0.000000}";
+			gazeEnergy_.Text = $"{person_.Mood.GazeEnergy:0.00}";
+			gazeTiredness_.Text = $"{person_.Mood.GazeTiredness:0.00}";
+			movementEnergy_.Text = $"{person_.Mood.MovementEnergy:0.00}";
 		}
 	}
 

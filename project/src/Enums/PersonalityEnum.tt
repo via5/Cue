@@ -398,6 +398,9 @@ V.Float("ExpressionTirednessFactor"),
 // instead of being very fast right after orgasm
 V.Float("MovementEnergyRampUpAfterOrgasm"),
 
+// easing used when ramping up movement energy
+V.String("MovementEnergyRampUpAfterOrgasmEasing"),
+
 
 // Mood
 // =====

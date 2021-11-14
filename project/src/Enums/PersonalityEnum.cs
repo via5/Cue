@@ -130,9 +130,10 @@ namespace Cue
 		public override int GetFloatCount() { return 103; }
 
 		// strings
+		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
 
-		public const int StringCount = 0;
-		public override int GetStringCount() { return 0; }
+		public const int StringCount = 1;
+		public override int GetStringCount() { return 1; }
 
 
 		private static string[] durationNames_ = new string[]
@@ -401,6 +402,7 @@ namespace Cue
 
 		private static string[] stringNames_ = new string[]
 		{
+			"movementEnergyRampUpAfterOrgasmEasing",
 		};
 
 		public static int StringFromString(string s)
@@ -561,6 +563,7 @@ namespace Cue
 			"postOrgasmTime",
 			"rateAdjustment",
 			"penetrationDamper",
+			"movementEnergyRampUpAfterOrgasmEasing",
 		};
 
 		public static string[] AllNames

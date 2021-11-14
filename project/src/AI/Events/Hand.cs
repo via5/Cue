@@ -280,16 +280,12 @@
 
 				if (state == Animator.Playing)
 				{
-					if (person_.Mood.State == Mood.OrgasmState ||
-						target.Mood.State == Mood.OrgasmState)
-					{
+					if (Mood.ShouldStopSexAnimation(person_, target))
 						person_.Animator.StopType(anim);
-					}
 				}
 				else if (state == Animator.NotPlaying)
 				{
-					if (person_.Mood.State == Mood.NormalState &&
-						target.Mood.State == Mood.NormalState)
+					if (Mood.CanStartSexAnimation(person_, target))
 					{
 						person_.Animator.PlayType(
 							anim, new AnimationContext(target, locks[0].Key));
