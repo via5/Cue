@@ -15,9 +15,6 @@ namespace Cue
 		private float elapsed_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 
-		private float flatExcitement_ = 0;
-		private IEasing excitementEasing_ = new SineOutEasing();
-
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 
@@ -244,7 +241,7 @@ namespace Cue
 					if (elapsed_ > ps.Get(PS.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						flatExcitement_ = ps.Get(PS.ExcitementPostOrgasm);
+						moods_[Moods.Excited].Value = ps.Get(PS.ExcitementPostOrgasm);
 					}
 
 					break;
@@ -342,10 +339,10 @@ namespace Cue
 			var ps = person_.Personality;
 			var ex = person_.Excitement;
 
-			if (flatExcitement_ > ex.Max)
+			if (moods_[Moods.Excited].Value > ex.Max)
 			{
-				flatExcitement_ = Math.Max(
-					flatExcitement_ + ps.Get(PS.ExcitementDecayRate) * s,
+				moods_[Moods.Excited].Value = Math.Max(
+					moods_[Moods.Excited].Value + ps.Get(PS.ExcitementDecayRate) * s,
 					ex.Max);
 			}
 			else
@@ -358,12 +355,10 @@ namespace Cue
 
 				rate *= ps.Get(PS.RateAdjustment);
 
-				flatExcitement_ = U.Clamp(
-					flatExcitement_ + rate * s,
+				moods_[Moods.Excited].Value = U.Clamp(
+					moods_[Moods.Excited].Value + rate * s,
 					0, ex.Max);
 			}
-
-			moods_[Moods.Excited].Value = excitementEasing_.Magnitude(flatExcitement_);
 		}
 
 		private float GetRate()
@@ -386,7 +381,7 @@ namespace Cue
 
 			person_.Animator.PlayType(Animations.Orgasm);
 
-			flatExcitement_ = 1;
+			moods_[Moods.Excited].Value = 1;
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
 		}

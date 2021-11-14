@@ -267,6 +267,7 @@ namespace Cue
 		public void Update(float s, float magnitude)
 		{
 			magnitude_ = magnitude;
+			nextElapsed_ += s;
 
 			if (finished_)
 			{
@@ -283,7 +284,6 @@ namespace Cue
 			}
 
 			elapsed_ += s;
-			nextElapsed_ += s;
 
 			if (elapsed_ > current_)
 				finished_ = true;
@@ -312,12 +312,13 @@ namespace Cue
 
 		public void SetRange(float min, float max)
 		{
-			if (min_ != min || max_ != max)
-			{
-				min_ = min;
-				max_ = max;
+			bool largeChange = (Math.Abs(min_ - min) >= 0.1f) || (Math.Abs(max_ - max) >= 0.1f);
+
+			min_ = min;
+			max_ = max;
+
+			if (largeChange)
 				nextElapsed_ = nextTime_ + 1;
-			}
 		}
 
 		private void NextValue(bool forceFast = false)

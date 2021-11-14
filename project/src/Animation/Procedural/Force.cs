@@ -6,6 +6,69 @@ namespace Cue.Proc
 {
 	class Force : BasicTarget
 	{
+		struct VectorTarget
+		{
+			public Vector3 min, max, window, last, target;
+
+			public VectorTarget(Vector3 min, Vector3 max, Vector3 window)
+			{
+				this.min = min;
+				this.max = max;
+				this.window = window;
+				this.last = Vector3.Zero;
+				this.target = Vector3.Zero;
+
+				if (this.window == Vector3.Zero)
+					this.window = Vector3.Abs(max - min);
+			}
+
+			public void Swap()
+			{
+				var temp = last;
+				last = target;
+				target = temp;
+			}
+
+			public void Reset()
+			{
+				last = Vector3.Zero;
+				target = Vector3.Zero;
+			}
+
+			public override string ToString()
+			{
+				return
+					$"last={last} target={target}\n" +
+					$"min={min} max={max} win={window}";
+			}
+		}
+
+		struct DirTarget
+		{
+			public float min, max, window, last, target;
+			public Vector3 dir;
+
+			public void Swap()
+			{
+				var temp = last;
+				last = target;
+				target = temp;
+			}
+
+			public void Reset()
+			{
+				last = 0;
+				target = 0;
+			}
+
+			public override string ToString()
+			{
+				return
+					$"last={last} target={target}\n" +
+					$"min={min} max={max} win={window} dir={dir}";
+			}
+		}
+
 		public const int RelativeForce = 1;
 		public const int RelativeTorque = 2;
 		public const int AbsoluteForce = 3;
@@ -26,12 +89,13 @@ namespace Cue.Proc
 		private float busyElapsed_ = 0;
 		private IEasing busyResetEasing_ = new SinusoidalEasing();
 
-		private Vector3 min_, max_;
-		private Vector3 last_, target_;
-		private Vector3 window_;
 		private IEasing windowEasing_ = new LinearEasing();
 		private Duration next_;
-		private bool needRange_ = false;
+		private bool needsNewsTarget_ = false;
+
+		private VectorTarget vtarget_;
+		private DirTarget dtarget_;
+		private bool useDir_ = false;
 
 
 		public Force(
@@ -50,14 +114,9 @@ namespace Cue.Proc
 		{
 			type_ = type;
 			bodyPartType_ = bodyPart;
-			min_ = min;
-			max_ = max;
+			vtarget_ = new VectorTarget(min, max, window);
 			next_ = next ?? new Duration();
-			window_ = window;
 			easing_ = easing ?? new SinusoidalEasing();
-
-			if (window_ == Vector3.Zero)
-				window_ = Vector3.Abs(max_ - min);
 		}
 
 		public static Force Create(int type, JSONClass o)
@@ -149,7 +208,8 @@ namespace Cue.Proc
 		{
 			var f = new Force(
 				Name, type_, bodyPartType_,
-				min_, max_, next_.Clone(), window_, Sync.Clone());
+				vtarget_.min, vtarget_.max, next_.Clone(),
+				vtarget_.window, Sync.Clone());
 
 			f.beforeNext_ = beforeNext_;
 
@@ -159,32 +219,60 @@ namespace Cue.Proc
 		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			bp_ = p.Body.Get(bodyPartType_);
-			needRange_ = true;
+			needsNewsTarget_ = true;
+
 			Next();
 		}
 
 		public override void Reset()
 		{
 			base.Reset();
-			last_ = Vector3.Zero;
-			target_ = Vector3.Zero;
+			vtarget_.Reset();
+			dtarget_.Reset();
+			needsNewsTarget_ = true;
 			next_.Reset(MovementEnergy);
 			Next();
 		}
 
 		public override void RequestStop()
 		{
-			last_ = Lerped();
-			target_ = Vector3.Zero;
+			if (useDir_)
+			{
+				dtarget_.last = LerpedForDir();
+				dtarget_.target = 0;
+			}
+			else
+			{
+				vtarget_.last = LerpedForVector();
+				vtarget_.target = Vector3.Zero;
+			}
+
 			base.RequestStop();
+		}
+
+		public void SetRangeWithDirection(
+			float min, float max, float win, Vector3 dir)
+		{
+			// ignore dir
+			if (!useDir_ || min != dtarget_.min || max != dtarget_.max || win != dtarget_.window)
+				needsNewsTarget_ = true;
+
+			dtarget_.min = min;
+			dtarget_.max = max;
+			dtarget_.dir = dir;
+			dtarget_.window = win;
+			useDir_ = true;
 		}
 
 		public void SetRange(Vector3 min, Vector3 max, Vector3 win)
 		{
-			min_ = min;
-			max_ = max;
-			window_ = win;
-			needRange_ = true;
+			if (useDir_ || min != vtarget_.min || max != vtarget_.max || win != vtarget_.window)
+				needsNewsTarget_ = true;
+
+			vtarget_.min = min;
+			vtarget_.max = max;
+			vtarget_.window = win;
+			useDir_ = false;
 		}
 
 		private bool CanAppyForce()
@@ -213,7 +301,7 @@ namespace Cue.Proc
 				}
 				else
 				{
-					forceBeforeBusy_ = Lerped();
+					forceBeforeBusy_ = LerpedForce();
 					busyElapsed_ = 0;
 				}
 
@@ -239,9 +327,9 @@ namespace Cue.Proc
 
 			next_.Update(s, 1);
 			if (next_.Finished)
-				needRange_ = true;
+				needsNewsTarget_ = true;
 
-			Apply(Lerped());
+			Apply(LerpedForce());
 
 			switch (Sync.UpdateResult)
 			{
@@ -252,9 +340,10 @@ namespace Cue.Proc
 
 				case BasicSync.DurationFinished:
 				{
-					var temp = last_;
-					last_ = target_;
-					target_ = temp;
+					if (useDir_)
+						dtarget_.Swap();
+					else
+						vtarget_.Swap();
 
 					break;
 				}
@@ -309,9 +398,24 @@ namespace Cue.Proc
 			}
 		}
 
-		private Vector3 Lerped()
+		private Vector3 LerpedForce()
 		{
-			return Vector3.Lerp(last_, target_, easing_.Magnitude(Sync.Magnitude));
+			if (useDir_)
+				return LerpedForDir() * dtarget_.dir;
+			else
+				return LerpedForVector();
+		}
+
+		private float LerpedForDir()
+		{
+			float f = easing_.Magnitude(Sync.Magnitude);
+			return U.Lerp(dtarget_.last, dtarget_.target, f);
+		}
+
+		private Vector3 LerpedForVector()
+		{
+			float f = easing_.Magnitude(Sync.Magnitude);
+			return Vector3.Lerp(vtarget_.last, vtarget_.target, f);
 		}
 
 		public static string TypeToString(int i)
@@ -330,7 +434,7 @@ namespace Cue.Proc
 		{
 			list.Add(
 				$"{bp_} ({BP.ToString(bodyPartType_)}) " +
-				$"{TypeToString(type_)} {Sys.Vam.U.ToUnity(Lerped())}");
+				$"{TypeToString(type_)} {Sys.Vam.U.ToUnity(LerpedForce())}");
 		}
 
 		public override string ToString()
@@ -344,39 +448,50 @@ namespace Cue.Proc
 		{
 			return
 				$"{TypeToString(type_)} {Name} {bp_}\n" +
-				$"last={last_} target={target_}\n" +
-				$"min={min_} max={max_} win={window_}\n" +
+				$"usedir={useDir_} {(useDir_ ? dtarget_.ToString() : vtarget_.ToString())}\n" +
 				$"next={next_}\n" +
-				$"lerped={Lerped()} busy={wasBusy_}";
+				$"lerped={LerpedForce()} busy={wasBusy_} e={MovementEnergy}";
 		}
 
 		private void Next()
 		{
 			beforeNext_?.Invoke();
 
-			var temp = last_;
-			last_ = target_;
-			target_ = temp;
+			if (useDir_)
+				dtarget_.Swap();
+			else
+				vtarget_.Swap();
 
-			if (needRange_)
+			if (needsNewsTarget_)
 			{
 				NextTarget();
-				needRange_ = false;
+				needsNewsTarget_ = false;
 			}
 		}
 
 		private void NextTarget()
 		{
-			Vector3 min, max;
+			if (useDir_)
+			{
+				float min, max;
 
-			CalculateWindow(min_.X, max_.X, window_.X, out min.X, out max.X);
-			CalculateWindow(min_.Y, max_.Y, window_.Y, out min.Y, out max.Y);
-			CalculateWindow(min_.Z, max_.Z, window_.Z, out min.Z, out max.Z);
+				CalculateWindow(dtarget_.min, dtarget_.max, dtarget_.window, out min, out max);
 
-			target_ = new Vector3(
-				U.RandomFloat(min.X, max.X),
-				U.RandomFloat(min.Y, max.Y),
-				U.RandomFloat(min.Z, max.Z));
+				dtarget_.target = U.RandomFloat(min, max);
+			}
+			else
+			{
+				Vector3 min, max;
+
+				CalculateWindow(vtarget_.min.X, vtarget_.max.X, vtarget_.window.X, out min.X, out max.X);
+				CalculateWindow(vtarget_.min.Y, vtarget_.max.Y, vtarget_.window.Y, out min.Y, out max.Y);
+				CalculateWindow(vtarget_.min.Z, vtarget_.max.Z, vtarget_.window.Z, out min.Z, out max.Z);
+
+				vtarget_.target = new Vector3(
+					U.RandomFloat(min.X, max.X),
+					U.RandomFloat(min.Y, max.Y),
+					U.RandomFloat(min.Z, max.Z));
+			}
 		}
 
 		private void CalculateWindow(

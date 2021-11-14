@@ -127,6 +127,8 @@ namespace Cue
 
 	class Instrumentation
 	{
+		public const bool AlwaysActive = false;
+
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
@@ -160,13 +162,13 @@ namespace Cue
 
 		public bool Enabled
 		{
-			get { return enabled_; }
+			get { return enabled_ || AlwaysActive; }
 			set { enabled_ = value; }
 		}
 
 		public void Start(int i)
 		{
-			if (!enabled_)
+			if (!Enabled)
 				return;
 
 			if (current_ < 0 || current_ >= stack_.Length)
@@ -189,7 +191,7 @@ namespace Cue
 
 		public void End()
 		{
-			if (!enabled_)
+			if (!Enabled)
 				return;
 
 			--current_;
@@ -222,7 +224,7 @@ namespace Cue
 
 		public void UpdateTickers(float s)
 		{
-			if (!enabled_)
+			if (!Enabled)
 				return;
 
 			for (int i = 0; i < tickers_.Length; ++i)

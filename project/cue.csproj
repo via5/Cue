@@ -224,7 +224,6 @@
     <Compile Include="src\Utilities\GeoRender.cs" />
     <Compile Include="src\Utilities\Json.cs" />
     <Compile Include="src\Utilities\Log.cs" />
-    <Compile Include="src\Utilities\Movement.cs" />
     <Compile Include="src\Utilities\Random.cs" />
     <Compile Include="src\Utilities\NatSort.cs" />
     <Compile Include="src\Utilities\Utilities.cs" />

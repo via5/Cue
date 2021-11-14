@@ -96,13 +96,9 @@ namespace Cue.Proc
 
 		public override bool Start(Person p, AnimationContext cx)
 		{
-			if (!base.Start(p, cx))
-				return false;
-
 			receiver_ = cx.ps as Person;
 
 			SetEnergySource(receiver_);
-			SetAsMainSync(receiver_);
 
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)
@@ -132,8 +128,12 @@ namespace Cue.Proc
 					config_.hipTorqueWin);
 			}
 
-			UpdateForces(true);
+			if (!base.Start(p, cx))
+				return false;
+
+			SetAsMainSync(receiver_);
 			Reset();
+			UpdateForces(true);
 
 			return true;
 		}
@@ -242,7 +242,7 @@ namespace Cue.Proc
 			float fmin = config_.hipForceMin * p;
 			float fmax = config_.hipForceMax * p;
 
-			f.SetRange(dir * fmin, dir * fmax, Vector3.Zero);
+			f.SetRangeWithDirection(fmin, fmax, 0, dir);
 		}
 
 		public override string ToDetailedString()

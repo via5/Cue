@@ -76,7 +76,7 @@
 			[
 				{
 					"id": "Pain",
-					"max": 0.5
+					"max": 0.3
 				}
 			]
 		},
@@ -106,14 +106,26 @@
 		},
 
 		{
-			"name": "angry",
-			"moods": "excited angry",
+			"name": "angryExcited",
+			"moods": "excited",
 			"bodyParts": "mouth",
 			"morphs":
 			[
 				{
 					"id": "Angry",
-					"max": 0.5
+					"max": 0.3
+				}
+			]
+		},
+
+		{
+			"name": "angry",
+			"moods": "angry",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Angry",
 				}
 			]
 		},
