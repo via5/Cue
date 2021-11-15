@@ -203,13 +203,12 @@ namespace Cue
 		{
 			if (o.HasKey("specificModifiers"))
 			{
-				var sms = new List<Personality.SpecificModifier>();
+				var sms = new List<SpecificModifier>();
 
 				foreach (JSONClass smn in o.AsObject["specificModifiers"].AsArray.Childs)
 				{
-					var m = new Personality.SpecificModifier();
-
-					if (ParseSpecificModifier(p, smn, ref m))
+					var m = ParseSpecificModifier(p, smn);
+					if (m != null)
 						sms.Add(m);
 				}
 
@@ -217,8 +216,7 @@ namespace Cue
 			}
 		}
 
-		private bool ParseSpecificModifier(
-			Personality p, JSONClass o, ref Personality.SpecificModifier m)
+		private SpecificModifier ParseSpecificModifier(Personality p, JSONClass o)
 		{
 			var source = J.OptString(o, "source");
 			var sourcePartName = J.ReqString(o, "sourceBodyPart");
@@ -226,27 +224,25 @@ namespace Cue
 			var target = J.OptString(o, "target");
 			var targetPartName = J.ReqString(o, "targetBodyPart");
 
-			m.sourcePlayer = (source == "player");
-			m.sourceBodyPart = BP.FromString(sourcePartName);
+			int sourceBodyPart = BP.FromString(sourcePartName);
+			int targetBodyPart = BP.FromString(targetPartName);
 
-			m.targetPlayer = (target == "player");
-			m.targetBodyPart = BP.FromString(targetPartName);
-
-			if (m.sourceBodyPart == BP.None && sourcePartName != "")
+			if (sourceBodyPart == BP.None && sourcePartName != "")
 			{
 				Log.Error($"{p}: bad sourceBodyPart {sourcePartName}");
-				return false;
+				return null;
 			}
 
-			if (m.targetBodyPart == BP.None && targetPartName != "")
+			if (targetBodyPart == BP.None && targetPartName != "")
 			{
 				Log.Error($"{p}: bad targetBodyPart {targetPartName}");
-				return false;
+				return null;
 			}
 
-			m.modifier = J.ReqFloat(o, "modifier");
+			float modifier = J.ReqFloat(o, "modifier");
 
-			return true;
+			return new SpecificModifier(
+				source, sourceBodyPart, target, targetBodyPart, modifier);
 		}
 
 		private void Add(Personality p, bool abst)

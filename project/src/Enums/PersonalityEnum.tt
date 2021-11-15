@@ -662,22 +662,22 @@ V.Float("PenetrationDamper"),
 // the source is the other character that is touching this one; they both might
 // be the same
 //
-// note that `source` and `target` only support "" and "player" for now, not
-// specific character names
+// `source` and `target` may be one of:
+//   - "" or "any"
+//   - "self"
+//   - "player"
+//   - the name of a person in the scene
+//
+// for `target`, "", "any" and "self" are equivalent
 //
 //
-//   source           if empty, applies to any source character; if "player",
-//                    only applies if the source body part is from the player
-//
+//   source           source character
 //   sourceBodyPart   name of the source body part (see BodyPartEnum.cs)
+//   target           target character
+//   targetBodyPart   name of the target body part (see BodyPartEnum.cs)
 //
-//   target           if empty, applies to any target character; if "player",
-//                    only applies if the target body part is on the player
-//
-//   targetBodyPart   name of the target body part
-//
-// for now, this feature is only used to increase the rates when the player is
-// touching genitals, because the player is awesome
+// this feature is used to increase the rates when the player is touching
+// genitals, because the player is awesome, and to reduce rates for masturbation
 
 };
 

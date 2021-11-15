@@ -161,70 +161,161 @@ namespace Cue
 	}
 
 
-	class Personality : EnumValueManager
+	class SpecificModifier
 	{
-		public struct SpecificModifier
+		public const int Unresolved = -1;
+		public const int Any = -2;
+		public const int Player = -3;
+		public const int Self = -4;
+
+		private string source_;
+		private int sourceIndex_ = Unresolved;
+		private int sourceBodyPart_;
+
+		private string target_;
+		private int targetIndex_ = Unresolved;
+		private int targetBodyPart_;
+
+		private float modifier_;
+
+
+		public SpecificModifier(
+			string source, int sourceBodyPart,
+			string target, int targetBodyPart,
+			float modifier)
 		{
-			public bool sourcePlayer;
-			public int sourceBodyPart;
-
-			public bool targetPlayer;
-			public int targetBodyPart;
-
-			public float modifier;
-
-
-			public bool AppliesTo(
-				int sourcePersonIndex, int sourceBodyPart,
-				int targetPersonIndex, int targetBodyPart)
-			{
-				if (this.sourcePlayer && !Cue.Instance.IsPlayer(sourcePersonIndex))
-					return false;
-
-				if (this.sourceBodyPart != sourceBodyPart)
-					return false;
-
-				if (this.targetPlayer && !Cue.Instance.IsPlayer(targetPersonIndex))
-					return false;
-
-				if (this.targetBodyPart != targetBodyPart)
-					return false;
-
-				return true;
-			}
-
-			public override string ToString()
-			{
-				string s = "";
-
-				if (sourcePlayer)
-					s += "player.";
-				else
-					s += "any.";
-
-				if (sourceBodyPart == BP.None)
-					s += "any";
-				else
-					s += BP.ToString(sourceBodyPart);
-
-				s += "=>";
-
-				if (targetPlayer)
-					s += "player.";
-				else
-					s += "any.";
-
-				if (targetBodyPart == BP.None)
-					s += "any";
-				else
-					s += BP.ToString(targetBodyPart);
-
-				s += $"   {modifier}";
-
-				return s;
-			}
+			source_ = source;
+			sourceBodyPart_ = sourceBodyPart;
+			target_ = target;
+			targetBodyPart_ = targetBodyPart;
+			modifier_ = modifier;
 		}
 
+		public float Modifier
+		{
+			get { return modifier_; }
+		}
+
+		public SpecificModifier Clone()
+		{
+			return new SpecificModifier(
+				source_, sourceBodyPart_, target_, targetBodyPart_, modifier_);
+		}
+
+		public bool AppliesTo(
+			Person self,
+			int sourcePersonIndex, int sourceBodyPart,
+			int targetPersonIndex, int targetBodyPart)
+		{
+			if (sourceIndex_ == Player)
+			{
+				if (sourcePersonIndex != Cue.Instance.Player.PersonIndex)
+					return false;
+			}
+			else if (sourceIndex_ == Self)
+			{
+				if (sourcePersonIndex != self.PersonIndex)
+					return false;
+			}
+			else if (sourceIndex_ != Any)
+			{
+				if (sourceIndex_ != sourcePersonIndex)
+					return false;
+			}
+
+
+			if (targetIndex_ == Player)
+			{
+				if (targetPersonIndex != Cue.Instance.Player.PersonIndex)
+					return false;
+			}
+			else if (targetIndex_ == Self)
+			{
+				if (targetPersonIndex != self.PersonIndex)
+					return false;
+			}
+			else if (targetIndex_ != Any)
+			{
+				if (targetIndex_ != targetPersonIndex)
+					return false;
+			}
+
+
+			if (sourceBodyPart_ != BP.None && sourceBodyPart_ != sourceBodyPart)
+				return false;
+
+			if (targetBodyPart_ != BP.None && targetBodyPart_ != targetBodyPart)
+				return false;
+
+
+			return true;
+		}
+
+		public override string ToString()
+		{
+			return
+				$"{ToString(sourceIndex_, sourceBodyPart_)}=>" +
+				$"{ToString(targetIndex_, targetBodyPart_)}    {modifier_}";
+		}
+
+		public void Resolve()
+		{
+			if (sourceIndex_ == Unresolved)
+				sourceIndex_ = Resolve(source_);
+
+			if (targetIndex_ == Unresolved)
+				targetIndex_ = Resolve(target_);
+		}
+
+		private int Resolve(string s)
+		{
+			if (s == "" || s == "any")
+				return Any;
+			else if (s == "player")
+				return Player;
+			else if (s == "self")
+				return Self;
+
+			Person p = Cue.Instance.FindPerson(s);
+			if (p == null)
+			{
+				Cue.LogError($"specific modifier: cannot resolve '{s}'");
+				return Any;
+			}
+
+			return p.PersonIndex;
+		}
+
+		private string ToString(int index, int bodyPart)
+		{
+			string s = IndexToString(index) + ".";
+
+			if (bodyPart == BP.None)
+				s += "any";
+			else
+				s += BP.ToString(bodyPart);
+
+			return s;
+		}
+
+		private string IndexToString(int i)
+		{
+			if (i == Unresolved)
+				return "??";
+			else if (i == Any)
+				return "any";
+			else if (i == Player)
+				return "player";
+			else if (i == Self)
+				return "self";
+			else
+				return Cue.Instance.GetPerson(i)?.ID ?? "?";
+		}
+	}
+
+
+	class Personality : EnumValueManager
+	{
 		private readonly string name_;
 		private Person person_;
 
@@ -259,7 +350,13 @@ namespace Cue
 
 			specificModifiers_ = new SpecificModifier[ps.specificModifiers_.Length];
 			for (int i = 0; i < ps.specificModifiers_.Length; ++i)
-				specificModifiers_[i] = ps.specificModifiers_[i];
+				specificModifiers_[i] = ps.specificModifiers_[i].Clone();
+		}
+
+		public void Init()
+		{
+			for (int i = 0; i < specificModifiers_.Length; ++i)
+				specificModifiers_[i].Resolve();
 		}
 
 		public void SetExpressions(Expression[] exps)
@@ -326,10 +423,11 @@ namespace Cue
 				var sm = specificModifiers_[i];
 
 				if (sm.AppliesTo(
+						person_,
 						sourcePersonIndex, sourceBodyPart,
 						targetPersonIndex, targetBodyPart))
 				{
-					return sm.modifier;
+					return sm.Modifier;
 				}
 			}
 

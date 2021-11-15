@@ -249,7 +249,7 @@
 	"maxExcitementForAvoid": 0,
 	"avoidDelayAfterOrgasm": 0,
 
-	"lookAboveMaxWeight": 0.4,
+	"lookAboveMaxWeight": 1,
 	"lookAboveMaxWeightOrgasm": 2,
 	"lookAboveMinExcitement": 0.35,
 	"lookAboveMinPhysicalRate": 0.001,
@@ -261,7 +261,7 @@
 	"idleEmptyRandomWeight": 0.05,
 	"naturalRandomWeight": 0,
 	"naturalOtherEyesWeight": 0.2,
-	"busyOtherEyesWeight": 0.1,
+	"busyOtherEyesWeight": 0.5,
 	"naturalPlayerEyesWeight": 1.5,
 	"busyPlayerEyesWeight": 1,
 	"otherEyesExcitementWeight": 1.0,
@@ -272,8 +272,8 @@
 	"blowjobGenitalsWeight": 5,
 	"handjobEyesWeight": 5,
 	"handjobGenitalsWeight": 2,
-	"penetratedEyesWeight": 5,
-	"penetratedGenitalsWeight": 2,
+	"penetratedEyesWeight": 8,
+	"penetratedGenitalsWeight": 1,
 	"penetratingEyesWeight": 5,
 	"penetratingGenitalsWeight": 2,
 	"gropedEyesWeight": 2,
@@ -391,6 +391,20 @@
 			"sourceBodyPart": "rightHand",
 			"targetBodyPart": "labia",
 			"modifier": 2
+		},
+
+		{
+			"source": "self",
+			"sourceBodyPart": "leftHand",
+			"targetBodyPart": "labia",
+			"modifier": 0.5
+		},
+
+		{
+			"source": "self",
+			"sourceBodyPart": "rightHand",
+			"targetBodyPart": "labia",
+			"modifier": 0.5
 		}
 	]
 }

@@ -54,7 +54,7 @@
 
 		private static int[] gropedBy_ = new[]
 		{
-			Head, LeftHand, RightHand, LeftFoot, RightFoot
+			LeftHand, RightHand, LeftFoot, RightFoot
 		};
 
 		public static int[] GropedByParts

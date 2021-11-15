@@ -71,15 +71,16 @@ namespace Cue
 
 		public void Init()
 		{
+			Personality.Init();
 			Body.Init();
-			gaze_.Init();
+			Gaze.Init();
 
 			hasBody_ = body_.Exists;
 
 			if (IsPlayer)
 				AI.EventsEnabled = false;
 
-			ai_.Init();
+			AI.Init();
 
 			Atom.Init();
 			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
@@ -165,6 +166,7 @@ namespace Cue
 			set
 			{
 				personality_ = value;
+				personality_.Init();
 				PersonalityChanged?.Invoke();
 			}
 		}
