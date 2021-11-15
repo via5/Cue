@@ -46,11 +46,17 @@
 
 		public struct FloatIndex
 		{
+			private static FloatIndex none_ = new FloatIndex(-100);
 			public int index;
 
 			public FloatIndex(int index)
 			{
 				this.index = index;
+			}
+
+			static public FloatIndex None
+			{
+				get { return none_; }
 			}
 		}
 
