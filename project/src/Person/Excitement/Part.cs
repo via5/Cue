@@ -4,12 +4,19 @@ namespace Cue
 {
 	class ExcitementBodyPart
 	{
+		struct Source
+		{
+			public float mod;
+			public bool ignored;
+		}
+
 		private int bodyPart_;
 		private Sys.TriggerInfo[] lastTriggers_ = null;
-		private float[] lastMods_ = new float[3]; // some initial count
+		private Source[] lastSources_ = new Source[3]; // some initial count
 		private float value_ = 0;
 		private float specificModifier_ = 0;
 		private float fromPenisValue_ = 0;
+		private bool[] saw_ = null;
 
 		public ExcitementBodyPart(int bodyPart)
 		{
@@ -55,18 +62,43 @@ namespace Cue
 			value_ = 0;
 			bool sawUnknown = false;
 
-			if (lastMods_ == null || lastMods_.Length < ts.Length)
-				lastMods_ = new float[ts.Length];
+			if (saw_ == null)
+			{
+				saw_ = new bool[Cue.Instance.ActivePersons.Length];
+			}
+			else
+			{
+				for (int i = 0; i < saw_.Length; ++i)
+					saw_[i] = false;
+			}
+
+			if (lastSources_ == null || lastSources_.Length < ts.Length)
+				lastSources_ = new Source[ts.Length];
 
 			for (int j = 0; j < ts.Length; ++j)
 			{
 				if (!ts[j].IsPerson())
 				{
 					if (sawUnknown)
+					{
+						lastSources_[j].ignored = true;
 						continue;
+					}
 					else
+					{
 						sawUnknown = true;
+					}
 				}
+				else
+				{
+					if (saw_[ts[j].personIndex])
+					{
+						lastSources_[j].ignored = true;
+						continue;
+					}
+				}
+
+				saw_[ts[j].personIndex] = true;
 
 				if (ts[j].sourcePartIndex == BP.Penis)
 					fromPenisValue_ += ts[j].value;
@@ -77,7 +109,7 @@ namespace Cue
 
 				value_ += ts[j].value;
 				specificModifier_ += mod;
-				lastMods_[j] = mod;
+				lastSources_[j].mod = mod;
 			}
 		}
 
@@ -100,10 +132,16 @@ namespace Cue
 					if (s != "")
 						s += " ";
 
+					if (lastSources_[i].ignored)
+						s += "(";
+
 					s += $"+{t}@{t.value:0.0}";
 
-					if (lastMods_[i] > 0)
-						s += $"*{lastMods_[i]}";
+					if (lastSources_[i].mod > 0)
+						s += $"*{lastSources_[i].mod}";
+
+					if (lastSources_[i].ignored)
+						s += ")";
 				}
 			}
 
