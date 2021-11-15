@@ -44,7 +44,6 @@ project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Objects.cs
 project\src\Integration\Vam.cs
-project\src\Person\Excitement.cs
 project\src\Person\Mood.cs
 project\src\Person\Object.cs
 project\src\Person\Person.cs
@@ -54,6 +53,7 @@ project\src\Person\Body\BodyPart.cs
 project\src\Person\Body\BodyParts.cs
 project\src\Person\Body\Hand.cs
 project\src\Person\Body\Morph.cs
+project\src\Person\Excitement\Excitement.cs
 project\src\Person\Expression\Expression.cs
 project\src\Person\Expression\Manager.cs
 project\src\Person\Expression\WeightedExpression.cs
