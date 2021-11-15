@@ -2,57 +2,47 @@
 
 namespace Cue
 {
-	class ExcitementReason
+	interface IExcitementReason
 	{
-		public class Source
-		{
-			public int bodyPart;
-			public BasicEnumValues.FloatIndex ps;
+		string Name { get; }
+		bool Physical { get; }
 
-			public float lastValue = 0;
-			public float lastMod = 0;
-			public bool allIgnored = false;
-			public bool someIgnored = false;
-			public bool guess = false;
+		float Value { get; }
+		float GlobalSensitivityRate { get; }
+		float SpecificSensitivityModifier { get; }
+		float DampenModifier { get; }
+		float Rate { get; }
+		float MaximumExcitement { get; }
 
-			public Source(int bodyPart, BasicEnumValues.FloatIndex ps)
-			{
-				this.bodyPart = bodyPart;
-				this.ps = ps;
-			}
-		}
+		void UpdateValue(Person p, ExcitementBodyPart[] parts);
+		void UpdateRate(Person p, bool isPenetrated);
+		string Debug(Person p, ExcitementBodyPart[] parts);
+	}
 
-		public const int Mouth = 0;
-		public const int Breasts = 1;
-		public const int Genitals = 2;
-		public const int Penetration = 3;
-		public const int OtherSex = 4;
-		public const int Count = 5;
 
-		private int type_;
-		private Source[] sources_;
+	abstract class BasicExcitementReason : IExcitementReason
+	{
+		private BasicEnumValues.FloatIndex rateIndex_;
+		private BasicEnumValues.FloatIndex maxIndex_;
+		private bool physical_;
 		private string name_;
-		private float value_ = 0;
-		private float rate_ = 0;
-		private float specificSensitivityModifier_ = 0;
+		protected float value_ = 0;
+		protected float specificSensitivityModifier_ = 0;
 		private float globalSensitivityRate_ = 0;
+		private float dampen_ = 0;
 		private float sensitivityMax_ = 0;
+		private float rate_ = 0;
 
-		private static string[] names_ = new string[]
+		protected BasicExcitementReason(
+			string name,
+			BasicEnumValues.FloatIndex rateIndex,
+			BasicEnumValues.FloatIndex maxIndex,
+			bool physical)
 		{
-			"mouth", "breasts", "genitals", "penetration", "others"
-		};
-
-		public ExcitementReason(int type, Source[] sources)
-		{
-			type_ = type;
-			sources_ = sources;
-			name_ = ToString(type);
-		}
-
-		private static string ToString(int type)
-		{
-			return names_[type];
+			name_ = name;
+			rateIndex_ = rateIndex;
+			maxIndex_ = maxIndex;
+			physical_ = physical;
 		}
 
 		public string Name
@@ -62,11 +52,7 @@ namespace Cue
 
 		public bool Physical
 		{
-			get
-			{
-				// todo
-				return (type_ != OtherSex);
-			}
+			get { return physical_; }
 		}
 
 		public float Value
@@ -93,44 +79,123 @@ namespace Cue
 			set { globalSensitivityRate_ = value; }
 		}
 
-		public float SensitivityMax
+		public float DampenModifier
+		{
+			get { return dampen_; }
+			set { dampen_ = value; }
+		}
+
+		public float MaximumExcitement
 		{
 			get { return sensitivityMax_; }
 			set { sensitivityMax_ = value; }
 		}
 
-		public void Update(Person p, ExcitementBodyPart[] parts)
+		public void UpdateValue(Person p, ExcitementBodyPart[] parts)
 		{
-			if (type_ == OtherSex)
+			value_ = 0;
+			specificSensitivityModifier_ = 0;
+
+			DoUpdateValue(p, parts);
+		}
+
+		protected abstract void DoUpdateValue(Person p, ExcitementBodyPart[] parts);
+
+		public void UpdateRate(Person p, bool isPenetrated)
+		{
+			GlobalSensitivityRate = p.Personality.Get(rateIndex_);
+			MaximumExcitement = p.Personality.Get(maxIndex_);
+			DampenModifier = 1;
+
+			DoUpdateRate(p, isPenetrated);
+
+			Rate =
+				Value *
+				GlobalSensitivityRate *
+				SpecificSensitivityModifier *
+				DampenModifier;
+		}
+
+		protected abstract void DoUpdateRate(Person p, bool isPenetrated);
+
+		protected abstract string DoDebug(Person p, ExcitementBodyPart[] parts);
+
+		public string Debug(Person p, ExcitementBodyPart[] parts)
+		{
+			string s = DoDebug(p, parts);
+
+			if (s == null)
+				return null;
+
+			return $"{Name}: " + s;
+		}
+
+		public override string ToString()
+		{
+			if (rate_ == 0)
+				return "0";
+
+			return
+				$"{value_:0.00}=" +
+				$"{rate_:0.000000}";
+		}
+	}
+
+
+	class BodyPartExcitementReason : BasicExcitementReason
+	{
+		public class Source
+		{
+			public int bodyPart;
+			public BasicEnumValues.FloatIndex ps;
+
+			public float lastValue = 0;
+			public float lastMod = 0;
+			public bool allIgnored = false;
+			public bool someIgnored = false;
+			public bool guess = false;
+
+			public Source(int bodyPart, BasicEnumValues.FloatIndex ps)
 			{
-				value_ = 0;
-				specificSensitivityModifier_ = 1;
-
-				foreach (var op in Cue.Instance.ActivePersons)
-				{
-					if (op == p || op.Body.HavingSexWith(p))
-						continue;
-
-					// todo, missing in debug
-					//if (op.Excitement.physicalRate_.Value > 0)
-					//	debug_.Add($"  other physical: {p.ID}@{p.Excitement.physicalRate_.Value}");
-
-					value_ += op.Excitement.PhysicalRate;
-				}
+				this.bodyPart = bodyPart;
+				this.ps = ps;
 			}
-			else
+		}
+
+		private Source[] sources_;
+		private bool ignoreFromPenis_;
+		private bool dampenedByPenetration_;
+
+		public BodyPartExcitementReason(
+			string name, Source[] sources,
+			BasicEnumValues.FloatIndex rateIndex,
+			BasicEnumValues.FloatIndex maxIndex,
+			bool ignoreFromPenis, bool dampenedByPenetration)
+				: base(name, rateIndex, maxIndex, true)
+		{
+			sources_ = sources;
+			ignoreFromPenis_ = ignoreFromPenis;
+			dampenedByPenetration_ = dampenedByPenetration;
+		}
+
+		protected override void DoUpdateValue(Person p, ExcitementBodyPart[] parts)
+		{
+			for (int i = 0; i < sources_.Length; ++i)
 			{
-				value_ = 0;
-				specificSensitivityModifier_ = 0;
+				value_ += GetValue(p, parts, sources_[i]);
+				specificSensitivityModifier_ += parts[sources_[i].bodyPart].SpecificModifier;
+			}
 
-				for (int i = 0; i < sources_.Length; ++i)
-				{
-					value_ += GetValue(p, parts, sources_[i]);
-					specificSensitivityModifier_ += parts[sources_[i].bodyPart].SpecificModifier;
-				}
+			if (specificSensitivityModifier_ == 0)
+				specificSensitivityModifier_ = 1;
+		}
 
-				if (specificSensitivityModifier_ == 0)
-					specificSensitivityModifier_ = 1;
+		protected override void DoUpdateRate(Person p, bool isPenetrated)
+		{
+			if (dampenedByPenetration_)
+			{
+				if (isPenetrated)
+					DampenModifier = p.Personality.Get(PS.PenetrationDamper);
 			}
 		}
 
@@ -150,7 +215,7 @@ namespace Cue
 			{
 				float value = parts[src.bodyPart].Value;
 
-				if (type_ == Genitals && value > 0)
+				if (ignoreFromPenis_ && value > 0)
 				{
 					if (parts[src.bodyPart].FromPenisValue > 0)
 					{
@@ -215,11 +280,11 @@ namespace Cue
 			return 0;
 		}
 
-		public string Debug(Person p, ExcitementBodyPart[] parts)
+		protected override string DoDebug(Person p, ExcitementBodyPart[] parts)
 		{
 			string s = null;
 
-			for (int i=0; i<sources_.Length;++i)
+			for (int i = 0; i < sources_.Length; ++i)
 			{
 				var src = sources_[i];
 
@@ -251,20 +316,44 @@ namespace Cue
 				}
 			}
 
-			if (s == null)
-				return null;
+			return s;
+		}
+	}
 
-			return $"{Name}: " + s;
+
+	class OtherSexExcitementReason : BasicExcitementReason
+	{
+		public OtherSexExcitementReason()
+			: base("otherSex", PS.OtherSexExcitementRateFactor, PS.MaxOtherSexExcitement, false)
+		{
 		}
 
-		public override string ToString()
+		protected override void DoUpdateValue(Person p, ExcitementBodyPart[] parts)
 		{
-			if (rate_ == 0)
-				return "0";
+			value_ = 0;
+			specificSensitivityModifier_ = 1;
 
-			return
-				$"{value_:0.00}=" +
-				$"{rate_:0.000000}";
+			foreach (var op in Cue.Instance.ActivePersons)
+			{
+				if (op == p || op.Body.HavingSexWith(p))
+					continue;
+
+				// todo, missing in debug
+				//if (op.Excitement.physicalRate_.Value > 0)
+				//	debug_.Add($"  other physical: {p.ID}@{p.Excitement.physicalRate_.Value}");
+
+				value_ += op.Excitement.PhysicalRate;
+			}
+		}
+
+		protected override void DoUpdateRate(Person p, bool isPenetrated)
+		{
+			// no-op
+		}
+
+		protected override string DoDebug(Person p, ExcitementBodyPart[] parts)
+		{
+			return null;
 		}
 	}
 }

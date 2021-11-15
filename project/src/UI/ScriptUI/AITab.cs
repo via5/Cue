@@ -182,10 +182,7 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			// will be picked up on next frame
-			person_.Excitement.DebugEnabled = true;
-
-			list_.SetItems(person_.Excitement.Debug);
+			list_.SetItems(person_.Excitement.Debug());
 		}
 	}
 
