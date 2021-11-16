@@ -76,6 +76,7 @@ namespace Cue
 			Personality.Init();
 			Body.Init();
 			Gaze.Init();
+			Status.Init();
 
 			hasBody_ = body_.Exists;
 

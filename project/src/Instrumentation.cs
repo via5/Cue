@@ -150,6 +150,7 @@ namespace Cue
 			tickers_[I.UpdatePersonExcitement] = new Ticker("Excitement");
 			tickers_[I.UpdatePersonMood] = new Ticker("Mood");
 			tickers_[I.UpdatePersonBody] = new Ticker("Body");
+			tickers_[I.UpdatePersonStatus] = new Ticker("Status");
 			tickers_[I.UpdatePersonAI] = new Ticker("AI");
 			tickers_[I.UpdateUi] = new Ticker("UI");
 			tickers_[I.FixedUpdate] = new Ticker("Fixed update");

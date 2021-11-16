@@ -1,5 +1,150 @@
-﻿namespace Cue
+﻿using System;
+using System.Collections.Generic;
+
+namespace Cue
 {
+	class Source
+	{
+		private bool active_ = false;
+		private readonly int personIndex_;
+		private readonly bool[] bodyParts_ = new bool[BP.Count];
+		private readonly float[] bodyPartsElapsed_ = new float[BP.Count];
+
+		public Source(int personIndex)
+		{
+			personIndex_ = personIndex;
+		}
+
+		public bool Active
+		{
+			get { return active_; }
+		}
+
+		public bool[] BodyParts
+		{
+			get { return bodyParts_; }
+		}
+
+		public void Decay(float s)
+		{
+			active_ = false;
+
+			for (int i = 0; i < bodyPartsElapsed_.Length; ++i)
+			{
+				// todo, decay
+				bodyPartsElapsed_[i] = Math.Max(0, bodyPartsElapsed_[i] - (s / 2));
+				bodyParts_[i] = (bodyPartsElapsed_[i] > 0);
+
+				if (bodyParts_[i])
+					active_ = true;
+			}
+		}
+
+		public void Set(int bodyPart)
+		{
+			active_ = true;
+			bodyPartsElapsed_[bodyPart] = 1.0f;
+			bodyParts_[bodyPart] = true;
+		}
+
+		public override string ToString()
+		{
+			if (personIndex_ == -1)
+				return $"external";
+			else
+				return $"{Cue.Instance.GetPerson(personIndex_)}";
+		}
+	}
+
+
+	class ErogenousZone
+	{
+		private const float UpdateInterval = 0.5f;
+
+		private Person person_;
+		private int[] bodyParts_;
+		private Source[] sources_;
+		private bool active_ = false;
+		private float elapsed_ = 0;
+
+		public ErogenousZone(Person p, int[] bodyParts)
+		{
+			person_ = p;
+			bodyParts_ = bodyParts;
+
+			// include an external one at the end
+			sources_ = new Source[Cue.Instance.ActivePersons.Length + 1];
+
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+				sources_[i] = new Source(i);
+
+			sources_[sources_.Length - 1] = new Source(-1);
+		}
+
+		public bool Active
+		{
+			get { return active_; }
+		}
+
+		public Source[] Sources
+		{
+			get { return sources_; }
+		}
+
+		private Source External
+		{
+			get { return sources_[sources_.Length - 1]; }
+		}
+
+		public void Update(float s)
+		{
+			Decay(s);
+
+			elapsed_ += s;
+			if (elapsed_ >= UpdateInterval)
+			{
+				elapsed_ = 0;
+
+				for (int i = 0; i < bodyParts_.Length; ++i)
+				{
+					var bp = bodyParts_[i];
+					var ts = person_.Body.Get(bp).GetTriggers();
+
+					if (ts != null)
+						CheckTriggers(ts);
+				}
+			}
+		}
+
+		private void Decay(float s)
+		{
+			active_ = false;
+
+			for (int i = 0; i < sources_.Length;++i)
+			{
+				sources_[i].Decay(s);
+				if (sources_[i].Active)
+					active_ = true;
+			}
+		}
+
+		private void CheckTriggers(Sys.TriggerInfo[] ts)
+		{
+			for (int i = 0; i < ts.Length; ++i)
+			{
+				var t = ts[i];
+
+				if (t.IsPerson())
+					sources_[t.personIndex].Set(t.sourcePartIndex);
+				else
+					External.Set(-1);
+
+				active_ = true;
+			}
+		}
+	}
+
+
 	class PersonStatus
 	{
 		public struct PartResult
@@ -45,11 +190,12 @@
 		}
 
 
-		private const float UpdateInterval = 0.5f;
-
 		private readonly Person person_;
 		private readonly Body body_;
-		private float elapsed_ = 0;
+		private ErogenousZone vaginal_ = null;
+		private ErogenousZone mouth_ = null;
+		private ErogenousZone breasts_ = null;
+		private ErogenousZone genitals_ = null;
 
 		public PersonStatus(Person p)
 		{
@@ -57,14 +203,42 @@
 			body_ = p.Body;
 		}
 
+		public void Init()
+		{
+			vaginal_ = new ErogenousZone(person_, new int[]
+			{
+				BP.Vagina, BP.DeepVagina, BP.DeeperVagina
+			});
+
+			mouth_ = new ErogenousZone(person_, new int[]
+			{
+				BP.Lips, BP.Mouth
+			});
+
+			breasts_ = new ErogenousZone(person_, new int[]
+			{
+				BP.LeftBreast, BP.RightBreast
+			});
+
+			genitals_ = new ErogenousZone(person_, new int[]
+			{
+				BP.Labia
+			});
+		}
+
 		public void Update(float s)
 		{
-			elapsed_ += s;
-			if (elapsed_ >= UpdateInterval)
-			{
-				elapsed_ = 0;
-			}
+			vaginal_.Update(s);
+			mouth_.Update(s);
+			breasts_.Update(s);
+			genitals_.Update(s);
 		}
+
+
+		public ErogenousZone VaginalPenetration { get { return vaginal_; } }
+		public ErogenousZone Mouth { get { return mouth_; } }
+		public ErogenousZone Breasts { get { return breasts_; } }
+		public ErogenousZone Genitals { get { return genitals_; } }
 
 		public bool AnyInsidePersonalSpace()
 		{
@@ -212,7 +386,7 @@
 				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
 		}
 
-		public PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
 			{
@@ -242,7 +416,7 @@
 			return PartResult.None;
 		}
 
-		public PartResult TriggeredBy(BodyPart p, BodyPart by)
+		private PartResult TriggeredBy(BodyPart p, BodyPart by)
 		{
 			if (!p.Exists || !by.Exists)
 				return PartResult.None;

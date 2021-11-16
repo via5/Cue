@@ -142,13 +142,46 @@ namespace Cue
 				totalRate_ = ps.Get(PS.ExcitementDecayRate);
 		}
 
+		private void DebugZone(ErogenousZone z, List<string> debug)
+		{
+			var srcs = z.Sources;
+
+			for (int i = 0; i < srcs.Length; ++i)
+			{
+				var s = srcs[i];
+				if (!s.Active)
+					continue;
+
+				var bps = s.BodyParts;
+
+				for (int j = 0; j < bps.Length; ++j)
+				{
+					if (bps[j])
+						debug.Add($"  {s} {BP.ToString(j)} {bps[j]}");
+				}
+			}
+		}
+
 		public string[] Debug()
 		{
 			var debug = new List<string>();
+
+			debug.Add($"vaginal penetration:");
+			DebugZone(person_.Status.VaginalPenetration, debug);
+
+			debug.Add($"mouth:");
+			DebugZone(person_.Status.Mouth, debug);
+
+			debug.Add($"breasts:");
+			DebugZone(person_.Status.Breasts, debug);
+
+			debug.Add($"genitals:");
+			DebugZone(person_.Status.Genitals, debug);
+
+
 			var ps = person_.Personality;
-
-			debug.Clear();
-
+			debug.Add("");
+			debug.Add("");
 			debug.Add("parts:");
 			for (int i = 0; i < parts_.Length; ++i)
 			{
