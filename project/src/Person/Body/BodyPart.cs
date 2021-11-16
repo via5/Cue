@@ -13,7 +13,7 @@ namespace Cue
 		private Sys.IGraphic render_ = null;
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
-		private float lastTriggerCheck_ = 0;
+		private float updateTriggersElapsed_ = 0;
 		private BodyPartLocker locker_;
 		private bool staleTriggers_ = true;
 		private List<Sys.TriggerInfo> tempList_ = null;
@@ -125,12 +125,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			lastTriggerCheck_ += s;
-			if (lastTriggerCheck_ >= TriggerCheckInterval)
-			{
+			updateTriggersElapsed_ += s;
+			if (updateTriggersElapsed_ >= TriggerCheckInterval)
 				staleTriggers_ = true;
-				lastTriggerCheck_ = 0;
-			}
 		}
 
 		public BodyPartLock Lock(int lockType, string why, bool strong = true)
@@ -176,16 +173,16 @@ namespace Cue
 		public Sys.TriggerInfo[] GetTriggers()
 		{
 			if (staleTriggers_)
-			{
-				staleTriggers_ = false;
 				UpdateTriggers();
-			}
 
 			return triggers_;
 		}
 
 		private void UpdateTriggers()
 		{
+			updateTriggersElapsed_ = 0;
+			staleTriggers_ = false;
+
 			triggers_ = part_.GetTriggers();
 
 			if (forcedTriggers_.Count > 0)

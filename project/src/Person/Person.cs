@@ -219,46 +219,52 @@ namespace Cue
 		{
 			base.Update(s);
 
-			if (hasBody_)
+			I.Start(I.UpdatePersonAnimator);
 			{
-				I.Start(I.UpdatePersonAnimator);
-				{
+				if (hasBody_)
 					animator_.Update(s);
-				}
-				I.End();
-
-
-				I.Start(I.UpdatePersonGaze);
-				{
-					if (!IsPlayer)
-						gaze_.Update(s);
-				}
-				I.End();
 			}
+			I.End();
 
 
-			if (!IsPlayer)
+			I.Start(I.UpdatePersonBody);
 			{
-				I.Start(I.UpdatePersonExcitement);
-				{
-					excitement_.Update(s);
-				}
-				I.End();
-
-
-				I.Start(I.UpdatePersonMood);
-				{
-					mood_.Update(s);
-				}
-				I.End();
-
-
-				I.Start(I.UpdatePersonBody);
-				{
+				if (hasBody_)
 					body_.Update(s);
-				}
-				I.End();
 			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonStatus);
+			{
+				if (hasBody_)
+					status_.Update(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonExcitement);
+			{
+				if (!IsPlayer)
+					excitement_.Update(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonGaze);
+			{
+				if (!IsPlayer && hasBody_)
+					gaze_.Update(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonMood);
+			{
+				if (!IsPlayer)
+					mood_.Update(s);
+			}
+			I.End();
 
 
 			I.Start(I.UpdatePersonAI);

@@ -450,7 +450,7 @@ namespace Cue
 			}
 			else
 			{
-				Body.PartResult pr;
+				PersonStatus.PartResult pr;
 
 				// check if head being groped
 				if (pr = person_.Status.GropedBy(t, BP.Head))
@@ -579,7 +579,7 @@ namespace Cue
 			}
 			else
 			{
-				Body.PartResult pr;
+				PersonStatus.PartResult pr;
 
 				// check if head being groped
 				if (pr = target.Status.GropedBy(source, BP.Head))

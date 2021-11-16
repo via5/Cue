@@ -132,7 +132,7 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
 		};
 		private int[] stack_ = new int[4];
 		private int current_ = 0;
@@ -244,10 +244,11 @@ namespace Cue
 		public const int UpdatePersonExcitement = 6;
 		public const int UpdatePersonMood = 7;
 		public const int UpdatePersonBody = 8;
-		public const int UpdatePersonAI = 9;
-		public const int UpdateUi = 10;
-		public const int FixedUpdate = 11;
-		public const int TickerCount = 12;
+		public const int UpdatePersonStatus = 9;
+		public const int UpdatePersonAI = 10;
+		public const int UpdateUi = 11;
+		public const int FixedUpdate = 12;
+		public const int TickerCount = 13;
 
 
 

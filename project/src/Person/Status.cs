@@ -2,13 +2,68 @@
 {
 	class PersonStatus
 	{
+		public struct PartResult
+		{
+			public int ownBodyPart;
+			public int byBodyPart;
+			public int byObjectIndex;
+
+			public PartResult(int ownBodyPart, int byObjectIndex, int byBodyPart)
+			{
+				this.ownBodyPart = ownBodyPart;
+				this.byObjectIndex = byObjectIndex;
+				this.byBodyPart = byBodyPart;
+			}
+
+			public static PartResult None
+			{
+				get { return new PartResult(-1, -1, -1); }
+			}
+
+			public bool Valid
+			{
+				get { return (ownBodyPart != -1); }
+			}
+
+			public override string ToString()
+			{
+				string s = "";
+
+				s +=
+					$"{BP.ToString(ownBodyPart)} by " +
+					$"{Cue.Instance.GetObject(byObjectIndex)?.ID ?? "?"}" +
+					$"." +
+					$"{BP.ToString(byBodyPart)}";
+
+				return s;
+			}
+
+			public static implicit operator bool(PartResult pr)
+			{
+				return pr.Valid;
+			}
+		}
+
+
+		private const float UpdateInterval = 0.5f;
+
 		private readonly Person person_;
 		private readonly Body body_;
+		private float elapsed_ = 0;
 
 		public PersonStatus(Person p)
 		{
 			person_ = p;
 			body_ = p.Body;
+		}
+
+		public void Update(float s)
+		{
+			elapsed_ += s;
+			if (elapsed_ >= UpdateInterval)
+			{
+				elapsed_ = 0;
+			}
 		}
 
 		public bool AnyInsidePersonalSpace()
@@ -113,12 +168,12 @@
 			return false;
 		}
 
-		public Body.PartResult GropedByAny(int triggerBodyPart)
+		public PartResult GropedByAny(int triggerBodyPart)
 		{
 			return GropedByAny(new int[] { triggerBodyPart });
 		}
 
-		public Body.PartResult GropedByAny(int[] triggerBodyParts)
+		public PartResult GropedByAny(int[] triggerBodyParts)
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -127,25 +182,25 @@
 					return pr;
 			}
 
-			return Body.PartResult.None;
+			return PartResult.None;
 		}
 
-		public Body.PartResult GropedBy(Person p)
+		public PartResult GropedBy(Person p)
 		{
 			return GropedBy(p, BodyParts.GropedParts);
 		}
 
-		public Body.PartResult GropedBy(Person p, int triggerBodyPart)
+		public PartResult GropedBy(Person p, int triggerBodyPart)
 		{
 			return GropedBy(p, new int[] { triggerBodyPart });
 		}
 
-		public Body.PartResult GropedBy(Person p, int[] triggerBodyParts)
+		public PartResult GropedBy(Person p, int[] triggerBodyParts)
 		{
 			if (p == person_)
-				return Body.PartResult.None;
+				return PartResult.None;
 
-			return body_.CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
+			return CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
 		}
 
 		public bool PenetratedBy(Person p)
@@ -153,8 +208,67 @@
 			if (p == person_)
 				return false;
 
-			return body_.CheckParts(
+			return CheckParts(
 				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
+		}
+
+		public PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		{
+			for (int i = 0; i < triggerParts.Length; ++i)
+			{
+				var triggerPart = body_.Get(triggerParts[i]);
+
+				for (int j = 0; j < checkParts.Length; ++j)
+				{
+					var byPart = by.Body.Get(checkParts[j]);
+
+					if (triggerPart.CanTrigger)
+					{
+						var pr = TriggeredBy(triggerPart, byPart);
+						if (pr.Valid)
+							return pr;
+					}
+					else
+					{
+						if (triggerPart.CloseTo(byPart))
+						{
+							return new PartResult(
+								triggerPart.Type, by.ObjectIndex, byPart.Type);
+						}
+					}
+				}
+			}
+
+			return PartResult.None;
+		}
+
+		public PartResult TriggeredBy(BodyPart p, BodyPart by)
+		{
+			if (!p.Exists || !by.Exists)
+				return PartResult.None;
+
+			var ts = p.GetTriggers();
+
+			if (ts != null)
+			{
+				for (int i = 0; i < ts.Length; ++i)
+				{
+					if (ts[i].sourcePartIndex >= 0)
+					{
+						var pp = Cue.Instance.GetPerson(ts[i].personIndex);
+						var bp = pp.Body.Get(ts[i].sourcePartIndex);
+
+						if (bp == by)
+						{
+							return new PartResult(
+								p.Type,
+								pp.ObjectIndex, ts[i].sourcePartIndex);
+						}
+					}
+				}
+			}
+
+			return PartResult.None;
 		}
 	}
 }
