@@ -1,26 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cue
 {
 	class BodyPart
 	{
-		private const float TriggerCheckDelay = 1;
+		private const float TriggerCheckInterval = 1;
 
 		private Person person_;
 		private int type_;
+		private Logger log_;
 		private Sys.IBodyPart part_;
 		private Sys.IGraphic render_ = null;
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float lastTriggerCheck_ = 0;
 		private BodyPartLocker locker_;
+		private bool staleTriggers_ = true;
+		private List<Sys.TriggerInfo> tempList_ = null;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
 			Cue.Assert(part != null, $"{BP.ToString(type)} is null");
 			person_ = p;
 			type_ = type;
+			log_ = new Logger(Logger.Object, p, $"body.{BP.ToString(type)}");
 			part_ = part;
 			locker_ = new BodyPartLocker(this);
 		}
@@ -43,7 +46,7 @@ namespace Cue
 
 		public Logger Log
 		{
-			get { return person_.Body.Log; }
+			get { return log_; }
 		}
 
 		public Sys.IBodyPart Sys
@@ -119,6 +122,17 @@ namespace Cue
 			get { return locker_; }
 		}
 
+
+		public void Update(float s)
+		{
+			lastTriggerCheck_ += s;
+			if (lastTriggerCheck_ >= TriggerCheckInterval)
+			{
+				staleTriggers_ = true;
+				lastTriggerCheck_ = 0;
+			}
+		}
+
 		public BodyPartLock Lock(int lockType, string why, bool strong = true)
 		{
 			return locker_.Lock(lockType, why, strong);
@@ -161,48 +175,58 @@ namespace Cue
 
 		public Sys.TriggerInfo[] GetTriggers()
 		{
-			// todo
-			if (UnityEngine.Time.realtimeSinceStartup >= (lastTriggerCheck_ + TriggerCheckDelay))
+			if (staleTriggers_)
 			{
-				lastTriggerCheck_ = UnityEngine.Time.realtimeSinceStartup;
-				triggers_ = part_.GetTriggers();
-
-				if (forcedTriggers_.Count > 0)
-				{
-					if (triggers_ == null)
-					{
-						triggers_ = forcedTriggers_.ToArray();
-					}
-					else
-					{
-						var copy = new List<Sys.TriggerInfo>(triggers_);
-
-						for (int i = 0; i < forcedTriggers_.Count; ++i)
-						{
-							bool found = false;
-
-							for (int j = 0; j < triggers_.Length; ++j)
-							{
-								if (triggers_[j].personIndex == forcedTriggers_[i].personIndex)
-								{
-									if (triggers_[j].sourcePartIndex == forcedTriggers_[i].sourcePartIndex)
-									{
-										found = true;
-										break;
-									}
-								}
-							}
-
-							if (!found)
-								copy.Add(forcedTriggers_[i]);
-						}
-
-						triggers_ = copy.ToArray();
-					}
-				}
+				staleTriggers_ = false;
+				UpdateTriggers();
 			}
 
 			return triggers_;
+		}
+
+		private void UpdateTriggers()
+		{
+			triggers_ = part_.GetTriggers();
+
+			if (forcedTriggers_.Count > 0)
+			{
+				if (triggers_ == null)
+					triggers_ = forcedTriggers_.ToArray();
+				else
+					MergeForcedTriggers();
+			}
+		}
+
+		private void MergeForcedTriggers()
+		{
+			if (tempList_ == null)
+				tempList_ = new List<Sys.TriggerInfo>();
+			else
+				tempList_.Clear();
+
+			tempList_.AddRange(triggers_);
+
+			for (int i = 0; i < forcedTriggers_.Count; ++i)
+			{
+				bool found = false;
+
+				for (int j = 0; j < triggers_.Length; ++j)
+				{
+					if (triggers_[j].personIndex == forcedTriggers_[i].personIndex)
+					{
+						if (triggers_[j].sourcePartIndex == forcedTriggers_[i].sourcePartIndex)
+						{
+							found = true;
+							break;
+						}
+					}
+				}
+
+				if (!found)
+					tempList_.Add(forcedTriggers_[i]);
+			}
+
+			triggers_ = tempList_.ToArray();
 		}
 
 		public bool Triggered

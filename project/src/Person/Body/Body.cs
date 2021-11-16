@@ -156,6 +156,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			for (int i = 0; i < all_.Length; ++i)
+				all_[i].Update(s);
+
 			var ps = person_.Personality;
 
 			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * ps.Get(PS.TemperatureExcitementRate);
