@@ -49,7 +49,7 @@ namespace Cue
 
 
 		public const int CloseDelay = 2;
-		private const float MaxMorphs = 1.0f;
+		private const float MaxMorphs = 1.1f;
 
 		private Person person_;
 		private Logger log_;
@@ -123,6 +123,64 @@ namespace Cue
 			set { person_.Atom.Body.Strapon = value; }
 		}
 
+		public float Temperature
+		{
+			get { return temperature_.Target; }
+		}
+
+		public DampedFloat DampedTemperature
+		{
+			get { return temperature_; }
+		}
+
+		public Hand LeftHand
+		{
+			get { return leftHand_; }
+		}
+
+		public Hand RightHand
+		{
+			get { return rightHand_; }
+		}
+
+		public BodyPart Get(int type)
+		{
+			if (type < 0 || type >= all_.Length)
+			{
+				Log.Error($"bad part type {type}");
+				return null;
+			}
+
+			return all_[type];
+		}
+
+		public void Update(float s)
+		{
+			var ps = person_.Personality;
+
+			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * ps.Get(PS.TemperatureExcitementRate);
+			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
+
+			temperature_.Target = U.Clamp(
+				person_.Mood.Get(Moods.Excited) / ps.Get(PS.TemperatureExcitementMax),
+				0, 1);
+
+			if (temperature_.Update(s))
+			{
+				person_.Atom.Body.Sweat = temperature_.Value * ps.Get(PS.MaxSweat);
+				person_.Atom.Body.Flush = temperature_.Value * ps.Get(PS.MaxFlush);
+				person_.Atom.Hair.Loose = temperature_.Value;
+			}
+
+			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
+
+			if (renderingParts_ > 0)
+			{
+				for (int i = 0; i < all_.Length; ++i)
+					all_[i].UpdateRender();
+			}
+		}
+
 		public void DebugAllLocks(List<string> list)
 		{
 			list.Clear();
@@ -190,62 +248,28 @@ namespace Cue
 			return PartResult.None;
 		}
 
-		public float Temperature
+		public Box GetUpperBodyBox()
 		{
-			get { return temperature_.Target; }
-		}
+			Vector3 topPos = person_.EyeInterest + new Vector3(0, 0.2f, 0);
+			Vector3 bottomPos;
 
-		public DampedFloat DampedTemperature
-		{
-			get { return temperature_; }
-		}
+			var hips = Get(BP.Hips);
 
-		public BodyPart Get(int type)
-		{
-			if (type < 0 || type >= all_.Length)
-			{
-				Log.Error($"bad part type {type}");
-				return null;
-			}
+			// this happens for the camera pseudo-person
+			if (hips.Exists)
+				bottomPos = hips.Position;
+			else
+				bottomPos = topPos - new Vector3(0, 0.5f, 0);
 
-			return all_[type];
-		}
-
-		public Hand LeftHand
-		{
-			get { return leftHand_; }
-		}
-
-		public Hand RightHand
-		{
-			get { return rightHand_; }
-		}
-
-		public Box TopBox
-		{
-			get
-			{
-				Vector3 topPos = person_.EyeInterest + new Vector3(0, 0.2f, 0);
-				Vector3 bottomPos;
-
-				var hips = Get(BP.Hips);
-
-				// this happens for the camera pseudo-person
-				if (hips.Exists)
-					bottomPos = hips.Position;
-				else
-					bottomPos = topPos - new Vector3(0, 0.5f, 0);
-
-				return new Box(
-					bottomPos + (topPos - bottomPos) / 2,
-					new Vector3(0.5f, (topPos - bottomPos).Y, 0.5f));
-			}
+			return new Box(
+				bottomPos + (topPos - bottomPos) / 2,
+				new Vector3(0.5f, (topPos - bottomPos).Y, 0.5f));
 		}
 
 		public void ResetMorphLimits()
 		{
 			for (int i = 0; i < morphsRemaining_.Length; ++i)
-				morphsRemaining_[i] = 1.1f;
+				morphsRemaining_[i] = MaxMorphs;
 		}
 
 		public float UseMorphs(int[] bodyParts, float use)
@@ -272,38 +296,6 @@ namespace Cue
 			}
 
 			return av;
-		}
-
-		public void Update(float s)
-		{
-			var ps = person_.Personality;
-
-			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * ps.Get(PS.TemperatureExcitementRate);
-			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
-
-			temperature_.Target = U.Clamp(
-				person_.Mood.Get(Moods.Excited) / ps.Get(PS.TemperatureExcitementMax),
-				0, 1);
-
-			if (temperature_.Update(s))
-				OnTemperatureChanged(temperature_.Value);
-
-			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
-
-			if (renderingParts_ > 0)
-			{
-				for (int i = 0; i < all_.Length; ++i)
-					all_[i].UpdateRender();
-			}
-		}
-
-		private void OnTemperatureChanged(float f)
-		{
-			var ps = person_.Personality;
-
-			person_.Atom.Body.Sweat = f * ps.Get(PS.MaxSweat);
-			person_.Atom.Body.Flush = f * ps.Get(PS.MaxFlush);
-			person_.Atom.Hair.Loose = f;
 		}
 	}
 }

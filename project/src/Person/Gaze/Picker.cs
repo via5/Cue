@@ -424,7 +424,7 @@ namespace Cue
 			var selfRef = person_.Body.Get(BP.Eyes);
 			var q = ReferencePart.Rotation;
 
-			var b = avoidP.Body.TopBox;
+			var b = avoidP.Body.GetUpperBodyBox();
 			b.center = q.RotateInv(b.center - selfRef.Position);
 
 			return b;
