@@ -3,190 +3,6 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class BodyPartLock
-	{
-		public const ulong NoKey = 0;
-
-		public const int NoLock = 0x00;
-		public const int Move = 0x01;
-		public const int Morph = 0x02;
-		public const int Anim = Move | Morph;
-
-		private static ulong nextKey_ = 1;
-
-		private BodyPart bp_;
-		private int type_;
-		private bool strong_;
-		private bool expired_ = false;
-		private string why_;
-		private ulong key_;
-
-		public BodyPartLock(BodyPart bp, int type, bool strong, string why, ulong key)
-		{
-			bp_ = bp;
-			type_ = type;
-			strong_ = strong;
-			why_ = why;
-			key_ = key;
-		}
-
-		public static ulong NextKey()
-		{
-			return nextKey_++;
-		}
-
-		public static BodyPartLock[] LockMany(
-			Person p, int[] bodyParts, int lockType, string why, bool strong = true)
-		{
-			List<BodyPartLock> list = null;
-			bool failed = false;
-
-			try
-			{
-				ulong key = BodyPartLock.NextKey();
-
-				for (int i = 0; i < bodyParts.Length; ++i)
-				{
-					var lk = p.Body.Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
-					if (lk == null)
-					{
-						failed = true;
-						break;
-					}
-
-					if (list == null)
-						list = new List<BodyPartLock>();
-
-					list.Add(lk);
-				}
-			}
-			catch (Exception e)
-			{
-				p.Body.Log.Error(
-					$"exception while locking body parts, " +
-					$"unlocking all; was locking:");
-
-				for (int i = 0; i < bodyParts.Length; ++i)
-					p.Body.Log.Error($"  - {BP.ToString(bodyParts[i])}");
-
-				p.Body.Log.Error($"lockType={lockType}, why={why}, strong={strong}");
-				p.Body.Log.Error($"exception:");
-				p.Body.Log.Error(e.ToString());
-
-				failed = true;
-			}
-
-
-			if (failed)
-			{
-				if (list != null)
-				{
-					for (int i = 0; i < list.Count; ++i)
-						list[i].Unlock();
-				}
-
-				return null;
-			}
-
-
-			return list?.ToArray();
-		}
-
-		public int Type
-		{
-			get { return type_; }
-		}
-
-		public ulong Key
-		{
-			get { return key_; }
-		}
-
-		public bool Prevents(int type, ulong key)
-		{
-			if (key_ != key)
-			{
-				if (Bits.IsAnySet(type_, type) && strong_)
-					return true;
-			}
-
-			return false;
-		}
-
-		public bool IsWeakFor(int type)
-		{
-			if (Bits.IsAnySet(type_, type) && !strong_)
-				return true;
-			else
-				return false;
-		}
-
-		public bool Expired
-		{
-			get { return expired_; }
-		}
-
-		public void SetExpired()
-		{
-			expired_ = true;
-		}
-
-		public void Unlock()
-		{
-			bp_.UnlockInternal(this);
-		}
-
-		public string Why
-		{
-			get { return Why; }
-		}
-
-		public static string TypeToString(int type)
-		{
-			if (type == 0)
-				return "";
-
-			var list = new List<string>();
-
-			if (Bits.IsSet(type, Move))
-				list.Add("move");
-
-			if (Bits.IsSet(type, Morph))
-				list.Add("morph");
-
-			if (list.Count == 0)
-				return $"?{type}";
-
-			return string.Join("|", list.ToArray());
-		}
-
-		public string ToDetailedString()
-		{
-			string s = "";
-
-			s += $"{bp_.Name}: {TypeToString(type_)}, ";
-			s += $"{(strong_ ? "strong" : "weak")}";
-
-			if (expired_)
-				s += ", expired";
-
-			s += $" ({ why_})";
-
-			if (key_ != NoKey)
-				s += $" k={key_}";
-			else
-				s += $" k=X";
-
-			return s;
-		}
-
-		public override string ToString()
-		{
-			return $"{bp_}/{TypeToString(type_)}";
-		}
-	}
-
-
 	class BodyPart
 	{
 		private const float TriggerCheckDelay = 1;
@@ -198,41 +14,20 @@ namespace Cue
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float lastTriggerCheck_ = 0;
-		private List<BodyPartLock> locks_ = new List<BodyPartLock>();
+		private BodyPartLocker locker_;
 
 		public BodyPart(Person p, int type, Sys.IBodyPart part)
 		{
+			Cue.Assert(part != null, $"{BP.ToString(type)} is null");
 			person_ = p;
 			type_ = type;
 			part_ = part;
+			locker_ = new BodyPartLocker(this);
 		}
 
 		public bool Render
 		{
-			set
-			{
-				if (value)
-				{
-					if (render_ == null)
-					{
-						render_ = Cue.Instance.Sys.CreateBoxGraphic(
-							Name + "_render",
-							Vector3.Zero, new Vector3(0.005f, 0.005f, 0.005f),
-							new Color(0, 0, 1, 0.1f));
-					}
-
-					render_.Visible = true;
-					++person_.Body.RenderingParts;
-				}
-				else
-				{
-					if (render_ != null)
-					{
-						render_.Visible = false;
-						--person_.Body.RenderingParts;
-					}
-				}
-			}
+			set { SetRender(value); }
 		}
 
 		public void UpdateRender()
@@ -263,7 +58,7 @@ namespace Cue
 
 		public bool Exists
 		{
-			get { return part_?.Exists ?? false; }
+			get { return part_.Exists; }
 		}
 
 		public string Name
@@ -273,7 +68,7 @@ namespace Cue
 
 		public string Source
 		{
-			get { return part_?.ToString() ?? ""; }
+			get { return part_.ToString(); }
 		}
 
 		public int Type
@@ -288,13 +83,50 @@ namespace Cue
 				if (forcedTriggers_.Count > 0)
 					return true;
 
-				return part_?.CanTrigger ?? false;
+				return part_.CanTrigger;
 			}
 		}
 
 		public bool CanGrab
 		{
-			get { return part_?.CanGrab ?? false; }
+			get { return part_.CanGrab; }
+		}
+
+		public Vector3 ControlPosition
+		{
+			get { return part_.ControlPosition; }
+			set { part_.ControlPosition = value; }
+		}
+
+		public Quaternion ControlRotation
+		{
+			get { return part_.ControlRotation; }
+			set { part_.ControlRotation = value; }
+		}
+
+		public Vector3 Position
+		{
+			get { return part_.Position; }
+		}
+
+		public Quaternion Rotation
+		{
+			get { return part_.Rotation; }
+		}
+
+		public BodyPartLocker Locker
+		{
+			get { return locker_; }
+		}
+
+		public BodyPartLock Lock(int lockType, string why, bool strong = true)
+		{
+			return locker_.Lock(lockType, why, strong);
+		}
+
+		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)
+		{
+			return locker_.LockedFor(lockType, key);
 		}
 
 		public void AddForcedTrigger(
@@ -333,7 +165,7 @@ namespace Cue
 			if (UnityEngine.Time.realtimeSinceStartup >= (lastTriggerCheck_ + TriggerCheckDelay))
 			{
 				lastTriggerCheck_ = UnityEngine.Time.realtimeSinceStartup;
-				triggers_ = part_?.GetTriggers();
+				triggers_ = part_.GetTriggers();
 
 				if (forcedTriggers_.Count > 0)
 				{
@@ -373,19 +205,10 @@ namespace Cue
 			return triggers_;
 		}
 
-		public Sys.GrabInfo[] GetGrabs()
-		{
-			// todo, cache it
-			return part_?.GetGrabs();
-		}
-
 		public bool Triggered
 		{
 			get
 			{
-				if (part_ == null)
-					return false;
-
 				var ts = GetTriggers();
 				if (ts == null)
 					return false;
@@ -394,9 +217,15 @@ namespace Cue
 			}
 		}
 
+		public Sys.GrabInfo[] GetGrabs()
+		{
+			// todo, cache it
+			return part_.GetGrabs();
+		}
+
 		public bool Grabbed
 		{
-			get { return part_?.Grabbed ?? false; }
+			get { return part_.Grabbed; }
 		}
 
 		public bool GrabbedByPlayer
@@ -481,164 +310,59 @@ namespace Cue
 			return Sys.IsLinkedTo(other.Sys);
 		}
 
-		public BodyPartLock LockInternal(
-			int lockType, string why, bool strong, ulong key)
-		{
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (locks_[i].Prevents(lockType, BodyPartLock.NoKey))
-					return null;
-			}
-
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (locks_[i].IsWeakFor(lockType))
-					locks_[i].SetExpired();
-			}
-
-			var lk = new BodyPartLock(this, lockType, strong, why, key);
-			locks_.Add(lk);
-			return lk;
-		}
-
-		public BodyPartLock Lock(int lockType, string why, bool strong = true)
-		{
-			return LockInternal(lockType, why, strong, BodyPartLock.NextKey());
-		}
-
-		public void UnlockInternal(BodyPartLock lk)
-		{
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (locks_[i] == lk)
-				{
-					locks_.RemoveAt(i);
-					return;
-				}
-			}
-
-			Log.Error($"can't unlock {lk}, not in list");
-		}
-
-		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)
-		{
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (locks_[i].Prevents(lockType, key))
-					return true;
-			}
-
-			return false;
-		}
-
-		public string DebugLockString()
-		{
-			int lockType = 0;
-
-			for (int i = 0; i < locks_.Count; ++i)
-			{
-				if (!locks_[i].Expired)
-					lockType |= locks_[i].Type;
-			}
-
-			if (lockType == 0 && locks_.Count > 0)
-				return "?";
-
-			return BodyPartLock.TypeToString(lockType);
-		}
-
-		public void DebugAllLocks(List<string> list)
-		{
-			for (int i = 0; i < locks_.Count; ++i)
-				list.Add(locks_[i].ToDetailedString());
-		}
-
-		public Vector3 ControlPosition
-		{
-			get
-			{
-				return part_?.ControlPosition ?? Vector3.Zero;
-
-			}
-
-			set
-			{
-				if (part_ != null)
-					part_.ControlPosition = value;
-			}
-		}
-
-		public Quaternion ControlRotation
-		{
-			get
-			{
-				return part_?.ControlRotation ?? Quaternion.Zero;
-			}
-
-			set
-			{
-				if (part_ != null)
-					part_.ControlRotation = value;
-			}
-		}
-
-		public Vector3 Position
-		{
-			get
-			{
-				return part_?.Position ?? Vector3.Zero;
-
-			}
-		}
-
-		public Quaternion Rotation
-		{
-			get
-			{
-				return part_?.Rotation ?? Quaternion.Zero;
-			}
-		}
-
 		public bool CanApplyForce()
 		{
-			if (part_ == null)
-				return true;
-			else
-				return part_.CanApplyForce();
+			return part_.CanApplyForce();
 		}
 
 		public void AddRelativeForce(Vector3 v)
 		{
-			part_?.AddRelativeForce(v);
+			part_.AddRelativeForce(v);
 		}
 
 		public void AddRelativeTorque(Vector3 v)
 		{
-			part_?.AddRelativeTorque(v);
+			part_.AddRelativeTorque(v);
 		}
 
 		public void AddForce(Vector3 v)
 		{
-			part_?.AddForce(v);
+			part_.AddForce(v);
 		}
 
 		public void AddTorque(Vector3 v)
 		{
-			part_?.AddTorque(v);
+			part_.AddTorque(v);
 		}
 
 		public override string ToString()
 		{
-			string s = "";
+			return $"{part_} ({BP.ToString(type_)})";
+		}
 
-			if (part_ == null)
-				s += "null";
+		private void SetRender(bool b)
+		{
+			if (b)
+			{
+				if (render_ == null)
+				{
+					render_ = Cue.Instance.Sys.CreateBoxGraphic(
+						Name + "_render",
+						Vector3.Zero, new Vector3(0.005f, 0.005f, 0.005f),
+						new Color(0, 0, 1, 0.1f));
+				}
+
+				render_.Visible = true;
+				++person_.Body.RenderingParts;
+			}
 			else
-				s += part_.ToString();
-
-			s += $" ({BP.ToString(type_)})";
-
-			return s;
+			{
+				if (render_ != null)
+				{
+					render_.Visible = false;
+					--person_.Body.RenderingParts;
+				}
+			}
 		}
 	}
 }

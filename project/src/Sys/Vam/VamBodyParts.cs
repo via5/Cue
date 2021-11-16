@@ -383,4 +383,30 @@ namespace Cue.Sys.Vam
 			// no-op
 		}
 	}
+
+
+	class NullBodyPart : VamBodyPart
+	{
+		public NullBodyPart(VamAtom a, int type)
+			: base(a, type)
+		{
+		}
+
+		public override bool Exists { get { return false; } }
+
+		public override Vector3 ControlPosition { get; set; }
+		public override Quaternion ControlRotation { get; set; }
+		public override Vector3 Position { get; }
+		public override Quaternion Rotation { get; }
+
+		public override bool ContainsTransform(Transform t)
+		{
+			return false;
+		}
+
+		public override string ToString()
+		{
+			return "";
+		}
+	}
 }

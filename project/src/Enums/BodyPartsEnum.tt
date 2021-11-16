@@ -10,12 +10,12 @@ V.Value("Mouth"),
 
 V.Value("LeftBreast"),
 V.Value("RightBreast"),
+
 V.Value("Labia"),
 V.Value("Vagina"),
 V.Value("DeepVagina"),
 V.Value("DeeperVagina"),
-
-// all
+V.Value("Penis"),
 V.Value("Anus"),
 
 V.Value("Chest"),
@@ -43,10 +43,6 @@ V.Value("RightShin"),
 V.Value("RightFoot"),
 
 V.Value("Eyes"),
-
-// male
-V.Value("Pectorals"),
-V.Value("Penis"),
 
 };
 

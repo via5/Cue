@@ -235,7 +235,7 @@ namespace Cue
 					w.grabbed.Text = "";
 				}
 
-				w.lk.Text = w.part.DebugLockString();
+				w.lk.Text = w.part.Locker.DebugLockString();
 				w.source.Text = w.part.Source;
 
 				if (Positions)

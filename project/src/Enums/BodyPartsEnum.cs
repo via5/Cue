@@ -16,32 +16,31 @@ namespace Cue
 		public const int Vagina = 6;
 		public const int DeepVagina = 7;
 		public const int DeeperVagina = 8;
-		public const int Anus = 9;
-		public const int Chest = 10;
-		public const int Belly = 11;
-		public const int Hips = 12;
-		public const int LeftGlute = 13;
-		public const int RightGlute = 14;
-		public const int LeftShoulder = 15;
-		public const int LeftArm = 16;
-		public const int LeftForearm = 17;
-		public const int LeftHand = 18;
-		public const int RightShoulder = 19;
-		public const int RightArm = 20;
-		public const int RightForearm = 21;
-		public const int RightHand = 22;
-		public const int LeftThigh = 23;
-		public const int LeftShin = 24;
-		public const int LeftFoot = 25;
-		public const int RightThigh = 26;
-		public const int RightShin = 27;
-		public const int RightFoot = 28;
-		public const int Eyes = 29;
-		public const int Pectorals = 30;
-		public const int Penis = 31;
+		public const int Penis = 9;
+		public const int Anus = 10;
+		public const int Chest = 11;
+		public const int Belly = 12;
+		public const int Hips = 13;
+		public const int LeftGlute = 14;
+		public const int RightGlute = 15;
+		public const int LeftShoulder = 16;
+		public const int LeftArm = 17;
+		public const int LeftForearm = 18;
+		public const int LeftHand = 19;
+		public const int RightShoulder = 20;
+		public const int RightArm = 21;
+		public const int RightForearm = 22;
+		public const int RightHand = 23;
+		public const int LeftThigh = 24;
+		public const int LeftShin = 25;
+		public const int LeftFoot = 26;
+		public const int RightThigh = 27;
+		public const int RightShin = 28;
+		public const int RightFoot = 29;
+		public const int Eyes = 30;
 
-		public const int Count = 32;
-		public int GetCount() { return 32; }
+		public const int Count = 31;
+		public int GetCount() { return 31; }
 
 
 		private static string[] names_ = new string[]
@@ -55,6 +54,7 @@ namespace Cue
 			"vagina",
 			"deepVagina",
 			"deeperVagina",
+			"penis",
 			"anus",
 			"chest",
 			"belly",
@@ -76,8 +76,6 @@ namespace Cue
 			"rightShin",
 			"rightFoot",
 			"eyes",
-			"pectorals",
-			"penis",
 		};
 
 		public static int FromString(string s)

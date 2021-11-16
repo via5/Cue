@@ -156,6 +156,7 @@
     <Compile Include="src\Person\Body\BodyPart.cs" />
     <Compile Include="src\Person\Body\BodyParts.cs" />
     <Compile Include="src\Person\Body\Hand.cs" />
+    <Compile Include="src\Person\Body\BodyPartLocker.cs" />
     <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement\Excitement.cs" />
     <Compile Include="src\Person\Excitement\Part.cs" />

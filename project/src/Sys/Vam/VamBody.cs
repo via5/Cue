@@ -412,19 +412,12 @@ namespace Cue.Sys.Vam
 			//
 			if (Atom.IsMale)
 			{
-				add(BP.Pectorals, GetRigidbody(
-					BP.Pectorals, new string[] {
-						"chest3/chest3Joint",
-						"chest5/chest5Joint" },
-					"chestControl", "chest"));
-
 				add(BP.Penis, GetRigidbody(
 					BP.Penis, new string[] { "Gen1Hard", "Gen3aHard" },
 					"penisBaseControl", "", "Gen1"));
 			}
 			else
 			{
-				add(BP.Pectorals, null);
 				add(BP.Penis, strapon_);
 			}
 
@@ -432,7 +425,14 @@ namespace Cue.Sys.Vam
 			var list = new List<IBodyPart>();
 
 			for (int i = 0; i < BP.Count; ++i)
-				list.Add(map[i]);
+			{
+				var p = map[i];
+
+				if (p == null)
+					list.Add(new NullBodyPart(Atom, i));
+				else
+					list.Add(p);
+			}
 
 			return list.ToArray();
 		}
@@ -600,14 +600,6 @@ namespace Cue.Sys.Vam
 
 			if (color_.Parameter != null)
 				color_.Parameter.val = U.ToHSV(initialColor_);
-		}
-
-		private string MakeName(string[] namesFemale, string[] namesMale, int i)
-		{
-			if (namesMale == null)
-				return MakeName(namesFemale[i], null);
-			else
-				return MakeName(namesFemale[i], namesMale[i]);
 		}
 
 		private string MakeName(string nameFemale, string nameMale)

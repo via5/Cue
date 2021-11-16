@@ -234,6 +234,12 @@ namespace Cue.Sys.Vam
 			parts_[BP.Eyes] = new VamCameraEyes(a);
 			parts_[BP.LeftHand] = left_;
 			parts_[BP.RightHand] = right_;
+
+			for (int i = 0; i < parts_.Length; ++i)
+			{
+				if (parts_[i] == null)
+					parts_[i] = new NullBodyPart(Atom, i);
+			}
 		}
 
 		public override bool Exists

@@ -510,11 +510,15 @@ namespace Cue
 				global::Cue.Sys.LogLevels.Error);
 		}
 
-		static public void Assert(bool b)
+		static public void Assert(bool b, string s = null)
 		{
 			if (!b)
 			{
-				LogErrorST("assertion failed");
+				if (s == null)
+					LogErrorST("assertion failed");
+				else
+					LogErrorST($"assertion failed: {s}");
+
 				Instance.DisablePlugin();
 				throw new PluginGone();
 			}

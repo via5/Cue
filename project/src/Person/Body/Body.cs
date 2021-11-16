@@ -186,7 +186,7 @@ namespace Cue
 			list.Clear();
 
 			for (int i = 0; i < all_.Length; ++i)
-				all_[i].DebugAllLocks(list);
+				all_[i].Locker.DebugAllLocks(list);
 		}
 
 		public PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
