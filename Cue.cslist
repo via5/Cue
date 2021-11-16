@@ -48,6 +48,7 @@ project\src\Person\Mood.cs
 project\src\Person\Object.cs
 project\src\Person\Person.cs
 project\src\Person\Personality.cs
+project\src\Person\Status.cs
 project\src\Person\Body\Body.cs
 project\src\Person\Body\BodyPart.cs
 project\src\Person\Body\BodyParts.cs

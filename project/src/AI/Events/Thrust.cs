@@ -172,7 +172,7 @@
 				if (p == person_)
 					continue;
 
-				if (person_.Body.PenetratedBy(p) || p.Body.PenetratedBy(person_))
+				if (person_.Status.PenetratedBy(p) || p.Status.PenetratedBy(person_))
 					return p;
 			}
 

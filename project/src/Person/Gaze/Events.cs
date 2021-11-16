@@ -374,7 +374,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Body.InsidePersonalSpace(t))
+			if (person_.Status.InsidePersonalSpace(t))
 			{
 				// person is close
 
@@ -408,7 +408,7 @@ namespace Cue
 			WeightInfo ownGenitals = new WeightInfo();
 			WeightInfo otherGenitals = new WeightInfo();
 
-			if (person_.Body.PenetratedBy(t))
+			if (person_.Status.PenetratedBy(t))
 			{
 				// is being penetrated by this person
 
@@ -428,7 +428,7 @@ namespace Cue
 						"penetrated");
 				}
 			}
-			else if (t.Body.PenetratedBy(person_))
+			else if (t.Status.PenetratedBy(person_))
 			{
 				// is penetrating this person
 
@@ -453,34 +453,34 @@ namespace Cue
 				Body.PartResult pr;
 
 				// check if head being groped
-				if (pr = person_.Body.GropedBy(t, BP.Head))
+				if (pr = person_.Status.GropedBy(t, BP.Head))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"head groped ({pr})");
 				}
-				else if (pr = t.Body.GropedBy(person_, BP.Head))
+				else if (pr = t.Status.GropedBy(person_, BP.Head))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"groping head ({pr})");
 				}
 
 				// check if breasts being groped
-				if (pr = person_.Body.GropedBy(t, BodyParts.BreastParts))
+				if (pr = person_.Status.GropedBy(t, BodyParts.BreastParts))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"chest groped ({pr})");
 					ownChest.Set(ps.Get(PS.GropedTargetWeight), $"chest groped ({pr})");
 				}
-				else if (pr = t.Body.GropedBy(person_, BodyParts.BreastParts))
+				else if (pr = t.Status.GropedBy(person_, BodyParts.BreastParts))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"groping chest ({pr})");
 					otherChest.Set(ps.Get(PS.GropedTargetWeight), $"groping chest ({pr})");
 				}
 
 				// check if genitals being groped
-				if (pr = person_.Body.GropedBy(t, BodyParts.GenitalParts))
+				if (pr = person_.Status.GropedBy(t, BodyParts.GenitalParts))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"genitals groped ({pr})");
 					ownGenitals.Set(ps.Get(PS.GropedTargetWeight), $"genitals groped ({pr})");
 				}
-				else if (pr = t.Body.GropedBy(person_, BodyParts.GenitalParts))
+				else if (pr = t.Status.GropedBy(person_, BodyParts.GenitalParts))
 				{
 					eyes.Set(ps.Get(PS.GropedEyesWeight), $"groping genitals ({pr})");
 					otherGenitals.Set(ps.Get(PS.GropedTargetWeight), $"groping genitals ({pr})");
@@ -563,7 +563,7 @@ namespace Cue
 
 
 			// check if being penetrated by this person
-			if (target.Body.PenetratedBy(source))
+			if (target.Status.PenetratedBy(source))
 			{
 				sourceEyes.Set(
 					ps.Get(PS.OtherPenetrationSourceEyesWeight),
@@ -582,7 +582,7 @@ namespace Cue
 				Body.PartResult pr;
 
 				// check if head being groped
-				if (pr = target.Body.GropedBy(source, BP.Head))
+				if (pr = target.Status.GropedBy(source, BP.Head))
 				{
 					targetEyes.Set(
 						ps.Get(PS.OtherGropedEyesWeight),
@@ -594,7 +594,7 @@ namespace Cue
 				}
 
 				// check if breasts being groped
-				if (pr = target.Body.GropedBy(source, BodyParts.BreastParts))
+				if (pr = target.Status.GropedBy(source, BodyParts.BreastParts))
 				{
 					targetEyes.Set(
 						ps.Get(PS.OtherGropedEyesWeight),
@@ -610,7 +610,7 @@ namespace Cue
 				}
 
 				// check if genitals being groped
-				if (pr = target.Body.GropedBy(source, BodyParts.GenitalParts))
+				if (pr = target.Status.GropedBy(source, BodyParts.GenitalParts))
 				{
 					targetEyes.Set(
 						ps.Get(PS.OtherGropedEyesWeight),

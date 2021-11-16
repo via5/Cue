@@ -252,7 +252,8 @@ namespace Cue
 		private bool Lock()
 		{
 			Unlock();
-			locks_ = person_.Body.LockMany(
+			locks_ = BodyPartLock.LockMany(
+				person_,
 				new int[] { BP.Head, BP.Lips, BP.Mouth },
 				BodyPartLock.Anim, "kiss");
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -32,6 +33,63 @@ namespace Cue
 		public static ulong NextKey()
 		{
 			return nextKey_++;
+		}
+
+		public static BodyPartLock[] LockMany(
+			Person p, int[] bodyParts, int lockType, string why, bool strong = true)
+		{
+			List<BodyPartLock> list = null;
+			bool failed = false;
+
+			try
+			{
+				ulong key = BodyPartLock.NextKey();
+
+				for (int i = 0; i < bodyParts.Length; ++i)
+				{
+					var lk = p.Body.Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
+					if (lk == null)
+					{
+						failed = true;
+						break;
+					}
+
+					if (list == null)
+						list = new List<BodyPartLock>();
+
+					list.Add(lk);
+				}
+			}
+			catch (Exception e)
+			{
+				p.Body.Log.Error(
+					$"exception while locking body parts, " +
+					$"unlocking all; was locking:");
+
+				for (int i = 0; i < bodyParts.Length; ++i)
+					p.Body.Log.Error($"  - {BP.ToString(bodyParts[i])}");
+
+				p.Body.Log.Error($"lockType={lockType}, why={why}, strong={strong}");
+				p.Body.Log.Error($"exception:");
+				p.Body.Log.Error(e.ToString());
+
+				failed = true;
+			}
+
+
+			if (failed)
+			{
+				if (list != null)
+				{
+					for (int i = 0; i < list.Count; ++i)
+						list[i].Unlock();
+				}
+
+				return null;
+			}
+
+
+			return list?.ToArray();
 		}
 
 		public int Type

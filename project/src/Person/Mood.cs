@@ -308,7 +308,7 @@ namespace Cue
 			var ps = person_.Personality;
 			var anger = ps.Get(PS.AngerWhenPlayerInteracts);
 
-			if (anger > 0 && person_.Body.InteractingWith(Cue.Instance.Player))
+			if (anger > 0 && person_.Status.InteractingWith(Cue.Instance.Player))
 			{
 				var ex = Get(Moods.Excited);
 				var happyMaxEx = ps.Get(PS.AngerMaxExcitementForHappiness);

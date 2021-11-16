@@ -109,21 +109,12 @@ namespace Cue
 
 		public bool HasPenis
 		{
-			get
-			{
-				return Get(BP.Penis).Exists;
-			}
+			get { return Get(BP.Penis).Exists; }
 		}
 
 		public int GenitalsBodyPart
 		{
-			get
-			{
-				if (HasPenis)
-					return BP.Penis;
-				else
-					return BP.Labia;
-			}
+			get { return (HasPenis ? BP.Penis : BP.Labia); }
 		}
 
 		public bool Strapon
@@ -140,215 +131,7 @@ namespace Cue
 				all_[i].DebugAllLocks(list);
 		}
 
-		public BodyPartLock[] LockMany(
-			int[] bodyParts, int lockType, string why, bool strong = true)
-		{
-			List<BodyPartLock> list = null;
-			bool failed = false;
-
-			try
-			{
-				ulong key = BodyPartLock.NextKey();
-
-				for (int i = 0; i < bodyParts.Length; ++i)
-				{
-					var lk = Get(bodyParts[i]).LockInternal(lockType, why, strong, key);
-					if (lk == null)
-					{
-						failed = true;
-						break;
-					}
-
-					if (list == null)
-						list = new List<BodyPartLock>();
-
-					list.Add(lk);
-				}
-			}
-			catch (Exception e)
-			{
-				Log.Error(
-					$"{this}: exception while locking body parts, " +
-					$"unlocking all; was locking:");
-
-				for (int i = 0; i < bodyParts.Length; ++i)
-					Log.Error($"  - {BP.ToString(bodyParts[i])}");
-
-				Log.Error($"lockType={lockType}, why={why}, strong={strong}");
-				Log.Error($"exception:");
-				Log.Error(e.ToString());
-
-				failed = true;
-			}
-
-
-			if (failed)
-			{
-				if (list != null)
-				{
-					for (int i = 0; i < list.Count; ++i)
-						list[i].Unlock();
-				}
-
-				return null;
-			}
-
-
-			return list?.ToArray();
-		}
-
-		public bool AnyInsidePersonalSpace()
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (p == person_)
-					continue;
-
-				if (InsidePersonalSpace(p))
-					return true;
-			}
-
-			return false;
-		}
-
-		public bool InsidePersonalSpace(Person other)
-		{
-			var checkParts = BodyParts.PersonalSpaceParts;
-
-			for (int i = 0; i < checkParts.Length; ++i)
-			{
-				var a = person_.Body.Get(checkParts[i]);
-
-				for (int j = 0; j < checkParts.Length; ++j)
-				{
-					var b = other.Body.Get(checkParts[j]);
-					if (a.CloseTo(b))
-						return true;
-				}
-			}
-
-			return false;
-		}
-
-		public bool InteractingWith(Person other)
-		{
-			if (InsidePersonalSpace(other) || PenetratedBy(other) || GropedBy(other))
-				return true;
-
-			// special case for unpossessed, because it's just the camera and
-			// the mouse pointer grab is not handled
-			if (!other.Body.Exists && other.IsPlayer)
-			{
-				for (int i = 0; i < all_.Length; ++i)
-				{
-					if (all_[i].GrabbedByPlayer)
-						return true;
-				}
-			}
-
-			return false;
-		}
-
-		public bool Groped()
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (GropedBy(p, BodyParts.GropedParts))
-					return true;
-			}
-
-			return false;
-		}
-
-		public Person PenetratedBy()
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (PenetratedBy(p))
-					return p;
-			}
-
-			return null;
-		}
-
-		public bool Penetrated()
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (PenetratedBy(p))
-					return true;
-			}
-
-			if (Get(BP.Vagina).Triggered)
-				return true;
-
-			return false;
-		}
-
-		public bool Penetrating()
-		{
-			if (!HasPenis)
-				return false;
-
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (p.Body.PenetratedBy(person_))
-					return true;
-			}
-
-			return false;
-		}
-
-		public PartResult GropedByAny(int triggerBodyPart)
-		{
-			return GropedByAny(new int[] { triggerBodyPart });
-		}
-
-		public PartResult GropedByAny(int[] triggerBodyParts)
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				var pr = GropedBy(p, triggerBodyParts);
-				if (pr.Valid)
-					return pr;
-			}
-
-			return PartResult.None;
-		}
-
-		public PartResult GropedBy(Person p)
-		{
-			return GropedBy(p, BodyParts.GropedParts);
-		}
-
-		public PartResult GropedBy(Person p, int triggerBodyPart)
-		{
-			return GropedBy(p, new int[] { triggerBodyPart });
-		}
-
-		public PartResult GropedBy(Person p, int[] triggerBodyParts)
-		{
-			if (p == person_)
-				return PartResult.None;
-
-			return CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
-		}
-
-		public bool PenetratedBy(Person p)
-		{
-			if (p == person_)
-				return false;
-
-			return CheckParts(
-				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
-		}
-
-		public bool HavingSexWith(Person p)
-		{
-			return PenetratedBy(p) || p.Body.PenetratedBy(person_);
-		}
-
-		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		public PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
 			{
@@ -378,7 +161,7 @@ namespace Cue
 			return PartResult.None;
 		}
 
-		private PartResult TriggeredBy(BodyPart p, BodyPart by)
+		public PartResult TriggeredBy(BodyPart p, BodyPart by)
 		{
 			if (!p.Exists || !by.Exists)
 				return PartResult.None;
@@ -456,35 +239,6 @@ namespace Cue
 				return new Box(
 					bottomPos + (topPos - bottomPos) / 2,
 					new Vector3(0.5f, (topPos - bottomPos).Y, 0.5f));
-			}
-		}
-
-		public Box FullBox
-		{
-			get
-			{
-				var avoidHead = Get(BP.Head).Position + new Vector3(0, 0.2f, 0);
-				var avoidFeet = person_.Position;
-
-				var b = new Box(
-					avoidFeet + (avoidHead - avoidFeet) / 2,
-					new Vector3(0.5f, (avoidHead - avoidFeet).Y, 0.35f));
-
-				b.center.Y -= b.size.Y / 2;
-
-				return b;
-			}
-		}
-
-		public Frustum ClosenessFrustum
-		{
-			get
-			{
-				var f = new Frustum(
-					new Vector3(0.45f, 2, 0.3f),
-					new Vector3(0.2f, 2, 0.4f));
-
-				return f;
 			}
 		}
 

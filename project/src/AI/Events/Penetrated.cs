@@ -25,7 +25,7 @@
 			{
 				case NotPenetrated:
 				{
-					if (person_.Body.Penetrated())
+					if (person_.Status.Penetrated())
 					{
 						penetration_ = TentativePenetration;
 						elapsedTentative_ = 0;
@@ -40,7 +40,7 @@
 
 				case TentativePenetration:
 				{
-					if (person_.Body.Penetrated())
+					if (person_.Status.Penetrated())
 					{
 						elapsedTentative_ += s;
 
@@ -60,7 +60,7 @@
 
 				case Penetrated:
 				{
-					if (!person_.Body.Penetrated())
+					if (!person_.Status.Penetrated())
 					{
 						OnOut();
 						penetration_ = NotPenetrated;

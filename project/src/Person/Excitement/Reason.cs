@@ -335,7 +335,7 @@ namespace Cue
 
 			foreach (var op in Cue.Instance.ActivePersons)
 			{
-				if (op == p || op.Body.HavingSexWith(p))
+				if (op == p || op.Status.PenetratedBy(p) || p.Status.PenetratedBy(op))
 					continue;
 
 				// todo, missing in debug

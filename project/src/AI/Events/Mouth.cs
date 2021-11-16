@@ -95,7 +95,8 @@
 			if (t == null)
 				return;
 
-			bjLocks_ = person_.Body.LockMany(
+			bjLocks_ = BodyPartLock.LockMany(
+				person_,
 				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Eyes },
 				BodyPartLock.Anim, "bj");
 

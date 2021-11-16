@@ -36,6 +36,7 @@ namespace Cue
 		private Mood mood_;
 		private IAI ai_ = null;
 		private ExpressionManager expression_;
+		private PersonStatus status_;
 
 		private IBreather breathing_;
 		private IOrgasmer orgasmer_;
@@ -60,6 +61,7 @@ namespace Cue
 			ai_ = new PersonAI(this);
 
 			expression_ = new ExpressionManager(this);
+			status_ = new PersonStatus(this);
 
 			breathing_ = Integration.CreateBreather(this);
 			orgasmer_ = Integration.CreateOrgasmer(this);
@@ -174,6 +176,11 @@ namespace Cue
 		public ExpressionManager Expression
 		{
 			get { return expression_; }
+		}
+
+		public PersonStatus Status
+		{
+			get { return status_; }
 		}
 
 		public bool IsInteresting

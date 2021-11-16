@@ -301,7 +301,8 @@
 
 		private bool LockLeft(string why)
 		{
-			leftLock_ = person_.Body.LockMany(
+			leftLock_ = BodyPartLock.LockMany(
+				person_,
 				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
 				BodyPartLock.Anim, why);
 
@@ -310,7 +311,8 @@
 
 		private bool LockRight(string why)
 		{
-			rightLock_ = person_.Body.LockMany(
+			rightLock_ = BodyPartLock.LockMany(
+				person_,
 				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
 				BodyPartLock.Anim, why);
 
@@ -351,7 +353,7 @@
 				return true;
 			}
 
-			if (tentative.Person.Body.Penetrating())
+			if (tentative.Person.Status.Penetrating())
 			{
 				// prioritize genitals that are not currently
 				// penetrating

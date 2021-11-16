@@ -91,6 +91,8 @@ namespace Cue
 				}
 				else
 				{
+					// todo: use highest value/modifier
+
 					if (saw_[ts[j].personIndex])
 					{
 						lastSources_[j].ignored = true;

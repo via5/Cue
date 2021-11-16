@@ -76,7 +76,7 @@ namespace Cue
 			if (person_.IsPlayer)
 				ps_.Text = "(this is the player)";
 			else
-				ps_.Text = person_.Body.InsidePersonalSpace(Cue.Instance.Player) ? "yes" : "no";
+				ps_.Text = person_.Status.InsidePersonalSpace(Cue.Instance.Player) ? "yes" : "no";
 		}
 	}
 
