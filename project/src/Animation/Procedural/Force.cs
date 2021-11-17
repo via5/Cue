@@ -307,6 +307,11 @@ namespace Cue.Proc
 		{
 			oneFrameFinished_ = false;
 
+			next_.Update(s, 1);
+			if (next_.Finished)
+				needsNewsTarget_ = true;
+
+
 			if (!CanAppyForce())
 			{
 				if (wasBusy_)
@@ -329,21 +334,13 @@ namespace Cue.Proc
 
 				if (p >= 1)
 					oneFrameFinished_ = true;
-
-				return;
 			}
-			else if (wasBusy_)
+			else
 			{
-				Reset();
 				wasBusy_ = false;
+				Apply(LerpedForce());
 			}
 
-
-			next_.Update(s, 1);
-			if (next_.Finished)
-				needsNewsTarget_ = true;
-
-			Apply(LerpedForce());
 
 			switch (Sync.UpdateResult)
 			{

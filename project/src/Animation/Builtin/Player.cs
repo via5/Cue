@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	abstract class BuiltinAnimation : IAnimation
+	public abstract class BuiltinAnimation : IAnimation
 	{
 		private readonly string name_;
 		private bool hasMovement_;

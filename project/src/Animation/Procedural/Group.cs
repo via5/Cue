@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace Cue.Proc
 {
-	interface ITargetGroup : ITarget
+	public interface ITargetGroup : ITarget
 	{
 		List<ITarget> Targets { get; }
 		void AddTarget(ITarget t);
 	}
 
 
-	abstract class BasicTargetGroup : BasicTarget, ITargetGroup
+	public abstract class BasicTargetGroup : BasicTarget, ITargetGroup
 	{
 		protected BasicTargetGroup(string name, ISync sync)
 			: base(name, sync)
@@ -54,7 +54,7 @@ namespace Cue.Proc
 	}
 
 
-	class ConcurrentTargetGroup : BasicTargetGroup
+	public class ConcurrentTargetGroup : BasicTargetGroup
 	{
 		private readonly List<ITarget> targets_ = new List<ITarget>();
 		private Duration delay_, maxDuration_;
@@ -226,7 +226,7 @@ namespace Cue.Proc
 	}
 
 
-	class SequentialTargetGroup : BasicTargetGroup
+	public class SequentialTargetGroup : BasicTargetGroup
 	{
 		struct TargetInfo
 		{
@@ -379,7 +379,7 @@ namespace Cue.Proc
 	}
 
 
-	class RootTargetGroup : ConcurrentTargetGroup
+	public class RootTargetGroup : ConcurrentTargetGroup
 	{
 		private BasicProcAnimation anim_ = null;
 		private Person energySource_ = null;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue.Proc
 {
-	abstract class BasicProcAnimation : BuiltinAnimation
+	public abstract class BasicProcAnimation : BuiltinAnimation
 	{
 		private RootTargetGroup root_;
 		private ISync oldSync_ = null;

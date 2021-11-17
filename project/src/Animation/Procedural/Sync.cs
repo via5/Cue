@@ -140,7 +140,7 @@ namespace Cue.Proc
 	}
 
 
-	class NoSync : BasicSync
+	public class NoSync : BasicSync
 	{
 		public override float Magnitude { get { return 0; } }
 		public override float Energy { set { } }
@@ -168,7 +168,7 @@ namespace Cue.Proc
 	}
 
 
-	class ParentTargetSync : BasicSync
+	public class ParentTargetSync : BasicSync
 	{
 		public ParentTargetSync()
 		{
@@ -216,7 +216,7 @@ namespace Cue.Proc
 	}
 
 
-	class SyncOther : BasicSync
+	public class SyncOther : BasicSync
 	{
 		private BasicSync other_;
 		private bool waiting_ = true;
@@ -283,7 +283,7 @@ namespace Cue.Proc
 
 
 
-	class ElapsedSync : BasicSync
+	public class ElapsedSync : BasicSync
 	{
 		public const int NoFlags = 0x00;
 		public const int Loop = 0x01;

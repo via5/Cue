@@ -91,21 +91,25 @@ namespace Cue.Proc.Tests
 			var tbp = new TestBodyPart();
 			var bp = new BodyPart(null, BP.Head, tbp);
 
+			var g = new RootTargetGroup(new DurationSync(
+				new Duration(2), null, null, null,
+				DurationSync.Loop | DurationSync.ResetBetween));
+
 			var f = new Force(
 				"", Force.AbsoluteForce, bp,
 				new Vector3(4, 4, 4), new Vector3(4, 4, 4),
 				null, Vector3.Zero,
-				new DurationSync(
-					new Duration(2), null, null, null,
-					DurationSync.Loop | DurationSync.ResetBetween),
+				new ParentTargetSync(),
 				new LinearEasing());
 
-			f.Start(null, new AnimationContext(null));
+			g.AddTarget(f);
+
+
+			g.Start(null, new AnimationContext(null));
 			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
 
-
 			// normal loops
-			TestLoops(tbp, f);
+			TestLoops(tbp, g);
 
 
 			// disable
@@ -114,57 +118,73 @@ namespace Cue.Proc.Tests
 
 			// will go up for one more frame because the sync duration increases
 			// and the force then remembers the current magnitude
-			f.FixedUpdate(1);
+			g.FixedUpdate(1);
 			Assert.AreEqual(new Vector3(2, 2, 2), tbp.force);
 
 			// then back to 0 over one second
-			f.FixedUpdate(0.5f);
+			g.FixedUpdate(0.5f);
 			Assert.AreEqual(new Vector3(1, 1, 1), tbp.force);
 
-			f.FixedUpdate(0.5f);
+			g.FixedUpdate(0.5f);
 			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
 
 			// then stay at 0 forever
-			for (int i = 0; i < 10; ++i)
-			{
-				f.FixedUpdate(1);
-				Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
-			}
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+
+
+			// based on all the updates above, sync is now at half magnitude
+			// (1s, duration is 2s) and going up
+			Assert.AreEqual(0.5f, g.Sync.Magnitude);
 
 
 			// enable
 			tbp.canApply = true;
 
 
-			// will stay at 0 for one frame because of the reset
-			f.FixedUpdate(1);
-			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+			// there's no catching up, the force will immediately get back to
+			// what it's supposed to have
 
-
-			// then normal loops
-			TestLoops(tbp, f);
-		}
-
-		private void TestLoops(TestBodyPart tbp, Force f)
-		{
-			for (int i = 0; i < 10; ++i)
-				TestOneLoop(tbp, f);
-		}
-
-		private void TestOneLoop(TestBodyPart tbp, Force f)
-		{
-			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
-
-			f.FixedUpdate(1);
-			Assert.AreEqual(new Vector3(2, 2, 2), tbp.force);
-
-			f.FixedUpdate(1);
+			g.FixedUpdate(1);
+			Assert.AreEqual(1.0f, g.Sync.Magnitude);
 			Assert.AreEqual(new Vector3(4, 4, 4), tbp.force);
 
-			f.FixedUpdate(1);
+			g.FixedUpdate(1);
+			Assert.AreEqual(0.5f, g.Sync.Magnitude);
 			Assert.AreEqual(new Vector3(2, 2, 2), tbp.force);
 
-			f.FixedUpdate(1);
+			g.FixedUpdate(1);
+			Assert.AreEqual(1, g.Sync.Magnitude);
+			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+
+			// normal loops again
+			TestLoops(tbp, g);
+		}
+
+		private void TestLoops(TestBodyPart tbp, ITarget g)
+		{
+			for (int i = 0; i < 10; ++i)
+				TestOneLoop(tbp, g);
+		}
+
+		private void TestOneLoop(TestBodyPart tbp, ITarget g)
+		{
+			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
+
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(2, 2, 2), tbp.force);
+
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(4, 4, 4), tbp.force);
+
+			g.FixedUpdate(1);
+			Assert.AreEqual(new Vector3(2, 2, 2), tbp.force);
+
+			g.FixedUpdate(1);
 			Assert.AreEqual(new Vector3(0, 0, 0), tbp.force);
 		}
 	}

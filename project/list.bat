@@ -5,7 +5,9 @@ set out=%~1
 set ignore=(%2 %3 %4 %5 %6 %7 %8 %9)
 
 > "%out%" (
+	cd src
 	call :dodir
+	cd ..
 )
 
 goto :eof
@@ -23,7 +25,7 @@ goto :eof
 		)
 
 		if !skip!==0 (
-			echo project\%dir%%%f
+			echo project\src\%dir%%%f
 		)
 	)
 

@@ -288,7 +288,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)"
-call $(ProjectDir)list.bat $(ProjectDir)..\Cue.cslist DummyMain.cs CueObject.cs
-</PostBuildEvent>
+call $(ProjectDir)list.bat $(ProjectDir)..\Cue.cslist</PostBuildEvent>
   </PropertyGroup>
 </Project>
