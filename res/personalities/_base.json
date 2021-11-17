@@ -60,11 +60,7 @@
 				{
 					"id": "CTRLEyesClosed",
 					"max": 0.66
-				},
-				{
-					"id": "CTRLTongueIn-Out",
-					"max": 0.012
-				},
+				}
 			]
 		},
 

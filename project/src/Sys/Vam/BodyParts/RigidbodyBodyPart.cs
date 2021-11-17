@@ -6,11 +6,12 @@ namespace Cue.Sys.Vam
 	class RigidbodyBodyPart : VamBodyPart
 	{
 		private Rigidbody[] rbs_;
+		private Rigidbody forForce_;
 		private FreeControllerV3 fc_ = null;
 
 		public RigidbodyBodyPart(
 			VamAtom a, int type, Rigidbody[] rbs, FreeControllerV3 fc,
-			string[] colliders)
+			string[] colliders, Rigidbody forForce)
 				: base(a, type, colliders)
 		{
 			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BP.ToString(Type)}");
@@ -19,6 +20,10 @@ namespace Cue.Sys.Vam
 
 			rbs_ = rbs;
 			fc_ = fc;
+			forForce_ = forForce;
+
+			if (forForce_ == null && rbs_ != null && rbs_.Length > 0)
+				forForce_ = rbs_[0];
 		}
 
 		public override Rigidbody Rigidbody
@@ -55,12 +60,12 @@ namespace Cue.Sys.Vam
 
 		public override Vector3 Position
 		{
-			get { return U.FromUnity(rbs_[0].position); }
+			get { return U.FromUnity(Rigidbody.position); }
 		}
 
 		public override Quaternion Rotation
 		{
-			get { return U.FromUnity(rbs_[0].rotation); }
+			get { return U.FromUnity(Rigidbody.rotation); }
 		}
 
 		public override bool ContainsTransform(Transform t)
@@ -90,27 +95,31 @@ namespace Cue.Sys.Vam
 
 		public override void AddRelativeForce(Vector3 v)
 		{
-			rbs_[0].AddRelativeForce(U.ToUnity(v));
+			if (forForce_ != null)
+				forForce_.AddRelativeForce(U.ToUnity(v));
 		}
 
 		public override void AddRelativeTorque(Vector3 v)
 		{
-			rbs_[0].AddRelativeTorque(U.ToUnity(v));
+			if (forForce_ != null)
+				forForce_.AddRelativeTorque(U.ToUnity(v));
 		}
 
 		public override void AddForce(Vector3 v)
 		{
-			rbs_[0].AddForce(U.ToUnity(v));
+			if (forForce_ != null)
+				forForce_.AddForce(U.ToUnity(v));
 		}
 
 		public override void AddTorque(Vector3 v)
 		{
-			rbs_[0].AddTorque(U.ToUnity(v));
+			if (forForce_ != null)
+				forForce_.AddTorque(U.ToUnity(v));
 		}
 
 		public override string ToString()
 		{
-			return $"rb {(rbs_ == null ? "" : rbs_[0].name)}";
+			return $"rb {(Rigidbody == null ? "" : Rigidbody.name)}";
 		}
 	}
 }

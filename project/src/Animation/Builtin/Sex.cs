@@ -20,9 +20,11 @@ namespace Cue.Proc
 		private const float ForceChangeMaxAmount = 0.02f;
 
 		private float chestTorqueMin_ = -10;
-		private float chestTorqueMax_ = -50;
+		private float chestTorqueMax_ = -100;
+		private float chestTorqueWin_ = 40;
 		private float headTorqueMin_ = 0;
-		private float headTorqueMax_ = -10;
+		private float headTorqueMax_ = -20;
+		private float headTorqueWin_ = 10;
 		private float durationMin_ = 1;
 		private float durationMax_ = 0.1f;
 		private float durationWin_ = 0.15f;
@@ -61,14 +63,14 @@ namespace Cue.Proc
 				"", Force.RelativeTorque, BP.Chest,
 				new Vector3(chestTorqueMin_, 0, 0),
 				new Vector3(chestTorqueMax_, 0, 0),
-				durationInterval_, Vector3.Zero,
+				durationInterval_, new Vector3(chestTorqueWin_, 0, 0),
 				new ParentTargetSync()));
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeTorque, BP.Head,
 				new Vector3(headTorqueMin_, 0, 0),
 				new Vector3(headTorqueMax_, 0, 0),
-				durationInterval_, Vector3.Zero,
+				durationInterval_, new Vector3(headTorqueWin_, 0, 0),
 				new ParentTargetSync()));
 
 
@@ -258,9 +260,9 @@ namespace Cue.Proc
 	{
 		private float hipForceMin_ = 300;
 		private float hipForceMax_ = 1400;
-		private float hipTorqueMin_ = -20;
-		private float hipTorqueMax_ = -50;
-		private float hipTorqueWindow_ = 0;
+		private float hipTorqueMin_ = 0;
+		private float hipTorqueMax_ = -120;
+		private float hipTorqueWindow_ = 40;
 
 		public SexProcAnimation()
 			: base("cueSex")
@@ -305,7 +307,7 @@ namespace Cue.Proc
 	{
 		private float hipAloneForceMin_ = 300;
 		private float hipAloneForceMax_ = 800;
-		private float hipAloneTorqueMin_ = -60;
+		private float hipAloneTorqueMin_ = -20;
 		private float hipAloneTorqueMax_ = -120;
 		private float hipAloneTorqueWindow_ = 20;
 

@@ -159,6 +159,9 @@ namespace Cue
 					if (bps[j])
 						debug.Add($"  {s} {BP.ToString(j)} {bps[j]}");
 				}
+
+				if (s.Unknown)
+					debug.Add($"  {s} unknown");
 			}
 		}
 

@@ -9,6 +9,8 @@ namespace Cue
 		private readonly int personIndex_;
 		private readonly bool[] bodyParts_ = new bool[BP.Count];
 		private readonly float[] bodyPartsElapsed_ = new float[BP.Count];
+		private bool unknown_ = false;
+		private float unknownElapsed_ = 0;
 
 		public Source(int personIndex)
 		{
@@ -25,26 +27,45 @@ namespace Cue
 			get { return bodyParts_; }
 		}
 
+		public bool Unknown
+		{
+			get { return unknown_; }
+		}
+
 		public void Decay(float s)
 		{
 			active_ = false;
 
 			for (int i = 0; i < bodyPartsElapsed_.Length; ++i)
-			{
-				// todo, decay
-				bodyPartsElapsed_[i] = Math.Max(0, bodyPartsElapsed_[i] - (s / 2));
-				bodyParts_[i] = (bodyPartsElapsed_[i] > 0);
+				DoDecay(s, ref bodyParts_[i], ref bodyPartsElapsed_[i]);
 
-				if (bodyParts_[i])
-					active_ = true;
-			}
+			DoDecay(s, ref unknown_, ref unknownElapsed_);
+		}
+
+		private void DoDecay(float s, ref bool value, ref float elapsed)
+		{
+			// todo, decay speed
+			elapsed = Math.Max(0, elapsed - (s / 2));
+			value = (elapsed  > 0);
+
+			if (value)
+				active_ = true;
 		}
 
 		public void Set(int bodyPart)
 		{
 			active_ = true;
-			bodyPartsElapsed_[bodyPart] = 1.0f;
-			bodyParts_[bodyPart] = true;
+
+			if (bodyPart == BP.None)
+			{
+				unknownElapsed_ = 1.0f;
+				unknown_ = true;
+			}
+			else
+			{
+				bodyPartsElapsed_[bodyPart] = 1.0f;
+				bodyParts_[bodyPart] = true;
+			}
 		}
 
 		public override string ToString()

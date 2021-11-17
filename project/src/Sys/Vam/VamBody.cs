@@ -341,12 +341,12 @@ namespace Cue.Sys.Vam
 
 				add(BP.Hips, GetRigidbody(
 					BP.Hips, new string[] {
-					"pelvisF7/pelvisF7Joint",
-					"pelvisFL8/pelvisFL8Joint",
-					"pelvisFR8/pelvisFR8Joint",
-					"pelvisL1/pelvisL1Joint",
-					"pelvisR1/pelvisR1Joint"
-					}, "hipControl", new string[] { "abdomen", "pelvis" }));
+						"pelvisF7/pelvisF7Joint",
+						"pelvisFL8/pelvisFL8Joint",
+						"pelvisFR8/pelvisFR8Joint",
+						"pelvisL1/pelvisL1Joint",
+						"pelvisR1/pelvisR1Joint"
+					}, "hipControl", new string[] { "abdomen", "pelvis" }, "hip"));
 			}
 
 			add(BP.LeftGlute, GetCollider(
@@ -657,7 +657,8 @@ namespace Cue.Sys.Vam
 		}
 
 		private IBodyPart GetRigidbody(
-			int id, string[] colliders, string controller, string[] names)
+			int id, string[] colliders, string controller, string[] names,
+			string rigidbodyForForce = "")
 		{
 			var rbs = new List<Rigidbody>();
 
@@ -674,6 +675,19 @@ namespace Cue.Sys.Vam
 				rbs.Add(rb);
 			}
 
+			Rigidbody forForce = null;
+			if (rigidbodyForForce == "")
+			{
+				if (rbs.Count > 0)
+					forForce = rbs[0];
+			}
+			else
+			{
+				forForce = U.FindRigidbody(Atom.Atom, rigidbodyForForce);
+				if (forForce == null)
+					Log.Error($"rb for force '{rigidbodyForForce}' not found");
+			}
+
 			FreeControllerV3 fc = null;
 			if (controller != "")
 			{
@@ -682,7 +696,8 @@ namespace Cue.Sys.Vam
 					Log.Error($"rb {rbs[0].name} has no controller {controller}");
 			}
 
-			return new RigidbodyBodyPart(Atom, id, rbs.ToArray(), fc, colliders);
+			return new RigidbodyBodyPart(
+				Atom, id, rbs.ToArray(), fc, colliders, forForce);
 		}
 
 		private IBodyPart GetRigidbody(
@@ -705,7 +720,8 @@ namespace Cue.Sys.Vam
 					Log.Error($"rb {name} has no controller {controller} ");
 			}
 
-			return new RigidbodyBodyPart(Atom, id, new Rigidbody[] { rb }, fc, colliders);
+			return new RigidbodyBodyPart(
+				Atom, id, new Rigidbody[] { rb }, fc, colliders, null);
 		}
 
 		private IBodyPart GetTrigger(
