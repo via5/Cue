@@ -90,9 +90,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			UpdateParts(s);
-			UpdateReasonValues(s);
-			UpdateReasonRates(s);
+			//UpdateParts(s);
+			//UpdateReasonValues(s);
+			//UpdateReasonRates(s);
 		}
 
 		private void UpdateParts(float s)
@@ -142,26 +142,46 @@ namespace Cue
 				totalRate_ = ps.Get(PS.ExcitementDecayRate);
 		}
 
+		private string DebugMakeSource(Source src, int part)
+		{
+			string s = $"  {src} ";
+
+			if (part == BP.None)
+				s += "unknown";
+			else
+				s += BP.ToString(part);
+
+			s += "=>";
+
+			if (src.TargetBodyPart == BP.None)
+				s += "unknown";
+			else
+				s += BP.ToString(src.TargetBodyPart);
+
+			if (src.IsIgnored(part))
+				s += " (ignored)";
+
+			return s;
+		}
+
 		private void DebugZone(ErogenousZone z, List<string> debug)
 		{
 			var srcs = z.Sources;
 
+			debug.Add($"  active sources: {z.ActiveSources}");
+
 			for (int i = 0; i < srcs.Length; ++i)
 			{
 				var s = srcs[i];
-				if (!s.Active)
-					continue;
 
-				var bps = s.BodyParts;
-
-				for (int j = 0; j < bps.Length; ++j)
+				for (int j = 0; j < BP.Count; ++j)
 				{
-					if (bps[j])
-						debug.Add($"  {s} {BP.ToString(j)} {bps[j]}");
+					if (s.IsStrictlyActive(j))
+						debug.Add(DebugMakeSource(s, j));
 				}
 
-				if (s.Unknown)
-					debug.Add($"  {s} unknown");
+				if (s.IsStrictlyActive(BP.None))
+					debug.Add(DebugMakeSource(s, BP.None));
 			}
 		}
 

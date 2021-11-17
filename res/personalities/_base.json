@@ -290,10 +290,7 @@
 	"otherGropedSourceEyesWeight": 1,
 	"otherGropedTargetWeight": 1,
 
-	"otherSexExcitementRateFactor": 0.3,
-	"maxOtherSexExcitement": 0.3,
 	"kissSpeedEnergyFactor": 1,
-	"idleMaxExcitement": 0,
 	"tirednessExcitementRateFactor": 0.6,
 
 	"gazeEnergyTirednessFactor": 1,
@@ -346,25 +343,29 @@
 	"neutralVoicePitch": 0.5,
 	"voicePitch": -1,
 
-	"mouthRate": 0.0001,
+	"mouthRate": 0.001,
 	"mouthMax": 0.3,
 	"lipsFactor": 0.1,
 	"mouthFactor": 0.9,
 
-	"breastsRate": 0.0003,
+	"breastsRate": 0.002,
 	"breastsMax": 0.4,
 	"leftBreastFactor": 0.5,
 	"rightBreastFactor": 0.5,
 
-	"genitalsRate": 0.005,
+	"genitalsRate": 0.004,
 	"genitalsMax": 1.0,
 	"labiaFactor": 1.0,
 
-	"penetrationRate": 0.004,
+	"penetrationRate": 0.003,
 	"penetrationMax": 1.0,
 	"vaginaFactor": 1,
 	"deepVaginaFactor": 1,
 	"deeperVaginaFactor": 1,
+
+	"otherSexExcitementRateFactor": 0.3,
+	"maxOtherSexExcitement": 0.3,
+	"idleMaxExcitement": 0,
 
 	"excitementDecayRate": -0.01,
 	"excitementPostOrgasm": 0.3,

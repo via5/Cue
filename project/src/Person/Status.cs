@@ -1,45 +1,74 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Cue
 {
 	public class Source
 	{
-		private bool active_ = false;
+		private int totalActive_ = 0;
+		private int validActive_ = 0;
 		private readonly int personIndex_;
 		private readonly bool[] bodyParts_ = new bool[BP.Count];
 		private readonly float[] bodyPartsElapsed_ = new float[BP.Count];
+		private readonly bool[] ignore_ = new bool[BP.Count];
 		private bool unknown_ = false;
 		private float unknownElapsed_ = 0;
+		private bool unknownIgnore_ = false;
+		private int target_ = BP.None;
 
 		public Source(int personIndex)
 		{
 			personIndex_ = personIndex;
 		}
 
-		public bool Active
+		public int ActiveCount
 		{
-			get { return active_; }
+			get { return validActive_; }
 		}
 
-		public bool[] BodyParts
+		public int StrictlyActiveCount
 		{
-			get { return bodyParts_; }
+			get { return totalActive_; }
 		}
 
-		public bool Unknown
+		public int TargetBodyPart
 		{
-			get { return unknown_; }
+			get { return target_; }
+		}
+
+		public bool IsActive(int bodyPart)
+		{
+			return IsStrictlyActive(bodyPart) && !IsIgnored(bodyPart);
+		}
+
+		public bool IsStrictlyActive(int bodyPart)
+		{
+			if (bodyPart == BP.None)
+				return unknown_;
+			else
+				return bodyParts_[bodyPart];
+		}
+
+		public bool IsIgnored(int bodyPart)
+		{
+			if (bodyPart == BP.None)
+				return unknownIgnore_;
+			else
+				return ignore_[bodyPart];
 		}
 
 		public void Decay(float s)
 		{
-			active_ = false;
+			totalActive_ = 0;
+			validActive_ = 0;
 
 			for (int i = 0; i < bodyPartsElapsed_.Length; ++i)
+			{
 				DoDecay(s, ref bodyParts_[i], ref bodyPartsElapsed_[i]);
+				ignore_[i] = false;
+ 			}
 
 			DoDecay(s, ref unknown_, ref unknownElapsed_);
+			unknownIgnore_ = false;
 		}
 
 		private void DoDecay(float s, ref bool value, ref float elapsed)
@@ -49,22 +78,55 @@ namespace Cue
 			value = (elapsed  > 0);
 
 			if (value)
-				active_ = true;
+			{
+				++totalActive_;
+				++validActive_;
+			}
 		}
 
-		public void Set(int bodyPart)
+		public void Set(int sourceBodyPart, int targetBodyPart)
 		{
-			active_ = true;
-
-			if (bodyPart == BP.None)
+			if (sourceBodyPart == BP.None)
 			{
 				unknownElapsed_ = 1.0f;
-				unknown_ = true;
+				unknownIgnore_ = false;
+
+				if (!unknown_)
+				{
+					unknown_ = true;
+					++totalActive_;
+					++validActive_;
+				}
 			}
 			else
 			{
-				bodyPartsElapsed_[bodyPart] = 1.0f;
-				bodyParts_[bodyPart] = true;
+				bodyPartsElapsed_[sourceBodyPart] = 1.0f;
+				ignore_[sourceBodyPart] = false;
+
+				if (!bodyParts_[sourceBodyPart])
+				{
+					bodyParts_[sourceBodyPart] = true;
+					++totalActive_;
+					++validActive_;
+				}
+			}
+
+			target_ = targetBodyPart;
+		}
+
+		public void Ignore(int bodyPart)
+		{
+			if (bodyPart == BP.None)
+			{
+				unknownIgnore_ = true;
+				if (unknown_)
+					--validActive_;
+			}
+			else
+			{
+				ignore_[bodyPart] = true;
+				if (bodyParts_[bodyPart])
+					--validActive_;
 			}
 		}
 
@@ -85,7 +147,7 @@ namespace Cue
 		private Person person_;
 		private int[] bodyParts_;
 		private Source[] sources_;
-		private bool active_ = false;
+		private int activeSources_ = 0;
 		private float elapsed_ = 0;
 
 		public ErogenousZone(Person p, int[] bodyParts)
@@ -104,7 +166,12 @@ namespace Cue
 
 		public bool Active
 		{
-			get { return active_; }
+			get { return (activeSources_ > 0); }
+		}
+
+		public int ActiveSources
+		{
+			get { return activeSources_; }
 		}
 
 		public Source[] Sources
@@ -132,35 +199,56 @@ namespace Cue
 					var ts = person_.Body.Get(bp).GetTriggers();
 
 					if (ts != null)
-						CheckTriggers(ts);
+						CheckTriggers(ts, bp);
+				}
+
+				activeSources_ = 0;
+				for (int i = 0; i < sources_.Length; ++i)
+				{
+					if (sources_[i].ActiveCount > 0)
+						++activeSources_;
+				}
+			}
+		}
+
+		public void IgnorePenetration(ErogenousZone from)
+		{
+			for (int i=0; i<sources_.Length;++i)
+			{
+				if (sources_[i].IsActive(BP.Penis))
+				{
+					if (from.Sources[i].IsActive(BP.Penis))
+					{
+						sources_[i].Ignore(BP.Penis);
+						if (sources_[i].ActiveCount == 0)
+							--activeSources_;
+					}
 				}
 			}
 		}
 
 		private void Decay(float s)
 		{
-			active_ = false;
+			activeSources_ = 0;
 
 			for (int i = 0; i < sources_.Length;++i)
 			{
 				sources_[i].Decay(s);
-				if (sources_[i].Active)
-					active_ = true;
+				if (sources_[i].ActiveCount > 0)
+					++activeSources_;
 			}
 		}
 
-		private void CheckTriggers(Sys.TriggerInfo[] ts)
+		private void CheckTriggers(Sys.TriggerInfo[] ts, int targetBodyPart)
 		{
 			for (int i = 0; i < ts.Length; ++i)
 			{
 				var t = ts[i];
 
 				if (t.IsPerson())
-					sources_[t.personIndex].Set(t.sourcePartIndex);
+					sources_[t.personIndex].Set(t.sourcePartIndex, targetBodyPart);
 				else
-					External.Set(-1);
-
-				active_ = true;
+					External.Set(-1, targetBodyPart);
 			}
 		}
 	}
@@ -253,6 +341,8 @@ namespace Cue
 			mouth_.Update(s);
 			breasts_.Update(s);
 			genitals_.Update(s);
+
+			genitals_.IgnorePenetration(vaginal_);
 		}
 
 
