@@ -4,19 +4,11 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	interface IObjectCreator
-	{
-		string Name { get; }
-		void Create(Sys.IAtom user, string id, Action<IObject> callback);
-		void Destroy(Sys.IAtom user, string id);
-	}
-
-
 	class ObjectResources
 	{
 		private Logger log_;
-		private Dictionary<string, List<IObjectCreator>> objects_ =
-			new Dictionary<string, List<IObjectCreator>>();
+		private Dictionary<string, List<Sys.IObjectCreator>> objects_ =
+			new Dictionary<string, List<Sys.IObjectCreator>>();
 
 		public ObjectResources()
 		{
@@ -39,9 +31,9 @@ namespace Cue
 			}
 		}
 
-		public IObjectCreator Get(string type)
+		public Sys.IObjectCreator Get(string type)
 		{
-			List<IObjectCreator> list;
+			List<Sys.IObjectCreator> list;
 			if (objects_.TryGetValue(type, out list))
 			{
 				// todo
@@ -73,7 +65,7 @@ namespace Cue
 			}
 		}
 
-		private IObjectCreator ParseObject(JSONClass o)
+		private Sys.IObjectCreator ParseObject(JSONClass o)
 		{
 			var name = o["name"].Value;
 			var type = o["type"].Value;
@@ -87,14 +79,14 @@ namespace Cue
 			return Cue.Instance.Sys.CreateObjectCreator(name, type, opts, ps);
 		}
 
-		private void Add(IObjectCreator o)
+		private void Add(Sys.IObjectCreator o)
 		{
 			log_.Info(o.ToString());
 
-			List<IObjectCreator> list;
+			List<Sys.IObjectCreator> list;
 			if (!objects_.TryGetValue(o.Name, out list))
 			{
-				list = new List<IObjectCreator>();
+				list = new List<Sys.IObjectCreator>();
 				objects_.Add(o.Name, list);
 			}
 

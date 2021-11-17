@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Body
+	public class Body
 	{
 		public const int CloseDelay = 2;
 		private const float MaxMorphs = 1.1f;

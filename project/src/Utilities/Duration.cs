@@ -3,7 +3,7 @@ using System;
 
 namespace Cue
 {
-	class Duration
+	public class Duration
 	{
 		class Range
 		{
@@ -285,7 +285,7 @@ namespace Cue
 
 			elapsed_ += s;
 
-			if (elapsed_ > current_)
+			if (elapsed_ >= current_)
 				finished_ = true;
 		}
 

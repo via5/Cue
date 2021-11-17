@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Excitement
+	public class Excitement
 	{
 		private Person person_;
 		private ExcitementBodyPart[] parts_ = new ExcitementBodyPart[BP.Count];

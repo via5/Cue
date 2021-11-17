@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	interface IEvent
+	public interface IEvent
 	{
 		string Name { get; }
 		void OnPluginState(bool b);

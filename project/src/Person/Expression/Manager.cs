@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class ExpressionManager
+	public class ExpressionManager
 	{
 		private const int MaxActive = 4;
 		private const int MaxEmergency = 1;

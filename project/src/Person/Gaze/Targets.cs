@@ -4,7 +4,7 @@ namespace Cue
 {
 	// all the possible targets in the scene for a particular person
 	//
-	class GazeTargets
+	public class GazeTargets
 	{
 		public const float ExclusiveWeight = -1;
 
@@ -220,7 +220,7 @@ namespace Cue
 	}
 
 
-	interface IGazeLookat
+	public interface IGazeLookat
 	{
 		float Weight { get; }
 		string Why { get; }

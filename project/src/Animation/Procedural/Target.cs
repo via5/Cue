@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue.Proc
 {
-	interface ITarget
+	public interface ITarget
 	{
 		string Name { get; }
 		ITarget Parent { get; set; }
@@ -25,7 +25,7 @@ namespace Cue.Proc
 	}
 
 
-	abstract class BasicTarget : ITarget
+	public abstract class BasicTarget : ITarget
 	{
 		protected Person person_ = null;
 		private ITarget parent_ = null;
@@ -78,12 +78,12 @@ namespace Cue.Proc
 
 		public virtual float MovementEnergy
 		{
-			get { return parent_.MovementEnergy; }
+			get { return parent_?.MovementEnergy ?? 1.0f; }
 		}
 
 		public virtual ulong LockKey
 		{
-			get { return parent_.LockKey; }
+			get { return parent_?.LockKey ?? 0; }
 		}
 
 		public abstract bool Done { get; }

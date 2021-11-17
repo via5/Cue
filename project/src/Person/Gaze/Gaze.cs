@@ -19,7 +19,7 @@ namespace Cue
 	}
 
 
-	class Gaze
+	public class Gaze
 	{
 		private Person person_;
 		private Logger log_;

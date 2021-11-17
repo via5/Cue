@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cue
 {
-	class BodyPartLocker
+	public class BodyPartLocker
 	{
 		private readonly BodyPart bp_;
 		private List<BodyPartLock> locks_ = new List<BodyPartLock>();
@@ -88,7 +88,7 @@ namespace Cue
 	}
 
 
-	class BodyPartLock
+	public class BodyPartLock
 	{
 		public const ulong NoKey = 0;
 

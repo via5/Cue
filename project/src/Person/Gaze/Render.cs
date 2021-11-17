@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class GazeRender
+	public class GazeRender
 	{
 		private Person person_;
 		private RandomTargetGeneratorRenderer frustums_ = null;

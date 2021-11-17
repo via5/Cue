@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class Expression
+	public class Expression
 	{
 		struct TargetInfo
 		{

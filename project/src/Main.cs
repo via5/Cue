@@ -6,7 +6,7 @@ using UnityEngine;
 namespace Cue
 {
 #if MOCK
-	class CueToken
+	public class CueToken
 	{
 		private int time_;
 
@@ -27,7 +27,7 @@ namespace Cue
 	}
 
 
-	class CueMain
+	public class CueMain
 	{
 		static private CueMain instance_ = null;
 
@@ -42,7 +42,10 @@ namespace Cue
 			sys_ = new Sys.Mock.MockSys();
 			cue_ = new Cue();
 			cue_.Init();
+		}
 
+		public void Run()
+		{
 			float deltaTime = 0;
 			long last = 0;
 
@@ -68,7 +71,7 @@ namespace Cue
 
 		public static void Main()
 		{
-			new CueMain();
+			new CueMain().Run();
 		}
 
 		static public CueMain Instance

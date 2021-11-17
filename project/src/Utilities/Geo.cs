@@ -3,7 +3,7 @@ using System;
 
 namespace Cue
 {
-	struct Vector3
+	public struct Vector3
 	{
 		public float X, Y, Z;
 
@@ -188,7 +188,7 @@ namespace Cue
 		}
 	}
 
-	struct Quaternion
+	public struct Quaternion
 	{
 		private UnityEngine.Quaternion q_;
 
@@ -584,7 +584,7 @@ namespace Cue
 	}
 
 
-	struct Color
+	public struct Color
 	{
 		public float r, g, b, a;
 
@@ -643,7 +643,7 @@ namespace Cue
 	}
 
 
-	struct Box
+	public struct Box
 	{
 		public Vector3 center, size;
 
@@ -665,7 +665,7 @@ namespace Cue
 	}
 
 
-	struct Plane
+	public struct Plane
 	{
 		// todo
 		public UnityEngine.Plane p_;
@@ -714,7 +714,7 @@ namespace Cue
 	}
 
 
-	struct Frustum
+	public struct Frustum
 	{
 		public Vector3 nearTL;
 		public Vector3 nearTR;

@@ -49,7 +49,7 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamAtom : IAtom
+	public class VamAtom : IAtom
 	{
 		private readonly Atom atom_;
 		private Logger log_;

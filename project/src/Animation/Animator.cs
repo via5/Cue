@@ -36,7 +36,7 @@ namespace Cue
 	}
 
 
-	class AnimationContext
+	public class AnimationContext
 	{
 		public object ps;
 		public ulong key;
@@ -48,7 +48,7 @@ namespace Cue
 		}
 	}
 
-	interface IPlayer
+	public interface IPlayer
 	{
 		string Name { get; }
 		bool UsesFrames { get; }
@@ -65,7 +65,7 @@ namespace Cue
 		void OnPluginState(bool b);
 	}
 
-	interface IAnimation
+	public interface IAnimation
 	{
 		string Name { get; }
 		float InitFrame { get; }
@@ -77,7 +77,7 @@ namespace Cue
 	}
 
 
-	class Animation
+	public class Animation
 	{
 		private readonly int type_ = Animations.None;
 		private readonly int style_ = MovementStyles.Any;
@@ -117,7 +117,7 @@ namespace Cue
 	}
 
 
-	class Animator
+	public class Animator
 	{
 		public class PlayingAnimation
 		{

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class PersonOptions
+	public class PersonOptions
 	{
 		private bool canKiss_ = true;
 
@@ -20,7 +20,7 @@ namespace Cue
 	}
 
 
-	class Person : BasicObject
+	public class Person : BasicObject
 	{
 		public delegate void Callback();
 		public event Callback PersonalityChanged;

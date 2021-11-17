@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
-	abstract class VamBodyPart : IBodyPart
+	public abstract class VamBodyPart : IBodyPart
 	{
 		private IAtom atom_;
 		private int type_;

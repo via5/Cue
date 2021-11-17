@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	interface IObject
+	public interface IObject
 	{
 		int ObjectIndex { get; }
 		string ID { get; }
@@ -30,7 +30,7 @@ namespace Cue
 	}
 
 
-	class BasicObject : IObject
+	public class BasicObject : IObject
 	{
 		public const float NoBearing = float.MaxValue;
 

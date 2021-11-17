@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Source
+	public class Source
 	{
 		private bool active_ = false;
 		private readonly int personIndex_;
@@ -57,7 +57,7 @@ namespace Cue
 	}
 
 
-	class ErogenousZone
+	public class ErogenousZone
 	{
 		private const float UpdateInterval = 0.5f;
 
@@ -145,7 +145,7 @@ namespace Cue
 	}
 
 
-	class PersonStatus
+	public class PersonStatus
 	{
 		public struct PartResult
 		{

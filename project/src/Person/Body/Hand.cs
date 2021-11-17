@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class Bone
+	public class Bone
 	{
 		private string name_;
 		private Sys.IBone sys_;
@@ -44,7 +44,7 @@
 		}
 	}
 
-	class Finger
+	public class Finger
 	{
 		private Hand hand_;
 		private string name_;
@@ -94,7 +94,7 @@
 	}
 
 
-	class Hand
+	public class Hand
 	{
 		private Person person_;
 		private string name_;

@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class BodyPart
+	public class BodyPart
 	{
 		private const float TriggerCheckInterval = 1;
 

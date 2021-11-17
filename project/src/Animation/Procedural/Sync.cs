@@ -2,7 +2,7 @@
 
 namespace Cue.Proc
 {
-	interface ISync
+	public interface ISync
 	{
 		ITarget Target { get; set; }
 
@@ -22,7 +22,7 @@ namespace Cue.Proc
 	}
 
 
-	abstract class BasicSync : ISync
+	public abstract class BasicSync : ISync
 	{
 		private const int NoState = 0;
 		public const int ForwardsState = 1;
@@ -108,6 +108,7 @@ namespace Cue.Proc
 		{
 			state_ = ForwardsState;
 			nextState_ = NoState;
+			updateResult_ = Working;
 		}
 
 		public abstract string ToDetailedString();
@@ -129,6 +130,12 @@ namespace Cue.Proc
 		protected void SetState(int s)
 		{
 			nextState_ = s;
+		}
+
+		protected void SetStateNow(int s)
+		{
+			state_ = s;
+			nextState_ = NoState;
 		}
 	}
 
@@ -354,7 +361,7 @@ namespace Cue.Proc
 
 
 
-	class DurationSync : BasicSync
+	public class DurationSync : BasicSync
 	{
 		public const int NoFlags = 0x00;
 		public const int Loop = 0x01;
@@ -494,7 +501,7 @@ namespace Cue.Proc
 			base.Reset();
 
 			stopping_ = false;
-			SetState(ForwardsState);
+			SetStateNow(ForwardsState);
 			fwdDuration_?.Reset(energy_, Bits.IsSet(flags_, StartFast));
 			bwdDuration_?.Reset(energy_);
 			fwdDelay_?.Reset(energy_);

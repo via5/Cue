@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class Mood
+	public class Mood
 	{
 		public const float NoOrgasm = 10000;
 

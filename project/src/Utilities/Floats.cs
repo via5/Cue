@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class ForceableFloat
+	public class ForceableFloat
 	{
 		private float value_;
 		private float forced_;
@@ -64,7 +64,7 @@ namespace Cue
 
 	// [0, 1], starts at 0
 	//
-	class DampedFloat : ForceableFloat
+	public class DampedFloat : ForceableFloat
 	{
 		private float target_;
 		private float up_;

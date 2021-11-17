@@ -196,7 +196,7 @@ public string Generate3(
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n" +
-		$"	class {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
+		$"	public class {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
 		$"	{{\r\n" +
 		defs + "\r\n\r\n\r\n" +
 		names + "\r\n" + allNamesArray +

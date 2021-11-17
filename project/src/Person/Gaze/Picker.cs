@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class GazeTargetPicker
+	public class GazeTargetPicker
 	{
 		public class FrustumInfo
 		{

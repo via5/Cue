@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class BP
+	public class BP
 	{
 		public const int None = -1;
 		public const int Head = 0;

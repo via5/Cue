@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	interface IEnumValues
+	public interface IEnumValues
 	{
 		string[] GetAllNames();
 
@@ -22,7 +22,7 @@
 	}
 
 
-	abstract class BasicEnumValues : IEnumValues
+	public abstract class BasicEnumValues : IEnumValues
 	{
 		public struct DurationIndex
 		{
@@ -116,7 +116,7 @@
 	}
 
 
-	class EnumValueManager
+	public class EnumValueManager
 	{
 		private IEnumValues values_;
 		private Duration[] durations_;

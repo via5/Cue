@@ -198,7 +198,10 @@ namespace Cue.Sys.Mock
 				exeDir = Path.GetDirectoryName(exe);
 			}
 
-			return Path.GetFullPath(Path.Combine(exeDir, "../../.."));
+			if (exeDir.Contains("project\\tests\\"))
+				return Path.GetFullPath(Path.Combine(exeDir, "../../../../.."));
+			else
+				return Path.GetFullPath(Path.Combine(exeDir, "../../.."));
 		}
 
 		private string ResPath()

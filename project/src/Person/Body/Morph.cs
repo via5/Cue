@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Morph
+	public class Morph
 	{
 		private Person person_;
 		private Sys.IMorph m_;
@@ -82,7 +82,7 @@ namespace Cue
 	}
 
 
-	class MorphGroup
+	public class MorphGroup
 	{
 		public class MorphInfo
 		{

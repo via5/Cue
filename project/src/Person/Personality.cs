@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Voice
+	public class Voice
 	{
 		public class Dataset
 		{
@@ -161,7 +161,7 @@ namespace Cue
 	}
 
 
-	class SpecificModifier
+	public class SpecificModifier
 	{
 		public const int Unresolved = -1;
 		public const int Any = -2;
@@ -314,7 +314,7 @@ namespace Cue
 	}
 
 
-	class Personality : EnumValueManager
+	public class Personality : EnumValueManager
 	{
 		private readonly string name_;
 		private Person person_;

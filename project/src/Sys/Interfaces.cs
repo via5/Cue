@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue.Sys
 {
-	class ObjectParameters
+	public class ObjectParameters
 	{
 		private Dictionary<string, string> map_ = null;
 
@@ -55,7 +55,7 @@ namespace Cue.Sys
 		}
 	}
 
-	interface ISys
+	public interface ISys
 	{
 		void ClearLog();
 		void LogLines(string s, int level);
@@ -93,14 +93,22 @@ namespace Cue.Sys
 	}
 
 
-	interface ILiveSaver
+	public interface ILiveSaver
 	{
 		JSONClass Load();
 		void Save(JSONClass o);
 	}
 
 
-	struct HoveredInfo
+	public interface IObjectCreator
+	{
+		string Name { get; }
+		void Create(Sys.IAtom user, string id, Action<IObject> callback);
+		void Destroy(Sys.IAtom user, string id);
+	}
+
+
+	public struct HoveredInfo
 	{
 		public IObject o;
 		public Vector3 pos;
@@ -122,7 +130,7 @@ namespace Cue.Sys
 		}
 	}
 
-	interface IInput
+	public interface IInput
 	{
 		bool HardReset { get; }
 		bool ReloadPlugin { get; }
@@ -184,7 +192,7 @@ namespace Cue.Sys
 		}
 	}
 
-	struct TriggerInfo
+	public struct TriggerInfo
 	{
 		public int personIndex;
 		public int sourcePartIndex;
@@ -233,7 +241,7 @@ namespace Cue.Sys
 		}
 	}
 
-	struct GrabInfo
+	public struct GrabInfo
 	{
 		public int personIndex;
 		public int sourcePartIndex;
@@ -276,7 +284,7 @@ namespace Cue.Sys
 		}
 	}
 
-	interface IBodyPart
+	public interface IBodyPart
 	{
 		IAtom Atom { get; }
 		int Type { get; }
@@ -302,18 +310,18 @@ namespace Cue.Sys
 		void AddTorque(Vector3 v);
 	}
 
-	interface IBone
+	public interface IBone
 	{
 		Vector3 Position { get; }
 		Quaternion Rotation { get; }
 	}
 
-	interface IHair
+	public interface IHair
 	{
 		float Loose { get; set; }
 	}
 
-	interface IMorph
+	public interface IMorph
 	{
 		string Name { get; }
 		float Value { get; set; }
@@ -322,13 +330,13 @@ namespace Cue.Sys
 		void Reset();
 	}
 
-	struct Hand
+	public struct Hand
 	{
 		public IMorph fist, inOut;
 		public IBone[][] bones;
 	}
 
-	interface IBody
+	public interface IBody
 	{
 		IBodyPart[] GetBodyParts();
 		Hand GetLeftHand();
@@ -345,7 +353,7 @@ namespace Cue.Sys
 		public const int Sex = 1;
 	}
 
-	interface IAtom
+	public interface IAtom
 	{
 		string ID { get; }
 		bool Visible { get; set; }
@@ -381,7 +389,7 @@ namespace Cue.Sys
 		void LateUpdate(float s);
 	}
 
-	interface IGraphic
+	public interface IGraphic
 	{
 		bool Visible { get; set; }
 		Vector3 Position { get; set; }

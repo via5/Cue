@@ -2,3 +2,7 @@
 /project/bin
 /project/.vs
 /project/*.user
+/project/tests/obj
+/project/tests/bin
+/project/TestResults
+/project/packages

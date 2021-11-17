@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue.Proc
 {
-	class Force : BasicTarget
+	public class Force : BasicTarget
 	{
 		struct VectorTarget
 		{
@@ -104,6 +104,17 @@ namespace Cue.Proc
 			ISync sync, IEasing easing = null)
 				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, easing)
 		{
+		}
+
+		// used in tests
+		//
+		public Force(
+			string name, int type, BodyPart bodyPart,
+			Vector3 min, Vector3 max, Duration next, Vector3 window,
+			ISync sync, IEasing easing = null)
+				: this(name, type, bodyPart.Type, min, max, next, window, sync, easing)
+		{
+			bp_ = bodyPart;
 		}
 
 		public Force(
@@ -218,7 +229,9 @@ namespace Cue.Proc
 
 		protected override void DoStart(Person p, AnimationContext cx)
 		{
-			bp_ = p.Body.Get(bodyPartType_);
+			if (bp_ == null)
+				bp_ = p.Body.Get(bodyPartType_);
+
 			vtarget_.Reset();
 			dtarget_.Reset();
 			needsNewsTarget_ = true;

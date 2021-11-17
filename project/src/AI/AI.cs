@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	interface IAI
+	public interface IAI
 	{
 		T GetEvent<T>() where T : class, IEvent;
 		List<IEvent> Events { get; }

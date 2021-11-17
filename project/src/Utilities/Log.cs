@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class Logger
+	public class Logger
 	{
 		public const int Animation = 0x001;
 		public const int Action = 0x002;

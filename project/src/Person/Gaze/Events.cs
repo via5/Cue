@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	interface IGazeEvent
+	public interface IGazeEvent
 	{
 		int Check(int flags);
 		bool HasEmergency(float s);

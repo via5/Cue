@@ -49,19 +49,19 @@ namespace Cue
 		}
 	}
 
-	interface IOrgasmer
+	public interface IOrgasmer
 	{
 		void Orgasm();
 	}
 
-	interface IBreather
+	public interface IBreather
 	{
 		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }
 		float Speed { get; set; }
 	}
 
-	interface IGazer
+	public interface IGazer
 	{
 		string Name { get; }
 
@@ -72,7 +72,7 @@ namespace Cue
 		void Update(float s);
 	}
 
-	interface IEyes
+	public interface IEyes
 	{
 		bool Blink { get; set; }
 		bool Saccade { get; set; }
@@ -84,12 +84,12 @@ namespace Cue
 		void Update(float s);
 	}
 
-	interface ISpeaker
+	public interface ISpeaker
 	{
 		void Say(string s);
 	}
 
-	interface IClothing
+	public interface IClothing
 	{
 		float HeelsAngle { get; }
 		float HeelsHeight { get; }
