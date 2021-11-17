@@ -18,6 +18,7 @@ namespace Cue.Proc.Tests
 		public Vector3 Position { get; }
 		public Quaternion Rotation { get; }
 		public bool Linked { get; }
+		public bool Render { get; set; }
 
 		public void AddForce(Vector3 v)
 		{

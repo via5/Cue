@@ -10,7 +10,6 @@ namespace Cue
 		private int type_;
 		private Logger log_;
 		private Sys.IBodyPart part_;
-		private Sys.IGraphic render_ = null;
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
 		private float updateTriggersElapsed_ = 0;
@@ -30,13 +29,7 @@ namespace Cue
 
 		public bool Render
 		{
-			set { SetRender(value); }
-		}
-
-		public void UpdateRender()
-		{
-			if (render_ != null)
-				render_.Position = part_.Position;
+			set { part_.Render = value; }
 		}
 
 		public Person Person
@@ -359,31 +352,6 @@ namespace Cue
 		public override string ToString()
 		{
 			return $"{part_} ({BP.ToString(type_)})";
-		}
-
-		private void SetRender(bool b)
-		{
-			if (b)
-			{
-				if (render_ == null)
-				{
-					render_ = Cue.Instance.Sys.CreateBoxGraphic(
-						Name + "_render",
-						Vector3.Zero, new Vector3(0.005f, 0.005f, 0.005f),
-						new Color(0, 0, 1, 0.1f));
-				}
-
-				render_.Visible = true;
-				++person_.Body.RenderingParts;
-			}
-			else
-			{
-				if (render_ != null)
-				{
-					render_.Visible = false;
-					--person_.Body.RenderingParts;
-				}
-			}
 		}
 	}
 }

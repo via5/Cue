@@ -85,21 +85,19 @@ namespace Cue
 		struct PartWidgets
 		{
 			public BodyPart part;
-			public VUI.Label name, triggering, grabbed, lk, source;
-			public VUI.Label position, direction;
+			public VUI.CheckBox name;
+			public VUI.Label triggering, grabbed, lk, source;
 		}
 
 		private readonly Person person_;
 		private readonly List<PartWidgets> widgets_ = new List<PartWidgets>();
-
-		private static bool Positions = false;
 
 		public PersonBodyPartsTab(Person ps)
 			: base ("Parts", false)
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(Positions ? 7 : 5);
+			var gl = new VUI.GridLayout(5);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
@@ -108,12 +106,6 @@ namespace Cue
 			p.Add(new VUI.Label("Grabbed", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
-
-			if (Positions)
-			{
-				p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
-				p.Add(new VUI.Label("Bearing", UnityEngine.FontStyle.Bold));
-			}
 
 			int fontSize = 20;
 
@@ -124,8 +116,9 @@ namespace Cue
 				var w = new PartWidgets();
 				w.part = bp;
 
-				w.name = new VUI.Label(bp.Name);
+				w.name = new VUI.CheckBox(bp.Name);
 				w.name.FontSize = fontSize;
+				w.name.Changed += (b) => OnChecked(b, bp);
 				p.Add(w.name);
 
 				w.triggering = new VUI.Label();
@@ -145,22 +138,16 @@ namespace Cue
 				w.source.FontSize = fontSize;
 				p.Add(w.source);
 
-				if (Positions)
-				{
-					w.position = new VUI.Label();
-					w.position.FontSize = fontSize;
-					p.Add(w.position);
-
-					w.direction = new VUI.Label();
-					w.direction.FontSize = fontSize;
-					p.Add(w.direction);
-				}
-
 				widgets_.Add(w);
 			}
 
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
+		}
+
+		private void OnChecked(bool b, BodyPart bp)
+		{
+			bp.Render = b;
 		}
 
 		protected override void DoUpdate(float s)
@@ -237,12 +224,6 @@ namespace Cue
 
 				w.lk.Text = w.part.Locker.DebugLockString();
 				w.source.Text = w.part.Source;
-
-				if (Positions)
-				{
-					w.position.Text = w.part.Position.ToString();
-					w.direction.Text = w.part.Rotation.Bearing.ToString("0.0");
-				}
 			}
 		}
 	}

@@ -57,6 +57,24 @@ namespace Cue.Sys.Vam
 			get { return atom_ as VamAtom; }
 		}
 
+		private VamDebugRenderer.IDebugRender renderer_ = null;
+
+		public bool Render
+		{
+			get
+			{
+				return (renderer_ != null);
+			}
+
+			set
+			{
+				if (value)
+					renderer_ = Cue.Instance.VamSys.DebugRenderer.AddRender(this);
+				else if (renderer_ != null)
+					Cue.Instance.VamSys.DebugRenderer.RemoveRender(renderer_);
+			}
+		}
+
 		public int Type { get { return type_; } }
 		public virtual bool Exists { get { return true; } }
 

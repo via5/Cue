@@ -170,23 +170,21 @@ namespace Cue.Sys.Vam
 
 	class VamDebugRenderer
 	{
-		interface IRender
+		public interface IDebugRender
 		{
 			void Destroy();
 			bool Update(float s);
 		}
 
 
-		class BoxRender : IRender
+		abstract class BoxRender : IDebugRender
 		{
-			private Transform t_;
 			private IGraphic g_;
 
-			public BoxRender(Transform t, Vector3 scale)
+			public BoxRender(string name, Vector3 scale)
 			{
-				t_ = t;
 				g_ = Cue.Instance.Sys.CreateBoxGraphic(
-					$"cue!DebugRender.{t.name}",
+					$"cue!DebugRender.{name}",
 					Vector3.Zero, scale,
 					new Color(0, 0, 1, 0.1f));
 			}
@@ -207,8 +205,7 @@ namespace Cue.Sys.Vam
 					if (g_ == null)
 						return false;
 
-					g_.Position = U.FromUnity(t_.position);
-					g_.Rotation = U.FromUnity(t_.rotation);
+					DoUpdate(g_);
 
 					return true;
 				}
@@ -217,10 +214,49 @@ namespace Cue.Sys.Vam
 					return false;
 				}
 			}
+
+			protected abstract void DoUpdate(IGraphic g);
 		}
 
 
-		class ColliderRender : IRender
+		class TransformRender : BoxRender
+		{
+			private Transform t_;
+
+			public TransformRender(Transform t, Vector3 scale)
+				: base(t.name, scale)
+			{
+				t_ = t;
+			}
+
+			protected override void DoUpdate(IGraphic g)
+			{
+				g.Position = U.FromUnity(t_.position);
+				g.Rotation = U.FromUnity(t_.rotation);
+			}
+		}
+
+
+		class BodyPartRender : BoxRender
+		{
+			private IBodyPart bp_;
+
+			public BodyPartRender(IBodyPart bp)
+				: base(BP.ToString(bp.Type), new Vector3(0.005f, 0.005f, 0.005f))
+			{
+				bp_ = bp;
+			}
+
+			protected override void DoUpdate(IGraphic g)
+			{
+				g.Position = bp_.Position;
+				g.Rotation = bp_.Rotation;
+			}
+		}
+
+
+
+		class ColliderRender : IDebugRender
 		{
 			private CapsuleCollider cc_;
 			private Transform parent_;
@@ -281,29 +317,40 @@ namespace Cue.Sys.Vam
 		}
 
 
-		private List<IRender> renders_ = null;
+		private List<IDebugRender> renders_ = null;
 
-		public void AddRender(Transform t)
+		public IDebugRender AddRender(Transform t)
 		{
-			AddRender(t, new Vector3(0.1f, 0.1f, 0.1f));
+			return AddRender(t, new Vector3(0.1f, 0.1f, 0.1f));
 		}
 
-		public void AddRender(Transform t, Vector3 scale)
+		public IDebugRender AddRender(Transform t, Vector3 scale)
 		{
-			AddRender(new BoxRender(t, scale));
+			return AddRender(new TransformRender(t, scale));
 		}
 
-		public void AddRender(Collider c)
+		public IDebugRender AddRender(Collider c)
 		{
-			AddRender(new ColliderRender(c));
+			return AddRender(new ColliderRender(c));
 		}
 
-		private void AddRender(IRender r)
+		public IDebugRender AddRender(IBodyPart bp)
+		{
+			return AddRender(new BodyPartRender(bp));
+		}
+
+		public void RemoveRender(IDebugRender r)
+		{
+			renders_.Remove(r);
+		}
+
+		private IDebugRender AddRender(IDebugRender r)
 		{
 			if (renders_ == null)
-				renders_ = new List<IRender>();
+				renders_ = new List<IDebugRender>();
 
 			renders_.Add(r);
+			return r;
 		}
 
 		public void Update(float s)

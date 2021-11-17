@@ -13,7 +13,6 @@ namespace Cue
 		private readonly BodyPart[] all_;
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
-		private int renderingParts_ = 0;
 		private float[] morphsRemaining_ = new float[BP.Count];
 
 		public Body(Person p)
@@ -51,12 +50,6 @@ namespace Cue
 		public BodyPart[] Parts
 		{
 			get { return all_; }
-		}
-
-		public int RenderingParts
-		{
-			get { return renderingParts_; }
-			set { renderingParts_ = value; }
 		}
 
 		public bool Exists
@@ -133,12 +126,6 @@ namespace Cue
 			}
 
 			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
-
-			if (renderingParts_ > 0)
-			{
-				for (int i = 0; i < all_.Length; ++i)
-					all_[i].UpdateRender();
-			}
 		}
 
 		public void DebugAllLocks(List<string> list)

@@ -290,6 +290,7 @@ namespace Cue.Sys
 		int Type { get; }
 		bool Exists { get; }
 		bool CanTrigger { get; }
+		bool Render { get; set; }
 		TriggerInfo[] GetTriggers();
 		GrabInfo[] GetGrabs();
 		bool CanGrab { get; }
