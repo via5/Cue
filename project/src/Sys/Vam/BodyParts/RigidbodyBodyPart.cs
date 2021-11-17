@@ -13,6 +13,10 @@ namespace Cue.Sys.Vam
 			string[] colliders)
 				: base(a, type, colliders)
 		{
+			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BP.ToString(Type)}");
+			foreach (var rb in rbs)
+				Cue.Assert(rb != null, $"null rb in {a.ID} {BP.ToString(Type)}");
+
 			rbs_ = rbs;
 			fc_ = fc;
 		}
@@ -106,7 +110,7 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"rb {rbs_[0].name}";
+			return $"rb {(rbs_ == null ? "" : rbs_[0].name)}";
 		}
 	}
 }

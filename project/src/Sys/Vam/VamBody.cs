@@ -174,6 +174,18 @@ namespace Cue.Sys.Vam
 			set { strapon_.Set(value); }
 		}
 
+		private bool AdvancedColliders()
+		{
+			var cs = Atom.Atom.GetComponentInChildren<DAZCharacterSelector>();
+			if (cs == null)
+			{
+				Log.Error("no DAZCharacterSelector");
+				return true;
+			}
+
+			return cs.useAdvancedColliders;
+		}
+
 		private IBodyPart[] CreateBodyParts()
 		{
 			var map = new Dictionary<int, IBodyPart>();
@@ -196,6 +208,8 @@ namespace Cue.Sys.Vam
 				"FemaleAutoColliderschest"
 			};
 
+
+			bool advanced = AdvancedColliders();
 
 
 			// head
@@ -259,28 +273,55 @@ namespace Cue.Sys.Vam
 			//
 			if (Atom.IsMale)
 			{
-				add(BP.Chest, GetRigidbody(
-					BP.Chest, new string[] { "chest1/chest1Joint" },
-					"chestControl", "chest"));
+				if (advanced)
+				{
+					add(BP.Chest, GetRigidbody(
+						BP.Chest, new string[] { "chest1/chest1Joint" },
+							"chestControl", "chest"));
 
-				add(BP.Belly, GetRigidbody(
-					BP.Belly, new string[] {
-						"abdomen2/_ColliderL1",
-						"abdomen/_ColliderL1b",
-						"abdomen/_ColliderL1f",
-						"abdomen/_ColliderL1l",
-						"abdomen/_ColliderL1r",
-						"abdomen/_ColliderL2b"
-					}, "", "abdomen2"));
+					add(BP.Belly, GetRigidbody(
+						BP.Belly, new string[] {
+							"abdomen2/_ColliderL1",
+							"abdomen/_ColliderL1b",
+							"abdomen/_ColliderL1f",
+							"abdomen/_ColliderL1l",
+							"abdomen/_ColliderL1r",
+							"abdomen/_ColliderL2b"
+						}, "", "abdomen2"));
 
-				add(BP.Hips, GetRigidbody(
-					BP.Hips, new string[] {
-						"pelvisB3/pelvisB3Joint",
-						"pelvisF5/pelvisF5Joint",
-						"pelvisF8/pelvisF8Joint",
-						"pelvisL1/pelvisL1Joint",
-						"pelvisR1/pelvisR1Joint"
-					}, "hipControl", new string[] { "abdomen", "pelvis" }));
+					add(BP.Hips, GetRigidbody(
+						BP.Hips, new string[] {
+							"pelvisB3/pelvisB3Joint",
+							"pelvisF5/pelvisF5Joint",
+							"pelvisF8/pelvisF8Joint",
+							"pelvisL1/pelvisL1Joint",
+							"pelvisR1/pelvisR1Joint"
+						}, "hipControl", new string[] { "abdomen", "pelvis" }));
+				}
+				else
+				{
+					add(BP.Chest, GetRigidbody(
+						BP.Chest, new string[] { "chest/ColliderL0" },
+						"chestControl", "chest"));
+
+					add(BP.Belly, GetRigidbody(
+						BP.Belly, new string[] {
+							"abdomen2/_ColliderL1",
+							"abdomen/_ColliderL1b",
+							"abdomen/_ColliderL1f",
+							"abdomen/_ColliderL1l",
+							"abdomen/_ColliderL1r",
+							"abdomen/_ColliderL2b"
+						}, "", "abdomen2"));
+
+					add(BP.Hips, GetRigidbody(
+						BP.Hips, new string[] {
+							"pelvis/CollidersL1/ColliderL1f",
+							"pelvis/CollidersL1/ColliderL1b",
+							"pelvis/CollidersL2/ColliderL2l1",
+							"pelvis/CollidersL2/ColliderL2r1"
+						}, "hipControl", new string[] { "abdomen", "pelvis" }));
+				}
 			}
 			else
 			{

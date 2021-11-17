@@ -98,9 +98,9 @@ namespace Cue
 						lastSources_[j].ignored = true;
 						continue;
 					}
-				}
 
-				saw_[ts[j].personIndex] = true;
+					saw_[ts[j].personIndex] = true;
+				}
 
 				if (ts[j].sourcePartIndex == BP.Penis)
 					fromPenisValue_ += ts[j].value;
