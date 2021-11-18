@@ -56,6 +56,7 @@ project\src\Person\Body\BodyPartLocker.cs
 project\src\Person\Body\BodyParts.cs
 project\src\Person\Body\Hand.cs
 project\src\Person\Body\Morph.cs
+project\src\Person\Body\Zone.cs
 project\src\Person\Excitement\Excitement.cs
 project\src\Person\Expression\Expression.cs
 project\src\Person\Expression\Manager.cs

@@ -77,7 +77,6 @@ namespace Cue
 			Excitement.Init();
 			Body.Init();
 			Gaze.Init();
-			Status.Init();
 
 			hasBody_ = body_.Exists;
 

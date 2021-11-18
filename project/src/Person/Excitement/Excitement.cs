@@ -85,7 +85,7 @@ namespace Cue
 
 			for (int i = 0; i < SS.Count; ++i)
 			{
-				var z = person_.Status.Zone(i);
+				var z = person_.Body.Zone(i);
 				if (z == null)
 					continue;
 
@@ -109,12 +109,12 @@ namespace Cue
 			float rate = 0;
 
 			float dampen = 1;
-			if (person_.Status.Zone(SS.Penetration).Active)
+			if (person_.Body.Zone(SS.Penetration).Active)
 				dampen = person_.Personality.Get(PS.PenetrationDamper);
 
 			for (int i = 0; i < SS.Count; ++i)
 			{
-				var z = person_.Status.Zone(i);
+				var z = person_.Body.Zone(i);
 				if (z == null)
 					continue;
 
@@ -187,7 +187,7 @@ namespace Cue
 				others_[highest].active = true;
 		}
 
-		private string DebugMakeSource(Source src, int part)
+		private string DebugMakeSource(ErogenousZoneSource src, int part)
 		{
 			string s = "";
 
@@ -208,7 +208,7 @@ namespace Cue
 
 		private void DebugZone(int sensitivityIndex, List<string> debug)
 		{
-			var z = person_.Status.Zone(sensitivityIndex);
+			var z = person_.Body.Zone(sensitivityIndex);
 			var srcs = z.Sources;
 
 			for (int i = 0; i < srcs.Length; ++i)
@@ -262,7 +262,7 @@ namespace Cue
 			var debug = new List<string>();
 
 			string damp = "";
-			if (person_.Status.Zone(SS.Penetration).Active)
+			if (person_.Body.Zone(SS.Penetration).Active)
 				damp = $" (dampened, mod={person_.Personality.Get(PS.PenetrationDamper)})";
 
 			debug.Add($"penetration:");

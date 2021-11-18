@@ -14,12 +14,14 @@ namespace Cue
 		private Hand leftHand_, rightHand_;
 		private DampedFloat temperature_;
 		private float[] morphsRemaining_ = new float[BP.Count];
+		private ErogenousZones zones_;
 
 		public Body(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Object, p, $"body");
 			temperature_ = new DampedFloat();
+			zones_ = new ErogenousZones(p);
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
@@ -45,6 +47,7 @@ namespace Cue
 
 		public void Init()
 		{
+			zones_.Init();
 		}
 
 		public BodyPart[] Parts
@@ -104,10 +107,17 @@ namespace Cue
 			return all_[type];
 		}
 
+		public ErogenousZone Zone(int i)
+		{
+			return zones_.Get(i);
+		}
+
 		public void Update(float s)
 		{
 			for (int i = 0; i < all_.Length; ++i)
 				all_[i].Update(s);
+
+			zones_.Update(s);
 
 			var ps = person_.Personality;
 
