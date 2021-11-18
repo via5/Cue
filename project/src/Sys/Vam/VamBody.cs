@@ -205,7 +205,10 @@ namespace Cue.Sys.Vam
 
 				// happens for larger bellies
 				"FemaleAutoCollidersabdomen",
-				"FemaleAutoColliderschest"
+				"FemaleAutoColliderschest",
+
+				// happens when the hips get squished on a surface
+				"LGlute", "RGlute"
 			};
 
 

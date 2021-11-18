@@ -341,7 +341,11 @@ namespace Cue.Sys.Vam
 
 		public void RemoveRender(IDebugRender r)
 		{
-			renders_.Remove(r);
+			if (r != null)
+			{
+				r.Destroy();
+				renders_.Remove(r);
+			}
 		}
 
 		private IDebugRender AddRender(IDebugRender r)

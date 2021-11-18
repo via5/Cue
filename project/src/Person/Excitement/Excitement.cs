@@ -153,10 +153,10 @@ namespace Cue
 
 			s += "=>";
 
-			if (src.TargetBodyPart == BP.None)
+			if (src.TargetBodyPart(part) == BP.None)
 				s += "unknown";
 			else
-				s += BP.ToString(src.TargetBodyPart);
+				s += BP.ToString(src.TargetBodyPart(part));
 
 			if (src.IsIgnored(part))
 				s += " (ignored)";
@@ -189,8 +189,8 @@ namespace Cue
 		{
 			var debug = new List<string>();
 
-			debug.Add($"vaginal penetration:");
-			DebugZone(person_.Status.VaginalPenetration, debug);
+			debug.Add($"penetration:");
+			DebugZone(person_.Status.Penetration, debug);
 
 			debug.Add($"mouth:");
 			DebugZone(person_.Status.Mouth, debug);
