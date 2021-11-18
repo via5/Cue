@@ -10,6 +10,7 @@ namespace Cue
 			public float rate;
 			public float mod;
 			public float max;
+			public bool active;
 		}
 
 
@@ -70,6 +71,15 @@ namespace Cue
 			physicalRate_.Value = GetPhysicalRate();
 			emotionalRate_.Value = GetEmotionalRate();
 			max_ = GetMaximum();
+
+			// todo
+			bool isPenetrated = person_.Status.Zone(SS.Penetration).Active;
+
+			subtotalRate_ = physicalRate_.Value + emotionalRate_.Value;
+			totalRate_ = subtotalRate_ * person_.Personality.Get(PS.RateAdjustment);
+
+			if (totalRate_ == 0)
+				totalRate_ = person_.Personality.Get(PS.ExcitementDecayRate);
 		}
 
 		private float GetMaximum()
@@ -111,7 +121,7 @@ namespace Cue
 				{
 					var src = z.Sources[j];
 
-					if (src.Active)
+					if (src.Active && (person_.Mood.Get(Moods.Excited) <= src.Maximum))
 						rate += src.Rate * src.Modifier;
 				}
 			}
@@ -123,8 +133,11 @@ namespace Cue
 		{
 			float rate = 0;
 
-			for (int i=0; i<others_.Length; ++i)
-				rate += others_[i].rate * others_[i].mod;
+			for (int i = 0; i < others_.Length; ++i)
+			{
+				if (others_[i].active)
+					rate += others_[i].rate * others_[i].mod;
+			}
 
 			return rate;
 		}
@@ -136,7 +149,10 @@ namespace Cue
 				others_[i].rate = 0;
 				others_[i].mod = 0;
 				others_[i].max = 0;
+				others_[i].active = false;
 			}
+
+			int highest = -1;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -149,41 +165,20 @@ namespace Cue
 				o.rate = p.Excitement.GetPhysicalRate();
 				o.mod = ss.Rate;
 				o.max = ss.Maximum;
+
+				if (person_.Mood.Get(Moods.Excited) <= o.max)
+				{
+					if (highest == -1)
+						highest = p.PersonIndex;
+					else if (o.rate > others_[highest].rate)
+						highest = p.PersonIndex;
+				}
 			}
+
+			if (highest >= 0)
+				others_[highest].active = true;
 		}
 
-		/*		private void UpdateReasonRates(float s)
-				{
-					var ps = person_.Personality;
-
-					// todo
-					bool isPenetrated = (reasons_[0].Rate > 0);
-
-					for (int i = 0; i < reasons_.Length; ++i)
-						reasons_[i].UpdateRate(person_, isPenetrated);
-
-					physicalRate_.Value = 0;
-					emotionalRate_.Value = 0;
-					max_ = 0;
-
-					for (int i = 0; i < reasons_.Length; ++i)
-					{
-						if (reasons_[i].Physical)
-							physicalRate_.Value += reasons_[i].Rate;
-						else
-							emotionalRate_.Value += reasons_[i].Rate;
-
-						if (reasons_[i].Rate > 0)
-							max_ = Math.Max(max_, reasons_[i].MaximumExcitement);
-					}
-
-					subtotalRate_ = physicalRate_.Value + emotionalRate_.Value;
-					totalRate_ = subtotalRate_ * ps.Get(PS.RateAdjustment);
-
-					if (totalRate_ == 0)
-						totalRate_ = ps.Get(PS.ExcitementDecayRate);
-				}
-		*/
 		private string DebugMakeSource(Source src, int part)
 		{
 			string s = "";
@@ -214,15 +209,14 @@ namespace Cue
 				if (s.StrictlyActiveCount == 0)
 					continue;
 
-				if (s.Active)
-					debug.Add($"  {s}");
-				else
-					debug.Add($"  ({s})");
+				bool active = (s.Active && person_.Mood.Get(Moods.Excited) <= s.Maximum);
 
-				if (s.Active)
-					debug.Add($"    rate={s.Rate} mod={s.Modifier} max={s.Maximum}");
-				else
-					debug.Add($"    (rate={s.Rate} mod={s.Modifier} max={s.Maximum})");
+				string line = "  ";
+				if (!active)
+					line += "(";
+
+				line += $"{s}";
+				line += $" rate={s.Rate} mod={s.Modifier} max={s.Maximum}";
 
 				string parts = "";
 
@@ -246,12 +240,12 @@ namespace Cue
 				}
 
 				if (parts != "")
-				{
-					if (s.Active)
-						debug.Add($"    parts: {parts}");
-					else
-						debug.Add($"    (parts: {parts})");
-				}
+					line += ", parts: " + parts;
+
+				if (!active)
+					line += ")";
+
+				debug.Add(line);
 			}
 		}
 
@@ -275,8 +269,13 @@ namespace Cue
 			for (int i = 0; i < others_.Length; ++i)
 			{
 				var o = others_[i];
-				//if (o.rate > 0)
-					debug.Add($"  {Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max}");
+				if (o.rate > 0)
+				{
+					if (o.active)
+						debug.Add($"  {Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max}");
+					else
+						debug.Add($"  ({Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max})");
+				}
 			}
 
 			debug.Add("values:");
