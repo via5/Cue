@@ -23,6 +23,10 @@ namespace Cue
 		private readonly int personIndex_;
 		private readonly Part[] parts_ = new Part[BP.Count + 1];
 
+		private float rate_ = 0;
+		private float mod_ = 0;
+		private float max_ = 0;
+
 		public Source(int personIndex)
 		{
 			personIndex_ = personIndex;
@@ -44,6 +48,21 @@ namespace Cue
 		public int StrictlyActiveCount
 		{
 			get { return totalActive_; }
+		}
+
+		public float Rate
+		{
+			get { return rate_; }
+		}
+
+		public float Modifier
+		{
+			get { return mod_; }
+		}
+
+		public float Maximum
+		{
+			get { return max_; }
 		}
 
 		private Part GetPart(int bodyPart)
@@ -106,6 +125,22 @@ namespace Cue
  			}
 		}
 
+		public void Check(Person p, int sensitivityIndex)
+		{
+			rate_ = 0;
+			mod_ = 0;
+			max_ = 0;
+
+			if (Active)
+			{
+				var ss = p.Personality.Sensitivities.Get(sensitivityIndex);
+
+				rate_ = ss.Rate;
+				mod_ = ss.GetModifier(p, personIndex_);
+				max_ = ss.Maximum;
+			}
+		}
+
 		private void DoDecay(float s, Part part)
 		{
 			// todo, decay speed
@@ -151,8 +186,17 @@ namespace Cue
 		{
 			if (personIndex_ == -1)
 				return $"external";
-			else
-				return $"{Cue.Instance.GetPerson(personIndex_)}";
+
+			var p = Cue.Instance.GetPerson(personIndex_);
+			if (p == null)
+				return $"?{personIndex_}";
+
+			string s = p.ID;
+
+			if (p.IsPlayer)
+				s += "(player)";
+
+			return s;
 		}
 	}
 
@@ -174,14 +218,16 @@ namespace Cue
 		private const float UpdateInterval = 0.5f;
 
 		private Person person_;
+		private int type_;
 		private Part[] parts_;
 		private Source[] sources_;
 		private int activeSources_ = 0;
 		private float elapsed_ = 0;
 
-		public ErogenousZone(Person p, Part[] bodyParts)
+		public ErogenousZone(Person p, int type, Part[] bodyParts)
 		{
 			person_ = p;
+			type_ = type;
 			parts_ = bodyParts;
 
 			// include an external one at the end
@@ -234,25 +280,21 @@ namespace Cue
 				activeSources_ = 0;
 				for (int i = 0; i < sources_.Length; ++i)
 				{
+					sources_[i].Check(person_, type_);
+
 					if (sources_[i].Active)
 						++activeSources_;
 				}
 			}
 		}
 
-		public void IgnoreParts(ErogenousZone penZone, int targetBodyPart)
+		public void Ignore(int source, int bodyPart)
 		{
-			for (int i = 0; i < penZone.Sources.Length; ++i)
-			{
-				if (penZone.Sources[i].IsAnyActiveForTarget(targetBodyPart))
-				{
-					bool wasActive = sources_[i].Active;
-					sources_[i].IgnoreTarget(targetBodyPart);
+			bool wasActive = sources_[source].Active;
+			sources_[source].IgnoreTarget(bodyPart);
 
-					if (wasActive && !sources_[i].Active)
-						--activeSources_;
-				}
-			}
+			if (wasActive && !sources_[source].Active)
+				--activeSources_;
 		}
 
 		private void Decay(float s)
@@ -333,10 +375,7 @@ namespace Cue
 
 		private readonly Person person_;
 		private readonly Body body_;
-		private ErogenousZone penetration_ = null;
-		private ErogenousZone mouth_ = null;
-		private ErogenousZone breasts_ = null;
-		private ErogenousZone genitals_ = null;
+		private ErogenousZone[] zones_ = new ErogenousZone[SS.Count];
 
 		public PersonStatus(Person p)
 		{
@@ -346,58 +385,83 @@ namespace Cue
 
 		public void Init()
 		{
-			penetration_ = new ErogenousZone(person_, new ErogenousZone.Part[]
-			{
-				new ErogenousZone.Part(BP.Labia, BP.Penis),
-				new ErogenousZone.Part(BP.Vagina),
-				new ErogenousZone.Part(BP.DeepVagina),
-				new ErogenousZone.Part(BP.DeeperVagina),
-				new ErogenousZone.Part(BP.Penis, BP.Labia),
-				new ErogenousZone.Part(BP.Penis, BP.DeepVagina),
-				new ErogenousZone.Part(BP.Penis, BP.DeeperVagina),
-			});
+			zones_[SS.Penetration] = new ErogenousZone(
+				person_, SS.Penetration, new ErogenousZone.Part[]
+				{
+					new ErogenousZone.Part(BP.Labia, BP.Penis),
+					new ErogenousZone.Part(BP.Vagina),
+					new ErogenousZone.Part(BP.DeepVagina),
+					new ErogenousZone.Part(BP.DeeperVagina),
+					new ErogenousZone.Part(BP.Penis, BP.Labia),
+					new ErogenousZone.Part(BP.Penis, BP.DeepVagina),
+					new ErogenousZone.Part(BP.Penis, BP.DeeperVagina),
+				});
 
-			mouth_ = new ErogenousZone(person_, new ErogenousZone.Part[]
-			{
-				new ErogenousZone.Part(BP.Lips),
-				new ErogenousZone.Part(BP.Mouth)
-			});
+			zones_[SS.Mouth] = new ErogenousZone(
+				person_, SS.Mouth, new ErogenousZone.Part[]
+				{
+					new ErogenousZone.Part(BP.Lips),
+					new ErogenousZone.Part(BP.Mouth)
+				});
 
-			breasts_ = new ErogenousZone(person_, new ErogenousZone.Part[]
-			{
-				new ErogenousZone.Part(BP.LeftBreast),
-				new ErogenousZone.Part(BP.RightBreast)
-			});
+			zones_[SS.Breasts] = new ErogenousZone(
+				person_, SS.Breasts, new ErogenousZone.Part[]
+				{
+					new ErogenousZone.Part(BP.LeftBreast),
+					new ErogenousZone.Part(BP.RightBreast)
+				});
 
-			genitals_ = new ErogenousZone(person_, new ErogenousZone.Part[]
-			{
-				new ErogenousZone.Part(BP.Labia),
-				new ErogenousZone.Part(BP.Penis)
-			});
+			zones_[SS.Genitals] = new ErogenousZone(
+				person_, SS.Genitals, new ErogenousZone.Part[]
+				{
+					new ErogenousZone.Part(BP.Labia),
+					new ErogenousZone.Part(BP.Penis)
+				});
 		}
 
 		public void Update(float s)
 		{
-			penetration_.Update(s);
-			mouth_.Update(s);
-			breasts_.Update(s);
-			genitals_.Update(s);
-
+			for (int i = 0; i < zones_.Length; ++i)
+			{
+				if (zones_[i] != null)
+					zones_[i].Update(s);
+			}
 
 			int[] ignore = new int[]
 			{
 				BP.Penis, BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina
 			};
 
-			for (int i = 0; i < ignore.Length; ++i)
-				genitals_.IgnoreParts(penetration_, ignore[i]);
+			for (int j = 0; j < zones_[SS.Penetration].Sources.Length; ++j)
+			{
+				bool ignoreAll = false;
+
+				for (int i = 0; i < ignore.Length; ++i)
+				{
+					int targetBodyPart = ignore[i];
+
+					if (zones_[SS.Penetration].Sources[j].IsAnyActiveForTarget(targetBodyPart))
+					{
+						ignoreAll = true;
+						break;
+					}
+				}
+
+				if (ignoreAll)
+				{
+					for (int i = 0; i < ignore.Length; ++i)
+					{
+						zones_[SS.Genitals].Ignore(j, ignore[i]);
+					}
+				}
+			}
 		}
 
 
-		public ErogenousZone Penetration { get { return penetration_; } }
-		public ErogenousZone Mouth { get { return mouth_; } }
-		public ErogenousZone Breasts { get { return breasts_; } }
-		public ErogenousZone Genitals { get { return genitals_; } }
+		public ErogenousZone Zone(int i)
+		{
+			return zones_[i];
+		}
 
 		public bool AnyInsidePersonalSpace()
 		{

@@ -74,6 +74,7 @@ namespace Cue
 		public void Init()
 		{
 			Personality.Init();
+			Excitement.Init();
 			Body.Init();
 			Gaze.Init();
 			Status.Init();

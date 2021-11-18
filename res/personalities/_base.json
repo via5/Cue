@@ -370,7 +370,19 @@
 		{
 			"type": "breasts",
 			"rate": 0.002,
-			"max": 0.4
+			"max": 0.4,
+
+			"modifiers":
+			[
+				{
+					"source": "player",
+					"modifier": 2
+				},
+				{
+					"source": "self",
+					"modifier": 0.5
+				}
+			]
 		},
 
 		{
