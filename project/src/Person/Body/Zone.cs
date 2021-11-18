@@ -4,8 +4,11 @@ namespace Cue
 {
 	public class ErogenousZones
 	{
+		private const float UpdateInterval = 0.5f;
+
 		private Person person_;
 		private ErogenousZone[] zones_ = new ErogenousZone[SS.Count];
+		private float elapsed_ = 0;
 
 		public ErogenousZones(Person p)
 		{
@@ -55,6 +58,12 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			elapsed_ += s;
+			if (elapsed_ < UpdateInterval)
+				return;
+
+			elapsed_ = 0;
+
 			for (int i = 0; i < zones_.Length; ++i)
 			{
 				if (zones_[i] != null)
@@ -306,14 +315,11 @@ namespace Cue
 			}
 		}
 
-		private const float UpdateInterval = 0.5f;
-
 		private Person person_;
 		private int type_;
 		private Part[] parts_;
 		private ErogenousZoneSource[] sources_;
 		private int activeSources_ = 0;
-		private float elapsed_ = 0;
 
 		public ErogenousZone(Person p, int type, Part[] bodyParts)
 		{
@@ -354,28 +360,22 @@ namespace Cue
 		{
 			Decay(s);
 
-			elapsed_ += s;
-			if (elapsed_ >= UpdateInterval)
+			for (int i = 0; i < parts_.Length; ++i)
 			{
-				elapsed_ = 0;
+				var bp = parts_[i];
+				var ts = person_.Body.Get(bp.target).GetTriggers();
 
-				for (int i = 0; i < parts_.Length; ++i)
-				{
-					var bp = parts_[i];
-					var ts = person_.Body.Get(bp.target).GetTriggers();
+				if (ts != null)
+					CheckTriggers(ts, bp.target, bp.source);
+			}
 
-					if (ts != null)
-						CheckTriggers(ts, bp.target, bp.source);
-				}
+			activeSources_ = 0;
+			for (int i = 0; i < sources_.Length; ++i)
+			{
+				sources_[i].Check(person_, type_);
 
-				activeSources_ = 0;
-				for (int i = 0; i < sources_.Length; ++i)
-				{
-					sources_[i].Check(person_, type_);
-
-					if (sources_[i].Active)
-						++activeSources_;
-				}
+				if (sources_[i].Active)
+					++activeSources_;
 			}
 		}
 

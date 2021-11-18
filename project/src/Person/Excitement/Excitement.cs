@@ -13,6 +13,7 @@ namespace Cue
 			public bool active;
 		}
 
+		private const float UpdateInterval = 1.0f;
 
 		private Person person_;
 		private Other[] others_ = null;
@@ -21,6 +22,7 @@ namespace Cue
 		private float subtotalRate_ = 0;
 		private float totalRate_ = 0;
 		private float max_ = 0;
+		private float elapsed_ = 0;
 
 		public Excitement(Person p)
 		{
@@ -66,17 +68,24 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			CheckOthersExcitement();
+			elapsed_ += s;
 
-			physicalRate_.Value = GetPhysicalRate();
-			emotionalRate_.Value = GetEmotionalRate();
-			max_ = GetMaximum();
+			if (elapsed_ >= UpdateInterval)
+			{
+				elapsed_ = 0;
 
-			subtotalRate_ = physicalRate_.Value + emotionalRate_.Value;
-			totalRate_ = subtotalRate_ * person_.Personality.Get(PS.RateAdjustment);
+				CheckOthersExcitement();
 
-			if (totalRate_ == 0)
-				totalRate_ = person_.Personality.Get(PS.ExcitementDecayRate);
+				physicalRate_.Value = GetPhysicalRate();
+				emotionalRate_.Value = GetEmotionalRate();
+				max_ = GetMaximum();
+
+				subtotalRate_ = physicalRate_.Value + emotionalRate_.Value;
+				totalRate_ = subtotalRate_ * person_.Personality.Get(PS.RateAdjustment);
+
+				if (totalRate_ == 0)
+					totalRate_ = person_.Personality.Get(PS.ExcitementDecayRate);
+			}
 		}
 
 		private float GetMaximum()

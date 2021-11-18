@@ -76,6 +76,9 @@ namespace Cue
 
 		public bool InsidePersonalSpace(Person other)
 		{
+			if (other == person_)
+				return false;
+
 			var checkParts = BodyParts.PersonalSpaceParts;
 
 			for (int i = 0; i < checkParts.Length; ++i)
@@ -155,9 +158,20 @@ namespace Cue
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p.Status.PenetratedBy(person_))
+				if (Penetrating(person_))
 					return true;
 			}
+
+			return false;
+		}
+
+		public bool Penetrating(Person p)
+		{
+			if (!body_.HasPenis)
+				return false;
+
+			if (p.Status.PenetratedBy(person_))
+				return true;
 
 			return false;
 		}
@@ -202,8 +216,10 @@ namespace Cue
 			if (p == person_)
 				return false;
 
-			return CheckParts(
-				p, BodyParts.PenetratedParts, BodyParts.PenetratedByParts);
+			if (person_.Body.HasPenis)
+				return false;
+
+			return person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].Active;
 		}
 
 		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)

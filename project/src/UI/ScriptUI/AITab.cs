@@ -29,7 +29,10 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
-		private VUI.Label ps_ = new VUI.Label();
+		private VUI.Label close_ = new VUI.Label();
+		private VUI.Label groped_ = new VUI.Label();
+		private VUI.Label penetrated_ = new VUI.Label();
+		private VUI.Label penetrating_ = new VUI.Label();
 
 		public PersonAIStateTab(Person p)
 			: base("State", false)
@@ -48,8 +51,20 @@ namespace Cue
 			state.Add(new VUI.Label("Traits"));
 			state.Add(traits_);
 
-			state.Add(new VUI.Label("Player close"));
-			state.Add(ps_);
+			state.Add(new VUI.Spacer(20));
+			state.Add(new VUI.Spacer(20));
+
+			state.Add(new VUI.Label("Close"));
+			state.Add(close_);
+
+			state.Add(new VUI.Label("Groped by"));
+			state.Add(groped_);
+
+			state.Add(new VUI.Label("Penetrated by"));
+			state.Add(penetrated_);
+
+			state.Add(new VUI.Label("Penetrating"));
+			state.Add(penetrating_);
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
@@ -73,10 +88,55 @@ namespace Cue
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
 
-			if (person_.IsPlayer)
-				ps_.Text = "(this is the player)";
-			else
-				ps_.Text = person_.Status.InsidePersonalSpace(Cue.Instance.Player) ? "yes" : "no";
+			string close = null, groped = null, penetrated = null, penetrating = null;
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (person_.Status.InsidePersonalSpace(p))
+				{
+					if (close == null)
+						close = "";
+					else
+						close += ", ";
+
+					close += p.ID;
+				}
+
+				if (person_.Status.GropedBy(p))
+				{
+					if (groped == null)
+						groped = "";
+					else
+						groped += ", ";
+
+					groped += p.ID;
+				}
+
+				if (person_.Status.PenetratedBy(p))
+				{
+					if (penetrated == null)
+						penetrated = "";
+					else
+						penetrated += ", ";
+
+					penetrated += p.ID;
+				}
+
+				if (person_.Status.Penetrating(p))
+				{
+					if (penetrating == null)
+						penetrating = "";
+					else
+						penetrating += ", ";
+
+					penetrating += p.ID;
+				}
+			}
+
+			close_.Text = close ?? "nobody";
+			groped_.Text = groped ?? "nobody";
+			penetrated_.Text = penetrated ?? "nobody";
+			penetrating_.Text = penetrating ?? "nobody";
 		}
 	}
 

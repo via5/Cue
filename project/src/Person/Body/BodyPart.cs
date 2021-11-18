@@ -4,14 +4,13 @@ namespace Cue
 {
 	public class BodyPart
 	{
-		private const float TriggerCheckInterval = 1;
-
 		private Person person_;
 		private int type_;
 		private Logger log_;
 		private Sys.IBodyPart part_;
 		private Sys.TriggerInfo[] triggers_ = null;
 		private List<Sys.TriggerInfo> forcedTriggers_ = new List<Sys.TriggerInfo>();
+		private float triggerCheckInterval_;
 		private float updateTriggersElapsed_ = 0;
 		private BodyPartLocker locker_;
 		private bool staleTriggers_ = true;
@@ -25,6 +24,7 @@ namespace Cue
 			log_ = new Logger(Logger.Object, p, $"body.{BP.ToString(type)}");
 			part_ = part;
 			locker_ = new BodyPartLocker(this);
+			triggerCheckInterval_ = U.RandomFloat(0.9f, 1.1f);
 		}
 
 		public bool Render
@@ -119,7 +119,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			updateTriggersElapsed_ += s;
-			if (updateTriggersElapsed_ >= TriggerCheckInterval)
+			if (updateTriggersElapsed_ >= triggerCheckInterval_)
 				staleTriggers_ = true;
 		}
 
