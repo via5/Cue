@@ -105,9 +105,10 @@ namespace Cue
 				if (ts[j].sourcePartIndex == BP.Penis)
 					fromPenisValue_ += ts[j].value;
 
-				float mod = ps.GetSpecificModifier(
-					ts[j].personIndex, ts[j].sourcePartIndex,
-					p.PersonIndex, bodyPart_);
+				float mod = 1;
+				//ps.GetSpecificModifier(
+				//	ts[j].personIndex, ts[j].sourcePartIndex,
+				//	p.PersonIndex, bodyPart_);
 
 				value_ += ts[j].value;
 				specificModifier_ += mod;

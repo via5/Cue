@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Cue
-{
+{/*
 	interface IExcitementReason
 	{
 		string Name { get; }
@@ -355,5 +355,5 @@ namespace Cue
 		{
 			return null;
 		}
-	}
+	}*/
 }

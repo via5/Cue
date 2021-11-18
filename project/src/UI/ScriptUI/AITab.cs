@@ -210,10 +210,17 @@ namespace Cue
 			var ps = person_.Personality;
 			var exps = new List<string[]>();
 
-			for (int i = 0; i < ps.SpecificModifiers.Length; ++i)
+			for (int i = 0; i < SS.Count; ++i)
 			{
-				var sm = ps.SpecificModifiers[i];
-				exps.Add(new string[] { sm.ToString(), "" });
+				var ss = ps.Sensitivities.Get(i);
+				exps.Add(new string[]
+				{
+					SS.ToString(ss.Type),
+					$"rate={ss.Rate:0.00000} max={ss.Maximum:0.00}"
+				});
+
+				foreach (var m in ss.Modifiers)
+					exps.Add(new string[] { $"    {m}", "" });
 			}
 
 			var v = ps.Voice;

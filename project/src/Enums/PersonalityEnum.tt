@@ -328,19 +328,6 @@ V.Float("LookAtPlayerTimeAfterGrab"),
 // ==========
 // Controls excitement values
 
-// the sum of all the excitement rates (not values) of all other characters in
-// the scene is multiplied by this number; the result is added to the rate at
-// which this character's excitement is going up
-//
-// this is used to increase the excitement of a character if other characters
-// are getting excited
-V.Float("OtherSexExcitementRateFactor"),
-
-// the highest excitement a character can reach using only the excitement of
-// other characters; this avoids orgasms just by looking at people, see also
-// LookAboveMinExcitement
-V.Float("MaxOtherSexExcitement", new Limit(0, 1)),
-
 // effect of energy on kiss movements; depends on the integration plugin, a
 // value of 1.0 should make morph movements faster as energy goes up
 V.Float("KissSpeedEnergyFactor"),
@@ -578,53 +565,6 @@ V.Float("NeutralVoicePitch"),
 //
 // clamped between [0, mouthMax]. Both `lipsTrigger` and `mouthTrigger` can be
 // either 0 or 1 depending on whether the trigger is active in VaM.
-
-
-// rate at which excitement goes up when the lips or mouth are being
-// triggered
-V.Float("MouthRate"),
-
-// maximum excitement value when the mouth is being triggered
-V.Float("MouthMax"),
-
-// how much the lips and mouth contribute to mouthRate
-V.Float("LipsFactor"),
-V.Float("MouthFactor"),
-
-
-// rate at which excitement goes up when the breasts are being triggered
-V.Float("BreastsRate"),
-
-// maximum excitement value when the breasts are being triggered
-V.Float("BreastsMax"),
-
-// how much the left and right breasts contribute to breastsRate
-V.Float("LeftBreastFactor"),
-V.Float("RightBreastFactor"),
-
-// rate at which excitement goes up when the genitals are being triggered
-V.Float("GenitalsRate"),
-
-// maximum excitement value when the genitals are being triggered
-V.Float("GenitalsMax"),
-
-// how much the labia contributes to genitalsRate; since the labia trigger is
-// the only one used for genitals, this should be 1.0
-V.Float("LabiaFactor"),
-
-
-// rate at which excitement goes up when penetrated
-V.Float("PenetrationRate"),
-
-// maximum excitement value when penetrated
-V.Float("PenetrationMax"),
-
-// how much the three triggers inside the vagina contribute to
-// penetrationRate; note that the latter two are difficult to trigger
-// normally in VaM
-V.Float("VaginaFactor"),
-V.Float("DeepVaginaFactor"),
-V.Float("DeeperVaginaFactor"),
 
 
 // rate at which excitement decreases when there is no stimulation of any

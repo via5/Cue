@@ -39,6 +39,7 @@ project\src\Enums\BodyPartsEnum.cs
 project\src\Enums\EnumValues.cs
 project\src\Enums\Moods.cs
 project\src\Enums\PersonalityEnum.cs
+project\src\Enums\Sensitivities.cs
 project\src\Integration\ClothingManager.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs

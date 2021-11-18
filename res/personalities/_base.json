@@ -343,28 +343,6 @@
 	"neutralVoicePitch": 0.5,
 	"voicePitch": -1,
 
-	"mouthRate": 0.001,
-	"mouthMax": 0.3,
-	"lipsFactor": 0.1,
-	"mouthFactor": 0.9,
-
-	"breastsRate": 0.002,
-	"breastsMax": 0.4,
-	"leftBreastFactor": 0.5,
-	"rightBreastFactor": 0.5,
-
-	"genitalsRate": 0.004,
-	"genitalsMax": 1.0,
-	"labiaFactor": 1.0,
-
-	"penetrationRate": 0.003,
-	"penetrationMax": 1.0,
-	"vaginaFactor": 1,
-	"deepVaginaFactor": 1,
-	"deeperVaginaFactor": 1,
-
-	"otherSexExcitementRateFactor": 0.3,
-	"maxOtherSexExcitement": 0.3,
 	"idleMaxExcitement": 0,
 
 	"excitementDecayRate": -0.01,
@@ -374,34 +352,50 @@
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 
-	"specificModifiers":
+
+	"sensitivities":
 	[
 		{
-			"source": "player",
-			"sourceBodyPart": "leftHand",
-			"targetBodyPart": "labia",
-			"modifier": 2
+			"type": "penetration",
+			"rate": 0.003,
+			"max": 1.0
 		},
 
 		{
-			"source": "player",
-			"sourceBodyPart": "rightHand",
-			"targetBodyPart": "labia",
-			"modifier": 2
+			"type": "mouth",
+			"rate": 0.001,
+			"max": 0.3
+		}
+
+		{
+			"type": "breasts",
+			"rate": 0.002,
+			"max": 0.4
 		},
 
 		{
-			"source": "self",
-			"sourceBodyPart": "leftHand",
-			"targetBodyPart": "labia",
-			"modifier": 0.5
+			"type": "genitals",
+			"rate": 0.004,
+			"max": 1.0,
+
+			"modifiers":
+			[
+				{
+					"source": "player",
+					"sourceBodyPart": "leftHand rightHand",
+					"modifier": 2
+				},
+				{
+					"source": "self",
+					"modifier": 0.5
+				}
+			]
 		},
 
 		{
-			"source": "self",
-			"sourceBodyPart": "rightHand",
-			"targetBodyPart": "labia",
-			"modifier": 0.5
+			"type": "othersExcitement",
+			"rate": 0.3,
+			"max": 0.3
 		}
 	]
 }

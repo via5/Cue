@@ -7,7 +7,6 @@ namespace Cue
 	{
 		private Person person_;
 		private ExcitementBodyPart[] parts_ = new ExcitementBodyPart[BP.Count];
-		private IExcitementReason[] reasons_;
 		private ForceableFloat physicalRate_ = new ForceableFloat();
 		private ForceableFloat emotionalRate_ = new ForceableFloat();
 		private float subtotalRate_ = 0;
@@ -20,42 +19,6 @@ namespace Cue
 
 			for (int i = 0; i < parts_.Length; ++i)
 				parts_[i] = new ExcitementBodyPart(i);
-
-			var rs = new List<IExcitementReason>();
-
-			// penetration must be first, it's used by the other reasons to
-			// check for the damper
-			rs.Add(new BodyPartExcitementReason(
-				"penetration", new BodyPartExcitementReason.Source[]
-				{
-					new BodyPartExcitementReason.Source(BP.Vagina, PS.VaginaFactor),
-					new BodyPartExcitementReason.Source(BP.DeepVagina, PS.DeepVaginaFactor),
-					new BodyPartExcitementReason.Source(BP.DeeperVagina, PS.DeeperVaginaFactor)
-				}, PS.PenetrationRate, PS.PenetrationMax, false, false));
-
-			rs.Add(new BodyPartExcitementReason(
-				"mouth", new BodyPartExcitementReason.Source[]
-				{
-					new BodyPartExcitementReason.Source(BP.Lips, PS.LipsFactor),
-					new BodyPartExcitementReason.Source(BP.Mouth, PS.MouthFactor)
-				}, PS.MouthRate, PS.MouthMax, false, true));
-
-			rs.Add(new BodyPartExcitementReason(
-				"breasts", new BodyPartExcitementReason.Source[]
-				{
-					new BodyPartExcitementReason.Source(BP.LeftBreast, PS.LeftBreastFactor),
-					new BodyPartExcitementReason.Source(BP.RightBreast, PS.RightBreastFactor)
-				}, PS.BreastsRate, PS.BreastsMax, false, true));
-
-			rs.Add(new BodyPartExcitementReason(
-				"genitals", new BodyPartExcitementReason.Source[]
-				{
-					new BodyPartExcitementReason.Source(BP.Labia, PS.LabiaFactor)
-				}, PS.GenitalsRate, PS.GenitalsMax, true, true));
-
-			rs.Add(new OtherSexExcitementReason());
-
-			reasons_ = rs.ToArray();
 		}
 
 		public float Max
@@ -104,13 +67,7 @@ namespace Cue
 			}
 		}
 
-		private void UpdateReasonValues(float s)
-		{
-			for (int i = 0; i < reasons_.Length; ++i)
-				reasons_[i].UpdateValue(person_, parts_);
-		}
-
-		private void UpdateReasonRates(float s)
+/*		private void UpdateReasonRates(float s)
 		{
 			var ps = person_.Personality;
 
@@ -141,7 +98,7 @@ namespace Cue
 			if (totalRate_ == 0)
 				totalRate_ = ps.Get(PS.ExcitementDecayRate);
 		}
-
+*/
 		private string DebugMakeSource(Source src, int part)
 		{
 			string s = $"  {src} ";
@@ -168,7 +125,22 @@ namespace Cue
 		{
 			var srcs = z.Sources;
 
-			debug.Add($"  active sources: {z.ActiveSources}");
+			string sources = "";
+			for (int i = 0; i < z.Sources.Length; ++i)
+			{
+				if (z.Sources[i].ActiveCount > 0)
+				{
+					if (sources != "")
+						sources += ", ";
+
+					sources += z.Sources[i].ToString();
+				}
+			}
+
+			if (sources == "")
+				sources = "none";
+
+			debug.Add($"  active sources: {sources}");
 
 			for (int i = 0; i < srcs.Length; ++i)
 			{
@@ -201,7 +173,7 @@ namespace Cue
 			debug.Add($"genitals:");
 			DebugZone(person_.Status.Genitals, debug);
 
-
+			/*
 			var ps = person_.Personality;
 			debug.Add("");
 			debug.Add("");
@@ -245,15 +217,15 @@ namespace Cue
 					$"max={r.MaximumExcitement} ";
 
 				debug.Add(s);
-			}
+			}*/
 
 			debug.Add("total rates:");
 			debug.Add($"  physical: {physicalRate_.Value:0.00000}");
 			debug.Add($"  emotional: {emotionalRate_.Value:0.00000}");
 			debug.Add($"  subtotal: {subtotalRate_:0.00000}");
 
-			if (ps.Get(PS.RateAdjustment) != 1)
-				debug.Add($"  rate adjustement: {ps.Get(PS.RateAdjustment)}");
+			//if (ps.Get(PS.RateAdjustment) != 1)
+			//	debug.Add($"  rate adjustement: {ps.Get(PS.RateAdjustment)}");
 
 			if (totalRate_ < 0)
 				debug.Add($"  total: {totalRate_:0.00000} (decaying)");

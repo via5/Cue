@@ -117,7 +117,7 @@ namespace Cue
 
 			Resources.LoadEnumValues(p, o, inherited);
 			ParseVoice(p.Voice, o, inherited);
-			ParseSpecificModifiers(p, o);
+			ParseSensitivities(p.Sensitivities, o, inherited);
 
 
 			if (o.HasKey("expressions"))
@@ -199,50 +199,84 @@ namespace Cue
 			v.Set(dss, orgasmDs);
 		}
 
-		private void ParseSpecificModifiers(Personality p, JSONClass o)
+		private void ParseSensitivities(Sensitivities ss, JSONClass o, bool inherited)
 		{
-			if (o.HasKey("specificModifiers"))
+			if (o.HasKey("sensitivities"))
 			{
-				var sms = new List<SpecificModifier>();
+				var a = new Sensitivity[SS.Count];
 
-				foreach (JSONClass smn in o.AsObject["specificModifiers"].AsArray.Childs)
+				foreach (var c in o["sensitivities"].AsArray.Childs)
 				{
-					var m = ParseSpecificModifier(p, smn);
-					if (m != null)
-						sms.Add(m);
+					var s = ParseSensitivity(c.AsObject);
+					if (s == null)
+						continue;
+
+					a[s.Type] = s;
 				}
 
-				p.SetSpecificModifiers(sms.ToArray());
+				for (int i = 0; i < a.Length; ++i)
+				{
+					if (a[i] == null)
+					{
+						throw new LoadFailed(
+							$"missing sensitivity " +
+							$"{SS.ToString(i)}");
+					}
+				}
+
+				ss.Set(a);
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing sensitivities");
 			}
 		}
 
-		private SpecificModifier ParseSpecificModifier(Personality p, JSONClass o)
+		private Sensitivity ParseSensitivity(JSONClass o)
+		{
+			var typeName = o["type"].Value;
+			var type = SS.FromString(typeName);
+			if (type == SS.None)
+			{
+				Log.Error($"bad sensitivity type {typeName}");
+				return null;
+			}
+
+			var rate = J.ReqFloat(o, "rate");
+			var max = J.OptFloat(o, "max", 1.0f);
+			var mods = new List<SensitivityModifier>();
+
+			if (o.HasKey("modifiers"))
+			{
+				foreach (var c in o["modifiers"].AsArray.Childs)
+				{
+					var ms = ParseSensitivityModifier(c.AsObject);
+					if (ms != null)
+					{
+						foreach (var m in ms)
+							mods.Add(m);
+					}
+				}
+			}
+
+			return new Sensitivity(type, rate, max, mods.ToArray());
+		}
+
+		private SensitivityModifier[] ParseSensitivityModifier(JSONClass o)
 		{
 			var source = J.OptString(o, "source");
-			var sourcePartName = J.ReqString(o, "sourceBodyPart");
-
-			var target = J.OptString(o, "target");
-			var targetPartName = J.ReqString(o, "targetBodyPart");
-
-			int sourceBodyPart = BP.FromString(sourcePartName);
-			int targetBodyPart = BP.FromString(targetPartName);
-
-			if (sourceBodyPart == BP.None && sourcePartName != "")
-			{
-				Log.Error($"{p}: bad sourceBodyPart {sourcePartName}");
-				return null;
-			}
-
-			if (targetBodyPart == BP.None && targetPartName != "")
-			{
-				Log.Error($"{p}: bad targetBodyPart {targetPartName}");
-				return null;
-			}
-
+			var sourcePartName = J.OptString(o, "sourceBodyPart");
+			int[] sourceBodyParts = BP.FromStringMany(sourcePartName);
 			float modifier = J.ReqFloat(o, "modifier");
 
-			return new SpecificModifier(
-				source, sourceBodyPart, target, targetBodyPart, modifier);
+			if (sourcePartName == "")
+				sourceBodyParts= new int[] { BP.None };
+
+			var list = new List<SensitivityModifier>();
+			foreach (var bp in sourceBodyParts)
+				list.Add(new SensitivityModifier(source, bp, modifier));
+
+			return list.ToArray();
 		}
 
 		private void Add(Personality p, bool abst)

@@ -145,6 +145,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Moods.tt</DependentUpon>
     </Compile>
+    <Compile Include="src\Enums\Sensitivities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Sensitivities.tt</DependentUpon>
+    </Compile>
     <Compile Include="src\Instrumentation.cs" />
     <Compile Include="src\Integration\ClothingManager.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
@@ -272,6 +277,10 @@
     <Content Include="src\Enums\Moods.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Moods.cs</LastGenOutput>
+    </Content>
+    <Content Include="src\Enums\Sensitivities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Sensitivities.cs</LastGenOutput>
     </Content>
     <Content Include="src\Utilities\Easings.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

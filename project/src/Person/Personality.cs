@@ -67,18 +67,13 @@ namespace Cue
 		}
 
 
-		private Person person_;
+		private Person person_ = null;
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
 		private Dataset orgasm_ = new Dataset("", -1);
 		private Dataset dummy_ = new Dataset("", -1);
 		private bool warned_ = false;
 		private float forcedPitch_ = -1;
 
-
-		public Voice(Person p)
-		{
-			person_ = p;
-		}
 
 		public Logger Log
 		{
@@ -94,8 +89,17 @@ namespace Cue
 				orgasm_ = orgasm;
 		}
 
-		public void CopyFrom(Voice v)
+		public Voice Clone(Person p)
 		{
+			var v = new Voice();
+			v.CopyFrom(this, p);
+			return v;
+		}
+
+		private void CopyFrom(Voice v, Person p)
+		{
+			person_ = p;
+
 			datasets_ = new DatasetForIntensity[v.datasets_.Length];
 			for (int i = 0; i < datasets_.Length; ++i)
 				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
@@ -161,34 +165,30 @@ namespace Cue
 	}
 
 
-	public class SpecificModifier
+	public class SensitivityModifier
 	{
 		public const int Unresolved = -1;
 		public const int Any = -2;
 		public const int Player = -3;
 		public const int Self = -4;
 
-		private string source_;
+		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
 		private int sourceBodyPart_;
-
-		private string target_;
-		private int targetIndex_ = Unresolved;
-		private int targetBodyPart_;
-
 		private float modifier_;
 
-
-		public SpecificModifier(
-			string source, int sourceBodyPart,
-			string target, int targetBodyPart,
-			float modifier)
+		public SensitivityModifier(
+			string source, int sourceBodyPart, float modifier)
 		{
-			source_ = source;
+			sourceName_ = source;
 			sourceBodyPart_ = sourceBodyPart;
-			target_ = target;
-			targetBodyPart_ = targetBodyPart;
 			modifier_ = modifier;
+		}
+
+		public SensitivityModifier Clone()
+		{
+			return new SensitivityModifier(
+				sourceName_, sourceBodyPart_, modifier_);
 		}
 
 		public float Modifier
@@ -196,16 +196,14 @@ namespace Cue
 			get { return modifier_; }
 		}
 
-		public SpecificModifier Clone()
+		public void Resolve()
 		{
-			return new SpecificModifier(
-				source_, sourceBodyPart_, target_, targetBodyPart_, modifier_);
+			if (sourceIndex_ == Unresolved)
+				sourceIndex_ = Resolve(sourceName_);
 		}
 
 		public bool AppliesTo(
-			Person self,
-			int sourcePersonIndex, int sourceBodyPart,
-			int targetPersonIndex, int targetBodyPart)
+			Person self, int sourcePersonIndex, int sourceBodyPart)
 		{
 			if (sourceIndex_ == Player)
 			{
@@ -224,47 +222,11 @@ namespace Cue
 			}
 
 
-			if (targetIndex_ == Player)
-			{
-				if (targetPersonIndex != Cue.Instance.Player.PersonIndex)
-					return false;
-			}
-			else if (targetIndex_ == Self)
-			{
-				if (targetPersonIndex != self.PersonIndex)
-					return false;
-			}
-			else if (targetIndex_ != Any)
-			{
-				if (targetIndex_ != targetPersonIndex)
-					return false;
-			}
-
-
 			if (sourceBodyPart_ != BP.None && sourceBodyPart_ != sourceBodyPart)
-				return false;
-
-			if (targetBodyPart_ != BP.None && targetBodyPart_ != targetBodyPart)
 				return false;
 
 
 			return true;
-		}
-
-		public override string ToString()
-		{
-			return
-				$"{ToString(sourceIndex_, sourceBodyPart_)}=>" +
-				$"{ToString(targetIndex_, targetBodyPart_)}    {modifier_}";
-		}
-
-		public void Resolve()
-		{
-			if (sourceIndex_ == Unresolved)
-				sourceIndex_ = Resolve(source_);
-
-			if (targetIndex_ == Unresolved)
-				targetIndex_ = Resolve(target_);
 		}
 
 		private int Resolve(string s)
@@ -284,6 +246,11 @@ namespace Cue
 			}
 
 			return p.PersonIndex;
+		}
+
+		public override string ToString()
+		{
+			return $"{ToString(sourceIndex_, sourceBodyPart_)} {modifier_}";
 		}
 
 		private string ToString(int index, int bodyPart)
@@ -314,59 +281,179 @@ namespace Cue
 	}
 
 
+	public class Sensitivity
+	{
+		private int type_;
+		private float rate_;
+		private float max_;
+		private SensitivityModifier[] modifiers_ = new SensitivityModifier[0];
+
+
+		public Sensitivity(int type, float rate, float max, SensitivityModifier[] mods)
+		{
+			type_ = type;
+			rate_ = rate;
+			max_ = max;
+			modifiers_ = mods ?? new SensitivityModifier[0];
+		}
+
+		public int Type
+		{
+			get { return type_; }
+		}
+
+		public float Rate
+		{
+			get { return rate_; }
+		}
+
+		public float Maximum
+		{
+			get { return max_; }
+		}
+
+		public SensitivityModifier[] Modifiers
+		{
+			get { return modifiers_; }
+		}
+
+		public Sensitivity Clone()
+		{
+			var s = new Sensitivity(type_, rate_, max_, null);
+			s.CopyFrom(this);
+			return s;
+		}
+
+		private void CopyFrom(Sensitivity s)
+		{
+			modifiers_ = new SensitivityModifier[s.modifiers_.Length];
+			for (int i = 0; i < modifiers_.Length; ++i)
+				modifiers_[i] = s.modifiers_[i].Clone();
+		}
+
+		public void Init()
+		{
+			for (int i = 0; i < modifiers_.Length; ++i)
+				modifiers_[i].Resolve();
+		}
+
+		public float GetModifier(
+			Person self, int sourcePersonIndex, int sourceBodyPart)
+		{
+			for (int i = 0; i < modifiers_.Length; ++i)
+			{
+				var m = modifiers_[i];
+
+				if (m.AppliesTo(self, sourcePersonIndex, sourceBodyPart))
+					return m.Modifier;
+			}
+
+			return 0;
+		}
+
+		public override string ToString()
+		{
+			return $"{SS.ToString(type_)} rate={rate_:0.00000} max={max_:0.00}";
+		}
+	}
+
+
+	public class Sensitivities
+	{
+		private Person person_ = null;
+		private Sensitivity[] s_ = new Sensitivity[SS.Count];
+
+		public Sensitivities()
+		{
+			for (int i = 0; i < s_.Length; ++i)
+				s_[i] = new Sensitivity(i, 0, 0, null);
+		}
+
+		public Sensitivities Clone(Person p)
+		{
+			var s = new Sensitivities();
+			s.CopyFrom(this, p);
+			return s;
+		}
+
+		private void CopyFrom(Sensitivities s, Person p)
+		{
+			person_ = p;
+			for (int i = 0; i < s_.Length; ++i)
+				s_[i] = s.s_[i].Clone();
+		}
+
+		public void Init()
+		{
+			for (int i = 0; i < s_.Length; ++i)
+				s_[i].Init();
+		}
+
+		public void Set(Sensitivity[] ss)
+		{
+			s_ = ss;
+		}
+
+		public float GetModifier(
+			int type, int sourcePersonIndex, int sourceBodyPart)
+		{
+			return Get(type).GetModifier(
+				person_, sourcePersonIndex, sourceBodyPart);
+		}
+
+		public Sensitivity Get(int type)
+		{
+			return s_[type];
+		}
+	}
+
+
 	public class Personality : EnumValueManager
 	{
 		private readonly string name_;
-		private Person person_;
+		private Person person_ = null;
 
 		private Voice voice_;
 		private Expression[] exps_ = new Expression[0];
-		private SpecificModifier[] specificModifiers_ = new SpecificModifier[0];
+		private Sensitivities sensitivities_;
 
-		public Personality(string name, Person p = null)
+		public Personality(string name)
 			: base(new PS())
 		{
-			voice_ = new Voice(p);
 			name_ = name;
-			person_ = p;
+			voice_ = new Voice();
+			sensitivities_ = new Sensitivities();
 		}
 
 		public Personality Clone(string newName, Person p)
 		{
-			var ps = new Personality(newName ?? name_, p);
-			ps.CopyFrom(this);
+			var ps = new Personality(newName ?? name_);
+			ps.CopyFrom(this, p);
 			return ps;
 		}
 
-		private void CopyFrom(Personality ps)
+		private void CopyFrom(Personality ps, Person p)
 		{
 			base.CopyFrom(ps);
+
+			person_ = p;
 
 			exps_ = new Expression[ps.exps_.Length];
 			for (int i = 0; i < ps.exps_.Length; i++)
 				exps_[i] = ps.exps_[i].Clone();
 
-			voice_.CopyFrom(ps.voice_);
-
-			specificModifiers_ = new SpecificModifier[ps.specificModifiers_.Length];
-			for (int i = 0; i < ps.specificModifiers_.Length; ++i)
-				specificModifiers_[i] = ps.specificModifiers_[i].Clone();
+			voice_ = ps.voice_.Clone(person_);
+			sensitivities_ = ps.sensitivities_.Clone(person_);
 		}
 
 		public void Init()
 		{
-			for (int i = 0; i < specificModifiers_.Length; ++i)
-				specificModifiers_[i].Resolve();
+			sensitivities_.Init();
 		}
 
 		public void SetExpressions(Expression[] exps)
 		{
 			exps_ = exps;
-		}
-
-		public void SetSpecificModifiers(SpecificModifier[] sms)
-		{
-			specificModifiers_ = sms;
 		}
 
 		public void Load(JSONClass o)
@@ -407,36 +494,16 @@ namespace Cue
 			get { return voice_; }
 		}
 
+		public Sensitivities Sensitivities
+		{
+			get { return sensitivities_; }
+		}
+
 		public Expression[] GetExpressions()
 		{
 			var e = new Expression[exps_.Length];
 			exps_.CopyTo(e, 0);
 			return e;
-		}
-
-		public float GetSpecificModifier(
-			int sourcePersonIndex, int sourceBodyPart,
-			int targetPersonIndex, int targetBodyPart)
-		{
-			for (int i = 0; i < specificModifiers_.Length; ++i)
-			{
-				var sm = specificModifiers_[i];
-
-				if (sm.AppliesTo(
-						person_,
-						sourcePersonIndex, sourceBodyPart,
-						targetPersonIndex, targetBodyPart))
-				{
-					return sm.Modifier;
-				}
-			}
-
-			return 0;
-		}
-
-		public SpecificModifier[] SpecificModifiers
-		{
-			get { return specificModifiers_; }
 		}
 
 		public override string ToString()
