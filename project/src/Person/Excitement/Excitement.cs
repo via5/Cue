@@ -72,9 +72,6 @@ namespace Cue
 			emotionalRate_.Value = GetEmotionalRate();
 			max_ = GetMaximum();
 
-			// todo
-			bool isPenetrated = person_.Status.Zone(SS.Penetration).Active;
-
 			subtotalRate_ = physicalRate_.Value + emotionalRate_.Value;
 			totalRate_ = subtotalRate_ * person_.Personality.Get(PS.RateAdjustment);
 
@@ -111,6 +108,10 @@ namespace Cue
 		{
 			float rate = 0;
 
+			float dampen = 1;
+			if (person_.Status.Zone(SS.Penetration).Active)
+				dampen = person_.Personality.Get(PS.PenetrationDamper);
+
 			for (int i = 0; i < SS.Count; ++i)
 			{
 				var z = person_.Status.Zone(i);
@@ -122,7 +123,14 @@ namespace Cue
 					var src = z.Sources[j];
 
 					if (src.Active && (person_.Mood.Get(Moods.Excited) <= src.Maximum))
-						rate += src.Rate * src.Modifier;
+					{
+						float thisRate = src.Rate * src.Modifier;
+
+						if (i != SS.Penetration)
+							thisRate *= dampen;
+
+						rate += thisRate;
+					}
 				}
 			}
 
@@ -253,16 +261,20 @@ namespace Cue
 		{
 			var debug = new List<string>();
 
+			string damp = "";
+			if (person_.Status.Zone(SS.Penetration).Active)
+				damp = $" (dampened, mod={person_.Personality.Get(PS.PenetrationDamper)})";
+
 			debug.Add($"penetration:");
 			DebugZone(SS.Penetration, debug);
 
-			debug.Add($"mouth:");
+			debug.Add($"mouth:{damp}");
 			DebugZone(SS.Mouth, debug);
 
-			debug.Add($"breasts:");
+			debug.Add($"breasts:{damp}");
 			DebugZone(SS.Breasts, debug);
 
-			debug.Add($"genitals:");
+			debug.Add($"genitals:{damp}");
 			DebugZone(SS.Genitals, debug);
 
 			debug.Add($"others excitement:");
@@ -282,10 +294,12 @@ namespace Cue
 			debug.Add($"  max: {max_:0.00000}");
 			debug.Add($"  physical: {physicalRate_.Value:0.00000}");
 			debug.Add($"  emotional: {emotionalRate_.Value:0.00000}");
-			debug.Add($"  subtotal: {subtotalRate_:0.00000}");
 
-			//if (ps.Get(PS.RateAdjustment) != 1)
-			//	debug.Add($"  rate adjustement: {ps.Get(PS.RateAdjustment)}");
+			if (subtotalRate_ != totalRate_)
+				debug.Add($"  subtotal: {subtotalRate_:0.00000}");
+
+			if (person_.Personality.Get(PS.RateAdjustment) != 1)
+				debug.Add($"  rate adjustement: {person_.Personality.Get(PS.RateAdjustment)}");
 
 			if (totalRate_ < 0)
 				debug.Add($"  total: {totalRate_:0.00000} (decaying)");
