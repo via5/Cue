@@ -174,21 +174,17 @@ namespace Cue
 
 		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
-		private int sourceBodyPart_;
 		private float modifier_;
 
-		public SensitivityModifier(
-			string source, int sourceBodyPart, float modifier)
+		public SensitivityModifier(string source, float modifier)
 		{
 			sourceName_ = source;
-			sourceBodyPart_ = sourceBodyPart;
 			modifier_ = modifier;
 		}
 
 		public SensitivityModifier Clone()
 		{
-			return new SensitivityModifier(
-				sourceName_, sourceBodyPart_, modifier_);
+			return new SensitivityModifier(sourceName_, modifier_);
 		}
 
 		public float Modifier
@@ -202,8 +198,7 @@ namespace Cue
 				sourceIndex_ = Resolve(sourceName_);
 		}
 
-		public bool AppliesTo(
-			Person self, int sourcePersonIndex, int sourceBodyPart)
+		public bool AppliesTo(Person self, int sourcePersonIndex)
 		{
 			if (sourceIndex_ == Player)
 			{
@@ -220,11 +215,6 @@ namespace Cue
 				if (sourceIndex_ != sourcePersonIndex)
 					return false;
 			}
-
-
-			if (sourceBodyPart_ != BP.None && sourceBodyPart_ != sourceBodyPart)
-				return false;
-
 
 			return true;
 		}
@@ -250,19 +240,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{ToString(sourceIndex_, sourceBodyPart_)} {modifier_}";
-		}
-
-		private string ToString(int index, int bodyPart)
-		{
-			string s = IndexToString(index) + ".";
-
-			if (bodyPart == BP.None)
-				s += "any";
-			else
-				s += BP.ToString(bodyPart);
-
-			return s;
+			return $"{IndexToString(sourceIndex_)} {modifier_}";
 		}
 
 		private string IndexToString(int i)
@@ -337,18 +315,17 @@ namespace Cue
 				modifiers_[i].Resolve();
 		}
 
-		public float GetModifier(
-			Person self, int sourcePersonIndex, int sourceBodyPart)
+		public float GetModifier(Person self, int sourcePersonIndex)
 		{
 			for (int i = 0; i < modifiers_.Length; ++i)
 			{
 				var m = modifiers_[i];
 
-				if (m.AppliesTo(self, sourcePersonIndex, sourceBodyPart))
+				if (m.AppliesTo(self, sourcePersonIndex))
 					return m.Modifier;
 			}
 
-			return 0;
+			return 1;
 		}
 
 		public override string ToString()
@@ -392,13 +369,6 @@ namespace Cue
 		public void Set(Sensitivity[] ss)
 		{
 			s_ = ss;
-		}
-
-		public float GetModifier(
-			int type, int sourcePersonIndex, int sourceBodyPart)
-		{
-			return Get(type).GetModifier(
-				person_, sourcePersonIndex, sourceBodyPart);
 		}
 
 		public Sensitivity Get(int type)

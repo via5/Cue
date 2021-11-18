@@ -31,9 +31,14 @@ namespace Cue
 				parts_[i] = new Part(i);
 		}
 
-		public int ActiveCount
+		public int PersonIndex
 		{
-			get { return validActive_; }
+			get { return personIndex_; }
+		}
+
+		public bool Active
+		{
+			get { return (validActive_ > 0); }
 		}
 
 		public int StrictlyActiveCount
@@ -229,7 +234,7 @@ namespace Cue
 				activeSources_ = 0;
 				for (int i = 0; i < sources_.Length; ++i)
 				{
-					if (sources_[i].ActiveCount > 0)
+					if (sources_[i].Active)
 						++activeSources_;
 				}
 			}
@@ -241,10 +246,10 @@ namespace Cue
 			{
 				if (penZone.Sources[i].IsAnyActiveForTarget(targetBodyPart))
 				{
-					bool wasActive = (sources_[i].ActiveCount > 0);
+					bool wasActive = sources_[i].Active;
 					sources_[i].IgnoreTarget(targetBodyPart);
 
-					if (wasActive && sources_[i].ActiveCount == 0)
+					if (wasActive && !sources_[i].Active)
 						--activeSources_;
 				}
 			}
@@ -257,7 +262,7 @@ namespace Cue
 			for (int i = 0; i < sources_.Length;++i)
 			{
 				sources_[i].Decay(s);
-				if (sources_[i].ActiveCount > 0)
+				if (sources_[i].Active)
 					++activeSources_;
 			}
 		}

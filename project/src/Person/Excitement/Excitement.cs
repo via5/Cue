@@ -6,7 +6,6 @@ namespace Cue
 	public class Excitement
 	{
 		private Person person_;
-		private ExcitementBodyPart[] parts_ = new ExcitementBodyPart[BP.Count];
 		private ForceableFloat physicalRate_ = new ForceableFloat();
 		private ForceableFloat emotionalRate_ = new ForceableFloat();
 		private float subtotalRate_ = 0;
@@ -16,9 +15,6 @@ namespace Cue
 		public Excitement(Person p)
 		{
 			person_ = p;
-
-			for (int i = 0; i < parts_.Length; ++i)
-				parts_[i] = new ExcitementBodyPart(i);
 		}
 
 		public float Max
@@ -53,17 +49,63 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			//UpdateParts(s);
-			//UpdateReasonValues(s);
-			//UpdateReasonRates(s);
+			physicalRate_.Value = 0;
+			max_ = 0;
+
+			CheckRate(person_.Status.Penetration, SS.Penetration);
+			CheckRate(person_.Status.Mouth, SS.Mouth);
+			CheckRate(person_.Status.Breasts, SS.Breasts);
+			CheckRate(person_.Status.Genitals, SS.Genitals);
 		}
 
-		private void UpdateParts(float s)
+		/*
+	class OtherSexExcitementReason : BasicExcitementReason
+	{
+		public OtherSexExcitementReason()
+			: base("otherSex", PS.OtherSexExcitementRateFactor, PS.MaxOtherSexExcitement, false)
 		{
-			for (int i = 0; i < BP.Count; ++i)
+		}
+
+		protected override void DoUpdateValue(Person p, ExcitementBodyPart[] parts)
+		{
+			value_ = 0;
+			specificSensitivityModifier_ = 1;
+
+			foreach (var op in Cue.Instance.ActivePersons)
 			{
-				var ts = person_.Body.Get(i).GetTriggers();
-				parts_[i].Update(s, person_, ts);
+				if (op == p || op.Status.PenetratedBy(p) || p.Status.PenetratedBy(op))
+					continue;
+
+				// todo, missing in debug
+				//if (op.Excitement.physicalRate_.Value > 0)
+				//	debug_.Add($"  other physical: {p.ID}@{p.Excitement.physicalRate_.Value}");
+
+				value_ += op.Excitement.PhysicalRate;
+			}
+		}
+
+		protected override void DoUpdateRate(Person p, bool isPenetrated)
+		{
+			// no-op
+		}
+
+		protected override string DoDebug(Person p, ExcitementBodyPart[] parts)
+		{
+			return null;
+		}
+		*/
+
+		private void CheckRate(ErogenousZone zone, int sensitivityIndex)
+		{
+			for (int i = 0; i < zone.Sources.Length; ++i)
+			{
+				var src = zone.Sources[i];
+				if (!src.Active)
+					continue;
+
+				var ss = person_.Personality.Sensitivities.Get(sensitivityIndex);
+				physicalRate_.Value += ss.Rate * ss.GetModifier(person_, src.PersonIndex);
+				max_ = Math.Max(max_, ss.Maximum);
 			}
 		}
 
@@ -128,7 +170,7 @@ namespace Cue
 			string sources = "";
 			for (int i = 0; i < z.Sources.Length; ++i)
 			{
-				if (z.Sources[i].ActiveCount > 0)
+				if (z.Sources[i].Active)
 				{
 					if (sources != "")
 						sources += ", ";
@@ -173,53 +215,8 @@ namespace Cue
 			debug.Add($"genitals:");
 			DebugZone(person_.Status.Genitals, debug);
 
-			/*
-			var ps = person_.Personality;
-			debug.Add("");
-			debug.Add("");
-			debug.Add("parts:");
-			for (int i = 0; i < parts_.Length; ++i)
-			{
-				var s = parts_[i].Debug();
-				if (s != null)
-					debug.Add("  " + s);
-			}
-
-			debug.Add("reasons:");
-			for (int i = 0; i < reasons_.Length; ++i)
-			{
-				var s = reasons_[i].Debug(person_, parts_);
-				if (s != null)
-					debug.Add("  " + s);
-			}
-
-			debug.Add("rates:");
-
-			for (int i = 0; i < reasons_.Length; ++i)
-			{
-				var r = reasons_[i];
-				if (r.Value <= 0)
-					continue;
-
-				string s =
-					$"  {r.Name}: " +
-					$"v={r.Value} " +
-					$"mod={r.GlobalSensitivityRate} ";
-
-				if (r.SpecificSensitivityModifier != 1)
-					s += $"smod={r.SpecificSensitivityModifier} ";
-
-				if (r.DampenModifier != 1)
-					s += $"damp={r.DampenModifier} ";
-
-				s +=
-					$"rate={r.Rate} " +
-					$"max={r.MaximumExcitement} ";
-
-				debug.Add(s);
-			}*/
-
-			debug.Add("total rates:");
+			debug.Add("values:");
+			debug.Add($"  max: {max_:0.00000}");
 			debug.Add($"  physical: {physicalRate_.Value:0.00000}");
 			debug.Add($"  emotional: {emotionalRate_.Value:0.00000}");
 			debug.Add($"  subtotal: {subtotalRate_:0.00000}");

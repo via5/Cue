@@ -382,7 +382,6 @@
 			[
 				{
 					"source": "player",
-					"sourceBodyPart": "leftHand rightHand",
 					"modifier": 2
 				},
 				{

@@ -250,33 +250,21 @@ namespace Cue
 			{
 				foreach (var c in o["modifiers"].AsArray.Childs)
 				{
-					var ms = ParseSensitivityModifier(c.AsObject);
-					if (ms != null)
-					{
-						foreach (var m in ms)
-							mods.Add(m);
-					}
+					var m = ParseSensitivityModifier(c.AsObject);
+					if (m != null)
+						mods.Add(m);
 				}
 			}
 
 			return new Sensitivity(type, rate, max, mods.ToArray());
 		}
 
-		private SensitivityModifier[] ParseSensitivityModifier(JSONClass o)
+		private SensitivityModifier ParseSensitivityModifier(JSONClass o)
 		{
 			var source = J.OptString(o, "source");
-			var sourcePartName = J.OptString(o, "sourceBodyPart");
-			int[] sourceBodyParts = BP.FromStringMany(sourcePartName);
 			float modifier = J.ReqFloat(o, "modifier");
 
-			if (sourcePartName == "")
-				sourceBodyParts= new int[] { BP.None };
-
-			var list = new List<SensitivityModifier>();
-			foreach (var bp in sourceBodyParts)
-				list.Add(new SensitivityModifier(source, bp, modifier));
-
-			return list.ToArray();
+			return new SensitivityModifier(source, modifier);
 		}
 
 		private void Add(Personality p, bool abst)

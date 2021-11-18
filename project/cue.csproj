@@ -164,8 +164,6 @@
     <Compile Include="src\Person\Body\BodyPartLocker.cs" />
     <Compile Include="src\Person\Body\Morph.cs" />
     <Compile Include="src\Person\Excitement\Excitement.cs" />
-    <Compile Include="src\Person\Excitement\Part.cs" />
-    <Compile Include="src\Person\Excitement\Reason.cs" />
     <Compile Include="src\Person\Expression\Expression.cs" />
     <Compile Include="src\Person\Expression\Manager.cs" />
     <Compile Include="src\Person\Expression\WeightedExpression.cs" />
