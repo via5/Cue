@@ -376,6 +376,31 @@ Controls what characters are looking at.
   easing used when ramping up movement energy
 
 
+- ExcitementDecayRate (float)
+  rate at which excitement decreases when there is no stimulation of any
+  body part
+
+- ExcitementPostOrgasm (float)
+  excitement will reset to this value after orgasm
+
+- OrgasmTime, PostOrgasmTime (float)
+  time during which orgasms and post-orgasm states will last; both are used
+  for animations and adjusting tiredness
+
+- RateAdjustment (float)
+  a flat value that multiplies the excitement rate, defaults to 1.0; this
+  can be changed to globally increase or decrease the rate at which
+  excitement changes
+
+- PenetrationDamper (float)
+  this is like RateAdjustement, but it only applies while this character is
+  being penetrated or is penetrating another; this is used to increase the time
+  between orgasm during sex regardless of interactions while still allowing
+  quicker orgasms for more ad hoc interactions
+
+  this is applied to all the individual rates above, except for PenetrationRate
+
+
 3.5 Mood
 --------
 
@@ -514,88 +539,29 @@ goes back to base.
 3.10 Sensitivity
 ----------------
 Controls the rate at which excitement goes up when various body parts are
-stimulated. Each source has a "rate" and a "max":
+stimulated or events are happening. Each sensitivity has a "rate" and a "max":
 
-  - rate: the rate at which excitement goes up when the source is
-          activated
-  - max:  the maximum excitement value that can be reached with this
-          source alone; if this is not 1.0, the character cannot have an
-          orgasm from this source
+- rate
+  the rate at which excitement goes up when this sensitivity is active
 
-The rate is multiplied by a value that depends on the level of stimulation of
-a particular body part, controlled by the `factor` parameters below. For
-example, the default `lipsFactor` is 0.1 and `mouthFactor` is 0.9. If only
-the lips are being triggered, `mouthRate` is multiplied by 0.1. The value is
-not clamped and can go above 1.0.
+- max
+  the maximum excitement value that can be reached with this source alone; if
+  this is not 1.0, the character cannot have an orgasm from this source
 
-Although these are named "factors", they're really just added together. VaM
-does not have variable triggers that depend on the pressure being applied,
-they're either 0 or 1. These factors are therefore always multiplied by 1
-when the trigger is active. If a future version supports variable triggers,
-the factors should scale accordingly.
+  if the excitement is above the max, this sensitivity is ignored
 
-If multiple sources are active at the same time, the highest "max" value is
-used and rates are added.
+A sensitivity can also have a "modifiers" section, to adjust rates depending
+on the source. The rate is multiplied by the modifier. The source can be "self",
+"player" or an atom ID. If empty, the modifier applies to any source, which is
+not very useful.
 
-As an example, the rate at which excitement goes up when the mouth is
-triggered would be something like:
-
-    ((lipsTrigger * lipsFactor) + (mouthTrigger * mouthFactor)) * mouthRate
-
-clamped between [0, mouthMax]. Both `lipsTrigger` and `mouthTrigger` can be
-either 0 or 1 depending on whether the trigger is active in VaM.
-
-
-- ExcitementDecayRate (float)
-  rate at which excitement decreases when there is no stimulation of any
-  body part
-
-- ExcitementPostOrgasm (float)
-  excitement will reset to this value after orgasm
-
-- OrgasmTime, PostOrgasmTime (float)
-  time during which orgasms and post-orgasm states will last; both are used
-  for animations and adjusting tiredness
-
-- RateAdjustment (float)
-  a flat value that multiplies the excitement rate, defaults to 1.0; this
-  can be changed to globally increase or decrease the rate at which
-  excitement changes
-
-- PenetrationDamper (float)
-  this is like RateAdjustement, but it only applies while this character is
-  being penetrated or is penetrating another; this is used to increase the time
-  between orgasm during sex regardless of interactions while still allowing
-  quicker orgasms for more ad hoc interactions
-
-  this is applied to all the individual rates above, except for PenetrationRate
-
-
-3.10.1 Specific modifiers
--------------------------
-Allows for changing rates when specific body parts and characters are
-interacting
-
-the target is the character whose excitement is currently being calculated;
-the source is the other character that is touching this one; they both might
-be the same
-
-`source` and `target` may be one of:
-  - "" or "any"
-  - "self"
-  - "player"
-  - the name of a person in the scene
-
-for `target`, "", "any" and "self" are equivalent
-
-
-  source           source character
-  sourceBodyPart   name of the source body part (see Enums/BodyPartEnum.cs)
-  target           target character
-  targetBodyPart   name of the target body part (see Enums/BodyPartEnum.cs)
-
-this feature is used to increase the rates when the player is touching
+This feature is used to increase the rates when the player is touching
 genitals, because the player is awesome, and to reduce rates for masturbation
+
+The "othersExcitement" sensitivity is used to increase excitement if other
+characters in the scene are currently being stimulated. Cue looks for the
+character whose excitement is currently rising the fastest and multiplies their
+excitement rate by this `rate` value.
 
 
 3.11 Expressions
