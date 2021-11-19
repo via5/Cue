@@ -82,7 +82,7 @@ A Range object has these values:
                   range)
 
     windowEasing  the easing used for the sliding window (optional, default
-                  "linear", see Easings.cs)
+                  "linear", see Enums/Easings.cs)
 
     rng           random generation algorithm (optional, defaults to
                   "uniform"); see below
@@ -590,9 +590,52 @@ for `target`, "", "any" and "self" are equivalent
 
 
   source           source character
-  sourceBodyPart   name of the source body part (see BodyPartEnum.cs)
+  sourceBodyPart   name of the source body part (see Enums/BodyPartEnum.cs)
   target           target character
-  targetBodyPart   name of the target body part (see BodyPartEnum.cs)
+  targetBodyPart   name of the target body part (see Enums/BodyPartEnum.cs)
 
 this feature is used to increase the rates when the player is touching
 genitals, because the player is awesome, and to reduce rates for masturbation
+
+
+3.11 Expressions
+----------------
+Defines a series of morphs or morph groups that are used randomly to animate
+the character's face. Each expression is associated with a mood. The intensity
+of the mood decides the value at which the morph is driven.
+
+- name
+  name of the expression, for display
+
+- moods
+  list of space-separated mood names for which this expression can be used;
+  see Enums/Moods.cs
+
+- bodyParts
+  list of space-separated body part names (see Enums/BodyPartsEnum.cs) that are
+  affected by this expression
+
+  multiple expressions can be active at the same time, with random values, to
+  create a variety of facial animations; if multiple expressions affect the same
+  body part (such as the mouth), the face can become distorted because of
+  compounding morphs
+
+  Cue uses these body parts to limit the value of morphs when multiple
+  expressions are active concurrently, making sure the total of all morph values
+  affecting a body part doesn't exceed a certain maximum (currently around 1.1)
+
+- morphs
+  an array of morphs that are used in this expression, with an optional maximum
+  value; this is a ghetto version of Vam's morph groups
+
+
+4 Inheritance
+=============
+Most of the default values are applicable to any personality. To avoid copying
+all the values for new personalities, inheritance can be used instead.
+
+If an "inherit" value is found, all the values from that personality are copied
+first, then overridden by any new value in this new personality.
+
+The special "abstract" field can be set to `true` to avoid showing it in the
+personality list in the user interface. This is used in the "base" personality.

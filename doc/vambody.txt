@@ -1,0 +1,96 @@
+1 Body parts
+============
+Cue has a higher level view of a person's body than Vam and needs to know how
+the various parts of the model are arranged to distribute them into body parts.
+
+Each body part has a type:
+
+  - rigidbody
+    the body part has a main rigidbody and a controller, basically anything that
+    shows as a "somethingControl" in the atom selection
+
+  - trigger
+    the body part has a trigger that can activate when something touches it
+
+  - collider
+    this is a body part that doesn't really have a Vam equivalent and Cue has
+    to approximate, such as glutes (no controller) or forearms (only elbow and
+    shoulder controllers)
+
+  - internal
+    special case for eyes
+
+  - strapon
+    special case for penis on females
+
+  - none
+    this body part doesn't exist yet
+
+
+These values define the body part:
+
+  - part
+    the name of the body part in Cue (see BodyPartsEnum.cs)
+
+  - name
+    the name of the rigidbody, trigger or collider; can be an array if the
+    body part is composed of multiple rigidbodies, such as the hips
+
+  - controller
+    name of the controller associated with this body part; used for automatic
+    linking and detecting grabs
+
+  - colliders
+    array of collider names that are used to detect proximity to the body part
+
+    for example, Cue tries to figure out if the player's hand is close to
+    someone's head; the closest distance between any collider on the hand and
+    any collider on the head is used to determine the actual distance
+
+    the more colliders are used, the more accurate the detection, but the slower
+    it is; there should be as few colliders as possible, while still covering
+    as much as the body part's volume
+
+  - rigidbody
+    for collider types, this is the closest rigidbody to the body part; used for
+    automatic linking, since controllers can only link to rigidbodies
+
+  - forceReceiver
+    for rigidbody types, this is the rigidbody that is used when applying forces
+    during animations; this is normally the rigidbody from `name`, but some
+    parts may use a different one
+
+
+Two more values can be used to create different body parts for males and
+females, or when advanced colliders are on or off. Vam uses different models
+for males and females: most of the stuff is the same, but not all of it. If
+"Advanced colliders" are off, Vam uses fewer colliders on the model and with
+different names.
+
+  - sex
+    can be "male" or "female"; if not given, the body part applies to both
+
+  - advanced
+    can be "yes" or "no"; if not given, the body part applies to both
+
+
+2 Hands
+=======
+Some animations in Cue need to know more about the positions of the fingers on
+a hand, as well as which morphs to use to animate them.
+
+  - type
+    "left" or "right"
+
+  - fistMorph
+    name of a morph that can make a fist
+
+  - fingersInOutMorph
+    name of a morph that can make the fingers go in and out laterally
+
+  - rigidbody
+    the rigidbody associated with this hand
+
+  - bones
+    the names of three bones for each finger, from closest to the palm to the
+    fingertip (in order: proximal, intermediate and distal)
