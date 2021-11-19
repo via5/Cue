@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SimpleJSON;
 
 namespace Cue.Sys.Vam
 {
@@ -91,7 +92,7 @@ namespace Cue.Sys.Vam
 
 	class VamBody : VamBasicBody
 	{
-		private readonly StraponBodyPart strapon_;
+		private StraponBodyPart strapon_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
 		private Color initialColor_;
@@ -107,8 +108,6 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 			: base(a)
 		{
-			strapon_ = new StraponBodyPart(a);
-
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
 				Log.Error("no skin gloss parameter");
@@ -128,7 +127,7 @@ namespace Cue.Sys.Vam
 
 		public void LateUpdate(float s)
 		{
-			strapon_.LateUpdate(s);
+			strapon_?.LateUpdate(s);
 		}
 
 		public IBodyPart GetPart(int i)
@@ -170,8 +169,8 @@ namespace Cue.Sys.Vam
 
 		public override bool Strapon
 		{
-			get { return strapon_.Exists; }
-			set { strapon_.Set(value); }
+			get { return strapon_?.Exists ?? false; }
+			set { strapon_?.Set(value); }
 		}
 
 		private bool AdvancedColliders()
@@ -188,6 +187,31 @@ namespace Cue.Sys.Vam
 
 		private IBodyPart[] CreateBodyParts()
 		{
+			return Load(Atom.IsMale, AdvancedColliders());
+		}
+
+		private IBodyPart[] Load(bool male, bool advancedColliders)
+		{
+			var d = JSON.Parse(
+				Cue.Instance.Sys.ReadFileIntoString(
+					Cue.Instance.Sys.GetResourcePath("vambody.json")));
+
+			var vars = new Dictionary<string, JSONNode>();
+			foreach (var k in d["vars"].AsObject.Keys)
+				vars[k] = d["vars"][k];
+
+			Func<string, JSONNode> getVar = (string key) =>
+			{
+				if (key.StartsWith("$"))
+					key = key.Substring(1);
+
+				JSONNode n;
+				if (vars.TryGetValue(key, out n))
+					return n;
+
+				throw new LoadFailed($"variable '{key}' not found");
+			};
+
 			var map = new Dictionary<int, IBodyPart>();
 
 			Action<int, IBodyPart> add = (type, p) =>
@@ -195,282 +219,20 @@ namespace Cue.Sys.Vam
 				map[type] = p;
 			};
 
-			// some colliders can fire the labia/vagina triggers even though
-			// they don't really make sense, especially for larger body parts;
-			// ignore them
-			var genitalsIgnore = new string[]
+			foreach (JSONClass o in d["parts"].AsArray)
 			{
-				// happens for crossed legs
-				"lThigh", "rThigh",
-
-				// happens for larger bellies
-				"FemaleAutoCollidersabdomen",
-				"FemaleAutoColliderschest",
-
-				// happens when the hips get squished on a surface
-				"LGlute", "RGlute"
-			};
-
-
-			bool advanced = AdvancedColliders();
-
-
-			// head
-			//
-			add(BP.Head, GetRigidbody(
-				BP.Head, new string[] {
-					"HeadHard1Hard", "HeadHard10Hard", "FaceCentral1Hard",
-					"TongueColliders/_Collider1",
-					"lowerJawStandardColliders/_ColliderL1b",
-					"HeadBack1Hard",
-					"FaceHardLeft4Hard",
-					"FaceHardRight4Hard",
-					"neck/StandardColliders/_Collider1l",
-					"neck/StandardColliders/_Collider1r",
-					"neck/StandardColliders/_ColliderB2",
-					"neck/StandardColliders/_Collider4r",
-					"neck/StandardColliders/_Collider4l",
-					"HeadLeftEarHard", "HeadRightEarHard"
-				}, "headControl", "head"));
-
-			add(BP.Lips, GetTrigger(
-				BP.Lips, "", "LipTrigger"));
-
-			add(BP.Mouth, GetTrigger(
-				BP.Mouth, "", "MouthTrigger"));
-
-
-			// breasts
-			//
-			add(BP.LeftBreast, GetTrigger(
-				BP.LeftBreast, "lNippleControl", "lNippleTrigger", "",
-				new string[] { "lShldr" }));
-
-			add(BP.RightBreast, GetTrigger(
-				BP.RightBreast, "rNippleControl", "rNippleTrigger", "",
-				new string[] { "rShldr" }));
-
-
-			// genitals
-			//
-			add(BP.Labia, GetTrigger(
-				BP.Labia, "", "LabiaTrigger", "",
-				genitalsIgnore, new string[] { "pelvisF1/pelvisF1Joint" }));
-
-			add(BP.Vagina, GetTrigger(
-				BP.Vagina, "", "VaginaTrigger", "",
-				genitalsIgnore));
-
-			add(BP.DeepVagina, GetTrigger(
-				BP.DeepVagina, "", "DeepVaginaTrigger", "",
-				genitalsIgnore));
-
-			add(BP.DeeperVagina, GetTrigger(
-				BP.DeeperVagina, "", "DeeperVaginaTrigger", "",
-				genitalsIgnore));
-
-			add(BP.Anus, null);
-
-
-			// upper body
-			//
-			if (Atom.IsMale)
-			{
-				if (advanced)
-				{
-					add(BP.Chest, GetRigidbody(
-						BP.Chest, new string[] { "chest1/chest1Joint" },
-							"chestControl", "chest"));
-
-					add(BP.Belly, GetRigidbody(
-						BP.Belly, new string[] {
-							"abdomen2/_ColliderL1",
-							"abdomen/_ColliderL1b",
-							"abdomen/_ColliderL1f",
-							"abdomen/_ColliderL1l",
-							"abdomen/_ColliderL1r",
-							"abdomen/_ColliderL2b"
-						}, "", "abdomen2"));
-
-					add(BP.Hips, GetRigidbody(
-						BP.Hips, new string[] {
-							"pelvisB3/pelvisB3Joint",
-							"pelvisF5/pelvisF5Joint",
-							"pelvisF8/pelvisF8Joint",
-							"pelvisL1/pelvisL1Joint",
-							"pelvisR1/pelvisR1Joint"
-						}, "hipControl", new string[] { "abdomen", "pelvis" }));
-				}
-				else
-				{
-					add(BP.Chest, GetRigidbody(
-						BP.Chest, new string[] { "chest/ColliderL0" },
-						"chestControl", "chest"));
-
-					add(BP.Belly, GetRigidbody(
-						BP.Belly, new string[] {
-							"abdomen2/_ColliderL1",
-							"abdomen/_ColliderL1b",
-							"abdomen/_ColliderL1f",
-							"abdomen/_ColliderL1l",
-							"abdomen/_ColliderL1r",
-							"abdomen/_ColliderL2b"
-						}, "", "abdomen2"));
-
-					add(BP.Hips, GetRigidbody(
-						BP.Hips, new string[] {
-							"pelvis/CollidersL1/ColliderL1f",
-							"pelvis/CollidersL1/ColliderL1b",
-							"pelvis/CollidersL2/ColliderL2l1",
-							"pelvis/CollidersL2/ColliderL2r1"
-						}, "hipControl", new string[] { "abdomen", "pelvis" }));
-				}
+				var bp = LoadPart(male, advancedColliders, o, getVar);
+				if (bp != null)
+					map[bp.Type] = bp;
 			}
-			else
-			{
-				add(BP.Chest, GetRigidbody(
-					BP.Chest, new string[] { "chest1/chest1Joint" },
-					"chestControl", "chest"));
-
-				add(BP.Belly, GetRigidbody(
-					BP.Belly, new string[] {
-						"abdomen2_3/abdomen2_3Joint",
-						"abdomen3/abdomen3Joint",
-						"abdomen7/abdomen7Joint",
-						"abdomen12/abdomen12Joint",
-						"abdomen17/abdomen17Joint",
-						"abdomen20/abdomen20Joint"
-					}, "", "abdomen2"));
-
-				add(BP.Hips, GetRigidbody(
-					BP.Hips, new string[] {
-						"pelvisF7/pelvisF7Joint",
-						"pelvisFL8/pelvisFL8Joint",
-						"pelvisFR8/pelvisFR8Joint",
-						"pelvisL1/pelvisL1Joint",
-						"pelvisR1/pelvisR1Joint"
-					}, "hipControl", new string[] { "abdomen", "pelvis" }, "hip"));
-			}
-
-			add(BP.LeftGlute, GetCollider(
-				BP.LeftGlute, "", "LGlute", "LGlute1Joint", ""));
-
-			add(BP.RightGlute, GetCollider(
-				BP.RightGlute, "", "RGlute", "RGlute1Joint", ""));
-
-
-			// left arm
-			//
-			add(BP.LeftShoulder, GetCollider(
-				BP.LeftShoulder, "lArmControl", "lShldr", "lShldr"));
-
-			add(BP.LeftArm, GetCollider(
-				BP.LeftArm, "lElbowControl", "lForeArm",
-				"StandardColliderslShldr/_Collider1"));
-
-			add(BP.LeftForearm, GetCollider(
-				BP.LeftForearm, "lElbowControl", "lHand",
-				"lForeArm/_Collider2"));
-
-			add(BP.LeftHand, GetRigidbody(
-				BP.LeftHand, new string[]
-				{
-					"lHand/_Collider",           // near wrist
-					"lHand/lCarpal1/Collider3",  // middle of the palm
-
-					// finger tips
-					"lHand/lCarpal1/lIndex1/lIndex2/lIndex3/Collider",
-					"lHand/lCarpal1/lMid1/lMid2/lMid3/Collider",
-					"lHand/lCarpal2/lPinky1/lPinky2/lPinky3/Collider",
-					"lHand/lCarpal2/lRing1/lRing2/lRing3/Collider",
-					"lThumb1/lThumb2/lThumb3/Collider",
-				},
-				"lHandControl", "lHand"));
-
-
-			// right arm
-			//
-			add(BP.RightShoulder, GetCollider(
-				BP.RightShoulder, "rArmControl", "rShldr", "rShldr"));
-
-			add(BP.RightArm, GetCollider(
-				BP.RightArm, "rElbowControl", "rForeArm",
-				"StandardCollidersrShldr/_Collider1"));
-
-			add(BP.RightForearm, GetCollider(
-				BP.RightForearm, "rElbowControl", "rHand",
-				"rForeArm/_Collider2"));
-
-			add(BP.RightHand, GetRigidbody(
-				BP.RightHand, new string[]
-				{
-					"rHand/_Collider",           // near wrist
-					"rHand/rCarpal1/Collider3",  // middle of the palm
-
-					// finger tips
-					"rHand/rCarpal1/rIndex1/rIndex2/rIndex3/Collider",
-					"rHand/rCarpal1/rMid1/rMid2/rMid3/Collider",
-					"rHand/rCarpal2/rPinky1/rPinky2/rPinky3/Collider",
-					"rHand/rCarpal2/rRing1/rRing2/rRing3/Collider",
-					"rThumb1/rThumb2/rThumb3/Collider",
-				},
-				"rHandControl", "rHand"));
-
-
-			// left leg
-			//
-			add(BP.LeftThigh, GetCollider(
-				BP.LeftThigh, "lKneeControl", "lThigh",
-				"lThigh12Joint", "StandardColliderslThigh/_Collider6"));
-
-			add(BP.LeftShin, GetCollider(
-				BP.LeftShin, "lKneeControl", "lShin",
-				"lShin8Joint", "StandardColliderslShin/_Collider2"));
-
-			add(BP.LeftFoot, GetRigidbody(
-				BP.LeftFoot, new string[] { "lFoot/_Collider4" },
-				"lFootControl", "lFoot"));
-
-
-			// right leg
-			//
-			add(BP.RightThigh, GetCollider(
-				BP.RightThigh, "rKneeControl", "rThigh",
-				"rThigh12Joint", "StandardCollidersrThigh/_Collider6"));
-
-			add(BP.RightShin, GetCollider(
-				BP.RightShin, "rKneeControl", "rShin",
-				"rShin8Joint", "StandardCollidersrShin/_Collider2"));
-
-			add(BP.RightFoot, GetRigidbody(
-				BP.RightFoot, new string[] { "rFoot/_Collider4" },
-				"rFootControl", "rFoot"));
-
-
-			// eyes
-			//
-			add(BP.Eyes, new EyesBodyPart(Atom));
-
-
-			// male parts
-			//
-			if (Atom.IsMale)
-			{
-				add(BP.Penis, GetRigidbody(
-					BP.Penis, new string[] { "Gen1Hard", "Gen3aHard" },
-					"penisBaseControl", "", "Gen1"));
-			}
-			else
-			{
-				add(BP.Penis, strapon_);
-			}
-
 
 			var list = new List<IBodyPart>();
 
 			for (int i = 0; i < BP.Count; ++i)
 			{
-				var p = map[i];
+				IBodyPart p = null;
+				if (!map.TryGetValue(i, out p))
+					Log.Verbose($"missing part {BP.ToString(i)}");
 
 				if (p == null)
 					list.Add(new NullBodyPart(Atom, i));
@@ -479,6 +241,122 @@ namespace Cue.Sys.Vam
 			}
 
 			return list.ToArray();
+		}
+
+		private IBodyPart LoadPart(bool male, bool advancedColliders, JSONClass o, Func<string, JSONNode> getVar)
+		{
+			if (o.HasKey("sex"))
+			{
+				if (o["sex"].Value == "male" && !male)
+					return null;
+				else if (o["sex"].Value == "female" && male)
+					return null;
+			}
+
+			if (o.HasKey("advanced"))
+			{
+				if (o["advanced"].Value == "yes" && !advancedColliders)
+					return null;
+				else if (o["advanced"].Value == "no" && advancedColliders)
+					return null;
+			}
+
+			var bpType = BP.FromString(J.ReqString(o, "part"));
+			if (bpType == BP.None)
+				throw new LoadFailed($"bad part '{o["part"].Value}'");
+
+			var names = new List<string>();
+
+			if (o.HasKey("name"))
+			{
+				if (o["name"].Value != "")
+				{
+					names.Add(o["name"].Value);
+				}
+				else if (o["name"].AsArray.Count > 0)
+				{
+					foreach (var n in o["name"].AsArray.Childs)
+						names.Add(n.Value);
+				}
+			}
+
+			string controller = J.OptString(o, "controller");
+
+			var colliders = new List<string>();
+			if (o.HasKey("colliders"))
+			{
+				foreach (var n in o["colliders"].AsArray.Childs)
+					colliders.Add(n.Value);
+			}
+
+			var ignore = new List<string>();
+			if (o.HasKey("ignore"))
+			{
+				JSONNode parent;
+
+				if (o["ignore"].Value != "" && o["ignore"].Value.StartsWith("$"))
+					parent = getVar(o["ignore"].Value);
+				else
+					parent = o["ignore"];
+
+				if (parent.Value != "")
+				{
+					ignore.Add(parent.Value);
+				}
+				else if (parent.AsArray.Count > 0)
+				{
+					foreach (var n in parent.AsArray.Childs)
+						ignore.Add(n.Value);
+				}
+			}
+
+			string forceReceiver = J.OptString(o, "forceReceiver");
+			if (forceReceiver == "")
+				forceReceiver = J.OptString(o, "rigidbody");
+
+			var type = J.ReqString(o, "type");
+
+			if (type == "rigidbody")
+			{
+				return CreateRigidbody(
+					bpType, names.ToArray(), controller, colliders.ToArray(),
+					ignore.ToArray(), forceReceiver);
+			}
+			else if (type == "trigger")
+			{
+				return CreateTrigger(
+					bpType, names.ToArray(), controller, colliders.ToArray(),
+					ignore.ToArray(), forceReceiver);
+			}
+			else if (type == "collider")
+			{
+				return CreateCollider(
+					bpType, names.ToArray(), controller, colliders.ToArray(),
+					ignore.ToArray(), forceReceiver);
+			}
+			else if (type == "internal")
+			{
+				if (bpType == BP.Eyes)
+					return new EyesBodyPart(Atom);
+				else
+					throw new LoadFailed($"no internal type for {BP.ToString(bpType)}");
+			}
+			else if (type == "strapon")
+			{
+				if (strapon_ != null)
+					throw new LoadFailed($"can only have one strapon");
+
+				strapon_ = new StraponBodyPart(Atom);
+				return strapon_;
+			}
+			else if (type == "none")
+			{
+				return new NullBodyPart(Atom, bpType);
+			}
+			else
+			{
+				throw new LoadFailed($"bad type '{o["type"].Value}'");
+			}
 		}
 
 		public override Hand GetLeftHand()
@@ -646,22 +524,9 @@ namespace Cue.Sys.Vam
 				color_.Parameter.val = U.ToHSV(initialColor_);
 		}
 
-		private string MakeName(string nameFemale, string nameMale)
-		{
-			if (!Atom.IsMale)
-				return nameFemale;
-
-			if (nameMale == "")
-				return "";
-			else if (nameMale == "same")
-				return nameFemale;
-			else
-				return nameMale;
-		}
-
-		private IBodyPart GetRigidbody(
-			int id, string[] colliders, string controller, string[] names,
-			string rigidbodyForForce = "")
+		private IBodyPart CreateRigidbody(
+			int bodyPart, string[] names, string controller, string[] colliders,
+			string[] ignore, string forceReceiver)
 		{
 			var rbs = new List<Rigidbody>();
 
@@ -678,17 +543,17 @@ namespace Cue.Sys.Vam
 				rbs.Add(rb);
 			}
 
-			Rigidbody forForce = null;
-			if (rigidbodyForForce == "")
+			Rigidbody fr = null;
+			if (forceReceiver == "")
 			{
 				if (rbs.Count > 0)
-					forForce = rbs[0];
+					fr = rbs[0];
 			}
 			else
 			{
-				forForce = U.FindRigidbody(Atom.Atom, rigidbodyForForce);
-				if (forForce == null)
-					Log.Error($"rb for force '{rigidbodyForForce}' not found");
+				fr = U.FindRigidbody(Atom.Atom, forceReceiver);
+				if (fr == null)
+					Log.Error($"rb for force '{forceReceiver}' not found");
 			}
 
 			FreeControllerV3 fc = null;
@@ -700,39 +565,14 @@ namespace Cue.Sys.Vam
 			}
 
 			return new RigidbodyBodyPart(
-				Atom, id, rbs.ToArray(), fc, colliders, forForce);
+				Atom, bodyPart, rbs.ToArray(), fc, colliders, fr);
 		}
 
-		private IBodyPart GetRigidbody(
-			int id, string[] colliders, string controller,
-			string nameFemale, string nameMale = "same")
+		private IBodyPart CreateTrigger(
+			int bodyPart, string[] names, string controller, string[] colliders,
+			string[] ignore, string forceReceiver)
 		{
-			string name = MakeName(nameFemale, nameMale);
-			if (name == "")
-				return null;
-
-			var rb = U.FindRigidbody(Atom.Atom, name);
-			if (rb == null)
-				Log.Error($"rb {name} not found");
-
-			FreeControllerV3 fc = null;
-			if (controller != "")
-			{
-				fc = U.FindController(Atom.Atom, controller);
-				if (fc == null)
-					Log.Error($"rb {name} has no controller {controller} ");
-			}
-
-			return new RigidbodyBodyPart(
-				Atom, id, new Rigidbody[] { rb }, fc, colliders, null);
-		}
-
-		private IBodyPart GetTrigger(
-			int id, string controller,
-			string nameFemale, string nameMale = "same",
-			string[] ignoreTransforms=null, string[] colliders = null)
-		{
-			string name = MakeName(nameFemale, nameMale);
+			string name = names[0];
 			if (name == "")
 				return null;
 
@@ -765,15 +605,15 @@ namespace Cue.Sys.Vam
 			}
 
 			return new TriggerBodyPart(
-				Atom, id, t, fc, t.thisRigidbody.transform,
-				ignoreTransforms, colliders);
+				Atom, bodyPart, t, fc, t.thisRigidbody.transform,
+				ignore, colliders);
 		}
 
-		private IBodyPart GetCollider(
-			int id, string controller, string closestRb,
-			string nameFemale, string nameMale = "same")
+		private IBodyPart CreateCollider(
+			int bodyPart, string[] names, string controller, string[] colliders,
+			string[] ignore, string forceReceiver)
 		{
-			string name = MakeName(nameFemale, nameMale);
+			string name = names[0];
 			if (name == "")
 				return null;
 
@@ -793,14 +633,14 @@ namespace Cue.Sys.Vam
 			}
 
 			Rigidbody rb = null;
-			if (closestRb != "")
+			if (forceReceiver != "")
 			{
-				rb = U.FindRigidbody(Atom.Atom, closestRb);
+				rb = U.FindRigidbody(Atom.Atom, forceReceiver);
 				if (rb == null)
-					Log.Error($"collider {name} has no rb {closestRb}");
+					Log.Error($"collider {name} has no rb {forceReceiver}");
 			}
 
-			return new ColliderBodyPart(Atom, id, c, fc, rb);
+			return new ColliderBodyPart(Atom, bodyPart, c, fc, rb);
 		}
 	}
 }

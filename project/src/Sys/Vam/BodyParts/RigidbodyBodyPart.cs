@@ -28,7 +28,7 @@ namespace Cue.Sys.Vam
 
 		public override Rigidbody Rigidbody
 		{
-			get { return rbs_[0]; }
+			get { return rbs_?[0]; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -119,7 +119,12 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"rb {(Rigidbody == null ? "" : Rigidbody.name)}";
+			string s = $"rb {(Rigidbody == null ? "" : Rigidbody.name)}";
+
+			if (forForce_ != null)
+				s += $" (fr={forForce_.name})";
+
+			return s;
 		}
 	}
 }

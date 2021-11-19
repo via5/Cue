@@ -20,7 +20,7 @@ namespace Cue
 
 		private static int enabled_ =
 			Action | Event | AI | Command |
-			Object | Animation;
+			Object | Animation | Sys;
 
 		private int type_;
 		private Func<string> prefix_;
