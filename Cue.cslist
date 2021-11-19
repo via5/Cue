@@ -74,6 +74,7 @@ project\src\Sys\Interfaces.cs
 project\src\Sys\Mock.cs
 project\src\Sys\Vam\VamAtom.cs
 project\src\Sys\Vam\VamBody.cs
+project\src\Sys\Vam\VamBodyLoader.cs
 project\src\Sys\Vam\VamBodyParts.cs
 project\src\Sys\Vam\VamCameraAtom.cs
 project\src\Sys\Vam\VamFixes.cs

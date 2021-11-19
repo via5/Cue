@@ -191,6 +191,7 @@
     <Compile Include="src\Sys\Vam\BodyParts\TriggerBodyPart.cs" />
     <Compile Include="src\Sys\Vam\VamAtom.cs" />
     <Compile Include="src\Sys\Vam\VamBody.cs" />
+    <Compile Include="src\Sys\Vam\VamBodyLoader.cs" />
     <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
     <Compile Include="src\Sys\Vam\VamFixes.cs" />

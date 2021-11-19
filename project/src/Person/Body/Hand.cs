@@ -45,7 +45,7 @@
 
 		public override string ToString()
 		{
-			return sys_?.ToString() ?? "badbone";
+			return sys_?.ToString() ?? "";
 		}
 	}
 
