@@ -58,6 +58,13 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			for (int i = 0; i < zones_.Length; ++i)
+			{
+				if (zones_[i] != null)
+					zones_[i].Decay(s);
+			}
+
+
 			elapsed_ += s;
 			if (elapsed_ < UpdateInterval)
 				return;
@@ -67,7 +74,7 @@ namespace Cue
 			for (int i = 0; i < zones_.Length; ++i)
 			{
 				if (zones_[i] != null)
-					zones_[i].Update(s);
+					zones_[i].Update();
 			}
 
 			int[] ignore = new int[]
@@ -120,16 +127,20 @@ namespace Cue
 
 		private int totalActive_ = 0;
 		private int validActive_ = 0;
-		private readonly int personIndex_;
+		private int physicalActive_ = 0;
+
+		private Person person_;
+		private readonly int sourcePersonIndex_;
 		private readonly Part[] parts_ = new Part[BP.Count + 1];
 
 		private float rate_ = 0;
 		private float mod_ = 0;
 		private float max_ = 0;
 
-		public ErogenousZoneSource(int personIndex)
+		public ErogenousZoneSource(Person p, int sourcePersonIndex)
 		{
-			personIndex_ = personIndex;
+			person_ = p;
+			sourcePersonIndex_ = sourcePersonIndex;
 
 			for (int i = 0; i < parts_.Length; ++i)
 				parts_[i] = new Part(i);
@@ -137,12 +148,17 @@ namespace Cue
 
 		public int PersonIndex
 		{
-			get { return personIndex_; }
+			get { return sourcePersonIndex_; }
 		}
 
 		public bool Active
 		{
 			get { return (validActive_ > 0); }
+		}
+
+		public bool IsPhysical
+		{
+			get { return (physicalActive_ > 0); }
 		}
 
 		public int StrictlyActiveCount
@@ -193,6 +209,11 @@ namespace Cue
 			return GetPart(bodyPart).targetBodyPart;
 		}
 
+		public float Elapsed(int bodyPart)
+		{
+			return GetPart(bodyPart).elapsed;
+		}
+
 		public bool IsAnyActiveForTarget(int targetBodyPart)
 		{
 			for (int i = 0; i < parts_.Length; ++i)
@@ -217,6 +238,7 @@ namespace Cue
 		{
 			totalActive_ = 0;
 			validActive_ = 0;
+			physicalActive_ = 0;
 
 			for (int i = 0; i < parts_.Length; ++i)
 			{
@@ -235,9 +257,18 @@ namespace Cue
 			{
 				var ss = p.Personality.Sensitivities.Get(sensitivityIndex);
 
-				rate_ = ss.Rate;
-				mod_ = ss.GetModifier(p, personIndex_);
-				max_ = ss.Maximum;
+				if (IsPhysical)
+				{
+					rate_ = ss.PhysicalRate;
+					max_ = ss.PhysicalMaximum;
+				}
+				else
+				{
+					rate_ = ss.NonPhysicalRate;
+					max_ = ss.NonPhysicalMaximum;
+				}
+
+				mod_ = ss.GetModifier(p, sourcePersonIndex_);
 			}
 		}
 
@@ -248,10 +279,7 @@ namespace Cue
 			part.active = (part.elapsed > 0);
 
 			if (part.active)
-			{
-				++totalActive_;
-				++validActive_;
-			}
+				Activated(part);
 		}
 
 		public void Set(int sourceBodyPart, int targetBodyPart)
@@ -265,8 +293,7 @@ namespace Cue
 			if (!p.active)
 			{
 				p.active = true;
-				++totalActive_;
-				++validActive_;
+				Activated(p);
 			}
 		}
 
@@ -278,18 +305,42 @@ namespace Cue
 			{
 				p.ignored = true;
 				if (p.active)
-					--validActive_;
+					Ignored(p);
 			}
+		}
+
+		private void Activated(Part p)
+		{
+			++totalActive_;
+			++validActive_;
+
+			if (p.targetBodyPart != BP.None)
+			{
+				if (person_.Body.Get(p.targetBodyPart).IsPhysical)
+					++physicalActive_;
+			}
+		}
+
+		private void Ignored(Part p)
+		{
+			--validActive_;
+
+			if (p.targetBodyPart != BP.None)
+			{
+				if (person_.Body.Get(p.targetBodyPart).IsPhysical)
+					--physicalActive_;
+			}
+
 		}
 
 		public override string ToString()
 		{
-			if (personIndex_ == -1)
+			if (sourcePersonIndex_ == -1)
 				return $"external";
 
-			var p = Cue.Instance.GetPerson(personIndex_);
+			var p = Cue.Instance.GetPerson(sourcePersonIndex_);
 			if (p == null)
-				return $"?{personIndex_}";
+				return $"?{sourcePersonIndex_}";
 
 			string s = p.ID;
 
@@ -331,9 +382,9 @@ namespace Cue
 			sources_ = new ErogenousZoneSource[Cue.Instance.ActivePersons.Length + 1];
 
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
-				sources_[i] = new ErogenousZoneSource(i);
+				sources_[i] = new ErogenousZoneSource(person_, i);
 
-			sources_[sources_.Length - 1] = new ErogenousZoneSource(-1);
+			sources_[sources_.Length - 1] = new ErogenousZoneSource(person_ , - 1);
 		}
 
 		public bool Active
@@ -356,10 +407,8 @@ namespace Cue
 			get { return sources_[sources_.Length - 1]; }
 		}
 
-		public void Update(float s)
+		public void Update()
 		{
-			Decay(s);
-
 			for (int i = 0; i < parts_.Length; ++i)
 			{
 				var bp = parts_[i];
@@ -388,7 +437,7 @@ namespace Cue
 				--activeSources_;
 		}
 
-		private void Decay(float s)
+		public void Decay(float s)
 		{
 			activeSources_ = 0;
 

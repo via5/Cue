@@ -276,7 +276,10 @@ namespace Cue
 				exps.Add(new string[]
 				{
 					SS.ToString(ss.Type),
-					$"rate={ss.Rate:0.00000} max={ss.Maximum:0.00}"
+					$"pRate={ss.PhysicalRate:0.00000} " +
+					$"pMax={ss.PhysicalMaximum:0.00} " +
+					$"npRate={ss.NonPhysicalRate:0.00000} " +
+					$"npMax={ss.NonPhysicalMaximum:0.00}"
 				});
 
 				foreach (var m in ss.Modifiers)

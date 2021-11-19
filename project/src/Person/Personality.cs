@@ -261,16 +261,24 @@ namespace Cue
 	public class Sensitivity
 	{
 		private int type_;
-		private float rate_;
-		private float max_;
+		private float physicalRate_;
+		private float physicalMax_;
+		private float nonPhysicalRate_;
+		private float nonPhysicalMax_;
 		private SensitivityModifier[] modifiers_ = new SensitivityModifier[0];
 
 
-		public Sensitivity(int type, float rate, float max, SensitivityModifier[] mods)
+		public Sensitivity(
+			int type,
+			float physicalRate, float physicalMax,
+			float nonPhysicalRate, float nonPhysicalMax,
+			SensitivityModifier[] mods)
 		{
 			type_ = type;
-			rate_ = rate;
-			max_ = max;
+			physicalRate_ = physicalRate;
+			physicalMax_ = physicalMax;
+			nonPhysicalRate_ = nonPhysicalRate;
+			nonPhysicalMax_ = nonPhysicalMax;
 			modifiers_ = mods ?? new SensitivityModifier[0];
 		}
 
@@ -279,14 +287,24 @@ namespace Cue
 			get { return type_; }
 		}
 
-		public float Rate
+		public float PhysicalRate
 		{
-			get { return rate_; }
+			get { return physicalRate_; }
 		}
 
-		public float Maximum
+		public float PhysicalMaximum
 		{
-			get { return max_; }
+			get { return physicalMax_; }
+		}
+
+		public float NonPhysicalRate
+		{
+			get { return nonPhysicalRate_; }
+		}
+
+		public float NonPhysicalMaximum
+		{
+			get { return nonPhysicalMax_; }
 		}
 
 		public SensitivityModifier[] Modifiers
@@ -296,7 +314,12 @@ namespace Cue
 
 		public Sensitivity Clone()
 		{
-			var s = new Sensitivity(type_, rate_, max_, null);
+			var s = new Sensitivity(
+				type_,
+				physicalRate_, physicalMax_,
+				nonPhysicalRate_, nonPhysicalMax_,
+				null);
+
 			s.CopyFrom(this);
 			return s;
 		}
@@ -329,7 +352,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{SS.ToString(type_)} rate={rate_:0.00000} max={max_:0.00}";
+			return $"{SS.ToString(type_)}";
 		}
 	}
 
@@ -342,7 +365,7 @@ namespace Cue
 		public Sensitivities()
 		{
 			for (int i = 0; i < s_.Length; ++i)
-				s_[i] = new Sensitivity(i, 0, 0, null);
+				s_[i] = new Sensitivity(i, 0, 0, 0, 0, null);
 		}
 
 		public Sensitivities Clone(Person p)

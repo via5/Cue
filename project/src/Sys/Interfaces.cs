@@ -289,6 +289,7 @@ namespace Cue.Sys
 		IAtom Atom { get; }
 		int Type { get; }
 		bool Exists { get; }
+		bool IsPhysical { get; }
 		bool CanTrigger { get; }
 		bool Render { get; set; }
 		TriggerInfo[] GetTriggers();

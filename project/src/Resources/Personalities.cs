@@ -242,8 +242,23 @@ namespace Cue
 				return null;
 			}
 
-			var rate = J.ReqFloat(o, "rate");
-			var max = J.OptFloat(o, "max", 1.0f);
+			float physicalRate, physicalMax, nonPhysicalRate, nonPhysicalMax;
+
+			if (o.HasKey("rate"))
+			{
+				physicalRate = J.ReqFloat(o, "rate");
+				physicalMax = J.OptFloat(o, "max", 1.0f);
+				nonPhysicalRate = physicalRate;
+				nonPhysicalMax = physicalMax;
+			}
+			else
+			{
+				physicalRate = J.ReqFloat(o, "physicalRate");
+				physicalMax = J.OptFloat(o, "physicalMax", 1.0f);
+				nonPhysicalRate = J.ReqFloat(o, "nonPhysicalRate");
+				nonPhysicalMax = J.OptFloat(o, "nonPhysicalMax", 1.0f);
+			}
+
 			var mods = new List<SensitivityModifier>();
 
 			if (o.HasKey("modifiers"))
@@ -256,7 +271,11 @@ namespace Cue
 				}
 			}
 
-			return new Sensitivity(type, rate, max, mods.ToArray());
+			return new Sensitivity(
+				type,
+				physicalRate, physicalMax,
+				nonPhysicalRate, nonPhysicalMax,
+				mods.ToArray());
 		}
 
 		private SensitivityModifier ParseSensitivityModifier(JSONClass o)

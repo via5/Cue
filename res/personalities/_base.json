@@ -352,13 +352,14 @@
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 
-
 	"sensitivities":
 	[
 		{
 			"type": "penetration",
-			"rate": 0.003,
-			"max": 1.0
+			"physicalRate": 0.003,
+			"physicalMax": 1.0,
+			"nonPhysicalRate": 0.0015,
+			"nonPhysicalMax": 1.0
 		},
 
 		{
@@ -387,8 +388,10 @@
 
 		{
 			"type": "genitals",
-			"rate": 0.004,
-			"max": 1.0,
+			"physicalRate": 0.004,
+			"physicalMax": 1.0,
+			"nonPhysicalRate": 0.002,
+			"nonPhysicalMax": 0.6,
 
 			"modifiers":
 			[

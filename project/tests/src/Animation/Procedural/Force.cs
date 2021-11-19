@@ -10,6 +10,7 @@ namespace Cue.Proc.Tests
 		public Sys.IAtom Atom { get; }
 		public int Type { get; }
 		public bool Exists { get; }
+		public bool IsPhysical { get; }
 		public bool CanTrigger { get; }
 		public bool CanGrab { get; }
 		public bool Grabbed { get; }

@@ -77,6 +77,7 @@ namespace Cue.Sys.Vam
 
 		public int Type { get { return type_; } }
 		public virtual bool Exists { get { return true; } }
+		public virtual bool IsPhysical { get { return true; } }
 
 		public virtual Rigidbody Rigidbody { get { return null; } }
 		public virtual FreeControllerV3 Controller { get { return null; } }

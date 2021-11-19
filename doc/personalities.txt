@@ -393,12 +393,12 @@ Controls what characters are looking at.
   excitement changes
 
 - PenetrationDamper (float)
-  this is like RateAdjustement, but it only applies while this character is
-  being penetrated or is penetrating another; this is used to increase the time
-  between orgasm during sex regardless of interactions while still allowing
-  quicker orgasms for more ad hoc interactions
+  a flat value that multiplies the excitement rate of all sensitivities except
+  penetration, only used while this character is being penetrated or is
+  penetrating another
 
-  this is applied to all the individual rates above, except for PenetrationRate
+  this is used to increase the time between orgasm during sex regardless of
+  interactions while still allowing quicker orgasms for more ad hoc interactions
 
 
 3.5 Mood
@@ -539,16 +539,22 @@ goes back to base.
 3.10 Sensitivity
 ----------------
 Controls the rate at which excitement goes up when various body parts are
-stimulated or events are happening. Each sensitivity has a "rate" and a "max":
+stimulated or events are happening. Each sensitivity has rates and maximum
+values, some both for physical and non-physical body parts.
 
-- rate
+The nonPhysicalRate and nonPhysicalMax values are only used if the only body
+part involved is a strapon.
+
+
+- rate, or physicalRate and nonPhysicalRate
   the rate at which excitement goes up when this sensitivity is active
 
-- max
+- max, or physicalMax and nonPhysicalMax
   the maximum excitement value that can be reached with this source alone; if
   this is not 1.0, the character cannot have an orgasm from this source
 
   if the excitement is above the max, this sensitivity is ignored
+
 
 A sensitivity can also have a "modifiers" section, to adjust rates depending
 on the source. The rate is multiplied by the modifier. The source can be "self",

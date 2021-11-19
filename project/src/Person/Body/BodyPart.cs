@@ -57,6 +57,11 @@ namespace Cue
 			get { return part_.Exists; }
 		}
 
+		public bool IsPhysical
+		{
+			get { return part_.IsPhysical; }
+		}
+
 		public string Name
 		{
 			get { return BP.ToString(type_); }

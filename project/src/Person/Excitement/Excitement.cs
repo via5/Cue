@@ -180,8 +180,8 @@ namespace Cue
 				var o = others_[p.PersonIndex];
 
 				o.rate = p.Excitement.GetPhysicalRate();
-				o.mod = ss.Rate;
-				o.max = ss.Maximum;
+				o.mod = ss.PhysicalRate;
+				o.max = ss.PhysicalMaximum;
 
 				if (person_.Mood.Get(Moods.Excited) <= o.max)
 				{
@@ -258,6 +258,9 @@ namespace Cue
 
 				if (parts != "")
 					line += ", parts: " + parts;
+
+				if (s.Active && !s.IsPhysical)
+					line += $" (not physical)";
 
 				if (!active)
 					line += ")";

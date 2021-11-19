@@ -35,6 +35,11 @@ namespace Cue.Sys.Vam
 			get { return dildo_; }
 		}
 
+		public override bool IsPhysical
+		{
+			get { return false; }
+		}
+
 		public void Set(bool b)
 		{
 			if (Exists == b)
