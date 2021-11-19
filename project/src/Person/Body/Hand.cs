@@ -42,6 +42,11 @@
 					return sys_.Rotation;
 			}
 		}
+
+		public override string ToString()
+		{
+			return sys_?.ToString() ?? "badbone";
+		}
 	}
 
 	public class Finger

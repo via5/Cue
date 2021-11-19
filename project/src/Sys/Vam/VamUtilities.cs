@@ -23,22 +23,51 @@ namespace Cue.Sys.Vam
 				ForEachChildRecursive(c, f);
 		}
 
-		public static GameObject FindChildRecursive(Component c, string name)
+		public static Transform FindChildRecursive(Component c, string name)
 		{
-			return FindChildRecursive(c.gameObject, name);
+			return FindChildRecursive(c.transform, name);
 		}
 
-		public static GameObject FindChildRecursive(GameObject o, string name)
+		public static Transform FindChildRecursive(GameObject o, string name)
 		{
-			if (o == null)
+			return FindChildRecursive(o.transform, name);
+		}
+
+		public static Transform FindChildRecursive(Transform t, string name)
+		{
+			if (t == null)
 				return null;
 
-			if (o.name == name)
-				return o;
+			if (t.name == name)
+				return t;
 
-			foreach (Transform c in o.transform)
+			var cs = name.Split('/');
+
+			Transform r = FindChildRecursiveImpl(t, cs[0]);
+			if (r == null)
+				return null;
+
+			for (int i = 1; i < cs.Length; ++i)
 			{
-				var r = FindChildRecursive(c.gameObject, name);
+				r = r.Find(cs[i]);
+				if (r == null)
+					return null;
+			}
+
+			return r;
+		}
+
+		private static Transform FindChildRecursiveImpl(Transform t, string name)
+		{
+			if (t == null)
+				return null;
+
+			if (t.name == name)
+				return t;
+
+			foreach (Transform c in t)
+			{
+				var r = FindChildRecursiveImpl(c, name);
 				if (r != null)
 					return r;
 			}

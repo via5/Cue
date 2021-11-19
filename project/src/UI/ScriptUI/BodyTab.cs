@@ -234,7 +234,7 @@ namespace Cue
 		struct BoneWidgets
 		{
 			public Bone bone;
-			public VUI.Label name, position, direction;
+			public VUI.Label name, source, position, direction;
 		}
 
 		private readonly Person person_;
@@ -245,11 +245,12 @@ namespace Cue
 		{
 			person_ = ps;
 
-			var gl = new VUI.GridLayout(3);
+			var gl = new VUI.GridLayout(4);
 			gl.UniformHeight = false;
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Position", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Rotation", UnityEngine.FontStyle.Bold));
 
@@ -274,15 +275,18 @@ namespace Cue
 					w.bone = b;
 
 					w.name = new VUI.Label($"{h.Name}/{f.Name}/{b.Name}");
+					w.source = new VUI.Label(b.ToString());
 					w.position = new VUI.Label();
 					w.direction = new VUI.Label();
 
 					int fontSize = 20;
 					w.name.FontSize = fontSize;
+					w.source.FontSize = fontSize;
 					w.position.FontSize = fontSize;
 					w.direction.FontSize = fontSize;
 
 					p.Add(w.name);
+					p.Add(w.source);
 					p.Add(w.position);
 					p.Add(w.direction);
 

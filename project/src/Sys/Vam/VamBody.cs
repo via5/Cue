@@ -39,6 +39,11 @@ namespace Cue.Sys.Vam
 				return U.FromUnity(bone_.transform.rotation);
 			}
 		}
+
+		public override string ToString()
+		{
+			return $"{bone_.name}";
+		}
 	}
 
 
@@ -98,6 +103,7 @@ namespace Cue.Sys.Vam
 		private Color initialColor_;
 		private DAZBone hipBone_ = null;
 		private IBodyPart[] parts_;
+		private Hand leftHand_, rightHand_;
 
 		private float sweat_ = 0;
 		private IEasing sweatEasing_ = new CubicInEasing();
@@ -117,7 +123,7 @@ namespace Cue.Sys.Vam
 				Log.Error("no skin color parameter");
 
 			initialColor_ = color_.Value;
-			parts_ = CreateBodyParts();
+			Load();
 		}
 
 		public override IBodyPart[] GetBodyParts()
@@ -185,12 +191,12 @@ namespace Cue.Sys.Vam
 			return cs.useAdvancedColliders;
 		}
 
-		private IBodyPart[] CreateBodyParts()
+		private void Load()
 		{
-			return Load(Atom.IsMale, AdvancedColliders());
+			Load(Atom.IsMale, AdvancedColliders());
 		}
 
-		private IBodyPart[] Load(bool male, bool advancedColliders)
+		private void Load(bool male, bool advancedColliders)
 		{
 			var d = JSON.Parse(
 				Cue.Instance.Sys.ReadFileIntoString(
@@ -240,7 +246,27 @@ namespace Cue.Sys.Vam
 					list.Add(p);
 			}
 
-			return list.ToArray();
+			parts_ = list.ToArray();
+
+
+
+			foreach (JSONClass o in d["hands"].AsArray)
+			{
+				if (!o.HasKey("type"))
+					throw new LoadFailed("hand missing type");
+
+				if (o["type"].Value == "left")
+					leftHand_ = LoadHand(o);
+				else if (o["type"].Value == "right")
+					rightHand_ = LoadHand(o);
+				else
+					throw new LoadFailed($"bad hand type '{o["type"].Value}'");
+			}
+
+			if (leftHand_.bones == null)
+				Log.Error("missing left hand");
+			if (rightHand_.bones == null)
+				Log.Error("missing right hand");
 		}
 
 		private IBodyPart LoadPart(bool male, bool advancedColliders, JSONClass o, Func<string, JSONNode> getVar)
@@ -361,57 +387,60 @@ namespace Cue.Sys.Vam
 
 		public override Hand GetLeftHand()
 		{
-			var h = new Hand();
-			h.bones = GetHandBones("l");
-			h.fist = new VamMorph(Atom, "Left Fingers Fist");
-			h.inOut = new VamMorph(Atom, "Left Fingers In-Out");
-
-			return h;
+			return leftHand_;
 		}
 
 		public override Hand GetRightHand()
 		{
+			return rightHand_;
+		}
+
+		private Hand LoadHand(JSONClass o)
+		{
 			var h = new Hand();
-			h.bones = GetHandBones("r");
-			h.fist = new VamMorph(Atom, "Right Fingers Fist");
-			h.inOut = new VamMorph(Atom, "Right Fingers In-Out");
+
+			h.fist = new VamMorph(Atom, J.ReqString(o, "fistMorph"));
+			h.inOut = new VamMorph(Atom, J.ReqString(o, "fingersInOutMorph"));
+			h.bones = LoadHandBones(o);
 
 			return h;
 		}
 
-		private IBone[][] GetHandBones(string s)
+		private IBone[][] LoadHandBones(JSONClass o)
 		{
 			var bones = new IBone[5][];
+			var hand = U.FindRigidbody(Atom.Atom, J.ReqString(o, "rigidbody"));
 
-			for (int i = 0; i < 5; ++i)
-				bones[i] = new IBone[3];
+			if (!o.HasKey("bones"))
+				throw new LoadFailed("hand missing bones");
 
-			var hand = U.FindRigidbody(Atom.Atom, $"{s}Hand");
+			var bo = o["bones"].AsObject;
 
-			bones[0][0] = FindFingerBone(hand, s, $"{s}Thumb1");
-			bones[0][1] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2");
-			bones[0][2] = FindFingerBone(hand, s, $"{s}Thumb1/{s}Thumb2/{s}Thumb3");
-
-			bones[1][0] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1");
-			bones[1][1] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1/{s}Index2");
-			bones[1][2] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Index1/{s}Index2/{s}Index3");
-
-			bones[2][0] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1");
-			bones[2][1] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1/{s}Mid2");
-			bones[2][2] = FindFingerBone(hand, s, $"{s}Carpal1/{s}Mid1/{s}Mid2/{s}Mid3");
-
-			bones[3][0] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1");
-			bones[3][1] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1/{s}Ring2");
-			bones[3][2] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Ring1/{s}Ring2/{s}Ring3");
-
-			bones[4][0] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1");
-			bones[4][1] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1/{s}Pinky2");
-			bones[4][2] = FindFingerBone(hand, s, $"{s}Carpal2/{s}Pinky1/{s}Pinky2/{s}Pinky3");
+			bones[0] = LoadFingerBones(hand, o, "thumb");
+			bones[1] = LoadFingerBones(hand, o, "index");
+			bones[2] = LoadFingerBones(hand, o, "middle");
+			bones[3] = LoadFingerBones(hand, o, "ring");
+			bones[4] = LoadFingerBones(hand, o, "little");
 
 			return bones;
 		}
 
-		private IBone FindFingerBone(Rigidbody hand, string s, string name)
+		private IBone[] LoadFingerBones(Rigidbody hand, JSONClass o, string key)
+		{
+			var bones = new IBone[3];
+
+			var a = o["bones"][key].AsArray;
+			if (a.Count != 3)
+				throw new LoadFailed($"hand finger '{key}' not an array of 3");
+
+			bones[0] = FindFingerBone(hand, a[0].Value);
+			bones[1] = FindFingerBone(hand, a[1].Value);
+			bones[2] = FindFingerBone(hand, a[2].Value);
+
+			return bones;
+		}
+
+		private IBone FindFingerBone(Rigidbody hand, string name)
 		{
 			if (hipBone_ == null)
 			{
@@ -432,21 +461,17 @@ namespace Cue.Sys.Vam
 			}
 
 
-			var id =
-				$"abdomen/abdomen2/" +
-				$"chest/{s}Collar/{s}Shldr/{s}ForeArm/{s}Hand/{name}";
-
-			var t = hipBone_.transform.Find(id);
+			var t = U.FindChildRecursive(hipBone_, name);
 			if (t == null)
 			{
-				Log.Error($"no finger bone {id}");
+				Log.Error($"no finger bone {name}");
 				return null;
 			}
 
 			var b = t.GetComponent<DAZBone>();
 			if (b == null)
 			{
-				Log.Error($"no DAZBone in {id}");
+				Log.Error($"no DAZBone in {name}");
 				return null;
 			}
 
