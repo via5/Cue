@@ -1,0 +1,598 @@
+1 Terms
+=======
+- excitement (float, [0, 1])
+  character's excitement value, orgasm at 1
+
+- tiredness (float, [0, 1])
+  how tired a character is:
+    - "base" tiredness starts at 0, goes up slightly for every orgasm,
+      decays when excitement stays low enough
+    - "actual" tiredness is never below base, but always shoots up to 1.0
+      quickly after orgasm and slowly goes back to base
+
+- energy (float, [0, 1])
+  how energetic a character is, goes up with excitement but can be dampened
+  by tiredness; see *TirednessFactor
+
+  energy is used for gaze and movement, but with independent factors,
+  because dampening movement too much makes the scene less interesting
+
+- busy
+  used for some gaze targets; whether a person is currently doing an action
+  where they're unlikely to look away, such as a HJ, BJ, etc.
+
+- gaze weight
+  each gaze target has a weight as a number; to decide which target a
+  person should look at next, the chance of a target being picked is its
+  weight divided by the sum of the weight of all targets (that is, the
+  higher the weight, the more chances a target has of getting picked)
+
+  a weight of -1 makes that target exclusive
+
+- personal space
+  a character is inside another character's personal space when certain
+  body parts are close enough (this is an expensive check, so only some
+  body parts are handled, such as hands, head, chest, hips, genitals and
+  feet)
+
+- groped
+  whether a character's head, breasts or genitals are currently being
+  touched by another character
+
+- sex
+  includes both penetration and groping
+
+- scene idle
+  the current scene is considered idle if the excitement of all characters
+  is 0
+
+- gaze emergency
+  something characters should be looking at immediately, such as another
+  character orgasming or the player's eyes when grabbing the head
+
+
+2 Types
+=======
+Various types used for the values in the JSON file.
+
+
+2.1 Durations
+-------------
+These are configurable durations that can have their min/max change
+depending on excitement.
+
+A duration can be a simple array with two floats: the minimum and maximum in
+seconds. The duration is a random number generated between the min and max,
+regenerated every time the duration elapses.
+
+A duration can also have a sliding window, which is a smaller window within
+the min and max that moves towards the max as excitement goes up.
+
+For these sliding durations, the duration is an object with two subobjects:
+"range" and "nextTimeRange". Both are Range objects, described below. The
+"range" object is for the duration itself, the "nextTimeRange" object is for
+the interval after which the current range is regenerated.
+
+A Range object has these values:
+
+    min, max      minimum and maximum durations (seconds, required)
+
+    window        duration range from the minimum, slides towards max as
+                  excitement goes up (optional, seconds, defaults to full
+                  range)
+
+    windowEasing  the easing used for the sliding window (optional, default
+                  "linear", see Easings.cs)
+
+    rng           random generation algorithm (optional, defaults to
+                  "uniform"); see below
+
+As an example, a sliding duration with a min/max of [1.0, 2.0] and a window
+of 0.2 would generate durations between [1.0, 1.2] if excitement is 0.0 and
+between [1.8, 2.0] if excitement is 1.0. The json would be like this:
+
+    "someDuration":
+    {
+        "range":
+        {
+            "min": 1.0,
+            "max": 2.0,
+            "window": 0.2
+        }
+    }
+
+The 'rng' value can be a string "uniform" or "normal". It can also be an
+object with a 'type' value with the same strings. If the 'type' is "normal",
+these additional values are supported:
+
+    centerMin,   range of the center of the distribution, both [0, 1],
+    centerMax    defaults to 0.5 for both; as excitement goes up, the center
+                 goes towards the max
+
+                 (this is used for the mean, as `(min + max) * center)`)
+
+    widthMin,    range of the width of the distribution; as excitement goes,
+    widthMax     up, the width goes towards the max
+
+                 values above 1.0 make a flatter curve, values below 1.0 make
+                 a higher peak around the center, defaults to 1.0 for both
+
+                 (this is used for the sigma, as `3.0/width`)
+
+
+3 Values
+========
+
+3.1 Gaze
+--------
+Controls what characters are looking at.
+
+- GazeDuration (duration)
+  time it takes to move the head to follow the eyes
+
+- GazeRandomInterval (duration)
+  time to wait before picking the next target
+
+- EmergencyGazeDuration (duration)
+  time it takes to move the head when looking at an emergency
+
+
+- GazeSaccade (bool)
+  whether saccades are enabled
+
+- GazeSaccadeInterval (duration)
+  time between saccades
+
+- GazeSaccadeMovementRange (float)
+  saccade movement range; a random value between [-this, +this] is picked for
+  both horizontal and vertical offsets
+
+
+3.2 Gaze avoidance
+------------------
+
+- AvoidGazePlayer (float)
+  excitement value below which the character avoids looking at the player
+
+- AvoidGazePlayerInsidePersonalSpace (float)
+  excitement value below which the character avoids looking at the player when
+  inside personal space
+
+- AvoidGazePlayerDuringSex (float)
+  excitement value below which the character avoids looking at the player
+  when involved in sex
+
+- AvoidGazePlayerDelayAfterOrgasm (float)
+  time after orgasm during which avoidance with player is disabled, starts
+  after the post-orgasm state (seconds)
+
+- AvoidGazePlayerWeight (float)
+  when the player is being avoided, weight of the player's eyes for gaze; set
+  to -1 to actively avoid the player by picking a different target if the
+  player gets into view
+
+  see also AvoidGazeAnger
+
+- AvoidGazeOthers (float)
+  excitement value below which the character avoids looking at other characters
+
+- AvoidGazeOthersInsidePersonalSpace (float)
+  excitement value below which the character avoids looking at other
+  characters when they're inside personal space
+
+- AvoidGazeOthersDuringSex (float)
+  excitement value below which the character avoids looking at other characters
+  when involved in sex with this one
+
+- AvoidGazeOthersDelayAfterOrgasm (float)
+  time after orgasm during which avoidable with others is disabled, starts
+  after the post-orgasm state (seconds)
+
+- AvoidGazeOthersWeight (float)
+  when other characters are being avoided, weight of the characters' eyes for
+  gaze; set to -1 to actively avoid other characters by picking a different
+  target if they get into view
+
+  see also AvoidGazeAnger
+
+- AvoidGazeUninvolvedHavingSex (float)
+  excitement value below which this character avoids looking at other
+  characters having sex with someone else
+
+
+3.3 Gaze weights
+----------------
+
+- LookAboveMaxWeight (float)
+  looking at a target directly above the character's head when mood is normal
+  or post-orgasm; this weight is multiplied by the character's energy
+
+- LookAboveMaxWeightOrgasm (float)
+  looking at a target directly above the character's head during orgasm; this
+  weight is multiplied by the character's energy
+
+- LookAboveMinExcitement (float)
+  excitement value below which looking up is disabled; avoids looking up for
+  low excitement, since it's a pretty strong emote, should probably be higher
+  than MaxOtherSexExcitement
+
+- LookAboveMinPhysicalRate (float)
+  physical rate value below which looking up is disabled; avoids looking up
+  when the excitement source is only emotional (note that rates are low values,
+  typically below 0.02)
+
+- IdleNaturalRandomWeight (float)
+  looking at a random point when not busy and scene is idle
+
+- IdleEmptyRandomWeight (float)
+  looking at a random point when not busy and scene is idle, and there is only
+  this character and the player in the scene
+
+- NaturalRandomWeight (float)
+  looking at a random point when not busy and scene is not idle
+
+- NaturalOtherEyesWeight (float)
+  looking at a random person when not busy; see also OtherEyesExcitementWeight
+
+- BusyOtherEyesWeight (float)
+  looking at a random person when busy; see also OtherEyesExcitementWeight
+
+- NaturalPlayerEyesWeight (float)
+  looking at the player randomly when not busy, used instead of
+  NaturalOtherEyesWeight for the player (allows for randomly looking at the
+  player more often)
+
+- BusyPlayerEyesWeight (float)
+  looking at the player randomly when busy, used instead of BusyOtherEyesWeight
+  for the player (allows for randomly looking at the player more often)
+
+- MaxTirednessForRandomGaze (float)
+  tiredness value above which random points and targets are disabled [0, 1]
+
+- OtherEyesExcitementWeight (float)
+  used with naturalOtherEyesWeight and busyOtherEyesWeight: multiplied by the
+  target's excitement and added to those weights; this is used to increase the
+  chances of looking at a target that has a high excitement value
+
+- OtherEyesOrgasmWeight (float)
+  looking at a person who is currently orgasming
+
+
+- BlowjobEyesWeight, BlowjobGenitalsWeight (float)
+  if this character is giving a BJ, looking at the other character's eyes
+  or genitals
+
+- HandjobEyesWeight, HandjobGenitalsWeight (float)
+  if this character is giving a HJ, looking at the other character's eyes or
+  genitals
+
+- PenetratedEyesWeight, PenetratedGenitalsWeight (float)
+  if this character is being penetrated, looking at the other character's eyes
+  or genitals
+
+- PenetratingEyesWeight, PenetratingGenitalsWeight (float)
+  if this character penetrating another, looking at the other character's eyes
+  or genitals
+
+- GropedEyesWeight, GropedTargetWeight (float)
+  while being groped, looking at the other character's eyes or the body part
+  being groped
+
+- GropingEyesWeight, GropingTargetWeight (float)
+  while groping another, looking at the other character's eyes or the body part
+  being groped
+
+- OtherBlowjobEyesWeight, OtherBlowjobTargetEyesWeight,
+  OtherBlowjobTargetGenitalsWeight (float)
+  if another character is giving a BJ, looking at that character's eyes or the
+  target's eyes or genitals
+
+- OtherHandjobEyesWeight, OtherHandjobTargetEyesWeight,
+  OtherHandjobTargetGenitalsWeight (float)
+  if another character is giving a HJ, looking at that character's eyes or the
+  target's eyes or genitals
+
+- OtherPenetrationEyesWeight, OtherPenetrationSourceEyesWeight,
+  OtherPenetrationSourceGenitalsWeight (float)
+  if another character is being penetrated, looking at that character's eyes or
+  the penetrator's eyes genitals
+
+- OtherGropedEyesWeight, OtherGropedSourceEyesWeight,
+  OtherGropedTargetWeight (float)
+  if another character is being groped, looking at that character's eyes or
+  body part, or the groper's eyes
+
+
+- LookAtPlayerOnGrabWeight (float)
+  if the character's head is being grabbed by the player, looking at the player
+
+- LookAtPlayerTimeAfterGrab (float)
+  minimum time to keep looking at the player after the head grab has been
+  released; the actual time might be longer since there might be a delay
+  before the next target is picked
+
+
+
+3.4 Excitement
+--------------
+
+- KissSpeedEnergyFactor (float)
+  effect of energy on kiss movements; depends on the integration plugin, a
+  value of 1.0 should make morph movements faster as energy goes up
+
+- IdleMaxExcitement (float)
+  excitement value under which the character is considered idle; when all
+  characters in a scene are idle, some behaviours will change, such as looking
+  around randomly
+
+- TirednessExcitementRateFactor (float)
+  impact of tiredness on excitement rate; slows down excitement buildup as
+  tiredness goes up, that is, increases the delay between orgasms the more
+  orgasms the character has in a row
+
+  higher values give slower rates: 0.0 ignores tiredness and 1.0 will freeze
+  the rate completely when tiredness is maxed out
+
+  excitement rate is `rate - (rate * tiredness * this)`, where `rate` is the
+  sum of emotional and physical rates and tiredness is [0, 1]
+
+  example: if the rate is at 2.0, this is 0.6, and tiredness is maxed out at
+  1.0, the excitement rate becomes `2.0 - (2.0 * 1.0 * 0.6)`, which is 0.8
+  (go up at 40% speed when tiredness is maxed); if the tiredness is 0.5, the
+  rate becomes `2.0 - (2.0 * 0.5 * 0.6)`, which is `1.4` (go up at 70% speed
+  when tiredness is at half)
+
+- GazeEnergyTirednessFactor (float)
+  impact of tiredness on excitement to determine gaze energy; affects speed
+  of head movement and delay between switching targets
+
+  gaze energy is `excitement - (tiredness * this)`, clamped [0, 1]
+
+- GazeTirednessFactor (float)
+  impact of tiredness on gaze; inhibits some gaze targets, see
+  MaxTirednessForRandomGaze
+
+  gaze tiredness is `tiredness * this`, clamped [0, 1]
+
+- MovementEnergyTirednessFactor (float)
+  impact of tiredness on excitement to determine movement energy; affects
+  the speed of various movements, such as sex animations
+
+  movement energy is `excitement - (tiredness * this)`, clamped [0, 1]
+
+- ExpressionTirednessFactor (float)
+  impact of tiredness on expressions; affects range of morph values and rate
+  of change for tired expressions, and dampens the other expressions
+
+  expression tiredness is `tiredness * this`, clamped [0, 1]
+
+- MovementEnergyRampUpAfterOrgasm (float)
+  time in seconds after post-orgasm until movement energy can be at its
+  maximum again; if greater than 0, movement energy will be forced to 0 after
+  post-orgasm and ramp up over time, which makes animations restart smoothly
+  instead of being very fast right after orgasm
+
+- MovementEnergyRampUpAfterOrgasmEasing (easing)
+  easing used when ramping up movement energy
+
+
+3.5 Mood
+--------
+
+- AvoidGazeAnger (float)
+  anger value when the character is currently looking at something it doesn't
+  like; see AvoidGazePlayerWeight and AvoidGazeOthersWeight
+
+- AngerWhenPlayerInteracts (float)
+  anger value when the player is interacting with this character; as soon as
+  interaction starts, anger is set to this value and hapiness to 0
+
+  if this is 0, none of the stuff below applies
+
+- AngerMaxExcitementForAnger (float)
+  excitement value above which this character starts being less angry; while
+  excitement is below this, anger is always at AngerWhenPlayerInteracts
+
+- AngerMaxExcitementForHappiness (float)
+  excitement value above which this character starts getting happier; while
+  excitement is below this, happiness is always at 0
+
+- AngerExcitementFactorForAnger (float)
+  impact of excitement on anger above AngerMaxExcitementForAnger
+
+  anger is always at max when excitement is below AngerMaxExcitementForAnger,
+  this determines how fast anger drops as excitement keeps rising
+
+  for example:
+  - a value of 1.0 would make anger drop to zero when excitement is at max
+  - a value of 2.0 would make anger drop to zero when excitement is halfway
+    between AngerMaxExcitementForAnger and max
+
+- AngerExcitementFactorForHappiness (float)
+  impact of excitement on happiness above AngerMaxExcitementForHappiness
+
+  happiness is always at zero when excitement is below
+  AngerMaxExcitementForHappiness, this determines how fast happiness rises with
+  excitement
+
+  for example:
+  - a value of 1.0 would set happiness to max when excitement is at max
+  - a value of 2.0 would set happiness to max when excitement is halfway
+    between AngerMaxExcitementForHappiness and max
+
+- MaxHappiness (float)
+  happiness will never rise above this value
+
+
+3.6 Voices
+----------
+Controls datasets and pitches depending on intensities; only applies to
+MacGruber's Breathing plugin for now
+
+The voice pitch values are [0, 1]. Higher values have higher pitch. The
+integration module is in charge of figuring out what that means. For
+MacGruber's Breathing, this corresponds to a pitch between [0.8, 1.2].
+
+
+orgasm object:
+  dataset: name of the orgasm dataset
+  pitch:   pitch during orgasm
+
+datasets array:
+ object:
+   dataset:       name of the breathe dataset
+   pitch:         pitch
+
+   intensityMin,
+   intensityMax:  range of intensities where this dataset is used; intensity
+                  is [0, 1] and corresponds to the movement energy (see
+                  MovementEnergyTirednessFactor)
+
+
+3.7 Appearance
+--------------
+
+- MaxSweat (float)
+  maximum gloss factor; 1.0 should be realistic, but can go above or below
+
+- MaxFlush (float)
+  maximum lerp towards red; 1.0 should be realistic, but can go above or below
+
+
+3.8 Temperature
+---------------
+Body temperature is defined by two numbers: the current value and the
+target value, both [0, 1]. `temperatureExcitementMax` is used to determine the
+target value based on excitement, and `temperatureExcitementRate` and
+`temperatureDecayRate` are rates at which the current value increases or
+decreases to reach the target
+
+- TemperatureExcitementMax (float)
+  the excitement value at which body temperature should be at 1.0 (its
+  maximum); the target temperature is therefore
+      `excitement / temperatureExcitementMax`, clamped[0, 1]
+
+- TemperatureExcitementRate (float)
+  the rate at which body temperature increases towards the current target based
+  on the current excitement; the rate is the current excitement (values [0, 1])
+  multiplied by this
+
+- TemperatureDecayRate (float)
+  rate at which the temperature decreases when the target is below the current
+  temperature
+
+
+3.9 Tiredness
+-------------
+Tiredness is defined by two numbers: the base value and the current value,
+both [0, 1]. The base tiredness starts at 0, goes up slightly for every
+orgasm, and decays when excitement stays low enough. The current value is
+never below base, but always shoots up to 1.0 quickly after orgasm and slowly
+goes back to base.
+
+- TirednessRateDuringPostOrgasm (float)
+  the rate at which tiredness increases during the post-orgasm state; by
+  default, the rate is high so 1.0 is reached during `postOrgasmTime`
+
+- TirednessBaseDecayRate (float)
+  the rate at which the base value decreases if excitement is lower than
+  `tirednessMaxExcitementForBaseDecay`
+
+- TirednessBackToBaseRate (float)
+  the rate at which the current value decreases back to the base value
+
+- DelayAfterOrgasmUntilTirednessDecay (float)
+  time after post-orgasm during which the base value will not decay
+
+- TirednessMaxExcitementForBaseDecay (float)
+  if the excitement is above this, the base value will not decay
+
+- OrgasmBaseTirednessIncrease (float)
+  added to the base value on each orgasm
+
+
+3.10 Sensitivity
+----------------
+Controls the rate at which excitement goes up when various body parts are
+stimulated. Each source has a "rate" and a "max":
+
+  - rate: the rate at which excitement goes up when the source is
+          activated
+  - max:  the maximum excitement value that can be reached with this
+          source alone; if this is not 1.0, the character cannot have an
+          orgasm from this source
+
+The rate is multiplied by a value that depends on the level of stimulation of
+a particular body part, controlled by the `factor` parameters below. For
+example, the default `lipsFactor` is 0.1 and `mouthFactor` is 0.9. If only
+the lips are being triggered, `mouthRate` is multiplied by 0.1. The value is
+not clamped and can go above 1.0.
+
+Although these are named "factors", they're really just added together. VaM
+does not have variable triggers that depend on the pressure being applied,
+they're either 0 or 1. These factors are therefore always multiplied by 1
+when the trigger is active. If a future version supports variable triggers,
+the factors should scale accordingly.
+
+If multiple sources are active at the same time, the highest "max" value is
+used and rates are added.
+
+As an example, the rate at which excitement goes up when the mouth is
+triggered would be something like:
+
+    ((lipsTrigger * lipsFactor) + (mouthTrigger * mouthFactor)) * mouthRate
+
+clamped between [0, mouthMax]. Both `lipsTrigger` and `mouthTrigger` can be
+either 0 or 1 depending on whether the trigger is active in VaM.
+
+
+- ExcitementDecayRate (float)
+  rate at which excitement decreases when there is no stimulation of any
+  body part
+
+- ExcitementPostOrgasm (float)
+  excitement will reset to this value after orgasm
+
+- OrgasmTime, PostOrgasmTime (float)
+  time during which orgasms and post-orgasm states will last; both are used
+  for animations and adjusting tiredness
+
+- RateAdjustment (float)
+  a flat value that multiplies the excitement rate, defaults to 1.0; this
+  can be changed to globally increase or decrease the rate at which
+  excitement changes
+
+- PenetrationDamper (float)
+  this is like RateAdjustement, but it only applies while this character is
+  being penetrated or is penetrating another; this is used to increase the time
+  between orgasm during sex regardless of interactions while still allowing
+  quicker orgasms for more ad hoc interactions
+
+  this is applied to all the individual rates above, except for PenetrationRate
+
+
+3.10.1 Specific modifiers
+-------------------------
+Allows for changing rates when specific body parts and characters are
+interacting
+
+the target is the character whose excitement is currently being calculated;
+the source is the other character that is touching this one; they both might
+be the same
+
+`source` and `target` may be one of:
+  - "" or "any"
+  - "self"
+  - "player"
+  - the name of a person in the scene
+
+for `target`, "", "any" and "self" are equivalent
+
+
+  source           source character
+  sourceBodyPart   name of the source body part (see BodyPartEnum.cs)
+  target           target character
+  targetBodyPart   name of the target body part (see BodyPartEnum.cs)
+
+this feature is used to increase the rates when the player is touching
+genitals, because the player is awesome, and to reduce rates for masturbation

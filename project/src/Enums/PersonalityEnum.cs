@@ -100,16 +100,15 @@ namespace Cue
 		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(75);
 		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(76);
 		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(77);
-		public static readonly FloatIndex NeutralVoicePitch = new FloatIndex(78);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(79);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(80);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(81);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(82);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(83);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(84);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(78);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(79);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(80);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(81);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(82);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(83);
 
-		public const int FloatCount = 85;
-		public override int GetFloatCount() { return 85; }
+		public const int FloatCount = 84;
+		public override int GetFloatCount() { return 84; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -307,7 +306,6 @@ namespace Cue
 			"delayAfterOrgasmUntilTirednessDecay",
 			"tirednessMaxExcitementForBaseDecay",
 			"orgasmBaseTirednessIncrease",
-			"neutralVoicePitch",
 			"excitementDecayRate",
 			"excitementPostOrgasm",
 			"orgasmTime",
@@ -502,7 +500,6 @@ namespace Cue
 			"delayAfterOrgasmUntilTirednessDecay",
 			"tirednessMaxExcitementForBaseDecay",
 			"orgasmBaseTirednessIncrease",
-			"neutralVoicePitch",
 			"excitementDecayRate",
 			"excitementPostOrgasm",
 			"orgasmTime",

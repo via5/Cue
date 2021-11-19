@@ -31,9 +31,8 @@ namespace Cue
 			{
 				if (pitch_ < 0)
 				{
-					float neutral = p.Personality.Get(PS.NeutralVoicePitch);
 					float scale = p.Atom.Scale;
-					SetPitch(neutral + (1 - scale));
+					SetPitch(0.5f + (1 - scale));
 				}
 
 				return pitch_;
