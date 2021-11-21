@@ -203,6 +203,9 @@ namespace Cue
 
 			for (int i = 0; i < forcedTriggers_.Count; ++i)
 			{
+				if (forcedTriggers_[i].personIndex == -1 && tempList_.Count > 0)
+					continue;
+
 				bool found = false;
 
 				for (int j = 0; j < triggers_.Length; ++j)

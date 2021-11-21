@@ -151,6 +151,11 @@ namespace Cue
 			get { return sourcePersonIndex_; }
 		}
 
+		public bool IsPlayer
+		{
+			get { return (sourcePersonIndex_ == Cue.Instance.Player.PersonIndex); }
+		}
+
 		public bool Active
 		{
 			get { return (validActive_ > 0); }

@@ -3,7 +3,209 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class Excitement
+	public abstract class ExcitementSource
+	{
+		protected readonly Person person_;
+		private bool enabledForOthers_ = true;
+		private bool enabledForPlayer_ = true;
+
+		protected ExcitementSource(Person p)
+		{
+			person_ = p;
+		}
+
+		public virtual bool Physical
+		{
+			get { return true; }
+		}
+
+		public bool EnabledForOthers
+		{
+			get { return enabledForOthers_; }
+			set { enabledForOthers_ = value; }
+		}
+
+		public bool EnabledForPlayer
+		{
+			get { return enabledForPlayer_; }
+			set { enabledForPlayer_ = value; }
+		}
+
+		public virtual void Update()
+		{
+			// no-op
+		}
+
+		public abstract float GetMaximum();
+		public abstract float GetRate(float penDampen);
+
+		public abstract void Debug(List<string> debug);
+	}
+
+
+	public class ZoneExcitementSource : ExcitementSource
+	{
+		private int zone_;
+
+		public ZoneExcitementSource(Person p, int ss)
+			: base(p)
+		{
+			zone_ = ss;
+		}
+
+		public override float GetMaximum()
+		{
+			var z = person_.Body.Zone(zone_);
+			if (z == null)
+				return 0;
+
+			float max = 0;
+
+			for (int j = 0; j < z.Sources.Length; ++j)
+			{
+				var src = z.Sources[j];
+
+				if (src.Active)
+					max = Math.Max(max, src.Maximum);
+			}
+
+			return max;
+		}
+
+		public override float GetRate(float penDampen)
+		{
+			var z = person_.Body.Zone(zone_);
+			if (z == null)
+				return 0;
+
+			float rate = 0;
+
+			for (int j = 0; j < z.Sources.Length; ++j)
+			{
+				var src = z.Sources[j];
+
+				if (UsableSource(src))
+				{
+					float thisRate = src.Rate * src.Modifier;
+
+					if (zone_ != SS.Penetration)
+						thisRate *= penDampen;
+
+					rate += thisRate;
+				}
+			}
+
+			return rate;
+		}
+
+		private bool UsableSource(ErogenousZoneSource s)
+		{
+			if (s.Active && (person_.Mood.Get(Moods.Excited) <= s.Maximum))
+			{
+				if ((EnabledForPlayer && s.IsPlayer) ||
+					(EnabledForOthers && !s.IsPlayer))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public override void Debug(List<string> debug)
+		{
+			string damp = "";
+			if (person_.Body.Zone(SS.Penetration).Active && zone_ != SS.Penetration)
+				damp = $" (damp={person_.Personality.Get(PS.PenetrationDamper):0.00})";
+
+			string disabled = "";
+
+			if (!EnabledForOthers && !EnabledForPlayer)
+				disabled = " (disabled for others/players)";
+			else if (!EnabledForOthers)
+				disabled = " (disabled for others)";
+			else if (!EnabledForPlayer)
+				disabled = " (disabled for player)";
+
+			debug.Add($"{SS.ToString(zone_)}:{damp}{disabled}");
+			DebugZone(zone_, debug);
+		}
+
+		private void DebugZone(int sensitivityIndex, List<string> debug)
+		{
+			var z = person_.Body.Zone(sensitivityIndex);
+			var srcs = z.Sources;
+
+			for (int i = 0; i < srcs.Length; ++i)
+			{
+				var s = srcs[i];
+				if (s.StrictlyActiveCount == 0)
+					continue;
+
+				bool usable = UsableSource(s);
+
+				string line = "  ";
+				if (!usable)
+					line += "(";
+
+				line += $"{s}";
+				line += $" rate={s.Rate} mod={s.Modifier} max={s.Maximum}";
+
+				string parts = "";
+
+				for (int j = 0; j < BP.Count; ++j)
+				{
+					if (s.IsStrictlyActive(j))
+					{
+						if (parts != "")
+							parts += ", ";
+
+						parts += DebugMakePart(s, j);
+					}
+				}
+
+				if (s.IsStrictlyActive(BP.None))
+				{
+					if (parts != "")
+						parts += ", ";
+
+					parts += DebugMakePart(s, BP.None);
+				}
+
+				if (parts != "")
+					line += ", parts: " + parts;
+
+				if (s.Active && !s.IsPhysical)
+					line += $" (not physical)";
+
+				if (!usable)
+					line += ")";
+
+				debug.Add(line);
+			}
+		}
+
+		private string DebugMakePart(ErogenousZoneSource src, int part)
+		{
+			string s = "";
+
+			if (part == BP.None)
+				s += "unknown";
+			else
+				s += BP.ToString(part);
+
+			s += "=>";
+
+			if (src.TargetBodyPart(part) == BP.None)
+				s += "unknown";
+			else
+				s += BP.ToString(src.TargetBodyPart(part));
+
+			return s;
+		}
+	}
+
+	public class OthersExcitementSource : ExcitementSource
 	{
 		class Other
 		{
@@ -13,10 +215,106 @@ namespace Cue
 			public bool active;
 		}
 
+		private Other[] others_;
+
+		public OthersExcitementSource(Person p)
+			: base(p)
+		{
+			others_ = new Other[Cue.Instance.ActivePersons.Length];
+			for (int i = 0; i < others_.Length; ++i)
+				others_[i] = new Other();
+		}
+
+		public override bool Physical
+		{
+			get { return false; }
+		}
+
+		public override void Update()
+		{
+			for (int i = 0; i < others_.Length; ++i)
+			{
+				others_[i].rate = 0;
+				others_[i].mod = 0;
+				others_[i].max = 0;
+				others_[i].active = false;
+			}
+
+			int highest = -1;
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_ || p.Status.PenetratedBy(person_) || person_.Status.PenetratedBy(p))
+					continue;
+
+				var ss = person_.Personality.Sensitivities.Get(SS.OthersExcitement);
+				var o = others_[p.PersonIndex];
+
+				o.rate = p.Excitement.CalculatePhysicalRate();
+				o.mod = ss.PhysicalRate;
+				o.max = ss.PhysicalMaximum;
+
+				if (person_.Mood.Get(Moods.Excited) <= o.max)
+				{
+					if (highest == -1)
+						highest = p.PersonIndex;
+					else if (o.rate > others_[highest].rate)
+						highest = p.PersonIndex;
+				}
+			}
+
+			if (highest >= 0)
+				others_[highest].active = true;
+		}
+
+		public override float GetMaximum()
+		{
+			float max = 0;
+
+			for (int i = 0; i < others_.Length; ++i)
+				max = Math.Max(max, others_[i].max);
+
+			return max;
+		}
+
+		public override float GetRate(float penDampen)
+		{
+			float rate = 0;
+
+			for (int i = 0; i < others_.Length; ++i)
+			{
+				if (others_[i].active)
+					rate += others_[i].rate * others_[i].mod;
+			}
+
+			return rate;
+		}
+
+		public override void Debug(List<string> debug)
+		{
+			debug.Add($"others excitement:");
+
+			for (int i = 0; i < others_.Length; ++i)
+			{
+				var o = others_[i];
+				if (o.rate > 0)
+				{
+					if (o.active)
+						debug.Add($"  {Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max}");
+					else
+						debug.Add($"  ({Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max})");
+				}
+			}
+		}
+	}
+
+
+	public class Excitement
+	{
 		private const float UpdateInterval = 1.0f;
 
 		private Person person_;
-		private Other[] others_ = null;
+		private ExcitementSource[] sources_ = new ExcitementSource[SS.Count];
 		private ForceableFloat physicalRate_ = new ForceableFloat();
 		private ForceableFloat emotionalRate_ = new ForceableFloat();
 		private float subtotalRate_ = 0;
@@ -31,9 +329,16 @@ namespace Cue
 
 		public void Init()
 		{
-			others_ = new Other[Cue.Instance.ActivePersons.Length];
-			for (int i = 0; i < others_.Length; ++i)
-				others_[i] = new Other();
+			for (int i = 0; i < SS.Count; ++i)
+			{
+				if (i == SS.OthersExcitement)
+					sources_[i] = new OthersExcitementSource(person_);
+				else
+					sources_[i] = new ZoneExcitementSource(person_, i);
+			}
+
+			sources_[SS.Penetration].EnabledForOthers = false;
+			sources_[SS.Genitals].EnabledForOthers = false;
 		}
 
 		public float Max
@@ -66,6 +371,11 @@ namespace Cue
 			get { return totalRate_; }
 		}
 
+		public ExcitementSource GetSource(int ss)
+		{
+			return sources_[ss];
+		}
+
 		public void Update(float s)
 		{
 			elapsed_ += s;
@@ -74,9 +384,10 @@ namespace Cue
 			{
 				elapsed_ = 0;
 
-				CheckOthersExcitement();
+				for (int i = 0; i < sources_.Length; ++i)
+					sources_[i].Update();
 
-				physicalRate_.Value = GetPhysicalRate();
+				physicalRate_.Value = CalculatePhysicalRate();
 				emotionalRate_.Value = GetEmotionalRate();
 				max_ = GetMaximum();
 
@@ -91,29 +402,13 @@ namespace Cue
 		private float GetMaximum()
 		{
 			float max = 0;
-
-			for (int i = 0; i < SS.Count; ++i)
-			{
-				var z = person_.Body.Zone(i);
-				if (z == null)
-					continue;
-
-				for (int j = 0; j < z.Sources.Length; ++j)
-				{
-					var src = z.Sources[j];
-
-					if (src.Active)
-						max = Math.Max(max, src.Maximum);
-				}
-			}
-
-			for (int i = 0; i < others_.Length; ++i)
-				max = Math.Max(max, others_[i].max);
+			for (int i=0; i<sources_.Length; ++i)
+				max = Math.Max(max, sources_[i].GetMaximum());
 
 			return max;
 		}
 
-		private float GetPhysicalRate()
+		public float CalculatePhysicalRate()
 		{
 			float rate = 0;
 
@@ -121,26 +416,12 @@ namespace Cue
 			if (person_.Body.Zone(SS.Penetration).Active)
 				dampen = person_.Personality.Get(PS.PenetrationDamper);
 
-			for (int i = 0; i < SS.Count; ++i)
+			for (int i = 0; i < sources_.Length;++i)
 			{
-				var z = person_.Body.Zone(i);
-				if (z == null)
+				if (!sources_[i].Physical)
 					continue;
 
-				for (int j = 0; j < z.Sources.Length; ++j)
-				{
-					var src = z.Sources[j];
-
-					if (src.Active && (person_.Mood.Get(Moods.Excited) <= src.Maximum))
-					{
-						float thisRate = src.Rate * src.Modifier;
-
-						if (i != SS.Penetration)
-							thisRate *= dampen;
-
-						rate += thisRate;
-					}
-				}
+				rate += sources_[i].GetRate(dampen);
 			}
 
 			return rate;
@@ -150,157 +431,28 @@ namespace Cue
 		{
 			float rate = 0;
 
-			for (int i = 0; i < others_.Length; ++i)
+			float dampen = 1;
+			if (person_.Body.Zone(SS.Penetration).Active)
+				dampen = person_.Personality.Get(PS.PenetrationDamper);
+
+			for (int i = 0; i < sources_.Length; ++i)
 			{
-				if (others_[i].active)
-					rate += others_[i].rate * others_[i].mod;
+				if (sources_[i].Physical)
+					continue;
+
+				rate += sources_[i].GetRate(dampen);
 			}
 
 			return rate;
 		}
 
-		private void CheckOthersExcitement()
-		{
-			for (int i = 0; i < others_.Length; ++i)
-			{
-				others_[i].rate = 0;
-				others_[i].mod = 0;
-				others_[i].max = 0;
-				others_[i].active = false;
-			}
-
-			int highest = -1;
-
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (p == person_ || p.Status.PenetratedBy(person_) || person_.Status.PenetratedBy(p))
-					continue;
-
-				var ss = person_.Personality.Sensitivities.Get(SS.OthersExcitement);
-				var o = others_[p.PersonIndex];
-
-				o.rate = p.Excitement.GetPhysicalRate();
-				o.mod = ss.PhysicalRate;
-				o.max = ss.PhysicalMaximum;
-
-				if (person_.Mood.Get(Moods.Excited) <= o.max)
-				{
-					if (highest == -1)
-						highest = p.PersonIndex;
-					else if (o.rate > others_[highest].rate)
-						highest = p.PersonIndex;
-				}
-			}
-
-			if (highest >= 0)
-				others_[highest].active = true;
-		}
-
-		private string DebugMakeSource(ErogenousZoneSource src, int part)
-		{
-			string s = "";
-
-			if (part == BP.None)
-				s += "unknown";
-			else
-				s += BP.ToString(part);
-
-			s += "=>";
-
-			if (src.TargetBodyPart(part) == BP.None)
-				s += "unknown";
-			else
-				s += BP.ToString(src.TargetBodyPart(part));
-
-			return s;
-		}
-
-		private void DebugZone(int sensitivityIndex, List<string> debug)
-		{
-			var z = person_.Body.Zone(sensitivityIndex);
-			var srcs = z.Sources;
-
-			for (int i = 0; i < srcs.Length; ++i)
-			{
-				var s = srcs[i];
-				if (s.StrictlyActiveCount == 0)
-					continue;
-
-				bool active = (s.Active && person_.Mood.Get(Moods.Excited) <= s.Maximum);
-
-				string line = "  ";
-				if (!active)
-					line += "(";
-
-				line += $"{s}";
-				line += $" rate={s.Rate} mod={s.Modifier} max={s.Maximum}";
-
-				string parts = "";
-
-				for (int j = 0; j < BP.Count; ++j)
-				{
-					if (s.IsStrictlyActive(j))
-					{
-						if (parts != "")
-							parts += ", ";
-
-						parts += DebugMakeSource(s, j);
-					}
-				}
-
-				if (s.IsStrictlyActive(BP.None))
-				{
-					if (parts != "")
-						parts += ", ";
-
-					parts += DebugMakeSource(s, BP.None);
-				}
-
-				if (parts != "")
-					line += ", parts: " + parts;
-
-				if (s.Active && !s.IsPhysical)
-					line += $" (not physical)";
-
-				if (!active)
-					line += ")";
-
-				debug.Add(line);
-			}
-		}
 
 		public string[] Debug()
 		{
 			var debug = new List<string>();
 
-			string damp = "";
-			if (person_.Body.Zone(SS.Penetration).Active)
-				damp = $" (dampened, mod={person_.Personality.Get(PS.PenetrationDamper)})";
-
-			debug.Add($"penetration:");
-			DebugZone(SS.Penetration, debug);
-
-			debug.Add($"mouth:{damp}");
-			DebugZone(SS.Mouth, debug);
-
-			debug.Add($"breasts:{damp}");
-			DebugZone(SS.Breasts, debug);
-
-			debug.Add($"genitals:{damp}");
-			DebugZone(SS.Genitals, debug);
-
-			debug.Add($"others excitement:");
-			for (int i = 0; i < others_.Length; ++i)
-			{
-				var o = others_[i];
-				if (o.rate > 0)
-				{
-					if (o.active)
-						debug.Add($"  {Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max}");
-					else
-						debug.Add($"  ({Cue.Instance.GetPerson(i).ID} rate={o.rate} mod={o.mod} max={o.max})");
-				}
-			}
+			for (int i = 0; i < sources_.Length; ++i)
+				sources_[i].Debug(debug);
 
 			debug.Add("values:");
 			debug.Add($"  max: {max_:0.00000}");

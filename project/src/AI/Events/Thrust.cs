@@ -113,6 +113,8 @@
 						receiver_.Person.PersonIndex, receiver_.Type);
 			}
 
+			SetZoneEnabled(true);
+
 			person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
 			running_ = true;
 
@@ -136,9 +138,19 @@
 					.RemoveForcedTrigger(
 						receiver_.Person.PersonIndex, receiver_.Type);
 			}
+
+			SetZoneEnabled(false);
+
 			running_ = false;
 			receiver_ = null;
 			anim_ = Animations.None;
+		}
+
+		private void SetZoneEnabled(bool b)
+		{
+			person_.Excitement.GetSource(SS.Genitals).EnabledForOthers = b;
+			if (receiver_ != null)
+				receiver_.Person.Excitement.GetSource(SS.Genitals).EnabledForOthers = b;
 		}
 
 		private void CheckAnim()
@@ -155,7 +167,7 @@
 				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
 				{
 					person_.Animator.PlayType(
-						anim_, new AnimationContext(receiver_));
+						anim_, new AnimationContext(receiver_?.Person));
 				}
 			}
 		}
@@ -199,6 +211,9 @@
 					var otherPart = p.Body.Get(frottageParts_[i]);
 					var d = selfGen.DistanceToSurface(otherPart);
 
+					if (d > FrottageDistance)
+						continue;
+
 					if (d < closestD)
 					{
 						if (BetterFrottageReceiver(closest, otherPart))
@@ -210,10 +225,7 @@
 				}
 			}
 
-			if (closestD <= FrottageDistance)
-				return closest;
-
-			return null;
+			return closest;
 		}
 
 		private bool BetterFrottageReceiver(BodyPart tentative, BodyPart check)

@@ -379,7 +379,13 @@
 			"type": "collider",
 			"sex": "female",
 			"rigidbody": "lThigh",
-			"colliders": ["lThigh12Joint"],
+			"colliders":
+			[
+				"lThigh10Joint",
+				"lThigh13Joint",
+				"lThigh16Joint",
+				"lThigh19Joint"
+			],
 			"controller": "lKneeControl"
 		},
 
@@ -423,7 +429,13 @@
 			"type": "collider",
 			"sex": "female",
 			"rigidbody": "rThigh",
-			"colliders": ["rThigh12Joint"],
+			"colliders":
+			[
+				"rThigh10Joint",
+				"rThigh13Joint",
+				"rThigh16Joint",
+				"rThigh19Joint"
+			],
 			"controller": "rKneeControl"
 		},
 

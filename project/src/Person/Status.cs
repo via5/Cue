@@ -216,9 +216,6 @@ namespace Cue
 			if (p == person_)
 				return false;
 
-			if (person_.Body.HasPenis)
-				return false;
-
 			return person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].Active;
 		}
 
