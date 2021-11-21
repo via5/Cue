@@ -195,7 +195,35 @@
 				}
 			]
 		},
-	]
+	],
+
+	"events":
+	[
+		{
+			"type": "kiss",
+			"startDistance": 0.15,
+			"stopDistance": 0.1,
+			"stopDistanceWithPlayer": 0.05,
+			"duration":
+			{
+				"range":
+				{
+					"min": 2,
+					"max": 100
+				},
+				"rng": "normal"
+			},
+			"interval":
+			{
+				"range":
+				{
+					"min": 30,
+					"max": 120
+				},
+				"rng": "normal"
+			}
+		}
+	],
 
 
 	"gazeDuration":
@@ -300,7 +328,7 @@
 	"expressionExcitementFactor": 1,
 	"expressionTirednessFactor": 1,
 
-	"movementEnergyDelayAfterOrgasm": 3,
+	"movementEnergyRampUpDelayAfterOrgasm": 3,
 	"movementEnergyRampUpAfterOrgasm": 30,
 	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
 

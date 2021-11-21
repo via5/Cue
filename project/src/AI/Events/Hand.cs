@@ -19,8 +19,8 @@
 		private int rightAnim_ = Animations.None;
 
 
-		public HandEvent(Person p)
-			: base("hand", p)
+		public HandEvent()
+			: base("hand")
 		{
 		}
 

@@ -408,6 +408,7 @@ namespace Cue
 		private Voice voice_;
 		private Expression[] exps_ = new Expression[0];
 		private Sensitivities sensitivities_;
+		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
 
 		public Personality(string name)
 			: base(new PS())
@@ -436,6 +437,10 @@ namespace Cue
 
 			voice_ = ps.voice_.Clone(person_);
 			sensitivities_ = ps.sensitivities_.Clone(person_);
+
+			events_.Clear();
+			foreach (var kv in ps.events_)
+				events_[kv.Key] = kv.Value.Clone();
 		}
 
 		public void Init()
@@ -446,6 +451,20 @@ namespace Cue
 		public void SetExpressions(Expression[] exps)
 		{
 			exps_ = exps;
+		}
+
+		public void SetEventData(string name, IEventData d)
+		{
+			events_[name] = d;
+		}
+
+		public IEventData CloneEventData(string name)
+		{
+			IEventData d;
+			if (events_.TryGetValue(name, out d))
+				return d.Clone();
+
+			return null;
 		}
 
 		public void Load(JSONClass o)

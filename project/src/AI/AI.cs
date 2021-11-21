@@ -5,7 +5,7 @@ namespace Cue
 	public interface IAI
 	{
 		T GetEvent<T>() where T : class, IEvent;
-		List<IEvent> Events { get; }
+		IEvent[] Events { get; }
 
 		void Init();
 		void FixedUpdate(float s);
@@ -20,18 +20,20 @@ namespace Cue
 		private Person person_ = null;
 		private Logger log_;
 		private bool eventsEnabled_ = true;
-		private readonly List<IEvent> events_ = new List<IEvent>();
+		private IEvent[] events_ = null;
 
 		public PersonAI(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "ai");
-
-			events_.AddRange(BasicEvent.All(p));
+			events_ = BasicEvent.All();
 		}
 
 		public void Init()
 		{
+			for (int i = 0; i < events_.Length; ++i)
+				events_[i].Init(person_);
+
 			person_.Animator.PlayType(Animations.Idle);
 		}
 
@@ -43,7 +45,7 @@ namespace Cue
 
 		public T GetEvent<T>() where T : class, IEvent
 		{
-			for (int i = 0; i < events_.Count; ++i)
+			for (int i = 0; i < events_.Length; ++i)
 			{
 				if (events_[i] is T)
 					return events_[i] as T;
@@ -52,7 +54,7 @@ namespace Cue
 			return null;
 		}
 
-		public List<IEvent> Events
+		public IEvent[] Events
 		{
 			get { return events_; }
 		}
@@ -61,7 +63,7 @@ namespace Cue
 		{
 			if (eventsEnabled_)
 			{
-				for (int i = 0; i < events_.Count; ++i)
+				for (int i = 0; i < events_.Length; ++i)
 					events_[i].FixedUpdate(s);
 			}
 		}
@@ -70,14 +72,14 @@ namespace Cue
 		{
 			if (eventsEnabled_)
 			{
-				for (int i = 0; i < events_.Count; ++i)
+				for (int i = 0; i < events_.Length; ++i)
 					events_[i].Update(s);
 			}
 		}
 
 		public void OnPluginState(bool b)
 		{
-			for (int i = 0; i < events_.Count; ++i)
+			for (int i = 0; i < events_.Length; ++i)
 				events_[i].OnPluginState(b);
 		}
 	}

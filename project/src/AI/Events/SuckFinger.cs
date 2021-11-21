@@ -4,8 +4,8 @@
 	{
 		private BodyPartLock mouthLock_ = null;
 
-		public SuckFingerEvent(Person p)
-			: base("suckFinger", p)
+		public SuckFingerEvent()
+			: base("suckFinger")
 		{
 		}
 

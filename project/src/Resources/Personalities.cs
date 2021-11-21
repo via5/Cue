@@ -118,7 +118,7 @@ namespace Cue
 			Resources.LoadEnumValues(p, o, inherited);
 			ParseVoice(p.Voice, o, inherited);
 			ParseSensitivities(p.Sensitivities, o, inherited);
-
+			ParseEvents(p, o, inherited);
 
 			if (o.HasKey("expressions"))
 			{
@@ -284,6 +284,23 @@ namespace Cue
 			float modifier = J.ReqFloat(o, "modifier");
 
 			return new SensitivityModifier(source, modifier);
+		}
+
+		private void ParseEvents(Personality p, JSONClass o, bool inherited)
+		{
+			if (o.HasKey("events"))
+			{
+				foreach (var eo in o["events"].AsArray.Childs)
+				{
+					var e = BasicEvent.Create(eo["type"].Value);
+					if (e == null)
+						throw new LoadFailed($"unknown event '{eo["type"].Value}'");
+
+					var d = e.ParseEventData(eo.AsObject);
+					if (d != null)
+						p.SetEventData(e.Name, d);
+				}
+			}
 		}
 
 		private void Add(Personality p, bool abst)

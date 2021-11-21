@@ -1,8 +1,13 @@
-﻿namespace Cue
+﻿using SimpleJSON;
+
+namespace Cue
 {
 	public interface IEvent
 	{
 		string Name { get; }
+
+		IEventData ParseEventData(JSONClass o);
+		void Init(Person p);
 		void OnPluginState(bool b);
 		void FixedUpdate(float s);
 		void Update(float s);
@@ -13,14 +18,13 @@
 	abstract class BasicEvent : IEvent
 	{
 		private string name_;
-		protected Person person_;
+		protected Person person_ = null;
 		private Logger log_;
 
-		protected BasicEvent(string name, Person p)
+		protected BasicEvent(string name)
 		{
 			name_ = name;
-			person_ = p;
-			log_ = new Logger(Logger.Event, p, "event." + name);
+			log_ = new Logger(Logger.Event, "event." + name);
 		}
 
 		public Logger Log
@@ -33,20 +37,53 @@
 			get { return name_; }
 		}
 
-		public static IEvent[] All(Person p)
+		public static IEvent[] All()
 		{
 			return new IEvent[]
 			{
-				new MouthEvent(p),
-				new KissEvent(p),
-				new SmokeEvent(p),
-				new ThrustEvent(p),
-				new HandLinker(p),
-				new HandEvent(p),
-				new PenetratedEvent(p),
-				new SuckFingerEvent(p),
-				new GrabEvent(p)
+				new MouthEvent(),
+				new KissEvent(),
+				new SmokeEvent(),
+				new ThrustEvent(),
+				new HandLinker(),
+				new HandEvent(),
+				new PenetratedEvent(),
+				new SuckFingerEvent(),
+				new GrabEvent()
 			};
+		}
+
+		public static IEvent Create(string type)
+		{
+			foreach (var e in All())
+			{
+				if (e.Name == type)
+					return e;
+			}
+
+			return null;
+		}
+
+		public IEventData ParseEventData(JSONClass o)
+		{
+			return DoParseEventData(o);
+		}
+
+		protected virtual IEventData DoParseEventData(JSONClass o)
+		{
+			return null;
+		}
+
+		public void Init(Person p)
+		{
+			person_ = p;
+			log_ = new Logger(Logger.Event, person_, "event." + Name);
+			DoInit();
+		}
+
+		protected virtual void DoInit()
+		{
+			// no-op
 		}
 
 		public virtual void OnPluginState(bool b)

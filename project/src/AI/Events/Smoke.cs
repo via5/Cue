@@ -13,8 +13,8 @@ namespace Cue
 		private Duration wait_;
 		private bool cleanedUp_ = false;
 
-		public SmokeEvent(Person p)
-			: base("smoke", p)
+		public SmokeEvent()
+			: base("smoke")
 		{
 			wait_ = new Duration(15, 40);
 		}

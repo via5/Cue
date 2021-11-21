@@ -14,8 +14,8 @@
 		private int penetration_ = NotPenetrated;
 
 
-		public PenetratedEvent(Person p)
-			: base("penetrated", p)
+		public PenetratedEvent()
+			: base("penetrated")
 		{
 		}
 

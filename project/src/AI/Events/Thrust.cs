@@ -9,8 +9,8 @@
 		private bool running_ = false;
 		private int anim_ = Animations.None;
 
-		public ThrustEvent(Person p)
-			: base("thrust", p)
+		public ThrustEvent()
+			: base("thrust")
 		{
 		}
 

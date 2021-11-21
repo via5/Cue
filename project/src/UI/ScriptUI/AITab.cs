@@ -516,7 +516,7 @@ namespace Cue
 		{
 			person_ = person;
 
-			var es = person_.AI.Events;
+			var es = new List<IEvent>(person_.AI.Events);
 			U.NatSort(es);
 
 			Layout = new VUI.BorderLayout(10);

@@ -3,13 +3,17 @@
 	class GrabEvent : BasicEvent
 	{
 		private BodyPartLock headLock_ = null;
-		private BodyPart head_;
+		private BodyPart head_ = null;
 		private bool wasGrabbed_ = false;
 
-		public GrabEvent(Person p)
-			: base("grab", p)
+		public GrabEvent()
+			: base("grab")
 		{
-			head_ = p.Body.Get(BP.Head);
+		}
+
+		protected override void DoInit()
+		{
+			head_ = person_.Body.Get(BP.Head);
 		}
 
 		public override string[] Debug()

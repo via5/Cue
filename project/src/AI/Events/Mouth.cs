@@ -12,8 +12,8 @@
 		private BodyPartLock[] bjLocks_ = null;
 
 
-		public MouthEvent(Person p)
-			: base("mouth", p)
+		public MouthEvent()
+			: base("mouth")
 		{
 		}
 

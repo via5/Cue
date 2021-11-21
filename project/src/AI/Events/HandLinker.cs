@@ -24,12 +24,16 @@
 			}
 		}
 
-		private readonly HandInfo left_;
-		private readonly HandInfo right_;
+		private HandInfo left_ = null;
+		private HandInfo right_ = null;
 		private bool grabbingPerson_ = false;
 
-		public HandLinker(Person p)
-			: base("handLinker", p)
+		public HandLinker()
+			: base("handLinker")
+		{
+		}
+
+		protected override void DoInit()
 		{
 			left_ = new HandInfo(person_.Body.Get(BP.LeftHand));
 			right_ = new HandInfo(person_.Body.Get(BP.RightHand));

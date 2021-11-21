@@ -1,32 +1,102 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
+	public interface IEventData
+	{
+		IEventData Clone();
+	}
+
+
+	class KissEventData : IEventData
+	{
+		public float startDistance;
+		public float stopDistance;
+		public float stopDistanceWithPlayer;
+		public Duration duration;
+		public Duration wait;
+
+
+		public IEventData Clone()
+		{
+			var d = new KissEventData();
+			d.CopyFrom(this);
+			return d;
+		}
+
+		private void CopyFrom(KissEventData d)
+		{
+			startDistance = d.startDistance;
+			stopDistance = d.stopDistance;
+			stopDistanceWithPlayer = d.stopDistanceWithPlayer;
+			duration = d.duration.Clone();
+			wait = d.wait.Clone();
+		}
+	}
+
+
 	class KissEvent : BasicEvent
 	{
-		public const float StartDistance = 0.15f;
-		public const float StopDistance = 0.1f;
-		public const float PlayerStopDistance = 0.15f;
-		public const float MinimumActiveTime = 3;
-		public const float MinWait = 2;
-		public const float MaxWait = 120;
-		public const float MinDuration = 2;
-		public const float MaxDuration = 120;
-		public const float WaitWhenFailed = 1;
+		private const float MinWait = 2;
 
-		private float elapsed_ = 0;
-		private float wait_ = 0;
-		private float duration_ = 0;
 		private string lastResult_ = "";
 		private BodyPartLock[] locks_ = null;
 		private Person target_ = null;
 		private bool wasGrabbed_ = false;
+		private KissEventData d_ = null;
 
-		public KissEvent(Person p)
-			: base("kiss", p)
+		private float elapsed_ = MinWait;
+		private bool durationFinished_ = false;
+		private bool waitFinished_ = false;
+
+
+		public KissEvent()
+			: base("kiss")
 		{
-			person_ = p;
+		}
+
+		protected override IEventData DoParseEventData(JSONClass o)
+		{
+			var d = new KissEventData();
+
+			d.startDistance = J.ReqFloat(o, "startDistance");
+			d.stopDistance = J.ReqFloat(o, "stopDistance");
+			d.stopDistanceWithPlayer = J.ReqFloat(o, "stopDistanceWithPlayer");
+			d.duration = Duration.FromJSON(o, "duration", true);
+			d.wait = Duration.FromJSON(o, "interval", true);
+
+			if (d.duration.Minimum < MinWait)
+			{
+				Cue.LogWarning(
+					$"kiss: duration minimum below hard minimum of " +
+					$"{MinWait}, overriding");
+
+				d.duration.SetRange(MinWait, d.duration.Maximum);
+			}
+
+			if (d.wait.Minimum < MinWait)
+			{
+				Cue.LogWarning(
+					$"kiss: wait minimum below hard minimum of " +
+					$"{MinWait}, overriding");
+
+				d.wait.SetRange(MinWait, d.wait.Maximum);
+			}
+
+			return d;
+		}
+
+		protected override void DoInit()
+		{
+			OnPersonalityChanged();
+			person_.PersonalityChanged += OnPersonalityChanged;
 			Next();
+		}
+
+		private void OnPersonalityChanged()
+		{
+			d_ = person_.Personality.CloneEventData(Name) as KissEventData;
 		}
 
 		public bool Active
@@ -43,11 +113,16 @@ namespace Cue
 		{
 			return new string[]
 			{
-				$"elapsed    {elapsed_:0.00}",
-				$"wait       {wait_:0.00}",
-				$"duration   {duration_:0.00}",
-				$"state      {(Active ? "active" : "waiting")}",
-				$"last       {lastResult_}"
+				$"startDistance            {d_.startDistance:0.00}",
+				$"stopDistance             {d_.stopDistance:0.00}",
+				$"stopDistanceWithPlayer   {d_.stopDistanceWithPlayer:0.00}",
+				$"duration                 {d_.duration.ToLiveString()}",
+				$"wait                     {d_.wait.ToLiveString()}",
+				$"state                    {(Active ? "active" : "waiting")}",
+				$"durationFinished         {durationFinished_}",
+				$"waitFinished             {waitFinished_}",
+				$"elapsed                  {elapsed_:0.00}",
+				$"last                     {lastResult_}"
 			};
 		}
 
@@ -58,23 +133,29 @@ namespace Cue
 
 			if (!person_.Options.CanKiss)
 			{
-				elapsed_ = 0;
 				if (Active)
 					Stop();
 
 				return;
 			}
 
-
 			elapsed_ += s;
 
 			if (Active)
 			{
+				d_.duration.Update(s, Mood.MultiMovementEnergy(person_, target_));
+				if (d_.duration.Finished)
+					durationFinished_ = true;
+
 				if (elapsed_ >= MinWait)
 					UpdateActive();
 			}
 			else
 			{
+				d_.wait.Update(s, person_.Mood.MovementEnergy);
+				if (d_.wait.Finished)
+					waitFinished_ = true;
+
 				if (elapsed_ >= MinWait)
 					UpdateInactive();
 			}
@@ -86,7 +167,7 @@ namespace Cue
 
 			// never stop with player
 			if (target_ == null || !target_.IsPlayer)
-				tooLong = (elapsed_ >= duration_);
+				tooLong = durationFinished_;
 
 			if (tooLong || MustStop())
 				Stop();
@@ -100,10 +181,7 @@ namespace Cue
 				return;
 			}
 
-			var elapsed = (elapsed_ > wait_);
-			var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
-
-			if (elapsed || (wasGrabbed_ && !grabbed))
+			if (waitFinished_)
 			{
 				lastResult_ = "";
 
@@ -111,9 +189,13 @@ namespace Cue
 				{
 					Next();
 					if (!TryStart(false))
-						wait_ = WaitWhenFailed;
+						elapsed_ = 0;
 				}
 			}
+
+			var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
+			if (wasGrabbed_ && !grabbed)
+				waitFinished_ = true;
 
 			wasGrabbed_ = grabbed;
 		}
@@ -136,9 +218,12 @@ namespace Cue
 
 		private void Next()
 		{
-			wait_ = U.RandomNormal(MinWait, MaxWait);
-			duration_ = U.RandomNormal(MinDuration, MaxDuration);
 			elapsed_ = 0;
+			durationFinished_ = false;
+			waitFinished_ = false;
+
+			d_.duration.Reset(1);
+			d_.wait.Reset(1);
 		}
 
 		private bool TryStart(bool playerOnly)
@@ -160,7 +245,7 @@ namespace Cue
 
 				var d = Vector3.Distance(srcLips, targetLips.Position);
 
-				if (d <= StartDistance)
+				if (d <= d_.startDistance)
 				{
 					foundClose = true;
 
@@ -311,7 +396,7 @@ namespace Cue
 
 			var d = Vector3.Distance(srcLips.Position, targetLips.Position);
 			var hasPlayer = (person_.IsPlayer || target_.IsPlayer);
-			var sd = (hasPlayer ? PlayerStopDistance : StopDistance);
+			var sd = (hasPlayer ? d_.stopDistanceWithPlayer : d_.stopDistance);
 
 			if (d >= sd)
 			{
