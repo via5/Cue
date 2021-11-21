@@ -385,9 +385,9 @@
 	[
 		{
 			"type": "penetration",
-			"physicalRate": 0.003,
+			"physicalRate": 0.0025,
 			"physicalMax": 1.0,
-			"nonPhysicalRate": 0.0015,
+			"nonPhysicalRate": 0.0012,
 			"nonPhysicalMax": 1.0
 		},
 
@@ -417,9 +417,9 @@
 
 		{
 			"type": "genitals",
-			"physicalRate": 0.004,
+			"physicalRate": 0.003,
 			"physicalMax": 1.0,
-			"nonPhysicalRate": 0.002,
+			"nonPhysicalRate": 0.0015,
 			"nonPhysicalMax": 0.6,
 
 			"modifiers":

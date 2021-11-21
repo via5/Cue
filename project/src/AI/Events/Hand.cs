@@ -120,6 +120,8 @@
 				}
 
 				UnlockLeft();
+				SetZoneEnabled(leftTarget_, false);
+
 				leftTarget_ = null;
 			}
 
@@ -134,6 +136,8 @@
 				}
 
 				UnlockRight();
+				SetZoneEnabled(rightTarget_, false);
+
 				rightTarget_ = null;
 			}
 		}
@@ -212,6 +216,9 @@
 
 				rightTarget_ = right;
 				rightAnim_ = Animations.None;
+
+				SetZoneEnabled(left, true);
+				SetZoneEnabled(right, true);
 			}
 		}
 
@@ -223,6 +230,7 @@
 			{
 				leftTarget_ = target;
 				leftAnim_ = Animations.HandjobLeft;
+				SetZoneEnabled(target, true);
 			}
 		}
 
@@ -235,6 +243,8 @@
 				leftTarget_ = target;
 				leftAnim_ = Animations.LeftFinger;
 				leftGroped_ = true;
+
+				SetZoneEnabled(target, true);
 				leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 			}
@@ -248,6 +258,7 @@
 			{
 				rightTarget_ = target;
 				rightAnim_ = Animations.HandjobRight;
+				SetZoneEnabled(target, true);
 			}
 		}
 
@@ -261,6 +272,7 @@
 				rightAnim_ = Animations.RightFinger;
 				rightGroped_ = true;
 
+				SetZoneEnabled(target, true);
 				rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 			}
@@ -292,6 +304,11 @@
 					}
 				}
 			}
+		}
+
+		private void SetZoneEnabled(Person target, bool b)
+		{
+			target.Excitement.GetSource(SS.Genitals).EnabledForOthers = b;
 		}
 
 		private bool LockBoth(string why)
