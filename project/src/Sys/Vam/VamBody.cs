@@ -84,7 +84,8 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
-		public abstract IBodyPart BodyPartForTransform(Transform t, Transform stop);
+		public abstract IBodyPart BodyPartForTransform(
+			Transform t, Transform stop, bool debug);
 
 		protected void AddBodyPartCache(Transform t, int bodyPart)
 		{
@@ -146,13 +147,17 @@ namespace Cue.Sys.Vam
 			return parts_[i];
 		}
 
-		public override IBodyPart BodyPartForTransform(Transform t, Transform stop)
+		public override IBodyPart BodyPartForTransform(
+			Transform t, Transform stop, bool debug)
 		{
 			// see VamSys.BodyPartForTransform()
 
 			var check = t;
 			while (check != null)
 			{
+				if (debug)
+					Log.Error($"{this}: looking for {t.name}, stop={stop.name}");
+
 				for (int i = 0; i < parts_.Length; ++i)
 				{
 					var vp = parts_[i] as VamBodyPart;
@@ -162,15 +167,26 @@ namespace Cue.Sys.Vam
 					// check this transform and all of its parents to see if they
 					// match any body part
 
-					if (vp.ContainsTransform(check))
+					if (vp.ContainsTransform(check, debug))
 					{
+						if (debug)
+							Log.Error($"found {t.name}, is {check.name} in {vp}");
+
 						AddBodyPartCache(t, i);
 						return vp;
 					}
 				}
 
 				if (check == stop)
+				{
+					if (debug)
+						Log.Error($"{t.name} not found, reached stop");
+
 					break;
+				}
+
+				if (debug)
+					Log.Error($"{check.name} not found, checking parent {check.parent.name}");
 
 				check = check.parent;
 			}

@@ -74,9 +74,23 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
-			return (t == lEye_ || t == rEye_);
+			if (t == lEye_)
+			{
+				if (debug)
+					Log.Error($"{t.name} is left eye");
+			}
+			else if (t == rEye_)
+			{
+				if (debug)
+					Log.Error($"{t.name} is right eye");
+			}
+
+			if (debug)
+				Log.Error($"{t.name} not found");
+
+			return false;
 		}
 
 		public override string ToString()

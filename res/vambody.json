@@ -233,8 +233,8 @@
 			"part": "leftGlute",
 			"type": "collider",
 			"sex": "female",
-			"name": "LGlute1Joint",
-			"rigidbody": "LGlute"
+			"rigidbody": "LGlute",
+			"colliders": ["LGlute1Joint"],
 		},
 
 		{
@@ -242,8 +242,8 @@
 			"type": "collider",
 			"sex": "male",
 			"advanced": "yes",
-			"name": "pelvisBR7/pelvisBR7Joint",
-			"rigidbody": "LGlute"
+			"rigidbody": "LGlute",
+			"colliders": ["pelvisBR7/pelvisBR7Joint"],
 		},
 
 		{
@@ -251,16 +251,16 @@
 			"type": "collider",
 			"sex": "male",
 			"advanced": "no",
-			"name": "lThigh/Collider4",
-			"rigidbody": "LGlute"
+			"rigidbody": "LGlute",
+			"colliders": ["lThigh/Collider4"],
 		},
 
 		{
 			"part": "rightGlute",
 			"type": "collider",
 			"sex": "female",
-			"name": "RGlute1Joint",
-			"rigidbody": "RGlute"
+			"rigidbody": "RGlute",
+			"colliders": ["RGlute1Joint"],
 		},
 
 		{
@@ -268,8 +268,8 @@
 			"type": "collider",
 			"sex": "male",
 			"advanced": "yes",
-			"name": "pelvisBL7/pelvisBL6Joint",
-			"rigidbody": "LGlute"
+			"rigidbody": "LGlute",
+			"colliders": ["pelvisBL7/pelvisBL6Joint"],
 		},
 
 		{
@@ -277,31 +277,31 @@
 			"type": "collider",
 			"sex": "male",
 			"advanced": "no",
-			"name": "rThigh/Collider4",
-			"rigidbody": "LGlute"
+			"rigidbody": "LGlute",
+			"colliders": ["rThigh/Collider4"],
 		},
 
 		{
 			"part": "leftShoulder",
 			"type": "collider",
-			"name": "lShldr",
 			"rigidbody": "lShldr",
+			"colliders": ["lShldr"],
 			"controller": "lArmControl"
 		},
 
 		{
 			"part": "leftArm",
 			"type": "collider",
-			"name": "lShldr/Collider1",
 			"rigidbody": "lForeArm",
+			"colliders": ["lShldr/Collider1"],
 			"controller": "lElbowControl"
 		},
 
 		{
 			"part": "leftForearm",
 			"type": "collider",
-			"name": "lForeArm/Collider2",
-			"rigidbody": "lHand",
+			"closestRigidbody": "lHand",
+			"colliders": ["lForeArm/Collider2"],
 			"controller": "lElbowControl"
 		},
 
@@ -326,24 +326,24 @@
 		{
 			"part": "rightShoulder",
 			"type": "collider",
-			"name": "rShldr",
 			"rigidbody": "rShldr",
+			"colliders": ["rShldr"],
 			"controller": "rArmControl"
 		},
 
 		{
 			"part": "rightArm",
 			"type": "collider",
-			"name": "rShldr/Collider1",
 			"rigidbody": "rForeArm",
+			"colliders": ["rShldr/Collider1"],
 			"controller": "rElbowControl"
 		},
 
 		{
 			"part": "rightForearm",
 			"type": "collider",
-			"name": "rForeArm/Collider2",
-			"rigidbody": "rHand",
+			"closestRigidbody": "rHand",
+			"colliders": ["rForeArm/Collider2"],
 			"controller": "rElbowControl"
 		},
 
@@ -369,8 +369,8 @@
 			"part": "leftThigh",
 			"type": "collider",
 			"sex": "male",
-			"name": "lThigh/Collider6",
 			"rigidbody": "lThigh",
+			"colliders": ["lThigh/Collider6"],
 			"controller": "lKneeControl"
 		},
 
@@ -378,8 +378,8 @@
 			"part": "leftThigh",
 			"type": "collider",
 			"sex": "female",
-			"name": "lThigh12Joint",
 			"rigidbody": "lThigh",
+			"colliders": ["lThigh12Joint"],
 			"controller": "lKneeControl"
 		},
 
@@ -387,8 +387,8 @@
 			"part": "leftShin",
 			"type": "collider",
 			"sex": "male",
-			"name": "lShin/Collider2",
 			"rigidbody": "lShin",
+			"colliders": ["lShin/Collider2"],
 			"controller": "lKneeControl"
 		},
 
@@ -396,8 +396,8 @@
 			"part": "leftShin",
 			"type": "collider",
 			"sex": "female",
-			"name": "lShin8Joint",
 			"rigidbody": "lShin",
+			"colliders": ["lShin8Joint"],
 			"controller": "lKneeControl"
 		},
 
@@ -413,8 +413,8 @@
 			"part": "rightThigh",
 			"type": "collider",
 			"sex": "male",
-			"name": "rThigh/Collider6",
 			"rigidbody": "rThigh",
+			"colliders": ["rThigh/Collider6"],
 			"controller": "rKneeControl"
 		},
 
@@ -422,8 +422,8 @@
 			"part": "rightThigh",
 			"type": "collider",
 			"sex": "female",
-			"name": "rThigh12Joint",
 			"rigidbody": "rThigh",
+			"colliders": ["rThigh12Joint"],
 			"controller": "rKneeControl"
 		},
 
@@ -431,8 +431,8 @@
 			"part": "rightShin",
 			"type": "collider",
 			"sex": "male",
-			"name": "rShin/Collider2",
 			"rigidbody": "rShin",
+			"colliders": ["rShin/Collider2"],
 			"controller": "rKneeControl"
 		},
 
@@ -440,8 +440,8 @@
 			"part": "rightShin",
 			"type": "collider",
 			"sex": "female",
-			"name": "rShin8Joint",
 			"rigidbody": "rShin",
+			"colliders": ["rShin8Joint"],
 			"controller": "rKneeControl"
 		},
 

@@ -68,12 +68,35 @@ namespace Cue.Sys.Vam
 			get { return U.FromUnity(Rigidbody.rotation); }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
+			if (rbs_ == null)
+			{
+				if (debug)
+					Log.Error($"{t.name} not found, rbs is null");
+
+				return false;
+			}
+			else
+			{
+				if (debug)
+					Log.Error($"checking in {rbs_.Length} rbs");
+			}
+
 			for (int i = 0; i < rbs_.Length; ++i)
 			{
 				if (rbs_[i].transform == t)
+				{
+					if (debug)
+						Log.Error($"found {t.name}");
+
 					return true;
+				}
+				else
+				{
+					if (debug)
+						Log.Error($"{t.name} is not {rbs_[i].transform.name}");
+				}
 			}
 
 			return false;

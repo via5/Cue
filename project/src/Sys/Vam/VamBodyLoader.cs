@@ -127,6 +127,18 @@ namespace Cue.Sys.Vam
 				Log.Error("missing right hand");
 		}
 
+		struct PartSettings
+		{
+			public int bodyPart;
+			public List<string> names;
+			public string controller;
+			public List<string> colliders;
+			public List<string> ignore;
+			public string forceReceiver;
+			public string rigidbody;
+			public string closestRigidbody;
+		}
+
 		private IBodyPart LoadPart(bool male, bool advancedColliders, JSONClass o, Func<string, JSONNode> getVar)
 		{
 			if (o.HasKey("sex"))
@@ -145,35 +157,36 @@ namespace Cue.Sys.Vam
 					return null;
 			}
 
-			var bpType = BP.FromString(J.ReqString(o, "part"));
-			if (bpType == BP.None)
-				throw new LoadFailed($"bad part '{o["part"].Value}'");
+			PartSettings ps;
+			ps.names = new List<string>();
+			ps.ignore = new List<string>();
+			ps.colliders = new List<string>();
 
-			var names = new List<string>();
+			ps.bodyPart = BP.FromString(J.ReqString(o, "part"));
+			if (ps.bodyPart == BP.None)
+				throw new LoadFailed($"bad part '{o["part"].Value}'");
 
 			if (o.HasKey("name"))
 			{
 				if (o["name"].Value != "")
 				{
-					names.Add(o["name"].Value);
+					ps.names.Add(o["name"].Value);
 				}
 				else if (o["name"].AsArray.Count > 0)
 				{
 					foreach (var n in o["name"].AsArray.Childs)
-						names.Add(n.Value);
+						ps.names.Add(n.Value);
 				}
 			}
 
-			string controller = J.OptString(o, "controller");
+			ps.controller = J.OptString(o, "controller");
 
-			var colliders = new List<string>();
 			if (o.HasKey("colliders"))
 			{
 				foreach (var n in o["colliders"].AsArray.Childs)
-					colliders.Add(n.Value);
+					ps.colliders.Add(n.Value);
 			}
 
-			var ignore = new List<string>();
 			if (o.HasKey("ignore"))
 			{
 				JSONNode parent;
@@ -185,45 +198,39 @@ namespace Cue.Sys.Vam
 
 				if (parent.Value != "")
 				{
-					ignore.Add(parent.Value);
+					ps.ignore.Add(parent.Value);
 				}
 				else if (parent.AsArray.Count > 0)
 				{
 					foreach (var n in parent.AsArray.Childs)
-						ignore.Add(n.Value);
+						ps.ignore.Add(n.Value);
 				}
 			}
 
-			string forceReceiver = J.OptString(o, "forceReceiver");
-			if (forceReceiver == "")
-				forceReceiver = J.OptString(o, "rigidbody");
+			ps.forceReceiver = J.OptString(o, "forceReceiver");
+			ps.rigidbody = J.OptString(o, "rigidbody");
+			ps.closestRigidbody = J.OptString(o, "closestRigidbody");
 
 			var type = J.ReqString(o, "type");
 
 			if (type == "rigidbody")
 			{
-				return CreateRigidbody(
-					bpType, names.ToArray(), controller, colliders.ToArray(),
-					ignore.ToArray(), forceReceiver);
+				return CreateRigidbody(ps);
 			}
 			else if (type == "trigger")
 			{
-				return CreateTrigger(
-					bpType, names.ToArray(), controller, colliders.ToArray(),
-					ignore.ToArray(), forceReceiver);
+				return CreateTrigger(ps);
 			}
 			else if (type == "collider")
 			{
-				return CreateCollider(
-					bpType, names.ToArray(), controller, colliders.ToArray(),
-					ignore.ToArray(), forceReceiver);
+				return CreateCollider(ps);
 			}
 			else if (type == "internal")
 			{
-				if (bpType == BP.Eyes)
+				if (ps.bodyPart == BP.Eyes)
 					return new EyesBodyPart(atom_);
 				else
-					throw new LoadFailed($"no internal type for {BP.ToString(bpType)}");
+					throw new LoadFailed($"no internal type for {BP.ToString(ps.bodyPart)}");
 			}
 			else if (type == "strapon")
 			{
@@ -231,7 +238,7 @@ namespace Cue.Sys.Vam
 			}
 			else if (type == "none")
 			{
-				return new NullBodyPart(atom_, bpType);
+				return new NullBodyPart(atom_, ps.bodyPart);
 			}
 			else
 			{
@@ -322,15 +329,13 @@ namespace Cue.Sys.Vam
 			return new VamBone(atom_.Body as VamBody, hand, b);
 		}
 
-		private IBodyPart CreateRigidbody(
-			int bodyPart, string[] names, string controller, string[] colliders,
-			string[] ignore, string forceReceiver)
+		private IBodyPart CreateRigidbody(PartSettings ps)
 		{
 			var rbs = new List<Rigidbody>();
 
-			for (int i = 0; i < names.Length; ++i)
+			for (int i = 0; i < ps.names.Count; ++i)
 			{
-				string name = names[i];
+				string name = ps.names[i];
 				if (name == "")
 					return null;
 
@@ -342,35 +347,33 @@ namespace Cue.Sys.Vam
 			}
 
 			Rigidbody fr = null;
-			if (forceReceiver == "")
+			if (ps.forceReceiver == "")
 			{
 				if (rbs.Count > 0)
 					fr = rbs[0];
 			}
 			else
 			{
-				fr = U.FindRigidbody(atom_.Atom, forceReceiver);
+				fr = U.FindRigidbody(atom_.Atom, ps.forceReceiver);
 				if (fr == null)
-					Log.Error($"rb for force '{forceReceiver}' not found");
+					Log.Error($"rb for force '{ps.forceReceiver}' not found");
 			}
 
 			FreeControllerV3 fc = null;
-			if (controller != "")
+			if (ps.controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, ps.controller);
 				if (fc == null)
-					Log.Error($"rb {rbs[0].name} has no controller {controller}");
+					Log.Error($"rb {rbs[0].name} has no controller {ps.controller}");
 			}
 
 			return new RigidbodyBodyPart(
-				atom_, bodyPart, rbs.ToArray(), fc, colliders, fr);
+				atom_, ps.bodyPart, rbs.ToArray(), fc, ps.colliders.ToArray(), fr);
 		}
 
-		private IBodyPart CreateTrigger(
-			int bodyPart, string[] names, string controller, string[] colliders,
-			string[] ignore, string forceReceiver)
+		private IBodyPart CreateTrigger(PartSettings ps)
 		{
-			string name = names[0];
+			string name = ps.names[0];
 			if (name == "")
 				return null;
 
@@ -395,50 +398,59 @@ namespace Cue.Sys.Vam
 			}
 
 			FreeControllerV3 fc = null;
-			if (controller != "")
+			if (ps.controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, ps.controller);
 				if (fc == null)
-					Log.Error($"trigger {name} has no controller {controller}");
+					Log.Error($"trigger {name} has no controller {ps.controller}");
 			}
 
 			return new TriggerBodyPart(
-				atom_, bodyPart, t, fc, t.thisRigidbody.transform,
-				ignore, colliders);
+				atom_, ps.bodyPart, t, fc, t.thisRigidbody.transform,
+				ps.ignore.ToArray(), ps.colliders.ToArray());
 		}
 
-		private IBodyPart CreateCollider(
-			int bodyPart, string[] names, string controller, string[] colliders,
-			string[] ignore, string forceReceiver)
+		private IBodyPart CreateCollider(PartSettings ps)
 		{
-			string name = names[0];
-			if (name == "")
-				return null;
-
-			var c = U.FindCollider(atom_.Atom, name);
-			if (c == null)
+			var cs = new List<Collider>();
+			foreach (var cn in ps.colliders)
 			{
-				Log.Error($"collider {name} not found");
-				return null;
+				var c = U.FindCollider(atom_.Atom, cn);
+				if (c == null)
+					Log.Error($"collider {cn} not found for {BP.ToString(ps.bodyPart)}");
+				else
+					cs.Add(c);
 			}
 
+			if (cs.Count == 0)
+				throw new LoadFailed($"no colliders for {BP.ToString(ps.bodyPart)}");
+
 			FreeControllerV3 fc = null;
-			if (controller != "")
+			if (ps.controller != "")
 			{
-				fc = U.FindController(atom_.Atom, controller);
+				fc = U.FindController(atom_.Atom, ps.controller);
 				if (fc == null)
-					Log.Error($"collider {name} has no controller {controller}");
+					Log.Error($"collider {BP.ToString(ps.bodyPart)} has no controller {ps.controller}");
 			}
 
 			Rigidbody rb = null;
-			if (forceReceiver != "")
+			if (ps.rigidbody != "")
 			{
-				rb = U.FindRigidbody(atom_.Atom, forceReceiver);
+				rb = U.FindRigidbody(atom_.Atom, ps.rigidbody);
 				if (rb == null)
-					Log.Error($"collider {name} has no rb {forceReceiver}");
+					Log.Error($"collider {BP.ToString(ps.bodyPart)} has no rb {ps.rigidbody}");
 			}
 
-			return new ColliderBodyPart(atom_, bodyPart, c, fc, rb);
+			Rigidbody closestRb = null;
+			if (ps.closestRigidbody != "")
+			{
+				closestRb = U.FindRigidbody(atom_.Atom, ps.closestRigidbody);
+				if (closestRb == null)
+					Log.Error($"collider {BP.ToString(ps.bodyPart)} has no rb {ps.closestRigidbody}");
+			}
+
+			return new ColliderBodyPart(
+				atom_, ps.bodyPart, cs.ToArray(), fc, rb, closestRb);
 		}
 	}
 }

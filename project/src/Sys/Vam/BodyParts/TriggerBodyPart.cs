@@ -119,9 +119,30 @@ namespace Cue.Sys.Vam
 			get { return true; }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
-			return (t_ == t);
+			if (t_ == null)
+			{
+				if (debug)
+					Log.Error($"{t.name} not found, null transform");
+
+				return false;
+			}
+
+			if (t_ == t)
+			{
+				if (debug)
+					Log.Error($"found {t.name}");
+
+				return true;
+			}
+			else
+			{
+				if (debug)
+					Log.Error($"{t.name} is not {t_.name}");
+
+				return false;
+			}
 		}
 
 		public override TriggerInfo[] GetTriggers()

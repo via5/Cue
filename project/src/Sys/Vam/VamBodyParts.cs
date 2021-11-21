@@ -370,7 +370,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public abstract bool ContainsTransform(Transform t);
+		public abstract bool ContainsTransform(Transform t, bool debug);
 
 		protected virtual Collider[] GetColliders()
 		{
@@ -418,8 +418,11 @@ namespace Cue.Sys.Vam
 		public override Vector3 Position { get; }
 		public override Quaternion Rotation { get; }
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
+			if (debug)
+				Log.Error($"{BP.ToString(Type)}: {t.name} not found");
+
 			return false;
 		}
 

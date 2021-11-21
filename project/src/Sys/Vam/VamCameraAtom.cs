@@ -31,7 +31,7 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
 			return false;
 		}
@@ -72,7 +72,7 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
 			return false;
 		}
@@ -101,7 +101,7 @@ namespace Cue.Sys.Vam
 			handOutputType_ = handOutputType;
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
 			if (t == desktopHand_)
 				return true;
@@ -280,13 +280,13 @@ namespace Cue.Sys.Vam
 			return new Hand();
 		}
 
-		public override IBodyPart BodyPartForTransform(Transform t, Transform stop)
+		public override IBodyPart BodyPartForTransform(Transform t, Transform stop, bool debug)
 		{
 			// see VamSys.BodyPartForTransform()
 
-			if (left_.ContainsTransform(t))
+			if (left_.ContainsTransform(t, debug))
 				return left_;
-			else if (right_.ContainsTransform(t))
+			else if (right_.ContainsTransform(t, debug))
 				return right_;
 			else
 				return null;

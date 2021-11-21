@@ -4,25 +4,24 @@ namespace Cue.Sys.Vam
 {
 	class ColliderBodyPart : VamBodyPart
 	{
-		private Collider c_;
 		private Collider[] colliders_;
 		private FreeControllerV3 fc_;
-		private Rigidbody rb_;
+		private Rigidbody rb2_, closestRb_;
 
 		public ColliderBodyPart(
-			VamAtom a, int type, Collider c, FreeControllerV3 fc,
-			Rigidbody closestRb)
+			VamAtom a, int type, Collider[] cs, FreeControllerV3 fc,
+			Rigidbody rb, Rigidbody closestRb)
 				: base(a, type)
 		{
-			c_ = c;
-			colliders_ = new Collider[] { c };
+			colliders_ = cs;
 			fc_ = fc;
-			rb_ = closestRb;
+			rb2_ = rb;
+			closestRb_ = closestRb;
 		}
 
 		public override Rigidbody Rigidbody
 		{
-			get { return rb_; }
+			get { return rb2_ ?? closestRb_; }
 		}
 
 		public override FreeControllerV3 Controller
@@ -40,15 +39,20 @@ namespace Cue.Sys.Vam
 			get { return (fc_?.isGrabbing ?? false); }
 		}
 
+		private Collider MainCollider
+		{
+			get { return colliders_[0]; }
+		}
+
 		public override Vector3 ControlPosition
 		{
-			get { return U.FromUnity(c_.bounds.center); }
+			get { return U.FromUnity(MainCollider.bounds.center); }
 			set { Log.Error("cannot move colliders"); }
 		}
 
 		public override Quaternion ControlRotation
 		{
-			get { return U.FromUnity(c_.transform.rotation); }
+			get { return U.FromUnity(MainCollider.transform.rotation); }
 			set { Log.Error("cannot rotate colliders"); }
 		}
 
@@ -62,9 +66,46 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override bool ContainsTransform(Transform t)
+		public override bool ContainsTransform(Transform t, bool debug)
 		{
-			return (c_.transform == t);
+			if (rb2_ == null)
+			{
+				if (debug)
+					Log.Error($"no rb, checking {colliders_.Length} colliders");
+
+				for (int i = 0; i < colliders_.Length; ++i)
+				{
+					if (colliders_[i].transform == t)
+					{
+						if (debug)
+							Log.Error($"{t.name} is collider #{i}");
+
+						return true;
+					}
+					else
+					{
+						if (debug)
+							Log.Error($"not collider {colliders_[i].transform.name}");
+					}
+				}
+			}
+			else
+			{
+				if (rb2_.transform == t)
+				{
+					if (debug)
+						Log.Error($"has rb, found {t.name}");
+
+					return true;
+				}
+				else
+				{
+					if (debug)
+						Log.Error($"has rb, {t.name} is not {rb2_.name}");
+				}
+			}
+
+			return false;
 		}
 
 		protected override Collider[] GetColliders()
@@ -82,17 +123,24 @@ namespace Cue.Sys.Vam
 
 			string s = "";
 
-			foreach (var i in ignore)
+			if (rb2_ == null)
 			{
-				if (c_.name.StartsWith(i))
+				foreach (var i in ignore)
 				{
-					s = c_.name.Substring(i.Length);
-					break;
+					if (MainCollider.name.StartsWith(i))
+					{
+						s = MainCollider.name.Substring(i.Length);
+						break;
+					}
 				}
-			}
 
-			if (s == "")
-				s = c_.name;
+				if (s == "")
+					s = MainCollider.name;
+			}
+			else
+			{
+				s += rb2_.name;
+			}
 
 			if (fc_ != null)
 				s = fc_.name + "." + s;

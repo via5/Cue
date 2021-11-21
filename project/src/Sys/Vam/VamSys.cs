@@ -306,7 +306,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public IBodyPart BodyPartForTransform(Transform t)
+		public IBodyPart BodyPartForTransform(Transform t, bool debug = false)
 		{
 			// all Persons in the scene are a VamAtom and have a VamBody, but
 			// there's also the special VamCameraAtom, which isn't an Atom at
@@ -362,6 +362,8 @@ namespace Cue.Sys.Vam
 
 			var ps = Cue.Instance.ActivePersons;
 
+			if (debug)
+				Log.Error($"looking for {t.name} in cache");
 
 			// start by looking for a cached value in all persons
 			for (int i = 0; i < ps.Length; ++i)
@@ -369,6 +371,9 @@ namespace Cue.Sys.Vam
 				var bp = (ps[i].Atom.Body as VamBasicBody).BodyPartForTransformCached(t);
 				if (bp != null)
 				{
+					if (debug)
+						Log.Error($"found {t.name} in cache in {bp}");
+
 					if (ps[i].Atom is VamCameraAtom)
 						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
 					else
@@ -378,6 +383,8 @@ namespace Cue.Sys.Vam
 
 
 			// not found, do a more expensive search
+			if (debug)
+				Log.Error($"{t.name} not in cache");
 
 
 			// find the parent atom for this transform, used to stop going up
@@ -386,7 +393,8 @@ namespace Cue.Sys.Vam
 
 			for (int i=0; i<ps.Length; ++i)
 			{
-				var bp = (ps[i].Atom.Body as VamBasicBody).BodyPartForTransform(t, stop);
+				var bp = (ps[i].Atom.Body as VamBasicBody)
+					.BodyPartForTransform(t, stop, debug);
 
 				if (bp != null)
 				{
