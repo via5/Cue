@@ -2,9 +2,9 @@
 {
 	class ThrustEvent : BasicEvent
 	{
-		private const float FrottageDistance = 0.06f;
+		private const float FrottageDistance = 0.1f;
 
-		private Person receiver_ = null;
+		private BodyPart receiver_ = null;
 		private bool active_ = false;
 		private bool running_ = false;
 		private int anim_ = Animations.None;
@@ -83,37 +83,34 @@
 
 				anim_ = Animations.Frottage;
 			}
-			else if (person_.Body.HasPenis || receiver_.Body.HasPenis)
+			else
 			{
-				// penetration
+				if (person_.Body.HasPenis || receiver_.Person.Body.HasPenis)
+				{
+					// penetration
+					Log.Info($"starting sex with {receiver_.Person.ID}.{receiver_}");
 
-				Log.Info($"starting sex with {receiver_.ID}");
+					person_.Clothing.GenitalsVisible = true;
+					receiver_.Person.Clothing.GenitalsVisible = true;
 
-				person_.Clothing.GenitalsVisible = true;
-				receiver_.Clothing.GenitalsVisible = true;
+					// play the penetrated animation now, don't bother if it can't
+					// start; see also Penetrated.OnIn()
+					person_.Animator.PlayType(Animations.Penetrated);
+					receiver_.Person.Animator.PlayType(Animations.Penetrated);
+
+					anim_ = Animations.Sex;
+				}
+				else
+				{
+					// frottage
+					Log.Info($"starting frottage with {receiver_.Person.ID}.{receiver_}");
+
+					anim_ = Animations.Frottage;
+				}
 
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(
-						receiver_.PersonIndex,
-						receiver_.Body.GenitalsBodyPart);
-
-				// play the penetrated animation now, don't bother if it can't
-				// start; see also Penetrated.OnIn()
-				person_.Animator.PlayType(Animations.Penetrated);
-				receiver_.Animator.PlayType(Animations.Penetrated);
-
-				anim_ = Animations.Sex;
-			}
-			else
-			{
-				// frottage
-
-				Log.Info($"starting frottage with {receiver_.ID}");
-
-				person_.Body.Get(person_.Body.GenitalsBodyPart)
-					.AddForcedTrigger(-1, -1);
-
-				anim_ = Animations.Frottage;
+						receiver_.Person.PersonIndex, receiver_.Type);
 			}
 
 			person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
@@ -127,20 +124,18 @@
 			Log.Verbose($"thrust: stopping");
 			person_.Animator.StopType(anim_);
 
-			if (receiver_ != null && (person_.Body.HasPenis ||receiver_.Body.HasPenis))
+			if (receiver_ == null)
 			{
-				person_.Body.Get(person_.Body.GenitalsBodyPart)
-					.RemoveForcedTrigger(
-						receiver_.PersonIndex,
-						receiver_.Body.GenitalsBodyPart);
-			}
-			else
-			{
-				// frottage
+				// frottage with nobody
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.RemoveForcedTrigger(-1, -1);
 			}
-
+			else
+			{
+				person_.Body.Get(person_.Body.GenitalsBodyPart)
+					.RemoveForcedTrigger(
+						receiver_.Person.PersonIndex, receiver_.Type);
+			}
 			running_ = false;
 			receiver_ = null;
 			anim_ = Animations.None;
@@ -152,12 +147,12 @@
 
 			if (state == Animator.Playing)
 			{
-				if (Mood.ShouldStopSexAnimation(person_, receiver_))
+				if (Mood.ShouldStopSexAnimation(person_, receiver_?.Person))
 					person_.Animator.StopType(anim_);
 			}
 			else if (state == Animator.NotPlaying)
 			{
-				if (Mood.CanStartSexAnimation(person_, receiver_))
+				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
 				{
 					person_.Animator.PlayType(
 						anim_, new AnimationContext(receiver_));
@@ -165,7 +160,7 @@
 			}
 		}
 
-		private Person FindPenetrationReceiver()
+		private BodyPart FindPenetrationReceiver()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -173,29 +168,69 @@
 					continue;
 
 				if (person_.Status.PenetratedBy(p) || p.Status.PenetratedBy(person_))
-					return p;
+					return p.Body.Get(p.Body.GenitalsBodyPart);
 			}
 
 			return null;
 		}
 
-		private Person FindFrottageReceiver()
+		private static int[] frottageParts_ = new int[]
 		{
-			var selfHips = person_.Body.Get(BP.Hips);
+			BP.Head, BP.Chest, BP.Hips, BP.Labia, BP.Penis,
+			BP.LeftThigh, BP.RightThigh,
+			BP.LeftShin, BP.RightShin,
+			BP.LeftArm, BP.RightArm
+		};
+
+		private BodyPart FindFrottageReceiver()
+		{
+			var selfGen = person_.Body.Get(person_.Body.GenitalsBodyPart);
+
+			BodyPart closest = null;
+			float closestD = float.MaxValue;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p == person_)
 					continue;
 
-				var otherHips = p.Body.Get(BP.Hips);
-				var d = selfHips.DistanceToSurface(otherHips);
+				for (int i = 0; i < frottageParts_.Length; ++i)
+				{
+					var otherPart = p.Body.Get(frottageParts_[i]);
+					var d = selfGen.DistanceToSurface(otherPart);
 
-				if (d <= FrottageDistance)
-					return p;
+					if (d < closestD)
+					{
+						if (BetterFrottageReceiver(closest, otherPart))
+						{
+							closest = otherPart;
+							closestD = d;
+						}
+					}
+				}
 			}
 
+			if (closestD <= FrottageDistance)
+				return closest;
+
 			return null;
+		}
+
+		private bool BetterFrottageReceiver(BodyPart tentative, BodyPart check)
+		{
+			if (tentative == null)
+			{
+				// first
+				return true;
+			}
+
+			if (check.Type == check.Person.Body.GenitalsBodyPart)
+			{
+				// prioritize genitals
+				return true;
+			}
+
+			return false;
 		}
 	}
 }
