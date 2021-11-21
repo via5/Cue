@@ -14,6 +14,17 @@
 		{
 		}
 
+		public override string[] Debug()
+		{
+			return new string[]
+			{
+				$"receiver    {receiver_}",
+				$"active      {active_}",
+				$"running     {running_}",
+				$"anim        {Animations.ToString(anim_)}"
+			};
+		}
+
 		public bool Active
 		{
 			get { return active_; }

@@ -55,23 +55,26 @@ namespace Cue
 		public static bool ShouldStopSexAnimation(
 			Person main, Person other = null)
 		{
-			if (main != null && main.Mood.MovementEnergy == 0)
-				return true;
-
-			if (other != null && other.Mood.MovementEnergy == 0)
-				return true;
-
-			return false;
+			return
+				!HasEnergyForAnimation(main) ||
+				!HasEnergyForAnimation(other);
 		}
 
 		public static bool CanStartSexAnimation(
 			Person main, Person other = null)
 		{
-			if (main != null && main.Mood.MovementEnergy == 0)
-				return false;
+			return
+				HasEnergyForAnimation(main) ||
+				HasEnergyForAnimation(other);
+		}
 
-			if (other != null && other.Mood.MovementEnergy == 0)
-				return false;
+		private static bool HasEnergyForAnimation(Person p)
+		{
+			if (p != null)
+			{
+				if (p.Mood.MovementEnergy == 0 && p.Mood.Get(Moods.Excited) > 0)
+					return false;
+			}
 
 			return true;
 		}
