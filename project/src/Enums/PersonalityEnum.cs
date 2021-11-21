@@ -81,34 +81,35 @@ namespace Cue
 		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(56);
 		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(57);
 		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(58);
-		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(59);
-		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(60);
-		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(61);
-		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(62);
-		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(63);
-		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(64);
-		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(65);
-		public static readonly FloatIndex MaxHappiness = new FloatIndex(66);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(67);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(68);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(69);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(70);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(71);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(72);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(73);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(74);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(75);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(76);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(77);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(78);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(79);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(80);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(81);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(82);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(83);
+		public static readonly FloatIndex MovementEnergyRampUpDelayAfterOrgasm = new FloatIndex(59);
+		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(60);
+		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(61);
+		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(62);
+		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(63);
+		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(64);
+		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(65);
+		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(66);
+		public static readonly FloatIndex MaxHappiness = new FloatIndex(67);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(68);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(69);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(70);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(71);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(72);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(73);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(74);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(75);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(76);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(77);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(78);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(79);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(80);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(81);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(82);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(83);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(84);
 
-		public const int FloatCount = 84;
-		public override int GetFloatCount() { return 84; }
+		public const int FloatCount = 85;
+		public override int GetFloatCount() { return 85; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -287,6 +288,7 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"movementEnergyRampUpDelayAfterOrgasm",
 			"movementEnergyRampUpAfterOrgasm",
 			"avoidGazeAnger",
 			"angerWhenPlayerInteracts",
@@ -481,6 +483,7 @@ namespace Cue
 			"gazeTirednessFactor",
 			"movementEnergyTirednessFactor",
 			"expressionTirednessFactor",
+			"movementEnergyRampUpDelayAfterOrgasm",
 			"movementEnergyRampUpAfterOrgasm",
 			"avoidGazeAnger",
 			"angerWhenPlayerInteracts",

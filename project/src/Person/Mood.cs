@@ -52,26 +52,28 @@ namespace Cue
 			energyRampUpEasing_ = e;
 		}
 
-		public static bool ShouldStopSexAnimation(Person a, Person b = null)
+		public static bool ShouldStopSexAnimation(
+			Person main, Person other = null)
 		{
-			if (a != null && a.Mood.State == OrgasmState)
+			if (main != null && main.Mood.MovementEnergy == 0)
 				return true;
 
-			if (b != null && b.Mood.State == OrgasmState)
+			if (other != null && other.Mood.MovementEnergy == 0)
 				return true;
 
 			return false;
 		}
 
-		public static bool CanStartSexAnimation(Person a, Person b = null)
+		public static bool CanStartSexAnimation(
+			Person main, Person other = null)
 		{
-			if (a == null || a.Mood.State != OrgasmState)
-				return true;
+			if (main != null && main.Mood.MovementEnergy == 0)
+				return false;
 
-			if (b == null || b.Mood.State != OrgasmState)
-				return true;
+			if (other != null && other.Mood.MovementEnergy == 0)
+				return false;
 
-			return false;
+			return true;
 		}
 
 		public static float MultiMovementEnergy(
@@ -219,16 +221,20 @@ namespace Cue
 
 		public float MovementEnergyForExcitement(float e)
 		{
+			var ps = person_.Personality;
 			float max = float.MaxValue;
 
-			var rampUpTime = person_.Personality.Get(PS.MovementEnergyRampUpAfterOrgasm);
-			if (rampUpTime > 0)
+			if (state_ != OrgasmState || elapsed_ >= ps.Get(PS.MovementEnergyRampUpDelayAfterOrgasm))
 			{
-				var f = U.Clamp(timeSinceLastOrgasm_ / rampUpTime, 0, 1);
-				max = energyRampUpEasing_.Magnitude(f);
+				var rampUpTime = ps.Get(PS.MovementEnergyRampUpAfterOrgasm);
+				if (rampUpTime > 0)
+				{
+					var f = U.Clamp(timeSinceLastOrgasm_ / rampUpTime, 0, 1);
+					max = energyRampUpEasing_.Magnitude(f);
+				}
 			}
 
-			var tf = person_.Personality.Get(PS.MovementEnergyTirednessFactor);
+			var tf = ps.Get(PS.MovementEnergyTirednessFactor);
 			return U.Clamp(e - (Get(Moods.Tired) * tf), 0, max);
 		}
 

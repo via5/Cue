@@ -366,6 +366,15 @@ Controls what characters are looking at.
 
   expression tiredness is `tiredness * this`, clamped [0, 1]
 
+
+- MovementEnergyRampUpDelayAfterOrgasm (float)
+  time in seconds after orgasm after which energy ramp up starts; after this
+  delay has elapsed, energy becomes 0 and will ramp up over time based on
+  MovementEnergyRampUpAfterOrgasm
+
+  this allows for animations to continue for a short period while the orgasm
+  animation is playing
+
 - MovementEnergyRampUpAfterOrgasm (float)
   time in seconds after post-orgasm until movement energy can be at its
   maximum again; if greater than 0, movement energy will be forced to 0 after

@@ -300,6 +300,7 @@
 	"expressionExcitementFactor": 1,
 	"expressionTirednessFactor": 1,
 
+	"movementEnergyDelayAfterOrgasm": 3,
 	"movementEnergyRampUpAfterOrgasm": 30,
 	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
 
