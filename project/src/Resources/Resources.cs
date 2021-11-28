@@ -6,6 +6,7 @@ namespace Cue
 	class ResourceFile
 	{
 		public JSONNode root = null;
+		public string path = "";
 		public string name = "";
 		public string inherit = "";
 		public int prio = 0;
@@ -47,11 +48,22 @@ namespace Cue
 			string rootPath, string pattern = "*.json")
 		{
 			var files = new Dictionary<string, ResourceFile>();
+			var filenames = Cue.Instance.Sys.GetFilenames(rootPath, pattern);
 
-			foreach (var path in Cue.Instance.Sys.GetFilenames(rootPath, pattern))
+			Cue.LogVerbose("found files:");
+			foreach (var f in filenames)
+				Cue.LogVerbose($"  - {f}");
+
+			foreach (var path in filenames)
 			{
 				var f = LoadResourceFile(path);
-				if (f != null)
+				if (f == null)
+					continue;
+
+				ResourceFile existing;
+				if (files.TryGetValue(f.name, out existing))
+					Cue.LogVerbose($"ignoring {f.path}, overriden by {existing.path}");
+				else
 					files.Add(f.name, f);
 			}
 
@@ -83,6 +95,7 @@ namespace Cue
 			}
 
 			var f = new ResourceFile();
+			f.path = path;
 			f.root = doc;
 			f.name = doc.AsObject["name"].Value;
 			f.inherit = doc.AsObject["inherit"].Value;

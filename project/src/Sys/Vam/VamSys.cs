@@ -546,19 +546,56 @@ namespace Cue.Sys.Vam
 				return pluginPath_ + "/res/" + path;
 		}
 
+		private const int PluginDataSource = 0;
+		private const int PluginPathSource = 1;
+		private const int AddonSource = 2;
+		private const int UnknownSource = 3;
+
+		private static readonly string PluginDataRoot = "Custom/PluginData/Cue/";
+		private static string PluginPathRoot = null;
+
 		public List<string> GetFilenames(string path, string pattern)
 		{
+			if (PluginPathRoot == null)
+			{
+				PluginPathRoot = CueMain.Instance.PluginPath.Replace('\\', '/');
+				Cue.LogInfo($"PluginPathRoot={PluginPathRoot}");
+			}
+
 			var list = new List<string>();
 
-			GetFilenames(list, "Custom/PluginData/Cue/" + path, pattern);
-			GetFilenames(list, CueMain.Instance.PluginPath + "/res/" + path, pattern);
+			GetFilenames(list, PluginDataRoot + path, pattern);
+			GetFilenames(list, PluginPathRoot + "/res/" + path, pattern);
 
 			for (int i = 0; i < list.Count; ++i)
 				list[i] = list[i].Replace('\\', '/');
 
-			list.Sort();
+			list.Sort((a, b) =>
+			{
+				int srcA = PathSource(a);
+				int srcB = PathSource(b);
+
+				if (srcA < srcB)
+					return -1;
+				else if (srcA > srcB)
+					return 1;
+				else
+					return a.CompareTo(b);
+			});
 
 			return list;
+		}
+
+		private int PathSource(string path)
+		{
+			if (path.StartsWith(PluginDataRoot, StringComparison.OrdinalIgnoreCase))
+				return PluginDataSource;
+			else if (path.StartsWith(PluginPathRoot, StringComparison.OrdinalIgnoreCase))
+				return PluginPathSource;
+			else if (path.StartsWith("AddonPackages/", StringComparison.OrdinalIgnoreCase))
+				return AddonSource;
+			else
+				return UnknownSource;
 		}
 
 		private void GetFilenames(List<string> list, string path, string pattern)

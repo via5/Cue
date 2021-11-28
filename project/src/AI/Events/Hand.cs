@@ -346,7 +346,7 @@
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
-				var d = hand.DistanceToSurface(g, true);
+				var d = hand.DistanceToSurface(g);
 
 				if (d > MaxDistanceToStart)
 					continue;
