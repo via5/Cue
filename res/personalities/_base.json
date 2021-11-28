@@ -201,9 +201,9 @@
 	[
 		{
 			"type": "kiss",
-			"startDistance": 0.15,
+			"startDistance": 0.1,
 			"stopDistance": 0.1,
-			"stopDistanceWithPlayer": 0.05,
+			"stopDistanceWithPlayer": 0.15,
 			"duration":
 			{
 				"range":

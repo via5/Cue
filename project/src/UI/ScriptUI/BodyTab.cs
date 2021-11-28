@@ -167,7 +167,7 @@ namespace Cue
 
 						for (int j = 0; j < ts.Length; ++j)
 						{
-							if (!ts[j].IsPerson())
+							if (!ts[j].IsPerson)
 							{
 								if (sawUnknown)
 									continue;

@@ -194,46 +194,83 @@ namespace Cue.Sys
 
 	public struct TriggerInfo
 	{
-		public int personIndex;
-		public int sourcePartIndex;
-		public float value;
-		public bool forced;
+		private int personIndex_;
+		private int bodyPart_;
+		private float value_;
+		private bool forced_;
+
+		private string externalAtom_;
+		private string externalName_;
+
+		public static TriggerInfo External(string atom, string name)
+		{
+			var t = new TriggerInfo(-1, BP.None, 1.0f);
+			t.externalAtom_ = atom;
+			t.externalName_ = name;
+			return t;
+		}
 
 		public TriggerInfo(int sourcePersonIndex, int sourceBodyPart, float v, bool forced = false)
 		{
-			personIndex = sourcePersonIndex;
-			sourcePartIndex = sourceBodyPart;
-			value = v;
-			this.forced = forced;
+			personIndex_ = sourcePersonIndex;
+			bodyPart_ = sourceBodyPart;
+			value_ = v;
+			forced_ = forced;
+			externalAtom_ = null;
+			externalName_ = null;
 		}
 
-		public static TriggerInfo None
+		public int PersonIndex
 		{
-			get { return new TriggerInfo(-1, BP.None, 1.0f); }
+			get { return personIndex_; }
 		}
 
-		public bool IsPerson()
+		public int BodyPart
 		{
-			return (personIndex != -1 && sourcePartIndex != -1);
+			get { return bodyPart_; }
+		}
+
+		public bool IsPerson
+		{
+			get { return (personIndex_ != -1 && bodyPart_ != -1); }
+		}
+
+		public bool IsExternal
+		{
+			get { return (personIndex_ == -1); }
+		}
+
+		public bool SameAs(TriggerInfo other)
+		{
+			return
+				(personIndex_ == other.personIndex_) &&
+				(bodyPart_ == other.bodyPart_);
+		}
+
+		public bool Is(int personIndex, int bodyPart)
+		{
+			return (personIndex_ == personIndex) && (bodyPart_ == bodyPart);
 		}
 
 		public override string ToString()
 		{
-			if (personIndex == -1 || sourcePartIndex == -1)
+			if (personIndex_ == -1 || bodyPart_ == -1)
 			{
-				if (forced)
+				if (forced_)
 					return "forced";
+				else if (externalAtom_ != null || externalName_ != null)
+					return $"{externalAtom_}.{externalName_}";
 				else
 					return "?";
 			}
 			else
 			{
-				var p = Cue.Instance.AllPersons[personIndex];
-				var bp = p.Body.Get(sourcePartIndex);
+				var p = Cue.Instance.AllPersons[personIndex_];
+				var bp = p.Body.Get(bodyPart_);
 
 				string s = $"{p.ID}.{bp.Name}";
 
-				if (forced)
+				if (forced_)
 					s += "(forced)";
 
 				return s;

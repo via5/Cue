@@ -12,7 +12,7 @@
 		private float torqueWin_ = 5;
 
 		private float forceMin_ = 100;
-		private float forceMax_ = 600;
+		private float forceMax_ = 500;
 		private float forceWin_ = 100;
 
 		public FingerProcAnimation(

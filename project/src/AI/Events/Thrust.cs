@@ -159,9 +159,11 @@
 
 		private void SetZoneEnabled(bool b)
 		{
-			person_.Excitement.GetSource(SS.Genitals).EnabledForOthers = b;
+			var ss = (anim_ == Animations.Frottage ? SS.Genitals : SS.Penetration);
+
+			person_.Excitement.GetSource(ss).EnabledForOthers = b;
 			if (receiver_ != null)
-				receiver_.Person.Excitement.GetSource(SS.Genitals).EnabledForOthers = b;
+				receiver_.Person.Excitement.GetSource(ss).EnabledForOthers = b;
 		}
 
 		private void CheckAnim()

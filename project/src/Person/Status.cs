@@ -260,16 +260,16 @@ namespace Cue
 			{
 				for (int i = 0; i < ts.Length; ++i)
 				{
-					if (ts[i].sourcePartIndex >= 0)
+					if (ts[i].BodyPart != BP.None)
 					{
-						var pp = Cue.Instance.GetPerson(ts[i].personIndex);
-						var bp = pp.Body.Get(ts[i].sourcePartIndex);
+						var pp = Cue.Instance.GetPerson(ts[i].PersonIndex);
+						var bp = pp.Body.Get(ts[i].BodyPart);
 
 						if (bp == by)
 						{
 							return new PartResult(
 								p.Type,
-								pp.ObjectIndex, ts[i].sourcePartIndex);
+								pp.ObjectIndex, ts[i].BodyPart);
 						}
 					}
 				}

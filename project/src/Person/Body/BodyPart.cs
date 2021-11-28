@@ -152,14 +152,11 @@ namespace Cue
 		{
 			for (int i = 0; i < forcedTriggers_.Count; ++i)
 			{
-				if (forcedTriggers_[i].personIndex == sourcePersonIndex)
+				if (forcedTriggers_[i].Is(sourcePersonIndex, sourceBodyPart))
 				{
-					if (forcedTriggers_[i].sourcePartIndex == sourceBodyPart)
-					{
-						Log.Verbose($"removing forced trigger: {forcedTriggers_[i]}");
-						forcedTriggers_.RemoveAt(i);
-						return;
-					}
+					Log.Verbose($"removing forced trigger: {forcedTriggers_[i]}");
+					forcedTriggers_.RemoveAt(i);
+					return;
 				}
 			}
 
@@ -203,20 +200,17 @@ namespace Cue
 
 			for (int i = 0; i < forcedTriggers_.Count; ++i)
 			{
-				if (forcedTriggers_[i].personIndex == -1 && tempList_.Count > 0)
+				if (forcedTriggers_[i].IsExternal && tempList_.Count > 0)
 					continue;
 
 				bool found = false;
 
 				for (int j = 0; j < triggers_.Length; ++j)
 				{
-					if (triggers_[j].personIndex == forcedTriggers_[i].personIndex)
+					if (triggers_[j].SameAs(forcedTriggers_[i]))
 					{
-						if (triggers_[j].sourcePartIndex == forcedTriggers_[i].sourcePartIndex)
-						{
-							found = true;
-							break;
-						}
+						found = true;
+						break;
 					}
 				}
 

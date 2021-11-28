@@ -248,20 +248,46 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public static Atom AtomForCollider(Collider c)
+		private static Transform sceneAtoms_ = null;
+
+		public static Transform AtomForCollider(Collider c)
 		{
+			{
+				var a = AtomForColliderFast(c);
+				if (a != null)
+					return a;
+			}
+
 			var p = c.transform;
 
 			while (p != null)
 			{
-				var a = p.GetComponent<Atom>();
-				if (a != null)
-					return a;
+				if (p.GetComponent<Atom>() != null)
+					return p;
 
 				p = p.parent;
 			}
 
 			return null;
+		}
+
+		private static Transform AtomForColliderFast(Collider c)
+		{
+			if (sceneAtoms_ == null)
+				sceneAtoms_ = c.transform.root;
+
+			Transform last = c.transform;
+			Transform t = c.transform.parent;
+
+			// atoms are always direct children of the scene root, get parent
+			// until the root is found and return the previous one
+			while (t != sceneAtoms_ && t != null)
+			{
+				last = t;
+				t = t.parent;
+			}
+
+			return last;
 		}
 
 		public static void DumpComponents(Transform t, int indent = 0)

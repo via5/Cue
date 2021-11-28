@@ -461,10 +461,10 @@ namespace Cue
 			{
 				var t = ts[i];
 
-				if (sourceCheck == BP.None || sourceCheck == t.sourcePartIndex)
+				if (sourceCheck == BP.None || sourceCheck == t.BodyPart)
 				{
-					if (t.IsPerson())
-						sources_[t.personIndex].Set(t.sourcePartIndex, targetBodyPart);
+					if (t.IsPerson)
+						sources_[t.PersonIndex].Set(t.BodyPart, targetBodyPart);
 					else
 						External.Set(-1, targetBodyPart);
 				}

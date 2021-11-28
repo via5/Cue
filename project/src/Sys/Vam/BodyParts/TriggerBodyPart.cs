@@ -195,7 +195,10 @@ namespace Cue.Sys.Vam
 						foundOtherCache_.Add(kv.Key.name);
 
 					if (!skip)
-						triggerCache_.Add(TriggerInfo.None);
+					{
+						triggerCache_.Add(TriggerInfo.External(
+							U.AtomForCollider(kv.Key)?.name, kv.Key.name));
+					}
 				}
 				else
 				{

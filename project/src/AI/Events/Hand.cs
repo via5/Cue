@@ -207,7 +207,7 @@
 
 		private void StartDoubleHJ(Person left, Person right)
 		{
-			Log.Verbose($"double hj");
+			Log.Info($"double hj {left?.ID}");
 
 			if (LockBoth("double hj"))
 			{
@@ -224,7 +224,7 @@
 
 		private void StartLeftHJ(Person target)
 		{
-			Log.Verbose($"left hj");
+			Log.Info($"left hj {target?.ID}");
 
 			if (LockLeft("left hj"))
 			{
@@ -236,7 +236,7 @@
 
 		private void StartLeftFinger(Person target)
 		{
-			Log.Verbose($"left finger");
+			Log.Info($"left finger with {target?.ID}");
 
 			if (LockLeft("left fingering"))
 			{
@@ -252,7 +252,7 @@
 
 		private void StartRightHJ(Person target)
 		{
-			Log.Verbose($"right hj");
+			Log.Info($"right hj {target?.ID}");
 
 			if (LockRight("right hj"))
 			{
@@ -264,7 +264,7 @@
 
 		private void StartRightFinger(Person target)
 		{
-			Log.Verbose($"right finger");
+			Log.Info($"right finger {target?.ID}");
 
 			if (LockRight("right fingering"))
 			{
@@ -339,17 +339,25 @@
 		private BodyPart FindTarget(int handPart)
 		{
 			var hand = person_.Body.Get(handPart);
+
 			BodyPart tentative = null;
+			float tentativeD = float.MaxValue;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
-				var d = hand.DistanceToSurface(g);
+				var d = hand.DistanceToSurface(g, true);
 
-				if (d < MaxDistanceToStart)
+				if (d > MaxDistanceToStart)
+					continue;
+
+				if (d < tentativeD)
 				{
 					if (BetterTarget(tentative, g))
+					{
 						tentative = g;
+						tentativeD = d;
+					}
 				}
 			}
 
@@ -364,13 +372,13 @@
 				return true;
 			}
 
-			if (tentative.Person == person_)
+			if (tentative.Person != person_)
 			{
 				// prioritize others
 				return true;
 			}
 
-			if (tentative.Person.Status.Penetrating())
+			if (!tentative.Person.Status.Penetrating())
 			{
 				// prioritize genitals that are not currently
 				// penetrating
