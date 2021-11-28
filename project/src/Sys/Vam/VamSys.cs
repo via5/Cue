@@ -557,10 +557,7 @@ namespace Cue.Sys.Vam
 		public List<string> GetFilenames(string path, string pattern)
 		{
 			if (PluginPathRoot == null)
-			{
 				PluginPathRoot = CueMain.Instance.PluginPath.Replace('\\', '/');
-				Cue.LogInfo($"PluginPathRoot={PluginPathRoot}");
-			}
 
 			var list = new List<string>();
 
