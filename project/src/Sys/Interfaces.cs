@@ -151,8 +151,6 @@ namespace Cue.Sys
 		bool MenuSelect { get; }
 
 		void Update(float s);
-		HoveredInfo GetLeftHovered();
-		HoveredInfo GetRightHovered();
 		HoveredInfo GetMouseHovered();
 
 		string DebugString();

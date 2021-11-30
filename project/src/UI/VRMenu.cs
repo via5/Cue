@@ -82,9 +82,6 @@ namespace Cue
 		{
 			if (sys_.IsPlayMode || UI.VRMenuDebug)
 			{
-				var lh = sys_.Input.GetLeftHovered();
-				var rh = sys_.Input.GetRightHovered();
-
 				if (sys_.Input.ShowLeftMenu)
 					ShowLeft();
 				else if (sys_.Input.ShowRightMenu)

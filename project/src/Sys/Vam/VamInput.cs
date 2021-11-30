@@ -9,9 +9,6 @@ namespace Cue.Sys.Vam
 		bool IsAtomVRHands(Atom a);
 		bool IsTransformVRHand(Transform t, bool left);
 
-		Transform LeftController { get; }
-		Transform RightController { get; }
-
 		Vector2 LeftJoystick { get; }
 		Vector2 RightJoystick { get; }
 	}
@@ -26,8 +23,6 @@ namespace Cue.Sys.Vam
 		private Transform leftHandAnchor_ = null;
 		private Transform rightHandAnchor_ = null;
 
-		public abstract Transform LeftController { get; }
-		public abstract Transform RightController { get; }
 		public abstract Vector2 LeftJoystick { get; }
 		public abstract Vector2 RightJoystick { get; }
 
@@ -76,16 +71,6 @@ namespace Cue.Sys.Vam
 
 	class SteamVRInput : BasicVRInput
 	{
-		public override Transform LeftController
-		{
-			get { return sc_.viveObjectLeft; }
-		}
-
-		public override Transform RightController
-		{
-			get { return sc_.viveObjectRight; }
-		}
-
 		public override Vector2 LeftJoystick
 		{
 			get
@@ -573,22 +558,6 @@ namespace Cue.Sys.Vam
 			return EventSystem.current.IsPointerOverGameObject();
 		}
 
-		public HoveredInfo GetLeftHovered()
-		{
-			if (!GetLeftVRRay())
-				return HoveredInfo.None;
-
-			return GetHovered();
-		}
-
-		public HoveredInfo GetRightHovered()
-		{
-			if (!GetRightVRRay())
-				return HoveredInfo.None;
-
-			return GetHovered();
-		}
-
 		public HoveredInfo GetMouseHovered()
 		{
 			if (!GetMouseRay())
@@ -628,20 +597,6 @@ namespace Cue.Sys.Vam
 		private bool GetMouseRay()
 		{
 			ray_ = sc_.MonitorCenterCamera.ScreenPointToRay(Input.mousePosition);
-			return true;
-		}
-
-		private bool GetLeftVRRay()
-		{
-			ray_.origin = vr_.LeftController.position;
-			ray_.direction = vr_.LeftController.forward;
-			return true;
-		}
-
-		private bool GetRightVRRay()
-		{
-			ray_.origin = vr_.RightController.position;
-			ray_.direction = vr_.RightController.forward;
 			return true;
 		}
 
