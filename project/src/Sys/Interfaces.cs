@@ -404,6 +404,7 @@ namespace Cue.Sys
 		bool Physics { get; set; }
 		bool Hidden { get; set; }
 		float Scale { get; set; }
+		bool AutoBlink { get; set; }
 
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }

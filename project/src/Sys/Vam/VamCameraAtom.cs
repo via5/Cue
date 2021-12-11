@@ -365,6 +365,7 @@ namespace Cue.Sys.Vam
 		public bool Physics { get; set; }
 		public bool Hidden { get; set; }
 		public float Scale { get; set; }
+		public bool AutoBlink { get; set; }
 		public Vector3 Position { get; set; }
 		public Quaternion Rotation { get; set; }
 		public bool NavEnabled { get; set; }

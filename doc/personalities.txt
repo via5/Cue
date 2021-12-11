@@ -472,8 +472,9 @@ MacGruber's Breathing, this corresponds to a pitch between [0.8, 1.2].
 
 
 orgasm object:
-  dataset: name of the orgasm dataset
-  pitch:   pitch during orgasm
+  dataset:        name of the orgasm dataset; if an empty string, disables
+                  voice during orgasm
+  pitch:          pitch during orgasm
 
 datasets array:
  object:

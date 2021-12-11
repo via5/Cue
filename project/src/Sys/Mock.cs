@@ -402,6 +402,12 @@ namespace Cue.Sys.Mock
 			set { }
 		}
 
+		public bool AutoBlink
+		{
+			get { return false; }
+			set { }
+		}
+
 		public void Init()
 		{
 		}

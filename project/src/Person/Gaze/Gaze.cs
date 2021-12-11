@@ -118,6 +118,12 @@ namespace Cue
 			set { forceLook_ = value; }
 		}
 
+		public bool AutoBlink
+		{
+			get { return person_.Atom.AutoBlink; }
+			set { person_.Atom.AutoBlink = value; }
+		}
+
 		public void Update(float s)
 		{
 			gazeDuration_.Update(s, person_.Mood.GazeEnergy);

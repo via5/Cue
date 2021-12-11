@@ -206,10 +206,13 @@ namespace Cue
 		{
 			var ds = person_.Personality.Voice.OrgasmDataset;
 
-			orgasmDataset_.Value = ds.Name;
-			pitch_.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
+			if (ds.Name != "")
+			{
+				orgasmDataset_.Value = ds.Name;
+				pitch_.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
 
-			action_.Fire();
+				action_.Fire();
+			}
 		}
 	}
 

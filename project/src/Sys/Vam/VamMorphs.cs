@@ -337,7 +337,7 @@ namespace Cue.Sys.Vam
 
 				m_.morphValue = f;
 
-				if (eyes_)
+				if (eyes_ && atom_.AutoBlink)
 					atom_.SetBlink(f < 0.45f);
 			}
 			finally

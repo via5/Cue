@@ -58,6 +58,7 @@ namespace Cue.Sys.Vam
 		private DAZCharacter char_ = null;
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
+		private bool autoBlink_ = true;
 
 		private BoolParameter collisions_;
 		private BoolParameter physics_;
@@ -146,6 +147,12 @@ namespace Cue.Sys.Vam
 			{
 				return (SuperController.singleton.GetSelectedAtom() == atom_);
 			}
+		}
+
+		public bool AutoBlink
+		{
+			get { return autoBlink_; }
+			set { autoBlink_ = value; }
 		}
 
 		public IBody Body

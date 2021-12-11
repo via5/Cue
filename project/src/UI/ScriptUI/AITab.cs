@@ -460,6 +460,8 @@ namespace Cue
 				person_.Gaze.Render.FrontPlane));
 
 			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
+			p.Add(new VUI.CheckBox("Manage blink", OnAutoBlink, true));
+
 			Add(p);
 		}
 
@@ -499,6 +501,11 @@ namespace Cue
 		private void OnForceLook(int s)
 		{
 			person_.Gaze.ForceLook = s;
+		}
+
+		private void OnAutoBlink(bool b)
+		{
+			person_.Gaze.AutoBlink = b;
 		}
 	}
 
