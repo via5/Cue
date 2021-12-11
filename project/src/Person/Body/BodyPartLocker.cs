@@ -15,7 +15,7 @@ namespace Cue
 		}
 
 		public BodyPartLock LockInternal(
-			int lockType, string why, bool strong, ulong key)
+			int lockType, string why, int strengthType, ulong key)
 		{
 			for (int i = 0; i < locks_.Count; ++i)
 			{
@@ -29,14 +29,14 @@ namespace Cue
 					locks_[i].SetExpired();
 			}
 
-			var lk = new BodyPartLock(bp_, lockType, strong, why, key);
+			var lk = new BodyPartLock(bp_, lockType, strengthType, why, key);
 			locks_.Add(lk);
 			return lk;
 		}
 
-		public BodyPartLock Lock(int lockType, string why, bool strong = true)
+		public BodyPartLock Lock(int lockType, string why, int strengthType)
 		{
-			return LockInternal(lockType, why, strong, BodyPartLock.NextKey());
+			return LockInternal(lockType, why, strengthType, BodyPartLock.NextKey());
 		}
 
 		public void UnlockInternal(BodyPartLock lk)
@@ -97,22 +97,35 @@ namespace Cue
 		public const int Morph = 0x02;
 		public const int Anim = Move | Morph;
 
+		public const int Weak = 0;
+		public const int Strong = 1;
+
 		private static ulong nextKey_ = 1;
 
 		private BodyPart bp_;
 		private int type_;
-		private bool strong_;
+		private int strengthType_;
 		private bool expired_ = false;
 		private string why_;
 		private ulong key_;
 
-		public BodyPartLock(BodyPart bp, int type, bool strong, string why, ulong key)
+		public BodyPartLock(BodyPart bp, int type, int strengthType, string why, ulong key)
 		{
 			bp_ = bp;
 			type_ = type;
-			strong_ = strong;
+			strengthType_ = strengthType;
 			why_ = why;
 			key_ = key;
+		}
+
+		public static string StrengthToString(int type)
+		{
+			switch (type)
+			{
+				case Weak: return "weak";
+				case Strong: return "strong";
+				default: return $"?{type}";
+			}
 		}
 
 		public static ulong NextKey()
@@ -121,7 +134,8 @@ namespace Cue
 		}
 
 		public static BodyPartLock[] LockMany(
-			Person p, int[] bodyParts, int lockType, string why, bool strong = true)
+			Person p, int[] bodyParts, int lockType,
+			string why, int strengthType)
 		{
 			List<BodyPartLock> list = null;
 			bool failed = false;
@@ -133,7 +147,7 @@ namespace Cue
 				for (int i = 0; i < bodyParts.Length; ++i)
 				{
 					var lk = p.Body.Get(bodyParts[i]).Locker.LockInternal(
-						lockType, why, strong, key);
+						lockType, why, strengthType, key);
 
 					if (lk == null)
 					{
@@ -156,7 +170,7 @@ namespace Cue
 				for (int i = 0; i < bodyParts.Length; ++i)
 					p.Body.Log.Error($"  - {BP.ToString(bodyParts[i])}");
 
-				p.Body.Log.Error($"lockType={lockType}, why={why}, strong={strong}");
+				p.Body.Log.Error($"lockType={lockType}, why={why}, str={StrengthToString(strengthType)}");
 				p.Body.Log.Error($"exception:");
 				p.Body.Log.Error(e.ToString());
 
@@ -189,11 +203,16 @@ namespace Cue
 			get { return key_; }
 		}
 
+		private bool IsStrong
+		{
+			get { return (strengthType_ == Strong); }
+		}
+
 		public bool Prevents(int type, ulong key)
 		{
 			if (key_ != key)
 			{
-				if (Bits.IsAnySet(type_, type) && strong_)
+				if (Bits.IsAnySet(type_, type) && IsStrong)
 					return true;
 			}
 
@@ -202,7 +221,7 @@ namespace Cue
 
 		public bool IsWeakFor(int type)
 		{
-			if (Bits.IsAnySet(type_, type) && !strong_)
+			if (Bits.IsAnySet(type_, type) && !IsStrong)
 				return true;
 			else
 				return false;
@@ -252,7 +271,7 @@ namespace Cue
 			string s = "";
 
 			s += $"{bp_.Name}: {TypeToString(type_)}, ";
-			s += $"{(strong_ ? "strong" : "weak")}";
+			s += StrengthToString(strengthType_);
 
 			if (expired_)
 				s += ", expired";

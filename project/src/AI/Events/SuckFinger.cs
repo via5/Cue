@@ -24,7 +24,8 @@
 
 			if (mouthLock_ == null && mouthTriggered)
 			{
-				mouthLock_ = head.Lock(BodyPartLock.Anim, "SuckFinger");
+				mouthLock_ = head.Lock(
+					BodyPartLock.Anim, "SuckFinger", BodyPartLock.Strong);
 
 				if (mouthLock_ != null)
 				{

@@ -128,9 +128,9 @@ namespace Cue
 				staleTriggers_ = true;
 		}
 
-		public BodyPartLock Lock(int lockType, string why, bool strong = true)
+		public BodyPartLock Lock(int lockType, string why, int strengthType)
 		{
-			return locker_.Lock(lockType, why, strong);
+			return locker_.Lock(lockType, why, strengthType);
 		}
 
 		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)

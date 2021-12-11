@@ -8,6 +8,8 @@
 		private bool active_ = false;
 		private bool running_ = false;
 		private int anim_ = Animations.None;
+		private BodyPartLock lock_ = null;
+
 
 		public ThrustEvent()
 			: base("thrust")
@@ -74,6 +76,15 @@
 				Log.Info($"no valid receiver");
 				active_ = false;
 				anim_ = Animations.None;
+				return false;
+			}
+
+			lock_ = person_.Body.Get(BP.Hips).Lock(
+				BodyPartLock.Anim, "thrust", BodyPartLock.Strong);
+
+			if (lock_ == null)
+			{
+				Log.Info($"hips are busy");
 				return false;
 			}
 
@@ -152,6 +163,12 @@
 
 			SetZoneEnabled(false);
 
+			if (lock_ != null)
+			{
+				lock_.Unlock();
+				lock_ = null;
+			}
+
 			running_ = false;
 			receiver_ = null;
 			anim_ = Animations.None;
@@ -180,7 +197,8 @@
 				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
 				{
 					person_.Animator.PlayType(
-						anim_, new AnimationContext(receiver_?.Person));
+						anim_, new AnimationContext(
+							receiver_?.Person, lock_.Key));
 				}
 			}
 		}

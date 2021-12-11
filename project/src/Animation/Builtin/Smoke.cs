@@ -355,19 +355,19 @@ namespace Cue
 				if (headLock_ == null)
 				{
 					headLock_ = person_.Body.Get(BP.Head)
-						.Lock(BodyPartLock.Move, "smoke");
+						.Lock(BodyPartLock.Move, "smoke", BodyPartLock.Strong);
 				}
 
 				if (mouthLock_ == null)
 				{
 					mouthLock_ = person_.Body.Get(BP.Mouth)
-						.Lock(BodyPartLock.Morph, "smoke");
+						.Lock(BodyPartLock.Morph, "smoke", BodyPartLock.Strong);
 				}
 
 				if (handLock_ == null)
 				{
 					handLock_ = handPart_
-						.Lock(BodyPartLock.Anim, "smoke");
+						.Lock(BodyPartLock.Anim, "smoke", BodyPartLock.Strong);
 				}
 			}
 			else

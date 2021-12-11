@@ -249,9 +249,6 @@ namespace Cue
 
 				var d = Vector3.Distance(srcLips, targetLips.Position);
 
-				if (playerOnly)
-					Log.Info($"{d}");
-
 				float startDistance;
 
 				if (target.IsPlayer)
@@ -278,11 +275,10 @@ namespace Cue
 
 		private bool TryStartWith(Person target)
 		{
-			Log.Info($"try start for {person_} and {target}");
+			Log.Verbose($"try start for {person_} and {target}");
 
 			if (!Lock())
 			{
-				Log.Info($"self lock failed");
 				lastResult_ = "self lock failed";
 				return false;
 			}
@@ -290,7 +286,6 @@ namespace Cue
 			var sf = target.AI.GetEvent<KissEvent>().TryStartFrom(person_);
 			if (sf != "")
 			{
-				Log.Info($"other failed to start: " + sf);
 				lastResult_ = $"other failed to start: " + sf;
 				return false;
 			}
@@ -298,7 +293,6 @@ namespace Cue
 			if (!person_.Animator.PlayType(
 				Animations.Kiss, new AnimationContext(target, locks_[0].Key)))
 			{
-				Log.Info($"kiss animation failed to start");
 				lastResult_ = $"kiss animation failed to start";
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
@@ -306,7 +300,6 @@ namespace Cue
 
 			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_))
 			{
-				Log.Info($"kiss animation failed startfrom");
 				lastResult_ = $"kiss animation failed startfrom";
 				person_.Animator.StopType(Animations.Kiss);
 				target.AI.GetEvent<KissEvent>().Unlock();
@@ -314,7 +307,6 @@ namespace Cue
 			}
 
 			target_ = target;
-			Log.Info($"try start with succeeded");
 
 			return true;
 		}
@@ -359,7 +351,7 @@ namespace Cue
 			locks_ = BodyPartLock.LockMany(
 				person_,
 				new int[] { BP.Head, BP.Lips, BP.Mouth },
-				BodyPartLock.Anim, "kiss");
+				BodyPartLock.Anim, "kiss", BodyPartLock.Strong);
 
 			return (locks_ != null);
 		}

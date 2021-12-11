@@ -83,7 +83,7 @@ namespace Cue.Proc
 
 		public virtual ulong LockKey
 		{
-			get { return parent_?.LockKey ?? 0; }
+			get { return parent_?.LockKey ?? BodyPartLock.NoKey; }
 		}
 
 		public abstract bool Done { get; }

@@ -321,7 +321,7 @@
 			leftLock_ = BodyPartLock.LockMany(
 				person_,
 				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
-				BodyPartLock.Anim, why);
+				BodyPartLock.Anim, why, BodyPartLock.Strong);
 
 			return (leftLock_ != null);
 		}
@@ -331,7 +331,7 @@
 			rightLock_ = BodyPartLock.LockMany(
 				person_,
 				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
-				BodyPartLock.Anim, why);
+				BodyPartLock.Anim, why, BodyPartLock.Strong);
 
 			return (rightLock_ != null);
 		}

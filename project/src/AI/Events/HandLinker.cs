@@ -102,7 +102,9 @@
 						info.lk = null;
 					}
 
-					info.lk = hand.Lock(BodyPartLock.Move, "HandLocker", false);
+					info.lk = hand.Lock(
+						BodyPartLock.Move, "HandLocker", BodyPartLock.Weak);
+
 					if (info.lk != null)
 					{
 						Log.Verbose($"linking {hand} with {close}");

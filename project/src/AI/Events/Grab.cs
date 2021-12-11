@@ -30,7 +30,8 @@
 				if (!wasGrabbed_)
 				{
 					wasGrabbed_ = true;
-					headLock_ = head_.Lock(BodyPartLock.Anim, "grabbed");
+					headLock_ = head_.Lock(
+						BodyPartLock.Anim, "grabbed", BodyPartLock.Strong);
 				}
 			}
 			else

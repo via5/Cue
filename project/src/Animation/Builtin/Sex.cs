@@ -260,9 +260,9 @@ namespace Cue.Proc
 	{
 		private float hipForceMin_ = 300;
 		private float hipForceMax_ = 1400;
-		private float hipTorqueMin_ = 0;
-		private float hipTorqueMax_ = -120;
-		private float hipTorqueWindow_ = 40;
+		private float hipTorqueMin_ = -40;
+		private float hipTorqueMax_ = 40;
+		private float hipTorqueWindow_ = 0;
 
 		public SexProcAnimation()
 			: base("cueSex")
