@@ -12,6 +12,7 @@ namespace Cue
 	class KissEventData : IEventData
 	{
 		public float startDistance;
+		public float startDistanceWithPlayer;
 		public float stopDistance;
 		public float stopDistanceWithPlayer;
 		public Duration duration;
@@ -28,6 +29,7 @@ namespace Cue
 		private void CopyFrom(KissEventData d)
 		{
 			startDistance = d.startDistance;
+			startDistanceWithPlayer = d.startDistanceWithPlayer;
 			stopDistance = d.stopDistance;
 			stopDistanceWithPlayer = d.stopDistanceWithPlayer;
 			duration = d.duration.Clone();
@@ -61,6 +63,7 @@ namespace Cue
 			var d = new KissEventData();
 
 			d.startDistance = J.ReqFloat(o, "startDistance");
+			d.startDistanceWithPlayer = J.ReqFloat(o, "startDistanceWithPlayer");
 			d.stopDistance = J.ReqFloat(o, "stopDistance");
 			d.stopDistanceWithPlayer = J.ReqFloat(o, "stopDistanceWithPlayer");
 			d.duration = Duration.FromJSON(o, "duration", true);
@@ -114,6 +117,7 @@ namespace Cue
 			return new string[]
 			{
 				$"startDistance            {d_.startDistance:0.00}",
+				$"startDistanceWithPlayer  {d_.startDistanceWithPlayer:0.00}",
 				$"stopDistance             {d_.stopDistance:0.00}",
 				$"stopDistanceWithPlayer   {d_.stopDistanceWithPlayer:0.00}",
 				$"duration                 {d_.duration.ToLiveString()}",
@@ -245,7 +249,17 @@ namespace Cue
 
 				var d = Vector3.Distance(srcLips, targetLips.Position);
 
-				if (d <= d_.startDistance)
+				if (playerOnly)
+					Log.Info($"{d}");
+
+				float startDistance;
+
+				if (target.IsPlayer)
+					startDistance = d_.startDistanceWithPlayer;
+				else
+					startDistance = d_.startDistance;
+
+				if (d <= startDistance)
 				{
 					foundClose = true;
 
@@ -264,10 +278,11 @@ namespace Cue
 
 		private bool TryStartWith(Person target)
 		{
-			Log.Verbose($"starting for {person_} and {target}");
+			Log.Info($"try start for {person_} and {target}");
 
 			if (!Lock())
 			{
+				Log.Info($"self lock failed");
 				lastResult_ = "self lock failed";
 				return false;
 			}
@@ -275,6 +290,7 @@ namespace Cue
 			var sf = target.AI.GetEvent<KissEvent>().TryStartFrom(person_);
 			if (sf != "")
 			{
+				Log.Info($"other failed to start: " + sf);
 				lastResult_ = $"other failed to start: " + sf;
 				return false;
 			}
@@ -282,6 +298,7 @@ namespace Cue
 			if (!person_.Animator.PlayType(
 				Animations.Kiss, new AnimationContext(target, locks_[0].Key)))
 			{
+				Log.Info($"kiss animation failed to start");
 				lastResult_ = $"kiss animation failed to start";
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
@@ -289,13 +306,15 @@ namespace Cue
 
 			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_))
 			{
-				lastResult_ = $"kiss animation failed to start anim";
+				Log.Info($"kiss animation failed startfrom");
+				lastResult_ = $"kiss animation failed startfrom";
 				person_.Animator.StopType(Animations.Kiss);
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
 			}
 
 			target_ = target;
+			Log.Info($"try start with succeeded");
 
 			return true;
 		}

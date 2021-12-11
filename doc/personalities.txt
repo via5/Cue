@@ -457,6 +457,9 @@ Controls what characters are looking at.
 - MaxHappiness (float)
   happiness will never rise above this value
 
+- MaxExcitedExpression (float)
+  excited expression intensity will never rise above this value
+
 
 3.6 Voices
 ----------

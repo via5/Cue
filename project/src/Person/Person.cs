@@ -186,13 +186,7 @@ namespace Cue
 
 		public bool IsInteresting
 		{
-			get
-			{
-				if (IsPlayer)
-					return true;
-				else
-					return Body.Exists;
-			}
+			get { return Body.Exists; }
 		}
 
 		public bool Grabbed
