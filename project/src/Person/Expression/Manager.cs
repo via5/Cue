@@ -251,6 +251,7 @@ namespace Cue
 					{
 						weight += m.Get(Moods.Excited) * 2;
 						intensity = Math.Max(intensity, m.Get(Moods.Excited));
+						intensity = Math.Max(intensity, ps.Get(PS.MaxExcitedExpression));
 					}
 
 					if (e.IsMood(Moods.Angry))

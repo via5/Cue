@@ -86,7 +86,9 @@ V.Float("AngerMaxExcitementForAnger"),
 V.Float("AngerMaxExcitementForHappiness"),
 V.Float("AngerExcitementFactorForAnger"),
 V.Float("AngerExcitementFactorForHappiness"),
+
 V.Float("MaxHappiness"),
+V.Float("MaxExcitedExpression"),
 
 V.Float("MaxSweat"),
 V.Float("MaxFlush"),

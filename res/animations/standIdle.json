@@ -18,8 +18,8 @@
 					"bodyPart": "hips",
 					"movement":
 					{
-						"min": [-50, 0, -50],
-						"max": [ 50, 0, 50]
+						"min": [-80, 0, -80],
+						"max": [80, 0, 80]
 					},
 					"sync":
 					{
@@ -37,8 +37,8 @@
 					"bodyPart": "chest",
 					"movement":
 					{
-						"min": [-50, 0, -50],
-						"max": [ 50, 0, 50]
+						"min": [-80, 0, -80],
+						"max": [80, 0, 80]
 					},
 					"sync":
 					{
@@ -56,8 +56,8 @@
 					"bodyPart": "leftHand",
 					"movement":
 					{
-						"min": [-50, 0, -50],
-						"max": [ 50, 0, 50]
+						"min": [-80, 0, -80],
+						"max": [80, 0, 80]
 					},
 					"sync":
 					{
@@ -75,8 +75,8 @@
 					"bodyPart": "rightHand",
 					"movement":
 					{
-						"min": [-50, 0, -50],
-						"max": [ 50, 0, 50]
+						"min": [-80, 0, -80],
+						"max": [80, 0, 80]
 					},
 					"sync":
 					{
@@ -96,8 +96,8 @@
 					"bodyPart": "hips",
 					"movement":
 					{
-						"min": [-5, -5, -5],
-						"max": [ 5,  5,  5]
+						"min": [-10, -10, -10],
+						"max": [10, 10, 10]
 					},
 					"sync":
 					{
@@ -115,8 +115,8 @@
 					"bodyPart": "chest",
 					"movement":
 					{
-						"min": [-5, -5, -5],
-						"max": [ 5,  5,  5]
+						"min": [-10, -10, -10],
+						"max": [10, 10, 10]
 					},
 					"sync":
 					{
@@ -134,8 +134,8 @@
 					"bodyPart": "leftHand",
 					"movement":
 					{
-						"min": [-5, -5, -5],
-						"max": [ 5,  5,  5]
+						"min": [-10, -10, -10],
+						"max": [10, 10, 10]
 					},
 					"sync":
 					{
@@ -153,8 +153,8 @@
 					"bodyPart": "rightHand",
 					"movement":
 					{
-						"min": [-5, -5, -5],
-						"max": [ 5,  5,  5]
+						"min": [-10, -10, -10],
+						"max": [10, 10, 10]
 					},
 					"sync":
 					{
@@ -174,8 +174,8 @@
 					"bodyPart": "head",
 					"movement":
 					{
-						"min": [-40, 0, -40],
-						"max": [ 40, 0, 40]
+						"min": [-80, -80, -80],
+						"max": [ 80, 80, 80]
 					},
 					"sync":
 					{
@@ -190,6 +190,27 @@
 				},
 
 
+
+				{
+					"type": "rtorque",
+					"bodyPart": "head",
+					"movement":
+					{
+						"min": [-10, -10, -10],
+						"max": [ 10, 10, 10]
+					},
+					"sync":
+					{
+						"type": "duration",
+						"fwdDuration": [1, 6],
+						"bwdDuration": [1, 6],
+						"fwdDelay": [0, 6],
+						"bwdDelay": [0, 6],
+						"loop": true,
+						"resetBetween": false
+					}
+				},
+				
 				{
 					"type": "morph",
 					"bodyPart": "rightHand",

@@ -1,0 +1,86 @@
+{
+	"name": "bored",
+	"inherit": "standard",
+	"maxHappiness": 0.0,
+	"maxExcitedExpression": 0.1,
+
+	"lookAboveMaxWeight": 0,
+	"lookAboveMaxWeightOrgasm": 0,
+
+	"naturalRandomWeight": 1,
+	"naturalOtherEyesWeight": 0,
+	"busyOtherEyesWeight": 0,
+
+	"blowjobEyesWeight": 0.5,
+	"blowjobGenitalsWeight": 5,
+	"handjobEyesWeight": 0,
+	"handjobGenitalsWeight": 2,
+	"penetratedEyesWeight": 0.5,
+	"penetratedGenitalsWeight": 1,
+	"penetratingEyesWeight": 0.5,
+	"penetratingGenitalsWeight": 2,
+	"gropedEyesWeight": 0.5,
+	"gropedTargetWeight": 0.5,
+	"gropingEyesWeight": 0.5,
+	"gropingTargetWeight": 0.5,
+
+	"otherEyesOrgasmWeight": 0,
+	"otherEyesExcitementWeight": 0,
+	"otherBlowjobEyesWeight": 0,
+	"otherBlowjobTargetEyesWeight": 0,
+	"otherBlowjobTargetGenitalsWeight": 0,
+	"otherHandjobEyesWeight": 0,
+	"otherHandjobTargetEyesWeight": 0,
+	"otherHandjobTargetGenitalsWeight": 0,
+	"otherPenetrationEyesWeight": 0,
+	"otherPenetrationSourceEyesWeight": 0,
+	"otherPenetrationSourceGenitalsWeight": 0,
+	"otherGropedEyesWeight": 0,
+	"otherGropedSourceEyesWeight": 0,
+	"otherGropedTargetWeight": 0,
+
+	"gazeDuration":
+	{
+		"range":
+		{
+			"min": 5,
+			"max": 2
+		}
+	},
+
+	"gazeRandomInterval":
+	{
+		"range":
+		{
+			"min": 5,
+			"max": 10
+		}
+	},
+
+	"voice":
+	{
+		"orgasm":
+		{
+			"dataset": "Candy Orgasm Soft",
+			"pitch": -1
+		},
+
+		"datasets":
+		[
+			{
+				"dataset": "Candy Nose",
+				"intensityMin": 0,
+				"intensityMax": 0.2,
+				"pitch": -1,
+			},
+
+			{
+				"dataset": "Candy Mouth",
+				"intensityMin": 0.2,
+				"intensityMax": 1,
+				"pitch": -1,
+			}
+		]
+	},
+
+}

@@ -34,8 +34,8 @@ namespace Cue
 				new GazeAbove(p),
 				new GazeGrabbed(p),
 				new GazeKissing(p),
-				new GazeBJ(p),
-				new GazeHJ(p),
+				new GazeMouth(p),
+				new GazeHands(p),
 				new GazeInteractions(p),
 				new GazeRandom(p),
 				new GazeOtherPersons(p)
@@ -225,9 +225,9 @@ namespace Cue
 	}
 
 
-	class GazeBJ : BasicGazeEvent
+	class GazeMouth : BasicGazeEvent
 	{
-		public GazeBJ(Person p)
+		public GazeMouth(Person p)
 			: base(p)
 		{
 		}
@@ -246,7 +246,8 @@ namespace Cue
 					if (g_.ShouldAvoidInsidePersonalSpace(t))
 					{
 						targets_.SetShouldAvoid(
-							t, true, g_.AvoidWeight(t), $"bj, but avoid in ps");
+							t, true, g_.AvoidWeight(t),
+							$"mouthevent, but avoid in ps");
 
 						return Continue | NoGazer | Busy;
 					}
@@ -254,11 +255,11 @@ namespace Cue
 					{
 						targets_.SetWeight(
 							t, BP.Eyes,
-							ps.Get(PS.BlowjobEyesWeight), "bj");
+							ps.Get(PS.BlowjobEyesWeight), "mouthevent");
 
 						targets_.SetWeight(
-							t, BP.Penis,
-							ps.Get(PS.BlowjobGenitalsWeight), "bj");
+							t, t.Body.GenitalsBodyPart,
+							ps.Get(PS.BlowjobGenitalsWeight), "mouthevent");
 
 						return Continue | NoGazer | Busy | NoRandom;
 					}
@@ -270,14 +271,14 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "bj";
+			return "mouthevent";
 		}
 	}
 
 
-	class GazeHJ : BasicGazeEvent
+	class GazeHands : BasicGazeEvent
 	{
-		public GazeHJ(Person p)
+		public GazeHands(Person p)
 			: base(p)
 		{
 		}
@@ -291,11 +292,17 @@ namespace Cue
 				int ret = 0;
 
 				if (e.LeftTarget != null && e.LeftTarget == e.RightTarget)
+				{
 					ret |= CheckTarget(e.LeftTarget);
-				else if (e.LeftTarget != null)
-					ret |= CheckTarget(e.LeftTarget);
-				else if (e.RightTarget != null)
-					ret |= CheckTarget(e.RightTarget);
+				}
+				else
+				{
+					if (e.LeftTarget != null)
+						ret |= CheckTarget(e.LeftTarget);
+
+					if (e.RightTarget != null)
+						ret |= CheckTarget(e.RightTarget);
+				}
 
 				return ret;
 			}
@@ -309,18 +316,21 @@ namespace Cue
 
 			if (g_.ShouldAvoidInsidePersonalSpace(t))
 			{
-				targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "hj, but avoid in ps");
+				targets_.SetShouldAvoid(
+					t, true, g_.AvoidWeight(t),
+					"handevent, but avoid in ps");
+
 				return Continue | Busy;
 			}
 			else
 			{
 				targets_.SetWeight(
 					t, BP.Eyes,
-					ps.Get(PS.HandjobEyesWeight), "hj");
+					ps.Get(PS.HandjobEyesWeight), "handevent");
 
 				targets_.SetWeight(
-					t, BP.Penis,
-					ps.Get(PS.HandjobGenitalsWeight), "hj");
+					t, t.Body.GenitalsBodyPart,
+					ps.Get(PS.HandjobGenitalsWeight), "handevent");
 
 				return Continue | Busy | NoRandom;
 			}
@@ -328,7 +338,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return "hj";
+			return "handevent";
 		}
 	}
 

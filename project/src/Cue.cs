@@ -8,7 +8,7 @@ namespace Cue
 	class Version
 	{
 		public const int Major = 0;
-		public const int Minor = 1;
+		public const int Minor = 2;
 
 		public static string String
 		{

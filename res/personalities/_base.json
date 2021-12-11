@@ -353,7 +353,7 @@
 	"angerExcitementFactorForAnger": 0,
 	"angerExcitementFactorForHappiness": 0,
 	"maxHappiness": 1,
-
+	"maxExcitedExpression": 1,
 
 	"maxSweat": 1,
 	"maxFlush": 1,
