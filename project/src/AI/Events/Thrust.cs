@@ -112,9 +112,6 @@
 					// penetration
 					Log.Info($"starting sex with {receiver_.Person.ID}.{receiver_}");
 
-					person_.Clothing.GenitalsVisible = true;
-					receiver_.Person.Clothing.GenitalsVisible = true;
-
 					// play the penetrated animation now, don't bother if it can't
 					// start; see also Penetrated.OnIn()
 					person_.Animator.PlayType(Animations.Penetrated);

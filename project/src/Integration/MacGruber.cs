@@ -231,6 +231,8 @@ namespace Cue
 
 		private int version_ = NotFound;
 		private Sys.Vam.BoolParameter enabled_;
+		public Sys.Vam.StringChooserParameter refAtom_;
+		public Sys.Vam.StringChooserParameter refControl_;
 		private Sys.Vam.FloatParameter gazeDuration_;
 		private Sys.Vam.FloatParameter maxAngleHor_;
 		private Sys.Vam.FloatParameter maxAngleVer_;
@@ -257,6 +259,8 @@ namespace Cue
 				p, "headControl", "holdRotationSpring");
 
 			enabled_ = new Sys.Vam.BoolParameter(p, "MacGruber.Gaze", "enabled");
+			refAtom_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "Reference Atom");
+			refControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "Reference Control");
 			gazeDuration_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Gaze Duration");
 			maxAngleHor_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Horizontal");
 			maxAngleVer_ = new Sys.Vam.FloatParameter(p, "MacGruber.Gaze", "Max Angle Vertical");
@@ -271,6 +275,8 @@ namespace Cue
 			lookatControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
 
 			enabled_.Value = false;
+			refAtom_.Value = p.ID;
+			refControl_.Value = "chestControl";
 			maxAngleVer_.Value = 70;
 			rollDurationMin_.Value = 1;
 		}

@@ -2,6 +2,8 @@
 {
 	class HandLinker : BasicEvent
 	{
+		private const float Distance = 0.03f;
+
 		class HandInfo
 		{
 			public BodyPart hand;
@@ -165,7 +167,7 @@
 
 					float d = bp.DistanceToSurface(hand);
 
-					if (d < 0.07f)
+					if (d < Distance)
 					{
 						if (d < closestDistance)
 						{

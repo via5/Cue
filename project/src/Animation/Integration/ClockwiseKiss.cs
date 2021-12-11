@@ -16,7 +16,6 @@
 		private Sys.Vam.FloatParameter lipDepth_ = null;
 		private Sys.Vam.FloatParameter morphDuration_ = null;
 		private Sys.Vam.FloatParameter morphSpeed_ = null;
-		private Sys.Vam.FloatParameter tongueLength_ = null;
 		private Sys.Vam.FloatParameter trackingSpeed_ = null;
 		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
@@ -194,9 +193,6 @@
 
 			morphSpeed_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Morph Speed");
-
-			tongueLength_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Tongue Length");
 
 			trackingSpeed_ = new Sys.Vam.FloatParameter(
 				p, "ClockwiseSilver.Kiss", "Tracking Speed");
