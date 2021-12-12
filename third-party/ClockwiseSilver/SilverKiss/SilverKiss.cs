@@ -326,7 +326,14 @@ namespace ClockwiseSilver {
 			List<string> kissTargetJSONTargetChoices = new List<string>();
 			if (kissAtom != null && kissTargetJSONID != null)
 			{
-				targetBody = kissAtom.rigidbodies.First(fc => fc.name == kissTargetJSONID);
+				try
+				{
+					targetBody = kissAtom.rigidbodies.First(fc => fc.name == kissTargetJSONID);
+				}
+				catch(Exception)
+				{
+				}
+
 				if (targetBody != null)
 				{
 					targetBodyTransform = targetBody.transform;
@@ -341,7 +348,7 @@ namespace ClockwiseSilver {
 				targetBody = null;
 				targetBodyTransform = null;
 			}
-	}
+		}
 
 		private void StartKiss(bool isCamKiss, bool isResume=false)
 		{
