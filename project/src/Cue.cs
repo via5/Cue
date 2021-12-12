@@ -8,7 +8,7 @@ namespace Cue
 	class Version
 	{
 		public const int Major = 0;
-		public const int Minor = 2;
+		public const int Minor = 3;
 
 		public static string String
 		{
@@ -189,7 +189,7 @@ namespace Cue
 				}
 			}
 
-			LogInfo("cue: running");
+			LogInfo($"cue: running, version {Version.String}");
 		}
 
 		private void CheckConfig()
