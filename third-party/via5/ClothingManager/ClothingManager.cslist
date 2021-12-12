@@ -1,0 +1,10 @@
+project\src\ClothingManager.cs
+project\src\Editor.cs
+project\src\Item.cs
+project\src\Loader.cs
+project\src\Log.cs
+project\src\Main.cs
+project\src\UI.cs
+project\src\Utilities.cs
+project\src\VamCharacter.cs
+project\src\VamClothingItem.cs

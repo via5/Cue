@@ -1,0 +1,24 @@
+{
+	"clothing":
+	[
+		{"id": "AIPantsDown", "showsGenitals": true},
+
+		{"id": "HeatUpPanty", "hidesGenitalsState": "Normal", "showsGenitalsState": "Access"}
+		{"id": "HeatUpPantySim", "hidesGenitalsState": "Normal", "showsGenitalsState": "Access"}
+		{"id": "SweetShorts", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"id": "TrystPanty", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"id": "CasualDenim2Jeans", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"id": "DATM_Pants", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"id": "DATM_PantsSim", "hidesGenitalsState": "Normal", "showsGenitalsState": "Down"},
+		{"id": "AlphakiniPanty", "hidesGenitalsState": "Normal", "showsGenitalsState": "Access"}
+		{"id": "AlphakiniPantySim", "hidesGenitalsState": "Normal", "showsGenitalsState": "Access"}
+
+		{"id": "SweetTank", "hidesBreastsState": "Normal", "showsBreastsState": "Exposed"},
+		{"id": "TrystBra", "hidesBreastsState": "Normal", "showsBreastsState": "Exposed"},
+		{"id": "AlphakiniBra", "hidesBreastsState": "Normal", "showsBreastsState": "Up"},
+		{"id": "AlphakiniBraSim", "hidesBreastsState": "Normal", "showsBreastsState": "Up"},
+
+		{"tag": "pants", "hidesGenitals": true},
+		{"tag": "shorts", "hidesGenitals": true},
+	]
+}
