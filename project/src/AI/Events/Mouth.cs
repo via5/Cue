@@ -10,6 +10,7 @@
 
 		private Person bjTarget_ = null;
 		private BodyPartLock[] bjLocks_ = null;
+		private bool hasForcedTrigger_ = false;
 
 
 		public MouthEvent()
@@ -54,6 +55,17 @@
 		private void Stop()
 		{
 			UnlockBJ();
+
+			if (hasForcedTrigger_)
+			{
+				bjTarget_.Body.Get(bjTarget_.Body.GenitalsBodyPart)
+					.RemoveForcedTrigger(person_.PersonIndex, BP.Mouth);
+
+				bjTarget_.Excitement.GetSource(SS.Genitals).EnabledForOthers = false;
+
+				hasForcedTrigger_ = false;
+			}
+
 			bjTarget_ = null;
 			person_.Animator.StopType(Animations.Blowjob);
 		}
@@ -93,7 +105,10 @@
 
 			var t = FindTarget();
 			if (t == null)
+			{
+				Log.Info("no target");
 				return;
+			}
 
 			bjLocks_ = BodyPartLock.LockMany(
 				person_,
@@ -108,6 +123,16 @@
 				{
 					UnlockBJ();
 					return;
+				}
+
+				if (t.Body.PenisSensitive)
+				{
+					t.Body.Get(t.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, BP.Mouth);
+
+					t.Excitement.GetSource(SS.Genitals).EnabledForOthers = true;
+
+					hasForcedTrigger_ = true;
 				}
 
 				bjTarget_ = t;

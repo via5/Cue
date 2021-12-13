@@ -173,17 +173,19 @@ namespace Cue
 
 		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
+		private int sourcePart_;
 		private float modifier_;
 
-		public SensitivityModifier(string source, float modifier)
+		public SensitivityModifier(string source, int sourcePart, float modifier)
 		{
 			sourceName_ = source;
+			sourcePart_ = sourcePart;
 			modifier_ = modifier;
 		}
 
 		public SensitivityModifier Clone()
 		{
-			return new SensitivityModifier(sourceName_, modifier_);
+			return new SensitivityModifier(sourceName_, sourcePart_, modifier_);
 		}
 
 		public float Modifier
@@ -197,7 +199,7 @@ namespace Cue
 				sourceIndex_ = Resolve(sourceName_);
 		}
 
-		public bool AppliesTo(Person self, int sourcePersonIndex)
+		public bool AppliesTo(Person self, int sourcePersonIndex, int sourcePart)
 		{
 			if (sourceIndex_ == Player)
 			{
@@ -214,6 +216,14 @@ namespace Cue
 				if (sourceIndex_ != sourcePersonIndex)
 					return false;
 			}
+
+
+			if (sourcePart_ != BP.None)
+			{
+				if (sourcePart_ != sourcePart)
+					return false;
+			}
+
 
 			return true;
 		}
@@ -239,7 +249,14 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{IndexToString(sourceIndex_)} {modifier_}";
+			string s = $"{IndexToString(sourceIndex_)}.";
+
+			if (sourcePart_ == BP.None)
+				s += "any";
+			else
+				s += BP.ToString(sourcePart_);
+
+			return s + $" {modifier_}";
 		}
 
 		private string IndexToString(int i)
@@ -337,13 +354,13 @@ namespace Cue
 				modifiers_[i].Resolve();
 		}
 
-		public float GetModifier(Person self, int sourcePersonIndex)
+		public float GetModifier(Person self, int sourcePersonIndex, int sourcePart)
 		{
 			for (int i = 0; i < modifiers_.Length; ++i)
 			{
 				var m = modifiers_[i];
 
-				if (m.AppliesTo(self, sourcePersonIndex))
+				if (m.AppliesTo(self, sourcePersonIndex, sourcePart))
 					return m.Modifier;
 			}
 

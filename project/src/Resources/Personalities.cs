@@ -281,9 +281,18 @@ namespace Cue
 		private SensitivityModifier ParseSensitivityModifier(JSONClass o)
 		{
 			var source = J.OptString(o, "source");
+			var sourcePartName = J.OptString(o, "sourcePart");
 			float modifier = J.ReqFloat(o, "modifier");
 
-			return new SensitivityModifier(source, modifier);
+			int sourcePart = BP.None;
+			if (sourcePartName != "" && sourcePartName != "any")
+			{
+				sourcePart = BP.FromString(sourcePartName);
+				if (sourcePart == BP.None)
+					Log.Error($"bad sourcePart '{sourcePartName}'");
+			}
+
+			return new SensitivityModifier(source, sourcePart, modifier);
 		}
 
 		private void ParseEvents(Personality p, JSONClass o, bool inherited)

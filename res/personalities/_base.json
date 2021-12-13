@@ -432,6 +432,11 @@
 				{
 					"source": "self",
 					"modifier": 0.5
+				},
+				{
+					"source": "any",
+					"sourcePart": "mouth",
+					"modifier": 1.5
 				}
 			]
 		},

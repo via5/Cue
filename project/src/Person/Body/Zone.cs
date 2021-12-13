@@ -273,7 +273,14 @@ namespace Cue
 					max_ = ss.NonPhysicalMaximum;
 				}
 
-				mod_ = ss.GetModifier(p, sourcePersonIndex_);
+				for (int i = 0; i < parts_.Length; ++i)
+				{
+					if (parts_[i].active && !parts_[i].ignored)
+					{
+						mod_ = Math.Max(
+							mod_, ss.GetModifier(p, sourcePersonIndex_, i));
+					}
+				}
 			}
 		}
 

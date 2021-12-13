@@ -233,7 +233,7 @@
 
 				if (leftTarget_ != rightTarget_ && rightTarget_.Body.PenisSensitive)
 				{
-					rightTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
 						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 
 					rightForcedTrigger_ = true;
