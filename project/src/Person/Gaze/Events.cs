@@ -142,7 +142,7 @@ namespace Cue
 
 			if (ps.Get(PS.LookAtPlayerOnGrabWeight) != 0)
 			{
-				if (head_.GrabbedByPlayer)
+				if (head_.GrabbedByPlayer && Cue.Instance.Player.IsInteresting)
 				{
 					active_ = true;
 					activeElapsed_ = 0;
@@ -285,12 +285,11 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
+			int ret = Continue;
 			var e = person_.AI.GetEvent<HandEvent>();
 
 			if (e.Active)
 			{
-				int ret = 0;
-
 				if (e.LeftTarget != null && e.LeftTarget == e.RightTarget)
 				{
 					ret |= CheckTarget(e.LeftTarget);
@@ -303,11 +302,21 @@ namespace Cue
 					if (e.RightTarget != null)
 						ret |= CheckTarget(e.RightTarget);
 				}
-
-				return ret;
 			}
 
-			return Continue;
+
+			foreach (var t in Cue.Instance.ActivePersons)
+			{
+				if (t == person_)
+					continue;
+
+				e = t.AI.GetEvent<HandEvent>();
+
+				if (e.LeftTarget == person_ || e.RightTarget == person_)
+					ret |= CheckTarget(t);
+			}
+
+			return ret;
 		}
 
 		private int CheckTarget(Person t)

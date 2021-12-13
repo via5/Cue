@@ -54,8 +54,9 @@
 		private bool Start()
 		{
 			// four cases:
-			//  1) no receiver, but this person has a penis: disallow, too
-			//     easy to trigger and the frottage animation doesn't work well
+			//  1) no receiver, but this person has a penis that's currently
+			//     visible: disallow, too easy to trigger and the frottage
+			//     animation doesn't work well
 			//
 			//  2) no receiver and this person does not have a penis: frottage
 			//     animation, but won't be able to sync
@@ -70,7 +71,7 @@
 			// start by checking penetration
 			receiver_ = FindPenetrationReceiver();
 
-			if (receiver_ == null && person_.Body.HasPenis)
+			if (receiver_ == null && person_.Body.HasPenis && person_.Clothing.GenitalsVisible)
 			{
 				// don't allow frottage from characters that can penetrate
 				Log.Info($"no valid receiver");
@@ -107,7 +108,7 @@
 			}
 			else
 			{
-				if (person_.Body.HasPenis || receiver_.Person.Body.HasPenis)
+				if (PersonStatus.EitherPenetrating(person_, receiver_.Person))
 				{
 					// penetration
 					Log.Info($"starting sex with {receiver_.Person.ID}.{receiver_}");
@@ -207,7 +208,7 @@
 				if (p == person_)
 					continue;
 
-				if (person_.Status.PenetratedBy(p) || p.Status.PenetratedBy(person_))
+				if (PersonStatus.EitherPenetrating(person_, p))
 					return p.Body.Get(p.Body.GenitalsBodyPart);
 			}
 

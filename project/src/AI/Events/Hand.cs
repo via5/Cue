@@ -12,11 +12,13 @@
 		private bool leftGroped_ = false;
 		private BodyPartLock[] leftLock_ = null;
 		private int leftAnim_ = Animations.None;
+		private bool leftForcedTrigger_ = false;
 
 		private Person rightTarget_ = null;
 		private bool rightGroped_ = false;
 		private BodyPartLock[] rightLock_ = null;
 		private int rightAnim_ = Animations.None;
+		private bool rightForcedTrigger_ = false;
 
 
 		public HandEvent()
@@ -111,33 +113,34 @@
 
 			if (leftTarget_ != null)
 			{
-				if (leftGroped_)
+				if (leftForcedTrigger_)
 				{
 					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
 						.RemoveForcedTrigger(person_.PersonIndex, BP.LeftHand);
 
-					leftGroped_ = false;
+					leftForcedTrigger_ = false;
 				}
 
 				UnlockLeft();
 				SetZoneEnabled(leftTarget_, false);
 
+				leftGroped_ = false;
 				leftTarget_ = null;
 			}
 
 			if (rightTarget_ != null)
 			{
-				if (rightGroped_)
+				if (rightForcedTrigger_)
 				{
 					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
 						.RemoveForcedTrigger(person_.PersonIndex, BP.RightHand);
 
-					rightGroped_ = false;
 				}
 
 				UnlockRight();
 				SetZoneEnabled(rightTarget_, false);
 
+				rightGroped_ = false;
 				rightTarget_ = null;
 			}
 		}
@@ -219,6 +222,22 @@
 
 				SetZoneEnabled(left, true);
 				SetZoneEnabled(right, true);
+
+				if (leftTarget_.Body.PenisSensitive)
+				{
+					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+
+					leftForcedTrigger_ = true;
+				}
+
+				if (leftTarget_ != rightTarget_ && rightTarget_.Body.PenisSensitive)
+				{
+					rightTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+
+					rightForcedTrigger_ = true;
+				}
 			}
 		}
 
@@ -231,6 +250,14 @@
 				leftTarget_ = target;
 				leftAnim_ = Animations.HandjobLeft;
 				SetZoneEnabled(target, true);
+
+				if (leftTarget_.Body.PenisSensitive)
+				{
+					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+
+					leftForcedTrigger_ = true;
+				}
 			}
 		}
 
@@ -245,8 +272,11 @@
 				leftGroped_ = true;
 
 				SetZoneEnabled(target, true);
+
 				leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+
+				leftForcedTrigger_ = true;
 			}
 		}
 
@@ -259,6 +289,14 @@
 				rightTarget_ = target;
 				rightAnim_ = Animations.HandjobRight;
 				SetZoneEnabled(target, true);
+
+				if (rightTarget_.Body.PenisSensitive)
+				{
+					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+
+					rightForcedTrigger_ = true;
+				}
 			}
 		}
 
@@ -273,8 +311,11 @@
 				rightGroped_ = true;
 
 				SetZoneEnabled(target, true);
+
 				rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
+
+				rightForcedTrigger_ = true;
 			}
 		}
 

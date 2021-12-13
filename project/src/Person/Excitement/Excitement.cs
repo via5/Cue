@@ -244,7 +244,7 @@ namespace Cue
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_ || p.Status.PenetratedBy(person_) || person_.Status.PenetratedBy(p))
+				if (p == person_ || PersonStatus.EitherPenetrating(p, person_))
 					continue;
 
 				var ss = person_.Personality.Sensitivities.Get(SS.OthersExcitement);

@@ -65,6 +65,11 @@ namespace Cue
 			get { return Get(BP.Penis).Exists; }
 		}
 
+		public bool PenisSensitive
+		{
+			get { return HasPenis && !Strapon; }
+		}
+
 		public int GenitalsBodyPart
 		{
 			get { return (HasPenis ? BP.Penis : BP.Labia); }

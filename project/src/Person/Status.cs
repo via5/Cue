@@ -176,6 +176,11 @@ namespace Cue
 			return false;
 		}
 
+		public static bool EitherPenetrating(Person a, Person b)
+		{
+			return a.Status.PenetratedBy(b) || b.Status.PenetratedBy(a);
+		}
+
 		public PartResult GropedByAny(int triggerBodyPart)
 		{
 			return GropedByAny(new int[] { triggerBodyPart });
