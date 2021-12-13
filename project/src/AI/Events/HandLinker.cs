@@ -6,23 +6,62 @@
 
 		class HandInfo
 		{
-			public BodyPart hand;
-			public BodyPartLock lk = null;
-			public bool grabbed = false;
+			private BodyPart hand_;
+			private BodyPartLock lk_ = null;
+			private bool grabbed_ = false;
 
 			public HandInfo(BodyPart h)
 			{
-				hand = h;
+				hand_ = h;
+			}
+
+			public BodyPart Hand
+			{
+				get { return hand_; }
+			}
+
+			public bool GrabStarted()
+			{
+				if (hand_.Grabbed && !grabbed_)
+				{
+					grabbed_ = true;
+					return true;
+				}
+
+				return false;
+			}
+
+			public bool GrabStopped()
+			{
+				if (!hand_.Grabbed && grabbed_)
+				{
+					grabbed_ = false;
+					return true;
+				}
+
+				return false;
+			}
+
+			public void LinkTo(BodyPart part, BodyPartLock lk)
+			{
+				hand_.LinkTo(part);
+				lk_ = lk;
 			}
 
 			public void Unlink()
 			{
-				if (lk != null)
+				if (lk_ != null)
 				{
-					lk.Unlock();
-					lk = null;
-					hand.Unlink();
+					lk_.Unlock();
+					lk_ = null;
+					hand_.Unlink();
 				}
+			}
+
+			public void CheckExpired()
+			{
+				if (lk_ != null && lk_.Expired)
+					Unlink();
 			}
 		}
 
@@ -76,52 +115,31 @@
 
 		private void Check(HandInfo info)
 		{
-			if (info.lk != null && info.lk.Expired)
+			info.CheckExpired();
+
+			bool grabbed = info.Hand.Grabbed;
+
+			if (info.GrabStarted())
+			{
+				// unlink other hands if they're linked to this one
+				UnlinkOthers(info.Hand);
+			}
+			else if (info.GrabStopped())
+			{
+				var close = FindClose(info.Hand);
+
+				// always unlink after grab
 				info.Unlink();
 
-			var hand = info.hand;
-			bool grabbed = hand.Grabbed;
-
-			if (grabbed && !info.grabbed)
-			{
-				// grab started
-				info.grabbed = true;
-
-				// unlink other hands if they're linked to this one
-				UnlinkOthers(hand);
-			}
-			else if (!grabbed && info.grabbed)
-			{
-				// grab stopped
-				info.grabbed = false;
-
-				var close = FindClose(hand);
 				if (close != null)
 				{
-					if (info.lk != null)
-					{
-						info.lk.Unlock();
-						info.lk = null;
-					}
-
-					info.lk = hand.Lock(
+					var lk = info.Hand.Lock(
 						BodyPartLock.Move, "HandLocker", BodyPartLock.Weak);
 
-					if (info.lk != null)
+					if (lk != null)
 					{
-						Log.Verbose($"linking {hand} with {close}");
-						hand.LinkTo(close);
-					}
-				}
-				else
-				{
-					Log.Verbose($"unlinking {hand}");
-					hand.Unlink();
-
-					if (info.lk != null)
-					{
-						info.lk.Unlock();
-						info.lk = null;
+						Log.Verbose($"linking {info.Hand} with {close}");
+						info.LinkTo(close, lk);
 					}
 				}
 			}

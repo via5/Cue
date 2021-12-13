@@ -2,7 +2,7 @@
 {
 	class HandEvent : BasicEvent
 	{
-		private const float MaxDistanceToStart = 0.05f;
+		private const float MaxDistanceToStart = 0.06f;
 		private const float CheckTargetsInterval = 2;
 
 		private bool active_ = false;
