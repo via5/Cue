@@ -7,6 +7,7 @@ namespace Cue
 	{
 		public JSONNode root = null;
 		public string path = "";
+		public string origin = "";
 		public string name = "";
 		public string inherit = "";
 		public int prio = 0;
@@ -47,29 +48,29 @@ namespace Cue
 		public static List<ResourceFile> LoadFiles(
 			string rootPath, string pattern = "*.json")
 		{
-			var files = new Dictionary<string, ResourceFile>();
-			var filenames = Cue.Instance.Sys.GetFilenames(rootPath, pattern);
+			var fileMap = new Dictionary<string, ResourceFile>();
+			var files = Cue.Instance.Sys.GetFiles(rootPath, pattern);
 
 			Cue.LogVerbose("found files:");
-			foreach (var f in filenames)
+			foreach (var f in files)
 				Cue.LogVerbose($"  - {f}");
 
-			foreach (var path in filenames)
+			foreach (var f in files)
 			{
-				var f = LoadResourceFile(path);
-				if (f == null)
+				var rf = LoadResourceFile(f);
+				if (rf == null)
 					continue;
 
 				ResourceFile existing;
-				if (files.TryGetValue(f.name, out existing))
-					Cue.LogVerbose($"ignoring {f.path}, overriden by {existing.path}");
+				if (fileMap.TryGetValue(rf.name.ToLower(), out existing))
+					Cue.LogVerbose($"ignoring {rf.path}, overriden by {existing.path}");
 				else
-					files.Add(f.name, f);
+					fileMap.Add(rf.name.ToLower(), rf);
 			}
 
-			FixPriorities(files);
+			FixPriorities(fileMap);
 
-			var sorted = new List<ResourceFile>(files.Values);
+			var sorted = new List<ResourceFile>(fileMap.Values);
 
 			sorted.Sort((a, b) =>
 			{
@@ -84,23 +85,24 @@ namespace Cue
 			return sorted;
 		}
 
-		private static ResourceFile LoadResourceFile(string path)
+		private static ResourceFile LoadResourceFile(Sys.FileInfo f)
 		{
-			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(path));
+			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(f.path));
 
 			if (doc == null)
 			{
-				Cue.LogError($"failed to parse file {path}");
+				Cue.LogError($"failed to parse file {f.path}");
 				return null;
 			}
 
-			var f = new ResourceFile();
-			f.path = path;
-			f.root = doc;
-			f.name = doc.AsObject["name"].Value;
-			f.inherit = doc.AsObject["inherit"].Value;
+			var rf = new ResourceFile();
+			rf.path = f.path;
+			rf.origin = f.origin;
+			rf.root = doc;
+			rf.name = doc.AsObject["name"].Value;
+			rf.inherit = doc.AsObject["inherit"].Value;
 
-			return f;
+			return rf;
 		}
 
 		private static void FixPriorities(Dictionary<string, ResourceFile> files)

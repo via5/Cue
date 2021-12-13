@@ -8,6 +8,7 @@
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.StringChooserParameter hand_ = null;
+		protected Sys.Vam.FloatParameter volume_ = null;
 		protected Sys.Vam.FloatParameter speedMin_ = null;
 		protected Sys.Vam.FloatParameter speedMax_ = null;
 
@@ -108,8 +109,12 @@
 			hand_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
 			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Min");
 			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Max");
+			volume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Audio Volume");
 
 			active_.Value = false;
+
+			if (Cue.Instance.Options.MuteSfx)
+				volume_.Value = 0;
 		}
 
 		protected bool StartCommon(Person target, string hand)

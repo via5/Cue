@@ -39,6 +39,12 @@ namespace VUI
 			FontStyle = fs;
 		}
 
+		public Label(string t, int wrapMode)
+			: this(t)
+		{
+			wrap_ = wrapMode;
+		}
+
 		public string Text
 		{
 			get

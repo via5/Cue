@@ -211,6 +211,7 @@
     <Compile Include="src\UI\ScriptUI\AnimationsTab.cs" />
     <Compile Include="src\UI\ScriptUI\DumpTab.cs" />
     <Compile Include="src\UI\ScriptUI\MiscTab.cs" />
+    <Compile Include="src\UI\ScriptUI\OptionsTab.cs" />
     <Compile Include="src\UI\ScriptUI\ScriptUI.cs" />
     <Compile Include="src\UI\ScriptUI\SettingsTab.cs" />
     <Compile Include="src\UI\ScriptUI\StateTab.cs" />

@@ -31,9 +31,97 @@ namespace Cue
 	class PluginGone : Exception { }
 
 
+	class Options
+	{
+		public delegate void Handler();
+		public event Handler Changed;
+
+		private bool muteSfx_ = true;
+		private bool skinColor_ = true;
+		private bool skinGloss_ = true;
+		private bool hairLoose_ = true;
+		private bool handLinking_ = true;
+		private bool devMode_ = false;
+
+		public Options()
+		{
+		}
+
+		public bool MuteSfx
+		{
+			get { return muteSfx_; }
+			set { muteSfx_ = value; OnChanged(); }
+		}
+
+		public bool SkinColor
+		{
+			get { return skinColor_; }
+			set { skinColor_ = value; OnChanged(); }
+		}
+
+		public bool SkinGloss
+		{
+			get { return skinGloss_; }
+			set { skinGloss_ = value; OnChanged(); }
+		}
+
+		public bool HairLoose
+		{
+			get { return hairLoose_; }
+			set { hairLoose_ = value; OnChanged(); }
+		}
+
+		public bool HandLinking
+		{
+			get { return handLinking_; }
+			set { handLinking_ = value; OnChanged(); }
+		}
+
+		public bool DevMode
+		{
+			get { return devMode_; }
+			set { devMode_ = value; OnChanged(); }
+		}
+
+		public JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+
+			o["muteSfx"] = new JSONData(muteSfx_);
+			o["skinColor"] = new JSONData(skinColor_);
+			o["skinGloss"] = new JSONData(skinGloss_);
+			o["handLinking"] = new JSONData(handLinking_);
+			o["hairLoose"] = new JSONData(hairLoose_);
+			o["devMode"] = new JSONData(devMode_);
+
+			return o;
+		}
+
+		public void Load(JSONClass o)
+		{
+			J.OptBool(o, "muteSfx", ref muteSfx_);
+			J.OptBool(o, "skinColor", ref skinColor_);
+			J.OptBool(o, "skinGloss", ref skinGloss_);
+			J.OptBool(o, "handLinking", ref handLinking_);
+			J.OptBool(o, "hairLoose", ref hairLoose_);
+			J.OptBool(o, "devMode", ref devMode_);
+
+			OnChanged();
+		}
+
+		private void OnChanged()
+		{
+			Cue.Instance.Save();
+			Changed?.Invoke();
+		}
+	}
+
+
 	class Cue
 	{
 		private static Cue instance_ = null;
+
+		private Options options_ = new Options();
 
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<Person> activePersons_ = new List<Person>();
@@ -79,8 +167,9 @@ namespace Cue
 		public List<IObject> Everything { get { return everything_; } }
 		public IObject[] EverythingActive { get { return everythingActiveArray_; } }
 
-		public UI UI { get { return ui_; } }
 
+		public Options Options { get { return options_; } }
+		public UI UI { get { return ui_; } }
 		public int Frame { get { return frame_; } }
 
 		public Person Player
@@ -247,11 +336,16 @@ namespace Cue
 			var ui = ui_?.ToJSON();
 			if (ui != null)
 				json.Add("ui", ui);
+
+			json.Add("options", options_.ToJSON());
 		}
 
 		private void Load(JSONClass c)
 		{
 			loaded_ = true;
+
+			if (c.HasKey("options"))
+				options_.Load(c["options"].AsObject);
 
 			var objects = c["objects"].AsArray;
 

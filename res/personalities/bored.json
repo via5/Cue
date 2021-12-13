@@ -1,5 +1,5 @@
 {
-	"name": "bored",
+	"name": "Bored",
 	"inherit": "standard",
 	"maxHappiness": 0.0,
 	"maxExcitedExpression": 0.1,

@@ -39,7 +39,7 @@ namespace Cue
 		{
 			foreach (var ps in valid_)
 			{
-				if (ps.Name == name)
+				if (ps.Name.ToLower() == name.ToLower())
 					return ps.Clone(null, p);
 			}
 
@@ -65,10 +65,10 @@ namespace Cue
 		private void LoadFiles()
 		{
 			foreach (var f in Resources.LoadFiles("personalities", "*.json"))
-				LoadFile(f.name, f.root.AsObject);
+				LoadFile(f.name, f.origin, f.root.AsObject);
 		}
 
-		private void LoadFile(string name, JSONClass root)
+		private void LoadFile(string name, string origin, JSONClass root)
 		{
 			Log.Info($"loading personality '{name}'");
 
@@ -77,7 +77,10 @@ namespace Cue
 				var p = ParsePersonality(root.AsObject);
 
 				if (p != null)
+				{
+					p.Origin = origin;
 					Add(p, J.OptBool(root.AsObject, "abstract", false));
+				}
 			}
 			catch (LoadFailed e)
 			{
@@ -95,7 +98,7 @@ namespace Cue
 			{
 				foreach (var ps in all_)
 				{
-					if (ps.Name == o["inherit"].Value)
+					if (ps.Name.ToLower() == o["inherit"].Value.ToLower())
 					{
 						p = ps.Clone(J.ReqString(o, "name"), null);
 					}

@@ -214,9 +214,9 @@ namespace Cue.Sys.Mock
 			return Path.Combine(ResPath(), path);
 		}
 
-		public List<string> GetFilenames(string path, string pattern)
+		public List<FileInfo> GetFiles(string path, string pattern)
 		{
-			return new List<string>();
+			return new List<FileInfo>();
 		}
 
 		public IObjectCreator CreateObjectCreator(

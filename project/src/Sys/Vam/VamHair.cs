@@ -81,6 +81,7 @@ namespace Cue.Sys.Vam
 		private VamAtom atom_;
 		private DAZCharacterSelector char_;
 		private float loose_ = 0;
+		private bool enabled_ = false;
 		private List<HairItem> list_ = new List<HairItem>();
 		private Logger log_;
 
@@ -111,6 +112,9 @@ namespace Cue.Sys.Vam
 				if (h != null)
 					list_.Add(new HairItem(this, h));
 			}
+
+			Cue.Instance.Options.Changed += CheckOptions;
+			CheckOptions();
 		}
 
 		public Logger Log
@@ -133,9 +137,20 @@ namespace Cue.Sys.Vam
 
 			set
 			{
-				loose_ = value;
+				if (loose_ != value)
+				{
+					loose_ = value;
+					SetLoose(value);
+				}
+			}
+		}
+
+		private void SetLoose(float v)
+		{
+			if (Cue.Instance.Options.HairLoose)
+			{
 				for (int i = 0; i < list_.Count; ++i)
-					list_[i].SetLoose(loose_);
+					list_[i].SetLoose(v);
 			}
 		}
 
@@ -145,8 +160,29 @@ namespace Cue.Sys.Vam
 
 		private void Reset()
 		{
-			for (int i = 0; i < list_.Count; ++i)
-				list_[i].Reset();
+			if (Cue.Instance.Options.HairLoose)
+			{
+				for (int i = 0; i < list_.Count; ++i)
+					list_[i].Reset();
+			}
+		}
+
+		private void CheckOptions()
+		{
+			if (enabled_ != Cue.Instance.Options.HairLoose)
+			{
+				enabled_ = Cue.Instance.Options.HairLoose;
+
+				if (Cue.Instance.Options.HairLoose)
+				{
+					SetLoose(loose_);
+				}
+				else
+				{
+					for (int i = 0; i < list_.Count; ++i)
+						list_[i].Reset();
+				}
+			}
 		}
 	}
 }

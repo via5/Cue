@@ -554,33 +554,52 @@ namespace Cue.Sys.Vam
 		private static readonly string PluginDataRoot = "Custom/PluginData/Cue/";
 		private static string PluginPathRoot = null;
 
-		public List<string> GetFilenames(string path, string pattern)
+		class SysFileInfo
+		{
+			public string path;
+			public int source;
+		}
+
+		public List<FileInfo> GetFiles(string path, string pattern)
 		{
 			if (PluginPathRoot == null)
 				PluginPathRoot = CueMain.Instance.PluginPath.Replace('\\', '/');
 
-			var list = new List<string>();
+			var list = new List<SysFileInfo>();
 
 			GetFilenames(list, PluginDataRoot + path, pattern);
 			GetFilenames(list, PluginPathRoot + "/res/" + path, pattern);
 
 			for (int i = 0; i < list.Count; ++i)
-				list[i] = list[i].Replace('\\', '/');
+				list[i].path = list[i].path.Replace('\\', '/');
 
 			list.Sort((a, b) =>
 			{
-				int srcA = PathSource(a);
-				int srcB = PathSource(b);
-
-				if (srcA < srcB)
+				if (a.source < b.source)
 					return -1;
-				else if (srcA > srcB)
+				else if (a.source > b.source)
 					return 1;
 				else
-					return a.CompareTo(b);
+					return a.path.CompareTo(b.path);
 			});
 
-			return list;
+			var ret = new List<FileInfo>();
+
+			foreach (var f in list)
+				ret.Add(new FileInfo(f.path, PathSourceToString(f.source)));
+
+			return ret;
+		}
+
+		private string PathSourceToString(int i)
+		{
+			switch (i)
+			{
+				case PluginDataSource: return "PluginData";
+				case PluginPathSource: return "Scripts";
+				case AddonSource: return "";
+				default: return "";
+			}
 		}
 
 		private int PathSource(string path)
@@ -595,7 +614,7 @@ namespace Cue.Sys.Vam
 				return UnknownSource;
 		}
 
-		private void GetFilenames(List<string> list, string path, string pattern)
+		private void GetFilenames(List<SysFileInfo> list, string path, string pattern)
 		{
 			var scs = FileManagerSecure.GetShortCutsForDirectory(path);
 
@@ -606,7 +625,14 @@ namespace Cue.Sys.Vam
 					continue;
 
 				foreach (var f in fs)
-					list.Add(f);
+				{
+					var fi = new SysFileInfo();
+
+					fi.path = f;
+					fi.source = PathSource(f);
+
+					list.Add(fi);
+				}
 			}
 		}
 	}

@@ -55,6 +55,19 @@ namespace Cue.Sys
 		}
 	}
 
+	public class FileInfo
+	{
+		public string path;
+		public string origin;
+
+		public FileInfo(string path, string origin)
+		{
+			this.path = path;
+			this.origin = origin;
+		}
+	}
+
+
 	public interface ISys
 	{
 		void ClearLog();
@@ -72,7 +85,7 @@ namespace Cue.Sys
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
-		List<string> GetFilenames(string path, string pattern);
+		List<FileInfo> GetFiles(string path, string pattern);
 		void HardReset();
 		void ReloadPlugin();
 		void OpenScriptUI();

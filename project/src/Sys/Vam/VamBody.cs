@@ -105,9 +105,11 @@ namespace Cue.Sys.Vam
 
 		private float sweat_ = 0;
 		private IEasing sweatEasing_ = new CubicInEasing();
+		private bool glossEnabled_ = false;
 
 		private float flush_ = 0;
 		private IEasing flushEasing_ = new SineInEasing();
+		private bool colorEnabled_ = false;
 
 		public VamBody(VamAtom a)
 			: base(a)
@@ -130,6 +132,9 @@ namespace Cue.Sys.Vam
 			leftHand_ = ld.LeftHand;
 			rightHand_ = ld.RightHand;
 			strapon_ = parts_[BP.Penis] as StraponBodyPart;
+
+			Cue.Instance.Options.Changed += CheckOptions;
+			CheckOptions();
 		}
 
 		public override IBodyPart[] GetBodyParts()
@@ -226,15 +231,10 @@ namespace Cue.Sys.Vam
 
 			set
 			{
-				sweat_ = value;
-
-				var p = gloss_.Parameter;
-				if (p != null)
+				if (sweat_ != value)
 				{
-					float def = p.defaultVal;
-					float range = (p.max - def);
-
-					p.val = def + sweatEasing_.Magnitude(sweat_) * range;
+					sweat_ = value;
+					SetSweat(value);
 				}
 			}
 		}
@@ -248,8 +248,11 @@ namespace Cue.Sys.Vam
 
 			set
 			{
-				flush_ = value;
-				LerpColor(Color.Red, flush_);
+				if (flush_ != value)
+				{
+					flush_ = value;
+					SetFlush(value);
+				}
 			}
 		}
 
@@ -267,19 +270,70 @@ namespace Cue.Sys.Vam
 				// changing body colours seem to allocate memory to update
 				// textures, avoid for small changes
 				if (cd >= 0.02f)
-				{
-					p.val = U.ToHSV(c);
-				}
+					SetColor(U.ToHSV(c));
 			}
+		}
+
+		private void SetSweat(float v)
+		{
+			var p = gloss_.Parameter;
+			if (p != null)
+			{
+				float def = p.defaultVal;
+				float range = (p.max - def);
+
+				SetGloss(def + sweatEasing_.Magnitude(sweat_) * range);
+			}
+		}
+
+		private void SetFlush(float v)
+		{
+			LerpColor(Color.Red, v);
 		}
 
 		private void Reset()
 		{
 			if (gloss_.Parameter != null)
-				gloss_.Parameter.val = gloss_.Parameter.defaultVal;
+				SetGloss(gloss_.Parameter.defaultVal);
 
 			if (color_.Parameter != null)
-				color_.Parameter.val = U.ToHSV(initialColor_);
+				SetColor(U.ToHSV(initialColor_));
+		}
+
+		private void SetGloss(float f)
+		{
+			if (glossEnabled_)
+				gloss_.Parameter.val = f;
+		}
+
+		private void SetColor(HSVColor c)
+		{
+			if (colorEnabled_)
+				color_.Parameter.val = c;
+		}
+
+		private void CheckOptions()
+		{
+			if (glossEnabled_ != Cue.Instance.Options.SkinGloss)
+			{
+				glossEnabled_ = Cue.Instance.Options.SkinGloss;
+
+				if (Cue.Instance.Options.SkinGloss)
+					SetSweat(sweat_);
+				else if (gloss_.Parameter != null)
+					gloss_.Parameter.val = gloss_.Parameter.defaultVal;
+			}
+
+
+			if (colorEnabled_ != Cue.Instance.Options.SkinColor)
+			{
+				colorEnabled_ = Cue.Instance.Options.SkinColor;
+
+				if (Cue.Instance.Options.SkinColor)
+					SetFlush(flush_);
+				else if (color_.Parameter != null)
+					color_.Parameter.val = color_.Parameter.defaultVal;
+			}
 		}
 	}
 }

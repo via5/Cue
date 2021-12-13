@@ -82,6 +82,9 @@
 
 		public override void Update(float s)
 		{
+			if (!Cue.Instance.Options.HandLinking)
+				return;
+
 			if (person_.IsPlayer)
 				return;
 

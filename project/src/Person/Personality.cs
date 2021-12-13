@@ -420,6 +420,7 @@ namespace Cue
 	public class Personality : EnumValueManager
 	{
 		private readonly string name_;
+		private string origin_;
 		private Person person_ = null;
 
 		private Voice voice_;
@@ -435,6 +436,12 @@ namespace Cue
 			sensitivities_ = new Sensitivities();
 		}
 
+		public string Origin
+		{
+			get { return origin_; }
+			set { origin_ = value; }
+		}
+
 		public Personality Clone(string newName, Person p)
 		{
 			var ps = new Personality(newName ?? name_);
@@ -447,6 +454,7 @@ namespace Cue
 			base.CopyFrom(ps);
 
 			person_ = p;
+			origin_ = ps.origin_;
 
 			exps_ = new Expression[ps.exps_.Length];
 			for (int i = 0; i < ps.exps_.Length; i++)

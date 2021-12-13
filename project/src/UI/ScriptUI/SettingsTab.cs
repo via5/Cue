@@ -2,10 +2,36 @@
 
 namespace Cue
 {
+	class PersonalityItem
+	{
+		private Personality p_;
+
+		public PersonalityItem(Personality p)
+		{
+			p_ = p;
+		}
+
+		public Personality Personality
+		{
+			get { return p_; }
+		}
+
+		public override string ToString()
+		{
+			string s = p_.Name;
+
+			if (p_.Origin != "")
+				s += $" (from {p_.Origin})";
+
+			return s;
+		}
+	}
+
+
 	class PersonSettingsTab : Tab
 	{
 		private Person person_;
-		private VUI.ComboBox<string> personality_ = new VUI.ComboBox<string>();
+		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
@@ -29,8 +55,9 @@ namespace Cue
 			p.Add(new VUI.Label("Traits"));
 			p.Add(traits_);
 
-			Layout = new VUI.BorderLayout();
-			Add(p, VUI.BorderLayout.Top);
+			Layout = new VUI.VerticalFlow(20);
+			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
+			Add(p);
 
 			personality_.SelectionChanged += OnPersonality;
 			voicePitch_.ValueChanged += OnVoicePitch;
@@ -54,6 +81,11 @@ namespace Cue
 			}
 		}
 
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
 		protected override void DoUpdate(float s)
 		{
 			try
@@ -61,16 +93,9 @@ namespace Cue
 				ignore_ = true;
 
 				if (personality_.Count == 0)
-				{
-					personality_.SetItems(
-						Resources.Personalities.AllNames(),
-						person_.Personality.Name);
-				}
+					RebuildPersonalities();
 				else
-				{
-					if (personality_.Selected != person_.Personality.Name)
-						personality_.Select(person_.Personality.Name);
-				}
+					SelectPersonality(person_.Personality.Name);
 			}
 			finally
 			{
@@ -78,15 +103,48 @@ namespace Cue
 			}
 		}
 
-		private void OnPersonality(string name)
+		private void RebuildPersonalities()
+		{
+			var items = new List<PersonalityItem>();
+			PersonalityItem sel = null;
+
+			foreach (var p in Resources.Personalities.All)
+			{
+				var item = new PersonalityItem(p);
+
+				if (p.Name == person_.Personality.Name)
+					sel = item;
+
+				items.Add(item);
+			}
+
+			personality_.SetItems(items, sel);
+		}
+
+		private void SelectPersonality(string name)
+		{
+			for (int i = 0; i < personality_.Items.Count; ++i)
+			{
+				if (personality_.At(i).Personality.Name == name)
+				{
+					if (personality_.SelectedIndex != i)
+						personality_.Select(i);
+
+					break;
+				}
+			}
+		}
+
+		private void OnPersonality(PersonalityItem item)
 		{
 			if (ignore_) return;
 
-			if (name != "" && name != person_.Personality.Name)
+			if (item.Personality.Name != person_.Personality.Name)
 			{
 				var old = person_.Personality;
 
-				person_.Personality = Resources.Personalities.Clone(name, person_);
+				person_.Personality = Resources.Personalities.Clone(
+					item.Personality.Name, person_);
 
 				if (old.Voice.ForcedPitch >= 0)
 					person_.Personality.Voice.ForcePitch(old.Voice.ForcedPitch);

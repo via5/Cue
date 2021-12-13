@@ -17,11 +17,16 @@ namespace Cue
 
 			misc_ = new MiscTab();
 
+			tabs_.AddTab(new OptionsTab());
+
 			foreach (var p in Cue.Instance.AllPersons)
 				tabs_.AddTab(new PersonTab(p));
 
 			tabs_.AddTab(misc_);
 			tabs_.AddTab(new UnityTab());
+			tabs_.CheckDebugTabs();
+
+			Cue.Instance.Options.Changed += () => { tabs_.CheckDebugTabs(); };
 
 			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI);
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
@@ -91,6 +96,19 @@ namespace Cue
 		public VUI.Tabs TabsWidget
 		{
 			get { return tabsWidget_; }
+		}
+
+		public void CheckDebugTabs()
+		{
+			for (int i = 0; i < tabs_.Count; ++i)
+			{
+				bool v = !tabs_[i].DebugOnly || Cue.Instance.Options.DevMode;
+
+				tabsWidget_.SetTabVisible(i, v);
+
+				if (tabs_[i].SubTabs != null)
+					tabs_[i].SubTabs.CheckDebugTabs();
+			}
 		}
 
 		public string GetSelectedString()
@@ -248,6 +266,11 @@ namespace Cue
 			get { return subTabs_; }
 		}
 
+		public virtual bool DebugOnly
+		{
+			get { return true; }
+		}
+
 		protected T AddSubTab<T>(T t) where T : Tab
 		{
 			return subTabs_.AddTab(t);
@@ -311,6 +334,14 @@ namespace Cue
 			AddSubTab(new PersonBodyTab(person_));
 			AddSubTab(new PersonAnimationsTab(person_));
 			AddSubTab(new PersonDumpTab(person_));
+
+			for (int i = 1; i < 6; ++i)
+				SubTabs.TabsWidget.SetTabVisible(i, false);
+		}
+
+		public override bool DebugOnly
+		{
+			get { return !person_.IsInteresting; }
 		}
 	}
 }

@@ -9,6 +9,7 @@
 		private Sys.Vam.BoolParameter active_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter male_ = null;
+		private Sys.Vam.FloatParameter sfxVolume_ = null;
 		private Sys.Vam.FloatParameter moanVolume_ = null;
 		private Sys.Vam.FloatParameter overallSpeed_ = null;
 		private Sys.Vam.FloatParameter speedMin_ = null;
@@ -121,6 +122,7 @@
 			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
 			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
 			moanVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
+			sfxVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
 
 			overallSpeed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Overall Speed");
 			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Min");
@@ -128,6 +130,9 @@
 
 			active_.Value = false;
 			moanVolume_.Value = 0;
+
+			if (Cue.Instance.Options.MuteSfx)
+				sfxVolume_.Value = 0;
 		}
 	}
 }
