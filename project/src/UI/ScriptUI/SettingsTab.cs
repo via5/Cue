@@ -20,8 +20,11 @@ namespace Cue
 		{
 			string s = p_.Name;
 
-			if (p_.Origin != "")
-				s += $" (from {p_.Origin})";
+			if (Cue.Instance.Options.DevMode)
+			{
+				if (p_.Origin != "")
+					s += $" (from {p_.Origin})";
+			}
 
 			return s;
 		}
