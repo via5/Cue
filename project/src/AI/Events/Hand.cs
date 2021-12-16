@@ -234,7 +234,7 @@
 				if (leftTarget_ != rightTarget_ && rightTarget_.Body.PenisSensitive)
 				{
 					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+						.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 
 					rightForcedTrigger_ = true;
 				}
@@ -293,7 +293,7 @@
 				if (rightTarget_.Body.PenisSensitive)
 				{
 					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+						.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 
 					rightForcedTrigger_ = true;
 				}
