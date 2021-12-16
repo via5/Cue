@@ -131,6 +131,9 @@
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.AddForcedTrigger(
 						receiver_.Person.PersonIndex, receiver_.Type);
+
+				receiver_.AddForcedTrigger(
+					person_.PersonIndex, person_.Body.GenitalsBodyPart);
 			}
 
 			SetZoneEnabled(true);
@@ -157,6 +160,9 @@
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
 					.RemoveForcedTrigger(
 						receiver_.Person.PersonIndex, receiver_.Type);
+
+				receiver_.RemoveForcedTrigger(
+					person_.PersonIndex, person_.Body.GenitalsBodyPart);
 			}
 
 			SetZoneEnabled(false);
