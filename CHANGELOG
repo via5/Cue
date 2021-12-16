@@ -1,0 +1,19 @@
+1.0.1   2021-12-16
+
+- excitement would still be going up after hand is deactivated if it was the
+  right hand on male genitals
+
+- tentative fix for the VR menu not being functional on some controllers
+
+- male characters would not have their excitement go up if the thrust was
+  activated on the female
+
+- added a global excitement speed in the options
+
+- desktop: moved the hud to the right side of the window, it will now be hidden
+  when the UI is hidden
+
+- desktop: stopped changing selected character when clicking atoms in the scene
+
+- added a new "Debug input" tab in dev mode to help diagnose problems with the
+  VR menu
