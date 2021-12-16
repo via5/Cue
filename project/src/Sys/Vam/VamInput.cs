@@ -383,34 +383,27 @@ namespace Cue.Sys.Vam
 			leftAction_.Update(s);
 			rightAction_.Update(s);
 
+			// this tries to handle two different cases, some controllers do
+			// different things
+			//
+			// this is probably incorrect, but it works for the reported cases:
+			//
+			//   trigger halfway: GetRightGrab and GetRightRemoteGrab
+			//   trigger click:   GetRightRemoteHoldGrab
+			//
+			//   trigger halfway: GetRightRemoteGrab
+			//   trigger click:   GetRightGrab
+			//
+			// so GetrightRemoteGrab is used for halfway because it happens on
+			// both
+			//
+			// for click, it's either GetRightRemoteHoldGrab, or GetRightGrab
+			// _without_ GetRightRemoteGrab
+			//
+			// this doesn't feel right at all, but it works for now
 
-			leftMenu_ = sc_.GetLeftUIPointerShow();
-
-			if (leftMenuSticky_)
-			{
-				if (sc_.GetLeftGrabRelease())
-					leftMenuSticky_ = false;
-			}
-			else if (leftMenu_)
-			{
-				if (sc_.GetLeftGrab())
-					leftMenuSticky_ = true;
-			}
-
-
-			rightMenu_ = sc_.GetRightUIPointerShow();
-
-			if (rightMenuSticky_)
-			{
-				if (sc_.GetRightGrabRelease())
-					rightMenuSticky_ = false;
-			}
-			else if (rightMenu_)
-			{
-				if (sc_.GetRightGrab())
-					rightMenuSticky_ = true;
-			}
-
+			UpdateLeftMenu();
+			UpdateRightMenu();
 
 			MeshVR.GlobalSceneOptions.singleton.disableNavigation = DisableNav();
 
@@ -423,6 +416,91 @@ namespace Cue.Sys.Vam
 			rightMenuDown_.Update(vr_.RightJoystick.y);
 			rightMenuLeft_.Update(vr_.RightJoystick.x);
 			rightMenuRight_.Update(vr_.RightJoystick.x);
+		}
+
+		private bool SysLeftMenuVisible()
+		{
+			return sc_.GetLeftUIPointerShow();
+		}
+
+		private bool SysRightMenuVisible()
+		{
+			return sc_.GetRightUIPointerShow();
+		}
+
+		private bool SysLeftMenuSticky()
+		{
+			return sc_.GetLeftRemoteGrab();
+		}
+
+		private bool SysRightMenuSticky()
+		{
+			return sc_.GetRightRemoteGrab();
+		}
+
+		private bool SysLeftMenuUnsticky()
+		{
+			return sc_.GetLeftRemoteGrabRelease();
+		}
+
+		private bool SysRightMenuUnsticky()
+		{
+			return sc_.GetRightRemoteGrabRelease();
+		}
+
+		private bool SysLeftMenuSelect()
+		{
+			if (sc_.GetLeftRemoteHoldGrab())
+				return true;
+
+			if (sc_.GetLeftGrab() && !sc_.GetLeftRemoteGrab())
+				return true;
+
+			return false;
+		}
+
+		private bool SysRightMenuSelect()
+		{
+			if (sc_.GetRightRemoteHoldGrab())
+				return true;
+
+			if (sc_.GetRightGrab() && !sc_.GetRightRemoteGrab())
+				return true;
+
+			return false;
+		}
+
+
+		private void UpdateLeftMenu()
+		{
+			leftMenu_ = SysLeftMenuVisible();
+
+			if (leftMenuSticky_)
+			{
+				if (SysLeftMenuUnsticky())
+					leftMenuSticky_ = false;
+			}
+			else if (leftMenu_)
+			{
+				if (SysLeftMenuSticky())
+					leftMenuSticky_ = true;
+			}
+		}
+
+		private void UpdateRightMenu()
+		{
+			rightMenu_ = SysRightMenuVisible();
+
+			if (rightMenuSticky_)
+			{
+				if (SysRightMenuUnsticky())
+					rightMenuSticky_ = false;
+			}
+			else if (rightMenu_)
+			{
+				if (SysRightMenuSticky())
+					rightMenuSticky_ = true;
+			}
 		}
 
 		private bool DisableNav()
@@ -601,12 +679,7 @@ namespace Cue.Sys.Vam
 
 		public bool MenuSelect
 		{
-			get
-			{
-				return
-					sc_.GetLeftRemoteHoldGrab() ||
-					sc_.GetRightRemoteHoldGrab();
-			}
+			get { return SysLeftMenuSelect() || SysRightMenuSelect(); }
 		}
 
 		private bool MouseOnUI()
