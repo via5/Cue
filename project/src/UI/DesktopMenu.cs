@@ -71,12 +71,7 @@ namespace Cue
 
 		public override void CheckInput()
 		{
-			if (sys_.Input.Select)
-			{
-				var o = sys_.Input.GetMouseHovered().o as Person;
-				if (o != null)
-					SelectedPerson = o;
-			}
+			// no-op
 		}
 
 		public override void Update()

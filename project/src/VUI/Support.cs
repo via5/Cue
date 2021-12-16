@@ -596,10 +596,10 @@ namespace VUI
 			ui_ = new GameObject("OverlayRootSupportUI");
 			ui_.transform.SetParent(panel_.transform, false);
 			var rt = ui_.AddComponent<RectTransform>();
-			rt.anchorMin = new Vector2(0.5f, 1);
-			rt.anchorMax = new Vector2(0.5f, 1);
-			rt.offsetMin = new Vector2(-width_ / 2, -(height_ + topOffset_));
-			rt.offsetMax = new Vector2(width_ / 2, -topOffset_);
+			rt.anchorMin = new Vector2(1, 1);
+			rt.anchorMax = new Vector2(1, 1);
+			rt.offsetMin = new Vector2(-width_, -(height_ + topOffset_));
+			rt.offsetMax = new Vector2(0, -topOffset_);
 
 			var bg = ui_.AddComponent<Image>();
 			bg.color = new Color(0, 0, 0, 0.8f);
@@ -613,6 +613,25 @@ namespace VUI
 			var topOffset = rt.offsetMin.y - rt.offsetMax.y;
 
 			return new InitResults(bounds, topOffset);
+		}
+
+		private bool ShowUI
+		{
+			get
+			{
+				var go = SuperController.singleton?.mainHUD?.gameObject;
+
+				if (go == null)
+					return true;
+				else
+					return go.activeSelf;
+			}
+		}
+
+		public override void Update(float s)
+		{
+			if (ShowUI != panel_.activeSelf)
+				SetActive(ShowUI);
 		}
 
 		public override void Destroy()
@@ -630,7 +649,7 @@ namespace VUI
 		public override void SetActive(bool b)
 		{
 			if (panel_ != null)
-				panel_.SetActive(b);
+				panel_.SetActive(b && ShowUI);
 		}
 
 		protected override Canvas GetCanvas()
