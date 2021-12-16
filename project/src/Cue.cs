@@ -7,14 +7,20 @@ namespace Cue
 {
 	class Version
 	{
-		public const int Major = 1;
-		public const int Minor = 0;
+		public static readonly int Major = 1;
+		public static readonly int Minor = 0;
+		public static readonly int Patch = 1;
 
 		public static string String
 		{
 			get
 			{
-				return Major.ToString() + "." + Minor.ToString();
+				string s = $"{Major}.{Minor}";
+
+				if (Patch != 0)
+					s += $".{Patch}";
+
+				return s;
 			}
 		}
 
