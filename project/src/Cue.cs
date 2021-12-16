@@ -42,6 +42,7 @@ namespace Cue
 		private bool hairLoose_ = true;
 		private bool handLinking_ = true;
 		private bool devMode_ = false;
+		private float excitement_ = 1.0f;
 
 		public Options()
 		{
@@ -83,6 +84,12 @@ namespace Cue
 			set { devMode_ = value; OnChanged(); }
 		}
 
+		public float Excitement
+		{
+			get { return excitement_; }
+			set { excitement_ = value; OnChanged(); }
+		}
+
 		public JSONNode ToJSON()
 		{
 			var o = new JSONClass();
@@ -93,6 +100,7 @@ namespace Cue
 			o["handLinking"] = new JSONData(handLinking_);
 			o["hairLoose"] = new JSONData(hairLoose_);
 			o["devMode"] = new JSONData(devMode_);
+			o["excitement"] = new JSONData(excitement_);
 
 			return o;
 		}
@@ -105,13 +113,14 @@ namespace Cue
 			J.OptBool(o, "handLinking", ref handLinking_);
 			J.OptBool(o, "hairLoose", ref hairLoose_);
 			J.OptBool(o, "devMode", ref devMode_);
+			J.OptFloat(o, "excitement", ref excitement_);
 
 			OnChanged();
 		}
 
 		private void OnChanged()
 		{
-			Cue.Instance.Save();
+			Cue.Instance.SaveLater();
 			Changed?.Invoke();
 		}
 	}
@@ -122,6 +131,9 @@ namespace Cue
 		private static Cue instance_ = null;
 
 		private Options options_ = new Options();
+		private float saveElapsed_ = 0;
+		private bool needSave_ = false;
+		private const float SaveLaterDelay = 2;
 
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<Person> activePersons_ = new List<Person>();
@@ -301,6 +313,12 @@ namespace Cue
 			saver_.Save(oo);
 		}
 
+		public void SaveLater()
+		{
+			needSave_ = true;
+			saveElapsed_ = 0;
+		}
+
 		private void Save(JSONClass json)
 		{
 			json.Add("version", Version.String);
@@ -454,6 +472,16 @@ namespace Cue
 		public void Update(float s)
 		{
 			I.Instance.Reset();
+
+			if (needSave_)
+			{
+				saveElapsed_ += s;
+				if (saveElapsed_ > SaveLaterDelay)
+				{
+					Save();
+					needSave_ = false;
+				}
+			}
 
 			I.Start(I.Update);
 			{

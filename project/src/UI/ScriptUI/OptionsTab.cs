@@ -2,6 +2,7 @@
 {
 	class OptionsTab : Tab
 	{
+		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox muteSfx_, skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, devMode_;
 		private bool ignore_ = false;
@@ -15,6 +16,14 @@
 			var o = Cue.Instance.Options;
 
 			o.Changed += OnOptionsChanged;
+
+			var ep = new VUI.Panel(new VUI.HorizontalFlow());
+			ep.Add(new VUI.Label("Global excitement speed"));
+			excitement_ = ep.Add(new VUI.FloatTextSlider(0, 10, OnExcitementChanged));
+
+			p.Add(ep);
+			p.Add(new VUI.Spacer(20));
+
 
 			muteSfx_ = p.Add(new VUI.CheckBox("Mute sfx", OnMuteSfx, o.MuteSfx));
 			p.Add(new VUI.Label("Mutes sound effects during hj/bj.", VUI.Label.Wrap));
@@ -63,6 +72,7 @@
 
 				var o = Cue.Instance.Options;
 
+				excitement_.Value = o.Excitement;
 				muteSfx_.Checked = o.MuteSfx;
 				skinColor_.Checked = o.SkinColor;
 				skinGloss_.Checked = o.SkinGloss;
@@ -74,6 +84,12 @@
 			{
 				ignore_ = false;
 			}
+		}
+
+		private void OnExcitementChanged(float f)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.Excitement = f;
 		}
 
 		private void OnMuteSfx(bool b)

@@ -297,6 +297,9 @@ namespace VUI
 			if (i < 0 || i >= tabs_.Count)
 				return;
 
+			if (tabs_[i].Button.Visible == b)
+				return;
+
 			if (!b && i == Selected)
 			{
 				if (i < (tabs_.Count - 1))
