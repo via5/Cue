@@ -289,9 +289,9 @@ namespace Cue.Sys.Mock
 			return HoveredInfo.None;
 		}
 
-		public string DebugString()
+		public List<Pair<string, string>> Debug()
 		{
-			return "";
+			return null;
 		}
 
 		public string VRInfo()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -432,9 +433,64 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public string DebugString()
+		private List<Pair<string, string>> debug_ = null;
+
+		private void D(string a, string b)
 		{
-			return $"left:{vr_.LeftJoystick} right:{vr_.RightJoystick}";
+			debug_.Add(new Pair<string, string>(a, b));
+		}
+
+		private void D(string a, bool b)
+		{
+			debug_.Add(new Pair<string, string>(a, (b ? "on" : "")));
+		}
+
+		private void D(string a, float f)
+		{
+			debug_.Add(new Pair<string, string>(a, (f == 0 ? "" : $"{f:0.00}")));
+		}
+
+		public List<Pair<string, string>> Debug()
+		{
+			if (debug_ == null)
+				debug_ = new List<Pair<string, string>>();
+
+			debug_.Clear();
+
+			D("joystick", $"left:{vr_.LeftJoystick} right:{vr_.RightJoystick}");
+			D("GetMenuShow", sc_.GetMenuShow());
+			D("GetMenuMoveLeft", sc_.GetMenuMoveLeft());
+			D("GetMenuMoveRight", sc_.GetMenuMoveRight());
+			D("GetGrabNavigateStartLeft", sc_.GetGrabNavigateStartLeft());
+			D("GetGrabNavigateStartRight", sc_.GetGrabNavigateStartRight());
+			D("GetGrabNavigateLeft", sc_.GetGrabNavigateLeft());
+			D("GetGrabNavigateRight", sc_.GetGrabNavigateRight());
+			D("GetTargetShow", sc_.GetTargetShow());
+			D("GetLeftUIPointerShow", sc_.GetLeftUIPointerShow());
+			D("GetRightUIPointerShow", sc_.GetLeftUIPointerShow());
+			D("GetLeftSelect", sc_.GetLeftSelect());
+			D("GetRightSelect", sc_.GetRightSelect());
+			D("GetCancel", sc_.GetCancel());
+			D("GetLeftCancel", sc_.GetLeftCancel());
+			D("GetRightCancel", sc_.GetRightCancel());
+			D("GetLeftGrabVal", sc_.GetLeftGrabVal());
+			D("GetRightGrabVal", sc_.GetRightGrabVal());
+			D("GetLeftGrab", sc_.GetLeftGrab());
+			D("GetRightGrab", sc_.GetRightGrab());
+			D("GetLeftRemoteGrab", sc_.GetLeftRemoteGrab());
+			D("GetRightRemoteGrab", sc_.GetRightRemoteGrab());
+			D("GetLeftGrabRelease", sc_.GetLeftGrabRelease());
+			D("GetRightGrabRelease", sc_.GetRightGrabRelease());
+			D("GetLeftRemoteGrabRelease", sc_.GetLeftRemoteGrabRelease());
+			D("GetRightRemoteGrabRelease", sc_.GetRightRemoteGrabRelease());
+			D("GetLeftHoldGrab", sc_.GetLeftHoldGrab());
+			D("GetRightHoldGrab", sc_.GetRightHoldGrab());
+			D("GetLeftRemoteHoldGrab", sc_.GetLeftRemoteHoldGrab());
+			D("GetRightRemoteHoldGrab", sc_.GetRightRemoteHoldGrab());
+			D("GetLeftToggleHand", sc_.GetLeftToggleHand());
+			D("GetRightToggleHand", sc_.GetRightToggleHand());
+
+			return debug_;
 		}
 
 		public string VRInfo()

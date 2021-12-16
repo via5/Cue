@@ -166,7 +166,7 @@ namespace Cue.Sys
 		void Update(float s);
 		HoveredInfo GetMouseHovered();
 
-		string DebugString();
+		List<Pair<string, string>> Debug();
 		string VRInfo();
 	}
 

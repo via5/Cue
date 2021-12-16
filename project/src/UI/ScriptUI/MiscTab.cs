@@ -7,11 +7,13 @@ namespace Cue
 	{
 		private MiscTimesTab times_;
 		private MiscInputTab input_;
+		private MiscDebugInputTab dinput_;
 
 		public MiscTab()
 			: base("Misc", true)
 		{
 			input_ = AddSubTab(new MiscInputTab());
+			dinput_ = AddSubTab(new MiscDebugInputTab());
 			times_ = AddSubTab(new MiscTimesTab());
 			AddSubTab(new MiscLogTab());
 		}
@@ -24,6 +26,7 @@ namespace Cue
 		public void UpdateInput(float s)
 		{
 			input_.UpdateInput(s);
+			dinput_.UpdateInput(s);
 		}
 	}
 
@@ -117,90 +120,123 @@ namespace Cue
 		}
 	}
 
-	class MiscInputTab : Tab
+	class InputDisplay
 	{
-		class Input
+		private string name_;
+		private Func<bool> fbool_ = null;
+		private Func<string> fstring_ = null;
+		private VUI.Label label_ = null;
+		private float onElapsed_ = 1000;
+
+		public InputDisplay(string name)
 		{
-			private string name_;
-			private Func<bool> fbool_ = null;
-			private Func<string> fstring_ = null;
-			private VUI.Label label_ = null;
-			private float onElapsed_ = 1000;
+			name_ = name;
+			label_ = new VUI.Label();
+		}
 
-			public Input(string name, Func<bool> f)
-			{
-				name_ = name;
-				fbool_ = f;
-				label_ = new VUI.Label();
-			}
+		public InputDisplay(string name, Func<bool> f)
+		{
+			name_ = name;
+			fbool_ = f;
+			label_ = new VUI.Label();
+		}
 
-			public Input(string name, Func<string> f)
-			{
-				name_ = name;
-				fstring_ = f;
-				label_ = new VUI.Label();
-				label_.Font = VUI.Style.Theme.MonospaceFont;
-			}
+		public InputDisplay(string name, Func<string> f)
+		{
+			name_ = name;
+			fstring_ = f;
+			label_ = new VUI.Label();
+			label_.Font = VUI.Style.Theme.MonospaceFont;
+		}
 
-			public string Name
-			{
-				get { return name_; }
-			}
+		public string Name
+		{
+			get { return name_; }
+		}
 
-			public VUI.Widget Widget
-			{
-				get { return label_; }
-			}
+		public VUI.Widget Widget
+		{
+			get { return label_; }
+		}
 
-			public void Update(float s)
-			{
-				if (fbool_ != null)
-					UpdateBool(s);
-				else if (fstring_ != null)
-					UpdateString(s);
-			}
+		public void Update(float s)
+		{
+			if (fbool_ != null)
+				UpdateBool(s);
+			else if (fstring_ != null)
+				UpdateString(s);
+		}
 
-			private void UpdateBool(float s)
+		public void UpdateValue(float s, string v)
+		{
+			onElapsed_ += s;
+
+			if (v != label_.Text)
 			{
-				if (fbool_())
+				if (v != "" || onElapsed_ > 1)
 				{
 					label_.TextColor = Sys.Vam.U.ToUnity(Color.Green);
-					label_.Text = "on";
+					label_.Text = v;
 					onElapsed_ = 0;
+				}
+			}
+
+			if (onElapsed_ < 1)
+				label_.TextColor = MakeColor();
+		}
+
+		private void UpdateBool(float s)
+		{
+			if (fbool_())
+			{
+				label_.TextColor = Sys.Vam.U.ToUnity(Color.Green);
+				label_.Text = "on";
+				onElapsed_ = 0;
+			}
+			else
+			{
+				onElapsed_ += s;
+
+				if (onElapsed_ < 1)
+				{
+					label_.Text = "on";
+					label_.TextColor = MakeColor();
 				}
 				else
 				{
-					onElapsed_ += s;
-
-					if (onElapsed_ < 1)
-					{
-						label_.Text = "on";
-						label_.TextColor = MakeColor();
-					}
-					else
-					{
-						label_.Text = "";
-					}
+					label_.Text = "";
 				}
-			}
-
-			private void UpdateString(float s)
-			{
-				label_.Text = fstring_();
-			}
-
-			private UnityEngine.Color MakeColor()
-			{
-				var from = Sys.Vam.U.FromUnity(VUI.Style.Theme.TextColor);
-				var to = Sys.Vam.U.FromUnity(VUI.Style.Theme.BackgroundColor);
-				var c = Color.Lerp(from, to, onElapsed_);
-
-				return Sys.Vam.U.ToUnity(c);
 			}
 		}
 
+		private void UpdateString(float s)
+		{
+			label_.Text = fstring_();
+		}
 
-		private List<Input> inputs_ = new List<Input>();
+		private UnityEngine.Color MakeColor()
+		{
+			var from = Sys.Vam.U.FromUnity(VUI.Style.Theme.TextColor);
+			var to = Sys.Vam.U.FromUnity(VUI.Style.Theme.BackgroundColor);
+			var c = Color.Lerp(from, to, onElapsed_);
+
+			return Sys.Vam.U.ToUnity(c);
+		}
+
+		private UnityEngine.Color MakeTextColor()
+		{
+			var from = Color.Green;
+			var to = Sys.Vam.U.FromUnity(VUI.Style.Theme.TextColor);
+			var c = Color.Lerp(from, to, onElapsed_);
+
+			return Sys.Vam.U.ToUnity(c);
+		}
+	}
+
+
+	class MiscInputTab : Tab
+	{
+		private List<InputDisplay> inputs_ = new List<InputDisplay>();
 
 
 		public MiscInputTab()
@@ -208,19 +244,18 @@ namespace Cue
 		{
 			var i = Cue.Instance.Sys.Input;
 
-			inputs_.Add(new Input("ShowLeftMenu", () => i.ShowLeftMenu));
-			inputs_.Add(new Input("ShowRightMenu", () => i.ShowRightMenu));
-			inputs_.Add(new Input("LeftAction", () => i.LeftAction));
-			inputs_.Add(new Input("RightAction", () => i.RightAction));
-			inputs_.Add(new Input("Select", () => i.Select));
-			inputs_.Add(new Input("Action", () => i.Action));
-			inputs_.Add(new Input("ToggleControls", () => i.ToggleControls));
-			inputs_.Add(new Input("MenuUp", () => i.MenuUp));
-			inputs_.Add(new Input("MenuDown", () => i.MenuDown));
-			inputs_.Add(new Input("MenuLeft", () => i.MenuLeft));
-			inputs_.Add(new Input("MenuRight", () => i.MenuRight));
-			inputs_.Add(new Input("MenuSelect", () => i.MenuSelect));
-			inputs_.Add(new Input("Sys", () => i.DebugString()));
+			inputs_.Add(new InputDisplay("ShowLeftMenu", () => i.ShowLeftMenu));
+			inputs_.Add(new InputDisplay("ShowRightMenu", () => i.ShowRightMenu));
+			inputs_.Add(new InputDisplay("LeftAction", () => i.LeftAction));
+			inputs_.Add(new InputDisplay("RightAction", () => i.RightAction));
+			inputs_.Add(new InputDisplay("Select", () => i.Select));
+			inputs_.Add(new InputDisplay("Action", () => i.Action));
+			inputs_.Add(new InputDisplay("ToggleControls", () => i.ToggleControls));
+			inputs_.Add(new InputDisplay("MenuUp", () => i.MenuUp));
+			inputs_.Add(new InputDisplay("MenuDown", () => i.MenuDown));
+			inputs_.Add(new InputDisplay("MenuLeft", () => i.MenuLeft));
+			inputs_.Add(new InputDisplay("MenuRight", () => i.MenuRight));
+			inputs_.Add(new InputDisplay("MenuSelect", () => i.MenuSelect));
 
 			var gl = new VUI.GridLayout(2);
 			gl.HorizontalStretch = new List<bool> { false, true };
@@ -245,6 +280,58 @@ namespace Cue
 			{
 				for (int i = 0; i < inputs_.Count; ++i)
 					inputs_[i].Update(s);
+
+
+			}
+		}
+	}
+
+
+	class MiscDebugInputTab : Tab
+	{
+		private VUI.Panel panel_;
+		private List<InputDisplay> values_ = new List<InputDisplay>();
+
+		public MiscDebugInputTab()
+			: base("Debug input", false)
+		{
+			var gl = new VUI.GridLayout(2);
+			gl.HorizontalStretch = new List<bool> { false, true };
+			panel_ = new VUI.Panel(gl);
+
+			Layout = new VUI.BorderLayout();
+			Add(panel_, VUI.BorderLayout.Center);
+		}
+
+		public void UpdateInput(float s)
+		{
+			if (IsVisibleOnScreen())
+			{
+				var sys = Cue.Instance.Sys.Input;
+				var d = sys.Debug();
+
+				if (values_.Count == 0)
+				{
+					for (int i = 0; i < d.Count; ++i)
+					{
+						var caption = new VUI.Label(d[i].first);
+						caption.FontSize = 20;
+
+						var v = new InputDisplay(d[i].first);
+						var label = v.Widget;
+						label.FontSize = 20;
+
+						values_.Add(v);
+
+						panel_.Add(caption);
+						panel_.Add(label);
+					}
+				}
+				else
+				{
+					for (int i = 0; i < d.Count; ++i)
+						values_[i].UpdateValue(s, d[i].second);
+				}
 			}
 		}
 	}
