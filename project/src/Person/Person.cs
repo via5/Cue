@@ -63,8 +63,8 @@ namespace Cue
 			expression_ = new ExpressionManager(this);
 			status_ = new PersonStatus(this);
 
-			breathing_ = Integration.CreateBreather(this);
-			orgasmer_ = Integration.CreateOrgasmer(this);
+			breathing_ = personality_.CreateBreather(this);
+			orgasmer_ = personality_.CreateOrgasmer(this);
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
 
@@ -170,6 +170,13 @@ namespace Cue
 			{
 				personality_ = value;
 				personality_.Init();
+
+				breathing_?.Destroy();
+				breathing_ = personality_.CreateBreather(this);
+
+				orgasmer_?.Destroy();
+				orgasmer_ = personality_.CreateOrgasmer(this);
+
 				PersonalityChanged?.Invoke();
 			}
 		}

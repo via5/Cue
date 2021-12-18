@@ -119,7 +119,8 @@ namespace Cue
 
 
 			Resources.LoadEnumValues(p, o, inherited);
-			ParseVoice(p.Voice, o, inherited);
+			ParseBreathing(p, o, inherited);
+			ParseOrgasmer(p, o, inherited);
 			ParseSensitivities(p.Sensitivities, o, inherited);
 			ParseEvents(p, o, inherited);
 
@@ -159,47 +160,52 @@ namespace Cue
 			return p;
 		}
 
-		private void ParseVoice(Voice v, JSONClass o, bool inherited)
+		private void ParseBreathing(Personality p, JSONClass o, bool inherited)
 		{
-			List<Voice.DatasetForIntensity> dss = null;
-			Voice.Dataset orgasmDs = null;
-			var voice = o["voice"].AsObject;
-
-			if (voice.HasKey("datasets"))
+			if (o.HasKey("breathing"))
 			{
-				dss = new List<Voice.DatasetForIntensity>();
+				var provider = o["breathing"]["provider"].Value;
+				var options = o["breathing"]["options"].AsObject;
 
-				foreach (JSONClass dn in voice["datasets"].AsArray.Childs)
-				{
-					var ds = new Voice.DatasetForIntensity(
-						new Voice.Dataset(
-							J.ReqString(dn, "dataset"),
-							J.ReqFloat(dn, "pitch")),
-						J.ReqFloat(dn, "intensityMin"),
-						J.ReqFloat(dn, "intensityMax"));
+				IBreather b;
 
-					dss.Add(ds);
-				}
+				if (provider == "mg")
+					b = new MG.Breather(options);
+				else if (provider == "vammoan")
+					b = new VAMMoanBreather(options);
+				else
+					throw new LoadFailed($"unknown breather provider '{provider}'");
+
+				p.SetBreather(b);
 			}
 			else
 			{
 				if (!inherited)
-					throw new LoadFailed("missing voice datasets");
+					throw new LoadFailed("missing breathing");
 			}
+		}
 
-			if (voice.HasKey("orgasm"))
-			{
-				var oo = voice["orgasm"].AsObject;
-				orgasmDs = new Voice.Dataset(
-					J.ReqString(oo, "dataset"),
-					J.ReqFloat(oo, "pitch"));
-			}
-			else if (!inherited)
-			{
-				throw new LoadFailed("missing orgasm dataset");
-			}
+		private void ParseOrgasmer(Personality p, JSONClass o, bool inherited)
+		{
+			IOrgasmer b = null;
 
-			v.Set(dss, orgasmDs);
+			if (o.HasKey("orgasm"))
+			{
+				var provider = o["orgasm"]["provider"].Value;
+				var options = o["orgasm"]["options"].AsObject;
+
+				if (provider == "mg")
+					b = new MG.Orgasmer(options);
+				else
+					throw new LoadFailed($"unknown orgasm provider '{provider}'");
+
+				p.SetOrgasmer(b);
+			}
+			else
+			{
+				if (!inherited)
+					throw new LoadFailed("missing orgasm");
+			}
 		}
 
 		private void ParseSensitivities(Sensitivities ss, JSONClass o, bool inherited)

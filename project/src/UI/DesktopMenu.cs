@@ -126,7 +126,7 @@ namespace Cue
 
 			var p = SelectedPerson;
 			if (p != null)
-				p.Mood.ForceOrgasm();
+				p.Animator.PlayType(Animations.Penetrated);
 		}
 
 		private void OnForceExcitement(bool b)

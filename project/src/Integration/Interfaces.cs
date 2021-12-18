@@ -13,16 +13,6 @@ namespace Cue
 
 	class Integration
 	{
-		public static IBreather CreateBreather(Person p)
-		{
-			return new MacGruberBreather(p);
-		}
-
-		public static IOrgasmer CreateOrgasmer(Person p)
-		{
-			return new MacGruberOrgasmer(p);
-		}
-
 		public static ISpeaker CreateSpeaker(Person p)
 		{
 			return new VamSpeaker(p);
@@ -35,7 +25,7 @@ namespace Cue
 
 		public static IGazer CreateGazer(Person p)
 		{
-			return new MacGruberGaze(p);
+			return new MG.Gaze(p);
 		}
 
 		public static IClothing CreateClothing(Person p)
@@ -51,14 +41,27 @@ namespace Cue
 
 	public interface IOrgasmer
 	{
+		void Init(Person p);
+		void Destroy();
+		IOrgasmer Clone();
+
+		void ForcePitch(float f);
+		float ForcedPitch { get; }
+
 		void Orgasm();
 	}
 
 	public interface IBreather
 	{
+		void Init(Person p);
+		void Destroy();
+		IBreather Clone();
+
+		void ForcePitch(float f);
+		float ForcedPitch { get; }
+
 		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }
-		float Speed { get; set; }
 	}
 
 	public interface IGazer

@@ -2,30 +2,39 @@
 	"name": "base",
 	"abstract": true,
 
-	"voice":
+	"breathing":
 	{
-		"orgasm":
+		"provider": "mg",
+		"options":
+		{
+			"datasets":
+			[
+				{
+					"dataset": "Candy Nose",
+					"intensityMin": 0,
+					"intensityMax": 0.2,
+					"pitch": -1,
+				},
+
+				{
+					"dataset": "Original",
+					"intensityMin": 0.2,
+					"intensityMax": 1,
+					"pitch": -1,
+				}
+			]
+		}
+	},
+
+
+	"orgasm":
+	{
+		"provider": "mg",
+		"options":
 		{
 			"dataset": "Candy Orgasm Soft",
 			"pitch": -1
-		},
-
-		"datasets":
-		[
-			{
-				"dataset": "Candy Nose",
-				"intensityMin": 0,
-				"intensityMax": 0.2,
-				"pitch": -1,
-			},
-
-			{
-				"dataset": "Original",
-				"intensityMin": 0.2,
-				"intensityMax": 1,
-				"pitch": -1,
-			}
-		]
+		}
 	},
 
 
@@ -50,7 +59,7 @@
 					"max": 0.46
 				},
 				{
-					"id": "PHMMouthOpenWide",
+					"id": "PHMMouthOpen",
 					"max": 1.7
 				},
 				{

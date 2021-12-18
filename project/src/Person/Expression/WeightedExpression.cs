@@ -91,7 +91,7 @@
 		public void Deactivate()
 		{
 			e_.SetAuto(0, 0, 0);
-			e_.SetTarget(0, RandomResetTime());
+			e_.SetTargetAndStop(0, RandomResetTime());
 			state_ = InactiveState;
 		}
 

@@ -72,9 +72,10 @@ namespace Cue
 			{
 				ignore_ = true;
 
-				voicePitch_.Set(
-					person_.Personality.Voice.GetNormalPitch(),
-					0, 1);
+				if (person.Breathing.ForcedPitch >= 0)
+					voicePitch_.Set(person.Breathing.ForcedPitch, 0, 1);
+				else
+					voicePitch_.Set(0.5f, 0, 1);
 
 				traits_.Text = string.Join(" ", person_.Traits);
 			}
@@ -99,6 +100,11 @@ namespace Cue
 					RebuildPersonalities();
 				else
 					SelectPersonality(person_.Personality.Name);
+
+				if (person_.Breathing.ForcedPitch >= 0)
+					voicePitch_.Set(person_.Breathing.ForcedPitch, 0, 1);
+				else
+					voicePitch_.Set(0.5f, 0, 1);
 			}
 			finally
 			{
@@ -144,13 +150,16 @@ namespace Cue
 
 			if (item.Personality.Name != person_.Personality.Name)
 			{
-				var old = person_.Personality;
+				var oldPitch = person_.Breathing.ForcedPitch;
 
 				person_.Personality = Resources.Personalities.Clone(
 					item.Personality.Name, person_);
 
-				if (old.Voice.ForcedPitch >= 0)
-					person_.Personality.Voice.ForcePitch(old.Voice.ForcedPitch);
+				if (oldPitch >= 0)
+				{
+					person_.Breathing.ForcePitch(oldPitch);
+					person_.Orgasmer.ForcePitch(oldPitch);
+				}
 
 				Cue.Instance.Save();
 			}
@@ -160,7 +169,9 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			person_.Personality.Voice.ForcePitch(f);
+			person_.Breathing.ForcePitch(f);
+			person_.Orgasmer.ForcePitch(f);
+
 			Cue.Instance.Save();
 		}
 

@@ -136,7 +136,6 @@ namespace Cue.Sys.Vam
 		{
 			DisableFreezeWhenGrabbed(a);
 			DisableAutoExpressions(a);
-			EnableAudioJawDriving(a);
 			SetEyes(a);
 		}
 
@@ -166,20 +165,6 @@ namespace Cue.Sys.Vam
 			var b = Parameters.GetBool(a, "AutoExpressions", "enabled");
 			if (b != null)
 				b.val = false;
-		}
-
-		private static void EnableAudioJawDriving(Atom a)
-		{
-			var p = Parameters.GetBool(
-				a, "JawControl", "driveXRotationFromAudioSource");
-
-			if (p != null)
-				p.val = true;
-
-			var v = Parameters.GetFloat(
-				a, "JawControl", "driveXRotationFromAudioSourceMultiplier");
-
-			v.val = v.max;
 		}
 
 		private static void SetEyes(Atom a)

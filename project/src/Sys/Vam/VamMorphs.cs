@@ -5,6 +5,8 @@ namespace Cue.Sys.Vam
 {
 	class MorphValueHijack
 	{
+		private static readonly bool Enabled = true;
+
 		private const float ValuePingOffset = 0.012345678f;
 		private const float ValuePongOffset = 0.087654321f;
 		private const float ValueUninstallOffset = 0.045612378f;
@@ -48,6 +50,9 @@ namespace Cue.Sys.Vam
 
 		public static void Install(MorphInfo m)
 		{
+			if (!Enabled)
+				return;
+
 			Log.Verbose($"{m.ID}: installing (tk={CueMain.Instance.Token})");
 
 			bool hadOld = DoUninstall(m);
@@ -61,6 +66,9 @@ namespace Cue.Sys.Vam
 
 		public static bool Uninstall(MorphInfo m)
 		{
+			if (!Enabled)
+				return false;
+
 			bool found = DoUninstall(m);
 
 			if (found)
@@ -455,6 +463,11 @@ namespace Cue.Sys.Vam
 		{
 			atom_ = a;
 			name_ = name;
+		}
+
+		public MorphInfo MorphInfo
+		{
+			get { return morph_; }
 		}
 
 		public string Name

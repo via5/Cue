@@ -222,6 +222,11 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public string ParameterName
+		{
+			get { return paramName_; }
+		}
+
 		public void MakeStale()
 		{
 			stale_ = true;

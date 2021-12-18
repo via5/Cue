@@ -310,7 +310,7 @@ namespace Cue
 			s[i++] = "";
 
 			for (int j = 0; j < exps_.Length; ++j)
-				s[i++] = $"{exps_[j]}";
+				s[i++] = $"{exps_[j].ToDetailedString()}";
 
 			s[i++] = "";
 			s[i++] = (needsMore_ ? "needs more" : "");

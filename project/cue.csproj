@@ -156,6 +156,7 @@
     <Compile Include="src\Integration\MacGruber.cs" />
     <Compile Include="src\Integration\Objects.cs" />
     <Compile Include="src\Integration\Vam.cs" />
+    <Compile Include="src\Integration\VAMMoan.cs" />
     <Compile Include="src\Main.cs" />
     <Compile Include="src\Person\Body\Body.cs" />
     <Compile Include="src\Person\Body\BodyPart.cs" />

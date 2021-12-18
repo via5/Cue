@@ -144,6 +144,16 @@ namespace Cue
 				return val;
 		}
 
+		public static int Clamp(int val, int min, int max)
+		{
+			if (val < min)
+				return min;
+			else if (val > max)
+				return max;
+			else
+				return val;
+		}
+
 		public static float Lerp(float min, float max, float t)
 		{
 			t = Clamp(t, 0, 1);

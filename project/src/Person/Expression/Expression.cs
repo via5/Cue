@@ -9,6 +9,7 @@
 			public float start;
 			public float elapsed;
 			public bool valid;
+			public bool stopAfter;
 			public bool auto;
 
 			public override string ToString()
@@ -86,7 +87,7 @@
 		{
 			return
 				$"{name_} {MoodString()} " +
-				$"{g_.Value:0.00}=>{target_:0.00} " +
+				$"{g_.Value:0.00}=>{target_:0.00} tv={target_.valid} " +
 				$"{target_.elapsed:0.00}/{target_.time:0.00}";
 		}
 
@@ -143,6 +144,13 @@
 			target_.elapsed = 0;
 			target_.valid = true;
 			target_.auto = false;
+			target_.stopAfter = false;
+		}
+
+		public void SetTargetAndStop(float t, float time)
+		{
+			SetTarget(t, time);
+			target_.stopAfter = true;
 		}
 
 		public void Reset()
@@ -166,7 +174,12 @@
 					value_ = v;
 
 				if (p >= 1)
-					NextAuto();
+				{
+					if (target_.stopAfter)
+						target_.valid = false;
+					else
+						NextAuto();
+				}
 			}
 			else
 			{

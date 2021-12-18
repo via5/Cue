@@ -3,167 +3,6 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class Voice
-	{
-		public class Dataset
-		{
-			private string name_;
-			private float pitch_;
-
-			public Dataset(string name, float pitch)
-			{
-				name_ = name;
-				pitch_ = pitch;
-			}
-
-			public Dataset(Dataset d)
-			{
-				name_ = d.name_;
-				pitch_ = d.pitch_;
-			}
-
-			public string Name
-			{
-				get { return name_; }
-			}
-
-			public float GetPitch(Person p)
-			{
-				if (pitch_ < 0)
-				{
-					float scale = p.Atom.Scale;
-					SetPitch(0.5f + (1 - scale));
-				}
-
-				return pitch_;
-			}
-
-			public void SetPitch(float f)
-			{
-				pitch_ = U.Clamp(f, 0, 1);
-			}
-		}
-
-		public class DatasetForIntensity
-		{
-			public Dataset dataset;
-			public float intensityMin;
-			public float intensityMax;
-
-			public DatasetForIntensity(Dataset ds, float intensityMin, float intensityMax)
-			{
-				this.dataset = ds;
-				this.intensityMin = intensityMin;
-				this.intensityMax = intensityMax;
-			}
-
-			public DatasetForIntensity(DatasetForIntensity d)
-			{
-				dataset = new Dataset(d.dataset);
-				intensityMin = d.intensityMin;
-				intensityMax = d.intensityMax;
-			}
-		}
-
-
-		private Person person_ = null;
-		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
-		private Dataset orgasm_ = new Dataset("", -1);
-		private Dataset dummy_ = new Dataset("", -1);
-		private bool warned_ = false;
-		private float forcedPitch_ = -1;
-
-
-		public Logger Log
-		{
-			get { return person_.Log; }
-		}
-
-		public void Set(List<DatasetForIntensity> dss, Dataset orgasm)
-		{
-			if (dss != null)
-				datasets_ = dss.ToArray();
-
-			if (orgasm != null)
-				orgasm_ = orgasm;
-		}
-
-		public Voice Clone(Person p)
-		{
-			var v = new Voice();
-			v.CopyFrom(this, p);
-			return v;
-		}
-
-		private void CopyFrom(Voice v, Person p)
-		{
-			person_ = p;
-
-			datasets_ = new DatasetForIntensity[v.datasets_.Length];
-			for (int i = 0; i < datasets_.Length; ++i)
-				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
-
-			orgasm_ = new Dataset(v.orgasm_);
-		}
-
-		public DatasetForIntensity[] Datasets
-		{
-			get { return datasets_; }
-		}
-
-		public Dataset OrgasmDataset
-		{
-			get { return orgasm_; }
-		}
-
-		public float ForcedPitch
-		{
-			get { return forcedPitch_; }
-		}
-
-		public float GetNormalPitch()
-		{
-			return GetDatasetForIntensity(0).GetPitch(person_);
-		}
-
-		public void ForcePitch(float f)
-		{
-			forcedPitch_ = f;
-
-			foreach (var d in datasets_)
-				d.dataset.SetPitch(f);
-
-			orgasm_.SetPitch(f);
-		}
-
-		public Dataset GetDatasetForIntensity(float e)
-		{
-			for (int i = 0; i < datasets_.Length; ++i)
-			{
-				if (e >= datasets_[i].intensityMin &&
-					e <= datasets_[i].intensityMax)
-				{
-					return datasets_[i].dataset;
-				}
-			}
-
-			if (!warned_)
-			{
-				Log.Error(
-					$"personality missing voice for excitement " +
-					$"{e}");
-
-				warned_ = true;
-			}
-
-			if (datasets_.Length == 0)
-				return dummy_;
-			else
-				return datasets_[0].dataset;
-		}
-	}
-
-
 	public class SensitivityModifier
 	{
 		public const int Unresolved = -1;
@@ -423,16 +262,16 @@ namespace Cue
 		private string origin_;
 		private Person person_ = null;
 
-		private Voice voice_;
 		private Expression[] exps_ = new Expression[0];
 		private Sensitivities sensitivities_;
 		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
+		private IBreather breatherProto_ = null;
+		private IOrgasmer orgasmerProto_ = null;
 
 		public Personality(string name)
 			: base(new PS())
 		{
 			name_ = name;
-			voice_ = new Voice();
 			sensitivities_ = new Sensitivities();
 		}
 
@@ -460,12 +299,14 @@ namespace Cue
 			for (int i = 0; i < ps.exps_.Length; i++)
 				exps_[i] = ps.exps_[i].Clone();
 
-			voice_ = ps.voice_.Clone(person_);
 			sensitivities_ = ps.sensitivities_.Clone(person_);
 
 			events_.Clear();
 			foreach (var kv in ps.events_)
 				events_[kv.Key] = kv.Value.Clone();
+
+			breatherProto_ = ps.breatherProto_?.Clone();
+			orgasmerProto_ = ps.orgasmerProto_?.Clone();
 		}
 
 		public void Init()
@@ -481,6 +322,16 @@ namespace Cue
 		public void SetEventData(string name, IEventData d)
 		{
 			events_[name] = d;
+		}
+
+		public void SetBreather(IBreather b)
+		{
+			breatherProto_ = b;
+		}
+
+		public void SetOrgasmer(IOrgasmer o)
+		{
+			orgasmerProto_ = o;
 		}
 
 		public IEventData CloneEventData(string name)
@@ -499,7 +350,14 @@ namespace Cue
 				var vo = o["voice"].AsObject;
 
 				if (vo.HasKey("pitch"))
-					voice_.ForcePitch(vo["pitch"].AsFloat);
+				{
+					float fp = vo["pitch"].AsFloat;
+
+					breatherProto_?.ForcePitch(fp);
+					person_.Breathing?.ForcePitch(fp);
+					person_.Orgasmer?.ForcePitch(fp);
+					orgasmerProto_?.ForcePitch(fp);
+				}
 			}
 		}
 
@@ -510,10 +368,10 @@ namespace Cue
 			if (name_ != Resources.DefaultPersonality)
 				o.Add("name", name_);
 
-			if (voice_.ForcedPitch >= 0)
+			if (person_.Breathing.ForcedPitch >= 0)
 			{
 				var v = new JSONClass();
-				v.Add("pitch", new JSONData(voice_.ForcedPitch));
+				v.Add("pitch", new JSONData(person_.Breathing.ForcedPitch));
 				o.Add("voice", v);
 			}
 
@@ -523,11 +381,6 @@ namespace Cue
 		public string Name
 		{
 			get { return name_; }
-		}
-
-		public Voice Voice
-		{
-			get { return voice_; }
 		}
 
 		public Sensitivities Sensitivities
@@ -540,6 +393,26 @@ namespace Cue
 			var e = new Expression[exps_.Length];
 			exps_.CopyTo(e, 0);
 			return e;
+		}
+
+		public IBreather CreateBreather(Person p)
+		{
+			if (breatherProto_ == null)
+				return null;
+
+			var b = breatherProto_.Clone();
+			b.Init(p);
+			return b;
+		}
+
+		public IOrgasmer CreateOrgasmer(Person p)
+		{
+			if (orgasmerProto_ == null)
+				return null;
+
+			var b = orgasmerProto_.Clone();
+			b.Init(p);
+			return b;
 		}
 
 		public override string ToString()

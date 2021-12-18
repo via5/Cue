@@ -45,6 +45,7 @@ project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Objects.cs
 project\src\Integration\Vam.cs
+project\src\Integration\VAMMoan.cs
 project\src\Person\Mood.cs
 project\src\Person\Object.cs
 project\src\Person\Person.cs

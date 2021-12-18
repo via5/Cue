@@ -57,30 +57,37 @@
 		}
 	},
 
-	"voice":
+	"breathing":
 	{
-		"orgasm":
+		"provider": "mg",
+		"options":
+		{
+			"datasets":
+			[
+				{
+					"dataset": "Candy Nose",
+					"intensityMin": 0,
+					"intensityMax": 0.2,
+					"pitch": -1,
+				},
+
+				{
+					"dataset": "Candy Mouth",
+					"intensityMin": 0.2,
+					"intensityMax": 1,
+					"pitch": -1,
+				}
+			]
+		}
+	},
+
+	"orgasm":
+	{
+		"provider": "mg",
+		"options":
 		{
 			"dataset": "",
 			"pitch": -1
-		},
-
-		"datasets":
-		[
-			{
-				"dataset": "Candy Nose",
-				"intensityMin": 0,
-				"intensityMax": 0.2,
-				"pitch": -1,
-			},
-
-			{
-				"dataset": "Candy Mouth",
-				"intensityMin": 0.2,
-				"intensityMax": 1,
-				"pitch": -1,
-			}
-		]
-	},
-
+		}
+	}
 }

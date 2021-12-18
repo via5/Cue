@@ -98,6 +98,11 @@ namespace Cue
 				bodyPart_ = bodyPart;
 			}
 
+			public Morph Morph
+			{
+				get { return m_; }
+			}
+
 			public MorphInfo Clone()
 			{
 				return new MorphInfo(id_, multiplier_, bodyPart_);

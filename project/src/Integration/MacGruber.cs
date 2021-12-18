@@ -1,8 +1,71 @@
 ﻿using System;
+using System.Collections.Generic;
+using SimpleJSON;
 
-namespace Cue
+namespace Cue.MG
 {
-	class MacGruberBreather : IBreather
+	public class Dataset
+	{
+		private string name_;
+		private float pitch_;
+
+		public Dataset(string name, float pitch)
+		{
+			name_ = name;
+			pitch_ = pitch;
+		}
+
+		public Dataset(Dataset d)
+		{
+			name_ = d.name_;
+			pitch_ = d.pitch_;
+		}
+
+		public string Name
+		{
+			get { return name_; }
+		}
+
+		public float GetPitch(Person p)
+		{
+			if (pitch_ < 0)
+			{
+				float scale = p.Atom.Scale;
+				SetPitch(0.5f + (1 - scale));
+			}
+
+			return pitch_;
+		}
+
+		public void SetPitch(float f)
+		{
+			pitch_ = U.Clamp(f, 0, 1);
+		}
+	}
+
+	public class DatasetForIntensity
+	{
+		public Dataset dataset;
+		public float intensityMin;
+		public float intensityMax;
+
+		public DatasetForIntensity(Dataset ds, float intensityMin, float intensityMax)
+		{
+			this.dataset = ds;
+			this.intensityMin = intensityMin;
+			this.intensityMax = intensityMax;
+		}
+
+		public DatasetForIntensity(DatasetForIntensity d)
+		{
+			dataset = new Dataset(d.dataset);
+			intensityMin = d.intensityMin;
+			intensityMax = d.intensityMax;
+		}
+	}
+
+
+	class Breather : IBreather
 	{
 		struct Pair
 		{
@@ -33,13 +96,63 @@ namespace Cue
 			public Sys.Vam.FloatParameter noseInMorphMax, noseOutMorphMax;
 		}
 
-		private Person person_;
+
+		private Person person_ = null;
+		private Logger log_ = new Logger(Logger.Integration, "mg.breather");
+
+		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
+		private Dataset dummy_ = new Dataset("", -1);
+		private bool warned_ = false;
+		private float forcedPitch_ = -1;
+
 		private Parameters p_ = new Parameters();
 		private bool mouthEnabled_ = true;
 
-		public MacGruberBreather(Person p)
+		private Breather()
+		{
+		}
+
+		public Breather(JSONClass options)
+		{
+			if (!options.HasKey("datasets"))
+				throw new LoadFailed("mg missing datasets");
+
+			var dss = new List<DatasetForIntensity>();
+
+			foreach (JSONClass dn in options["datasets"].AsArray.Childs)
+			{
+				var ds = new DatasetForIntensity(
+					new Dataset(
+						J.ReqString(dn, "dataset"),
+						J.ReqFloat(dn, "pitch")),
+					J.ReqFloat(dn, "intensityMin"),
+					J.ReqFloat(dn, "intensityMax"));
+
+				dss.Add(ds);
+			}
+
+			datasets_ = dss.ToArray();
+		}
+
+		public IBreather Clone()
+		{
+			var b = new Breather();
+			b.CopyFrom(this);
+			return b;
+		}
+
+		private void CopyFrom(Breather v)
+		{
+			forcedPitch_ = v.forcedPitch_;
+			datasets_ = new DatasetForIntensity[v.datasets_.Length];
+			for (int i = 0; i < datasets_.Length; ++i)
+				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
+		}
+
+		public void Init(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.Integration, p, "mg.breather");
 
 			p_.breathingEnabled_ = new Sys.Vam.BoolParameter(
 				p, "MacGruber.Breathing", "enabled");
@@ -135,18 +248,51 @@ namespace Cue
 			}
 		}
 
-		// not supported, tied to pitch
-		//
-		public float Speed
+		public void Destroy()
 		{
-			get { return 0; }
-			set { }
+			// no-op
+		}
+
+		public void ForcePitch(float f)
+		{
+			forcedPitch_ = f;
+
+			foreach (var d in datasets_)
+				d.dataset.SetPitch(f);
+		}
+
+		public float ForcedPitch
+		{
+			get { return forcedPitch_; }
+		}
+
+		private Dataset GetDatasetForIntensity(float e)
+		{
+			for (int i = 0; i < datasets_.Length; ++i)
+			{
+				if (e >= datasets_[i].intensityMin &&
+					e <= datasets_[i].intensityMax)
+				{
+					return datasets_[i].dataset;
+				}
+			}
+
+			if (!warned_)
+			{
+				log_.Error($"missing voice for excitement {e}");
+				warned_ = true;
+			}
+
+			if (datasets_.Length == 0)
+				return dummy_;
+			else
+				return datasets_[0].dataset;
 		}
 
 		private void Apply()
 		{
 			var f = Intensity;
-			var ds = person_.Personality.Voice.GetDatasetForIntensity(f);
+			var ds = GetDatasetForIntensity(f);
 
 			// taken over by MacGruberOrgasmer during orgasm
 			if (person_.Mood.State != Mood.OrgasmState)
@@ -179,19 +325,53 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"MacGruber: v={p_.intensity} pitch={p_.pitch.Value}";
+			string s = $"MacGruber: v={p_.intensity} ";
+
+			if (forcedPitch_ >= 0)
+				s += $"forcedPitch={forcedPitch_:0.00}";
+			else
+				s += $"pitch={p_.pitch.Value:0.00}";
+
+			return s;
 		}
 	}
 
 
-	class MacGruberOrgasmer : IOrgasmer
+	class Orgasmer : IOrgasmer
 	{
 		private Person person_ = null;
+		private Dataset orgasm_ = new Dataset("", -1);
+		private float forcedPitch_ = -1;
+
 		private Sys.Vam.ActionParameter action_;
 		private Sys.Vam.StringChooserParameter orgasmDataset_;
 		private Sys.Vam.FloatParameter pitch_;
 
-		public MacGruberOrgasmer(Person p)
+		private Orgasmer()
+		{
+		}
+
+		public Orgasmer(JSONClass options)
+		{
+			orgasm_ = new Dataset(
+				J.ReqString(options, "dataset"),
+				J.ReqFloat(options, "pitch"));
+		}
+
+		public IOrgasmer Clone()
+		{
+			var o = new Orgasmer();
+			o.CopyFrom(this);
+			return o;
+		}
+
+		private void CopyFrom(Orgasmer v)
+		{
+			forcedPitch_ = v.forcedPitch_;
+			orgasm_ = new Dataset(v.orgasm_);
+		}
+
+		public void Init(Person p)
 		{
 			person_ = p;
 			action_ = new Sys.Vam.ActionParameter(
@@ -202,9 +382,25 @@ namespace Cue
 				p, "MacGruber.Breathing", "Pitch");
 		}
 
+		public void Destroy()
+		{
+			// no-op
+		}
+
+		public void ForcePitch(float f)
+		{
+			forcedPitch_ = f;
+			orgasm_.SetPitch(f);
+		}
+
+		public float ForcedPitch
+		{
+			get { return forcedPitch_; }
+		}
+
 		public void Orgasm()
 		{
-			var ds = person_.Personality.Voice.OrgasmDataset;
+			var ds = orgasm_;
 
 			if (ds.Name != "")
 			{
@@ -214,10 +410,22 @@ namespace Cue
 				action_.Fire();
 			}
 		}
+
+		public override string ToString()
+		{
+			string s = $"MacGruber: ";
+
+			if (forcedPitch_ >= 0)
+				s += $"forcedPitch={forcedPitch_:0.00}";
+			else
+				s += $"pitch={pitch_.Value:0.00}";
+
+			return s;
+		}
 	}
 
 
-	class MacGruberGaze : IGazer
+	class Gaze : IGazer
 	{
 		private const int NotFound = 0;
 		private const int Target = 1;
@@ -250,7 +458,7 @@ namespace Cue
 		private Sys.Vam.StringChooserParameter lookatControl_;
 
 
-		public MacGruberGaze(Person p)
+		public Gaze(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "mgGaze");

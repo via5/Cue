@@ -286,15 +286,15 @@ namespace Cue
 					exps.Add(new string[] { $"    {m}", "" });
 			}
 
-			var v = ps.Voice;
-			exps.Add(new string[] { "orgasm ds", v.OrgasmDataset.Name });
-
-			foreach (var ds in v.Datasets)
-			{
-				exps.Add(new string[] {
-					ds.dataset.Name,
-					$"[{ds.intensityMin}, {ds.intensityMax}]" });
-			}
+			//var v = ps.Voice;
+			//exps.Add(new string[] { "orgasm ds", v.OrgasmDataset.Name });
+			//
+			//foreach (var ds in v.Datasets)
+			//{
+			//	exps.Add(new string[] {
+			//		ds.dataset.Name,
+			//		$"[{ds.intensityMin}, {ds.intensityMax}]" });
+			//}
 
 			list_.SetItems(MakeTable(ps, exps.ToArray()));
 		}
