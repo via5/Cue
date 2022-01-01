@@ -39,48 +39,35 @@ namespace Cue
 			return VamSmoke.Create(id, existsOnly);
 		}
 
-		public static IBreather CreateBreather(string provider, JSONClass options)
+		public static IVoice CreateVoice(string provider, JSONClass options)
 		{
 			if (provider == "macgruber")
-				return new MacGruber.Breather(options);
+				return new MacGruber.Voice(options);
 			else if (provider == "vammoan")
-				return new VamMoan.Breather(options);
-			else
-				return null;
-		}
-
-		public static IOrgasmer CreateOrgasmer(string provider, JSONClass options)
-		{
-			if (provider == "macgruber")
-				return new MacGruber.Orgasmer(options);
+				return new VamMoan.Voice(options);
 			else
 				return null;
 		}
 	}
 
-	public interface IOrgasmer
+	public interface IVoice
 	{
 		void Init(Person p);
 		void Destroy();
-		IOrgasmer Clone();
+		IVoice Clone();
 
-		void ForcePitch(float f);
-		float ForcedPitch { get; }
+		void Update(float s);
+		void StartOrgasm();
+		void StopOrgasm();
 
-		void Orgasm();
-	}
-
-	public interface IBreather
-	{
-		void Init(Person p);
-		void Destroy();
-		IBreather Clone();
-
-		void ForcePitch(float f);
-		float ForcedPitch { get; }
+		float Pitch { get; set; }
+		Pair<float, float> PitchRange { get; }
 
 		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }
+
+		string[] AvailableVoices { get; }
+		string Name { get; set; }
 	}
 
 	public interface IGazer

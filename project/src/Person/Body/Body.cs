@@ -140,7 +140,7 @@ namespace Cue
 				person_.Atom.Hair.Loose = temperature_.Value;
 			}
 
-			person_.Breathing.Intensity = person_.Mood.MovementEnergy;
+			person_.Voice.Intensity = person_.Mood.MovementEnergy;
 		}
 
 		public void DebugAllLocks(List<string> list)

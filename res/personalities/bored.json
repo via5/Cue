@@ -57,22 +57,13 @@
 		}
 	},
 
-	"breathing":
+	"voice":
 	{
 		"provider": "vammoan",
 		"options":
 		{
 			"breathingMax": 1,
-		}
-	},
-
-	"orgasm":
-	{
-		"provider": "macgruber",
-		"options":
-		{
-			"dataset": "",
-			"pitch": -1
+			"orgasmAction": "Voice intensity 0"
 		}
 	}
 }

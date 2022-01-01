@@ -270,6 +270,8 @@ namespace Cue
 			var ps = person_.Personality;
 			var exps = new List<string[]>();
 
+			exps.Add(new string[] { "name", ps.Name });
+
 			for (int i = 0; i < SS.Count; ++i)
 			{
 				var ss = ps.Sensitivities.Get(i);

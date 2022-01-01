@@ -63,7 +63,7 @@
 
 			elapsed_ = 0;
 			state_ = ReactionState;
-			person_.Breathing.MouthEnabled = false;
+			person_.Voice.MouthEnabled = false;
 
 			expressions_ = person_.Expression.GetExpressionsForMood(Moods.Excited);
 
@@ -182,7 +182,7 @@
 
 		private void Restore()
 		{
-			person_.Breathing.MouthEnabled = true;
+			person_.Voice.MouthEnabled = true;
 			person_.Expression.Enable();
 		}
 

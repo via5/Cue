@@ -2,24 +2,14 @@
 	"name": "base",
 	"abstract": true,
 
-	"breathing":
+	"voice":
 	{
 		"provider": "vammoan",
 		"options":
 		{
 			"breathingMax": 0.2,
-			"intensitiesEasing": "linear"
-		}
-	},
-
-
-	"orgasm":
-	{
-		"provider": "macgruber",
-		"options":
-		{
-			"dataset": "Candy Orgasm Soft",
-			"pitch": -1
+			"intensitiesEasing": "linear",
+			"orgasmAction": "Voice orgasm"
 		}
 	},
 

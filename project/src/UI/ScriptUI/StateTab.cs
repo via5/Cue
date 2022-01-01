@@ -15,8 +15,7 @@ namespace Cue
 		private VUI.Label state_ = new VUI.Label();
 		private VUI.Label gaze_ = new VUI.Label();
 
-		private VUI.Label breath_ = new VUI.Label();
-		private VUI.Label orgasm_ = new VUI.Label();
+		private VUI.Label voice_ = new VUI.Label();
 		private VUI.Label eyes_ = new VUI.Label();
 		private VUI.Label gazer_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
@@ -65,11 +64,8 @@ namespace Cue
 			state.Add(new VUI.Spacer(20));
 
 
-			state.Add(new VUI.Label("Breathing"));
-			state.Add(breath_);
-
-			state.Add(new VUI.Label("Orgasm"));
-			state.Add(orgasm_);
+			state.Add(new VUI.Label("Voice"));
+			state.Add(voice_);
 
 			state.Add(new VUI.Label("Eyes"));
 			state.Add(eyes_);
@@ -104,8 +100,7 @@ namespace Cue
 			gaze_.Text = person_.Gaze.ToString();
 			anim_.Text = person_.Animator.ToString();
 
-			breath_.Text = person_.Breathing?.ToString() ?? "(null)";
-			orgasm_.Text = person_.Orgasmer?.ToString() ?? "(null)";
+			voice_.Text = person_.Voice?.ToString() ?? "(null)";
 			eyes_.Text = person_.Gaze.Eyes.ToString();
 			gazer_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();

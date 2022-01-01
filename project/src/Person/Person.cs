@@ -38,8 +38,7 @@ namespace Cue
 		private ExpressionManager expression_;
 		private PersonStatus status_;
 
-		private IBreather breathing_;
-		private IOrgasmer orgasmer_;
+		private IVoice voice_;
 		private ISpeaker speech_;
 		private IClothing clothing_;
 
@@ -63,8 +62,7 @@ namespace Cue
 			expression_ = new ExpressionManager(this);
 			status_ = new PersonStatus(this);
 
-			breathing_ = personality_.CreateBreather(this);
-			orgasmer_ = personality_.CreateOrgasmer(this);
+			voice_ = personality_.CreateVoice(this, null);
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
 
@@ -101,7 +99,7 @@ namespace Cue
 				{
 					var p = Resources.Personalities.Clone(po["name"], this);
 					if (p != null)
-						personality_ = p;
+						Personality = p;
 				}
 
 				personality_.Load(po);
@@ -136,8 +134,7 @@ namespace Cue
 		public IAI AI { get { return ai_; } }
 		public IClothing Clothing { get { return clothing_; } }
 
-		public IBreather Breathing { get { return breathing_; } }
-		public IOrgasmer Orgasmer { get { return orgasmer_; } }
+		public IVoice Voice { get { return voice_; } }
 		public ISpeaker Speech { get { return speech_; } }
 
 		public int MovementStyle
@@ -171,11 +168,10 @@ namespace Cue
 				personality_ = value;
 				personality_.Init();
 
-				breathing_?.Destroy();
-				breathing_ = personality_.CreateBreather(this);
+				IVoice old = voice_;
 
-				orgasmer_?.Destroy();
-				orgasmer_ = personality_.CreateOrgasmer(this);
+				voice_?.Destroy();
+				voice_ = personality_.CreateVoice(this, old);
 
 				PersonalityChanged?.Invoke();
 			}
@@ -257,6 +253,14 @@ namespace Cue
 			{
 				if (!IsPlayer && hasBody_)
 					gaze_.Update(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonVoice);
+			{
+				if (!IsPlayer && hasBody_)
+					voice_.Update(s);
 			}
 			I.End();
 

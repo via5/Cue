@@ -4,39 +4,45 @@ using System.Collections.Generic;
 
 namespace Cue.VamMoan
 {
-	public class Breather : IBreather
+	sealed class Voice : IVoice
 	{
 		private const string PluginName = "VAMMoanPlugin.VAMMoan";
 		private const float DefaultBreathingMax = 0.2f;
+		private const float VoiceCheckInterval = 5;
 
 		struct Parameters
 		{
 			public Sys.Vam.BoolParameter autoJaw;
 			public Sys.Vam.StringChooserParameter voice;
+			public Sys.Vam.FloatParameter pitch;
 			public Sys.Vam.ActionParameter breathing;
+			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter[] intensities;
 			public Sys.Vam.FloatParameter availableIntensities;
 			public bool hasAvailableIntensities;
 		}
 
-		private Person person_;
+		private Person person_ = null;
 		private Logger log_;
 		private float intensity_ = 0;
-		private int lastIntensityIndex_ = -1;
-		private string last_ = "";
+		private string lastAction_ = "";
 		private int intensitiesCount_ = -1;
-		private float forcedPitch_ = -1;
 		private Parameters p_;
+		private float voiceCheckElapsed_ = 0;
+		private bool inOrgasm_ = false;
 
+		private string voice_ = "";
+		private float pitch_ = -1;
 		private float breathingMax_ = DefaultBreathingMax;
 		private IEasing intensitiesEasing_ = new LinearEasing();
+		private string orgasmAction_ = "Voice orgasm";
 
 
-		private Breather()
+		private Voice()
 		{
 		}
 
-		public Breather(JSONClass o)
+		public Voice(JSONClass o)
 		{
 			breathingMax_ = U.Clamp(
 				J.OptFloat(o, "breathingMax", DefaultBreathingMax),
@@ -54,18 +60,24 @@ namespace Cue.VamMoan
 						intensitiesEasing_ = e;
 				}
 			}
+
+			J.OptString(o, "orgasmAction", ref orgasmAction_);
 		}
 
-		public IBreather Clone()
+		public IVoice Clone()
 		{
-			var b = new Breather();
+			var b = new Voice();
 			b.CopyFrom(this);
 			return b;
 		}
 
-		private void CopyFrom(Breather b)
+		private void CopyFrom(Voice b)
 		{
+			voice_ = b.voice_;
+			pitch_ = b.pitch_;
 			breathingMax_ = b.breathingMax_;
+			intensitiesEasing_ = b.intensitiesEasing_.Clone();
+			orgasmAction_ = b.orgasmAction_;
 		}
 
 		public void Init(Person p)
@@ -73,14 +85,44 @@ namespace Cue.VamMoan
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "vammoan");
 
+			Cue.Assert(person_ != null);
 			p_.autoJaw = BP("Enable auto-jaw animation");
 			p_.voice = SCP("voice");
-			p_.intensities = GetIntensities();
+			p_.pitch = FP("Voice pitch");
 			p_.breathing = AP("Voice breathing");
+			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
 
+			if (orgasmAction_ != "")
+				p_.orgasm = AP(orgasmAction_);
+
 			CheckVersion();
-			SetVoice("Lia");
+			CheckVoice();
+		}
+
+		public void Update(float s)
+		{
+			voiceCheckElapsed_ += s;
+
+			if (voiceCheckElapsed_ >= VoiceCheckInterval)
+			{
+				voiceCheckElapsed_ = 0;
+				CheckVoice();
+			}
+		}
+
+		public void StartOrgasm()
+		{
+			if (p_.orgasm != null)
+			{
+				inOrgasm_ = true;
+				Fire(p_.orgasm);
+			}
+		}
+
+		public void StopOrgasm()
+		{
+			inOrgasm_ = false;
 		}
 
 		private void CheckVersion()
@@ -126,18 +168,24 @@ namespace Cue.VamMoan
 			return new Sys.Vam.FloatParameter(person_, PluginName, name);
 		}
 
-		private void SetVoice(string name)
+		private void CheckVoice()
 		{
-			p_.voice.Value = name;
+			var v = p_.voice.Value;
 
-			if (p_.hasAvailableIntensities)
+			if (v != voice_)
 			{
-				float c = p_.availableIntensities.Value;
-				intensitiesCount_ = U.Clamp((int)c, 0, p_.intensities.Length);
-			}
-			else
-			{
-				intensitiesCount_ = p_.intensities.Length;
+				if (p_.hasAvailableIntensities)
+				{
+					float c = p_.availableIntensities.Value;
+					intensitiesCount_ = U.Clamp((int)c, 0, p_.intensities.Length);
+				}
+				else
+				{
+					intensitiesCount_ = p_.intensities.Length;
+				}
+
+				SetIntensity(true);
+				voice_ = v;
 			}
 		}
 
@@ -146,14 +194,28 @@ namespace Cue.VamMoan
 			// no-op
 		}
 
-		public float ForcedPitch
+		public float Pitch
 		{
-			get { return forcedPitch_; }
+			get
+			{
+				return pitch_;
+			}
+
+			set
+			{
+				if (pitch_ != value)
+				{
+					pitch_ = value;
+
+					if (p_.pitch != null)
+						p_.pitch.Value = value;
+				}
+			}
 		}
 
-		public void ForcePitch(float f)
+		public Pair<float, float> PitchRange
 		{
-			// todo
+			get { return new Pair<float, float>(0.8f, 1.2f); }
 		}
 
 		public bool MouthEnabled
@@ -172,42 +234,76 @@ namespace Cue.VamMoan
 			set
 			{
 				intensity_ = value;
-				SetIntensity(intensity_);
+				SetIntensity();
 			}
 		}
 
-		private void SetIntensity(float i)
+		public string[] AvailableVoices
 		{
-			if (i >= 0 && i <= breathingMax_)
+			get { return p_.voice.Choices; }
+		}
+
+		public string Name
+		{
+			get
 			{
-				log_.Info($"setting to breathing");
-				last_ = "breathing";
-				p_.breathing.Fire();
+				return voice_;
+			}
+
+			set
+			{
+				if (value != voice_)
+				{
+					voice_ = value;
+
+					if (p_.voice != null)
+					{
+						p_.voice.Value = value;
+						CheckVoice();
+					}
+				}
+			}
+		}
+
+		private void SetIntensity(bool force = false)
+		{
+			if (inOrgasm_)
+				return;
+
+			if (intensity_ >= 0 && intensity_ <= breathingMax_)
+			{
+				Fire(p_.breathing, force);
 			}
 			else
 			{
 				float range = 1 - breathingMax_;
-				float v = i - breathingMax_;
+				float v = intensity_ - breathingMax_;
 				float p = intensitiesEasing_.Magnitude(v / range);
 
 				int index = (int)(p * intensitiesCount_);
 				index = U.Clamp(index, 0, intensitiesCount_ - 1);
 
-				if (index != lastIntensityIndex_)
-				{
-					log_.Info($"setting to intensity {p_.intensities[index].ParameterName}");
-					last_ = $"{index}/{intensitiesCount_ - 1}";
-					p_.intensities[index].Fire();
-					lastIntensityIndex_ = index;
-				}
+				Fire(p_.intensities[index], force);
+			}
+		}
+
+		private void Fire(Sys.Vam.ActionParameter a, bool force = false)
+		{
+			var n = a.ParameterName;
+
+			if (lastAction_ != n || force)
+			{
+				lastAction_ = n;
+				log_.Info($"setting to '{n}'");
+				a.Fire();
 			}
 		}
 
 		public override string ToString()
 		{
 			return
-				$"VAMMoan " +
-				$"i={last_} " +
+				$"VAMMoan v={voice_} " +
+				$"i={lastAction_} " +
 				$"bm={breathingMax_}";
 		}
 	}

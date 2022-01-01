@@ -265,8 +265,7 @@ namespace Cue
 		private Expression[] exps_ = new Expression[0];
 		private Sensitivities sensitivities_;
 		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
-		private IBreather breatherProto_ = null;
-		private IOrgasmer orgasmerProto_ = null;
+		private IVoice voiceProto_ = null;
 
 		public Personality(string name)
 			: base(new PS())
@@ -305,8 +304,7 @@ namespace Cue
 			foreach (var kv in ps.events_)
 				events_[kv.Key] = kv.Value.Clone();
 
-			breatherProto_ = ps.breatherProto_?.Clone();
-			orgasmerProto_ = ps.orgasmerProto_?.Clone();
+			voiceProto_ = ps.voiceProto_?.Clone();
 		}
 
 		public void Init()
@@ -324,14 +322,9 @@ namespace Cue
 			events_[name] = d;
 		}
 
-		public void SetBreather(IBreather b)
+		public void SetVoice(IVoice v)
 		{
-			breatherProto_ = b;
-		}
-
-		public void SetOrgasmer(IOrgasmer o)
-		{
-			orgasmerProto_ = o;
+			voiceProto_ = v;
 		}
 
 		public IEventData CloneEventData(string name)
@@ -353,10 +346,22 @@ namespace Cue
 				{
 					float fp = vo["pitch"].AsFloat;
 
-					breatherProto_?.ForcePitch(fp);
-					person_.Breathing?.ForcePitch(fp);
-					person_.Orgasmer?.ForcePitch(fp);
-					orgasmerProto_?.ForcePitch(fp);
+					if (voiceProto_ != null)
+						voiceProto_.Pitch = fp;
+
+					if (person_.Voice != null)
+						person_.Voice.Pitch = fp;
+				}
+
+				if (vo.HasKey("name"))
+				{
+					string name = vo["name"].Value;
+
+					if (voiceProto_ != null)
+						voiceProto_.Name = name;
+
+					if (person_.Voice != null)
+						person_.Voice.Name = name;
 				}
 			}
 		}
@@ -368,12 +373,10 @@ namespace Cue
 			if (name_ != Resources.DefaultPersonality)
 				o.Add("name", name_);
 
-			if (person_.Breathing.ForcedPitch >= 0)
-			{
-				var v = new JSONClass();
-				v.Add("pitch", new JSONData(person_.Breathing.ForcedPitch));
-				o.Add("voice", v);
-			}
+			var v = new JSONClass();
+			v.Add("pitch", new JSONData(person_.Voice.Pitch));
+			v.Add("name", person_.Voice.Name);
+			o.Add("voice", v);
 
 			return o;
 		}
@@ -395,23 +398,20 @@ namespace Cue
 			return e;
 		}
 
-		public IBreather CreateBreather(Person p)
+		public IVoice CreateVoice(Person p, IVoice old)
 		{
-			if (breatherProto_ == null)
+			if (voiceProto_ == null)
 				return null;
 
-			var b = breatherProto_.Clone();
+			var b = voiceProto_.Clone();
 			b.Init(p);
-			return b;
-		}
 
-		public IOrgasmer CreateOrgasmer(Person p)
-		{
-			if (orgasmerProto_ == null)
-				return null;
+			if (old != null)
+			{
+				b.Name = old.Name;
+				b.Pitch = old.Pitch;
+			}
 
-			var b = orgasmerProto_.Clone();
-			b.Init(p);
 			return b;
 		}
 

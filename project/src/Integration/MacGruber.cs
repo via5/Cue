@@ -29,10 +29,7 @@ namespace Cue.MacGruber
 		public float GetPitch(Person p)
 		{
 			if (pitch_ < 0)
-			{
-				float scale = p.Atom.Scale;
-				SetPitch(0.5f + (1 - scale));
-			}
+				pitch_ = 0.5f;
 
 			return pitch_;
 		}
@@ -65,7 +62,7 @@ namespace Cue.MacGruber
 	}
 
 
-	class Breather : IBreather
+	sealed class Voice : IVoice
 	{
 		struct Pair
 		{
@@ -89,6 +86,9 @@ namespace Cue.MacGruber
 			public Sys.Vam.FloatParameter vrVolume;
 			public Sys.Vam.FloatParameter pitch;
 
+			public Sys.Vam.ActionParameter orgasmAction;
+			public Sys.Vam.StringChooserParameter orgasmDataset;
+
 			public Pair chestMorph, chestJointDrive, stomach, mouthMorph;
 			public Sys.Vam.FloatParameter chestJointDriveSpring;
 			public Sys.Vam.FloatParameter mouthOpenTime, mouthCloseTime;
@@ -101,6 +101,7 @@ namespace Cue.MacGruber
 		private Logger log_ = new Logger(Logger.Integration, "mg.breather");
 
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
+		private Dataset orgasmDataset_ = new Dataset("", -1);
 		private Dataset dummy_ = new Dataset("", -1);
 		private bool warned_ = false;
 		private float forcedPitch_ = -1;
@@ -108,11 +109,11 @@ namespace Cue.MacGruber
 		private Parameters p_ = new Parameters();
 		private bool mouthEnabled_ = true;
 
-		private Breather()
+		private Voice()
 		{
 		}
 
-		public Breather(JSONClass options)
+		public Voice(JSONClass options)
 		{
 			if (!options.HasKey("datasets"))
 				throw new LoadFailed("mg missing datasets");
@@ -132,21 +133,31 @@ namespace Cue.MacGruber
 			}
 
 			datasets_ = dss.ToArray();
+
+			if (!options.HasKey("orgasm"))
+				throw new LoadFailed("mg missing orgasm");
+
+			var od = options["orgasm"].AsObject;
+
+			orgasmDataset_ = new Dataset(
+				J.ReqString(od, "dataset"),
+				J.ReqFloat(od, "pitch"));
 		}
 
-		public IBreather Clone()
+		public IVoice Clone()
 		{
-			var b = new Breather();
+			var b = new Voice();
 			b.CopyFrom(this);
 			return b;
 		}
 
-		private void CopyFrom(Breather v)
+		private void CopyFrom(Voice v)
 		{
 			forcedPitch_ = v.forcedPitch_;
 			datasets_ = new DatasetForIntensity[v.datasets_.Length];
 			for (int i = 0; i < datasets_.Length; ++i)
 				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
+			orgasmDataset_ = new Dataset(v.orgasmDataset_);
 		}
 
 		public void Init(Person p)
@@ -175,10 +186,35 @@ namespace Cue.MacGruber
 			p_.lipsMorphMax = DBF("LipsMorph Max");
 			p_.noseInMorphMax = DBF("NoseInMorph Max");
 			p_.noseOutMorphMax = DBF("NoseOutMorph Max");
+			p_.orgasmAction = BA("QueueOrgasm");
+			p_.orgasmDataset = BSC("Orgasm Dataset");
 
 			p_.vrVolume.Value = p_.desktopVolume.Value;
 
 			Apply();
+		}
+
+		public void Update(float s)
+		{
+			// no-op
+		}
+
+		public void StartOrgasm()
+		{
+			var ds = orgasmDataset_;
+
+			if (ds.Name != "")
+			{
+				p_.orgasmDataset.Value = ds.Name;
+				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
+
+				p_.orgasmAction.Fire();
+			}
+		}
+
+		public void StopOrgasm()
+		{
+			// no-op
 		}
 
 		private Sys.Vam.FloatParameter DBF(string name)
@@ -205,6 +241,12 @@ namespace Cue.MacGruber
 		private Sys.Vam.FloatParameter BF(string name)
 		{
 			return new Sys.Vam.FloatParameter(
+				person_, "MacGruber.Breathing", name);
+		}
+
+		private Sys.Vam.ActionParameter BA(string name)
+		{
+			return new Sys.Vam.ActionParameter(
 				person_, "MacGruber.Breathing", name);
 		}
 
@@ -248,22 +290,41 @@ namespace Cue.MacGruber
 			}
 		}
 
+		public string[] AvailableVoices
+		{
+			get { return new string[0]; }
+		}
+
+		public string Name
+		{
+			get { return ""; }
+			set { }
+		}
+
 		public void Destroy()
 		{
 			// no-op
 		}
 
-		public void ForcePitch(float f)
+		public float Pitch
 		{
-			forcedPitch_ = f;
+			get
+			{
+				return forcedPitch_;
+			}
 
-			foreach (var d in datasets_)
-				d.dataset.SetPitch(f);
+			set
+			{
+				forcedPitch_ = value;
+
+				foreach (var d in datasets_)
+					d.dataset.SetPitch(value);
+			}
 		}
 
-		public float ForcedPitch
+		public Pair<float, float> PitchRange
 		{
-			get { return forcedPitch_; }
+			get { return new Pair<float, float>(0, 1); }
 		}
 
 		private Dataset GetDatasetForIntensity(float e)
@@ -331,94 +392,6 @@ namespace Cue.MacGruber
 				s += $"forcedPitch={forcedPitch_:0.00}";
 			else
 				s += $"pitch={p_.pitch.Value:0.00}";
-
-			return s;
-		}
-	}
-
-
-	class Orgasmer : IOrgasmer
-	{
-		private Person person_ = null;
-		private Dataset orgasm_ = new Dataset("", -1);
-		private float forcedPitch_ = -1;
-
-		private Sys.Vam.ActionParameter action_;
-		private Sys.Vam.StringChooserParameter orgasmDataset_;
-		private Sys.Vam.FloatParameter pitch_;
-
-		private Orgasmer()
-		{
-		}
-
-		public Orgasmer(JSONClass options)
-		{
-			orgasm_ = new Dataset(
-				J.ReqString(options, "dataset"),
-				J.ReqFloat(options, "pitch"));
-		}
-
-		public IOrgasmer Clone()
-		{
-			var o = new Orgasmer();
-			o.CopyFrom(this);
-			return o;
-		}
-
-		private void CopyFrom(Orgasmer v)
-		{
-			forcedPitch_ = v.forcedPitch_;
-			orgasm_ = new Dataset(v.orgasm_);
-		}
-
-		public void Init(Person p)
-		{
-			person_ = p;
-			action_ = new Sys.Vam.ActionParameter(
-				p, "MacGruber.Breathing", "QueueOrgasm");
-			orgasmDataset_ = new Sys.Vam.StringChooserParameter(
-				p, "MacGruber.Breathing", "Orgasm Dataset");
-			pitch_ = new Sys.Vam.FloatParameter(
-				p, "MacGruber.Breathing", "Pitch");
-		}
-
-		public void Destroy()
-		{
-			// no-op
-		}
-
-		public void ForcePitch(float f)
-		{
-			forcedPitch_ = f;
-			orgasm_.SetPitch(f);
-		}
-
-		public float ForcedPitch
-		{
-			get { return forcedPitch_; }
-		}
-
-		public void Orgasm()
-		{
-			var ds = orgasm_;
-
-			if (ds.Name != "")
-			{
-				orgasmDataset_.Value = ds.Name;
-				pitch_.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
-
-				action_.Fire();
-			}
-		}
-
-		public override string ToString()
-		{
-			string s = $"MacGruber: ";
-
-			if (forcedPitch_ >= 0)
-				s += $"forcedPitch={forcedPitch_:0.00}";
-			else
-				s += $"pitch={pitch_.Value:0.00}";
 
 			return s;
 		}

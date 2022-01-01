@@ -247,7 +247,7 @@ namespace Cue.Sys.Vam
 
 				if (TimeToCheck(now, force))
 				{
-					if (GetParameter())
+					if (atom_ != null && GetParameter())
 					{
 						stale_ = false;
 						backoff_ = 0;
@@ -709,6 +709,18 @@ namespace Cue.Sys.Vam
 		public StringChooserParameter(IAtom a, string s, string name)
 			: base(a, s, name)
 		{
+		}
+
+		public string[] Choices
+		{
+			get
+			{
+				var p = Parameter;
+				if (p == null)
+					return new string[0];
+
+				return p.choices.ToArray();
+			}
 		}
 
 		protected override JSONStorableStringChooser DoGetParameter()

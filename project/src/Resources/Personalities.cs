@@ -119,8 +119,7 @@ namespace Cue
 
 
 			Resources.LoadEnumValues(p, o, inherited);
-			ParseBreathing(p, o, inherited);
-			ParseOrgasmer(p, o, inherited);
+			ParseVoice(p, o, inherited);
 			ParseSensitivities(p.Sensitivities, o, inherited);
 			ParseEvents(p, o, inherited);
 
@@ -160,45 +159,23 @@ namespace Cue
 			return p;
 		}
 
-		private void ParseBreathing(Personality p, JSONClass o, bool inherited)
+		private void ParseVoice(Personality p, JSONClass o, bool inherited)
 		{
-			if (o.HasKey("breathing"))
+			if (o.HasKey("voice"))
 			{
-				var provider = o["breathing"]["provider"].Value;
-				var options = o["breathing"]["options"].AsObject;
+				var provider = o["voice"]["provider"].Value;
+				var options = o["voice"]["options"].AsObject;
 
-				IBreather b = Integration.CreateBreather(provider, options);
+				IVoice v = Integration.CreateVoice(provider, options);
+				if (v == null)
+					throw new LoadFailed($"unknown voice provider '{provider}'");
 
-				if (b == null)
-					throw new LoadFailed($"unknown breather provider '{provider}'");
-
-				p.SetBreather(b);
+				p.SetVoice(v);
 			}
 			else
 			{
 				if (!inherited)
-					throw new LoadFailed("missing breathing");
-			}
-		}
-
-		private void ParseOrgasmer(Personality p, JSONClass o, bool inherited)
-		{
-			if (o.HasKey("orgasm"))
-			{
-				var provider = o["orgasm"]["provider"].Value;
-				var options = o["orgasm"]["options"].AsObject;
-
-				IOrgasmer b = Integration.CreateOrgasmer(provider, options);
-
-				if (b == null)
-					throw new LoadFailed($"unknown orgasm provider '{provider}'");
-
-				p.SetOrgasmer(b);
-			}
-			else
-			{
-				if (!inherited)
-					throw new LoadFailed("missing orgasm");
+					throw new LoadFailed("missing voice");
 			}
 		}
 

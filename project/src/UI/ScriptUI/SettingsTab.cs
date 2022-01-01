@@ -35,6 +35,7 @@ namespace Cue
 	{
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
+		private VUI.ComboBox<string> voice_ = new VUI.ComboBox<string>();
 		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
@@ -52,17 +53,21 @@ namespace Cue
 			p.Add(new VUI.Label("Personality"));
 			p.Add(personality_);
 
+			p.Add(new VUI.Label("Voice"));
+			p.Add(voice_);
+
 			p.Add(new VUI.Label("Voice pitch"));
 			p.Add(voicePitch_);
 
-			p.Add(new VUI.Label("Traits"));
-			p.Add(traits_);
+			//p.Add(new VUI.Label("Traits"));
+			//p.Add(traits_);
 
 			Layout = new VUI.VerticalFlow(20);
 			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
 			Add(p);
 
 			personality_.SelectionChanged += OnPersonality;
+			voice_.SelectionChanged += OnVoice;
 			voicePitch_.ValueChanged += OnVoicePitch;
 			traits_.Edited += OnTraits;
 
@@ -71,12 +76,6 @@ namespace Cue
 			try
 			{
 				ignore_ = true;
-
-				if (person.Breathing.ForcedPitch >= 0)
-					voicePitch_.Set(person.Breathing.ForcedPitch, 0, 1);
-				else
-					voicePitch_.Set(0.5f, 0, 1);
-
 				traits_.Text = string.Join(" ", person_.Traits);
 			}
 			finally
@@ -101,10 +100,15 @@ namespace Cue
 				else
 					SelectPersonality(person_.Personality.Name);
 
-				if (person_.Breathing.ForcedPitch >= 0)
-					voicePitch_.Set(person_.Breathing.ForcedPitch, 0, 1);
+				if (voice_.Count == 0)
+					RebuildVoices();
 				else
-					voicePitch_.Set(0.5f, 0, 1);
+					SelectVoice(person_.Voice.Name);
+
+				voicePitch_.Set(
+					person_.Voice.Pitch,
+					person_.Voice.PitchRange.first,
+					person_.Voice.PitchRange.second);
 			}
 			finally
 			{
@@ -150,17 +154,39 @@ namespace Cue
 
 			if (item.Personality.Name != person_.Personality.Name)
 			{
-				var oldPitch = person_.Breathing.ForcedPitch;
-
 				person_.Personality = Resources.Personalities.Clone(
 					item.Personality.Name, person_);
 
-				if (oldPitch >= 0)
-				{
-					person_.Breathing.ForcePitch(oldPitch);
-					person_.Orgasmer.ForcePitch(oldPitch);
-				}
+				Cue.Instance.Save();
+			}
+		}
 
+		private void RebuildVoices()
+		{
+			var names = person_.Voice.AvailableVoices;
+
+			if (names.Length == 0)
+			{
+				voice_.Enabled = false;
+				return;
+			}
+
+			voice_.Enabled = true;
+			voice_.SetItems(names, person_.Voice.Name);
+		}
+
+		private void SelectVoice(string name)
+		{
+			voice_.Select(name);
+		}
+
+		private void OnVoice(string name)
+		{
+			if (ignore_) return;
+
+			if (name != person_.Voice.Name)
+			{
+				person_.Voice.Name = name;
 				Cue.Instance.Save();
 			}
 		}
@@ -169,9 +195,7 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			person_.Breathing.ForcePitch(f);
-			person_.Orgasmer.ForcePitch(f);
-
+			person_.Voice.Pitch = f;
 			Cue.Instance.Save();
 		}
 
