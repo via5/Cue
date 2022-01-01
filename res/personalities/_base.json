@@ -7,9 +7,22 @@
 		"provider": "vammoan",
 		"options":
 		{
-			"breathingMax": 0.2,
-			"intensitiesEasing": "linear",
-			"orgasmAction": "Voice orgasm"
+			"breathingMax": 0.1,
+			"orgasmAction": "Voice orgasm",
+			"intensityWait":
+			{
+				"range": [0, 3],
+			},
+			"intensityTarget":
+			{
+				"rng":
+				{
+					"type": "normal",
+					"centerMin": 0,
+					"centerMax": 0.8,
+					"width": 3
+				}
+			}
 		}
 	},
 

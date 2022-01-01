@@ -99,6 +99,7 @@ namespace Cue.MacGruber
 
 		private Person person_ = null;
 		private Logger log_ = new Logger(Logger.Integration, "mg.breather");
+		private List<string> debug_ = null;
 
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
 		private Dataset orgasmDataset_ = new Dataset("", -1);
@@ -235,6 +236,17 @@ namespace Cue.MacGruber
 		public void StopOrgasm()
 		{
 			// no-op
+		}
+
+		public string[] Debug()
+		{
+			if (debug_ == null)
+				debug_ = new List<string>();
+
+			debug_.Clear();
+			debug_.Add("macgruber");
+
+			return debug_.ToArray();
 		}
 
 		private Sys.Vam.FloatParameter DBF(string name)

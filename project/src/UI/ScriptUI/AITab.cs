@@ -225,7 +225,6 @@ namespace Cue
 	class PersonAIExcitementTab : Tab
 	{
 		private Person person_;
-
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 
 		public PersonAIExcitementTab(Person p)

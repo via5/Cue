@@ -60,6 +60,8 @@ namespace Cue
 		void StartOrgasm();
 		void StopOrgasm();
 
+		string[] Debug();
+
 		float Pitch { get; set; }
 
 		bool MouthEnabled { get; set; }

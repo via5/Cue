@@ -12,6 +12,7 @@ namespace Cue
 			person_ = person;
 
 			AddSubTab(new PersonBodyStateTab(person_));
+			AddSubTab(new PersonBodyVoiceTab(person_));
 			AddSubTab(new PersonBodyPartsTab(person_));
 			AddSubTab(new PersonBodyFingersTab(person_));
 			AddSubTab(new PersonBodyLocksTab(person_));
@@ -76,6 +77,30 @@ namespace Cue
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
+		}
+	}
+
+
+	class PersonBodyVoiceTab : Tab
+	{
+		private Person person_;
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+
+		public PersonBodyVoiceTab(Person person)
+			: base("Voice", false)
+		{
+			person_ = person;
+
+			Layout = new VUI.BorderLayout();
+			Add(list_, VUI.BorderLayout.Center);
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			list_.SetItems(person_.Voice.Debug());
 		}
 	}
 

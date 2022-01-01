@@ -140,31 +140,57 @@ namespace Cue
 		public new static NormalRandom FromJSON(JSONClass o)
 		{
 			float centerMin = 0.5f;
-			if (o.HasKey("centerMin"))
-			{
-				if (!float.TryParse(o["centerMin"].Value, out centerMin))
-					throw new LoadFailed($"centerMin is not a float");
-			}
-
 			float centerMax = 0.5f;
-			if (o.HasKey("centerMax"))
+
+			if (o.HasKey("center"))
 			{
-				if (!float.TryParse(o["centerMax"].Value, out centerMax))
-					throw new LoadFailed($"centerMax is not a float");
+				float c;
+				if (!float.TryParse(o["center"].Value, out c))
+					throw new LoadFailed($"center is not a float");
+
+				centerMin = c;
+				centerMax = c;
+			}
+			else
+			{
+				if (o.HasKey("centerMin"))
+				{
+					if (!float.TryParse(o["centerMin"].Value, out centerMin))
+						throw new LoadFailed($"centerMin is not a float");
+				}
+
+				if (o.HasKey("centerMax"))
+				{
+					if (!float.TryParse(o["centerMax"].Value, out centerMax))
+						throw new LoadFailed($"centerMax is not a float");
+				}
 			}
 
 			float widthMin = 1.0f;
-			if (o.HasKey("widthMin"))
-			{
-				if (!float.TryParse(o["widthMin"].Value, out widthMin))
-					throw new LoadFailed($"widthMin is not a float");
-			}
-
 			float widthMax = 1.0f;
-			if (o.HasKey("widthMax"))
+
+			if (o.HasKey("width"))
 			{
-				if (!float.TryParse(o["widthMax"].Value, out widthMax))
-					throw new LoadFailed($"widthMax is not a float");
+				float w;
+				if (!float.TryParse(o["width"].Value, out w))
+					throw new LoadFailed($"width is not a float");
+
+				widthMin = w;
+				widthMax = w;
+			}
+			else
+			{
+				if (o.HasKey("widthMin"))
+				{
+					if (!float.TryParse(o["widthMin"].Value, out widthMin))
+						throw new LoadFailed($"widthMin is not a float");
+				}
+
+				if (o.HasKey("widthMax"))
+				{
+					if (!float.TryParse(o["widthMax"].Value, out widthMax))
+						throw new LoadFailed($"widthMax is not a float");
+				}
 			}
 
 			return new NormalRandom(centerMin, centerMax, widthMin, widthMax);

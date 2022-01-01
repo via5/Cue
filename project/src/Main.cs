@@ -49,6 +49,9 @@ namespace Cue
 			float deltaTime = 0;
 			long last = 0;
 
+			var r = new NormalRandom(0, 0.8f, 3, 3);
+			NormalTest(r, 0, 0.36f, 0.36f);
+
 			for (; ; )
 			{
 				var now = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -67,6 +70,102 @@ namespace Cue
 				sys_.Tick();
 				last = now;
 			}
+		}
+
+		private void TestIntensities()
+		{
+			for (int i = 0; i < 10; ++i)
+			{
+				float intensity_ = (i + 1) / 10.0f;
+				Console.WriteLine($"intensity: {intensity_}");
+				TestIntensity(intensity_);
+			}
+
+			for (; ;)
+			{
+				Console.Write("intensity: ");
+				float intensity_ = float.Parse(Console.ReadLine());
+				TestIntensity(intensity_);
+			}
+		}
+
+		private void TestIntensity(float i)
+		{
+			float breathingMax_ = 0.2f;
+			float min = 0;
+			float breathingCutoff = 1;
+
+			if (i >= breathingCutoff)
+				min = breathingMax_ + 0.01f;
+			else
+				min = 0;
+
+			float max = i;
+			float center = U.Clamp(min + (max - min) * 0.8f, 0, 1);
+
+			NormalTest(min, max, center, 3);
+		}
+
+		private void NormalTest(float min, float max, float center, float width)
+		{
+			int bucketCount = 10;
+			float bucketSize = 1.0f / bucketCount;
+			int n = 1000;
+
+			int[] buckets = new int[bucketCount];
+
+			for (int i = 0; i < n; ++i)
+			{
+				float f = U.RandomNormal(min, max, center, width);
+				bool okay = false;
+
+				for (int b = 0; b < bucketCount; ++b)
+				{
+					if (f <= (bucketSize * (b + 1)))
+					{
+						++buckets[b];
+						okay = true;
+						break;
+					}
+				}
+
+				if (!okay)
+					Console.WriteLine($"!! {f}");
+			}
+
+			for (int i = 0; i < buckets.Length; ++i)
+				Console.WriteLine($"{i}  {buckets[i]}");
+		}
+
+		private void NormalTest(NormalRandom r, float first, float last, float mag)
+		{
+			int bucketCount = 10;
+			float bucketSize = 1.0f / bucketCount;
+			int n = 1000;
+
+			int[] buckets = new int[bucketCount];
+
+			for (int i = 0; i < n; ++i)
+			{
+				float f = r.RandomFloat(first, last, mag);
+				bool okay = false;
+
+				for (int b = 0; b < bucketCount; ++b)
+				{
+					if (f <= (bucketSize * (b + 1)))
+					{
+						++buckets[b];
+						okay = true;
+						break;
+					}
+				}
+
+				if (!okay)
+					Console.WriteLine($"!! {f}");
+			}
+
+			for (int i = 0; i < buckets.Length; ++i)
+				Console.WriteLine($"{i}  {buckets[i]}");
 		}
 
 		public static void Main()

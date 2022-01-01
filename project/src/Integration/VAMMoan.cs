@@ -26,7 +26,10 @@ namespace Cue.VamMoan
 
 		private Person person_ = null;
 		private Logger log_;
-		private float intensity_ = 0;
+		private List<string[]> debug_ = null;
+		private List<string> debugLines_ = null;
+
+		private float maxIntensity_ = 0;
 		private string lastAction_ = "";
 		private int intensitiesCount_ = -1;
 		private Parameters p_;
@@ -37,9 +40,15 @@ namespace Cue.VamMoan
 		private string voice_ = "";
 		private float pitch_ = -1;
 		private float breathingMax_ = DefaultBreathingMax;
-		private IEasing intensitiesEasing_ = new LinearEasing();
 		private string orgasmAction_ = "Voice orgasm";
 
+		private float intensity_ = 0;
+		private float intensityTarget_ = 0;
+		private float intensityWait_ = 0;
+
+		private Pair<float, float> intensityWaitRange_ = new Pair<float, float>(0, 0);
+		private IRandom intensityWaitRng_ = new UniformRandom();
+		private IRandom intensityTargetRng_ = new UniformRandom();
 
 		private Voice()
 		{
@@ -51,20 +60,40 @@ namespace Cue.VamMoan
 				J.OptFloat(o, "breathingMax", DefaultBreathingMax),
 				0, 1);
 
-			if (o.HasKey("intensitiesEasing"))
+			J.OptString(o, "orgasmAction", ref orgasmAction_);
+
+			if (o.HasKey("intensityWait"))
 			{
-				var en = o["intensitiesEasing"].Value;
-				if (en != "")
+				var wt = o["intensityWait"].AsObject;
+
+				if (!wt.HasKey("range"))
+					throw new LoadFailed("intensityWait missing range");
+
+				var a = wt["range"].AsArray;
+				if (a.Count != 2)
+					throw new LoadFailed("bad intensityWait range");
+
+				intensityWaitRange_.first = a[0].AsFloat;
+				intensityWaitRange_.second = a[1].AsFloat;
+
+				if (wt.HasKey("rng"))
 				{
-					var e = EasingFactory.FromString(en);
-					if (e == null)
-						log_.Error($"bad intensitiesEasing '{en}'");
-					else
-						intensitiesEasing_ = e;
+					intensityWaitRng_ = BasicRandom.FromJSON(wt["rng"].AsObject);
+					if (intensityWaitRng_ == null)
+						throw new LoadFailed("bad intensityWait rng");
 				}
 			}
 
-			J.OptString(o, "orgasmAction", ref orgasmAction_);
+			if (o.HasKey("intensityTarget"))
+			{
+				var ot = o["intensityTarget"].AsObject;
+				if (!ot.HasKey("rng"))
+					throw new LoadFailed("intensityTarget missing rng");
+
+				intensityTargetRng_ = BasicRandom.FromJSON(ot["rng"].AsObject);
+				if (intensityTargetRng_ == null)
+					throw new LoadFailed("bad intensityTarget rng");
+			}
 		}
 
 		public IVoice Clone()
@@ -79,8 +108,10 @@ namespace Cue.VamMoan
 			voice_ = b.voice_;
 			pitch_ = b.pitch_;
 			breathingMax_ = b.breathingMax_;
-			intensitiesEasing_ = b.intensitiesEasing_.Clone();
 			orgasmAction_ = b.orgasmAction_;
+			intensityWaitRange_ = b.intensityWaitRange_;
+			intensityWaitRng_ = b.intensityWaitRng_.Clone();
+			intensityTargetRng_ = b.intensityTargetRng_.Clone();
 		}
 
 		public void Init(Person p)
@@ -123,6 +154,7 @@ namespace Cue.VamMoan
 				CheckVoice();
 			}
 
+			UpdateIntensity(s);
 
 			// the orgasm action is special because it will prevent another
 			// intensity from being set while running, and so the time after
@@ -139,6 +171,39 @@ namespace Cue.VamMoan
 			}
 		}
 
+		private void UpdateIntensity(float s)
+		{
+			if (intensityWait_ > 0)
+			{
+				intensityWait_ -= s;
+				if (intensityWait_ < 0)
+					intensityWait_ = 0;
+			}
+			else if (Math.Abs(intensity_ - intensityTarget_) < 0.001f)
+			{
+				intensity_ = intensityTarget_;
+
+				intensityWait_ = intensityWaitRng_.RandomFloat(
+					intensityWaitRange_.first, intensityWaitRange_.second,
+					maxIntensity_);
+
+				intensityTarget_ = intensityTargetRng_.RandomFloat(
+					0, maxIntensity_, maxIntensity_);
+			}
+			else if (intensity_ > intensityTarget_)
+			{
+				intensity_ -= 0.1f * s;
+				if (intensity_ < intensityTarget_)
+					intensity_ = intensityTarget_;
+			}
+			else
+			{
+				intensity_ += 0.1f * s;
+				if (intensity_ > intensityTarget_)
+					intensity_ = intensityTarget_;
+			}
+		}
+
 		public void StartOrgasm()
 		{
 			if (p_.orgasm != null)
@@ -151,6 +216,66 @@ namespace Cue.VamMoan
 		public void StopOrgasm()
 		{
 			inOrgasm_ = false;
+		}
+
+		public string[] Debug()
+		{
+			if (debug_ == null)
+				debug_ = new List<string[]>();
+
+			if (debugLines_ == null)
+				debugLines_ = new List<string>();
+
+			int i = 0;
+
+			Action<string, string> A = (a, b) =>
+			{
+				if (i >= debug_.Count)
+					debug_.Add(new string[2]);
+
+				debug_[i][0] = a;
+				debug_[i][1] = b;
+
+				++i;
+			};
+
+			A("provider", "vammoan");
+			A("voice", voice_);
+			A("intensitiesCount", $"{intensitiesCount_}");
+			A("pitch", $"{pitch_:0.00}");
+			A("breathingMax", $"{breathingMax_:0.00}");
+			A("orgasmAction", orgasmAction_);
+			A("", "");
+			A("maxIntensity", $"{maxIntensity_:0.00}");
+			A("intensity", $"{intensity_:0.00}");
+			A("intensityTarget", $"{intensityTarget_:0.00}");
+			A("intensityWait", $"{intensityWait_:0.00}");
+			A("lastAction", lastAction_);
+			A("inOrgasm", $"{inOrgasm_}");
+			A("", "");
+			A("intensityWaitrange", $"{intensityWaitRange_.first:0.00},{intensityWaitRange_.second:0.00}");
+			A("intensityWaitRng", $"{intensityWaitRng_}");
+			A("intensityTargetRng", $"{intensityTargetRng_}");
+
+
+			MakeDebugLines();
+			return debugLines_.ToArray();
+		}
+
+		private void MakeDebugLines()
+		{
+			int longest = 0;
+			for (int i = 0; i < debug_.Count; ++i)
+				longest = Math.Max(longest, debug_[i][0].Length);
+
+			for (int i = 0; i < debug_.Count; ++i)
+			{
+				string s = debug_[i][0].PadRight(longest, ' ') + "  " + debug_[i][1];
+				if (i >= debugLines_.Count)
+					debugLines_.Add(s);
+				else
+					debugLines_[i] = s;
+			}
 		}
 
 		private void CheckVersion()
@@ -257,12 +382,12 @@ namespace Cue.VamMoan
 		{
 			get
 			{
-				return intensity_;
+				return maxIntensity_;
 			}
 
 			set
 			{
-				intensity_ = value;
+				maxIntensity_ = value;
 				SetIntensity();
 			}
 		}
@@ -307,7 +432,7 @@ namespace Cue.VamMoan
 			{
 				float range = 1 - breathingMax_;
 				float v = intensity_ - breathingMax_;
-				float p = intensitiesEasing_.Magnitude(v / range);
+				float p = (v / range);
 
 				int index = (int)(p * intensitiesCount_);
 				index = U.Clamp(index, 0, intensitiesCount_ - 1);
