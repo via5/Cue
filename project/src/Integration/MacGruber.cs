@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SimpleJSON;
 
-namespace Cue.MG
+namespace Cue.MacGruber
 {
 	public class Dataset
 	{

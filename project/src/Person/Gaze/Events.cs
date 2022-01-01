@@ -434,7 +434,7 @@ namespace Cue
 				eyes.Set(ps.Get(PS.PenetratedEyesWeight), "penetrated");
 
 				// todo
-				if (t.Gaze.Gazer is MG.Gaze)
+				if (t.Gaze.Gazer is MacGruber.Gaze)
 				{
 					otherChest.Set(
 						ps.Get(PS.PenetratedGenitalsWeight),
@@ -454,7 +454,7 @@ namespace Cue
 				eyes.Set(ps.Get(PS.PenetratingEyesWeight), "penetrating");
 
 				// todo
-				if (t.Gaze.Gazer is MG.Gaze)
+				if (t.Gaze.Gazer is MacGruber.Gaze)
 				{
 					otherChest.Set(
 						ps.Get(PS.PenetratingGenitalsWeight),

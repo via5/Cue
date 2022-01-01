@@ -4,32 +4,18 @@
 
 	"breathing":
 	{
-		"provider": "mg",
+		"provider": "vammoan",
 		"options":
 		{
-			"datasets":
-			[
-				{
-					"dataset": "Candy Nose",
-					"intensityMin": 0,
-					"intensityMax": 0.2,
-					"pitch": -1,
-				},
-
-				{
-					"dataset": "Original",
-					"intensityMin": 0.2,
-					"intensityMax": 1,
-					"pitch": -1,
-				}
-			]
+			"breathingMax": 0.2,
+			"intensitiesEasing": "linear"
 		}
 	},
 
 
 	"orgasm":
 	{
-		"provider": "mg",
+		"provider": "macgruber",
 		"options":
 		{
 			"dataset": "Candy Orgasm Soft",

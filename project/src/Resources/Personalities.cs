@@ -167,13 +167,9 @@ namespace Cue
 				var provider = o["breathing"]["provider"].Value;
 				var options = o["breathing"]["options"].AsObject;
 
-				IBreather b;
+				IBreather b = Integration.CreateBreather(provider, options);
 
-				if (provider == "mg")
-					b = new MG.Breather(options);
-				else if (provider == "vammoan")
-					b = new VAMMoanBreather(options);
-				else
+				if (b == null)
 					throw new LoadFailed($"unknown breather provider '{provider}'");
 
 				p.SetBreather(b);
@@ -187,16 +183,14 @@ namespace Cue
 
 		private void ParseOrgasmer(Personality p, JSONClass o, bool inherited)
 		{
-			IOrgasmer b = null;
-
 			if (o.HasKey("orgasm"))
 			{
 				var provider = o["orgasm"]["provider"].Value;
 				var options = o["orgasm"]["options"].AsObject;
 
-				if (provider == "mg")
-					b = new MG.Orgasmer(options);
-				else
+				IOrgasmer b = Integration.CreateOrgasmer(provider, options);
+
+				if (b == null)
 					throw new LoadFailed($"unknown orgasm provider '{provider}'");
 
 				p.SetOrgasmer(b);

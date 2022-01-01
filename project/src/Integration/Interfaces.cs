@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
@@ -25,7 +26,7 @@ namespace Cue
 
 		public static IGazer CreateGazer(Person p)
 		{
-			return new MG.Gaze(p);
+			return new MacGruber.Gaze(p);
 		}
 
 		public static IClothing CreateClothing(Person p)
@@ -36,6 +37,24 @@ namespace Cue
 		public static ISmoke CreateSmoke(string id, bool existsOnly = false)
 		{
 			return VamSmoke.Create(id, existsOnly);
+		}
+
+		public static IBreather CreateBreather(string provider, JSONClass options)
+		{
+			if (provider == "macgruber")
+				return new MacGruber.Breather(options);
+			else if (provider == "vammoan")
+				return new VamMoan.Breather(options);
+			else
+				return null;
+		}
+
+		public static IOrgasmer CreateOrgasmer(string provider, JSONClass options)
+		{
+			if (provider == "macgruber")
+				return new MacGruber.Orgasmer(options);
+			else
+				return null;
 		}
 	}
 
