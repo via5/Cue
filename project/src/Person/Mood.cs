@@ -64,7 +64,7 @@ namespace Cue
 			Person main, Person other = null)
 		{
 			return
-				HasEnergyForAnimation(main) ||
+				HasEnergyForAnimation(main) &&
 				HasEnergyForAnimation(other);
 		}
 
