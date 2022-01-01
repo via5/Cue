@@ -105,10 +105,7 @@ namespace Cue
 				else
 					SelectVoice(person_.Voice.Name);
 
-				voicePitch_.Set(
-					person_.Voice.Pitch,
-					person_.Voice.PitchRange.first,
-					person_.Voice.PitchRange.second);
+				voicePitch_.Set(person_.Voice.Pitch, 0, 1);
 			}
 			finally
 			{
@@ -156,6 +153,8 @@ namespace Cue
 			{
 				person_.Personality = Resources.Personalities.Clone(
 					item.Personality.Name, person_);
+
+				RebuildVoices();
 
 				Cue.Instance.Save();
 			}

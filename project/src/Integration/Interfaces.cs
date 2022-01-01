@@ -61,7 +61,6 @@ namespace Cue
 		void StopOrgasm();
 
 		float Pitch { get; set; }
-		Pair<float, float> PitchRange { get; }
 
 		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }

@@ -77,10 +77,10 @@ namespace Cue.MacGruber
 
 		struct Parameters
 		{
-			public Sys.Vam.BoolParameter breathingEnabled_;
-			public Sys.Vam.BoolParameter driverEnabled_;
+			public Sys.Vam.BoolParameter breathingEnabled;
+			public Sys.Vam.BoolParameter driverEnabled;
 
-			public Sys.Vam.StringChooserParameter breathDataset_;
+			public Sys.Vam.StringChooserParameter breathDataset;
 			public Sys.Vam.FloatParameter intensity;
 			public Sys.Vam.FloatParameter desktopVolume;
 			public Sys.Vam.FloatParameter vrVolume;
@@ -165,13 +165,13 @@ namespace Cue.MacGruber
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "mg.breather");
 
-			p_.breathingEnabled_ = new Sys.Vam.BoolParameter(
+			p_.breathingEnabled = new Sys.Vam.BoolParameter(
 				p, "MacGruber.Breathing", "enabled");
 
-			p_.driverEnabled_ = new Sys.Vam.BoolParameter(
+			p_.driverEnabled = new Sys.Vam.BoolParameter(
 				p, "MacGruber.DriverBreathing", "enabled");
 
-			p_.breathDataset_ = BSC("Breath Dataset");
+			p_.breathDataset = BSC("Breath Dataset");
 			p_.intensity = BF("Intensity");
 			p_.desktopVolume = AAF("Volume Desktop");
 			p_.vrVolume = AAF("Volume VR");
@@ -191,7 +191,26 @@ namespace Cue.MacGruber
 
 			p_.vrVolume.Value = p_.desktopVolume.Value;
 
+			VamMoan.Voice.Disable(p);
+			p_.breathingEnabled.Value = true;
+			p_.driverEnabled.Value = true;
+
 			Apply();
+		}
+
+		public static void Disable(Person p)
+		{
+			var e = Sys.Vam.Parameters.GetBool(
+				p, "MacGruber.Breathing", "enabled");
+
+			if (e != null)
+				e.val = false;
+
+			e  = Sys.Vam.Parameters.GetBool(
+				p, "MacGruber.DriverBreathing", "enabled");
+
+			if (e != null)
+				e.val = false;
 		}
 
 		public void Update(float s)
@@ -205,9 +224,10 @@ namespace Cue.MacGruber
 
 			if (ds.Name != "")
 			{
-				p_.orgasmDataset.Value = ds.Name;
-				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
+				if (p_.orgasmDataset.Value != ds.Name)
+					p_.orgasmDataset.Value = ds.Name;
 
+				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
 				p_.orgasmAction.Fire();
 			}
 		}
@@ -322,11 +342,6 @@ namespace Cue.MacGruber
 			}
 		}
 
-		public Pair<float, float> PitchRange
-		{
-			get { return new Pair<float, float>(0, 1); }
-		}
-
 		private Dataset GetDatasetForIntensity(float e)
 		{
 			for (int i = 0; i < datasets_.Length; ++i)
@@ -358,7 +373,7 @@ namespace Cue.MacGruber
 			// taken over by MacGruberOrgasmer during orgasm
 			if (person_.Mood.State != Mood.OrgasmState)
 			{
-				p_.breathDataset_.Value = ds.Name;
+				p_.breathDataset.Value = ds.Name;
 				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
 			}
 

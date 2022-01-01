@@ -9,9 +9,11 @@ namespace Cue.VamMoan
 		private const string PluginName = "VAMMoanPlugin.VAMMoan";
 		private const float DefaultBreathingMax = 0.2f;
 		private const float VoiceCheckInterval = 5;
+		private const float ForceIntensityInterval = 1;
 
 		struct Parameters
 		{
+			public Sys.Vam.BoolParameter enabled;
 			public Sys.Vam.BoolParameter autoJaw;
 			public Sys.Vam.StringChooserParameter voice;
 			public Sys.Vam.FloatParameter pitch;
@@ -29,6 +31,7 @@ namespace Cue.VamMoan
 		private int intensitiesCount_ = -1;
 		private Parameters p_;
 		private float voiceCheckElapsed_ = 0;
+		private float forceIntensityElapsed_ = 0;
 		private bool inOrgasm_ = false;
 
 		private string voice_ = "";
@@ -85,7 +88,7 @@ namespace Cue.VamMoan
 			person_ = p;
 			log_ = new Logger(Logger.Integration, p, "vammoan");
 
-			Cue.Assert(person_ != null);
+			p_.enabled = BP("enabled");
 			p_.autoJaw = BP("Enable auto-jaw animation");
 			p_.voice = SCP("voice");
 			p_.pitch = FP("Voice pitch");
@@ -98,16 +101,41 @@ namespace Cue.VamMoan
 
 			CheckVersion();
 			CheckVoice();
+
+			p_.enabled.Value = true;
+			MacGruber.Voice.Disable(p);
+		}
+
+		public static void Disable(Person p)
+		{
+			var e = Sys.Vam.Parameters.GetBool(p, PluginName, "enabled");
+
+			if (e != null)
+				e.val = false;
 		}
 
 		public void Update(float s)
 		{
 			voiceCheckElapsed_ += s;
-
 			if (voiceCheckElapsed_ >= VoiceCheckInterval)
 			{
 				voiceCheckElapsed_ = 0;
 				CheckVoice();
+			}
+
+
+			// the orgasm action is special because it will prevent another
+			// intensity from being set while running, and so the time after
+			// which the intensity can be changed depends on the audio length
+			//
+			// so just fire the action once in a while to make sure it's the
+			// active one
+
+			forceIntensityElapsed_ += s;
+			if (forceIntensityElapsed_ >= ForceIntensityInterval)
+			{
+				forceIntensityElapsed_ = 0;
+				SetIntensity(true);
 			}
 		}
 
@@ -208,14 +236,15 @@ namespace Cue.VamMoan
 					pitch_ = value;
 
 					if (p_.pitch != null)
-						p_.pitch.Value = value;
+					{
+						float min = 0.8f;
+						float max = 1.2f;
+						float range = max - min;
+
+						p_.pitch.Value = min + range * value;
+					}
 				}
 			}
-		}
-
-		public Pair<float, float> PitchRange
-		{
-			get { return new Pair<float, float>(0.8f, 1.2f); }
 		}
 
 		public bool MouthEnabled
@@ -252,7 +281,7 @@ namespace Cue.VamMoan
 
 			set
 			{
-				if (value != voice_)
+				if (value != voice_ && value != "")
 				{
 					voice_ = value;
 
