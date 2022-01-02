@@ -42,13 +42,15 @@ namespace Cue
 		public delegate void Handler();
 		public event Handler Changed;
 
-		private bool muteSfx_ = true;
+		private bool muteSfx_ = false;
 		private bool skinColor_ = true;
 		private bool skinGloss_ = true;
 		private bool hairLoose_ = true;
 		private bool handLinking_ = true;
 		private bool devMode_ = false;
 		private float excitement_ = 1.0f;
+		private bool leftMenu_ = true;
+		private bool rightMenu_ = true;
 
 		public Options()
 		{
@@ -84,6 +86,18 @@ namespace Cue
 			set { handLinking_ = value; OnChanged(); }
 		}
 
+		public bool LeftMenu
+		{
+			get { return leftMenu_; }
+			set { leftMenu_ = value; OnChanged(); }
+		}
+
+		public bool RightMenu
+		{
+			get { return rightMenu_; }
+			set { rightMenu_ = value; OnChanged(); }
+		}
+
 		public bool DevMode
 		{
 			get { return devMode_; }
@@ -107,6 +121,8 @@ namespace Cue
 			o["hairLoose"] = new JSONData(hairLoose_);
 			o["devMode"] = new JSONData(devMode_);
 			o["excitement"] = new JSONData(excitement_);
+			o["leftMenu"] = new JSONData(leftMenu_);
+			o["rightMenu"] = new JSONData(rightMenu_);
 
 			return o;
 		}
@@ -120,6 +136,8 @@ namespace Cue
 			J.OptBool(o, "hairLoose", ref hairLoose_);
 			J.OptBool(o, "devMode", ref devMode_);
 			J.OptFloat(o, "excitement", ref excitement_);
+			J.OptBool(o, "leftMenu", ref leftMenu_);
+			J.OptBool(o, "rightMenu", ref rightMenu_);
 
 			OnChanged();
 		}

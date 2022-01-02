@@ -141,6 +141,11 @@ namespace Cue.Sys.Vam
 			return input_.VRInput.IsTransformVRHand(t, (hand == BP.LeftHand));
 		}
 
+		public void SetMenuVisible(bool b)
+		{
+			GlobalSceneOptions.singleton.disableNavigation = b;
+		}
+
 		public IAtom ContainingAtom
 		{
 			get { return new VamAtom(script_.containingAtom); }

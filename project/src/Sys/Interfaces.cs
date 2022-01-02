@@ -89,6 +89,7 @@ namespace Cue.Sys
 		void HardReset();
 		void ReloadPlugin();
 		void OpenScriptUI();
+		void SetMenuVisible(bool b);
 		bool IsPlayMode { get; }
 		bool IsVR { get; }
 		bool HasUI { get; }

@@ -141,14 +141,20 @@ namespace Cue
 
 		public void ShowLeft()
 		{
-			state_ = Left;
-			UpdateVisibility();
+			if (Cue.Instance.Options.LeftMenu)
+			{
+				state_ = Left;
+				UpdateVisibility();
+			}
 		}
 
 		public void ShowRight()
 		{
-			state_ = Right;
-			UpdateVisibility();
+			if (Cue.Instance.Options.RightMenu)
+			{
+				state_ = Right;
+				UpdateVisibility();
+			}
 		}
 
 		public void Hide()
@@ -167,6 +173,7 @@ namespace Cue
 				case Hidden:
 				{
 					Visible = false;
+					Cue.Instance.Sys.SetMenuVisible(false);
 					break;
 				}
 
@@ -177,6 +184,8 @@ namespace Cue
 					if (vrSupport_ != null)
 						vrSupport_.Attach(VUI.VRHandRootSupport.LeftHand);
 
+					Cue.Instance.Sys.SetMenuVisible(true);
+
 					break;
 				}
 
@@ -186,6 +195,8 @@ namespace Cue
 
 					if (vrSupport_ != null)
 						vrSupport_.Attach(VUI.VRHandRootSupport.RightHand);
+
+					Cue.Instance.Sys.SetMenuVisible(true);
 
 					break;
 				}

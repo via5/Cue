@@ -171,6 +171,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void SetMenuVisible(bool b)
+		{
+		}
+
 		public void OnReady(Action f)
 		{
 			f?.Invoke();

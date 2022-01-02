@@ -405,7 +405,6 @@ namespace Cue.Sys.Vam
 			UpdateLeftMenu();
 			UpdateRightMenu();
 
-			MeshVR.GlobalSceneOptions.singleton.disableNavigation = DisableNav();
 
 			leftMenuUp_.Update(vr_.LeftJoystick.y);
 			leftMenuDown_.Update(vr_.LeftJoystick.y);
@@ -501,14 +500,6 @@ namespace Cue.Sys.Vam
 				if (SysRightMenuSticky())
 					rightMenuSticky_ = true;
 			}
-		}
-
-		private bool DisableNav()
-		{
-			if (sc_.gameMode == SuperController.GameMode.Play || UI.VRMenuDebug)
-				return (ShowLeftMenu || ShowRightMenu);
-
-			return false;
 		}
 
 		private List<Pair<string, string>> debug_ = null;
