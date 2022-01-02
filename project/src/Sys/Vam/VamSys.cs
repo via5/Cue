@@ -418,7 +418,6 @@ namespace Cue.Sys.Vam
 		private IEnumerator DeferredInit()
 		{
 			yield return new WaitForEndOfFrame();
-			yield return SuperController.singleton.StartCoroutine(VamPrefabFactory.LoadUIAssets());
 			Log.Verbose("running deferred init");
 			deferredInit_?.Invoke();
 			deferredInit_ = null;
@@ -644,6 +643,68 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		private string PluginDataPath
+		{
+			get { return "Custom\\PluginData\\Cue"; }
+		}
+
+		public void SaveFileDialog(string ext, Action<string> f)
+		{
+			FileManagerSecure.CreateDirectory(PluginDataPath);
+			var shortcuts = FileManagerSecure.GetShortCutsForDirectory(
+				PluginDataPath);
+
+			SuperController.singleton.GetMediaPathDialog(
+				(string path) =>
+				{
+					if (string.IsNullOrEmpty(path))
+					{
+						f(null);
+						return;
+					}
+
+					if (!path.Contains("."))
+						path += "." + ext;
+
+					f(path);
+				},
+				ext, PluginDataPath, true, true, false, null, false, shortcuts);
+
+			var browser = SuperController.singleton.mediaFileBrowserUI;
+			browser.SetTextEntry(true);
+			browser.ActivateFileNameField();
+		}
+
+		public void LoadFileDialog(string ext, Action<string> f)
+		{
+			FileManagerSecure.CreateDirectory(PluginDataPath);
+			var shortcuts = FileManagerSecure.GetShortCutsForDirectory(
+				PluginDataPath);
+
+			SuperController.singleton.GetMediaPathDialog(
+				(string path) =>
+				{
+					if (string.IsNullOrEmpty(path))
+					{
+						f(null);
+						return;
+					}
+
+					f(path);
+				},
+				ext, PluginDataPath, true, true, false, null, false, shortcuts);
+		}
+
+		public JSONNode ReadJSON(string path)
+		{
+			return SuperController.singleton.LoadJSON(path);
+		}
+
+		public void WriteJSON(string path, JSONNode content)
+		{
+			SuperController.singleton.SaveJSON(content.AsObject, path);
+		}
+
 		public IActionTrigger CreateActionTrigger()
 		{
 			return new ActionTrigger();
@@ -664,6 +725,9 @@ namespace Cue.Sys.Vam
 
 	public class VamPrefabFactory : MonoBehaviour
 	{
+		private static bool loading_ = false;
+		private static bool loaded_ = false;
+
 		public static RectTransform triggerActionsPrefab;
 		public static RectTransform triggerActionMiniPrefab;
 		public static RectTransform triggerActionDiscretePrefab;
@@ -671,14 +735,25 @@ namespace Cue.Sys.Vam
 		public static RectTransform scrollbarPrefab;
 		public static RectTransform buttonPrefab;
 
-		public static IEnumerator LoadUIAssets()
+		public static IEnumerator LoadUIAssets(Action onReady)
 		{
-			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionsPanel", prefab => triggerActionsPrefab = prefab)) yield return x;
-			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionMiniPanel", prefab => triggerActionMiniPrefab = prefab)) yield return x;
-			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionDiscretePanel", prefab => triggerActionDiscretePrefab = prefab)) yield return x;
-			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionTransitionPanel", prefab => triggerActionTransitionPrefab = prefab)) yield return x;
-			foreach (var x in LoadUIAsset("z_ui2", "DynamicTextField", prefab => scrollbarPrefab = prefab.GetComponentInChildren<ScrollRect>().verticalScrollbar.gameObject.GetComponent<RectTransform>())) yield return x;
-			foreach (var x in LoadUIAsset("z_ui2", "DynamicButton", prefab => buttonPrefab = prefab)) yield return x;
+			if (loading_)
+				yield break;
+
+			if (!loaded_)
+			{
+				loading_ = true;
+				foreach (var x in LoadUIAsset("z_ui2", "TriggerActionsPanel", prefab => triggerActionsPrefab = prefab)) yield return x;
+				foreach (var x in LoadUIAsset("z_ui2", "TriggerActionMiniPanel", prefab => triggerActionMiniPrefab = prefab)) yield return x;
+				foreach (var x in LoadUIAsset("z_ui2", "TriggerActionDiscretePanel", prefab => triggerActionDiscretePrefab = prefab)) yield return x;
+				foreach (var x in LoadUIAsset("z_ui2", "TriggerActionTransitionPanel", prefab => triggerActionTransitionPrefab = prefab)) yield return x;
+				foreach (var x in LoadUIAsset("z_ui2", "DynamicTextField", prefab => scrollbarPrefab = prefab.GetComponentInChildren<ScrollRect>().verticalScrollbar.gameObject.GetComponent<RectTransform>())) yield return x;
+				foreach (var x in LoadUIAsset("z_ui2", "DynamicButton", prefab => buttonPrefab = prefab)) yield return x;
+				loading_ = false;
+				loaded_ = true;
+			}
+
+			onReady();
 		}
 
 		private static IEnumerable LoadUIAsset(string assetBundleName, string assetName, Action<RectTransform> assign)
@@ -752,14 +827,18 @@ namespace Cue.Sys.Vam
 
 		public void Edit(Action onDone = null)
 		{
+			closeHandler_ = onDone;
+			SuperController.singleton.StartCoroutine(VamPrefabFactory.LoadUIAssets(OnPrefabsReady));
+		}
+
+		private void OnPrefabsReady()
+		{
 			Transform parent = CueMain.Instance.UITransform;
 
 			triggerActionsParent = parent;
 			InitTriggerUI();
 			OpenTriggerActionsPanel();
 			SetPanelParent(parent);
-
-			closeHandler_ = onDone;
 
 			if (firstEdit_)
 			{

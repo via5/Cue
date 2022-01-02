@@ -77,6 +77,13 @@
 			devMode_ = p.Add(new VUI.CheckBox("Dev mode", OnDevMode, o.DevMode));
 			p.Add(new VUI.Label("Enables a bunch of tabs.", VUI.Label.Wrap));
 
+
+			var export = new VUI.Panel(new VUI.HorizontalFlow(10));
+			export.Add(new VUI.Button("Export options...", OnExport));
+			export.Add(new VUI.Button("Import options...", OnImport));
+			p.Add(new VUI.Spacer(20));
+			p.Add(export);
+
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
 
@@ -166,6 +173,36 @@
 			if (ignore_) return;
 			Cue.Instance.Options.DevMode = b;
 		}
+
+		private void OnExport()
+		{
+			var o = Cue.Instance.Options.ToJSON();
+			Cue.Instance.Sys.SaveFileDialog("options", (f) =>
+			{
+				if (string.IsNullOrEmpty(f))
+					return;
+
+				Cue.Instance.Sys.WriteJSON(f, o);
+			});
+		}
+
+		private void OnImport()
+		{
+			Cue.Instance.Sys.LoadFileDialog("options", (f) =>
+			{
+				if (string.IsNullOrEmpty(f))
+					return;
+
+				var o = Cue.Instance.Sys.ReadJSON(f);
+				if (o == null)
+				{
+					Cue.LogError("failed to read json");
+					return;
+				}
+
+				Cue.Instance.Options.Load(o.AsObject);
+			});
+		}
 	}
 
 
@@ -179,9 +216,9 @@
 			var top = new VUI.Panel(new VUI.HorizontalFlow());
 			top.Add(new VUI.Button("Add button", OnAdd));
 
-			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
+			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
 
-			Layout = new VUI.BorderLayout();
+			Layout = new VUI.BorderLayout(20);
 			Add(top, VUI.BorderLayout.Top);
 			Add(buttons_, VUI.BorderLayout.Center);
 		}

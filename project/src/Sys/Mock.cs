@@ -223,6 +223,23 @@ namespace Cue.Sys.Mock
 			return new List<FileInfo>();
 		}
 
+		public void SaveFileDialog(string ext, Action<string> f)
+		{
+		}
+
+		public void LoadFileDialog(string ext, Action<string> f)
+		{
+		}
+
+		public JSONNode ReadJSON(string path)
+		{
+			return null;
+		}
+
+		public void WriteJSON(string path, JSONNode content)
+		{
+		}
+
 		public IObjectCreator CreateObjectCreator(
 			string name, string type, JSONClass opts, Sys.ObjectParameters ps)
 		{

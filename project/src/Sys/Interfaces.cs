@@ -86,6 +86,10 @@ namespace Cue.Sys
 		string ReadFileIntoString(string path);
 		string GetResourcePath(string path);
 		List<FileInfo> GetFiles(string path, string pattern);
+		void SaveFileDialog(string ext, Action<string> f);
+		void LoadFileDialog(string ext, Action<string> f);
+		JSONNode ReadJSON(string path);
+		void WriteJSON(string path, JSONNode content);
 		void HardReset();
 		void ReloadPlugin();
 		void OpenScriptUI();

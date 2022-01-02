@@ -54,7 +54,7 @@ namespace Cue
 
 			// custom menus
 			{
-				custom_ = new VUI.Panel(new VUI.HorizontalFlow());
+				custom_ = new VUI.Panel(new VUI.HorizontalFlow(10));
 
 				foreach (var m in Cue.Instance.Options.Menus)
 					AddCustomButton(m);
