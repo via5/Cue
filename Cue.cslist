@@ -1,6 +1,8 @@
 project\src\Cue.cs
 project\src\Instrumentation.cs
 project\src\Main.cs
+project\src\Options.cs
+project\src\Version.cs
 project\src\AI\AI.cs
 project\src\AI\Events.cs
 project\src\AI\Events\Grab.cs

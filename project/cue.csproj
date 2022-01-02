@@ -158,6 +158,7 @@
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Integration\VAMMoan.cs" />
     <Compile Include="src\Main.cs" />
+    <Compile Include="src\Options.cs" />
     <Compile Include="src\Person\Body\Body.cs" />
     <Compile Include="src\Person\Body\BodyPart.cs" />
     <Compile Include="src\Person\Body\BodyParts.cs" />
@@ -238,6 +239,7 @@
     <Compile Include="src\Utilities\Random.cs" />
     <Compile Include="src\Utilities\NatSort.cs" />
     <Compile Include="src\Utilities\Utilities.cs" />
+    <Compile Include="src\Version.cs" />
     <Compile Include="src\VUI\BorderLayout.cs" />
     <Compile Include="src\VUI\Button.cs" />
     <Compile Include="src\VUI\CheckBox.cs" />
