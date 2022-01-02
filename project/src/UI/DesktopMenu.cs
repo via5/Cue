@@ -11,6 +11,7 @@ namespace Cue
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
 		private VUI.Label fps_ = null;
+		private VUI.Panel tools_ = null;
 		private bool ignore_ = false;
 
 		public DesktopMenu()
@@ -52,14 +53,14 @@ namespace Cue
 
 			// debug row
 			{
-				var tools = new VUI.Panel(new VUI.HorizontalFlow(5));
-				tools.Add(new VUI.ToolButton("Reload", OnReload));
-				tools.Add(new VUI.ToolButton("ui", Cue.Instance.OpenScriptUI));
-				forceExcitement_ = tools.Add(new VUI.CheckBox("Ex", OnForceExcitement));
-				excitement_ = tools.Add(new VUI.FloatTextSlider(OnExcitement));
-				tools.Add(new VUI.ToolButton("test", OnTest));
-				fps_ = tools.Add(new VUI.Label());
-				p.Add(tools);
+				tools_ = new VUI.Panel(new VUI.HorizontalFlow(5));
+				tools_.Add(new VUI.ToolButton("Reload", OnReload));
+				tools_.Add(new VUI.ToolButton("ui", Cue.Instance.OpenScriptUI));
+				forceExcitement_ = tools_.Add(new VUI.CheckBox("Ex", OnForceExcitement));
+				excitement_ = tools_.Add(new VUI.FloatTextSlider(OnExcitement));
+				tools_.Add(new VUI.ToolButton("test", OnTest));
+				fps_ = tools_.Add(new VUI.Label());
+				p.Add(tools_);
 			}
 
 			root.ContentPanel.Layout = new VUI.BorderLayout();
@@ -108,6 +109,8 @@ namespace Cue
 					if (excitement_ != null)
 						excitement_.Value = p.Mood.GetValue(Moods.Excited).Value;
 				}
+
+				tools_.Visible = Cue.Instance.Options.DevMode;
 			}
 			finally
 			{
