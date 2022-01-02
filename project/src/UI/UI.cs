@@ -18,6 +18,11 @@ namespace Cue
 			vr_ = sys_.IsVR;
 		}
 
+		public ScriptUI ScriptUI
+		{
+			get { return sui_; }
+		}
+
 		public JSONClass ToJSON()
 		{
 			var sui = sui_.ToJSON();

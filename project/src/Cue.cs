@@ -37,10 +37,81 @@ namespace Cue
 	class PluginGone : Exception { }
 
 
+	class CustomMenu
+	{
+		private string caption_;
+		private Sys.IActionTrigger trigger_;
+
+		private CustomMenu(string caption, Sys.IActionTrigger trigger)
+		{
+			caption_ = caption;
+			trigger_ = trigger;
+		}
+
+		public CustomMenu()
+		{
+			caption_ = "Button";
+			trigger_ = Cue.Instance.Sys.CreateActionTrigger();
+		}
+
+		public static CustomMenu FromJSON(JSONClass n)
+		{
+			try
+			{
+				var c = J.ReqString(n, "caption");
+
+				if (!n.HasKey("trigger"))
+					throw new LoadFailed("missing trigger");
+
+				var t = Cue.Instance.Sys.LoadActionTrigger(n["trigger"].AsObject);
+				if (t == null)
+					throw new LoadFailed("failed to create trigger");
+
+				return new CustomMenu(c, t);
+			}
+			catch (Exception e)
+			{
+				Cue.LogError("failed to load custom menu, " + e.ToString());
+				return null;
+			}
+		}
+
+		public string Caption
+		{
+			get
+			{
+				return caption_;
+			}
+
+			set
+			{
+				caption_ = value;
+				trigger_.Name = value;
+				Cue.Instance.Options.ForceMenusChanged();
+			}
+		}
+
+		public Sys.IActionTrigger Trigger
+		{
+			get { return trigger_; }
+		}
+
+		public JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+
+			o["caption"] = caption_;
+			o["trigger"] = trigger_.ToJSON();
+
+			return o;
+		}
+	}
+
+
 	class Options
 	{
 		public delegate void Handler();
-		public event Handler Changed;
+		public event Handler Changed, MenusChanged;
 
 		private bool muteSfx_ = false;
 		private bool skinColor_ = true;
@@ -51,9 +122,12 @@ namespace Cue
 		private float excitement_ = 1.0f;
 		private bool leftMenu_ = true;
 		private bool rightMenu_ = true;
+		private List<CustomMenu> menus_ = new List<CustomMenu>();
 
 		public Options()
 		{
+			//menus_.Add(new CustomMenu(
+			//	"test", Cue.Instance.Sys.CreateActionTrigger()));
 		}
 
 		public bool MuteSfx
@@ -110,6 +184,36 @@ namespace Cue
 			set { excitement_ = value; OnChanged(); }
 		}
 
+		public CustomMenu[] Menus
+		{
+			get { return menus_.ToArray(); }
+		}
+
+		public CustomMenu AddCustomMenu()
+		{
+			var m = new CustomMenu();
+			menus_.Add(m);
+			OnMenusChanged();
+			return m;
+		}
+
+		public void RemoveCustomMenu(CustomMenu m)
+		{
+			if (!menus_.Contains(m))
+			{
+				Cue.LogError($"custom menu '{m.Caption}' not found");
+				return;
+			}
+
+			menus_.Remove(m);
+			OnMenusChanged();
+		}
+
+		public void ForceMenusChanged()
+		{
+			OnMenusChanged();
+		}
+
 		public JSONNode ToJSON()
 		{
 			var o = new JSONClass();
@@ -123,6 +227,16 @@ namespace Cue
 			o["excitement"] = new JSONData(excitement_);
 			o["leftMenu"] = new JSONData(leftMenu_);
 			o["rightMenu"] = new JSONData(rightMenu_);
+
+			if (menus_.Count > 0)
+			{
+				var mo = new JSONArray();
+
+				foreach (var m in menus_)
+					mo.Add(m.ToJSON());
+
+				o["menus"] = mo;
+			}
 
 			return o;
 		}
@@ -139,13 +253,32 @@ namespace Cue
 			J.OptBool(o, "leftMenu", ref leftMenu_);
 			J.OptBool(o, "rightMenu", ref rightMenu_);
 
+			if (o.HasKey("menus"))
+			{
+				var a = o["menus"].AsArray;
+
+				foreach (var mo in a.Childs)
+				{
+					var m = CustomMenu.FromJSON(mo.AsObject);
+					if (m != null)
+						menus_.Add(m);
+				}
+			}
+
 			OnChanged();
+			OnMenusChanged();
 		}
 
 		private void OnChanged()
 		{
 			Cue.Instance.SaveLater();
 			Changed?.Invoke();
+		}
+
+		private void OnMenusChanged()
+		{
+			Cue.Instance.SaveLater();
+			MenusChanged?.Invoke();
 		}
 	}
 
@@ -154,7 +287,7 @@ namespace Cue
 	{
 		private static Cue instance_ = null;
 
-		private Options options_ = new Options();
+		private Options options_;
 		private float saveElapsed_ = 0;
 		private bool needSave_ = false;
 		private const float SaveLaterDelay = 2;
@@ -186,6 +319,7 @@ namespace Cue
 			instance_ = this;
 			LogVerbose("cue: ctor");
 
+			options_ = new Options();
 			saver_ = Sys.CreateLiveSaver();
 		}
 

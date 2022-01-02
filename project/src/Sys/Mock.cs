@@ -248,6 +248,16 @@ namespace Cue.Sys.Mock
 		{
 			return new MockGraphic();
 		}
+
+		public IActionTrigger CreateActionTrigger()
+		{
+			return null;
+		}
+
+		public IActionTrigger LoadActionTrigger(JSONNode n)
+		{
+			return null;
+		}
 	}
 
 	class MockInput : IInput

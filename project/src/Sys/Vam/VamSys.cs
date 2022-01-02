@@ -5,6 +5,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using AssetBundles;
 
 namespace Cue.Sys.Vam
 {
@@ -396,7 +398,7 @@ namespace Cue.Sys.Vam
 			// the transform's parent chain
 			var stop = t.GetComponentInParent<Atom>()?.transform;
 
-			for (int i=0; i<ps.Length; ++i)
+			for (int i = 0; i < ps.Length; ++i)
 			{
 				var bp = (ps[i].Atom.Body as VamBasicBody)
 					.BodyPartForTransform(t, stop, debug);
@@ -416,6 +418,7 @@ namespace Cue.Sys.Vam
 		private IEnumerator DeferredInit()
 		{
 			yield return new WaitForEndOfFrame();
+			yield return SuperController.singleton.StartCoroutine(VamPrefabFactory.LoadUIAssets());
 			Log.Verbose("running deferred init");
 			deferredInit_?.Invoke();
 			deferredInit_ = null;
@@ -637,6 +640,192 @@ namespace Cue.Sys.Vam
 					fi.source = PathSource(f);
 
 					list.Add(fi);
+				}
+			}
+		}
+
+		public IActionTrigger CreateActionTrigger()
+		{
+			return new ActionTrigger();
+		}
+
+		public IActionTrigger LoadActionTrigger(JSONNode n)
+		{
+			var t = new ActionTrigger();
+			t.RestoreFromJSON(n.AsObject);
+			return t;
+		}
+	}
+
+
+	class Trigger2 : Trigger
+	{
+	}
+
+	public class VamPrefabFactory : MonoBehaviour
+	{
+		public static RectTransform triggerActionsPrefab;
+		public static RectTransform triggerActionMiniPrefab;
+		public static RectTransform triggerActionDiscretePrefab;
+		public static RectTransform triggerActionTransitionPrefab;
+		public static RectTransform scrollbarPrefab;
+		public static RectTransform buttonPrefab;
+
+		public static IEnumerator LoadUIAssets()
+		{
+			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionsPanel", prefab => triggerActionsPrefab = prefab)) yield return x;
+			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionMiniPanel", prefab => triggerActionMiniPrefab = prefab)) yield return x;
+			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionDiscretePanel", prefab => triggerActionDiscretePrefab = prefab)) yield return x;
+			foreach (var x in LoadUIAsset("z_ui2", "TriggerActionTransitionPanel", prefab => triggerActionTransitionPrefab = prefab)) yield return x;
+			foreach (var x in LoadUIAsset("z_ui2", "DynamicTextField", prefab => scrollbarPrefab = prefab.GetComponentInChildren<ScrollRect>().verticalScrollbar.gameObject.GetComponent<RectTransform>())) yield return x;
+			foreach (var x in LoadUIAsset("z_ui2", "DynamicButton", prefab => buttonPrefab = prefab)) yield return x;
+		}
+
+		private static IEnumerable LoadUIAsset(string assetBundleName, string assetName, Action<RectTransform> assign)
+		{
+			var request = AssetBundleManager.LoadAssetAsync(assetBundleName, assetName, typeof(GameObject));
+			if (request == null) throw new NullReferenceException($"Request for {assetName} in {assetBundleName} assetbundle failed: Null request.");
+			yield return request;
+			var go = request.GetAsset<GameObject>();
+			if (go == null) throw new NullReferenceException($"Request for {assetName} in {assetBundleName} assetbundle failed: Null GameObject.");
+			var prefab = go.GetComponent<RectTransform>();
+			if (prefab == null) throw new NullReferenceException($"Request for {assetName} in {assetBundleName} assetbundle failed: Null RectTransform.");
+			assign(prefab);
+		}
+	}
+
+
+	class TH : MonoBehaviour, TriggerHandler
+	{
+		void TriggerHandler.RemoveTrigger(Trigger t)
+		{
+			throw new NotImplementedException();
+		}
+
+		void TriggerHandler.DuplicateTrigger(Trigger t)
+		{
+			throw new NotImplementedException();
+		}
+
+		RectTransform TriggerHandler.CreateTriggerActionsUI()
+		{
+			return Instantiate(VamPrefabFactory.triggerActionsPrefab);
+		}
+
+		RectTransform TriggerHandler.CreateTriggerActionMiniUI()
+		{
+			return Instantiate(VamPrefabFactory.triggerActionMiniPrefab);
+		}
+
+		RectTransform TriggerHandler.CreateTriggerActionDiscreteUI()
+		{
+			return Instantiate(VamPrefabFactory.triggerActionDiscretePrefab);
+		}
+
+		RectTransform TriggerHandler.CreateTriggerActionTransitionUI()
+		{
+			return Instantiate(VamPrefabFactory.triggerActionTransitionPrefab);
+		}
+
+		void TriggerHandler.RemoveTriggerActionUI(RectTransform rt)
+		{
+			if (rt != null) Destroy(rt.gameObject);
+		}
+	}
+
+
+	class ActionTrigger : Trigger, IActionTrigger
+	{
+		private bool firstEdit_ = true;
+		private Action closeHandler_ = null;
+
+		public ActionTrigger()
+		{
+			handler = new TH();
+		}
+
+		public string Name
+		{
+			get { return displayName; }
+			set { displayName = value; }
+		}
+
+		public void Edit(Action onDone = null)
+		{
+			Transform parent = CueMain.Instance.UITransform;
+
+			triggerActionsParent = parent;
+			InitTriggerUI();
+			OpenTriggerActionsPanel();
+			SetPanelParent(parent);
+
+			closeHandler_ = onDone;
+
+			if (firstEdit_)
+			{
+				firstEdit_ = false;
+				closeTriggerActionsPanelButton.onClick.AddListener(OnClosed);
+			}
+		}
+
+		public void Fire()
+		{
+			active = true;
+			active = false;
+		}
+
+		private void OnClosed()
+		{
+			closeHandler_?.Invoke();
+			closeHandler_ = null;
+		}
+
+		public JSONNode ToJSON()
+		{
+			return this.GetJSON();
+		}
+
+		private void SetPanelParent(Transform parent)
+		{
+			if (triggerActionsPanel != null)
+			{
+				triggerActionsPanel.SetParent(parent, false);
+				triggerActionsPanel.SetAsLastSibling();
+			}
+
+			if (discreteActionsStart != null)
+			{
+				foreach (var start in discreteActionsStart)
+				{
+					if (start.triggerActionPanel != null)
+					{
+						start.triggerActionPanel.SetParent(parent, false);
+						start.triggerActionPanel.SetAsLastSibling();
+					}
+				}
+			}
+
+			if (transitionActions != null)
+			{
+				foreach (var transition in transitionActions)
+				{
+					if (transition.triggerActionPanel != null)
+					{
+						transition.triggerActionPanel.SetParent(parent, false);
+						transition.triggerActionPanel.SetAsLastSibling();
+					}
+				}
+			}
+
+			if (discreteActionsEnd != null)
+			{
+				foreach (var end in discreteActionsEnd)
+				{
+					if (end.triggerActionPanel != null)
+					{
+						end.triggerActionPanel.SetParent(parent, false);
+						end.triggerActionPanel.SetAsLastSibling();
+					}
 				}
 			}
 		}

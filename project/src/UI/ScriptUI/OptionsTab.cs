@@ -2,14 +2,30 @@
 {
 	class OptionsTab : Tab
 	{
+		public OptionsTab()
+			: base("Options", true)
+		{
+			AddSubTab(new MainOptionsTab());
+			AddSubTab(new MenuOptionsTab());
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+	}
+
+
+	class MainOptionsTab : Tab
+	{
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox playSfx_, skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, devMode_;
 		private VUI.CheckBox leftMenu_, rightMenu_;
 		private bool ignore_ = false;
 
-		public OptionsTab()
-			: base("Options", false)
+		public MainOptionsTab()
+			: base("Main", false)
 		{
 			var ly = new VUI.VerticalFlow(5);
 			var p = new VUI.Panel(ly);
@@ -149,6 +165,73 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.DevMode = b;
+		}
+	}
+
+
+	class MenuOptionsTab : Tab
+	{
+		private VUI.Panel buttons_;
+
+		public MenuOptionsTab()
+			: base("Menu", false)
+		{
+			var top = new VUI.Panel(new VUI.HorizontalFlow());
+			top.Add(new VUI.Button("Add button", OnAdd));
+
+			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
+
+			Layout = new VUI.BorderLayout();
+			Add(top, VUI.BorderLayout.Top);
+			Add(buttons_, VUI.BorderLayout.Center);
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			if (buttons_.Children.Count != Cue.Instance.Options.Menus.Length)
+				Rebuild();
+		}
+
+		private void Rebuild()
+		{
+			buttons_.RemoveAllChildren();
+			foreach (var m in Cue.Instance.Options.Menus)
+				buttons_.Add(CreatePanel(m));
+		}
+
+		private VUI.Panel CreatePanel(CustomMenu m)
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			var c = p.Add(new VUI.TextBox(m.Caption));
+			c.Edited += (s) => { OnCaption(m, s); };
+			p.Add(new VUI.Button("Edit trigger", () => OnEditTrigger(m)));
+			p.Add(new VUI.ToolButton("X", () => OnDelete(m)));
+			return p;
+		}
+
+		private void OnAdd()
+		{
+			Cue.Instance.Options.AddCustomMenu();
+		}
+
+		private void OnEditTrigger(CustomMenu m)
+		{
+			m.Trigger.Edit(() => Cue.Instance.Options.ForceMenusChanged());
+		}
+
+		private void OnCaption(CustomMenu m, string s)
+		{
+			m.Caption = s;
+		}
+
+		private void OnDelete(CustomMenu m)
+		{
+			Cue.Instance.Options.RemoveCustomMenu(m);
 		}
 	}
 }

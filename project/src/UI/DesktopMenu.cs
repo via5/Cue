@@ -11,6 +11,7 @@ namespace Cue
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
 		private VUI.Label fps_ = null;
+		private VUI.Panel custom_ = null;
 		private VUI.Panel tools_ = null;
 		private bool ignore_ = false;
 
@@ -51,6 +52,17 @@ namespace Cue
 				p.Add(selButtons_);
 			}
 
+			// custom menus
+			{
+				custom_ = new VUI.Panel(new VUI.HorizontalFlow());
+
+				foreach (var m in Cue.Instance.Options.Menus)
+					AddCustomButton(m);
+
+				p.Add(custom_);
+			}
+
+
 			// debug row
 			{
 				tools_ = new VUI.Panel(new VUI.HorizontalFlow(5));
@@ -68,6 +80,20 @@ namespace Cue
 
 			SetRoot(root);
 			PersonChanged();
+
+			Cue.Instance.Options.Changed += OnOptionsChanged;
+			OnOptionsChanged();
+
+			Cue.Instance.Options.MenusChanged += OnMenusChanged;
+			OnMenusChanged();
+		}
+
+		private void AddCustomButton(CustomMenu m)
+		{
+			custom_.Add(new VUI.Button(m.Caption, () =>
+			{
+				m.Trigger.Fire();
+			}));
 		}
 
 		public override void CheckInput()
@@ -109,13 +135,23 @@ namespace Cue
 					if (excitement_ != null)
 						excitement_.Value = p.Mood.GetValue(Moods.Excited).Value;
 				}
-
-				tools_.Visible = Cue.Instance.Options.DevMode;
 			}
 			finally
 			{
 				ignore_ = false;
 			}
+		}
+
+		private void OnOptionsChanged()
+		{
+			tools_.Visible = Cue.Instance.Options.DevMode;
+		}
+
+		private void OnMenusChanged()
+		{
+			custom_.RemoveAllChildren();
+			foreach (var m in Cue.Instance.Options.Menus)
+				AddCustomButton(m);
 		}
 
 		private void OnReload()

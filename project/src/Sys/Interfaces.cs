@@ -104,6 +104,8 @@ namespace Cue.Sys
 		IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c);
 		IGraphic CreateCapsuleGraphic(string name, Color c);
 		ILiveSaver CreateLiveSaver();
+		IActionTrigger CreateActionTrigger();
+		IActionTrigger LoadActionTrigger(JSONNode n);
 	}
 
 
@@ -450,5 +452,13 @@ namespace Cue.Sys
 		Color Color { get; set; }
 		bool Collision { get; set; }
 		void Destroy();
+	}
+
+	public interface IActionTrigger
+	{
+		string Name { get; set; }
+		void Edit(Action onDone = null);
+		void Fire();
+		JSONNode ToJSON();
 	}
 }

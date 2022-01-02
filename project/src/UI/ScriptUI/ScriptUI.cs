@@ -36,6 +36,11 @@ namespace Cue
 			panel_.Add(tabs_.TabsWidget, VUI.BorderLayout.Center);
 		}
 
+		public VUI.Root Root
+		{
+			get { return root_; }
+		}
+
 		public JSONClass ToJSON()
 		{
 			var o = new JSONClass();
