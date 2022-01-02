@@ -9,12 +9,14 @@ namespace Cue
 			public Frustum frustum;
 			public bool avoid;
 			public bool selected;
+			public float weight;
 
-			public FrustumInfo(Person p, Frustum f)
+			public FrustumInfo(Person p, Frustum f, float w)
 			{
 				frustum = f;
 				avoid = false;
 				selected = false;
+				weight = w;
 			}
 		}
 
@@ -24,7 +26,16 @@ namespace Cue
 		public const int XCount = 5;
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
+
 		private const float AvoidInterval = 5;
+		private readonly float[] FrustumWeights = new float[XCount * YCount]
+		{
+			0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
+			0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
+			0.5f, 2.0f, 2.0f, 2.0f, 0.5f,
+			0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
+			0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
+		};
 
 		private Person person_;
 		private Logger log_;
@@ -48,7 +59,7 @@ namespace Cue
 			var fs = main.Split(XCount, YCount);
 
 			for (int i = 0; i < fs.Length; ++i)
-				frustums_[i] = new FrustumInfo(p, fs[i]);
+				frustums_[i] = new FrustumInfo(p, fs[i], FrustumWeights[i]);
 
 			OnPersonalityChanged();
 			person_.PersonalityChanged += OnPersonalityChanged;
@@ -433,27 +444,36 @@ namespace Cue
 		public Frustum RandomAvailableFrustum()
 		{
 			int av = 0;
+			float totalWeight = 0;
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				if (!frustums_[i].avoid)
+				{
 					++av;
+					totalWeight += frustums_[i].weight;
+				}
 			}
 
 
-			int fi = U.RandomInt(0, av - 1);
+			float or = U.RandomFloat(0, totalWeight);
+			float r = or;
 
 			for (int i = 0; i < frustums_.Length; ++i)
 			{
 				if (frustums_[i].avoid)
 					continue;
 
-				if (fi == 0)
+				if (r <= frustums_[i].weight)
+				{
+					//Cue.LogError($"tw={totalWeight} r={r} picked {i}");
 					return frustums_[i].frustum;
+				}
 
-				--fi;
+				r -= frustums_[i].weight;
 			}
 
+			//Cue.LogError($"no frustum, tw={totalWeight} r was {or}");
 			return Frustum.Zero;
 		}
 	}
