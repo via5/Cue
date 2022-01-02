@@ -208,6 +208,8 @@ namespace Cue
 
 		public void Load(JSONClass o)
 		{
+			menus_.Clear();
+
 			J.OptBool(o, "muteSfx", ref muteSfx_);
 			J.OptBool(o, "skinColor", ref skinColor_);
 			J.OptBool(o, "skinGloss", ref skinGloss_);

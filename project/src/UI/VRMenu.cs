@@ -4,12 +4,18 @@ namespace Cue
 {
 	class VRMenu : BasicMenu
 	{
+		private const float Width = 300;
+		private const float MinDesktopHeight = 375;
+		private const float MinVRHeight = 350;
+
 		private const int Hidden = 0;
 		private const int Left = 1;
 		private const int Right = 2;
 
 		private readonly Sys.ISys sys_;
+		private float minHeight_;
 		private VUI.Label name_ = null;
+		private VUI.Panel buttons_ = null;
 		private CircularIndex<UIActions.IItem> widgetSel_;
 		private int state_ = Hidden;
 		private VUI.VRHandRootSupport vrSupport_ = null;
@@ -17,21 +23,24 @@ namespace Cue
 		public VRMenu(bool debugDesktop)
 		{
 			sys_ = Cue.Instance.Sys;
-			widgetSel_ = new CircularIndex<UIActions.IItem>(Items);
 
 			VUI.Root root;
 
 			if (debugDesktop)
 			{
-				root = new VUI.Root(new VUI.OverlayRootSupport(10, 300, 400));
+				minHeight_ = MinDesktopHeight;
+				root = new VUI.Root(new VUI.OverlayRootSupport(
+					10, Width, MinDesktopHeight));
 			}
 			else
 			{
+				minHeight_ = MinVRHeight;
+
 				vrSupport_ = new VUI.VRHandRootSupport(
 					VUI.VRHandRootSupport.LeftHand,
 					new UnityEngine.Vector3(0, 0.1f, 0),
 					new UnityEngine.Vector2(0, 0),
-					new UnityEngine.Vector2(300, 350));
+					new UnityEngine.Vector2(Width, MinVRHeight));
 
 				root = new VUI.Root(vrSupport_);
 			}
@@ -45,8 +54,8 @@ namespace Cue
 
 			p.Add(new VUI.Spacer(10));
 
-			foreach (var i in Items)
-				p.Add(i.Panel);
+			buttons_ = new VUI.Panel(new VUI.VerticalFlow());
+			p.Add(buttons_);
 
 			if (UI.VRMenuDebug)
 			{
@@ -72,10 +81,35 @@ namespace Cue
 			};
 
 			SetRoot(root);
+			Rebuild();
 
 			UpdateVisibility();
 			SetWidget(widgetSel_.Index);
 			PersonChanged();
+
+			Cue.Instance.Options.MenusChanged += Rebuild;
+		}
+
+		public override void Destroy()
+		{
+			base.Destroy();
+			Cue.Instance.Options.MenusChanged -= Rebuild;
+		}
+
+		private void Rebuild()
+		{
+			widgetSel_ = new CircularIndex<UIActions.IItem>(Items);
+			buttons_.RemoveAllChildren();
+
+			foreach (var i in Items)
+				buttons_.Add(i.Panel);
+
+			float height =
+				minHeight_ +
+				Cue.Instance.Options.Menus.Length * VUI.Style.Metrics.ButtonMinimumSize.Height;
+
+			Root.RootSupport.SetSize(new UnityEngine.Vector3(Width, height));
+			Root.SupportBoundsChanged();
 		}
 
 		public override void CheckInput()
@@ -184,7 +218,8 @@ namespace Cue
 					if (vrSupport_ != null)
 						vrSupport_.Attach(VUI.VRHandRootSupport.LeftHand);
 
-					Cue.Instance.Sys.SetMenuVisible(true);
+					if (!UI.VRMenuAlwaysVisible)
+						Cue.Instance.Sys.SetMenuVisible(true);
 
 					break;
 				}
@@ -196,7 +231,8 @@ namespace Cue
 					if (vrSupport_ != null)
 						vrSupport_.Attach(VUI.VRHandRootSupport.RightHand);
 
-					Cue.Instance.Sys.SetMenuVisible(true);
+					if (!UI.VRMenuAlwaysVisible)
+						Cue.Instance.Sys.SetMenuVisible(true);
 
 					break;
 				}

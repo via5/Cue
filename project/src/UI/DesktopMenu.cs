@@ -4,6 +4,9 @@ namespace Cue
 {
 	class DesktopMenu : BasicMenu
 	{
+		private float Width = 1200;
+		private float MinHeight = 90;
+
 		private readonly Sys.ISys sys_;
 
 		private VUI.Label name_ = null;
@@ -19,9 +22,9 @@ namespace Cue
 		{
 			sys_ = Cue.Instance.Sys;
 
-			var root = new VUI.Root(new VUI.OverlayRootSupport(10, 1200, 220));
+			var root = new VUI.Root(new VUI.OverlayRootSupport(10, Width, MinHeight));
 
-			var p = new VUI.Panel(new VUI.VerticalFlow(10));
+			var p = new VUI.Panel(new VUI.VerticalFlow(5));
 
 			{
 				var top = new VUI.Panel(new VUI.BorderLayout());
@@ -76,16 +79,23 @@ namespace Cue
 			}
 
 			root.ContentPanel.Layout = new VUI.BorderLayout();
-			root.ContentPanel.Add(p, VUI.BorderLayout.Center);
+			root.ContentPanel.Add(p, VUI.BorderLayout.Top);
 
 			SetRoot(root);
 			PersonChanged();
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;
-			OnOptionsChanged();
-
 			Cue.Instance.Options.MenusChanged += OnMenusChanged;
+
+			OnOptionsChanged();
 			OnMenusChanged();
+		}
+
+		public override void Destroy()
+		{
+			Cue.Instance.Options.Changed -= OnOptionsChanged;
+			Cue.Instance.Options.MenusChanged -= OnMenusChanged;
+			base.Destroy();
 		}
 
 		private void AddCustomButton(CustomMenu m)
@@ -145,13 +155,37 @@ namespace Cue
 		private void OnOptionsChanged()
 		{
 			tools_.Visible = Cue.Instance.Options.DevMode;
+			UpdateRootSize();
 		}
 
 		private void OnMenusChanged()
 		{
 			custom_.RemoveAllChildren();
+
+			custom_.Visible = (Cue.Instance.Options.Menus.Length > 0);
 			foreach (var m in Cue.Instance.Options.Menus)
 				AddCustomButton(m);
+
+			UpdateRootSize();
+		}
+
+		private void UpdateRootSize()
+		{
+			float height = 0;
+
+			if (custom_.Visible)
+				height += VUI.Style.Metrics.ButtonMinimumSize.Height;
+
+			if (tools_.Visible)
+				height += VUI.Style.Metrics.ButtonMinimumSize.Height;
+
+			if (height > 0)
+				height += 10;
+
+			height += MinHeight;
+
+			Root.RootSupport.SetSize(new UnityEngine.Vector3(Width, height));
+			Root.SupportBoundsChanged();
 		}
 
 		private void OnReload()

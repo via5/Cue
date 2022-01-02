@@ -173,13 +173,55 @@ namespace Cue
 		}
 
 
+		public class CustomMenuItem : Item<VUI.Button>
+		{
+			private CustomMenu m_;
+
+			public CustomMenuItem(CustomMenu m)
+				: base(new VUI.Button(m.Caption), null)
+			{
+				m_ = m;
+				Widget.Clicked += OnClicked;
+			}
+
+			public override bool Selected
+			{
+				set
+				{
+					if (value)
+						Widget.BackgroundColor = VUI.Style.Theme.HighlightBackgroundColor;
+					else
+						Widget.BackgroundColor = VUI.Style.Theme.ButtonBackgroundColor;
+				}
+			}
+
+			public override void Activate()
+			{
+				Widget.Click();
+			}
+
+			private void OnClicked()
+			{
+				m_.Trigger.Fire();
+			}
+		}
+
+
 		public static List<IItem> All()
 		{
-			return new List<IItem>
+			var list = new List<IItem>
 			{
-				Hand(), Mouth(), Thrust(), CanKiss(), Strapon(),
-				Genitals(), Breasts(), MovePlayer()
+				Hand(), Mouth(), Thrust(), CanKiss(), Strapon()
 			};
+
+			foreach (var m in Cue.Instance.Options.Menus)
+				list.Add(new CustomMenuItem(m));
+
+			list.Add(Genitals());
+			list.Add(Breasts());
+			list.Add(MovePlayer());
+
+			return list;
 		}
 
 		private static IItem Hand()
@@ -294,11 +336,18 @@ namespace Cue
 
 		public BasicMenu()
 		{
-			foreach (var i in UIActions.All())
-				items_.Add(i);
-
 			personSel_ = new CircularIndex<Person>(
 				Cue.Instance.ActivePersons, (p) => p.Body.Exists);
+
+			Cue.Instance.Options.MenusChanged += UpdateItems;
+			UpdateItems();
+		}
+
+		private void UpdateItems()
+		{
+			items_.Clear();
+			foreach (var i in UIActions.All())
+				items_.Add(i);
 
 			SetPerson(personSel_.Index, false);
 		}
@@ -338,8 +387,7 @@ namespace Cue
 			set { root_.Visible = value; }
 		}
 
-
-		public void Destroy()
+		public virtual void Destroy()
 		{
 			if (root_ != null)
 			{

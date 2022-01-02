@@ -87,6 +87,11 @@ namespace VUI
 			}
 		}
 
+		public void ForceRelayout(string why)
+		{
+			SetDirty(true, why);
+		}
+
 		protected override void NeedsLayoutImpl(string why)
 		{
 			if (!dirty_)
@@ -295,11 +300,7 @@ namespace VUI
 			Utilities.SetRectTransform(rootObject_, support_.Bounds);
 			rootObject_.AddComponent<LayoutElement>().ignoreLayout = true;
 
-			bounds_ = new Rectangle(0, 0, support_.Bounds.Size);
-			Glue.LogVerbose($"root: bounds {bounds_}");
-
-			content_.SetBounds(bounds_);
-			floating_.SetBounds(bounds_);
+			SupportBoundsChanged();
 
 			var text = SuperController.singleton.GetComponentInChildren<Text>();
 			if (text == null)
@@ -416,6 +417,22 @@ namespace VUI
 			{
 				Glue.LogErrorST(e.ToString());
 			}
+		}
+
+		public void SupportBoundsChanged()
+		{
+			bounds_ = new Rectangle(0, 0, support_.Bounds.Size);
+			Glue.LogVerbose($"root: bounds {bounds_}");
+
+			content_.SetBounds(bounds_);
+			floating_.SetBounds(bounds_);
+
+			ForceRelayout("support bounds changed");
+		}
+
+		public void ForceRelayout(string why = "")
+		{
+			content_.ForceRelayout(why);
 		}
 
 		public bool OverlayVisible
