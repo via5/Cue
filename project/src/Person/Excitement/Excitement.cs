@@ -98,7 +98,7 @@ namespace Cue
 			return rate;
 		}
 
-		private bool UsableSource(ErogenousZoneSource s)
+		public bool UsableSource(ErogenousZoneSource s)
 		{
 			if (s.Active && (person_.Mood.Get(Moods.Excited) <= s.Maximum))
 			{
@@ -115,7 +115,7 @@ namespace Cue
 		public override void Debug(List<string> debug)
 		{
 			string damp = "";
-			if (person_.Body.Zone(SS.Penetration).Active && zone_ != SS.Penetration)
+			if (person_.Excitement.NeedsPenetrationDamper() && zone_ != SS.Penetration)
 				damp = $" (damp={person_.Personality.Get(PS.PenetrationDamper):0.00})";
 
 			string disabled = "";
@@ -371,6 +371,26 @@ namespace Cue
 			get { return totalRate_; }
 		}
 
+		public bool NeedsPenetrationDamper()
+		{
+			var z = person_.Body.Zone(SS.Penetration);
+
+			if (z.Active)
+			{
+				var pen = sources_[SS.Penetration] as ZoneExcitementSource;
+
+				for (int i = 0; i < z.Sources.Length; ++i)
+				{
+					var s = z.Sources[i];
+
+					if (pen.UsableSource(s))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		public ExcitementSource GetSource(int ss)
 		{
 			return sources_[ss];
@@ -432,7 +452,7 @@ namespace Cue
 			float rate = 0;
 
 			float dampen = 1;
-			if (person_.Body.Zone(SS.Penetration).Active)
+			if (NeedsPenetrationDamper())
 				dampen = person_.Personality.Get(PS.PenetrationDamper);
 
 			for (int i = 0; i < sources_.Length; ++i)

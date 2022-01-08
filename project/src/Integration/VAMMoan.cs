@@ -424,6 +424,9 @@ namespace Cue.VamMoan
 			if (inOrgasm_)
 				return;
 
+			if (intensitiesCount_ == 0)
+				return;
+
 			if (intensity_ >= 0 && intensity_ <= breathingMax_)
 			{
 				Fire(p_.breathing, force);

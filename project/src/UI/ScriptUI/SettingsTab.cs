@@ -59,8 +59,8 @@ namespace Cue
 			p.Add(new VUI.Label("Voice pitch"));
 			p.Add(voicePitch_);
 
-			//p.Add(new VUI.Label("Traits"));
-			//p.Add(traits_);
+			p.Add(new VUI.Label("Traits"));
+			p.Add(traits_);
 
 			Layout = new VUI.VerticalFlow(20);
 			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));

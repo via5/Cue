@@ -48,20 +48,12 @@ namespace Cue
 			// sel row
 			{
 				selButtons_ = new VUI.Panel(new VUI.HorizontalFlow());
-
-				foreach (var i in Items)
-					selButtons_.Add(i.Panel);
-
 				p.Add(selButtons_);
 			}
 
 			// custom menus
 			{
 				custom_ = new VUI.Panel(new VUI.HorizontalFlow(10));
-
-				foreach (var m in Cue.Instance.Options.Menus)
-					AddCustomButton(m);
-
 				p.Add(custom_);
 			}
 
@@ -161,10 +153,16 @@ namespace Cue
 		private void OnMenusChanged()
 		{
 			custom_.RemoveAllChildren();
-
 			custom_.Visible = (Cue.Instance.Options.Menus.Length > 0);
 			foreach (var m in Cue.Instance.Options.Menus)
 				AddCustomButton(m);
+
+			selButtons_.RemoveAllChildren();
+			foreach (var i in Items)
+			{
+				if (!(i is UIActions.CustomMenuItem))
+					selButtons_.Add(i.Panel);
+			}
 
 			UpdateRootSize();
 		}
