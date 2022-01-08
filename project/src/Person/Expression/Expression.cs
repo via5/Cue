@@ -78,9 +78,9 @@
 			easing_ = e.easing_.Clone();
 		}
 
-		public void Init(Person p)
+		public bool Init(Person p)
 		{
-			g_.Init(p);
+			return g_.Init(p);
 		}
 
 		public override string ToString()

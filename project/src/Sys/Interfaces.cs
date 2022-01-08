@@ -380,6 +380,7 @@ namespace Cue.Sys
 
 	public interface IMorph
 	{
+		bool Valid { get; }
 		string Name { get; }
 		float Value { get; set; }
 		bool LimiterEnabled { set; }

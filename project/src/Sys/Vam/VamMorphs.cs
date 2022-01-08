@@ -465,6 +465,16 @@ namespace Cue.Sys.Vam
 			name_ = name;
 		}
 
+		public bool Valid
+		{
+			get
+			{
+				GetMorph();
+				return (morph_ != null && morph_.DAZMorph != null);
+			}
+		}
+
+
 		public MorphInfo MorphInfo
 		{
 			get { return morph_; }

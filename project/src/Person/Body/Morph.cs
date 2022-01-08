@@ -23,6 +23,11 @@ namespace Cue
 				bodyParts_ = new int[] { bodyPart };
 		}
 
+		public bool Init()
+		{
+			return (m_ != null) && m_.Valid;
+		}
+
 		public string Name
 		{
 			get { return m_?.Name ?? "?"; }
@@ -108,9 +113,10 @@ namespace Cue
 				return new MorphInfo(id_, multiplier_, bodyPart_);
 			}
 
-			public void Init(Person p)
+			public bool Init(Person p)
 			{
 				m_ = new Morph(p, id_, bodyPart_);
+				return m_.Init();
 			}
 
 			public void Set(float v)
@@ -166,12 +172,17 @@ namespace Cue
 			g.bodyParts_.CopyTo(bodyParts_, 0);
 		}
 
-		public void Init(Person p)
+		public bool Init(Person p)
 		{
 			person_ = p;
 
 			for (int i = 0; i < morphs_.Length; ++i)
-				morphs_[i].Init(p);
+			{
+				if (!morphs_[i].Init(p))
+					return false;
+			}
+
+			return true;
 		}
 
 		public string Name

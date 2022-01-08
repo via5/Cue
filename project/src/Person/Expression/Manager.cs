@@ -57,13 +57,15 @@ namespace Cue
 		private void Init()
 		{
 			var all = person_.Personality.GetExpressions();
-			exps_ = new WeightedExpression[all.Length];
+			var exps = new List<WeightedExpression>();
 
 			for (int i = 0; i < all.Length; ++i)
 			{
-				all[i].Init(person_);
-				exps_[i] = new WeightedExpression(all[i]);
+				if (all[i].Init(person_))
+					exps.Add(new WeightedExpression(all[i]));
 			}
+
+			exps_ = exps.ToArray();
 
 			for (int i = 0; i < MaxActive; ++i)
 				NextActive();
