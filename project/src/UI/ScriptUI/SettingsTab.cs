@@ -36,6 +36,7 @@ namespace Cue
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.ComboBox<string> voice_ = new VUI.ComboBox<string>();
+		private VUI.Label voiceWarning_ = new VUI.Label();
 		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
@@ -54,7 +55,11 @@ namespace Cue
 			p.Add(personality_);
 
 			p.Add(new VUI.Label("Voice"));
-			p.Add(voice_);
+
+			var voicePanel = new VUI.Panel(new VUI.HorizontalFlow(10));
+			voicePanel.Add(voice_);
+			voicePanel.Add(voiceWarning_);
+			p.Add(voicePanel);
 
 			p.Add(new VUI.Label("Voice pitch"));
 			p.Add(voicePitch_);
@@ -72,6 +77,8 @@ namespace Cue
 			traits_.Edited += OnTraits;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
+			voiceWarning_.Visible = false;
+			voiceWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
 
 			try
 			{
@@ -106,6 +113,8 @@ namespace Cue
 					SelectVoice(person_.Voice.Name);
 
 				voicePitch_.Set(person_.Voice.Pitch, 0, 1);
+				voiceWarning_.Text = person_.Voice.Warning;
+				voiceWarning_.Visible = (voiceWarning_.Text.Length > 0);
 			}
 			finally
 			{
@@ -167,12 +176,14 @@ namespace Cue
 			if (names.Length == 0)
 			{
 				voice_.Enabled = false;
-				return;
 			}
-
-			voice_.Enabled = true;
-			voice_.SetItems(names, person_.Voice.Name);
+			else
+			{
+				voice_.Enabled = true;
+				voice_.SetItems(names, person_.Voice.Name);
+			}
 		}
+
 
 		private void SelectVoice(string name)
 		{

@@ -36,6 +36,7 @@ namespace Cue.VamMoan
 		private float voiceCheckElapsed_ = 0;
 		private float forceIntensityElapsed_ = 0;
 		private bool inOrgasm_ = false;
+		private string warning_ = "";
 
 		private string voice_ = "";
 		private float pitch_ = -1;
@@ -130,7 +131,6 @@ namespace Cue.VamMoan
 			if (orgasmAction_ != "")
 				p_.orgasm = AP(orgasmAction_);
 
-			CheckVersion();
 			CheckVoice();
 
 			p_.enabled.Value = true;
@@ -278,16 +278,48 @@ namespace Cue.VamMoan
 			}
 		}
 
+		private void CheckVoice()
+		{
+			CheckVersion();
+
+			var v = p_.voice.Value;
+
+			if (v != voice_)
+			{
+				if (p_.hasAvailableIntensities)
+				{
+					float c = p_.availableIntensities.Value;
+					intensitiesCount_ = U.Clamp((int)c, 0, p_.intensities.Length);
+				}
+				else
+				{
+					intensitiesCount_ = p_.intensities.Length;
+				}
+
+				SetIntensity(true);
+				voice_ = v;
+			}
+		}
+
 		private void CheckVersion()
 		{
-			if (p_.voice.Check() && !p_.availableIntensities.Check())
+			warning_ = "";
+
+			if (p_.voice.Check())
 			{
-				log_.Error($"Cue requires VAMMoan 11 or above");
-				p_.hasAvailableIntensities = false;
+				if (p_.availableIntensities.Check())
+				{
+					p_.hasAvailableIntensities = true;
+				}
+				else
+				{
+					warning_ = $"Cue requires VAMMoan 11 or above";
+					p_.hasAvailableIntensities = false;
+				}
 			}
 			else
 			{
-				p_.hasAvailableIntensities = true;
+				warning_ = $"VAMMoan not found";
 			}
 		}
 
@@ -321,27 +353,6 @@ namespace Cue.VamMoan
 			return new Sys.Vam.FloatParameter(person_, PluginName, name);
 		}
 
-		private void CheckVoice()
-		{
-			var v = p_.voice.Value;
-
-			if (v != voice_)
-			{
-				if (p_.hasAvailableIntensities)
-				{
-					float c = p_.availableIntensities.Value;
-					intensitiesCount_ = U.Clamp((int)c, 0, p_.intensities.Length);
-				}
-				else
-				{
-					intensitiesCount_ = p_.intensities.Length;
-				}
-
-				SetIntensity(true);
-				voice_ = v;
-			}
-		}
-
 		public void Destroy()
 		{
 			// no-op
@@ -359,15 +370,7 @@ namespace Cue.VamMoan
 				if (pitch_ != value)
 				{
 					pitch_ = value;
-
-					if (p_.pitch != null)
-					{
-						float min = 0.8f;
-						float max = 1.2f;
-						float range = max - min;
-
-						p_.pitch.Value = min + range * value;
-					}
+					SetPitch();
 				}
 			}
 		}
@@ -417,6 +420,23 @@ namespace Cue.VamMoan
 					}
 				}
 			}
+		}
+
+		public string Warning
+		{
+			get { return warning_; }
+		}
+
+		private void SetPitch()
+		{
+			if (p_.pitch == null)
+				return;
+
+			float min = 0.8f;
+			float max = 1.2f;
+			float range = max - min;
+
+			p_.pitch.Value = min + range * pitch_;
 		}
 
 		private void SetIntensity(bool force = false)

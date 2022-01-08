@@ -69,6 +69,7 @@ namespace Cue
 
 		string[] AvailableVoices { get; }
 		string Name { get; set; }
+		string Warning { get; }
 	}
 
 	public interface IGazer

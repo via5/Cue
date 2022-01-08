@@ -345,6 +345,8 @@ namespace Cue
 				if (vo.HasKey("pitch"))
 				{
 					float fp = vo["pitch"].AsFloat;
+					if (fp < 0)
+						fp = 0.5f;
 
 					if (voiceProto_ != null)
 						voiceProto_.Pitch = fp;

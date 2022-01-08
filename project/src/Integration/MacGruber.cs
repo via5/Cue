@@ -333,6 +333,11 @@ namespace Cue.MacGruber
 			set { }
 		}
 
+		public string Warning
+		{
+			get { return ""; }
+		}
+
 		public void Destroy()
 		{
 			// no-op
