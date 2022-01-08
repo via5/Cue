@@ -173,7 +173,7 @@ namespace Cue
 			var lips = b.Get(BP.Lips);
 
 			bool busy =
-				person_.Status.AnyInsidePersonalSpace() ||
+				person_.Status.Groped() ||
 				person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim) ||
 				head.LockedFor(BodyPartLock.Move) ||
 				lips.LockedFor(BodyPartLock.Morph);
