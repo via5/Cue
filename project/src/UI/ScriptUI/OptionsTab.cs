@@ -21,7 +21,6 @@
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox playSfx_, skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, devMode_;
-		private VUI.CheckBox leftMenu_, rightMenu_;
 		private bool ignore_ = false;
 
 		public MainOptionsTab()
@@ -67,13 +66,6 @@
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
-			leftMenu_ = p.Add(new VUI.CheckBox("Left hand menu", OnLeftMenu, o.LeftMenu));
-			rightMenu_ = p.Add(new VUI.CheckBox("Right hand menu", OnRightMenu, o.RightMenu));
-			p.Add(new VUI.Label(
-				"Enables the VR menu on the left or right hand.",
-				VUI.Label.Wrap));
-			p.Add(new VUI.Spacer(20));
-
 			devMode_ = p.Add(new VUI.CheckBox("Dev mode", OnDevMode, o.DevMode));
 			p.Add(new VUI.Label("Enables a bunch of tabs.", VUI.Label.Wrap));
 
@@ -110,8 +102,6 @@
 				skinGloss_.Checked = o.SkinGloss;
 				hairLoose_.Checked = o.HairLoose;
 				handLinking_.Checked = o.HandLinking;
-				leftMenu_.Checked = o.LeftMenu;
-				rightMenu_.Checked = o.RightMenu;
 				devMode_.Checked = o.DevMode;
 			}
 			finally
@@ -156,18 +146,6 @@
 			Cue.Instance.Options.HandLinking = b;
 		}
 
-		private void OnLeftMenu(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.LeftMenu = b;
-		}
-
-		private void OnRightMenu(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.RightMenu = b;
-		}
-
 		private void OnDevMode(bool b)
 		{
 			if (ignore_) return;
@@ -208,19 +186,43 @@
 
 	class MenuOptionsTab : Tab
 	{
+		private VUI.CheckBox leftMenu_, rightMenu_;
 		private VUI.Panel buttons_;
+		private bool ignore_ = false;
 
 		public MenuOptionsTab()
 			: base("Menu", false)
 		{
-			var top = new VUI.Panel(new VUI.HorizontalFlow());
-			top.Add(new VUI.Button("Add button", OnAdd));
+			var o = Cue.Instance.Options;
 
+			var ly = new VUI.VerticalFlow(5);
+			var top = new VUI.Panel(ly);
+
+			leftMenu_ = top.Add(new VUI.CheckBox("Left hand menu", OnLeftMenu, o.LeftMenu));
+			rightMenu_ = top.Add(new VUI.CheckBox("Right hand menu", OnRightMenu, o.RightMenu));
+
+			top.Add(new VUI.Label(
+				"Enables the VR menu on the left or right hand.",
+				VUI.Label.Wrap));
+			top.Add(new VUI.Spacer(20));
+
+
+			var center = new VUI.Panel(new VUI.BorderLayout(10));
+			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
+
+			controls.Add(new VUI.Button("Add button", OnAdd));
+			controls.Add(new VUI.Label("Adds custom buttons to the menu"));
 			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			center.Add(controls, VUI.BorderLayout.Top);
+			center.Add(buttons_, VUI.BorderLayout.Center);
 
 			Layout = new VUI.BorderLayout(20);
 			Add(top, VUI.BorderLayout.Top);
-			Add(buttons_, VUI.BorderLayout.Center);
+			Add(center, VUI.BorderLayout.Center);
+
+			o.Changed += OnOptionsChanged;
+			OnOptionsChanged();
 		}
 
 		public override bool DebugOnly
@@ -251,9 +253,38 @@
 			return p;
 		}
 
+		private void OnOptionsChanged()
+		{
+			try
+			{
+				ignore_ = true;
+
+				var o = Cue.Instance.Options;
+
+				leftMenu_.Checked = o.LeftMenu;
+				rightMenu_.Checked = o.RightMenu;
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
 		private void OnAdd()
 		{
 			Cue.Instance.Options.AddCustomMenu();
+		}
+
+		private void OnLeftMenu(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.LeftMenu = b;
+		}
+
+		private void OnRightMenu(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.RightMenu = b;
 		}
 
 		private void OnEditTrigger(CustomMenu m)
