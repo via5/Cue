@@ -26,8 +26,8 @@ namespace Cue.Proc
 		private float headTorqueMax_ = -20;
 		private float headTorqueWin_ = 10;
 		private float durationMin_ = 1;
-		private float durationMax_ = 0.1f;
-		private float durationWin_ = 0.15f;
+		private float durationMax_ = 0.15f;
+		private float durationWin_ = 0.1f;
 		private float durationInterval_ = 10;
 		private Force hipForce_ = null;
 		private Force hipTorque_ = null;
@@ -308,7 +308,7 @@ namespace Cue.Proc
 		private float hipAloneForceMin_ = 300;
 		private float hipAloneForceMax_ = 800;
 		private float hipAloneTorqueMin_ = -20;
-		private float hipAloneTorqueMax_ = -120;
+		private float hipAloneTorqueMax_ = -150;
 		private float hipAloneTorqueWindow_ = 20;
 
 		public FrottageProcAnimation()
