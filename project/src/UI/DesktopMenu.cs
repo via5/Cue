@@ -98,7 +98,7 @@ namespace Cue
 			}));
 		}
 
-		public override void CheckInput()
+		public override void CheckInput(float s)
 		{
 			// no-op
 		}

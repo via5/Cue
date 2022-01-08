@@ -19,6 +19,7 @@ namespace Cue
 		private CircularIndex<UIActions.IItem> widgetSel_;
 		private int state_ = Hidden;
 		private VUI.VRHandRootSupport vrSupport_ = null;
+		private float menuDelay_ = 0;
 
 		public VRMenu(bool debugDesktop)
 		{
@@ -112,20 +113,40 @@ namespace Cue
 			Root.SupportBoundsChanged();
 		}
 
-		public override void CheckInput()
+		private bool CheckMenuDelay(float s)
+		{
+			menuDelay_ += s;
+
+			if (menuDelay_ >= Cue.Instance.Options.MenuDelay)
+				return true;
+
+			return false;
+		}
+
+		public override void CheckInput(float s)
 		{
 			if (sys_.IsPlayMode || UI.VRMenuDebug)
 			{
 				if (sys_.Input.ShowLeftMenu)
-					ShowLeft();
+				{
+					if (CheckMenuDelay(s))
+						ShowLeft();
+				}
 				else if (sys_.Input.ShowRightMenu)
-					ShowRight();
+				{
+					if (CheckMenuDelay(s))
+						ShowRight();
+				}
 				else
+				{
 					Hide();
+					menuDelay_ = 0;
+				}
 			}
 			else
 			{
 				Hide();
+				menuDelay_ = 0;
 			}
 
 

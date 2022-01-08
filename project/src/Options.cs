@@ -87,6 +87,7 @@ namespace Cue
 		private bool handLinking_ = true;
 		private bool devMode_ = false;
 		private float excitement_ = 1.0f;
+		private float menuDelay_ = 0.5f;
 		private bool leftMenu_ = true;
 		private bool rightMenu_ = true;
 		private List<CustomMenu> menus_ = new List<CustomMenu>();
@@ -149,6 +150,12 @@ namespace Cue
 			set { excitement_ = value; OnChanged(); }
 		}
 
+		public float MenuDelay
+		{
+			get { return menuDelay_; }
+			set { menuDelay_ = value; OnChanged(); }
+		}
+
 		public CustomMenu[] Menus
 		{
 			get { return menus_.ToArray(); }
@@ -190,6 +197,7 @@ namespace Cue
 			o["hairLoose"] = new JSONData(hairLoose_);
 			o["devMode"] = new JSONData(devMode_);
 			o["excitement"] = new JSONData(excitement_);
+			o["menuDelay"] = new JSONData(menuDelay_);
 			o["leftMenu"] = new JSONData(leftMenu_);
 			o["rightMenu"] = new JSONData(rightMenu_);
 
@@ -217,6 +225,7 @@ namespace Cue
 			J.OptBool(o, "hairLoose", ref hairLoose_);
 			J.OptBool(o, "devMode", ref devMode_);
 			J.OptFloat(o, "excitement", ref excitement_);
+			J.OptFloat(o, "menuDelay", ref menuDelay_);
 			J.OptBool(o, "leftMenu", ref leftMenu_);
 			J.OptBool(o, "rightMenu", ref rightMenu_);
 

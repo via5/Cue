@@ -420,7 +420,7 @@ namespace Cue
 				throw new PluginGone();
 			}
 
-			ui_?.CheckInput();
+			ui_?.CheckInput(s);
 		}
 
 		private void DoUpdateObjects(float s)

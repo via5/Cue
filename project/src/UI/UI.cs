@@ -55,7 +55,7 @@ namespace Cue
 			}
 		}
 
-		public void CheckInput()
+		public void CheckInput(float s)
 		{
 			var vr = sys_.IsVR || VRMenuDebug;
 
@@ -72,7 +72,7 @@ namespace Cue
 				CreateUI();
 			}
 
-			menu_.CheckInput();
+			menu_.CheckInput(s);
 		}
 
 		public void OnPluginState(bool b)

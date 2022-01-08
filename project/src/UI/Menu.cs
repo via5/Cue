@@ -323,7 +323,7 @@ namespace Cue
 		Person SelectedPerson { get; set; }
 
 		void Destroy();
-		void CheckInput();
+		void CheckInput(float s);
 		void Update();
 	}
 
@@ -398,7 +398,7 @@ namespace Cue
 			items_.Clear();
 		}
 
-		public abstract void CheckInput();
+		public abstract void CheckInput(float s);
 
 		public virtual void Update()
 		{

@@ -187,6 +187,7 @@
 	class MenuOptionsTab : Tab
 	{
 		private VUI.CheckBox leftMenu_, rightMenu_;
+		private VUI.FloatTextSlider menuDelay_;
 		private VUI.Panel buttons_;
 		private bool ignore_ = false;
 
@@ -196,6 +197,8 @@
 			var o = Cue.Instance.Options;
 
 			var ly = new VUI.VerticalFlow(5);
+			ly.Expand = false;
+
 			var top = new VUI.Panel(ly);
 
 			leftMenu_ = top.Add(new VUI.CheckBox("Left hand menu", OnLeftMenu, o.LeftMenu));
@@ -206,6 +209,10 @@
 				VUI.Label.Wrap));
 			top.Add(new VUI.Spacer(20));
 
+			menuDelay_ = top.Add(new VUI.FloatTextSlider(0, 5, OnMenuDelay));
+			top.Add(new VUI.Label("Delay in seconds before showing the hand menus"));
+
+			menuDelay_.MaximumSize = new VUI.Size(300, DontCare);
 
 			var center = new VUI.Panel(new VUI.BorderLayout(10));
 			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
@@ -261,6 +268,7 @@
 
 				var o = Cue.Instance.Options;
 
+				menuDelay_.Value = o.MenuDelay;
 				leftMenu_.Checked = o.LeftMenu;
 				rightMenu_.Checked = o.RightMenu;
 			}
@@ -273,6 +281,12 @@
 		private void OnAdd()
 		{
 			Cue.Instance.Options.AddCustomMenu();
+		}
+
+		private void OnMenuDelay(float f)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.MenuDelay = f;
 		}
 
 		private void OnLeftMenu(bool b)
