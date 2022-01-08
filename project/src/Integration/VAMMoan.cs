@@ -8,6 +8,7 @@ namespace Cue.VamMoan
 	{
 		private const string PluginName = "VAMMoanPlugin.VAMMoan";
 		private const float DefaultBreathingMax = 0.2f;
+		private const float DefaultBreathingIntensityCutoff = 0.6f;
 		private const float VoiceCheckInterval = 5;
 		private const float ForceIntensityInterval = 1;
 
@@ -40,7 +41,8 @@ namespace Cue.VamMoan
 
 		private string voice_ = "";
 		private float pitch_ = -1;
-		private float breathingMax_ = DefaultBreathingMax;
+		private float breathingRange_ = DefaultBreathingMax;
+		private float breathingIntensityCutoff_ = DefaultBreathingIntensityCutoff;
 		private string orgasmAction_ = "Voice orgasm";
 
 		private float intensity_ = 0;
@@ -57,8 +59,12 @@ namespace Cue.VamMoan
 
 		public Voice(JSONClass o)
 		{
-			breathingMax_ = U.Clamp(
-				J.OptFloat(o, "breathingMax", DefaultBreathingMax),
+			breathingRange_ = U.Clamp(
+				J.OptFloat(o, "breathingRange", DefaultBreathingMax),
+				0, 1);
+
+			breathingIntensityCutoff_ = U.Clamp(
+				J.OptFloat(o, "breathingIntensityCutoff", DefaultBreathingIntensityCutoff),
 				0, 1);
 
 			J.OptString(o, "orgasmAction", ref orgasmAction_);
@@ -108,7 +114,8 @@ namespace Cue.VamMoan
 		{
 			voice_ = b.voice_;
 			pitch_ = b.pitch_;
-			breathingMax_ = b.breathingMax_;
+			breathingRange_ = b.breathingRange_;
+			breathingIntensityCutoff_ = b.breathingIntensityCutoff_;
 			orgasmAction_ = b.orgasmAction_;
 			intensityWaitRange_ = b.intensityWaitRange_;
 			intensityWaitRng_ = b.intensityWaitRng_.Clone();
@@ -154,7 +161,6 @@ namespace Cue.VamMoan
 				if (bs[i]?.buttonText?.text == "Set optimal auto-jaw animation parameters")
 				{
 					bs[i]?.button?.onClick?.Invoke();
-					Cue.LogError("!");
 					break;
 				}
 			}
@@ -210,8 +216,12 @@ namespace Cue.VamMoan
 					intensityWaitRange_.first, intensityWaitRange_.second,
 					maxIntensity_);
 
+				float min = 0;
+				if (maxIntensity_ >= breathingIntensityCutoff_)
+					min = breathingRange_ + 0.01f;
+
 				intensityTarget_ = intensityTargetRng_.RandomFloat(
-					0, maxIntensity_, maxIntensity_);
+					min, maxIntensity_, maxIntensity_);
 			}
 			else if (intensity_ > intensityTarget_)
 			{
@@ -266,7 +276,8 @@ namespace Cue.VamMoan
 			A("voice", voice_);
 			A("intensitiesCount", $"{intensitiesCount_}");
 			A("pitch", $"{pitch_:0.00}");
-			A("breathingMax", $"{breathingMax_:0.00}");
+			A("breathingRange", $"{breathingRange_:0.00}");
+			A("breathingCutoff", $"{breathingIntensityCutoff_:0.00}");
 			A("orgasmAction", orgasmAction_);
 			A("", "");
 			A("maxIntensity", $"{maxIntensity_:0.00}");
@@ -471,14 +482,14 @@ namespace Cue.VamMoan
 			if (intensitiesCount_ == 0)
 				return;
 
-			if (intensity_ >= 0 && intensity_ <= breathingMax_)
+			if (intensity_ >= 0 && intensity_ <= breathingRange_)
 			{
 				Fire(p_.breathing, force);
 			}
 			else
 			{
-				float range = 1 - breathingMax_;
-				float v = intensity_ - breathingMax_;
+				float range = 1 - breathingRange_;
+				float v = intensity_ - breathingRange_;
 				float p = (v / range);
 
 				int index = (int)(p * intensitiesCount_);
@@ -502,10 +513,7 @@ namespace Cue.VamMoan
 
 		public override string ToString()
 		{
-			return
-				$"VAMMoan v={voice_} " +
-				$"i={lastAction_} " +
-				$"bm={breathingMax_}";
+			return $"VAMMoan v={voice_} i={lastAction_}";
 		}
 	}
 }

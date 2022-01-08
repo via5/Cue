@@ -49,8 +49,9 @@ namespace Cue
 			float deltaTime = 0;
 			long last = 0;
 
-			var r = new NormalRandom(0, 0.8f, 3, 3);
-			NormalTest(r, 0, 0.36f, 0.36f);
+			//var r = new NormalRandom(0, 0.8f, 3, 3);
+			//NormalTest(r, 0, 0.36f, 0.36f);
+			TestIntensities();
 
 			for (; ; )
 			{
@@ -96,7 +97,7 @@ namespace Cue
 
 		private void TestIntensity(float i)
 		{
-			float breathingMax_ = 0.2f;
+			float breathingMax_ = 0.1f;
 			float min = 0;
 			float breathingCutoff = 1;
 

@@ -7,7 +7,8 @@
 		"provider": "vammoan",
 		"options":
 		{
-			"breathingMax": 0.1,
+			"breathingRange": 0.1,
+			"breathingIntensityCutoff": 0.6,
 			"orgasmAction": "Voice orgasm",
 			"intensityWait":
 			{
