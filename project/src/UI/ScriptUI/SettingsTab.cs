@@ -187,7 +187,8 @@ namespace Cue
 
 		private void SelectVoice(string name)
 		{
-			voice_.Select(name);
+			if (voice_.Selected != name)
+				voice_.Select(name);
 		}
 
 		private void OnVoice(string name)

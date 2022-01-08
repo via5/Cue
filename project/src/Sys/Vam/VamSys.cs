@@ -437,7 +437,7 @@ namespace Cue.Sys.Vam
 
 		public void ReloadPlugin()
 		{
-			var pui = GetPluginUI();
+			var pui = GetPluginUI(CueMain.PluginCslist);
 			if (pui == null)
 				return;
 
@@ -448,7 +448,7 @@ namespace Cue.Sys.Vam
 
 		public void OpenScriptUI()
 		{
-			var pui = GetPluginUI();
+			var pui = GetPluginUI(CueMain.PluginCslist);
 			if (pui == null)
 				return;
 
@@ -497,7 +497,7 @@ namespace Cue.Sys.Vam
 			scui.openUIButton?.onClick?.Invoke();
 		}
 
-		private MVRPluginUI GetPluginUI()
+		public MVRPluginUI GetPluginUI(string pluginCslist)
 		{
 			// don't use cue for logging in case something went wrong when
 			// loading
@@ -521,7 +521,7 @@ namespace Cue.Sys.Vam
 
 			foreach (var pui in uit.parent.GetComponentsInChildren<MVRPluginUI>())
 			{
-				if (pui.urlText.text.Contains("Cue.cslist"))
+				if (pui.urlText.text.Contains(pluginCslist))
 					return pui;
 			}
 

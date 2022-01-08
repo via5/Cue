@@ -134,7 +134,30 @@ namespace Cue.VamMoan
 			CheckVoice();
 
 			p_.enabled.Value = true;
+			p_.autoJaw.Value = true;
+			SetOptimalJaw();
+
 			MacGruber.Voice.Disable(p);
+		}
+
+		private void SetOptimalJaw()
+		{
+			var atom = CueMain.Instance.MVRPluginManager?.containingAtom;
+			var atomUI = atom?.UITransform?.GetComponentInChildren<AtomUI>();
+			var bs = atomUI?.GetComponentsInChildren<UIDynamicButton>(true);
+
+			if (bs == null)
+				return;
+
+			for (int i=0; i<bs.Length; ++i)
+			{
+				if (bs[i]?.buttonText?.text == "Set optimal auto-jaw animation parameters")
+				{
+					bs[i]?.button?.onClick?.Invoke();
+					Cue.LogError("!");
+					break;
+				}
+			}
 		}
 
 		public static void Disable(Person p)
@@ -278,13 +301,13 @@ namespace Cue.VamMoan
 			}
 		}
 
-		private void CheckVoice()
+		private void CheckVoice(bool force = false)
 		{
 			CheckVersion();
 
 			var v = p_.voice.Value;
 
-			if (v != voice_)
+			if (force || v != voice_)
 			{
 				if (p_.hasAvailableIntensities)
 				{
@@ -297,6 +320,7 @@ namespace Cue.VamMoan
 				}
 
 				SetIntensity(true);
+				SetOptimalJaw();
 				voice_ = v;
 			}
 		}
@@ -416,7 +440,7 @@ namespace Cue.VamMoan
 					if (p_.voice != null)
 					{
 						p_.voice.Value = value;
-						CheckVoice();
+						CheckVoice(true);
 					}
 				}
 			}

@@ -72,6 +72,11 @@ namespace Cue
 			}
 		}
 
+		public static string PluginCslist
+		{
+			get { return "Cue.cslist"; }
+		}
+
 		private void TestIntensities()
 		{
 			for (int i = 0; i < 10; ++i)
@@ -255,6 +260,11 @@ namespace Cue
 		static public CueMain Instance
 		{
 			get { return instance_; }
+		}
+
+		public static string PluginCslist
+		{
+			get { return "Cue.cslist"; }
 		}
 
 		public CueToken Token
