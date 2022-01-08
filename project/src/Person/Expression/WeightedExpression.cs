@@ -20,13 +20,21 @@
 		private float speed_ = 0;
 		private float min_ = 0;
 		private float max_ = 1;
+		private int mainMood_ = Moods.None;
 
-		private Duration holdTime_ = new Duration(0, 3);
+		private Duration holdTime_;
 
 
-		public WeightedExpression(Expression e)
+		public WeightedExpression(Person p, Expression e)
 		{
+			var ps = p.Personality;
+
 			e_ = e;
+
+			holdTime_ = new Duration(
+				e.MinHoldTime < 0 ? ps.Get(PS.ExpressionMinHoldTime) : e.MinHoldTime,
+				e.MaxHoldTime < 0 ? ps.Get(PS.ExpressionMaxHoldTime) : e.MaxHoldTime);
+
 			Deactivate();
 		}
 
@@ -50,20 +58,16 @@
 			get { return speed_; }
 		}
 
-		public void Set(float weight, float intensity, float speed)
-		{
-			Set(weight, intensity, speed, 0, 1);
-		}
-
 		public void Set(
 			float weight, float intensity, float speed,
-			float min, float max)
+			float min, float max, int mainMood)
 		{
 			weight_ = weight;
 			intensity_ = intensity;
 			speed_ = speed;
 			min_ = min;
 			max_ = max;
+			mainMood_ = mainMood;
 		}
 
 		public bool Active
@@ -154,9 +158,21 @@
 			return $"{e_.Name} ({e_.MoodString()}) w={weight_:0.00}";
 		}
 
+		IRandom rng_ = new NormalRandom(0.3f, 0.9f, 1, 5);
+
 		private float RandomTarget()
 		{
-			return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);
+			if (e_.MaxOnly)
+			{
+				return 1.0f;
+			}
+			else
+			{
+				if (mainMood_ == Moods.Excited)
+					return rng_.RandomFloat(min_, intensity_, intensity_);
+				else
+					return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);
+			}
 		}
 
 		private float MinRandomTime()

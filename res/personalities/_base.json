@@ -104,6 +104,11 @@
 			"name": "stifled",
 			"moods": "excited",
 			"bodyParts": "mouth",
+			"exclusive": true,
+			"minExcitement": 0.7,
+			"minHoldTime": 2,
+			"maxHoldTime": 3,
+			"maxOnly": true,
 			"morphs":
 			[
 				{
@@ -309,7 +314,7 @@
 
 	"idleNaturalRandomWeight": 0.05,
 	"idleEmptyRandomWeight": 0.05,
-	"naturalRandomWeight": 0,
+	"naturalRandomWeight": 0.0001,
 	"naturalOtherEyesWeight": 0.2,
 	"busyOtherEyesWeight": 0.5,
 	"naturalPlayerEyesWeight": 1.5,
@@ -380,6 +385,14 @@
 	"angerExcitementFactorForHappiness": 0,
 	"maxHappiness": 1,
 	"maxExcitedExpression": 1,
+
+	"expressionMinHoldTime": 0,
+	"expressionMaxHoldTime": 3,
+	"excitedExpressionWeightModifier": 2,
+	"exclusiveExpressionWeightModifier": 0.1,
+	"orgasmExpressionRangeMin": 0.8,
+	"orgasmExpressionRangeMax": 1,
+	"orgasmFirstExpressionTime": 0.2,
 
 	"maxSweat": 1,
 	"maxFlush": 1,

@@ -62,7 +62,7 @@ namespace Cue
 			for (int i = 0; i < all.Length; ++i)
 			{
 				if (all[i].Init(person_))
-					exps.Add(new WeightedExpression(all[i]));
+					exps.Add(new WeightedExpression(person_, all[i]));
 			}
 
 			exps_ = exps.ToArray();
@@ -78,7 +78,6 @@ namespace Cue
 			if (lastPersonality_ != person_.Personality)
 				Init();
 
-
 			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
 			{
 				isOrgasming_ = true;
@@ -89,8 +88,7 @@ namespace Cue
 					if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(Moods.Orgasm))
 					{
 						foundActive = true;
-						exps_[i].Set(1, 1, 1, 0.9f, 1.0f);
-						exps_[i].Activate(1.0f, 0.2f);
+						ActivateForOrgasm(exps_[i]);
 					}
 					else if (exps_[i].Active)
 					{
@@ -104,8 +102,7 @@ namespace Cue
 					{
 						if (exps_[i].Expression.IsMood(Moods.Orgasm))
 						{
-							exps_[i].Set(1, 1, 1, 0.9f, 1.0f);
-							exps_[i].Activate(1.0f, 0.2f);
+							ActivateForOrgasm(exps_[i]);
 							break;
 						}
 					}
@@ -199,16 +196,64 @@ namespace Cue
 						continue;
 
 					if (r < exps_[i].Weight)
-					{
-						exps_[i].Activate();
-						return true;
-					}
+						return Activate(exps_[i]);
 
 					r -= exps_[i].Weight;
 				}
 			}
 
 			return false;
+		}
+
+		private bool Activate(WeightedExpression e)
+		{
+			if (e.Expression.Exclusive)
+			{
+				e.Activate();
+
+				for (int i = 0; i < exps_.Length; ++i)
+				{
+					if (exps_[i] == e)
+						continue;
+
+					if (exps_[i].Active)
+					{
+						if (exps_[i].Expression.AffectsAnyBodyPart(e.Expression.BodyParts))
+							exps_[i].Deactivate();
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < exps_.Length; ++i)
+				{
+					if (exps_[i] == e)
+						continue;
+
+					if (exps_[i].Active && exps_[i].Expression.Exclusive)
+					{
+						if (exps_[i].Expression.AffectsAnyBodyPart(e.Expression.BodyParts))
+							return false;
+					}
+				}
+
+				e.Activate();
+			}
+
+			return true;
+		}
+
+		private void ActivateForOrgasm(WeightedExpression e)
+		{
+			var ps = person_.Personality;
+
+			e.Set(
+				1, 1, 1,
+				ps.Get(PS.OrgasmExpressionRangeMin),
+				ps.Get(PS.OrgasmExpressionRangeMax),
+				Moods.Orgasm);
+
+			e.Activate(1.0f, ps.Get(PS.OrgasmFirstExpressionTime));
 		}
 
 		private void UpdateExpressions()
@@ -230,43 +275,81 @@ namespace Cue
 				float intensity = 0;
 				float min = 0, max = 1;
 
+				int highestMood = Moods.None;
+				float highestMoodValue = 0;
 
 				if (isOrgasming_)
 				{
 					if (e.IsMood(Moods.Orgasm))
 					{
+						if (m.Get(Moods.Orgasm) > highestMood)
+						{
+							highestMood = Moods.Orgasm;
+							highestMoodValue = m.Get(Moods.Orgasm);
+						}
+
 						weight += 1;
 						intensity = 1;
-						min = 0.8f;
-						max = 1.0f;
+						min = ps.Get(PS.OrgasmExpressionRangeMin);
+						max = ps.Get(PS.OrgasmExpressionRangeMax);
 					}
 				}
 				else
 				{
 					if (e.IsMood(Moods.Happy))
 					{
+						if (m.Get(Moods.Happy) > highestMood)
+						{
+							highestMood = Moods.Happy;
+							highestMoodValue = m.Get(Moods.Happy);
+						}
+
 						weight += m.Get(Moods.Happy);
 						intensity = Math.Max(intensity, m.Get(Moods.Happy));
 					}
 
 					if (e.IsMood(Moods.Excited))
 					{
-						weight += m.Get(Moods.Excited) * 2;
+						if (m.Get(Moods.Excited) > highestMood)
+						{
+							highestMood = Moods.Excited;
+							highestMoodValue = m.Get(Moods.Excited);
+						}
+
+						weight += m.Get(Moods.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
 						intensity = Math.Max(intensity, m.Get(Moods.Excited));
 						intensity = Math.Min(intensity, ps.Get(PS.MaxExcitedExpression));
 					}
 
 					if (e.IsMood(Moods.Angry))
 					{
+						if (m.Get(Moods.Angry) > highestMood)
+						{
+							highestMood = Moods.Angry;
+							highestMoodValue = m.Get(Moods.Angry);
+						}
+
 						weight += m.Get(Moods.Angry);
 						intensity = Math.Max(intensity, m.Get(Moods.Angry));
 					}
 
 					if (e.IsMood(Moods.Tired))
 					{
+						if (m.Get(Moods.Tired) > highestMood)
+						{
+							highestMood = Moods.Tired;
+							highestMoodValue = m.Get(Moods.Tired);
+						}
+
 						weight += expressionTiredness;
 						intensity = Math.Max(intensity, expressionTiredness);
 					}
+
+					if (m.Get(Moods.Excited) < e.MinExcitement)
+						weight = 0;
+
+					if (e.Exclusive)
+						weight *= ps.Get(PS.ExclusiveExpressionWeightModifier);
 				}
 
 
@@ -278,7 +361,7 @@ namespace Cue
 
 				float speed = 1 - expressionTiredness;
 
-				we.Set(weight, intensity, speed, min, max);
+				we.Set(weight, intensity, speed, min, max, highestMood);
 			}
 		}
 

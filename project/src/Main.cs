@@ -49,9 +49,16 @@ namespace Cue
 			float deltaTime = 0;
 			long last = 0;
 
-			//var r = new NormalRandom(0, 0.8f, 3, 3);
-			//NormalTest(r, 0, 0.36f, 0.36f);
-			TestIntensities();
+			var r = new NormalRandom(0.3f, 0.9f, 1, 5);
+
+			for (int i = 0; i < 10; ++i)
+			{
+				Console.WriteLine($"intensity: {i/10.0f}");
+				NormalTest(r, 0, i / 10.0f, i / 10.0f);
+			}
+
+			//TestIntensities();
+			//NormalTest(0, 0.4f, 0.3f, 1);
 
 			for (; ; )
 			{

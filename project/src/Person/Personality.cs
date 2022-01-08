@@ -312,6 +312,12 @@ namespace Cue
 			sensitivities_.Init();
 		}
 
+		public void Destroy()
+		{
+			for (int i = 0; i < exps_.Length; ++i)
+				exps_[i].Reset();
+		}
+
 		public void SetExpressions(Expression[] exps)
 		{
 			exps_ = exps;

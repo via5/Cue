@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class Moods
+	public class Moods
 	{
+		public const int None = -1;
 		public const int Happy = 0;
 		public const int Excited = 1;
 		public const int Angry = 2;

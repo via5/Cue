@@ -6,7 +6,7 @@ namespace Cue
 	public class Body
 	{
 		public const int CloseDelay = 2;
-		private const float MaxMorphs = 1.1f;
+		private const float MaxMorphs = 1.2f;
 
 		private Person person_;
 		private Logger log_;

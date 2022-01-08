@@ -138,13 +138,23 @@ namespace Cue
 					{
 						morphs.Add(new MorphGroup.MorphInfo(
 							mn["id"].Value,
+							J.OptFloat(mn, "min", 0),
 							J.OptFloat(mn, "max", 1.0f),
 							BP.None));
 					}
 
+					var c = new Expression.Config();
+
+					c.exclusive = en["exclusive"].AsBool;
+					c.minExcitement = en["minExcitement"].AsFloat;
+					c.maxOnly = en["maxOnly"].AsBool;
+					c.minHoldTime = J.OptFloat(en, "minHoldTime", -1);
+					c.maxHoldTime = J.OptFloat(en, "maxHoldTime", -1);
+
+
 					es.Add(new Expression(
 						en["name"].Value,
-						Moods.FromStringMany(en["moods"].Value),
+						Moods.FromStringMany(en["moods"].Value), c,
 						new MorphGroup(
 							en["name"].Value,
 							BP.FromStringMany(en["bodyParts"].Value),

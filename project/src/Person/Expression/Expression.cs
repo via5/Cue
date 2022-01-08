@@ -35,24 +35,36 @@
 			}
 		}
 
+		public struct Config
+		{
+			public bool exclusive;
+			public float minExcitement;
+			public bool maxOnly;
+			public float minHoldTime;
+			public float maxHoldTime;
+		}
+
 
 		private string name_;
 		private bool[] moods_ = new bool[Moods.Count];
 		private MorphGroup g_;
+		private Config config_;
 		private TargetInfo target_;
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
 		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
 
-		public Expression(string name, int mood, MorphGroup g)
-			: this(name, new int[] { mood }, g)
+		public Expression(string name, int mood, Config c, MorphGroup g)
+				: this(name, new int[] { mood }, c, g)
 		{
 		}
 
-		public Expression(string name, int[] moods, MorphGroup g)
-			: this(name)
+		public Expression(string name, int[] moods, Config c, MorphGroup g)
+				: this(name)
 		{
 			g_ = g;
+			config_ = c;
+
 			for (int i = 0; i < moods.Length; ++i)
 				moods_[moods[i]] = true;
 		}
@@ -75,6 +87,7 @@
 			moods_ = new bool[e.moods_.Length];
 			e.moods_.CopyTo(moods_, 0);
 			g_ = e.g_.Clone();
+			config_ = e.config_;
 			easing_ = e.easing_.Clone();
 		}
 
@@ -99,6 +112,36 @@
 		public float Target
 		{
 			get { return target_.value; }
+		}
+
+		public bool Exclusive
+		{
+			get { return config_.exclusive; }
+		}
+
+		public int[] BodyParts
+		{
+			get { return g_.BodyParts; }
+		}
+
+		public float MinExcitement
+		{
+			get { return config_.minExcitement; }
+		}
+
+		public float MinHoldTime
+		{
+			get { return config_.minHoldTime; }
+		}
+
+		public float MaxHoldTime
+		{
+			get { return config_.maxHoldTime; }
+		}
+
+		public bool MaxOnly
+		{
+			get { return config_.maxOnly; }
 		}
 
 		public void SetAuto(float range, float minTime, float maxTime)
@@ -134,6 +177,11 @@
 		public bool IsMood(int t)
 		{
 			return moods_[t];
+		}
+
+		public bool AffectsAnyBodyPart(int[] bodyParts)
+		{
+			return g_.AffectsAnyBodyPart(bodyParts);
 		}
 
 		public void SetTarget(float t, float time)

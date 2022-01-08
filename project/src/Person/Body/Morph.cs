@@ -92,14 +92,15 @@ namespace Cue
 		public class MorphInfo
 		{
 			private string id_;
-			private float multiplier_;
+			private float min_, max_;
 			private int bodyPart_;
 			private Morph m_ = null;
 
-			public MorphInfo(string id, float multiplier, int bodyPart)
+			public MorphInfo(string id, float min, float max, int bodyPart)
 			{
 				id_ = id;
-				multiplier_ = multiplier;
+				min_ = min;
+				max_ = max;
 				bodyPart_ = bodyPart;
 			}
 
@@ -110,7 +111,7 @@ namespace Cue
 
 			public MorphInfo Clone()
 			{
-				return new MorphInfo(id_, multiplier_, bodyPart_);
+				return new MorphInfo(id_, min_, max_, bodyPart_);
 			}
 
 			public bool Init(Person p)
@@ -122,7 +123,10 @@ namespace Cue
 			public void Set(float v)
 			{
 				if (m_.Sys != null)
-					m_.Sys.Value = v * multiplier_;
+				{
+					float range = max_ - min_;
+					m_.Sys.Value = min_ + v * range;
+				}
 			}
 
 			public void Reset()
@@ -185,6 +189,20 @@ namespace Cue
 			return true;
 		}
 
+		public bool AffectsAnyBodyPart(int[] bodyParts)
+		{
+			for (int i = 0; i < bodyParts.Length; ++i)
+			{
+				for (int j = 0; j < bodyParts_.Length; ++j)
+				{
+					if (bodyParts[i] == bodyParts_[j])
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		public string Name
 		{
 			get { return name_; }
@@ -194,6 +212,11 @@ namespace Cue
 		{
 			get { return value_; }
 			set { SetValue(value); }
+		}
+
+		public int[] BodyParts
+		{
+			get { return bodyParts_; }
 		}
 
 		private void SetValue(float requestedValue)

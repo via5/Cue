@@ -165,6 +165,9 @@ namespace Cue
 
 			set
 			{
+				if (personality_ != null)
+					personality_.Destroy();
+
 				personality_ = value;
 				personality_.Init();
 
