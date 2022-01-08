@@ -11,7 +11,20 @@
 			"morphs":
 			[
 				{
-					"id": "Smile Open Full Face"
+					"id": "Smile Open Full Face",
+					"max": 0.7
+				}
+			]
+		},
+
+		{
+			"name": "eliseSmile",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Elise Smile (REN)"
 				}
 			]
 		},

@@ -26,5 +26,44 @@
 				},
 			]
 		},
+
+		{
+			"name": "curious",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Curious1",
+					"max": 0.5
+				}
+			]
+		},
+
+		{
+			"name": "desire",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Desire",
+					"max": 0.2
+				}
+			]
+		},
+
+		{
+			"name": "flirting",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Flirting",
+					"max": 0.5
+				}
+			]
+		},
 	]
 }

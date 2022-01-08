@@ -101,6 +101,19 @@
 		},
 
 		{
+			"name": "stifled",
+			"moods": "excited",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Stifled1",
+					"max": 0.5
+				}
+			]
+		},
+
+		{
 			"name": "angryExcited",
 			"moods": "excited",
 			"bodyParts": "mouth",
@@ -109,6 +122,19 @@
 				{
 					"id": "Angry",
 					"max": 0.3
+				}
+			]
+		},
+
+		{
+			"name": "embarassed",
+			"moods": "excited",
+			"bodyParts": "mouth eyes",
+			"morphs":
+			[
+				{
+					"id": "Embarassed_1",
+					"max": 0.5
 				}
 			]
 		},

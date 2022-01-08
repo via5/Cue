@@ -210,15 +210,16 @@
 			top.Add(new VUI.Spacer(20));
 
 			menuDelay_ = top.Add(new VUI.FloatTextSlider(0, 5, OnMenuDelay));
-			top.Add(new VUI.Label("Delay in seconds before showing the hand menus"));
-
+			top.Add(new VUI.Label("Delay in seconds before showing the hand menus."));
 			menuDelay_.MaximumSize = new VUI.Size(300, DontCare);
+
+			top.Add(new VUI.Spacer(20));
 
 			var center = new VUI.Panel(new VUI.BorderLayout(10));
 			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
 
 			controls.Add(new VUI.Button("Add button", OnAdd));
-			controls.Add(new VUI.Label("Adds custom buttons to the menu"));
+			controls.Add(new VUI.Label("Adds custom buttons to the menu."));
 			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
 
 			center.Add(controls, VUI.BorderLayout.Top);
