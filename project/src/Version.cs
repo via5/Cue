@@ -3,8 +3,8 @@
 	class Version
 	{
 		public static readonly int Major = 1;
-		public static readonly int Minor = 0;
-		public static readonly int Patch = 1;
+		public static readonly int Minor = 1;
+		public static readonly int Patch = 0;
 
 		public static string String
 		{

@@ -348,13 +348,13 @@ namespace Cue.VamMoan
 				}
 				else
 				{
-					warning_ = $"Cue requires VAMMoan 11 or above";
+					warning_ = $"VAMMoan 11 or above required";
 					p_.hasAvailableIntensities = false;
 				}
 			}
 			else
 			{
-				warning_ = $"VAMMoan not found";
+				warning_ = $"VAMMoan missing";
 			}
 		}
 

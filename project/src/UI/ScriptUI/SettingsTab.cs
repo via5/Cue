@@ -40,6 +40,7 @@ namespace Cue
 		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
+		private bool firstUpdate_ = true;
 
 		public PersonSettingsTab(Person person)
 			: base("Settings", false)
@@ -79,16 +80,6 @@ namespace Cue
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 			voiceWarning_.Visible = false;
 			voiceWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
-
-			try
-			{
-				ignore_ = true;
-				traits_.Text = string.Join(" ", person_.Traits);
-			}
-			finally
-			{
-				ignore_ = false;
-			}
 		}
 
 		public override bool DebugOnly
@@ -101,6 +92,12 @@ namespace Cue
 			try
 			{
 				ignore_ = true;
+
+				if (firstUpdate_)
+				{
+					traits_.Text = string.Join(" ", person_.Traits);
+					firstUpdate_ = false;
+				}
 
 				if (personality_.Count == 0)
 					RebuildPersonalities();
