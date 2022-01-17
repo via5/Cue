@@ -9,7 +9,7 @@ namespace Cue.VamMoan
 		private const string PluginName = "VAMMoanPlugin.VAMMoan";
 		private const float DefaultBreathingMax = 0.2f;
 		private const float DefaultBreathingIntensityCutoff = 0.6f;
-		private const float VoiceCheckInterval = 5;
+		private const float VoiceCheckInterval = 2;
 		private const float ForceIntensityInterval = 1;
 
 		struct Parameters

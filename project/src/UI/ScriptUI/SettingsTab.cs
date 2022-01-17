@@ -112,6 +112,7 @@ namespace Cue
 				voicePitch_.Set(person_.Voice.Pitch, 0, 1);
 				voiceWarning_.Text = person_.Voice.Warning;
 				voiceWarning_.Visible = (voiceWarning_.Text.Length > 0);
+				voice_.Enabled = !voiceWarning_.Visible;
 			}
 			finally
 			{
