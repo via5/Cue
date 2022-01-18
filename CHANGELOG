@@ -1,3 +1,49 @@
+1.1     2022-01-17
+
+features:
+  - now uses VAMMoan from hazmhox instead of MacGruber's Life for breathing and
+    voices, Life is still required for gazing
+
+    the plugin preset includes VAMMoan, but it can be added manually to atoms
+    for existing scenes
+
+    Cue will automatically disable Life's Breathing and DriverBreathing scripts
+    so they don't interfere with VAMMoan
+
+  - new menu options in the options, Menu tab:
+    - the VR menu can be disabled on the left or right hand
+    - added a delay before showing the VR menu, defaults to 0.5 seconds
+    - custom buttons with standard triggers can be added to the menu
+
+  - added buttons in the "Main" options tab to export and import the options
+
+
+changes:
+  - females with advanced colliders disabled are handled correctly
+
+  - disabled voice pitch being automatically based on scale, wasn't reliable
+
+  - cleaned up the desktop HUD
+
+  - characters will prefer looking forwards when gazing at random targets,
+    prevents looking straight down or up for no reason
+
+  - increased the distance when attempting to start a Hand event; makes it less
+    likely to get a "no target" message, but the hand might find unexpected
+    targets
+
+  - slightly slower max speed for the thrust animations
+
+  - added in a few more expressions from AshAuryn and cotyounoyume, if available
+
+
+fixes:
+  - fixed some animations not stopping properly during orgasms
+
+  - some options would not show the correct value after loading a scene
+
+
+
 1.0.1   2021-12-16
 
 - excitement would still be going up after hand is deactivated if it was the
