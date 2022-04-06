@@ -137,7 +137,7 @@ namespace Cue
 			get
 			{
 				var chest = person_.Body.Get(BP.Chest);
-				var p = chest.Position + chest.Rotation.Rotate(new Vector3(0, 0, -0.3f));
+				var p = chest.Position + chest.Rotation.Rotate(new Vector3(0, 0, -0.05f));
 				return new Plane(p, chest.Rotation.Rotate(new Vector3(0, 0, 1)));
 			}
 		}

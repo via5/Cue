@@ -35,9 +35,7 @@ namespace Cue
 	{
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
-		private VUI.ComboBox<string> voice_ = new VUI.ComboBox<string>();
-		private VUI.Label voiceWarning_ = new VUI.Label();
-		private VUI.FloatTextSlider voicePitch_ = new VUI.FloatTextSlider();
+		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
 		private bool firstUpdate_ = true;
@@ -55,31 +53,22 @@ namespace Cue
 			p.Add(new VUI.Label("Personality"));
 			p.Add(personality_);
 
-			p.Add(new VUI.Label("Voice"));
-
-			var voicePanel = new VUI.Panel(new VUI.HorizontalFlow(10));
-			voicePanel.Add(voice_);
-			voicePanel.Add(voiceWarning_);
-			p.Add(voicePanel);
-
-			p.Add(new VUI.Label("Voice pitch"));
-			p.Add(voicePitch_);
-
 			p.Add(new VUI.Label("Traits"));
 			p.Add(traits_);
+
+			p.Add(new VUI.Spacer());
+			p.Add(warning_);
 
 			Layout = new VUI.VerticalFlow(20);
 			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
 			Add(p);
 
 			personality_.SelectionChanged += OnPersonality;
-			voice_.SelectionChanged += OnVoice;
-			voicePitch_.ValueChanged += OnVoicePitch;
 			traits_.Edited += OnTraits;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
-			voiceWarning_.Visible = false;
-			voiceWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
+			warning_.Visible = false;
+			warning_.TextColor = new UnityEngine.Color(1, 0, 0);
 		}
 
 		public override bool DebugOnly
@@ -104,15 +93,8 @@ namespace Cue
 				else
 					SelectPersonality(person_.Personality.Name);
 
-				if (voice_.Count == 0)
-					RebuildVoices();
-				else
-					SelectVoice(person_.Voice.Name);
-
-				voicePitch_.Set(person_.Voice.Pitch, 0, 1);
-				voiceWarning_.Text = person_.Voice.Warning;
-				voiceWarning_.Visible = (voiceWarning_.Text.Length > 0);
-				voice_.Enabled = !voiceWarning_.Visible;
+				warning_.Text = person_.Voice.Warning;
+				warning_.Visible = (warning_.Text.Length > 0);
 			}
 			finally
 			{
@@ -161,51 +143,8 @@ namespace Cue
 				person_.Personality = Resources.Personalities.Clone(
 					item.Personality.Name, person_);
 
-				RebuildVoices();
-
 				Cue.Instance.Save();
 			}
-		}
-
-		private void RebuildVoices()
-		{
-			var names = person_.Voice.AvailableVoices;
-
-			if (names.Length == 0)
-			{
-				voice_.Enabled = false;
-			}
-			else
-			{
-				voice_.Enabled = true;
-				voice_.SetItems(names, person_.Voice.Name);
-			}
-		}
-
-
-		private void SelectVoice(string name)
-		{
-			if (voice_.Selected != name)
-				voice_.Select(name);
-		}
-
-		private void OnVoice(string name)
-		{
-			if (ignore_) return;
-
-			if (name != person_.Voice.Name)
-			{
-				person_.Voice.Name = name;
-				Cue.Instance.Save();
-			}
-		}
-
-		private void OnVoicePitch(float f)
-		{
-			if (ignore_) return;
-
-			person_.Voice.Pitch = f;
-			Cue.Instance.Save();
 		}
 
 		private void OnTraits(string s)

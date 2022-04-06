@@ -18,8 +18,8 @@
 					"bodyPart": "hips",
 					"movement":
 					{
-						"min": [-80, 0, -80],
-						"max": [80, 0, 80]
+						"min": [-120, 0, -120],
+						"max": [120, 0, 120]
 					},
 					"sync":
 					{
@@ -37,8 +37,8 @@
 					"bodyPart": "chest",
 					"movement":
 					{
-						"min": [-80, 0, -80],
-						"max": [80, 0, 80]
+						"min": [-120, 0, -120],
+						"max": [120, 0, 120]
 					},
 					"sync":
 					{
@@ -56,8 +56,8 @@
 					"bodyPart": "leftHand",
 					"movement":
 					{
-						"min": [-80, 0, -80],
-						"max": [80, 0, 80]
+						"min": [-60, 0, -60],
+						"max": [60, 0, 60]
 					},
 					"sync":
 					{
@@ -75,8 +75,8 @@
 					"bodyPart": "rightHand",
 					"movement":
 					{
-						"min": [-80, 0, -80],
-						"max": [80, 0, 80]
+						"min": [-60, 0, -60],
+						"max": [60, 0, 60]
 					},
 					"sync":
 					{
@@ -96,8 +96,8 @@
 					"bodyPart": "hips",
 					"movement":
 					{
-						"min": [-10, -10, -10],
-						"max": [10, 10, 10]
+						"min": [-30, -30, -30],
+						"max": [30, 30, 30]
 					},
 					"sync":
 					{
@@ -115,8 +115,8 @@
 					"bodyPart": "chest",
 					"movement":
 					{
-						"min": [-10, -10, -10],
-						"max": [10, 10, 10]
+						"min": [-30, -30, -30],
+						"max": [30, 30, 30]
 					},
 					"sync":
 					{
@@ -174,8 +174,8 @@
 					"bodyPart": "head",
 					"movement":
 					{
-						"min": [-80, -80, -80],
-						"max": [ 80, 80, 80]
+						"min": [-120, -120, -120],
+						"max": [ 120, 120, 120]
 					},
 					"sync":
 					{
@@ -196,8 +196,8 @@
 					"bodyPart": "head",
 					"movement":
 					{
-						"min": [-10, -10, -10],
-						"max": [ 10, 10, 10]
+						"min": [-30, -30, -30],
+						"max": [ 30, 30, 30]
 					},
 					"sync":
 					{
@@ -210,13 +210,13 @@
 						"resetBetween": false
 					}
 				},
-				
+
 				{
 					"type": "morph",
 					"bodyPart": "rightHand",
 					"morph": "Right Fingers Fist",
 					"min": 0.2,
-					"max": 0.6,
+					"max": 0.5,
 					"sync":
 					{
 						"type": "duration",
@@ -231,7 +231,7 @@
 					"bodyPart": "leftHand",
 					"morph": "Left Fingers Fist",
 					"min": 0.2,
-					"max": 0.6,
+					"max": 0.5,
 					"sync":
 					{
 						"type": "duration",

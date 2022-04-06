@@ -7,36 +7,20 @@ namespace Cue.MacGruber
 	public class Dataset
 	{
 		private string name_;
-		private float pitch_;
 
-		public Dataset(string name, float pitch)
+		public Dataset(string name)
 		{
 			name_ = name;
-			pitch_ = pitch;
 		}
 
 		public Dataset(Dataset d)
 		{
 			name_ = d.name_;
-			pitch_ = d.pitch_;
 		}
 
 		public string Name
 		{
 			get { return name_; }
-		}
-
-		public float GetPitch(Person p)
-		{
-			if (pitch_ < 0)
-				pitch_ = 0.5f;
-
-			return pitch_;
-		}
-
-		public void SetPitch(float f)
-		{
-			pitch_ = U.Clamp(f, 0, 1);
 		}
 	}
 
@@ -84,7 +68,6 @@ namespace Cue.MacGruber
 			public Sys.Vam.FloatParameter intensity;
 			public Sys.Vam.FloatParameter desktopVolume;
 			public Sys.Vam.FloatParameter vrVolume;
-			public Sys.Vam.FloatParameter pitch;
 
 			public Sys.Vam.ActionParameter orgasmAction;
 			public Sys.Vam.StringChooserParameter orgasmDataset;
@@ -102,10 +85,9 @@ namespace Cue.MacGruber
 		private List<string> debug_ = null;
 
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
-		private Dataset orgasmDataset_ = new Dataset("", -1);
-		private Dataset dummy_ = new Dataset("", -1);
+		private Dataset orgasmDataset_ = new Dataset("");
+		private Dataset dummy_ = new Dataset("");
 		private bool warned_ = false;
-		private float forcedPitch_ = -1;
 
 		private Parameters p_ = new Parameters();
 		private bool mouthEnabled_ = true;
@@ -124,9 +106,7 @@ namespace Cue.MacGruber
 			foreach (JSONClass dn in options["datasets"].AsArray.Childs)
 			{
 				var ds = new DatasetForIntensity(
-					new Dataset(
-						J.ReqString(dn, "dataset"),
-						J.ReqFloat(dn, "pitch")),
+					new Dataset(J.ReqString(dn, "dataset")),
 					J.ReqFloat(dn, "intensityMin"),
 					J.ReqFloat(dn, "intensityMax"));
 
@@ -140,9 +120,7 @@ namespace Cue.MacGruber
 
 			var od = options["orgasm"].AsObject;
 
-			orgasmDataset_ = new Dataset(
-				J.ReqString(od, "dataset"),
-				J.ReqFloat(od, "pitch"));
+			orgasmDataset_ = new Dataset(J.ReqString(od, "dataset"));
 		}
 
 		public IVoice Clone()
@@ -154,7 +132,6 @@ namespace Cue.MacGruber
 
 		private void CopyFrom(Voice v)
 		{
-			forcedPitch_ = v.forcedPitch_;
 			datasets_ = new DatasetForIntensity[v.datasets_.Length];
 			for (int i = 0; i < datasets_.Length; ++i)
 				datasets_[i] = new DatasetForIntensity(v.datasets_[i]);
@@ -176,7 +153,6 @@ namespace Cue.MacGruber
 			p_.intensity = BF("Intensity");
 			p_.desktopVolume = AAF("Volume Desktop");
 			p_.vrVolume = AAF("Volume VR");
-			p_.pitch = BF("Pitch");
 			p_.chestMorph = DBPF("ChestMorph Min", "ChestMorph Max");
 			p_.chestJointDrive = DBPF("ChestJointDrive Min", "ChestJointDrive Max");
 			p_.stomach = DBPF("StomachMin", "StomachMax");
@@ -228,7 +204,6 @@ namespace Cue.MacGruber
 				if (p_.orgasmDataset.Value != ds.Name)
 					p_.orgasmDataset.Value = ds.Name;
 
-				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
 				p_.orgasmAction.Fire();
 			}
 		}
@@ -322,17 +297,6 @@ namespace Cue.MacGruber
 			}
 		}
 
-		public string[] AvailableVoices
-		{
-			get { return new string[0]; }
-		}
-
-		public string Name
-		{
-			get { return ""; }
-			set { }
-		}
-
 		public string Warning
 		{
 			get { return ""; }
@@ -341,22 +305,6 @@ namespace Cue.MacGruber
 		public void Destroy()
 		{
 			// no-op
-		}
-
-		public float Pitch
-		{
-			get
-			{
-				return forcedPitch_;
-			}
-
-			set
-			{
-				forcedPitch_ = value;
-
-				foreach (var d in datasets_)
-					d.dataset.SetPitch(value);
-			}
 		}
 
 		private Dataset GetDatasetForIntensity(float e)
@@ -389,10 +337,7 @@ namespace Cue.MacGruber
 
 			// taken over by MacGruberOrgasmer during orgasm
 			if (person_.Mood.State != Mood.OrgasmState)
-			{
 				p_.breathDataset.Value = ds.Name;
-				p_.pitch.Value = 0.8f + ds.GetPitch(person_) * 0.4f;
-			}
 
 			if (mouthEnabled_)
 			{
@@ -418,14 +363,7 @@ namespace Cue.MacGruber
 
 		public override string ToString()
 		{
-			string s = $"MacGruber: v={p_.intensity} ";
-
-			if (forcedPitch_ >= 0)
-				s += $"forcedPitch={forcedPitch_:0.00}";
-			else
-				s += $"pitch={p_.pitch.Value:0.00}";
-
-			return s;
+			return $"MacGruber: v={p_.intensity}";
 		}
 	}
 

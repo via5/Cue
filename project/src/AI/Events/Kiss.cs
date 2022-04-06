@@ -41,6 +41,7 @@ namespace Cue
 	class KissEvent : BasicEvent
 	{
 		private const float MinWait = 2;
+		private const float MinDurationAfterGrab = 30;
 
 		private string lastResult_ = "";
 		private BodyPartLock[] locks_ = null;
@@ -49,8 +50,10 @@ namespace Cue
 		private KissEventData d_ = null;
 
 		private float elapsed_ = MinWait;
+		private float minDuration_ = 0;
 		private bool durationFinished_ = false;
 		private bool waitFinished_ = false;
+		private bool waitFinishedBecauseGrab_ = false;
 
 
 		public KissEvent()
@@ -171,7 +174,7 @@ namespace Cue
 
 			// never stop with player
 			if (target_ == null || !target_.IsPlayer)
-				tooLong = durationFinished_;
+				tooLong = (durationFinished_ && (elapsed_ >= minDuration_));
 
 			if (tooLong || MustStop())
 				Stop();
@@ -199,7 +202,10 @@ namespace Cue
 
 			var grabbed = person_.Body.Get(BP.Head).GrabbedByPlayer;
 			if (wasGrabbed_ && !grabbed)
+			{
 				waitFinished_ = true;
+				waitFinishedBecauseGrab_ = true;
+			}
 
 			wasGrabbed_ = grabbed;
 		}
@@ -222,9 +228,15 @@ namespace Cue
 
 		private void Next()
 		{
+			if (waitFinishedBecauseGrab_)
+				minDuration_ = MinDurationAfterGrab;
+			else
+				minDuration_ = 0;
+
 			elapsed_ = 0;
 			durationFinished_ = false;
 			waitFinished_ = false;
+			waitFinishedBecauseGrab_ = false;
 
 			d_.duration.Reset(1);
 			d_.wait.Reset(1);

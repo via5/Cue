@@ -17,7 +17,6 @@ namespace Cue.VamMoan
 			public Sys.Vam.BoolParameter enabled;
 			public Sys.Vam.BoolParameter autoJaw;
 			public Sys.Vam.StringChooserParameter voice;
-			public Sys.Vam.FloatParameter pitch;
 			public Sys.Vam.ActionParameter breathing;
 			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter[] intensities;
@@ -40,7 +39,6 @@ namespace Cue.VamMoan
 		private string warning_ = "";
 
 		private string voice_ = "";
-		private float pitch_ = -1;
 		private float breathingRange_ = DefaultBreathingMax;
 		private float breathingIntensityCutoff_ = DefaultBreathingIntensityCutoff;
 		private string orgasmAction_ = "Voice orgasm";
@@ -112,8 +110,6 @@ namespace Cue.VamMoan
 
 		private void CopyFrom(Voice b)
 		{
-			voice_ = b.voice_;
-			pitch_ = b.pitch_;
 			breathingRange_ = b.breathingRange_;
 			breathingIntensityCutoff_ = b.breathingIntensityCutoff_;
 			orgasmAction_ = b.orgasmAction_;
@@ -130,7 +126,6 @@ namespace Cue.VamMoan
 			p_.enabled = BP("enabled");
 			p_.autoJaw = BP("Enable auto-jaw animation");
 			p_.voice = SCP("voice");
-			p_.pitch = FP("Voice pitch");
 			p_.breathing = AP("Voice breathing");
 			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
@@ -273,9 +268,7 @@ namespace Cue.VamMoan
 			};
 
 			A("provider", "vammoan");
-			A("voice", voice_);
 			A("intensitiesCount", $"{intensitiesCount_}");
-			A("pitch", $"{pitch_:0.00}");
 			A("breathingRange", $"{breathingRange_:0.00}");
 			A("breathingCutoff", $"{breathingIntensityCutoff_:0.00}");
 			A("orgasmAction", orgasmAction_);
@@ -393,23 +386,6 @@ namespace Cue.VamMoan
 			// no-op
 		}
 
-		public float Pitch
-		{
-			get
-			{
-				return pitch_;
-			}
-
-			set
-			{
-				if (pitch_ != value)
-				{
-					pitch_ = value;
-					SetPitch();
-				}
-			}
-		}
-
 		public bool MouthEnabled
 		{
 			get { return p_.autoJaw.Value; }
@@ -435,43 +411,9 @@ namespace Cue.VamMoan
 			get { return p_.voice.Choices; }
 		}
 
-		public string Name
-		{
-			get
-			{
-				return voice_;
-			}
-
-			set
-			{
-				if (value != voice_ && value != "")
-				{
-					voice_ = value;
-
-					if (p_.voice != null)
-					{
-						p_.voice.Value = value;
-						CheckVoice(true);
-					}
-				}
-			}
-		}
-
 		public string Warning
 		{
 			get { return warning_; }
-		}
-
-		private void SetPitch()
-		{
-			if (p_.pitch == null)
-				return;
-
-			float min = 0.8f;
-			float max = 1.2f;
-			float range = max - min;
-
-			p_.pitch.Value = min + range * pitch_;
 		}
 
 		private void SetIntensity(bool force = false)

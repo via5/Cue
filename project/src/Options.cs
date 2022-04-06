@@ -90,6 +90,8 @@ namespace Cue
 		private float menuDelay_ = 0.5f;
 		private bool leftMenu_ = true;
 		private bool rightMenu_ = true;
+		private bool straponPhysical_ = false;
+
 		private List<CustomMenu> menus_ = new List<CustomMenu>();
 
 		public Options()
@@ -156,6 +158,12 @@ namespace Cue
 			set { menuDelay_ = value; OnChanged(); }
 		}
 
+		public bool StraponPhysical
+		{
+			get { return straponPhysical_; }
+			set { straponPhysical_ = value; OnChanged(); }
+		}
+
 		public CustomMenu[] Menus
 		{
 			get { return menus_.ToArray(); }
@@ -200,6 +208,7 @@ namespace Cue
 			o["menuDelay"] = new JSONData(menuDelay_);
 			o["leftMenu"] = new JSONData(leftMenu_);
 			o["rightMenu"] = new JSONData(rightMenu_);
+			o["straponPhysical"] = new JSONData(straponPhysical_);
 
 			if (menus_.Count > 0)
 			{
@@ -228,6 +237,7 @@ namespace Cue
 			J.OptFloat(o, "menuDelay", ref menuDelay_);
 			J.OptBool(o, "leftMenu", ref leftMenu_);
 			J.OptBool(o, "rightMenu", ref rightMenu_);
+			J.OptBool(o, "straponPhysical", ref straponPhysical_);
 
 			if (o.HasKey("menus"))
 			{

@@ -344,34 +344,7 @@ namespace Cue
 
 		public void Load(JSONClass o)
 		{
-			if (o.HasKey("voice"))
-			{
-				var vo = o["voice"].AsObject;
-
-				if (vo.HasKey("pitch"))
-				{
-					float fp = vo["pitch"].AsFloat;
-					if (fp < 0)
-						fp = 0.5f;
-
-					if (voiceProto_ != null)
-						voiceProto_.Pitch = fp;
-
-					if (person_.Voice != null)
-						person_.Voice.Pitch = fp;
-				}
-
-				if (vo.HasKey("name"))
-				{
-					string name = vo["name"].Value;
-
-					if (voiceProto_ != null)
-						voiceProto_.Name = name;
-
-					if (person_.Voice != null)
-						person_.Voice.Name = name;
-				}
-			}
+			// no-op
 		}
 
 		public JSONNode ToJSON()
@@ -382,8 +355,6 @@ namespace Cue
 				o.Add("name", name_);
 
 			var v = new JSONClass();
-			v.Add("pitch", new JSONData(person_.Voice.Pitch));
-			v.Add("name", person_.Voice.Name);
 			o.Add("voice", v);
 
 			return o;
@@ -413,12 +384,6 @@ namespace Cue
 
 			var b = voiceProto_.Clone();
 			b.Init(p);
-
-			if (old != null)
-			{
-				b.Name = old.Name;
-				b.Pitch = old.Pitch;
-			}
 
 			return b;
 		}

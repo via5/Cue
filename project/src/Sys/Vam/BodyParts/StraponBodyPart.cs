@@ -37,7 +37,7 @@ namespace Cue.Sys.Vam
 
 		public override bool IsPhysical
 		{
-			get { return false; }
+			get { return Cue.Instance.Options.StraponPhysical; }
 		}
 
 		public void Set(bool b)

@@ -62,13 +62,9 @@ namespace Cue
 
 		string[] Debug();
 
-		float Pitch { get; set; }
-
 		bool MouthEnabled { get; set; }
 		float Intensity { get; set; }
 
-		string[] AvailableVoices { get; }
-		string Name { get; set; }
 		string Warning { get; }
 	}
 

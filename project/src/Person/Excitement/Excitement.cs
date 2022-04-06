@@ -433,7 +433,7 @@ namespace Cue
 			float rate = 0;
 
 			float dampen = 1;
-			if (person_.Body.Zone(SS.Penetration).Active)
+			if (NeedsPenetrationDamper())
 				dampen = person_.Personality.Get(PS.PenetrationDamper);
 
 			for (int i = 0; i < sources_.Length;++i)

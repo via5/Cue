@@ -35,7 +35,7 @@
 
 		private const float StartTrackingSpeed = 0.1f;
 		private const float StopTrackingSpeed = 0.1f;
-		private const float DefaultTrackingSpeed = 1.5f;
+		private const float DefaultTrackingSpeed = 0.1f;
 		private const float TrackingSpeedTime = 3;
 
 		private string[] targetStorableCache_ =
