@@ -218,7 +218,11 @@ namespace Cue
 
 		private void UpdatePostTarget(float s)
 		{
-			if (picker_.HasTarget)
+			if (person_.IsPlayer)
+			{
+				gazer_.Enabled = false;
+			}
+			else if (picker_.HasTarget)
 			{
 				if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
 					gazer_.Enabled = false;

@@ -254,7 +254,7 @@ namespace Cue
 
 			I.Start(I.UpdatePersonGaze);
 			{
-				if (!IsPlayer && hasBody_)
+				if (hasBody_)
 					gaze_.Update(s);
 			}
 			I.End();
