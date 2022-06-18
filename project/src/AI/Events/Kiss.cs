@@ -224,7 +224,9 @@ namespace Cue
 		{
 			Unlock();
 			Next();
+			SetExcitement(false);
 			person_.Animator.StopType(Animations.Kiss);
+			person_.Excitement.GetSource(SS.Mouth).RemoveEnabledForOthers();
 			target_ = null;
 		}
 
@@ -331,6 +333,7 @@ namespace Cue
 			}
 
 			target_ = target;
+			SetExcitement(true);
 
 			return true;
 		}
@@ -365,9 +368,28 @@ namespace Cue
 
 			target_ = initiator;
 			Next();
+			SetExcitement(true);
 			minDuration_ = minDuration;
 
 			return true;
+		}
+
+		private void SetExcitement(bool b)
+		{
+			if (b)
+			{
+				person_.Excitement.GetSource(SS.Mouth).AddEnabledForOthers();
+
+				if (target_ != null)
+					person_.Body.Get(BP.Mouth).AddForcedTrigger(target_.PersonIndex, BP.Mouth);
+			}
+			else
+			{
+				person_.Excitement.GetSource(SS.Mouth).RemoveEnabledForOthers();
+
+				if (target_ != null)
+					person_.Body.Get(BP.Mouth).RemoveForcedTrigger(target_.PersonIndex, BP.Mouth);
+			}
 		}
 
 		private bool Lock()

@@ -369,6 +369,9 @@ namespace Cue
 
 			sources_[SS.Penetration].ClearEnabledForOthers();
 			sources_[SS.Genitals].ClearEnabledForOthers();
+
+			sources_[SS.Mouth].AddEnabledForOthers();
+			sources_[SS.Breasts].AddEnabledForOthers();
 		}
 
 		public float Max
