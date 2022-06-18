@@ -12,6 +12,7 @@
 		private const int HoldState = 2;
 		private const int FinishedState = 3;
 
+		private readonly Person person_;
 		private readonly Expression e_;
 		private int state_ = InactiveState;
 
@@ -27,6 +28,8 @@
 
 		public WeightedExpression(Person p, Expression e)
 		{
+			person_ = p;
+
 			var ps = p.Personality;
 
 			e_ = e;
@@ -80,9 +83,29 @@
 			get { return (state_ == FinishedState); }
 		}
 
-		public void Activate()
+		public bool Activate()
 		{
+			var bps = e_.BodyParts;
+
+			if (bps.Length > 0)
+			{
+				bool found = false;
+
+				for (int i = 0; i < bps.Length; ++i)
+				{
+					if (!person_.Body.Get(bps[i]).LockedFor(BodyPartLock.Morph))
+					{
+						found = true;
+						break;
+					}
+				}
+
+				if (!found)
+					return false;
+			}
+
 			Activate(RandomTarget(), RandomTargetTime());
+			return true;
 		}
 
 		public void Activate(float target, float time)

@@ -115,15 +115,16 @@ namespace Cue
 			return false;
 		}
 
-		public bool Groped()
+		public PartResult Groped()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (GropedBy(p, BodyParts.GropedParts))
-					return true;
+				PartResult pr = GropedBy(p, BodyParts.GropedParts);
+				if (pr)
+					return pr;
 			}
 
-			return false;
+			return PartResult.None;
 		}
 
 		public Person PenetratedBy()

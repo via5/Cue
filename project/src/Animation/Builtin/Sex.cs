@@ -29,7 +29,6 @@ namespace Cue.Proc
 		private float headTorqueMin_ = 0;
 		private float headTorqueMax_ = -20;
 		private float headTorqueWin_ = 10;
-		private float durationInterval_ = 10;
 		private Force hipForce_ = null;
 		private Force hipTorque_ = null;
 
@@ -288,8 +287,8 @@ namespace Cue.Proc
 			c.hipForceMin = 300;
 			c.hipForceMax = 1500;
 
-			c.hipTorqueMin = new Vector3(-20, 0, 0);
-			c.hipTorqueMax = new Vector3(-100, 0, 0);
+			c.hipTorqueMin = new Vector3(0, 0, 0);
+			c.hipTorqueMax = new Vector3(-30, 0, 0);
 			c.hipTorqueWin = new Vector3(0, 0, 0);
 
 			c.durationMin = 1.0f;

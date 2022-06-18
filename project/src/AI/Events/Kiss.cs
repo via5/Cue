@@ -362,7 +362,7 @@ namespace Cue
 			Unlock();
 			locks_ = BodyPartLock.LockMany(
 				person_,
-				new int[] { BP.Head, BP.Lips, BP.Mouth },
+				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
 				BodyPartLock.Anim, "kiss", BodyPartLock.Strong);
 
 			return (locks_ != null);

@@ -21,6 +21,14 @@ namespace Cue
 
 		public override string[] Debug()
 		{
+			string canRunReason = "";
+			string canRun = "";
+
+			if (!CanRun(ref canRunReason))
+				canRun = "no: " + canRunReason;
+			else
+				canRun = "yes";
+
 			return new string[]
 			{
 				$"enabled       {enabled_}",
@@ -28,7 +36,7 @@ namespace Cue
 				$"smoke         {smoke_}",
 				$"checkElapsed  {checkElapsed_:0.00}",
 				$"wait          {wait_.ToLiveString()}",
-				$"canRun        {CanRun()}"
+				$"canRun        {canRun}"
 			};
 		}
 
@@ -168,21 +176,46 @@ namespace Cue
 
 		private bool CanRun()
 		{
+			string s = null;
+			return CanRun(ref s);
+		}
+
+		private bool CanRun(ref string reason)
+		{
 			var b = person_.Body;
 			var head = b.Get(BP.Head);
 			var lips = b.Get(BP.Lips);
 
-			bool busy =
-				person_.Status.Groped() ||
-				person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim) ||
-				head.LockedFor(BodyPartLock.Move) ||
-				lips.LockedFor(BodyPartLock.Morph);
-
-			if (busy)
+			PersonStatus.PartResult g = person_.Status.Groped();
+			if (g)
+			{
+				if (reason != null) reason = "groped, " + g.ToString();
 				return false;
+			}
+
+			if (person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim))
+			{
+				if (reason != null) reason = "right hand busy";
+				return false;
+			}
+
+			if (head.LockedFor(BodyPartLock.Move))
+			{
+				if (reason != null) reason = "head locked";
+				return false;
+			}
+
+			if (lips.LockedFor(BodyPartLock.Morph))
+			{
+				if (reason != null) reason = "lips locked";
+				return false;
+			}
 
 			if (person_.Status.GropedByAny(BP.Head))
+			{
+				if (reason != null) reason = "head groped";
 				return false;
+			}
 
 			return true;
 		}

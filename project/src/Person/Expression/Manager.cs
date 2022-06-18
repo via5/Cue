@@ -209,7 +209,8 @@ namespace Cue
 		{
 			if (e.Expression.Exclusive)
 			{
-				e.Activate();
+				if (!e.Activate())
+					return false;
 
 				for (int i = 0; i < exps_.Length; ++i)
 				{
@@ -237,7 +238,8 @@ namespace Cue
 					}
 				}
 
-				e.Activate();
+				if (!e.Activate())
+					return false;
 			}
 
 			return true;

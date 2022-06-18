@@ -9,7 +9,8 @@
 		private float checkElapsed_ = CheckTargetsInterval;
 
 		private Person bjTarget_ = null;
-		private BodyPartLock[] bjLocks_ = null;
+		private BodyPartLock[] sourceLocks_ = null;
+		private BodyPartLock[] targetLocks_ = null;
 		private bool hasForcedTrigger_ = false;
 
 
@@ -22,10 +23,11 @@
 		{
 			return new string[]
 			{
-				$"active     {active_}",
-				$"elapsed    {checkElapsed_:0.00}",
-				$"bjTarget   {bjTarget_}",
-				$"bjLocks    {bjLocks_?.ToString() ?? ""}"
+				$"active       {active_}",
+				$"elapsed      {checkElapsed_:0.00}",
+				$"bjTarget     {bjTarget_}",
+				$"sourceLocks  {sourceLocks_?.ToString() ?? ""}",
+				$"targetLocks  {targetLocks_?.ToString() ?? ""}"
 			};
 		}
 
@@ -54,7 +56,7 @@
 
 		private void Stop()
 		{
-			UnlockBJ();
+			Unlock();
 
 			if (hasForcedTrigger_)
 			{
@@ -70,14 +72,22 @@
 			person_.Animator.StopType(Animations.Blowjob);
 		}
 
-		private void UnlockBJ()
+		private void Unlock()
 		{
-			if (bjLocks_ != null)
+			if (sourceLocks_ != null)
 			{
-				for (int i = 0; i < bjLocks_.Length; ++i)
-					bjLocks_[i].Unlock();
+				for (int i = 0; i < sourceLocks_.Length; ++i)
+					sourceLocks_[i].Unlock();
 
-				bjLocks_ = null;
+				sourceLocks_ = null;
+			}
+
+			if (targetLocks_ != null)
+			{
+				for (int i = 0; i < targetLocks_.Length; ++i)
+					targetLocks_[i].Unlock();
+
+				targetLocks_ = null;
 			}
 		}
 
@@ -110,33 +120,41 @@
 				return;
 			}
 
-			bjLocks_ = BodyPartLock.LockMany(
+			sourceLocks_ = BodyPartLock.LockMany(
 				person_,
-				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Eyes },
+				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
-			if (bjLocks_ != null)
+			targetLocks_ = BodyPartLock.LockMany(
+				t,
+				new int[] { BP.Hips },
+				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
+
+			if (sourceLocks_ == null || targetLocks_ == null)
 			{
-				if (!person_.Animator.PlayType(
-					Animations.Blowjob,
-					new AnimationContext(t, bjLocks_[0].Key)))
-				{
-					UnlockBJ();
-					return;
-				}
-
-				if (t.Body.PenisSensitive)
-				{
-					t.Body.Get(t.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.Mouth);
-
-					t.Excitement.GetSource(SS.Genitals).EnabledForOthers = true;
-
-					hasForcedTrigger_ = true;
-				}
-
-				bjTarget_ = t;
+				Unlock();
+				return;
 			}
+
+			if (!person_.Animator.PlayType(
+				Animations.Blowjob,
+				new AnimationContext(t, sourceLocks_[0].Key)))
+			{
+				Unlock();
+				return;
+			}
+
+			if (t.Body.PenisSensitive)
+			{
+				t.Body.Get(t.Body.GenitalsBodyPart)
+					.AddForcedTrigger(person_.PersonIndex, BP.Mouth);
+
+				t.Excitement.GetSource(SS.Genitals).EnabledForOthers = true;
+
+				hasForcedTrigger_ = true;
+			}
+
+			bjTarget_ = t;
 		}
 
 		private Person FindTarget()

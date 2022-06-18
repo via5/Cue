@@ -2,7 +2,7 @@
 {
 	class BodyParts : BP
 	{
-		public const float CloseToDistance = 0.1f;
+		public const float CloseToDistance = 0.05f;
 
 		private static int[] breasts_ = new int[]
 		{

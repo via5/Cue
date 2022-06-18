@@ -116,13 +116,13 @@ namespace Cue.Sys.Vam
 				}
 
 				Log.Info($"atom {id} created");
-			}
 
-			if (!string.IsNullOrEmpty(preset_))
-			{
-				var path = Cue.Instance.Sys.GetResourcePath(preset_);
-				Log.Info($"atom {id} loading preset {path}");
-				atom.LoadPreset(path);
+				if (!string.IsNullOrEmpty(preset_))
+				{
+					var path = Cue.Instance.Sys.GetResourcePath(preset_);
+					Log.Info($"atom {id} loading preset {path}");
+					atom.LoadPreset(path);
+				}
 			}
 
 			var a = new VamAtom(atom);

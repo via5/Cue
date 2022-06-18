@@ -106,7 +106,7 @@
 				var minRange = speedMin_.Maximum - speedMin_.DefaultValue;
 				var maxRange = speedMax_.Maximum - speedMax_.DefaultValue;
 				var range = overallSpeed_.Maximum - overallSpeed_.DefaultValue;
-				var p = person_.Mood.MovementEnergy;
+				var p =  Mood.MultiMovementEnergy(person_, target_);
 
 				speedMin_.Value = speedMin_.DefaultValue + minRange * p;
 				speedMax_.Value = speedMax_.DefaultValue + maxRange * p;

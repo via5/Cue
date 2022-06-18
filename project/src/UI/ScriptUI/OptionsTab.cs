@@ -20,7 +20,7 @@
 	{
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox playSfx_, skinColor_, skinGloss_, hairLoose_;
-		private VUI.CheckBox handLinking_, devMode_;
+		private VUI.CheckBox handLinking_, devMode_, straponPhysical_;
 		private bool ignore_ = false;
 
 		public MainOptionsTab()
@@ -63,6 +63,13 @@
 				"Enables linking hands to body parts when they're close " +
 				"enough. Hands sometimes become impossible to move in Play " +
 				"Mode, but they can always be moved in Edit Mode.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			straponPhysical_ = p.Add(new VUI.CheckBox("Strapon physical", OnHandLinking, o.HandLinking));
+			p.Add(new VUI.Label(
+				"Treats strapons the same as genitals instead of limiting " +
+				"their impact on excitement.",
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 

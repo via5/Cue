@@ -90,7 +90,7 @@ namespace Cue
 		private float menuDelay_ = 0.5f;
 		private bool leftMenu_ = true;
 		private bool rightMenu_ = true;
-		private bool straponPhysical_ = false;
+		private bool straponPhysical_ = true;
 
 		private List<CustomMenu> menus_ = new List<CustomMenu>();
 
