@@ -346,7 +346,7 @@ namespace Cue
 
 		public override bool DebugOnly
 		{
-			get { return !person_.IsInteresting; }
+			get { return !person_.Body.Exists; }
 		}
 	}
 }

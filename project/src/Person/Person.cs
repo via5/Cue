@@ -192,7 +192,13 @@ namespace Cue
 
 		public bool IsInteresting
 		{
-			get { return Body.Exists; }
+			get
+			{
+				if (Cue.Instance.Options.IgnoreCamera)
+					return Body.Exists;
+
+				return true;
+			}
 		}
 
 		public bool Grabbed

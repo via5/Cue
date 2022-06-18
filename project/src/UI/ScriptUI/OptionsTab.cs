@@ -21,6 +21,7 @@
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox playSfx_, skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, devMode_, straponPhysical_;
+		private VUI.CheckBox ignoreCamera_;
 		private bool ignore_ = false;
 
 		public MainOptionsTab()
@@ -73,6 +74,12 @@
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
+			ignoreCamera_ = p.Add(new VUI.CheckBox("Ignore camera", OnIgnoreCamera, o.IgnoreCamera));
+			p.Add(new VUI.Label(
+				"Never look at the camera.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
 			devMode_ = p.Add(new VUI.CheckBox("Dev mode", OnDevMode, o.DevMode));
 			p.Add(new VUI.Label("Enables a bunch of tabs.", VUI.Label.Wrap));
 
@@ -109,6 +116,7 @@
 				skinGloss_.Checked = o.SkinGloss;
 				hairLoose_.Checked = o.HairLoose;
 				handLinking_.Checked = o.HandLinking;
+				ignoreCamera_.Checked = o.IgnoreCamera;
 				devMode_.Checked = o.DevMode;
 			}
 			finally
@@ -151,6 +159,12 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.HandLinking = b;
+		}
+
+		private void OnIgnoreCamera(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.IgnoreCamera = b;
 		}
 
 		private void OnDevMode(bool b)
