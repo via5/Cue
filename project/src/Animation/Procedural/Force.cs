@@ -75,6 +75,7 @@ namespace Cue.Proc
 		public const int AbsoluteTorque = 4;
 
 		private const float BusyResetTime = 1;
+		private const float NotBusyCatchUpTime = 1;
 
 		private int type_;
 		private int bodyPartType_;
@@ -87,7 +88,9 @@ namespace Cue.Proc
 		private bool wasBusy_ = false;
 		private Vector3 forceBeforeBusy_;
 		private float busyElapsed_ = 0;
+		private float notBusyElapsed_ = 0;
 		private IEasing busyResetEasing_ = new SinusoidalEasing();
+		private IEasing notBusyResetEasing_ = new SinusoidalEasing();
 
 		private IEasing windowEasing_ = new LinearEasing();
 		private Duration next_;
@@ -314,6 +317,8 @@ namespace Cue.Proc
 
 			if (!CanAppyForce())
 			{
+				notBusyElapsed_ = 0;
+
 				if (wasBusy_)
 				{
 					busyElapsed_ += s;
@@ -335,9 +340,26 @@ namespace Cue.Proc
 				if (p >= 1)
 					oneFrameFinished_ = true;
 			}
+			else if (wasBusy_)
+			{
+				notBusyElapsed_ += s;
+
+				if (notBusyElapsed_ >= NotBusyCatchUpTime)
+				{
+					wasBusy_ = false;
+					Apply(LerpedForce());
+				}
+				else
+				{
+					var p = U.Clamp(notBusyElapsed_ / NotBusyCatchUpTime, 0, 1);
+					var mag = notBusyResetEasing_.Magnitude(p);
+					var v = Vector3.Lerp(Vector3.Zero, LerpedForce(), mag);
+
+					Apply(v);
+				}
+			}
 			else
 			{
-				wasBusy_ = false;
 				Apply(LerpedForce());
 			}
 
