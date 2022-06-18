@@ -439,7 +439,7 @@
 		{
 			"type": "breasts",
 			"rate": 0.002,
-			"max": 0.4,
+			"max": 0.2,
 
 			"modifiers":
 			[
@@ -482,7 +482,7 @@
 		{
 			"type": "othersExcitement",
 			"rate": 0.3,
-			"max": 0.3
+			"max": 0.10
 		}
 	]
 }

@@ -211,6 +211,46 @@
 					}
 				},
 
+
+				{
+					"type": "rtorque",
+					"bodyPart": "leftFoot",
+					"movement":
+					{
+						"min": [-20, -20, -20],
+						"max": [ 20,  20,  20]
+					},
+					"sync":
+					{
+						"type": "duration",
+						"fwdDuration": [1, 6],
+						"bwdDuration": [1, 6],
+						"fwdDelay": [0, 6],
+						"bwdDelay": [0, 6],
+						"loop": true,
+						"resetBetween": false
+					}
+				},
+				{
+					"type": "rtorque",
+					"bodyPart": "rightFoot",
+					"movement":
+					{
+						"min": [-20, -20, -20],
+						"max": [ 20,  20,  20]
+					},
+					"sync":
+					{
+						"type": "duration",
+						"fwdDuration": [1, 6],
+						"bwdDuration": [1, 6],
+						"fwdDelay": [0, 6],
+						"bwdDelay": [0, 6],
+						"loop": true,
+						"resetBetween": false
+					}
+				},
+
 				{
 					"type": "morph",
 					"bodyPart": "rightHand",

@@ -21,8 +21,8 @@
 							"bodyPart": "hips",
 							"movement":
 							{
-								"min": [-75, 0, 200],
-								"max": [ 75, 0, 400]
+								"min": [-125, 0, 200],
+								"max": [ 150, 0, 600]
 							},
 							"sync":
 							{
@@ -40,8 +40,8 @@
 							"bodyPart": "chest",
 							"movement":
 							{
-								"min": [-75, 0, 200],
-								"max": [ 75, 0, 400]
+								"min": [-125, 0, 200],
+								"max": [ 150, 0, 600]
 							},
 							"sync":
 							{
@@ -59,8 +59,8 @@
 							"bodyPart": "head",
 							"movement":
 							{
-								"min": [-35, 0, 50],
-								"max": [ 35, 0, 10]
+								"min": [-50, 0, 75],
+								"max": [ 50, 0, 10]
 							},
 							"sync":
 							{
@@ -78,8 +78,8 @@
 							"bodyPart": "rightHand",
 							"movement":
 							{
-								"min": [-35, 0, 50],
-								"max": [ 35, 0, 10]
+								"min": [-50, 0, 75],
+								"max": [ 50, 0, 10]
 							},
 							"sync":
 							{
@@ -97,8 +97,8 @@
 							"bodyPart": "leftHand",
 							"movement":
 							{
-								"min": [-35, 0, 50],
-								"max": [ 35, 0, 10]
+								"min": [-50, 0, 75],
+								"max": [ 50, 0, 10]
 							},
 							"sync":
 							{
