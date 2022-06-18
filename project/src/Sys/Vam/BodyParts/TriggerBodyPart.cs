@@ -52,6 +52,9 @@ namespace Cue.Sys.Vam
 			t_ = tr;
 			ignoreTransforms_ = new Transform[0];
 
+			if (trigger_ != null)
+				trigger_.active = true;
+
 			if (h_ == null)
 			{
 				enabled_ = false;

@@ -47,15 +47,36 @@ namespace Cue.Sys.Vam
 
 			if (b)
 			{
+				if (dildo_ != null)
+				{
+					try
+					{
+						dildo_.Visible = true;
+					}
+					catch (Exception)
+					{
+						// dead
+						dildo_ = null;
+					}
+				}
+
 				if (dildo_ == null)
 					Create();
-				else
-					dildo_.Visible = true;
 			}
 			else
 			{
 				if (dildo_ != null)
-					dildo_.Visible = false;
+				{
+					try
+					{
+						dildo_.Visible = false;
+					}
+					catch (Exception)
+					{
+						// dead
+						dildo_ = null;
+					}
+				}
 			}
 		}
 
