@@ -259,6 +259,11 @@
 					rightForcedTrigger_ = true;
 				}
 			}
+			else
+			{
+				Log.Info("failed to double hj, can't lock");
+			}
+
 		}
 
 		private void StartLeftHJ(Person target)
@@ -279,6 +284,10 @@
 					leftForcedTrigger_ = true;
 				}
 			}
+			else
+			{
+				Log.Info("failed to start left hj, can't lock");
+			}
 		}
 
 		private void StartLeftFinger(Person target)
@@ -297,6 +306,10 @@
 					.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 
 				leftForcedTrigger_ = true;
+			}
+			else
+			{
+				Log.Info("failed to start left fingering, can't lock");
 			}
 		}
 
@@ -318,6 +331,10 @@
 					rightForcedTrigger_ = true;
 				}
 			}
+			else
+			{
+				Log.Info("failed to start right hj, can't lock");
+			}
 		}
 
 		private void StartRightFinger(Person target)
@@ -336,6 +353,10 @@
 					.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 
 				rightForcedTrigger_ = true;
+			}
+			else
+			{
+				Log.Info("failed to start right finger, can't lock");
 			}
 		}
 
@@ -422,7 +443,7 @@
 			var hand = person_.Body.Get(handPart);
 
 			BodyPart tentative = null;
-			float tentativeD = float.MaxValue;
+			Log.Info($"finding target for {hand}");
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -430,15 +451,15 @@
 				var d = hand.DistanceToSurface(g);
 
 				if (d > MaxDistanceToStart)
-					continue;
-
-				if (d < tentativeD)
 				{
-					if (BetterTarget(tentative, g))
-					{
-						tentative = g;
-						tentativeD = d;
-					}
+					Log.Verbose($"{g} too far");
+					continue;
+				}
+
+				if (BetterTarget(tentative, g))
+				{
+					Log.Verbose($"{g} better target");
+					tentative = g;
 				}
 			}
 
@@ -450,13 +471,25 @@
 			if (tentative == null)
 			{
 				// first
+				Log.Verbose($"BetterTarget: {check} is first");
 				return true;
 			}
 
 			if (tentative.Person == person_ && check.Person != person_)
 			{
-				// prioritize others
-				return true;
+				Log.Verbose($"BetterTarget: tentative {tentative} is self, {check} is not");
+
+				// prioritize others that are not penetrating
+				if (check.Person.Status.Penetrating())
+				{
+					Log.Verbose($"BetterTarget: but {check} is penetrating");
+					return false;
+				}
+				else
+				{
+					Log.Verbose($"BetterTarget: and {check} is not penetrating");
+					return true;
+				}
 			}
 
 			if (tentative.Person.Status.Penetrating() &&
@@ -464,8 +497,11 @@
 			{
 				// prioritize genitals that are not currently
 				// penetrating
+				Log.Verbose($"BetterTarget: tentative {tentative} is penetrating, {check} is not");
 				return true;
 			}
+
+			Log.Verbose($"BetterTarget: {tentative} still better than {check}");
 
 			return false;
 		}

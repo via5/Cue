@@ -159,7 +159,7 @@ namespace Cue
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (Penetrating(person_))
+				if (Penetrating(p))
 					return true;
 			}
 

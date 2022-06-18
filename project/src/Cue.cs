@@ -426,7 +426,10 @@ namespace Cue
 			if (!Sys.Paused)
 			{
 				for (int i = 0; i < everythingActive_.Count; ++i)
-					everythingActive_[i].Update(s);
+				{
+					if (everythingActive_[i].Visible)
+						everythingActive_[i].Update(s);
+				}
 			}
 		}
 
