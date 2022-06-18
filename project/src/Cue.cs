@@ -231,8 +231,6 @@ namespace Cue
 			if (a.Count > 0)
 				json.Add("objects", a);
 
-			json.Add("log", new JSONData(Logger.Enabled));
-
 			var ui = ui_?.ToJSON();
 			if (ui != null)
 				json.Add("ui", ui);
@@ -257,9 +255,6 @@ namespace Cue
 						o.Load(oj.AsObject);
 				}
 			}
-
-			if (c.HasKey("log"))
-				Logger.Enabled = c["log"].AsInt;
 
 			if (c.HasKey("ui"))
 				ui_.Load(c["ui"].AsObject);

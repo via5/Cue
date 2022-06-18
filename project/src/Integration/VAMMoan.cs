@@ -17,6 +17,7 @@ namespace Cue.VamMoan
 			public Sys.Vam.BoolParameter enabled;
 			public Sys.Vam.BoolParameter autoJaw;
 			public Sys.Vam.StringChooserParameter voice;
+			public Sys.Vam.FloatParameter volume;
 			public Sys.Vam.ActionParameter breathing;
 			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter[] intensities;
@@ -46,6 +47,9 @@ namespace Cue.VamMoan
 		private float intensity_ = 0;
 		private float intensityTarget_ = 0;
 		private float intensityWait_ = 0;
+
+		private float oldVolume_ = 0;
+		private bool muted_ = false;
 
 		private Pair<float, float> intensityWaitRange_ = new Pair<float, float>(0, 0);
 		private IRandom intensityWaitRng_ = new UniformRandom();
@@ -126,6 +130,7 @@ namespace Cue.VamMoan
 			p_.enabled = BP("enabled");
 			p_.autoJaw = BP("Enable auto-jaw animation");
 			p_.voice = SCP("voice");
+			p_.volume = FP("Voice volume");
 			p_.breathing = AP("Voice breathing");
 			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
@@ -176,6 +181,26 @@ namespace Cue.VamMoan
 			{
 				voiceCheckElapsed_ = 0;
 				CheckVoice();
+
+				if (person_.IsPlayer && Cue.Instance.Options.MutePlayer)
+				{
+					if (!muted_)
+					{
+						log_.Info("person is player, muting");
+						oldVolume_ = p_.volume.Value;
+						p_.volume.Value = 0;
+						muted_ = true;
+					}
+				}
+				else
+				{
+					if (muted_)
+					{
+						log_.Info("person is not player, unmuting");
+						p_.volume.Value = oldVolume_;
+						muted_ = false;
+					}
+				}
 			}
 
 			UpdateIntensity(s);

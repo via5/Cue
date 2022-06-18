@@ -92,6 +92,7 @@ namespace Cue
 		private bool rightMenu_ = true;
 		private bool straponPhysical_ = true;
 		private bool ignoreCamera_ = true;
+		private bool mutePlayer_ = true;
 
 		private List<CustomMenu> menus_ = new List<CustomMenu>();
 
@@ -164,10 +165,17 @@ namespace Cue
 			get { return straponPhysical_; }
 			set { straponPhysical_ = value; OnChanged(); }
 		}
+
 		public bool IgnoreCamera
 		{
 			get { return ignoreCamera_; }
 			set { ignoreCamera_ = value; OnChanged(); }
+		}
+
+		public bool MutePlayer
+		{
+			get { return mutePlayer_; }
+			set { mutePlayer_ = value; OnChanged(); }
 		}
 
 		public CustomMenu[] Menus
@@ -216,6 +224,7 @@ namespace Cue
 			o["rightMenu"] = new JSONData(rightMenu_);
 			o["straponPhysical"] = new JSONData(straponPhysical_);
 			o["ignoreCamera"] = new JSONData(ignoreCamera_);
+			o["mutePlayer"] = new JSONData(mutePlayer_);
 
 			if (menus_.Count > 0)
 			{
@@ -246,6 +255,7 @@ namespace Cue
 			J.OptBool(o, "rightMenu", ref rightMenu_);
 			J.OptBool(o, "straponPhysical", ref straponPhysical_);
 			J.OptBool(o, "ignoreCamera", ref ignoreCamera_);
+			J.OptBool(o, "mutePlayer", ref mutePlayer_);
 
 			if (o.HasKey("menus"))
 			{

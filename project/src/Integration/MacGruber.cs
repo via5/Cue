@@ -68,6 +68,7 @@ namespace Cue.MacGruber
 			public Sys.Vam.FloatParameter intensity;
 			public Sys.Vam.FloatParameter desktopVolume;
 			public Sys.Vam.FloatParameter vrVolume;
+			public Sys.Vam.FloatParameter volume;
 
 			public Sys.Vam.ActionParameter orgasmAction;
 			public Sys.Vam.StringChooserParameter orgasmDataset;
@@ -91,6 +92,9 @@ namespace Cue.MacGruber
 
 		private Parameters p_ = new Parameters();
 		private bool mouthEnabled_ = true;
+
+		private float oldVolume_ = 0;
+		private bool muted_ = false;
 
 		private Voice()
 		{
@@ -165,6 +169,7 @@ namespace Cue.MacGruber
 			p_.noseOutMorphMax = DBF("NoseOutMorph Max");
 			p_.orgasmAction = BA("QueueOrgasm");
 			p_.orgasmDataset = BSC("Orgasm Dataset");
+			p_.volume = BF("Volume");
 
 			p_.vrVolume.Value = p_.desktopVolume.Value;
 
@@ -192,7 +197,25 @@ namespace Cue.MacGruber
 
 		public void Update(float s)
 		{
-			// no-op
+			if (person_.IsPlayer && Cue.Instance.Options.MutePlayer)
+			{
+				if (!muted_)
+				{
+					log_.Info("person is player, muting");
+					oldVolume_ = p_.volume.Value;
+					p_.volume.Value = 0;
+					muted_ = true;
+				}
+			}
+			else
+			{
+				if (muted_)
+				{
+					log_.Info("person is not player, unmuting");
+					p_.volume.Value = oldVolume_;
+					muted_ = false;
+				}
+			}
 		}
 
 		public void StartOrgasm()

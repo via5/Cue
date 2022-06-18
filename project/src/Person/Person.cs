@@ -268,7 +268,7 @@ namespace Cue
 
 			I.Start(I.UpdatePersonVoice);
 			{
-				if (!IsPlayer && hasBody_)
+				if (hasBody_)
 					voice_.Update(s);
 			}
 			I.End();

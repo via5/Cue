@@ -6,6 +6,7 @@
 			: base("Options", true)
 		{
 			AddSubTab(new MainOptionsTab());
+			AddSubTab(new SoundOptionsTab());
 			AddSubTab(new MenuOptionsTab());
 		}
 
@@ -19,7 +20,7 @@
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
-		private VUI.CheckBox playSfx_, skinColor_, skinGloss_, hairLoose_;
+		private VUI.CheckBox skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, devMode_, straponPhysical_;
 		private VUI.CheckBox ignoreCamera_;
 		private bool ignore_ = false;
@@ -39,10 +40,6 @@
 			p.Add(ep);
 			p.Add(new VUI.Spacer(20));
 
-
-			playSfx_ = p.Add(new VUI.CheckBox("Play sfx", OnPlaySfx, o.MuteSfx));
-			p.Add(new VUI.Label("Play sound effects during hj/bj.", VUI.Label.Wrap));
-			p.Add(new VUI.Spacer(20));
 
 			skinColor_ = p.Add(new VUI.CheckBox("Skin color", OnSkinColor, o.SkinColor));
 			skinGloss_ = p.Add(new VUI.CheckBox("Skin gloss", OnSkinGloss, o.SkinGloss));
@@ -111,7 +108,6 @@
 				var o = Cue.Instance.Options;
 
 				excitement_.Value = o.Excitement;
-				playSfx_.Checked = !o.MuteSfx;
 				skinColor_.Checked = o.SkinColor;
 				skinGloss_.Checked = o.SkinGloss;
 				hairLoose_.Checked = o.HairLoose;
@@ -129,12 +125,6 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.Excitement = f;
-		}
-
-		private void OnPlaySfx(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.MuteSfx = !b;
 		}
 
 		private void OnSkinColor(bool b)
@@ -336,6 +326,75 @@
 		private void OnDelete(CustomMenu m)
 		{
 			Cue.Instance.Options.RemoveCustomMenu(m);
+		}
+	}
+
+
+	class SoundOptionsTab : Tab
+	{
+		private VUI.CheckBox playSfx_, mutePlayer_;
+		private bool ignore_ = false;
+
+		public SoundOptionsTab()
+			: base("Sound", false)
+		{
+			var o = Cue.Instance.Options;
+
+			var ly = new VUI.VerticalFlow(5);
+			ly.Expand = false;
+
+			var p = new VUI.Panel(ly);
+
+			playSfx_ = p.Add(new VUI.CheckBox("Play sfx", OnPlaySfx, o.MuteSfx));
+			p.Add(new VUI.Label("Play sound effects during hj/bj.", VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			mutePlayer_ = p.Add(new VUI.CheckBox("Mute possessed", OnMutePlayer, o.MutePlayer));
+			p.Add(new VUI.Label("Mute voice for possessed atoms", VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			Layout = new VUI.BorderLayout(20);
+			Add(p, VUI.BorderLayout.Top);
+
+			o.Changed += OnOptionsChanged;
+			OnOptionsChanged();
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+		}
+
+		private void OnOptionsChanged()
+		{
+			try
+			{
+				ignore_ = true;
+
+				var o = Cue.Instance.Options;
+
+				playSfx_.Checked = !o.MuteSfx;
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		private void OnPlaySfx(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.MuteSfx = !b;
+		}
+
+		private void OnMutePlayer(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.MutePlayer = b;
 		}
 	}
 }
