@@ -410,6 +410,12 @@ Controls what characters are looking at.
   interactions while still allowing quicker orgasms for more ad hoc interactions
 
 
+- OrgasmSyncMinExcitement (float)
+  syncs orgasms across characters; if any character in the scene is having an
+  orgasm and this character's excitement is above this value, its orgasm will be
+  triggered
+
+
 3.5 Mood
 --------
 

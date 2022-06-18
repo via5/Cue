@@ -393,6 +393,7 @@
 	"orgasmExpressionRangeMin": 0.8,
 	"orgasmExpressionRangeMax": 1,
 	"orgasmFirstExpressionTime": 0.2,
+	"orgasmSyncMinExcitement": 0.9,
 
 	"maxSweat": 1,
 	"maxFlush": 1,

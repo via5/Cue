@@ -97,6 +97,7 @@ V.Float("ExclusiveExpressionWeightModifier"),
 V.Float("OrgasmExpressionRangeMin"),
 V.Float("OrgasmExpressionRangeMax"),
 V.Float("OrgasmFirstExpressionTime"),
+V.Float("OrgasmSyncMinExcitement"),
 
 V.Float("MaxSweat"),
 V.Float("MaxFlush"),

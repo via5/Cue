@@ -251,7 +251,7 @@ namespace Cue
 
 		public void ForceOrgasm()
 		{
-			DoOrgasm();
+			DoOrgasm(false);
 		}
 
 		public void Update(float s)
@@ -431,7 +431,7 @@ namespace Cue
 			return rate - (rate * tirednessFactor);
 		}
 
-		private void DoOrgasm()
+		private void DoOrgasm(bool syncOthers = true)
 		{
 			person_.Log.Info("orgasm");
 			person_.Voice.StartOrgasm();
@@ -441,6 +441,32 @@ namespace Cue
 			moods_[Moods.Excited].Value = 1;
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
+
+			SyncOrgasms();
+		}
+
+		private void SyncOrgasms()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p == person_)
+					continue;
+
+				float min = p.Personality.Get(PS.OrgasmSyncMinExcitement);
+
+				if (min > 0)
+				{
+					float e = p.Mood.moods_[Moods.Excited].Value;
+					if (e >= min)
+					{
+						if (p.Mood.TimeSinceLastOrgasm >= 5)
+						{
+							person_.Log.Info($"{p} is at {e}, min is {min}, syncing orgasm");
+							p.Mood.ForceOrgasm();
+						}
+					}
+				}
+			}
 		}
 
 		private void SetState(int s)

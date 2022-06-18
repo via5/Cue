@@ -98,26 +98,27 @@ namespace Cue
 		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(73);
 		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(74);
 		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(75);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(76);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(77);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(78);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(79);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(80);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(81);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(82);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(83);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(84);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(85);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(86);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(87);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(88);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(89);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(90);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(91);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(92);
+		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(76);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(77);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(78);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(79);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(80);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(81);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(82);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(83);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(84);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(85);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(86);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(87);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(88);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(89);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(90);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(91);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(92);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(93);
 
-		public const int FloatCount = 93;
-		public override int GetFloatCount() { return 93; }
+		public const int FloatCount = 94;
+		public override int GetFloatCount() { return 94; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -313,6 +314,7 @@ namespace Cue
 			"orgasmExpressionRangeMin",
 			"orgasmExpressionRangeMax",
 			"orgasmFirstExpressionTime",
+			"orgasmSyncMinExcitement",
 			"maxSweat",
 			"maxFlush",
 			"temperatureExcitementMax",
@@ -516,6 +518,7 @@ namespace Cue
 			"orgasmExpressionRangeMin",
 			"orgasmExpressionRangeMax",
 			"orgasmFirstExpressionTime",
+			"orgasmSyncMinExcitement",
 			"maxSweat",
 			"maxFlush",
 			"temperatureExcitementMax",
