@@ -50,13 +50,13 @@ namespace ClothingManager
 			rotY_ = new JSONStorableFloat("Rotation Y", 0, OnChanged, 0, 360);
 			rotZ_ = new JSONStorableFloat("Rotation Z", 0, OnChanged, 0, 360);
 
-			scaleX_ = new JSONStorableFloat("Scale X", 0, OnChanged, 0, 1);
-			scaleY_ = new JSONStorableFloat("Scale Y", 0, OnChanged, 0, 1);
-			scaleZ_ = new JSONStorableFloat("Scale Z", 0, OnChanged, 0, 1);
+			scaleX_ = new JSONStorableFloat("Scale X", 0.1f, OnChanged, 0, 0.5f);
+			scaleY_ = new JSONStorableFloat("Scale Y", 0.1f, OnChanged, 0, 0.5f);
+			scaleZ_ = new JSONStorableFloat("Scale Z", 0.1f, OnChanged, 0, 0.5f);
 
-			posX_ = new JSONStorableFloat("Position X", 0, OnChanged, -1, 1);
-			posY_ = new JSONStorableFloat("Position Y", 0, OnChanged, -1, 1);
-			posZ_ = new JSONStorableFloat("Position Z", 0, OnChanged, -1, 1);
+			posX_ = new JSONStorableFloat("Position X", 0, OnChanged, -0.5f, 0.5f);
+			posY_ = new JSONStorableFloat("Position Y", 0, OnChanged, -0.5f, 0.5f);
+			posZ_ = new JSONStorableFloat("Position Z", 0, OnChanged, -0.5f, 0.5f);
 
 			s.CreateButton("Reload meta files").button.onClick.AddListener(OnReload);
 			s.CreateToggle(edit_);
@@ -64,7 +64,7 @@ namespace ClothingManager
 			s.CreatePopup(sides_);
 			s.CreateToggle(left_);
 			s.CreateToggle(right_);
-			s.CreateButton("Save meta file...").button.onClick.AddListener(OnSave);
+			s.CreateButton("Save meta file").button.onClick.AddListener(OnSave);
 
 			CreateSlider(s, rotX_, true);
 			CreateSlider(s, rotY_, true);
@@ -296,6 +296,12 @@ namespace ClothingManager
 					c.rotation = new Vector3(rotX_.val, rotY_.val, rotZ_.val);
 					c.size = new Vector3(scaleX_.val, scaleY_.val, scaleZ_.val);
 					c.center = new Vector3(posX_.val, posY_.val, posZ_.val);
+
+					if (c.size == Vector3.zero)
+					{
+						c.size = new Vector3(0.03f, 0.03f, 0.03f);
+						Select(ci_, int.Parse(sides_.val));
+					}
 
 					ci_.SetCollider(c, side);
 				}

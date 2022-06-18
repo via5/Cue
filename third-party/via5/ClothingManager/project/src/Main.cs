@@ -7,7 +7,7 @@ namespace via5
 	class Version
 	{
 		public int Major = 1;
-		public int Minor = 0;
+		public int Minor = 1;
 	}
 
 
