@@ -157,12 +157,12 @@ namespace ClockwiseSilver {
 				maxSpeedJSON = Helpers.SetupSlider(this, "Speed Max", 4.9f, 0.1f, 10, false);
 				frontBackRangeJSON = Helpers.SetupSlider(this, "Range", 1.0f, 0.1f, 10, false);
 				minRangeJSON = Helpers.SetupSlider(this, "Range Min", 0.7f, 0.5f, 0.75f, false);
-				maxRangeJSON = Helpers.SetupSlider(this, "Range Max", 1f, 0.8f, 1.2f, false);
+				maxRangeJSON = Helpers.SetupSlider(this, "Range Max", 1.2f, 1f, 1.2f, false);
 				flipLimitJSON = Helpers.SetupSlider(this, "Flip Limit", 0.995f, 0.98f, 0.9999f, false);
 				trackingSpeedJSON = Helpers.SetupSlider(this, "Tracking Speed", 0.5f, 0.05f, 2.0f, false);
 				topOnlyChanceJSON = Helpers.SetupSlider(this, "Top Only Chance", 0f, 0f, 1f, false);
 				zStrokeRotMinJSON = Helpers.SetupSlider(this, "Z Stroke Min", 0f, 0f, 90f, false);
-				zStrokeRotMaxJSON = Helpers.SetupSlider(this, "Z Stroke Max", 30f, 0f, 90f, false);
+				zStrokeRotMaxJSON = Helpers.SetupSlider(this, "Z Stroke Max", 15f, 0f, 90f, false);
 
 				baseUpJSON = new JSONStorableBool ("baseUpJSON", false);
 				RegisterBool (baseUpJSON);
