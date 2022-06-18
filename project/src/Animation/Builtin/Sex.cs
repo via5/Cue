@@ -166,11 +166,11 @@ namespace Cue.Proc
 		{
 			if (receiver_ == null)
 			{
-				var rot = person_.Body.Get(BP.Hips).Rotation;
+				var rot = Person.Body.Get(BP.Hips).Rotation;
 				return rot.Rotate(new Vector3(0, 0, 1)).Normalized;
 			}
 
-			var thisBP = person_.Body.Get(person_.Body.GenitalsBodyPart);
+			var thisBP = Person.Body.Get(Person.Body.GenitalsBodyPart);
 			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 
 			// direction between genitals
@@ -207,7 +207,7 @@ namespace Cue.Proc
 			if (receiver_ == null)
 				return 0.7f;
 
-			var thisBP = person_.Body.Get(person_.Body.GenitalsBodyPart);
+			var thisBP = Person.Body.Get(Person.Body.GenitalsBodyPart);
 			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 
 			var range = ForceFarDistance - ForceCloseDistance;

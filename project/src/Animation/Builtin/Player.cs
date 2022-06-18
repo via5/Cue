@@ -7,7 +7,7 @@ namespace Cue
 	{
 		private readonly string name_;
 		private bool hasMovement_;
-		protected Person person_ = null;
+		private Person person_ = null;
 		private Logger log_;
 
 		protected BuiltinAnimation(string name)
@@ -25,6 +25,11 @@ namespace Cue
 		public string Name
 		{
 			get { return name_; }
+		}
+
+		public Person Person
+		{
+			get { return person_; }
 		}
 
 		// todo
@@ -50,6 +55,7 @@ namespace Cue
 		public virtual bool Start(Person p, AnimationContext cx)
 		{
 			person_ = p;
+			log_.Set(p, "builtinAnim." + name_);
 			return true;
 		}
 
@@ -221,6 +227,22 @@ namespace Cue
 				{
 					Log.Verbose($"found animation at {i}");
 					DoRequestStop(i);
+					return;
+				}
+			}
+		}
+
+		public void MainSyncStopping(IAnimation a, Proc.ISync s)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+				{
+					// todo
+					var pa = playing_[i].anim as Proc.BasicProcAnimation;
+					if (pa != null)
+						pa.MainSyncStopping(s);
+
 					return;
 				}
 			}

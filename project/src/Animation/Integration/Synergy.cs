@@ -70,6 +70,11 @@ namespace Cue
 			StopNow(a);
 		}
 
+		public void MainSyncStopping(IAnimation a, Proc.ISync s)
+		{
+			// no-op
+		}
+
 		public void FixedUpdate(float s)
 		{
 		}

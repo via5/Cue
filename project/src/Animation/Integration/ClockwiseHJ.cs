@@ -90,7 +90,7 @@
 				var minRange = minRangeMax - minRangeMin;
 				var maxRange = maxRangeMax - maxRangeMin;
 
-				var e = Mood.MultiMovementEnergy(person_, leftTarget_, rightTarget_);
+				var e = Mood.MultiMovementEnergy(Person, leftTarget_, rightTarget_);
 				var minSpeed = minRangeMin + minRange * e;
 				var maxSpeed = maxRangeMin + maxRange * e;
 

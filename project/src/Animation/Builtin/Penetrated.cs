@@ -63,14 +63,14 @@
 
 			elapsed_ = 0;
 			state_ = ReactionState;
-			person_.Voice.MouthEnabled = false;
+			Person.Voice.MouthEnabled = false;
 
-			expressions_ = person_.Expression.GetExpressionsForMood(Moods.Excited);
+			expressions_ = Person.Expression.GetExpressionsForMood(Moods.Excited);
 
 			config_ = MakeConfig();
 			settings_ = MakeSettings(expressions_, config_);
 
-			person_.Expression.Disable();
+			Person.Expression.Disable();
 
 			StartLookUp();
 
@@ -166,8 +166,8 @@
 		{
 			if (settings_.lookUp)
 			{
-				person_.Gaze.Picker.ForcedTarget = person_.Gaze.Targets.LookatAbove;
-				person_.Gaze.Gazer.Duration = settings_.reactionTime;
+				Person.Gaze.Picker.ForcedTarget = Person.Gaze.Targets.LookatAbove;
+				Person.Gaze.Gazer.Duration = settings_.reactionTime;
 			}
 		}
 
@@ -175,15 +175,15 @@
 		{
 			if (settings_.lookUp)
 			{
-				person_.Gaze.Picker.ForcedTarget = null;
-				person_.Gaze.Gazer.Duration = settings_.postReactionTime;
+				Person.Gaze.Picker.ForcedTarget = null;
+				Person.Gaze.Gazer.Duration = settings_.postReactionTime;
 			}
 		}
 
 		private void Restore()
 		{
-			person_.Voice.MouthEnabled = true;
-			person_.Expression.Enable();
+			Person.Voice.MouthEnabled = true;
+			Person.Expression.Enable();
 		}
 
 		public override void Reset()

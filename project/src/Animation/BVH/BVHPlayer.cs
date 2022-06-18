@@ -201,7 +201,12 @@ namespace Cue.BVH
             StopNow(a);
         }
 
-        void CreateControllerMap()
+		public void MainSyncStopping(IAnimation a, Proc.ISync s)
+		{
+			// no-op
+		}
+
+		void CreateControllerMap()
         {
             controllerMap_ = new Dictionary<string, Controller>();
             foreach (var fc in containingAtom_.freeControllers)

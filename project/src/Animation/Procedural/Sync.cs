@@ -247,6 +247,11 @@ namespace Cue.Proc
 			get { return other_.Finished; }
 		}
 
+		public ISync Other
+		{
+			get { return other_; }
+		}
+
 		public override ISync Clone()
 		{
 			return null;

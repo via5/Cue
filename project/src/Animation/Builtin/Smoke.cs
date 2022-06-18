@@ -110,8 +110,8 @@ namespace Cue
 			if (!base.Start(p, cx))
 				return false;
 
-			hand_ = person_.Body.RightHand;
-			handPart_ = person_.Body.Get(BP.RightHand);
+			hand_ = Person.Body.RightHand;
+			handPart_ = Person.Body.Get(BP.RightHand);
 
 			mouthOpen_ = new Morph(p, "Mouth Open Wide", BP.Mouth);
 			lipsPucker_ = new Morph(p, "Lips Pucker", BP.Mouth);
@@ -177,7 +177,7 @@ namespace Cue
 		private IObject FindCigarette()
 		{
 			var a = Cue.Instance.Sys.GetAtom(
-				SmokeEvent.MakeCigaretteID(person_));
+				SmokeEvent.MakeCigaretteID(Person));
 
 			if (a == null)
 				return null;
@@ -188,7 +188,7 @@ namespace Cue
 		private ISmoke FindSmoke()
 		{
 			return Integration.CreateSmoke(
-				SmokeEvent.MakeSmokeID(person_), true);
+				SmokeEvent.MakeSmokeID(Person), true);
 		}
 
 		public override bool Done
@@ -261,7 +261,7 @@ namespace Cue
 
 			if (DoRender && render_.hand != null)
 			{
-				var mouth = person_.Body.Get(BP.Lips);
+				var mouth = Person.Body.Get(BP.Lips);
 				render_.hand.Position = handPart_.Position;
 
 				try
@@ -285,9 +285,9 @@ namespace Cue
 
 		private Quaternion GetTargetRotation()
 		{
-			var head = person_.Body.Get(BP.Head);
+			var head = Person.Body.Get(BP.Head);
 
-			if (hand_ == person_.Body.RightHand)
+			if (hand_ == Person.Body.RightHand)
 			{
 				return Quaternion.FromEuler(
 					head.Rotation.Euler.X,
@@ -305,15 +305,15 @@ namespace Cue
 
 		private void CheckTarget()
 		{
-			var head = person_.Body.Get(BP.Head);
-			var mouth = person_.Body.Get(BP.Lips);
+			var head = Person.Body.Get(BP.Head);
+			var mouth = Person.Body.Get(BP.Lips);
 
 			var d = handPart_.ControlRotation.RotateInv(
 				SmokeEvent.MakeCigarettePosition(hand_) - handPart_.ControlPosition);
 
 			var mouthDistance = U.Lerp(
 				DistanceFromMouthShort, DistanceFromMouthTall,
-				person_.Atom.Scale);
+				Person.Atom.Scale);
 
 			targetRot_ = GetTargetRotation();
 
@@ -322,13 +322,13 @@ namespace Cue
 				head.Rotation.Rotate(new Vector3(0, 0, mouthDistance));
 
 			midPointDistance_ = U.Lerp(
-				MidPointRangeShort, MidPointRangeTall, person_.Atom.Scale);
+				MidPointRangeShort, MidPointRangeTall, Person.Atom.Scale);
 		}
 
 		private void StartMoveToMouth()
 		{
-			var chest = person_.Body.Get(BP.Chest);
-			var mouth = person_.Body.Get(BP.Lips);
+			var chest = Person.Body.Get(BP.Chest);
+			var mouth = Person.Body.Get(BP.Lips);
 
 			startPos_ = handPart_.Position;
 			startRot_ = handPart_.Rotation;
@@ -354,13 +354,13 @@ namespace Cue
 			{
 				if (headLock_ == null)
 				{
-					headLock_ = person_.Body.Get(BP.Head)
+					headLock_ = Person.Body.Get(BP.Head)
 						.Lock(BodyPartLock.Move, "smoke", BodyPartLock.Strong);
 				}
 
 				if (mouthLock_ == null)
 				{
-					mouthLock_ = person_.Body.Get(BP.Mouth)
+					mouthLock_ = Person.Body.Get(BP.Mouth)
 						.Lock(BodyPartLock.Morph, "smoke", BodyPartLock.Strong);
 				}
 
@@ -494,7 +494,7 @@ namespace Cue
 
 			bool xNeg, yNeg, zNeg;
 
-			if (hand_ == person_.Body.RightHand)
+			if (hand_ == Person.Body.RightHand)
 			{
 				xNeg = true;
 				yNeg = false;
@@ -541,12 +541,12 @@ namespace Cue
 			state_ = Adjusting;
 			adjustStopDistance_ = U.Lerp(
 				AdjustDistanceRangeShort, AdjustDistanceRangeTall,
-				person_.Atom.Scale);
+				Person.Atom.Scale);
 		}
 
 		private void Adjust(float s)
 		{
-			var mouth = person_.Body.Get(BP.Lips);
+			var mouth = Person.Body.Get(BP.Lips);
 			var cig = SmokeEvent.MakeCigarettePosition(hand_);
 
 			{
@@ -618,7 +618,7 @@ namespace Cue
 
 		private void StartExhale()
 		{
-			var chest = person_.Body.Get(BP.Chest);
+			var chest = Person.Body.Get(BP.Chest);
 
 			targetMidPos_ =
 				startPos_ + (targetPos_ - startPos_) / 2 +
@@ -630,7 +630,7 @@ namespace Cue
 
 		private void Exhale()
 		{
-			var head = person_.Body.Get(BP.Head);
+			var head = Person.Body.Get(BP.Head);
 
 			if (elapsed_ >= HoldInTime)
 			{
@@ -682,7 +682,7 @@ namespace Cue
 
 		private void DoReset()
 		{
-			var head = person_.Body.Get(BP.Head);
+			var head = Person.Body.Get(BP.Head);
 
 			float mf = morphEasing_.Magnitude(U.Clamp(elapsed_ / ResetTime, 0, 1));
 			SetExhaleMorphs(1 - mf);

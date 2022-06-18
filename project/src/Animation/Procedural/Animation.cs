@@ -43,34 +43,65 @@ namespace Cue.Proc
 				}
 				else
 				{
-					person_.Log.Info($"{this}: syncing with {other.Animator.MainSync}");
+					Log.Info($"{this}: syncing with {other.Animator.MainSync}");
 					oldSync_ = root_.Sync;
 					root_.Sync = new SyncOther(other.Animator.MainSync);
 				}
 			}
 
-			if (person_.Animator.MainSync != null)
+			if (Person.Animator.MainSync != null)
 			{
-				person_.Log.Error($"{this}: already has a main sync");
+				Log.Error($"{this}: already has a main sync");
 			}
 			else
 			{
-				person_.Log.Info($"{this} is main sync");
-				person_.Animator.SetMainSync(root_.Sync);
+				Log.Info($"{this} is main sync");
+				Person.Animator.SetMainSync(root_.Sync);
 				mainSync_ = true;
 			}
 		}
 
 		public void MainSyncStopping(ISync s)
 		{
-			if (mainSync_ && oldSync_ == null)
+			if (Person == null)
 			{
-				// this is the reason for the call, ignore it
+				Log.ErrorST("person is null");
 				return;
 			}
 
-			if (oldSync_ != null)
-				root_.Sync = oldSync_;
+			Log.Info($"main sync {s} stopping");
+
+			if (root_.Sync == s)
+			{
+				// this is the reason for the call, ignore it
+				Log.Info($"ignoring");
+				return;
+			}
+			else if (oldSync_ == null)
+			{
+				Log.Info($"but oldSync is null");
+			}
+			else
+			{
+				var so = root_.Sync as SyncOther;
+				if (so == null)
+				{
+					Log.Info("but root sync is not a SyncOther");
+				}
+				else
+				{
+					if (so.Other != s)
+					{
+						Log.Info("but root sync isn't synced to this");
+					}
+					else
+					{
+						Log.Info($"setting old sync {oldSync_}");
+						root_.Sync = oldSync_;
+						oldSync_ = null;
+					}
+				}
+			}
 		}
 
 		public void AddTarget(ITarget t)
@@ -90,7 +121,7 @@ namespace Cue.Proc
 
 		public override bool Start(Person p, AnimationContext cx)
 		{
-			person_ = p;
+			base.Start(p, cx);
 			root_.Start(p, cx);
 			return true;
 		}
@@ -111,7 +142,10 @@ namespace Cue.Proc
 			base.Stopped();
 
 			if (mainSync_)
-				person_.Animator.SetMainSync(null);
+			{
+				mainSync_ = false;
+				Person.Animator.SetMainSync(null);
+			}
 		}
 
 		protected void SetEnergySource(Person p)

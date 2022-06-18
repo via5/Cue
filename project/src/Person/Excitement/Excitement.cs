@@ -6,8 +6,8 @@ namespace Cue
 	public abstract class ExcitementSource
 	{
 		protected readonly Person person_;
-		private bool enabledForOthers_ = true;
-		private bool enabledForPlayer_ = true;
+		private int enabledForOthers_ = 0;
+		private int enabledForPlayer_ = 0;
 
 		protected ExcitementSource(Person p)
 		{
@@ -21,14 +21,44 @@ namespace Cue
 
 		public bool EnabledForOthers
 		{
-			get { return enabledForOthers_; }
-			set { enabledForOthers_ = value; }
+			get { return (enabledForOthers_ > 0); }
 		}
 
 		public bool EnabledForPlayer
 		{
-			get { return enabledForPlayer_; }
-			set { enabledForPlayer_ = value; }
+			get { return (enabledForPlayer_ > 0); }
+		}
+
+		public void AddEnabledForOthers()
+		{
+			++enabledForOthers_;
+		}
+
+		public void RemoveEnabledForOthers()
+		{
+			Cue.Assert(enabledForOthers_ > 0);
+			enabledForOthers_ = Math.Max(enabledForOthers_ - 1, 0);
+		}
+
+		public void ClearEnabledForOthers()
+		{
+			enabledForOthers_ = 0;
+		}
+
+		public void AddEnabledForPlayer()
+		{
+			++enabledForPlayer_;
+		}
+
+		public void RemoveEnabledForPlayer()
+		{
+			Cue.Assert(enabledForPlayer_ > 0);
+			enabledForPlayer_ = Math.Max(enabledForPlayer_ - 1, 0);
+		}
+
+		public void ClearEnabledForPlayer()
+		{
+			enabledForPlayer_ = 0;
 		}
 
 		public virtual void Update()
@@ -337,8 +367,8 @@ namespace Cue
 					sources_[i] = new ZoneExcitementSource(person_, i);
 			}
 
-			sources_[SS.Penetration].EnabledForOthers = false;
-			sources_[SS.Genitals].EnabledForOthers = false;
+			sources_[SS.Penetration].ClearEnabledForOthers();
+			sources_[SS.Genitals].ClearEnabledForOthers();
 		}
 
 		public float Max

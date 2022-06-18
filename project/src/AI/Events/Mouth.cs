@@ -63,7 +63,7 @@
 				bjTarget_.Body.Get(bjTarget_.Body.GenitalsBodyPart)
 					.RemoveForcedTrigger(person_.PersonIndex, BP.Mouth);
 
-				bjTarget_.Excitement.GetSource(SS.Genitals).EnabledForOthers = false;
+				bjTarget_.Excitement.GetSource(SS.Genitals).RemoveEnabledForOthers();
 
 				hasForcedTrigger_ = false;
 			}
@@ -149,7 +149,7 @@
 				t.Body.Get(t.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, BP.Mouth);
 
-				t.Excitement.GetSource(SS.Genitals).EnabledForOthers = true;
+				t.Excitement.GetSource(SS.Genitals).AddEnabledForOthers();
 
 				hasForcedTrigger_ = true;
 			}

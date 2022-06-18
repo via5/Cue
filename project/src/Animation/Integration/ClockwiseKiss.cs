@@ -107,12 +107,12 @@
 			// this person leads by default
 			bool leader = true;
 
-			if (person_.IsPlayer)
+			if (Person.IsPlayer)
 			{
 				// player never leads
 				leader = false;
 			}
-			else if (person_.Body.Get(BP.Head).Grabbed && !target.IsPlayer)
+			else if (Person.Body.Get(BP.Head).Grabbed && !target.IsPlayer)
 			{
 				// this person's head is grabbed and being moved towards a
 				// target that's not the player, make the target the leader
@@ -238,7 +238,7 @@
 				}
 			}
 
-			closeEyes_.Value = !person_.Gaze.ShouldAvoid(target);
+			closeEyes_.Value = !Person.Gaze.ShouldAvoid(target);
 
 			trackingSpeed_.Value = StartTrackingSpeed;
 			trackPos_.Value = leader;
@@ -301,7 +301,7 @@
 
 			if (k && active_.Value)
 			{
-				var ps = person_.Personality;
+				var ps = Person.Personality;
 
 				// don't go too low
 				var range =
@@ -309,12 +309,12 @@
 
 				morphDuration_.Value =
 					morphDuration_.DefaultValue -
-					range * person_.Mood.MovementEnergy;
+					range * Person.Mood.MovementEnergy;
 
 				range = morphSpeed_.Maximum - morphSpeed_.DefaultValue;
 				morphSpeed_.Value =
 					morphSpeed_.DefaultValue +
-					range * person_.Mood.MovementEnergy;
+					range * Person.Mood.MovementEnergy;
 			}
 
 			if (k)

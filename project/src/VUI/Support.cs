@@ -574,6 +574,7 @@ namespace VUI
 		private GameObject panel_ = null;
 		private GameObject ui_ = null;
 		private Canvas canvas_ = null;
+		private CanvasScaler scaler_ = null;
 
 		public OverlayRootSupport(float topOffset, float width, float height)
 		{
@@ -592,7 +593,7 @@ namespace VUI
 
 			canvas_ = panel_.AddComponent<Canvas>();
 			panel_.AddComponent<CanvasRenderer>();
-			panel_.AddComponent<CanvasScaler>();
+			scaler_ = panel_.AddComponent<CanvasScaler>();
 
 			canvas_.renderMode = RenderMode.ScreenSpaceOverlay;
 			canvas_.gameObject.AddComponent<GraphicRaycaster>();
@@ -652,6 +653,8 @@ namespace VUI
 		{
 			if (ShowUI != panel_.activeSelf)
 				SetActive(ShowUI);
+
+			scaler_.scaleFactor = SuperController.singleton.monitorUIScale / 2;
 		}
 
 		public override void Destroy()

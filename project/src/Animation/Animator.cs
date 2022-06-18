@@ -58,6 +58,7 @@ namespace Cue
 		bool Play(IAnimation a, int flags, AnimationContext cx);
 		void RequestStop(IAnimation a);
 		void StopNow(IAnimation a);
+		void MainSyncStopping(IAnimation a, Proc.ISync s);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
 		void Update(float s);
@@ -190,11 +191,13 @@ namespace Cue
 		{
 			if (s == null)
 			{
-				for (int i = 0; i < playing_.Count; ++i)
+				foreach (Person p in Cue.Instance.ActivePersons)
 				{
-					var pa = playing_[i].anim.Sys as Proc.BasicProcAnimation;
-					if (pa != null)
-						pa.MainSyncStopping(sync_);
+					for (int i = 0; i < p.Animator.playing_.Count; ++i)
+					{
+						p.Animator.playing_[i].player.MainSyncStopping(
+							p.Animator.playing_[i].anim.Sys, sync_);
+					}
 				}
 			}
 
