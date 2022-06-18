@@ -129,7 +129,9 @@ namespace Cue
 				$"durationFinished         {durationFinished_}",
 				$"waitFinished             {waitFinished_}",
 				$"elapsed                  {elapsed_:0.00}",
-				$"last                     {lastResult_}"
+				$"last                     {lastResult_}",
+				$"minDuration              {minDuration_}",
+				$"waitFinishedBecauseGrab_ {waitFinishedBecauseGrab_}",
 			};
 		}
 
@@ -182,7 +184,7 @@ namespace Cue
 
 		private void UpdateInactive()
 		{
-			if (TryStart(true))
+			if (TryStartWithPlayer())
 			{
 				Next();
 				return;
@@ -195,7 +197,7 @@ namespace Cue
 				if (SelfCanStart(person_))
 				{
 					Next();
-					if (!TryStart(false))
+					if (!TryStartWithAnyone())
 						elapsed_ = 0;
 				}
 			}
@@ -240,6 +242,16 @@ namespace Cue
 
 			d_.duration.Reset(1);
 			d_.wait.Reset(1);
+		}
+
+		private bool TryStartWithPlayer()
+		{
+			return TryStart(true);
+		}
+
+		private bool TryStartWithAnyone()
+		{
+			return TryStart(false);
 		}
 
 		private bool TryStart(bool playerOnly)
@@ -310,7 +322,7 @@ namespace Cue
 				return false;
 			}
 
-			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_))
+			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_, minDuration_))
 			{
 				lastResult_ = $"kiss animation failed startfrom";
 				person_.Animator.StopType(Animations.Kiss);
@@ -337,7 +349,7 @@ namespace Cue
 			return "";
 		}
 
-		private bool StartedFrom(Person initiator)
+		private bool StartedFrom(Person initiator, float minDuration)
 		{
 			if (!person_.Animator.PlayType(
 				Animations.Kiss, new AnimationContext(
@@ -353,6 +365,7 @@ namespace Cue
 
 			target_ = initiator;
 			Next();
+			minDuration_ = minDuration;
 
 			return true;
 		}
