@@ -141,7 +141,7 @@ namespace Cue
 		public void AddForcedTrigger(
 			int sourcePersonIndex, int sourceBodyPart, float value = 1)
 		{
-			var ti = new Sys.TriggerInfo(
+			var ti = global::Cue.Sys.TriggerInfo.FromPerson(
 				sourcePersonIndex, sourceBodyPart, value, true);
 
 			Log.Verbose($"adding forced trigger for {this}: {ti}");
@@ -200,7 +200,7 @@ namespace Cue
 
 			for (int i = 0; i < forcedTriggers_.Count; ++i)
 			{
-				if (forcedTriggers_[i].IsExternal && tempList_.Count > 0)
+				if (forcedTriggers_[i].Type != global::Cue.Sys.TriggerInfo.PersonType && tempList_.Count > 0)
 					continue;
 
 				bool found = false;

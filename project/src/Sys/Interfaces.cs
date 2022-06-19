@@ -212,30 +212,49 @@ namespace Cue.Sys
 
 	public struct TriggerInfo
 	{
+		public const int NoneType = 0;
+		public const int PersonType = 1;
+		public const int ToyType = 2;
+
+
+		private int type_;
+
 		private int personIndex_;
 		private int bodyPart_;
 		private float value_;
 		private bool forced_;
 
-		private string externalAtom_;
-		private string externalName_;
+		private Atom externalAtom_;
 
-		public static TriggerInfo External(string atom, string name)
+		public static TriggerInfo FromExternal(int type, Atom atom)
 		{
-			var t = new TriggerInfo(-1, BP.None, 1.0f);
-			t.externalAtom_ = atom;
-			t.externalName_ = name;
-			return t;
+			return new TriggerInfo(type, -1, BP.None, 1.0f, false, atom);
 		}
 
-		public TriggerInfo(int sourcePersonIndex, int sourceBodyPart, float v, bool forced = false)
+		public static TriggerInfo FromPerson(
+			int sourcePersonIndex, int sourceBodyPart, float v,
+			bool forced = false)
 		{
+			return new TriggerInfo(
+				PersonType, sourcePersonIndex, sourceBodyPart,
+				v, forced, null);
+		}
+
+		private TriggerInfo(
+			int type, int sourcePersonIndex, int sourceBodyPart, float v,
+			bool forced, Atom externalAtom)
+		{
+			type_ = type;
 			personIndex_ = sourcePersonIndex;
 			bodyPart_ = sourceBodyPart;
 			value_ = v;
 			forced_ = forced;
-			externalAtom_ = null;
-			externalName_ = null;
+			externalAtom_ = externalAtom;
+		}
+
+		public int Type
+		{
+			get { return type_; }
 		}
 
 		public int PersonIndex
@@ -246,16 +265,6 @@ namespace Cue.Sys
 		public int BodyPart
 		{
 			get { return bodyPart_; }
-		}
-
-		public bool IsPerson
-		{
-			get { return (personIndex_ != -1 && bodyPart_ != -1); }
-		}
-
-		public bool IsExternal
-		{
-			get { return (personIndex_ == -1); }
 		}
 
 		public bool SameAs(TriggerInfo other)
@@ -272,26 +281,44 @@ namespace Cue.Sys
 
 		public override string ToString()
 		{
-			if (personIndex_ == -1 || bodyPart_ == -1)
+			switch (type_)
 			{
-				if (forced_)
-					return "forced";
-				else if (externalAtom_ != null || externalName_ != null)
-					return $"{externalAtom_}.{externalName_}";
-				else
-					return "?";
-			}
-			else
-			{
-				var p = Cue.Instance.AllPersons[personIndex_];
-				var bp = p.Body.Get(bodyPart_);
+				case PersonType:
+				{
+					var p = Cue.Instance.AllPersons[personIndex_];
+					var bp = p.Body.Get(bodyPart_);
 
-				string s = $"{p.ID}.{bp.Name}";
+					string s = $"{p.ID}.{bp.Name}";
 
-				if (forced_)
-					s += "(forced)";
+					if (forced_)
+						s += "(forced)";
 
-				return s;
+					return s;
+				}
+
+				case ToyType:
+				{
+					string s;
+
+					if (externalAtom_ != null)
+						s = $"{externalAtom_.uid}";
+					else
+						s = "?";
+
+					if (forced_)
+						s += "(forced)";
+
+					return s;
+				}
+
+				case NoneType:
+				default:
+				{
+					if (forced_)
+						return "forced";
+					else
+						return "?";
+				}
 			}
 		}
 	}

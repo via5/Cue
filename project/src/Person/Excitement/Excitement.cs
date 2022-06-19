@@ -29,6 +29,16 @@ namespace Cue
 			get { return (enabledForPlayer_ > 0); }
 		}
 
+		public bool EnabledForToys
+		{
+			get { return true; }
+		}
+
+		public bool EnabledForExternal
+		{
+			get { return false; }
+		}
+
 		public void AddEnabledForOthers()
 		{
 			++enabledForOthers_;
@@ -132,10 +142,29 @@ namespace Cue
 		{
 			if (s.Active && (person_.Mood.Get(Moods.Excited) <= s.Maximum))
 			{
-				if ((EnabledForPlayer && s.IsPlayer) ||
-					(EnabledForOthers && !s.IsPlayer))
+				switch (s.Type)
 				{
-					return true;
+					case Sys.TriggerInfo.PersonType:
+					{
+						if (EnabledForPlayer && s.IsPlayer)
+							return true;
+
+						if (EnabledForOthers && !s.IsPlayer)
+							return true;
+
+						return false;
+					}
+
+					case Sys.TriggerInfo.ToyType:
+					{
+						return EnabledForToys;
+					}
+
+					case Sys.TriggerInfo.NoneType:
+					default:
+					{
+						return EnabledForExternal;
+					}
 				}
 			}
 
@@ -148,16 +177,26 @@ namespace Cue
 			if (person_.Excitement.NeedsPenetrationDamper() && zone_ != SS.Penetration)
 				damp = $" (damp={person_.Personality.Get(PS.PenetrationDamper):0.00})";
 
-			string disabled = "";
+			string enabled = "";
 
-			if (!EnabledForOthers && !EnabledForPlayer)
-				disabled = " (disabled for others/players)";
-			else if (!EnabledForOthers)
-				disabled = " (disabled for others)";
-			else if (!EnabledForPlayer)
-				disabled = " (disabled for player)";
+			if (EnabledForPlayer)
+				enabled += "player ";
 
-			debug.Add($"{SS.ToString(zone_)}:{damp}{disabled}");
+			if (EnabledForOthers)
+				enabled += "other ";
+
+			if (EnabledForToys)
+				enabled += "toys ";
+
+			if (EnabledForExternal)
+				enabled += "external ";
+
+			if (enabled.Length == 0)
+				enabled = "enabled:none";
+			else
+				enabled = "enabled:" + enabled;
+
+			debug.Add($"{SS.ToString(zone_)}:{damp}{enabled}");
 			DebugZone(zone_, debug);
 		}
 

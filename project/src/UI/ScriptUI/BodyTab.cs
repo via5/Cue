@@ -192,7 +192,7 @@ namespace Cue
 
 						for (int j = 0; j < ts.Length; ++j)
 						{
-							if (!ts[j].IsPerson)
+							if (ts[j].Type == Sys.TriggerInfo.NoneType)
 							{
 								if (sawUnknown)
 									continue;

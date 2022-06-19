@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
@@ -249,21 +250,33 @@ namespace Cue.Sys.Vam
 		}
 
 		private static Transform sceneAtoms_ = null;
+		private static Dictionary<Collider, Atom> atomCache_ = new Dictionary<Collider, Atom>();
 
-		public static Transform AtomForCollider(Collider c)
+		public static Atom AtomForCollider(Collider c)
 		{
+			Atom a;
+			if (atomCache_.TryGetValue(c, out a))
+				return a;
+
 			{
-				var a = AtomForColliderFast(c);
+				a = AtomForColliderFast(c);
 				if (a != null)
+				{
+					atomCache_.Add(c, a);
 					return a;
+				}
 			}
 
 			var p = c.transform;
 
 			while (p != null)
 			{
-				if (p.GetComponent<Atom>() != null)
-					return p;
+				a = p.GetComponent<Atom>();
+				if (a != null)
+				{
+					atomCache_.Add(c, a);
+					return a;
+				}
 
 				p = p.parent;
 			}
@@ -271,7 +284,7 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
-		private static Transform AtomForColliderFast(Collider c)
+		private static Atom AtomForColliderFast(Collider c)
 		{
 			if (sceneAtoms_ == null)
 				sceneAtoms_ = c.transform.root;
@@ -287,7 +300,7 @@ namespace Cue.Sys.Vam
 				t = t.parent;
 			}
 
-			return last;
+			return last.GetComponent<Atom>();
 		}
 
 		public static void DumpComponents(Transform t, int indent = 0)

@@ -15,7 +15,7 @@ namespace Cue.Sys.Vam
 		private bool enabled_ = false;
 
 		private List<TriggerInfo> triggerCache_ = null;
-		private List<string> foundOtherCache_ = null;
+		private List<Atom> foundOtherCache_ = null;
 
 		protected TriggerBodyPart(VamAtom a, int type)
 			: base(a, type)
@@ -187,17 +187,29 @@ namespace Cue.Sys.Vam
 				{
 					bool skip = false;
 
+					var a = U.AtomForCollider(kv.Key);
+
 					if (foundOtherCache_ == null)
-						foundOtherCache_ = new List<string>();
-					else if (foundOtherCache_.Contains(kv.Key.name))
-						skip = true;
+					{
+						foundOtherCache_ = new List<Atom>();
+					}
 					else
-						foundOtherCache_.Add(kv.Key.name);
+					{
+						if (foundOtherCache_.Contains(a))
+							skip = true;
+					}
+
 
 					if (!skip)
 					{
-						triggerCache_.Add(TriggerInfo.External(
-							U.AtomForCollider(kv.Key)?.name, kv.Key.name));
+						foundOtherCache_.Add(a);
+
+						int type = TriggerInfo.NoneType;
+
+						if (a.category == "Toys")
+							type = TriggerInfo.ToyType;
+
+						triggerCache_.Add(TriggerInfo.FromExternal(type, a));
 					}
 				}
 				else
@@ -211,7 +223,7 @@ namespace Cue.Sys.Vam
 							continue;
 
 						found[p.PersonIndex, bp.Type] = true;
-						triggerCache_.Add(new TriggerInfo(p.PersonIndex, bp.Type, 1.0f));
+						triggerCache_.Add(TriggerInfo.FromPerson(p.PersonIndex, bp.Type, 1.0f));
 					}
 				}
 			}

@@ -125,20 +125,25 @@ namespace Cue
 			}
 		}
 
+		private const int ToyPartIndex = BP.Count;
+		private const int ExternalPartIndex = BP.Count + 1;
+
 		private int totalActive_ = 0;
 		private int validActive_ = 0;
 		private int physicalActive_ = 0;
 
 		private Person person_;
+		private int type_;  // Sys.TriggerInfo types
 		private readonly int sourcePersonIndex_;
-		private readonly Part[] parts_ = new Part[BP.Count + 1];
+		private readonly Part[] parts_ = new Part[BP.Count + 2];
 
 		private float rate_ = 0;
 		private float mod_ = 0;
 		private float max_ = 0;
 
-		public ErogenousZoneSource(Person p, int sourcePersonIndex)
+		public ErogenousZoneSource(Person p, int type, int sourcePersonIndex)
 		{
+			type_ = type;
 			person_ = p;
 			sourcePersonIndex_ = sourcePersonIndex;
 
@@ -149,6 +154,11 @@ namespace Cue
 		public int PersonIndex
 		{
 			get { return sourcePersonIndex_; }
+		}
+
+		public int Type
+		{
+			get { return type_; }
 		}
 
 		public bool IsPlayer
@@ -186,10 +196,20 @@ namespace Cue
 			get { return max_; }
 		}
 
+		private Part GetExternalPart()
+		{
+			return parts_[ExternalPartIndex];
+		}
+
+		private Part GetToyPart()
+		{
+			return parts_[ToyPartIndex];
+		}
+
 		private Part GetPart(int bodyPart)
 		{
 			if (bodyPart == BP.None)
-				return parts_[parts_.Length - 1];
+				return GetExternalPart();
 			else
 				return parts_[bodyPart];
 		}
@@ -294,10 +314,23 @@ namespace Cue
 				Activated(part);
 		}
 
-		public void Set(int sourceBodyPart, int targetBodyPart)
+		public void SetFromPerson(int sourceBodyPart, int targetBodyPart)
 		{
-			var p = GetPart(sourceBodyPart);
+			SetInternal(GetPart(sourceBodyPart), targetBodyPart);
+		}
 
+		public void SetFromToy(int targetBodyPart)
+		{
+			SetInternal(GetToyPart(), targetBodyPart);
+		}
+
+		public void SetFromExternal(int targetBodyPart)
+		{
+			SetInternal(GetExternalPart(), targetBodyPart);
+		}
+
+		private void SetInternal(Part p, int targetBodyPart)
+		{
 			p.elapsed = 1.0f;
 			p.ignored = false;
 			p.targetBodyPart = targetBodyPart;
@@ -347,19 +380,33 @@ namespace Cue
 
 		public override string ToString()
 		{
-			if (sourcePersonIndex_ == -1)
-				return $"external";
+			switch (type_)
+			{
+				case Sys.TriggerInfo.PersonType:
+				{
+					var p = Cue.Instance.GetPerson(sourcePersonIndex_);
+					if (p == null)
+						return $"?{sourcePersonIndex_}";
 
-			var p = Cue.Instance.GetPerson(sourcePersonIndex_);
-			if (p == null)
-				return $"?{sourcePersonIndex_}";
+					string s = p.ID;
 
-			string s = p.ID;
+					if (p.IsPlayer)
+						s += "(player)";
 
-			if (p.IsPlayer)
-				s += "(player)";
+					return s;
+				}
 
-			return s;
+				case Sys.TriggerInfo.ToyType:
+				{
+					return "toy";
+				}
+
+				case Sys.TriggerInfo.NoneType:
+				default:
+				{
+					return $"external";
+				}
+			}
 		}
 	}
 
@@ -378,6 +425,9 @@ namespace Cue
 			}
 		}
 
+		private int ToySourceIndex = -1;
+		private int ExternalSourceIndex = -1;
+
 		private Person person_;
 		private int type_;
 		private Part[] parts_;
@@ -390,13 +440,17 @@ namespace Cue
 			type_ = type;
 			parts_ = bodyParts;
 
-			// include an external one at the end
-			sources_ = new ErogenousZoneSource[Cue.Instance.ActivePersons.Length + 1];
+			ToySourceIndex = Cue.Instance.ActivePersons.Length;
+			ExternalSourceIndex = Cue.Instance.ActivePersons.Length + 1;
+
+			// include a toy and external ones at the end
+			sources_ = new ErogenousZoneSource[Cue.Instance.ActivePersons.Length + 2];
 
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
-				sources_[i] = new ErogenousZoneSource(person_, i);
+				sources_[i] = new ErogenousZoneSource(person_, Sys.TriggerInfo.PersonType, i);
 
-			sources_[sources_.Length - 1] = new ErogenousZoneSource(person_ , - 1);
+			sources_[ToySourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.ToyType, - 1);
+			sources_[ExternalSourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.NoneType, -1);
 		}
 
 		public bool Active
@@ -412,11 +466,6 @@ namespace Cue
 		public ErogenousZoneSource[] Sources
 		{
 			get { return sources_; }
-		}
-
-		private ErogenousZoneSource External
-		{
-			get { return sources_[sources_.Length - 1]; }
 		}
 
 		public void Update()
@@ -470,10 +519,27 @@ namespace Cue
 
 				if (sourceCheck == BP.None || sourceCheck == t.BodyPart)
 				{
-					if (t.IsPerson)
-						sources_[t.PersonIndex].Set(t.BodyPart, targetBodyPart);
-					else
-						External.Set(-1, targetBodyPart);
+					switch (t.Type)
+					{
+						case Sys.TriggerInfo.PersonType:
+						{
+							sources_[t.PersonIndex].SetFromPerson(t.BodyPart, targetBodyPart);
+							break;
+						}
+
+						case Sys.TriggerInfo.ToyType:
+						{
+							sources_[ToySourceIndex].SetFromToy(targetBodyPart);
+							break;
+						}
+
+						case Sys.TriggerInfo.NoneType:
+						default:
+						{
+							sources_[ExternalSourceIndex].SetFromExternal(targetBodyPart);
+							break;
+						}
+					}
 				}
 			}
 		}
