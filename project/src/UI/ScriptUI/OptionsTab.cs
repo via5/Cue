@@ -6,6 +6,7 @@
 			: base("Options", true)
 		{
 			AddSubTab(new MainOptionsTab());
+			AddSubTab(new EffectsOptionsTab());
 			AddSubTab(new SoundOptionsTab());
 			AddSubTab(new MenuOptionsTab());
 		}
@@ -20,7 +21,6 @@
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
-		private VUI.CheckBox skinColor_, skinGloss_, hairLoose_;
 		private VUI.CheckBox handLinking_, autoHands_, devMode_, straponPhysical_;
 		private VUI.CheckBox ignoreCamera_;
 		private bool ignore_ = false;
@@ -38,22 +38,6 @@
 			excitement_ = ep.Add(new VUI.FloatTextSlider(0, 10, OnExcitementChanged));
 
 			p.Add(ep);
-			p.Add(new VUI.Spacer(20));
-
-
-			skinColor_ = p.Add(new VUI.CheckBox("Skin color", OnSkinColor, o.SkinColor));
-			skinGloss_ = p.Add(new VUI.CheckBox("Skin gloss", OnSkinGloss, o.SkinGloss));
-			p.Add(new VUI.Label(
-				"Enables skin color and gloss changes depending on body " +
-				"temperature. Might not work well for darker skin colors.",
-				VUI.Label.Wrap));
-			p.Add(new VUI.Spacer(20));
-
-			hairLoose_ = p.Add(new VUI.CheckBox("Loose hair", OnHairLoose, o.HairLoose));
-			p.Add(new VUI.Label(
-				"Enables loose hair depending on body temperature. Might not " +
-				"work well for some hair items.",
-				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
 			autoHands_ = p.Add(new VUI.CheckBox("Auto hands", OnAutoHands, o.AutoHands));
@@ -115,9 +99,6 @@
 				var o = Cue.Instance.Options;
 
 				excitement_.Value = o.Excitement;
-				skinColor_.Checked = o.SkinColor;
-				skinGloss_.Checked = o.SkinGloss;
-				hairLoose_.Checked = o.HairLoose;
 				handLinking_.Checked = o.HandLinking;
 				autoHands_.Checked = o.AutoHands;
 				straponPhysical_.Checked = o.StraponPhysical;
@@ -134,24 +115,6 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.Excitement = f;
-		}
-
-		private void OnSkinColor(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.SkinColor = b;
-		}
-
-		private void OnSkinGloss(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.SkinGloss = b;
-		}
-
-		private void OnHairLoose(bool b)
-		{
-			if (ignore_) return;
-			Cue.Instance.Options.HairLoose = b;
 		}
 
 		private void OnHandLinking(bool b)
@@ -410,6 +373,90 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.MutePlayer = b;
+		}
+	}
+
+
+	class EffectsOptionsTab : Tab
+	{
+		private VUI.CheckBox skinColor_, skinGloss_, hairLoose_;
+		private bool ignore_ = false;
+
+		public EffectsOptionsTab()
+			: base("Effects", false)
+		{
+			var o = Cue.Instance.Options;
+
+			var ly = new VUI.VerticalFlow(5);
+			ly.Expand = false;
+
+			var p = new VUI.Panel(ly);
+
+			skinColor_ = p.Add(new VUI.CheckBox("Skin color", OnSkinColor, o.SkinColor));
+			skinGloss_ = p.Add(new VUI.CheckBox("Skin gloss", OnSkinGloss, o.SkinGloss));
+			p.Add(new VUI.Label(
+				"Enables skin color and gloss changes depending on body " +
+				"temperature. Might not work well for darker skin colors.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			hairLoose_ = p.Add(new VUI.CheckBox("Loose hair", OnHairLoose, o.HairLoose));
+			p.Add(new VUI.Label(
+				"Enables loose hair depending on body temperature. Might not " +
+				"work well for some hair items.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			Layout = new VUI.BorderLayout(20);
+			Add(p, VUI.BorderLayout.Top);
+
+			o.Changed += OnOptionsChanged;
+			OnOptionsChanged();
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+		}
+
+		private void OnOptionsChanged()
+		{
+			try
+			{
+				ignore_ = true;
+
+				var o = Cue.Instance.Options;
+
+				skinColor_.Checked = o.SkinColor;
+				skinGloss_.Checked = o.SkinGloss;
+				hairLoose_.Checked = o.HairLoose;
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		private void OnSkinColor(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.SkinColor = b;
+		}
+
+		private void OnSkinGloss(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.SkinGloss = b;
+		}
+
+		private void OnHairLoose(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.HairLoose = b;
 		}
 	}
 }
