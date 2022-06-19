@@ -21,8 +21,8 @@
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
-		private VUI.CheckBox handLinking_, autoHands_, devMode_, straponPhysical_;
-		private VUI.CheckBox ignoreCamera_;
+		private VUI.CheckBox idlePose_, autoHands_, handLinking_;
+		private VUI.CheckBox straponPhysical_, ignoreCamera_, devMode_;
 		private bool ignore_ = false;
 
 		public MainOptionsTab()
@@ -40,6 +40,12 @@
 			p.Add(ep);
 			p.Add(new VUI.Spacer(20));
 
+			idlePose_ = p.Add(new VUI.CheckBox("Idle animation", OnIdlePose, o.IdlePose));
+			p.Add(new VUI.Label(
+				"Moves body parts around randomly.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
 			autoHands_ = p.Add(new VUI.CheckBox("Auto hands", OnAutoHands, o.AutoHands));
 			p.Add(new VUI.Label(
 				"Starts hand events automatically when a hand is close to " +
@@ -55,7 +61,7 @@
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
-			straponPhysical_ = p.Add(new VUI.CheckBox("Strapon physical", OnHandLinking, o.HandLinking));
+			straponPhysical_ = p.Add(new VUI.CheckBox("Strapon physical", OnStraponPhysical, o.StraponPhysical));
 			p.Add(new VUI.Label(
 				"Treats strapons the same as genitals instead of limiting " +
 				"their impact on excitement.",
@@ -99,8 +105,9 @@
 				var o = Cue.Instance.Options;
 
 				excitement_.Value = o.Excitement;
-				handLinking_.Checked = o.HandLinking;
+				idlePose_.Checked = o.IdlePose;
 				autoHands_.Checked = o.AutoHands;
+				handLinking_.Checked = o.HandLinking;
 				straponPhysical_.Checked = o.StraponPhysical;
 				ignoreCamera_.Checked = o.IgnoreCamera;
 				devMode_.Checked = o.DevMode;
@@ -117,16 +124,28 @@
 			Cue.Instance.Options.Excitement = f;
 		}
 
-		private void OnHandLinking(bool b)
+		private void OnIdlePose(bool b)
 		{
 			if (ignore_) return;
-			Cue.Instance.Options.HandLinking = b;
+			Cue.Instance.Options.IdlePose = b;
 		}
 
 		private void OnAutoHands(bool b)
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.AutoHands = b;
+		}
+
+		private void OnHandLinking(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.HandLinking = b;
+		}
+
+		private void OnStraponPhysical(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.StraponPhysical = b;
 		}
 
 		private void OnIgnoreCamera(bool b)

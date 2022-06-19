@@ -21,6 +21,7 @@ namespace Cue
 		private Logger log_;
 		private bool eventsEnabled_ = true;
 		private IEvent[] events_ = null;
+		private bool hasIdlePose_ = false;
 
 		public PersonAI(Person p)
 		{
@@ -33,8 +34,6 @@ namespace Cue
 		{
 			for (int i = 0; i < events_.Length; ++i)
 				events_[i].Init(person_);
-
-			person_.Animator.PlayType(Animations.Idle);
 		}
 
 		public bool EventsEnabled
@@ -70,6 +69,17 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (Cue.Instance.Options.IdlePose && !hasIdlePose_)
+			{
+				hasIdlePose_ = true;
+				person_.Animator.PlayType(Animations.Idle);
+			}
+			else if (!Cue.Instance.Options.IdlePose && hasIdlePose_)
+			{
+				hasIdlePose_ = false;
+				person_.Animator.StopType(Animations.Idle);
+			}
+
 			if (eventsEnabled_)
 			{
 				for (int i = 0; i < events_.Length; ++i)
