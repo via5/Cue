@@ -72,7 +72,17 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			hasPenis_.Text = person_.Body.HasPenis.ToString();
+			if (person_.Body.HasPenis)
+			{
+				if (person_.Body.Get(BP.Penis).IsPhysical)
+					hasPenis_.Text = "yes";
+				else
+					hasPenis_.Text = "yes, not physical";
+			}
+			else
+			{
+				hasPenis_.Text = "no";
+			}
 
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";

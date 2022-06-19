@@ -402,6 +402,8 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
+			Check();
+
 			if (param_ == null)
 			{
 				if (checkedOnce_)

@@ -68,6 +68,8 @@
 				hasForcedTrigger_ = false;
 			}
 
+			bjTarget_.Homing.Mouth = false;
+
 			bjTarget_ = null;
 			person_.Animator.StopType(Animations.Blowjob);
 		}
@@ -153,6 +155,8 @@
 
 				hasForcedTrigger_ = true;
 			}
+
+			t.Homing.Mouth = true;
 
 			bjTarget_ = t;
 		}

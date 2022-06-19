@@ -202,6 +202,8 @@
 				UnlockLeft();
 				SetZoneEnabled(leftTarget_, false);
 
+				leftTarget_.Homing.LeftHand = false;
+
 				leftGroped_ = false;
 				leftTarget_ = null;
 			}
@@ -217,6 +219,8 @@
 
 				UnlockRight();
 				SetZoneEnabled(rightTarget_, false);
+
+				rightTarget_.Homing.RightHand = false;
 
 				rightGroped_ = false;
 				rightTarget_ = null;
@@ -317,6 +321,17 @@
 				SetZoneEnabled(left, true);
 				SetZoneEnabled(right, true);
 
+				if (left == right)
+				{
+					// just one hand
+					left.Homing.LeftHand = true;
+				}
+				else
+				{
+					left.Homing.LeftHand = true;
+					right.Homing.RightHand = true;
+				}
+
 				if (leftTarget_.Body.PenisSensitive)
 				{
 					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
@@ -349,6 +364,8 @@
 				leftTarget_ = target;
 				leftAnim_ = Animations.HandjobLeft;
 				SetZoneEnabled(target, true);
+
+				target.Homing.LeftHand = true;
 
 				if (leftTarget_.Body.PenisSensitive)
 				{
@@ -396,6 +413,8 @@
 				rightTarget_ = target;
 				rightAnim_ = Animations.HandjobRight;
 				SetZoneEnabled(target, true);
+
+				target.Homing.RightHand = true;
 
 				if (rightTarget_.Body.PenisSensitive)
 				{

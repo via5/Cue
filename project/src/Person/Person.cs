@@ -41,6 +41,7 @@ namespace Cue
 		private IVoice voice_;
 		private ISpeaker speech_;
 		private IClothing clothing_;
+		private IHoming homing_;
 
 		private bool hasBody_ = false;
 
@@ -65,6 +66,7 @@ namespace Cue
 			voice_ = personality_.CreateVoice(this, null);
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
+			homing_ = Integration.CreateHoming(this);
 
 			Atom.SetDefaultControls("init");
 		}
@@ -75,6 +77,7 @@ namespace Cue
 			Excitement.Init();
 			Body.Init();
 			Gaze.Init();
+			Homing.Init();
 
 			hasBody_ = body_.Exists;
 
@@ -136,6 +139,7 @@ namespace Cue
 
 		public IVoice Voice { get { return voice_; } }
 		public ISpeaker Speech { get { return speech_; } }
+		public IHoming Homing { get { return homing_; } }
 
 		public int MovementStyle
 		{
@@ -278,6 +282,14 @@ namespace Cue
 			{
 				if (!IsPlayer)
 					mood_.Update(s);
+			}
+			I.End();
+
+
+			I.Start(I.UpdatePersonHoming);
+			{
+				if (hasBody_)
+					homing_.Update(s);
 			}
 			I.End();
 

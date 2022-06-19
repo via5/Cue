@@ -48,6 +48,11 @@ namespace Cue
 			else
 				return null;
 		}
+
+		public static IHoming CreateHoming(Person p)
+		{
+			return new ToumeiHitsuji.DiviningRod(p);
+		}
 	}
 
 	public interface IVoice
@@ -105,11 +110,23 @@ namespace Cue
 		void Dump();
 	}
 
-	interface ISmoke
+	public interface ISmoke
 	{
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
 		float Opacity { get; set; }
 		void Destroy();
+	}
+
+	public interface IHoming
+	{
+		bool Genitals { get; set; }
+		bool Mouth { get; set; }
+		bool LeftHand { get; set; }
+		bool RightHand { get; set; }
+		string Warning { get; }
+
+		void Init();
+		void Update(float s);
 	}
 }

@@ -132,7 +132,7 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
 		};
 		private int[] stack_ = new int[4];
 		private int current_ = 0;
@@ -150,6 +150,7 @@ namespace Cue
 			tickers_[I.UpdatePersonVoice] = new Ticker("Voice");
 			tickers_[I.UpdatePersonExcitement] = new Ticker("Excitement");
 			tickers_[I.UpdatePersonMood] = new Ticker("Mood");
+			tickers_[I.UpdatePersonHoming] = new Ticker("Homing");
 			tickers_[I.UpdatePersonBody] = new Ticker("Body");
 			tickers_[I.UpdatePersonStatus] = new Ticker("Status");
 			tickers_[I.UpdatePersonAI] = new Ticker("AI");
@@ -247,11 +248,12 @@ namespace Cue
 		public const int UpdatePersonExcitement = 7;
 		public const int UpdatePersonMood = 8;
 		public const int UpdatePersonBody = 9;
-		public const int UpdatePersonStatus = 10;
-		public const int UpdatePersonAI = 11;
-		public const int UpdateUi = 12;
-		public const int FixedUpdate = 13;
-		public const int TickerCount = 14;
+		public const int UpdatePersonHoming = 10;
+		public const int UpdatePersonStatus = 11;
+		public const int UpdatePersonAI = 12;
+		public const int UpdateUi = 13;
+		public const int FixedUpdate = 14;
+		public const int TickerCount = 15;
 
 
 

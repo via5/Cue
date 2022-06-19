@@ -93,13 +93,28 @@ namespace Cue
 				else
 					SelectPersonality(person_.Personality.Name);
 
-				warning_.Text = person_.Voice.Warning;
+				warning_.Text = MakeWarnings();
 				warning_.Visible = (warning_.Text.Length > 0);
 			}
 			finally
 			{
 				ignore_ = false;
 			}
+		}
+
+		private string MakeWarnings()
+		{
+			string s = person_.Homing.Warning;
+
+			if (person_.Voice.Warning != "")
+			{
+				if (s != "")
+					s += ", ";
+
+				s += person_.Voice.Warning;
+			}
+
+			return s;
 		}
 
 		private void RebuildPersonalities()

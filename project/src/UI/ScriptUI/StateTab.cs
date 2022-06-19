@@ -20,6 +20,7 @@ namespace Cue
 		private VUI.Label gazer_ = new VUI.Label();
 		private VUI.Label speech_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
+		private VUI.Label homing_ = new VUI.Label();
 
 		private VUI.CheckBox forcePlayer_ = new VUI.CheckBox("Force as player");
 
@@ -79,6 +80,9 @@ namespace Cue
 			state.Add(new VUI.Label("Clothing"));
 			state.Add(clothing_);
 
+			state.Add(new VUI.Label("Homing"));
+			state.Add(homing_);
+
 
 			var buttons = new VUI.Panel(new VUI.VerticalFlow(10));
 			buttons.Add(forcePlayer_);
@@ -105,6 +109,7 @@ namespace Cue
 			gazer_.Text = person_.Gaze.Gazer.ToString();
 			speech_.Text = person_.Speech.ToString();
 			clothing_.Text = person_.Clothing.ToString();
+			homing_.Text = person_.Homing.ToString();
 
 			forcePlayer_.Checked = (Cue.Instance.ForcedPlayer == person_);
 		}
