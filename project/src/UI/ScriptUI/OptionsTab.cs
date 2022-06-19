@@ -21,7 +21,7 @@
 	{
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox skinColor_, skinGloss_, hairLoose_;
-		private VUI.CheckBox handLinking_, devMode_, straponPhysical_;
+		private VUI.CheckBox handLinking_, autoHands_, devMode_, straponPhysical_;
 		private VUI.CheckBox ignoreCamera_;
 		private bool ignore_ = false;
 
@@ -53,6 +53,13 @@
 			p.Add(new VUI.Label(
 				"Enables loose hair depending on body temperature. Might not " +
 				"work well for some hair items.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			autoHands_ = p.Add(new VUI.CheckBox("Auto hands", OnAutoHands, o.AutoHands));
+			p.Add(new VUI.Label(
+				"Starts hand events automatically when a hand is close to " +
+				"genitals.",
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
@@ -112,6 +119,8 @@
 				skinGloss_.Checked = o.SkinGloss;
 				hairLoose_.Checked = o.HairLoose;
 				handLinking_.Checked = o.HandLinking;
+				autoHands_.Checked = o.AutoHands;
+				straponPhysical_.Checked = o.StraponPhysical;
 				ignoreCamera_.Checked = o.IgnoreCamera;
 				devMode_.Checked = o.DevMode;
 			}
@@ -149,6 +158,12 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.HandLinking = b;
+		}
+
+		private void OnAutoHands(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.AutoHands = b;
 		}
 
 		private void OnIgnoreCamera(bool b)

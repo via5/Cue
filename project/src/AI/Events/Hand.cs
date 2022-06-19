@@ -4,6 +4,8 @@
 	{
 		private const float MaxDistanceToStart = 0.09f;
 		private const float CheckTargetsInterval = 2;
+		private const float AutoStartDistance = 0.05f;
+		private const float StopDistance = 0.05f;
 
 		private bool active_ = false;
 		private float checkElapsed_ = CheckTargetsInterval;
@@ -14,6 +16,7 @@
 		private BodyPartLock[] leftTargetLock_ = null;
 		private int leftAnim_ = Animations.None;
 		private bool leftForcedTrigger_ = false;
+		private bool leftWasGrabbed_ = false;
 
 		private Person rightTarget_ = null;
 		private bool rightGroped_ = false;
@@ -21,6 +24,7 @@
 		private BodyPartLock[] rightTargetLock_ = null;
 		private int rightAnim_ = Animations.None;
 		private bool rightForcedTrigger_ = false;
+		private bool rightWasGrabbed_ = false;
 
 
 		public HandEvent()
@@ -77,12 +81,16 @@
 		{
 			if (!active_)
 			{
+				if (CheckAutoStart())
+					return;
+
 				UnlockLeft();
 				UnlockRight();
 				return;
 			}
 
-			CheckAnim();
+			if (!CheckAnim())
+				Active = false;
 
 			checkElapsed_ += s;
 			if (checkElapsed_ >= CheckTargetsInterval)
@@ -99,6 +107,72 @@
 				if (leftTarget_ == null && rightTarget_ == null)
 					active_ = false;
 			}
+		}
+
+		private bool CheckAutoStart()
+		{
+			if (!Cue.Instance.Options.AutoHands)
+				return false;
+
+			bool check = false;
+
+			var left = person_.Body.Get(BP.LeftHand);
+			var right = person_.Body.Get(BP.RightHand);
+
+			{
+				if (left.Grabbed && !leftWasGrabbed_)
+				{
+					leftWasGrabbed_ = true;
+				}
+				else if (!left.Grabbed && leftWasGrabbed_)
+				{
+					leftWasGrabbed_ = false;
+					check = true;
+				}
+			}
+
+			{
+				if (right.Grabbed && !rightWasGrabbed_)
+				{
+					rightWasGrabbed_ = true;
+				}
+				else if (!right.Grabbed && rightWasGrabbed_)
+				{
+					rightWasGrabbed_ = false;
+					check = true;
+				}
+			}
+
+
+			if (!check)
+				return false;
+
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				var g = p.Body.Get(p.Body.GenitalsBodyPart);
+				BodyPart bp = null;
+
+				float d = g.DistanceToSurface(left);
+				if (d < AutoStartDistance)
+				{
+					bp = left;
+				}
+				else
+				{
+					d = g.DistanceToSurface(right);
+					if (d < AutoStartDistance)
+						bp = right;
+				}
+
+				if (bp != null)
+				{
+					Log.Info($"autostart: activating with {bp} and {g}, d={d}");
+					Active = true;
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void Stop()
@@ -360,13 +434,18 @@
 			}
 		}
 
-		private void CheckAnim()
+		private bool CheckAnim()
 		{
-			CheckAnim(leftAnim_, leftTarget_, leftSourceLock_);
-			CheckAnim(rightAnim_, rightTarget_, rightSourceLock_);
+			if (!CheckAnim(leftAnim_, leftTarget_, leftSourceLock_))
+				return false;
+
+			if (!CheckAnim(rightAnim_, rightTarget_, rightSourceLock_))
+				return false;
+
+			return true;
 		}
 
-		private void CheckAnim(int anim, Person target, BodyPartLock[] locks)
+		private bool CheckAnim(int anim, Person target, BodyPartLock[] locks)
 		{
 			if (anim != Animations.None)
 			{
@@ -381,11 +460,16 @@
 				{
 					if (Mood.CanStartSexAnimation(person_, target))
 					{
-						person_.Animator.PlayType(
-							anim, new AnimationContext(target, locks[0].Key));
+						if (!person_.Animator.PlayType(
+								anim, new AnimationContext(target, locks[0].Key)))
+						{
+							return false;
+						}
 					}
 				}
 			}
+
+			return true;
 		}
 
 		private void SetZoneEnabled(Person target, bool b)

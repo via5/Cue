@@ -226,7 +226,6 @@ namespace Cue
 			Next();
 			SetExcitement(false);
 			person_.Animator.StopType(Animations.Kiss);
-			person_.Excitement.GetSource(SS.Mouth).RemoveEnabledForOthers();
 			target_ = null;
 		}
 
