@@ -18,12 +18,74 @@ namespace Cue.VamMoan
 			public Sys.Vam.BoolParameter autoJaw;
 			public Sys.Vam.StringChooserParameter voice;
 			public Sys.Vam.FloatParameter volume;
+			public Sys.Vam.ActionParameter disabled;
 			public Sys.Vam.ActionParameter breathing;
 			public Sys.Vam.ActionParameter orgasm;
+			public Sys.Vam.ActionParameter kissing;
 			public Sys.Vam.ActionParameter[] intensities;
 			public Sys.Vam.FloatParameter availableIntensities;
 			public bool hasAvailableIntensities;
 		}
+
+		class RandomRange
+		{
+			public Pair<float, float> range = new Pair<float, float>(0, 0);
+			public IRandom rng = new UniformRandom();
+
+			public RandomRange Clone()
+			{
+				var r = new RandomRange();
+				r.range = range;
+				r.rng = rng.Clone();
+
+				return r;
+			}
+
+			public override string ToString()
+			{
+				return $"{range.first:0.00},{range.second:0.00};rng={rng}";
+			}
+		}
+
+		class Pause
+		{
+			public float minExcitement = 0;
+			public RandomRange timeRange = new RandomRange();
+			public float chance = 0;
+			public IRandom rng = new UniformRandom();
+
+			public bool active = false;
+			public float time = 0;
+			public float elapsed = 0;
+			public float lastRng = 0;
+
+			public Pause Clone()
+			{
+				var p = new Pause();
+
+				p.minExcitement = minExcitement;
+				p.timeRange = timeRange.Clone();
+				p.chance = chance;
+				p.rng = rng.Clone();
+
+				return p;
+			}
+
+			public string SettingsToString()
+			{
+				return
+					$"minEx={minExcitement:0.00} timeRange={timeRange} " +
+					$"chance={chance};rng={rng}";
+			}
+
+			public string LiveToString()
+			{
+				return
+					$"active={active} time={time:0.00} elapsed={elapsed:0.00} " +
+					$"lastrng={lastRng:0.00}";
+			}
+		}
+
 
 		private Person person_ = null;
 		private Logger log_;
@@ -47,12 +109,18 @@ namespace Cue.VamMoan
 		private float intensity_ = 0;
 		private float intensityTarget_ = 0;
 		private float intensityWait_ = 0;
+		private float intensityTime_ = 0;
+		private float intensityElapsed_ = 0;
+		private float lastIntensity_ = 0;
+
+		private Pause pause_ = new Pause();
 
 		private float oldVolume_ = 0;
 		private bool muted_ = false;
 
-		private Pair<float, float> intensityWaitRange_ = new Pair<float, float>(0, 0);
-		private IRandom intensityWaitRng_ = new UniformRandom();
+		private RandomRange intensityWaitRange_ = new RandomRange();
+		private RandomRange intensityTimeRange_ = new RandomRange();
+
 		private IRandom intensityTargetRng_ = new UniformRandom();
 
 		private Voice()
@@ -71,27 +139,8 @@ namespace Cue.VamMoan
 
 			J.OptString(o, "orgasmAction", ref orgasmAction_);
 
-			if (o.HasKey("intensityWait"))
-			{
-				var wt = o["intensityWait"].AsObject;
-
-				if (!wt.HasKey("range"))
-					throw new LoadFailed("intensityWait missing range");
-
-				var a = wt["range"].AsArray;
-				if (a.Count != 2)
-					throw new LoadFailed("bad intensityWait range");
-
-				intensityWaitRange_.first = a[0].AsFloat;
-				intensityWaitRange_.second = a[1].AsFloat;
-
-				if (wt.HasKey("rng"))
-				{
-					intensityWaitRng_ = BasicRandom.FromJSON(wt["rng"].AsObject);
-					if (intensityWaitRng_ == null)
-						throw new LoadFailed("bad intensityWait rng");
-				}
-			}
+			intensityWaitRange_ = ParseRange(o, "intensityWait");
+			intensityTimeRange_ = ParseRange(o, "intensityTime");
 
 			if (o.HasKey("intensityTarget"))
 			{
@@ -103,6 +152,63 @@ namespace Cue.VamMoan
 				if (intensityTargetRng_ == null)
 					throw new LoadFailed("bad intensityTarget rng");
 			}
+
+			pause_ = ParsePause(o);
+		}
+
+		private RandomRange ParseRange(JSONClass o, string name)
+		{
+			RandomRange r = new RandomRange();
+
+			if (o.HasKey(name))
+			{
+				var wt = o[name].AsObject;
+
+				if (!wt.HasKey("range"))
+					throw new LoadFailed($"{name} missing range");
+
+				var a = wt["range"].AsArray;
+				if (a.Count != 2)
+					throw new LoadFailed($"bad {name} range");
+
+				r.range.first = a[0].AsFloat;
+				r.range.second = a[1].AsFloat;
+
+				if (wt.HasKey("rng"))
+				{
+					r.rng = BasicRandom.FromJSON(wt["rng"].AsObject);
+					if (r.rng == null)
+						throw new LoadFailed($"bad {name} rng");
+				}
+			}
+
+			return r;
+		}
+
+		private Pause ParsePause(JSONClass o)
+		{
+			var p = new Pause();
+
+			if (o.HasKey("pause"))
+			{
+				var po = o["pause"].AsObject;
+
+				p.minExcitement = J.ReqFloat(po, "minExcitement");
+				p.timeRange = ParseRange(po, "time");
+
+				var co = po["chance"].AsObject;
+
+				p.chance = J.ReqFloat(co, "value");
+
+				if (co.HasKey("rng"))
+				{
+					p.rng = BasicRandom.FromJSON(co["rng"]);
+					if (p.rng == null)
+						throw new LoadFailed("bad pause rng");
+				}
+			}
+
+			return p;
 		}
 
 		public IVoice Clone()
@@ -117,9 +223,10 @@ namespace Cue.VamMoan
 			breathingRange_ = b.breathingRange_;
 			breathingIntensityCutoff_ = b.breathingIntensityCutoff_;
 			orgasmAction_ = b.orgasmAction_;
-			intensityWaitRange_ = b.intensityWaitRange_;
-			intensityWaitRng_ = b.intensityWaitRng_.Clone();
+			intensityWaitRange_ = b.intensityWaitRange_.Clone();
+			intensityTimeRange_ = b.intensityTimeRange_.Clone();
 			intensityTargetRng_ = b.intensityTargetRng_.Clone();
+			pause_ = b.pause_.Clone();
 		}
 
 		public void Init(Person p)
@@ -131,7 +238,9 @@ namespace Cue.VamMoan
 			p_.autoJaw = BP("Enable auto-jaw animation");
 			p_.voice = SCP("voice");
 			p_.volume = FP("Voice volume");
+			p_.disabled = AP("Voice disabled");
 			p_.breathing = AP("Voice breathing");
+			p_.kissing = AP("Voice kissing");
 			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
 
@@ -228,12 +337,64 @@ namespace Cue.VamMoan
 				if (intensityWait_ < 0)
 					intensityWait_ = 0;
 			}
+			else if (pause_.active)
+			{
+				pause_.elapsed += s;
+
+				if (pause_.elapsed >= pause_.time)
+				{
+					pause_.active = false;
+					NextIntensity(1.0f);
+				}
+			}
 			else if (Math.Abs(intensity_ - intensityTarget_) < 0.001f)
 			{
-				intensity_ = intensityTarget_;
+				if (CheckPause())
+					return;
 
-				intensityWait_ = intensityWaitRng_.RandomFloat(
-					intensityWaitRange_.first, intensityWaitRange_.second,
+				NextIntensity();
+			}
+			else
+			{
+				intensityElapsed_ += s;
+
+				if (intensityElapsed_ >= intensityTime_ || intensityTime_ == 0)
+				{
+					intensity_ = intensityTarget_;
+				}
+				else
+				{
+					intensity_ = U.Lerp(
+						lastIntensity_, intensityTarget_,
+						intensityElapsed_ / intensityTime_);
+				}
+			}
+		}
+
+		private void NextIntensity(float forceTargetNow = -1)
+		{
+			lastIntensity_ = intensity_;
+			intensity_ = intensityTarget_;
+
+			intensityWait_ = intensityWaitRange_.rng.RandomFloat(
+				intensityWaitRange_.range.first,
+				intensityWaitRange_.range.second,
+				maxIntensity_);
+
+			intensityElapsed_ = 0;
+
+			if (forceTargetNow >= 0)
+			{
+				intensityTarget_ = forceTargetNow;
+				intensity_ = forceTargetNow;
+				intensityTime_ = 0;
+				SetIntensity(true);
+			}
+			else
+			{
+				intensityTime_ = intensityTimeRange_.rng.RandomFloat(
+					intensityTimeRange_.range.first,
+					intensityTimeRange_.range.second,
 					maxIntensity_);
 
 				float min = 0;
@@ -243,18 +404,27 @@ namespace Cue.VamMoan
 				intensityTarget_ = intensityTargetRng_.RandomFloat(
 					min, maxIntensity_, maxIntensity_);
 			}
-			else if (intensity_ > intensityTarget_)
-			{
-				intensity_ -= 0.1f * s;
-				if (intensity_ < intensityTarget_)
-					intensity_ = intensityTarget_;
-			}
-			else
-			{
-				intensity_ += 0.1f * s;
-				if (intensity_ > intensityTarget_)
-					intensity_ = intensityTarget_;
-			}
+		}
+
+		private bool CheckPause()
+		{
+			if (maxIntensity_ < pause_.minExcitement)
+				return false;
+
+			pause_.lastRng = pause_.rng.RandomFloat(0, 1, maxIntensity_);
+			if (pause_.lastRng >= pause_.chance)
+				return false;
+
+			pause_.active = true;
+			pause_.elapsed = 0;
+			pause_.time = pause_.timeRange.rng.RandomFloat(
+				pause_.timeRange.range.first,
+				pause_.timeRange.range.second,
+				maxIntensity_);
+
+			Fire(p_.disabled);
+
+			return true;
 		}
 
 		public void StartOrgasm()
@@ -299,15 +469,18 @@ namespace Cue.VamMoan
 			A("orgasmAction", orgasmAction_);
 			A("", "");
 			A("maxIntensity", $"{maxIntensity_:0.00}");
-			A("intensity", $"{intensity_:0.00}");
-			A("intensityTarget", $"{intensityTarget_:0.00}");
+			A("intensity", $"{intensity_:0.00}->{intensityTarget_:0.00} rng={intensityTargetRng_}");
 			A("intensityWait", $"{intensityWait_:0.00}");
+			A("intensityTime", $"{intensityElapsed_:0.00}/{intensityTime_:0.00}");
+			A("pause settings", pause_.SettingsToString());
+			A("pause", pause_.LiveToString());
+			A("", "");
+			A("intensityWait", $"{intensityWaitRange_}");
+			A("intensityTime", $"{intensityTimeRange_}");
+			A("lastIntensity", $"{lastIntensity_:0.00}");
+			A("", "");
 			A("lastAction", lastAction_);
 			A("inOrgasm", $"{inOrgasm_}");
-			A("", "");
-			A("intensityWaitrange", $"{intensityWaitRange_.first:0.00},{intensityWaitRange_.second:0.00}");
-			A("intensityWaitRng", $"{intensityWaitRng_}");
-			A("intensityTargetRng", $"{intensityTargetRng_}");
 
 
 			MakeDebugLines();
@@ -443,11 +616,18 @@ namespace Cue.VamMoan
 
 		private void SetIntensity(bool force = false)
 		{
-			if (inOrgasm_)
+			if (inOrgasm_ || pause_.active)
 				return;
 
 			if (intensitiesCount_ == 0)
 				return;
+
+			//var k = person_.AI.GetEvent<KissEvent>();
+			//if (k != null && k.Active)
+			//{
+			//	Fire(p_.kissing, force);
+			//	return;
+			//}
 
 			if (intensity_ >= 0 && intensity_ <= breathingRange_)
 			{

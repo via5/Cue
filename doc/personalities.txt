@@ -85,7 +85,7 @@ A Range object has these values:
                   "linear", see Enums/Easings.cs)
 
     rng           random generation algorithm (optional, defaults to
-                  "uniform"); see below
+                  "uniform"); see RNG (2.2) below
 
 As an example, a sliding duration with a min/max of [1.0, 2.0] and a window
 of 0.2 would generate durations between [1.0, 1.2] if excitement is 0.0 and
@@ -101,9 +101,18 @@ between [1.8, 2.0] if excitement is 1.0. The json would be like this:
         }
     }
 
-The 'rng' value can be a string "uniform" or "normal". It can also be an
-object with a 'type' value with the same strings. If the 'type' is "normal",
-these additional values are supported:
+
+2.2 Random number generator (RNG)
+---------------------------------
+An RNG is an object used to generate random numbers. It can either be "uniform"
+(each number in the range has an equal chance of being picked) or "normal" (the
+chances of generating numbers is a on a curve).
+
+RNGs of type "normal" are affected by the character's excitement.
+
+An RNG can be a string "uniform" or "normal". It can also be an object with a
+'type' value with the same strings. If the 'type' is "normal", these additional
+values are supported:
 
     centerMin,   range of the center of the distribution, both [0, 1],
     centerMax    defaults to 0.5 for both; as excitement goes up, the center
@@ -118,6 +127,23 @@ these additional values are supported:
                  a higher peak around the center, defaults to 1.0 for both
 
                  (this is used for the sigma, as `3.0/width`)
+
+Both ranges can be specified as simply "center" and "width" if the min and max
+are the same.
+
+For example, a simple uniform RNG:
+
+    "rng": "normal"
+
+A normal RNG:
+
+    "rng":
+    {
+        "type": "normal",
+        "centerMin": 0,
+        "centerMax": 0.8,
+        "width": 3
+    }
 
 
 3 Values
@@ -469,28 +495,62 @@ Controls what characters are looking at.
 
 3.6 Voices
 ----------
-Controls datasets and pitches depending on intensities; only applies to
-MacGruber's Breathing plugin for now
-
-The voice pitch values are [0, 1]. Higher values have higher pitch. The
-integration module is in charge of figuring out what that means. For
-MacGruber's Breathing, this corresponds to a pitch between [0.8, 1.2].
+Controls voices and breathing. The `provider` key can be either "macgruber" or
+"vammoan". Provider-specific options are within an `options` object.
 
 
-orgasm object:
-  dataset:        name of the orgasm dataset; if an empty string, disables
-                  voice during orgasm
-  pitch:          pitch during orgasm
+3.6.1 MacGruber
 
-datasets array:
- object:
+Controls the dataset used depending on excitement.
+
+`datasets` array of objects, each object has:
    dataset:       name of the breathe dataset
-   pitch:         pitch
 
    intensityMin,
    intensityMax:  range of intensities where this dataset is used; intensity
                   is [0, 1] and corresponds to the movement energy (see
                   MovementEnergyTirednessFactor)
+
+`orgasm` object:
+  dataset:        name of the orgasm dataset; if an empty string, disables
+                  voice during orgasm
+
+
+3.6.2 VAMMoan
+
+Controls when the breathing and/or intensity actions are used. Cue picks a
+new random intensity value based on excitement every `intensityWait` seconds.
+
+When excitement is high enough, the 'pause' setting can create random periods
+during which voice is disabled, followed by periods of the highest intensity.
+
+
+- breathingRange
+  when excitement is below this value, only breathing is used
+
+- breathingIntensityCutoff
+  when excitement is above this value, breathing is never used
+
+- orgasmAction
+  the name of the action to trigger during orgasm
+
+- intensityWait
+  the range of random numbers used to generate an interval to wait for before
+  picking a new intensity
+
+- intentisyTarget (rng)
+  a generator for the voice intensity, based on the character's excitement; this
+  is a normal rng by default, so that the chances of generating a low intensity
+  voice gets lower the higher the excitement rises
+
+- pause
+  object containing this:
+
+    minExcitement      excitement above which pauses are enabled
+    time (duration)    random time range
+    chance             object containing 'value', the chance of pauses happening
+                       each time a new intensity is picked, and 'rng', an RNG
+                       object
 
 
 3.7 Appearance

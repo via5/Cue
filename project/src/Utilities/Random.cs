@@ -12,19 +12,35 @@ namespace Cue
 
 	abstract class BasicRandom : IRandom
 	{
-		public static IRandom FromJSON(JSONClass o)
+		public static IRandom FromJSON(JSONNode node)
 		{
-			if (!o.HasKey("type"))
-				throw new LoadFailed("missing 'type'");
+			var o = node.AsObject;
 
-			var type = o["type"].Value;
+			if (o == null)
+			{
+				var s = node.Value;
 
-			if (type == "uniform")
-				return UniformRandom.FromJSON(o);
-			else if (type == "normal")
-				return NormalRandom.FromJSON(o);
+				if (s == "uniform")
+					return new UniformRandom();
+				else if (s == "normal")
+					return new NormalRandom();
+				else
+					throw new LoadFailed($"unknown rng '{s}'");
+			}
 			else
-				throw new LoadFailed($"unknown type '{type}'");
+			{
+				if (!o.HasKey("type"))
+					throw new LoadFailed("missing 'type'");
+
+				var type = o["type"].Value;
+
+				if (type == "uniform")
+					return UniformRandom.FromJSON(o);
+				else if (type == "normal")
+					return NormalRandom.FromJSON(o);
+				else
+					throw new LoadFailed($"unknown type '{type}'");
+			}
 		}
 
 		public abstract IRandom Clone();
@@ -95,7 +111,7 @@ namespace Cue
 
 	class UniformRandom : BasicRandom
 	{
-		public new static UniformRandom FromJSON(JSONClass o)
+		public new static UniformRandom FromJSON(JSONNode o)
 		{
 			return new UniformRandom();
 		}
@@ -124,6 +140,11 @@ namespace Cue
 		private readonly float widthMin_;
 		private readonly float widthMax_;
 
+		public NormalRandom()
+			: this(0.5f, 0.5f, 1, 1)
+		{
+		}
+
 		public NormalRandom(float centerMin, float centerMax, float widthMin, float widthMax)
 		{
 			centerMin_ = centerMin;
@@ -137,8 +158,12 @@ namespace Cue
 			return $"normal:c=({centerMin_},{centerMax_}),w=({widthMin_},{widthMax_})";
 		}
 
-		public new static NormalRandom FromJSON(JSONClass o)
+		public new static NormalRandom FromJSON(JSONNode node)
 		{
+			var o = node.AsObject;
+			if (o == null)
+				throw new LoadFailed("normal rng is not an object");
+
 			float centerMin = 0.5f;
 			float centerMax = 0.5f;
 
