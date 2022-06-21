@@ -40,6 +40,16 @@
 					"value": 0.2,
 					"rng": "uniform"
 				}
+			},
+			"kiss":
+			{
+				"enabled": true,
+				"voiceChance": 0.2
+			},
+			"bj":
+			{
+				"enabled": true,
+				"minExcitementForIntense": 0.7
 			}
 		}
 	},

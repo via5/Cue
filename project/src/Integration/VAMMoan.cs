@@ -115,6 +115,9 @@ namespace Cue.VamMoan
 
 		private Pause pause_ = new Pause();
 
+		private bool kissEnabled_ = false;
+		private float kissVoiceChance_ = 0;
+
 		private float oldVolume_ = 0;
 		private bool muted_ = false;
 
@@ -154,6 +157,14 @@ namespace Cue.VamMoan
 			}
 
 			pause_ = ParsePause(o);
+
+			if (o.HasKey("kiss"))
+			{
+				var ko = o["kiss"].AsObject;
+
+				kissEnabled_ = J.ReqBool(ko, "enabled");
+				kissVoiceChance_ = J.ReqFloat(ko, "voiceChance");
+			}
 		}
 
 		private RandomRange ParseRange(JSONClass o, string name)
