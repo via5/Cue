@@ -377,14 +377,14 @@ namespace Cue
 		{
 			if (b)
 			{
-				person_.Excitement.GetSource(SS.Mouth).AddEnabledForOthers();
+				person_.Excitement.GetSource(SS.Mouth).AddEnabledFor(target_);
 
 				if (target_ != null)
 					person_.Body.Get(BP.Mouth).AddForcedTrigger(target_.PersonIndex, BP.Mouth);
 			}
 			else
 			{
-				person_.Excitement.GetSource(SS.Mouth).RemoveEnabledForOthers();
+				person_.Excitement.GetSource(SS.Mouth).RemoveEnabledFor(target_);
 
 				if (target_ != null)
 					person_.Body.Get(BP.Mouth).RemoveForcedTrigger(target_.PersonIndex, BP.Mouth);

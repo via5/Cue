@@ -494,9 +494,9 @@
 		private void SetZoneEnabled(Person target, bool b)
 		{
 			if (b)
-				target.Excitement.GetSource(SS.Genitals).AddEnabledForOthers();
+				target.Excitement.GetSource(SS.Genitals).AddEnabledFor(target);
 			else
-				target.Excitement.GetSource(SS.Genitals).RemoveEnabledForOthers();
+				target.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(target);
 		}
 
 		private bool LockLeft(string why, Person target)

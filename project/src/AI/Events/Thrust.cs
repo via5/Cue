@@ -184,15 +184,15 @@
 
 			if (b)
 			{
-				person_.Excitement.GetSource(ss).AddEnabledForOthers();
+				person_.Excitement.GetSource(ss).AddEnabledFor(receiver_?.Person);
 				if (receiver_ != null)
-					receiver_.Person.Excitement.GetSource(ss).AddEnabledForOthers();
+					receiver_.Person.Excitement.GetSource(ss).AddEnabledFor(person_);
 			}
 			else
 			{
-				person_.Excitement.GetSource(ss).RemoveEnabledForOthers();
+				person_.Excitement.GetSource(ss).RemoveEnabledFor(receiver_?.Person);
 				if (receiver_ != null)
-					receiver_.Person.Excitement.GetSource(ss).RemoveEnabledForOthers();
+					receiver_.Person.Excitement.GetSource(ss).RemoveEnabledFor(person_);
 			}
 		}
 

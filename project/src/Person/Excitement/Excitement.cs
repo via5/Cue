@@ -39,37 +39,65 @@ namespace Cue
 			get { return false; }
 		}
 
-		public void AddEnabledForOthers()
+		public void AddEnabledFor(Person p)
+		{
+			if (p == null || !p.IsPlayer)
+				AddEnabledForOthers();
+			else
+				AddEnabledForPlayer();
+		}
+
+		public void RemoveEnabledFor(Person p)
+		{
+			if (p == null || !p.IsPlayer)
+				RemoveEnabledForOthers();
+			else
+				RemoveEnabledForPlayer();
+		}
+
+		public void ForceEnabledForOthers()
+		{
+			AddEnabledForOthers();
+		}
+
+		public void ForceEnabledForPlayer()
+		{
+			AddEnabledForPlayer();
+		}
+
+
+		private void AddEnabledForOthers()
 		{
 			++enabledForOthers_;
 		}
 
-		public void RemoveEnabledForOthers()
+		private void RemoveEnabledForOthers()
 		{
 			Cue.Assert(enabledForOthers_ > 0);
 			enabledForOthers_ = Math.Max(enabledForOthers_ - 1, 0);
 		}
 
-		public void ClearEnabledForOthers()
+		private void ClearEnabledForOthers()
 		{
 			enabledForOthers_ = 0;
 		}
 
-		public void AddEnabledForPlayer()
+		private void AddEnabledForPlayer()
 		{
 			++enabledForPlayer_;
 		}
 
-		public void RemoveEnabledForPlayer()
+		private void RemoveEnabledForPlayer()
 		{
 			Cue.Assert(enabledForPlayer_ > 0);
 			enabledForPlayer_ = Math.Max(enabledForPlayer_ - 1, 0);
 		}
 
-		public void ClearEnabledForPlayer()
+		private void ClearEnabledForPlayer()
 		{
 			enabledForPlayer_ = 0;
 		}
+
 
 		public virtual void Update()
 		{
@@ -180,23 +208,23 @@ namespace Cue
 			string enabled = "";
 
 			if (EnabledForPlayer)
-				enabled += "player ";
+				enabled += "player|";
 
 			if (EnabledForOthers)
-				enabled += "other ";
+				enabled += "other|";
 
 			if (EnabledForToys)
-				enabled += "toys ";
+				enabled += "toys|";
 
 			if (EnabledForExternal)
-				enabled += "external ";
+				enabled += "external|";
 
 			if (enabled.Length == 0)
 				enabled = "enabled:none";
 			else
-				enabled = "enabled:" + enabled;
+				enabled = "enabled:" + enabled.Substring(0, enabled.Length - 1);
 
-			debug.Add($"{SS.ToString(zone_)}:{damp}{enabled}");
+			debug.Add($"{SS.ToString(zone_)}:{damp} {enabled}");
 			DebugZone(zone_, debug);
 		}
 
@@ -406,11 +434,12 @@ namespace Cue
 					sources_[i] = new ZoneExcitementSource(person_, i);
 			}
 
-			sources_[SS.Penetration].ClearEnabledForOthers();
-			sources_[SS.Genitals].ClearEnabledForOthers();
+			sources_[SS.Mouth].ForceEnabledForOthers();
+			sources_[SS.Breasts].ForceEnabledForOthers();
 
-			sources_[SS.Mouth].AddEnabledForOthers();
-			sources_[SS.Breasts].AddEnabledForOthers();
+			sources_[SS.Mouth].ForceEnabledForPlayer();
+			sources_[SS.Breasts].ForceEnabledForPlayer();
+			sources_[SS.Genitals].ForceEnabledForPlayer();
 		}
 
 		public float Max
