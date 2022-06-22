@@ -4,53 +4,56 @@
 
 	"voice":
 	{
-		"provider": "vammoan",
-		"options":
+		"provider":
 		{
-			"breathingRange": 0.1,
-			"breathingIntensityCutoff": 0.6,
-			"orgasmAction": "Voice orgasm",
-			"intensityWait":
+			"name": "vammoan",
+			"options":
 			{
-				"range": [0, 5],
-			},
-			"intensityTarget":
-			{
-				"rng":
-				{
-					"type": "normal",
-					"centerMin": 0,
-					"centerMax": 0.8,
-					"width": 3
-				}
-			},
-			"intensityTime":
-			{
-				"range": [1, 5]
-			},
-			"pause":
-			{
-				"minExcitement": 0.8,
-				"time":
-				{
-					"range": [1, 5]
-				},
-				"chance":
-				{
-					"value": 0.2,
-					"rng": "uniform"
-				}
-			},
-			"kiss":
-			{
-				"enabled": true,
-				"voiceChance": 0.2
-			},
-			"bj":
-			{
-				"enabled": true,
-				"minExcitementForIntense": 0.7
+				"breathingRange": 0.1,
 			}
+		},
+
+		"breathingIntensityCutoff": 0.6,
+		"intensityWait":
+		{
+			"range": [0, 5],
+		},
+		"intensityTarget":
+		{
+			"rng":
+			{
+				"type": "normal",
+				"centerMin": 0,
+				"centerMax": 0.8,
+				"width": 3
+			}
+		},
+		"intensityTime":
+		{
+			"range": [1, 5]
+		},
+		"pause":
+		{
+			"minExcitement": 0.8,
+			"time":
+			{
+				"range": [2, 5]
+			},
+			"chance":
+			{
+				"value": 0.2,
+				"rng": "uniform"
+			}
+		},
+		"kiss":
+		{
+			"enabled": true,
+			"voiceChance": 0.2
+		},
+		"bj":
+		{
+			"enabled": true,
+			"minExcitementForIntense": 0.7
 		}
 	},
 

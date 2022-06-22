@@ -83,7 +83,6 @@ namespace Cue.MacGruber
 
 		private Person person_ = null;
 		private Logger log_ = new Logger(Logger.Integration, "mg.breather");
-		private List<string> debug_ = null;
 
 		private DatasetForIntensity[] datasets_ = new DatasetForIntensity[0];
 		private Dataset orgasmDataset_ = new Dataset("");
@@ -202,8 +201,6 @@ namespace Cue.MacGruber
 				if (!muted_)
 				{
 					log_.Info("person is player, muting");
-					oldVolume_ = p_.volume.Value;
-					p_.volume.Value = 0;
 					muted_ = true;
 				}
 			}
@@ -236,15 +233,9 @@ namespace Cue.MacGruber
 			// no-op
 		}
 
-		public string[] Debug()
+		public void Debug(DebugLines debug)
 		{
-			if (debug_ == null)
-				debug_ = new List<string>();
-
-			debug_.Clear();
-			debug_.Add("macgruber");
-
-			return debug_.ToArray();
+			debug.Add("provider", "macgruber");
 		}
 
 		private Sys.Vam.FloatParameter DBF(string name)
@@ -286,6 +277,22 @@ namespace Cue.MacGruber
 				person_, "MacGruber.AudioAttenuation", name);
 		}
 
+		public bool Muted
+		{
+			set
+			{
+				if (value)
+				{
+					oldVolume_ = p_.volume.Value;
+					p_.volume.Value = 0;
+				}
+				else
+				{
+					p_.volume.Value = oldVolume_;
+				}
+			}
+		}
+
 		public bool MouthEnabled
 		{
 			get
@@ -306,18 +313,10 @@ namespace Cue.MacGruber
 			}
 		}
 
-		public float Intensity
+		public void SetIntensity(float v)
 		{
-			get
-			{
-				return p_.intensity.Value;
-			}
-
-			set
-			{
-				p_.intensity.Value = value;
-				Apply();
-			}
+			p_.intensity.Value = v;
+			Apply();
 		}
 
 		public string Warning
@@ -355,7 +354,7 @@ namespace Cue.MacGruber
 
 		private void Apply()
 		{
-			var f = Intensity;
+			var f = p_.intensity.Value;
 			var ds = GetDatasetForIntensity(f);
 
 			// taken over by MacGruberOrgasmer during orgasm

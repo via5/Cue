@@ -56,7 +56,7 @@ namespace Cue
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
-			voice_ = new Voice(this, personality_.CreateVoice(this, null));
+			voice_ = personality_.CreateVoice();
 			gaze_ = new Gaze(this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
@@ -76,7 +76,7 @@ namespace Cue
 			Personality.Init();
 			Excitement.Init();
 			Body.Init();
-			Voice.Init();
+			Voice.Init(this);
 			Gaze.Init();
 			Homing.Init();
 
@@ -176,7 +176,9 @@ namespace Cue
 				personality_ = value;
 				personality_.Init();
 
-				voice_.Provider = personality_.CreateVoice(this, voice_.Provider);
+				voice_?.Destroy();
+				voice_ = personality_.CreateVoice();
+				voice_.Init(this);
 
 				PersonalityChanged?.Invoke();
 			}

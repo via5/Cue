@@ -265,7 +265,7 @@ namespace Cue
 		private Expression[] exps_ = new Expression[0];
 		private Sensitivities sensitivities_;
 		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
-		private IVoice voiceProto_ = null;
+		private Voice voiceProto_ = null;
 
 		public Personality(string name)
 			: base(new PS())
@@ -328,7 +328,7 @@ namespace Cue
 			events_[name] = d;
 		}
 
-		public void SetVoice(IVoice v)
+		public void SetVoice(Voice v)
 		{
 			voiceProto_ = v;
 		}
@@ -377,7 +377,7 @@ namespace Cue
 			return e;
 		}
 
-		public IVoice CreateVoice(Person p, IVoice old)
+		public Voice CreateVoice()
 		{
 			if (voiceProto_ == null)
 				return null;

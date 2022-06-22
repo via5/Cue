@@ -173,14 +173,7 @@ namespace Cue
 		{
 			if (o.HasKey("voice"))
 			{
-				var provider = o["voice"]["provider"].Value;
-				var options = o["voice"]["options"].AsObject;
-
-				IVoice v = Integration.CreateVoice(provider, options);
-				if (v == null)
-					throw new LoadFailed($"unknown voice provider '{provider}'");
-
-				p.SetVoice(v);
+				p.SetVoice(new Voice(o["voice"].AsObject));
 			}
 			else
 			{

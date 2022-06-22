@@ -64,11 +64,12 @@ namespace Cue
 		void Update(float s);
 		void StartOrgasm();
 		void StopOrgasm();
+		void SetIntensity(float v);
 
-		string[] Debug();
+		void Debug(DebugLines debug);
 
+		bool Muted { set; }
 		bool MouthEnabled { get; set; }
-		float Intensity { get; set; }
 
 		string Warning { get; }
 	}
