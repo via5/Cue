@@ -382,10 +382,7 @@ namespace Cue
 			if (voiceProto_ == null)
 				return null;
 
-			var b = voiceProto_.Clone();
-			b.Init(p);
-
-			return b;
+			return voiceProto_.Clone();
 		}
 
 		public override string ToString()

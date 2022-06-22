@@ -32,13 +32,13 @@ namespace Cue
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
+		private Voice voice_;
 		private Gaze gaze_;
 		private Mood mood_;
 		private IAI ai_ = null;
 		private ExpressionManager expression_;
 		private PersonStatus status_;
 
-		private IVoice voice_;
 		private ISpeaker speech_;
 		private IClothing clothing_;
 		private IHoming homing_;
@@ -56,6 +56,7 @@ namespace Cue
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
+			voice_ = new Voice(this, personality_.CreateVoice(this, null));
 			gaze_ = new Gaze(this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
@@ -63,7 +64,6 @@ namespace Cue
 			expression_ = new ExpressionManager(this);
 			status_ = new PersonStatus(this);
 
-			voice_ = personality_.CreateVoice(this, null);
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
 			homing_ = Integration.CreateHoming(this);
@@ -76,6 +76,7 @@ namespace Cue
 			Personality.Init();
 			Excitement.Init();
 			Body.Init();
+			Voice.Init();
 			Gaze.Init();
 			Homing.Init();
 
@@ -132,12 +133,12 @@ namespace Cue
 		public Animator Animator { get { return animator_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }
+		public Voice Voice { get { return voice_; } }
 		public Gaze Gaze { get { return gaze_; } }
 		public Mood Mood { get { return mood_; } }
 		public IAI AI { get { return ai_; } }
 		public IClothing Clothing { get { return clothing_; } }
 
-		public IVoice Voice { get { return voice_; } }
 		public ISpeaker Speech { get { return speech_; } }
 		public IHoming Homing { get { return homing_; } }
 
@@ -175,10 +176,7 @@ namespace Cue
 				personality_ = value;
 				personality_.Init();
 
-				IVoice old = voice_;
-
-				voice_?.Destroy();
-				voice_ = personality_.CreateVoice(this, old);
+				voice_.Provider = personality_.CreateVoice(this, voice_.Provider);
 
 				PersonalityChanged?.Invoke();
 			}

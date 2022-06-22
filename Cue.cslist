@@ -70,6 +70,7 @@ project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
+project\src\Person\Voice\Voice.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Objects.cs
 project\src\Resources\Personalities.cs
