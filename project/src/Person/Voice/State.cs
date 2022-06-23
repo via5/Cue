@@ -12,6 +12,7 @@ namespace Cue
 		IVoiceState Clone();
 		void Init(Voice v);
 		void Start();
+		void EarlyUpdate(float s);
 		void Update(float s);
 		int CanRun();
 		bool HasEmergency();
@@ -42,6 +43,11 @@ namespace Cue
 		public void Start()
 		{
 			DoStart();
+		}
+
+		public void EarlyUpdate(float s)
+		{
+			DoEarlyUpdate(s);
 		}
 
 		public void Update(float s)
@@ -82,6 +88,11 @@ namespace Cue
 		protected void SetLastState(string s)
 		{
 			lastState_ = s;
+		}
+
+		protected virtual void DoEarlyUpdate(float s)
+		{
+			// no-op
 		}
 
 		protected virtual void DoUpdate(float s)

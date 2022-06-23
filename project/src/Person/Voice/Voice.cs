@@ -118,6 +118,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			for (int i = 0; i < states_.Count; ++i)
+				states_[i].EarlyUpdate(s);
+
 			CheckMute();
 
 			if (!emergency_)

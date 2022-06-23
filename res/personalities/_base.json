@@ -35,7 +35,12 @@
 		"pauseState":
 		{
 			"minExcitement": 0.8,
-			"time":
+			"cooldown": 10,
+			"timePaused":
+			{
+				"range": [2, 5]
+			},
+			"timeHigh":
 			{
 				"range": [2, 5]
 			},
@@ -43,7 +48,7 @@
 			{
 				"value": 0.2,
 				"rng": "uniform"
-			}
+			},
 		},
 		"kissState":
 		{

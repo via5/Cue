@@ -1,16 +1,20 @@
 ﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
 	public class VoiceStatePause : VoiceState
 	{
 		private float minExcitement_ = 0;
-		private RandomRange timeRange_ = new RandomRange();
+		private float cooldown_ = 0;
+		private RandomRange timePausedRange_ = new RandomRange();
+		private RandomRange timeHighRange_ = new RandomRange();
 		private float chance_ = 0;
 		private IRandom rng_ = new UniformRandom();
 
 		private float time_ = 0;
 		private float elapsed_ = 0;
+		private float cooldownElapsed_ = 0;
 		private float lastRng_ = 0;
 		private bool inPause_ = false;
 
@@ -35,10 +39,20 @@ namespace Cue
 				else if (!inherited)
 					throw new LoadFailed("missing minExcitement");
 
-				if (o.HasKey("time"))
-					timeRange_ = RandomRange.Create(o, "time");
+				if (o.HasKey("cooldown"))
+					cooldown_ = J.ReqFloat(o, "cooldown");
 				else if (!inherited)
-					throw new LoadFailed("missing time");
+					throw new LoadFailed("missing cooldown");
+
+				if (o.HasKey("timePaused"))
+					timePausedRange_ = RandomRange.Create(o, "timePaused");
+				else if (!inherited)
+					throw new LoadFailed("missing timePaused");
+
+				if (o.HasKey("timeHigh"))
+					timeHighRange_ = RandomRange.Create(o, "timeHigh");
+				else if (!inherited)
+					throw new LoadFailed("missing timeHigh");
 
 				if (o.HasKey("chance"))
 				{
@@ -78,7 +92,9 @@ namespace Cue
 		private void CopyFrom(VoiceStatePause o)
 		{
 			minExcitement_ = o.minExcitement_;
-			timeRange_ = o.timeRange_.Clone();
+			cooldown_ = o.cooldown_;
+			timePausedRange_ = o.timePausedRange_.Clone();
+			timeHighRange_ = o.timeHighRange_.Clone();
 			chance_ = o.chance_;
 			rng_ = o.rng_.Clone();
 		}
@@ -86,10 +102,15 @@ namespace Cue
 		protected override void DoStart()
 		{
 			elapsed_ = 0;
-			time_ = timeRange_.RandomFloat(v_.MaxIntensity);
+			time_ = timePausedRange_.RandomFloat(v_.MaxIntensity);
 			inPause_ = true;
 
 			v_.Provider.SetSilent();
+		}
+
+		protected override void DoEarlyUpdate(float s)
+		{
+			cooldownElapsed_ = Math.Min(cooldownElapsed_ + s, cooldown_);
 		}
 
 		protected override void DoUpdate(float s)
@@ -100,14 +121,17 @@ namespace Cue
 			{
 				if (elapsed_ >= time_)
 				{
+					elapsed_ = 0;
 					v_.Provider.SetMoaning(1.0f);
+					time_ = timeHighRange_.RandomFloat(v_.MaxIntensity);
 					inPause_ = false;
 				}
 			}
 			else
 			{
-				if (elapsed_ >= 3)
+				if (elapsed_ >= time_)
 				{
+					cooldownElapsed_ = 0;
 					SetDone();
 				}
 			}
@@ -115,6 +139,12 @@ namespace Cue
 
 		public override int CanRun()
 		{
+			if (cooldownElapsed_ < cooldown_)
+			{
+				SetLastState($"cooldown {cooldownElapsed_: 0.00}/{cooldown_: 0.00}");
+				return CannotRun;
+			}
+
 			if (v_.MaxIntensity < minExcitement_)
 			{
 				SetLastState("excitement too low");
@@ -132,24 +162,16 @@ namespace Cue
 			return HighPriority;
 		}
 
-		public string SettingsToString()
-		{
-			return
-				$"minEx={minExcitement_:0.00} timeRange={timeRange_} " +
-				$"chance={chance_:0.00};rng={rng_}";
-		}
-
-		public string LiveToString()
-		{
-			return
-				$"time={time_:0.00} elapsed={elapsed_:0.00} " +
-				$"lastrng={lastRng_:0.00}";
-		}
-
 		protected override void DoDebug(DebugLines debug)
 		{
-			debug.Add("pause settings", SettingsToString());
-			debug.Add("pause", LiveToString());
+			debug.Add("minExcitement", $"{minExcitement_:0.00}");
+			debug.Add("timePausedRange", $"{timePausedRange_}");
+			debug.Add("timeHighRange", $"{timeHighRange_}");
+			debug.Add("chance", $"{chance_:0.00}");
+			debug.Add("rng", $"{rng_}");
+			debug.Add("lastRng", $"{lastRng_}");
+			debug.Add("elapsed", $"{elapsed_:0.00}/{time_:0.00}");
+			debug.Add("cooldown", $"{cooldownElapsed_:0.00}/{cooldown_:0.00}");
 		}
 	}
 }
