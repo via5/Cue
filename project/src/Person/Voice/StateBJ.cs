@@ -52,7 +52,10 @@ namespace Cue
 
 		protected override void DoSetSound()
 		{
-			v_.Provider.SetBJ(v_.MaxIntensity);
+			if (Cue.Instance.Options.BJAudio)
+				v_.Provider.SetBJ(v_.MaxIntensity);
+			else
+				v_.Provider.SetSilent();
 		}
 
 		private bool BJActive()

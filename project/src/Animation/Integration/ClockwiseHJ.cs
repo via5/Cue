@@ -16,6 +16,8 @@
 		protected Person leftTarget_ = null;
 		protected Person rightTarget_ = null;
 
+		private bool wasSilent_ = false;
+
 		protected ClockwiseHJAnimation(string name)
 			: base(name)
 		{
@@ -103,6 +105,17 @@
 				speedMin_.Value = minSpeed;
 				speedMax_.Value = maxSpeed;
 			}
+
+			if (wasSilent_ && Cue.Instance.Options.HJAudio)
+			{
+				wasSilent_ = false;
+				volume_.Value = volume_.DefaultValue;
+			}
+			else if (!wasSilent_ && !Cue.Instance.Options.HJAudio)
+			{
+				wasSilent_ = true;
+				volume_.Value = 0;
+			}
 		}
 
 		private void Init(Person p)
@@ -119,8 +132,11 @@
 
 			active_.Value = false;
 
-			if (Cue.Instance.Options.MuteSfx)
+			if (!Cue.Instance.Options.HJAudio)
+			{
+				wasSilent_ = true;
 				volume_.Value = 0;
+			}
 		}
 
 		protected bool StartCommon(Person target, string hand)

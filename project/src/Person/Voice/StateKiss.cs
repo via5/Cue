@@ -54,10 +54,17 @@ namespace Cue
 
 		protected override void DoSetSound()
 		{
-			if (leading_)
-				v_.Provider.SetKissing();
+			if (Cue.Instance.Options.KissAudio)
+			{
+				if (leading_)
+					v_.Provider.SetKissing();
+				else
+					v_.Provider.SetSilent();
+			}
 			else
+			{
 				v_.Provider.SetSilent();
+			}
 		}
 
 		private bool IsKissing()

@@ -80,7 +80,9 @@ namespace Cue
 		public delegate void Handler();
 		public event Handler Changed, MenusChanged;
 
-		private bool muteSfx_ = false;
+		private bool hjAudio_ = true;
+		private bool bjAudio_ = true;
+		private bool kissAudio_ = true;
 		private bool skinColor_ = true;
 		private bool skinGloss_ = true;
 		private bool hairLoose_ = true;
@@ -102,10 +104,22 @@ namespace Cue
 		{
 		}
 
-		public bool MuteSfx
+		public bool HJAudio
 		{
-			get { return muteSfx_; }
-			set { muteSfx_ = value; OnChanged(); }
+			get { return hjAudio_; }
+			set { hjAudio_ = value; OnChanged(); }
+		}
+
+		public bool BJAudio
+		{
+			get { return bjAudio_; }
+			set { bjAudio_ = value; OnChanged(); }
+		}
+
+		public bool KissAudio
+		{
+			get { return kissAudio_; }
+			set { kissAudio_ = value; OnChanged(); }
 		}
 
 		public bool SkinColor
@@ -226,7 +240,9 @@ namespace Cue
 		{
 			var o = new JSONClass();
 
-			o["muteSfx"] = new JSONData(muteSfx_);
+			o["hjAudio"] = new JSONData(hjAudio_);
+			o["bjAudio"] = new JSONData(bjAudio_);
+			o["kissAudio"] = new JSONData(kissAudio_);
 			o["skinColor"] = new JSONData(skinColor_);
 			o["skinGloss"] = new JSONData(skinGloss_);
 			o["handLinking"] = new JSONData(handLinking_);
@@ -259,7 +275,23 @@ namespace Cue
 		{
 			menus_.Clear();
 
-			J.OptBool(o, "muteSfx", ref muteSfx_);
+			if (o.HasKey("muteSfx"))
+			{
+				bool b = J.OptBool(o, "muteSfx", false);
+				if (b)
+				{
+					hjAudio_ = false;
+					bjAudio_ = false;
+					kissAudio_ = true;
+				}
+			}
+			else
+			{
+				J.OptBool(o, "hjAudio", ref hjAudio_);
+				J.OptBool(o, "bjAudio", ref bjAudio_);
+				J.OptBool(o, "kissAudio", ref kissAudio_);
+			}
+
 			J.OptBool(o, "skinColor", ref skinColor_);
 			J.OptBool(o, "skinGloss", ref skinGloss_);
 			J.OptBool(o, "handLinking", ref handLinking_);

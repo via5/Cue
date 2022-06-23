@@ -329,7 +329,8 @@
 
 	class SoundOptionsTab : Tab
 	{
-		private VUI.CheckBox playSfx_, mutePlayer_;
+		private VUI.CheckBox hjAudio_, bjAudio_, kissAudio_;
+		private VUI.CheckBox mutePlayer_;
 		private bool ignore_ = false;
 
 		public SoundOptionsTab()
@@ -342,12 +343,16 @@
 
 			var p = new VUI.Panel(ly);
 
-			playSfx_ = p.Add(new VUI.CheckBox("Play sfx", OnPlaySfx, o.MuteSfx));
-			p.Add(new VUI.Label("Play sound effects during hj/bj.", VUI.Label.Wrap));
+			hjAudio_ = p.Add(new VUI.CheckBox("Play HJ sounds", OnHJAudio, o.HJAudio));
 			p.Add(new VUI.Spacer(20));
 
-			mutePlayer_ = p.Add(new VUI.CheckBox("Mute possessed", OnMutePlayer, o.MutePlayer));
-			p.Add(new VUI.Label("Mute voice for possessed atoms", VUI.Label.Wrap));
+			bjAudio_ = p.Add(new VUI.CheckBox("Play BJ sounds", OnBJAudio, o.BJAudio));
+			p.Add(new VUI.Spacer(20));
+
+			kissAudio_ = p.Add(new VUI.CheckBox("Play kissing sounds", OnKissAudio, o.KissAudio));
+			p.Add(new VUI.Spacer(20));
+
+			mutePlayer_ = p.Add(new VUI.CheckBox("Mute possessed atom", OnMutePlayer, o.MutePlayer));
 			p.Add(new VUI.Spacer(20));
 
 			Layout = new VUI.BorderLayout(20);
@@ -374,7 +379,9 @@
 
 				var o = Cue.Instance.Options;
 
-				playSfx_.Checked = !o.MuteSfx;
+				hjAudio_.Checked = o.HJAudio;
+				bjAudio_.Checked = o.BJAudio;
+				kissAudio_.Checked = o.KissAudio;
 			}
 			finally
 			{
@@ -382,10 +389,22 @@
 			}
 		}
 
-		private void OnPlaySfx(bool b)
+		private void OnHJAudio(bool b)
 		{
 			if (ignore_) return;
-			Cue.Instance.Options.MuteSfx = !b;
+			Cue.Instance.Options.HJAudio = b;
+		}
+
+		private void OnBJAudio(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.BJAudio = b;
+		}
+
+		private void OnKissAudio(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.KissAudio = b;
 		}
 
 		private void OnMutePlayer(bool b)
