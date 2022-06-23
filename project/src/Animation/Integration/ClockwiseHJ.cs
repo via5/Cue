@@ -21,6 +21,12 @@
 		{
 		}
 
+		public override void Reset(Person p)
+		{
+			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			active.Value = false;
+		}
+
 		public override bool Done
 		{
 			get { return !active_.Value && !running_.Value; }

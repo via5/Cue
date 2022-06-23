@@ -17,6 +17,11 @@ namespace Cue
 			return new TimelineAnimation(o["name"]);
 		}
 
+		public void Reset(Person p)
+		{
+			// no-op
+		}
+
 		public string Name
 		{
 			get { return name_; }

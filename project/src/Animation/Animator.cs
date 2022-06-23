@@ -33,6 +33,12 @@ namespace Cue
 
 			return null;
 		}
+
+		public static void ResetAll(Person p)
+		{
+			foreach (var a in list_)
+				a.Reset(p);
+		}
 	}
 
 
@@ -72,6 +78,8 @@ namespace Cue
 		float InitFrame { get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
+
+		void Reset(Person p);
 		string[] GetAllForcesDebug();
 		string[] Debug();
 		string ToDetailedString();
@@ -159,6 +167,8 @@ namespace Cue
 			person_ = p;
 			log_ = new Logger(Logger.Animation, p, "animator");
 			players_.AddRange(CreatePlayers(p));
+
+			BuiltinAnimations.ResetAll(person_);
 		}
 
 		public Logger Log

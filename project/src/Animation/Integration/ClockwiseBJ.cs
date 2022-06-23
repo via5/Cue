@@ -22,6 +22,12 @@
 		{
 		}
 
+		public override void Reset(Person p)
+		{
+			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			active.Value = false;
+		}
+
 		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseBJAnimation();

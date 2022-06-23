@@ -108,6 +108,11 @@ namespace Cue
 			return new SynergyAnimation(o["step"]);
 		}
 
+		public void Reset(Person p)
+		{
+			// no-op
+		}
+
 		public string Name
 		{
 			get { return name_; }

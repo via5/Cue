@@ -48,7 +48,8 @@
 		"kissState":
 		{
 			"enabled": true,
-			"voiceChance": 0.2
+			"voiceChance": 0.2,
+			"voiceTime": 2
 		},
 		"orgasmState":
 		{

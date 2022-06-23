@@ -17,6 +17,11 @@ namespace Cue
 			log_ = new Logger(Logger.Animation, "builtinAnim." + name);
 		}
 
+		public virtual void Reset(Person p)
+		{
+			// no-op
+		}
+
 		public Logger Log
 		{
 			get { return log_; }

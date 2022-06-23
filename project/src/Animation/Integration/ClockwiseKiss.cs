@@ -47,6 +47,12 @@
 		{
 		}
 
+		public override void Reset(Person p)
+		{
+			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.Kiss", "isActive");
+			active.Value = false;
+		}
+
 		public override BuiltinAnimation Clone()
 		{
 			var a = new ClockwiseKissAnimation();

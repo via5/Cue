@@ -112,7 +112,12 @@ namespace Cue.BVH
                 (o.HasKey("useHead") ? o["useHead"].AsBool : true));
         }
 
-        public string Name
+		public void Reset(Person p)
+		{
+			// no-op
+		}
+
+		public string Name
         {
             get { return file_.Name; }
         }
