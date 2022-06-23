@@ -328,9 +328,12 @@ namespace Cue
 			events_[name] = d;
 		}
 
-		public void SetVoice(Voice v)
+		public void LoadVoice(JSONClass o, bool inherited)
 		{
-			voiceProto_ = v;
+			if (voiceProto_ == null)
+				voiceProto_ = new Voice(o);
+			else
+				voiceProto_.Load(o, inherited);
 		}
 
 		public IEventData CloneEventData(string name)

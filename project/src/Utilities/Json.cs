@@ -78,6 +78,14 @@ namespace Cue
 			return o[key].AsBool;
 		}
 
+		public static JSONClass ReqObject(JSONClass o, string key)
+		{
+			if (!o.HasKey(key))
+				throw new LoadFailed($"object '{key}' is missing");
+
+			return o[key].AsObject;
+		}
+
 		public static bool OptBool(JSONClass o, string key, ref bool b)
 		{
 			if (!o.HasKey(key))
@@ -93,6 +101,14 @@ namespace Cue
 				return def;
 
 			return o[key].AsBool;
+		}
+
+		public static JSONClass OptObject(JSONClass o, string key, JSONClass def=null)
+		{
+			if (!o.HasKey(key))
+				return def;
+
+			return o[key].AsObject;
 		}
 	}
 }

@@ -19,25 +19,47 @@ namespace Cue
 		{
 		}
 
-		public VoiceStatePause(JSONClass o)
+		public VoiceStatePause(JSONClass vo)
 		{
-			if (o.HasKey("pause"))
+			Load(vo, false);
+		}
+
+		public override void Load(JSONClass vo, bool inherited)
+		{
+			if (vo.HasKey("pauseState"))
 			{
-				var po = o["pause"].AsObject;
+				var o = J.ReqObject(vo, "pauseState");
 
-				minExcitement_ = J.ReqFloat(po, "minExcitement");
-				timeRange_ = RandomRange.Create(po, "time");
+				if (o.HasKey("minExcitement"))
+					minExcitement_ = J.ReqFloat(o, "minExcitement");
+				else if (!inherited)
+					throw new LoadFailed("missing minExcitement");
 
-				var co = po["chance"].AsObject;
+				if (o.HasKey("time"))
+					timeRange_ = RandomRange.Create(o, "time");
+				else if (!inherited)
+					throw new LoadFailed("missing time");
 
-				chance_ = J.ReqFloat(co, "value");
-
-				if (co.HasKey("rng"))
+				if (o.HasKey("chance"))
 				{
-					rng_ = BasicRandom.FromJSON(co["rng"]);
-					if (rng_ == null)
-						throw new LoadFailed("bad pause rng");
+					var co = J.ReqObject(o, "chance");
+					chance_ = J.ReqFloat(co, "value");
+
+					if (co.HasKey("rng"))
+					{
+						rng_ = BasicRandom.FromJSON(co["rng"]);
+						if (rng_ == null)
+							throw new LoadFailed("bad pause rng");
+					}
 				}
+				else if (!inherited)
+				{
+					throw new LoadFailed("missing chance");
+				}
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing pauseState");
 			}
 		}
 

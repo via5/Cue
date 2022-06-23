@@ -173,7 +173,7 @@ namespace Cue
 		{
 			if (o.HasKey("voice"))
 			{
-				p.SetVoice(new Voice(o["voice"].AsObject));
+				p.LoadVoice(o["voice"].AsObject, inherited);
 			}
 			else
 			{

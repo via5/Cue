@@ -101,7 +101,12 @@ namespace Cue.MacGruber
 
 		public Voice(JSONClass options)
 		{
-			if (!options.HasKey("datasets"))
+			Load(options, false);
+		}
+
+		public void Load(JSONClass options, bool inherited)
+		{
+			if (!options.HasKey("datasets") && !inherited)
 				throw new LoadFailed("mg missing datasets");
 
 			var dss = new List<DatasetForIntensity>();
@@ -118,7 +123,7 @@ namespace Cue.MacGruber
 
 			datasets_ = dss.ToArray();
 
-			if (!options.HasKey("orgasm"))
+			if (!options.HasKey("orgasm") && !inherited)
 				throw new LoadFailed("mg missing orgasm");
 
 			var od = options["orgasm"].AsObject;
@@ -275,6 +280,11 @@ namespace Cue.MacGruber
 		{
 			return new Sys.Vam.FloatParameter(
 				person_, "MacGruber.AudioAttenuation", name);
+		}
+
+		public string Name
+		{
+			get { return "macgruber"; }
 		}
 
 		public bool Muted

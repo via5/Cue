@@ -13,14 +13,30 @@ namespace Cue
 		{
 		}
 
-		public VoiceStateKiss(JSONClass o)
+		public VoiceStateKiss(JSONClass vo)
 		{
-			if (o.HasKey("kiss"))
-			{
-				var ko = o["kiss"].AsObject;
+			Load(vo, false);
+		}
 
-				kissEnabled_ = J.ReqBool(ko, "enabled");
-				kissVoiceChance_ = J.ReqFloat(ko, "voiceChance");
+		public override void Load(JSONClass vo, bool inherited)
+		{
+			if (vo.HasKey("kissState"))
+			{
+				var o = J.ReqObject(vo, "kissState");
+
+				if (o.HasKey("enabled"))
+					kissEnabled_ = J.ReqBool(o, "enabled");
+				else if (!inherited)
+					throw new LoadFailed("missing enabled");
+
+				if (o.HasKey("voiceChance"))
+					kissVoiceChance_ = J.ReqFloat(o, "voiceChance");
+				else if (!inherited)
+					throw new LoadFailed("missing voiceChance");
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing kissState");
 			}
 		}
 

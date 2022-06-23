@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using SimpleJSON;
+
+namespace Cue
 {
 	public interface IVoiceState
 	{
@@ -6,6 +8,7 @@
 		string LastState { get; }
 		bool Done { get; }
 
+		void Load(JSONClass vo, bool inherited);
 		IVoiceState Clone();
 		void Init(Voice v);
 		void Start();
@@ -28,6 +31,8 @@
 		private string lastState_ = "";
 
 		public abstract IVoiceState Clone();
+
+		public abstract void Load(JSONClass vo, bool inherited);
 
 		public void Init(Voice v)
 		{

@@ -26,24 +26,52 @@ namespace Cue
 		{
 		}
 
-		public VoiceStateNormal(JSONClass o)
+		public VoiceStateNormal(JSONClass vo)
 		{
-			breathingIntensityCutoff_ = U.Clamp(
-				J.OptFloat(o, "breathingIntensityCutoff", DefaultBreathingIntensityCutoff),
-				0, 1);
+			Load(vo, false);
+		}
 
-			intensityWaitRange_ = RandomRange.Create(o, "intensityWait");
-			intensityTimeRange_ = RandomRange.Create(o, "intensityTime");
-
-			if (o.HasKey("intensityTarget"))
+		public override void Load(JSONClass vo, bool inherited)
+		{
+			if (vo.HasKey("normalState"))
 			{
-				var ot = o["intensityTarget"].AsObject;
-				if (!ot.HasKey("rng"))
-					throw new LoadFailed("intensityTarget missing rng");
+				var o = J.ReqObject(vo, "normalState");
 
-				intensityTargetRng_ = BasicRandom.FromJSON(ot["rng"].AsObject);
-				if (intensityTargetRng_ == null)
-					throw new LoadFailed("bad intensityTarget rng");
+				if (o.HasKey("breathingIntensityCutoff"))
+				{
+					breathingIntensityCutoff_ = U.Clamp(
+						J.OptFloat(o, "breathingIntensityCutoff", DefaultBreathingIntensityCutoff),
+						0, 1);
+				}
+
+				if (o.HasKey("intensityWait"))
+					intensityWaitRange_ = RandomRange.Create(o, "intensityWait");
+				else if (!inherited)
+					throw new LoadFailed("missing intensityWait");
+
+				if (o.HasKey("intensityTime"))
+					intensityTimeRange_ = RandomRange.Create(o, "intensityTime");
+				else if (!inherited)
+					throw new LoadFailed("missing intensityTime");
+
+				if (o.HasKey("intensityTarget"))
+				{
+					var ot = o["intensityTarget"].AsObject;
+					if (!ot.HasKey("rng"))
+						throw new LoadFailed("intensityTarget missing rng");
+
+					intensityTargetRng_ = BasicRandom.FromJSON(ot["rng"].AsObject);
+					if (intensityTargetRng_ == null)
+						throw new LoadFailed("bad intensityTarget rng");
+				}
+				else if (!inherited)
+				{
+					throw new LoadFailed("missing intensityTarget");
+				}
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing normalState");
 			}
 		}
 

@@ -57,6 +57,7 @@ namespace Cue
 
 	public interface IVoice
 	{
+		void Load(JSONClass o, bool inherited);
 		void Init(Person p);
 		void Destroy();
 		IVoice Clone();
@@ -68,6 +69,7 @@ namespace Cue
 
 		void Debug(DebugLines debug);
 
+		string Name { get; }
 		bool Muted { set; }
 		bool MouthEnabled { get; set; }
 

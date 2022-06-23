@@ -49,9 +49,21 @@ namespace Cue.VamMoan
 
 		public Voice(JSONClass o)
 		{
-			breathingRange_ = U.Clamp(
-				J.OptFloat(o, "breathingRange", DefaultBreathingMax),
-				0, 1);
+			Load(o, false);
+		}
+
+		public void Load(JSONClass o, bool inherited)
+		{
+			if (o.HasKey("breathingRange"))
+			{
+				breathingRange_ = U.Clamp(
+					J.OptFloat(o, "breathingRange", DefaultBreathingMax),
+					0, 1);
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing breathingRange");
+			}
 		}
 
 		public IVoice Clone()
@@ -116,6 +128,11 @@ namespace Cue.VamMoan
 
 			if (e != null)
 				e.val = false;
+		}
+
+		public string Name
+		{
+			get { return "vammoan"; }
 		}
 
 		public bool Muted

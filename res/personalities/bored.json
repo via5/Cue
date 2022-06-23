@@ -64,7 +64,7 @@
 			"name": "vammoan",
 			"options":
 			{
-				"breathingMax": 1,
+				"breathingRange": 1,
 				"orgasmAction": "Voice intensity 0",
 			}
 		}

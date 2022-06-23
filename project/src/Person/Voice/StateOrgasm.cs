@@ -8,8 +8,20 @@ namespace Cue
 		{
 		}
 
-		public VoiceStateOrgasm(JSONClass o)
+		public VoiceStateOrgasm(JSONClass vo)
 		{
+			Load(vo, false);
+		}
+
+		public override void Load(JSONClass vo, bool inherited)
+		{
+			if (vo.HasKey("orgasmState"))
+			{
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed("missing orgasmState");
+			}
 		}
 
 		public override string Name

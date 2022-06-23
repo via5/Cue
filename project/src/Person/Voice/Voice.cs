@@ -25,18 +25,45 @@ namespace Cue
 
 		public Voice(JSONClass o)
 		{
+			Load(o, false);
+		}
+
+		public void Load(JSONClass o, bool inherited)
+		{
 			if (o == null)
 				throw new LoadFailed("no object");
 
-			if (!o.HasKey("provider"))
-				throw new LoadFailed("voice missing provider");
+			if (o.HasKey("provider"))
+			{
+				var po = o["provider"].AsObject;
 
-			provider_ = CreateProvider(o["provider"].AsObject);
+				if (provider_ == null || provider_.Name != J.ReqString(po, "name"))
+					provider_ = CreateProvider(po);
+				else
+					provider_.Load(J.OptObject(po, "options"), inherited);
+			}
+			else
+			{
+				if (!inherited)
+					throw new LoadFailed("voice missing provider");
+			}
 
-			states_.Add(new VoiceStateNormal(o));
-			states_.Add(new VoiceStatePause(o));
-			states_.Add(new VoiceStateOrgasm(o));
-			states_.Add(new VoiceStateKiss(o));
+			if (states_.Count == 0)
+			{
+				Cue.Assert(!inherited);
+
+				states_.Add(new VoiceStateNormal(o));
+				states_.Add(new VoiceStatePause(o));
+				states_.Add(new VoiceStateOrgasm(o));
+				states_.Add(new VoiceStateKiss(o));
+			}
+			else
+			{
+				Cue.Assert(inherited);
+
+				for (int i = 0; i < states_.Count; ++i)
+					states_[i].Load(o, true);
+			}
 		}
 
 		private IVoice CreateProvider(JSONClass o)

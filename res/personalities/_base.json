@@ -12,27 +12,29 @@
 				"breathingRange": 0.1,
 			}
 		},
-
-		"breathingIntensityCutoff": 0.6,
-		"intensityWait":
+		"normalState":
 		{
-			"range": [0, 5],
-		},
-		"intensityTarget":
-		{
-			"rng":
+			"breathingIntensityCutoff": 0.6,
+			"intensityWait":
 			{
-				"type": "normal",
-				"centerMin": 0,
-				"centerMax": 0.8,
-				"width": 3
+				"range": [0, 5],
+			},
+			"intensityTarget":
+			{
+				"rng":
+				{
+					"type": "normal",
+					"centerMin": 0,
+					"centerMax": 0.8,
+					"width": 3
+				}
+			},
+			"intensityTime":
+			{
+				"range": [1, 5]
 			}
-		},
-		"intensityTime":
-		{
-			"range": [1, 5]
-		},
-		"pause":
+		}
+		"pauseState":
 		{
 			"minExcitement": 0.8,
 			"time":
@@ -45,12 +47,15 @@
 				"rng": "uniform"
 			}
 		},
-		"kiss":
+		"kissState":
 		{
 			"enabled": true,
 			"voiceChance": 0.2
 		},
-		"bj":
+		"orgasmState":
+		{
+		},
+		"bjState":
 		{
 			"enabled": true,
 			"minExcitementForIntense": 0.7
