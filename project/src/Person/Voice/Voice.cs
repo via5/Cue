@@ -51,11 +51,7 @@ namespace Cue
 			if (states_.Count == 0)
 			{
 				Cue.Assert(!inherited);
-
-				states_.Add(new VoiceStateNormal(o));
-				states_.Add(new VoiceStatePause(o));
-				states_.Add(new VoiceStateOrgasm(o));
-				states_.Add(new VoiceStateKiss(o));
+				states_.AddRange(VoiceState.CreateAll(o));
 			}
 			else
 			{

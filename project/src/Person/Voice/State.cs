@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -34,6 +35,18 @@ namespace Cue
 		public abstract IVoiceState Clone();
 
 		public abstract void Load(JSONClass vo, bool inherited);
+
+		public static List<IVoiceState> CreateAll(JSONClass o)
+		{
+			return new List<IVoiceState>()
+			{
+				new VoiceStateNormal(o),
+				new VoiceStatePause(o),
+				new VoiceStateOrgasm(o),
+				new VoiceStateKiss(o),
+				new VoiceStateBJ(o)
+			};
+		}
 
 		public void Init(Voice v)
 		{
@@ -106,5 +119,105 @@ namespace Cue
 		}
 
 		protected abstract void DoDebug(DebugLines debug);
+	}
+
+
+	public abstract class VoiceStateWithMoaning : VoiceState
+	{
+		private bool enabled_ = false;
+		private float voiceChance_ = 0;
+		private float voiceTime_ = 0;
+		private float elapsed_ = 0;
+
+		private bool moaning_ = false;
+		private float lastRng_ = 0;
+
+		protected void LoadWithMoaning(JSONClass o, bool inherited)
+		{
+			if (o.HasKey("enabled"))
+				enabled_ = J.ReqBool(o, "enabled");
+			else if (!inherited)
+				throw new LoadFailed("missing enabled");
+
+			if (o.HasKey("voiceChance"))
+				voiceChance_ = J.ReqFloat(o, "voiceChance");
+			else if (!inherited)
+				throw new LoadFailed("missing voiceChance");
+
+			if (o.HasKey("voiceTime"))
+				voiceTime_ = J.ReqFloat(o, "voiceTime");
+			else if (!inherited)
+				throw new LoadFailed("missing voiceTime");
+		}
+
+		protected void CopyFrom(VoiceStateWithMoaning o)
+		{
+			enabled_ = o.enabled_;
+			voiceChance_ = o.voiceChance_;
+			voiceTime_ = o.voiceTime_;
+		}
+
+		public override int CanRun()
+		{
+			if (HasEmergency())
+			{
+				SetLastState("ok");
+				return Emergency;
+			}
+
+			SetLastState("not kissing");
+			return CannotRun;
+		}
+
+		public override bool HasEmergency()
+		{
+			if (!enabled_)
+				return false;
+
+			if (DoCanRun())
+			{
+				SetLastState("ok");
+				return true;
+			}
+
+			return false;
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			if (!DoCanRun())
+			{
+				SetDone();
+				return;
+			}
+
+			elapsed_ += s;
+			if (elapsed_ >= voiceTime_)
+			{
+				elapsed_ = 0;
+
+				lastRng_ = U.RandomFloat(0, 1);
+				if (lastRng_ <= voiceChance_)
+				{
+					moaning_ = true;
+					v_.Provider.SetMoaning(v_.MaxIntensity);
+				}
+				else
+				{
+					moaning_ = false;
+					DoSetSound();
+				}
+			}
+		}
+
+		protected override void DoDebug(DebugLines debug)
+		{
+			debug.Add("elapsed", $"{elapsed_:0.00}/{voiceTime_:0.00}");
+			debug.Add("moaning", $"{moaning_:0.00}");
+			debug.Add("lastRng", $"{lastRng_:0.00}/{voiceChance_:0.00}");
+		}
+
+		protected abstract bool DoCanRun();
+		protected abstract void DoSetSound();
 	}
 }

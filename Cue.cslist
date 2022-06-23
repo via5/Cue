@@ -72,6 +72,7 @@ project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
 project\src\Person\Voice\State.cs
+project\src\Person\Voice\StateBJ.cs
 project\src\Person\Voice\StateKiss.cs
 project\src\Person\Voice\StateNormal.cs
 project\src\Person\Voice\StateOrgasm.cs

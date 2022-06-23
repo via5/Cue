@@ -62,7 +62,8 @@
 		"bjState":
 		{
 			"enabled": true,
-			"minExcitementForIntense": 0.7
+			"voiceChance": 0.2,
+			"voiceTime": 2
 		}
 	},
 

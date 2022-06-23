@@ -20,6 +20,7 @@ namespace Cue.VamMoan
 			public Sys.Vam.ActionParameter breathing;
 			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter kissing;
+			public Sys.Vam.ActionParameter[] bj;
 			public Sys.Vam.ActionParameter[] intensities;
 			public Sys.Vam.FloatParameter availableIntensities;
 			public bool hasAvailableIntensities;
@@ -80,6 +81,12 @@ namespace Cue.VamMoan
 			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
 			p_.orgasm = AP("Voice orgasm");
+
+			p_.bj = new Sys.Vam.ActionParameter[]
+			{
+				AP("Voice blowjob"),
+				AP("Voice blowjob intense")
+			};
 
 			CheckVoice();
 
@@ -291,6 +298,15 @@ namespace Cue.VamMoan
 		public void SetKissing()
 		{
 			currentAction_ = p_.kissing;
+			Fire();
+		}
+
+		public void SetBJ(float v)
+		{
+			int index = (int)(v * p_.bj.Length);
+			index = U.Clamp(index, 0, p_.bj.Length - 1);
+
+			currentAction_ = p_.bj[index];
 			Fire();
 		}
 

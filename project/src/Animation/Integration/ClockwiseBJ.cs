@@ -135,10 +135,10 @@
 			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Max");
 
 			active_.Value = false;
-			moanVolume_.Value = 0;
 
-			if (Cue.Instance.Options.MuteSfx)
-				sfxVolume_.Value = 0;
+			// handled by vammoan
+			moanVolume_.Value = 0;
+			sfxVolume_.Value = 0;
 		}
 	}
 }

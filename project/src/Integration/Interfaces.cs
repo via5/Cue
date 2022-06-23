@@ -69,6 +69,7 @@ namespace Cue
 		void SetSilent();
 		void SetOrgasm();
 		void SetKissing();
+		void SetBJ(float v);
 
 		void Debug(DebugLines debug);
 

@@ -255,6 +255,11 @@ namespace Cue.MacGruber
 			}
 		}
 
+		public void SetBJ(float v)
+		{
+			// no supported
+		}
+
 		public void Debug(DebugLines debug)
 		{
 			debug.Add("provider", "macgruber");
