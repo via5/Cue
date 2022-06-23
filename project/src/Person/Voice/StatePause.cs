@@ -1,0 +1,133 @@
+﻿using SimpleJSON;
+
+namespace Cue
+{
+	public class VoiceStatePause : VoiceState
+	{
+		private float minExcitement_ = 0;
+		private RandomRange timeRange_ = new RandomRange();
+		private float chance_ = 0;
+		private IRandom rng_ = new UniformRandom();
+
+		private float time_ = 0;
+		private float elapsed_ = 0;
+		private float lastRng_ = 0;
+		private bool inPause_ = false;
+
+
+		private VoiceStatePause()
+		{
+		}
+
+		public VoiceStatePause(JSONClass o)
+		{
+			if (o.HasKey("pause"))
+			{
+				var po = o["pause"].AsObject;
+
+				minExcitement_ = J.ReqFloat(po, "minExcitement");
+				timeRange_ = RandomRange.Create(po, "time");
+
+				var co = po["chance"].AsObject;
+
+				chance_ = J.ReqFloat(co, "value");
+
+				if (co.HasKey("rng"))
+				{
+					rng_ = BasicRandom.FromJSON(co["rng"]);
+					if (rng_ == null)
+						throw new LoadFailed("bad pause rng");
+				}
+			}
+		}
+
+		public override string Name
+		{
+			get { return "pause"; }
+		}
+
+		public override IVoiceState Clone()
+		{
+			var s = new VoiceStatePause();
+			s.CopyFrom(this);
+			return s;
+		}
+
+		private void CopyFrom(VoiceStatePause o)
+		{
+			minExcitement_ = o.minExcitement_;
+			timeRange_ = o.timeRange_.Clone();
+			chance_ = o.chance_;
+			rng_ = o.rng_.Clone();
+		}
+
+		protected override void DoStart()
+		{
+			elapsed_ = 0;
+			time_ = timeRange_.RandomFloat(v_.MaxIntensity);
+			inPause_ = true;
+
+			v_.Provider.SetIntensity(0);
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			elapsed_ += s;
+
+			if (inPause_)
+			{
+				if (elapsed_ >= time_)
+				{
+					v_.Provider.SetIntensity(1.0f);
+					inPause_ = false;
+				}
+			}
+			else
+			{
+				if (elapsed_ >= 3)
+				{
+					SetDone();
+				}
+			}
+		}
+
+		public override int CanRun()
+		{
+			if (v_.MaxIntensity < minExcitement_)
+			{
+				SetLastState("excitement too low");
+				return CannotRun;
+			}
+
+			lastRng_ = rng_.RandomFloat(0, 1, v_.MaxIntensity);
+			if (lastRng_ >= chance_)
+			{
+				SetLastState($"rng failed, {lastRng_} >= {chance_}");
+				return CannotRun;
+			}
+
+			SetLastState("ok");
+			return HighPriority;
+		}
+
+		public string SettingsToString()
+		{
+			return
+				$"minEx={minExcitement_:0.00} timeRange={timeRange_} " +
+				$"chance={chance_};rng={rng_}";
+		}
+
+		public string LiveToString()
+		{
+			return
+				$"time={time_:0.00} elapsed={elapsed_:0.00} " +
+				$"lastrng={lastRng_:0.00}";
+		}
+
+		protected override void DoDebug(DebugLines debug)
+		{
+			debug.Add("pause settings", SettingsToString());
+			debug.Add("pause", LiveToString());
+		}
+	}
+}

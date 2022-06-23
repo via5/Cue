@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
@@ -389,6 +390,60 @@ namespace Cue
 					break;
 				}
 			}
+		}
+	}
+
+	class RandomRange
+	{
+		private Pair<float, float> range_ = new Pair<float, float>(0, 0);
+		private IRandom rng_ = new UniformRandom();
+
+		public static RandomRange Create(JSONClass o, string name)
+		{
+			RandomRange r = new RandomRange();
+
+			if (o.HasKey(name))
+			{
+				var wt = o[name].AsObject;
+
+				if (!wt.HasKey("range"))
+					throw new LoadFailed($"{name} missing range");
+
+				var a = wt["range"].AsArray;
+				if (a.Count != 2)
+					throw new LoadFailed($"bad {name} range");
+
+				r.range_.first = a[0].AsFloat;
+				r.range_.second = a[1].AsFloat;
+
+				if (wt.HasKey("rng"))
+				{
+					r.rng_ = BasicRandom.FromJSON(wt["rng"].AsObject);
+					if (r.rng_ == null)
+						throw new LoadFailed($"bad {name} rng");
+				}
+			}
+
+			return r;
+		}
+
+		public RandomRange Clone()
+		{
+			var r = new RandomRange();
+			r.range_ = range_;
+			r.rng_ = rng_.Clone();
+
+			return r;
+		}
+
+		public float RandomFloat(float magnitude)
+		{
+			return rng_.RandomFloat(range_.first, range_.second, magnitude);
+		}
+
+		public override string ToString()
+		{
+			return $"{range_.first:0.00},{range_.second:0.00};rng={rng_}";
 		}
 	}
 }
