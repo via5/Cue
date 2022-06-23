@@ -72,6 +72,95 @@
 	"expressions":
 	[
 		{
+			"name": "smile1",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Smile Open Full Face",
+					"max": 0.7
+				}
+			]
+		},
+
+		{
+			"name": "smile2",
+			"moods": "happy",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Elise Smile (REN)"
+				}
+			]
+		},
+
+
+		{
+			"name": "cornerSmile",
+			"moods": "playful",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Smile Open Full Face",
+					"max": 0.3
+				},
+
+				{
+					"id": "Mouth Smile Simple Left",
+					"max": 1.2
+				},
+
+				{
+					"id": "Eyes Squint",
+					"max": 0.15
+				},
+			]
+		},
+
+		{
+			"name": "curious",
+			"moods": "playful",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Curious1",
+					"max": 0.5
+				}
+			]
+		},
+
+		{
+			"name": "desire",
+			"moods": "playful",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Desire",
+					"max": 0.2
+				}
+			]
+		},
+
+		{
+			"name": "flirting",
+			"moods": "playful",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Flirting",
+					"max": 0.5
+				}
+			]
+		},
+
+
+		{
 			"name": "pleasure",
 			"moods": "excited orgasm",
 			"bodyParts": "mouth eyes",
@@ -185,17 +274,68 @@
 			]
 		},
 
+
+
 		{
-			"name": "angry",
+			"name": "angryMouth",
 			"moods": "angry",
 			"bodyParts": "mouth",
 			"morphs":
 			[
 				{
 					"id": "Angry",
+					"max": 0.3
 				}
 			]
 		},
+
+			{
+			"name": "angryFrown",
+			"moods": "angry",
+			"bodyParts": "eyes",
+			"morphs":
+			[
+				{
+					"id": "Brow Down"
+				}
+			]
+		},
+
+		{
+			"name": "angrySquint",
+			"moods": "angry",
+			"bodyParts": "eyes",
+			"morphs":
+			[
+				{
+					"id": "Eyes Squint"
+				},
+
+				{
+					"id": "Nose Wrinkle"
+				}
+			]
+		},
+
+		{
+			"name": "angryMouthFrown",
+			"moods": "angry",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Mouth Corner Up-Down",
+					"max": -0.5
+				},
+
+				{
+					"id": "Lip Top Up",
+					"max": 0.3
+				}
+			]
+		},
+
+
 
 		{
 			"name": "eyesClosed",
@@ -217,52 +357,6 @@
 			[
 				{
 					"id": "Mouth Open"
-				}
-			]
-		},
-
-		{
-			"name": "frown",
-			"moods": "angry",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Brow Down"
-				}
-			]
-		},
-
-		{
-			"name": "squint",
-			"moods": "angry",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Squint"
-				},
-
-				{
-					"id": "Nose Wrinkle"
-				}
-			]
-		},
-
-		{
-			"name": "mouthFrown",
-			"moods": "angry",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Mouth Corner Up-Down",
-					"max": -0.5
-				},
-
-				{
-					"id": "Lip Top Up",
-					"max": 0.3
 				}
 			]
 		},
@@ -424,7 +518,10 @@
 	"angerMaxExcitementForHappiness": 0,
 	"angerExcitementFactorForAnger": 0,
 	"angerExcitementFactorForHappiness": 0,
-	"maxHappiness": 1,
+
+	"defaultHappiness": 1,
+	"defaultPlayfulness": 0,
+	"defaultAnger": 0,
 	"maxExcitedExpression": 1,
 
 	"expressionMinHoldTime": 0,

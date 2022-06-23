@@ -338,27 +338,30 @@ namespace Cue
 				if (ex < happyMaxEx)
 				{
 					moods_[Moods.Happy].Value = 0;
+					moods_[Moods.Playful].Value = 0;
 				}
 				else
 				{
 					var exInRange = (ex - happyMaxEx) / happyMaxEx;
 					var v = (exInRange * ps.Get(PS.AngerExcitementFactorForHappiness));
 
-					moods_[Moods.Happy].Value = U.Clamp(v, 0, ps.Get(PS.MaxHappiness));
+					moods_[Moods.Happy].Value = U.Clamp(v, 0, ps.Get(PS.DefaultHappiness));
+					moods_[Moods.Playful].Value = U.Clamp(v, 0, ps.Get(PS.DefaultPlayfulness));
 				}
 			}
 			else
 			{
-
 				if (person_.Gaze.Picker.CurrentTarget?.Reluctant ?? false)
 				{
 					moods_[Moods.Happy].Value = 0;
+					moods_[Moods.Playful].Value = 0;
 					moods_[Moods.Angry].Value = ps.Get(PS.AvoidGazeAnger);
 				}
 				else
 				{
-					moods_[Moods.Happy].Value = ps.Get(PS.MaxHappiness);
-					moods_[Moods.Angry].Value = 0;
+					moods_[Moods.Happy].Value = ps.Get(PS.DefaultHappiness);
+					moods_[Moods.Playful].Value = ps.Get(PS.DefaultPlayfulness);
+					moods_[Moods.Angry].Value = ps.Get(PS.DefaultAnger);
 				}
 			}
 		}

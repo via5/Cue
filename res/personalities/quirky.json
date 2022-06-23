@@ -1,69 +1,7 @@
 {
 	"name": "Quirky",
 	"inherit": "base",
-
-	"expressions":
-	[
-		{
-			"name": "cornerSmile",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Smile Open Full Face",
-					"max": 0.3
-				},
-
-				{
-					"id": "Mouth Smile Simple Left",
-					"max": 1.2
-				},
-
-				{
-					"id": "Eyes Squint",
-					"max": 0.15
-				},
-			]
-		},
-
-		{
-			"name": "curious",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Curious1",
-					"max": 0.5
-				}
-			]
-		},
-
-		{
-			"name": "desire",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Desire",
-					"max": 0.2
-				}
-			]
-		},
-
-		{
-			"name": "flirting",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Flirting",
-					"max": 0.5
-				}
-			]
-		},
-	]
+	"defaultHappiness": 0.3,
+	"defaultPlayfulness": 1,
+	"defaultAnger": 0,
 }

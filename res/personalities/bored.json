@@ -1,7 +1,9 @@
 {
 	"name": "Bored",
 	"inherit": "standard",
-	"maxHappiness": 0.0,
+	"defaultHappiness": 0,
+	"defaultPlayfulness": 0,
+	"defaultAnger": 0,
 	"maxExcitedExpression": 0.1,
 
 	"lookAboveMaxWeight": 0,

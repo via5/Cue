@@ -445,13 +445,29 @@ Controls what characters are looking at.
 3.5 Mood
 --------
 
+- DefaultHappiness (float)
+  happiness mood will usually be set to this value
+
+- DefaultPlayfulness (float)
+  playful mood will usually be set to this value
+
+- DefaultAnger (float)
+  angry mood will usually be set to this value
+
+- MaxExcitedExpression (float)
+  excited expression intensity will never rise above this value
+
+
+3.5.1 Anger management
+----------------------
+
 - AvoidGazeAnger (float)
   anger value when the character is currently looking at something it doesn't
   like; see AvoidGazePlayerWeight and AvoidGazeOthersWeight
 
 - AngerWhenPlayerInteracts (float)
   anger value when the player is interacting with this character; as soon as
-  interaction starts, anger is set to this value and hapiness to 0
+  interaction starts, anger is set to this value and happiness to 0
 
   if this is 0, none of the stuff below applies
 
@@ -485,12 +501,6 @@ Controls what characters are looking at.
   - a value of 1.0 would set happiness to max when excitement is at max
   - a value of 2.0 would set happiness to max when excitement is halfway
     between AngerMaxExcitementForHappiness and max
-
-- MaxHappiness (float)
-  happiness will never rise above this value
-
-- MaxExcitedExpression (float)
-  excited expression intensity will never rise above this value
 
 
 3.6 Voices

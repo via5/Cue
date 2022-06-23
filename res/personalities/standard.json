@@ -1,32 +1,4 @@
 {
 	"name": "Standard",
 	"inherit": "base",
-
-	"expressions":
-	[
-		{
-			"name": "smile",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Smile Open Full Face",
-					"max": 0.7
-				}
-			]
-		},
-
-		{
-			"name": "eliseSmile",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Elise Smile (REN)"
-				}
-			]
-		},
-	]
 }

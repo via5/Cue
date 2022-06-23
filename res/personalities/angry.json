@@ -1,68 +1,7 @@
 {
 	"name": "Angry",
 	"inherit": "base",
-	"maxHappiness": 0.4,
-
-	"expressions":
-	[
-
-		{
-			"name": "happyAngry",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Angry",
-					"max": 0.3
-				}
-			]
-		},
-
-		{
-			"name": "happyFrown",
-			"moods": "happy",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Brow Down"
-				}
-			]
-		},
-
-		{
-			"name": "happySquint",
-			"moods": "happy",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Squint"
-				},
-
-				{
-					"id": "Nose Wrinkle"
-				}
-			]
-		},
-
-		{
-			"name": "happyMouthFrown",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Mouth Corner Up-Down",
-					"max": -0.5
-				},
-
-				{
-					"id": "Lip Top Up",
-					"max": 0.3
-				}
-			]
-		},
-	]
+	"defaultHappiness": 0,
+	"defaultPlayfulness": 0,
+	"defaultAnger": 1,
 }

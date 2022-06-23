@@ -1,5 +1,7 @@
 {
 	"name": "Shy",
 	"inherit": "standard",
-	"maxHappiness": 0.3
+	"defaultHappiness": 0.3,
+	"defaultPlayfulness": 0,
+	"defaultAnger": 0,
 }

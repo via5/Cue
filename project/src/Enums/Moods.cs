@@ -8,18 +8,20 @@ namespace Cue
 	{
 		public const int None = -1;
 		public const int Happy = 0;
-		public const int Excited = 1;
-		public const int Angry = 2;
-		public const int Tired = 3;
-		public const int Orgasm = 4;
+		public const int Playful = 1;
+		public const int Excited = 2;
+		public const int Angry = 3;
+		public const int Tired = 4;
+		public const int Orgasm = 5;
 
-		public const int Count = 5;
-		public int GetCount() { return 5; }
+		public const int Count = 6;
+		public int GetCount() { return 6; }
 
 
 		private static string[] names_ = new string[]
 		{
 			"happy",
+			"playful",
 			"excited",
 			"angry",
 			"tired",

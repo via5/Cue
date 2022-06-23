@@ -89,36 +89,38 @@ namespace Cue
 		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(64);
 		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(65);
 		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(66);
-		public static readonly FloatIndex MaxHappiness = new FloatIndex(67);
-		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(68);
-		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(69);
-		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(70);
-		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(71);
-		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(72);
-		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(73);
-		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(74);
-		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(75);
-		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(76);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(77);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(78);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(79);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(80);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(81);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(82);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(83);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(84);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(85);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(86);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(87);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(88);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(89);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(90);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(91);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(92);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(93);
+		public static readonly FloatIndex DefaultHappiness = new FloatIndex(67);
+		public static readonly FloatIndex DefaultAnger = new FloatIndex(68);
+		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(69);
+		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(70);
+		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(71);
+		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(72);
+		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(73);
+		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(74);
+		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(75);
+		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(76);
+		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(77);
+		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(78);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(79);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(80);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(81);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(82);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(83);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(84);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(85);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(86);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(87);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(88);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(89);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(90);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(91);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(92);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(93);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(94);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(95);
 
-		public const int FloatCount = 94;
-		public override int GetFloatCount() { return 94; }
+		public const int FloatCount = 96;
+		public override int GetFloatCount() { return 96; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -305,7 +307,9 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
-			"maxHappiness",
+			"defaultHappiness",
+			"defaultAnger",
+			"defaultPlayfulness",
 			"maxExcitedExpression",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
@@ -509,7 +513,9 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
-			"maxHappiness",
+			"defaultHappiness",
+			"defaultAnger",
+			"defaultPlayfulness",
 			"maxExcitedExpression",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
