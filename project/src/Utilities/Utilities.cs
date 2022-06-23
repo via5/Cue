@@ -3,6 +3,61 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	public class DebugLines
+	{
+		private List<string[]> debug_ = null;
+		private List<string> debugLines_ = null;
+		private int i_ = 0;
+
+		public void Clear()
+		{
+			i_ = 0;
+		}
+
+		public void Add(string a, string b)
+		{
+			if (debug_ == null)
+				debug_ = new List<string[]>();
+
+			if (debugLines_ == null)
+				debugLines_ = new List<string>();
+
+			if (i_ >= debug_.Count)
+				debug_.Add(new string[2]);
+
+			debug_[i_][0] = a;
+			debug_[i_][1] = b;
+
+			++i_;
+		}
+
+		public string[] MakeArray()
+		{
+			MakeDebugLines();
+			return debugLines_.ToArray();
+		}
+
+		private void MakeDebugLines()
+		{
+			int longest = 0;
+			for (int i = 0; i < i_; ++i)
+				longest = Math.Max(longest, debug_[i][0].Length);
+
+			for (int i = 0; i < i_; ++i)
+			{
+				string s = debug_[i][0].PadRight(longest, ' ') + "  " + debug_[i][1];
+				if (i >= debugLines_.Count)
+					debugLines_.Add(s);
+				else
+					debugLines_[i] = s;
+			}
+
+			for (int i = i_; i < debugLines_.Count; ++i)
+				debugLines_[i] = "";
+		}
+	}
+
+
 	static class Bits
 	{
 		public static bool IsSet(int flag, int bits)

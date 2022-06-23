@@ -277,7 +277,6 @@ namespace Cue
 
 					if (elapsed_ >= ps.Get(PS.OrgasmTime))
 					{
-						person_.Voice.StopOrgasm();
 						person_.Animator.StopType(Animations.Orgasm);
 
 						tiredness_.UpRate = ps.Get(PS.TirednessRateDuringPostOrgasm);
@@ -434,7 +433,6 @@ namespace Cue
 		private void DoOrgasm(bool syncOthers = true)
 		{
 			person_.Log.Info("orgasm");
-			person_.Voice.StartOrgasm();
 
 			person_.Animator.PlayType(Animations.Orgasm);
 

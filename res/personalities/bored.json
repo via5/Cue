@@ -59,11 +59,14 @@
 
 	"voice":
 	{
-		"provider": "vammoan",
-		"options":
+		"provider":
 		{
-			"breathingMax": 1,
-			"orgasmAction": "Voice intensity 0",
+			"name": "vammoan",
+			"options":
+			{
+				"breathingMax": 1,
+				"orgasmAction": "Voice intensity 0",
+			}
 		}
 	}
 }

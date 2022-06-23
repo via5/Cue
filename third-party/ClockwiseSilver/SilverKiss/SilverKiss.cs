@@ -89,6 +89,13 @@ namespace ClockwiseSilver {
 				RegisterBool(isActive);
 				var toggle = CreateToggle(isActive, false);
 				toggle.label = "Active";
+
+				kissActive = new JSONStorableBool("Is Kissing", false);
+				RegisterBool(kissActive);
+				toggle = CreateToggle(kissActive, false);
+				toggle.label = "Running";
+				toggle.toggle.interactable = false;
+
 				kissObjectChooser = new JSONStorableStringChooser("atom", SuperController.singleton.GetAtomUIDs(), null, "Kiss Atom", SyncAtom);
 				RegisterStringChooser(kissObjectChooser);
 				SyncAtomChocies();
@@ -219,9 +226,6 @@ namespace ClockwiseSilver {
 				tongueLengthJSON = new JSONStorableFloat("Tongue Length", 0.15f, 0f, 1f, false);
 				RegisterFloat(tongueLengthJSON);
 				CreateSlider(tongueLengthJSON, false);
-
-				kissActive = new JSONStorableBool("Is Kissing", false);
-				RegisterBool(kissActive);
 
 				var btn = CreateButton("Reset Morphs", false);
                 btn.button.onClick.AddListener(() => { ZeroMorphs(); });
@@ -387,7 +391,7 @@ namespace ClockwiseSilver {
 
 			//Restore gaze control
 
-			giveUpTimer = 5.0f;
+			giveUpTimer = 4.0f;
 			kissStopping = true;
 			kissStoppingDoMove = true;
 			SetMorphTargets();
