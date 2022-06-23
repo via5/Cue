@@ -110,9 +110,9 @@
     <Compile Include="src\Animation\Builtin\Finger.cs" />
     <Compile Include="src\Animation\Builtin\Penetrated.cs" />
     <Compile Include="src\Animation\Builtin\Player.cs" />
-    <Compile Include="src\Animation\Builtin\Sex.cs" />
     <Compile Include="src\Animation\Builtin\Smoke.cs" />
     <Compile Include="src\Animation\Builtin\Suck.cs" />
+    <Compile Include="src\Animation\Builtin\Thrust.cs" />
     <Compile Include="src\Animation\BVH\BVH.cs" />
     <Compile Include="src\Animation\BVH\BVHFile.cs" />
     <Compile Include="src\Animation\BVH\BVHPlayer.cs" />

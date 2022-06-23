@@ -18,9 +18,9 @@ project\src\Animation\Animator.cs
 project\src\Animation\Builtin\Finger.cs
 project\src\Animation\Builtin\Penetrated.cs
 project\src\Animation\Builtin\Player.cs
-project\src\Animation\Builtin\Sex.cs
 project\src\Animation\Builtin\Smoke.cs
 project\src\Animation\Builtin\Suck.cs
+project\src\Animation\Builtin\Thrust.cs
 project\src\Animation\BVH\BVH.cs
 project\src\Animation\BVH\BVHFile.cs
 project\src\Animation\BVH\BVHPlayer.cs
