@@ -65,7 +65,8 @@
 		},
 		"orgasmState":
 		{
-			"orgasmAction": "Voice intensity 0"
+			"voice": "moaning",
+			"moaningIntensity": 0.3
 		}
 	}
 }
