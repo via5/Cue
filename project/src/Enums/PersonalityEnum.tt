@@ -101,6 +101,11 @@ V.Float("OrgasmExpressionRangeMax"),
 V.Float("OrgasmFirstExpressionTime"),
 V.Float("OrgasmSyncMinExcitement"),
 
+V.Float("SlapMinExpressionChange"),
+V.Float("SlapMaxExpressionChange"),
+V.Float("SlapMinTime"),
+V.Float("SlapMaxTime"),
+
 V.Float("MaxSweat"),
 V.Float("MaxFlush"),
 V.Float("TemperatureExcitementMax", new Limit(0, 1)),

@@ -559,6 +559,11 @@
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 
+	"slapMinExpressionChange": 0,
+	"slapMaxExpressionChange": 0.4,
+	"slapMinTime": 0.15,
+	"slapMaxTime": 0.35,
+
 	"sensitivities":
 	[
 		{

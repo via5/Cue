@@ -17,6 +17,12 @@ namespace Cue
 		private bool enabled_ = true;
 		private bool isOrgasming_ = false;
 
+		private float slapTime_ = 0;
+		private float slapElapsed_ = 0;
+		private float slapAmount_ = 0;
+		private bool slapUp_ = false;
+		private IEasing slapEasing_ = new SinusoidalEasing();
+
 		public ExpressionManager(Person p)
 		{
 			person_ = p;
@@ -73,8 +79,60 @@ namespace Cue
 			lastPersonality_ = person_.Personality;
 		}
 
+		public void Slapped(float speed)
+		{
+			if (slapTime_ != 0)
+				return;
+
+			slapElapsed_ = 0;
+			slapUp_ = true;
+
+			slapTime_ = U.RandomNormal(
+				person_.Personality.Get(PS.SlapMinTime),
+				person_.Personality.Get(PS.SlapMaxTime));
+
+			slapAmount_ = U.RandomFloat(
+				person_.Personality.Get(PS.SlapMinExpressionChange),
+				person_.Personality.Get(PS.SlapMaxExpressionChange));
+		}
+
+		private float GetSlap()
+		{
+			float slap = 0;
+
+			if (slapTime_ > 0)
+			{
+				if (slapUp_)
+				{
+					slap = slapElapsed_ / slapTime_;
+					if (slap >= 1)
+					{
+						slap = 1;
+						slapElapsed_ = 0;
+						slapUp_ = false;
+					}
+				}
+				else
+				{
+					slap = slapElapsed_ / slapTime_;
+					if (slap >= 1)
+					{
+						slap = 1;
+						slapTime_ = 0;
+					}
+
+					slap = 1 - slap;
+				}
+			}
+
+			return slapEasing_.Magnitude(slap);
+		}
+
 		public void FixedUpdate(float s)
 		{
+			if (slapTime_ > 0)
+				slapElapsed_ += s;
+
 			if (lastPersonality_ != person_.Personality)
 				Init();
 
@@ -116,9 +174,17 @@ namespace Cue
 
 			int finished = 0;
 			int activeCount = 0;
+			float slap = GetSlap();
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
+				exps_[i].Add = 0;
+
+				if (exps_[i].Active)
+					exps_[i].Add = slap * slapAmount_;
+				else
+					exps_[i].Add = 0;
+
 				exps_[i].FixedUpdate(s);
 
 				if (exps_[i].Active)

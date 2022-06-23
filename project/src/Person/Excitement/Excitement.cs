@@ -8,6 +8,7 @@ namespace Cue
 		protected readonly Person person_;
 		private int enabledForOthers_ = 0;
 		private int enabledForPlayer_ = 0;
+		private int enabledForExternal_ = 0;
 
 		protected ExcitementSource(Person p)
 		{
@@ -36,23 +37,27 @@ namespace Cue
 
 		public bool EnabledForExternal
 		{
-			get { return false; }
+			get { return (enabledForExternal_ > 0); }
 		}
 
 		public void AddEnabledFor(Person p)
 		{
-			if (p == null || !p.IsPlayer)
-				AddEnabledForOthers();
-			else
+			if (p == null)
+				AddEnabledForExternal();
+			else if (p.IsPlayer)
 				AddEnabledForPlayer();
+			else
+				AddEnabledForOthers();
 		}
 
 		public void RemoveEnabledFor(Person p)
 		{
-			if (p == null || !p.IsPlayer)
-				RemoveEnabledForOthers();
-			else
+			if (p == null)
+				RemoveEnabledForExternal();
+			else if (p.IsPlayer)
 				RemoveEnabledForPlayer();
+			else
+				RemoveEnabledForOthers();
 		}
 
 		public void ForceEnabledForOthers()
@@ -77,11 +82,6 @@ namespace Cue
 			enabledForOthers_ = Math.Max(enabledForOthers_ - 1, 0);
 		}
 
-		private void ClearEnabledForOthers()
-		{
-			enabledForOthers_ = 0;
-		}
-
 		private void AddEnabledForPlayer()
 		{
 			++enabledForPlayer_;
@@ -93,9 +93,15 @@ namespace Cue
 			enabledForPlayer_ = Math.Max(enabledForPlayer_ - 1, 0);
 		}
 
-		private void ClearEnabledForPlayer()
+		private void AddEnabledForExternal()
 		{
-			enabledForPlayer_ = 0;
+			++enabledForExternal_;
+		}
+
+		private void RemoveEnabledForExternal()
+		{
+			Cue.Assert(enabledForExternal_ > 0);
+			enabledForExternal_ = Math.Max(enabledForExternal_ - 1, 0);
 		}
 
 

@@ -21,6 +21,7 @@
 		private float speed_ = 0;
 		private float min_ = 0;
 		private float max_ = 1;
+		private float add_ = 0;
 		private int mainMood_ = Moods.None;
 
 		private Duration holdTime_;
@@ -59,6 +60,11 @@
 		public float Speed
 		{
 			get { return speed_; }
+		}
+
+		public float Add
+		{
+			set { add_ = value; }
 		}
 
 		public void Set(
@@ -113,6 +119,7 @@
 			e_.SetAuto(0.1f, MinRandomTime(), MaxRandomTime());
 			e_.SetTarget(target, time);
 			state_ = RampUpState;
+			add_ = 0;
 		}
 
 		public void Deactivate()
@@ -124,6 +131,7 @@
 
 		public void FixedUpdate(float s)
 		{
+			e_.Add = add_;
 			e_.FixedUpdate(s);
 
 			switch (state_)

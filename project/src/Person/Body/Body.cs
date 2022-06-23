@@ -117,6 +117,11 @@ namespace Cue
 			return zones_.Get(i);
 		}
 
+		public void Slapped(float speed)
+		{
+			person_.Expression.Slapped(speed);
+		}
+
 		public void Update(float s)
 		{
 			for (int i = 0; i < all_.Length; ++i)

@@ -101,26 +101,30 @@ namespace Cue
 		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(76);
 		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(77);
 		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(78);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(79);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(80);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(81);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(82);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(83);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(84);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(85);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(86);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(87);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(88);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(89);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(90);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(91);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(92);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(93);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(94);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(95);
+		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(79);
+		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(80);
+		public static readonly FloatIndex SlapMinTime = new FloatIndex(81);
+		public static readonly FloatIndex SlapMaxTime = new FloatIndex(82);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(83);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(84);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(85);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(86);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(87);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(88);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(89);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(90);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(91);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(92);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(93);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(94);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(95);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(96);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(97);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(98);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(99);
 
-		public const int FloatCount = 96;
-		public override int GetFloatCount() { return 96; }
+		public const int FloatCount = 100;
+		public override int GetFloatCount() { return 100; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -319,6 +323,10 @@ namespace Cue
 			"orgasmExpressionRangeMax",
 			"orgasmFirstExpressionTime",
 			"orgasmSyncMinExcitement",
+			"slapMinExpressionChange",
+			"slapMaxExpressionChange",
+			"slapMinTime",
+			"slapMaxTime",
 			"maxSweat",
 			"maxFlush",
 			"temperatureExcitementMax",
@@ -525,6 +533,10 @@ namespace Cue
 			"orgasmExpressionRangeMax",
 			"orgasmFirstExpressionTime",
 			"orgasmSyncMinExcitement",
+			"slapMinExpressionChange",
+			"slapMaxExpressionChange",
+			"slapMinTime",
+			"slapMaxTime",
 			"maxSweat",
 			"maxFlush",
 			"temperatureExcitementMax",

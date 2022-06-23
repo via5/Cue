@@ -8,12 +8,16 @@ namespace Cue.Proc
 
 		ISync Clone();
 
+		string Name { get; }
 		int State{ get; }
 		int UpdateResult { get; }
 
 		bool Finished { get; }
 		float Magnitude { get; }
 		float Energy { set; }
+
+		bool Slaps { get; set; }
+		Person[] SlapTargets { get; set; }
 
 		void RequestStop();
 		void Reset();
@@ -43,6 +47,13 @@ namespace Cue.Proc
 		private int nextState_ = NoState;
 		private int updateResult_ = Working;
 
+		private bool slaps_ = false;
+		private Person[] slapTargets_ = null;
+
+		protected BasicSync(bool slaps)
+		{
+			slaps_ = slaps;
+		}
 
 		public static ISync Create(JSONClass o)
 		{
@@ -74,6 +85,8 @@ namespace Cue.Proc
 
 		public abstract ISync Clone();
 
+		public abstract string Name { get; }
+
 		public ITarget Target
 		{
 			get { return target_; }
@@ -99,6 +112,18 @@ namespace Cue.Proc
 		public abstract float Energy { set; }
 		public abstract bool Finished { get; }
 
+		public bool Slaps
+		{
+			get { return slaps_; }
+			set { slaps_ = value; }
+		}
+
+		public Person[] SlapTargets
+		{
+			get { return slapTargets_; }
+			set { slapTargets_ = value; }
+		}
+
 		public virtual void RequestStop()
 		{
 			// no-op
@@ -111,7 +136,24 @@ namespace Cue.Proc
 			updateResult_ = Working;
 		}
 
-		public abstract string ToDetailedString();
+		public virtual string ToDetailedString()
+		{
+			string s = Name;
+
+			if (slaps_)
+				s += " (slaps)";
+
+			var ss = DoToDetailedString();
+			if (ss != "")
+				s += "\n" + ss;
+
+			return s;
+		}
+
+		protected virtual string DoToDetailedString()
+		{
+			return "";
+		}
 
 		public int FixedUpdate(float s)
 		{
@@ -146,33 +188,38 @@ namespace Cue.Proc
 		public override float Energy { set { } }
 		public override bool Finished { get { return true; } }
 
+		public NoSync(bool slaps = false)
+			: base(slaps)
+		{
+		}
+
 		public new static NoSync Create(JSONClass o)
 		{
-			return new NoSync();
+			return new NoSync(false);
 		}
+
+		public override string Name { get { return "nosync"; } }
 
 		public override ISync Clone()
 		{
-			return new NoSync();
+			return new NoSync(Slaps);
 		}
 
 		protected override int DoFixedUpdate(float s)
 		{
 			return SyncFinished;
 		}
-
-		public override string ToDetailedString()
-		{
-			return "nosync";
-		}
 	}
 
 
 	public class ParentTargetSync : BasicSync
 	{
-		public ParentTargetSync()
+		public ParentTargetSync(bool slaps=false)
+			: base(slaps)
 		{
 		}
+
+		public override string Name { get { return "parent"; } }
 
 		public override int State
 		{
@@ -196,22 +243,17 @@ namespace Cue.Proc
 
 		public new static ParentTargetSync Create(JSONClass o)
 		{
-			return new ParentTargetSync();
+			return new ParentTargetSync(false);
 		}
 
 		public override ISync Clone()
 		{
-			return new ParentTargetSync();
+			return new ParentTargetSync(Slaps);
 		}
 
 		protected override int DoFixedUpdate(float s)
 		{
 			return Target?.Parent?.Sync.UpdateResult ?? SyncFinished;
-		}
-
-		public override string ToDetailedString()
-		{
-			return "parent";
 		}
 	}
 
@@ -223,9 +265,12 @@ namespace Cue.Proc
 		private float mag_ = 0;
 
 		public SyncOther(ISync sync)
+			: base(sync.Slaps)
 		{
 			other_ = sync as BasicSync;
 		}
+
+		public override string Name { get { return "syncother"; } }
 
 		public override int State
 		{
@@ -280,9 +325,9 @@ namespace Cue.Proc
 			}
 		}
 
-		public override string ToDetailedString()
+		protected override string DoToDetailedString()
 		{
-			return $"sync other {other_}";
+			return $"{other_}";
 		}
 	}
 
@@ -299,10 +344,20 @@ namespace Cue.Proc
 		private IEasing easing_ = new SinusoidalEasing();
 
 		public ElapsedSync(float duration, int flags = NoFlags)
+			: base(false)
 		{
 			duration_ = duration;
 			flags_ = flags;
 		}
+
+		protected ElapsedSync(float duration, int flags, bool slaps)
+			: base(slaps)
+		{
+			duration_ = duration;
+			flags_ = flags;
+		}
+
+		public override string Name { get { return "elapsed"; } }
 
 		public override float Magnitude
 		{
@@ -329,7 +384,7 @@ namespace Cue.Proc
 
 		public override ISync Clone()
 		{
-			return new ElapsedSync(duration_, flags_);
+			return new ElapsedSync(duration_, flags_, Slaps);
 		}
 
 		public override void Reset()
@@ -358,9 +413,9 @@ namespace Cue.Proc
 			return Working;
 		}
 
-		public override string ToDetailedString()
+		protected override string DoToDetailedString()
 		{
-			return $"elapsed\n{elapsed_}/{duration_}";
+			return $"{elapsed_}/{duration_}";
 		}
 	}
 
@@ -368,6 +423,9 @@ namespace Cue.Proc
 
 	public class DurationSync : BasicSync
 	{
+		private const float SlapMinOffset = 0;
+		private const float SlapMaxOffset = 0.5f;
+
 		public const int NoFlags = 0x00;
 		public const int Loop = 0x01;
 		public const int ResetBetween = 0x02;
@@ -385,9 +443,13 @@ namespace Cue.Proc
 		private float energy_ = 0;
 		private bool needsRestart_ = false;
 
+		private float slapOffset_ = 0;
+		private bool slapped_ = false;
+
 		public DurationSync(
 			Duration fwdDuration, Duration bwdDuration,
-			Duration fwdDelay, Duration bwdDelay, int flags)
+			Duration fwdDelay, Duration bwdDelay, int flags, bool slaps=false)
+				: base(slaps)
 		{
 			fwdDuration_ = fwdDuration;
 			bwdDuration_ = bwdDuration;
@@ -425,6 +487,8 @@ namespace Cue.Proc
 			return new DurationSync(fwd, bwd, fwdD, bwdD, flags);
 		}
 
+		public override string Name { get { return "sliding"; } }
+
 		public override ISync Clone()
 		{
 			return new DurationSync(
@@ -432,7 +496,7 @@ namespace Cue.Proc
 				bwdDuration_?.Clone(),
 				fwdDelay_?.Clone(),
 				bwdDelay_?.Clone(),
-				flags_);
+				flags_, Slaps);
 		}
 
 		public override bool Finished
@@ -512,6 +576,7 @@ namespace Cue.Proc
 			fwdDelay_?.Reset(energy_);
 			bwdDelay_?.Reset(energy_);
 			needsRestart_ = false;
+			slapOffset_ = U.RandomFloat(SlapMinOffset, SlapMaxOffset);
 		}
 
 		public override void RequestStop()
@@ -551,10 +616,9 @@ namespace Cue.Proc
 			}
 		}
 
-		public override string ToDetailedString()
+		protected override string DoToDetailedString()
 		{
 			return
-				$"sliding\n" +
 				$"fdur={fwdDuration_?.ToLiveString()}\n" +
 				$"bdur={bwdDuration_?.ToLiveString()}\n" +
 				$"fdel={fwdDelay_?.ToLiveString()}\n" +
@@ -573,8 +637,25 @@ namespace Cue.Proc
 
 			fwdDuration_.Update(s, energy_);
 
+			if (!slapped_ && fwdDuration_.Remaining < slapOffset_)
+			{
+				slapped_ = true;
+
+				if (Slaps)
+				{
+					for (int i = 0; i < SlapTargets.Length; ++i)
+					{
+						if (SlapTargets[i] != null)
+							SlapTargets[i].Body.Slapped(fwdDuration_.Current);
+					}
+				}
+			}
+
 			if (fwdDuration_.Finished)
 			{
+				slapped_ = false;
+				slapOffset_ = U.RandomFloat(SlapMinOffset, SlapMaxOffset);
+
 				if (bwdDuration_ == null)
 					needsRestart_ = true;
 

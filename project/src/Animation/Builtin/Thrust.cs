@@ -50,6 +50,7 @@ namespace Cue.Proc
 				null, null, null,
 				DurationSync.Loop | DurationSync.ResetBetween);
 
+			RootGroup.Sync.Slaps = true;
 
 			RootGroup.AddTarget(new Force(
 				"hipForce", Force.AbsoluteForce, BP.Hips,
@@ -103,6 +104,7 @@ namespace Cue.Proc
 			receiver_ = cx.ps as Person;
 
 			SetEnergySource(receiver_);
+			RootGroup.Sync.SlapTargets = new Person[] { p, receiver_ };
 
 			hipForce_ = FindTarget("hipForce") as Force;
 			if (hipForce_ == null)

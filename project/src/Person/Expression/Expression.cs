@@ -53,6 +53,7 @@
 		private IEasing easing_ = new SinusoidalEasing();
 		private float value_ = 0;
 		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
+		private float add_ = 0;
 
 		public Expression(string name, int mood, Config c, MorphGroup g)
 				: this(name, new int[] { mood }, c, g)
@@ -144,6 +145,11 @@
 			get { return config_.maxOnly; }
 		}
 
+		public float Add
+		{
+			set { add_ = value; }
+		}
+
 		public void SetAuto(float range, float minTime, float maxTime)
 		{
 			auto_.range = range;
@@ -212,11 +218,15 @@
 			{
 				target_.elapsed += s;
 
+				float targetValue = target_.value;
+				if (targetValue > 0)
+					targetValue += add_;
+
 				float p = U.Clamp(target_.elapsed / target_.time, 0, 1);
 				float t = easing_.Magnitude(p);
-				float v = U.Lerp(target_.start, target_.value, t);
+				float v = U.Lerp(target_.start, targetValue, t);
 
-				g_.Value = v;
+				g_.Value = v ;
 
 				if (!target_.auto)
 					value_ = v;
