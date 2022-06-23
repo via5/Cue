@@ -89,7 +89,7 @@ namespace Cue
 			time_ = timeRange_.RandomFloat(v_.MaxIntensity);
 			inPause_ = true;
 
-			v_.Provider.SetIntensity(0);
+			v_.Provider.SetSilent();
 		}
 
 		protected override void DoUpdate(float s)
@@ -100,7 +100,7 @@ namespace Cue
 			{
 				if (elapsed_ >= time_)
 				{
-					v_.Provider.SetIntensity(1.0f);
+					v_.Provider.SetMoaning(1.0f);
 					inPause_ = false;
 				}
 			}
@@ -124,7 +124,7 @@ namespace Cue
 			lastRng_ = rng_.RandomFloat(0, 1, v_.MaxIntensity);
 			if (lastRng_ >= chance_)
 			{
-				SetLastState($"rng failed, {lastRng_} >= {chance_}");
+				SetLastState($"rng failed, {lastRng_:0.00} >= {chance_:0.00}");
 				return CannotRun;
 			}
 
@@ -136,7 +136,7 @@ namespace Cue
 		{
 			return
 				$"minEx={minExcitement_:0.00} timeRange={timeRange_} " +
-				$"chance={chance_};rng={rng_}";
+				$"chance={chance_:0.00};rng={rng_}";
 		}
 
 		public string LiveToString()

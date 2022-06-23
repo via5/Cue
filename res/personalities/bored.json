@@ -59,14 +59,13 @@
 
 	"voice":
 	{
-		"provider":
+		"normalState":
 		{
-			"name": "vammoan",
-			"options":
-			{
-				"breathingRange": 1,
-				"orgasmAction": "Voice intensity 0",
-			}
+			"breathingRange": 1
+		},
+		"orgasmState":
+		{
+			"orgasmAction": "Voice intensity 0"
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace Cue
 		private bool kissEnabled_ = false;
 		private float kissVoiceChance_ = 0;
 		private KissEvent e_ = null;
-
+		private bool leading_ = false;
 
 		private VoiceStateKiss()
 		{
@@ -56,6 +56,16 @@ namespace Cue
 		{
 		}
 
+		protected override void DoStart()
+		{
+			leading_ = e_.Leading;
+
+			if (leading_)
+				v_.Provider.SetKissing();
+			else
+				v_.Provider.SetSilent();
+		}
+
 		protected override void DoUpdate(float s)
 		{
 			if (!IsKissing())
@@ -95,6 +105,10 @@ namespace Cue
 
 		protected override void DoDebug(DebugLines debug)
 		{
+			if (leading_)
+				debug.Add("audio", "yes, leading");
+			else
+				debug.Add("audio", "no, not leading");
 		}
 	}
 }

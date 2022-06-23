@@ -46,6 +46,7 @@ namespace Cue
 		private string lastResult_ = "";
 		private BodyPartLock[] locks_ = null;
 		private Person target_ = null;
+		private bool leading_ = false;
 		private bool wasGrabbed_ = false;
 		private KissEventData d_ = null;
 
@@ -108,6 +109,11 @@ namespace Cue
 		public bool Active
 		{
 			get { return target_ != null; }
+		}
+
+		public bool Leading
+		{
+			get { return leading_; }
 		}
 
 		public Person Target
@@ -199,6 +205,8 @@ namespace Cue
 					Next();
 					if (!TryStartWithAnyone())
 						elapsed_ = 0;
+
+					//Log.Info(lastResult_);
 				}
 			}
 
@@ -227,6 +235,7 @@ namespace Cue
 			SetExcitement(false);
 			person_.Animator.StopType(Animations.Kiss);
 			target_ = null;
+			leading_ = false;
 		}
 
 		private void Next()
@@ -270,7 +279,10 @@ namespace Cue
 
 				var targetLips = target.Body.Get(BP.Lips);
 				if (targetLips == null)
+				{
+					lastResult_ = "no lips";
 					return false;
+				}
 
 				var d = Vector3.Distance(srcLips, targetLips.Position);
 
@@ -286,7 +298,10 @@ namespace Cue
 					foundClose = true;
 
 					if (TryStartWith(target))
+					{
+						leading_ = true;
 						return true;
+					}
 
 					Unlock();
 				}
@@ -332,6 +347,7 @@ namespace Cue
 			}
 
 			target_ = target;
+			leading_ = false;
 			SetExcitement(true);
 
 			return true;

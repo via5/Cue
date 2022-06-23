@@ -63,9 +63,12 @@ namespace Cue
 		IVoice Clone();
 
 		void Update(float s);
-		void StartOrgasm();
-		void StopOrgasm();
-		void SetIntensity(float v);
+
+		void SetMoaning(float v);
+		void SetBreathing();
+		void SetSilent();
+		void SetOrgasm();
+		void SetKissing();
 
 		void Debug(DebugLines debug);
 

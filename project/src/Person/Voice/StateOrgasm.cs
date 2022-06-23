@@ -42,16 +42,13 @@ namespace Cue
 
 		protected override void DoStart()
 		{
-			v_.Provider.StartOrgasm();
+			v_.Provider.SetOrgasm();
 		}
 
 		protected override void DoUpdate(float s)
 		{
 			if (v_.Person.Mood.State != Mood.OrgasmState)
-			{
-				v_.Provider.StopOrgasm();
 				SetDone();
-			}
 		}
 
 		public override int CanRun()

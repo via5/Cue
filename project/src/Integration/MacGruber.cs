@@ -220,7 +220,29 @@ namespace Cue.MacGruber
 			}
 		}
 
-		public void StartOrgasm()
+		public void SetMoaning(float v)
+		{
+			p_.intensity.Value = v;
+			Apply();
+		}
+
+		public void SetBreathing()
+		{
+			SetMoaning(0);
+		}
+
+		public void SetSilent()
+		{
+			// todo
+		}
+
+		public void SetKissing()
+		{
+			// not supported
+			SetMoaning(0.2f);
+		}
+
+		public void SetOrgasm()
 		{
 			var ds = orgasmDataset_;
 
@@ -231,11 +253,6 @@ namespace Cue.MacGruber
 
 				p_.orgasmAction.Fire();
 			}
-		}
-
-		public void StopOrgasm()
-		{
-			// no-op
 		}
 
 		public void Debug(DebugLines debug)
@@ -321,12 +338,6 @@ namespace Cue.MacGruber
 					p_.lipsMorphMax.Value = 0;
 				}
 			}
-		}
-
-		public void SetIntensity(float v)
-		{
-			p_.intensity.Value = v;
-			Apply();
 		}
 
 		public string Warning

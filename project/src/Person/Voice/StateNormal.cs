@@ -6,7 +6,9 @@ namespace Cue
 	public class VoiceStateNormal : VoiceState
 	{
 		private const float DefaultBreathingIntensityCutoff = 0.6f;
+		private const float DefaultBreathingMax = 0.2f;
 
+		private float breathingRange_ = DefaultBreathingMax;
 		private float breathingIntensityCutoff_ = DefaultBreathingIntensityCutoff;
 
 		private float intensity_ = 0;
@@ -36,6 +38,13 @@ namespace Cue
 			if (vo.HasKey("normalState"))
 			{
 				var o = J.ReqObject(vo, "normalState");
+
+				if (o.HasKey("breathingRange"))
+				{
+					breathingRange_ = U.Clamp(
+						J.OptFloat(o, "breathingRange", DefaultBreathingMax),
+						0, 1);
+				}
 
 				if (o.HasKey("breathingIntensityCutoff"))
 				{
@@ -89,6 +98,7 @@ namespace Cue
 
 		private void CopyFrom(VoiceStateNormal o)
 		{
+			breathingRange_ = o.breathingRange_;
 			breathingIntensityCutoff_ = o.breathingIntensityCutoff_;
 			intensityWaitRange_ = o.intensityWaitRange_.Clone();
 			intensityTimeRange_ = o.intensityTimeRange_.Clone();
@@ -154,16 +164,23 @@ namespace Cue
 
 				intensityTarget_ = intensityTargetRng_.RandomFloat(
 					0, v_.MaxIntensity, v_.MaxIntensity);
-
-				// 0 is disabled
-				if (intensityTarget_ <= 0)
-					intensityTarget_ = 0.01f;
 			}
 		}
 
 		private void SetIntensity()
 		{
-			v_.Provider.SetIntensity(intensity_);
+			if (intensity_ <= breathingRange_)
+			{
+				v_.Provider.SetBreathing();
+			}
+			else
+			{
+				float range = 1 - breathingRange_;
+				float v = intensity_ - breathingRange_;
+				float p = (v / range);
+
+				v_.Provider.SetMoaning(p);
+			}
 		}
 
 		protected override void DoDebug(DebugLines debug)
@@ -171,6 +188,7 @@ namespace Cue
 			debug.Add("intensity", $"{intensity_:0.00}->{intensityTarget_:0.00} rng={intensityTargetRng_}");
 			debug.Add("intensityWait", $"{intensityWait_:0.00}");
 			debug.Add("intensityTime", $"{intensityElapsed_:0.00}/{intensityTime_:0.00}");
+			debug.Add("breathingRange", $"{breathingRange_:0.00}");
 			debug.Add("breathingCutoff", $"{breathingIntensityCutoff_:0.00}");
 			debug.Add("intensityWait", $"{intensityWaitRange_}");
 			debug.Add("intensityTime", $"{intensityTimeRange_}");

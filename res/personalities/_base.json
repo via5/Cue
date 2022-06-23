@@ -7,13 +7,11 @@
 		"provider":
 		{
 			"name": "vammoan",
-			"options":
-			{
-				"breathingRange": 0.1,
-			}
+			"options": {}
 		},
 		"normalState":
 		{
+			"breathingRange": 0.1,
 			"breathingIntensityCutoff": 0.6,
 			"intensityWait":
 			{

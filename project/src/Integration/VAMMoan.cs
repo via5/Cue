@@ -9,7 +9,6 @@ namespace Cue.VamMoan
 		private const string PluginName = "VAMMoanPlugin.VAMMoan";
 		private const float VoiceCheckInterval = 2;
 		private const float ForceIntensityInterval = 1;
-		private const float DefaultBreathingMax = 0.2f;
 
 		struct Parameters
 		{
@@ -37,8 +36,7 @@ namespace Cue.VamMoan
 		private float forceIntensityElapsed_ = 0;
 		private string warning_ = "";
 		private float oldVolume_ = 0;
-		private float intensity_ = 0;
-		private float breathingRange_ = DefaultBreathingMax;
+		private Sys.Vam.ActionParameter currentAction_ = null;
 
 		private string voice_ = "";
 
@@ -54,16 +52,6 @@ namespace Cue.VamMoan
 
 		public void Load(JSONClass o, bool inherited)
 		{
-			if (o.HasKey("breathingRange"))
-			{
-				breathingRange_ = U.Clamp(
-					J.OptFloat(o, "breathingRange", DefaultBreathingMax),
-					0, 1);
-			}
-			else if (!inherited)
-			{
-				throw new LoadFailed("missing breathingRange");
-			}
 		}
 
 		public IVoice Clone()
@@ -75,7 +63,6 @@ namespace Cue.VamMoan
 
 		private void CopyFrom(Voice v)
 		{
-			breathingRange_ = v.breathingRange_;
 		}
 
 		public void Init(Person p)
@@ -171,25 +158,14 @@ namespace Cue.VamMoan
 			if (forceIntensityElapsed_ >= ForceIntensityInterval)
 			{
 				forceIntensityElapsed_ = 0;
-				UpdateIntensity(true);
+				Fire(true);
 			}
-		}
-
-		public void StartOrgasm()
-		{
-			Fire(p_.orgasm);
-		}
-
-		public void StopOrgasm()
-		{
-			// no-op
 		}
 
 		public void Debug(DebugLines debug)
 		{
 			debug.Add("provider", "vammoan");
 			debug.Add("intensitiesCount", $"{intensitiesCount_}");
-			debug.Add("breathingRange", $"{breathingRange_:0.00}");
 			debug.Add("lastAction", lastAction_);
 		}
 
@@ -211,7 +187,7 @@ namespace Cue.VamMoan
 					intensitiesCount_ = p_.intensities.Length;
 				}
 
-				UpdateIntensity(true);
+				Fire(true);
 				SetOptimalJaw();
 				voice_ = v;
 			}
@@ -285,54 +261,51 @@ namespace Cue.VamMoan
 			get { return warning_; }
 		}
 
-		public void SetIntensity(float v)
+		public void SetMoaning(float v)
 		{
-			intensity_ = v;
-			UpdateIntensity();
+			int index = (int)(v * intensitiesCount_);
+			index = U.Clamp(index, 0, intensitiesCount_ - 1);
+
+			currentAction_ = p_.intensities[index];
+			Fire();
 		}
 
-		private void UpdateIntensity(bool force = false)
+		public void SetBreathing()
 		{
-			if (intensitiesCount_ == 0)
+			currentAction_ = p_.breathing;
+			Fire();
+		}
+
+		public void SetSilent()
+		{
+			currentAction_ = p_.disabled;
+			Fire();
+		}
+
+		public void SetOrgasm()
+		{
+			currentAction_ = p_.orgasm;
+			Fire();
+		}
+
+		public void SetKissing()
+		{
+			currentAction_ = p_.kissing;
+			Fire();
+		}
+
+		private void Fire(bool force = false)
+		{
+			if (currentAction_ == null)
 				return;
 
-			//var k = person_.AI.GetEvent<KissEvent>();
-			//if (k != null && k.Active)
-			//{
-			//	Fire(p_.kissing, force);
-			//	return;
-			//}
-
-			if (intensity_ <= 0)
-			{
-				Fire(p_.disabled, force);
-			}
-			else if (intensity_ <= breathingRange_)
-			{
-				Fire(p_.breathing, force);
-			}
-			else
-			{
-				float range = 1 - breathingRange_;
-				float v = intensity_ - breathingRange_;
-				float p = (v / range);
-
-				int index = (int)(p * intensitiesCount_);
-				index = U.Clamp(index, 0, intensitiesCount_ - 1);
-
-				Fire(p_.intensities[index], force);
-			}
-		}
-
-		private void Fire(Sys.Vam.ActionParameter a, bool force = false)
-		{
-			var n = a.ParameterName;
+			var n = currentAction_.ParameterName;
 
 			if (lastAction_ != n || force)
 			{
 				lastAction_ = n;
 				log_.Info($"setting to '{n}'");
-				a.Fire();
+				currentAction_.Fire();
 			}
 		}
 
