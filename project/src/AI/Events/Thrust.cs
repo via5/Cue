@@ -51,6 +51,12 @@
 			}
 		}
 
+		public override void ForceStop()
+		{
+			if (Active)
+				Stop();
+		}
+
 		private bool Start()
 		{
 			// four cases:

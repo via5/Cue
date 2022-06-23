@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="src\Instrumentation.cs" />
     <Compile Include="src\Integration\ClothingManager.cs" />
+    <Compile Include="src\Integration\Embody.cs" />
     <Compile Include="src\Integration\Interfaces.cs" />
     <Compile Include="src\Integration\MacGruber.cs" />
     <Compile Include="src\Integration\Objects.cs" />

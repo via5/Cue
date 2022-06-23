@@ -109,6 +109,12 @@
 			}
 		}
 
+		public override void ForceStop()
+		{
+			if (Active)
+				Stop();
+		}
+
 		private void CheckBJ()
 		{
 			// todo, make it dynamic

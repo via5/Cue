@@ -11,6 +11,7 @@ namespace Cue
 		void OnPluginState(bool b);
 		void FixedUpdate(float s);
 		void Update(float s);
+		void ForceStop();
 		string[] Debug();
 	}
 
@@ -79,6 +80,11 @@ namespace Cue
 			person_ = p;
 			log_ = new Logger(Logger.Event, person_, "event." + Name);
 			DoInit();
+		}
+
+		public virtual void ForceStop()
+		{
+			// no-op
 		}
 
 		protected virtual void DoInit()

@@ -69,13 +69,13 @@
 		{
 			if (!active_.Check())
 			{
-				log_.Error("can't start, plugin not found");
+				log_.Verbose("can't start, plugin not found");
 				return false;
 			}
 
 			if (running_.Value)
 			{
-				log_.Error("can't start, already active");
+				log_.Verbose("can't start, already active");
 				return false;
 			}
 

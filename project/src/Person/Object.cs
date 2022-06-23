@@ -39,6 +39,7 @@ namespace Cue
 		protected readonly Logger log_;
 		private Sys.ObjectParameters ps_ = null;
 		private string[] traits_ = new string[0];
+		private IPossesser possesser_ = null;
 
 
 		public BasicObject(int index, Sys.IAtom atom, Sys.ObjectParameters ps = null)
@@ -47,6 +48,7 @@ namespace Cue
 			atom_ = atom;
 			log_ = new Logger(Logger.Object, this, "");
 			ps_ = ps;
+			possesser_ = new AcidBubbles.Embody(atom);
 		}
 
 		public string GetParameter(string key)
@@ -117,7 +119,16 @@ namespace Cue
 
 		public bool Possessed
 		{
-			get { return Atom.Possessed; }
+			get
+			{
+				if (Atom.Possessed)
+					return true;
+
+				if (possesser_ != null && possesser_.Possessed)
+					return true;
+
+				return false;
+			}
 		}
 
 		public bool HasTrait(string name)

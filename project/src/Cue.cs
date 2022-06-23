@@ -458,6 +458,12 @@ namespace Cue
 
 		private void SetPlayer(Person p)
 		{
+			if (p != null)
+			{
+				foreach (var e in p.AI.Events)
+					e.ForceStop();
+			}
+
 			player_ = p;
 		}
 

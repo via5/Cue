@@ -182,6 +182,12 @@ namespace Cue
 
 		private bool CanRun(ref string reason)
 		{
+			if (person_.Possessed)
+			{
+				if (reason != null) reason = "possessed";
+				return false;
+			}
+
 			var b = person_.Body;
 			var head = b.Get(BP.Head);
 			var lips = b.Get(BP.Lips);

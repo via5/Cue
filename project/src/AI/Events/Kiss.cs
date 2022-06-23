@@ -176,6 +176,12 @@ namespace Cue
 			}
 		}
 
+		public override void ForceStop()
+		{
+			if (Active)
+				Stop();
+		}
+
 		private void UpdateActive()
 		{
 			bool tooLong = false;

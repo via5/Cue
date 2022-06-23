@@ -44,6 +44,7 @@ project\src\Enums\PersonalityEnum.cs
 project\src\Enums\Sensitivities.cs
 project\src\Integration\ClothingManager.cs
 project\src\Integration\DiviningRod.cs
+project\src\Integration\Embody.cs
 project\src\Integration\Interfaces.cs
 project\src\Integration\MacGruber.cs
 project\src\Integration\Objects.cs

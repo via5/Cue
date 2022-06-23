@@ -135,4 +135,9 @@ namespace Cue
 		void Init();
 		void Update(float s);
 	}
+
+	public interface IPossesser
+	{
+		bool Possessed { get; }
+	}
 }
