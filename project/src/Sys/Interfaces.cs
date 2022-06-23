@@ -226,9 +226,9 @@ namespace Cue.Sys
 
 		private Atom externalAtom_;
 
-		public static TriggerInfo FromExternal(int type, Atom atom)
+		public static TriggerInfo FromExternal(int type, Atom atom, bool forced=false)
 		{
-			return new TriggerInfo(type, -1, BP.None, 1.0f, false, atom);
+			return new TriggerInfo(type, -1, BP.None, 1.0f, forced, atom);
 		}
 
 		public static TriggerInfo FromPerson(
