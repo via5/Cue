@@ -270,6 +270,9 @@ namespace Cue.VamMoan
 
 		public void SetMoaning(float v)
 		{
+			if (p_.intensities.Length == 0)
+				return;
+
 			int index = (int)(v * intensitiesCount_);
 			index = U.Clamp(index, 0, intensitiesCount_ - 1);
 
@@ -303,6 +306,9 @@ namespace Cue.VamMoan
 
 		public void SetBJ(float v)
 		{
+			if (p_.bj.Length == 0)
+				return;
+
 			int index = (int)(v * p_.bj.Length);
 			index = U.Clamp(index, 0, p_.bj.Length - 1);
 

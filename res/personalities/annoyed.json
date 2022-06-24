@@ -1,0 +1,7 @@
+{
+	"name": "Annoyed",
+	"inherit": "base",
+	"defaultHappiness": 0,
+	"defaultPlayfulness": 0,
+	"defaultAnger": 0.4,
+}

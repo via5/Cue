@@ -160,6 +160,7 @@
 		},
 
 
+
 		{
 			"name": "pleasure",
 			"moods": "excited orgasm",
@@ -289,7 +290,7 @@
 			]
 		},
 
-			{
+		{
 			"name": "angryFrown",
 			"moods": "angry",
 			"bodyParts": "eyes",
@@ -330,6 +331,19 @@
 
 				{
 					"id": "Lip Top Up",
+					"max": 0.3
+				}
+			]
+		},
+
+		{
+			"name": "angrySnarl",
+			"moods": "angry",
+			"bodyParts": "mouth",
+			"morphs":
+			[
+				{
+					"id": "Snarl Left",
 					"max": 0.3
 				}
 			]
