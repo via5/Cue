@@ -2,73 +2,88 @@
 {
 	class MouthEvent : BasicEvent
 	{
-		private const float MaxDistanceToStart = 0.4f;
-		private const float CheckTargetsInterval = 2;
+		private const float ManualStartDistance = 0.4f;
+		private const float AutoStartDistance = 0.3f;
 
-		private bool active_ = false;
-		private float checkElapsed_ = CheckTargetsInterval;
+		private BodyPart head_ = null;
 
-		private Person bjTarget_ = null;
+		private Person target_ = null;
 		private BodyPartLock[] sourceLocks_ = null;
 		private BodyPartLock[] targetLocks_ = null;
 		private bool hasForcedTrigger_ = false;
-
+		private bool wasGrabbed_;
 
 		public MouthEvent()
 			: base("mouth")
 		{
 		}
 
+		protected override void DoInit()
+		{
+			base.DoInit();
+			head_ = person_.Body.Get(BP.Head);
+		}
+
 		public override void Debug(DebugLines debug)
 		{
-			debug.Add("active", $"{active_}");
-			debug.Add("elapsed", $"{checkElapsed_:0.00}");
-			debug.Add("bjTarget", $"{bjTarget_}");
-			debug.Add("sourceLocks", $"{sourceLocks_}");
-			debug.Add("targetLocks", $"{targetLocks_}");
+			debug.Add("active", $"{Active}");
+			debug.Add("bjTarget", $"{target_}");
+
+			if (sourceLocks_ != null)
+			{
+				for (int i = 0; i < sourceLocks_.Length; ++i)
+					debug.Add($"srcLock", sourceLocks_[i].ToString());
+			}
+
+			if (targetLocks_ != null)
+			{
+				for (int i = 0; i < targetLocks_.Length; ++i)
+					debug.Add($"tarLock", targetLocks_[i].ToString());
+			}
 		}
 
 		public bool Active
 		{
 			get
 			{
-				return active_;
+				return (target_ != null);
 			}
 
 			set
 			{
-				if (!active_ && value)
-					checkElapsed_ = CheckTargetsInterval;
-				else if (active_ && !value)
+				if (value)
+					Check(ManualStartDistance);
+				else
 					Stop();
-
-				active_ = value;
 			}
 		}
 
 		public Person Target
 		{
-			get { return bjTarget_; }
+			get { return target_; }
 		}
 
-		private void Stop()
+		private void Stop(int stopFlags = Animation.NoStopFlags)
 		{
 			Unlock();
 
-			if (hasForcedTrigger_)
+			if (target_ != null)
 			{
-				bjTarget_.Body.Get(bjTarget_.Body.GenitalsBodyPart)
-					.RemoveForcedTrigger(person_.PersonIndex, BP.Mouth);
+				if (hasForcedTrigger_)
+				{
+					target_.Body.Get(target_.Body.GenitalsBodyPart)
+						.RemoveForcedTrigger(person_.PersonIndex, BP.Mouth);
 
-				bjTarget_.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(person_);
+					target_.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(person_);
 
-				hasForcedTrigger_ = false;
+					hasForcedTrigger_ = false;
+				}
+
+				target_.Homing.Mouth = false;
+				target_ = null;
 			}
 
-			bjTarget_.Homing.Mouth = false;
-
-			bjTarget_ = null;
-			person_.Animator.StopType(Animations.Blowjob);
+			person_.Animator.StopType(Animations.Blowjob, stopFlags);
 		}
 
 		private void Unlock()
@@ -92,18 +107,28 @@
 
 		public override void Update(float s)
 		{
-			if (active_)
-			{
-				checkElapsed_ += s;
-				if (checkElapsed_ >= CheckTargetsInterval)
-				{
-					checkElapsed_ = 0;
-					CheckBJ();
+			CheckAutoStart();
+		}
 
-					if (bjTarget_ == null)
-						active_ = false;
-				}
+		private void CheckAutoStart()
+		{
+			if (GrabEnded())
+				Check(AutoStartDistance, Animation.StopNoReturn);
+		}
+
+		private bool GrabEnded()
+		{
+			if (head_.Grabbed && !wasGrabbed_)
+			{
+				wasGrabbed_ = true;
 			}
+			else if (!head_.Grabbed && wasGrabbed_)
+			{
+				wasGrabbed_ = false;
+				return true;
+			}
+
+			return false;
 		}
 
 		public override void ForceStop()
@@ -112,41 +137,57 @@
 				Stop();
 		}
 
-		private void CheckBJ()
+		private bool Check(float maxDistance, int stopFlags = Animation.NoStopFlags)
 		{
-			// todo, make it dynamic
-			if (bjTarget_ != null)
-				return;
-
-			var t = FindTarget();
+			var t = FindTarget(maxDistance);
 			if (t == null)
 			{
 				Log.Info("no target");
-				return;
+				Stop(stopFlags);
+				return false;
 			}
+
+			if (t == target_)
+			{
+				Log.Info("same target");
+				return true;
+			}
+
+			Stop(stopFlags);
+
+			Log.Info($"found target {t}");
 
 			sourceLocks_ = BodyPartLock.LockMany(
 				person_,
 				new int[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
+			if (sourceLocks_ == null)
+			{
+				Log.Error("failed to lock sources");
+				Unlock();
+				return false;
+			}
+
 			targetLocks_ = BodyPartLock.LockMany(
 				t,
 				new int[] { BP.Hips },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
-			if (sourceLocks_ == null || targetLocks_ == null)
+			if (targetLocks_ == null)
 			{
+				Log.Error("failed to lock targets");
 				Unlock();
-				return;
+				return false;
 			}
 
 			if (!person_.Animator.PlayType(
 				Animations.Blowjob,
 				new AnimationContext(t, sourceLocks_[0].Key)))
 			{
+				Log.Error("failed to start animation");
 				Unlock();
-				return;
+				return false;
 			}
 
 			if (t.Body.PenisSensitive)
@@ -160,23 +201,24 @@
 			}
 
 			t.Homing.Mouth = true;
+			target_ = t;
 
-			bjTarget_ = t;
+			Log.Info($"started with {target_}");
+
+			return true;
 		}
 
-		private Person FindTarget()
+		private Person FindTarget(float maxDistance)
 		{
-			var head = person_.Body.Get(BP.Head);
-
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p == person_ || !p.Body.HasPenis)
 					continue;
 
 				var g = p.Body.Get(BP.Penis);
-				var d = Vector3.Distance(head.Position, g.Position);
+				var d = Vector3.Distance(head_.Position, g.Position);
 
-				if (d < MaxDistanceToStart)
+				if (d < maxDistance)
 					return p;
 			}
 

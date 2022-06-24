@@ -7,6 +7,7 @@
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
+		private Sys.Vam.BoolParameter doReturn_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.StringChooserParameter hand_ = null;
@@ -74,10 +75,11 @@
 
 		protected abstract bool DoStart(Person target);
 
-		public override void RequestStop()
+		public override void RequestStop(int stopFlags = Animation.NoStopFlags)
 		{
-			base.RequestStop();
+			base.RequestStop(stopFlags);
 
+			doReturn_.Value = !Bits.IsSet(stopFlags, Animation.StopNoReturn);
 			active_.Value = false;
 			leftTarget_ = null;
 			rightTarget_ = null;
@@ -154,6 +156,7 @@
 			log_ = new Logger(Logger.Integration, p, "cwhj");
 			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "enabled");
 			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			doReturn_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "doReturn");
 			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
 			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
 			hand_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");

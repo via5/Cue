@@ -69,7 +69,7 @@ namespace Cue
 			// no-op
 		}
 
-		public virtual void RequestStop()
+		public virtual void RequestStop(int stopFlags)
 		{
 			// no-op
 		}
@@ -203,7 +203,7 @@ namespace Cue
 			return true;
 		}
 
-		public void StopNow(IAnimation a)
+		public void StopNow(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			Log.Verbose(
 				$"stopping animation now {a}, " +
@@ -220,7 +220,7 @@ namespace Cue
 			}
 		}
 
-		public void RequestStop(IAnimation a)
+		public void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			Log.Verbose(
 				$"requesting stop for animation {a}, " +
@@ -231,7 +231,7 @@ namespace Cue
 				if (playing_[i].proto == a)
 				{
 					Log.Verbose($"found animation at {i}");
-					DoRequestStop(i);
+					DoRequestStop(i, stopFlags);
 					return;
 				}
 			}
@@ -253,13 +253,13 @@ namespace Cue
 			}
 		}
 
-		private void DoRequestStop(int i)
+		private void DoRequestStop(int i, int stopFlags)
 		{
 			Log.Verbose(
 				$"requesting stop for {i}, proto is {playing_[i].proto}, " +
 				$"anim is {playing_[i].anim}");
 
-			playing_[i].anim.RequestStop();
+			playing_[i].anim.RequestStop(stopFlags);
 		}
 
 		public void FixedUpdate(float s)

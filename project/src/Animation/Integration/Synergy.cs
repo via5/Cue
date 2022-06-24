@@ -59,13 +59,13 @@ namespace Cue
 			return true;
 		}
 
-		public void StopNow(IAnimation a)
+		public void StopNow(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			step_.Value = "";
 			anim_ = null;
 		}
 
-		public void RequestStop(IAnimation a)
+		public void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			StopNow(a);
 		}

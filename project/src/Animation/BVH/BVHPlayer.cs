@@ -186,7 +186,7 @@ namespace Cue.BVH
             return true;
         }
 
-        public void StopNow(IAnimation a)
+        public void StopNow(IAnimation a, int stopFlags = global::Cue.Animation.NoStopFlags)
         {
             if (anim_ == null)
                 return;
@@ -196,9 +196,9 @@ namespace Cue.BVH
             anim_ = null;
         }
 
-        public void RequestStop(IAnimation a)
+        public void RequestStop(IAnimation a, int stopFlags = global::Cue.Animation.NoStopFlags)
         {
-            StopNow(a);
+            StopNow(a, stopFlags);
         }
 
 		public void MainSyncStopping(IAnimation a, Proc.ISync s)

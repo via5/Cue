@@ -280,9 +280,9 @@
 			return null;
 		}
 
-		public override void RequestStop()
+		public override void RequestStop(int stopFlags)
 		{
-			base.RequestStop();
+			base.RequestStop(stopFlags);
 
 			if (active_.Value)
 			{

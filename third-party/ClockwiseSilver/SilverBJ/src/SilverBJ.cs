@@ -16,7 +16,7 @@ namespace ClockwiseSilver {
 
 		private Atom her;
 		private Atom him;
-		private JSONStorableBool isActive, blink, isBJRoutine, gazeActive, hjActive;
+		private JSONStorableBool isActive, blink, isBJRoutine, gazeActive, hjActive, doReturn;
 		private JSONStorableFloat speedMultiJSON, rangeMultiJSON, frontBackSpeedJSON, frontBackRangeJSON, flipLimitJSON, randomTimeJSON;
 		private JSONStorableFloat topOnlyChanceJSON, intensityVolumeScaleJSON, intensityChanceScaleJSON;
 		private JSONStorableFloat headShiftXJSON, headShiftYJSON, headShiftZJSON;
@@ -95,6 +95,9 @@ namespace ClockwiseSilver {
 				RegisterBool (isActive);
 				var toggle = CreateToggle(isActive);
 				toggle.label = "Active";
+
+				doReturn = new JSONStorableBool ("doReturn", false);
+				RegisterBool (doReturn);
 
 				JSONStorableAction ToggleActive = new JSONStorableAction("Toggle BJ", () =>
                 {
@@ -522,7 +525,7 @@ namespace ClockwiseSilver {
 
 		private IEnumerator BJRoutine()
 		{
-			isBJRoutine.val = true; bjRunning = true;
+			isBJRoutine.val = true; bjRunning = true; doReturn.val = true;
 
 			//--------------------------------Silver Gaze
 			JSONStorable gazePlugin = Helpers.FindPlugin(this, "ClockwiseSilver.Gaze");
@@ -724,8 +727,11 @@ namespace ClockwiseSilver {
 						+ gen1Transform.TransformVector(headShift) + (dir * dist);
 				}
 
-				headControlTransform.position = Vector3.LerpUnclamped(tarPosBegin, targetPos, progress);
-				headControlTransform.rotation =	Quaternion.LerpUnclamped(tarRotBegin, targetRot, progress);
+				if (!headControl.isGrabbing)
+				{
+					headControlTransform.position = Vector3.LerpUnclamped(tarPosBegin, targetPos, progress);
+					headControlTransform.rotation =	Quaternion.LerpUnclamped(tarRotBegin, targetRot, progress);
+				}
 
 				yield return new WaitForFixedUpdate();
 			}
@@ -737,29 +743,32 @@ namespace ClockwiseSilver {
 			giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
 
 			//--------------------------------------------------Return----------------------
-			while (giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
+			if (doReturn.val)
 			{
-				if (audioMoanLoaded)
+				while (giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
 				{
-					audioMoanTransform.position = headRBTransform.position;
-				}
-				if (audioSFXLoaded)
-				{
-					audioSFXTransform.position = headRBTransform.position;
-				}
+					if (audioMoanLoaded)
+					{
+						audioMoanTransform.position = headRBTransform.position;
+					}
+					if (audioSFXLoaded)
+					{
+						audioSFXTransform.position = headRBTransform.position;
+					}
 
-				dTime = Time.fixedDeltaTime;
-				float dMorphTime = dTime * 20;
-				mouthOpenWide.morphValue = Mathf.Lerp(mouthOpenWide.morphValue, 0f, dMorphTime);
-				eyesClosed.morphValue = Mathf.LerpUnclamped(eyesClosed.morphValue, 0f, dMorphTime);
-				for (int i = 0; i < morphsLip.Length; i++)
-				{
-					morphsLip[i].morphValue = Mathf.LerpUnclamped(morphsLip[i].morphValue, 0f, dMorphTime);
-				}
+					dTime = Time.fixedDeltaTime;
+					float dMorphTime = dTime * 20;
+					mouthOpenWide.morphValue = Mathf.Lerp(mouthOpenWide.morphValue, 0f, dMorphTime);
+					eyesClosed.morphValue = Mathf.LerpUnclamped(eyesClosed.morphValue, 0f, dMorphTime);
+					for (int i = 0; i < morphsLip.Length; i++)
+					{
+						morphsLip[i].morphValue = Mathf.LerpUnclamped(morphsLip[i].morphValue, 0f, dMorphTime);
+					}
 
-				headControlTransform.position = Vector3.MoveTowards(headControlTransform.position, startPoshead, 0.4f * dTime);
-				headControlTransform.rotation = Quaternion.RotateTowards(headControlTransform.rotation, startRothead, dTime * 50);
-				giveUpTimer += dTime; yield return new WaitForFixedUpdate();
+					headControlTransform.position = Vector3.MoveTowards(headControlTransform.position, startPoshead, 0.4f * dTime);
+					headControlTransform.rotation = Quaternion.RotateTowards(headControlTransform.rotation, startRothead, dTime * 50);
+					giveUpTimer += dTime; yield return new WaitForFixedUpdate();
+				}
 			}
 
 			mouthOpenWide.morphValue = 0f;
@@ -787,8 +796,8 @@ namespace ClockwiseSilver {
 			}
 			else
 			{
-				if (doPos) { headControlTransform.position = startPoshead; }
-				if (doRot) { headControlTransform.rotation = startRothead; }
+				if (doPos && doReturn.val) { headControlTransform.position = startPoshead; }
+				if (doRot && doReturn.val) { headControlTransform.rotation = startRothead; }
 				headControl.currentPositionState = wasHeadPosState;
 				headControl.currentRotationState = wasHeadRotState;
 			}

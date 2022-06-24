@@ -40,8 +40,16 @@ namespace Cue
 
 		public static IEvent[] All()
 		{
+			// todo: there's an ordering problem, where GrabEvent locks the
+			// head when grabbed, but MouthEvent tries to lock when the grab
+			// is released
+			//
+			// GrabEvent is at the top right now, which fixes this, but it's
+			// not a fix
+
 			return new IEvent[]
 			{
+				new GrabEvent(),
 				new MouthEvent(),
 				new KissEvent(),
 				new SmokeEvent(),
@@ -50,7 +58,6 @@ namespace Cue
 				new HandEvent(),
 				new PenetratedEvent(),
 			//	new SuckFingerEvent(),
-				new GrabEvent()
 			};
 		}
 

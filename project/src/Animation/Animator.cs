@@ -62,8 +62,8 @@ namespace Cue
 		IAnimation[] GetPlaying();
 		bool CanPlay(IAnimation a);
 		bool Play(IAnimation a, int flags, AnimationContext cx);
-		void RequestStop(IAnimation a);
-		void StopNow(IAnimation a);
+		void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags);
+		void StopNow(IAnimation a, int stopFlags = Animation.NoStopFlags);
 		void MainSyncStopping(IAnimation a, Proc.ISync s);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
@@ -91,6 +91,9 @@ namespace Cue
 		private readonly int type_ = Animations.None;
 		private readonly int style_ = MovementStyles.Any;
 		private readonly IAnimation anim_ = null;
+
+		public const int NoStopFlags = 0x0;
+		public const int StopNoReturn = 0x1;
 
 		public Animation(int type, int ms, IAnimation anim)
 		{
@@ -328,7 +331,7 @@ namespace Cue
 			playing_.Clear();
 		}
 
-		public void StopType(int type)
+		public void StopType(int type, int stopFlags = Animation.NoStopFlags)
 		{
 			Log.Verbose($"stopping animation {Animations.ToString(type)}");
 
@@ -343,7 +346,7 @@ namespace Cue
 					Log.Info($"stopping animation {a}");
 					a.stopping = true;
 					a.stopElapsed = 0;
-					a.player.RequestStop(a.anim.Sys);
+					a.player.RequestStop(a.anim.Sys, stopFlags);
 					++stopped;
 				}
 			}

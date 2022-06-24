@@ -138,15 +138,15 @@ namespace Cue
 			return true;
 		}
 
-		public void StopNow(IAnimation a)
+		public void StopNow(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			stop_.Fire();
 			play_ = null;
 		}
 
-		public void RequestStop(IAnimation a)
+		public void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
-			StopNow(a);
+			StopNow(a, stopFlags);
 		}
 
 		public void MainSyncStopping(IAnimation a, Proc.ISync s)

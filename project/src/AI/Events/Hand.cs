@@ -47,7 +47,6 @@
 
 		private const float ManualStartDistance = 0.09f;
 		private const float AutoStartDistance = 0.05f;
-		private const float StopDistance = 0.05f;
 
 		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;
@@ -130,7 +129,7 @@
 			if (checkLeft || checkRight)
 			{
 				Log.Info($"checking auto start, left={checkLeft} right={checkRight}");
-				Check(AutoStartDistance, checkLeft, checkRight);
+				Check(AutoStartDistance, checkLeft, checkRight, Animation.StopNoReturn);
 			}
 		}
 
@@ -151,14 +150,16 @@
 			return (left.Person == right.Person);
 		}
 
-		private void Check(float maxDistance, bool canStartLeft, bool canStartRight)
+		private void Check(
+			float maxDistance, bool canStartLeft, bool canStartRight,
+			int stopFlags = Animation.NoStopFlags)
 		{
 			var leftTarget = FindTarget(left_.bp.Type, maxDistance);
 			var rightTarget = FindTarget(right_.bp.Type, maxDistance);
 
 			if (leftTarget == null && rightTarget == null)
 			{
-				Stop();
+				Stop(stopFlags);
 				Log.Info("no target");
 				return;
 			}
@@ -166,7 +167,7 @@
 			if (TargetsForDouble(leftTarget, rightTarget))
 			{
 				Log.Info("check found double targets");
-				Stop();
+				Stop(stopFlags);
 				StartDoubleHJ(leftTarget);
 			}
 			else
@@ -174,7 +175,7 @@
 				if (left_.anim == Animations.HandjobBoth)
 				{
 					Log.Info("stopping because current is both and one target is gone");
-					Stop();
+					Stop(stopFlags);
 					canStartLeft = true;
 					canStartRight = true;
 				}
@@ -182,7 +183,7 @@
 				if (leftTarget == null)
 				{
 					Log.Info("no left target");
-					Stop(left_);
+					Stop(left_, stopFlags);
 				}
 				else
 				{
@@ -194,7 +195,7 @@
 					{
 						Log.Info($"new left target {leftTarget}");
 
-						Stop(left_);
+						Stop(left_, stopFlags);
 
 						if (leftTarget.Type == BP.Penis)
 							StartHJ(left_, leftTarget);
@@ -206,7 +207,7 @@
 				if (rightTarget == null)
 				{
 					Log.Info("no right target");
-					Stop(right_);
+					Stop(right_, stopFlags);
 				}
 				else
 				{
@@ -218,7 +219,7 @@
 					{
 						Log.Info($"right target now {rightTarget}");
 
-						Stop(right_);
+						Stop(right_, stopFlags);
 
 						if (rightTarget.Type == BP.Penis)
 							StartHJ(right_, rightTarget);
@@ -244,19 +245,19 @@
 			return false;
 		}
 
-		private void Stop()
+		private void Stop(int stopFlags = Animation.NoStopFlags)
 		{
-			Stop(left_);
-			Stop(right_);
+			Stop(left_, stopFlags);
+			Stop(right_, stopFlags);
 		}
 
-		private void Stop(HandInfo hand)
+		private void Stop(HandInfo hand, int stopFlags = Animation.NoStopFlags)
 		{
 			Log.Info($"stopping {hand.name}");
 
 			if (hand.anim != Animations.None)
 			{
-				person_.Animator.StopType(hand.anim);
+				person_.Animator.StopType(hand.anim, stopFlags);
 				hand.anim = Animations.None;
 			}
 

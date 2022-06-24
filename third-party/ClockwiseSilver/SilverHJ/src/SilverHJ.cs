@@ -16,7 +16,7 @@ namespace ClockwiseSilver {
 
 		private Atom her;
 		private Atom him;
-		private JSONStorableBool isActive, ejEnabled, baseUpJSON, bjActive;
+		private JSONStorableBool isActive, ejEnabled, baseUpJSON, bjActive, doReturn;
 		private JSONStorableFloat speedMultiJSON, trackingSpeedJSON, frontBackSpeedJSON, frontBackRangeJSON, flipLimitJSON, randomTimeJSON, frontBackOutputJSON;
 		private JSONStorableFloat ejWaitJSON, ejDurationJSON, topOnlyChanceJSON, zStrokeRotMinJSON, zStrokeRotMaxJSON, rotSpeedJSON;
 		private JSONStorableFloat handShiftXJSON, handShiftYJSON, handShiftZJSON, handAngleXJSON, handAngleYJSON, handAngleZJSON;
@@ -80,6 +80,9 @@ namespace ClockwiseSilver {
 				RegisterBool (isActive);
 				var toggle = CreateToggle(isActive);
 				toggle.label = "Active";
+
+				doReturn = new JSONStorableBool ("doReturn", false);
+				RegisterBool (doReturn);
 
 				JSONStorableAction ToggleActive = new JSONStorableAction("Stop HJ", () =>
                 {
@@ -641,7 +644,7 @@ namespace ClockwiseSilver {
 
 		private IEnumerator HJRoutine()
 		{
-			isHJRoutine.val = true; hjRunning = true;
+			isHJRoutine.val = true; hjRunning = true; doReturn.val = true;
 
 			//--------------------------------Silver BJ
 			JSONStorable bjPlugin = Helpers.FindPlugin(this, "ClockwiseSilver.BJ");
@@ -828,18 +831,31 @@ namespace ClockwiseSilver {
 						+ handControlTransform.right * (knuckleDistance * knuckleSign) + handControlTransform.up * (0.4f * knuckleDistance);
 				}
 
-				handControlTransform.position = Vector3.LerpUnclamped(tarPosBegin, targetPos, progress);
+				if (!handControl.isGrabbing)
+					handControlTransform.position = Vector3.LerpUnclamped(tarPosBegin, targetPos, progress);
+
 				handAngle.x = handAngleXJSON.val + randomRotX; handAngle.y = handAngleYJSON.val; handAngle.z = handAngleZJSON.val + randomRotZ;
-				handControlTransform.rotation = Quaternion.LerpUnclamped(tarRotBegin, startTargetRot * Quaternion.Euler(handAngle), progress);
+
+				if (!handControl.isGrabbing)
+					handControlTransform.rotation = Quaternion.LerpUnclamped(tarRotBegin, startTargetRot * Quaternion.Euler(handAngle), progress);
 
 				if (bothHands)
 				{
 					handShift.x = handShiftX2JSON.val; handShift.y = handShiftY2JSON.val; handShift.z = handShiftZ2JSON.val;
-					handControl2Transform.position = Vector3.LerpUnclamped(tarPosBegin2, targetPos
-						+ (handControl2Transform.forward * knuckleDistance) + gen1Transform.TransformVector(handShift) - (handControl2Transform.up * (0.8f * -knuckleDistance)), progress);
+
+					if (!handControl2.isGrabbing)
+					{
+						handControl2Transform.position = Vector3.LerpUnclamped(tarPosBegin2, targetPos
+							+ (handControl2Transform.forward * knuckleDistance) + gen1Transform.TransformVector(handShift) - (handControl2Transform.up * (0.8f * -knuckleDistance)), progress);
+					}
 
 					handAngle.z = -handAngle.z;
-					handControl2Transform.rotation = Quaternion.LerpUnclamped(tarRotBegin2, startTargetRot2 * Quaternion.Euler(handAngle), progress);
+
+					if (!handControl2.isGrabbing)
+					{
+						handControl2Transform.rotation = Quaternion.LerpUnclamped(tarRotBegin2, startTargetRot2 * Quaternion.Euler(handAngle), progress);
+					}
+
 					handCloseMorph2.morphValue = handCloseMorph.morphValue; thumbOutMorph2.morphValue = thumbOutMorph.morphValue;
 				}
 				yield return new WaitForFixedUpdate();
@@ -849,47 +865,54 @@ namespace ClockwiseSilver {
 			bool doRot = (wasHandRotState == FreeControllerV3.RotationState.On);
 			giveUpTimer = 0f;
 
-			//--------------------------------------------------Stop----------------------
-			while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, handTravelUp) > 0.002f)
+			if (doReturn.val)
 			{
-				float dMorphTime = dTime * 24;
-				handOpenMorph.morphValue = Mathf.LerpUnclamped(handOpenMorph.morphValue, handOpenStart, dMorphTime);
-				handCloseMorph.morphValue = Mathf.LerpUnclamped(handCloseMorph.morphValue, handCloseStart, dMorphTime);
-				thumbOutMorph.morphValue = Mathf.LerpUnclamped(thumbOutMorph.morphValue, thumbOutStart, dMorphTime);
-
-				if (doRot) { handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startRotHand, dTime * 150); }
-				if (doPos) { handControlTransform.position = Vector3.MoveTowards(handControlTransform.position, handTravelUp, trackingSpeedJSON.val * dTime); }
-
-				if (bothHands)
+				//--------------------------------------------------Stop----------------------
+				while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, handTravelUp) > 0.002f)
 				{
-					handControl2Transform.rotation = Quaternion.RotateTowards(handControl2Transform.rotation, startRotHand2, dTime * 150);
-					handControl2Transform.position = Vector3.MoveTowards(handControl2Transform.position, startPosHand2, trackingSpeedJSON.val * dTime);
-					handOpenMorph2.morphValue = handOpenMorph.morphValue; handCloseMorph2.morphValue = handCloseMorph.morphValue; thumbOutMorph2.morphValue = thumbOutMorph.morphValue;
+					float dMorphTime = dTime * 24;
+					handOpenMorph.morphValue = Mathf.LerpUnclamped(handOpenMorph.morphValue, handOpenStart, dMorphTime);
+					handCloseMorph.morphValue = Mathf.LerpUnclamped(handCloseMorph.morphValue, handCloseStart, dMorphTime);
+					thumbOutMorph.morphValue = Mathf.LerpUnclamped(thumbOutMorph.morphValue, thumbOutStart, dMorphTime);
+
+					if (doRot) { handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startRotHand, dTime * 150); }
+					if (doPos) { handControlTransform.position = Vector3.MoveTowards(handControlTransform.position, handTravelUp, trackingSpeedJSON.val * dTime); }
+
+					if (bothHands)
+					{
+						handControl2Transform.rotation = Quaternion.RotateTowards(handControl2Transform.rotation, startRotHand2, dTime * 150);
+						handControl2Transform.position = Vector3.MoveTowards(handControl2Transform.position, startPosHand2, trackingSpeedJSON.val * dTime);
+						handOpenMorph2.morphValue = handOpenMorph.morphValue; handCloseMorph2.morphValue = handCloseMorph.morphValue; thumbOutMorph2.morphValue = thumbOutMorph.morphValue;
+					}
+
+					giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 				}
+				giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
 
-				giveUpTimer += dTime; yield return new WaitForFixedUpdate();
-			}
-			giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
-
-			//--------------------------------------------------Return----------------------
-			while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, startPosHand) > 0.002f)
-			{
-				handControlTransform.position = Vector3.MoveTowards(handControlTransform.position, startPosHand, trackingSpeedJSON.val * dTime);
-				handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startRotHand, dTime * 150);
-				if (bothHands)
+				//--------------------------------------------------Return----------------------
+				while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, startPosHand) > 0.002f)
 				{
-					handControl2Transform.position = Vector3.MoveTowards(handControl2Transform.position, startPosHand2, trackingSpeedJSON.val * dTime);
-					handControl2Transform.rotation = Quaternion.RotateTowards(handControl2Transform.rotation, startRotHand2, dTime * 150);
+					handControlTransform.position = Vector3.MoveTowards(handControlTransform.position, startPosHand, trackingSpeedJSON.val * dTime);
+					handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startRotHand, dTime * 150);
+					if (bothHands)
+					{
+						handControl2Transform.position = Vector3.MoveTowards(handControl2Transform.position, startPosHand2, trackingSpeedJSON.val * dTime);
+						handControl2Transform.rotation = Quaternion.RotateTowards(handControl2Transform.rotation, startRotHand2, dTime * 150);
+					}
+					giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 				}
-				giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 			}
 
-			if (doPos) { handControlTransform.position = startPosHand; }
-			if (doRot) { handControlTransform.rotation = startRotHand; }
+			handOpenMorph.morphValue = handOpenStart;
+			handCloseMorph.morphValue = handCloseStart;
+			thumbOutMorph.morphValue = thumbOutStart;
+
+			if (doPos && doReturn.val) { handControlTransform.position = startPosHand; }
+			if (doRot && doReturn.val) { handControlTransform.rotation = startRotHand; }
 			if (bothHands)
 			{
-				if (doPos) { handControl2Transform.position = startPosHand2; }
-				if (doRot) { handControl2Transform.rotation = startRotHand2; }
+				if (doPos && doReturn.val) { handControl2Transform.position = startPosHand2; }
+				if (doRot && doReturn.val) { handControl2Transform.rotation = startRotHand2; }
 			}
 			hasBJ = false;
 			isBJ = false;

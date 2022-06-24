@@ -126,7 +126,7 @@ namespace Cue.Proc
 			return true;
 		}
 
-		public override void RequestStop()
+		public override void RequestStop(int stopFlags = Animation.NoStopFlags)
 		{
 			if (oldSync_ != null)
 			{

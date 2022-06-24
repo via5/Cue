@@ -7,6 +7,7 @@
 
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
+		private Sys.Vam.BoolParameter doReturn_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.FloatParameter sfxVolume_ = null;
@@ -93,8 +94,9 @@
 			return true;
 		}
 
-		public override void RequestStop()
+		public override void RequestStop(int stopFlags = Animation.NoStopFlags)
 		{
+			doReturn_.Value = !Bits.IsSet(stopFlags, Animation.StopNoReturn);
 			active_.Value = false;
 			target_ = null;
 		}
@@ -125,6 +127,7 @@
 			log_ = new Logger(Logger.Integration, p, "cwbj");
 			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "enabled");
 			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			doReturn_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "doReturn");
 			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
 			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
 			moanVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
