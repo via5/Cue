@@ -10,7 +10,7 @@
 			public readonly int hjAnimType;
 			public readonly int[] sourceLockTypes;
 
-			public Person target = null;
+			public BodyPart targetBodyPart = null;
 			public bool groped = false;
 			public BodyPartLock[] sourceLock = null;
 			public BodyPartLock[] targetLock = null;
@@ -29,7 +29,7 @@
 
 			public void Debug(DebugLines debug)
 			{
-				debug.Add($"{name} target", $"{target} groped={groped}");
+				debug.Add($"{name} target", $"{targetBodyPart} groped={groped} anim={anim}");
 
 				if (sourceLock != null)
 				{
@@ -45,14 +45,11 @@
 			}
 		}
 
-		private const float MaxDistanceToStart = 0.09f;
-		private const float CheckTargetsInterval = 2;
+		private const float ManualStartDistance = 0.09f;
 		private const float AutoStartDistance = 0.05f;
 		private const float StopDistance = 0.05f;
 
-		private bool active_ = false;
-		private float checkElapsed_ = CheckTargetsInterval;
-
+		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;
 		private HandInfo right_ = null;
 
@@ -79,9 +76,7 @@
 
 		public override void Debug(DebugLines debug)
 		{
-			debug.Add("active",  $"{active_}");
-			debug.Add("elapsed", $"{checkElapsed_:0.00}");
-
+			debug.Add("active", $"{Active}");
 			left_.Debug(debug);
 			right_.Debug(debug);
 		}
@@ -90,104 +85,151 @@
 		{
 			get
 			{
-				return active_;
+				return (left_.targetBodyPart != null || right_.targetBodyPart != null);
 			}
 
 			set
 			{
-				if (!active_ && value)
-					checkElapsed_ = CheckTargetsInterval;
-				else if (active_ && !value)
+				if (value)
+					doManualCheck_ = true;
+				else
 					Stop();
-
-				active_ = value;
 			}
 		}
 
 		public Person LeftTarget
 		{
-			get { return left_.target; }
+			get { return left_.targetBodyPart?.Person; }
 		}
 
 		public Person RightTarget
 		{
-			get { return right_.target; }
+			get { return right_.targetBodyPart?.Person; }
 		}
 
 		public override void Update(float s)
 		{
-			if (!active_)
+			CheckAutoStart();
+			CheckAnim();
+
+			if (doManualCheck_)
 			{
-				if (CheckAutoStart())
-					return;
+				doManualCheck_ = false;
+				CheckManualStart();
+			}
+		}
 
-				Unlock(left_);
-				Unlock(right_);
+		private void CheckAutoStart()
+		{
+			if (!Cue.Instance.Options.AutoHands)
+				return;
 
+			bool checkLeft = GrabEnded(left_);
+			bool checkRight = GrabEnded(right_);
+
+			if (checkLeft || checkRight)
+			{
+				Log.Info($"checking auto start, left={checkLeft} right={checkRight}");
+				Check(AutoStartDistance, checkLeft, checkRight);
+			}
+		}
+
+		private void CheckManualStart()
+		{
+			Log.Info("checking manual start");
+			Check(ManualStartDistance, true, true);
+		}
+
+		private bool TargetsForDouble(BodyPart left, BodyPart right)
+		{
+			if (left == null || right == null)
+				return false;
+
+			if (left.Type != BP.Penis || right.Type != BP.Penis)
+				return false;
+
+			return (left.Person == right.Person);
+		}
+
+		private void Check(float maxDistance, bool canStartLeft, bool canStartRight)
+		{
+			var leftTarget = FindTarget(left_.bp.Type, maxDistance);
+			var rightTarget = FindTarget(right_.bp.Type, maxDistance);
+
+			if (leftTarget == null && rightTarget == null)
+			{
+				Stop();
+				Log.Info("no target");
 				return;
 			}
 
-			if (!CheckAnim())
-				Active = false;
-
-			checkElapsed_ += s;
-			if (checkElapsed_ >= CheckTargetsInterval)
+			if (TargetsForDouble(leftTarget, rightTarget))
 			{
-				checkElapsed_ = 0;
-				Check();
-
-				if (left_.target == null)
-					Unlock(left_);
-
-				if (right_.target == null)
-					Unlock(right_);
-
-				if (left_.target == null && right_.target == null)
-					active_ = false;
+				Log.Info("check found double targets");
+				Stop();
+				StartDoubleHJ(leftTarget);
 			}
-		}
-
-		private bool CheckAutoStart()
-		{
-			if (!Cue.Instance.Options.AutoHands)
-				return false;
-
-			bool check = false;
-			check = check || CheckAutoStart(left_);
-			check = check || CheckAutoStart(right_);
-
-			if (!check)
-				return false;
-
-			foreach (var p in Cue.Instance.ActivePersons)
+			else
 			{
-				var g = p.Body.Get(p.Body.GenitalsBodyPart);
-				BodyPart bp = null;
-
-				float d = g.DistanceToSurface(left_.bp);
-				if (d < AutoStartDistance)
+				if (left_.anim == Animations.HandjobBoth)
 				{
-					bp = left_.bp;
+					Log.Info("stopping because current is both and one target is gone");
+					Stop();
+					canStartLeft = true;
+					canStartRight = true;
+				}
+
+				if (leftTarget == null)
+				{
+					Log.Info("no left target");
+					Stop(left_);
 				}
 				else
 				{
-					d = g.DistanceToSurface(right_.bp);
-					if (d < AutoStartDistance)
-						bp = right_.bp;
+					if (leftTarget == left_.targetBodyPart)
+					{
+						Log.Info("left target is the same as before");
+					}
+					else if (canStartLeft)
+					{
+						Log.Info($"new left target {leftTarget}");
+
+						Stop(left_);
+
+						if (leftTarget.Type == BP.Penis)
+							StartHJ(left_, leftTarget);
+						else if (leftTarget.Type == BP.Labia)
+							StartFinger(left_, leftTarget);
+					}
 				}
 
-				if (bp != null)
+				if (rightTarget == null)
 				{
-					Log.Info($"autostart: activating with {bp} and {g}, d={d}");
-					Active = true;
-					return true;
+					Log.Info("no right target");
+					Stop(right_);
+				}
+				else
+				{
+					if (rightTarget == right_.targetBodyPart)
+					{
+						Log.Info("right target is the same as before");
+					}
+					else if (canStartRight)
+					{
+						Log.Info($"right target now {rightTarget}");
+
+						Stop(right_);
+
+						if (rightTarget.Type == BP.Penis)
+							StartHJ(right_, rightTarget);
+						else if (rightTarget.Type == BP.Labia)
+							StartFinger(right_, rightTarget);
+					}
 				}
 			}
-
-			return false;
 		}
 
-		private bool CheckAutoStart(HandInfo hand)
+		private bool GrabEnded(HandInfo hand)
 		{
 			if (hand.bp.Grabbed && !hand.wasGrabbed)
 			{
@@ -210,33 +252,36 @@
 
 		private void Stop(HandInfo hand)
 		{
+			Log.Info($"stopping {hand.name}");
+
 			if (hand.anim != Animations.None)
 			{
 				person_.Animator.StopType(hand.anim);
 				hand.anim = Animations.None;
 			}
 
-			if (hand.target != null)
+			if (hand.targetBodyPart != null)
 			{
 				if (hand.forcedTrigger)
 				{
-					hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+					hand.targetBodyPart.Person.Body.Get(hand.targetBodyPart.Person.Body.GenitalsBodyPart)
 						.RemoveForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
 					hand.forcedTrigger = false;
 				}
 
-				Unlock(hand);
-				SetZoneEnabled(hand.target, false);
+				SetZoneEnabled(hand.targetBodyPart.Person, false);
 
 				if (hand.bp.Type == BP.LeftHand)
-					hand.target.Homing.LeftHand = false;
+					hand.targetBodyPart.Person.Homing.LeftHand = false;
 				else
-					hand.target.Homing.RightHand = false;
+					hand.targetBodyPart.Person.Homing.RightHand = false;
 
 				hand.groped = false;
-				hand.target = null;
+				hand.targetBodyPart = null;
 			}
+
+			Unlock(hand);
 		}
 
 		private void Unlock(HandInfo hand)
@@ -258,87 +303,31 @@
 			}
 		}
 
-		private void Check()
+		private void StartDoubleHJ(BodyPart targetBodyPart)
 		{
-			// todo, make it dynamic
-			if (left_.target != null || right_.target != null)
-				return;
+			Log.Info($"double hj {targetBodyPart}");
 
-			var rightTarget = FindTarget(BP.RightHand);
-			var leftTarget = FindTarget(BP.LeftHand);
-
-			if (leftTarget == null && rightTarget == null)
+			if (LockBoth("double hj", targetBodyPart.Person))
 			{
-				Log.Info("no target");
-				return;
-			}
-
-			if ((rightTarget != null && rightTarget.Type == BP.Penis) &&
-				(leftTarget != null && leftTarget.Type == BP.Penis) &&
-				(leftTarget.Person == rightTarget.Person))
-			{
-				StartDoubleHJ(leftTarget.Person, rightTarget.Person);
-			}
-			else
-			{
-				if (leftTarget != null)
-				{
-					if (leftTarget.Type == BP.Penis)
-						StartHJ(left_, leftTarget.Person);
-					else if (leftTarget.Type == BP.Labia)
-						StartFinger(left_, leftTarget.Person);
-				}
-
-				if (rightTarget != null)
-				{
-					if (rightTarget.Type == BP.Penis)
-						StartHJ(right_, rightTarget.Person);
-					else if (rightTarget.Type == BP.Labia)
-						StartFinger(right_, rightTarget.Person);
-				}
-			}
-		}
-
-		private void StartDoubleHJ(Person left, Person right)
-		{
-			Log.Info($"double hj {left?.ID}");
-
-			if (Lock("double hj", left_, left) && Lock("double hj", right_, right))
-			{
-				left_.target = left;
+				left_.targetBodyPart = targetBodyPart;
 				left_.anim = Animations.HandjobBoth;
 
-				right_.target = right;
+				right_.targetBodyPart = targetBodyPart;
 				right_.anim = Animations.None;
 
-				SetZoneEnabled(left, true);
-				SetZoneEnabled(right, true);
+				// once for each hand, since Stop() will try to remove it twice
+				SetZoneEnabled(targetBodyPart.Person, true);
+				SetZoneEnabled(targetBodyPart.Person, true);
 
-				if (left == right)
-				{
-					// just one hand
-					left.Homing.LeftHand = true;
-				}
-				else
-				{
-					left.Homing.LeftHand = true;
-					right.Homing.RightHand = true;
-				}
+				// just one hand
+				//target.Homing.LeftHand = true;
 
-				if (left_.target.Body.PenisSensitive)
+				if (targetBodyPart.Person.Body.PenisSensitive)
 				{
-					left_.target.Body.Get(left_.target.Body.GenitalsBodyPart)
+					targetBodyPart.Person.Body.Get(targetBodyPart.Person.Body.GenitalsBodyPart)
 						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 
 					left_.forcedTrigger = true;
-				}
-
-				if (left_.target != right_.target && right_.target.Body.PenisSensitive)
-				{
-					right_.target.Body.Get(right_.target.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
-
-					right_.forcedTrigger = true;
 				}
 			}
 			else
@@ -348,21 +337,21 @@
 
 		}
 
-		private void StartHJ(HandInfo hand, Person target)
+		private void StartHJ(HandInfo hand, BodyPart targetBodyPart)
 		{
-			Log.Info($"{hand.name} hj {target?.ID}");
+			Log.Info($"{hand.name} hj {targetBodyPart}");
 
-			if (Lock("hj", hand, target))
+			if (Lock("hj", hand, targetBodyPart.Person))
 			{
-				hand.target = target;
+				hand.targetBodyPart = targetBodyPart;
 				hand.anim = hand.hjAnimType;
-				SetZoneEnabled(target, true);
+				SetZoneEnabled(targetBodyPart.Person, true);
 
-				target.Homing.LeftHand = true;
+				targetBodyPart.Person.Homing.LeftHand = true;
 
-				if (hand.target.Body.PenisSensitive)
+				if (hand.targetBodyPart.Person.Body.PenisSensitive)
 				{
-					hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+					hand.targetBodyPart.Person.Body.Get(hand.targetBodyPart.Person.Body.GenitalsBodyPart)
 						.AddForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
 					hand.forcedTrigger = true;
@@ -374,19 +363,19 @@
 			}
 		}
 
-		private void StartFinger(HandInfo hand, Person target)
+		private void StartFinger(HandInfo hand, BodyPart targetBodyPart)
 		{
-			Log.Info($"{hand.name} finger with {target?.ID}");
+			Log.Info($"{hand.name} finger with {targetBodyPart}");
 
-			if (Lock("fingering", hand, target))
+			if (Lock("fingering", hand, targetBodyPart.Person))
 			{
-				hand.target = target;
+				hand.targetBodyPart = targetBodyPart;
 				hand.anim = hand.fingeringAnimType;
 				hand.groped = true;
 
-				SetZoneEnabled(target, true);
+				SetZoneEnabled(targetBodyPart.Person, true);
 
-				hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+				hand.targetBodyPart.Person.Body.Get(hand.targetBodyPart.Person.Body.GenitalsBodyPart)
 					.AddForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
 				hand.forcedTrigger = true;
@@ -397,15 +386,13 @@
 			}
 		}
 
-		private bool CheckAnim()
+		private void CheckAnim()
 		{
 			if (!CheckAnim(left_))
-				return false;
+				Stop(left_);
 
 			if (!CheckAnim(right_))
-				return false;
-
-			return true;
+				Stop(right_);
 		}
 
 		private bool CheckAnim(HandInfo hand)
@@ -416,15 +403,15 @@
 
 				if (state == Animator.Playing)
 				{
-					if (Mood.ShouldStopSexAnimation(person_, hand.target))
+					if (Mood.ShouldStopSexAnimation(person_, hand.targetBodyPart.Person))
 						person_.Animator.StopType(hand.anim);
 				}
 				else if (state == Animator.NotPlaying)
 				{
-					if (Mood.CanStartSexAnimation(person_, hand.target))
+					if (Mood.CanStartSexAnimation(person_, hand.targetBodyPart.Person))
 					{
 						if (!person_.Animator.PlayType(
-								hand.anim, new AnimationContext(hand.target, hand.sourceLock[0].Key)))
+								hand.anim, new AnimationContext(hand.targetBodyPart.Person, hand.sourceLock[0].Key)))
 						{
 							return false;
 						}
@@ -443,19 +430,43 @@
 				target.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(target);
 		}
 
+		private bool LockBoth(string why, Person target)
+		{
+			if (!LockSources(why, left_))
+				return false;
+
+			if (!LockTargets(why, left_, target))
+				return false;
+
+			if (!LockSources(why, right_))
+				return false;
+
+			// don't lock targets for right hand, it's the same ones as the
+			// left, which would fail because they're locked above
+
+			return true;
+		}
+
 		private bool Lock(string why, HandInfo hand, Person target)
+		{
+			if (!LockSources(why, hand))
+				return false;
+
+			if (!LockTargets(why, hand, target))
+				return false;
+
+			return true;
+		}
+
+		private bool LockSources(string why, HandInfo hand)
 		{
 			hand.sourceLock = BodyPartLock.LockMany(
 				person_, hand.sourceLockTypes,
 				BodyPartLock.Anim, why, BodyPartLock.Strong);
 
-			hand.targetLock = BodyPartLock.LockMany(
-				target,
-				new int[] { BP.Hips },
-				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
-
-			if (hand.sourceLock == null || hand.targetLock == null)
+			if (hand.sourceLock == null)
 			{
+				Log.Error($"failed to lock sources for {why}");
 				Unlock(hand);
 				return false;
 			}
@@ -463,19 +474,36 @@
 			return true;
 		}
 
-		private BodyPart FindTarget(int handPart)
+		private bool LockTargets(string why, HandInfo hand, Person target)
+		{
+			hand.targetLock = BodyPartLock.LockMany(
+				target,
+				new int[] { BP.Hips },
+				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
+
+			if (hand.targetLock == null)
+			{
+				Log.Error($"failed to lock targets for {why}");
+				Unlock(hand);
+				return false;
+			}
+
+			return true;
+		}
+
+		private BodyPart FindTarget(int handPart, float maxDistance)
 		{
 			var hand = person_.Body.Get(handPart);
 
 			BodyPart tentative = null;
-			Log.Info($"finding target for {hand}");
+			Log.Verbose($"finding target for {hand}");
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
 				var d = hand.DistanceToSurface(g);
 
-				if (d > MaxDistanceToStart)
+				if (d > maxDistance)
 				{
 					Log.Verbose($"{g} too far");
 					continue;

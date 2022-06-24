@@ -11,6 +11,8 @@ using static ClockwiseSilver.Helpers;
 
 namespace ClockwiseSilver {
 	public class BJ : MVRScript {
+		private const float GiveUpTime = 4;
+
 
 		private Atom her;
 		private Atom him;
@@ -584,7 +586,7 @@ namespace ClockwiseSilver {
 
 			//--------------------------------------------------Begin----------------------
 
-			while (bjRunning && giveUpTimer < 5f && Vector3.Distance(headControlTransform.position, startTargetPos) > 0.001f)
+			while (bjRunning && giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startTargetPos) > 0.001f)
 			{
 				dTime = Time.fixedDeltaTime;
 				float dMorphTime = dTime * 20;
@@ -732,10 +734,10 @@ namespace ClockwiseSilver {
 			bool doRot = (wasHeadRotState == FreeControllerV3.RotationState.On);
 			headControl.RBHoldPositionSpring = 2000;
 			headControl.RBHoldRotationSpring = 200;
-			giveUpTimer = (doPos || doRot) ? 0f : 5f;
+			giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
 
 			//--------------------------------------------------Return----------------------
-			while (giveUpTimer < 5f && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
+			while (giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
 			{
 				if (audioMoanLoaded)
 				{

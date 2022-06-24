@@ -11,6 +11,8 @@ using static ClockwiseSilver.Helpers;
 
 namespace ClockwiseSilver {
 	public class HJ : MVRScript {
+		private const float GiveUpTime = 4;
+
 
 		private Atom her;
 		private Atom him;
@@ -652,7 +654,7 @@ namespace ClockwiseSilver {
 			float giveUpTimer = 0f; float dTime = Time.fixedDeltaTime;
 
 			//--------------------------------------------------Begin----------------------
-			while (hjRunning && giveUpTimer < 5f && Vector3.Distance(handControlTransform.position, startTargetPos) > 0.001f)
+			while (hjRunning && giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, startTargetPos) > 0.001f)
 			{
 				float dMorphTime = dTime * 7;
 				handOpenMorph.morphValue = Mathf.LerpUnclamped(handOpenMorph.morphValue, handOpenTarget, dMorphTime);
@@ -676,7 +678,7 @@ namespace ClockwiseSilver {
 			SetHandRotation(penisBase.transform); giveUpTimer = 0f;
 
 			//--------------------------------------------------Grip----------------------
-			while (hjRunning && giveUpTimer < 5f && handCloseMorph.morphValue < handCloseTarget - 0.05f)
+			while (hjRunning && giveUpTimer < GiveUpTime && handCloseMorph.morphValue < handCloseTarget - 0.05f)
 			{
 				handShift.x = handShiftXJSON.val; handShift.y = handShiftYJSON.val; handShift.z = handShiftZJSON.val;
 				Vector3 tPos;
@@ -848,7 +850,7 @@ namespace ClockwiseSilver {
 			giveUpTimer = 0f;
 
 			//--------------------------------------------------Stop----------------------
-			while (giveUpTimer < 5f && Vector3.Distance(handControlTransform.position, handTravelUp) > 0.002f)
+			while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, handTravelUp) > 0.002f)
 			{
 				float dMorphTime = dTime * 24;
 				handOpenMorph.morphValue = Mathf.LerpUnclamped(handOpenMorph.morphValue, handOpenStart, dMorphTime);
@@ -867,10 +869,10 @@ namespace ClockwiseSilver {
 
 				giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 			}
-			giveUpTimer = (doPos || doRot) ? 0f : 5f;
+			giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
 
 			//--------------------------------------------------Return----------------------
-			while (giveUpTimer < 5f && Vector3.Distance(handControlTransform.position, startPosHand) > 0.002f)
+			while (giveUpTimer < GiveUpTime && Vector3.Distance(handControlTransform.position, startPosHand) > 0.002f)
 			{
 				handControlTransform.position = Vector3.MoveTowards(handControlTransform.position, startPosHand, trackingSpeedJSON.val * dTime);
 				handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startRotHand, dTime * 150);

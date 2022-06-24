@@ -2,6 +2,8 @@
 {
 	abstract class ClockwiseHJAnimation : BuiltinAnimation
 	{
+		private const float WaitForDoneTime = 5;
+
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
@@ -17,6 +19,8 @@
 		protected Person rightTarget_ = null;
 
 		private bool wasSilent_ = false;
+		private bool waitForDone_ = false;
+		private float waitForDoneElapsed_ = 0;
 
 		protected ClockwiseHJAnimation(string name)
 			: base(name)
@@ -82,6 +86,33 @@
 		public override void Update(float s)
 		{
 			base.Update(s);
+
+			if (waitForDone_)
+			{
+				if (leftTarget_ == null && rightTarget_ == null)
+				{
+					// stopped
+					log_.Info("animation was stopped before cw could start");
+					waitForDone_ = false;
+					return;
+				}
+
+				waitForDoneElapsed_ += s;
+
+				if (!running_.Value)
+				{
+					log_.Info("finally stopped, starting");
+					active_.Value = true;
+					waitForDone_ = false;
+				}
+				else if (waitForDoneElapsed_ >= WaitForDoneTime)
+				{
+					log_.Info("still running, giving up");
+					RequestStop();
+					waitForDone_ = false;
+					return;
+				}
+			}
 
 			wasActive_ = Active;
 			if (!wasActive_)
@@ -161,7 +192,18 @@
 
 			hand_.Value = hand;
 			enabled_.Value = true;
-			active_.Value = true;
+
+			if (!active_.Value && running_.Value)
+			{
+				waitForDone_ = true;
+				waitForDoneElapsed_ = 0;
+				log_.Info("still running, waiting for done");
+			}
+			else
+			{
+				waitForDone_ = false;
+				active_.Value = true;
+			}
 
 			return true;
 		}

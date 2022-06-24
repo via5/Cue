@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace ClockwiseSilver {
 	public class Kiss : MVRScript {
+		private const float GiveUpTime = 4;
 
 		private FreeControllerV3 headControl;
         private Rigidbody lipTrigger, headRB, chestRB, targetBody;
@@ -36,7 +37,7 @@ namespace ClockwiseSilver {
 		private float[] targetsLip;
 		private float[] targetsTongue;
 		private float openTimer, morphTimer = 0f;
-		private float giveUpTimer = 5f;
+		private float giveUpTimer = GiveUpTime;
 		private float mouthOpenWideMax = 0.8f;
 		private float mouthOpenWideTarget = 0.8f;
 		private float tongueLengthTarget = 0.15f;
@@ -391,7 +392,7 @@ namespace ClockwiseSilver {
 
 			//Restore gaze control
 
-			giveUpTimer = 4.0f;
+			giveUpTimer = GiveUpTime;
 			kissStopping = true;
 			kissStoppingDoMove = true;
 			SetMorphTargets();
