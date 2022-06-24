@@ -121,24 +121,21 @@ namespace Cue
 			get { return target_; }
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
-			return new string[]
-			{
-				$"startDistance            {d_.startDistance:0.00}",
-				$"startDistanceWithPlayer  {d_.startDistanceWithPlayer:0.00}",
-				$"stopDistance             {d_.stopDistance:0.00}",
-				$"stopDistanceWithPlayer   {d_.stopDistanceWithPlayer:0.00}",
-				$"duration                 {d_.duration.ToLiveString()}",
-				$"wait                     {d_.wait.ToLiveString()}",
-				$"state                    {(Active ? "active" : "waiting")}",
-				$"durationFinished         {durationFinished_}",
-				$"waitFinished             {waitFinished_}",
-				$"elapsed                  {elapsed_:0.00}",
-				$"last                     {lastResult_}",
-				$"minDuration              {minDuration_}",
-				$"waitFinishedBecauseGrab_ {waitFinishedBecauseGrab_}",
-			};
+			debug.Add("startDistance", $"{d_.startDistance:0.00}");
+			debug.Add("startDistanceWithPlayer", $"{d_.startDistanceWithPlayer:0.00}");
+			debug.Add("stopDistance", $"{d_.stopDistance:0.00}");
+			debug.Add("stopDistanceWithPlayer", $"{d_.stopDistanceWithPlayer:0.00}");
+			debug.Add("duration", $"{d_.duration.ToLiveString()}");
+			debug.Add("wait", $"{d_.wait.ToLiveString()}");
+			debug.Add("state", $"{(Active ? "active" : "waiting")}");
+			debug.Add("durationFinished", $"{durationFinished_}");
+			debug.Add("waitFinished", $"{waitFinished_}");
+			debug.Add("elapsed", $"{elapsed_:0.00}");
+			debug.Add("last", $"{lastResult_}");
+			debug.Add("minDuration", $"{minDuration_}");
+			debug.Add("waitFinishedBecauseGrab", $"{waitFinishedBecauseGrab_}");
 		}
 
 		public override void Update(float s)

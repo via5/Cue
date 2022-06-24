@@ -16,15 +16,12 @@
 		{
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
-			return new string[]
-			{
-				$"receiver    {receiver_}",
-				$"active      {active_}",
-				$"running     {running_}",
-				$"anim        {Animations.ToString(anim_)}"
-			};
+			debug.Add("receiver", $"{receiver_}");
+			debug.Add("active", $"{active_}");
+			debug.Add("running", $"{running_}");
+			debug.Add("anim", $"{Animations.ToString(anim_)}");
 		}
 
 		public bool Active

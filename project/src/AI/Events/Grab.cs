@@ -16,11 +16,8 @@
 			head_ = person_.Body.Get(BP.Head);
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
-			return new string[]
-			{
-			};
 		}
 
 		public override void Update(float s)

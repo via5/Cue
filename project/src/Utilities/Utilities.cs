@@ -8,6 +8,7 @@ namespace Cue
 	{
 		private List<string[]> debug_ = null;
 		private List<string> debugLines_ = null;
+		private static string[] empty_ = new string[0];
 		private int i_ = 0;
 
 		public void Clear()
@@ -34,6 +35,9 @@ namespace Cue
 
 		public string[] MakeArray()
 		{
+			if (debug_ == null || debugLines_ == null)
+				return empty_;
+
 			MakeDebugLines();
 			return debugLines_.ToArray();
 		}

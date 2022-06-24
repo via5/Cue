@@ -19,16 +19,13 @@
 		{
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
-			return new string[]
-			{
-				$"active       {active_}",
-				$"elapsed      {checkElapsed_:0.00}",
-				$"bjTarget     {bjTarget_}",
-				$"sourceLocks  {sourceLocks_?.ToString() ?? ""}",
-				$"targetLocks  {targetLocks_?.ToString() ?? ""}"
-			};
+			debug.Add("active", $"{active_}");
+			debug.Add("elapsed", $"{checkElapsed_:0.00}");
+			debug.Add("bjTarget", $"{bjTarget_}");
+			debug.Add("sourceLocks", $"{sourceLocks_}");
+			debug.Add("targetLocks", $"{targetLocks_}");
 		}
 
 		public bool Active

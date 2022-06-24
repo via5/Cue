@@ -2,6 +2,49 @@
 {
 	class HandEvent : BasicEvent
 	{
+		class HandInfo
+		{
+			public readonly string name;
+			public readonly BodyPart bp;
+			public readonly int fingeringAnimType;
+			public readonly int hjAnimType;
+			public readonly int[] sourceLockTypes;
+
+			public Person target = null;
+			public bool groped = false;
+			public BodyPartLock[] sourceLock = null;
+			public BodyPartLock[] targetLock = null;
+			public int anim = Animations.None;
+			public bool forcedTrigger = false;
+			public bool wasGrabbed = false;
+
+			public HandInfo(string name, BodyPart part, int fingeringAnim, int hjAnim, int[] sourceLockTypes)
+			{
+				this.name = name;
+				bp = part;
+				fingeringAnimType = fingeringAnim;
+				hjAnimType = hjAnim;
+				this.sourceLockTypes = sourceLockTypes;
+			}
+
+			public void Debug(DebugLines debug)
+			{
+				debug.Add($"{name} target", $"{target} groped={groped}");
+
+				if (sourceLock != null)
+				{
+					for (int i = 0; i < sourceLock.Length; ++i)
+						debug.Add($"{name} srcLock", sourceLock[i].ToString());
+				}
+
+				if (targetLock != null)
+				{
+					for (int i = 0; i < targetLock.Length; ++i)
+						debug.Add($"{name} tarLock", targetLock[i].ToString());
+				}
+			}
+		}
+
 		private const float MaxDistanceToStart = 0.09f;
 		private const float CheckTargetsInterval = 2;
 		private const float AutoStartDistance = 0.05f;
@@ -10,21 +53,8 @@
 		private bool active_ = false;
 		private float checkElapsed_ = CheckTargetsInterval;
 
-		private Person leftTarget_ = null;
-		private bool leftGroped_ = false;
-		private BodyPartLock[] leftSourceLock_ = null;
-		private BodyPartLock[] leftTargetLock_ = null;
-		private int leftAnim_ = Animations.None;
-		private bool leftForcedTrigger_ = false;
-		private bool leftWasGrabbed_ = false;
-
-		private Person rightTarget_ = null;
-		private bool rightGroped_ = false;
-		private BodyPartLock[] rightSourceLock_ = null;
-		private BodyPartLock[] rightTargetLock_ = null;
-		private int rightAnim_ = Animations.None;
-		private bool rightForcedTrigger_ = false;
-		private bool rightWasGrabbed_ = false;
+		private HandInfo left_ = null;
+		private HandInfo right_ = null;
 
 
 		public HandEvent()
@@ -32,21 +62,28 @@
 		{
 		}
 
-		public override string[] Debug()
+		protected override void DoInit()
 		{
-			return new string[]
-			{
-				$"active         {active_}",
-				$"elapsed        {checkElapsed_:0.00}",
-				$"left target    {leftTarget_}",
-				$"left groped    {leftGroped_}",
-				$"left src lock  {leftSourceLock_?.ToString() ?? ""}",
-				$"left tar lock  {leftTargetLock_?.ToString() ?? ""}",
-				$"right target   {rightTarget_}",
-				$"right groped   {rightGroped_}",
-				$"right src lock {rightSourceLock_?.ToString() ?? ""}",
-				$"right tar lock {rightTargetLock_?.ToString() ?? ""}"
-			};
+			base.DoInit();
+
+			left_ = new HandInfo(
+				"left", person_.Body.Get(BP.LeftHand),
+				Animations.LeftFinger, Animations.HandjobLeft,
+				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand });
+
+			right_ = new HandInfo(
+				"right", person_.Body.Get(BP.RightHand),
+				Animations.RightFinger, Animations.HandjobRight,
+				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand });
+		}
+
+		public override void Debug(DebugLines debug)
+		{
+			debug.Add("active",  $"{active_}");
+			debug.Add("elapsed", $"{checkElapsed_:0.00}");
+
+			left_.Debug(debug);
+			right_.Debug(debug);
 		}
 
 		public bool Active
@@ -69,12 +106,12 @@
 
 		public Person LeftTarget
 		{
-			get { return leftTarget_; }
+			get { return left_.target; }
 		}
 
 		public Person RightTarget
 		{
-			get { return rightTarget_; }
+			get { return right_.target; }
 		}
 
 		public override void Update(float s)
@@ -84,8 +121,9 @@
 				if (CheckAutoStart())
 					return;
 
-				UnlockLeft();
-				UnlockRight();
+				Unlock(left_);
+				Unlock(right_);
+
 				return;
 			}
 
@@ -98,13 +136,13 @@
 				checkElapsed_ = 0;
 				Check();
 
-				if (leftTarget_ == null)
-					UnlockLeft();
+				if (left_.target == null)
+					Unlock(left_);
 
-				if (rightTarget_ == null)
-					UnlockRight();
+				if (right_.target == null)
+					Unlock(right_);
 
-				if (leftTarget_ == null && rightTarget_ == null)
+				if (left_.target == null && right_.target == null)
 					active_ = false;
 			}
 		}
@@ -115,34 +153,8 @@
 				return false;
 
 			bool check = false;
-
-			var left = person_.Body.Get(BP.LeftHand);
-			var right = person_.Body.Get(BP.RightHand);
-
-			{
-				if (left.Grabbed && !leftWasGrabbed_)
-				{
-					leftWasGrabbed_ = true;
-				}
-				else if (!left.Grabbed && leftWasGrabbed_)
-				{
-					leftWasGrabbed_ = false;
-					check = true;
-				}
-			}
-
-			{
-				if (right.Grabbed && !rightWasGrabbed_)
-				{
-					rightWasGrabbed_ = true;
-				}
-				else if (!right.Grabbed && rightWasGrabbed_)
-				{
-					rightWasGrabbed_ = false;
-					check = true;
-				}
-			}
-
+			check = check || CheckAutoStart(left_);
+			check = check || CheckAutoStart(right_);
 
 			if (!check)
 				return false;
@@ -152,16 +164,16 @@
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
 				BodyPart bp = null;
 
-				float d = g.DistanceToSurface(left);
+				float d = g.DistanceToSurface(left_.bp);
 				if (d < AutoStartDistance)
 				{
-					bp = left;
+					bp = left_.bp;
 				}
 				else
 				{
-					d = g.DistanceToSurface(right);
+					d = g.DistanceToSurface(right_.bp);
 					if (d < AutoStartDistance)
-						bp = right;
+						bp = right_.bp;
 				}
 
 				if (bp != null)
@@ -175,100 +187,81 @@
 			return false;
 		}
 
+		private bool CheckAutoStart(HandInfo hand)
+		{
+			if (hand.bp.Grabbed && !hand.wasGrabbed)
+			{
+				hand.wasGrabbed = true;
+			}
+			else if (!hand.bp.Grabbed && hand.wasGrabbed)
+			{
+				hand.wasGrabbed = false;
+				return true;
+			}
+
+			return false;
+		}
+
 		private void Stop()
 		{
-			if (leftAnim_ != Animations.None)
+			Stop(left_);
+			Stop(right_);
+		}
+
+		private void Stop(HandInfo hand)
+		{
+			if (hand.anim != Animations.None)
 			{
-				person_.Animator.StopType(leftAnim_);
-				leftAnim_ = Animations.None;
+				person_.Animator.StopType(hand.anim);
+				hand.anim = Animations.None;
 			}
 
-			if (rightAnim_ != Animations.None)
+			if (hand.target != null)
 			{
-				person_.Animator.StopType(rightAnim_);
-				rightAnim_ = Animations.None;
-			}
-
-			if (leftTarget_ != null)
-			{
-				if (leftForcedTrigger_)
+				if (hand.forcedTrigger)
 				{
-					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
-						.RemoveForcedTrigger(person_.PersonIndex, BP.LeftHand);
+					hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+						.RemoveForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
-					leftForcedTrigger_ = false;
+					hand.forcedTrigger = false;
 				}
 
-				UnlockLeft();
-				SetZoneEnabled(leftTarget_, false);
+				Unlock(hand);
+				SetZoneEnabled(hand.target, false);
 
-				leftTarget_.Homing.LeftHand = false;
+				if (hand.bp.Type == BP.LeftHand)
+					hand.target.Homing.LeftHand = false;
+				else
+					hand.target.Homing.RightHand = false;
 
-				leftGroped_ = false;
-				leftTarget_ = null;
-			}
-
-			if (rightTarget_ != null)
-			{
-				if (rightForcedTrigger_)
-				{
-					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-						.RemoveForcedTrigger(person_.PersonIndex, BP.RightHand);
-
-				}
-
-				UnlockRight();
-				SetZoneEnabled(rightTarget_, false);
-
-				rightTarget_.Homing.RightHand = false;
-
-				rightGroped_ = false;
-				rightTarget_ = null;
+				hand.groped = false;
+				hand.target = null;
 			}
 		}
 
-		private void UnlockLeft()
+		private void Unlock(HandInfo hand)
 		{
-			if (leftSourceLock_ != null)
+			if (hand.sourceLock != null)
 			{
-				for (int i = 0; i < leftSourceLock_.Length; ++i)
-					leftSourceLock_[i].Unlock();
+				for (int i = 0; i < hand.sourceLock.Length; ++i)
+					hand.sourceLock[i].Unlock();
 
-				leftSourceLock_ = null;
+				hand.sourceLock = null;
 			}
 
-			if (leftTargetLock_ != null)
+			if (hand.targetLock != null)
 			{
-				for (int i = 0; i < leftTargetLock_.Length; ++i)
-					leftTargetLock_[i].Unlock();
+				for (int i = 0; i < hand.targetLock.Length; ++i)
+					hand.targetLock[i].Unlock();
 
-				leftTargetLock_ = null;
-			}
-		}
-
-		private void UnlockRight()
-		{
-			if (rightSourceLock_ != null)
-			{
-				for (int i = 0; i < rightSourceLock_.Length; ++i)
-					rightSourceLock_[i].Unlock();
-
-				rightSourceLock_ = null;
-			}
-
-			if (rightTargetLock_ != null)
-			{
-				for (int i = 0; i < rightTargetLock_.Length; ++i)
-					rightTargetLock_[i].Unlock();
-
-				rightTargetLock_ = null;
+				hand.targetLock = null;
 			}
 		}
 
 		private void Check()
 		{
 			// todo, make it dynamic
-			if (leftTarget_ != null || rightTarget_ != null)
+			if (left_.target != null || right_.target != null)
 				return;
 
 			var rightTarget = FindTarget(BP.RightHand);
@@ -291,17 +284,17 @@
 				if (leftTarget != null)
 				{
 					if (leftTarget.Type == BP.Penis)
-						StartLeftHJ(leftTarget.Person);
+						StartHJ(left_, leftTarget.Person);
 					else if (leftTarget.Type == BP.Labia)
-						StartLeftFinger(leftTarget.Person);
+						StartFinger(left_, leftTarget.Person);
 				}
 
 				if (rightTarget != null)
 				{
 					if (rightTarget.Type == BP.Penis)
-						StartRightHJ(rightTarget.Person);
+						StartHJ(right_, rightTarget.Person);
 					else if (rightTarget.Type == BP.Labia)
-						StartRightFinger(rightTarget.Person);
+						StartFinger(right_, rightTarget.Person);
 				}
 			}
 		}
@@ -310,13 +303,13 @@
 		{
 			Log.Info($"double hj {left?.ID}");
 
-			if (LockLeft("double hj", left) && LockRight("double hj", right))
+			if (Lock("double hj", left_, left) && Lock("double hj", right_, right))
 			{
-				leftTarget_ = left;
-				leftAnim_ = Animations.HandjobBoth;
+				left_.target = left;
+				left_.anim = Animations.HandjobBoth;
 
-				rightTarget_ = right;
-				rightAnim_ = Animations.None;
+				right_.target = right;
+				right_.anim = Animations.None;
 
 				SetZoneEnabled(left, true);
 				SetZoneEnabled(right, true);
@@ -332,20 +325,20 @@
 					right.Homing.RightHand = true;
 				}
 
-				if (leftTarget_.Body.PenisSensitive)
+				if (left_.target.Body.PenisSensitive)
 				{
-					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
+					left_.target.Body.Get(left_.target.Body.GenitalsBodyPart)
 						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
 
-					leftForcedTrigger_ = true;
+					left_.forcedTrigger = true;
 				}
 
-				if (leftTarget_ != rightTarget_ && rightTarget_.Body.PenisSensitive)
+				if (left_.target != right_.target && right_.target.Body.PenisSensitive)
 				{
-					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
+					right_.target.Body.Get(right_.target.Body.GenitalsBodyPart)
 						.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
 
-					rightForcedTrigger_ = true;
+					right_.forcedTrigger = true;
 				}
 			}
 			else
@@ -355,132 +348,83 @@
 
 		}
 
-		private void StartLeftHJ(Person target)
+		private void StartHJ(HandInfo hand, Person target)
 		{
-			Log.Info($"left hj {target?.ID}");
+			Log.Info($"{hand.name} hj {target?.ID}");
 
-			if (LockLeft("left hj", target))
+			if (Lock("hj", hand, target))
 			{
-				leftTarget_ = target;
-				leftAnim_ = Animations.HandjobLeft;
+				hand.target = target;
+				hand.anim = hand.hjAnimType;
 				SetZoneEnabled(target, true);
 
 				target.Homing.LeftHand = true;
 
-				if (leftTarget_.Body.PenisSensitive)
+				if (hand.target.Body.PenisSensitive)
 				{
-					leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+					hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+						.AddForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
-					leftForcedTrigger_ = true;
+					hand.forcedTrigger = true;
 				}
 			}
 			else
 			{
-				Log.Info("failed to start left hj, can't lock");
+				Log.Info($"failed to start {hand.name} hj, can't lock");
 			}
 		}
 
-		private void StartLeftFinger(Person target)
+		private void StartFinger(HandInfo hand, Person target)
 		{
-			Log.Info($"left finger with {target?.ID}");
+			Log.Info($"{hand.name} finger with {target?.ID}");
 
-			if (LockLeft("left fingering", target))
+			if (Lock("fingering", hand, target))
 			{
-				leftTarget_ = target;
-				leftAnim_ = Animations.LeftFinger;
-				leftGroped_ = true;
+				hand.target = target;
+				hand.anim = hand.fingeringAnimType;
+				hand.groped = true;
 
 				SetZoneEnabled(target, true);
 
-				leftTarget_.Body.Get(leftTarget_.Body.GenitalsBodyPart)
-					.AddForcedTrigger(person_.PersonIndex, BP.LeftHand);
+				hand.target.Body.Get(hand.target.Body.GenitalsBodyPart)
+					.AddForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
-				leftForcedTrigger_ = true;
+				hand.forcedTrigger = true;
 			}
 			else
 			{
-				Log.Info("failed to start left fingering, can't lock");
-			}
-		}
-
-		private void StartRightHJ(Person target)
-		{
-			Log.Info($"right hj {target?.ID}");
-
-			if (LockRight("right hj", target))
-			{
-				rightTarget_ = target;
-				rightAnim_ = Animations.HandjobRight;
-				SetZoneEnabled(target, true);
-
-				target.Homing.RightHand = true;
-
-				if (rightTarget_.Body.PenisSensitive)
-				{
-					rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-						.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
-
-					rightForcedTrigger_ = true;
-				}
-			}
-			else
-			{
-				Log.Info("failed to start right hj, can't lock");
-			}
-		}
-
-		private void StartRightFinger(Person target)
-		{
-			Log.Info($"right finger {target?.ID}");
-
-			if (LockRight("right fingering", target))
-			{
-				rightTarget_ = target;
-				rightAnim_ = Animations.RightFinger;
-				rightGroped_ = true;
-
-				SetZoneEnabled(target, true);
-
-				rightTarget_.Body.Get(rightTarget_.Body.GenitalsBodyPart)
-					.AddForcedTrigger(person_.PersonIndex, BP.RightHand);
-
-				rightForcedTrigger_ = true;
-			}
-			else
-			{
-				Log.Info("failed to start right finger, can't lock");
+				Log.Info($"failed to start {hand.name} fingering, can't lock");
 			}
 		}
 
 		private bool CheckAnim()
 		{
-			if (!CheckAnim(leftAnim_, leftTarget_, leftSourceLock_))
+			if (!CheckAnim(left_))
 				return false;
 
-			if (!CheckAnim(rightAnim_, rightTarget_, rightSourceLock_))
+			if (!CheckAnim(right_))
 				return false;
 
 			return true;
 		}
 
-		private bool CheckAnim(int anim, Person target, BodyPartLock[] locks)
+		private bool CheckAnim(HandInfo hand)
 		{
-			if (anim != Animations.None)
+			if (hand.anim != Animations.None)
 			{
-				int state = person_.Animator.PlayingStatus(anim);
+				int state = person_.Animator.PlayingStatus(hand.anim);
 
 				if (state == Animator.Playing)
 				{
-					if (Mood.ShouldStopSexAnimation(person_, target))
-						person_.Animator.StopType(anim);
+					if (Mood.ShouldStopSexAnimation(person_, hand.target))
+						person_.Animator.StopType(hand.anim);
 				}
 				else if (state == Animator.NotPlaying)
 				{
-					if (Mood.CanStartSexAnimation(person_, target))
+					if (Mood.CanStartSexAnimation(person_, hand.target))
 					{
 						if (!person_.Animator.PlayType(
-								anim, new AnimationContext(target, locks[0].Key)))
+								hand.anim, new AnimationContext(hand.target, hand.sourceLock[0].Key)))
 						{
 							return false;
 						}
@@ -499,42 +443,20 @@
 				target.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(target);
 		}
 
-		private bool LockLeft(string why, Person target)
+		private bool Lock(string why, HandInfo hand, Person target)
 		{
-			leftSourceLock_ = BodyPartLock.LockMany(
-				person_,
-				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand },
+			hand.sourceLock = BodyPartLock.LockMany(
+				person_, hand.sourceLockTypes,
 				BodyPartLock.Anim, why, BodyPartLock.Strong);
 
-			leftTargetLock_ = BodyPartLock.LockMany(
+			hand.targetLock = BodyPartLock.LockMany(
 				target,
 				new int[] { BP.Hips },
-				BodyPartLock.Anim, why, BodyPartLock.Strong);
+				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
 
-			if (leftSourceLock_ == null || leftTargetLock_ == null)
+			if (hand.sourceLock == null || hand.targetLock == null)
 			{
-				UnlockLeft();
-				return false;
-			}
-
-			return true;
-		}
-
-		private bool LockRight(string why, Person target)
-		{
-			rightSourceLock_ = BodyPartLock.LockMany(
-				person_,
-				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand },
-				BodyPartLock.Anim, why, BodyPartLock.Strong);
-
-			rightTargetLock_ = BodyPartLock.LockMany(
-				target,
-				new int[] { BP.Hips },
-				BodyPartLock.Anim, why, BodyPartLock.Strong);
-
-			if (rightSourceLock_ == null || rightTargetLock_ == null)
-			{
-				UnlockLeft();
+				Unlock(hand);
 				return false;
 			}
 

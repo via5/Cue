@@ -12,7 +12,7 @@ namespace Cue
 		void FixedUpdate(float s);
 		void Update(float s);
 		void ForceStop();
-		string[] Debug();
+		void Debug(DebugLines debug);
 	}
 
 
@@ -112,9 +112,8 @@ namespace Cue
 			return name_;
 		}
 
-		public virtual string[] Debug()
+		public virtual void Debug(DebugLines debug)
 		{
-			return null;
 		}
 	}
 }

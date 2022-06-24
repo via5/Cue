@@ -518,6 +518,7 @@ namespace Cue
 
 		private VUI.ComboBox<IEvent> events_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private DebugLines debug_ = new DebugLines();
 
 		public PersonAIEventsTab(Person person)
 			: base("Events", false)
@@ -530,6 +531,7 @@ namespace Cue
 			Layout = new VUI.BorderLayout(10);
 			events_ = new VUI.ComboBox<IEvent>(es, OnSelection);
 			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 
 			Add(events_, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
@@ -537,16 +539,12 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			var d = events_.Selected?.Debug();
+			debug_.Clear();
 
-			if (d == null)
-			{
-				list_.Clear();
-			}
-			else
-			{
-				list_.SetItems(d);
-			}
+			if (events_.Selected != null)
+				events_.Selected.Debug(debug_);
+
+			list_.SetItems(debug_.MakeArray());
 		}
 
 		private void OnSelection(IEvent e)

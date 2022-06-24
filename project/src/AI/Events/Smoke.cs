@@ -19,7 +19,7 @@ namespace Cue
 			wait_ = new Duration(15, 40);
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
 			string canRunReason = "";
 			string canRun = "";
@@ -29,15 +29,12 @@ namespace Cue
 			else
 				canRun = "yes";
 
-			return new string[]
-			{
-				$"enabled       {enabled_}",
-				$"cig           {cig_}",
-				$"smoke         {smoke_}",
-				$"checkElapsed  {checkElapsed_:0.00}",
-				$"wait          {wait_.ToLiveString()}",
-				$"canRun        {canRun}"
-			};
+			debug.Add("enabled", $"{enabled_}");
+			debug.Add("cig", $"{cig_}");
+			debug.Add("smoke", $"{smoke_}");
+			debug.Add("checkElapsed", $"{checkElapsed_:0.00}");
+			debug.Add("wait", $"{wait_.ToLiveString()}");
+			debug.Add("canRun", $"{canRun}");
 		}
 
 		private void CheckEnabled(float s)

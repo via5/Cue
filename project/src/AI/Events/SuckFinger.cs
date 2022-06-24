@@ -9,12 +9,9 @@
 		{
 		}
 
-		public override string[] Debug()
+		public override void Debug(DebugLines debug)
 		{
-			return new string[]
-			{
-				$"mouthLock  {mouthLock_}",
-			};
+			debug.Add("mouthLock", $"{mouthLock_}");
 		}
 
 		public override void Update(float s)
