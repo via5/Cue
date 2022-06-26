@@ -220,7 +220,7 @@ namespace Cue.Sys
 		private int type_;
 
 		private int personIndex_;
-		private BodyPartTypes bodyPart_;
+		private BodyPartType bodyPart_;
 		private float value_;
 		private bool forced_;
 
@@ -232,7 +232,7 @@ namespace Cue.Sys
 		}
 
 		public static TriggerInfo FromPerson(
-			int sourcePersonIndex, BodyPartTypes sourceBodyPart, float v,
+			int sourcePersonIndex, BodyPartType sourceBodyPart, float v,
 			bool forced = false)
 		{
 			return new TriggerInfo(
@@ -241,7 +241,7 @@ namespace Cue.Sys
 		}
 
 		private TriggerInfo(
-			int type, int sourcePersonIndex, BodyPartTypes sourceBodyPart, float v,
+			int type, int sourcePersonIndex, BodyPartType sourceBodyPart, float v,
 			bool forced, Atom externalAtom)
 		{
 			type_ = type;
@@ -262,7 +262,7 @@ namespace Cue.Sys
 			get { return personIndex_; }
 		}
 
-		public BodyPartTypes BodyPart
+		public BodyPartType BodyPart
 		{
 			get { return bodyPart_; }
 		}
@@ -274,7 +274,7 @@ namespace Cue.Sys
 				(bodyPart_ == other.bodyPart_);
 		}
 
-		public bool Is(int personIndex, BodyPartTypes bodyPart)
+		public bool Is(int personIndex, BodyPartType bodyPart)
 		{
 			return (personIndex_ == personIndex) && (bodyPart_ == bodyPart);
 		}
@@ -326,9 +326,9 @@ namespace Cue.Sys
 	public struct GrabInfo
 	{
 		public int personIndex;
-		public BodyPartTypes sourcePartIndex;
+		public BodyPartType sourcePartIndex;
 
-		public GrabInfo(int personIndex, BodyPartTypes sourcePartIndex)
+		public GrabInfo(int personIndex, BodyPartType sourcePartIndex)
 		{
 			this.personIndex = personIndex;
 			this.sourcePartIndex = sourcePartIndex;
@@ -360,7 +360,7 @@ namespace Cue.Sys
 			if (sourcePartIndex == BP.None)
 				s += "?";
 			else
-				s += BodyPartTypes.ToString(sourcePartIndex);
+				s += BodyPartType.ToString(sourcePartIndex);
 
 			return s;
 		}
@@ -369,7 +369,7 @@ namespace Cue.Sys
 	public interface IBodyPart
 	{
 		IAtom Atom { get; }
-		BodyPartTypes Type { get; }
+		BodyPartType Type { get; }
 		bool Exists { get; }
 		bool IsPhysical { get; }
 		bool CanTrigger { get; }

@@ -11,4 +11,4 @@ V.Value("OthersExcitement"),
 
 };
 
-#><#= Generate(vars, "ZoneTypes", "Sensitivities", false, "SS") #>
+#><#= Generate(vars, "ZoneType", "Sensitivities", false, "SS") #>

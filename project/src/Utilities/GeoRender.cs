@@ -7,11 +7,11 @@
 		private Color color_ = Color.Zero;
 		private Sys.IGraphic near_ = null;
 		private Sys.IGraphic far_ = null;
-		private BodyPartTypes offset_, rot_;
+		private BodyPartType offset_, rot_;
 
 		public FrustumRenderer(
 			Person p, Frustum f,
-			BodyPartTypes offsetBodyPart, BodyPartTypes rotationBodyPart)
+			BodyPartType offsetBodyPart, BodyPartType rotationBodyPart)
 		{
 			person_ = p;
 			frustum_ = f;

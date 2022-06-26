@@ -119,9 +119,9 @@ namespace Cue
 
 	public class ZoneExcitementSource : ExcitementSource
 	{
-		private ZoneTypes zone_;
+		private ZoneType zone_;
 
-		public ZoneExcitementSource(Person p, ZoneTypes ss)
+		public ZoneExcitementSource(Person p, ZoneType ss)
 			: base(p)
 		{
 			zone_ = ss;
@@ -230,11 +230,11 @@ namespace Cue
 			else
 				enabled = "enabled:" + enabled.Substring(0, enabled.Length - 1);
 
-			debug.Add($"{ZoneTypes.ToString(zone_)}:{damp} {enabled}");
+			debug.Add($"{ZoneType.ToString(zone_)}:{damp} {enabled}");
 			DebugZone(zone_, debug);
 		}
 
-		private void DebugZone(ZoneTypes zoneType, List<string> debug)
+		private void DebugZone(ZoneType zoneType, List<string> debug)
 		{
 			var z = person_.Body.Zone(zoneType);
 			var srcs = z.Sources;
@@ -256,7 +256,7 @@ namespace Cue
 
 				string parts = "";
 
-				foreach (BodyPartTypes j in BodyPartTypes.Values)
+				foreach (BodyPartType j in BodyPartType.Values)
 				{
 					if (s.IsStrictlyActive(j))
 					{
@@ -288,21 +288,21 @@ namespace Cue
 			}
 		}
 
-		private string DebugMakePart(ErogenousZoneSource src, BodyPartTypes part)
+		private string DebugMakePart(ErogenousZoneSource src, BodyPartType part)
 		{
 			string s = "";
 
 			if (part == BP.None)
 				s += "unknown";
 			else
-				s += BodyPartTypes.ToString(part);
+				s += BodyPartType.ToString(part);
 
 			s += "=>";
 
 			if (src.TargetBodyPart(part) == BP.None)
 				s += "unknown";
 			else
-				s += BodyPartTypes.ToString(src.TargetBodyPart(part));
+				s += BodyPartType.ToString(src.TargetBodyPart(part));
 
 			return s;
 		}
@@ -432,7 +432,7 @@ namespace Cue
 
 		public void Init()
 		{
-			foreach (ZoneTypes z in ZoneTypes.Values)
+			foreach (ZoneType z in ZoneType.Values)
 			{
 				if (z == SS.OthersExcitement)
 					sources_[z.Int] = new OthersExcitementSource(person_);
@@ -498,7 +498,7 @@ namespace Cue
 			return false;
 		}
 
-		public ExcitementSource GetSource(ZoneTypes ss)
+		public ExcitementSource GetSource(ZoneType ss)
 		{
 			return sources_[ss.Int];
 		}

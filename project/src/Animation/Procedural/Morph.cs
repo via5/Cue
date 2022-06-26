@@ -14,7 +14,7 @@ namespace Cue.Proc
 		public const int ForceToRangePercent = 2;
 		public const int ForceIgnore = 3;
 
-		private BodyPartTypes bodyPartType_;
+		private BodyPartType bodyPartType_;
 		private BodyPart bp_ = null;
 		private string morphId_;
 		private float min_, max_, mid_;
@@ -34,7 +34,7 @@ namespace Cue.Proc
 		private int flags_;
 
 		public MorphTarget(
-			BodyPartTypes bodyPart, string morphId, float min, float max,
+			BodyPartType bodyPart, string morphId, float min, float max,
 			ISync sync, IEasing easing = null, int flags = NoFlags)
 				: base("", sync)
 		{
@@ -52,7 +52,7 @@ namespace Cue.Proc
 
 			try
 			{
-				var bodyPart = BodyPartTypes.FromString(o["bodyPart"]);
+				var bodyPart = BodyPartType.FromString(o["bodyPart"]);
 				if (bodyPart == BP.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
@@ -283,14 +283,14 @@ namespace Cue.Proc
 		public override string ToString()
 		{
 			return
-				$"morph.{morphId_} ({BodyPartTypes.ToString(bodyPartType_)})"
+				$"morph.{morphId_} ({BodyPartType.ToString(bodyPartType_)})"
 				 + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"morph {morphId_} ({BodyPartTypes.ToString(bodyPartType_)})\n" +
+				$"morph {morphId_} ({BodyPartType.ToString(bodyPartType_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
 				$"intensity={intensity_} limitHit={limitHit_} lv={limitedValue_}\n" +

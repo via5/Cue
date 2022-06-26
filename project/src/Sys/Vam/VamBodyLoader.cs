@@ -76,9 +76,9 @@ namespace Cue.Sys.Vam
 				throw new LoadFailed($"variable '{key}' not found");
 			};
 
-			var map = new Dictionary<BodyPartTypes, IBodyPart>();
+			var map = new Dictionary<BodyPartType, IBodyPart>();
 
-			Action<BodyPartTypes, IBodyPart> add = (type, p) =>
+			Action<BodyPartType, IBodyPart> add = (type, p) =>
 			{
 				map[type] = p;
 			};
@@ -92,11 +92,11 @@ namespace Cue.Sys.Vam
 
 			var list = new List<IBodyPart>();
 
-			foreach (BodyPartTypes i in BodyPartTypes.Values)
+			foreach (BodyPartType i in BodyPartType.Values)
 			{
 				IBodyPart p = null;
 				if (!map.TryGetValue(i, out p))
-					Log.Verbose($"missing part {BodyPartTypes.ToString(i)}");
+					Log.Verbose($"missing part {BodyPartType.ToString(i)}");
 
 				if (p == null)
 					list.Add(new NullBodyPart(atom_, i));
@@ -129,7 +129,7 @@ namespace Cue.Sys.Vam
 
 		struct PartSettings
 		{
-			public BodyPartTypes bodyPart;
+			public BodyPartType bodyPart;
 			public List<string> names;
 			public string controller;
 			public List<string> colliders;
@@ -162,7 +162,7 @@ namespace Cue.Sys.Vam
 			ps.ignore = new List<string>();
 			ps.colliders = new List<string>();
 
-			ps.bodyPart = BodyPartTypes.FromString(J.ReqString(o, "part"));
+			ps.bodyPart = BodyPartType.FromString(J.ReqString(o, "part"));
 			if (ps.bodyPart == BP.None)
 				throw new LoadFailed($"bad part '{o["part"].Value}'");
 
@@ -230,7 +230,7 @@ namespace Cue.Sys.Vam
 				if (ps.bodyPart == BP.Eyes)
 					return new EyesBodyPart(atom_);
 				else
-					throw new LoadFailed($"no internal type for {BodyPartTypes.ToString(ps.bodyPart)}");
+					throw new LoadFailed($"no internal type for {BodyPartType.ToString(ps.bodyPart)}");
 			}
 			else if (type == "strapon")
 			{
@@ -417,20 +417,20 @@ namespace Cue.Sys.Vam
 			{
 				var c = U.FindCollider(atom_.Atom, cn);
 				if (c == null)
-					Log.Error($"collider {cn} not found for {BodyPartTypes.ToString(ps.bodyPart)}");
+					Log.Error($"collider {cn} not found for {BodyPartType.ToString(ps.bodyPart)}");
 				else
 					cs.Add(c);
 			}
 
 			if (cs.Count == 0)
-				throw new LoadFailed($"no colliders for {BodyPartTypes.ToString(ps.bodyPart)}");
+				throw new LoadFailed($"no colliders for {BodyPartType.ToString(ps.bodyPart)}");
 
 			FreeControllerV3 fc = null;
 			if (ps.controller != "")
 			{
 				fc = U.FindController(atom_.Atom, ps.controller);
 				if (fc == null)
-					Log.Error($"collider {BodyPartTypes.ToString(ps.bodyPart)} has no controller {ps.controller}");
+					Log.Error($"collider {BodyPartType.ToString(ps.bodyPart)} has no controller {ps.controller}");
 			}
 
 			Rigidbody rb = null;
@@ -438,7 +438,7 @@ namespace Cue.Sys.Vam
 			{
 				rb = U.FindRigidbody(atom_.Atom, ps.rigidbody);
 				if (rb == null)
-					Log.Error($"collider {BodyPartTypes.ToString(ps.bodyPart)} has no rb {ps.rigidbody}");
+					Log.Error($"collider {BodyPartType.ToString(ps.bodyPart)} has no rb {ps.rigidbody}");
 			}
 
 			Rigidbody closestRb = null;
@@ -446,7 +446,7 @@ namespace Cue.Sys.Vam
 			{
 				closestRb = U.FindRigidbody(atom_.Atom, ps.closestRigidbody);
 				if (closestRb == null)
-					Log.Error($"collider {BodyPartTypes.ToString(ps.bodyPart)} has no rb {ps.closestRigidbody}");
+					Log.Error($"collider {BodyPartType.ToString(ps.bodyPart)} has no rb {ps.closestRigidbody}");
 			}
 
 			return new ColliderBodyPart(

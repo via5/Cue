@@ -72,12 +72,12 @@ namespace Cue
 			if (Cue.Instance.Options.IdlePose && !hasIdlePose_)
 			{
 				hasIdlePose_ = true;
-				person_.Animator.PlayType(AnimationTypes.Idle);
+				person_.Animator.PlayType(AnimationType.Idle);
 			}
 			else if (!Cue.Instance.Options.IdlePose && hasIdlePose_)
 			{
 				hasIdlePose_ = false;
-				person_.Animator.StopType(AnimationTypes.Idle);
+				person_.Animator.StopType(AnimationType.Idle);
 			}
 
 			if (eventsEnabled_)

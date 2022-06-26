@@ -96,7 +96,7 @@ namespace Cue
 			{
 				var p = Cue.Instance.AllPersons[pi];
 
-				foreach (BodyPartTypes bi in BodyPartTypes.Values)
+				foreach (BodyPartType bi in BodyPartType.Values)
 					bodyParts_[pi, bi.Int] = new LookatPart(person_, p.Body.Get(bi));
 			}
 
@@ -160,13 +160,13 @@ namespace Cue
 				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from avoid)");
 		}
 
-		public void SetWeightIfZero(Person p, BodyPartTypes bodyPart, float w, string why)
+		public void SetWeightIfZero(Person p, BodyPartType bodyPart, float w, string why)
 		{
 			if (bodyParts_[p.PersonIndex, bodyPart.Int].Weight == 0)
 				bodyParts_[p.PersonIndex, bodyPart.Int].SetWeight(w, why);
 		}
 
-		public void SetWeight(Person p, BodyPartTypes bodyPart, float w, string why)
+		public void SetWeight(Person p, BodyPartType bodyPart, float w, string why)
 		{
 			bodyParts_[p.PersonIndex, bodyPart.Int].SetWeight(w, why);
 		}

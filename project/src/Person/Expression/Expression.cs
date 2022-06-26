@@ -120,7 +120,7 @@
 			get { return config_.exclusive; }
 		}
 
-		public BodyPartTypes[] BodyParts
+		public BodyPartType[] BodyParts
 		{
 			get { return g_.BodyParts; }
 		}
@@ -185,7 +185,7 @@
 			return moods_[t.Int];
 		}
 
-		public bool AffectsAnyBodyPart(BodyPartTypes[] bodyParts)
+		public bool AffectsAnyBodyPart(BodyPartType[] bodyParts)
 		{
 			return g_.AffectsAnyBodyPart(bodyParts);
 		}

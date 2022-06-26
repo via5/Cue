@@ -7,20 +7,20 @@ namespace Cue
 	{
 		private Person person_;
 		private Sys.IMorph m_;
-		private BodyPartTypes[] bodyParts_ = null;
+		private BodyPartType[] bodyParts_ = null;
 
-		public Morph(Person p, string id, BodyPartTypes bodyPart)
+		public Morph(Person p, string id, BodyPartType bodyPart)
 			: this(p, p.Atom.GetMorph(id), bodyPart)
 		{
 		}
 
-		public Morph(Person p, Sys.IMorph m, BodyPartTypes bodyPart)
+		public Morph(Person p, Sys.IMorph m, BodyPartType bodyPart)
 		{
 			person_ = p;
 			m_ = m;
 
 			if (bodyPart != BP.None)
-				bodyParts_ = new BodyPartTypes[] { bodyPart };
+				bodyParts_ = new BodyPartType[] { bodyPart };
 		}
 
 		public bool Init()
@@ -93,10 +93,10 @@ namespace Cue
 		{
 			private string id_;
 			private float min_, max_;
-			private BodyPartTypes bodyPart_;
+			private BodyPartType bodyPart_;
 			private Morph m_ = null;
 
-			public MorphInfo(string id, float min, float max, BodyPartTypes bodyPart)
+			public MorphInfo(string id, float min, float max, BodyPartType bodyPart)
 			{
 				id_ = id;
 				min_ = min;
@@ -139,15 +139,15 @@ namespace Cue
 		private Person person_ = null;
 		private string name_;
 		private MorphInfo[] morphs_;
-		private BodyPartTypes[] bodyParts_ = null;
+		private BodyPartType[] bodyParts_ = null;
 		private float value_ = 0;
 
-		public MorphGroup(string name, BodyPartTypes bodyPart, MorphInfo[] morphs)
-			: this(name, new BodyPartTypes[] { bodyPart }, morphs)
+		public MorphGroup(string name, BodyPartType bodyPart, MorphInfo[] morphs)
+			: this(name, new BodyPartType[] { bodyPart }, morphs)
 		{
 		}
 
-		public MorphGroup(string name, BodyPartTypes[] bodyParts, MorphInfo[] morphs)
+		public MorphGroup(string name, BodyPartType[] bodyParts, MorphInfo[] morphs)
 			: this(name)
 		{
 			morphs_ = morphs;
@@ -172,7 +172,7 @@ namespace Cue
 			for (int i = 0; i < g.morphs_.Length; ++i)
 				morphs_[i] = g.morphs_[i].Clone();
 
-			bodyParts_ = new BodyPartTypes[g.bodyParts_.Length];
+			bodyParts_ = new BodyPartType[g.bodyParts_.Length];
 			g.bodyParts_.CopyTo(bodyParts_, 0);
 		}
 
@@ -189,7 +189,7 @@ namespace Cue
 			return true;
 		}
 
-		public bool AffectsAnyBodyPart(BodyPartTypes[] bodyParts)
+		public bool AffectsAnyBodyPart(BodyPartType[] bodyParts)
 		{
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
@@ -214,7 +214,7 @@ namespace Cue
 			set { SetValue(value); }
 		}
 
-		public BodyPartTypes[] BodyParts
+		public BodyPartType[] BodyParts
 		{
 			get { return bodyParts_; }
 		}
@@ -248,19 +248,19 @@ namespace Cue
 			return name_;
 		}
 
-		private static BodyPartTypes[] FixedBodyParts(BodyPartTypes[] bodyParts)
+		private static BodyPartType[] FixedBodyParts(BodyPartType[] bodyParts)
 		{
 			if (bodyParts == null)
 				return null;
 
-			List<BodyPartTypes> fixedBodyParts = null;
+			List<BodyPartType> fixedBodyParts = null;
 
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
 				if (bodyParts[i] != BP.None)
 				{
 					if (fixedBodyParts == null)
-						fixedBodyParts = new List<BodyPartTypes>();
+						fixedBodyParts = new List<BodyPartType>();
 
 					fixedBodyParts.Add(bodyParts[i]);
 				}

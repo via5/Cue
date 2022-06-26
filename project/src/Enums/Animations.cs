@@ -4,47 +4,47 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public struct AnimationTypes
+	public struct AnimationType
 	{
-		public static readonly AnimationTypes None = AnimationTypes.CreateInternal(-1);
-		public static readonly AnimationTypes Idle = AnimationTypes.CreateInternal(0);
-		public static readonly AnimationTypes Sex = AnimationTypes.CreateInternal(1);
-		public static readonly AnimationTypes Frottage = AnimationTypes.CreateInternal(2);
-		public static readonly AnimationTypes Orgasm = AnimationTypes.CreateInternal(3);
-		public static readonly AnimationTypes Smoke = AnimationTypes.CreateInternal(4);
-		public static readonly AnimationTypes SuckFinger = AnimationTypes.CreateInternal(5);
-		public static readonly AnimationTypes Penetrated = AnimationTypes.CreateInternal(6);
-		public static readonly AnimationTypes RightFinger = AnimationTypes.CreateInternal(7);
-		public static readonly AnimationTypes LeftFinger = AnimationTypes.CreateInternal(8);
-		public static readonly AnimationTypes Kiss = AnimationTypes.CreateInternal(9);
-		public static readonly AnimationTypes HandjobBoth = AnimationTypes.CreateInternal(10);
-		public static readonly AnimationTypes HandjobLeft = AnimationTypes.CreateInternal(11);
-		public static readonly AnimationTypes HandjobRight = AnimationTypes.CreateInternal(12);
-		public static readonly AnimationTypes Blowjob = AnimationTypes.CreateInternal(13);
+		public static readonly AnimationType None = AnimationType.CreateInternal(-1);
+		public static readonly AnimationType Idle = AnimationType.CreateInternal(0);
+		public static readonly AnimationType Sex = AnimationType.CreateInternal(1);
+		public static readonly AnimationType Frottage = AnimationType.CreateInternal(2);
+		public static readonly AnimationType Orgasm = AnimationType.CreateInternal(3);
+		public static readonly AnimationType Smoke = AnimationType.CreateInternal(4);
+		public static readonly AnimationType SuckFinger = AnimationType.CreateInternal(5);
+		public static readonly AnimationType Penetrated = AnimationType.CreateInternal(6);
+		public static readonly AnimationType RightFinger = AnimationType.CreateInternal(7);
+		public static readonly AnimationType LeftFinger = AnimationType.CreateInternal(8);
+		public static readonly AnimationType Kiss = AnimationType.CreateInternal(9);
+		public static readonly AnimationType HandjobBoth = AnimationType.CreateInternal(10);
+		public static readonly AnimationType HandjobLeft = AnimationType.CreateInternal(11);
+		public static readonly AnimationType HandjobRight = AnimationType.CreateInternal(12);
+		public static readonly AnimationType Blowjob = AnimationType.CreateInternal(13);
 
 		public const int Count = 14;
 		public int GetCount() { return 14; }
 
 
-		private static AnimationTypes[] values_ = new AnimationTypes[]
+		private static AnimationType[] values_ = new AnimationType[]
 		{
-			AnimationTypes.CreateInternal(0),
-			AnimationTypes.CreateInternal(1),
-			AnimationTypes.CreateInternal(2),
-			AnimationTypes.CreateInternal(3),
-			AnimationTypes.CreateInternal(4),
-			AnimationTypes.CreateInternal(5),
-			AnimationTypes.CreateInternal(6),
-			AnimationTypes.CreateInternal(7),
-			AnimationTypes.CreateInternal(8),
-			AnimationTypes.CreateInternal(9),
-			AnimationTypes.CreateInternal(10),
-			AnimationTypes.CreateInternal(11),
-			AnimationTypes.CreateInternal(12),
-			AnimationTypes.CreateInternal(13),
+			AnimationType.CreateInternal(0),
+			AnimationType.CreateInternal(1),
+			AnimationType.CreateInternal(2),
+			AnimationType.CreateInternal(3),
+			AnimationType.CreateInternal(4),
+			AnimationType.CreateInternal(5),
+			AnimationType.CreateInternal(6),
+			AnimationType.CreateInternal(7),
+			AnimationType.CreateInternal(8),
+			AnimationType.CreateInternal(9),
+			AnimationType.CreateInternal(10),
+			AnimationType.CreateInternal(11),
+			AnimationType.CreateInternal(12),
+			AnimationType.CreateInternal(13),
 		};
 
-		public static AnimationTypes[] Values
+		public static AnimationType[] Values
 		{
 			get { return values_; }
 		}
@@ -67,20 +67,20 @@ namespace Cue
 			"blowjob",
 		};
 
-		public static AnimationTypes FromString(string s)
+		public static AnimationType FromString(string s)
 		{
 			for (int i = 0; i<names_.Length; ++i)
 			{
 				if (names_[i] == s)
-					return AnimationTypes.CreateInternal(i);
+					return AnimationType.CreateInternal(i);
 			}
 
 			return None;
 		}
 
-		public static AnimationTypes[] FromStringMany(string s)
+		public static AnimationType[] FromStringMany(string s)
 		{
-			var list = new List<AnimationTypes>();
+			var list = new List<AnimationType>();
 			var ss = s.Split(' ');
 
 			foreach (string p in ss)
@@ -97,12 +97,12 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetName(AnimationTypes i)
+		public string GetName(AnimationType i)
 		{
 			return ToString(i);
 		}
 
-		public static string ToString(AnimationTypes i)
+		public static string ToString(AnimationType i)
 		{
 			if (i.v_ >= 0 && i.v_ < names_.Length)
 				return names_[i.v_];
@@ -119,14 +119,14 @@ namespace Cue
 
 		private int v_;
 
-		private AnimationTypes(int value)
+		private AnimationType(int value)
 		{
 			v_ = value;
 		}
 
-		public static AnimationTypes CreateInternal(int value)
+		public static AnimationType CreateInternal(int value)
 		{
-			return new AnimationTypes(value);
+			return new AnimationType(value);
 		}
 
 		public int Int
@@ -134,19 +134,19 @@ namespace Cue
 			get { return v_; }
 		}
 
-		public static bool operator==(AnimationTypes a, AnimationTypes b)
+		public static bool operator==(AnimationType a, AnimationType b)
 		{
 			return (a.v_ == b.v_);
 		}
 
-		public static bool operator!=(AnimationTypes a, AnimationTypes b)
+		public static bool operator!=(AnimationType a, AnimationType b)
 		{
 			return (a.v_ != b.v_);
 		}
 
 		public override bool Equals(object o)
 		{
-			return (o is AnimationTypes) && (((AnimationTypes)o).v_ == v_);
+			return (o is AnimationType) && (((AnimationType)o).v_ == v_);
 		}
 
 		public override int GetHashCode()

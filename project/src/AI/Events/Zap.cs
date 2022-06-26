@@ -16,7 +16,7 @@
 					personIndex = i;
 				}
 
-				public bool CheckActive(float s, Person self, Person other, ZoneTypes zone)
+				public bool CheckActive(float s, Person self, Person other, ZoneType zone)
 				{
 					if (active)
 					{
@@ -54,7 +54,7 @@
 					return false;
 				}
 
-				public string DebugLine(Person self, Person other, ZoneTypes zone)
+				public string DebugLine(Person self, Person other, ZoneType zone)
 				{
 					var ps = self.Personality;
 
@@ -69,10 +69,10 @@
 
 			private Person person_;
 			private string name_;
-			private ZoneTypes zone_;
+			private ZoneType zone_;
 			private Source[] sources_;
 
-			public ZapZone(Person p, string n, ZoneTypes zone)
+			public ZapZone(Person p, string n, ZoneType zone)
 			{
 				person_ = p;
 				name_ = n;
@@ -96,7 +96,7 @@
 					if (p == person_)
 						continue;
 
-					debug.Add(ZoneTypes.ToString(zone_), sources_[i].DebugLine(person_, p, zone_));
+					debug.Add(ZoneType.ToString(zone_), sources_[i].DebugLine(person_, p, zone_));
 				}
 			}
 

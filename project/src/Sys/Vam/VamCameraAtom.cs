@@ -91,7 +91,7 @@ namespace Cue.Sys.Vam
 		private MeshVR.Hands.HandOutput.Hand handOutputType_;
 
 		public VamCameraHand(
-			IAtom a, BodyPartTypes bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
+			IAtom a, BodyPartType bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
 			Transform vrHand, Transform desktopHand)
 				: base(a, bodyPart)
 		{
@@ -235,7 +235,7 @@ namespace Cue.Sys.Vam
 			parts_[BP.LeftHand.Int] = left_;
 			parts_[BP.RightHand.Int] = right_;
 
-			foreach (BodyPartTypes i in BodyPartTypes.Values)
+			foreach (BodyPartType i in BodyPartType.Values)
 			{
 				if (parts_[i.Int] == null)
 					parts_[i.Int] = new NullBodyPart(Atom, i);

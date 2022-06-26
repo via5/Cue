@@ -27,7 +27,7 @@
 				if (mouthLock_ != null)
 				{
 					person_.Animator.PlayType(
-						AnimationTypes.SuckFinger,
+						AnimationType.SuckFinger,
 						new AnimationContext(mouthLock_.Key));
 				}
 			}
@@ -35,7 +35,7 @@
 			{
 				mouthLock_.Unlock();
 				mouthLock_ = null;
-				person_.Animator.StopType(AnimationTypes.SuckFinger);
+				person_.Animator.StopType(AnimationType.SuckFinger);
 			}
 		}
 	}

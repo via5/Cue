@@ -83,7 +83,7 @@
 				target_ = null;
 			}
 
-			person_.Animator.StopType(AnimationTypes.Blowjob, stopFlags);
+			person_.Animator.StopType(AnimationType.Blowjob, stopFlags);
 		}
 
 		private void Unlock()
@@ -159,7 +159,7 @@
 
 			sourceLocks_ = BodyPartLock.LockMany(
 				person_,
-				new BodyPartTypes[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
+				new BodyPartType[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
 			if (sourceLocks_ == null)
@@ -171,7 +171,7 @@
 
 			targetLocks_ = BodyPartLock.LockMany(
 				t,
-				new BodyPartTypes[] { BP.Hips },
+				new BodyPartType[] { BP.Hips },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
 			if (targetLocks_ == null)
@@ -182,7 +182,7 @@
 			}
 
 			if (!person_.Animator.PlayType(
-				AnimationTypes.Blowjob,
+				AnimationType.Blowjob,
 				new AnimationContext(t, sourceLocks_[0].Key)))
 			{
 				Log.Error("failed to start animation");

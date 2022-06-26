@@ -12,10 +12,10 @@ namespace Cue
 
 		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
-		private BodyPartTypes sourcePart_;
+		private BodyPartType sourcePart_;
 		private float modifier_;
 
-		public SensitivityModifier(string source, BodyPartTypes sourcePart, float modifier)
+		public SensitivityModifier(string source, BodyPartType sourcePart, float modifier)
 		{
 			sourceName_ = source;
 			sourcePart_ = sourcePart;
@@ -38,7 +38,7 @@ namespace Cue
 				sourceIndex_ = Resolve(sourceName_);
 		}
 
-		public bool AppliesTo(Person self, int sourcePersonIndex, BodyPartTypes sourcePart)
+		public bool AppliesTo(Person self, int sourcePersonIndex, BodyPartType sourcePart)
 		{
 			if (sourceIndex_ == Player)
 			{
@@ -93,7 +93,7 @@ namespace Cue
 			if (sourcePart_ == BP.None)
 				s += "any";
 			else
-				s += BodyPartTypes.ToString(sourcePart_);
+				s += BodyPartType.ToString(sourcePart_);
 
 			return s + $" {modifier_}";
 		}
@@ -116,7 +116,7 @@ namespace Cue
 
 	public class Sensitivity
 	{
-		private ZoneTypes type_;
+		private ZoneType type_;
 		private float physicalRate_;
 		private float physicalMax_;
 		private float nonPhysicalRate_;
@@ -125,7 +125,7 @@ namespace Cue
 
 
 		public Sensitivity(
-			ZoneTypes type,
+			ZoneType type,
 			float physicalRate, float physicalMax,
 			float nonPhysicalRate, float nonPhysicalMax,
 			SensitivityModifier[] mods)
@@ -138,7 +138,7 @@ namespace Cue
 			modifiers_ = mods ?? new SensitivityModifier[0];
 		}
 
-		public ZoneTypes Type
+		public ZoneType Type
 		{
 			get { return type_; }
 		}
@@ -193,7 +193,7 @@ namespace Cue
 				modifiers_[i].Resolve();
 		}
 
-		public float GetModifier(Person self, int sourcePersonIndex, BodyPartTypes sourcePart)
+		public float GetModifier(Person self, int sourcePersonIndex, BodyPartType sourcePart)
 		{
 			for (int i = 0; i < modifiers_.Length; ++i)
 			{
@@ -208,7 +208,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{ZoneTypes.ToString(type_)}";
+			return $"{ZoneType.ToString(type_)}";
 		}
 	}
 
@@ -220,7 +220,7 @@ namespace Cue
 
 		public Sensitivities()
 		{
-			foreach (ZoneTypes z in ZoneTypes.Values)
+			foreach (ZoneType z in ZoneType.Values)
 				s_[z.Int] = new Sensitivity(z, 0, 0, 0, 0, null);
 		}
 
@@ -249,7 +249,7 @@ namespace Cue
 			s_ = ss;
 		}
 
-		public Sensitivity Get(ZoneTypes type)
+		public Sensitivity Get(ZoneType type)
 		{
 			return s_[type.Int];
 		}

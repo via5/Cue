@@ -8,7 +8,7 @@ namespace Cue.Proc.Tests
 		public bool canApply = true;
 
 		public Sys.IAtom Atom { get; }
-		public BodyPartTypes Type { get; }
+		public BodyPartType Type { get; }
 		public bool Exists { get; }
 		public bool IsPhysical { get; }
 		public bool CanTrigger { get; }

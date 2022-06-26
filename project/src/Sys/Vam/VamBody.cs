@@ -147,7 +147,7 @@ namespace Cue.Sys.Vam
 			strapon_?.LateUpdate(s);
 		}
 
-		public IBodyPart GetPart(BodyPartTypes i)
+		public IBodyPart GetPart(BodyPartType i)
 		{
 			return parts_[i.Int];
 		}

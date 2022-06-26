@@ -15,7 +15,7 @@ namespace Cue
 			person_ = p;
 		}
 
-		public ErogenousZone Get(ZoneTypes i)
+		public ErogenousZone Get(ZoneType i)
 		{
 			return zones_[i.Int];
 		}
@@ -77,7 +77,7 @@ namespace Cue
 					zones_[i].Update();
 			}
 
-			BodyPartTypes[] ignore = new BodyPartTypes[]
+			BodyPartType[] ignore = new BodyPartType[]
 			{
 				BP.Penis, BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina
 			};
@@ -88,7 +88,7 @@ namespace Cue
 
 				for (int i = 0; i < ignore.Length; ++i)
 				{
-					BodyPartTypes targetBodyPart = ignore[i];
+					BodyPartType targetBodyPart = ignore[i];
 
 					if (Get(SS.Penetration).Sources[j].IsAnyActiveForTarget(targetBodyPart))
 					{
@@ -113,13 +113,13 @@ namespace Cue
 	{
 		class Part
 		{
-			public BodyPartTypes bodyPart;
+			public BodyPartType bodyPart;
 			public bool active = false;
 			public float elapsed = 0;
 			public bool ignored = false;
-			public BodyPartTypes targetBodyPart = BP.None;
+			public BodyPartType targetBodyPart = BP.None;
 
-			public Part(BodyPartTypes i)
+			public Part(BodyPartType i)
 			{
 				bodyPart = i;
 			}
@@ -147,12 +147,12 @@ namespace Cue
 			person_ = p;
 			sourcePersonIndex_ = sourcePersonIndex;
 
-			foreach (BodyPartTypes i in BodyPartTypes.Values)
+			foreach (BodyPartType i in BodyPartType.Values)
 				parts_[i.Int] = new Part(i);
 
 			// hack
-			parts_[BP.Count] = new Part(BodyPartTypes.CreateInternal(BP.Count));
-			parts_[BP.Count + 1] = new Part(BodyPartTypes.CreateInternal(BP.Count + 1));
+			parts_[BP.Count] = new Part(BodyPartType.CreateInternal(BP.Count));
+			parts_[BP.Count + 1] = new Part(BodyPartType.CreateInternal(BP.Count + 1));
 		}
 
 		public int PersonIndex
@@ -210,7 +210,7 @@ namespace Cue
 			return parts_[ToyPartIndex];
 		}
 
-		private Part GetPart(BodyPartTypes bodyPart)
+		private Part GetPart(BodyPartType bodyPart)
 		{
 			if (bodyPart == BP.None)
 				return GetExternalPart();
@@ -218,32 +218,32 @@ namespace Cue
 				return parts_[bodyPart.Int];
 		}
 
-		public bool IsActive(BodyPartTypes bodyPart)
+		public bool IsActive(BodyPartType bodyPart)
 		{
 			return IsStrictlyActive(bodyPart) && !IsIgnored(bodyPart);
 		}
 
-		public bool IsStrictlyActive(BodyPartTypes bodyPart)
+		public bool IsStrictlyActive(BodyPartType bodyPart)
 		{
 			return GetPart(bodyPart).active;
 		}
 
-		public bool IsIgnored(BodyPartTypes bodyPart)
+		public bool IsIgnored(BodyPartType bodyPart)
 		{
 			return GetPart(bodyPart).ignored;
 		}
 
-		public BodyPartTypes TargetBodyPart(BodyPartTypes bodyPart)
+		public BodyPartType TargetBodyPart(BodyPartType bodyPart)
 		{
 			return GetPart(bodyPart).targetBodyPart;
 		}
 
-		public float Elapsed(BodyPartTypes bodyPart)
+		public float Elapsed(BodyPartType bodyPart)
 		{
 			return GetPart(bodyPart).elapsed;
 		}
 
-		public bool IsAnyActiveForTarget(BodyPartTypes targetBodyPart)
+		public bool IsAnyActiveForTarget(BodyPartType targetBodyPart)
 		{
 			for (int i = 0; i < parts_.Length; ++i)
 			{
@@ -254,7 +254,7 @@ namespace Cue
 			return false;
 		}
 
-		public void IgnoreTarget(BodyPartTypes targetBodyPart)
+		public void IgnoreTarget(BodyPartType targetBodyPart)
 		{
 			for (int i = 0; i < parts_.Length; ++i)
 			{
@@ -276,7 +276,7 @@ namespace Cue
 			}
 		}
 
-		public void Check(Person p, ZoneTypes zoneType)
+		public void Check(Person p, ZoneType zoneType)
 		{
 			rate_ = 0;
 			mod_ = 0;
@@ -297,7 +297,7 @@ namespace Cue
 					max_ = ss.NonPhysicalMaximum;
 				}
 
-				foreach (BodyPartTypes i in BodyPartTypes.Values)
+				foreach (BodyPartType i in BodyPartType.Values)
 				{
 					if (parts_[i.Int].active && !parts_[i.Int].ignored)
 					{
@@ -318,22 +318,22 @@ namespace Cue
 				Activated(part);
 		}
 
-		public void SetFromPerson(BodyPartTypes sourceBodyPart, BodyPartTypes targetBodyPart)
+		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart)
 		{
 			SetInternal(GetPart(sourceBodyPart), targetBodyPart);
 		}
 
-		public void SetFromToy(BodyPartTypes targetBodyPart)
+		public void SetFromToy(BodyPartType targetBodyPart)
 		{
 			SetInternal(GetToyPart(), targetBodyPart);
 		}
 
-		public void SetFromExternal(BodyPartTypes targetBodyPart)
+		public void SetFromExternal(BodyPartType targetBodyPart)
 		{
 			SetInternal(GetExternalPart(), targetBodyPart);
 		}
 
-		private void SetInternal(Part p, BodyPartTypes targetBodyPart)
+		private void SetInternal(Part p, BodyPartType targetBodyPart)
 		{
 			p.elapsed = 1.0f;
 			p.ignored = false;
@@ -346,7 +346,7 @@ namespace Cue
 			}
 		}
 
-		public void Ignore(BodyPartTypes bodyPart)
+		public void Ignore(BodyPartType bodyPart)
 		{
 			var p = GetPart(bodyPart);
 
@@ -419,15 +419,15 @@ namespace Cue
 	{
 		public struct Part
 		{
-			public BodyPartTypes target;
-			public BodyPartTypes source;
+			public BodyPartType target;
+			public BodyPartType source;
 
-			public Part(BodyPartTypes target)
+			public Part(BodyPartType target)
 				: this(target, BP.None)
 			{
 			}
 
-			public Part(BodyPartTypes target, BodyPartTypes source)
+			public Part(BodyPartType target, BodyPartType source)
 			{
 				this.source = source;
 				this.target = target;
@@ -438,12 +438,12 @@ namespace Cue
 		private int ExternalSourceIndex = -1;
 
 		private Person person_;
-		private ZoneTypes type_;
+		private ZoneType type_;
 		private Part[] parts_;
 		private ErogenousZoneSource[] sources_;
 		private int activeSources_ = 0;
 
-		public ErogenousZone(Person p, ZoneTypes type, Part[] bodyParts)
+		public ErogenousZone(Person p, ZoneType type, Part[] bodyParts)
 		{
 			person_ = p;
 			type_ = type;
@@ -464,7 +464,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return ZoneTypes.ToString(type_);
+			return ZoneType.ToString(type_);
 		}
 
 		public bool Active
@@ -519,7 +519,7 @@ namespace Cue
 			}
 		}
 
-		public void Ignore(int source, BodyPartTypes bodyPart)
+		public void Ignore(int source, BodyPartType bodyPart)
 		{
 			bool wasActive = sources_[source].Active;
 			sources_[source].IgnoreTarget(bodyPart);
@@ -541,7 +541,7 @@ namespace Cue
 		}
 
 		private void CheckTriggers(
-			Sys.TriggerInfo[] ts, BodyPartTypes targetBodyPart, BodyPartTypes sourceCheck)
+			Sys.TriggerInfo[] ts, BodyPartType targetBodyPart, BodyPartType sourceCheck)
 		{
 			for (int i = 0; i < ts.Length; ++i)
 			{

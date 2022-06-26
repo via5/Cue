@@ -10,13 +10,13 @@ namespace Cue.Sys.Vam
 		private FreeControllerV3 fc_ = null;
 
 		public RigidbodyBodyPart(
-			VamAtom a, BodyPartTypes type, Rigidbody[] rbs, FreeControllerV3 fc,
+			VamAtom a, BodyPartType type, Rigidbody[] rbs, FreeControllerV3 fc,
 			string[] colliders, Rigidbody forForce)
 				: base(a, type, colliders)
 		{
-			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartTypes.ToString(Type)}");
+			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartType.ToString(Type)}");
 			foreach (var rb in rbs)
-				Cue.Assert(rb != null, $"null rb in {a.ID} {BodyPartTypes.ToString(Type)}");
+				Cue.Assert(rb != null, $"null rb in {a.ID} {BodyPartType.ToString(Type)}");
 
 			rbs_ = rbs;
 			fc_ = fc;

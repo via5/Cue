@@ -138,7 +138,7 @@ namespace Cue.Sys.Vam
 			return input_.VRInput.IsAtomVRHands(a);
 		}
 
-		public bool IsVRHand(Transform t, BodyPartTypes hand)
+		public bool IsVRHand(Transform t, BodyPartType hand)
 		{
 			return input_.VRInput.IsTransformVRHand(t, (hand == BP.LeftHand));
 		}

@@ -8,12 +8,12 @@ namespace Cue
 		public class ZapInfo
 		{
 			private Person source_ = null;
-			private ZoneTypes zone_ = SS.None;
+			private ZoneType zone_ = SS.None;
 			private float maxIntensity_ = 0;
 			private float time_ = 0;
 			private float elapsed_ = 0;
 
-			public void Set(Person source, ZoneTypes zone, float maxIntensity, float time)
+			public void Set(Person source, ZoneType zone, float maxIntensity, float time)
 			{
 				source_ = source;
 				zone_ = zone;
@@ -43,7 +43,7 @@ namespace Cue
 				get { return source_; }
 			}
 
-			public ZoneTypes Zone
+			public ZoneType Zone
 			{
 				get { return zone_; }
 			}
@@ -93,7 +93,7 @@ namespace Cue
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
 
-			foreach (BodyPartTypes i in BodyPartTypes.Values)
+			foreach (BodyPartType i in BodyPartType.Values)
 			{
 				if (parts[i.Int] != null && parts[i.Int].Type != i)
 					Log.Error($"mismatched body part type {parts[i.Int].Type} {i.Int}");
@@ -137,7 +137,7 @@ namespace Cue
 			get { return (HasPenis && Get(BP.Penis).IsPhysical); }
 		}
 
-		public BodyPartTypes GenitalsBodyPart
+		public BodyPartType GenitalsBodyPart
 		{
 			get { return (HasPenis ? BP.Penis : BP.Labia); }
 		}
@@ -173,7 +173,7 @@ namespace Cue
 			get { return zap_; }
 		}
 
-		public BodyPart Get(BodyPartTypes type)
+		public BodyPart Get(BodyPartType type)
 		{
 			if (type.Int < 0 || type.Int >= all_.Length)
 			{
@@ -184,7 +184,7 @@ namespace Cue
 			return all_[type.Int];
 		}
 
-		public ErogenousZone Zone(ZoneTypes i)
+		public ErogenousZone Zone(ZoneType i)
 		{
 			return zones_.Get(i);
 		}
@@ -194,7 +194,7 @@ namespace Cue
 			person_.Expression.Slapped(speed);
 		}
 
-		public void Zapped(Person source, ZoneTypes zone, float intensity, float time)
+		public void Zapped(Person source, ZoneType zone, float intensity, float time)
 		{
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{
@@ -263,7 +263,7 @@ namespace Cue
 				morphsRemaining_[i] = MaxMorphs;
 		}
 
-		public float UseMorphs(BodyPartTypes[] bodyParts, float use)
+		public float UseMorphs(BodyPartType[] bodyParts, float use)
 		{
 			if (bodyParts == null || bodyParts.Length == 0)
 				return use;

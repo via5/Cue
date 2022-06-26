@@ -20,4 +20,4 @@ V.Value("Blowjob"),
 
 };
 
-#><#= Generate(vars, "AnimationTypes", "Animations", false) #>
+#><#= Generate(vars, "AnimationType", "Animations", false) #>

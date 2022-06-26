@@ -236,7 +236,7 @@ namespace Cue
 			Unlock();
 			Next();
 			SetExcitement(false);
-			person_.Animator.StopType(AnimationTypes.Kiss);
+			person_.Animator.StopType(AnimationType.Kiss);
 			target_ = null;
 			leading_ = false;
 		}
@@ -334,7 +334,7 @@ namespace Cue
 			}
 
 			if (!person_.Animator.PlayType(
-				AnimationTypes.Kiss, new AnimationContext(target, locks_[0].Key)))
+				AnimationType.Kiss, new AnimationContext(target, locks_[0].Key)))
 			{
 				elapsed_ = 0;
 				lastResult_ = $"kiss animation failed to start";
@@ -345,7 +345,7 @@ namespace Cue
 			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_, minDuration_))
 			{
 				lastResult_ = $"kiss animation failed startfrom";
-				person_.Animator.StopType(AnimationTypes.Kiss);
+				person_.Animator.StopType(AnimationType.Kiss);
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;
 			}
@@ -374,7 +374,7 @@ namespace Cue
 		private bool StartedFrom(Person initiator, float minDuration)
 		{
 			if (!person_.Animator.PlayType(
-				AnimationTypes.Kiss, new AnimationContext(
+				AnimationType.Kiss, new AnimationContext(
 					initiator, locks_[0].Key)))
 			{
 				// animations can fail on player
@@ -416,7 +416,7 @@ namespace Cue
 			Unlock();
 			locks_ = BodyPartLock.LockMany(
 				person_,
-				new BodyPartTypes[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
+				new BodyPartType[] { BP.Head, BP.Lips, BP.Mouth, BP.Chest },
 				BodyPartLock.Anim, "kiss", BodyPartLock.Strong);
 
 			return (locks_ != null);
@@ -452,7 +452,7 @@ namespace Cue
 
 		private bool MustStop()
 		{
-			if (!person_.Animator.IsPlayingType(AnimationTypes.Kiss))
+			if (!person_.Animator.IsPlayingType(AnimationType.Kiss))
 			{
 				// not all animations can run on player
 				if (!person_.IsPlayer)

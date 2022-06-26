@@ -276,13 +276,13 @@ namespace Cue
 
 			exps.Add(new string[] { "name", ps.Name });
 
-			foreach (ZoneTypes z in ZoneTypes.Values)
+			foreach (ZoneType z in ZoneType.Values)
 			{
 				var ss = ps.Sensitivities.Get(z);
 
 				exps.Add(new string[]
 				{
-					ZoneTypes.ToString(ss.Type),
+					ZoneType.ToString(ss.Type),
 					$"pRate={ss.PhysicalRate:0.00000} " +
 					$"pMax={ss.PhysicalMaximum:0.00} " +
 					$"npRate={ss.NonPhysicalRate:0.00000} " +

@@ -318,7 +318,7 @@ namespace Cue
 				$"{z.Source} is zapping {other}");
 		}
 
-		private float GetEyesWeight(bool player, ZoneTypes zone)
+		private float GetEyesWeight(bool player, ZoneType zone)
 		{
 			var ps = person_.Personality;
 
@@ -348,7 +348,7 @@ namespace Cue
 			return -1;
 		}
 
-		private float GetTargetWeight(bool player, ZoneTypes zone)
+		private float GetTargetWeight(bool player, ZoneType zone)
 		{
 			var ps = person_.Personality;
 

@@ -6,31 +6,31 @@ namespace Cue
 {
 	public class SS
 	{
-		public static readonly ZoneTypes None = ZoneTypes.CreateInternal(-1);
-		public static readonly ZoneTypes Penetration = ZoneTypes.CreateInternal(0);
-		public static readonly ZoneTypes Mouth = ZoneTypes.CreateInternal(1);
-		public static readonly ZoneTypes Breasts = ZoneTypes.CreateInternal(2);
-		public static readonly ZoneTypes Genitals = ZoneTypes.CreateInternal(3);
-		public static readonly ZoneTypes OthersExcitement = ZoneTypes.CreateInternal(4);
+		public static readonly ZoneType None = ZoneType.CreateInternal(-1);
+		public static readonly ZoneType Penetration = ZoneType.CreateInternal(0);
+		public static readonly ZoneType Mouth = ZoneType.CreateInternal(1);
+		public static readonly ZoneType Breasts = ZoneType.CreateInternal(2);
+		public static readonly ZoneType Genitals = ZoneType.CreateInternal(3);
+		public static readonly ZoneType OthersExcitement = ZoneType.CreateInternal(4);
 
 		public const int Count = 5;
 		public int GetCount() { return 5; }
 	}
 
 
-	public struct ZoneTypes
+	public struct ZoneType
 	{
 
-		private static ZoneTypes[] values_ = new ZoneTypes[]
+		private static ZoneType[] values_ = new ZoneType[]
 		{
-			ZoneTypes.CreateInternal(0),
-			ZoneTypes.CreateInternal(1),
-			ZoneTypes.CreateInternal(2),
-			ZoneTypes.CreateInternal(3),
-			ZoneTypes.CreateInternal(4),
+			ZoneType.CreateInternal(0),
+			ZoneType.CreateInternal(1),
+			ZoneType.CreateInternal(2),
+			ZoneType.CreateInternal(3),
+			ZoneType.CreateInternal(4),
 		};
 
-		public static ZoneTypes[] Values
+		public static ZoneType[] Values
 		{
 			get { return values_; }
 		}
@@ -44,20 +44,20 @@ namespace Cue
 			"othersExcitement",
 		};
 
-		public static ZoneTypes FromString(string s)
+		public static ZoneType FromString(string s)
 		{
 			for (int i = 0; i<names_.Length; ++i)
 			{
 				if (names_[i] == s)
-					return ZoneTypes.CreateInternal(i);
+					return ZoneType.CreateInternal(i);
 			}
 
 			return CreateInternal(-1);
 		}
 
-		public static ZoneTypes[] FromStringMany(string s)
+		public static ZoneType[] FromStringMany(string s)
 		{
-			var list = new List<ZoneTypes>();
+			var list = new List<ZoneType>();
 			var ss = s.Split(' ');
 
 			foreach (string p in ss)
@@ -74,12 +74,12 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public string GetName(ZoneTypes i)
+		public string GetName(ZoneType i)
 		{
 			return ToString(i);
 		}
 
-		public static string ToString(ZoneTypes i)
+		public static string ToString(ZoneType i)
 		{
 			if (i.v_ >= 0 && i.v_ < names_.Length)
 				return names_[i.v_];
@@ -96,14 +96,14 @@ namespace Cue
 
 		private int v_;
 
-		private ZoneTypes(int value)
+		private ZoneType(int value)
 		{
 			v_ = value;
 		}
 
-		public static ZoneTypes CreateInternal(int value)
+		public static ZoneType CreateInternal(int value)
 		{
-			return new ZoneTypes(value);
+			return new ZoneType(value);
 		}
 
 		public int Int
@@ -111,19 +111,19 @@ namespace Cue
 			get { return v_; }
 		}
 
-		public static bool operator==(ZoneTypes a, ZoneTypes b)
+		public static bool operator==(ZoneType a, ZoneType b)
 		{
 			return (a.v_ == b.v_);
 		}
 
-		public static bool operator!=(ZoneTypes a, ZoneTypes b)
+		public static bool operator!=(ZoneType a, ZoneType b)
 		{
 			return (a.v_ != b.v_);
 		}
 
 		public override bool Equals(object o)
 		{
-			return (o is ZoneTypes) && (((ZoneTypes)o).v_ == v_);
+			return (o is ZoneType) && (((ZoneType)o).v_ == v_);
 		}
 
 		public override int GetHashCode()

@@ -4,30 +4,30 @@
 	{
 		public const float CloseToDistance = 0.05f;
 
-		private static BodyPartTypes[] breasts_ = new BodyPartTypes[]
+		private static BodyPartType[] breasts_ = new BodyPartType[]
 		{
 			BP.LeftBreast,
 			BP.RightBreast
 		};
 
-		public static BodyPartTypes[] BreastParts
+		public static BodyPartType[] BreastParts
 		{
 			get { return breasts_; }
 		}
 
 
-		private static BodyPartTypes[] genitals_ = new BodyPartTypes[]
+		private static BodyPartType[] genitals_ = new BodyPartType[]
 		{
 			BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina
 		};
 
-		public static BodyPartTypes[] GenitalParts
+		public static BodyPartType[] GenitalParts
 		{
 			get { return genitals_; }
 		}
 
 
-		private static BodyPartTypes[] personalSpace_ = new BodyPartTypes[]
+		private static BodyPartType[] personalSpace_ = new BodyPartType[]
 		{
 			BP.LeftHand, BP.RightHand,
 			BP.Head, BP.Chest, BP.Hips,
@@ -35,51 +35,51 @@
 			BP.LeftFoot, BP.RightFoot
 		};
 
-		public static BodyPartTypes[] PersonalSpaceParts
+		public static BodyPartType[] PersonalSpaceParts
 		{
 			get { return personalSpace_; }
 		}
 
 
-		private static BodyPartTypes[] groped_ = new BodyPartTypes[]
+		private static BodyPartType[] groped_ = new BodyPartType[]
 		{
 			BP.Head, BP.LeftBreast, BP.RightBreast, BP.Labia, BP.Penis
 		};
 
-		public static BodyPartTypes[] GropedParts
+		public static BodyPartType[] GropedParts
 		{
 			get { return groped_; }
 		}
 
 
-		private static BodyPartTypes[] gropedBy_ = new BodyPartTypes[]
+		private static BodyPartType[] gropedBy_ = new BodyPartType[]
 		{
 			BP.LeftHand, BP.RightHand, BP.LeftFoot, BP.RightFoot
 		};
 
-		public static BodyPartTypes[] GropedByParts
+		public static BodyPartType[] GropedByParts
 		{
 			get { return gropedBy_; }
 		}
 
 
-		private static BodyPartTypes[] penetrated_ = new BodyPartTypes[]
+		private static BodyPartType[] penetrated_ = new BodyPartType[]
 		{
 			BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina, BP.Anus
 		};
 
-		public static BodyPartTypes[] PenetratedParts
+		public static BodyPartType[] PenetratedParts
 		{
 			get { return penetrated_; }
 		}
 
 
-		private static BodyPartTypes[] penetratedBy_ = new BodyPartTypes[]
+		private static BodyPartType[] penetratedBy_ = new BodyPartType[]
 		{
 			BP.Penis
 		};
 
-		public static BodyPartTypes[] PenetratedByParts
+		public static BodyPartType[] PenetratedByParts
 		{
 			get { return penetratedBy_; }
 		}

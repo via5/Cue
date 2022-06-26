@@ -157,7 +157,7 @@ namespace Cue
 						MoodType.FromStringMany(en["moods"].Value), c,
 						new MorphGroup(
 							en["name"].Value,
-							BodyPartTypes.FromStringMany(en["bodyParts"].Value),
+							BodyPartType.FromStringMany(en["bodyParts"].Value),
 							morphs.ToArray())));
 				}
 
@@ -197,13 +197,13 @@ namespace Cue
 					a[s.Type.Int] = s;
 				}
 
-				foreach (ZoneTypes z in ZoneTypes.Values)
+				foreach (ZoneType z in ZoneType.Values)
 				{
 					if (a[z.Int] == null)
 					{
 						throw new LoadFailed(
 							$"missing sensitivity " +
-							$"{ZoneTypes.ToString(z)}");
+							$"{ZoneType.ToString(z)}");
 					}
 				}
 
@@ -218,7 +218,7 @@ namespace Cue
 		private Sensitivity ParseSensitivity(JSONClass o)
 		{
 			var typeName = o["type"].Value;
-			var type = ZoneTypes.FromString(typeName);
+			var type = ZoneType.FromString(typeName);
 			if (type == SS.None)
 			{
 				Log.Error($"bad sensitivity type {typeName}");
@@ -267,10 +267,10 @@ namespace Cue
 			var sourcePartName = J.OptString(o, "sourcePart");
 			float modifier = J.ReqFloat(o, "modifier");
 
-			BodyPartTypes sourcePart = BP.None;
+			BodyPartType sourcePart = BP.None;
 			if (sourcePartName != "" && sourcePartName != "any")
 			{
-				sourcePart = BodyPartTypes.FromString(sourcePartName);
+				sourcePart = BodyPartType.FromString(sourcePartName);
 				if (sourcePart == BP.None)
 					Log.Error($"bad sourcePart '{sourcePartName}'");
 			}

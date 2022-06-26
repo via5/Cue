@@ -64,8 +64,8 @@ namespace Cue
 				return null;
 			}
 
-			AnimationTypes type = AnimationTypes.FromString(o["animation"].Value);
-			if (type == AnimationTypes.None)
+			AnimationType type = AnimationType.FromString(o["animation"].Value);
+			if (type == AnimationType.None)
 			{
 				log_.Error($"bad animation type '{o["animation"].Value}'");
 				return null;
@@ -115,7 +115,7 @@ namespace Cue
 			return a;
 		}
 
-		public Animation GetAny(AnimationTypes type, int style)
+		public Animation GetAny(AnimationType type, int style)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
@@ -131,12 +131,12 @@ namespace Cue
 
 		public List<Animation> GetAll()
 		{
-			return GetAll(AnimationTypes.None, MovementStyles.Any);
+			return GetAll(AnimationType.None, MovementStyles.Any);
 		}
 
-		public List<Animation> GetAll(AnimationTypes type, int style)
+		public List<Animation> GetAll(AnimationType type, int style)
 		{
-			if (type == AnimationTypes.None && style == MovementStyles.Any)
+			if (type == AnimationType.None && style == MovementStyles.Any)
 				return anims_;
 
 			var list = new List<Animation>();
