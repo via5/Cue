@@ -498,6 +498,16 @@ namespace Cue
 			get { return sources_; }
 		}
 
+		public ErogenousZoneSource GetPersonSource(Person p)
+		{
+			return sources_[p.PersonIndex];
+		}
+
+		public ErogenousZoneSource GetToySource()
+		{
+			return sources_[ToySourceIndex];
+		}
+
 		public void Update()
 		{
 			for (int i = 0; i < parts_.Length; ++i)

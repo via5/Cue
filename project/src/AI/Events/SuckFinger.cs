@@ -16,10 +16,27 @@
 
 		public override void Update(float s)
 		{
-			var mouthTriggered = person_.Body.Get(BP.Mouth).Triggered;
+			var z = person_.Body.Zone(SS.Mouth);
+			bool triggered = false;
+
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+			{
+				var p = Cue.Instance.ActivePersons[i];
+				var src = z.GetPersonSource(p);
+
+				if (src.IsActive(BP.LeftHand) || src.IsActive(BP.RightHand))
+				{
+					triggered = true;
+					break;
+				}
+			}
+
+			if (!triggered)
+				triggered = z.GetToySource().Active;
+
 			var head = person_.Body.Get(BP.Head);
 
-			if (mouthLock_ == null && mouthTriggered)
+			if (mouthLock_ == null && triggered)
 			{
 				mouthLock_ = head.Lock(
 					BodyPartLock.Anim, "SuckFinger", BodyPartLock.Strong);
@@ -31,7 +48,7 @@
 						new AnimationContext(mouthLock_.Key));
 				}
 			}
-			else if (mouthLock_ != null && !mouthTriggered)
+			else if (mouthLock_ != null && !triggered)
 			{
 				mouthLock_.Unlock();
 				mouthLock_ = null;

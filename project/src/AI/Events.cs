@@ -58,7 +58,7 @@ namespace Cue
 				new HandLinker(),
 				new HandEvent(),
 				new ZappedEvent(),
-			//	new SuckFingerEvent(),
+				new SuckFingerEvent(),
 			};
 		}
 
