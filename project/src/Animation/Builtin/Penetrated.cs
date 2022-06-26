@@ -65,7 +65,7 @@
 			state_ = ReactionState;
 			Person.Voice.MouthEnabled = false;
 
-			expressions_ = Person.Expression.GetExpressionsForMood(Moods.Excited);
+			expressions_ = Person.Expression.GetExpressionsForMood(MoodType.Excited);
 
 			config_ = MakeConfig();
 			settings_ = MakeSettings(expressions_, config_);

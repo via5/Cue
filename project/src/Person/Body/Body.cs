@@ -8,12 +8,12 @@ namespace Cue
 		public class ZapInfo
 		{
 			private Person source_ = null;
-			private int zone_ = SS.None;
+			private ZoneTypes zone_ = SS.None;
 			private float maxIntensity_ = 0;
 			private float time_ = 0;
 			private float elapsed_ = 0;
 
-			public void Set(Person source, int zone, float maxIntensity, float time)
+			public void Set(Person source, ZoneTypes zone, float maxIntensity, float time)
 			{
 				source_ = source;
 				zone_ = zone;
@@ -43,7 +43,7 @@ namespace Cue
 				get { return source_; }
 			}
 
-			public int Zone
+			public ZoneTypes Zone
 			{
 				get { return zone_; }
 			}
@@ -93,12 +93,12 @@ namespace Cue
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
 
-			for (int i = 0; i < BP.Count; ++i)
+			foreach (BodyPartTypes i in BodyPartTypes.Values)
 			{
-				if (parts[i] != null && parts[i].Type != i)
-					Log.Error($"mismatched body part type {parts[i].Type} {i}");
+				if (parts[i.Int] != null && parts[i.Int].Type != i)
+					Log.Error($"mismatched body part type {parts[i.Int].Type} {i.Int}");
 
-				all.Add(new BodyPart(person_, i, parts[i]));
+				all.Add(new BodyPart(person_, i, parts[i.Int]));
 			}
 
 			all_ = all.ToArray();
@@ -137,7 +137,7 @@ namespace Cue
 			get { return (HasPenis && Get(BP.Penis).IsPhysical); }
 		}
 
-		public int GenitalsBodyPart
+		public BodyPartTypes GenitalsBodyPart
 		{
 			get { return (HasPenis ? BP.Penis : BP.Labia); }
 		}
@@ -173,18 +173,18 @@ namespace Cue
 			get { return zap_; }
 		}
 
-		public BodyPart Get(int type)
+		public BodyPart Get(BodyPartTypes type)
 		{
-			if (type < 0 || type >= all_.Length)
+			if (type.Int < 0 || type.Int >= all_.Length)
 			{
 				Log.Error($"bad part type {type}");
 				return null;
 			}
 
-			return all_[type];
+			return all_[type.Int];
 		}
 
-		public ErogenousZone Zone(int i)
+		public ErogenousZone Zone(ZoneTypes i)
 		{
 			return zones_.Get(i);
 		}
@@ -194,7 +194,7 @@ namespace Cue
 			person_.Expression.Slapped(speed);
 		}
 
-		public void Zapped(Person source, int zone, float intensity, float time)
+		public void Zapped(Person source, ZoneTypes zone, float intensity, float time)
 		{
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{
@@ -214,11 +214,11 @@ namespace Cue
 
 			var ps = person_.Personality;
 
-			temperature_.UpRate = person_.Mood.Get(Moods.Excited) * ps.Get(PS.TemperatureExcitementRate);
+			temperature_.UpRate = person_.Mood.Get(MoodType.Excited) * ps.Get(PS.TemperatureExcitementRate);
 			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
 
 			temperature_.Target = U.Clamp(
-				person_.Mood.Get(Moods.Excited) / ps.Get(PS.TemperatureExcitementMax),
+				person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
 				0, 1);
 
 			if (temperature_.Update(s))
@@ -263,7 +263,7 @@ namespace Cue
 				morphsRemaining_[i] = MaxMorphs;
 		}
 
-		public float UseMorphs(int[] bodyParts, float use)
+		public float UseMorphs(BodyPartTypes[] bodyParts, float use)
 		{
 			if (bodyParts == null || bodyParts.Length == 0)
 				return use;
@@ -273,8 +273,8 @@ namespace Cue
 			for (int i = 0; i < bodyParts.Length; ++i)
 			{
 				var bp = bodyParts[i];
-				if (bp != BP.None && morphsRemaining_[bp] < smallestAv)
-					smallestAv = morphsRemaining_[bp];
+				if (bp != BP.None && morphsRemaining_[bp.Int] < smallestAv)
+					smallestAv = morphsRemaining_[bp.Int];
 			}
 
 			float av = Math.Min(use, smallestAv);
@@ -283,7 +283,7 @@ namespace Cue
 			{
 				var bp = bodyParts[i];
 				if (bp != BP.None)
-					morphsRemaining_[bp] -= av;
+					morphsRemaining_[bp.Int] -= av;
 			}
 
 			return av;

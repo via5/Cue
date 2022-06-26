@@ -16,7 +16,7 @@
 		private float forceWin_ = 100;
 
 		public FingerProcAnimation(
-			string name, int bodyPart, Vector3 torqueDir, Vector3 forceDir)
+			string name, BodyPartTypes bodyPart, Vector3 torqueDir, Vector3 forceDir)
 				: base(name)
 		{
 			var g = new ConcurrentTargetGroup(

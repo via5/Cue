@@ -134,7 +134,7 @@ namespace Cue
 		}
 
 		public static BodyPartLock[] LockMany(
-			Person p, int[] bodyParts, int lockType,
+			Person p, BodyPartTypes[] bodyParts, int lockType,
 			string why, int strengthType)
 		{
 			List<BodyPartLock> list = null;
@@ -168,7 +168,7 @@ namespace Cue
 					$"unlocking all; was locking:");
 
 				for (int i = 0; i < bodyParts.Length; ++i)
-					p.Body.Log.Error($"  - {BP.ToString(bodyParts[i])}");
+					p.Body.Log.Error($"  - {BodyPartTypes.ToString(bodyParts[i])}");
 
 				p.Body.Log.Error($"lockType={lockType}, why={why}, str={StrengthToString(strengthType)}");
 				p.Body.Log.Error($"exception:");

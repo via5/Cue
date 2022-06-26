@@ -242,7 +242,7 @@ namespace Cue.Sys.Vam
 			private IBodyPart bp_;
 
 			public BodyPartRender(IBodyPart bp)
-				: base(BP.ToString(bp.Type), new Vector3(0.005f, 0.005f, 0.005f))
+				: base(BodyPartTypes.ToString(bp.Type), new Vector3(0.005f, 0.005f, 0.005f))
 			{
 				bp_ = bp;
 			}

@@ -7,7 +7,7 @@
 		private BodyPart receiver_ = null;
 		private bool active_ = false;
 		private bool running_ = false;
-		private int anim_ = Animations.None;
+		private AnimationTypes anim_ = AnimationTypes.None;
 		private BodyPartLock lock_ = null;
 
 
@@ -21,7 +21,7 @@
 			debug.Add("receiver", $"{receiver_}");
 			debug.Add("active", $"{active_}");
 			debug.Add("running", $"{running_}");
-			debug.Add("anim", $"{Animations.ToString(anim_)}");
+			debug.Add("anim", $"{AnimationTypes.ToString(anim_)}");
 		}
 
 		public bool Active
@@ -79,7 +79,7 @@
 				// don't allow frottage from characters that can penetrate
 				Log.Info($"no valid receiver");
 				active_ = false;
-				anim_ = Animations.None;
+				anim_ = AnimationTypes.None;
 				return false;
 			}
 
@@ -105,9 +105,9 @@
 				Log.Info($"starting frottage with nobody");
 
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
-					.AddForcedTrigger(-1, -1);
+					.AddForcedTrigger(-1, BP.None);
 
-				anim_ = Animations.Frottage;
+				anim_ = AnimationTypes.Frottage;
 			}
 			else
 			{
@@ -118,17 +118,17 @@
 
 					// play the penetrated animation now, don't bother if it can't
 					// start; see also Penetrated.OnIn()
-					person_.Animator.PlayType(Animations.Penetrated);
-					receiver_.Person.Animator.PlayType(Animations.Penetrated);
+					person_.Animator.PlayType(AnimationTypes.Penetrated);
+					receiver_.Person.Animator.PlayType(AnimationTypes.Penetrated);
 
-					anim_ = Animations.Sex;
+					anim_ = AnimationTypes.Sex;
 				}
 				else
 				{
 					// frottage
 					Log.Info($"starting frottage with {receiver_.Person.ID}.{receiver_}");
 
-					anim_ = Animations.Frottage;
+					anim_ = AnimationTypes.Frottage;
 				}
 
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
@@ -156,7 +156,7 @@
 			{
 				// frottage with nobody
 				person_.Body.Get(person_.Body.GenitalsBodyPart)
-					.RemoveForcedTrigger(-1, -1);
+					.RemoveForcedTrigger(-1, BP.None);
 			}
 			else
 			{
@@ -178,12 +178,12 @@
 
 			running_ = false;
 			receiver_ = null;
-			anim_ = Animations.None;
+			anim_ = AnimationTypes.None;
 		}
 
 		private void SetZoneEnabled(bool b)
 		{
-			var ss = (anim_ == Animations.Frottage ? SS.Genitals : SS.Penetration);
+			var ss = (anim_ == AnimationTypes.Frottage ? SS.Genitals : SS.Penetration);
 
 			if (b)
 			{
@@ -233,7 +233,7 @@
 			return null;
 		}
 
-		private static int[] frottageParts_ = new int[]
+		private static BodyPartTypes[] frottageParts_ = new BodyPartTypes[]
 		{
 			BP.Head, BP.Chest, BP.Hips, BP.Labia, BP.Penis,
 			BP.LeftThigh, BP.RightThigh,

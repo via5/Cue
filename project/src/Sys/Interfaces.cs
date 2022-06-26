@@ -220,7 +220,7 @@ namespace Cue.Sys
 		private int type_;
 
 		private int personIndex_;
-		private int bodyPart_;
+		private BodyPartTypes bodyPart_;
 		private float value_;
 		private bool forced_;
 
@@ -232,7 +232,7 @@ namespace Cue.Sys
 		}
 
 		public static TriggerInfo FromPerson(
-			int sourcePersonIndex, int sourceBodyPart, float v,
+			int sourcePersonIndex, BodyPartTypes sourceBodyPart, float v,
 			bool forced = false)
 		{
 			return new TriggerInfo(
@@ -241,7 +241,7 @@ namespace Cue.Sys
 		}
 
 		private TriggerInfo(
-			int type, int sourcePersonIndex, int sourceBodyPart, float v,
+			int type, int sourcePersonIndex, BodyPartTypes sourceBodyPart, float v,
 			bool forced, Atom externalAtom)
 		{
 			type_ = type;
@@ -262,7 +262,7 @@ namespace Cue.Sys
 			get { return personIndex_; }
 		}
 
-		public int BodyPart
+		public BodyPartTypes BodyPart
 		{
 			get { return bodyPart_; }
 		}
@@ -274,7 +274,7 @@ namespace Cue.Sys
 				(bodyPart_ == other.bodyPart_);
 		}
 
-		public bool Is(int personIndex, int bodyPart)
+		public bool Is(int personIndex, BodyPartTypes bodyPart)
 		{
 			return (personIndex_ == personIndex) && (bodyPart_ == bodyPart);
 		}
@@ -326,9 +326,9 @@ namespace Cue.Sys
 	public struct GrabInfo
 	{
 		public int personIndex;
-		public int sourcePartIndex;
+		public BodyPartTypes sourcePartIndex;
 
-		public GrabInfo(int personIndex, int sourcePartIndex)
+		public GrabInfo(int personIndex, BodyPartTypes sourcePartIndex)
 		{
 			this.personIndex = personIndex;
 			this.sourcePartIndex = sourcePartIndex;
@@ -357,10 +357,10 @@ namespace Cue.Sys
 			s += ".";
 
 
-			if (sourcePartIndex == -1)
+			if (sourcePartIndex == BP.None)
 				s += "?";
 			else
-				s += BP.ToString(sourcePartIndex);
+				s += BodyPartTypes.ToString(sourcePartIndex);
 
 			return s;
 		}
@@ -369,7 +369,7 @@ namespace Cue.Sys
 	public interface IBodyPart
 	{
 		IAtom Atom { get; }
-		int Type { get; }
+		BodyPartTypes Type { get; }
 		bool Exists { get; }
 		bool IsPhysical { get; }
 		bool CanTrigger { get; }

@@ -14,7 +14,7 @@ namespace Cue.Proc
 		public const int ForceToRangePercent = 2;
 		public const int ForceIgnore = 3;
 
-		private int bodyPartType_;
+		private BodyPartTypes bodyPartType_;
 		private BodyPart bp_ = null;
 		private string morphId_;
 		private float min_, max_, mid_;
@@ -34,7 +34,7 @@ namespace Cue.Proc
 		private int flags_;
 
 		public MorphTarget(
-			int bodyPart, string morphId, float min, float max,
+			BodyPartTypes bodyPart, string morphId, float min, float max,
 			ISync sync, IEasing easing = null, int flags = NoFlags)
 				: base("", sync)
 		{
@@ -52,7 +52,7 @@ namespace Cue.Proc
 
 			try
 			{
-				var bodyPart = BP.FromString(o["bodyPart"]);
+				var bodyPart = BodyPartTypes.FromString(o["bodyPart"]);
 				if (bodyPart == BP.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
@@ -116,7 +116,7 @@ namespace Cue.Proc
 		{
 			morph_ = new Morph(person_, morphId_, bodyPartType_);
 
-			if (bodyPartType_ != -1)
+			if (bodyPartType_ != BP.None)
 				bp_ = person_.Body.Get(bodyPartType_);
 
 			mid_ = Mid();
@@ -216,11 +216,11 @@ namespace Cue.Proc
 			float v = rawV;
 
 			limitHit_ = false;
-			if (remaining != null && bodyPartType_ >= 0)
+			if (remaining != null && bodyPartType_ != BP.None)
 			{
-				if (Math.Abs(rawV - mid_) > remaining[bodyPartType_])
+				if (Math.Abs(rawV - mid_) > remaining[bodyPartType_.Int])
 				{
-					limitedValue_ = Math.Sign(rawV) * remaining[bodyPartType_];
+					limitedValue_ = Math.Sign(rawV) * remaining[bodyPartType_.Int];
 					v = mid_ + limitedValue_;
 					limitHit_ = true;
 				}
@@ -246,8 +246,8 @@ namespace Cue.Proc
 				awayFromMid_ = true;
 			}
 
-			if (remaining != null && bodyPartType_ >= 0)
-				remaining[bodyPartType_] -= d;
+			if (remaining != null && bodyPartType_ != BP.None)
+				remaining[bodyPartType_.Int] -= d;
 		}
 
 		private void Next(bool resetBetween, bool forceHigh = false)
@@ -283,14 +283,14 @@ namespace Cue.Proc
 		public override string ToString()
 		{
 			return
-				$"morph.{morphId_} ({BP.ToString(bodyPartType_)})"
+				$"morph.{morphId_} ({BodyPartTypes.ToString(bodyPartType_)})"
 				 + (Name == "" ? "" : $" '{Name}'");
 		}
 
 		public override string ToDetailedString()
 		{
 			return
-				$"morph {morphId_} ({BP.ToString(bodyPartType_)})\n" +
+				$"morph {morphId_} ({BodyPartTypes.ToString(bodyPartType_)})\n" +
 				$"min={min_} max={max_} mid={mid_} r={r_} mag={mag_}\n" +
 				$"finished={finished_} last={last_} timeactive={timeActive_}\n" +
 				$"intensity={intensity_} limitHit={limitHit_} lv={limitedValue_}\n" +

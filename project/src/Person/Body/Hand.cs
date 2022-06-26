@@ -103,12 +103,12 @@
 	{
 		private Person person_;
 		private string name_;
-		private int bodyPart_;
+		private BodyPartTypes bodyPart_;
 		private Finger[] fingers_;
 		private Morph fist_;
 		private Morph inOut_;
 
-		public Hand(Person p, string name, Sys.Hand h, int bodyPart)
+		public Hand(Person p, string name, Sys.Hand h, BodyPartTypes bodyPart)
 		{
 			person_ = p;
 			name_ = name;
@@ -130,7 +130,7 @@
 			get { return name_; }
 		}
 
-		public int BodyPart
+		public BodyPartTypes BodyPart
 		{
 			get { return bodyPart_; }
 		}

@@ -46,4 +46,4 @@ V.Value("Eyes"),
 
 };
 
-#><#= Generate(vars, "BP", "BodyParts", false) #>
+#><#= Generate(vars, "BodyPartTypes", "BodyParts", false, "BP") #>

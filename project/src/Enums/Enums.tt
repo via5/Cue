@@ -58,7 +58,7 @@ public class V
 }
 
 
-public string Generate(V[] vars, string name, string file, bool generateEmpty = true)
+public string Generate(V[] vars, string name, string file, bool generateEmpty = true, string shortName="")
 {
 	var values = new List<V>();
 	var durations = new List<V>();
@@ -82,26 +82,30 @@ public string Generate(V[] vars, string name, string file, bool generateEmpty = 
 			throw new Exception($"bad type {v.type}");
 	}
 
-	return Generate3(
+	return Generate(
 		values.ToArray(), durations.ToArray(), bools.ToArray(),
 		floats.ToArray(), strings.ToArray(),
-		name, file, generateEmpty);
+		name, file, generateEmpty, shortName);
 }
 
-public string Generate3(
+public string Generate(
 	V[] values,
 	V[] durations, V[] bools, V[] floats,
-	V[] strings, string name, string file, bool generateEmpty)
+	V[] strings, string name, string file, bool generateEmpty, string shortName)
 {
 	string defs = "";
 	string names = "";
+	string array = "";
 	var allNames = new List<string>();
 	int sectionCount = 0;
+	string classStruct = "class";
 
 	if (values.Length > 0)
 	{
-		defs += MakeEnum(values, "Count", "int", generateEmpty);
-		names += MakeNames(values, "", allNames, "int", generateEmpty);
+		classStruct = "struct";
+		defs += MakeEnum(values, "Count", "int", generateEmpty, name);
+		names += MakeNames(values, "", allNames, "int", generateEmpty, name, shortName);
+		array += MakeArray(values, "", allNames, "int", generateEmpty, name, shortName);
 		++sectionCount;
 	}
 
@@ -111,7 +115,7 @@ public string Generate3(
 			$"		// durations\r\n" +
 			MakeEnum(durations, "DurationCount", "DurationIndex", generateEmpty);
 
-		names += MakeNames(durations, "duration", allNames, "DurationIndex", generateEmpty);
+		names += MakeNames(durations, "duration", allNames, "DurationIndex", generateEmpty, name);
 		++sectionCount;
 	}
 
@@ -127,7 +131,7 @@ public string Generate3(
 			$"		// bools\r\n" +
 			MakeEnum(bools, "BoolCount", "BoolIndex", generateEmpty);
 
-		names += MakeNames(bools, "bool", allNames, "BoolIndex", generateEmpty);
+		names += MakeNames(bools, "bool", allNames, "BoolIndex", generateEmpty, name);
 		++sectionCount;
 	}
 
@@ -143,7 +147,7 @@ public string Generate3(
 			$"		// floats\r\n" +
 			MakeEnum(floats, "FloatCount", "FloatIndex", generateEmpty);
 
-		names += MakeNames(floats, "float", allNames, "FloatIndex", generateEmpty);
+		names += MakeNames(floats, "float", allNames, "FloatIndex", generateEmpty, name);
 		++sectionCount;
 	}
 
@@ -159,7 +163,7 @@ public string Generate3(
 			$"		// strings\r\n" +
 			MakeEnum(strings, "StringCount", "StringIndex", generateEmpty);
 
-		names += MakeNames(strings, "string", allNames, "StringIndex", generateEmpty);
+		names += MakeNames(strings, "string", allNames, "StringIndex", generateEmpty, name);
 		++sectionCount;
 	}
 
@@ -195,18 +199,85 @@ public string Generate3(
 		$"using System.Collections.Generic;\r\n" +
 		$"\r\n" +
 		$"namespace Cue\r\n" +
-		$"{{\r\n" +
-		$"	public class {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
-		$"	{{\r\n" +
-		defs + "\r\n\r\n\r\n" +
-		names + "\r\n" + allNamesArray +
+		$"{{\r\n";
+
+	if (shortName == "")
+	{
+		s +=
+			$"	public {classStruct} {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
+			$"	{{\r\n" +
+			defs + "\r\n\r\n" +
+			$"\r\n" +
+			array + "\r\n\r\n" +
+			names + "\r\n\r\n" +
+			allNamesArray;
+	}
+	else
+	{
+		s +=
+			$"	public class {shortName}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
+			$"	{{\r\n" +
+			defs + "\r\n" +
+			$"	}}\r\n" +
+			$"\r\n\r\n" +
+			$"	public struct {name}{(generateEmpty ? " : BasicEnumValues" : "")}\r\n" +
+			$"	{{\r\n" +
+			$"\r\n" +
+			array + "\r\n\r\n" +
+			names + "\r\n\r\n" +
+			allNamesArray;
+	}
+
+	if (values.Length > 0)
+	{
+		s +=
+		"\r\n\r\n" +
+		$"		private int v_;\r\n" +
+		$"\r\n" +
+		$"		private {name}(int value)\r\n" +
+		$"		{{\r\n" +
+		$"			v_ = value;\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public static {name} CreateInternal(int value)\r\n" +
+		$"		{{\r\n" +
+		$"			return new {name}(value);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public int Int\r\n" +
+		$"		{{\r\n" +
+		$"			get {{ return v_; }}\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public static bool operator==({name} a, {name} b)\r\n" +
+		$"		{{\r\n" +
+		$"			return (a.v_ == b.v_);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public static bool operator!=({name} a, {name} b)\r\n" +
+		$"		{{\r\n" +
+		$"			return (a.v_ != b.v_);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public override bool Equals(object o)\r\n" +
+		$"		{{\r\n" +
+		$"			return (o is {name}) && ((({name})o).v_ == v_);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
+		$"		public override int GetHashCode()\r\n" +
+		$"		{{\r\n" +
+		$"			return v_;\r\n" +
+		$"		}}\r\n";
+	}
+
+	s +=
 		$"	}}\r\n" +
 		$"}}";
 
 	return s;
 }
 
-public string MakeEnum(V[] names, string count, string indexType, bool generateEmpty)
+public string MakeEnum(V[] names, string count, string indexType, bool generateEmpty, string name ="")
 {
 	string s = "";
 	int nextValue = 0;
@@ -226,7 +297,7 @@ public string MakeEnum(V[] names, string count, string indexType, bool generateE
 		}
 
 		if (indexType == "int")
-			s += $"		public const {indexType} {names[i].name} = {v}";
+			s += $"		public static readonly {name} {names[i].name} = {name}.CreateInternal({v})";
 		else
 			s += $"		public static readonly {indexType} {names[i].name} = new {indexType}({v})";
 
@@ -258,7 +329,7 @@ public string CamelCase(string s, bool firstUpper)
 
 public string MakeNames(
 	V[] names, string name, List<string> allNames, string indexType,
-	bool generateEmpty)
+	bool generateEmpty, string enumName, string shortName = "")
 {
 	string var, ccName;
 
@@ -289,29 +360,46 @@ public string MakeNames(
 	}
 
 	string getIndex;
+	string none;
+	string makeValue = "";
 
 	if (indexType == "int")
-		getIndex = "i";
+	{
+		indexType = enumName;
+		getIndex = "i.v_";
+
+		if (shortName == "")
+			none = "None";
+		else
+			none = $"CreateInternal(-1)";
+
+		makeValue = $"{enumName}.CreateInternal(i)";
+	}
 	else
+	{
 		getIndex = "i.index";
+		enumName = "int";
+		none = "-1";
+		makeValue = "i";
+	}
 
 	s +=
 		$"		}};\r\n" +
 		$"\r\n" +
-		$"		public static int {ccName}FromString(string s)\r\n" +
+		$"		public static {enumName} {ccName}FromString(string s)\r\n" +
 		$"		{{\r\n" +
 		$"			for (int i = 0; i<{var}.Length; ++i)\r\n" +
 		$"			{{\r\n" +
 		$"				if ({var}[i] == s)\r\n" +
-		$"					return i;\r\n" +
+		$"					return {makeValue};\r\n" +
 		$"			}}\r\n" +
 		$"\r\n" +
-		$"			return -1;\r\n" +
+		$"			return {none};\r\n" +
 		$"		}}\r\n" +
 		$"\r\n" +
-		$"		public static int[] {ccName}FromStringMany(string s)\r\n" +
+		$"		public static {enumName}[] {ccName}FromStringMany(string s)\r\n" +
 		$"		{{\r\n" +
-		$"			var list = new List<int>();\r\n" +
+		$"			var list = new List<{enumName}>();\r\n" +
 		$"			var ss = s.Split(' ');\r\n" +
 		$"\r\n" +
 		$"			foreach (string p in ss)\r\n" +
@@ -321,7 +409,7 @@ public string MakeNames(
 		$"					continue;\r\n" +
 		$"\r\n" +
 		$"				var i = {ccName}FromString(tp);\r\n" +
-		$"				if (i != -1)\r\n" +
+		$"				if (i != {none})\r\n" +
 		$"					list.Add(i);\r\n" +
 		$"			}}\r\n" +
 		$"\r\n" +
@@ -348,4 +436,36 @@ public string MakeNames(
 
 	return s;
 }
+
+public string MakeArray(
+	V[] names, string name, List<string> allNames, string indexType,
+	bool generateEmpty, string enumName, string shortName = "")
+{
+	string prefix = (shortName == "" ? "" : shortName + ".");
+
+	string s =
+		$"		private static {enumName}[] values_ = new {enumName}[]\r\n" +
+		$"		{{\r\n";
+
+	int init = 0;
+	for (int i = 0; i < names.Length; ++i)
+	{
+		if (names[i].hasForced)
+			continue;
+
+		s += $"			{enumName}.CreateInternal({init}),\r\n";
+		++init;
+	}
+
+	s +=
+		$"		}};\r\n" +
+		$"\r\n" +
+		$"		public static {enumName}[] Values\r\n" +
+		$"		{{\r\n" +
+		$"			get {{ return values_; }}\r\n" +
+		$"		}}";
+
+	return s;
+}
+
 #>

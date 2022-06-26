@@ -12,4 +12,4 @@ V.Value("Orgasm")
 
 };
 
-#><#= Generate(vars, "Moods", "Moods", false) #>
+#><#= Generate(vars, "MoodType", "Moods", false) #>

@@ -340,7 +340,7 @@ namespace Cue
 			BasicEnumValues.FloatIndex avoidOthers)
 		{
 			var ps = person_.Personality;
-			float ex = person_.Mood.Get(Moods.Excited);
+			float ex = person_.Mood.Get(MoodType.Excited);
 
 			if (p != null && p.IsPlayer)
 			{

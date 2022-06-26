@@ -28,7 +28,7 @@ namespace Cue
 			person_ = p;
 		}
 
-		public Expression[] GetExpressionsForMood(int mood)
+		public Expression[] GetExpressionsForMood(MoodType mood)
 		{
 			var list = new List<Expression>();
 
@@ -143,7 +143,7 @@ namespace Cue
 
 				for (int i = 0; i < exps_.Length; ++i)
 				{
-					if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(Moods.Orgasm))
+					if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(MoodType.Orgasm))
 					{
 						foundActive = true;
 						ActivateForOrgasm(exps_[i]);
@@ -158,7 +158,7 @@ namespace Cue
 				{
 					for (int i = 0; i < exps_.Length; ++i)
 					{
-						if (exps_[i].Expression.IsMood(Moods.Orgasm))
+						if (exps_[i].Expression.IsMood(MoodType.Orgasm))
 						{
 							ActivateForOrgasm(exps_[i]);
 							break;
@@ -319,7 +319,7 @@ namespace Cue
 				1, 1, 1,
 				ps.Get(PS.OrgasmExpressionRangeMin),
 				ps.Get(PS.OrgasmExpressionRangeMax),
-				Moods.Orgasm);
+				MoodType.Orgasm);
 
 			e.Activate(1.0f, ps.Get(PS.OrgasmFirstExpressionTime));
 		}
@@ -330,7 +330,7 @@ namespace Cue
 			var ps = person_.Personality;
 
 			float expressionTiredness = U.Clamp(
-				m.Get(Moods.Tired) * ps.Get(PS.ExpressionTirednessFactor),
+				m.Get(MoodType.Tired) * ps.Get(PS.ExpressionTirednessFactor),
 				0, 1);
 
 
@@ -343,17 +343,17 @@ namespace Cue
 				float intensity = 0;
 				float min = 0, max = 1;
 
-				int highestMood = Moods.None;
+				MoodType highestMood = MoodType.None;
 				float highestMoodValue = 0;
 
 				if (isOrgasming_)
 				{
-					if (e.IsMood(Moods.Orgasm))
+					if (e.IsMood(MoodType.Orgasm))
 					{
-						if (m.Get(Moods.Orgasm) > highestMoodValue)
+						if (m.Get(MoodType.Orgasm) > highestMoodValue)
 						{
-							highestMood = Moods.Orgasm;
-							highestMoodValue = m.Get(Moods.Orgasm);
+							highestMood = MoodType.Orgasm;
+							highestMoodValue = m.Get(MoodType.Orgasm);
 						}
 
 						weight += 1;
@@ -364,68 +364,68 @@ namespace Cue
 				}
 				else
 				{
-					if (e.IsMood(Moods.Happy))
+					if (e.IsMood(MoodType.Happy))
 					{
-						if (m.Get(Moods.Happy) > highestMoodValue)
+						if (m.Get(MoodType.Happy) > highestMoodValue)
 						{
-							highestMood = Moods.Happy;
-							highestMoodValue = m.Get(Moods.Happy);
+							highestMood = MoodType.Happy;
+							highestMoodValue = m.Get(MoodType.Happy);
 						}
 
-						weight += m.Get(Moods.Happy);
-						intensity = Math.Max(intensity, m.Get(Moods.Happy));
+						weight += m.Get(MoodType.Happy);
+						intensity = Math.Max(intensity, m.Get(MoodType.Happy));
 					}
 
-					if (e.IsMood(Moods.Excited))
+					if (e.IsMood(MoodType.Excited))
 					{
-						if (m.Get(Moods.Excited) > highestMoodValue)
+						if (m.Get(MoodType.Excited) > highestMoodValue)
 						{
-							highestMood = Moods.Excited;
-							highestMoodValue = m.Get(Moods.Excited);
+							highestMood = MoodType.Excited;
+							highestMoodValue = m.Get(MoodType.Excited);
 						}
 
-						weight += m.Get(Moods.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
-						intensity = Math.Max(intensity, m.Get(Moods.Excited));
+						weight += m.Get(MoodType.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
+						intensity = Math.Max(intensity, m.Get(MoodType.Excited));
 						intensity = Math.Min(intensity, ps.Get(PS.MaxExcitedExpression));
 					}
 
-					if (e.IsMood(Moods.Playful))
+					if (e.IsMood(MoodType.Playful))
 					{
-						if (m.Get(Moods.Playful) > highestMoodValue)
+						if (m.Get(MoodType.Playful) > highestMoodValue)
 						{
-							highestMood = Moods.Playful;
-							highestMoodValue = m.Get(Moods.Playful);
+							highestMood = MoodType.Playful;
+							highestMoodValue = m.Get(MoodType.Playful);
 						}
 
-						weight += m.Get(Moods.Playful);
-						intensity = Math.Max(intensity, m.Get(Moods.Playful));
+						weight += m.Get(MoodType.Playful);
+						intensity = Math.Max(intensity, m.Get(MoodType.Playful));
 					}
 
-					if (e.IsMood(Moods.Angry))
+					if (e.IsMood(MoodType.Angry))
 					{
-						if (m.Get(Moods.Angry) > highestMoodValue)
+						if (m.Get(MoodType.Angry) > highestMoodValue)
 						{
-							highestMood = Moods.Angry;
-							highestMoodValue = m.Get(Moods.Angry);
+							highestMood = MoodType.Angry;
+							highestMoodValue = m.Get(MoodType.Angry);
 						}
 
-						weight += m.Get(Moods.Angry);
-						intensity = Math.Max(intensity, m.Get(Moods.Angry));
+						weight += m.Get(MoodType.Angry);
+						intensity = Math.Max(intensity, m.Get(MoodType.Angry));
 					}
 
-					if (e.IsMood(Moods.Tired))
+					if (e.IsMood(MoodType.Tired))
 					{
-						if (m.Get(Moods.Tired) > highestMoodValue)
+						if (m.Get(MoodType.Tired) > highestMoodValue)
 						{
-							highestMood = Moods.Tired;
-							highestMoodValue = m.Get(Moods.Tired);
+							highestMood = MoodType.Tired;
+							highestMoodValue = m.Get(MoodType.Tired);
 						}
 
 						weight += expressionTiredness;
 						intensity = Math.Max(intensity, expressionTiredness);
 					}
 
-					if (m.Get(Moods.Excited) < e.MinExcitement)
+					if (m.Get(MoodType.Excited) < e.MinExcitement)
 						weight = 0;
 
 					if (e.Exclusive)
@@ -433,7 +433,7 @@ namespace Cue
 				}
 
 
-				if (!e.IsMood(Moods.Tired))
+				if (!e.IsMood(MoodType.Tired))
 				{
 					weight *= Math.Max(1 - expressionTiredness, 0.05f);
 				}

@@ -86,7 +86,7 @@ namespace Cue
 			}
 			else
 			{
-				if (person_.Mood.Get(Moods.Excited) >= ps.Get(PS.LookAboveMinExcitement))
+				if (person_.Mood.Get(MoodType.Excited) >= ps.Get(PS.LookAboveMinExcitement))
 				{
 					if (person_.Excitement.PhysicalRate >= ps.Get(PS.LookAboveMinPhysicalRate))
 					{
@@ -318,54 +318,57 @@ namespace Cue
 				$"{z.Source} is zapping {other}");
 		}
 
-		private float GetEyesWeight(bool player, int zone)
+		private float GetEyesWeight(bool player, ZoneTypes zone)
 		{
 			var ps = person_.Personality;
 
 			if (player)
 			{
-				switch (zone)
-				{
-					case SS.Genitals: return ps.Get(PS.ZappedByPlayerGenitalsEyesWeight);
-					case SS.Breasts: return ps.Get(PS.ZappedByPlayerBreastsEyesWeight);
-					case SS.Penetration: return ps.Get(PS.ZappedByPlayerPenetrationEyesWeight);
-					case SS.Mouth: return ps.Get(PS.ZappedByPlayerMouthEyesWeight);
-				}
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByPlayerGenitalsEyesWeight);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByPlayerBreastsEyesWeight);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByPlayerPenetrationEyesWeight);
+				else if (zone == SS.Mouth)
+					return ps.Get(PS.ZappedByPlayerMouthEyesWeight);
 			}
 			else
 			{
-				switch (zone)
-				{
-					case SS.Genitals: return ps.Get(PS.ZappedByOtherGenitalsEyesWeight);
-					case SS.Breasts: return ps.Get(PS.ZappedByOtherBreastsEyesWeight);
-					case SS.Penetration: return ps.Get(PS.ZappedByOtherPenetrationEyesWeight);
-					case SS.Mouth: return ps.Get(PS.ZappedByOtherMouthEyesWeight);
-				}
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByOtherGenitalsEyesWeight);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByOtherBreastsEyesWeight);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByOtherPenetrationEyesWeight);
+				else if (zone == SS.Mouth)
+					return ps.Get(PS.ZappedByOtherMouthEyesWeight);
 			}
+
 			return -1;
 		}
 
-		private float GetTargetWeight(bool player, int zone)
+		private float GetTargetWeight(bool player, ZoneTypes zone)
 		{
 			var ps = person_.Personality;
 
 			if (player)
 			{
-				switch (zone)
-				{
-					case SS.Genitals: return ps.Get(PS.ZappedByPlayerGenitalsTargetWeight);
-					case SS.Breasts: return ps.Get(PS.ZappedByPlayerBreastsTargetWeight);
-					case SS.Penetration: return ps.Get(PS.ZappedByPlayerPenetrationTargetWeight);
-				}
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByPlayerGenitalsTargetWeight);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByPlayerBreastsTargetWeight);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByPlayerPenetrationTargetWeight);
 			}
 			else
 			{
-				switch (zone)
-				{
-					case SS.Genitals: return ps.Get(PS.ZappedByOtherGenitalsTargetWeight);
-					case SS.Breasts: return ps.Get(PS.ZappedByOtherBreastsTargetWeight);
-					case SS.Penetration: return ps.Get(PS.ZappedByOtherPenetrationTargetWeight);
-				}
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByOtherGenitalsTargetWeight);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByOtherBreastsTargetWeight);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByOtherPenetrationTargetWeight);
 			}
 
 			return -1;

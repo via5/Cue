@@ -5,7 +5,7 @@ namespace Cue
 	public class BodyPart
 	{
 		private Person person_;
-		private int type_;
+		private BodyPartTypes type_;
 		private Logger log_;
 		private Sys.IBodyPart part_;
 		private Sys.TriggerInfo[] triggers_ = null;
@@ -16,12 +16,12 @@ namespace Cue
 		private bool staleTriggers_ = true;
 		private List<Sys.TriggerInfo> tempList_ = null;
 
-		public BodyPart(Person p, int type, Sys.IBodyPart part)
+		public BodyPart(Person p, BodyPartTypes type, Sys.IBodyPart part)
 		{
-			Cue.Assert(part != null, $"{BP.ToString(type)} is null");
+			Cue.Assert(part != null, $"{BodyPartTypes.ToString(type)} is null");
 			person_ = p;
 			type_ = type;
-			log_ = new Logger(Logger.Object, p, $"body.{BP.ToString(type)}");
+			log_ = new Logger(Logger.Object, p, $"body.{BodyPartTypes.ToString(type)}");
 			part_ = part;
 			locker_ = new BodyPartLocker(this);
 			triggerCheckInterval_ = U.RandomFloat(0.9f, 1.1f);
@@ -64,7 +64,7 @@ namespace Cue
 
 		public string Name
 		{
-			get { return BP.ToString(type_); }
+			get { return BodyPartTypes.ToString(type_); }
 		}
 
 		public string Source
@@ -72,7 +72,7 @@ namespace Cue
 			get { return part_.ToString(); }
 		}
 
-		public int Type
+		public BodyPartTypes Type
 		{
 			get { return type_; }
 		}
@@ -139,7 +139,7 @@ namespace Cue
 		}
 
 		public void AddForcedTrigger(
-			int sourcePersonIndex, int sourceBodyPart, float value = 1)
+			int sourcePersonIndex, BodyPartTypes sourceBodyPart, float value = 1)
 		{
 			global::Cue.Sys.TriggerInfo ti;
 
@@ -158,7 +158,7 @@ namespace Cue
 			forcedTriggers_.Add(ti);
 		}
 
-		public void RemoveForcedTrigger(int sourcePersonIndex, int sourceBodyPart)
+		public void RemoveForcedTrigger(int sourcePersonIndex, BodyPartTypes sourceBodyPart)
 		{
 			for (int i = 0; i < forcedTriggers_.Count; ++i)
 			{
@@ -363,7 +363,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{part_} ({BP.ToString(type_)})";
+			return $"{part_} ({BodyPartTypes.ToString(type_)})";
 		}
 	}
 }

@@ -4,11 +4,13 @@
 	{
 		public struct PartResult
 		{
-			public int ownBodyPart;
-			public int byBodyPart;
+			public BodyPartTypes ownBodyPart;
+			public BodyPartTypes byBodyPart;
 			public int byObjectIndex;
 
-			public PartResult(int ownBodyPart, int byObjectIndex, int byBodyPart)
+			public PartResult(
+				BodyPartTypes ownBodyPart, int byObjectIndex,
+				BodyPartTypes byBodyPart)
 			{
 				this.ownBodyPart = ownBodyPart;
 				this.byObjectIndex = byObjectIndex;
@@ -17,12 +19,12 @@
 
 			public static PartResult None
 			{
-				get { return new PartResult(-1, -1, -1); }
+				get { return new PartResult(BP.None, -1, BP.None); }
 			}
 
 			public bool Valid
 			{
-				get { return (ownBodyPart != -1); }
+				get { return (ownBodyPart != BP.None); }
 			}
 
 			public override string ToString()
@@ -30,10 +32,10 @@
 				string s = "";
 
 				s +=
-					$"{BP.ToString(ownBodyPart)} by " +
+					$"{BodyPartTypes.ToString(ownBodyPart)} by " +
 					$"{Cue.Instance.GetObject(byObjectIndex)?.ID ?? "?"}" +
 					$"." +
-					$"{BP.ToString(byBodyPart)}";
+					$"{BodyPartTypes.ToString(byBodyPart)}";
 
 				return s;
 			}
@@ -103,7 +105,7 @@
 			// the mouse pointer grab is not handled
 			if (!other.Body.Exists && other.IsPlayer)
 			{
-				for (int i = 0; i < BP.Count; ++i)
+				foreach (BodyPartTypes i in BodyPartTypes.Values)
 				{
 					if (body_.Get(i).GrabbedByPlayer)
 						return true;
@@ -180,12 +182,12 @@
 			return a.Status.PenetratedBy(b) || b.Status.PenetratedBy(a);
 		}
 
-		public PartResult GropedByAny(int triggerBodyPart)
+		public PartResult GropedByAny(BodyPartTypes triggerBodyPart)
 		{
-			return GropedByAny(new int[] { triggerBodyPart });
+			return GropedByAny(new BodyPartTypes[] { triggerBodyPart });
 		}
 
-		public PartResult GropedByAny(int[] triggerBodyParts)
+		public PartResult GropedByAny(BodyPartTypes[] triggerBodyParts)
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -202,12 +204,12 @@
 			return GropedBy(p, BodyParts.GropedParts);
 		}
 
-		public PartResult GropedBy(Person p, int triggerBodyPart)
+		public PartResult GropedBy(Person p, BodyPartTypes triggerBodyPart)
 		{
-			return GropedBy(p, new int[] { triggerBodyPart });
+			return GropedBy(p, new BodyPartTypes[] { triggerBodyPart });
 		}
 
-		public PartResult GropedBy(Person p, int[] triggerBodyParts)
+		public PartResult GropedBy(Person p, BodyPartTypes[] triggerBodyParts)
 		{
 			if (p == person_)
 				return PartResult.None;
@@ -228,7 +230,8 @@
 			return person_.Body.Zone(SS.Genitals).Sources[p.PersonIndex].Active;
 		}
 
-		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)
+		private PartResult CheckParts(
+			Person by, BodyPartTypes[] triggerParts, BodyPartTypes[] checkParts)
 		{
 			for (int i = 0; i < triggerParts.Length; ++i)
 			{

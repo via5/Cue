@@ -12,10 +12,10 @@ namespace Cue
 
 		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
-		private int sourcePart_;
+		private BodyPartTypes sourcePart_;
 		private float modifier_;
 
-		public SensitivityModifier(string source, int sourcePart, float modifier)
+		public SensitivityModifier(string source, BodyPartTypes sourcePart, float modifier)
 		{
 			sourceName_ = source;
 			sourcePart_ = sourcePart;
@@ -38,7 +38,7 @@ namespace Cue
 				sourceIndex_ = Resolve(sourceName_);
 		}
 
-		public bool AppliesTo(Person self, int sourcePersonIndex, int sourcePart)
+		public bool AppliesTo(Person self, int sourcePersonIndex, BodyPartTypes sourcePart)
 		{
 			if (sourceIndex_ == Player)
 			{
@@ -93,7 +93,7 @@ namespace Cue
 			if (sourcePart_ == BP.None)
 				s += "any";
 			else
-				s += BP.ToString(sourcePart_);
+				s += BodyPartTypes.ToString(sourcePart_);
 
 			return s + $" {modifier_}";
 		}
@@ -116,7 +116,7 @@ namespace Cue
 
 	public class Sensitivity
 	{
-		private int type_;
+		private ZoneTypes type_;
 		private float physicalRate_;
 		private float physicalMax_;
 		private float nonPhysicalRate_;
@@ -125,7 +125,7 @@ namespace Cue
 
 
 		public Sensitivity(
-			int type,
+			ZoneTypes type,
 			float physicalRate, float physicalMax,
 			float nonPhysicalRate, float nonPhysicalMax,
 			SensitivityModifier[] mods)
@@ -138,7 +138,7 @@ namespace Cue
 			modifiers_ = mods ?? new SensitivityModifier[0];
 		}
 
-		public int Type
+		public ZoneTypes Type
 		{
 			get { return type_; }
 		}
@@ -193,7 +193,7 @@ namespace Cue
 				modifiers_[i].Resolve();
 		}
 
-		public float GetModifier(Person self, int sourcePersonIndex, int sourcePart)
+		public float GetModifier(Person self, int sourcePersonIndex, BodyPartTypes sourcePart)
 		{
 			for (int i = 0; i < modifiers_.Length; ++i)
 			{
@@ -208,7 +208,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{SS.ToString(type_)}";
+			return $"{ZoneTypes.ToString(type_)}";
 		}
 	}
 
@@ -220,8 +220,8 @@ namespace Cue
 
 		public Sensitivities()
 		{
-			for (int i = 0; i < s_.Length; ++i)
-				s_[i] = new Sensitivity(i, 0, 0, 0, 0, null);
+			foreach (ZoneTypes z in ZoneTypes.Values)
+				s_[z.Int] = new Sensitivity(z, 0, 0, 0, 0, null);
 		}
 
 		public Sensitivities Clone(Person p)
@@ -249,9 +249,9 @@ namespace Cue
 			s_ = ss;
 		}
 
-		public Sensitivity Get(int type)
+		public Sensitivity Get(ZoneTypes type)
 		{
-			return s_[type];
+			return s_[type.Int];
 		}
 	}
 

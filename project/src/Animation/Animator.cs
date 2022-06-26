@@ -88,21 +88,21 @@ namespace Cue
 
 	public class Animation
 	{
-		private readonly int type_ = Animations.None;
+		private readonly AnimationTypes type_ = AnimationTypes.None;
 		private readonly int style_ = MovementStyles.Any;
 		private readonly IAnimation anim_ = null;
 
 		public const int NoStopFlags = 0x0;
 		public const int StopNoReturn = 0x1;
 
-		public Animation(int type, int ms, IAnimation anim)
+		public Animation(AnimationTypes type, int ms, IAnimation anim)
 		{
 			type_ = type;
 			style_ = ms;
 			anim_ = anim;
 		}
 
-		public int Type { get { return type_; } }
+		public AnimationTypes Type { get { return type_; } }
 		public int MovementStyle { get { return style_; } }
 		public IAnimation Sys { get { return anim_; } }
 
@@ -124,7 +124,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{anim_.Name} ({Animations.ToString(type_)})";
+			return $"{anim_.Name} ({AnimationTypes.ToString(type_)})";
 		}
 	}
 
@@ -162,7 +162,7 @@ namespace Cue
 		private Logger log_;
 		private readonly List<IPlayer> players_ = new List<IPlayer>();
 		private readonly List<PlayingAnimation> playing_ = new List<PlayingAnimation>();
-		private List<int> failed_ = new List<int>();
+		private List<AnimationTypes> failed_ = new List<AnimationTypes>();
 		private Proc.ISync sync_ = null;
 
 		public Animator(Person p)
@@ -227,7 +227,7 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public int PlayingStatus(int type)
+		public int PlayingStatus(AnimationTypes type)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
@@ -254,7 +254,7 @@ namespace Cue
 			return false;
 		}
 
-		public bool IsPlayingType(int type)
+		public bool IsPlayingType(AnimationTypes type)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
@@ -265,7 +265,7 @@ namespace Cue
 			return false;
 		}
 
-		public bool PlayType(int type, AnimationContext cx = null)
+		public bool PlayType(AnimationTypes type, AnimationContext cx = null)
 		{
 			if (IsPlayingType(type))
 				return false;
@@ -276,7 +276,7 @@ namespace Cue
 				if (!failed_.Contains(type))
 				{
 					failed_.Add(type);
-					Log.Error($"no animation for type {Animations.ToString(type)}");
+					Log.Error($"no animation for type {AnimationTypes.ToString(type)}");
 				}
 
 				return false;
@@ -331,9 +331,9 @@ namespace Cue
 			playing_.Clear();
 		}
 
-		public void StopType(int type, int stopFlags = Animation.NoStopFlags)
+		public void StopType(AnimationTypes type, int stopFlags = Animation.NoStopFlags)
 		{
-			Log.Verbose($"stopping animation {Animations.ToString(type)}");
+			Log.Verbose($"stopping animation {AnimationTypes.ToString(type)}");
 
 			int stopped = 0;
 
@@ -354,7 +354,7 @@ namespace Cue
 			if (stopped == 0)
 			{
 				Log.Verbose(
-					$"no animation {Animations.ToString(type)} found to stop, " +
+					$"no animation {AnimationTypes.ToString(type)} found to stop, " +
 					$"count={playing_.Count}");
 			}
 			else

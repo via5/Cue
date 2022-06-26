@@ -22,7 +22,7 @@
 		private float min_ = 0;
 		private float max_ = 1;
 		private float add_ = 0;
-		private int mainMood_ = Moods.None;
+		private MoodType mainMood_ = MoodType.None;
 
 		private Duration holdTime_;
 
@@ -69,7 +69,7 @@
 
 		public void Set(
 			float weight, float intensity, float speed,
-			float min, float max, int mainMood)
+			float min, float max, MoodType mainMood)
 		{
 			weight_ = weight;
 			intensity_ = intensity;
@@ -199,7 +199,7 @@
 			}
 			else
 			{
-				if (mainMood_ == Moods.Excited)
+				if (mainMood_ == MoodType.Excited)
 					return rng_.RandomFloat(min_, intensity_, intensity_);
 				else
 					return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);

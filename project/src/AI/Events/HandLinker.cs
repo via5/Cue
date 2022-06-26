@@ -150,7 +150,7 @@
 
 		private BodyPart FindClose(BodyPart hand)
 		{
-			int[] selfIgnore = new int[]
+			BodyPartTypes[] selfIgnore = new BodyPartTypes[]
 			{
 				BP.LeftShoulder, BP.LeftArm, BP.LeftForearm,
 				BP.RightShoulder, BP.RightArm, BP.RightForearm

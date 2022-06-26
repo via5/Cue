@@ -78,7 +78,7 @@ namespace Cue.Proc
 		private const float NotBusyCatchUpTime = 1;
 
 		private int type_;
-		private int bodyPartType_;
+		private BodyPartTypes bodyPartType_;
 		private BodyPart bp_ = null;
 		private IEasing easing_;
 
@@ -102,7 +102,7 @@ namespace Cue.Proc
 
 
 		public Force(
-			string name, int type, int bodyPart,
+			string name, int type, BodyPartTypes bodyPart,
 			Vector3 min, Vector3 max, float next, Vector3 window,
 			ISync sync, IEasing easing = null)
 				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, easing)
@@ -121,7 +121,7 @@ namespace Cue.Proc
 		}
 
 		public Force(
-			string name, int type, int bodyPart,
+			string name, int type, BodyPartTypes bodyPart,
 			Vector3 min, Vector3 max, Duration next, Vector3 window,
 			ISync sync, IEasing easing = null)
 				: base(name, sync)
@@ -137,7 +137,7 @@ namespace Cue.Proc
 		{
 			try
 			{
-				var bodyPart = BP.FromString(o["bodyPart"]);
+				var bodyPart = BodyPartTypes.FromString(o["bodyPart"]);
 				if (bodyPart == BP.None)
 					throw new LoadFailed($"bad body part '{o["bodyPart"]}'");
 
@@ -466,14 +466,14 @@ namespace Cue.Proc
 		public override void GetAllForcesDebug(List<string> list)
 		{
 			list.Add(
-				$"{bp_} ({BP.ToString(bodyPartType_)}) " +
+				$"{bp_} ({BodyPartTypes.ToString(bodyPartType_)}) " +
 				$"{TypeToString(type_)} {Sys.Vam.U.ToUnity(LerpedForce())}");
 		}
 
 		public override string ToString()
 		{
 			return
-				$"{TypeToString(type_)}.{BP.ToString(bodyPartType_)}" +
+				$"{TypeToString(type_)}.{BodyPartTypes.ToString(bodyPartType_)}" +
 				(Name == "" ? "" : $" '{Name}'");
 		}
 

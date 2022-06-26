@@ -4,19 +4,34 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class Moods
+	public struct MoodType
 	{
-		public const int None = -1;
-		public const int Happy = 0;
-		public const int Playful = 1;
-		public const int Excited = 2;
-		public const int Angry = 3;
-		public const int Tired = 4;
-		public const int Orgasm = 5;
+		public static readonly MoodType None = MoodType.CreateInternal(-1);
+		public static readonly MoodType Happy = MoodType.CreateInternal(0);
+		public static readonly MoodType Playful = MoodType.CreateInternal(1);
+		public static readonly MoodType Excited = MoodType.CreateInternal(2);
+		public static readonly MoodType Angry = MoodType.CreateInternal(3);
+		public static readonly MoodType Tired = MoodType.CreateInternal(4);
+		public static readonly MoodType Orgasm = MoodType.CreateInternal(5);
 
 		public const int Count = 6;
 		public int GetCount() { return 6; }
 
+
+		private static MoodType[] values_ = new MoodType[]
+		{
+			MoodType.CreateInternal(0),
+			MoodType.CreateInternal(1),
+			MoodType.CreateInternal(2),
+			MoodType.CreateInternal(3),
+			MoodType.CreateInternal(4),
+			MoodType.CreateInternal(5),
+		};
+
+		public static MoodType[] Values
+		{
+			get { return values_; }
+		}
 
 		private static string[] names_ = new string[]
 		{
@@ -28,20 +43,20 @@ namespace Cue
 			"orgasm",
 		};
 
-		public static int FromString(string s)
+		public static MoodType FromString(string s)
 		{
 			for (int i = 0; i<names_.Length; ++i)
 			{
 				if (names_[i] == s)
-					return i;
+					return MoodType.CreateInternal(i);
 			}
 
-			return -1;
+			return None;
 		}
 
-		public static int[] FromStringMany(string s)
+		public static MoodType[] FromStringMany(string s)
 		{
-			var list = new List<int>();
+			var list = new List<MoodType>();
 			var ss = s.Split(' ');
 
 			foreach (string p in ss)
@@ -51,29 +66,68 @@ namespace Cue
 					continue;
 
 				var i = FromString(tp);
-				if (i != -1)
+				if (i != None)
 					list.Add(i);
 			}
 
 			return list.ToArray();
 		}
 
-		public string GetName(int i)
+		public string GetName(MoodType i)
 		{
 			return ToString(i);
 		}
 
-		public static string ToString(int i)
+		public static string ToString(MoodType i)
 		{
-			if (i >= 0 && i < names_.Length)
-				return names_[i];
+			if (i.v_ >= 0 && i.v_ < names_.Length)
+				return names_[i.v_];
 			else
-				return $"?{i}";
+				return $"?{i.v_}";
 		}
 
 		public static string[] Names
 		{
 			get { return names_; }
+		}
+
+
+
+		private int v_;
+
+		private MoodType(int value)
+		{
+			v_ = value;
+		}
+
+		public static MoodType CreateInternal(int value)
+		{
+			return new MoodType(value);
+		}
+
+		public int Int
+		{
+			get { return v_; }
+		}
+
+		public static bool operator==(MoodType a, MoodType b)
+		{
+			return (a.v_ == b.v_);
+		}
+
+		public static bool operator!=(MoodType a, MoodType b)
+		{
+			return (a.v_ != b.v_);
+		}
+
+		public override bool Equals(object o)
+		{
+			return (o is MoodType) && (((MoodType)o).v_ == v_);
+		}
+
+		public override int GetHashCode()
+		{
+			return v_;
 		}
 	}
 }

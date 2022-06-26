@@ -9,7 +9,7 @@ namespace Cue.Sys.Vam
 		private Rigidbody rb2_, closestRb_;
 
 		public ColliderBodyPart(
-			VamAtom a, int type, Collider[] cs, FreeControllerV3 fc,
+			VamAtom a, BodyPartTypes type, Collider[] cs, FreeControllerV3 fc,
 			Rigidbody rb, Rigidbody closestRb)
 				: base(a, type)
 		{

@@ -17,13 +17,13 @@ namespace Cue.Sys.Vam
 		private List<TriggerInfo> triggerCache_ = null;
 		private List<Atom> foundOtherCache_ = null;
 
-		protected TriggerBodyPart(VamAtom a, int type)
+		protected TriggerBodyPart(VamAtom a, BodyPartTypes type)
 			: base(a, type)
 		{
 		}
 
 		public TriggerBodyPart(
-			VamAtom a, int type, CollisionTriggerEventHandler h,
+			VamAtom a, BodyPartTypes type, CollisionTriggerEventHandler h,
 			FreeControllerV3 fc, Transform tr,
 			string[] ignoreTransforms, string[] colliders)
 				: base(a, type, colliders)
@@ -217,12 +217,12 @@ namespace Cue.Sys.Vam
 					var p = Cue.Instance.PersonForAtom(bp.Atom);
 					var personIndex = p.PersonIndex;
 
-					if (!found[personIndex, bp.Type])
+					if (!found[personIndex, bp.Type.Int])
 					{
 						if (!ValidCollision(p, bp.Type))
 							continue;
 
-						found[p.PersonIndex, bp.Type] = true;
+						found[p.PersonIndex, bp.Type.Int] = true;
 						triggerCache_.Add(TriggerInfo.FromPerson(p.PersonIndex, bp.Type, 1.0f));
 					}
 				}
@@ -234,7 +234,7 @@ namespace Cue.Sys.Vam
 				triggers_ = triggerCache_.ToArray();
 		}
 
-		private bool ValidCollision(Person p, int bp)
+		private bool ValidCollision(Person p, BodyPartTypes bp)
 		{
 			// self collision
 			if (p.VamAtom == VamAtom)

@@ -119,9 +119,9 @@ namespace Cue
 
 	public class ZoneExcitementSource : ExcitementSource
 	{
-		private int zone_;
+		private ZoneTypes zone_;
 
-		public ZoneExcitementSource(Person p, int ss)
+		public ZoneExcitementSource(Person p, ZoneTypes ss)
 			: base(p)
 		{
 			zone_ = ss;
@@ -174,7 +174,7 @@ namespace Cue
 
 		public bool UsableSource(ErogenousZoneSource s)
 		{
-			if (s.Active && (person_.Mood.Get(Moods.Excited) <= s.Maximum))
+			if (s.Active && (person_.Mood.Get(MoodType.Excited) <= s.Maximum))
 			{
 				switch (s.Type)
 				{
@@ -230,13 +230,13 @@ namespace Cue
 			else
 				enabled = "enabled:" + enabled.Substring(0, enabled.Length - 1);
 
-			debug.Add($"{SS.ToString(zone_)}:{damp} {enabled}");
+			debug.Add($"{ZoneTypes.ToString(zone_)}:{damp} {enabled}");
 			DebugZone(zone_, debug);
 		}
 
-		private void DebugZone(int sensitivityIndex, List<string> debug)
+		private void DebugZone(ZoneTypes zoneType, List<string> debug)
 		{
-			var z = person_.Body.Zone(sensitivityIndex);
+			var z = person_.Body.Zone(zoneType);
 			var srcs = z.Sources;
 
 			for (int i = 0; i < srcs.Length; ++i)
@@ -256,7 +256,7 @@ namespace Cue
 
 				string parts = "";
 
-				for (int j = 0; j < BP.Count; ++j)
+				foreach (BodyPartTypes j in BodyPartTypes.Values)
 				{
 					if (s.IsStrictlyActive(j))
 					{
@@ -288,21 +288,21 @@ namespace Cue
 			}
 		}
 
-		private string DebugMakePart(ErogenousZoneSource src, int part)
+		private string DebugMakePart(ErogenousZoneSource src, BodyPartTypes part)
 		{
 			string s = "";
 
 			if (part == BP.None)
 				s += "unknown";
 			else
-				s += BP.ToString(part);
+				s += BodyPartTypes.ToString(part);
 
 			s += "=>";
 
 			if (src.TargetBodyPart(part) == BP.None)
 				s += "unknown";
 			else
-				s += BP.ToString(src.TargetBodyPart(part));
+				s += BodyPartTypes.ToString(src.TargetBodyPart(part));
 
 			return s;
 		}
@@ -357,7 +357,7 @@ namespace Cue
 				o.mod = ss.PhysicalRate;
 				o.max = ss.PhysicalMaximum;
 
-				if (person_.Mood.Get(Moods.Excited) <= o.max)
+				if (person_.Mood.Get(MoodType.Excited) <= o.max)
 				{
 					if (highest == -1)
 						highest = p.PersonIndex;
@@ -432,20 +432,20 @@ namespace Cue
 
 		public void Init()
 		{
-			for (int i = 0; i < SS.Count; ++i)
+			foreach (ZoneTypes z in ZoneTypes.Values)
 			{
-				if (i == SS.OthersExcitement)
-					sources_[i] = new OthersExcitementSource(person_);
+				if (z == SS.OthersExcitement)
+					sources_[z.Int] = new OthersExcitementSource(person_);
 				else
-					sources_[i] = new ZoneExcitementSource(person_, i);
+					sources_[z.Int] = new ZoneExcitementSource(person_, z);
 			}
 
-			sources_[SS.Mouth].ForceEnabledForOthers();
-			sources_[SS.Breasts].ForceEnabledForOthers();
+			GetSource(SS.Mouth).ForceEnabledForOthers();
+			GetSource(SS.Breasts).ForceEnabledForOthers();
 
-			sources_[SS.Mouth].ForceEnabledForPlayer();
-			sources_[SS.Breasts].ForceEnabledForPlayer();
-			sources_[SS.Genitals].ForceEnabledForPlayer();
+			GetSource(SS.Mouth).ForceEnabledForPlayer();
+			GetSource(SS.Breasts).ForceEnabledForPlayer();
+			GetSource(SS.Genitals).ForceEnabledForPlayer();
 		}
 
 		public float Max
@@ -484,7 +484,7 @@ namespace Cue
 
 			if (z.Active)
 			{
-				var pen = sources_[SS.Penetration] as ZoneExcitementSource;
+				var pen = GetSource(SS.Penetration) as ZoneExcitementSource;
 
 				for (int i = 0; i < z.Sources.Length; ++i)
 				{
@@ -498,9 +498,9 @@ namespace Cue
 			return false;
 		}
 
-		public ExcitementSource GetSource(int ss)
+		public ExcitementSource GetSource(ZoneTypes ss)
 		{
-			return sources_[ss];
+			return sources_[ss.Int];
 		}
 
 		public void Update(float s)

@@ -6,19 +6,22 @@
 		{
 			public readonly string name;
 			public readonly BodyPart bp;
-			public readonly int fingeringAnimType;
-			public readonly int hjAnimType;
-			public readonly int[] sourceLockTypes;
+			public readonly AnimationTypes fingeringAnimType;
+			public readonly AnimationTypes hjAnimType;
+			public readonly BodyPartTypes[] sourceLockTypes;
 
 			public BodyPart targetBodyPart = null;
 			public bool groped = false;
 			public BodyPartLock[] sourceLock = null;
 			public BodyPartLock[] targetLock = null;
-			public int anim = Animations.None;
+			public AnimationTypes anim = AnimationTypes.None;
 			public bool forcedTrigger = false;
 			public bool wasGrabbed = false;
 
-			public HandInfo(string name, BodyPart part, int fingeringAnim, int hjAnim, int[] sourceLockTypes)
+			public HandInfo(
+				string name, BodyPart part,
+				AnimationTypes fingeringAnim, AnimationTypes hjAnim,
+				BodyPartTypes[] sourceLockTypes)
 			{
 				this.name = name;
 				bp = part;
@@ -64,13 +67,13 @@
 
 			left_ = new HandInfo(
 				"left", person_.Body.Get(BP.LeftHand),
-				Animations.LeftFinger, Animations.HandjobLeft,
-				new int[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand });
+				AnimationTypes.LeftFinger, AnimationTypes.HandjobLeft,
+				new BodyPartTypes[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand });
 
 			right_ = new HandInfo(
 				"right", person_.Body.Get(BP.RightHand),
-				Animations.RightFinger, Animations.HandjobRight,
-				new int[] { BP.RightArm, BP.RightForearm, BP.RightHand });
+				AnimationTypes.RightFinger, AnimationTypes.HandjobRight,
+				new BodyPartTypes[] { BP.RightArm, BP.RightForearm, BP.RightHand });
 		}
 
 		public override void Debug(DebugLines debug)
@@ -172,7 +175,7 @@
 			}
 			else
 			{
-				if (left_.anim == Animations.HandjobBoth)
+				if (left_.anim == AnimationTypes.HandjobBoth)
 				{
 					Log.Info("stopping because current is both and one target is gone");
 					Stop(stopFlags);
@@ -255,10 +258,10 @@
 		{
 			Log.Info($"stopping {hand.name}");
 
-			if (hand.anim != Animations.None)
+			if (hand.anim != AnimationTypes.None)
 			{
 				person_.Animator.StopType(hand.anim, stopFlags);
-				hand.anim = Animations.None;
+				hand.anim = AnimationTypes.None;
 			}
 
 			if (hand.targetBodyPart != null)
@@ -311,10 +314,10 @@
 			if (LockBoth("double hj", targetBodyPart.Person))
 			{
 				left_.targetBodyPart = targetBodyPart;
-				left_.anim = Animations.HandjobBoth;
+				left_.anim = AnimationTypes.HandjobBoth;
 
 				right_.targetBodyPart = targetBodyPart;
-				right_.anim = Animations.None;
+				right_.anim = AnimationTypes.None;
 
 				// once for each hand, since Stop() will try to remove it twice
 				SetZoneEnabled(targetBodyPart.Person, true);
@@ -398,7 +401,7 @@
 
 		private bool CheckAnim(HandInfo hand)
 		{
-			if (hand.anim != Animations.None)
+			if (hand.anim != AnimationTypes.None)
 			{
 				int state = person_.Animator.PlayingStatus(hand.anim);
 
@@ -479,7 +482,7 @@
 		{
 			hand.targetLock = BodyPartLock.LockMany(
 				target,
-				new int[] { BP.Hips },
+				new BodyPartTypes[] { BP.Hips },
 				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
 
 			if (hand.targetLock == null)
@@ -492,7 +495,7 @@
 			return true;
 		}
 
-		private BodyPart FindTarget(int handPart, float maxDistance)
+		private BodyPart FindTarget(BodyPartTypes handPart, float maxDistance)
 		{
 			var hand = person_.Body.Get(handPart);
 

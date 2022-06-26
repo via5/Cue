@@ -16,7 +16,7 @@
 					personIndex = i;
 				}
 
-				public bool CheckActive(float s, Person self, Person other, int zone)
+				public bool CheckActive(float s, Person self, Person other, ZoneTypes zone)
 				{
 					if (active)
 					{
@@ -54,7 +54,7 @@
 					return false;
 				}
 
-				public string DebugLine(Person self, Person other, int zone)
+				public string DebugLine(Person self, Person other, ZoneTypes zone)
 				{
 					var ps = self.Personality;
 
@@ -69,10 +69,10 @@
 
 			private Person person_;
 			private string name_;
-			private int zone_;
+			private ZoneTypes zone_;
 			private Source[] sources_;
 
-			public ZapZone(Person p, string n, int zone)
+			public ZapZone(Person p, string n, ZoneTypes zone)
 			{
 				person_ = p;
 				name_ = n;
@@ -96,7 +96,7 @@
 					if (p == person_)
 						continue;
 
-					debug.Add(SS.ToString(zone_), sources_[i].DebugLine(person_, p, zone_));
+					debug.Add(ZoneTypes.ToString(zone_), sources_[i].DebugLine(person_, p, zone_));
 				}
 			}
 
@@ -127,23 +127,25 @@
 
 				if (other.IsPlayer)
 				{
-					switch (zone_)
-					{
-						case SS.Genitals: return ps.Get(PS.ZappedByPlayerGenitalsExcitement);
-						case SS.Breasts: return ps.Get(PS.ZappedByPlayerBreastsExcitement);
-						case SS.Penetration: return ps.Get(PS.ZappedByPlayerPenetrationExcitement);
-						case SS.Mouth: return ps.Get(PS.ZappedByPlayerMouthExcitement);
-					}
+					if (zone_ ==SS.Genitals)
+						return ps.Get(PS.ZappedByPlayerGenitalsExcitement);
+					else if (zone_ == SS.Breasts)
+						return ps.Get(PS.ZappedByPlayerBreastsExcitement);
+					else if (zone_ == SS.Penetration)
+						return ps.Get(PS.ZappedByPlayerPenetrationExcitement);
+					else if (zone_ == SS.Mouth)
+						return ps.Get(PS.ZappedByPlayerMouthExcitement);
 				}
 				else
 				{
-					switch (zone_)
-					{
-						case SS.Genitals: return ps.Get(PS.ZappedByOtherGenitalsExcitement);
-						case SS.Breasts: return ps.Get(PS.ZappedByOtherBreastsExcitement);
-						case SS.Penetration: return ps.Get(PS.ZappedByOtherPenetrationExcitement);
-						case SS.Mouth: return ps.Get(PS.ZappedByOtherMouthExcitement);
-					}
+					if (zone_ == SS.Genitals)
+						return ps.Get(PS.ZappedByOtherGenitalsExcitement);
+					else if (zone_ == SS.Breasts)
+						return ps.Get(PS.ZappedByOtherBreastsExcitement);
+					else if (zone_ == SS.Penetration)
+						return ps.Get(PS.ZappedByOtherPenetrationExcitement);
+					else if (zone_ == SS.Mouth)
+						return ps.Get(PS.ZappedByOtherMouthExcitement);
 				}
 
 				self.Log.Error($"zap source: bad zone {zone_}");

@@ -91,7 +91,7 @@ namespace Cue.Sys.Vam
 		private MeshVR.Hands.HandOutput.Hand handOutputType_;
 
 		public VamCameraHand(
-			IAtom a, int bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
+			IAtom a, BodyPartTypes bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
 			Transform vrHand, Transform desktopHand)
 				: base(a, bodyPart)
 		{
@@ -230,15 +230,15 @@ namespace Cue.Sys.Vam
 				SuperController.singleton.rightHand,
 				SuperController.singleton.mouseGrab);
 
-			parts_[BP.Head] = new VamCameraHead(a);
-			parts_[BP.Eyes] = new VamCameraEyes(a);
-			parts_[BP.LeftHand] = left_;
-			parts_[BP.RightHand] = right_;
+			parts_[BP.Head.Int] = new VamCameraHead(a);
+			parts_[BP.Eyes.Int] = new VamCameraEyes(a);
+			parts_[BP.LeftHand.Int] = left_;
+			parts_[BP.RightHand.Int] = right_;
 
-			for (int i = 0; i < parts_.Length; ++i)
+			foreach (BodyPartTypes i in BodyPartTypes.Values)
 			{
-				if (parts_[i] == null)
-					parts_[i] = new NullBodyPart(Atom, i);
+				if (parts_[i.Int] == null)
+					parts_[i.Int] = new NullBodyPart(Atom, i);
 			}
 		}
 

@@ -7,12 +7,12 @@ namespace Cue.Sys.Vam
 	public abstract class VamBodyPart : IBodyPart
 	{
 		private IAtom atom_;
-		private int type_;
+		private BodyPartTypes type_;
 		private Collider[] colliders_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 		private Logger log_ = null;
 
-		protected VamBodyPart(IAtom a, int t, string[] colliders = null)
+		protected VamBodyPart(IAtom a, BodyPartTypes t, string[] colliders = null)
 		{
 			atom_ = a;
 			type_ = t;
@@ -75,7 +75,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public int Type { get { return type_; } }
+		public BodyPartTypes Type { get { return type_; } }
 		public virtual bool Exists { get { return true; } }
 		public virtual bool IsPhysical { get { return true; } }
 
@@ -406,7 +406,7 @@ namespace Cue.Sys.Vam
 
 	class NullBodyPart : VamBodyPart
 	{
-		public NullBodyPart(VamAtom a, int type)
+		public NullBodyPart(VamAtom a, BodyPartTypes type)
 			: base(a, type)
 		{
 		}
@@ -421,7 +421,7 @@ namespace Cue.Sys.Vam
 		public override bool ContainsTransform(Transform t, bool debug)
 		{
 			if (debug)
-				Log.Error($"{BP.ToString(Type)}: {t.name} not found");
+				Log.Error($"{BodyPartTypes.ToString(Type)}: {t.name} not found");
 
 			return false;
 		}

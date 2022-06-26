@@ -123,13 +123,13 @@ namespace Cue
 				if (cig_ != null)
 					cig_.Visible = true;
 
-				person_.Animator.PlayType(Animations.Smoke);
+				person_.Animator.PlayType(AnimationTypes.Smoke);
 			}
 
 
 			if (cig_ != null)
 			{
-				if (!person_.Animator.IsPlayingType(Animations.Smoke))
+				if (!person_.Animator.IsPlayingType(AnimationTypes.Smoke))
 				{
 					if (person_.Body.Get(BP.RightHand).LockedFor(BodyPartLock.Anim))
 						cig_.Visible = false;

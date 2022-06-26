@@ -164,6 +164,8 @@ namespace Cue
 		public override int GetStringCount() { return 1; }
 
 
+
+
 		private static string[] durationNames_ = new string[]
 		{
 			"gazeDuration",
@@ -508,6 +510,7 @@ namespace Cue
 		{
 			get { return stringNames_; }
 		}
+
 
 
 		private static string[] allNames_ = new string[] {

@@ -131,7 +131,7 @@ namespace Cue.Sys.Vam
 			parts_ = ld.Parts;
 			leftHand_ = ld.LeftHand;
 			rightHand_ = ld.RightHand;
-			strapon_ = parts_[BP.Penis] as StraponBodyPart;
+			strapon_ = parts_[BP.Penis.Int] as StraponBodyPart;
 
 			Cue.Instance.Options.Changed += CheckOptions;
 			CheckOptions();
@@ -147,9 +147,9 @@ namespace Cue.Sys.Vam
 			strapon_?.LateUpdate(s);
 		}
 
-		public IBodyPart GetPart(int i)
+		public IBodyPart GetPart(BodyPartTypes i)
 		{
-			return parts_[i];
+			return parts_[i.Int];
 		}
 
 		public override IBodyPart BodyPartForTransform(

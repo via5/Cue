@@ -46,7 +46,7 @@
 
 
 		private string name_;
-		private bool[] moods_ = new bool[Moods.Count];
+		private bool[] moods_ = new bool[MoodType.Count];
 		private MorphGroup g_;
 		private Config config_;
 		private TargetInfo target_;
@@ -55,19 +55,19 @@
 		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
 		private float add_ = 0;
 
-		public Expression(string name, int mood, Config c, MorphGroup g)
-				: this(name, new int[] { mood }, c, g)
+		public Expression(string name, MoodType mood, Config c, MorphGroup g)
+				: this(name, new MoodType[] { mood }, c, g)
 		{
 		}
 
-		public Expression(string name, int[] moods, Config c, MorphGroup g)
+		public Expression(string name, MoodType[] moods, Config c, MorphGroup g)
 				: this(name)
 		{
 			g_ = g;
 			config_ = c;
 
 			for (int i = 0; i < moods.Length; ++i)
-				moods_[moods[i]] = true;
+				moods_[moods[i].Int] = true;
 		}
 
 		private Expression(string name)
@@ -120,7 +120,7 @@
 			get { return config_.exclusive; }
 		}
 
-		public int[] BodyParts
+		public BodyPartTypes[] BodyParts
 		{
 			get { return g_.BodyParts; }
 		}
@@ -166,26 +166,26 @@
 		{
 			string s = "";
 
-			for (int i = 0; i < moods_.Length; ++i)
+			foreach (MoodType i in MoodType.Values)
 			{
-				if (moods_[i])
+				if (moods_[i.Int])
 				{
 					if (s != "")
 						s += "|";
 
-					s += Moods.ToString(i);
+					s += MoodType.ToString(i);
 				}
 			}
 
 			return s;
 		}
 
-		public bool IsMood(int t)
+		public bool IsMood(MoodType t)
 		{
-			return moods_[t];
+			return moods_[t.Int];
 		}
 
-		public bool AffectsAnyBodyPart(int[] bodyParts)
+		public bool AffectsAnyBodyPart(BodyPartTypes[] bodyParts)
 		{
 			return g_.AffectsAnyBodyPart(bodyParts);
 		}

@@ -200,8 +200,8 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
-			for (int i=0; i<Moods.Count; ++i)
-				AddForceable(p, person_.Mood.GetValue(i), $"    {Moods.ToString(i)}");
+			foreach (MoodType i in MoodType.Values)
+				AddForceable(p, person_.Mood.GetValue(i), $"    {MoodType.ToString(i)}");
 
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));
@@ -276,12 +276,13 @@ namespace Cue
 
 			exps.Add(new string[] { "name", ps.Name });
 
-			for (int i = 0; i < SS.Count; ++i)
+			foreach (ZoneTypes z in ZoneTypes.Values)
 			{
-				var ss = ps.Sensitivities.Get(i);
+				var ss = ps.Sensitivities.Get(z);
+
 				exps.Add(new string[]
 				{
-					SS.ToString(ss.Type),
+					ZoneTypes.ToString(ss.Type),
 					$"pRate={ss.PhysicalRate:0.00000} " +
 					$"pMax={ss.PhysicalMaximum:0.00} " +
 					$"npRate={ss.NonPhysicalRate:0.00000} " +
