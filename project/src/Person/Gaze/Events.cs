@@ -170,6 +170,7 @@ namespace Cue
 	class GazeZapped : BasicGazeEvent
 	{
 		private bool active_ = false;
+		private float gazeDuration_ = -1;
 
 		public GazeZapped(Person p)
 			: base(p)
@@ -225,7 +226,11 @@ namespace Cue
 				else
 				{
 					active_ = false;
+					gazeDuration_ = -1;
 				}
+
+				if (active_)
+					person_.Gaze.Gazer.Duration = gazeDuration_;
 			}
 
 			return Continue;
@@ -243,6 +248,7 @@ namespace Cue
 				if (p.Body.Zap.Intensity > 0 && p.Body.Zap.Source != person_)
 				{
 					active_ = true;
+					gazeDuration_ = -1;
 					break;
 				}
 			}
@@ -289,6 +295,11 @@ namespace Cue
 					ps.Get(PS.ZappedByOtherLookUpWeight) * z.Intensity,
 					$"self zapped by {z.Source}");
 			}
+
+			if (z.Source.IsPlayer)
+				SetGazeDuration(PS.ZappedByPlayerGazeDuration, z.Intensity);
+			else
+				SetGazeDuration(PS.ZappedByOtherGazeDuration, z.Intensity);
 		}
 
 		private void DoOtherZapped(Person other)
@@ -316,6 +327,20 @@ namespace Cue
 				z.Source, BP.Eyes,
 				ps.Get(PS.OtherZappedSourceWeight) * z.Intensity,
 				$"{z.Source} is zapping {other}");
+
+			SetGazeDuration(PS.OtherZappedGazeDuration, z.Intensity);
+		}
+
+		private void SetGazeDuration(PS.DurationIndex di, float intensity)
+		{
+			if (gazeDuration_ < 0)
+			{
+				var d = person_.Personality.GetDuration(di);
+				d.Reset(intensity);
+				person_.Log.Info($"d: {d.ToDetailedString()}");
+				gazeDuration_ = d.Current;
+				person_.Log.Info($"new gaze duration {gazeDuration_}");
+			}
 		}
 
 		private float GetEyesWeight(bool player, ZoneType zone)

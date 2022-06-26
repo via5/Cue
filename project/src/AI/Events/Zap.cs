@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System;
+
+namespace Cue
 {
 	class ZappedEvent : BasicEvent
 	{
@@ -47,7 +49,9 @@
 						}
 						else
 						{
-							inactiveElapsed += s;
+							inactiveElapsed = Math.Min(
+								inactiveElapsed + s,
+								self.Personality.Get(PS.ZappedCooldown));
 						}
 					}
 
