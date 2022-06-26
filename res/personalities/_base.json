@@ -499,6 +499,7 @@
 	"otherGropedTargetWeight": 1,
 
 
+	"zappedEnabled": true,
 	"zappedTentativeTime": 2,
 	"zappedCooldown": 30,
 	"zappedTime": 3,

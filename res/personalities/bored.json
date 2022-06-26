@@ -9,23 +9,24 @@
 	"lookAboveMaxWeight": 0,
 	"lookAboveMaxWeightOrgasm": 0,
 
+	"idleNaturalRandomWeight": 1,
 	"naturalRandomWeight": 1,
 	"naturalOtherEyesWeight": 0,
 	"naturalPlayerEyesWeight": 0,
 	"busyOtherEyesWeight": 0,
 
-	"blowjobEyesWeight": 0.5,
-	"blowjobGenitalsWeight": 5,
+	"blowjobEyesWeight": 0.05,
+	"blowjobGenitalsWeight": 1,
 	"handjobEyesWeight": 0,
-	"handjobGenitalsWeight": 2,
-	"penetratedEyesWeight": 0.5,
+	"handjobGenitalsWeight": 1,
+	"penetratedEyesWeight": 0.05,
 	"penetratedGenitalsWeight": 1,
-	"penetratingEyesWeight": 0.5,
-	"penetratingGenitalsWeight": 2,
-	"gropedEyesWeight": 0.5,
-	"gropedTargetWeight": 0.5,
-	"gropingEyesWeight": 0.5,
-	"gropingTargetWeight": 0.5,
+	"penetratingEyesWeight": 0.05,
+	"penetratingGenitalsWeight": 1,
+	"gropedEyesWeight": 0.05,
+	"gropedTargetWeight": 0.05,
+	"gropingEyesWeight": 0.05,
+	"gropingTargetWeight": 0.05,
 
 	"otherEyesOrgasmWeight": 0,
 	"otherEyesExcitementWeight": 0,
@@ -41,6 +42,8 @@
 	"otherGropedEyesWeight": 0,
 	"otherGropedSourceEyesWeight": 0,
 	"otherGropedTargetWeight": 0,
+
+	"zappedEnabled": false,
 
 	"gazeDuration":
 	{

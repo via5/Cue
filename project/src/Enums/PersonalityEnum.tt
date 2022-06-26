@@ -65,6 +65,7 @@ V.Float("OtherGropedEyesWeight"),
 V.Float("OtherGropedSourceEyesWeight"),
 V.Float("OtherGropedTargetWeight"),
 
+V.Bool("ZappedEnabled"),
 V.Float("ZappedTentativeTime"),
 V.Float("ZappedCooldown"),
 V.Float("ZappedTime"),

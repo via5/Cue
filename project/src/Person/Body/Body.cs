@@ -196,10 +196,11 @@ namespace Cue
 
 		public void Zapped(Person source, int zone, float intensity, float time)
 		{
-			zap_.Set(source, zone, intensity, time);
-
-			Log.Info($"zapped: {zap_.DebugLine(person_)}");
-
+			if (person_.Personality.GetBool(PS.ZappedEnabled))
+			{
+				zap_.Set(source, zone, intensity, time);
+				Log.Info($"zapped: {zap_.DebugLine(person_)}");
+			}
 		}
 
 		public void Update(float s)

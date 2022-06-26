@@ -17,9 +17,10 @@ namespace Cue
 
 		// bools
 		public static readonly BoolIndex GazeSaccade = new BoolIndex(0);
+		public static readonly BoolIndex ZappedEnabled = new BoolIndex(1);
 
-		public const int BoolCount = 1;
-		public override int GetBoolCount() { return 1; }
+		public const int BoolCount = 2;
+		public override int GetBoolCount() { return 2; }
 
 		// floats
 		public static readonly FloatIndex GazeSaccadeMovementRange = new FloatIndex(0);
@@ -222,6 +223,7 @@ namespace Cue
 		private static string[] boolNames_ = new string[]
 		{
 			"gazeSaccade",
+			"zappedEnabled",
 		};
 
 		public static int BoolFromString(string s)
@@ -514,6 +516,7 @@ namespace Cue
 			"emergencyGazeDuration",
 			"gazeSaccadeInterval",
 			"gazeSaccade",
+			"zappedEnabled",
 			"gazeSaccadeMovementRange",
 			"avoidGazePlayer",
 			"avoidGazePlayerInsidePersonalSpace",
