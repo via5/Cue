@@ -72,59 +72,89 @@ namespace Cue
 		public static readonly FloatIndex OtherGropedEyesWeight = new FloatIndex(47);
 		public static readonly FloatIndex OtherGropedSourceEyesWeight = new FloatIndex(48);
 		public static readonly FloatIndex OtherGropedTargetWeight = new FloatIndex(49);
-		public static readonly FloatIndex LookAtPlayerOnGrabWeight = new FloatIndex(50);
-		public static readonly FloatIndex LookAtPlayerTimeAfterGrab = new FloatIndex(51);
-		public static readonly FloatIndex KissSpeedEnergyFactor = new FloatIndex(52);
-		public static readonly FloatIndex IdleMaxExcitement = new FloatIndex(53);
-		public static readonly FloatIndex TirednessExcitementRateFactor = new FloatIndex(54);
-		public static readonly FloatIndex GazeEnergyTirednessFactor = new FloatIndex(55);
-		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(56);
-		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(57);
-		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(58);
-		public static readonly FloatIndex MovementEnergyRampUpDelayAfterOrgasm = new FloatIndex(59);
-		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(60);
-		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(61);
-		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(62);
-		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(63);
-		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(64);
-		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(65);
-		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(66);
-		public static readonly FloatIndex DefaultHappiness = new FloatIndex(67);
-		public static readonly FloatIndex DefaultAnger = new FloatIndex(68);
-		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(69);
-		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(70);
-		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(71);
-		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(72);
-		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(73);
-		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(74);
-		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(75);
-		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(76);
-		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(77);
-		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(78);
-		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(79);
-		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(80);
-		public static readonly FloatIndex SlapMinTime = new FloatIndex(81);
-		public static readonly FloatIndex SlapMaxTime = new FloatIndex(82);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(83);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(84);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(85);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(86);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(87);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(88);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(89);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(90);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(91);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(92);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(93);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(94);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(95);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(96);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(97);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(98);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(99);
+		public static readonly FloatIndex ZappedTentativeTime = new FloatIndex(50);
+		public static readonly FloatIndex ZappedCooldown = new FloatIndex(51);
+		public static readonly FloatIndex ZappedTime = new FloatIndex(52);
+		public static readonly FloatIndex ZappedByPlayerBreastsEyesWeight = new FloatIndex(53);
+		public static readonly FloatIndex ZappedByPlayerBreastsTargetWeight = new FloatIndex(54);
+		public static readonly FloatIndex ZappedByPlayerBreastsExcitement = new FloatIndex(55);
+		public static readonly FloatIndex ZappedByPlayerGenitalsEyesWeight = new FloatIndex(56);
+		public static readonly FloatIndex ZappedByPlayerGenitalsTargetWeight = new FloatIndex(57);
+		public static readonly FloatIndex ZappedByPlayerGenitalsExcitement = new FloatIndex(58);
+		public static readonly FloatIndex ZappedByPlayerPenetrationEyesWeight = new FloatIndex(59);
+		public static readonly FloatIndex ZappedByPlayerPenetrationTargetWeight = new FloatIndex(60);
+		public static readonly FloatIndex ZappedByPlayerPenetrationExcitement = new FloatIndex(61);
+		public static readonly FloatIndex ZappedByPlayerMouthEyesWeight = new FloatIndex(62);
+		public static readonly FloatIndex ZappedByPlayerMouthExcitement = new FloatIndex(63);
+		public static readonly FloatIndex ZappedByPlayerLookUpWeight = new FloatIndex(64);
+		public static readonly FloatIndex ZappedByOtherBreastsEyesWeight = new FloatIndex(65);
+		public static readonly FloatIndex ZappedByOtherBreastsTargetWeight = new FloatIndex(66);
+		public static readonly FloatIndex ZappedByOtherBreastsExcitement = new FloatIndex(67);
+		public static readonly FloatIndex ZappedByOtherGenitalsEyesWeight = new FloatIndex(68);
+		public static readonly FloatIndex ZappedByOtherGenitalsTargetWeight = new FloatIndex(69);
+		public static readonly FloatIndex ZappedByOtherGenitalsExcitement = new FloatIndex(70);
+		public static readonly FloatIndex ZappedByOtherPenetrationEyesWeight = new FloatIndex(71);
+		public static readonly FloatIndex ZappedByOtherPenetrationTargetWeight = new FloatIndex(72);
+		public static readonly FloatIndex ZappedByOtherPenetrationExcitement = new FloatIndex(73);
+		public static readonly FloatIndex ZappedByOtherMouthEyesWeight = new FloatIndex(74);
+		public static readonly FloatIndex ZappedByOtherMouthExcitement = new FloatIndex(75);
+		public static readonly FloatIndex ZappedByOtherLookUpWeight = new FloatIndex(76);
+		public static readonly FloatIndex OtherZappedEyesWeight = new FloatIndex(77);
+		public static readonly FloatIndex OtherZappedTargetWeight = new FloatIndex(78);
+		public static readonly FloatIndex OtherZappedSourceWeight = new FloatIndex(79);
+		public static readonly FloatIndex LookAtPlayerOnGrabWeight = new FloatIndex(80);
+		public static readonly FloatIndex LookAtPlayerTimeAfterGrab = new FloatIndex(81);
+		public static readonly FloatIndex KissSpeedEnergyFactor = new FloatIndex(82);
+		public static readonly FloatIndex IdleMaxExcitement = new FloatIndex(83);
+		public static readonly FloatIndex TirednessExcitementRateFactor = new FloatIndex(84);
+		public static readonly FloatIndex GazeEnergyTirednessFactor = new FloatIndex(85);
+		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(86);
+		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(87);
+		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(88);
+		public static readonly FloatIndex MovementEnergyRampUpDelayAfterOrgasm = new FloatIndex(89);
+		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(90);
+		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(91);
+		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(92);
+		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(93);
+		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(94);
+		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(95);
+		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(96);
+		public static readonly FloatIndex DefaultHappiness = new FloatIndex(97);
+		public static readonly FloatIndex DefaultAnger = new FloatIndex(98);
+		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(99);
+		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(100);
+		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(101);
+		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(102);
+		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(103);
+		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(104);
+		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(105);
+		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(106);
+		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(107);
+		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(108);
+		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(109);
+		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(110);
+		public static readonly FloatIndex SlapMinTime = new FloatIndex(111);
+		public static readonly FloatIndex SlapMaxTime = new FloatIndex(112);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(113);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(114);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(115);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(116);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(117);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(118);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(119);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(120);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(121);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(122);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(123);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(124);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(125);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(126);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(127);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(128);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(129);
 
-		public const int FloatCount = 100;
-		public override int GetFloatCount() { return 100; }
+		public const int FloatCount = 130;
+		public override int GetFloatCount() { return 130; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -294,6 +324,36 @@ namespace Cue
 			"otherGropedEyesWeight",
 			"otherGropedSourceEyesWeight",
 			"otherGropedTargetWeight",
+			"zappedTentativeTime",
+			"zappedCooldown",
+			"zappedTime",
+			"zappedByPlayerBreastsEyesWeight",
+			"zappedByPlayerBreastsTargetWeight",
+			"zappedByPlayerBreastsExcitement",
+			"zappedByPlayerGenitalsEyesWeight",
+			"zappedByPlayerGenitalsTargetWeight",
+			"zappedByPlayerGenitalsExcitement",
+			"zappedByPlayerPenetrationEyesWeight",
+			"zappedByPlayerPenetrationTargetWeight",
+			"zappedByPlayerPenetrationExcitement",
+			"zappedByPlayerMouthEyesWeight",
+			"zappedByPlayerMouthExcitement",
+			"zappedByPlayerLookUpWeight",
+			"zappedByOtherBreastsEyesWeight",
+			"zappedByOtherBreastsTargetWeight",
+			"zappedByOtherBreastsExcitement",
+			"zappedByOtherGenitalsEyesWeight",
+			"zappedByOtherGenitalsTargetWeight",
+			"zappedByOtherGenitalsExcitement",
+			"zappedByOtherPenetrationEyesWeight",
+			"zappedByOtherPenetrationTargetWeight",
+			"zappedByOtherPenetrationExcitement",
+			"zappedByOtherMouthEyesWeight",
+			"zappedByOtherMouthExcitement",
+			"zappedByOtherLookUpWeight",
+			"otherZappedEyesWeight",
+			"otherZappedTargetWeight",
+			"otherZappedSourceWeight",
 			"lookAtPlayerOnGrabWeight",
 			"lookAtPlayerTimeAfterGrab",
 			"kissSpeedEnergyFactor",
@@ -504,6 +564,36 @@ namespace Cue
 			"otherGropedEyesWeight",
 			"otherGropedSourceEyesWeight",
 			"otherGropedTargetWeight",
+			"zappedTentativeTime",
+			"zappedCooldown",
+			"zappedTime",
+			"zappedByPlayerBreastsEyesWeight",
+			"zappedByPlayerBreastsTargetWeight",
+			"zappedByPlayerBreastsExcitement",
+			"zappedByPlayerGenitalsEyesWeight",
+			"zappedByPlayerGenitalsTargetWeight",
+			"zappedByPlayerGenitalsExcitement",
+			"zappedByPlayerPenetrationEyesWeight",
+			"zappedByPlayerPenetrationTargetWeight",
+			"zappedByPlayerPenetrationExcitement",
+			"zappedByPlayerMouthEyesWeight",
+			"zappedByPlayerMouthExcitement",
+			"zappedByPlayerLookUpWeight",
+			"zappedByOtherBreastsEyesWeight",
+			"zappedByOtherBreastsTargetWeight",
+			"zappedByOtherBreastsExcitement",
+			"zappedByOtherGenitalsEyesWeight",
+			"zappedByOtherGenitalsTargetWeight",
+			"zappedByOtherGenitalsExcitement",
+			"zappedByOtherPenetrationEyesWeight",
+			"zappedByOtherPenetrationTargetWeight",
+			"zappedByOtherPenetrationExcitement",
+			"zappedByOtherMouthEyesWeight",
+			"zappedByOtherMouthExcitement",
+			"zappedByOtherLookUpWeight",
+			"otherZappedEyesWeight",
+			"otherZappedTargetWeight",
+			"otherZappedSourceWeight",
 			"lookAtPlayerOnGrabWeight",
 			"lookAtPlayerTimeAfterGrab",
 			"kissSpeedEnergyFactor",

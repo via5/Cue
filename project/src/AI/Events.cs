@@ -13,6 +13,7 @@ namespace Cue
 		void Update(float s);
 		void ForceStop();
 		void Debug(DebugLines debug);
+		DebugButtons DebugButtons();
 	}
 
 
@@ -56,7 +57,7 @@ namespace Cue
 				new ThrustEvent(),
 				new HandLinker(),
 				new HandEvent(),
-				new PenetratedEvent(),
+				new ZappedEvent(),
 			//	new SuckFingerEvent(),
 			};
 		}
@@ -121,6 +122,11 @@ namespace Cue
 
 		public virtual void Debug(DebugLines debug)
 		{
+		}
+
+		public virtual DebugButtons DebugButtons()
+		{
+			return null;
 		}
 	}
 }

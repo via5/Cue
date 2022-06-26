@@ -5,6 +5,71 @@ namespace Cue
 {
 	public class Body
 	{
+		public class ZapInfo
+		{
+			private Person source_ = null;
+			private int zone_ = SS.None;
+			private float maxIntensity_ = 0;
+			private float time_ = 0;
+			private float elapsed_ = 0;
+
+			public void Set(Person source, int zone, float maxIntensity, float time)
+			{
+				source_ = source;
+				zone_ = zone;
+				maxIntensity_ = maxIntensity;
+				time_ = time;
+				elapsed_ = 0;
+			}
+
+			public void Update(float s)
+			{
+				elapsed_ += s;
+
+				if (elapsed_ >= time_)
+					Reset();
+			}
+
+			public void Reset()
+			{
+				source_ = null;
+				maxIntensity_ = 0;
+				time_ = 0;
+				elapsed_ = 0;
+			}
+
+			public Person Source
+			{
+				get { return source_; }
+			}
+
+			public int Zone
+			{
+				get { return zone_; }
+			}
+
+			public float Intensity
+			{
+				get
+				{
+					if (time_ > 0)
+						return maxIntensity_ * (1 - (elapsed_ / time_));
+					else
+						return 0;
+				}
+			}
+
+			public string DebugLine(Person self)
+			{
+				if (source_ == null)
+					return "no";
+
+				return
+					$"{source_} on {self.Body.Zone(zone_)} at {Intensity}, " +
+					$"max={maxIntensity_:0.00} time={time_:0.00}";
+			}
+		}
+
 		public const int CloseDelay = 2;
 		private const float MaxMorphs = 1.2f;
 
@@ -15,6 +80,8 @@ namespace Cue
 		private DampedFloat temperature_;
 		private float[] morphsRemaining_ = new float[BP.Count];
 		private ErogenousZones zones_;
+		private ZapInfo zap_ = new ZapInfo();
+
 
 		public Body(Person p)
 		{
@@ -101,6 +168,11 @@ namespace Cue
 			get { return rightHand_; }
 		}
 
+		public ZapInfo Zap
+		{
+			get { return zap_; }
+		}
+
 		public BodyPart Get(int type)
 		{
 			if (type < 0 || type >= all_.Length)
@@ -122,8 +194,18 @@ namespace Cue
 			person_.Expression.Slapped(speed);
 		}
 
+		public void Zapped(Person source, int zone, float intensity, float time)
+		{
+			zap_.Set(source, zone, intensity, time);
+
+			Log.Info($"zapped: {zap_.DebugLine(person_)}");
+
+		}
+
 		public void Update(float s)
 		{
+			zap_.Update(s);
+
 			for (int i = 0; i < all_.Length; ++i)
 				all_[i].Update(s);
 

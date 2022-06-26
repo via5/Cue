@@ -65,7 +65,7 @@ namespace Cue
 				tools_.Add(new VUI.ToolButton("ui", Cue.Instance.OpenScriptUI));
 				forceExcitement_ = tools_.Add(new VUI.CheckBox("Ex", OnForceExcitement));
 				excitement_ = tools_.Add(new VUI.FloatTextSlider(OnExcitement));
-				tools_.Add(new VUI.ToolButton("test", OnTest));
+				tools_.Add(new VUI.ToolButton("zap", OnTest));
 				fps_ = tools_.Add(new VUI.Label());
 				p.Add(tools_);
 			}
@@ -197,7 +197,7 @@ namespace Cue
 
 			var p = SelectedPerson;
 			if (p != null)
-				p.Animator.PlayType(Animations.Penetrated);
+				p.Body.Zapped(Cue.Instance.Player, SS.Genitals, 1, 5);
 		}
 
 		private void OnForceExcitement(bool b)

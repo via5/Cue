@@ -18,6 +18,7 @@ namespace Cue
 
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
+		private float baseExcitement_ = 0;
 
 		private ForceableFloat[] moods_ = new ForceableFloat[Moods.Count];
 
@@ -298,7 +299,7 @@ namespace Cue
 					if (elapsed_ > ps.Get(PS.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						moods_[Moods.Excited].Value = ps.Get(PS.ExcitementPostOrgasm);
+						baseExcitement_ = ps.Get(PS.ExcitementPostOrgasm);
 					}
 
 					break;
@@ -399,10 +400,10 @@ namespace Cue
 			var ps = person_.Personality;
 			var ex = person_.Excitement;
 
-			if (moods_[Moods.Excited].Value > ex.Max)
+			if (baseExcitement_ > ex.Max)
 			{
-				moods_[Moods.Excited].Value = Math.Max(
-					moods_[Moods.Excited].Value + ps.Get(PS.ExcitementDecayRate) * s,
+				baseExcitement_ = Math.Max(
+					baseExcitement_ + ps.Get(PS.ExcitementDecayRate) * s,
 					ex.Max);
 			}
 			else
@@ -414,10 +415,15 @@ namespace Cue
 				rate = rate - (rate * tirednessFactor);
 				rate *= Cue.Instance.Options.Excitement;
 
-				moods_[Moods.Excited].Value = U.Clamp(
-					moods_[Moods.Excited].Value + rate * s,
+				baseExcitement_ = U.Clamp(
+					baseExcitement_ + rate * s,
 					0, ex.Max);
 			}
+
+			float zapped = person_.Body.Zap.Intensity * 0.9f;
+
+			moods_[Moods.Excited].Value = Math.Max(
+				baseExcitement_, zapped);
 		}
 
 		private float GetRate()
@@ -439,7 +445,9 @@ namespace Cue
 
 			person_.Animator.PlayType(Animations.Orgasm);
 
-			moods_[Moods.Excited].Value = 1;
+			baseExcitement_ = 1;
+			moods_[Moods.Excited].Value = baseExcitement_;
+
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;
 

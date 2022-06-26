@@ -4,6 +4,30 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	public class DebugButtons
+	{
+		public class Button
+		{
+			public string text;
+			public Action f;
+		}
+
+		public List<Button> buttons = new List<Button>();
+
+		public void Clear()
+		{
+			buttons.Clear();
+		}
+
+		public void Add(string s, Action f)
+		{
+			var b = new Button();
+			b.text = s;
+			b.f = f;
+			buttons.Add(b);
+		}
+	}
+
 	public class DebugLines
 	{
 		private List<string[]> debug_ = null;

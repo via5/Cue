@@ -82,6 +82,7 @@ namespace Cue
 		public IGazer Gazer { get { return gazer_; } }
 		public GazeTargets Targets { get { return targets_; } }
 		public string LastString { get { return lastString_.ToString(); } }
+		public IGazeLookat CurrentTarget { get { return picker_.CurrentTarget; } }
 
 		public void Init()
 		{
@@ -222,17 +223,17 @@ namespace Cue
 			{
 				gazer_.Enabled = false;
 			}
-			else if (picker_.HasTarget)
+			else if (CurrentTarget != null)
 			{
 				if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
 					gazer_.Enabled = false;
 				else
 					gazer_.Enabled = gazerEnabled_;
 
-				gazer_.Variance = picker_.CurrentTarget.Variance;
+				gazer_.Variance = CurrentTarget.Variance;
 			}
 
-			eyes_.LookAt(picker_.Position);
+			eyes_.LookAt(CurrentTarget?.Position ?? Vector3.Zero);
 			eyes_.Update(s);
 			gazer_.Update(s);
 		}

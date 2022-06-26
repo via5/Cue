@@ -336,6 +336,7 @@ namespace Cue
 			if (!person_.Animator.PlayType(
 				Animations.Kiss, new AnimationContext(target, locks_[0].Key)))
 			{
+				elapsed_ = 0;
 				lastResult_ = $"kiss animation failed to start";
 				target.AI.GetEvent<KissEvent>().Unlock();
 				return false;

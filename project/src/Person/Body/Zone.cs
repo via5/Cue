@@ -453,6 +453,11 @@ namespace Cue
 			sources_[ExternalSourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.NoneType, -1);
 		}
 
+		public override string ToString()
+		{
+			return SS.ToString(type_);
+		}
+
 		public bool Active
 		{
 			get { return (activeSources_ > 0); }
@@ -461,6 +466,22 @@ namespace Cue
 		public int ActiveSources
 		{
 			get { return activeSources_; }
+		}
+
+		public BodyPart MainBodyPart
+		{
+			get
+			{
+				for (int i = 0; i < parts_.Length; ++i)
+				{
+					var bp = person_.Body.Get(parts_[i].target);
+
+					if (bp.Exists)
+						return bp;
+				}
+
+				return null;
+			}
 		}
 
 		public ErogenousZoneSource[] Sources

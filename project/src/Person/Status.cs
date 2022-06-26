@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cue
+﻿namespace Cue
 {
 	public class PersonStatus
 	{
@@ -223,6 +221,11 @@ namespace Cue
 				return false;
 
 			return person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].Active;
+		}
+
+		public bool FingeredBy(Person p)
+		{
+			return person_.Body.Zone(SS.Genitals).Sources[p.PersonIndex].Active;
 		}
 
 		private PartResult CheckParts(Person by, int[] triggerParts, int[] checkParts)

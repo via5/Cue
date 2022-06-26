@@ -33,6 +33,7 @@ namespace Cue
 			{
 				new GazeAbove(p),
 				new GazeGrabbed(p),
+				new GazeZapped(p),
 				new GazeKissing(p),
 				new GazeMouth(p),
 				new GazeHands(p),
@@ -162,6 +163,217 @@ namespace Cue
 		public override string ToString()
 		{
 			return "head grabbed";
+		}
+	}
+
+
+	class GazeZapped : BasicGazeEvent
+	{
+		private bool active_ = false;
+
+		public GazeZapped(Person p)
+			: base(p)
+		{
+		}
+
+		protected override int DoCheck(int flags)
+		{
+			var ps = person_.Personality;
+
+			if (active_)
+			{
+				Person other = null;
+				float otherIntensity = 0;
+				bool self = false;
+
+				for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+				{
+					var p = Cue.Instance.ActivePersons[i];
+					if (p.Body.Zap.Intensity <= 0)
+						continue;
+
+					if (p == person_)
+					{
+						// self was zapped
+						self = true;
+						break;
+					}
+					else
+					{
+						if (p.Body.Zap.Source != person_)
+						{
+							if (p.Body.Zap.Intensity > otherIntensity)
+							{
+								// other was zapped
+								other = p;
+								otherIntensity = p.Body.Zap.Intensity;
+							}
+						}
+					}
+				}
+
+				if (self)
+				{
+					DoSelfZapped();
+					active_ = true;
+				}
+				else if (other != null)
+				{
+					DoOtherZapped(other);
+					active_ = true;
+				}
+				else
+				{
+					active_ = false;
+				}
+			}
+
+			return Continue;
+		}
+
+		protected override bool DoHasEmergency(float s)
+		{
+			active_ = false;
+
+			// find anybody zapped, including self
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+			{
+				var p = Cue.Instance.ActivePersons[i];
+
+				if (p.Body.Zap.Intensity > 0 && p.Body.Zap.Source != person_)
+				{
+					active_ = true;
+					break;
+				}
+			}
+
+			return active_;
+		}
+
+		private void DoSelfZapped()
+		{
+			var ps = person_.Personality;
+			var z = person_.Body.Zap;
+
+			// look at person zapping
+			float w = GetEyesWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
+			if (w >= 0)
+			{
+				targets_.SetWeight(
+					z.Source, BP.Eyes, w, $"self zapped by {z.Source}");
+			}
+
+			// look at body part being zapped
+			var targetPart = person_.Body.Zone(z.Zone).MainBodyPart;
+			if (targetPart != null)
+			{
+				w = GetTargetWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
+				if (w >= 0)
+				{
+					targets_.SetWeight(
+						person_, targetPart.Type, w,
+						$"self zapped by {z.Source}");
+				}
+			}
+
+			// look up
+			if (z.Source.IsPlayer)
+			{
+				targets_.SetAboveWeight(
+					ps.Get(PS.ZappedByPlayerLookUpWeight) * z.Intensity,
+					$"self zapped by {z.Source}");
+			}
+			else
+			{
+				targets_.SetAboveWeight(
+					ps.Get(PS.ZappedByOtherLookUpWeight) * z.Intensity,
+					$"self zapped by {z.Source}");
+			}
+		}
+
+		private void DoOtherZapped(Person other)
+		{
+			var ps = person_.Personality;
+			var z = other.Body.Zap;
+
+			// look at person being zapped
+			targets_.SetWeight(
+				other, BP.Eyes, ps.Get(PS.OtherZappedEyesWeight) * z.Intensity,
+				$"other {other} zapped by {z.Source}");
+
+			// look at body part being zapped
+			var targetPart = other.Body.Zone(z.Zone).MainBodyPart;
+			if (targetPart != null)
+			{
+				targets_.SetWeight(
+					other, targetPart.Type,
+					ps.Get(PS.OtherZappedTargetWeight) * z.Intensity,
+					$"other {other} zapped by {z.Source}");
+			}
+
+			// look at person zapping
+			targets_.SetWeight(
+				z.Source, BP.Eyes,
+				ps.Get(PS.OtherZappedSourceWeight) * z.Intensity,
+				$"{z.Source} is zapping {other}");
+		}
+
+		private float GetEyesWeight(bool player, int zone)
+		{
+			var ps = person_.Personality;
+
+			if (player)
+			{
+				switch (zone)
+				{
+					case SS.Genitals: return ps.Get(PS.ZappedByPlayerGenitalsEyesWeight);
+					case SS.Breasts: return ps.Get(PS.ZappedByPlayerBreastsEyesWeight);
+					case SS.Penetration: return ps.Get(PS.ZappedByPlayerPenetrationEyesWeight);
+					case SS.Mouth: return ps.Get(PS.ZappedByPlayerMouthEyesWeight);
+				}
+			}
+			else
+			{
+				switch (zone)
+				{
+					case SS.Genitals: return ps.Get(PS.ZappedByOtherGenitalsEyesWeight);
+					case SS.Breasts: return ps.Get(PS.ZappedByOtherBreastsEyesWeight);
+					case SS.Penetration: return ps.Get(PS.ZappedByOtherPenetrationEyesWeight);
+					case SS.Mouth: return ps.Get(PS.ZappedByOtherMouthEyesWeight);
+				}
+			}
+			return -1;
+		}
+
+		private float GetTargetWeight(bool player, int zone)
+		{
+			var ps = person_.Personality;
+
+			if (player)
+			{
+				switch (zone)
+				{
+					case SS.Genitals: return ps.Get(PS.ZappedByPlayerGenitalsTargetWeight);
+					case SS.Breasts: return ps.Get(PS.ZappedByPlayerBreastsTargetWeight);
+					case SS.Penetration: return ps.Get(PS.ZappedByPlayerPenetrationTargetWeight);
+				}
+			}
+			else
+			{
+				switch (zone)
+				{
+					case SS.Genitals: return ps.Get(PS.ZappedByOtherGenitalsTargetWeight);
+					case SS.Breasts: return ps.Get(PS.ZappedByOtherBreastsTargetWeight);
+					case SS.Penetration: return ps.Get(PS.ZappedByOtherPenetrationTargetWeight);
+				}
+			}
+
+			return -1;
+		}
+
+		public override string ToString()
+		{
+			return "zapped";
 		}
 	}
 

@@ -470,7 +470,7 @@
 	"busyPlayerEyesWeight": 1,
 	"otherEyesExcitementWeight": 1.0,
 	"maxTirednessForRandomGaze": 0.5,
-	"otherEyesOrgasmWeight": 20,
+	"otherEyesOrgasmWeight": 50,
 
 	"blowjobEyesWeight": 0.5,
 	"blowjobGenitalsWeight": 5,
@@ -497,6 +497,42 @@
 	"otherGropedEyesWeight": 1.5,
 	"otherGropedSourceEyesWeight": 1,
 	"otherGropedTargetWeight": 1,
+
+
+	"zappedTentativeTime": 2,
+	"zappedCooldown": 30,
+	"zappedTime": 3,
+
+	"zappedByPlayerBreastsEyesWeight": 50,
+	"zappedByPlayerBreastsTargetWeight": 10,
+	"zappedByPlayerBreastsExcitement": 0.4,
+	"zappedByPlayerGenitalsEyesWeight": 50,
+	"zappedByPlayerGenitalsTargetWeight": 10,
+	"zappedByPlayerGenitalsExcitement": 0.7,
+	"zappedByPlayerPenetrationEyesWeight": 50,
+	"zappedByPlayerPenetrationTargetWeight": 10,
+	"zappedByPlayerPenetrationExcitement": 0.95,
+	"zappedByPlayerMouthEyesWeight": 20,
+	"zappedByPlayerMouthExcitement": 0.3,
+	"zappedByPlayerLookUpWeight": 5,
+
+	"zappedByOtherBreastsEyesWeight": 20,
+	"zappedByOtherBreastsTargetWeight": 5,
+	"zappedByOtherBreastsExcitement": 0.3,
+	"zappedByOtherGenitalsEyesWeight": 20,
+	"zappedByOtherGenitalsTargetWeight": 5,
+	"zappedByOtherGenitalsExcitement": 0.5,
+	"zappedByOtherPenetrationEyesWeight": 20,
+	"zappedByOtherPenetrationTargetWeight": 5,
+	"zappedByOtherPenetrationExcitement": 0.7,
+	"zappedByOtherMouthEyesWeight": 5,
+	"zappedByOtherMouthExcitement": 0.3,
+	"zappedByOtherLookUpWeight": 5,
+
+	"otherZappedEyesWeight": 20,
+	"otherZappedTargetWeight": 10,
+	"otherZappedSourceWeight": 10,
+
 
 	"kissSpeedEnergyFactor": 1,
 	"tirednessExcitementRateFactor": 0.6,

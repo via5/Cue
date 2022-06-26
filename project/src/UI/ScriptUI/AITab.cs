@@ -33,6 +33,7 @@ namespace Cue
 		private VUI.Label groped_ = new VUI.Label();
 		private VUI.Label penetrated_ = new VUI.Label();
 		private VUI.Label penetrating_ = new VUI.Label();
+		private VUI.Label zapped_ = new VUI.Label();
 
 		public PersonAIStateTab(Person p)
 			: base("State", false)
@@ -65,6 +66,9 @@ namespace Cue
 
 			state.Add(new VUI.Label("Penetrating"));
 			state.Add(penetrating_);
+
+			state.Add(new VUI.Label("Zapped"));
+			state.Add(zapped_);
 
 			Layout = new VUI.BorderLayout();
 			Add(state, VUI.BorderLayout.Top);
@@ -137,6 +141,7 @@ namespace Cue
 			groped_.Text = groped ?? "nobody";
 			penetrated_.Text = penetrated ?? "nobody";
 			penetrating_.Text = penetrating ?? "nobody";
+			zapped_.Text = person_.Body.Zap.DebugLine(person_);
 		}
 	}
 
@@ -518,6 +523,7 @@ namespace Cue
 
 		private VUI.ComboBox<IEvent> events_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private VUI.Panel buttons_ = new VUI.Panel();
 		private DebugLines debug_ = new DebugLines();
 
 		public PersonAIEventsTab(Person person)
@@ -529,16 +535,28 @@ namespace Cue
 			U.NatSort(es);
 
 			Layout = new VUI.BorderLayout(10);
+
 			events_ = new VUI.ComboBox<IEvent>(es, OnSelection);
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 			list_.FontSize = 22;
 
+			buttons_.Layout = new VUI.HorizontalFlow();
+
+			var content = new VUI.Panel(new VUI.BorderLayout());
+			content.Add(buttons_, VUI.BorderLayout.Top);
+			content.Add(list_, VUI.BorderLayout.Center);
+
 			Add(events_, VUI.BorderLayout.Top);
-			Add(list_, VUI.BorderLayout.Center);
+			Add(content, VUI.BorderLayout.Center);
+
+			OnSelection(null);
 		}
 
 		protected override void DoUpdate(float s)
 		{
+			if (person_.ID == "Person")
+				list_.Name = "eventsList";
+
 			debug_.Clear();
 
 			if (events_.Selected != null)
@@ -549,6 +567,24 @@ namespace Cue
 
 		private void OnSelection(IEvent e)
 		{
+			buttons_.RemoveAllChildren();
+
+			if (e != null)
+			{
+				var bs = e.DebugButtons();
+
+				if (bs != null)
+				{
+					foreach (var b in bs.buttons)
+						buttons_.Add(new VUI.Button(b.text, () => b.f()));
+				}
+			}
+
+			// there's a bug with ListView, where resizing dynamically doesn't
+			// move the list correctly, so hardcode a spacer so the list doesn't
+			// change heights
+			if (buttons_.Children.Count == 0)
+				buttons_.Add(new VUI.Spacer(40));
 		}
 	}
 }
