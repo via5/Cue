@@ -10,6 +10,90 @@ using AssetBundles;
 
 namespace Cue.Sys.Vam
 {
+	class Linker
+	{
+		class Link
+		{
+			private VamBodyPart from_, to_;
+			private Vector3 last_;
+
+			public Link(VamBodyPart from, VamBodyPart to)
+			{
+				from_ = from;
+				to_ = to;
+				last_ = to_.Position;
+			}
+
+			public VamBodyPart From
+			{
+				get { return from_; }
+			}
+
+			public VamBodyPart To
+			{
+				get { return to_; }
+			}
+
+			public void LateUpdate(float s)
+			{
+				var p = to_.Position;
+				var d = p - last_;
+
+				from_.ControlPosition += d;
+				last_ = p;
+			}
+		}
+
+		private List<Link> linksList_ = new List<Link>();
+		private Link[] linksArray_ = new Link[0];
+
+		public void Add(VamBodyPart from, VamBodyPart to)
+		{
+			linksList_.Add(new Link(from, to));
+			linksArray_ = linksList_.ToArray();
+		}
+
+		public void Remove(VamBodyPart from)
+		{
+			for (int i = 0; i < linksArray_.Length; ++i)
+			{
+				if (linksArray_[i].From == from)
+				{
+					linksList_.RemoveAt(i);
+					linksArray_ = linksList_.ToArray();
+				}
+			}
+		}
+
+		public bool IsLinked(VamBodyPart from)
+		{
+			return (GetLink(from) != null);
+		}
+
+		public bool IsLinkedTo(VamBodyPart from, VamBodyPart to)
+		{
+			return (GetLink(from) == to);
+		}
+
+		public VamBodyPart GetLink(VamBodyPart from)
+		{
+			for (int i = 0; i < linksArray_.Length; ++i)
+			{
+				if (linksArray_[i].From == from)
+					return linksArray_[i].To;
+			}
+
+			return null;
+		}
+
+		public void LateUpdate(float s)
+		{
+			for (int i = 0; i < linksArray_.Length; ++i)
+				linksArray_[i].LateUpdate(s);
+		}
+	}
+
+
 	class VamSys : ISys
 	{
 		private static VamSys instance_ = null;
@@ -24,6 +108,7 @@ namespace Cue.Sys.Vam
 		private PerfMon perf_ = null;
 		private VamDebugRenderer debugRenderer_ = new VamDebugRenderer();
 		private Action deferredInit_ = null;
+		private Linker linker_ = new Linker();
 
 		public VamSys(MVRScript s)
 		{
@@ -63,6 +148,11 @@ namespace Cue.Sys.Vam
 		public VamDebugRenderer DebugRenderer
 		{
 			get { return debugRenderer_; }
+		}
+
+		public Linker Linker
+		{
+			get { return linker_; }
 		}
 
 		static public VamSys Instance
@@ -283,6 +373,11 @@ namespace Cue.Sys.Vam
 			}
 
 			debugRenderer_.Update(s);
+		}
+
+		public void LateUpdate(float s)
+		{
+			linker_.LateUpdate(s);
 		}
 
 		public void OnPluginState(bool b)

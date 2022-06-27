@@ -72,6 +72,7 @@ namespace Cue
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
 					cue_.LateUpdate(deltaTime);
+					sys_.LateUpdate(Time.deltaTime);
 				}
 
 				Thread.Sleep(1);
@@ -378,6 +379,7 @@ namespace Cue
 			try
 			{
 				cue_.LateUpdate(Time.deltaTime);
+				sys_.LateUpdate(Time.deltaTime);
 			}
 			catch(PluginGone e)
 			{

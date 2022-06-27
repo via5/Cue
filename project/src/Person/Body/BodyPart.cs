@@ -325,14 +325,29 @@ namespace Cue
 			}
 		}
 
-		public bool Linked
+		public bool IsLinked
 		{
 			get
 			{
 				if (!Exists)
 					return false;
 
-				return Sys.Linked;
+				return Sys.IsLinked;
+			}
+		}
+
+		public BodyPart Link
+		{
+			get
+			{
+				if (!Exists)
+					return null;
+
+				var link = Sys.Link;
+				if (link == null)
+					return null;
+
+				return person_.Body.Get(link.Type);
 			}
 		}
 

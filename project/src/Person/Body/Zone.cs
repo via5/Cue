@@ -311,7 +311,7 @@ namespace Cue
 		private void DoDecay(float s, Part part)
 		{
 			// todo, decay speed
-			part.elapsed = Math.Max(0, part.elapsed - (s / 2));
+			part.elapsed = Math.Max(0, part.elapsed - (s * 2));
 			part.active = (part.elapsed > 0);
 
 			if (part.active)

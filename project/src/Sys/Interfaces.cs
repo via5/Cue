@@ -81,6 +81,7 @@ namespace Cue.Sys
 		Vector3 InteractiveRightHandPosition { get; }
 		bool Paused { get; }
 		void Update(float s);
+		void LateUpdate(float s);
 		void OnPluginState(bool b);
 		void OnReady(Action f);
 		string ReadFileIntoString(string path);
@@ -382,7 +383,8 @@ namespace Cue.Sys
 		Quaternion ControlRotation { get; set; }
 		Vector3 Position { get; }
 		Quaternion Rotation { get; }
-		bool Linked { get; }
+		IBodyPart Link { get; }
+		bool IsLinked { get; }
 		void LinkTo(IBodyPart other);
 		bool IsLinkedTo(IBodyPart other);
 		float DistanceToSurface(IBodyPart other, bool debug = false);

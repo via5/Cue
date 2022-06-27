@@ -121,7 +121,7 @@ namespace Cue
 		{
 			public BodyPart part;
 			public VUI.CheckBox name;
-			public VUI.Label triggering, grabbed, lk, source;
+			public VUI.Label triggering, grabbed, lk, link;
 		}
 
 		private readonly Person person_;
@@ -142,7 +142,7 @@ namespace Cue
 			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Grabbed", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Source", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Link", UnityEngine.FontStyle.Bold));
 
 			int fontSize = 20;
 
@@ -171,10 +171,10 @@ namespace Cue
 				w.lk.TextColor = Sys.Vam.U.ToUnity(Color.Green);
 				p.Add(w.lk);
 
-				w.source = new VUI.Label();
-				w.source.FontSize = fontSize;
-				w.source.WrapMode = VUI.Label.Clip;
-				p.Add(w.source);
+				w.link = new VUI.Label();
+				w.link.FontSize = fontSize;
+				w.link.WrapMode = VUI.Label.Clip;
+				p.Add(w.link);
 
 				widgets_.Add(w);
 			}
@@ -272,8 +272,7 @@ namespace Cue
 				}
 
 				w.lk.Text = w.part.Locker.DebugLockString();
-				w.source.Text = w.part.Source;
-				w.source.Tooltip.Text = w.part.Source;
+				w.link.Text = (w.part.Link?.Name ?? "");
 			}
 		}
 	}

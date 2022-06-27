@@ -95,50 +95,22 @@ namespace Cue.Sys.Vam
 
 		private List<VamDebugRenderer.IDebugRender> renderers_ = new List<VamDebugRenderer.IDebugRender>();
 
-		public virtual bool Linked
+		public virtual IBodyPart Link
 		{
-			get
-			{
-				return
-					Controller?.linkToRB != null &&
-					Controller.currentPositionState == FreeControllerV3.PositionState.ParentLink &&
-					Controller.currentRotationState == FreeControllerV3.RotationState.ParentLink;
-			}
+			get { return Cue.Instance.VamSys.Linker.GetLink(this); }
+		}
+
+		public virtual bool IsLinked
+		{
+			get { return Cue.Instance.VamSys.Linker.IsLinked(this); }
 		}
 
 		public virtual void LinkTo(IBodyPart other)
 		{
-			if (Controller == null)
-			{
-				Log.Error($"cannot link {this} to {other}, no controller");
-				return;
-			}
-
 			if (other == null)
-			{
-				SetOn(Controller);
-			}
+				Cue.Instance.VamSys.Linker.Remove(this);
 			else
-			{
-				var o = other as VamBodyPart;
-				if (o?.Rigidbody == null)
-				{
-					Log.Error($"cannot link {this} to {other}, not an rb");
-				}
-				else
-				{
-					if (o.Controller?.linkToRB == Rigidbody)
-					{
-						Log.Error(
-							$"cannot link {this} to {other}, would be " +
-							$"reciprocal");
-					}
-					else
-					{
-						SetParentLink(Controller, o.Rigidbody);
-					}
-				}
-			}
+				Cue.Instance.VamSys.Linker.Add(this, other as VamBodyPart);
 		}
 
 		public virtual bool IsLinkedTo(IBodyPart other)
@@ -150,11 +122,10 @@ namespace Cue.Sys.Vam
 			if (Controller == null || o.Rigidbody == null)
 				return false;
 
-			if (Controller.linkToRB == o.Rigidbody)
+			if (Cue.Instance.VamSys.Linker.IsLinkedTo(this, other as VamBodyPart))
 				return true;
 
 			// todo: should probably use BodyPartForTransform()
-
 			if (other.Atom.Possessed || other.Atom is VamCameraAtom)
 			{
 				var sys = Cue.Instance.VamSys;
@@ -198,19 +169,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return grabCache_.ToArray();
-		}
-
-		private void SetParentLink(FreeControllerV3 fc, Rigidbody rb)
-		{
-			fc.SelectLinkToRigidbody(
-				rb, FreeControllerV3.SelectLinkState.PositionAndRotation);
-		}
-
-		private void SetOn(FreeControllerV3 fc)
-		{
-			fc.SelectLinkToRigidbody(null);
-			fc.currentPositionState = FreeControllerV3.PositionState.On;
-			fc.currentRotationState = FreeControllerV3.RotationState.On;
 		}
 
 		public float DistanceToSurface(Vector3 pos, bool debug = false)

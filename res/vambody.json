@@ -19,7 +19,9 @@
                 "TongueColliders/_Collider1",
                 "lowerJawStandardColliders/_ColliderL1b",
                 "HeadBack1Hard",
+                "FaceHardLeft2Hard",
                 "FaceHardLeft4Hard",
+                "FaceHardRight2Hard",
                 "FaceHardRight4Hard",
                 "HeadLeftEarHard",
                 "HeadRightEarHard"
@@ -135,7 +137,7 @@
 			"advanced": "yes",
 			"name": "chest",
 			"controller": "chestControl",
-			"colliders": ["chest1/chest1Joint"]
+			"colliders": ["chest2/chest2", "chest4/chest4", "chest6 (3)/chest6 (3)", "chest6 (4)/chest6 (4)"]
 		},
 
 		{

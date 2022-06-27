@@ -18,7 +18,8 @@ namespace Cue.Proc.Tests
 		public Quaternion ControlRotation { get; set; }
 		public Vector3 Position { get; }
 		public Quaternion Rotation { get; }
-		public bool Linked { get; }
+		public bool IsLinked { get; }
+		public Sys.IBodyPart Link { get { return null; } }
 		public bool Render { get; set; }
 
 		public void AddForce(Vector3 v)

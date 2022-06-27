@@ -219,6 +219,13 @@ namespace Cue.Sys.Vam
 
 		private static bool EquivalentName(string cn, string pathstring)
 		{
+			return
+				DoEquivalentName(cn, pathstring) ||
+				DoEquivalentName(cn, pathstring + "Joint");
+		}
+
+		private static bool DoEquivalentName(string cn, string pathstring)
+		{
 			if (cn == pathstring)
 				return true;
 

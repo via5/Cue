@@ -155,6 +155,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void LateUpdate(float s)
+		{
+		}
+
 		public void OnPluginState(bool b)
 		{
 		}
