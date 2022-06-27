@@ -68,12 +68,12 @@
 			left_ = new HandInfo(
 				"left", person_.Body.Get(BP.LeftHand),
 				AnimationType.LeftFinger, AnimationType.HandjobLeft,
-				new BodyPartType[] { BP.LeftArm, BP.LeftForearm, BP.LeftHand });
+				new BodyPartType[] { BP.LeftShoulder, BP.LeftElbow, BP.LeftHand });
 
 			right_ = new HandInfo(
 				"right", person_.Body.Get(BP.RightHand),
 				AnimationType.RightFinger, AnimationType.HandjobRight,
-				new BodyPartType[] { BP.RightArm, BP.RightForearm, BP.RightHand });
+				new BodyPartType[] { BP.RightShoulder, BP.RightElbow, BP.RightHand });
 		}
 
 		public override void Debug(DebugLines debug)

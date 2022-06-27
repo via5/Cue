@@ -21,17 +21,27 @@
                 "HeadBack1Hard",
                 "FaceHardLeft4Hard",
                 "FaceHardRight4Hard",
-                "neck/StandardColliders/_Collider1l",
-                "neck/StandardColliders/_Collider1r",
-                "neck/StandardColliders/_ColliderB2",
-                "neck/StandardColliders/_Collider4r",
-                "neck/StandardColliders/_Collider4l",
                 "HeadLeftEarHard",
                 "HeadRightEarHard"
             ]
         },
 
-        {
+         {
+            "part": "neck",
+            "type": "rigidbody",
+            "name": "neck",
+            "controller": "neckControl",
+            "colliders":
+			[
+                "neck/StandardColliders/_Collider1l",
+                "neck/StandardColliders/_Collider1r",
+                "neck/StandardColliders/_ColliderB2",
+                "neck/StandardColliders/_Collider4r",
+                "neck/StandardColliders/_Collider4l"
+            ]
+        },
+
+       {
             "part": "lips",
             "type": "trigger",
             "name": "LipTrigger"
@@ -306,25 +316,17 @@
 
 		{
 			"part": "leftShoulder",
-			"type": "collider",
-			"rigidbody": "lShldr",
-			"colliders": ["lShldr"],
+			"type": "rigidbody",
+			"name": "lShldr",
+			"colliders": ["lShldr", "rShldr/Collider1"],
 			"controller": "lArmControl"
 		},
 
 		{
-			"part": "leftArm",
-			"type": "collider",
-			"rigidbody": "lForeArm",
-			"colliders": ["lShldr/Collider1"],
-			"controller": "lElbowControl"
-		},
-
-		{
-			"part": "leftForearm",
-			"type": "collider",
-			"closestRigidbody": "lHand",
-			"colliders": ["lForeArm/Collider2"],
+			"part": "leftElbow",
+			"type": "rigidbody",
+			"name": "lForeArm",
+			"colliders": ["lShldr/Collider2", "lForeArm/Collider1", "lForeArm/Collider2"],
 			"controller": "lElbowControl"
 		},
 
@@ -348,25 +350,17 @@
 
 		{
 			"part": "rightShoulder",
-			"type": "collider",
-			"rigidbody": "rShldr",
-			"colliders": ["rShldr"],
+			"type": "rigidbody",
+			"name": "rShldr",
+			"colliders": ["rShldr", "rShldr/Collider1"],
 			"controller": "rArmControl"
 		},
 
 		{
-			"part": "rightArm",
-			"type": "collider",
-			"rigidbody": "rForeArm",
-			"colliders": ["rShldr/Collider1"],
-			"controller": "rElbowControl"
-		},
-
-		{
-			"part": "rightForearm",
-			"type": "collider",
-			"closestRigidbody": "rHand",
-			"colliders": ["rForeArm/Collider2"],
+			"part": "rightElbow",
+			"type": "rigidbody",
+			"name": "rForeArm",
+			"colliders": ["rShldr/Collider2", "rForeArm/Collider1", "rForeArm/Collider2"],
 			"controller": "rElbowControl"
 		},
 

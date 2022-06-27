@@ -51,6 +51,11 @@ namespace Cue.Proc.Tests
 			throw new System.NotImplementedException();
 		}
 
+		public float DistanceToSurface(Vector3 pos, bool debug = false)
+		{
+			throw new System.NotImplementedException();
+		}
+
 		public Sys.GrabInfo[] GetGrabs()
 		{
 			throw new System.NotImplementedException();

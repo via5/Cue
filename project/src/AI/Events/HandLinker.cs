@@ -2,7 +2,7 @@
 {
 	class HandLinker : BasicEvent
 	{
-		private const float Distance = 0.03f;
+		private const float Distance = 0.06f;
 
 		class HandInfo
 		{
@@ -164,8 +164,8 @@
 		{
 			BodyPartType[] selfIgnore = new BodyPartType[]
 			{
-				BP.LeftShoulder, BP.LeftArm, BP.LeftForearm,
-				BP.RightShoulder, BP.RightArm, BP.RightForearm
+				BP.LeftShoulder, BP.LeftElbow,
+				BP.RightShoulder, BP.RightElbow,
 			};
 
 			BodyPart closest = null;
@@ -198,7 +198,7 @@
 					if (ignore)
 						continue;
 
-					float d = bp.DistanceToSurface(hand);
+					float d = bp.DistanceToSurface(hand.Position);
 
 					if (d < Distance)
 					{

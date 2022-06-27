@@ -186,7 +186,7 @@ namespace Cue.Sys.Vam
 				g_ = Cue.Instance.Sys.CreateBoxGraphic(
 					$"cue!DebugRender.{name}",
 					Vector3.Zero, scale,
-					new Color(0, 0, 1, 0.1f));
+					new Color(1, 1, 1, 0.1f));
 			}
 
 			public void Destroy()
@@ -233,6 +233,23 @@ namespace Cue.Sys.Vam
 			{
 				g.Position = U.FromUnity(t_.position);
 				g.Rotation = U.FromUnity(t_.rotation);
+			}
+		}
+
+
+		class PointRender : BoxRender
+		{
+			private Vector3 p_;
+
+			public PointRender(Vector3 p, Vector3 scale)
+				: base("point", scale)
+			{
+				p_ = p;
+			}
+
+			protected override void DoUpdate(IGraphic g)
+			{
+				g.Position = p_;
 			}
 		}
 
@@ -318,6 +335,11 @@ namespace Cue.Sys.Vam
 
 
 		private List<IDebugRender> renders_ = null;
+
+		public IDebugRender AddRender(Vector3 p)
+		{
+			return AddRender(new PointRender(p, new Vector3(0.005f, 0.005f, 0.005f)));
+		}
 
 		public IDebugRender AddRender(Transform t)
 		{

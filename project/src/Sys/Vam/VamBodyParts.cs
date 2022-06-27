@@ -93,6 +93,8 @@ namespace Cue.Sys.Vam
 		public abstract Vector3 Position { get; }
 		public abstract Quaternion Rotation { get; }
 
+		private List<VamDebugRenderer.IDebugRender> renderers_ = new List<VamDebugRenderer.IDebugRender>();
+
 		public virtual bool Linked
 		{
 			get
@@ -211,14 +213,36 @@ namespace Cue.Sys.Vam
 			fc.currentRotationState = FreeControllerV3.RotationState.On;
 		}
 
+		public float DistanceToSurface(Vector3 pos, bool debug = false)
+		{
+			return DistanceToSurface(null, debug, pos, true);
+		}
+
 		public float DistanceToSurface(IBodyPart other, bool debug)
 		{
+			return DistanceToSurface(other, debug, Vector3.Zero, false);
+		}
+
+		private UnityEngine.Vector3 ClosestPoint(Collider c, UnityEngine.Vector3 p)
+		{
+			return Physics.ClosestPoint(p, c, c.transform.position, c.transform.rotation);
+		}
+
+		public float DistanceToSurface(IBodyPart other, bool debug, Vector3 forceOtherPos, bool doForceOtherPos)
+		{
+			if (debug)
+			{
+				foreach (var d in renderers_)
+					d.Destroy();
+				renderers_.Clear();
+			}
+
 			var thisColliders = GetColliders();
-			var otherColliders = (other as VamBodyPart).GetColliders();
+			var otherColliders = (other as VamBodyPart)?.GetColliders();
 
 			var thisPos = Position;
 			var thisPosU = U.ToUnity(thisPos);
-			var otherPos = other.Position;
+			var otherPos = (doForceOtherPos ? forceOtherPos : (other?.Position ?? Vector3.Zero));
 			var otherPosU = U.ToUnity(otherPos);
 
 			bool thisCollidersValid = (thisColliders != null && thisColliders.Length > 0);
@@ -238,10 +262,12 @@ namespace Cue.Sys.Vam
 					{
 						for (int j = 0; j < otherColliders.Length; ++j)
 						{
-							var thisPoint = thisColliders[i].ClosestPointOnBounds(
+							var thisPoint = ClosestPoint(
+								thisColliders[i],
 								otherColliders[j].transform.position);
 
-							var otherPoint = otherColliders[j].ClosestPointOnBounds(
+							var otherPoint = ClosestPoint(
+								otherColliders[j],
 								thisColliders[i].transform.position);
 
 							var d = UnityEngine.Vector3.Distance(thisPoint, otherPoint);
@@ -293,8 +319,14 @@ namespace Cue.Sys.Vam
 				{
 					for (int i = 0; i < thisColliders.Length; ++i)
 					{
-						var p = thisColliders[i].ClosestPointOnBounds(otherPosU);
+						var p = ClosestPoint(thisColliders[i], otherPosU);
 						var d = Vector3.Distance(otherPos, U.FromUnity(p));
+
+						//if (debug && (Type == BP.RightElbow))
+						//{
+						//	Log.Error($"{p} {d} {U.FullName(thisColliders[i])}");
+						//	renderers_.Add(Cue.Instance.VamSys.DebugRenderer.AddRender(U.FromUnity(p)));
+						//}
 
 						if (d < closest)
 						{
@@ -332,7 +364,7 @@ namespace Cue.Sys.Vam
 				{
 					for (int i = 0; i < otherColliders.Length; ++i)
 					{
-						var p = otherColliders[i].ClosestPointOnBounds(thisPosU);
+						var p = ClosestPoint(otherColliders[i], thisPosU);
 						var d = Vector3.Distance(thisPos, U.FromUnity(p));
 
 						if (d < closest)
@@ -361,10 +393,10 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				float d = Vector3.Distance(thisPos, other.Position);
+				float d = Vector3.Distance(thisPos, otherPos);
 
 				if (debug)
-					Log.Error($"neither valid, {thisPos} {other.Position} {d}");
+					Log.Error($"neither valid, {thisPos} {otherPos} {d}");
 
 				return d;
 			}

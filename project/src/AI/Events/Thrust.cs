@@ -233,7 +233,7 @@
 			BP.Head, BP.Chest, BP.Hips, BP.Labia, BP.Penis,
 			BP.LeftThigh, BP.RightThigh,
 			BP.LeftShin, BP.RightShin,
-			BP.LeftArm, BP.RightArm
+			BP.LeftElbow, BP.RightElbow
 		};
 
 		private BodyPart FindFrottageReceiver()

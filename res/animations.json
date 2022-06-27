@@ -56,15 +56,6 @@
 		},
 
 		{
-			"animation": "penetrated",
-			"type": "internal",
-			"options":
-			{
-				"name": "cuePenetrated"
-			}
-		},
-
-		{
 			"animation": "rightFinger",
 			"type": "internal",
 			"options":

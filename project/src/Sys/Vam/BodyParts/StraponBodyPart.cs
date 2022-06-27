@@ -321,7 +321,9 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			Init(h, d.mainController, d.transform, null);
+			Init(
+				h, d.mainController, d.transform,
+				new string[] { "lThigh", "rThigh", "LGlute", "RGlute", "FemaleAutoCollidersabdomen" });
 		}
 	}
 }

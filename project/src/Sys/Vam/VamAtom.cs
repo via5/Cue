@@ -227,6 +227,20 @@ namespace Cue.Sys.Vam
 			{
 				log_.Info($"{ID}: setting default controls ({why})");
 				setOnlyKeyJointsOn_.Fire();
+
+				foreach (var fc in atom_.freeControllers)
+				{
+					var ps = fc.currentPositionState;
+					var rs = fc.currentRotationState;
+
+					if (ps != FreeControllerV3.PositionState.ParentLink &&
+						ps != FreeControllerV3.PositionState.PhysicsLink &&
+						rs != FreeControllerV3.RotationState.ParentLink &&
+						rs != FreeControllerV3.RotationState.PhysicsLink)
+					{
+						fc.linkToRB = null;
+					}
+				}
 			}
 		}
 

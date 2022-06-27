@@ -7,6 +7,7 @@ V.Value("None", -1),
 V.Value("Head"),
 V.Value("Lips"),
 V.Value("Mouth"),
+V.Value("Neck"),
 
 V.Value("LeftBreast"),
 V.Value("RightBreast"),
@@ -25,13 +26,11 @@ V.Value("LeftGlute"),
 V.Value("RightGlute"),
 
 V.Value("LeftShoulder"),
-V.Value("LeftArm"),
-V.Value("LeftForearm"),
+V.Value("LeftElbow"),
 V.Value("LeftHand"),
 
 V.Value("RightShoulder"),
-V.Value("RightArm"),
-V.Value("RightForearm"),
+V.Value("RightElbow"),
 V.Value("RightHand"),
 
 V.Value("LeftThigh"),

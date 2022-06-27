@@ -287,6 +287,14 @@ namespace Cue
 			return Sys.DistanceToSurface(other.Sys, debug);
 		}
 
+		public float DistanceToSurface(Vector3 pos, bool debug = false)
+		{
+			if (!Exists)
+				return float.MaxValue;
+
+			return Sys.DistanceToSurface(pos, debug);
+		}
+
 		public void LinkTo(BodyPart other)
 		{
 			if (!Exists)
