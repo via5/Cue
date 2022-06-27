@@ -134,6 +134,11 @@ namespace Cue
 			get { return v_; }
 		}
 
+		public override string ToString()
+		{
+			return ToString(this);
+		}
+
 		public static bool operator==(AnimationType a, AnimationType b)
 		{
 			return (a.v_ == b.v_);

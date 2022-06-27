@@ -332,6 +332,11 @@ namespace Cue.Sys.Vam
 			body_?.LateUpdate(s);
 		}
 
+		public override string ToString()
+		{
+			return ID;
+		}
+
 		private void GetHead()
 		{
 			if (head_ != null)

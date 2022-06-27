@@ -68,6 +68,7 @@
 		private HandInfo left_ = null;
 		private HandInfo right_ = null;
 		private bool grabbingPerson_ = false;
+		private bool wasEnabled_ = false;
 
 		public HandLinker()
 			: base("handLinker")
@@ -83,7 +84,18 @@
 		public override void Update(float s)
 		{
 			if (!Cue.Instance.Options.HandLinking)
+			{
+				if (wasEnabled_)
+				{
+					left_.Unlink();
+					right_.Unlink();
+					wasEnabled_ = false;
+				}
+
 				return;
+			}
+
+			wasEnabled_ = true;
 
 			if (person_.IsPlayer)
 				return;

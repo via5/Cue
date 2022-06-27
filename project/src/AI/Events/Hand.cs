@@ -49,7 +49,7 @@
 		}
 
 		private const float ManualStartDistance = 0.09f;
-		private const float AutoStartDistance = 0.05f;
+		private const float AutoStartDistance = 0.02f;
 
 		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;
@@ -480,9 +480,16 @@
 
 		private bool LockTargets(string why, HandInfo hand, Person target)
 		{
+			BodyPartType[] locks;
+
+			// don't lock genitals for females
+			if (target.Body.Get(BP.Penis).Exists)
+				locks = new BodyPartType[] { BP.Hips, BP.Penis };
+			else
+				locks = new BodyPartType[] { BP.Hips };
+
 			hand.targetLock = BodyPartLock.LockMany(
-				target,
-				new BodyPartType[] { BP.Hips },
+				target, locks,
 				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
 
 			if (hand.targetLock == null)
@@ -500,6 +507,8 @@
 			var hand = person_.Body.Get(handPart);
 
 			BodyPart tentative = null;
+			float tentativeDistance = float.MaxValue;
+
 			Log.Verbose($"finding target for {hand}");
 
 			foreach (var p in Cue.Instance.ActivePersons)
@@ -515,8 +524,15 @@
 
 				if (BetterTarget(tentative, g))
 				{
-					Log.Verbose($"{g} better target");
-					tentative = g;
+					if (d < tentativeDistance)
+					{
+						Log.Verbose($"{g} better target");
+						tentative = g;
+					}
+					else
+					{
+						Log.Verbose($"{g} is farther than {tentative}");
+					}
 				}
 			}
 
@@ -525,6 +541,13 @@
 
 		private bool BetterTarget(BodyPart tentative, BodyPart check)
 		{
+			if (check.LockedFor(BodyPartLock.Anim))
+			{
+				// locked
+				Log.Verbose($"BetterTarget: {check} is locked");
+				return false;
+			}
+
 			if (tentative == null)
 			{
 				// first
@@ -532,31 +555,11 @@
 				return true;
 			}
 
-			if (tentative.Person == person_ && check.Person != person_)
-			{
-				Log.Verbose($"BetterTarget: tentative {tentative} is self, {check} is not");
-
-				// prioritize others that are not penetrating
-				if (check.Person.Status.Penetrating())
-				{
-					Log.Verbose($"BetterTarget: but {check} is penetrating");
-					return false;
-				}
-				else
-				{
-					Log.Verbose($"BetterTarget: and {check} is not penetrating");
-					return true;
-				}
-			}
-
-			if (tentative.Person.Status.Penetrating() &&
-				!check.Person.Status.Penetrating())
-			{
-				// prioritize genitals that are not currently
-				// penetrating
-				Log.Verbose($"BetterTarget: tentative {tentative} is penetrating, {check} is not");
-				return true;
-			}
+			//if (tentative.Person == person_ && check.Person != person_)
+			//{
+			//	Log.Verbose($"BetterTarget: tentative {tentative} is self, {check} is not");
+			//	return true;
+			//}
 
 			Log.Verbose($"BetterTarget: {tentative} still better than {check}");
 

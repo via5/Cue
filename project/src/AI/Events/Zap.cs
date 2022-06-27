@@ -116,44 +116,10 @@ namespace Cue
 
 					if (sources_[i].CheckActive(s, person_, p, zone_))
 					{
-						person_.Body.Zapped(
-							p, zone_, GetExcitementValue(person_, p),
-							ps.Get(PS.ZappedTime));
-
+						person_.Body.Zapped(p, zone_);
 						break;
 					}
 				}
-			}
-
-			private float GetExcitementValue(Person self, Person other)
-			{
-				var ps = self.Personality;
-
-				if (other.IsPlayer)
-				{
-					if (zone_ ==SS.Genitals)
-						return ps.Get(PS.ZappedByPlayerGenitalsExcitement);
-					else if (zone_ == SS.Breasts)
-						return ps.Get(PS.ZappedByPlayerBreastsExcitement);
-					else if (zone_ == SS.Penetration)
-						return ps.Get(PS.ZappedByPlayerPenetrationExcitement);
-					else if (zone_ == SS.Mouth)
-						return ps.Get(PS.ZappedByPlayerMouthExcitement);
-				}
-				else
-				{
-					if (zone_ == SS.Genitals)
-						return ps.Get(PS.ZappedByOtherGenitalsExcitement);
-					else if (zone_ == SS.Breasts)
-						return ps.Get(PS.ZappedByOtherBreastsExcitement);
-					else if (zone_ == SS.Penetration)
-						return ps.Get(PS.ZappedByOtherPenetrationExcitement);
-					else if (zone_ == SS.Mouth)
-						return ps.Get(PS.ZappedByOtherMouthExcitement);
-				}
-
-				self.Log.Error($"zap source: bad zone {zone_}");
-				return 0;
 			}
 		}
 

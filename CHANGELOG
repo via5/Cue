@@ -1,3 +1,47 @@
+2      ?
+
+features:
+  - auto hands and head: moving hands or head close to genitals will start the
+    appropriate event, can be disabled in options; each hand is independent and
+    will start/stop if necessary after being grabbed and moved
+
+  - integration with ToumeiHitsuji's DiviningRod: genitals are always enabled,
+    but hands and mouth are disabled unless the corresponding event is started
+
+  - voice: supports kissing an bj sounds from VAMMoan, can be disabled in
+    options
+
+  - sync orgasms across multiple characters
+
+  - new personalities: annoyed and angry
+
+  - reorganised options into several tabs, added more:
+      - treat strapon as physical for excitement
+      - enable look at camera
+      - disable idle animation
+
+  - zap: some actions like the player touching genitals can "zap" a character,
+    triggering head movements, expressions and moans
+
+  - slap: thrust animation now drives some facial expressions on each thrust,
+    might make noises in a future update
+
+changes:
+  - idle animation has more movement
+  - removed most voice settings from Cue, caused more problems than anything
+
+
+fixes:
+  - many fixes for excitement not rising when it should; characters should be
+    much more responsive now
+  - hj/bj speed now changes based on excitement and have slightly more movements
+  - fixed head and hands snapping after kiss or hj animations
+  - detect Embody passenger mode to disable head movements
+  - sucking finger shouldn't trigger unless a hand is actually touching
+  - fixed hands being closed too often and morphs still being driven after the
+    hands are attached to something
+
+
 1.1     2022-01-17
 
 features:

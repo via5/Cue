@@ -115,19 +115,14 @@
 				{
 					// penetration
 					Log.Info($"starting sex with {receiver_.Person.ID}.{receiver_}");
-
-					// play the penetrated animation now, don't bother if it can't
-					// start; see also Penetrated.OnIn()
-					person_.Animator.PlayType(AnimationType.Penetrated);
-					receiver_.Person.Animator.PlayType(AnimationType.Penetrated);
-
+					receiver_.Person.Body.Zapped(person_, SS.Penetration);
 					anim_ = AnimationType.Sex;
 				}
 				else
 				{
 					// frottage
 					Log.Info($"starting frottage with {receiver_.Person.ID}.{receiver_}");
-
+					receiver_.Person.Body.Zapped(person_, SS.Genitals);
 					anim_ = AnimationType.Frottage;
 				}
 

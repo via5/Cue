@@ -133,7 +133,9 @@ namespace Cue
 			person_ = ps;
 
 			var gl = new VUI.GridLayout(5);
-			gl.UniformHeight = false;
+			gl.UniformHeight = false; // exclude header
+			gl.UniformWidth = true;
+
 			var p = new VUI.Panel(gl);
 
 			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
@@ -171,6 +173,7 @@ namespace Cue
 
 				w.source = new VUI.Label();
 				w.source.FontSize = fontSize;
+				w.source.WrapMode = VUI.Label.Clip;
 				p.Add(w.source);
 
 				widgets_.Add(w);
@@ -193,7 +196,9 @@ namespace Cue
 
 				if (w.part.CanTrigger)
 				{
-					var ss = "";
+					string ss = "";
+					string one = "";
+					int more = 0;
 
 					var ts = w.part.GetTriggers();
 					if (ts != null)
@@ -214,12 +219,21 @@ namespace Cue
 								ss += ",";
 
 							ss += ts[j].ToString();
+
+							if (one == "")
+								one = ts[j].ToString();
+							else
+								++more;
 						}
 					}
 
+					if (more > 0)
+						one += $", +{more}";
+
 					bool triggered = (ts != null && ts.Length > 0);
 
-					w.triggering.Text = ss;
+					w.triggering.Text = one;
+					w.triggering.Tooltip.Text = ss;
 
 					w.triggering.TextColor = (
 						triggered ?
@@ -259,6 +273,7 @@ namespace Cue
 
 				w.lk.Text = w.part.Locker.DebugLockString();
 				w.source.Text = w.part.Source;
+				w.source.Tooltip.Text = w.part.Source;
 			}
 		}
 	}

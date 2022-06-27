@@ -3,7 +3,7 @@
 	class MouthEvent : BasicEvent
 	{
 		private const float ManualStartDistance = 0.4f;
-		private const float AutoStartDistance = 0.3f;
+		private const float AutoStartDistance = 0.02f;
 
 		private BodyPart head_ = null;
 
@@ -171,7 +171,7 @@
 
 			targetLocks_ = BodyPartLock.LockMany(
 				t,
-				new BodyPartType[] { BP.Hips },
+				new BodyPartType[] { BP.Hips, BP.Penis },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
 			if (targetLocks_ == null)
@@ -210,16 +210,44 @@
 
 		private Person FindTarget(float maxDistance)
 		{
+			BodyPart tentative = null;
+			float tentativeDistance = float.MaxValue;
+
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				if (p == person_ || !p.Body.HasPenis)
+				if (p == person_)
 					continue;
 
-				var g = p.Body.Get(BP.Penis);
-				var d = Vector3.Distance(head_.Position, g.Position);
+				var bp = p.Body.Get(BP.Penis);
 
-				if (d < maxDistance)
-					return p;
+				if (bp.Exists)
+				{
+					Log.Info($"ok, {p} has penis");
+
+					if (!bp.LockedFor(BodyPartLock.Anim))
+					{
+						Log.Info($"ok, {p} is not locked");
+
+						var d = bp.DistanceToSurface(head_);
+						if (d < maxDistance)
+						{
+							Log.Info($"ok, d={d}, max={maxDistance}");
+							return p;
+						}
+						else
+						{
+							Log.Info($"too far, d={d}, max={maxDistance}");
+						}
+					}
+					else
+					{
+						Log.Info($"{p} is locked");
+					}
+				}
+				else
+				{
+					Log.Info($"{p} has no penis");
+				}
 			}
 
 			return null;

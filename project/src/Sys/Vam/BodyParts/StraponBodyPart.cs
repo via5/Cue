@@ -17,7 +17,14 @@ namespace Cue.Sys.Vam
 			: base(a, BP.Penis)
 		{
 			if (Cue.Instance.Sys.GetAtom(DildoID) != null)
+			{
+				Log.Verbose($"dildo '{DildoID}' found");
 				Set(true);
+			}
+			else
+			{
+				Log.Verbose($"dildo '{DildoID}' doesn't exist");
+			}
 		}
 
 		private string DildoID
@@ -43,7 +50,10 @@ namespace Cue.Sys.Vam
 		public void Set(bool b)
 		{
 			if (Exists == b)
+			{
+				Log.Verbose($"Set: {Exists} == {b}");
 				return;
+			}
 
 			if (b)
 			{
@@ -57,6 +67,7 @@ namespace Cue.Sys.Vam
 					{
 						// dead
 						dildo_ = null;
+						Log.Verbose($"dildo '{DildoID}' is dead");
 					}
 				}
 

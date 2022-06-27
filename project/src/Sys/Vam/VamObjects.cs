@@ -74,10 +74,7 @@ namespace Cue.Sys.Vam
 
 		public override void Create(IAtom user, string id, Action<IObject> callback)
 		{
-			if (creating_)
-				return;
-
-			creating_ = true;
+			Log.Verbose($"creating for {user}, id={id}");
 
 			sc_.StartCoroutine(CreateObjectRoutine(
 				id, (o) =>
@@ -95,6 +92,11 @@ namespace Cue.Sys.Vam
 
 		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
 		{
+			while (creating_)
+				yield return new WaitForSeconds(0.25f);
+
+			creating_ = true;
+
 			var atom = sc_.GetAtomByUid(id);
 
 			if (atom != null)

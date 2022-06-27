@@ -194,6 +194,14 @@ namespace Cue
 			person_.Expression.Slapped(speed);
 		}
 
+		public void Zapped(Person source, ZoneType zone)
+		{
+			Zapped(
+				source, zone,
+				GetZappedIntensity(source, zone),
+				person_.Personality.Get(PS.ZappedTime));
+		}
+
 		public void Zapped(Person source, ZoneType zone, float intensity, float time)
 		{
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
@@ -201,6 +209,37 @@ namespace Cue
 				zap_.Set(source, zone, intensity, time);
 				Log.Info($"zapped: {zap_.DebugLine(person_)}");
 			}
+		}
+
+		private float GetZappedIntensity(Person other, ZoneType zone)
+		{
+			var ps = person_.Personality;
+
+			if (other.IsPlayer)
+			{
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByPlayerGenitalsExcitement);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByPlayerBreastsExcitement);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByPlayerPenetrationExcitement);
+				else if (zone == SS.Mouth)
+					return ps.Get(PS.ZappedByPlayerMouthExcitement);
+			}
+			else
+			{
+				if (zone == SS.Genitals)
+					return ps.Get(PS.ZappedByOtherGenitalsExcitement);
+				else if (zone == SS.Breasts)
+					return ps.Get(PS.ZappedByOtherBreastsExcitement);
+				else if (zone == SS.Penetration)
+					return ps.Get(PS.ZappedByOtherPenetrationExcitement);
+				else if (zone == SS.Mouth)
+					return ps.Get(PS.ZappedByOtherMouthExcitement);
+			}
+
+			Log.Error($"zap source: bad zone {zone}");
+			return 0;
 		}
 
 		public void Update(float s)

@@ -249,6 +249,11 @@ public string Generate(
 		$"			get {{ return v_; }}\r\n" +
 		$"		}}\r\n" +
 		$"\r\n" +
+		$"		public override string ToString()\r\n" +
+		$"		{{\r\n" +
+		$"			return ToString(this);\r\n" +
+		$"		}}\r\n" +
+		$"\r\n" +
 		$"		public static bool operator==({name} a, {name} b)\r\n" +
 		$"		{{\r\n" +
 		$"			return (a.v_ == b.v_);\r\n" +
