@@ -308,6 +308,7 @@ namespace Cue
 			animator_.OnPluginState(b);
 			ai_.OnPluginState(b);
 			expression_.OnPluginState(b);
+			gaze_.OnPluginState(b);
 		}
 
 		public virtual void Say(string s)

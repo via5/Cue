@@ -587,7 +587,7 @@ namespace ClockwiseSilver {
 
 			float springTimer = 0;
 			const float SetSpringTime = 2;
-			const float ResetSpringTime = 0.5f;
+			const float ResetSpringTime = 1;
 			float holdPositionStart = headControl.RBHoldPositionSpring;
 			float holdRotationStart = headControl.RBHoldRotationSpring;
 			bool springDone = false;
@@ -783,8 +783,10 @@ namespace ClockwiseSilver {
 			//--------------------------------------------------Return----------------------
 			if (doReturn.val)
 			{
-				while (giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
+				while (giveUpTimer < GiveUpTime && (Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f || springTimer < ResetSpringTime))
 				{
+					dTime = Time.fixedDeltaTime;
+
 					if (!springDone)
 					{
 						springTimer += dTime;
@@ -806,7 +808,6 @@ namespace ClockwiseSilver {
 						audioSFXTransform.position = headRBTransform.position;
 					}
 
-					dTime = Time.fixedDeltaTime;
 					float dMorphTime = dTime * 20;
 					mouthOpenWide.morphValue = Mathf.Lerp(mouthOpenWide.morphValue, 0f, dMorphTime);
 					eyesClosed.morphValue = Mathf.LerpUnclamped(eyesClosed.morphValue, 0f, dMorphTime);
@@ -816,7 +817,7 @@ namespace ClockwiseSilver {
 					}
 
 					headControlTransform.position = Vector3.MoveTowards(headControlTransform.position, startPoshead, 0.4f * dTime);
-					headControlTransform.rotation = Quaternion.RotateTowards(headControlTransform.rotation, startRothead, dTime * 50);
+					headControlTransform.rotation = Quaternion.RotateTowards(headControlTransform.rotation, startRothead, dTime * 80);
 					giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 				}
 			}

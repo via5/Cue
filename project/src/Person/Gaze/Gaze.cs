@@ -334,6 +334,11 @@ namespace Cue
 				PS.AvoidGazeUninvolvedHavingSex);
 		}
 
+		public void OnPluginState(bool b)
+		{
+			eyes_?.OnPluginState(b);
+		}
+
 		private bool ShouldAvoidImpl(
 			Person p,
 			BasicEnumValues.FloatIndex avoidPlayer,

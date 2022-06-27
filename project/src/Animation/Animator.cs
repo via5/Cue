@@ -8,7 +8,6 @@ namespace Cue
 		private static List<IAnimation> list_ = new List<IAnimation>()
 		{
 			new SmokeAnimation(),
-			new PenetratedAnimation(),
 			new ClockwiseKissAnimation(),
 			new ClockwiseBJAnimation(),
 			new ClockwiseHJBothAnimation(),

@@ -16,7 +16,6 @@ project\src\AI\Events\Thrust.cs
 project\src\AI\Events\Zap.cs
 project\src\Animation\Animator.cs
 project\src\Animation\Builtin\Finger.cs
-project\src\Animation\Builtin\Penetrated.cs
 project\src\Animation\Builtin\Player.cs
 project\src\Animation\Builtin\Smoke.cs
 project\src\Animation\Builtin\Suck.cs

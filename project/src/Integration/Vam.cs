@@ -52,6 +52,8 @@ namespace Cue
 
 			if (eyes_ != null)
 			{
+				eyes_.detectCollisions = false;
+
 				foreach (var c in eyes_.gameObject.GetComponents<Component>())
 				{
 					if (c != null && c.ToString().Contains("Cue.VamEyesBehaviour"))
@@ -64,6 +66,12 @@ namespace Cue
 			ResetSaccade();
 
 			person_.PersonalityChanged += OnPersonalityChanged;
+		}
+
+		public void OnPluginState(bool b)
+		{
+			if (eyes_ != null)
+				eyes_.detectCollisions = !b;
 		}
 
 		public bool Blink

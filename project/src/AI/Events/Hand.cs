@@ -555,14 +555,7 @@
 				return true;
 			}
 
-			//if (tentative.Person == person_ && check.Person != person_)
-			//{
-			//	Log.Verbose($"BetterTarget: tentative {tentative} is self, {check} is not");
-			//	return true;
-			//}
-
 			Log.Verbose($"BetterTarget: {tentative} still better than {check}");
-
 			return false;
 		}
 	}

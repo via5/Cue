@@ -211,10 +211,7 @@
 				if (state == Animator.Playing)
 				{
 					if (Mood.ShouldStopSexAnimation(person_, target_))
-					{
-						Log.Info(">>> must stop");
 						person_.Animator.StopType(AnimationType.Blowjob);
-					}
 				}
 				else if (state == Animator.NotPlaying)
 				{
@@ -235,9 +232,6 @@
 
 		private Person FindTarget(float maxDistance)
 		{
-			BodyPart tentative = null;
-			float tentativeDistance = float.MaxValue;
-
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p == person_)
@@ -247,31 +241,31 @@
 
 				if (bp.Exists)
 				{
-					Log.Info($"ok, {p} has penis");
+					Log.Verbose($"ok, {p} has penis");
 
 					if (!bp.LockedFor(BodyPartLock.Anim))
 					{
-						Log.Info($"ok, {p} is not locked");
+						Log.Verbose($"ok, {p} is not locked");
 
 						var d = bp.DistanceToSurface(head_);
 						if (d < maxDistance)
 						{
-							Log.Info($"ok, d={d}, max={maxDistance}");
+							Log.Verbose($"ok, d={d}, max={maxDistance}");
 							return p;
 						}
 						else
 						{
-							Log.Info($"too far, d={d}, max={maxDistance}");
+							Log.Verbose($"too far, d={d}, max={maxDistance}");
 						}
 					}
 					else
 					{
-						Log.Info($"{p} is locked");
+						Log.Verbose($"{p} is locked");
 					}
 				}
 				else
 				{
-					Log.Info($"{p} has no penis");
+					Log.Verbose($"{p} has no penis");
 				}
 			}
 

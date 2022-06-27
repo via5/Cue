@@ -101,6 +101,7 @@ namespace Cue
 		void LookAtNothing();
 
 		void Update(float s);
+		void OnPluginState(bool b);
 	}
 
 	public interface ISpeaker

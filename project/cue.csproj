@@ -108,7 +108,6 @@
     <Compile Include="src\AI\Events\Zap.cs" />
     <Compile Include="src\Animation\Animator.cs" />
     <Compile Include="src\Animation\Builtin\Finger.cs" />
-    <Compile Include="src\Animation\Builtin\Penetrated.cs" />
     <Compile Include="src\Animation\Builtin\Player.cs" />
     <Compile Include="src\Animation\Builtin\Smoke.cs" />
     <Compile Include="src\Animation\Builtin\Suck.cs" />

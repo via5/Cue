@@ -13,17 +13,16 @@ namespace Cue
 		public static readonly AnimationType Orgasm = AnimationType.CreateInternal(3);
 		public static readonly AnimationType Smoke = AnimationType.CreateInternal(4);
 		public static readonly AnimationType SuckFinger = AnimationType.CreateInternal(5);
-		public static readonly AnimationType Penetrated = AnimationType.CreateInternal(6);
-		public static readonly AnimationType RightFinger = AnimationType.CreateInternal(7);
-		public static readonly AnimationType LeftFinger = AnimationType.CreateInternal(8);
-		public static readonly AnimationType Kiss = AnimationType.CreateInternal(9);
-		public static readonly AnimationType HandjobBoth = AnimationType.CreateInternal(10);
-		public static readonly AnimationType HandjobLeft = AnimationType.CreateInternal(11);
-		public static readonly AnimationType HandjobRight = AnimationType.CreateInternal(12);
-		public static readonly AnimationType Blowjob = AnimationType.CreateInternal(13);
+		public static readonly AnimationType RightFinger = AnimationType.CreateInternal(6);
+		public static readonly AnimationType LeftFinger = AnimationType.CreateInternal(7);
+		public static readonly AnimationType Kiss = AnimationType.CreateInternal(8);
+		public static readonly AnimationType HandjobBoth = AnimationType.CreateInternal(9);
+		public static readonly AnimationType HandjobLeft = AnimationType.CreateInternal(10);
+		public static readonly AnimationType HandjobRight = AnimationType.CreateInternal(11);
+		public static readonly AnimationType Blowjob = AnimationType.CreateInternal(12);
 
-		public const int Count = 14;
-		public int GetCount() { return 14; }
+		public const int Count = 13;
+		public int GetCount() { return 13; }
 
 
 		private static AnimationType[] values_ = new AnimationType[]
@@ -41,7 +40,6 @@ namespace Cue
 			AnimationType.CreateInternal(10),
 			AnimationType.CreateInternal(11),
 			AnimationType.CreateInternal(12),
-			AnimationType.CreateInternal(13),
 		};
 
 		public static AnimationType[] Values
@@ -57,7 +55,6 @@ namespace Cue
 			"orgasm",
 			"smoke",
 			"suckFinger",
-			"penetrated",
 			"rightFinger",
 			"leftFinger",
 			"kiss",
