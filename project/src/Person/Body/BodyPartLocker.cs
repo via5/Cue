@@ -212,7 +212,7 @@ namespace Cue
 		{
 			if (key_ != key)
 			{
-				if (Bits.IsAnySet(type_, type) && IsStrong)
+				if (Bits.IsAnySet(type_, type))
 					return true;
 			}
 

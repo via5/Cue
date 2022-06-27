@@ -32,6 +32,7 @@ namespace Cue.Proc
 		private bool limitHit_ = false;
 		private float limitedValue_ = 0;
 		private int flags_;
+		private bool wasBusy_ = false;
 
 		public MorphTarget(
 			BodyPartType bodyPart, string morphId, float min, float max,
@@ -119,6 +120,7 @@ namespace Cue.Proc
 			if (bodyPartType_ != BP.None)
 				bp_ = person_.Body.Get(bodyPartType_);
 
+			wasBusy_ = false;
 			mid_ = Mid();
 			last_ = mid_;
 			Next(false, Bits.IsSet(flags_, StartHigh));
@@ -228,8 +230,23 @@ namespace Cue.Proc
 
 			var d = v - mid_;
 
-			if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
-				morph_.Value = v;
+			if (bp_ != null)
+			{
+				bool busy = bp_.LockedFor(BodyPartLock.Morph, LockKey);
+
+				if (!wasBusy_ && busy)
+				{
+					wasBusy_ = true;
+					morph_.Reset();
+				}
+				else if (!busy)
+				{
+					wasBusy_ = false;
+				}
+
+				if (!busy)
+					morph_.Value = v;
+			}
 
 			d = Math.Abs(d);
 

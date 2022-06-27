@@ -137,7 +137,7 @@
 				if (close != null)
 				{
 					var lk = info.Hand.Lock(
-						BodyPartLock.Move, "HandLocker", BodyPartLock.Weak);
+						BodyPartLock.Anim, "HandLocker", BodyPartLock.Weak);
 
 					if (lk != null)
 					{

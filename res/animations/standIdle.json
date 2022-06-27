@@ -255,8 +255,8 @@
 					"type": "morph",
 					"bodyPart": "rightHand",
 					"morph": "Right Fingers Fist",
-					"min": 0.2,
-					"max": 0.5,
+					"min": 0.0,
+					"max": 0.2,
 					"sync":
 					{
 						"type": "duration",
@@ -270,8 +270,8 @@
 					"type": "morph",
 					"bodyPart": "leftHand",
 					"morph": "Left Fingers Fist",
-					"min": 0.2,
-					"max": 0.5,
+					"min": 0.0,
+					"max": 0.2,
 					"sync":
 					{
 						"type": "duration",
