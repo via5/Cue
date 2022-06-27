@@ -3,7 +3,7 @@
 	class MouthEvent : BasicEvent
 	{
 		private const float ManualStartDistance = 0.4f;
-		private const float AutoStartDistance = 0.02f;
+		private const float AutoStartDistance = 0.025f;
 
 		private BodyPart head_ = null;
 
@@ -108,6 +108,9 @@
 		public override void Update(float s)
 		{
 			CheckAutoStart();
+
+			if (!CheckAnim())
+				Stop();
 		}
 
 		private void CheckAutoStart()
@@ -181,15 +184,6 @@
 				return false;
 			}
 
-			if (!person_.Animator.PlayType(
-				AnimationType.Blowjob,
-				new AnimationContext(t, sourceLocks_[0].Key)))
-			{
-				Log.Error("failed to start animation");
-				Unlock();
-				return false;
-			}
-
 			if (t.Body.PenisSensitive)
 			{
 				t.Body.Get(t.Body.GenitalsBodyPart)
@@ -204,6 +198,37 @@
 			target_ = t;
 
 			Log.Info($"started with {target_}");
+
+			return true;
+		}
+
+		private bool CheckAnim()
+		{
+			if (target_ != null)
+			{
+				int state = person_.Animator.PlayingStatus(AnimationType.Blowjob);
+
+				if (state == Animator.Playing)
+				{
+					if (Mood.ShouldStopSexAnimation(person_, target_))
+					{
+						Log.Info(">>> must stop");
+						person_.Animator.StopType(AnimationType.Blowjob);
+					}
+				}
+				else if (state == Animator.NotPlaying)
+				{
+					if (Mood.CanStartSexAnimation(person_, target_))
+					{
+						if (!person_.Animator.PlayType(
+								AnimationType.Blowjob, new AnimationContext(
+									target_, targetLocks_[0].Key)))
+						{
+							return false;
+						}
+					}
+				}
+			}
 
 			return true;
 		}

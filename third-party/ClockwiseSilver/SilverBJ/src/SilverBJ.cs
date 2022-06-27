@@ -574,8 +574,6 @@ namespace ClockwiseSilver {
 			frontBackCurrent = 0f;
 			tarPosBegin = headControlTransform.position;
 			tarRotBegin = headControlTransform.rotation;
-			headControl.RBHoldPositionSpring = holdSpringPosJSON.val;
-            headControl.RBHoldRotationSpring = holdSpringRotJSON.val;
 			fbRangeMax = Vector3.Distance(gen1Transform.position, gen3Transform.position);
 
 			bool wasBlink = blink.val;
@@ -586,6 +584,13 @@ namespace ClockwiseSilver {
 			startTargetPos = gen3Transform.position
 				+ headRBTransform.position - lipTriggerTransform.position
 				+ gen1Transform.TransformVector(headShift);
+
+			float springTimer = 0;
+			const float SetSpringTime = 2;
+			const float ResetSpringTime = 0.5f;
+			float holdPositionStart = headControl.RBHoldPositionSpring;
+			float holdRotationStart = headControl.RBHoldRotationSpring;
+			bool springDone = false;
 
 			//--------------------------------------------------Begin----------------------
 
@@ -606,6 +611,18 @@ namespace ClockwiseSilver {
 				targetRot = Quaternion.LookRotation(gen3Transform.position - lipTriggerTransform.position, headRBTransform.up) * Quaternion.Euler(headAngle);
 				headControlTransform.rotation =	Quaternion.RotateTowards(headControlTransform.rotation, targetRot, dTime * 100);
 
+				if (!springDone)
+				{
+					springTimer += dTime;
+					float spring = springTimer / SetSpringTime;
+
+					if (spring >= 1)
+						springDone = true;
+
+					headControl.RBHoldPositionSpring = Mathf.Lerp(holdPositionStart, holdSpringPosJSON.val, spring);
+					headControl.RBHoldRotationSpring = Mathf.Lerp(holdRotationStart, holdSpringRotJSON.val, spring);
+				}
+
 				giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 			}
 
@@ -625,6 +642,20 @@ namespace ClockwiseSilver {
 			//--------------------------------------------------BJ----------------------
 			while (bjRunning)
 			{
+				dTime = Time.fixedDeltaTime;
+
+				if (!springDone)
+				{
+					springTimer += dTime;
+					float spring = springTimer / SetSpringTime;
+
+					if (spring >= 1)
+						springDone = true;
+
+					headControl.RBHoldPositionSpring = Mathf.Lerp(holdPositionStart, holdSpringPosJSON.val, spring);
+					headControl.RBHoldRotationSpring = Mathf.Lerp(holdRotationStart, holdSpringRotJSON.val, spring);
+				}
+
 				if (audioMoanLoaded)
 				{
 					audioMoanTransform.position = headRBTransform.position;
@@ -634,7 +665,6 @@ namespace ClockwiseSilver {
 					audioSFXTransform.position = headRBTransform.position;
 				}
 
-				dTime = Time.fixedDeltaTime;
 				eyesClosedTimer -= dTime;
 				if (eyesClosedTimer < 0.0f)
 				{
@@ -738,15 +768,35 @@ namespace ClockwiseSilver {
 
 			bool doPos = (wasHeadPosState == FreeControllerV3.PositionState.On);
 			bool doRot = (wasHeadRotState == FreeControllerV3.RotationState.On);
-			headControl.RBHoldPositionSpring = 2000;
-			headControl.RBHoldRotationSpring = 200;
 			giveUpTimer = (doPos || doRot) ? 0f : GiveUpTime;
+
+			springTimer = 0;
+			holdPositionStart = headControl.RBHoldPositionSpring;
+			holdRotationStart = headControl.RBHoldRotationSpring;
+			springDone = false;
+
+			float holdPositionDefault = 2000.0f;
+			float holdRotationDefault = 250.0f;
+
+
 
 			//--------------------------------------------------Return----------------------
 			if (doReturn.val)
 			{
 				while (giveUpTimer < GiveUpTime && Vector3.Distance(headControlTransform.position, startPoshead) > 0.002f)
 				{
+					if (!springDone)
+					{
+						springTimer += dTime;
+						float spring = springTimer / ResetSpringTime;
+
+						if (spring >= 1)
+							springDone = true;
+
+						headControl.RBHoldPositionSpring = Mathf.Lerp(holdPositionStart, holdPositionDefault, spring);
+						headControl.RBHoldRotationSpring = Mathf.Lerp(holdRotationStart, holdRotationDefault, spring);
+					}
+
 					if (audioMoanLoaded)
 					{
 						audioMoanTransform.position = headRBTransform.position;
@@ -770,6 +820,9 @@ namespace ClockwiseSilver {
 					giveUpTimer += dTime; yield return new WaitForFixedUpdate();
 				}
 			}
+
+			headControl.RBHoldPositionSpring = holdPositionDefault;
+			headControl.RBHoldRotationSpring = holdRotationDefault;
 
 			mouthOpenWide.morphValue = 0f;
 			eyesClosed.morphValue = 0f;
