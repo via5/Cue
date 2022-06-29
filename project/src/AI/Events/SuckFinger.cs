@@ -25,28 +25,12 @@ namespace Cue
 			if (wait_ > 0)
 				return;
 
-			var z = person_.Body.Zone(SS.Mouth);
-			bool triggered = false;
-
-			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
-			{
-				var p = Cue.Instance.ActivePersons[i];
-				var src = z.GetPersonSource(p);
-
-				if (src.IsActive(BP.LeftHand) || src.IsActive(BP.RightHand))
-				{
-					triggered = true;
-					break;
-				}
-			}
-
-			if (!triggered)
-				triggered = z.GetToySource().Active;
-
-			var head = person_.Body.Get(BP.Head);
+			bool triggered = person_.Body.Get(BP.Mouth).Triggered;
 
 			if (mouthLock_ == null && triggered)
 			{
+				var head = person_.Body.Get(BP.Head);
+
 				mouthLock_ = head.Lock(
 					BodyPartLock.Anim, "SuckFinger", BodyPartLock.Strong);
 

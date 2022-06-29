@@ -93,8 +93,8 @@ namespace Cue.Sys.Vam
 				parent_.transform.position = U.ToUnity(to.Position);
 				parent_.transform.rotation = U.ToUnity(to.Rotation);
 
-				self_.transform.position = U.ToUnity(from.Position);
-				self_.transform.rotation = U.ToUnity(from.Rotation);
+				self_.transform.position = U.ToUnity(from.ControlPosition);
+				self_.transform.rotation = U.ToUnity(from.ControlRotation);
 			}
 
 			public VamBodyPart From

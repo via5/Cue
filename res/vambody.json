@@ -65,6 +65,7 @@
             "sex": "female",
             "name": "lNippleTrigger",
             "controller": "lNippleControl",
+			"colliders": ["lPectoral1", "lPectoral2", "lPectoral3"],
             "ignore": ["StandardColliderslShldr"]
         },
 
@@ -74,6 +75,7 @@
 			"sex": "female",
 			"name": "rNippleTrigger",
 			"controller": "rNippleControl",
+			"colliders": ["rPectoral1", "rPectoral2", "rPectoral3"],
 			"ignore": ["StandardCollidersrShldr"]
 		},
 
