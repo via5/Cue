@@ -8,7 +8,7 @@ namespace Cue.Sys.Vam
 	{
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
-		private Collider[] colliders_ = null;
+		private VamColliderRegion[] colliders_ = null;
 
 		private float postCreateElapsed_ = 0;
 		private bool postCreate_ = false;
@@ -168,7 +168,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		protected override Collider[] GetColliders()
+		protected override VamBodyPartRegion[] GetRegions()
 		{
 			return colliders_;
 		}
@@ -260,7 +260,7 @@ namespace Cue.Sys.Vam
 			{
 				var colliderNames = collidersString.Split(';');
 
-				var cs = new List<Collider>();
+				var cs = new List<VamColliderRegion>();
 				foreach (var cn in colliderNames)
 				{
 					var c = U.FindCollider(
@@ -272,14 +272,14 @@ namespace Cue.Sys.Vam
 						continue;
 					}
 
-					cs.Add(c);
+					cs.Add(new VamColliderRegion(this, c));
 				}
 
 				colliders_ = cs.ToArray();
 
 				var names = new List<string>();
 				foreach (var c in colliders_)
-					names.Add(c.name);
+					names.Add(c.Collider.name);
 
 				Log.Info($"dildo colliders: {string.Join(", ", names.ToArray())}");
 			}

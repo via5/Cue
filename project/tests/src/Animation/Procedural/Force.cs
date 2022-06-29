@@ -18,8 +18,9 @@ namespace Cue.Proc.Tests
 		public Quaternion ControlRotation { get; set; }
 		public Vector3 Position { get; }
 		public Quaternion Rotation { get; }
+
+		public Sys.IBodyPartRegion Link { get { return null; } }
 		public bool IsLinked { get; }
-		public Sys.IBodyPart Link { get { return null; } }
 		public bool Render { get; set; }
 
 		public void AddForce(Vector3 v)
@@ -47,6 +48,11 @@ namespace Cue.Proc.Tests
 			return canApply;
 		}
 
+		public Sys.BodyPartRegionInfo ClosestBodyPartRegion(Vector3 pos)
+		{
+			throw new System.NotImplementedException();
+		}
+
 		public float DistanceToSurface(Sys.IBodyPart other, bool debug = false)
 		{
 			throw new System.NotImplementedException();
@@ -72,9 +78,13 @@ namespace Cue.Proc.Tests
 			throw new System.NotImplementedException();
 		}
 
-		public void LinkTo(Sys.IBodyPart other)
+		public void LinkTo(Sys.IBodyPartRegion other)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		public void Unlink()
+		{
 		}
 	}
 

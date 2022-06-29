@@ -49,7 +49,7 @@
 		}
 
 		private const float ManualStartDistance = 0.09f;
-		private const float AutoStartDistance = 0.02f;
+		private const float AutoStartDistance = 0.06f;
 
 		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;
@@ -68,12 +68,12 @@
 			left_ = new HandInfo(
 				"left", person_.Body.Get(BP.LeftHand),
 				AnimationType.LeftFinger, AnimationType.HandjobLeft,
-				new BodyPartType[] { BP.LeftShoulder, BP.LeftElbow, BP.LeftHand });
+				BodyParts.FullLeftArm);
 
 			right_ = new HandInfo(
 				"right", person_.Body.Get(BP.RightHand),
 				AnimationType.RightFinger, AnimationType.HandjobRight,
-				new BodyPartType[] { BP.RightShoulder, BP.RightElbow, BP.RightHand });
+				BodyParts.FullRightArm);
 		}
 
 		public override void Debug(DebugLines debug)
@@ -131,14 +131,14 @@
 
 			if (checkLeft || checkRight)
 			{
-				Log.Info($"checking auto start, left={checkLeft} right={checkRight}");
+				Log.Verbose($"checking auto start, left={checkLeft} right={checkRight}");
 				Check(AutoStartDistance, checkLeft, checkRight, Animation.StopNoReturn);
 			}
 		}
 
 		private void CheckManualStart()
 		{
-			Log.Info("checking manual start");
+			Log.Verbose("checking manual start");
 			Check(ManualStartDistance, true, true);
 		}
 
@@ -157,19 +157,19 @@
 			float maxDistance, bool canStartLeft, bool canStartRight,
 			int stopFlags = Animation.NoStopFlags)
 		{
-			var leftTarget = FindTarget(left_.bp.Type, maxDistance);
-			var rightTarget = FindTarget(right_.bp.Type, maxDistance);
+			var leftTarget = FindTarget(left_, maxDistance);
+			var rightTarget = FindTarget(right_, maxDistance);
 
 			if (leftTarget == null && rightTarget == null)
 			{
 				Stop(stopFlags);
-				Log.Info("no target");
+				Log.Verbose("no target");
 				return;
 			}
 
 			if (TargetsForDouble(leftTarget, rightTarget))
 			{
-				Log.Info("check found double targets");
+				Log.Verbose("check found double targets");
 				Stop(stopFlags);
 				StartDoubleHJ(leftTarget);
 			}
@@ -177,7 +177,7 @@
 			{
 				if (left_.anim == AnimationType.HandjobBoth)
 				{
-					Log.Info("stopping because current is both and one target is gone");
+					Log.Verbose("stopping because current is both and one target is gone");
 					Stop(stopFlags);
 					canStartLeft = true;
 					canStartRight = true;
@@ -185,18 +185,18 @@
 
 				if (leftTarget == null)
 				{
-					Log.Info("no left target");
+					Log.Verbose("no left target");
 					Stop(left_, stopFlags);
 				}
 				else
 				{
 					if (leftTarget == left_.targetBodyPart)
 					{
-						Log.Info("left target is the same as before");
+						Log.Verbose("left target is the same as before");
 					}
 					else if (canStartLeft)
 					{
-						Log.Info($"new left target {leftTarget}");
+						Log.Verbose($"new left target {leftTarget}");
 
 						Stop(left_, stopFlags);
 
@@ -209,18 +209,18 @@
 
 				if (rightTarget == null)
 				{
-					Log.Info("no right target");
+					Log.Verbose("no right target");
 					Stop(right_, stopFlags);
 				}
 				else
 				{
 					if (rightTarget == right_.targetBodyPart)
 					{
-						Log.Info("right target is the same as before");
+						Log.Verbose("right target is the same as before");
 					}
 					else if (canStartRight)
 					{
-						Log.Info($"right target now {rightTarget}");
+						Log.Verbose($"right target now {rightTarget}");
 
 						Stop(right_, stopFlags);
 
@@ -256,7 +256,7 @@
 
 		private void Stop(HandInfo hand, int stopFlags = Animation.NoStopFlags)
 		{
-			Log.Info($"stopping {hand.name}");
+			Log.Verbose($"stopping {hand.name}");
 
 			if (hand.anim != AnimationType.None)
 			{
@@ -502,10 +502,8 @@
 			return true;
 		}
 
-		private BodyPart FindTarget(BodyPartType handPart, float maxDistance)
+		private BodyPart FindTarget(HandInfo hand, float maxDistance)
 		{
-			var hand = person_.Body.Get(handPart);
-
 			BodyPart tentative = null;
 			float tentativeDistance = float.MaxValue;
 
@@ -514,15 +512,19 @@
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
-				var d = hand.DistanceToSurface(g);
+				var d = hand.bp.DistanceToSurface(g);
 
 				if (d > maxDistance)
 				{
-					Log.Verbose($"{g} too far");
+					Log.Verbose($"{g} too far {d}");
 					continue;
 				}
 
-				if (BetterTarget(tentative, g))
+				ulong key = BodyPartLock.NoKey;
+				if (hand.targetLock != null && hand.targetLock.Length > 0)
+					key = hand.targetLock[0].Key;
+
+				if (BetterTarget(tentative, g, key))
 				{
 					if (d < tentativeDistance)
 					{
@@ -539,9 +541,9 @@
 			return tentative;
 		}
 
-		private bool BetterTarget(BodyPart tentative, BodyPart check)
+		private bool BetterTarget(BodyPart tentative, BodyPart check, ulong key)
 		{
-			if (check.LockedFor(BodyPartLock.Anim))
+			if (check.LockedFor(BodyPartLock.Anim, key))
 			{
 				// locked
 				Log.Verbose($"BetterTarget: {check} is locked");

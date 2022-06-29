@@ -20,7 +20,15 @@ namespace Cue
 			for (int i = 0; i < locks_.Count; ++i)
 			{
 				if (locks_[i].Prevents(lockType, BodyPartLock.NoKey))
+				{
+					// not an error
+					//
+					//bp_.Person.Log.Info(
+					//	$"failed to lock {bp_} for {why}, "+
+					//	$"lock {locks_[i]} prevents it");
+
 					return null;
+				}
 			}
 
 			for (int i = 0; i < locks_.Count; ++i)
@@ -288,7 +296,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{bp_}/{TypeToString(type_)}";
+			return $"{bp_}/{TypeToString(type_)}/{why_}";
 		}
 	}
 }

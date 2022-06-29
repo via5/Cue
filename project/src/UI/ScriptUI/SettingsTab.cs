@@ -69,6 +69,7 @@ namespace Cue
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 			warning_.Visible = false;
 			warning_.TextColor = new UnityEngine.Color(1, 0, 0);
+			warning_.WrapMode = VUI.Label.Wrap;
 		}
 
 		public override bool DebugOnly
@@ -112,6 +113,14 @@ namespace Cue
 					s += ", ";
 
 				s += person_.Voice.Warning;
+			}
+
+			if (person_.Atom.Warning != "")
+			{
+				if (s != "")
+					s += ", ";
+
+				s += person_.Atom.Warning;
 			}
 
 			return s;

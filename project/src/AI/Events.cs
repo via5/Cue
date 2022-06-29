@@ -55,10 +55,10 @@ namespace Cue
 				new KissEvent(),
 				new SmokeEvent(),
 				new ThrustEvent(),
-				new HandLinker(),
 				new HandEvent(),
 				new ZappedEvent(),
 				new SuckFingerEvent(),
+				new HandLinker(),
 			};
 		}
 

@@ -144,7 +144,7 @@ namespace Cue
 			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Label("Link", UnityEngine.FontStyle.Bold));
 
-			int fontSize = 20;
+			int fontSize = 18;
 
 			for (int i = 0; i < person_.Body.Parts.Length; ++i)
 			{

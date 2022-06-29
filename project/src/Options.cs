@@ -319,6 +319,9 @@ namespace Cue
 				}
 			}
 
+			if (Cue.Instance.Sys.ForceDevMode)
+				devMode_ = true;
+
 			OnChanged();
 			OnMenusChanged();
 		}

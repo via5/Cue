@@ -39,22 +39,22 @@ namespace Cue.Sys.Vam
 
 		public void Load()
 		{
-			Load(atom_.IsMale, AdvancedColliders());
-		}
-
-		private bool AdvancedColliders()
-		{
-			var cs = atom_.Atom.GetComponentInChildren<DAZCharacterSelector>();
-			if (cs == null)
+			try
 			{
-				Log.Error("no DAZCharacterSelector");
-				return true;
+				Load(atom_.IsMale);
 			}
+			catch (Exception e)
+			{
+				Log.Error(e.Message);
 
-			return cs.useAdvancedColliders;
+				if (!atom_.AdvancedColliders)
+					Log.Error(">>>>> Cue requires Advanced Colliders <<<<<");
+
+				Cue.Instance.DisablePlugin();
+			}
 		}
 
-		private void Load(bool male, bool advancedColliders)
+		private void Load(bool male)
 		{
 			var d = JSON.Parse(
 				Cue.Instance.Sys.ReadFileIntoString(
@@ -85,7 +85,7 @@ namespace Cue.Sys.Vam
 
 			foreach (JSONClass o in d["parts"].AsArray)
 			{
-				var bp = LoadPart(male, advancedColliders, o, getVar);
+				var bp = LoadPart(male, o, getVar);
 				if (bp != null)
 					map[bp.Type] = bp;
 			}
@@ -133,13 +133,14 @@ namespace Cue.Sys.Vam
 			public List<string> names;
 			public string controller;
 			public List<string> colliders;
+			public List<string> linkColliders;
 			public List<string> ignore;
 			public string forceReceiver;
 			public string rigidbody;
 			public string closestRigidbody;
 		}
 
-		private IBodyPart LoadPart(bool male, bool advancedColliders, JSONClass o, Func<string, JSONNode> getVar)
+		private IBodyPart LoadPart(bool male, JSONClass o, Func<string, JSONNode> getVar)
 		{
 			if (o.HasKey("sex"))
 			{
@@ -149,18 +150,11 @@ namespace Cue.Sys.Vam
 					return null;
 			}
 
-			if (o.HasKey("advanced"))
-			{
-				if (o["advanced"].Value == "yes" && !advancedColliders)
-					return null;
-				else if (o["advanced"].Value == "no" && advancedColliders)
-					return null;
-			}
-
 			PartSettings ps;
 			ps.names = new List<string>();
 			ps.ignore = new List<string>();
 			ps.colliders = new List<string>();
+			ps.linkColliders = new List<string>();
 
 			ps.bodyPart = BodyPartType.FromString(J.ReqString(o, "part"));
 			if (ps.bodyPart == BP.None)
@@ -185,6 +179,12 @@ namespace Cue.Sys.Vam
 			{
 				foreach (var n in o["colliders"].AsArray.Childs)
 					ps.colliders.Add(n.Value);
+			}
+
+			if (o.HasKey("linkColliders"))
+			{
+				foreach (var n in o["linkColliders"].AsArray.Childs)
+					ps.linkColliders.Add(n.Value);
 			}
 
 			if (o.HasKey("ignore"))
@@ -368,7 +368,8 @@ namespace Cue.Sys.Vam
 			}
 
 			return new RigidbodyBodyPart(
-				atom_, ps.bodyPart, rbs.ToArray(), fc, ps.colliders.ToArray(), fr);
+				atom_, ps.bodyPart, rbs.ToArray(), fc,
+				ps.colliders.ToArray(), ps.linkColliders.ToArray(), fr);
 		}
 
 		private IBodyPart CreateTrigger(PartSettings ps)

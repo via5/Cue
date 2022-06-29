@@ -295,20 +295,25 @@ namespace Cue
 			return Sys.DistanceToSurface(pos, debug);
 		}
 
-		public void LinkTo(BodyPart other)
+		public Sys.BodyPartRegionInfo ClosestBodyPartRegion(Vector3 pos)
+		{
+			if (!Exists)
+				return global::Cue.Sys.BodyPartRegionInfo.None;
+
+			return Sys.ClosestBodyPartRegion(pos);
+		}
+
+		public void LinkTo(Sys.IBodyPartRegion other)
 		{
 			if (!Exists)
 				return;
 
-			if (other != null && !other.Exists)
-				return;
-
-			Sys.LinkTo(other?.Sys);
+			Sys.LinkTo(other);
 		}
 
 		public void Unlink()
 		{
-			LinkTo(null);
+			Sys?.Unlink();
 		}
 
 		public void UnlinkFrom(Person to)
@@ -347,7 +352,7 @@ namespace Cue
 				if (link == null)
 					return null;
 
-				return person_.Body.Get(link.Type);
+				return person_.Body.Get(link.BodyPart.Type);
 			}
 		}
 
@@ -386,7 +391,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return $"{part_} ({BodyPartType.ToString(type_)})";
+			return $"{person_.ID}.{BodyPartType.ToString(type_)}";
 		}
 	}
 }

@@ -8,9 +8,31 @@ namespace Cue.Sys.Vam
 	{
 		private IAtom atom_;
 		private BodyPartType type_;
-		private Collider[] colliders_ = null;
+		private VamColliderRegion[] colliders_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 		private Logger log_ = null;
+
+		public BodyPartType Type { get { return type_; } }
+		public virtual bool Exists { get { return true; } }
+		public virtual bool IsPhysical { get { return true; } }
+
+		public virtual Rigidbody Rigidbody { get { return null; } }
+		public virtual FreeControllerV3 Controller { get { return null; } }
+
+		public virtual bool CanTrigger { get { return false; } }
+		public virtual TriggerInfo[] GetTriggers() { return null; }
+
+		public virtual bool CanGrab { get { return false; } }
+		public virtual bool Grabbed { get { return false; } }
+
+		public abstract Vector3 ControlPosition { get; set; }
+		public abstract Quaternion ControlRotation { get; set; }
+		public abstract Vector3 Position { get; }
+		public abstract Quaternion Rotation { get; }
+
+		private List<VamDebugRenderer.IDebugRender> renderers_ = null;
+		private List<VamDebugRenderer.IDebugRender> distanceRenderers_ = null;
+
 
 		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders = null)
 		{
@@ -19,7 +41,7 @@ namespace Cue.Sys.Vam
 
 			if (colliders != null)
 			{
-				var cs = new List<Collider>();
+				var cs = new List<VamColliderRegion>();
 				foreach (var cn in colliders)
 				{
 					var c = U.FindCollider((a as VamAtom).Atom, cn);
@@ -29,7 +51,7 @@ namespace Cue.Sys.Vam
 						continue;
 					}
 
-					cs.Add(c);
+					cs.Add(new VamColliderRegion(this, c));
 				}
 
 				colliders_ = cs.ToArray();
@@ -57,45 +79,74 @@ namespace Cue.Sys.Vam
 			get { return atom_ as VamAtom; }
 		}
 
-		private VamDebugRenderer.IDebugRender renderer_ = null;
-
 		public bool Render
 		{
 			get
 			{
-				return (renderer_ != null);
+				return (renderers_ != null && renderers_.Count > 0);
 			}
 
 			set
 			{
 				if (value)
-					renderer_ = Cue.Instance.VamSys.DebugRenderer.AddRender(this);
-				else if (renderer_ != null)
-					Cue.Instance.VamSys.DebugRenderer.RemoveRender(renderer_);
+				{
+					AddDebugRenderers();
+				}
+				else
+				{
+					if (renderers_ != null)
+					{
+						foreach (var r in renderers_)
+							Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
+
+						renderers_.Clear();
+					}
+
+					if (distanceRenderers_ != null)
+					{
+						foreach (var r in distanceRenderers_)
+							Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
+
+						distanceRenderers_.Clear();
+					}
+				}
 			}
 		}
 
-		public BodyPartType Type { get { return type_; } }
-		public virtual bool Exists { get { return true; } }
-		public virtual bool IsPhysical { get { return true; } }
+		protected virtual void AddDebugRenderers()
+		{
+			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(this));
 
-		public virtual Rigidbody Rigidbody { get { return null; } }
-		public virtual FreeControllerV3 Controller { get { return null; } }
+			var cs = GetRegions();
+			if (cs != null)
+			{
+				foreach (var c in cs)
+				{
+					var cc = c as VamColliderRegion;
+					if (cc != null)
+						AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(cc.Collider));
+				}
+			}
+		}
 
-		public virtual bool CanTrigger { get { return false; } }
-		public virtual TriggerInfo[] GetTriggers() { return null; }
+		protected void AddDebugRenderer(VamDebugRenderer.IDebugRender r)
+		{
+			if (renderers_ == null)
+				renderers_ = new List<VamDebugRenderer.IDebugRender>();
 
-		public virtual bool CanGrab { get { return false; } }
-		public virtual bool Grabbed { get { return false; } }
+			renderers_.Add(r);
+		}
 
-		public abstract Vector3 ControlPosition { get; set; }
-		public abstract Quaternion ControlRotation { get; set; }
-		public abstract Vector3 Position { get; }
-		public abstract Quaternion Rotation { get; }
+		protected void AddDistanceRenderer(Vector3 from, Vector3 to)
+		{
+			if (distanceRenderers_ == null)
+				distanceRenderers_ = new List<VamDebugRenderer.IDebugRender>();
 
-		private List<VamDebugRenderer.IDebugRender> renderers_ = new List<VamDebugRenderer.IDebugRender>();
+			distanceRenderers_.Add(
+				Cue.Instance.VamSys.DebugRenderer.AddRender(from, to));
+		}
 
-		public virtual IBodyPart Link
+		public virtual IBodyPartRegion Link
 		{
 			get { return Cue.Instance.VamSys.Linker.GetLink(this); }
 		}
@@ -105,12 +156,14 @@ namespace Cue.Sys.Vam
 			get { return Cue.Instance.VamSys.Linker.IsLinked(this); }
 		}
 
-		public virtual void LinkTo(IBodyPart other)
+		public virtual void LinkTo(IBodyPartRegion other)
 		{
-			if (other == null)
-				Cue.Instance.VamSys.Linker.Remove(this);
-			else
-				Cue.Instance.VamSys.Linker.Add(this, other as VamBodyPart);
+			Cue.Instance.VamSys.Linker.Add(this, other as VamBodyPartRegion);
+		}
+
+		public void Unlink()
+		{
+			Cue.Instance.VamSys.Linker.Remove(this);
 		}
 
 		public virtual bool IsLinkedTo(IBodyPart other)
@@ -181,22 +234,33 @@ namespace Cue.Sys.Vam
 			return DistanceToSurface(other, debug, Vector3.Zero, false);
 		}
 
-		private UnityEngine.Vector3 ClosestPoint(Collider c, UnityEngine.Vector3 p)
+		private UnityEngine.Vector3 ClosestPoint(VamBodyPartRegion c, Vector3 p)
 		{
-			return Physics.ClosestPoint(p, c, c.transform.position, c.transform.rotation);
+			var cc = (c as VamColliderRegion);
+			Cue.Assert(cc != null);
+
+			return Physics.ClosestPoint(
+				U.ToUnity(p), cc.Collider,
+				cc.Collider.transform.position, cc.Collider.transform.rotation);
 		}
 
-		public float DistanceToSurface(IBodyPart other, bool debug, Vector3 forceOtherPos, bool doForceOtherPos)
+		public BodyPartRegionInfo ClosestBodyPartRegion(Vector3 pos)
 		{
-			if (debug)
+			return ClosestBodyPartRegion(null, false, pos, true);
+		}
+
+		public BodyPartRegionInfo ClosestBodyPartRegion(IBodyPart other, bool debug, Vector3 forceOtherPos, bool doForceOtherPos)
+		{
+			if (distanceRenderers_ != null)
 			{
-				foreach (var d in renderers_)
-					d.Destroy();
-				renderers_.Clear();
+				foreach (var d in distanceRenderers_)
+					Cue.Instance.VamSys.DebugRenderer.RemoveRender(d);
+
+				distanceRenderers_.Clear();
 			}
 
-			var thisColliders = GetColliders();
-			var otherColliders = (other as VamBodyPart)?.GetColliders();
+			var thisColliders = GetRegions();
+			var otherColliders = (other as VamBodyPart)?.GetRegions();
 
 			var thisPos = Position;
 			var thisPosU = U.ToUnity(thisPos);
@@ -211,8 +275,8 @@ namespace Cue.Sys.Vam
 			{
 				float closest = float.MaxValue;
 
-				Collider thisDebug = null;
-				Collider otherDebug = null;
+				VamBodyPartRegion thisDebug = null;
+				VamBodyPartRegion otherDebug = null;
 
 				try
 				{
@@ -222,22 +286,18 @@ namespace Cue.Sys.Vam
 						{
 							var thisPoint = ClosestPoint(
 								thisColliders[i],
-								otherColliders[j].transform.position);
+								otherColliders[j].Position);
 
 							var otherPoint = ClosestPoint(
 								otherColliders[j],
-								thisColliders[i].transform.position);
+								thisColliders[i].Position);
 
 							var d = UnityEngine.Vector3.Distance(thisPoint, otherPoint);
 
 							if (d < closest)
 							{
-								if (debug)
-								{
-									thisDebug = thisColliders[i];
-									otherDebug = otherColliders[j];
-								}
-
+								thisDebug = thisColliders[i];
+								otherDebug = otherColliders[j];
 								closest = d;
 							}
 						}
@@ -256,7 +316,11 @@ namespace Cue.Sys.Vam
 					{
 						if (debug)
 						{
-							Log.Error($"both valid, closest is {U.FullName(thisDebug)} {U.FullName(otherDebug)} {closest}");
+							Log.Error(
+								$"both valid, " +
+								$"closest is {thisDebug.FullName} " +
+								$"{otherDebug.FullName} " +
+								$"{closest}");
 						}
 					}
 				}
@@ -266,31 +330,26 @@ namespace Cue.Sys.Vam
 					Log.Error(e.ToString());
 				}
 
-				return closest;
+				return new BodyPartRegionInfo(otherDebug, closest);
 			}
 			else if (thisCollidersValid)
 			{
 				float closest = float.MaxValue;
-				Collider c = null;
+				VamBodyPartRegion c = null;
 
 				try
 				{
 					for (int i = 0; i < thisColliders.Length; ++i)
 					{
-						var p = ClosestPoint(thisColliders[i], otherPosU);
+						var p = ClosestPoint(thisColliders[i], otherPos);
 						var d = Vector3.Distance(otherPos, U.FromUnity(p));
 
-						//if (debug && (Type == BP.RightElbow))
-						//{
-						//	Log.Error($"{p} {d} {U.FullName(thisColliders[i])}");
-						//	renderers_.Add(Cue.Instance.VamSys.DebugRenderer.AddRender(U.FromUnity(p)));
-						//}
+						if (Render)
+							AddDistanceRenderer(otherPos, U.FromUnity(p));
 
 						if (d < closest)
 						{
-							if (debug)
-								c = thisColliders[i];
-
+							c = thisColliders[i];
 							closest = d;
 						}
 					}
@@ -300,8 +359,8 @@ namespace Cue.Sys.Vam
 						Log.Error(
 							$"this valid, " +
 							$"closest is {other} at {otherPos}, " +
-							$"this is {this} {U.FullName(c)} " +
-							$"at {c.transform.position}, d={closest}");
+							$"this is {this} {c.FullName} " +
+							$"at {c.Position}, d={closest}");
 					}
 				}
 				catch (Exception e)
@@ -311,25 +370,23 @@ namespace Cue.Sys.Vam
 				}
 
 
-				return closest;
+				return new BodyPartRegionInfo(c, closest);
 			}
 			else if (otherCollidersValid)
 			{
 				float closest = float.MaxValue;
-				Collider c = null;
+				VamBodyPartRegion c = null;
 
 				try
 				{
 					for (int i = 0; i < otherColliders.Length; ++i)
 					{
-						var p = ClosestPoint(otherColliders[i], thisPosU);
+						var p = ClosestPoint(otherColliders[i], thisPos);
 						var d = Vector3.Distance(thisPos, U.FromUnity(p));
 
 						if (d < closest)
 						{
-							if (debug)
-								c = otherColliders[i];
-
+							c = otherColliders[i];
 							closest = d;
 						}
 					}
@@ -338,7 +395,7 @@ namespace Cue.Sys.Vam
 					{
 						Log.Error(
 							$"other valid, closest is {thisPos} " +
-							$"{U.FullName(c)} {closest}");
+							$"{c.FullName} {closest}");
 					}
 				}
 				catch (Exception e)
@@ -347,22 +404,34 @@ namespace Cue.Sys.Vam
 					Log.Error(e.ToString());
 				}
 
-				return closest;
+				return new BodyPartRegionInfo(c, closest);
 			}
 			else
 			{
-				float d = Vector3.Distance(thisPos, otherPos);
-
-				if (debug)
-					Log.Error($"neither valid, {thisPos} {otherPos} {d}");
-
-				return d;
+				return BodyPartRegionInfo.None;
 			}
+		}
+
+		public float DistanceToSurface(IBodyPart other, bool debug, Vector3 forceOtherPos, bool doForceOtherPos)
+		{
+			var r = ClosestBodyPartRegion(other, debug, forceOtherPos, doForceOtherPos);
+
+			if (r.region != null)
+				return r.distance;
+
+			var thisPos = Position;
+			var otherPos = (doForceOtherPos ? forceOtherPos : (other?.Position ?? Vector3.Zero));
+
+			float d = Vector3.Distance(thisPos, otherPos);
+			if (debug)
+				Log.Error($"neither valid, {thisPos} {otherPos} {d}");
+
+			return d;
 		}
 
 		public abstract bool ContainsTransform(Transform t, bool debug);
 
-		protected virtual Collider[] GetColliders()
+		protected virtual VamBodyPartRegion[] GetRegions()
 		{
 			return colliders_;
 		}

@@ -101,6 +101,7 @@ namespace Cue.Sys
 		float DeltaTime { get; }
 		float RealtimeSinceStartup { get; }
 		string Fps { get; }
+		bool ForceDevMode { get; }
 		int RandomInt(int first, int last);
 		float RandomFloat(float first, float last);
 		IObjectCreator CreateObjectCreator(string name, string type, JSONClass opts, ObjectParameters ps);
@@ -367,6 +368,28 @@ namespace Cue.Sys
 		}
 	}
 
+	public interface IBodyPartRegion
+	{
+		IBodyPart BodyPart { get; }
+	}
+
+	public struct BodyPartRegionInfo
+	{
+		public IBodyPartRegion region;
+		public float distance;
+
+		public BodyPartRegionInfo(IBodyPartRegion r, float d)
+		{
+			region = r;
+			distance = d;
+		}
+
+		public static BodyPartRegionInfo None
+		{
+			get { return new BodyPartRegionInfo(null, float.MaxValue); }
+		}
+	}
+
 	public interface IBodyPart
 	{
 		IAtom Atom { get; }
@@ -383,12 +406,16 @@ namespace Cue.Sys
 		Quaternion ControlRotation { get; set; }
 		Vector3 Position { get; }
 		Quaternion Rotation { get; }
-		IBodyPart Link { get; }
+
+		IBodyPartRegion Link { get; }
 		bool IsLinked { get; }
-		void LinkTo(IBodyPart other);
+		void LinkTo(IBodyPartRegion other);
+		void Unlink();
 		bool IsLinkedTo(IBodyPart other);
+
 		float DistanceToSurface(IBodyPart other, bool debug = false);
 		float DistanceToSurface(Vector3 pos, bool debug = false);
+		BodyPartRegionInfo ClosestBodyPartRegion(Vector3 pos);
 
 		bool CanApplyForce();
 		void AddRelativeForce(Vector3 v);
@@ -459,6 +486,8 @@ namespace Cue.Sys
 
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
+
+		string Warning { get; }
 
 		void Init();
 		void Destroy();

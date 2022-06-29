@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
 	class ColliderBodyPart : VamBodyPart
 	{
-		private Collider[] colliders_;
+		private VamColliderRegion[] colliders_;
 		private FreeControllerV3 fc_;
 		private Rigidbody rb2_, closestRb_;
 
@@ -13,7 +14,12 @@ namespace Cue.Sys.Vam
 			Rigidbody rb, Rigidbody closestRb)
 				: base(a, type)
 		{
-			colliders_ = cs;
+			var list = new List<VamColliderRegion>();
+			foreach (var c in cs)
+				list.Add(new VamColliderRegion(this, c));
+
+			colliders_ = list.ToArray();
+
 			fc_ = fc;
 			rb2_ = rb;
 			closestRb_ = closestRb;
@@ -41,7 +47,7 @@ namespace Cue.Sys.Vam
 
 		private Collider MainCollider
 		{
-			get { return colliders_[0]; }
+			get { return colliders_[0].Collider; }
 		}
 
 		public override Vector3 ControlPosition
@@ -75,7 +81,7 @@ namespace Cue.Sys.Vam
 
 				for (int i = 0; i < colliders_.Length; ++i)
 				{
-					if (colliders_[i].transform == t)
+					if (colliders_[i].Collider.transform == t)
 					{
 						if (debug)
 							Log.Error($"{t.name} is collider #{i}");
@@ -85,7 +91,7 @@ namespace Cue.Sys.Vam
 					else
 					{
 						if (debug)
-							Log.Error($"not collider {colliders_[i].transform.name}");
+							Log.Error($"not collider {colliders_[i].Collider.transform.name}");
 					}
 				}
 			}
@@ -108,7 +114,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		protected override Collider[] GetColliders()
+		protected override VamBodyPartRegion[] GetRegions()
 		{
 			return colliders_;
 		}

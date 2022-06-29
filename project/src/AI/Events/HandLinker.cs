@@ -42,9 +42,9 @@
 				return false;
 			}
 
-			public void LinkTo(BodyPart part, BodyPartLock lk)
+			public void LinkTo(Sys.IBodyPartRegion region, BodyPartLock lk)
 			{
-				hand_.LinkTo(part);
+				hand_.LinkTo(region);
 				lk_ = lk;
 			}
 
@@ -137,38 +137,40 @@
 			if (info.GrabStarted())
 			{
 				// unlink other hands if they're linked to this one
-				UnlinkOthers(info.Hand);
+				//UnlinkOthers(info.Hand);
+
+				// always unlink when grabbing
+				info.Unlink();
 			}
 			else if (info.GrabStopped())
 			{
 				var close = FindClose(info.Hand);
 
-				// always unlink after grab
-				info.Unlink();
-
 				if (close != null)
 				{
+					Log.Info($"found {close}");
+
 					var lk = info.Hand.Lock(
 						BodyPartLock.Anim, "HandLocker", BodyPartLock.Weak);
 
 					if (lk != null)
 					{
-						Log.Verbose($"linking {info.Hand} with {close}");
+						Log.Info($"linking {info.Hand} with {close}");
 						info.LinkTo(close, lk);
 					}
 				}
 			}
 		}
 
-		private BodyPart FindClose(BodyPart hand)
+		private Sys.IBodyPartRegion FindClose(BodyPart hand)
 		{
 			BodyPartType[] selfIgnore = new BodyPartType[]
 			{
-				BP.LeftShoulder, BP.LeftElbow,
-				BP.RightShoulder, BP.RightElbow,
+				BP.LeftShoulder, BP.LeftArm, BP.LeftElbow, BP.LeftForearm,
+				BP.RightShoulder, BP.RightArm, BP.RightElbow, BP.RightForearm,
 			};
 
-			BodyPart closest = null;
+			Sys.IBodyPartRegion closest = null;
 			float closestDistance = float.MaxValue;
 
 			foreach (var p in Cue.Instance.ActivePersons)
@@ -198,14 +200,16 @@
 					if (ignore)
 						continue;
 
-					float d = bp.DistanceToSurface(hand.Position);
+					var r = bp.ClosestBodyPartRegion(hand.Position);
+					if (r.region == null)
+						continue;
 
-					if (d < Distance)
+					if (r.distance < Distance)
 					{
-						if (d < closestDistance)
+						if (r.distance < closestDistance)
 						{
-							closestDistance = d;
-							closest = bp;
+							closestDistance = r.distance;
+							closest = r.region;
 						}
 					}
 				}

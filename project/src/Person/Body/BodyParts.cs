@@ -4,6 +4,36 @@
 	{
 		public const float CloseToDistance = 0.05f;
 
+		private static BodyPartType[] fullLeftArm_ = new BodyPartType[]
+		{
+			BP.LeftShoulder,
+			BP.LeftArm,
+			BP.LeftElbow,
+			BP.LeftForearm,
+			BP.LeftHand,
+		};
+
+		public static BodyPartType[] FullLeftArm
+		{
+			get { return fullLeftArm_ ; }
+		}
+
+
+		private static BodyPartType[] fullRightArm_ = new BodyPartType[]
+		{
+			BP.RightShoulder,
+			BP.RightArm,
+			BP.RightElbow,
+			BP.RightForearm,
+			BP.RightHand,
+		};
+
+		public static BodyPartType[] FullRightArm
+		{
+			get { return fullRightArm_; }
+		}
+
+
 		private static BodyPartType[] breasts_ = new BodyPartType[]
 		{
 			BP.LeftBreast,

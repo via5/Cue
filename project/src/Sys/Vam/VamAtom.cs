@@ -56,6 +56,7 @@ namespace Cue.Sys.Vam
 		private ActionParameter setOnlyKeyJointsOn_;
 		private FreeControllerV3 head_ = null;
 		private DAZCharacter char_ = null;
+		private DAZCharacterSelector selector_ = null;
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
 		private bool autoBlink_ = true;
@@ -80,11 +81,23 @@ namespace Cue.Sys.Vam
 				hair_ = new VamHair(this);
 			}
 
+			selector_ = atom.GetComponentInChildren<DAZCharacterSelector>();
+
 			collisions_ = new BoolParameter(this, "AtomControl", "collisionEnabled");
 			physics_ = new BoolParameter(this, "control", "physicsEnabled");
 			scale_ = FindScale();
 			blink_ = new BoolParameter(this, "EyelidControl", "blinkEnabled");
 			cd_ = new VamCorruptionDetector(atom, OnCorruption);
+		}
+
+		public string Warning
+		{
+			get { return ""; }
+		}
+
+		public bool AdvancedColliders
+		{
+			get { return selector_ != null && selector_.useAdvancedColliders; }
 		}
 
 		private FloatParameter FindScale()

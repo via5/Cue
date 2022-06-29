@@ -228,14 +228,6 @@
 			return null;
 		}
 
-		private static BodyPartType[] frottageParts_ = new BodyPartType[]
-		{
-			BP.Head, BP.Chest, BP.Hips, BP.Labia, BP.Penis,
-			BP.LeftThigh, BP.RightThigh,
-			BP.LeftShin, BP.RightShin,
-			BP.LeftElbow, BP.RightElbow
-		};
-
 		private BodyPart FindFrottageReceiver()
 		{
 			var selfGen = person_.Body.Get(person_.Body.GenitalsBodyPart);
@@ -248,9 +240,9 @@
 				if (p == person_)
 					continue;
 
-				for (int i = 0; i < frottageParts_.Length; ++i)
+				foreach (BodyPartType bp in BodyPartType.Values)
 				{
-					var otherPart = p.Body.Get(frottageParts_[i]);
+					var otherPart = p.Body.Get(bp);
 					var d = selfGen.DistanceToSurface(otherPart);
 
 					if (d > FrottageDistance)

@@ -305,6 +305,11 @@ namespace Cue.Sys.Vam
 			hair_ = new VamHair(null);
 		}
 
+		public string Warning
+		{
+			get { return ""; }
+		}
+
 		public string ID
 		{
 			get { return "Camera"; }

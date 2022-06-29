@@ -184,6 +184,11 @@ namespace Cue.Sys.Mock
 			f?.Invoke();
 		}
 
+		public bool ForceDevMode
+		{
+			get { return true; }
+		}
+
 		public string ReadFileIntoString(string path)
 		{
 			return File.ReadAllText(path);
@@ -343,6 +348,11 @@ namespace Cue.Sys.Mock
 		public MockAtom(string id)
 		{
 			id_ = id;
+		}
+
+		public string Warning
+		{
+			get { return ""; }
 		}
 
 		public string ID
