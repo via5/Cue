@@ -208,6 +208,7 @@
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />
     <Compile Include="src\Sys\Vam\VamHair.cs" />
     <Compile Include="src\Sys\Vam\VamInput.cs" />
+    <Compile Include="src\Sys\Vam\VamLinker.cs" />
     <Compile Include="src\Sys\Vam\VamLiveSaver.cs" />
     <Compile Include="src\Sys\Vam\VamMorphs.cs" />
     <Compile Include="src\Sys\Vam\VamObjects.cs" />

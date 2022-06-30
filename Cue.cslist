@@ -92,6 +92,7 @@ project\src\Sys\Vam\VamFixes.cs
 project\src\Sys\Vam\VamGraphic.cs
 project\src\Sys\Vam\VamHair.cs
 project\src\Sys\Vam\VamInput.cs
+project\src\Sys\Vam\VamLinker.cs
 project\src\Sys\Vam\VamLiveSaver.cs
 project\src\Sys\Vam\VamMorphs.cs
 project\src\Sys\Vam\VamObjects.cs

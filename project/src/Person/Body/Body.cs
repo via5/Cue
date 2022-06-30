@@ -65,7 +65,7 @@ namespace Cue
 					return "no";
 
 				return
-					$"{source_} on {self.Body.Zone(zone_)} at {Intensity}, " +
+					$"{source_} on {self.Body.Zone(zone_)} at {Intensity:0.00}, " +
 					$"max={maxIntensity_:0.00} time={time_:0.00}";
 			}
 		}
