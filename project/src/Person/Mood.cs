@@ -18,7 +18,7 @@ namespace Cue
 
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
-		private float baseExcitement_ = 0;
+		private ForceableFloat baseExcitement_ = new ForceableFloat();
 
 		private ForceableFloat[] moods_ = new ForceableFloat[MoodType.Count];
 
@@ -69,11 +69,16 @@ namespace Cue
 				HasEnergyForAnimation(other);
 		}
 
+		private float BaseExcitement
+		{
+			get { return baseExcitement_.Value; }
+		}
+
 		private static bool HasEnergyForAnimation(Person p)
 		{
 			if (p != null)
 			{
-				if (p.Mood.MovementEnergy == 0 && p.Mood.Get(MoodType.Excited) > 0)
+				if (p.Mood.MovementEnergy == 0 && p.Mood.BaseExcitement > 0)
 					return false;
 			}
 
@@ -87,7 +92,7 @@ namespace Cue
 			// characters involved
 			//
 			// this allows for an unexcited character to have high energy
-			// if interacting with an exicted character, or an excited
+			// if interacting with an excited character, or an excited
 			// character to have low energy if interacting with a tired
 			// character
 
@@ -96,34 +101,44 @@ namespace Cue
 
 			if (a != null)
 			{
-				mostExcited = HighestValue(mostExcited, a, MoodType.Excited);
-				mostTired = HighestValue(mostTired, a, MoodType.Tired);
+				mostExcited = HighestExcitement(mostExcited, a);
+				mostTired = HighestTiredness(mostTired, a);
 			}
 
 			if (b != null && b != a)
 			{
-				mostExcited = HighestValue(mostExcited, b, MoodType.Excited);
-				mostTired = HighestValue(mostTired, b, MoodType.Tired);
+				mostExcited = HighestExcitement(mostExcited, b);
+				mostTired = HighestTiredness(mostTired, b);
 			}
 
 			if (c != null && c != b)
 			{
-				mostExcited = HighestValue(mostExcited, c, MoodType.Excited);
-				mostTired = HighestValue(mostTired, c, MoodType.Tired);
+				mostExcited = HighestExcitement(mostExcited, c);
+				mostTired = HighestTiredness(mostTired, c);
 			}
 
 			if (mostExcited == null || mostTired == null)
 				return 1;
 
 			return mostTired.Mood.MovementEnergyForExcitement(
-					mostExcited.Mood.Get(MoodType.Excited));
+					mostExcited.Mood.BaseExcitement);
 		}
 
-		private static Person HighestValue(Person current, Person check, MoodType what)
+		private static Person HighestExcitement(Person current, Person check)
 		{
 			if (current == null)
 				return check;
-			else if (check.Mood.Get(what) > current.Mood.Get(what))
+			else if (check.Mood.BaseExcitement > current.Mood.BaseExcitement)
+				return check;
+			else
+				return current;
+		}
+
+		private static Person HighestTiredness(Person current, Person check)
+		{
+			if (current == null)
+				return check;
+			else if (check.Mood.Get(MoodType.Tired) > current.Mood.Get(MoodType.Tired))
 				return check;
 			else
 				return current;
@@ -188,7 +203,10 @@ namespace Cue
 
 		public ForceableFloat GetValue(MoodType i)
 		{
-			return moods_[i.Int];
+			if (i == MoodType.Excited)
+				return baseExcitement_;
+			else
+				return moods_[i.Int];
 		}
 
 
@@ -224,11 +242,11 @@ namespace Cue
 		{
 			get
 			{
-				return MovementEnergyForExcitement(Get(MoodType.Excited));
+				return MovementEnergyForExcitement(BaseExcitement);
 			}
 		}
 
-		public float MovementEnergyForExcitement(float e)
+		private float MovementEnergyForExcitement(float e)
 		{
 			var ps = person_.Personality;
 			float max = float.MaxValue;
@@ -304,7 +322,7 @@ namespace Cue
 					if (elapsed_ > ps.Get(PS.PostOrgasmTime))
 					{
 						SetState(NormalState);
-						baseExcitement_ = ps.Get(PS.ExcitementPostOrgasm);
+						baseExcitement_.Value = ps.Get(PS.ExcitementPostOrgasm);
 					}
 
 					break;
@@ -405,10 +423,10 @@ namespace Cue
 			var ps = person_.Personality;
 			var ex = person_.Excitement;
 
-			if (baseExcitement_ > ex.Max)
+			if (baseExcitement_.Value > ex.Max)
 			{
-				baseExcitement_ = Math.Max(
-					baseExcitement_ + ps.Get(PS.ExcitementDecayRate) * s,
+				baseExcitement_.Value = Math.Max(
+					baseExcitement_.Value + ps.Get(PS.ExcitementDecayRate) * s,
 					ex.Max);
 			}
 			else
@@ -420,13 +438,13 @@ namespace Cue
 				rate = rate - (rate * tirednessFactor);
 				rate *= Cue.Instance.Options.Excitement;
 
-				baseExcitement_ = U.Clamp(
-					baseExcitement_ + rate * s,
+				baseExcitement_.Value = U.Clamp(
+					baseExcitement_.Value + rate * s,
 					0, ex.Max);
 			}
 
 			float zapped = person_.Body.Zap.Intensity * 0.9f;
-			Set(MoodType.Excited, Math.Max(baseExcitement_, zapped));
+			Set(MoodType.Excited, Math.Max(BaseExcitement, zapped));
 		}
 
 		private float GetRate()
@@ -448,8 +466,8 @@ namespace Cue
 
 			person_.Animator.PlayType(AnimationType.Orgasm);
 
-			baseExcitement_ = 1;
-			Set(MoodType.Excited, baseExcitement_);
+			baseExcitement_.Value = 1;
+			Set(MoodType.Excited, baseExcitement_.Value);
 
 			SetState(OrgasmState);
 			timeSinceLastOrgasm_ = 0;

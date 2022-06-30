@@ -198,6 +198,17 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
+		public void SetOn()
+		{
+			var fc = Controller;
+			if (fc == null)
+				return;
+
+			fc.SelectLinkToRigidbody(null);
+			fc.currentPositionState = FreeControllerV3.PositionState.On;
+			fc.currentRotationState = FreeControllerV3.RotationState.On;
+		}
+
 		public virtual GrabInfo[] GetGrabs()
 		{
 			if (!Grabbed)

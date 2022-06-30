@@ -216,7 +216,7 @@ namespace Cue
 				{
 					moreElapsed_ += s;
 
-					if (moreElapsed_ > MoreCheckInterval)
+					if (moreElapsed_ > MoreCheckInterval || person_.Body.Zap.Intensity > 0)
 					{
 						moreElapsed_ = 0;
 						var tries = MaxActive - activeCount;

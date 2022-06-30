@@ -135,7 +135,7 @@ namespace Cue
 						forceExcitement_.Checked = p.Mood.GetValue(MoodType.Excited).IsForced;
 
 					if (excitement_ != null)
-						excitement_.Value = p.Mood.GetValue(MoodType.Excited).Value;
+						excitement_.Value = p.Mood.Get(MoodType.Excited);
 				}
 			}
 			finally

@@ -129,6 +129,7 @@ namespace Cue.Sys.Vam
 
 		public void Add(VamBodyPart from, VamBodyPartRegion to)
 		{
+			from.SetOn();
 			linksList_.Add(new Link(from, to));
 			linksArray_ = linksList_.ToArray();
 		}
