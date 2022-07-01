@@ -11,10 +11,8 @@ namespace Cue.Sys.Vam
 		private Transform t_ = null;
 		private Transform ignoreStop_ = null;
 		private Transform[] ignoreTransforms_ = new Transform[0];
-		private TriggerInfo[] triggers_ = null;
 		private bool enabled_ = false;
 
-		private List<TriggerInfo> triggerCache_ = null;
 		private List<Atom> foundOtherCache_ = null;
 
 		protected TriggerBodyPart(VamAtom a, BodyPartType type)
@@ -114,12 +112,7 @@ namespace Cue.Sys.Vam
 			get { return fc_; }
 		}
 
-		public override bool CanTrigger
-		{
-			get { return true; }
-		}
-
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			if (t_ == null)
 			{
@@ -143,121 +136,6 @@ namespace Cue.Sys.Vam
 
 				return false;
 			}
-		}
-
-		public override TriggerInfo[] GetTriggers()
-		{
-			if (!Exists)
-				return null;
-
-			UpdateTriggers();
-			return triggers_;
-		}
-
-		private void UpdateTriggers()
-		{
-			if (!trigger_.active)
-			{
-				triggers_ = null;
-				return;
-			}
-
-			if (triggerCache_ != null)
-				triggerCache_.Clear();
-
-			if (foundOtherCache_ != null)
-				foundOtherCache_.Clear();
-
-			var found = new bool[Cue.Instance.AllPersons.Count, BP.Count];
-
-			foreach (var kv in h_.collidingWithDictionary)
-			{
-				if (!kv.Value || kv.Key == null)
-					continue;
-
-				if (!ValidTrigger(kv.Key))
-					continue;
-
-				if (triggerCache_ == null)
-					triggerCache_ = new List<TriggerInfo>();
-
-				var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform);
-
-				if (bp == null)
-				{
-					bool skip = false;
-
-					var a = U.AtomForCollider(kv.Key);
-
-					if (foundOtherCache_ == null)
-					{
-						foundOtherCache_ = new List<Atom>();
-					}
-					else
-					{
-						if (foundOtherCache_.Contains(a))
-							skip = true;
-					}
-
-
-					if (!skip)
-					{
-						foundOtherCache_.Add(a);
-
-						int type = TriggerInfo.NoneType;
-
-						if (a.category == "Toys")
-							type = TriggerInfo.ToyType;
-
-						triggerCache_.Add(TriggerInfo.FromExternal(type, a));
-					}
-				}
-				else
-				{
-					var p = Cue.Instance.PersonForAtom(bp.Atom);
-					var personIndex = p.PersonIndex;
-
-					if (!found[personIndex, bp.Type.Int])
-					{
-						if (!ValidCollision(p, bp.Type))
-							continue;
-
-						found[p.PersonIndex, bp.Type.Int] = true;
-						triggerCache_.Add(TriggerInfo.FromPerson(p.PersonIndex, bp.Type, 1.0f));
-					}
-				}
-			}
-
-			if (triggerCache_ == null)
-				triggers_ = null;
-			else
-				triggers_ = triggerCache_.ToArray();
-		}
-
-		private bool ValidCollision(Person p, BodyPartType bp)
-		{
-			// self collision
-			if (p.VamAtom == VamAtom)
-			{
-				if (bp == BP.Penis)
-				{
-					// probably the dildo touching genitals, ignore
-					return false;
-				}
-				else
-				{
-					if (Type == BP.Penis)
-					{
-						if (bp == BP.Hips)
-						{
-							// probably the dildo touching genitals, ignore
-							return false;
-						}
-					}
-				}
-			}
-
-			return true;
 		}
 
 		public override bool CanGrab
@@ -306,7 +184,7 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			string s = "";
 
@@ -322,27 +200,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return $"trigger {s}";
-		}
-
-		private bool ValidTrigger(Collider c)
-		{
-			var t = c.transform;
-
-			while (t != null)
-			{
-				if (t == ignoreStop_)
-					break;
-
-				for (int i = 0; i < ignoreTransforms_.Length; ++i)
-				{
-					if (ignoreTransforms_[i] == t)
-						return false;
-				}
-
-				t = t.parent;
-			}
-
-			return true;
 		}
 	}
 }

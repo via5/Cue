@@ -11,7 +11,7 @@ namespace Cue.Sys.Vam
 
 		public RigidbodyBodyPart(
 			VamAtom a, BodyPartType type, Rigidbody[] rbs, FreeControllerV3 fc,
-			string[] colliders, string[] linkColliders, Rigidbody forForce)
+			string[] colliders, Rigidbody forForce)
 				: base(a, type, colliders)
 		{
 			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartType.ToString(Type)}");
@@ -68,7 +68,7 @@ namespace Cue.Sys.Vam
 			get { return U.FromUnity(Rigidbody.rotation); }
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			if (rbs_ == null)
 			{
@@ -140,7 +140,7 @@ namespace Cue.Sys.Vam
 				forForce_.AddTorque(U.ToUnity(v));
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			string s = $"rb {(Rigidbody == null ? "" : Rigidbody.name)}";
 

@@ -31,12 +31,12 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			return false;
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			return $"camera eyes";
 		}
@@ -72,12 +72,12 @@ namespace Cue.Sys.Vam
 			get { return Quaternion.Zero; }
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			return false;
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			return $"camera head";
 		}
@@ -101,7 +101,7 @@ namespace Cue.Sys.Vam
 			handOutputType_ = handOutputType;
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			if (t == desktopHand_)
 				return true;
@@ -240,6 +240,12 @@ namespace Cue.Sys.Vam
 				if (parts_[i.Int] == null)
 					parts_[i.Int] = new NullBodyPart(Atom, i);
 			}
+		}
+
+		public void Init()
+		{
+			foreach (var p in parts_)
+				(p as VamBodyPart).Init();
 		}
 
 		public override bool Exists
@@ -388,6 +394,7 @@ namespace Cue.Sys.Vam
 
 		public void Init()
 		{
+			body_.Init();
 		}
 
 		public void NavStop(string why)

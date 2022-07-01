@@ -6,8 +6,8 @@ features:
     will start/stop if necessary after being grabbed and moved
 
   - hand linker: now uses a custom, internal implementation managed by Cue
-    instead of VaM's Parent Link connection, and so supports much more precise
-    linking targets
+    instead of VaM's Parent Link connection, and so can link more precisely
+    to targets
 
     this also fixes body parts being difficult to move in Play Mode (because VaM
     ignores controllers that are linked when multiple body parts overlap)
@@ -21,6 +21,8 @@ features:
   - sync orgasms across multiple characters
 
   - new personalities: annoyed and angry
+
+  - excitement will now rise with toys
 
   - reorganised options into several tabs, added more:
       - treat strapon as physical for excitement

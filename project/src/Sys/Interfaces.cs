@@ -290,7 +290,7 @@ namespace Cue.Sys
 					var p = Cue.Instance.AllPersons[personIndex_];
 					var bp = p.Body.Get(bodyPart_);
 
-					string s = $"{p.ID}.{bp.Name}";
+					string s = $"{p.ID}.{bp.Name}:{value_:0.00}";
 
 					if (forced_)
 						s += "(forced)";
@@ -396,7 +396,6 @@ namespace Cue.Sys
 		BodyPartType Type { get; }
 		bool Exists { get; }
 		bool IsPhysical { get; }
-		bool CanTrigger { get; }
 		bool Render { get; set; }
 		TriggerInfo[] GetTriggers();
 		GrabInfo[] GetGrabs();

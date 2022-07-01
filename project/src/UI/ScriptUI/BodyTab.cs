@@ -194,37 +194,34 @@ namespace Cue
 			{
 				var w = widgets_[i];
 
-				if (w.part.CanTrigger)
+				var ts = w.part.GetTriggers();
+				if (ts != null)
 				{
 					string ss = "";
 					string one = "";
 					int more = 0;
 
-					var ts = w.part.GetTriggers();
-					if (ts != null)
+					bool sawUnknown = false;
+
+					for (int j = 0; j < ts.Length; ++j)
 					{
-						bool sawUnknown = false;
-
-						for (int j = 0; j < ts.Length; ++j)
+						if (ts[j].Type == Sys.TriggerInfo.NoneType)
 						{
-							if (ts[j].Type == Sys.TriggerInfo.NoneType)
-							{
-								if (sawUnknown)
-									continue;
-								else
-									sawUnknown = true;
-							}
-
-							if (ss != "")
-								ss += ",";
-
-							ss += ts[j].ToString();
-
-							if (one == "")
-								one = ts[j].ToString();
+							if (sawUnknown)
+								continue;
 							else
-								++more;
+								sawUnknown = true;
 						}
+
+						if (ss != "")
+							ss += ",";
+
+						ss += ts[j].ToString();
+
+						if (one == "")
+							one = ts[j].ToString();
+						else
+							++more;
 					}
 
 					if (more > 0)

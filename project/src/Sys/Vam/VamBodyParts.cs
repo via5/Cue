@@ -4,6 +4,46 @@ using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
+	class CueCollisionHandler : MonoBehaviour
+	{
+		private VamBodyPart bp_ = null;
+		private Person person_;
+
+		public void Init(VamBodyPart bp)
+		{
+			bp_ = bp;
+			person_ = Cue.Instance.FindPerson(bp_.Atom);
+		}
+
+		public void OnCollisionStay(Collision c)
+		{
+			if (!isActiveAndEnabled || bp_ == null || CueMain.Instance.Sys.Paused)
+				return;
+
+			var sourcePart = Cue.Instance.VamSys.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
+			if (sourcePart == null)
+				return;
+
+			var sourceIndex = Cue.Instance.FindPerson(sourcePart.Atom)?.PersonIndex ?? -1;
+			if (sourceIndex < 0)
+				return;
+
+
+			var targetPart = bp_;
+			if (targetPart == null)
+				return;
+
+			var targetIndex = person_.PersonIndex;
+
+
+			float mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
+
+			bp_.AddPersonCollision(sourceIndex, sourcePart.Type, mag);
+			sourcePart.AddPersonCollision(targetIndex, targetPart.Type, mag);
+		}
+	}
+
+
 	public abstract class VamBodyPart : IBodyPart
 	{
 		private IAtom atom_;
@@ -11,6 +51,14 @@ namespace Cue.Sys.Vam
 		private VamColliderRegion[] colliders_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 		private Logger log_ = null;
+		private CueCollisionHandler[] handlers_ = null;
+		private float[,] collisions_ = null;
+
+		private Atom toyAtom_ = null;
+		private float toyCollision_ = 0;
+
+		private Atom externalAtom_ = null;
+		private float externalCollision_ = 0;
 
 		public BodyPartType Type { get { return type_; } }
 		public virtual bool Exists { get { return true; } }
@@ -18,9 +66,6 @@ namespace Cue.Sys.Vam
 
 		public virtual Rigidbody Rigidbody { get { return null; } }
 		public virtual FreeControllerV3 Controller { get { return null; } }
-
-		public virtual bool CanTrigger { get { return false; } }
-		public virtual TriggerInfo[] GetTriggers() { return null; }
 
 		public virtual bool CanGrab { get { return false; } }
 		public virtual bool Grabbed { get { return false; } }
@@ -33,6 +78,94 @@ namespace Cue.Sys.Vam
 		private List<VamDebugRenderer.IDebugRender> renderers_ = null;
 		private List<VamDebugRenderer.IDebugRender> distanceRenderers_ = null;
 
+		private List<TriggerInfo> triggerCache_ = new List<TriggerInfo>();
+		private TriggerInfo[] triggers_ = null;
+
+
+		public TriggerInfo[] GetTriggers()
+		{
+			if (!Exists)
+				return null;
+
+			//if (triggerCache_ != null)
+			{
+				triggers_ = null;
+				triggerCache_.Clear();
+			}
+
+			UpdateTriggers();
+
+			for (int i = 0; i < collisions_.GetLength(0); ++i)
+			{
+				foreach (var b in BodyPartType.Values)
+				{
+					if (collisions_[i, b.Int] > 0)
+					{
+						triggerCache_.Add(TriggerInfo.FromPerson(
+							i, b, collisions_[i, b.Int]));
+					}
+				}
+			}
+
+			if (toyCollision_ > 0)
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.ToyType, toyAtom_));
+
+			if (externalCollision_ > 0)
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.NoneType, externalAtom_));
+
+			triggers_ = triggerCache_.ToArray();
+			ClearCollisions();
+
+			return triggers_;
+		}
+
+		protected virtual void UpdateTriggers()
+		{
+			// no-op
+		}
+
+		public void AddPersonCollision(int sourcePersonIndex, BodyPartType sourceBodyPart, float f)
+		{
+			collisions_[sourcePersonIndex, sourceBodyPart.Int] = Math.Max(
+				collisions_[sourcePersonIndex, sourceBodyPart.Int], f);
+		}
+
+		public void AddExternalCollision(int triggerType, Atom a, float f)
+		{
+			if (triggerType == TriggerInfo.ToyType)
+				toyCollision_ = Math.Max(toyCollision_, f);
+			else
+				externalCollision_ = Math.Max(externalCollision_, f);
+		}
+
+		private void ClearCollisions()
+		{
+			toyAtom_ = null;
+			toyCollision_ = 0;
+			externalAtom_ = null;
+			externalCollision_ = 0;
+
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+			{
+				for (int j = 0; j < BP.Count; ++j)
+					collisions_[i, j] = 0;
+			}
+		}
+
+
+
+		protected VamBodyPart(IAtom a, BodyPartType t, Collider[] colliders)
+			: this(a, t, (string[])null)
+		{
+			if (colliders != null)
+			{
+				var cs = new List<VamColliderRegion>();
+				foreach (var c in colliders)
+					cs.Add(new VamColliderRegion(this, c));
+
+				SetColliders(cs.ToArray());
+			}
+		}
 
 		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders = null)
 		{
@@ -54,8 +187,38 @@ namespace Cue.Sys.Vam
 					cs.Add(new VamColliderRegion(this, c));
 				}
 
-				colliders_ = cs.ToArray();
+				SetColliders(cs.ToArray());
 			}
+		}
+
+		private void SetColliders(VamColliderRegion[] cs)
+		{
+			colliders_ = cs;
+
+			var hs = new List<CueCollisionHandler>();
+			foreach (var c in colliders_)
+			{
+				if (U.FullName(c.Collider.transform).Contains("lIndex3"))
+					Log.Error($"{U.FullName(c.Collider.transform)} rb={c.Collider.attachedRigidbody}");
+
+				var h = c.Collider.gameObject.GetComponent<CueCollisionHandler>();
+				if (h != null)
+				{
+					Log.Error($"collider {U.FullName(c.Collider)} already has handler");
+					continue;
+				}
+
+				h = c.Collider.gameObject.AddComponent<CueCollisionHandler>();
+				if (h == null)
+				{
+					Log.Error($"failed to add handler to collider {U.FullName(c.Collider)}");
+					continue;
+				}
+
+				hs.Add(h);
+			}
+
+			handlers_ = hs.ToArray();
 		}
 
 		public Logger Log
@@ -108,6 +271,35 @@ namespace Cue.Sys.Vam
 							Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
 
 						distanceRenderers_.Clear();
+					}
+				}
+			}
+		}
+
+		public virtual void Init()
+		{
+			collisions_ = new float[Cue.Instance.ActivePersons.Length, BP.Count];
+
+			if (handlers_ != null)
+			{
+				foreach (var h in handlers_)
+					h.Init(this);
+			}
+		}
+
+		public void OnPluginState(bool b)
+		{
+			if (handlers_ != null)
+			{
+				foreach (var h in handlers_)
+				{
+					try
+					{
+						h.enabled = b;
+					}
+					catch (Exception)
+					{
+						Log.Error($"failed to disable handler");
 					}
 				}
 			}
@@ -440,7 +632,31 @@ namespace Cue.Sys.Vam
 			return d;
 		}
 
-		public abstract bool ContainsTransform(Transform t, bool debug);
+		public bool ContainsTransform(Transform t, bool debug)
+		{
+			if (colliders_ != null)
+			{
+				for (int i = 0; i < colliders_.Length; ++i)
+				{
+					if (colliders_[i].Collider.transform == t)
+					{
+						if (debug)
+							Log.Error($"{t.name} is collider #{i}");
+
+						return true;
+					}
+					else
+					{
+						if (debug)
+							Log.Error($"{t.name} not collider {colliders_[i].Collider.transform.name}");
+					}
+				}
+			}
+
+			return DoContainsTransform(t, debug);
+		}
+
+		protected abstract bool DoContainsTransform(Transform t, bool debug);
 
 		protected virtual VamBodyPartRegion[] GetRegions()
 		{
@@ -471,6 +687,11 @@ namespace Cue.Sys.Vam
 		{
 			// no-op
 		}
+
+		public override string ToString()
+		{
+			return $"{Atom.ID}.{BodyPartType.ToString(Type)}";
+		}
 	}
 
 
@@ -488,7 +709,7 @@ namespace Cue.Sys.Vam
 		public override Vector3 Position { get; }
 		public override Quaternion Rotation { get; }
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			if (debug)
 				Log.Error($"{BodyPartType.ToString(Type)}: {t.name} not found");
@@ -496,7 +717,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			return "";
 		}

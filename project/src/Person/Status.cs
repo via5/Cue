@@ -241,20 +241,9 @@
 				{
 					var byPart = by.Body.Get(checkParts[j]);
 
-					if (triggerPart.CanTrigger)
-					{
-						var pr = TriggeredBy(triggerPart, byPart);
-						if (pr.Valid)
-							return pr;
-					}
-					else
-					{
-						if (triggerPart.CloseTo(byPart))
-						{
-							return new PartResult(
-								triggerPart.Type, by.ObjectIndex, byPart.Type);
-						}
-					}
+					var pr = TriggeredBy(triggerPart, byPart);
+					if (pr.Valid)
+						return pr;
 				}
 			}
 

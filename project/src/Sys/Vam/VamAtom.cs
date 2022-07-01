@@ -111,6 +111,7 @@ namespace Cue.Sys.Vam
 		public void Init()
 		{
 			VamFixes.Run(atom_);
+			body_.Init();
 		}
 
 		public void Destroy()

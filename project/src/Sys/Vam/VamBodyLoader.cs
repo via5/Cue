@@ -133,7 +133,6 @@ namespace Cue.Sys.Vam
 			public List<string> names;
 			public string controller;
 			public List<string> colliders;
-			public List<string> linkColliders;
 			public List<string> ignore;
 			public string forceReceiver;
 			public string rigidbody;
@@ -154,7 +153,6 @@ namespace Cue.Sys.Vam
 			ps.names = new List<string>();
 			ps.ignore = new List<string>();
 			ps.colliders = new List<string>();
-			ps.linkColliders = new List<string>();
 
 			ps.bodyPart = BodyPartType.FromString(J.ReqString(o, "part"));
 			if (ps.bodyPart == BP.None)
@@ -179,12 +177,6 @@ namespace Cue.Sys.Vam
 			{
 				foreach (var n in o["colliders"].AsArray.Childs)
 					ps.colliders.Add(n.Value);
-			}
-
-			if (o.HasKey("linkColliders"))
-			{
-				foreach (var n in o["linkColliders"].AsArray.Childs)
-					ps.linkColliders.Add(n.Value);
 			}
 
 			if (o.HasKey("ignore"))
@@ -369,7 +361,7 @@ namespace Cue.Sys.Vam
 
 			return new RigidbodyBodyPart(
 				atom_, ps.bodyPart, rbs.ToArray(), fc,
-				ps.colliders.ToArray(), ps.linkColliders.ToArray(), fr);
+				ps.colliders.ToArray(), fr);
 		}
 
 		private IBodyPart CreateTrigger(PartSettings ps)

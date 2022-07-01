@@ -114,6 +114,15 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 			: base(a)
 		{
+			foreach (var collider in Atom.Atom.GetComponentsInChildren<Collider>())
+			{
+				foreach (var c in collider.GetComponents<Component>())
+				{
+					if (c != null && c.ToString().Contains("CueCollisionHandler"))
+						Object.Destroy(c);
+				}
+			}
+
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
 				Log.Error("no skin gloss parameter");
@@ -215,11 +224,19 @@ namespace Cue.Sys.Vam
 			return rightHand_;
 		}
 
+		public void Init()
+		{
+			foreach (var p in parts_)
+				(p as VamBodyPart).Init();
+		}
 
 		public void OnPluginState(bool b)
 		{
 			if (!b)
 				Reset();
+
+			foreach (var p in parts_)
+				(p as VamBodyPart).OnPluginState(b);
 		}
 
 		public override float Sweat

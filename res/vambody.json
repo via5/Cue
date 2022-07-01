@@ -92,6 +92,7 @@
 			"type": "trigger",
 			"sex": "female",
 			"name": "VaginaTrigger",
+			"colliders": ["pelvis/_JointB", "pelvis/_JointGl", "pelvis/_JointGr"],
 			"ignore": "$genitalsIgnore"
 		},
 

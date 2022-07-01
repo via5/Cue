@@ -77,17 +77,6 @@ namespace Cue
 			get { return type_; }
 		}
 
-		public bool CanTrigger
-		{
-			get
-			{
-				if (forcedTriggers_.Count > 0)
-					return true;
-
-				return part_.CanTrigger;
-			}
-		}
-
 		public bool CanGrab
 		{
 			get { return part_.CanGrab; }

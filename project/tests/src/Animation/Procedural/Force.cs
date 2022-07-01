@@ -11,7 +11,6 @@ namespace Cue.Proc.Tests
 		public BodyPartType Type { get; }
 		public bool Exists { get; }
 		public bool IsPhysical { get; }
-		public bool CanTrigger { get; }
 		public bool CanGrab { get; }
 		public bool Grabbed { get; }
 		public Vector3 ControlPosition { get; set; }

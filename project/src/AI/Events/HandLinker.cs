@@ -148,14 +148,14 @@
 
 				if (close != null)
 				{
-					Log.Info($"found {close}");
+					Log.Verbose($"found {close}");
 
 					var lk = info.Hand.Lock(
 						BodyPartLock.Anim, "HandLocker", BodyPartLock.Weak);
 
 					if (lk != null)
 					{
-						Log.Info($"linking {info.Hand} with {close}");
+						Log.Verbose($"linking {info.Hand} with {close}");
 						info.LinkTo(close, lk);
 					}
 				}

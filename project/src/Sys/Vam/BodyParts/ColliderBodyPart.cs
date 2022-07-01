@@ -5,24 +5,23 @@ namespace Cue.Sys.Vam
 {
 	class ColliderBodyPart : VamBodyPart
 	{
-		private VamColliderRegion[] colliders_;
 		private FreeControllerV3 fc_;
 		private Rigidbody rb2_, closestRb_;
+		private Collider main_ = null;
+		private Collider[] colliders_;
 
 		public ColliderBodyPart(
 			VamAtom a, BodyPartType type, Collider[] cs, FreeControllerV3 fc,
 			Rigidbody rb, Rigidbody closestRb)
-				: base(a, type)
+				: base(a, type, cs)
 		{
-			var list = new List<VamColliderRegion>();
-			foreach (var c in cs)
-				list.Add(new VamColliderRegion(this, c));
-
-			colliders_ = list.ToArray();
-
 			fc_ = fc;
 			rb2_ = rb;
 			closestRb_ = closestRb;
+			colliders_ = cs;
+
+			if (cs != null && cs.Length > 0)
+				main_ = cs[0];
 		}
 
 		public override Rigidbody Rigidbody
@@ -47,7 +46,7 @@ namespace Cue.Sys.Vam
 
 		private Collider MainCollider
 		{
-			get { return colliders_[0].Collider; }
+			get { return main_; }
 		}
 
 		public override Vector3 ControlPosition
@@ -72,30 +71,9 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
-			if (rb2_ == null)
-			{
-				if (debug)
-					Log.Error($"no rb, checking {colliders_.Length} colliders");
-
-				for (int i = 0; i < colliders_.Length; ++i)
-				{
-					if (colliders_[i].Collider.transform == t)
-					{
-						if (debug)
-							Log.Error($"{t.name} is collider #{i}");
-
-						return true;
-					}
-					else
-					{
-						if (debug)
-							Log.Error($"not collider {colliders_[i].Collider.transform.name}");
-					}
-				}
-			}
-			else
+			if (rb2_ != null)
 			{
 				if (rb2_.transform == t)
 				{
@@ -114,12 +92,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		protected override VamBodyPartRegion[] GetRegions()
-		{
-			return colliders_;
-		}
-
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			var ignore = new string[]
 			{

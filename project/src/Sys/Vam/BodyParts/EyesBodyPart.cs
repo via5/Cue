@@ -74,7 +74,7 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		public override bool ContainsTransform(Transform t, bool debug)
+		protected override bool DoContainsTransform(Transform t, bool debug)
 		{
 			if (t == lEye_)
 			{
@@ -93,7 +93,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public override string ToString()
+		public string ToDetailedString()
 		{
 			return $"eyes {Position}";
 		}
