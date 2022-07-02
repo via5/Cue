@@ -6,6 +6,11 @@ namespace Cue.Sys.Vam
 {
 	class StraponBodyPart : TriggerBodyPart
 	{
+		private static readonly string[] IgnoreTransforms = new string[]
+		{
+			"belly", "hips", "leftThigh", "rightThigh", "leftGlute", "rightGlute"
+		};
+
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
 		private VamColliderRegion[] colliders_ = null;
@@ -14,7 +19,7 @@ namespace Cue.Sys.Vam
 		private bool postCreate_ = false;
 
 		public StraponBodyPart(VamAtom a)
-			: base(a, BP.Penis)
+			: base(a, BP.Penis, IgnoreTransforms)
 		{
 			if (Cue.Instance.Sys.GetAtom(DildoID) != null)
 			{
@@ -149,7 +154,7 @@ namespace Cue.Sys.Vam
 			{
 				Log.Info($"removing dildo");
 				dildo_ = null;
-				Init(null, null, null, null);
+				Init(null, null, null);
 				SetEnabled(false);
 			}
 			else
@@ -321,9 +326,7 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			Init(
-				h, d.mainController, d.transform,
-				new string[] { "lThigh", "rThigh", "LGlute", "RGlute", "FemaleAutoCollidersabdomen" });
+			Init(h, d.mainController, d.transform);
 		}
 	}
 }

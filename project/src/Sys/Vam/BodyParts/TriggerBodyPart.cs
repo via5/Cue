@@ -9,24 +9,20 @@ namespace Cue.Sys.Vam
 		private Trigger trigger_ = null;
 		private FreeControllerV3 fc_ = null;
 		private Transform t_ = null;
-		private Transform ignoreStop_ = null;
-		private Transform[] ignoreTransforms_ = new Transform[0];
 		private bool enabled_ = false;
 
-		private List<Atom> foundOtherCache_ = null;
-
-		protected TriggerBodyPart(VamAtom a, BodyPartType type)
-			: base(a, type)
+		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts)
+			: base(a, type, (Collider[])null, ignoreBodyParts)
 		{
 		}
 
 		public TriggerBodyPart(
 			VamAtom a, BodyPartType type, CollisionTriggerEventHandler h,
 			FreeControllerV3 fc, Transform tr,
-			string[] ignoreTransforms, string[] colliders)
-				: base(a, type, colliders)
+			string[] ignoreBodyParts, string[] colliders)
+				: base(a, type, colliders, ignoreBodyParts)
 		{
-			Init(h, fc, tr, ignoreTransforms);
+			Init(h, fc, tr);
 		}
 
 		public override bool Exists
@@ -42,13 +38,12 @@ namespace Cue.Sys.Vam
 
 		protected void Init(
 			CollisionTriggerEventHandler h,
-			FreeControllerV3 fc, Transform tr, string[] ignoreTransforms)
+			FreeControllerV3 fc, Transform tr)
 		{
 			h_ = h;
 			trigger_ = h?.collisionTrigger?.trigger;
 			fc_ = fc;
 			t_ = tr;
-			ignoreTransforms_ = new Transform[0];
 
 			if (h_ == null)
 			{
@@ -57,49 +52,7 @@ namespace Cue.Sys.Vam
 			else
 			{
 				enabled_ = true;
-
-				if (ignoreTransforms != null)
-					FindIgnoreTransforms(ignoreTransforms);
 			}
-		}
-
-		private void FindIgnoreTransforms(string[] ignoreTransforms)
-		{
-			var rb = U.FindRigidbody(VamAtom.Atom, "hip");
-			if (rb == null)
-				Log.Error($"{Atom.ID}: trigger {h_.name}: no hip");
-			else
-				ignoreStop_ = rb.transform;
-
-			var list = new List<Transform>();
-			for (int i = 0; i < ignoreTransforms.Length; ++i)
-			{
-				rb = U.FindRigidbody(VamAtom.Atom, ignoreTransforms[i]);
-
-				if (rb != null)
-				{
-					list.Add(rb.transform);
-				}
-				else
-				{
-					var t = U.FindChildRecursive(
-						VamAtom.Atom, ignoreTransforms[i])?.transform;
-
-					if (t != null)
-					{
-						list.Add(t);
-					}
-					else
-					{
-						Log.Error(
-							$"{Atom.ID}: trigger {h_.name}: " +
-							$"no ignore {ignoreTransforms[i]}");
-					}
-				}
-			}
-
-			if (list.Count > 0)
-				ignoreTransforms_ = list.ToArray();
 		}
 
 		public override Rigidbody Rigidbody

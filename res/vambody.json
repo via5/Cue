@@ -1,7 +1,10 @@
 {
 	"vars":
 	{
-		"genitalsIgnore": ["lThigh", "rThigh", "LGlute", "RGlute", "FemaleAutoCollidersabdomen"]
+		"genitalsIgnore":
+		[
+			"belly", "hips", "leftThigh", "rightThigh", "leftGlute", "rightGlute"
+		]
 	},
 
     "parts":
@@ -66,7 +69,7 @@
             "name": "lNippleTrigger",
             "controller": "lNippleControl",
 			"colliders": ["lPectoral1", "lPectoral2", "lPectoral3"],
-            "ignore": ["StandardColliderslShldr"]
+            "ignore": ["leftShoulder", "leftArm", "leftElbow"]
         },
 
 		{
@@ -76,7 +79,7 @@
 			"name": "rNippleTrigger",
 			"controller": "rNippleControl",
 			"colliders": ["rPectoral1", "rPectoral2", "rPectoral3"],
-			"ignore": ["StandardCollidersrShldr"]
+			"ignore": ["rightShoulder", "rightArm", "rightElbow"]
 		},
 
 		{

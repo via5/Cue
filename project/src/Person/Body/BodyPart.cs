@@ -140,7 +140,7 @@ namespace Cue
 			else
 			{
 				ti = global::Cue.Sys.TriggerInfo.FromExternal(
-					global::Cue.Sys.TriggerInfo.NoneType, null, true);
+					global::Cue.Sys.TriggerInfo.NoneType, null, value, true);
 			}
 
 			Log.Verbose($"adding forced trigger for {this}: {ti}");

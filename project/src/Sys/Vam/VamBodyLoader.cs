@@ -45,7 +45,7 @@ namespace Cue.Sys.Vam
 			}
 			catch (Exception e)
 			{
-				Log.Error(e.Message);
+				Log.Error(e.ToString());
 
 				if (!atom_.AdvancedColliders)
 					Log.Error(">>>>> Cue requires Advanced Colliders <<<<<");
@@ -361,7 +361,7 @@ namespace Cue.Sys.Vam
 
 			return new RigidbodyBodyPart(
 				atom_, ps.bodyPart, rbs.ToArray(), fc,
-				ps.colliders.ToArray(), fr);
+				ps.colliders.ToArray(), fr, ps.ignore.ToArray());
 		}
 
 		private IBodyPart CreateTrigger(PartSettings ps)
@@ -443,7 +443,8 @@ namespace Cue.Sys.Vam
 			}
 
 			return new ColliderBodyPart(
-				atom_, ps.bodyPart, cs.ToArray(), fc, rb, closestRb);
+				atom_, ps.bodyPart, cs.ToArray(), fc, rb, closestRb,
+				ps.ignore.ToArray());
 		}
 	}
 }

@@ -20,28 +20,99 @@ namespace Cue.Sys.Vam
 			if (!isActiveAndEnabled || bp_ == null || CueMain.Instance.Sys.Paused)
 				return;
 
-			var sourcePart = Cue.Instance.VamSys.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
-			if (sourcePart == null)
-				return;
-
-			var sourceIndex = Cue.Instance.FindPerson(sourcePart.Atom)?.PersonIndex ?? -1;
-			if (sourceIndex < 0)
-				return;
-
-
-			var targetPart = bp_;
-			if (targetPart == null)
-				return;
-
-			var targetIndex = person_.PersonIndex;
-
-
 			float mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
 
-			bp_.AddPersonCollision(sourceIndex, sourcePart.Type, mag);
-			sourcePart.AddPersonCollision(targetIndex, targetPart.Type, mag);
+			var sourcePart = Cue.Instance.VamSys.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
+
+			if (sourcePart == null)
+			{
+				if (c.collider != null)
+				{
+					var a = U.AtomForCollider(c.collider);
+					//Cue.LogError($"{a?.uid}");
+
+					if (a != null && a.category == "Toys")
+					{
+						bp_.AddExternalCollision(TriggerInfo.ToyType, a, mag);
+					}
+					else
+					{
+						Cue.LogError($"unknown collider {U.FullName(c.collider)}");
+						bp_.AddExternalCollision(TriggerInfo.NoneType, a, mag);
+					}
+				}
+				else
+				{
+					Cue.LogError($"null collider {U.FullName(c.transform)}");
+				}
+			}
+			else
+			{
+				var sourcePerson = Cue.Instance.FindPerson(sourcePart.Atom);
+
+				if (Ignore(sourcePerson, sourcePart))
+					return;
+
+				var sourceIndex = sourcePerson?.PersonIndex ?? -1;
+				if (sourceIndex < 0)
+					return;
+
+				var targetPart = bp_;
+				if (targetPart == null)
+					return;
+
+				var targetIndex = person_.PersonIndex;
+
+
+				bp_.AddPersonCollision(sourceIndex, sourcePart.Type, mag);
+				sourcePart.AddPersonCollision(targetIndex, targetPart.Type, mag);
+			}
+		}
+
+		private bool Ignore(Person sourcePerson, VamBodyPart sourcePart)
+		{
+			if (DoIgnore(sourcePerson, sourcePart, person_, bp_))
+				return true;
+
+			if (DoIgnore(person_, bp_, sourcePerson, sourcePart))
+				return true;
+
+			return false;
+		}
+
+		private static bool DoIgnore(
+			Person sourcePerson, VamBodyPart sourcePart,
+			Person targetPerson, VamBodyPart targetPart)
+		{
+			// self collision
+			if (sourcePerson != null && sourcePerson.Atom == targetPerson.Atom)
+			{
+				if (sourcePart.Type == BP.Penis)
+				{
+					// probably the dildo touching genitals, ignore
+					return true;
+				}
+				else
+				{
+					if (targetPart.Type == BP.Penis && sourcePart.Type == BP.Hips)
+					{
+						// probably the dildo touching genitals, ignore
+						return true;
+					}
+				}
+
+				if (targetPart.IgnoreBodyPart(sourcePart.Type))
+					return true;
+			}
+
+			return false;
 		}
 	}
+
+
+
+	// handle ignore
+
 
 
 	public abstract class VamBodyPart : IBodyPart
@@ -53,6 +124,7 @@ namespace Cue.Sys.Vam
 		private Logger log_ = null;
 		private CueCollisionHandler[] handlers_ = null;
 		private float[,] collisions_ = null;
+		private BodyPartType[] ignoreBodyParts_ = new BodyPartType[0];
 
 		private Atom toyAtom_ = null;
 		private float toyCollision_ = 0;
@@ -82,6 +154,17 @@ namespace Cue.Sys.Vam
 		private TriggerInfo[] triggers_ = null;
 
 
+		public bool IgnoreBodyPart(BodyPartType t)
+		{
+			for (int i = 0; i < ignoreBodyParts_.Length; ++i)
+			{
+				if (ignoreBodyParts_[i] == t)
+					return true;
+			}
+
+			return false;
+		}
+
 		public TriggerInfo[] GetTriggers()
 		{
 			if (!Exists)
@@ -108,10 +191,10 @@ namespace Cue.Sys.Vam
 			}
 
 			if (toyCollision_ > 0)
-				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.ToyType, toyAtom_));
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.ToyType, toyAtom_, toyCollision_));
 
 			if (externalCollision_ > 0)
-				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.NoneType, externalAtom_));
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.NoneType, externalAtom_, externalCollision_));
 
 			triggers_ = triggerCache_.ToArray();
 			ClearCollisions();
@@ -133,9 +216,15 @@ namespace Cue.Sys.Vam
 		public void AddExternalCollision(int triggerType, Atom a, float f)
 		{
 			if (triggerType == TriggerInfo.ToyType)
+			{
 				toyCollision_ = Math.Max(toyCollision_, f);
+				toyAtom_ = a;
+			}
 			else
+			{
 				externalCollision_ = Math.Max(externalCollision_, f);
+				externalAtom_ = a;
+			}
 		}
 
 		private void ClearCollisions()
@@ -153,9 +242,14 @@ namespace Cue.Sys.Vam
 		}
 
 
+		protected VamBodyPart(IAtom a, BodyPartType t)
+		{
+			atom_ = a;
+			type_ = t;
+		}
 
-		protected VamBodyPart(IAtom a, BodyPartType t, Collider[] colliders)
-			: this(a, t, (string[])null)
+		protected VamBodyPart(IAtom a, BodyPartType t, Collider[] colliders, string[] ignoreBodyParts)
+			: this(a, t)
 		{
 			if (colliders != null)
 			{
@@ -163,15 +257,13 @@ namespace Cue.Sys.Vam
 				foreach (var c in colliders)
 					cs.Add(new VamColliderRegion(this, c));
 
-				SetColliders(cs.ToArray());
+				SetColliders(cs.ToArray(), ignoreBodyParts);
 			}
 		}
 
-		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders = null)
+		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders, string[] ignoreBodyParts)
+			: this(a, t)
 		{
-			atom_ = a;
-			type_ = t;
-
 			if (colliders != null)
 			{
 				var cs = new List<VamColliderRegion>();
@@ -187,20 +279,17 @@ namespace Cue.Sys.Vam
 					cs.Add(new VamColliderRegion(this, c));
 				}
 
-				SetColliders(cs.ToArray());
+				SetColliders(cs.ToArray(), ignoreBodyParts);
 			}
 		}
 
-		private void SetColliders(VamColliderRegion[] cs)
+		private void SetColliders(VamColliderRegion[] cs, string[] ignoreBodyParts)
 		{
 			colliders_ = cs;
 
 			var hs = new List<CueCollisionHandler>();
 			foreach (var c in colliders_)
 			{
-				if (U.FullName(c.Collider.transform).Contains("lIndex3"))
-					Log.Error($"{U.FullName(c.Collider.transform)} rb={c.Collider.attachedRigidbody}");
-
 				var h = c.Collider.gameObject.GetComponent<CueCollisionHandler>();
 				if (h != null)
 				{
@@ -219,6 +308,31 @@ namespace Cue.Sys.Vam
 			}
 
 			handlers_ = hs.ToArray();
+
+
+			if (ignoreBodyParts == null)
+				ignoreBodyParts_ = new BodyPartType[0];
+			else
+				ignoreBodyParts_ = MakeIgnoreBodyParts(ignoreBodyParts);
+		}
+
+		private BodyPartType[] MakeIgnoreBodyParts(string[] ignoreBodyParts)
+		{
+			var list = new List<BodyPartType>();
+
+			foreach (var s in ignoreBodyParts)
+			{
+				var bp = BodyPartType.FromString(s);
+				if (bp == BP.None)
+				{
+					Log.Error($"ignore body parts: bad part '{s}'");
+					continue;
+				}
+
+				list.Add(bp);
+			}
+
+			return list.ToArray();
 		}
 
 		public Logger Log

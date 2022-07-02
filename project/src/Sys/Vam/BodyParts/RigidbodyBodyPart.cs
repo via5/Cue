@@ -11,8 +11,8 @@ namespace Cue.Sys.Vam
 
 		public RigidbodyBodyPart(
 			VamAtom a, BodyPartType type, Rigidbody[] rbs, FreeControllerV3 fc,
-			string[] colliders, Rigidbody forForce)
-				: base(a, type, colliders)
+			string[] colliders, Rigidbody forForce, string[] ignoreBodyParts)
+				: base(a, type, colliders, ignoreBodyParts)
 		{
 			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartType.ToString(Type)}");
 			foreach (var rb in rbs)
