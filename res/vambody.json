@@ -52,8 +52,14 @@
 
        {
             "part": "lips",
-            "type": "trigger",
-            "name": "LipTrigger"
+            "type": "collider",
+            "colliders":
+			[
+				"lowerJaw/ColliderLipM",
+				"lowerJaw/ColliderLipL",
+				"lowerJaw/ColliderLipR",
+				"FaceCentral2/FaceCentral2"
+			]
         },
 
         {
@@ -64,37 +70,24 @@
 
         {
             "part": "leftBreast",
-            "type": "trigger",
+            "type": "collider",
             "sex": "female",
-            "name": "lNippleTrigger",
-            "controller": "lNippleControl",
 			"colliders": ["lPectoral1", "lPectoral2", "lPectoral3"],
             "ignore": ["leftShoulder", "leftArm", "leftElbow"]
         },
 
 		{
 			"part": "rightBreast",
-			"type": "trigger",
+			"type": "collider",
 			"sex": "female",
-			"name": "rNippleTrigger",
-			"controller": "rNippleControl",
 			"colliders": ["rPectoral1", "rPectoral2", "rPectoral3"],
 			"ignore": ["rightShoulder", "rightArm", "rightElbow"]
 		},
 
 		{
-			"part": "labia",
-			"type": "trigger",
-			"sex": "female",
-			"name": "LabiaTrigger",
-			"ignore": "$genitalsIgnore"
-		},
-
-		{
 			"part": "vagina",
-			"type": "trigger",
+			"type": "collider",
 			"sex": "female",
-			"name": "VaginaTrigger",
 			"colliders": ["pelvis/_JointB", "pelvis/_JointGl", "pelvis/_JointGr"],
 			"ignore": "$genitalsIgnore"
 		},
@@ -104,14 +97,6 @@
 			"type": "trigger",
 			"sex": "female",
 			"name": "DeepVaginaTrigger",
-			"ignore": "$genitalsIgnore"
-		},
-
-		{
-			"part": "deeperVagina",
-			"type": "trigger",
-			"sex": "female",
-			"name": "DeeperVaginaTrigger",
 			"ignore": "$genitalsIgnore"
 		},
 

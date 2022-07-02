@@ -48,7 +48,7 @@
 
 		private static BodyPartType[] genitals_ = new BodyPartType[]
 		{
-			BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina
+			BP.Vagina, BP.DeepVagina
 		};
 
 		public static BodyPartType[] GenitalParts
@@ -61,7 +61,7 @@
 		{
 			BP.LeftHand, BP.RightHand,
 			BP.Head, BP.Chest, BP.Hips,
-			BP.Labia, BP.Penis,
+			BP.Vagina, BP.Penis,
 			BP.LeftFoot, BP.RightFoot
 		};
 
@@ -73,7 +73,7 @@
 
 		private static BodyPartType[] groped_ = new BodyPartType[]
 		{
-			BP.Head, BP.LeftBreast, BP.RightBreast, BP.Labia, BP.Penis
+			BP.Head, BP.LeftBreast, BP.RightBreast, BP.Vagina, BP.Penis
 		};
 
 		public static BodyPartType[] GropedParts
@@ -95,7 +95,7 @@
 
 		private static BodyPartType[] penetrated_ = new BodyPartType[]
 		{
-			BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina, BP.Anus
+			BP.Vagina, BP.DeepVagina, BP.Anus
 		};
 
 		public static BodyPartType[] PenetratedParts

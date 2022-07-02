@@ -139,7 +139,7 @@ namespace Cue
 
 		public BodyPartType GenitalsBodyPart
 		{
-			get { return (HasPenis ? BP.Penis : BP.Labia); }
+			get { return (HasPenis ? BP.Penis : BP.Vagina); }
 		}
 
 		public bool Strapon

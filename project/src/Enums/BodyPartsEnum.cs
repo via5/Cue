@@ -13,39 +13,37 @@ namespace Cue
 		public static readonly BodyPartType Mouth = BodyPartType.CreateInternal(3);
 		public static readonly BodyPartType LeftBreast = BodyPartType.CreateInternal(4);
 		public static readonly BodyPartType RightBreast = BodyPartType.CreateInternal(5);
-		public static readonly BodyPartType Labia = BodyPartType.CreateInternal(6);
-		public static readonly BodyPartType Vagina = BodyPartType.CreateInternal(7);
-		public static readonly BodyPartType DeepVagina = BodyPartType.CreateInternal(8);
-		public static readonly BodyPartType DeeperVagina = BodyPartType.CreateInternal(9);
-		public static readonly BodyPartType Penis = BodyPartType.CreateInternal(10);
-		public static readonly BodyPartType Anus = BodyPartType.CreateInternal(11);
-		public static readonly BodyPartType Chest = BodyPartType.CreateInternal(12);
-		public static readonly BodyPartType Belly = BodyPartType.CreateInternal(13);
-		public static readonly BodyPartType Hips = BodyPartType.CreateInternal(14);
-		public static readonly BodyPartType LeftGlute = BodyPartType.CreateInternal(15);
-		public static readonly BodyPartType RightGlute = BodyPartType.CreateInternal(16);
-		public static readonly BodyPartType LeftShoulder = BodyPartType.CreateInternal(17);
-		public static readonly BodyPartType LeftArm = BodyPartType.CreateInternal(18);
-		public static readonly BodyPartType LeftElbow = BodyPartType.CreateInternal(19);
-		public static readonly BodyPartType LeftForearm = BodyPartType.CreateInternal(20);
-		public static readonly BodyPartType LeftHand = BodyPartType.CreateInternal(21);
-		public static readonly BodyPartType RightShoulder = BodyPartType.CreateInternal(22);
-		public static readonly BodyPartType RightArm = BodyPartType.CreateInternal(23);
-		public static readonly BodyPartType RightElbow = BodyPartType.CreateInternal(24);
-		public static readonly BodyPartType RightForearm = BodyPartType.CreateInternal(25);
-		public static readonly BodyPartType RightHand = BodyPartType.CreateInternal(26);
-		public static readonly BodyPartType LeftThigh = BodyPartType.CreateInternal(27);
-		public static readonly BodyPartType LeftKnee = BodyPartType.CreateInternal(28);
-		public static readonly BodyPartType LeftShin = BodyPartType.CreateInternal(29);
-		public static readonly BodyPartType LeftFoot = BodyPartType.CreateInternal(30);
-		public static readonly BodyPartType RightThigh = BodyPartType.CreateInternal(31);
-		public static readonly BodyPartType RightKnee = BodyPartType.CreateInternal(32);
-		public static readonly BodyPartType RightShin = BodyPartType.CreateInternal(33);
-		public static readonly BodyPartType RightFoot = BodyPartType.CreateInternal(34);
-		public static readonly BodyPartType Eyes = BodyPartType.CreateInternal(35);
+		public static readonly BodyPartType Vagina = BodyPartType.CreateInternal(6);
+		public static readonly BodyPartType DeepVagina = BodyPartType.CreateInternal(7);
+		public static readonly BodyPartType Penis = BodyPartType.CreateInternal(8);
+		public static readonly BodyPartType Anus = BodyPartType.CreateInternal(9);
+		public static readonly BodyPartType Chest = BodyPartType.CreateInternal(10);
+		public static readonly BodyPartType Belly = BodyPartType.CreateInternal(11);
+		public static readonly BodyPartType Hips = BodyPartType.CreateInternal(12);
+		public static readonly BodyPartType LeftGlute = BodyPartType.CreateInternal(13);
+		public static readonly BodyPartType RightGlute = BodyPartType.CreateInternal(14);
+		public static readonly BodyPartType LeftShoulder = BodyPartType.CreateInternal(15);
+		public static readonly BodyPartType LeftArm = BodyPartType.CreateInternal(16);
+		public static readonly BodyPartType LeftElbow = BodyPartType.CreateInternal(17);
+		public static readonly BodyPartType LeftForearm = BodyPartType.CreateInternal(18);
+		public static readonly BodyPartType LeftHand = BodyPartType.CreateInternal(19);
+		public static readonly BodyPartType RightShoulder = BodyPartType.CreateInternal(20);
+		public static readonly BodyPartType RightArm = BodyPartType.CreateInternal(21);
+		public static readonly BodyPartType RightElbow = BodyPartType.CreateInternal(22);
+		public static readonly BodyPartType RightForearm = BodyPartType.CreateInternal(23);
+		public static readonly BodyPartType RightHand = BodyPartType.CreateInternal(24);
+		public static readonly BodyPartType LeftThigh = BodyPartType.CreateInternal(25);
+		public static readonly BodyPartType LeftKnee = BodyPartType.CreateInternal(26);
+		public static readonly BodyPartType LeftShin = BodyPartType.CreateInternal(27);
+		public static readonly BodyPartType LeftFoot = BodyPartType.CreateInternal(28);
+		public static readonly BodyPartType RightThigh = BodyPartType.CreateInternal(29);
+		public static readonly BodyPartType RightKnee = BodyPartType.CreateInternal(30);
+		public static readonly BodyPartType RightShin = BodyPartType.CreateInternal(31);
+		public static readonly BodyPartType RightFoot = BodyPartType.CreateInternal(32);
+		public static readonly BodyPartType Eyes = BodyPartType.CreateInternal(33);
 
-		public const int Count = 36;
-		public int GetCount() { return 36; }
+		public const int Count = 34;
+		public int GetCount() { return 34; }
 	}
 
 
@@ -88,8 +86,6 @@ namespace Cue
 			BodyPartType.CreateInternal(31),
 			BodyPartType.CreateInternal(32),
 			BodyPartType.CreateInternal(33),
-			BodyPartType.CreateInternal(34),
-			BodyPartType.CreateInternal(35),
 		};
 
 		public static BodyPartType[] Values
@@ -105,10 +101,8 @@ namespace Cue
 			"mouth",
 			"leftBreast",
 			"rightBreast",
-			"labia",
 			"vagina",
 			"deepVagina",
-			"deeperVagina",
 			"penis",
 			"anus",
 			"chest",

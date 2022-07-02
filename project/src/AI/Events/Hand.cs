@@ -202,7 +202,7 @@
 
 						if (leftTarget.Type == BP.Penis)
 							StartHJ(left_, leftTarget);
-						else if (leftTarget.Type == BP.Labia)
+						else if (leftTarget.Type == BP.Vagina)
 							StartFinger(left_, leftTarget);
 					}
 				}
@@ -226,7 +226,7 @@
 
 						if (rightTarget.Type == BP.Penis)
 							StartHJ(right_, rightTarget);
-						else if (rightTarget.Type == BP.Labia)
+						else if (rightTarget.Type == BP.Vagina)
 							StartFinger(right_, rightTarget);
 					}
 				}

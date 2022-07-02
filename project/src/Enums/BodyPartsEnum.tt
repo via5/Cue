@@ -12,10 +12,8 @@ V.Value("Mouth"),
 V.Value("LeftBreast"),
 V.Value("RightBreast"),
 
-V.Value("Labia"),
 V.Value("Vagina"),
 V.Value("DeepVagina"),
-V.Value("DeeperVagina"),
 V.Value("Penis"),
 V.Value("Anus"),
 

@@ -217,6 +217,25 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
+		private static string[] NameFormat = new string[]
+		{
+			"AutoColliderFemaleAutoColliders{0}",
+			"AutoColliderMaleAutoColliders{0}",
+			"AutoCollider{0}",
+			"AutoColliders{0}",
+			"AutoColliders{0}Hard",
+			"AutoColliders{0}HardJoint",
+			"AutoColliderAutoColliders{0}",
+			"AutoColliderAutoColliders{0}Hard",
+			"FemaleAutoColliders{0}",
+			"MaleAutoColliders{0}",
+			"StandardColliders{0}",
+			"{0}StandardColliders",
+			"{0}Joint",
+			"{0}HardJoint",
+			"_{0}"
+		};
+
 		private static bool EquivalentName(string cn, string pathstring)
 		{
 			return
@@ -229,29 +248,11 @@ namespace Cue.Sys.Vam
 			if (cn == pathstring)
 				return true;
 
-			if (cn == "AutoColliderFemaleAutoColliders" + pathstring)
-				return true;
-
-			if (cn == "AutoColliderMaleAutoColliders" + pathstring)
-				return true;
-
-			if (cn == "AutoCollider" + pathstring)
-				return true;
-
-			if (cn == "AutoColliderAutoColliders" + pathstring)
-				return true;
-
-			if (cn == "FemaleAutoColliders" + pathstring)
-				return true;
-
-			if (cn == "MaleAutoColliders" + pathstring)
-				return true;
-
-			if (cn == "StandardColliders" + pathstring)
-				return true;
-
-			if (cn == "_" + pathstring)
-				return true;
+			for (int i = 0; i < NameFormat.Length; ++i)
+			{
+				if (cn == string.Format(NameFormat[i], pathstring))
+					return true;
+			}
 
 			return false;
 		}

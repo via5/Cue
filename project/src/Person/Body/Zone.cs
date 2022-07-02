@@ -25,13 +25,10 @@ namespace Cue
 			zones_[SS.Penetration.Int] = new ErogenousZone(
 				person_, SS.Penetration, new ErogenousZone.Part[]
 				{
-					new ErogenousZone.Part(BP.Labia, BP.Penis),
-					new ErogenousZone.Part(BP.Vagina),
+					new ErogenousZone.Part(BP.Vagina, BP.Penis),
 					new ErogenousZone.Part(BP.DeepVagina),
-					new ErogenousZone.Part(BP.DeeperVagina),
-					new ErogenousZone.Part(BP.Penis, BP.Labia),
+					new ErogenousZone.Part(BP.Penis, BP.Vagina),
 					new ErogenousZone.Part(BP.Penis, BP.DeepVagina),
-					new ErogenousZone.Part(BP.Penis, BP.DeeperVagina),
 				});
 
 			zones_[SS.Mouth.Int] = new ErogenousZone(
@@ -51,7 +48,7 @@ namespace Cue
 			zones_[SS.Genitals.Int] = new ErogenousZone(
 				person_, SS.Genitals, new ErogenousZone.Part[]
 				{
-					new ErogenousZone.Part(BP.Labia),
+					new ErogenousZone.Part(BP.Vagina),
 					new ErogenousZone.Part(BP.Penis)
 				});
 		}
@@ -79,7 +76,7 @@ namespace Cue
 
 			BodyPartType[] ignore = new BodyPartType[]
 			{
-				BP.Penis, BP.Labia, BP.Vagina, BP.DeepVagina, BP.DeeperVagina
+				BP.Penis, BP.Vagina, BP.DeepVagina
 			};
 
 			for (int j = 0; j < Get(SS.Penetration).Sources.Length; ++j)
