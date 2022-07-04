@@ -204,10 +204,11 @@ namespace Cue
 
 				bool found = false;
 
-				for (int j = 0; j < triggers_.Length; ++j)
+				for (int j = 0; j < tempList_.Count; ++j)
 				{
-					if (triggers_[j].SameAs(forcedTriggers_[i]))
+					if (tempList_[j].SameAs(forcedTriggers_[i]))
 					{
+						tempList_[j] = tempList_[j].MergeFrom(forcedTriggers_[i]);
 						found = true;
 						break;
 					}

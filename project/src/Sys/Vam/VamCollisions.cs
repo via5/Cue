@@ -97,17 +97,26 @@ namespace Cue.Sys.Vam
 
 		private void DoExternalCollision(Collision c, float mag)
 		{
+			var a = U.AtomForCollider(c.collider);
+
+			if (VamBodyPart.IgnoreTrigger(a, null, bp_.Atom as VamAtom, bp_))
+				return;
+
 			//Cue.LogError(
 			//	$"{bp_} " +
 			//	$"{U.QualifiedName(c.collider)}");
 
-			bp_.AddExternalCollision(U.AtomForCollider(c.collider), mag);
+			bp_.AddExternalCollision(a, mag);
 		}
 
 		private void DoPersonCollision(VamBodyPart sourcePart, float mag)
 		{
-			if (VamBodyPart.IgnoreTrigger(sourcePart.Atom, sourcePart, bp_.Atom, bp_))
+			if (VamBodyPart.IgnoreTrigger(
+					sourcePart.Atom as VamAtom, sourcePart,
+					bp_.Atom as VamAtom, bp_))
+			{
 				return;
+			}
 
 			//Cue.LogError($"{bp_} {sourcePart} {U.QualifiedName(c.collider)}");
 

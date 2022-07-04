@@ -39,11 +39,11 @@ namespace Cue.Proc
 			{
 				if (other.Animator.MainSync == null)
 				{
-					other.Log.Info($"no main sync");
+					other.Log.Verbose($"no main sync");
 				}
 				else
 				{
-					Log.Info($"{this}: syncing with {other.Animator.MainSync}");
+					Log.Verbose($"{this}: syncing with {other.Animator.MainSync}");
 					oldSync_ = root_.Sync;
 					root_.Sync = new SyncOther(other.Animator.MainSync);
 				}
@@ -55,7 +55,7 @@ namespace Cue.Proc
 			}
 			else
 			{
-				Log.Info($"{this} is main sync");
+				Log.Verbose($"{this} is main sync");
 				Person.Animator.SetMainSync(root_.Sync);
 				mainSync_ = true;
 			}
@@ -69,34 +69,34 @@ namespace Cue.Proc
 				return;
 			}
 
-			Log.Info($"main sync {s} stopping");
+			Log.Verbose($"main sync {s} stopping");
 
 			if (root_.Sync == s)
 			{
 				// this is the reason for the call, ignore it
-				Log.Info($"ignoring");
+				Log.Verbose($"ignoring");
 				return;
 			}
 			else if (oldSync_ == null)
 			{
-				Log.Info($"but oldSync is null");
+				Log.Verbose($"but oldSync is null");
 			}
 			else
 			{
 				var so = root_.Sync as SyncOther;
 				if (so == null)
 				{
-					Log.Info("but root sync is not a SyncOther");
+					Log.Verbose("but root sync is not a SyncOther");
 				}
 				else
 				{
 					if (so.Other != s)
 					{
-						Log.Info("but root sync isn't synced to this");
+						Log.Verbose("but root sync isn't synced to this");
 					}
 					else
 					{
-						Log.Info($"setting old sync {oldSync_}");
+						Log.Verbose($"setting old sync {oldSync_}");
 						root_.Sync = oldSync_;
 						oldSync_ = null;
 					}

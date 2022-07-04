@@ -133,18 +133,16 @@ namespace Cue
 			person_ = ps;
 
 			var gl = new VUI.GridLayout(5);
-			gl.UniformHeight = false; // exclude header
+			gl.UniformHeight = true; // exclude header
 			gl.UniformWidth = true;
 
 			var p = new VUI.Panel(gl);
 
-			p.Add(new VUI.Label("Name", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Trigger", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Grabbed", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Lock", UnityEngine.FontStyle.Bold));
-			p.Add(new VUI.Label("Link", UnityEngine.FontStyle.Bold));
-
-			int fontSize = 18;
+			p.Add(CreateLabel("Name", UnityEngine.FontStyle.Bold));
+			p.Add(CreateLabel("Trigger", UnityEngine.FontStyle.Bold));
+			p.Add(CreateLabel("Grabbed", UnityEngine.FontStyle.Bold));
+			p.Add(CreateLabel("Lock", UnityEngine.FontStyle.Bold));
+			p.Add(CreateLabel("Link", UnityEngine.FontStyle.Bold));
 
 			for (int i = 0; i < person_.Body.Parts.Length; ++i)
 			{
@@ -153,26 +151,21 @@ namespace Cue
 				var w = new PartWidgets();
 				w.part = bp;
 
-				w.name = new VUI.CheckBox(bp.Name);
-				w.name.FontSize = fontSize;
+				w.name = CreateCheckBox(bp.Name);
 				w.name.Changed += (b) => OnChecked(b, bp);
 				p.Add(w.name);
 
-				w.triggering = new VUI.Label();
-				w.triggering.FontSize = fontSize;
+				w.triggering = CreateLabel();
 				p.Add(w.triggering);
 
-				w.grabbed = new VUI.Label();
-				w.grabbed.FontSize = fontSize;
+				w.grabbed = CreateLabel();
 				p.Add(w.grabbed);
 
-				w.lk = new VUI.Label();
-				w.lk.FontSize = fontSize;
+				w.lk = CreateLabel();
 				w.lk.TextColor = Sys.Vam.U.ToUnity(Color.Green);
 				p.Add(w.lk);
 
-				w.link = new VUI.Label();
-				w.link.FontSize = fontSize;
+				w.link = CreateLabel();
 				w.link.WrapMode = VUI.Label.Clip;
 				p.Add(w.link);
 
@@ -181,6 +174,27 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
+		}
+
+		private VUI.Label CreateLabel(string s="")
+		{
+			var lb = new VUI.Label(s);
+			lb.FontSize = 18;
+			return lb;
+		}
+
+		private VUI.Label CreateLabel(string s, UnityEngine.FontStyle fs)
+		{
+			var lb = new VUI.Label(s, fs);
+			lb.FontSize = 18;
+			return lb;
+		}
+
+		private VUI.CheckBox CreateCheckBox(string s)
+		{
+			var lb = new VUI.CheckBox(s);
+			lb.FontSize = 18;
+			return lb;
 		}
 
 		private void OnChecked(bool b, BodyPart bp)

@@ -25,10 +25,9 @@ namespace Cue
 			zones_[SS.Penetration.Int] = new ErogenousZone(
 				person_, SS.Penetration, new ErogenousZone.Part[]
 				{
+					new ErogenousZone.Part(BP.Vagina, ErogenousZone.Part.SourceToy),
 					new ErogenousZone.Part(BP.Vagina, BP.Penis),
-					new ErogenousZone.Part(BP.DeepVagina),
 					new ErogenousZone.Part(BP.Penis, BP.Vagina),
-					new ErogenousZone.Part(BP.Penis, BP.DeepVagina),
 				});
 
 			zones_[SS.Mouth.Int] = new ErogenousZone(
@@ -74,10 +73,7 @@ namespace Cue
 					zones_[i].Update();
 			}
 
-			BodyPartType[] ignore = new BodyPartType[]
-			{
-				BP.Penis, BP.Vagina, BP.DeepVagina
-			};
+			BodyPartType[] ignore = BodyParts.GenitalParts;
 
 			for (int j = 0; j < Get(SS.Penetration).Sources.Length; ++j)
 			{
@@ -113,6 +109,7 @@ namespace Cue
 			public BodyPartType bodyPart;
 			public bool active = false;
 			public float elapsed = 0;
+			public float magnitude = 0;
 			public bool ignored = false;
 			public BodyPartType targetBodyPart = BP.None;
 
@@ -137,6 +134,7 @@ namespace Cue
 		private float rate_ = 0;
 		private float mod_ = 0;
 		private float max_ = 0;
+		private float mag_ = 0;
 
 		public ErogenousZoneSource(Person p, int type, int sourcePersonIndex)
 		{
@@ -185,6 +183,11 @@ namespace Cue
 		public float Rate
 		{
 			get { return rate_; }
+		}
+
+		public float Magnitude
+		{
+			get { return mag_; }
 		}
 
 		public float Modifier
@@ -267,19 +270,17 @@ namespace Cue
 			physicalActive_ = 0;
 
 			for (int i = 0; i < parts_.Length; ++i)
-			{
 				DoDecay(s, parts_[i]);
-				parts_[i].ignored = false;
-			}
 		}
 
 		public void Check(Person p, ZoneType zoneType)
 		{
 			rate_ = 0;
-			mod_ = 0;
+			mod_ = 1;
 			max_ = 0;
+			mag_ = 0;
 
-			if (Active)
+			if (totalActive_ > 0)
 			{
 				var ss = p.Personality.Sensitivities.Get(zoneType);
 
@@ -294,14 +295,24 @@ namespace Cue
 					max_ = ss.NonPhysicalMaximum;
 				}
 
-				foreach (BodyPartType i in BodyPartType.Values)
+				foreach (var i in BodyPartType.Values)
 				{
-					if (parts_[i.Int].active && !parts_[i.Int].ignored)
+					var part = parts_[i.Int];
+
+					if (part.active)
 					{
 						mod_ = Math.Max(
 							mod_, ss.GetModifier(p, sourcePersonIndex_, i));
+
+						mag_ = Math.Max(mag_, part.magnitude);
 					}
 				}
+
+				if (GetToyPart().active)
+					mag_ = Math.Max(mag_, GetToyPart().magnitude);
+
+				if (GetExternalPart().active)
+					mag_ = Math.Max(mag_, GetExternalPart().magnitude);
 			}
 		}
 
@@ -313,28 +324,31 @@ namespace Cue
 
 			if (part.active)
 				Activated(part);
+			else
+				part.magnitude = 0;
 		}
 
-		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart)
+		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart, float mag)
 		{
-			SetInternal(GetPart(sourceBodyPart), targetBodyPart);
+			SetInternal(GetPart(sourceBodyPart), targetBodyPart, mag);
 		}
 
-		public void SetFromToy(BodyPartType targetBodyPart)
+		public void SetFromToy(BodyPartType targetBodyPart, float mag)
 		{
-			SetInternal(GetToyPart(), targetBodyPart);
+			SetInternal(GetToyPart(), targetBodyPart, mag);
 		}
 
-		public void SetFromExternal(BodyPartType targetBodyPart)
+		public void SetFromExternal(BodyPartType targetBodyPart, float mag)
 		{
-			SetInternal(GetExternalPart(), targetBodyPart);
+			SetInternal(GetExternalPart(), targetBodyPart, mag);
 		}
 
-		private void SetInternal(Part p, BodyPartType targetBodyPart)
+		private void SetInternal(Part p, BodyPartType targetBodyPart, float mag)
 		{
-			p.elapsed = 1.0f;
-			p.ignored = false;
 			p.targetBodyPart = targetBodyPart;
+			p.magnitude = Math.Max(p.magnitude, mag);
+			p.elapsed = 1.0f;
+			p.ignored = (p.magnitude < 0.1f);
 
 			if (!p.active)
 			{
@@ -358,7 +372,9 @@ namespace Cue
 		private void Activated(Part p)
 		{
 			++totalActive_;
-			++validActive_;
+
+			if (!p.ignored)
+				++validActive_;
 
 			if (p.targetBodyPart != BP.None)
 			{
@@ -416,18 +432,25 @@ namespace Cue
 	{
 		public struct Part
 		{
+			public const int SourcePerson = 0x01;
+			public const int SourceToy = 0x02;
+			public const int SourceExternal = 0x04;
+			public const int SourceAny = SourcePerson | SourceToy | SourceExternal;
+
 			public BodyPartType target;
 			public BodyPartType source;
+			public int sourceType;
 
-			public Part(BodyPartType target)
-				: this(target, BP.None)
+			public Part(BodyPartType target, int sourceType = SourceAny)
+				: this(target, BP.None, sourceType)
 			{
 			}
 
-			public Part(BodyPartType target, BodyPartType source)
+			public Part(BodyPartType target, BodyPartType source, int sourceType = SourceAny)
 			{
 				this.source = source;
 				this.target = target;
+				this.sourceType = sourceType;
 			}
 		}
 
@@ -513,7 +536,7 @@ namespace Cue
 				var ts = person_.Body.Get(bp.target).GetTriggers();
 
 				if (ts != null)
-					CheckTriggers(ts, bp.target, bp.source);
+					CheckTriggers(ts, bp);
 			}
 
 			activeSources_ = 0;
@@ -547,33 +570,38 @@ namespace Cue
 			}
 		}
 
-		private void CheckTriggers(
-			Sys.TriggerInfo[] ts, BodyPartType targetBodyPart, BodyPartType sourceCheck)
+		private void CheckTriggers(Sys.TriggerInfo[] ts, Part part)
 		{
 			for (int i = 0; i < ts.Length; ++i)
 			{
 				var t = ts[i];
 
-				if (sourceCheck == BP.None || sourceCheck == t.BodyPart)
+				if (part.source == BP.None || part.source == t.BodyPart)
 				{
 					switch (t.Type)
 					{
 						case Sys.TriggerInfo.PersonType:
 						{
-							sources_[t.PersonIndex].SetFromPerson(t.BodyPart, targetBodyPart);
+							if (Bits.IsSet(part.sourceType, Part.SourcePerson))
+								sources_[t.PersonIndex].SetFromPerson(t.BodyPart, part.target, t.Magnitude);
+
 							break;
 						}
 
 						case Sys.TriggerInfo.ToyType:
 						{
-							sources_[ToySourceIndex].SetFromToy(targetBodyPart);
+							if (Bits.IsSet(part.sourceType, Part.SourceToy))
+								sources_[ToySourceIndex].SetFromToy(part.target, t.Magnitude);
+
 							break;
 						}
 
 						case Sys.TriggerInfo.NoneType:
 						default:
 						{
-							sources_[ExternalSourceIndex].SetFromExternal(targetBodyPart);
+							if (Bits.IsSet(part.sourceType, Part.SourceExternal))
+								sources_[ExternalSourceIndex].SetFromExternal(part.target, t.Magnitude);
+
 							break;
 						}
 					}

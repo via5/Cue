@@ -95,14 +95,6 @@
 		},
 
 		{
-			"part": "deepVagina",
-			"type": "trigger",
-			"sex": "female",
-			"name": "DeepVaginaTrigger",
-			"ignore": "$genitalsIgnore"
-		},
-
-		{
 			"part": "anus",
 			"type": "none"
 		},

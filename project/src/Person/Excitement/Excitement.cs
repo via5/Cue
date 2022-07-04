@@ -22,12 +22,12 @@ namespace Cue
 
 		public bool EnabledForOthers
 		{
-			get { return (enabledForOthers_ > 0); }
+			get { return true || (enabledForOthers_ > 0); }
 		}
 
 		public bool EnabledForPlayer
 		{
-			get { return (enabledForPlayer_ > 0); }
+			get { return true || (enabledForPlayer_ > 0); }
 		}
 
 		public bool EnabledForToys
@@ -252,7 +252,7 @@ namespace Cue
 					line += "(";
 
 				line += $"{s}";
-				line += $" rate={s.Rate} mod={s.Modifier} max={s.Maximum}";
+				line += $" rate={s.Rate} mag={s.Magnitude:0.00} mod={s.Modifier} max={s.Maximum}";
 
 				string parts = "";
 

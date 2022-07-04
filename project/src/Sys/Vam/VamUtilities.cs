@@ -258,20 +258,23 @@ namespace Cue.Sys.Vam
 		}
 
 		private static Transform sceneAtoms_ = null;
-		private static Dictionary<Collider, Atom> atomCache_ = new Dictionary<Collider, Atom>();
+		private static Dictionary<Collider, VamAtom> atomCache_ = new Dictionary<Collider, VamAtom>();
 
-		public static Atom AtomForCollider(Collider c)
+		public static VamAtom AtomForCollider(Collider c)
 		{
+			VamAtom va;
+			if (atomCache_.TryGetValue(c, out va))
+				return va;
+
 			Atom a;
-			if (atomCache_.TryGetValue(c, out a))
-				return a;
 
 			{
 				a = AtomForColliderFast(c);
 				if (a != null)
 				{
-					atomCache_.Add(c, a);
-					return a;
+					va = new VamAtom(a);
+					atomCache_.Add(c, va);
+					return va;
 				}
 			}
 
@@ -282,8 +285,9 @@ namespace Cue.Sys.Vam
 				a = p.GetComponent<Atom>();
 				if (a != null)
 				{
-					atomCache_.Add(c, a);
-					return a;
+					va = new VamAtom(a);
+					atomCache_.Add(c, va);
+					return va;
 				}
 
 				p = p.parent;

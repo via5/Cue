@@ -158,8 +158,11 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					if (VamBodyPart.IgnoreTrigger(bp.Atom, bp, Atom, this))
+					if (VamBodyPart.IgnoreTrigger(
+							bp.Atom as VamAtom, bp, Atom as VamAtom, this))
+					{
 						continue;
+					}
 
 					var p = Cue.Instance.PersonForAtom(bp.Atom);
 					if (p == null)

@@ -15,10 +15,10 @@ namespace Cue.Sys.Vam
 		private float[,] collisions_ = null;
 		private BodyPartType[] ignoreBodyParts_ = new BodyPartType[0];
 
-		private Atom toyAtom_ = null;
+		private VamAtom toyAtom_ = null;
 		private float toyCollision_ = 0;
 
-		private Atom externalAtom_ = null;
+		private VamAtom externalAtom_ = null;
 		private float externalCollision_ = 0;
 
 		public BodyPartType Type { get { return type_; } }
@@ -330,15 +330,32 @@ namespace Cue.Sys.Vam
 
 
 		public static bool IgnoreTrigger(
-			IAtom sourceAtom, VamBodyPart sourcePart,
-			IAtom targetAtom, VamBodyPart targetPart)
+			VamAtom sourceAtom, VamBodyPart sourcePart,
+			VamAtom targetAtom, VamBodyPart targetPart)
 		{
-			if (sourcePart == targetPart)
+			if (sourceAtom == null || targetAtom == null)
 				return true;
 
-			return
-				targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
-				sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
+			if (sourceAtom.IsPerson && targetAtom.IsPerson)
+			{
+				if (sourceAtom == targetAtom && sourcePart == targetPart)
+				{
+					// self collision
+					return true;
+				}
+
+				return
+					targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
+					sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
+			}
+			else
+			{
+				return
+					sourceAtom.Atom.category == "Environments" ||
+					sourceAtom.Atom.category == "Floors And Walls" ||
+					sourceAtom.Atom.category == "Furniture" ||
+					sourceAtom.Atom.category == "Props";
+			}
 		}
 
 		private bool DoIgnoreTrigger(IAtom sourceAtom, VamBodyPart sourcePart)
@@ -418,9 +435,9 @@ namespace Cue.Sys.Vam
 				collisions_[sourcePersonIndex, sourceBodyPart.Int], f);
 		}
 
-		public void AddExternalCollision(Atom a, float f)
+		public void AddExternalCollision(VamAtom a, float f)
 		{
-			if (a != null && a.category == "Toys")
+			if (a != null && a.Atom.category == "Toys")
 			{
 				toyCollision_ = Math.Max(toyCollision_, f);
 				toyAtom_ = a;

@@ -48,7 +48,7 @@
 
 		private static BodyPartType[] genitals_ = new BodyPartType[]
 		{
-			BP.Vagina, BP.DeepVagina
+			BP.Vagina, BP.Penis
 		};
 
 		public static BodyPartType[] GenitalParts
@@ -95,7 +95,7 @@
 
 		private static BodyPartType[] penetrated_ = new BodyPartType[]
 		{
-			BP.Vagina, BP.DeepVagina, BP.Anus
+			BP.Vagina, BP.Anus
 		};
 
 		public static BodyPartType[] PenetratedParts

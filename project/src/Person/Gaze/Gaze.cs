@@ -142,7 +142,7 @@ namespace Cue
 					if (lastEmergency_ != emergency)
 					{
 						// new emergency
-						Log.Info(
+						Log.Verbose(
 							$"gaze emergency: {events_[emergency]}, " +
 							$"gazer was {gazerEnabledBeforeEmergency_}");
 
@@ -158,7 +158,7 @@ namespace Cue
 					if (lastEmergency_ != -1)
 					{
 						// an emergency has just terminated
-						Log.Info(
+						Log.Verbose(
 							$"gaze emergency finished: {events_[lastEmergency_]}, " +
 							$"gazer now {gazerEnabledBeforeEmergency_}");
 

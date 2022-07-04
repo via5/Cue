@@ -337,9 +337,8 @@ namespace Cue
 			{
 				var d = person_.Personality.GetDuration(di);
 				d.Reset(intensity);
-				person_.Log.Info($"d: {d.ToDetailedString()}");
 				gazeDuration_ = d.Current;
-				person_.Log.Info($"new gaze duration {gazeDuration_}");
+				person_.Log.Verbose($"new gaze duration {gazeDuration_}");
 			}
 		}
 

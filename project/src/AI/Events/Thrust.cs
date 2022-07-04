@@ -114,14 +114,14 @@
 				if (PersonStatus.EitherPenetrating(person_, receiver_.Person))
 				{
 					// penetration
-					Log.Info($"starting sex with {receiver_.Person.ID}.{receiver_}");
+					Log.Info($"starting sex with {receiver_}");
 					receiver_.Person.Body.Zapped(person_, SS.Penetration);
 					anim_ = AnimationType.Sex;
 				}
 				else
 				{
 					// frottage
-					Log.Info($"starting frottage with {receiver_.Person.ID}.{receiver_}");
+					Log.Info($"starting frottage with {receiver_}");
 					receiver_.Person.Body.Zapped(person_, SS.Genitals);
 					anim_ = AnimationType.Frottage;
 				}

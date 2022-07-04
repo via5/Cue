@@ -223,34 +223,34 @@ namespace Cue.Sys
 
 		private int personIndex_;
 		private BodyPartType bodyPart_;
-		private float value_;
+		private float mag_;
 		private bool forced_;
 
-		private Atom externalAtom_;
+		private IAtom externalAtom_;
 
 		public static TriggerInfo FromExternal(
-			int type, Atom atom, float v, bool forced=false)
+			int type, IAtom atom, float v, bool forced=false)
 		{
 			return new TriggerInfo(type, -1, BP.None, v, forced, atom);
 		}
 
 		public static TriggerInfo FromPerson(
-			int sourcePersonIndex, BodyPartType sourceBodyPart, float v,
+			int sourcePersonIndex, BodyPartType sourceBodyPart, float mag,
 			bool forced = false)
 		{
 			return new TriggerInfo(
 				PersonType, sourcePersonIndex, sourceBodyPart,
-				v, forced, null);
+				mag, forced, null);
 		}
 
 		private TriggerInfo(
-			int type, int sourcePersonIndex, BodyPartType sourceBodyPart, float v,
-			bool forced, Atom externalAtom)
+			int type, int sourcePersonIndex, BodyPartType sourceBodyPart,
+			float mag, bool forced, IAtom externalAtom)
 		{
 			type_ = type;
 			personIndex_ = sourcePersonIndex;
 			bodyPart_ = sourceBodyPart;
-			value_ = v;
+			mag_ = mag;
 			forced_ = forced;
 			externalAtom_ = externalAtom;
 		}
@@ -270,11 +270,40 @@ namespace Cue.Sys
 			get { return bodyPart_; }
 		}
 
+		public float Magnitude
+		{
+			get { return mag_; }
+		}
+
 		public bool SameAs(TriggerInfo other)
 		{
-			return
-				(personIndex_ == other.personIndex_) &&
-				(bodyPart_ == other.bodyPart_);
+			if (type_ != other.type_)
+				return false;
+
+			switch (type_)
+			{
+				case PersonType:
+				{
+					return
+						(personIndex_ == other.personIndex_) &&
+						(bodyPart_ == other.bodyPart_);
+				}
+
+				case ToyType:
+				case NoneType:
+				default:
+				{
+					return (externalAtom_ == other.externalAtom_);
+				}
+			}
+		}
+
+		public TriggerInfo MergeFrom(TriggerInfo other)
+		{
+			return new TriggerInfo(
+				type_, personIndex_, bodyPart_,
+				Math.Max(mag_, other.mag_),
+				forced_, externalAtom_);
 		}
 
 		public bool Is(int personIndex, BodyPartType bodyPart)
@@ -291,7 +320,7 @@ namespace Cue.Sys
 					var p = Cue.Instance.AllPersons[personIndex_];
 					var bp = p.Body.Get(bodyPart_);
 
-					string s = $"{p.ID}.{bp.Name}:{value_:0.00}";
+					string s = $"{p.ID}.{bp.Name}:{mag_:0.00}";
 
 					if (forced_)
 						s += "(forced)";
@@ -304,7 +333,7 @@ namespace Cue.Sys
 					string s;
 
 					if (externalAtom_ != null)
-						s = $"{externalAtom_.uid}:{value_:0.00}";
+						s = $"{externalAtom_.ID}:{mag_:0.00}";
 					else
 						s = "?";
 
