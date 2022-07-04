@@ -111,6 +111,12 @@ namespace Cue.Sys.Vam
 		private IEasing flushEasing_ = new SineInEasing();
 		private bool colorEnabled_ = false;
 
+		private string[] mouthColliderNames_ = null;
+		private Collider[] mouthColliders_ = null;
+
+		private string[] tongueColliderNames_ = null;
+		private Collider[] tongueColliders_ = null;
+
 		public VamBody(VamAtom a)
 			: base(a)
 		{
@@ -138,6 +144,11 @@ namespace Cue.Sys.Vam
 			leftHand_ = ld.LeftHand;
 			rightHand_ = ld.RightHand;
 			strapon_ = parts_[BP.Penis.Int] as StraponBodyPart;
+			mouthColliderNames_ = ld.MouthColliders;
+			tongueColliderNames_ = ld.TongueColliders;
+
+			// too slow to do it on demand
+			GetKissColliders();
 
 			Cue.Instance.Options.Changed += CheckOptions;
 			CheckOptions();
@@ -203,6 +214,72 @@ namespace Cue.Sys.Vam
 			}
 
 			return null;
+		}
+
+		public void SetCollidersForKiss(bool ignoreCollision, VamBody other)
+		{
+			GetKissColliders();
+			other.GetKissColliders();
+
+			SetIgnoreCollision(ignoreCollision, mouthColliders_, other.mouthColliders_);
+			SetIgnoreCollision(ignoreCollision, tongueColliders_, other.tongueColliders_);
+		}
+
+		private void SetIgnoreCollision(bool ignoreCollision, Collider[] acs, Collider[] bcs)
+		{
+			for (int i = 0; i < acs.Length; ++i)
+			{
+				var a = acs[i];
+				if (a == null)
+					continue;
+
+				for (int j = 0; j < bcs.Length; ++j)
+				{
+					var b = bcs[j];
+					if (b == null)
+						continue;
+
+					//Log.Info($"ignore collision {a} {b}");
+					Physics.IgnoreCollision(a, b, ignoreCollision);
+				}
+			}
+		}
+
+		private void GetKissColliders()
+		{
+			if (mouthColliders_ == null)
+			{
+				var list = new List<Collider>();
+
+				for (int i = 0; i < mouthColliderNames_.Length; ++i)
+				{
+					var c = Atom.FindCollider(mouthColliderNames_[i]);
+					if (c == null)
+						Log.Error($"mouth colliders: {mouthColliderNames_[i]} not found");
+
+					list.Add(c);
+				}
+
+				Log.Verbose($"{list.Count} mouth colliders");
+				mouthColliders_ = list.ToArray();
+			}
+
+			if (tongueColliders_ == null)
+			{
+				var list = new List<Collider>();
+
+				for (int i = 0; i < tongueColliderNames_.Length; ++i)
+				{
+					var c = Atom.FindCollider(tongueColliderNames_[i]);
+					if (c == null)
+						Log.Error($"tongue colliders: {tongueColliderNames_[i]} not found");
+
+					list.Add(c);
+				}
+
+				Log.Verbose($"{list.Count} tongue colliders");
+				tongueColliders_ = list.ToArray();
+			}
 		}
 
 		public override bool Strapon

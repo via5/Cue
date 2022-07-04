@@ -162,70 +162,87 @@ namespace Cue.Sys.Vam
 			return null;
 		}
 
-		public static Collider FindCollider(Atom atom, string pathstring)
+
+		public static Collider FindCollider(List<Collider> cs, string pathstring)
 		{
 			var path = pathstring.Split('/');
-			var p = path[path.Length - 1];
 
-			foreach (var c in atom.GetComponentsInChildren<Collider>())
+			foreach (var c in cs)
 			{
-				if (EquivalentName(c.name, p))
+				var t = FindTransform(c.transform, pathstring, path);
+				if (t != null)
 				{
-					if (path.Length == 1)
-						return c;
+					var cc = t.GetComponent<Collider>();
+					if (cc == null)
+						Cue.LogError($"FindCollider: found {pathstring}, but not a collider");
 
-					var check = c.transform.parent;
-					if (check == null)
-					{
-						Cue.LogInfo("parent is not a collider");
-						continue;
-					}
-
-					bool okay = true;
-
-					for (int i = 1; i < path.Length; ++i)
-					{
-						var thispath = path[path.Length - i - 1];
-
-						if (!EquivalentName(check.name, thispath))
-						{
-							okay = false;
-							break;
-						}
-
-						check = check.parent;
-						if (check == null)
-						{
-							Cue.LogInfo("parent is not a collider");
-							okay = false;
-							break;
-						}
-					}
-
-					if (okay)
-						return c;
+					return cc;
 				}
 			}
 
+			return null;
+		}
 
-			foreach (var c in atom.GetComponentsInChildren<Collider>())
+		private static Transform FindTransform(Transform c, string pathstring, string[] path)
+		{
+			var p = path[path.Length - 1];
+
+			if (EquivalentName(c.name, p))
 			{
-				if (EquivalentName(c.name, pathstring))
+				if (path.Length == 1)
+					return c;
+
+				var check = c.transform.parent;
+				if (check == null)
+				{
+					Cue.LogInfo("parent is not a collider");
+					return null;
+				}
+
+				bool okay = true;
+
+				for (int i = 1; i < path.Length; ++i)
+				{
+					var thispath = path[path.Length - i - 1];
+
+					if (!EquivalentName(check.name, thispath))
+					{
+						okay = false;
+						break;
+					}
+
+					check = check.parent;
+					if (check == null)
+					{
+						Cue.LogInfo("parent is not a collider");
+						okay = false;
+						break;
+					}
+				}
+
+				if (okay)
 					return c;
 			}
+
+
+			if (EquivalentName(c.name, pathstring))
+				return c;
 
 			return null;
 		}
 
 		private static string[] NameFormat = new string[]
 		{
+			"AutoColliderFemaleAutoColliders{0}Joint",
 			"AutoColliderFemaleAutoColliders{0}",
 			"AutoColliderMaleAutoColliders{0}",
 			"AutoColliderAutoColliders{0}Hard",
 			"AutoColliderAutoColliders{0}",
 			"AutoColliders{0}HardJoint",
 			"AutoColliders{0}Hard",
+			"AutoColliders{0}Joint",
 			"AutoColliders{0}",
+			"AutoCollider{0}Joint",
 			"AutoCollider{0}",
 			"FemaleAutoColliders{0}",
 			"MaleAutoColliders{0}",
@@ -233,14 +250,13 @@ namespace Cue.Sys.Vam
 			"{0}StandardColliders",
 			"{0}HardJoint",
 			"{0}Joint",
+			"_Collider{0}",
 			"_{0}"
 		};
 
 		private static bool EquivalentName(string cn, string pathstring)
 		{
-			return
-				DoEquivalentName(cn, pathstring) ||
-				DoEquivalentName(cn, pathstring + "Joint");
+			return DoEquivalentName(cn, pathstring);
 		}
 
 		private static bool DoEquivalentName(string cn, string pathstring)

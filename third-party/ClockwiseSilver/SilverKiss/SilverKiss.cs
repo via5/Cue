@@ -41,6 +41,7 @@ namespace ClockwiseSilver {
 		private float mouthOpenWideMax = 0.8f;
 		private float mouthOpenWideTarget = 0.8f;
 		private float tongueLengthTarget = 0.15f;
+		private float tongueRaiseMin = 0.3f;
 		private float tongueRaiseMax = 0.4f;
 		private float tongueRaiseTarget = 0.4f;
 		private float eyesClosedTarget = 0.4f;
@@ -452,7 +453,7 @@ namespace ClockwiseSilver {
 			{
 				mouthOpenWideTarget = 0f;
 				tongueLengthTarget = 0f;
-				tongueRaiseTarget = 0f;
+				tongueRaiseTarget = tongueRaiseMin;
 				eyesClosedTarget = eyesClosedMinJSON.val;
 
 				blink.val = true;

@@ -70,7 +70,7 @@ namespace Cue.Sys.Vam
 				var cs = new List<VamColliderRegion>();
 				foreach (var cn in colliders)
 				{
-					var c = U.FindCollider((a as VamAtom).Atom, cn);
+					var c = (a as VamAtom).FindCollider(cn);
 					if (c == null)
 					{
 						Log.Error($"{a.ID}: collider {cn} not found");

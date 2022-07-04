@@ -168,10 +168,6 @@
 			"morphs":
 			[
 				{
-					"id": "CTRLTongueRaise-Lower",
-					"max": 0.13
-				},
-				{
 					"id": "CTRLBrowInnerUp",
 					"max": 0.70
 				},

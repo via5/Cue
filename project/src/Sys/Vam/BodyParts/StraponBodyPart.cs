@@ -271,8 +271,7 @@ namespace Cue.Sys.Vam
 				var cs = new List<VamColliderRegion>();
 				foreach (var cn in colliderNames)
 				{
-					var c = U.FindCollider(
-						(dildo_.Atom as VamAtom).Atom, cn.Trim());
+					var c = (dildo_.Atom as VamAtom).FindCollider(cn.Trim());
 
 					if (c == null)
 					{
@@ -300,7 +299,7 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				anchor_ = U.FindCollider(VamAtom.Atom, anchorName);
+				anchor_ = VamAtom.FindCollider(anchorName);
 
 				if (anchor_ == null)
 					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");

@@ -487,6 +487,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void SetCollidersForKiss(bool b, IAtom other)
+		{
+		}
+
 		public void OnPluginState(bool b)
 		{
 		}

@@ -421,6 +421,10 @@ namespace Cue.Sys.Vam
 		{
 		}
 
+		public void SetCollidersForKiss(bool b, IAtom other)
+		{
+		}
+
 		public void TeleportTo(Vector3 p, float bearing)
 		{
 		}

@@ -532,5 +532,46 @@
 				"little": ["rCarpal2/rPinky1", "rCarpal2/rPinky1/rPinky2", "rCarpal2/rPinky1/rPinky2/rPinky3"]
 			}
 		}
-	]
+	],
+
+	"kiss":
+	{
+		"mouthColliders":
+		[
+			"FaceCentral/FaceCentral1/FaceCentral1",
+			"FaceCentral/FaceCentral2/FaceCentral2",
+			"TongueUpperLip/FaceCentral2/FaceCentral2",
+			"FaceHardLeft16", "FaceHardLeft17",
+			"FaceHardRight16", "FaceHardRight17",
+			"lowerJaw/LipL", "lowerJaw/LipM", "lowerJaw/LipR",
+			"TongueColliders/LipM", "TongueColliders/LipM2",
+			"lowerJaw/L2r", "lowerJaw/L2l",
+			"lowerJaw/L3r", "lowerJaw/L3l",
+		],
+
+		"tongueColliders":
+		[
+			"TongueTip/_Collider1",
+			"TongueTip/_Collider2",
+			"TongueTip/_Collider3",
+			"TongueTip/_Collider4",
+			"TongueTip/_Collider5",
+
+			"Tongue05/_Collider1",
+			"Tongue05/_Collider2",
+			"Tongue05/_Collider3",
+			"Tongue05/_Collider4",
+			"Tongue05/_Collider5",
+
+			"Tongue04/_Collider1",
+			"Tongue04/_Collider2",
+			"Tongue04/_Collider3",
+			"Tongue04/_Collider4",
+			"Tongue04/_Collider5",
+
+			"Tongue03/_Collider1",
+			"Tongue03/_Collider2",
+			"Tongue03/_Collider3",
+		]
+	}
 }

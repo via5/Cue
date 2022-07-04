@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
@@ -66,6 +67,7 @@ namespace Cue.Sys.Vam
 		private FloatParameter scale_;
 		private BoolParameter blink_;
 		private VamCorruptionDetector cd_;
+		private List<Collider> allColliders_;
 
 		public VamAtom(Atom atom)
 		{
@@ -73,6 +75,8 @@ namespace Cue.Sys.Vam
 			log_ = new Logger(Logger.Sys, this, "vamAtom");
 			setOnlyKeyJointsOn_ = new ActionParameter(
 				this, "AllJointsControl", "SetOnlyKeyJointsOn");
+
+			GetAllColliders();
 
 			char_ = atom_.GetComponentInChildren<DAZCharacter>();
 			if (char_ != null)
@@ -290,6 +294,13 @@ namespace Cue.Sys.Vam
 			SetStrongerDamping("rKneeControl", e, false);
 		}
 
+		public void SetCollidersForKiss(bool b, IAtom other)
+		{
+			body_.SetCollidersForKiss(b, (other as VamAtom).body_);
+			(other as VamAtom).body_.SetCollidersForKiss(b, body_);
+		}
+
+
 		public void SetBlink(bool b)
 		{
 			blink_.Value = b;
@@ -358,6 +369,32 @@ namespace Cue.Sys.Vam
 		public void LateUpdate(float s)
 		{
 			body_?.LateUpdate(s);
+		}
+
+		private void GetAllColliders()
+		{
+			if (allColliders_ != null)
+				return;
+
+			allColliders_ = new List<Collider>();
+
+			foreach (var c in Atom.GetComponentsInChildren<Collider>())
+				allColliders_.Add(c);
+
+			foreach (var c in Atom.GetComponentsInChildren<AutoCollider>())
+			{
+				if (c.hardCollider != null)
+					allColliders_.Add(c.hardCollider);
+
+				if (c.jointCollider != null)
+					allColliders_.Add(c.jointCollider);
+			}
+		}
+
+		public Collider FindCollider(string pathstring)
+		{
+			GetAllColliders();
+			return U.FindCollider(allColliders_, pathstring);
 		}
 
 		public override string ToString()

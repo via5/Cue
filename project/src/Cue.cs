@@ -131,6 +131,7 @@ namespace Cue
 
 		public void Init()
 		{
+			var start = Sys.RealtimeSinceStartup;
 			LogVerbose($"cue: init (token {CueMain.Instance.Token})");
 
 			VUI.Root.Init(
@@ -172,7 +173,8 @@ namespace Cue
 				}
 			}
 
-			LogInfo($"cue: running, version {Version.String}");
+			var end = Cue.Instance.Sys.RealtimeSinceStartup;
+			LogInfo($"cue: running, version {Version.String}, init {(end - start):0.00}s");
 		}
 
 		private void CheckConfig()

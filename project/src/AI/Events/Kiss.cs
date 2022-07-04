@@ -56,7 +56,6 @@ namespace Cue
 		private bool waitFinished_ = false;
 		private bool waitFinishedBecauseGrab_ = false;
 
-
 		public KissEvent()
 			: base("kiss")
 		{
@@ -237,6 +236,7 @@ namespace Cue
 			Next();
 			SetExcitement(false);
 			person_.Animator.StopType(AnimationType.Kiss);
+			person_.Atom.SetCollidersForKiss(false, target_.Atom);
 			target_ = null;
 			leading_ = false;
 		}
@@ -302,6 +302,9 @@ namespace Cue
 
 					if (TryStartWith(target))
 					{
+						person_.Atom.SetCollidersForKiss(true, target.Atom);
+						target.Atom.SetCollidersForKiss(true, person_.Atom);
+
 						leading_ = true;
 						return true;
 					}

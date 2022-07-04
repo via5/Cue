@@ -11,6 +11,8 @@ namespace Cue.Sys.Vam
 		private IBodyPart[] parts_;
 		private Hand leftHand_, rightHand_;
 		private DAZBone hipBone_ = null;
+		private string[] mouthColliders_ = null;
+		private string[] tongueColliders_ = null;
 
 		public VamBodyLoader(VamAtom atom)
 		{
@@ -35,6 +37,16 @@ namespace Cue.Sys.Vam
 		public Hand RightHand
 		{
 			get { return rightHand_; }
+		}
+
+		public string[] MouthColliders
+		{
+			get { return mouthColliders_; }
+		}
+
+		public string[] TongueColliders
+		{
+			get { return tongueColliders_; }
 		}
 
 		public void Load()
@@ -125,6 +137,35 @@ namespace Cue.Sys.Vam
 				Log.Error("missing left hand");
 			if (rightHand_.bones == null)
 				Log.Error("missing right hand");
+
+
+			{
+				var slist = new List<string>();
+				foreach (JSONNode mouth in d["kiss"]["mouthColliders"].AsArray)
+				{
+					var s = mouth.Value;
+					if (string.IsNullOrEmpty(s))
+						continue;
+
+					slist.Add(s);
+				}
+
+				mouthColliders_ = slist.ToArray();
+			}
+
+			{
+				var slist = new List<string>();
+				foreach (JSONNode mouth in d["kiss"]["tongueColliders"].AsArray)
+				{
+					var s = mouth.Value;
+					if (string.IsNullOrEmpty(s))
+						continue;
+
+					slist.Add(s);
+				}
+
+				tongueColliders_ = slist.ToArray();
+			}
 		}
 
 		struct PartSettings
@@ -408,7 +449,7 @@ namespace Cue.Sys.Vam
 			var cs = new List<Collider>();
 			foreach (var cn in ps.colliders)
 			{
-				var c = U.FindCollider(atom_.Atom, cn);
+				var c = atom_.FindCollider(cn);
 				if (c == null)
 					Log.Error($"collider {cn} not found for {BodyPartType.ToString(ps.bodyPart)}");
 				else

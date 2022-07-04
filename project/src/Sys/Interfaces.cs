@@ -530,6 +530,7 @@ namespace Cue.Sys
 		void SetDefaultControls(string why);
 		void SetParentLink(IBodyPart bp);
 		void SetBodyDamping(int e);
+		void SetCollidersForKiss(bool b, IAtom other);
 
 		void OnPluginState(bool b);
 
