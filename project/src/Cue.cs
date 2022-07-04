@@ -342,6 +342,8 @@ namespace Cue
 
 		private void DoFixedUpdate(float s)
 		{
+			Sys.FixedUpdate(s);
+
 			for (int i = 0; i < everythingActive_.Count; ++i)
 				everythingActive_[i].FixedUpdate(s);
 		}
@@ -391,12 +393,30 @@ namespace Cue
 				DoUpdateUI(s);
 			}
 			I.End();
+
+			Sys.Update(s);
 		}
 
 		public void LateUpdate(float s)
 		{
+			if (!Sys.Paused)
+			{
+				I.Instance.Reset();
+
+				I.Start(I.LateUpdate);
+				{
+					DoLateUpdate(s);
+				}
+				I.End();
+			}
+		}
+
+		private void DoLateUpdate(float s)
+		{
 			for (int i = 0; i < activePersonsArray_.Length; ++i)
 				activePersonsArray_[i].LateUpdate(s);
+
+			Sys.LateUpdate(s);
 		}
 
 		private void DoUpdateInput(float s)

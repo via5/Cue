@@ -31,7 +31,7 @@ namespace Cue.VamMoan
 		private Logger log_;
 
 		private string lastAction_ = "";
-		private int intensitiesCount_ = -1;
+		private int intensitiesCount_ = 0;
 		private Parameters p_;
 		private float voiceCheckElapsed_ = 0;
 		private float forceIntensityElapsed_ = 0;
@@ -273,8 +273,8 @@ namespace Cue.VamMoan
 			if (p_.intensities.Length == 0)
 				return;
 
-			int index = (int)(v * intensitiesCount_);
-			index = U.Clamp(index, 0, intensitiesCount_ - 1);
+			int index = (int)(v * p_.intensities.Length);
+			index = U.Clamp(index, 0, p_.intensities.Length - 1);
 
 			currentAction_ = p_.intensities[index];
 			Fire();

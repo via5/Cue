@@ -74,7 +74,9 @@
 			// start by checking penetration
 			receiver_ = FindPenetrationReceiver();
 
-			if (receiver_ == null && person_.Body.HasPenis && person_.Clothing.GenitalsVisible)
+
+			// todo: && person_.Clothing.GenitalsVisible, but it's not reliable
+			if (receiver_ == null && person_.Body.HasPenis)
 			{
 				// don't allow frottage from characters that can penetrate
 				Log.Info($"no valid receiver");

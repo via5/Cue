@@ -10,7 +10,7 @@ using AssetBundles;
 
 namespace Cue.Sys.Vam
 {
-	class VamSys : ISys
+	sealed class VamSys : ISys
 	{
 		private const int PluginDataSource = 0;
 		private const int PluginPathSource = 1;
@@ -300,6 +300,11 @@ namespace Cue.Sys.Vam
 				return FileManagerSecure.FileExists(
 					$"{PluginDataRoot}/devmode");
 			}
+		}
+
+		public void FixedUpdate(float s)
+		{
+			// no-op
 		}
 
 		public void Update(float s)

@@ -80,6 +80,7 @@ namespace Cue.Sys
 		Vector3 InteractiveLeftHandPosition { get; }
 		Vector3 InteractiveRightHandPosition { get; }
 		bool Paused { get; }
+		void FixedUpdate(float s);
 		void Update(float s);
 		void LateUpdate(float s);
 		void OnPluginState(bool b);

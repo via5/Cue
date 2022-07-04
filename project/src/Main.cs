@@ -68,11 +68,9 @@ namespace Cue
 				{
 					deltaTime = (float)((now - deltaTime) / 1000.0);
 
-					sys_.Update(deltaTime);
 					cue_.FixedUpdate(deltaTime);
 					cue_.Update(deltaTime);
 					cue_.LateUpdate(deltaTime);
-					sys_.LateUpdate(Time.deltaTime);
 				}
 
 				Thread.Sleep(1);
@@ -363,7 +361,6 @@ namespace Cue
 
 			try
 			{
-				sys_.Update(Time.deltaTime);
 				cue_.Update(Time.deltaTime);
 			}
 			catch(PluginGone e)
@@ -384,7 +381,6 @@ namespace Cue
 			try
 			{
 				cue_.LateUpdate(Time.deltaTime);
-				sys_.LateUpdate(Time.deltaTime);
 			}
 			catch(PluginGone e)
 			{

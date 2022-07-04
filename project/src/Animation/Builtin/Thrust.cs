@@ -286,7 +286,7 @@ namespace Cue.Proc
 		{
 			var c = new Config();
 
-			c.hipForceMin = 300;
+			c.hipForceMin = 600;
 			c.hipForceMax = 1500;
 
 			c.hipTorqueMin = new Vector3(0, 0, 0);
@@ -294,7 +294,7 @@ namespace Cue.Proc
 			c.hipTorqueWin = new Vector3(0, 0, 0);
 
 			c.durationMin = 1.0f;
-			c.durationMax = 0.15f;
+			c.durationMax = 0.17f;
 			c.durationWin = 0.1f;
 			c.durationInterval = 10;
 

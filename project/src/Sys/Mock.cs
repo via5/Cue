@@ -35,7 +35,7 @@ namespace Cue.Sys.Mock
 	}
 
 
-	class MockSys : ISys
+	sealed class MockSys : ISys
 	{
 		private static MockSys instance_ = null;
 		private readonly MockInput input_ = new MockInput();
@@ -149,6 +149,10 @@ namespace Cue.Sys.Mock
 		public float RandomFloat(float first, float last)
 		{
 			return (float)(rnd_.NextDouble() * (last - first) + first);
+		}
+
+		public void FixedUpdate(float s)
+		{
 		}
 
 		public void Update(float s)

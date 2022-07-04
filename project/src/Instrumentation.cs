@@ -132,7 +132,7 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.TickerCount];
 		private int[] depth_ = new int[I.TickerCount]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1
+			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1
 		};
 		private int[] stack_ = new int[4];
 		private int current_ = 0;
@@ -156,6 +156,7 @@ namespace Cue
 			tickers_[I.UpdatePersonAI] = new Ticker("AI");
 			tickers_[I.UpdateUi] = new Ticker("UI");
 			tickers_[I.FixedUpdate] = new Ticker("Fixed update");
+			tickers_[I.LateUpdate] = new Ticker("Late update");
 		}
 
 		public bool Updated
@@ -253,7 +254,8 @@ namespace Cue
 		public const int UpdatePersonAI = 12;
 		public const int UpdateUi = 13;
 		public const int FixedUpdate = 14;
-		public const int TickerCount = 15;
+		public const int LateUpdate = 15;
+		public const int TickerCount = 16;
 
 
 
