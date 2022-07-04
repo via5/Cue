@@ -137,6 +137,39 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
+		protected override void UpdateTriggers()
+		{
+			base.UpdateTriggers();
+
+			if (!trigger_.active)
+				return;
+
+			foreach (var kv in h_.collidingWithDictionary)
+			{
+				if (!kv.Value || kv.Key == null)
+					continue;
+
+				var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform) as VamBodyPart;
+
+				if (bp == null)
+				{
+					var a = U.AtomForCollider(kv.Key);
+					AddExternalCollision(a, 1.0f);
+				}
+				else
+				{
+					if (VamBodyPart.IgnoreTrigger(bp.Atom, bp, Atom, this))
+						continue;
+
+					var p = Cue.Instance.PersonForAtom(bp.Atom);
+					if (p == null)
+						return;
+
+					AddPersonCollision(p.PersonIndex, bp.Type, 1.0f);
+				}
+			}
+		}
+
 		public string ToDetailedString()
 		{
 			string s = "";

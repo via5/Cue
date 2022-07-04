@@ -117,21 +117,7 @@ namespace Cue.Sys.Vam
 			}
 
 			foreach (var c in a.GetComponentsInChildren<Collider>())
-			{
-				var ch = c.gameObject.GetComponent<CueCollisionHandler>();
-				if (ch != null)
-				{
-					Cue.LogError($"collider {U.FullName(ch)} already has handler");
-					continue;
-				}
-
-				ch = c.gameObject.AddComponent<CueCollisionHandler>();
-				if (ch == null)
-				{
-					Cue.LogError($"failed to add handler to collider {U.FullName(ch)}");
-					continue;
-				}
-			}
+				CueCollisionHandler.AddToCollider(c, null);
 
 			h.Reset();
 		}

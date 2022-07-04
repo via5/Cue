@@ -14,6 +14,7 @@
             "type": "rigidbody",
             "name": "head",
             "controller": "headControl",
+			"ignore": "lips",
             "colliders":
 			[
                 "HeadHard1Hard",
@@ -53,6 +54,7 @@
        {
             "part": "lips",
             "type": "collider",
+			"ignore": "head",
             "colliders":
 			[
 				"lowerJaw/ColliderLipM",

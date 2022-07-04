@@ -221,18 +221,18 @@ namespace Cue.Sys.Vam
 		{
 			"AutoColliderFemaleAutoColliders{0}",
 			"AutoColliderMaleAutoColliders{0}",
-			"AutoCollider{0}",
-			"AutoColliders{0}",
-			"AutoColliders{0}Hard",
-			"AutoColliders{0}HardJoint",
-			"AutoColliderAutoColliders{0}",
 			"AutoColliderAutoColliders{0}Hard",
+			"AutoColliderAutoColliders{0}",
+			"AutoColliders{0}HardJoint",
+			"AutoColliders{0}Hard",
+			"AutoColliders{0}",
+			"AutoCollider{0}",
 			"FemaleAutoColliders{0}",
 			"MaleAutoColliders{0}",
 			"StandardColliders{0}",
 			"{0}StandardColliders",
-			"{0}Joint",
 			"{0}HardJoint",
+			"{0}Joint",
 			"_{0}"
 		};
 
@@ -436,6 +436,53 @@ namespace Cue.Sys.Vam
 				return FullName(((GameObject)o).transform);
 			else
 				return o.ToString();
+		}
+
+		public static string QualifiedName(UnityEngine.Component o)
+		{
+			var t = o?.transform;
+			if (t == null)
+				return "null";
+
+			string s = CleanedUp(t.name);
+
+			string ps = CleanedUp(t.parent.name);
+			if (ps == "")
+				s = CleanedUp(t.parent.parent.name) + "/" + t.parent.name + "/" + s;
+			else
+				s = ps + "/" + s;
+
+			return s;
+		}
+
+		private static string CleanedUp(string name)
+		{
+			if (string.IsNullOrEmpty(name))
+				return "?";
+
+			for (int i = 0; i < NameFormat.Length; ++i)
+			{
+				var p = NameFormat[i].IndexOf("{0}");
+				if (p == -1)
+					continue;
+
+				string prefix = "";
+				string suffix = "";
+
+				if (p > 0)
+					prefix = NameFormat[i].Substring(0, p);
+
+				if (p < (NameFormat[i].Length - 3))
+					suffix = NameFormat[i].Substring(p + 3);
+
+				if (name.StartsWith(prefix))
+					name = name.Substring(prefix.Length);
+
+				if (name.EndsWith(suffix))
+					name = name.Substring(0, name.Length - suffix.Length);
+			}
+
+			return name;
 		}
 
 
