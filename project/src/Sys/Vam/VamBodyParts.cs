@@ -4,134 +4,6 @@ using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
-	class CueCollisionHandler : MonoBehaviour
-	{
-		private VamBodyPart bp_ = null;
-		private Person person_ = null;
-		private Rigidbody rb_ = null;
-		private Collider collider_ = null;
-
-		public static CueCollisionHandler AddToCollider(Collider c, VamBodyPart bp)
-		{
-			var rb = FindRigidbody(c);
-			if (rb == null)
-			{
-				Cue.LogError($"{U.QualifiedName(c)} has no rigidbody");
-				return null;
-			}
-
-			var ch = rb.gameObject.AddComponent<CueCollisionHandler>();
-			if (ch == null)
-			{
-				Cue.LogError($"failed to add handler to collider {U.FullName(c)}");
-				return null;
-			}
-
-			ch.bp_ = bp;
-			if (ch.bp_ != null)
-				ch.person_ = Cue.Instance.PersonForAtom(ch.bp_.Atom);
-
-			ch.rb_ = rb;
-			ch.collider_ = c;
-
-			return ch;
-		}
-
-		private static Rigidbody FindRigidbody(Collider c)
-		{
-			var rb = c.GetComponent<Rigidbody>();
-			if (rb != null)
-				return rb;
-
-			return c.attachedRigidbody;
-		}
-
-		private static void Remove(Rigidbody rb)
-		{
-			foreach (var cm in rb.GetComponents<Component>())
-			{
-				if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
-					UnityEngine.Object.Destroy(cm);
-			}
-		}
-
-		public void OnCollisionStay(Collision c)
-		{
-			try
-			{
-				if (!isActiveAndEnabled || bp_ == null || CueMain.Instance.Sys.Paused)
-					return;
-
-				float mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
-
-				var sourcePart = Cue.Instance.VamSys
-					.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
-
-				if (sourcePart == null)
-				{
-					bool ok = false;
-
-					for (int i = 0; i < c.contacts.Length; ++i)
-					{
-						if (c.contacts[i].thisCollider == collider_)
-						{
-							ok = true;
-							break;
-						}
-					}
-
-					if (!ok)
-						return;
-
-					//Cue.LogError(
-					//	$"{bp_} " +
-					//	$"{U.QualifiedName(c.collider)}");
-
-					bp_.AddExternalCollision(U.AtomForCollider(c.collider), mag);
-				}
-				else
-				{
-					if (VamBodyPart.IgnoreTrigger(sourcePart.Atom, sourcePart, bp_.Atom, bp_))
-						return;
-
-					//Cue.LogError($"{bp_} {sourcePart} {U.QualifiedName(c.collider)}");
-
-					var sourcePerson = Cue.Instance.PersonForAtom(sourcePart.Atom);
-
-					var sourceIndex = sourcePerson?.PersonIndex ?? -1;
-					if (sourceIndex < 0)
-					{
-						Cue.LogError($"no source index");
-						return;
-					}
-
-					var targetPart = bp_;
-					if (targetPart == null)
-					{
-						Cue.LogError($"no target part");
-						return;
-					}
-
-					var targetIndex = person_.PersonIndex;
-
-
-					bp_.AddPersonCollision(sourceIndex, sourcePart.Type, mag);
-					sourcePart.AddPersonCollision(targetIndex, targetPart.Type, mag);
-				}
-			}
-			catch (Exception e)
-			{
-				Cue.LogError(e.ToString());
-			}
-		}
-
-		public override string ToString()
-		{
-			return "CueCollisionHandler";
-		}
-	}
-
-
 	public abstract class VamBodyPart : IBodyPart
 	{
 		private IAtom atom_;
@@ -169,124 +41,6 @@ namespace Cue.Sys.Vam
 
 		private List<TriggerInfo> triggerCache_ = new List<TriggerInfo>();
 		private TriggerInfo[] triggers_ = null;
-
-
-		public static bool IgnoreTrigger(
-			IAtom sourceAtom, VamBodyPart sourcePart,
-			IAtom targetAtom, VamBodyPart targetPart)
-		{
-			if (sourcePart == targetPart)
-				return true;
-
-			return
-				targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
-				sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
-		}
-
-		private bool DoIgnoreTrigger(IAtom sourceAtom, VamBodyPart sourcePart)
-		{
-			// self collision
-			if (sourceAtom != null && sourceAtom == Atom)
-			{
-				if (sourcePart.Type == BP.Penis)
-				{
-					// probably the dildo touching genitals, ignore
-					return true;
-				}
-				else
-				{
-					if (Type == BP.Penis && sourcePart.Type == BP.Hips)
-					{
-						// probably the dildo touching genitals, ignore
-						return true;
-					}
-				}
-
-				for (int i = 0; i < ignoreBodyParts_.Length; ++i)
-				{
-					if (ignoreBodyParts_[i] == sourcePart.Type)
-						return true;
-				}
-			}
-
-			return false;
-		}
-
-		public TriggerInfo[] GetTriggers()
-		{
-			if (!Exists)
-				return null;
-
-			//if (triggerCache_ != null)
-			{
-				triggers_ = null;
-				triggerCache_.Clear();
-			}
-
-			UpdateTriggers();
-
-			for (int i = 0; i < collisions_.GetLength(0); ++i)
-			{
-				foreach (var b in BodyPartType.Values)
-				{
-					if (collisions_[i, b.Int] > 0)
-					{
-						triggerCache_.Add(TriggerInfo.FromPerson(
-							i, b, collisions_[i, b.Int]));
-					}
-				}
-			}
-
-			if (toyCollision_ > 0)
-				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.ToyType, toyAtom_, toyCollision_));
-
-			if (externalCollision_ > 0)
-				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.NoneType, externalAtom_, externalCollision_));
-
-			triggers_ = triggerCache_.ToArray();
-			ClearCollisions();
-
-			return triggers_;
-		}
-
-		protected virtual void UpdateTriggers()
-		{
-			// no-op
-		}
-
-		public void AddPersonCollision(int sourcePersonIndex, BodyPartType sourceBodyPart, float f)
-		{
-			collisions_[sourcePersonIndex, sourceBodyPart.Int] = Math.Max(
-				collisions_[sourcePersonIndex, sourceBodyPart.Int], f);
-		}
-
-		public void AddExternalCollision(Atom a, float f)
-		{
-			if (a != null && a.category == "Toys")
-			{
-				toyCollision_ = Math.Max(toyCollision_, f);
-				toyAtom_ = a;
-			}
-			else
-			{
-				externalCollision_ = Math.Max(externalCollision_, f);
-				externalAtom_ = a;
-			}
-		}
-
-		private void ClearCollisions()
-		{
-			toyAtom_ = null;
-			toyCollision_ = 0;
-			externalAtom_ = null;
-			externalCollision_ = 0;
-
-			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
-			{
-				for (int j = 0; j < BP.Count; ++j)
-					collisions_[i, j] = 0;
-			}
-		}
 
 
 		protected VamBodyPart(IAtom a, BodyPartType t)
@@ -572,6 +326,124 @@ namespace Cue.Sys.Vam
 			}
 
 			return grabCache_.ToArray();
+		}
+
+
+		public static bool IgnoreTrigger(
+			IAtom sourceAtom, VamBodyPart sourcePart,
+			IAtom targetAtom, VamBodyPart targetPart)
+		{
+			if (sourcePart == targetPart)
+				return true;
+
+			return
+				targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
+				sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
+		}
+
+		private bool DoIgnoreTrigger(IAtom sourceAtom, VamBodyPart sourcePart)
+		{
+			// self collision
+			if (sourceAtom != null && sourceAtom == Atom)
+			{
+				if (sourcePart.Type == BP.Penis)
+				{
+					// probably the dildo touching genitals, ignore
+					return true;
+				}
+				else
+				{
+					if (Type == BP.Penis && sourcePart.Type == BP.Hips)
+					{
+						// probably the dildo touching genitals, ignore
+						return true;
+					}
+				}
+
+				for (int i = 0; i < ignoreBodyParts_.Length; ++i)
+				{
+					if (ignoreBodyParts_[i] == sourcePart.Type)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		public TriggerInfo[] GetTriggers()
+		{
+			if (!Exists)
+				return null;
+
+			//if (triggerCache_ != null)
+			{
+				triggers_ = null;
+				triggerCache_.Clear();
+			}
+
+			UpdateTriggers();
+
+			for (int i = 0; i < collisions_.GetLength(0); ++i)
+			{
+				foreach (var b in BodyPartType.Values)
+				{
+					if (collisions_[i, b.Int] > 0)
+					{
+						triggerCache_.Add(TriggerInfo.FromPerson(
+							i, b, collisions_[i, b.Int]));
+					}
+				}
+			}
+
+			if (toyCollision_ > 0)
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.ToyType, toyAtom_, toyCollision_));
+
+			if (externalCollision_ > 0)
+				triggerCache_.Add(TriggerInfo.FromExternal(TriggerInfo.NoneType, externalAtom_, externalCollision_));
+
+			triggers_ = triggerCache_.ToArray();
+			ClearCollisions();
+
+			return triggers_;
+		}
+
+		protected virtual void UpdateTriggers()
+		{
+			// no-op
+		}
+
+		public void AddPersonCollision(int sourcePersonIndex, BodyPartType sourceBodyPart, float f)
+		{
+			collisions_[sourcePersonIndex, sourceBodyPart.Int] = Math.Max(
+				collisions_[sourcePersonIndex, sourceBodyPart.Int], f);
+		}
+
+		public void AddExternalCollision(Atom a, float f)
+		{
+			if (a != null && a.category == "Toys")
+			{
+				toyCollision_ = Math.Max(toyCollision_, f);
+				toyAtom_ = a;
+			}
+			else
+			{
+				externalCollision_ = Math.Max(externalCollision_, f);
+				externalAtom_ = a;
+			}
+		}
+
+		private void ClearCollisions()
+		{
+			toyAtom_ = null;
+			toyCollision_ = 0;
+			externalAtom_ = null;
+			externalCollision_ = 0;
+
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+			{
+				for (int j = 0; j < BP.Count; ++j)
+					collisions_[i, j] = 0;
+			}
 		}
 
 		public float DistanceToSurface(Vector3 pos, bool debug = false)

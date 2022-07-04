@@ -204,6 +204,7 @@
     <Compile Include="src\Sys\Vam\VamBodyLoader.cs" />
     <Compile Include="src\Sys\Vam\VamBodyParts.cs" />
     <Compile Include="src\Sys\Vam\VamCameraAtom.cs" />
+    <Compile Include="src\Sys\Vam\VamCollisions.cs" />
     <Compile Include="src\Sys\Vam\VamFixes.cs" />
     <Compile Include="src\Sys\Vam\VamGraphic.cs" />
     <Compile Include="src\Sys\Vam\VamHair.cs" />

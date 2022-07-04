@@ -322,6 +322,14 @@ namespace Cue
 				list[n] = value;
 			}
 		}
+
+		public static void DebugTimeThis(string what, Action a)
+		{
+			var start = Cue.Instance.Sys.RealtimeSinceStartup;
+			a();
+			var end = Cue.Instance.Sys.RealtimeSinceStartup;
+			Cue.LogError(what + ": " + (end - start) + "s");
+		}
 	}
 
 

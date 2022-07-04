@@ -225,6 +225,11 @@ namespace Cue
 		public void DisablePlugin()
 		{
 		}
+
+		public static void OnException(Exception e)
+		{
+			Console.Write(e.ToString());
+		}
 	}
 #else
 	class CueToken
@@ -471,7 +476,7 @@ namespace Cue
 			throw new PluginGone();
 		}
 
-		private void OnException(Exception e)
+		public static void OnException(Exception e)
 		{
 			SuperController.LogError(e.ToString());
 
