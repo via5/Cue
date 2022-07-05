@@ -86,7 +86,7 @@ namespace Cue.Proc
 		private Action beforeNext_ = null;
 
 		private bool wasBusy_ = false;
-		private Vector3 forceBeforeBusy_;
+		private Vector3 forceBeforeBusy_, forceAfterBusy_;
 		private float busyElapsed_ = 0;
 		private float notBusyElapsed_ = 0;
 		private IEasing busyResetEasing_ = new SinusoidalEasing();
@@ -335,6 +335,8 @@ namespace Cue.Proc
 				var mag = busyResetEasing_.Magnitude(p);
 				var v = Vector3.Lerp(forceBeforeBusy_, Vector3.Zero, mag);
 
+				forceAfterBusy_ = v;
+
 				Apply(v);
 
 				if (p >= 1)
@@ -343,6 +345,7 @@ namespace Cue.Proc
 			else if (wasBusy_)
 			{
 				notBusyElapsed_ += s;
+				busyElapsed_ = 0;
 
 				if (notBusyElapsed_ >= NotBusyCatchUpTime)
 				{
@@ -353,7 +356,9 @@ namespace Cue.Proc
 				{
 					var p = U.Clamp(notBusyElapsed_ / NotBusyCatchUpTime, 0, 1);
 					var mag = notBusyResetEasing_.Magnitude(p);
-					var v = Vector3.Lerp(Vector3.Zero, LerpedForce(), mag);
+					var v = Vector3.Lerp(forceAfterBusy_, LerpedForce(), mag);
+
+					forceBeforeBusy_ = v;
 
 					Apply(v);
 				}
