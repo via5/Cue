@@ -323,8 +323,7 @@
 				SetZoneEnabled(targetBodyPart.Person, true);
 				SetZoneEnabled(targetBodyPart.Person, true);
 
-				// just one hand
-				//target.Homing.LeftHand = true;
+				// no homing, cw does weird stuff
 
 				if (targetBodyPart.Person.Body.PenisSensitive)
 				{

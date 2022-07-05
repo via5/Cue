@@ -300,8 +300,8 @@ namespace Cue.Proc
 			if (self.Body.HasPenis)
 			{
 				c.hipTorqueMin = new Vector3(-50, 0, 0);
-				c.hipTorqueMax = new Vector3(-100, 0, 0);
-				c.hipTorqueWin = new Vector3(0, 0, 0);
+				c.hipTorqueMax = new Vector3(-150, 0, 0);
+				c.hipTorqueWin = new Vector3(50, 0, 0);
 			}
 			else
 			{

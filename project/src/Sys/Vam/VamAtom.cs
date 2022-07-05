@@ -52,6 +52,34 @@ namespace Cue.Sys.Vam
 
 	public class VamAtom : IAtom
 	{
+		struct Damping
+		{
+			public FreeControllerV3 controller;
+			public float normalPosition, normalRotation;
+			public float sexPosition, sexRotation;
+
+			public void Set(int e)
+			{
+				switch (e)
+				{
+					case BodyDamping.SexReceiver:
+					{
+						controller.RBHoldPositionDamper = sexPosition;
+						controller.RBHoldRotationDamper = sexRotation;
+						break;
+					}
+
+					case BodyDamping.Normal:
+					default:
+					{
+						controller.RBHoldPositionDamper = normalPosition;
+						controller.RBHoldRotationDamper = normalRotation;
+						break;
+					}
+				}
+			}
+		}
+
 		private readonly Atom atom_;
 		private Logger log_;
 		private ActionParameter setOnlyKeyJointsOn_;
@@ -68,6 +96,7 @@ namespace Cue.Sys.Vam
 		private BoolParameter blink_;
 		private VamCorruptionDetector cd_;
 		private List<Collider> allColliders_;
+		private Damping[] damping_;
 
 		public VamAtom(Atom atom)
 		{
@@ -116,6 +145,7 @@ namespace Cue.Sys.Vam
 		{
 			VamFixes.Run(atom_);
 			body_.Init();
+			CreateDampings();
 		}
 
 		public void Destroy()
@@ -281,17 +311,71 @@ namespace Cue.Sys.Vam
 			atom_.mainController.SelectLinkToRigidbody(rb);
 		}
 
+		private void CreateDampings()
+		{
+			var list = new List<Damping>();
+
+			float strongPos = 250;
+			float strongRot = 30;
+
+			float weakPos = 100;
+			float weakRot = 10;
+
+			AddDamping(list, "hipControl",    strongPos, strongRot);
+			AddDamping(list, "chestControl",  strongPos, strongRot);
+			AddDamping(list, "headControl",   weakPos, weakRot);
+			AddDamping(list, "lThighControl", weakPos, weakRot);
+			AddDamping(list, "rThighControl", weakPos, weakRot);
+			AddDamping(list, "lFootControl",  weakPos, weakRot);
+			AddDamping(list, "rFootControl",  weakPos, weakRot);
+			AddDamping(list, "lKneeControl",  weakPos, weakRot);
+			AddDamping(list, "rKneeControl",  weakPos, weakRot);
+
+			damping_ = list.ToArray();
+		}
+
+		private void AddDamping(List<Damping> list, string controller, float sexPosition, float sexRotation)
+		{
+			var c = U.FindController(atom_, controller);
+			if (c == null)
+			{
+				Log.Error($"Damping: controller {controller} not found");
+				return;
+			}
+
+			float normalPos = 35;
+			float normalRot = 5;
+
+			{
+				var holdPosParam = c.GetFloatJSONParam("holdPositionDamper");
+				if (holdPosParam == null)
+					Log.Error($"Damping: param holdPositionDamper not found for controlller {c.name}");
+				else
+					normalPos = holdPosParam.defaultVal;
+			}
+
+			{
+				var holdRotParam = c.GetFloatJSONParam("holdRotationDamper");
+				if (holdRotParam == null)
+					Log.Error($"Damping: param holdRotationDamper not found for controlller {c.name}");
+				else
+					normalRot = holdRotParam.defaultVal;
+			}
+
+			var d = new Damping();
+			d.controller = c;
+			d.normalPosition = normalPos;
+			d.normalRotation = normalRot;
+			d.sexPosition = sexPosition;
+			d.sexRotation = sexRotation;
+
+			list.Add(d);
+		}
+
 		public void SetBodyDamping(int e)
 		{
-			SetStrongerDamping("hipControl", e, true);
-			SetStrongerDamping("chestControl", e, true);
-			SetStrongerDamping("headControl", e, true);
-			SetStrongerDamping("lThighControl", e, true);
-			SetStrongerDamping("rThighControl", e, true);
-			SetStrongerDamping("lFootControl", e, false);
-			SetStrongerDamping("rFootControl", e, false);
-			SetStrongerDamping("lKneeControl", e, false);
-			SetStrongerDamping("rKneeControl", e, false);
+			for (int i = 0; i < damping_.Length; ++i)
+				damping_[i].Set(e);
 		}
 
 		public void SetCollidersForKiss(bool b, IAtom other)
@@ -304,28 +388,6 @@ namespace Cue.Sys.Vam
 		public void SetBlink(bool b)
 		{
 			blink_.Value = b;
-		}
-
-		private void SetStrongerDamping(string cn, int e, bool lowerForSex)
-		{
-			float pos = 160;
-			float rot = 25;
-
-			if (e == BodyDamping.Sex || lowerForSex)
-			{
-				pos = 35;
-				rot = 5;
-			}
-
-			var c = U.FindController(atom_, cn);
-			if (c == null)
-			{
-				log_.Error($"SetStrongerDamping: controller '{cn}' not found");
-				return;
-			}
-
-			c.RBHoldPositionDamper = pos;
-			c.RBHoldRotationDamper = rot;
 		}
 
 		void SetControllerForMoving(string id, bool b)

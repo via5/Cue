@@ -495,7 +495,7 @@ namespace Cue.Sys
 	static class BodyDamping
 	{
 		public const int Normal = 0;
-		public const int Sex = 1;
+		public const int SexReceiver = 1;
 	}
 
 	public interface IAtom

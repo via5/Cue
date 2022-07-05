@@ -134,11 +134,11 @@
 
 				receiver_.AddForcedTrigger(
 					person_.PersonIndex, person_.Body.GenitalsBodyPart);
+
+				receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.SexReceiver);
 			}
 
 			SetZoneEnabled(true);
-
-			person_.Atom.SetBodyDamping(Sys.BodyDamping.Sex);
 			running_ = true;
 
 			return true;
@@ -163,6 +163,8 @@
 
 				receiver_.RemoveForcedTrigger(
 					person_.PersonIndex, person_.Body.GenitalsBodyPart);
+
+				receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.Normal);
 			}
 
 			SetZoneEnabled(false);
