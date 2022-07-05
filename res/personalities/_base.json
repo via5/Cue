@@ -455,9 +455,9 @@
 	"lookAboveMinPhysicalRate": 0.001,
 
 	"lookAtPlayerOnGrabWeight": -1,
-	"lookAtPlayerTimeAfterGrab": 5,
+	"lookAtPlayerTimeAfterGrab": 3,
 
-	"idleNaturalRandomWeight": 0.05,
+	"idleNaturalRandomWeight": 0.4,
 	"idleEmptyRandomWeight": 0.05,
 	"naturalRandomWeight": 0.0001,
 	"naturalOtherEyesWeight": 0.2,

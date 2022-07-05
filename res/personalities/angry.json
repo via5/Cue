@@ -4,6 +4,7 @@
 	"defaultHappiness": 0,
 	"defaultPlayfulness": 0,
 	"defaultAnger": 1,
+	"lookAtPlayerTimeAfterGrab": 0,
 
 	"zappedByPlayerBreastsExcitement": 0,
 	"zappedByPlayerGenitalsExcitement": 0,

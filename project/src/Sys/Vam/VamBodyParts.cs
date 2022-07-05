@@ -272,7 +272,7 @@ namespace Cue.Sys.Vam
 				return true;
 
 			// todo: should probably use BodyPartForTransform()
-			if (other.Atom.Possessed || other.Atom is VamCameraAtom)
+			if (other.Atom.Possessed || other.Atom is VamCameraAtom || other.Atom == Cue.Instance.Player?.Atom)
 			{
 				var sys = Cue.Instance.VamSys;
 
@@ -344,9 +344,12 @@ namespace Cue.Sys.Vam
 					return true;
 				}
 
-				return
-					targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
-					sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
+				if (sourcePart != null && targetPart != null)
+				{
+					return
+						targetPart.DoIgnoreTrigger(sourceAtom, sourcePart) ||
+						sourcePart.DoIgnoreTrigger(targetAtom, targetPart);
+				}
 			}
 			else
 			{
@@ -356,6 +359,8 @@ namespace Cue.Sys.Vam
 					sourceAtom.Atom.category == "Furniture" ||
 					sourceAtom.Atom.category == "Props";
 			}
+
+			return false;
 		}
 
 		private bool DoIgnoreTrigger(IAtom sourceAtom, VamBodyPart sourcePart)

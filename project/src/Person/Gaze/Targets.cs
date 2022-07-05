@@ -222,6 +222,7 @@ namespace Cue
 
 	public interface IGazeLookat
 	{
+		bool Exclusive { get; }
 		float Weight { get; }
 		string Why { get; }
 		string Failure { get; }
@@ -258,6 +259,11 @@ namespace Cue
 		public Logger Log
 		{
 			get { return person_.Gaze.Log; }
+		}
+
+		public bool Exclusive
+		{
+			get { return (weight_ < 0); }
 		}
 
 		public float Weight

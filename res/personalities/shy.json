@@ -4,4 +4,5 @@
 	"defaultHappiness": 0.3,
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
+	"lookAtPlayerTimeAfterGrab": 0,
 }

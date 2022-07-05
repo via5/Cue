@@ -220,6 +220,11 @@ namespace Cue
 			get { return sys_; }
 		}
 
+		public bool PluginEnabled
+		{
+			get { return true; }
+		}
+
 		public void DisablePlugin()
 		{
 		}
@@ -292,6 +297,11 @@ namespace Cue
 		public string PluginID
 		{
 			get { return name; }
+		}
+
+		public bool PluginEnabled
+		{
+			get { return enabledJSON.val; }
 		}
 
 		public override void Init()

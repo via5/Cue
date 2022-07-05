@@ -4,6 +4,8 @@
 
 	"idleEmptyRandomWeight": 1,
 
+	"lookAtPlayerTimeAfterGrab": 0,
+
 	"avoidGazePlayer": 0.4,
 	"avoidGazePlayerInsidePersonalSpace": 0.4,
 	"avoidGazePlayerDuringSex": 0.4,

@@ -49,8 +49,12 @@ namespace Cue.Sys.Vam
 		{
 			try
 			{
-				if (!isActiveAndEnabled || bp_ == null || CueMain.Instance.Sys.Paused)
+				if (!isActiveAndEnabled || bp_ == null ||
+					CueMain.Instance.Sys.Paused ||
+					CueMain.Instance.PluginEnabled)
+				{
 					return;
+				}
 
 				if (!CollisionWithThis(c))
 					return;

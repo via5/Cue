@@ -261,11 +261,16 @@ namespace Cue
 				return "no target";
 		}
 
-		public void ForceNextTarget(bool emergency)
+		public void EmergencyStarted()
 		{
-			emergency_ = emergency;
+			emergency_ = true;
 			delay_.Reset(0);
 			NextTarget();
+		}
+
+		public void EmergencyEnded()
+		{
+			emergency_ = false;
 		}
 
 		public void NextTarget()
@@ -275,7 +280,7 @@ namespace Cue
 			float total = 0;
 			for (int i = 0; i < targets_.Length; ++i)
 			{
-				if (targets_[i].Weight == GazeTargets.ExclusiveWeight)
+				if (targets_[i].Exclusive)
 				{
 					lastString_.Append(" target=#");
 					lastString_.Append(i);

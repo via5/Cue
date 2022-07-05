@@ -146,9 +146,9 @@ namespace Cue
 							$"gaze emergency: {events_[emergency]}, " +
 							$"gazer was {gazerEnabledBeforeEmergency_}");
 
-						UpdateTargets();
-						picker_.ForceNextTarget(true);
 						lastEmergency_ = emergency;
+						UpdateTargets();
+						picker_.EmergencyStarted();
 					}
 
 					picker_.Update(s);
@@ -165,6 +165,8 @@ namespace Cue
 						// restore gazer state
 						gazerEnabled_ = gazerEnabledBeforeEmergency_;
 						gazer_.Duration = gazeDuration_.Current;
+
+						picker_.EmergencyEnded();
 
 						lastEmergency_ = -1;
 					}
@@ -214,7 +216,7 @@ namespace Cue
 				}
 			}
 
-			picker_.ForceNextTarget(false);
+			picker_.EmergencyEnded();
 		}
 
 		private void UpdatePostTarget(float s)
@@ -275,15 +277,21 @@ namespace Cue
 			gazerEnabled_ = true;
 			int flags = 0;
 
-			for (int i = 0; i < events_.Length; ++i)
+			if (lastEmergency_ >= 0)
 			{
-				var e = events_[i];
-				flags |= e.Check(flags);
-
-				if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
-					gazerEnabled_ = false;
+				flags |= events_[lastEmergency_].Check(flags);
+			}
+			else
+			{
+				for (int i = 0; i < events_.Length; ++i)
+				{
+					var e = events_[i];
+					flags |= e.Check(flags);
+				}
 			}
 
+			if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
+				gazerEnabled_ = false;
 
 			if (Bits.IsSet(flags, BasicGazeEvent.NoGazer))
 				lastString_.Append("nogazer ");
