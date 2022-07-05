@@ -275,21 +275,60 @@ namespace Cue.Sys.Vam
 			{
 				log_.Info($"{ID}: setting default controls ({why})");
 				setOnlyKeyJointsOn_.Fire();
+			}
 
-				foreach (var fc in atom_.freeControllers)
+			ResetLinkToRB();
+
+			// todo
+			if (Cue.Instance.Options.DevMode)
+				SetNotInteractable();
+		}
+
+		private void ResetLinkToRB()
+		{
+			foreach (var fc in atom_.freeControllers)
+			{
+				var ps = fc.currentPositionState;
+				var rs = fc.currentRotationState;
+
+				if (ps != FreeControllerV3.PositionState.ParentLink &&
+					ps != FreeControllerV3.PositionState.PhysicsLink &&
+					rs != FreeControllerV3.RotationState.ParentLink &&
+					rs != FreeControllerV3.RotationState.PhysicsLink)
 				{
-					var ps = fc.currentPositionState;
-					var rs = fc.currentRotationState;
-
-					if (ps != FreeControllerV3.PositionState.ParentLink &&
-						ps != FreeControllerV3.PositionState.PhysicsLink &&
-						rs != FreeControllerV3.RotationState.ParentLink &&
-						rs != FreeControllerV3.RotationState.PhysicsLink)
-					{
-						fc.linkToRB = null;
-					}
+					fc.linkToRB = null;
 				}
 			}
+		}
+
+		private void SetNotInteractable()
+		{
+			foreach (var fc in atom_.freeControllers)
+			{
+				var rb = fc.GetComponent<Rigidbody>();
+				if (rb == null)
+					continue;
+
+				if (!ShouldBeInteractable(fc, rb))
+					fc.interactableInPlayMode = false;
+			}
+		}
+
+		private bool ShouldBeInteractable(FreeControllerV3 fc, Rigidbody rb)
+		{
+			if (fc.name == "control")
+				return true;
+
+			if (fc.name.Contains("hairTool") || fc.name.Contains("hairScalp"))
+				return true;
+
+			if (fc.currentPositionState != FreeControllerV3.PositionState.Off &&
+				fc.currentRotationState != FreeControllerV3.RotationState.Off)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		public void SetParentLink(IBodyPart bp)
