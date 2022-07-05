@@ -222,7 +222,7 @@
 			if (p == person_)
 				return false;
 
-			return person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].Active;
+			return (person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].StrictlyActiveCount > 0);
 		}
 
 		public bool FingeredBy(Person p)

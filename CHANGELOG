@@ -1,16 +1,25 @@
 2      ?
 
 features:
+  - Cue can now detect when body parts are rubbing against each other and at
+    what velocity, so excitement will rise automatically during penetration if
+    there's enough movement
+
+    running the thrust event is still more robust because excitement will
+    always continue to rise even if body parts become misaligned and stop
+    touching, which happens often for frottage
+
+  - excitement will now rise correctly with toys
+
   - auto hands and head: moving hands or head close to genitals will start the
     appropriate event, can be disabled in options; each hand is independent and
     will start/stop if necessary after being grabbed and moved
 
   - hand linker: now uses a custom, internal implementation managed by Cue
     instead of VaM's Parent Link connection, and so can link more precisely
-    to targets
-
-    this also fixes body parts being difficult to move in Play Mode (because VaM
-    ignores controllers that are linked when multiple body parts overlap)
+    to targets; this also fixes body parts being difficult to move in Play Mode
+    (because VaM ignores controllers that are linked when multiple body parts
+    overlap)
 
   - integration with ToumeiHitsuji's DiviningRod: genitals are always enabled,
     but hands and mouth are disabled unless the corresponding event is started
@@ -18,11 +27,10 @@ features:
   - voice: supports kissing an bj sounds from VAMMoan, can be disabled in
     options
 
-  - sync orgasms across multiple characters
+  - orgasms are synced across multiple characters when excitement is close
+    enough
 
   - new personalities: annoyed and angry
-
-  - excitement will now rise with toys
 
   - reorganised options into several tabs, added more:
       - treat strapon as physical for excitement
@@ -35,6 +43,7 @@ features:
   - slap: thrust animation now drives some facial expressions on each thrust,
     might make noises in a future update
 
+
 changes:
   - idle animation has more movement
   - removed most voice settings from Cue, caused more problems than anything
@@ -46,7 +55,7 @@ fixes:
   - hj/bj speed now changes based on excitement and have slightly more movements
   - fixed head and hands snapping after kiss or hj animations
   - detect Embody passenger mode to disable head movements
-  - sucking finger shouldn't trigger unless a hand is actually touching
+  - sucking finger should trigger less often
   - fixed hands being closed too often and morphs still being driven after the
     hands are attached to something
 

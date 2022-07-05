@@ -51,7 +51,7 @@ namespace Cue.Sys.Vam
 			{
 				if (!isActiveAndEnabled || bp_ == null ||
 					CueMain.Instance.Sys.Paused ||
-					CueMain.Instance.PluginEnabled)
+					!CueMain.Instance.PluginEnabled)
 				{
 					return;
 				}
