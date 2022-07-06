@@ -162,6 +162,12 @@
 
 				for (int i = 0; i < frustums_.Length; ++i)
 					frustums_[i].Visible = value;
+
+				for (int i = 0; i < avoid_.Length; ++i)
+					avoid_[i].Visible = value;
+
+				if (lookAt_ != null)
+					lookAt_.Visible = value;
 			}
 		}
 

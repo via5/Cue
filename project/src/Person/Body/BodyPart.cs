@@ -244,7 +244,7 @@ namespace Cue
 			get { return part_.Grabbed; }
 		}
 
-		public bool GrabbedByPlayer
+		public PersonStatus.PartResult GrabbedByPlayer
 		{
 			get
 			{
@@ -252,12 +252,13 @@ namespace Cue
 				{
 					var p = Cue.Instance.Player;
 
-					return
-						IsLinkedTo(p.Body.Get(BP.LeftHand)) ||
-						IsLinkedTo(p.Body.Get(BP.RightHand));
+					if (IsLinkedTo(p.Body.Get(BP.LeftHand)))
+						return new PersonStatus.PartResult(Type, p.ObjectIndex, BP.LeftHand);
+					else if (IsLinkedTo(p.Body.Get(BP.RightHand)))
+						return new PersonStatus.PartResult(Type, p.ObjectIndex, BP.RightHand);
 				}
 
-				return false;
+				return PersonStatus.PartResult.None;
 			}
 		}
 

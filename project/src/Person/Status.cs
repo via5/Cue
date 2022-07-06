@@ -119,7 +119,7 @@
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				PartResult pr = GropedBy(p, BodyParts.GropedParts);
+				PartResult pr = GropedBy(p);
 				if (pr)
 					return pr;
 			}
@@ -243,7 +243,14 @@
 					var byPart = by.Body.Get(checkParts[j]);
 
 					var pr = TriggeredBy(triggerPart, byPart);
-					if (pr.Valid)
+					if (pr)
+						return pr;
+				}
+
+				if (by.IsPlayer)
+				{
+					var pr = triggerPart.GrabbedByPlayer;
+					if (pr)
 						return pr;
 				}
 			}

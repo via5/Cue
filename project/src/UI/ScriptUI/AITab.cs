@@ -29,6 +29,7 @@ namespace Cue
 
 		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label traits_ = new VUI.Label();
+		private VUI.Label interacting_ = new VUI.Label();
 		private VUI.Label close_ = new VUI.Label();
 		private VUI.Label groped_ = new VUI.Label();
 		private VUI.Label penetrated_ = new VUI.Label();
@@ -54,6 +55,9 @@ namespace Cue
 
 			state.Add(new VUI.Spacer(20));
 			state.Add(new VUI.Spacer(20));
+
+			state.Add(new VUI.Label("Interacting with"));
+			state.Add(interacting_);
 
 			state.Add(new VUI.Label("Close"));
 			state.Add(close_);
@@ -92,10 +96,21 @@ namespace Cue
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
 
-			string close = null, groped = null, penetrated = null, penetrating = null;
+			string interacting = null, close = null, groped = null;
+			string penetrated = null, penetrating = null;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
+				if (person_.Status.InteractingWith(p))
+				{
+					if (interacting == null)
+						interacting = "";
+					else
+						interacting += ", ";
+
+					interacting += p.ID;
+				}
+
 				if (person_.Status.InsidePersonalSpace(p))
 				{
 					if (close == null)
@@ -137,6 +152,7 @@ namespace Cue
 				}
 			}
 
+			interacting_.Text = interacting ?? "nobody";
 			close_.Text = close ?? "nobody";
 			groped_.Text = groped ?? "nobody";
 			penetrated_.Text = penetrated ?? "nobody";
