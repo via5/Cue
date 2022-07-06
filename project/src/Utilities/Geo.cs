@@ -202,7 +202,7 @@ namespace Cue
 			get { return q_; }
 		}
 
-		public static Quaternion Zero
+		public static Quaternion Identity
 		{
 			get { return new Quaternion(UnityEngine.Quaternion.identity); }
 		}
@@ -220,6 +220,38 @@ namespace Cue
 		public static Quaternion FromBearing(float b)
 		{
 			return new Quaternion(UnityEngine.Quaternion.Euler(0, b, 0));
+		}
+
+		public static Quaternion FromJSON(JSONClass o, string key, bool mandatory = false)
+		{
+			if (!o.HasKey(key))
+			{
+				if (mandatory)
+					throw new LoadFailed($"quaternion '{key}' is missing");
+				else
+					return Identity;
+			}
+
+			var a = o[key].AsArray;
+			if (a == null)
+				throw new LoadFailed($"quaternion '{key}' node is not an array");
+
+			if (a.Count != 3)
+				throw new LoadFailed($"quaternion '{key}' array must have 3 elements");
+
+			float x;
+			if (!float.TryParse(a[0], out x))
+				throw new LoadFailed($"quaternion '{key}' x is not a number");
+
+			float y;
+			if (!float.TryParse(a[1], out y))
+				throw new LoadFailed($"quaternion '{key}' is not a number");
+
+			float z;
+			if (!float.TryParse(a[2], out z))
+				throw new LoadFailed($"quaternion '{key}' is not a number");
+
+			return FromEuler(x, y, z);
 		}
 
 		public float Bearing
@@ -269,7 +301,7 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return q_.ToString();
+			return Euler.ToString();
 		}
 
 		public override bool Equals(object o)
@@ -284,6 +316,12 @@ namespace Cue
 		public override int GetHashCode()
 		{
 			return q_.GetHashCode();
+		}
+
+		public static Quaternion operator *(Quaternion a, Quaternion b)
+		{
+			return Sys.Vam.U.FromUnity(
+				Sys.Vam.U.ToUnity(a) * Sys.Vam.U.ToUnity(b));
 		}
 
 		public static bool operator ==(Quaternion a, Quaternion b)

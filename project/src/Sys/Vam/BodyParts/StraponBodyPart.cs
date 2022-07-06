@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
 {
-	class StraponBodyPart : TriggerBodyPart
+	class StraponBodyPart : ColliderBodyPart
 	{
 		private static readonly string[] IgnoreTransforms = new string[]
 		{
@@ -13,13 +14,16 @@ namespace Cue.Sys.Vam
 
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
-		private VamColliderRegion[] colliders_ = null;
 
 		private float postCreateElapsed_ = 0;
 		private bool postCreate_ = false;
+		private bool enabled_ = false;
+
+		private Vector3 positionOffset_ = Vector3.Zero;
+		private Quaternion rotationOffset_ = Quaternion.Identity;
 
 		public StraponBodyPart(VamAtom a)
-			: base(a, BP.Penis, IgnoreTransforms)
+			: base(a, BP.Penis)
 		{
 			if (Cue.Instance.Sys.GetAtom(DildoID) != null)
 			{
@@ -50,6 +54,17 @@ namespace Cue.Sys.Vam
 		public override bool IsPhysical
 		{
 			get { return Cue.Instance.Options.StraponPhysical; }
+		}
+
+		public override bool Exists
+		{
+			get { return (base.Exists && enabled_); }
+		}
+
+		private bool Enabled
+		{
+			get { return enabled_; }
+			set { enabled_ = value; }
 		}
 
 		public void Set(bool b)
@@ -154,7 +169,7 @@ namespace Cue.Sys.Vam
 			{
 				Log.Info($"removing dildo");
 				dildo_ = null;
-				Init(null, null, null);
+				Set(null, null);
 				SetEnabled(false);
 			}
 			else
@@ -171,11 +186,6 @@ namespace Cue.Sys.Vam
 				DoInit();
 				SetEnabled(true);
 			}
-		}
-
-		protected override VamBodyPartRegion[] GetRegions()
-		{
-			return colliders_;
 		}
 
 		private void SetEnabled(bool b)
@@ -211,16 +221,12 @@ namespace Cue.Sys.Vam
 
 				var gen = (Atom.Body as VamBody)?.GetPart(BP.Vagina);
 
-				var q = Quaternion.Zero;
+				var q = Quaternion.Identity;
 				if (gen != null)
-				{
-					q = gen.Rotation;
-					q = U.FromUnity(U.ToUnity(q) * UnityEngine.Quaternion.Euler(-40, 0, 0));
-				}
+					q = gen.Rotation * rotationOffset_;
 
 				var v = U.FromUnity(anchor_.transform.position);
-				v.Y += 0.01f;
-				v.Z += 0.003f;
+				v += positionOffset_;
 
 				dildo_.Position = v;
 				dildo_.Rotation = q;
@@ -251,6 +257,28 @@ namespace Cue.Sys.Vam
 			return $"dildo (" + base.ToString() + ")";
 		}
 
+		protected override bool DoContainsTransform(Transform t, bool debug)
+		{
+			var d = (dildo_?.Atom as VamAtom)?.Atom;
+			if (d == null)
+				return false;
+
+			if (d.transform == t)
+			{
+				if (debug)
+					Log.Error($"found {t.name}");
+
+				return true;
+			}
+			else
+			{
+				if (debug)
+					Log.Error($"{t.name} is not {d.transform.name}");
+
+				return false;
+			}
+		}
+
 		private void DoInit()
 		{
 			dildo_.Atom.Collisions = false;
@@ -259,41 +287,38 @@ namespace Cue.Sys.Vam
 			postCreate_ = true;
 			postCreateElapsed_ = 0;
 
-			var collidersString = dildo_.GetParameter("colliders");
-			if (collidersString == "")
+			var cs = new List<Collider>();
+
+			var colliderNames = dildo_.Parameters.Object["colliders"]?.AsArray;
+			if (colliderNames == null)
 			{
-				Log.Warning("dildo is missing collidersString parameter");
+				Log.Warning("dildo missing colliders");
 			}
 			else
 			{
-				var colliderNames = collidersString.Split(';');
-
-				var cs = new List<VamColliderRegion>();
-				foreach (var cn in colliderNames)
+				foreach (JSONNode cn in colliderNames)
 				{
-					var c = (dildo_.Atom as VamAtom).FindCollider(cn.Trim());
+					var c = (dildo_.Atom as VamAtom).FindCollider(cn.Value.Trim());
 
 					if (c == null)
 					{
-						Log.Error($"{Atom.ID}: dildo collider {cn} not found");
+						Log.Error($"{Atom.ID}: dildo collider {cn.Value} not found");
 						continue;
 					}
 
-					cs.Add(new VamColliderRegion(this, c));
+					cs.Add(c);
 				}
 
-				colliders_ = cs.ToArray();
-
 				var names = new List<string>();
-				foreach (var c in colliders_)
-					names.Add(c.Collider.name);
+				foreach (var c in cs)
+					names.Add(U.QualifiedName(c));
 
 				Log.Info($"dildo colliders: {string.Join(", ", names.ToArray())}");
 			}
 
 
-			var anchorName = dildo_.GetParameter("anchor");
-			if (anchorName == "")
+			var anchorName = dildo_.Parameters.Object["anchor"].Value;
+			if (string.IsNullOrEmpty(anchorName))
 			{
 				Log.Warning("dildo is missing anchor parameter");
 			}
@@ -304,9 +329,12 @@ namespace Cue.Sys.Vam
 				if (anchor_ == null)
 					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
 				else
-					Log.Info($"dildo anchor: {anchor_}");
+					Log.Info($"dildo anchor: {U.QualifiedName(anchor_)}");
 			}
 
+
+			positionOffset_ = Vector3.FromJSON(dildo_.Parameters.Object, "positionOffset");
+			rotationOffset_ = Quaternion.FromJSON(dildo_.Parameters.Object, "rotationOffset");
 
 			var d = (dildo_.Atom as VamAtom).Atom;
 
@@ -328,7 +356,18 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			Init(h, d.mainController, d.transform);
+
+			Log.Verbose($"removing vamfixes handlers from {d}");
+			CueCollisionHandler.RemoveAll(d.transform);
+
+			Log.Verbose($"adding handlers on {d}");
+			foreach (var c in cs)
+			{
+				Log.Verbose($"{U.QualifiedName(c)}");
+				CueCollisionHandler.AddToCollider(c, this);
+			}
+
+			Set(cs.ToArray(), d.mainController, IgnoreTransforms);
 		}
 	}
 }

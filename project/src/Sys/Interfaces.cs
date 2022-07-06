@@ -6,31 +6,16 @@ namespace Cue.Sys
 {
 	public class ObjectParameters
 	{
-		private Dictionary<string, string> map_ = null;
+		private JSONClass ps_ = null;
 
 		public ObjectParameters(JSONClass o)
 		{
-			var keys = o?.Keys?.ToList();
-
-			if (keys != null && keys.Count > 0)
-			{
-				map_ = new Dictionary<string, string>();
-
-				for (int i = 0; i < keys.Count; ++i)
-					map_.Add(keys[i], o[keys[i]].Value);
-			}
+			ps_ = o ?? new JSONClass();
 		}
 
-		public string Get(string key)
+		public JSONClass Object
 		{
-			if (map_ != null)
-			{
-				string v;
-				if (map_.TryGetValue(key, out v))
-					return v;
-			}
-
-			return "";
+			get { return ps_; }
 		}
 	}
 

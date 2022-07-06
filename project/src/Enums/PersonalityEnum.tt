@@ -162,7 +162,8 @@ V.Float("ExcitementPostOrgasm"),
 V.Float("OrgasmTime"),
 V.Float("PostOrgasmTime"),
 V.Float("RateAdjustment"),
-V.Float("PenetrationDamper")
+V.Float("PenetrationDamper"),
+V.Float("MinCollisionMagnitude")
 
 };
 

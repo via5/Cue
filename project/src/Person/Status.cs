@@ -219,10 +219,11 @@
 
 		public bool PenetratedBy(Person p)
 		{
-			if (p == person_)
+			if (p == person_ || !p.Body.HasPenis)
 				return false;
 
-			return (person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex].StrictlyActiveCount > 0);
+			var src = person_.Body.Zone(SS.Penetration).Sources[p.PersonIndex];
+			return src.IsStrictlyActive(BP.Penis);
 		}
 
 		public bool FingeredBy(Person p)

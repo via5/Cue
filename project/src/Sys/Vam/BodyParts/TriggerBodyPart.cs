@@ -9,7 +9,6 @@ namespace Cue.Sys.Vam
 		private Trigger trigger_ = null;
 		private FreeControllerV3 fc_ = null;
 		private Transform t_ = null;
-		private bool enabled_ = false;
 
 		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts)
 			: base(a, type, (Collider[])null, ignoreBodyParts)
@@ -27,13 +26,7 @@ namespace Cue.Sys.Vam
 
 		public override bool Exists
 		{
-			get { return (h_ != null && enabled_); }
-		}
-
-		protected bool Enabled
-		{
-			get { return enabled_; }
-			set { enabled_ = value; }
+			get { return (h_ != null); }
 		}
 
 		protected void Init(
@@ -44,15 +37,6 @@ namespace Cue.Sys.Vam
 			trigger_ = h?.collisionTrigger?.trigger;
 			fc_ = fc;
 			t_ = tr;
-
-			if (h_ == null)
-			{
-				enabled_ = false;
-			}
-			else
-			{
-				enabled_ = true;
-			}
 		}
 
 		public override Rigidbody Rigidbody
@@ -119,7 +103,7 @@ namespace Cue.Sys.Vam
 			get
 			{
 				if (h_?.thisRigidbody == null)
-					return Quaternion.Zero;
+					return Quaternion.Identity;
 				else
 					return U.FromUnity(h_.thisRigidbody.rotation);
 			}

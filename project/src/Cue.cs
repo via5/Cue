@@ -30,6 +30,7 @@ namespace Cue
 
 		private UI ui_;
 		private bool loaded_ = false;
+		private bool objectsFound_ = false;
 
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
@@ -52,14 +53,59 @@ namespace Cue
 		public Sys.ISys Sys { get { return CueMain.Instance.Sys; } }
 		public Sys.Vam.VamSys VamSys { get { return Sys as Sys.Vam.VamSys; } }
 
-		public List<Person> AllPersons { get { return persons_; } }
-		public Person[] ActivePersons { get { return activePersonsArray_; } }
+		public List<Person> AllPersons
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return persons_;
+			}
+		}
 
-		public List<IObject> AllObjects { get { return objects_; } }
-		public IObject[] ActiveObjects { get { return activeObjectsArray_; } }
+		public Person[] ActivePersons
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return activePersonsArray_;
+			}
+		}
 
-		public List<IObject> Everything { get { return everything_; } }
-		public IObject[] EverythingActive { get { return everythingActiveArray_; } }
+		public List<IObject> AllObjects
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return objects_;
+			}
+		}
+
+		public IObject[] ActiveObjects
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return activeObjectsArray_;
+			}
+		}
+
+		public List<IObject> Everything
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return everything_;
+			}
+		}
+
+		public IObject[] EverythingActive
+		{
+			get
+			{
+				Assert(objectsFound_);
+				return everythingActiveArray_;
+			}
+		}
 
 
 		public Options Options { get { return options_; } }
@@ -96,6 +142,8 @@ namespace Cue
 
 		public IObject GetObject(int objectIndex)
 		{
+			Assert(objectsFound_);
+
 			if (objectIndex < 0 || objectIndex >= everything_.Count)
 				return null;
 			else
@@ -104,11 +152,14 @@ namespace Cue
 
 		public Person GetPerson(int personIndex)
 		{
+			Assert(objectsFound_);
 			return persons_[personIndex];
 		}
 
 		public Person FindPerson(string id)
 		{
+			Assert(objectsFound_);
+
 			for (int i = 0; i < persons_.Count; ++i)
 			{
 				if (persons_[i].ID == id)
@@ -120,6 +171,8 @@ namespace Cue
 
 		public Person PersonForAtom(Sys.IAtom a)
 		{
+			Assert(objectsFound_);
+
 			for (int i = 0; i < persons_.Count; ++i)
 			{
 				if (persons_[i].Atom == a)
@@ -273,6 +326,8 @@ namespace Cue
 			activePersonsArray_ = activePersons_.ToArray();
 			activeObjectsArray_ = activeObjects_.ToArray();
 			everythingActiveArray_ = everythingActive_.ToArray();
+
+			objectsFound_ = true;
 		}
 
 		private void InitPersons()
@@ -515,29 +570,51 @@ namespace Cue
 		static public void LogVerbose(string s)
 		{
 			if (LogVerboseEnabled)
-				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Verbose);
+			{
+				if (Instance == null)
+					SuperController.LogError(s);
+				else
+					Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Verbose);
+			}
 		}
 
 		static public void LogInfo(string s)
 		{
-			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Info);
+			if (Instance == null)
+				SuperController.LogError(s);
+			else
+				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Info);
 		}
 
 		static public void LogWarning(string s)
 		{
-			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Warning);
+			if (Instance == null)
+				SuperController.LogError(s);
+			else
+				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Warning);
 		}
 
 		static public void LogError(string s)
 		{
-			Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Error);
+			if (Instance == null)
+				SuperController.LogError(s);
+			else
+				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Error);
 		}
 
 		static public void LogErrorST(string s)
 		{
-			Instance.Sys.LogLines(
-				s + "\n" + new StackTrace(1).ToString(),
-				global::Cue.Sys.LogLevels.Error);
+			if (Instance == null)
+			{
+				SuperController.LogError(
+					s + "\n" + new StackTrace(1).ToString());
+			}
+			else
+			{
+				Instance.Sys.LogLines(
+					s + "\n" + new StackTrace(1).ToString(),
+					global::Cue.Sys.LogLevels.Error);
+			}
 		}
 
 		static public void Assert(bool b, string s = null)
@@ -549,7 +626,9 @@ namespace Cue
 				else
 					LogErrorST($"assertion failed: {s}");
 
-				Instance.DisablePlugin();
+				if (Instance != null)
+					Instance.DisablePlugin();
+
 				throw new PluginGone();
 			}
 		}

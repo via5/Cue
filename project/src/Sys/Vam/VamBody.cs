@@ -120,11 +120,7 @@ namespace Cue.Sys.Vam
 		public VamBody(VamAtom a)
 			: base(a)
 		{
-			foreach (var cm in Atom.Atom.GetComponentsInChildren<Component>())
-			{
-				if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
-					UnityEngine.Object.Destroy(cm);
-			}
+			CueCollisionHandler.RemoveAll(Atom.Atom.transform);
 
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))

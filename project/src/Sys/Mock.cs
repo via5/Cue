@@ -423,7 +423,7 @@ namespace Cue.Sys.Mock
 
 		public Quaternion Rotation
 		{
-			get { return Quaternion.Zero; }
+			get { return Quaternion.Identity; }
 			set { }
 		}
 

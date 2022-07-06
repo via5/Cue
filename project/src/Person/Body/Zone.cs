@@ -348,7 +348,7 @@ namespace Cue
 			p.targetBodyPart = targetBodyPart;
 			p.magnitude = Math.Max(p.magnitude, mag);
 			p.elapsed = 1.0f;
-			p.ignored = (p.magnitude < 0.1f);
+			p.ignored = (p.magnitude < person_.Personality.Get(PS.MinCollisionMagnitude));
 
 			if (!p.active)
 			{

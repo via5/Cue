@@ -22,6 +22,7 @@ namespace Cue.Sys.Vam
 		public abstract Quaternion Rotation { get; }
 	}
 
+
 	public class VamColliderRegion : VamBodyPartRegion
 	{
 		private Collider c_;
@@ -39,7 +40,7 @@ namespace Cue.Sys.Vam
 
 		public override string FullName
 		{
-			get { return U.FullName(c_); }
+			get { return U.QualifiedName(c_); }
 		}
 
 		public override Vector3 Position

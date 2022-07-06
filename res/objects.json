@@ -30,8 +30,10 @@
 			},
 			"parameters":
 			{
-				"colliders": "b3/_Collider6",
-				"anchor": "pelvisF4/pelvisF4Joint"
+				"colliders": ["b2/2", "b3/1", "b1/1"],
+				"anchor": "pelvisF4/pelvisF4Joint",
+				"positionOffset": [0, 0.01, 0.003],
+				"rotationOffset": [-40, 0, 0]
 			}
 		},
 

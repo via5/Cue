@@ -14,6 +14,7 @@ namespace Cue
 		Quaternion Rotation { get; set; }
 		Vector3 EyeInterest { get; }
 		bool Possessed { get; }
+		Sys.ObjectParameters Parameters { get; }
 
 		bool HasTrait(string name);
 		string[] Traits { get; set; }
@@ -25,8 +26,6 @@ namespace Cue
 
 		JSONNode ToJSON();
 		void Load(JSONClass r);
-
-		string GetParameter(string key);
 	}
 
 
@@ -49,14 +48,6 @@ namespace Cue
 			log_ = new Logger(Logger.Object, this, "");
 			ps_ = ps;
 			possesser_ = new AcidBubbles.Embody(atom);
-		}
-
-		public string GetParameter(string key)
-		{
-			if (ps_ == null)
-				return "";
-			else
-				return ps_.Get(key);
 		}
 
 		public void Destroy()
@@ -129,6 +120,11 @@ namespace Cue
 
 				return false;
 			}
+		}
+
+		public Sys.ObjectParameters Parameters
+		{
+			get { return ps_; }
 		}
 
 		public bool HasTrait(string name)

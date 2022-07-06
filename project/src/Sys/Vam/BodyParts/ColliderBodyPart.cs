@@ -8,7 +8,6 @@ namespace Cue.Sys.Vam
 		private FreeControllerV3 fc_;
 		private Rigidbody rb2_, closestRb_;
 		private Collider main_ = null;
-		private Collider[] colliders_;
 
 		public ColliderBodyPart(
 			VamAtom a, BodyPartType type, Collider[] cs, FreeControllerV3 fc,
@@ -18,10 +17,24 @@ namespace Cue.Sys.Vam
 			fc_ = fc;
 			rb2_ = rb;
 			closestRb_ = closestRb;
-			colliders_ = cs;
 
 			if (cs != null && cs.Length > 0)
 				main_ = cs[0];
+		}
+
+		protected ColliderBodyPart(VamAtom a, BodyPartType type)
+			: base(a, type)
+		{
+		}
+
+		protected void Set(Collider[] cs, FreeControllerV3 fc, string[] ignoreBodyParts)
+		{
+			fc_ = fc;
+
+			if (cs != null && cs.Length > 0)
+				main_ = cs[0];
+
+			Set(cs, ignoreBodyParts);
 		}
 
 		public override Rigidbody Rigidbody

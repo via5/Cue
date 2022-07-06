@@ -58,8 +58,14 @@ namespace Cue.Sys.Vam
 				foreach (var c in colliders)
 					cs.Add(new VamColliderRegion(this, c));
 
-				SetColliders(cs.ToArray(), ignoreBodyParts);
+				colliders_ = cs.ToArray();
 			}
+
+			if (ignoreBodyParts == null)
+				ignoreBodyParts_ = new BodyPartType[0];
+			else
+				ignoreBodyParts_ = MakeIgnoreBodyParts(ignoreBodyParts);
+
 		}
 
 		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders, string[] ignoreBodyParts)
@@ -80,18 +86,43 @@ namespace Cue.Sys.Vam
 					cs.Add(new VamColliderRegion(this, c));
 				}
 
-				SetColliders(cs.ToArray(), ignoreBodyParts);
+				colliders_ = cs.ToArray();
 			}
-		}
-
-		private void SetColliders(VamColliderRegion[] cs, string[] ignoreBodyParts)
-		{
-			colliders_ = cs;
 
 			if (ignoreBodyParts == null)
 				ignoreBodyParts_ = new BodyPartType[0];
 			else
 				ignoreBodyParts_ = MakeIgnoreBodyParts(ignoreBodyParts);
+
+		}
+
+		protected void Set(Collider[] colliders, string[] ignoreBodyParts)
+		{
+			if (colliders_ != null)
+			{
+				foreach (var c in colliders_)
+					CueCollisionHandler.RemoveFromCollider(c.Collider);
+
+				handlers_ = null;
+				colliders_ = null;
+			}
+
+			if (colliders != null)
+			{
+				var cs = new List<VamColliderRegion>();
+				foreach (var c in colliders)
+					cs.Add(new VamColliderRegion(this, c));
+
+				colliders_ = cs.ToArray();
+			}
+
+			if (ignoreBodyParts == null)
+				ignoreBodyParts_ = new BodyPartType[0];
+			else
+				ignoreBodyParts_ = MakeIgnoreBodyParts(ignoreBodyParts);
+
+
+			SetColliders();
 		}
 
 		private BodyPartType[] MakeIgnoreBodyParts(string[] ignoreBodyParts)
@@ -171,7 +202,11 @@ namespace Cue.Sys.Vam
 		public virtual void Init()
 		{
 			collisions_ = new float[Cue.Instance.ActivePersons.Length, BP.Count];
+			SetColliders();
+		}
 
+		private void SetColliders()
+		{
 			var hs = new List<CueCollisionHandler>();
 
 			if (colliders_ != null)

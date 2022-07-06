@@ -156,9 +156,10 @@ namespace Cue
 		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(127);
 		public static readonly FloatIndex RateAdjustment = new FloatIndex(128);
 		public static readonly FloatIndex PenetrationDamper = new FloatIndex(129);
+		public static readonly FloatIndex MinCollisionMagnitude = new FloatIndex(130);
 
-		public const int FloatCount = 130;
-		public override int GetFloatCount() { return 130; }
+		public const int FloatCount = 131;
+		public override int GetFloatCount() { return 131; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -414,6 +415,7 @@ namespace Cue
 			"postOrgasmTime",
 			"rateAdjustment",
 			"penetrationDamper",
+			"minCollisionMagnitude",
 		};
 
 		public static int FloatFromString(string s)
@@ -659,6 +661,7 @@ namespace Cue
 			"postOrgasmTime",
 			"rateAdjustment",
 			"penetrationDamper",
+			"minCollisionMagnitude",
 			"movementEnergyRampUpAfterOrgasmEasing",
 		};
 

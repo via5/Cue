@@ -441,6 +441,10 @@ Controls what characters are looking at.
   orgasm and this character's excitement is above this value, its orgasm will be
   triggered
 
+- MinCollisionMagnitude (float)
+  if the relative velocity of the collision between two body parts is lower than
+  this, excitement won't rise
+
 
 3.5 Mood
 --------

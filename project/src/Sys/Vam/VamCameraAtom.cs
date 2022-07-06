@@ -28,7 +28,7 @@ namespace Cue.Sys.Vam
 
 		public override Quaternion Rotation
 		{
-			get { return Quaternion.Zero; }
+			get { return Quaternion.Identity; }
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)
@@ -69,7 +69,7 @@ namespace Cue.Sys.Vam
 
 		public override Quaternion Rotation
 		{
-			get { return Quaternion.Zero; }
+			get { return Quaternion.Identity; }
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)
@@ -193,9 +193,9 @@ namespace Cue.Sys.Vam
 			get
 			{
 				if (ActiveTransform == null)
-					return Quaternion.Zero;
+					return Quaternion.Identity;
 				else if (!Cue.Instance.VamSys.IsVR)  // see Position
-					return Quaternion.Zero;
+					return Quaternion.Identity;
 				else
 					return U.FromUnity(ActiveTransform.rotation);
 			}

@@ -5,7 +5,7 @@
 		private IObject smoke_ = null;
 		private Sys.Vam.FloatParameter smokeOpacityParam_ = null;
 		private Vector3 pos_ = Vector3.Zero;
-		private Quaternion rot_ = Quaternion.Zero;
+		private Quaternion rot_ = Quaternion.Identity;
 		private float smokeOpacity_ = 0;
 		private bool destroy_ = false;
 		private Logger log_;

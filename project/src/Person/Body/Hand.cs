@@ -37,7 +37,7 @@
 			get
 			{
 				if (sys_ == null)
-					return Quaternion.Zero;
+					return Quaternion.Identity;
 				else
 					return sys_.Rotation;
 			}

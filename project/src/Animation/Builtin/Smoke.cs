@@ -70,10 +70,10 @@ namespace Cue
 		private BodyPart handPart_ = null;
 		private int state_ = NoState;
 		private Vector3 startPos_ = Vector3.Zero;
-		private Quaternion startRot_ = Quaternion.Zero;
+		private Quaternion startRot_ = Quaternion.Identity;
 		private Vector3 targetMidPos_ = Vector3.Zero;
 		private Vector3 targetPos_ = Vector3.Zero;
-		private Quaternion targetRot_ = Quaternion.Zero;
+		private Quaternion targetRot_ = Quaternion.Identity;
 		private Render render_ = new Render();
 		private float startFist_ = 0;
 		private float targetFist_ = 0;

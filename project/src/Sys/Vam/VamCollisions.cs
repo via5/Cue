@@ -22,18 +22,41 @@ namespace Cue.Sys.Vam
 			var ch = rb.gameObject.AddComponent<CueCollisionHandler>();
 			if (ch == null)
 			{
-				Cue.LogError($"failed to add handler to collider {U.FullName(c)}");
+				Cue.LogError($"failed to add handler to collider {U.QualifiedName(c)}");
 				return null;
 			}
 
 			ch.bp_ = bp;
 			if (ch.bp_ != null)
+			{
 				ch.person_ = Cue.Instance.PersonForAtom(ch.bp_.Atom);
+
+				if (ch.person_ == null)
+					Cue.LogErrorST($"CueCollisionHandler: bp atom {ch.bp_.Atom} not found for {bp} ({U.QualifiedName(c)})");
+			}
 
 			ch.rb_ = rb;
 			ch.collider_ = c;
 
 			return ch;
+		}
+
+		public static void RemoveAll(Transform t)
+		{
+			foreach (var cm in t.GetComponentsInChildren<Component>())
+			{
+				if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
+					UnityEngine.Object.Destroy(cm);
+			}
+		}
+
+		public static void RemoveFromCollider(Collider c)
+		{
+			foreach (var cm in c.GetComponentsInChildren<Component>())
+			{
+				if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
+					UnityEngine.Object.Destroy(cm);
+			}
 		}
 
 		private static Rigidbody FindRigidbody(Collider c)
@@ -68,6 +91,9 @@ namespace Cue.Sys.Vam
 					DoExternalCollision(c, mag);
 				else
 					DoPersonCollision(sourcePart, mag);
+			}
+			catch (PluginGone)
+			{
 			}
 			catch (Exception e)
 			{
@@ -122,8 +148,6 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			//Cue.LogError($"{bp_} {sourcePart} {U.QualifiedName(c.collider)}");
-
 			var sourcePerson = Cue.Instance.PersonForAtom(sourcePart.Atom);
 
 			var sourceIndex = sourcePerson?.PersonIndex ?? -1;
@@ -141,7 +165,6 @@ namespace Cue.Sys.Vam
 			}
 
 			var targetIndex = person_.PersonIndex;
-
 
 			bp_.AddPersonCollision(sourceIndex, sourcePart.Type, mag);
 			sourcePart.AddPersonCollision(targetIndex, targetPart.Type, mag);
