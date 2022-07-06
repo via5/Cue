@@ -456,16 +456,16 @@ namespace Cue
 
 		public void LateUpdate(float s)
 		{
-			if (!Sys.Paused)
-			{
-				I.Instance.Reset();
+			// don't check paused, LateUpdate is used to keep some objects in
+			// the right place, like the strapon
 
-				I.Start(I.LateUpdate);
-				{
-					DoLateUpdate(s);
-				}
-				I.End();
+			I.Instance.Reset();
+
+			I.Start(I.LateUpdate);
+			{
+				DoLateUpdate(s);
 			}
+			I.End();
 		}
 
 		private void DoLateUpdate(float s)

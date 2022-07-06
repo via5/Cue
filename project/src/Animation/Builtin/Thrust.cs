@@ -21,7 +21,7 @@ namespace Cue.Proc
 			public Vector3 hipTorqueWin;
 		}
 
-		private const float DirectionChangeMaxDistance = 0.05f;
+		private const float DirectionChangeMaxDistance = 0.01f;
 		private const float ForceFarDistance = 0.07f;
 		private const float ForceCloseDistance = 0.04f;
 		private const float MinimumForce = 1;//0.4f;

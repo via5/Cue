@@ -108,6 +108,9 @@ namespace Cue.Sys.Vam
 
 			public void LateUpdate(float s)
 			{
+				if (Cue.Instance.Sys.Paused)
+					return;
+
 				Vector3 p = to_.Position;
 				Quaternion q = to_.Rotation;
 

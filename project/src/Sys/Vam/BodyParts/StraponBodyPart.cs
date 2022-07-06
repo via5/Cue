@@ -61,6 +61,18 @@ namespace Cue.Sys.Vam
 			get { return (base.Exists && enabled_); }
 		}
 
+		public override Vector3 ControlPosition
+		{
+			get { return dildo_.Atom.Position; }
+			set { Log.Error("cannot move colliders"); }
+		}
+
+		public override Quaternion ControlRotation
+		{
+			get { return dildo_.Atom.Rotation; }
+			set { Log.Error("cannot rotate colliders"); }
+		}
+
 		private bool Enabled
 		{
 			get { return enabled_; }
