@@ -608,7 +608,7 @@
 	"postOrgasmTime": 10,
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
-	"minCollisionMagnitude": 0.05,
+	"minCollisionMagnitude": 0.1,
 
 	"slapMinExpressionChange": 0,
 	"slapMaxExpressionChange": 0.4,

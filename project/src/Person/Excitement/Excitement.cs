@@ -40,6 +40,11 @@ namespace Cue
 			get { return (enabledForExternal_ > 0); }
 		}
 
+		public virtual bool AllowDecay
+		{
+			get { return true; }
+		}
+
 		public void AddEnabledFor(Person p)
 		{
 			if (p == null)
@@ -125,6 +130,28 @@ namespace Cue
 			: base(p)
 		{
 			zone_ = ss;
+		}
+
+		public override bool AllowDecay
+		{
+			get
+			{
+				// don't allow decay if something is active, even if its mag is
+				// too low
+
+				var z = person_.Body.Zone(zone_);
+
+				if (z != null)
+				{
+					for (int i = 0; i < z.Sources.Length; ++i)
+					{
+						if (z.Sources[i].StrictlyActiveCount > 0)
+							return false;
+					}
+				}
+
+				return true;
+			}
 		}
 
 		public override float GetMaximum()
@@ -522,7 +549,21 @@ namespace Cue
 				totalRate_ = subtotalRate_ * person_.Personality.Get(PS.RateAdjustment);
 
 				if (totalRate_ == 0)
-					totalRate_ = person_.Personality.Get(PS.ExcitementDecayRate);
+				{
+					bool allowDecay = true;
+
+					for (int i = 0; i < sources_.Length; ++i)
+					{
+						if (!sources_[i].AllowDecay)
+						{
+							allowDecay = false;
+							break;
+						}
+					}
+
+					if (allowDecay)
+						totalRate_ = person_.Personality.Get(PS.ExcitementDecayRate);
+				}
 			}
 		}
 
@@ -594,6 +635,8 @@ namespace Cue
 
 			if (totalRate_ < 0)
 				debug.Add($"  total: {totalRate_:0.00000} (decaying)");
+			else if (totalRate_ == 0)
+				debug.Add($"  total: {totalRate_:0.00000} (stable)");
 			else
 				debug.Add($"  total: {totalRate_:0.00000} (rising)");
 
