@@ -45,19 +45,26 @@ features:
 
 
 changes:
+  - advanced colliders are now required
   - idle animation has more movement
   - removed most voice settings from Cue, caused more problems than anything
-
+  - hj/bj speed now changes based on excitement and have slightly more movements
+  - many tweaks to thrust animation
+  - eyeTargetControl now always hidden, can only be selected from the person's
+    Select menu
+  - devmode only: all targets that are off are now hidden in play mode
 
 fixes:
   - many fixes for excitement not rising when it should; characters should be
     much more responsive now
-  - hj/bj speed now changes based on excitement and have slightly more movements
-  - fixed head and hands snapping after kiss or hj animations
+  - many fixes for gaze getting stuck or not responding to emergencies like
+    orgasms or head grabs
+  - fixed head and hands snapping after kiss, hj or bj animations
   - detect Embody passenger mode to disable head movements
   - sucking finger should trigger less often
   - fixed hands being closed too often and morphs still being driven after the
     hands are attached to something
+  - fixed multiple strapons in the same scene only working for one
 
 
 1.1     2022-01-17
