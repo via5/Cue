@@ -24,7 +24,6 @@ namespace Cue.Proc
 		private const float DirectionChangeMaxDistance = 0.01f;
 		private const float ForceFarDistance = 0.07f;
 		private const float ForceCloseDistance = 0.04f;
-		private const float MinimumForce = 1;//0.4f;
 		private const float ForceChangeMaxAmount = 0.02f;
 
 		private float chestTorqueMin_ = -10;
@@ -217,32 +216,21 @@ namespace Cue.Proc
 			if (receiver_ == null)
 				return 0.7f;
 
-			var thisBP = Person.Body.Get(Person.Body.GenitalsBodyPart);
-			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
+			float scaleMin = 0.65f;
+			float scaleMax = 1.0f;
+			float scaleRange = scaleMax - scaleMin;
 
-			var range = ForceFarDistance - ForceCloseDistance;
+			float scale = U.Clamp(receiver_.Atom.Scale, scaleMin, scaleMax);
+			float scaleF = (scale - scaleMin) / scaleRange;
 
-			var dist = Vector3.Distance(thisBP.Position, targetBP.Position);
-			var cdist = U.Clamp(dist, ForceCloseDistance, ForceFarDistance);
-			var currentP = Math.Max((cdist - ForceCloseDistance) / range, MinimumForce);
 
-			float p;
+			float minForce = 0.8f;
+			float maxForce = 1.0f;
+			float forceRange = maxForce - minForce;
 
-			if (lastForceFactor_ == 0)
-			{
-				p = currentP;
-			}
-			else
-			{
-				if (currentP > lastForceFactor_)
-					p = Math.Min(lastForceFactor_ + ForceChangeMaxAmount, currentP);
-				else
-					p = Math.Max(lastForceFactor_ - ForceChangeMaxAmount, currentP);
-			}
+			lastForceFactor_ = minForce + scaleF * forceRange;
 
-			lastForceFactor_ = p;
-
-			return p;
+			return lastForceFactor_;
 		}
 
 		private void UpdateForce(Force f)
@@ -307,7 +295,7 @@ namespace Cue.Proc
 			{
 				c.hipTorqueMin = new Vector3(0, 0, 0);
 				c.hipTorqueMax = new Vector3(-30, 0, 0);
-				c.hipTorqueWin = new Vector3(0, 0, 0);
+				c.hipTorqueWin = new Vector3(10, 0, 0);
 			}
 
 			return c;
