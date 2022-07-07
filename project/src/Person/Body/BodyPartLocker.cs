@@ -19,7 +19,9 @@ namespace Cue
 		{
 			for (int i = 0; i < locks_.Count; ++i)
 			{
-				if (locks_[i].Prevents(lockType, BodyPartLock.NoKey))
+				Cue.LogError($"checking {bp_} for {lockType} {strengthType}");
+
+				if (!locks_[i].CanLock(lockType, strengthType, BodyPartLock.NoKey))
 				{
 					// not an error
 					//
@@ -225,6 +227,14 @@ namespace Cue
 			}
 
 			return false;
+		}
+
+		public bool CanLock(int type, int strengthType, ulong key)
+		{
+			if (Prevents(type, key) && IsStrong)
+				return false;
+
+			return true;
 		}
 
 		public bool IsWeakFor(int type)

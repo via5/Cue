@@ -178,6 +178,7 @@ namespace Cue.Sys.Vam
 			public string forceReceiver;
 			public string rigidbody;
 			public string closestRigidbody;
+			public bool useTrigger;
 		}
 
 		private IBodyPart LoadPart(bool male, JSONClass o, Func<string, JSONNode> getVar)
@@ -243,6 +244,7 @@ namespace Cue.Sys.Vam
 			ps.forceReceiver = J.OptString(o, "forceReceiver");
 			ps.rigidbody = J.OptString(o, "rigidbody");
 			ps.closestRigidbody = J.OptString(o, "closestRigidbody");
+			ps.useTrigger = J.OptBool(o, "useTrigger", true);
 
 			var type = J.ReqString(o, "type");
 
@@ -441,7 +443,7 @@ namespace Cue.Sys.Vam
 
 			return new TriggerBodyPart(
 				atom_, ps.bodyPart, t, fc, t.thisRigidbody.transform,
-				ps.ignore.ToArray(), ps.colliders.ToArray());
+				ps.ignore.ToArray(), ps.colliders.ToArray(), ps.useTrigger);
 		}
 
 		private IBodyPart CreateCollider(PartSettings ps)

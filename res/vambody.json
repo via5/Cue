@@ -57,10 +57,10 @@
 			"ignore": "head",
             "colliders":
 			[
+				"FaceCentral2/FaceCentral2",
 				"lowerJaw/ColliderLipM",
 				"lowerJaw/ColliderLipL",
 				"lowerJaw/ColliderLipR",
-				"FaceCentral2/FaceCentral2"
 			]
         },
 
@@ -90,7 +90,13 @@
 			"part": "vagina",
 			"type": "collider",
 			"sex": "female",
-			"colliders": ["pelvis/_JointB", "pelvis/_JointGl", "pelvis/_JointGr"],
+			"colliders":
+			[
+				"pelvisF1/pelvisF1",
+				"pelvis/JointB",
+				"pelvis/JointGl",
+				"pelvis/JointGr"
+			],
 			"ignore": "$genitalsIgnore"
 		},
 

@@ -9,18 +9,21 @@ namespace Cue.Sys.Vam
 		private Trigger trigger_ = null;
 		private FreeControllerV3 fc_ = null;
 		private Transform t_ = null;
+		private bool useTrigger_ = true;
 
-		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts)
+		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts, bool useTrigger)
 			: base(a, type, (Collider[])null, ignoreBodyParts)
 		{
+			useTrigger_ = useTrigger;
 		}
 
 		public TriggerBodyPart(
 			VamAtom a, BodyPartType type, CollisionTriggerEventHandler h,
 			FreeControllerV3 fc, Transform tr,
-			string[] ignoreBodyParts, string[] colliders)
+			string[] ignoreBodyParts, string[] colliders, bool useTrigger)
 				: base(a, type, colliders, ignoreBodyParts)
 		{
+			useTrigger_ = useTrigger;
 			Init(h, fc, tr);
 		}
 
@@ -125,34 +128,37 @@ namespace Cue.Sys.Vam
 		{
 			base.UpdateTriggers();
 
-			if (!trigger_.active)
-				return;
-
-			foreach (var kv in h_.collidingWithDictionary)
+			if (useTrigger_)
 			{
-				if (!kv.Value || kv.Key == null)
-					continue;
+				if (!trigger_.active)
+					return;
 
-				var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform) as VamBodyPart;
-
-				if (bp == null)
+				foreach (var kv in h_.collidingWithDictionary)
 				{
-					var a = U.AtomForCollider(kv.Key);
-					AddExternalCollision(a, 1.0f);
-				}
-				else
-				{
-					if (VamBodyPart.IgnoreTrigger(
-							bp.Atom as VamAtom, bp, Atom as VamAtom, this))
-					{
+					if (!kv.Value || kv.Key == null)
 						continue;
+
+					var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform) as VamBodyPart;
+
+					if (bp == null)
+					{
+						var a = U.AtomForCollider(kv.Key);
+						AddExternalCollision(a, 1.0f);
 					}
+					else
+					{
+						if (VamBodyPart.IgnoreTrigger(
+								bp.Atom as VamAtom, bp, Atom as VamAtom, this))
+						{
+							continue;
+						}
 
-					var p = Cue.Instance.PersonForAtom(bp.Atom);
-					if (p == null)
-						return;
+						var p = Cue.Instance.PersonForAtom(bp.Atom);
+						if (p == null)
+							return;
 
-					AddPersonCollision(p.PersonIndex, bp.Type, 1.0f);
+						AddPersonCollision(p.PersonIndex, bp.Type, 1.0f);
+					}
 				}
 			}
 		}

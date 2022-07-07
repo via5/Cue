@@ -392,7 +392,8 @@ namespace Cue.Sys.Vam
 					sourceAtom.Atom.category == "Environments" ||
 					sourceAtom.Atom.category == "Floors And Walls" ||
 					sourceAtom.Atom.category == "Furniture" ||
-					sourceAtom.Atom.category == "Props";
+					sourceAtom.Atom.category == "Props" ||
+					sourceAtom.Atom.category == "None";  // cua
 			}
 
 			return false;

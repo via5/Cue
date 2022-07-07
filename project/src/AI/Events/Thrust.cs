@@ -10,6 +10,7 @@
 		private AnimationType anim_ = AnimationType.None;
 		private BodyPartLock lock_ = null;
 
+		private BodyPartLock idleLock_ = null;
 
 		public ThrustEvent()
 			: base("thrust")
@@ -38,6 +39,12 @@
 				{
 					if (!Start())
 						return;
+
+					if (idleLock_ != null)
+					{
+						idleLock_.Unlock();
+						idleLock_ = null;
+					}
 				}
 
 				CheckAnim();
@@ -45,6 +52,26 @@
 			else if (running_)
 			{
 				Stop();
+			}
+			else
+			{
+				if (idleLock_ == null)
+				{
+					if (person_.Status.Penetrated() || person_.Status.Penetrating())
+					{
+						idleLock_ = person_.Body.Get(BP.Hips).Lock(
+							BodyPartLock.Anim, "idle lock for pen",
+							BodyPartLock.Weak);
+					}
+				}
+				else
+				{
+					if (!person_.Status.Penetrated() && !person_.Status.Penetrating())
+					{
+						idleLock_.Unlock();
+						idleLock_ = null;
+					}
+				}
 			}
 		}
 
