@@ -74,6 +74,16 @@ namespace Cue
 			// no-op
 		}
 
+		public virtual bool Pause()
+		{
+			return false;
+		}
+
+		public virtual bool Resume()
+		{
+			return false;
+		}
+
 		public virtual void Stopped()
 		{
 			// no-op
@@ -237,6 +247,42 @@ namespace Cue
 			}
 		}
 
+		public bool Pause(IAnimation a)
+		{
+			Log.Verbose(
+				$"pausing animation {a}, " +
+				$"looking for proto, count={playing_.Count}");
+
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+				{
+					Log.Verbose($"found animation at {i}");
+					return DoPause(i);
+				}
+			}
+
+			return false;
+		}
+
+		public bool Resume(IAnimation a)
+		{
+			Log.Verbose(
+				$"resuming animation {a}, " +
+				$"looking for proto, count={playing_.Count}");
+
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].proto == a)
+				{
+					Log.Verbose($"found animation at {i}");
+					return DoResume(i);
+				}
+			}
+
+			return false;
+		}
+
 		public void MainSyncStopping(IAnimation a, Proc.ISync s)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
@@ -260,6 +306,24 @@ namespace Cue
 				$"anim is {playing_[i].anim}");
 
 			playing_[i].anim.RequestStop(stopFlags);
+		}
+
+		private bool DoPause(int i)
+		{
+			Log.Verbose(
+				$"pausing {i}, proto is {playing_[i].proto}, " +
+				$"anim is {playing_[i].anim}");
+
+			return playing_[i].anim.Pause();
+		}
+
+		private bool DoResume(int i)
+		{
+			Log.Verbose(
+				$"resuming {i}, proto is {playing_[i].proto}, " +
+				$"anim is {playing_[i].anim}");
+
+			return playing_[i].anim.Resume();
 		}
 
 		public void FixedUpdate(float s)

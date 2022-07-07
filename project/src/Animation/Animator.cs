@@ -63,6 +63,8 @@ namespace Cue
 		bool Play(IAnimation a, int flags, AnimationContext cx);
 		void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags);
 		void StopNow(IAnimation a, int stopFlags = Animation.NoStopFlags);
+		bool Pause(IAnimation a);
+		bool Resume(IAnimation a);
 		void MainSyncStopping(IAnimation a, Proc.ISync s);
 		void Seek(IAnimation a, float where);
 		void FixedUpdate(float s);
@@ -135,6 +137,7 @@ namespace Cue
 			public readonly Animation anim;
 			public readonly IPlayer player;
 			public bool stopping = false;
+			public bool paused = false;
 			public float stopElapsed = 0;
 
 			public PlayingAnimation(Animation a, IPlayer p)
@@ -150,10 +153,6 @@ namespace Cue
 		}
 
 		public const int Loop = 0x01;
-
-		public const int NotPlaying = 0;
-		public const int Playing = 1;
-		public const int Stopping = 2;
 
 		private const float StopGracePeriod = 5;
 
@@ -226,20 +225,22 @@ namespace Cue
 			return list.ToArray();
 		}
 
-		public int PlayingStatus(AnimationType type)
+		public AnimationStatus PlayingStatus(AnimationType type)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				if (playing_[i].anim.Type == type)
 				{
 					if (playing_[i].stopping)
-						return Stopping;
+						return AnimationStatus.Stopping;
+					else if (playing_[i].paused)
+						return AnimationStatus.Paused;
 					else
-						return Playing;
+						return AnimationStatus.Playing;
 				}
 			}
 
-			return NotPlaying;
+			return AnimationStatus.NotPlaying;
 		}
 
 		public bool IsPlaying(Animation a)
@@ -266,8 +267,14 @@ namespace Cue
 
 		public bool PlayType(AnimationType type, AnimationContext cx = null)
 		{
-			if (IsPlayingType(type))
-				return false;
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim.Type == type && playing_[i].paused)
+				{
+					if (Resume(playing_[i]))
+						return true;
+				}
+			}
 
 			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
@@ -342,10 +349,7 @@ namespace Cue
 
 				if (a.anim.Type == type && !a.stopping)
 				{
-					Log.Info($"stopping animation {a}");
-					a.stopping = true;
-					a.stopElapsed = 0;
-					a.player.RequestStop(a.anim.Sys, stopFlags);
+					Stop(a, stopFlags);
 					++stopped;
 				}
 			}
@@ -361,6 +365,92 @@ namespace Cue
 				Log.Verbose($"stopped {stopped} animations");
 			}
 		}
+
+		private void Stop(PlayingAnimation a, int stopFlags = Animation.NoStopFlags)
+		{
+			Log.Info($"stopping animation {a}");
+			a.stopping = true;
+			a.stopElapsed = 0;
+			a.player.RequestStop(a.anim.Sys, stopFlags);
+		}
+
+		public void PauseType(AnimationType type)
+		{
+			Log.Verbose($"pausing animation {AnimationType.ToString(type)}");
+
+			int paused = 0;
+			int stopped = 0;
+
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				var a = playing_[i];
+
+				if (a.anim.Type == type && !a.stopping)
+				{
+					Log.Info($"pausing animation {a}");
+					a.paused = true;
+
+					if (a.player.Pause(a.anim.Sys))
+					{
+						++paused;
+					}
+					else
+					{
+						// not an error, not all animation support pausing
+						Log.Verbose($"failed to pause {a}, stopping");
+						Stop(a);
+						++stopped;
+					}
+				}
+			}
+
+			if (paused == 0)
+			{
+				Log.Verbose(
+					$"no animation {AnimationType.ToString(type)} found to pause, " +
+					$"stopped {stopped} anims, count={playing_.Count}");
+			}
+			else
+			{
+				Log.Verbose($"paused {paused} animations, stopped {stopped}");
+			}
+		}
+
+		private bool Resume(PlayingAnimation a)
+		{
+			Log.Info("resuming " + a.ToString());
+
+			for (int i = 0; i < players_.Count; ++i)
+			{
+				var p = players_[i];
+
+				if (p.CanPlay(a.anim.Sys))
+				{
+					try
+					{
+						if (p.Resume(a.anim.Sys))
+							return true;
+
+						Log.Error($"player '{p.Name}' failed to resume {a}, stopping");
+						Stop(a);
+
+						return false;
+					}
+					catch (Exception e)
+					{
+						Log.Error($"exception while trying to resume {a} with player {p}:");
+						Log.Error(e.ToString());
+						Stop(a);
+
+						return false;
+					}
+				}
+			}
+
+			Log.Error("no player can resume " + a.ToString());
+			return false;
+		}
+
 
 		public void FixedUpdate(float s)
 		{

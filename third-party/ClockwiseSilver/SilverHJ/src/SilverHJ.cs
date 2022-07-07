@@ -16,7 +16,7 @@ namespace ClockwiseSilver {
 
 		private Atom her;
 		private Atom him;
-		private JSONStorableBool isActive, ejEnabled, baseUpJSON, bjActive, doReturn;
+		private JSONStorableBool isActive, ejEnabled, baseUpJSON, bjActive, doReturn, pause;
 		private JSONStorableFloat speedMultiJSON, trackingSpeedJSON, frontBackSpeedJSON, frontBackRangeJSON, flipLimitJSON, randomTimeJSON, frontBackOutputJSON;
 		private JSONStorableFloat ejWaitJSON, ejDurationJSON, topOnlyChanceJSON, zStrokeRotMinJSON, zStrokeRotMaxJSON, rotSpeedJSON;
 		private JSONStorableFloat handShiftXJSON, handShiftYJSON, handShiftZJSON, handAngleXJSON, handAngleYJSON, handAngleZJSON;
@@ -83,6 +83,11 @@ namespace ClockwiseSilver {
 
 				doReturn = new JSONStorableBool ("doReturn", false);
 				RegisterBool (doReturn);
+
+				pause = new JSONStorableBool ("pause", false);
+				RegisterBool (pause);
+				toggle = CreateToggle(pause);
+				toggle.label = "Pause";
 
 				JSONStorableAction ToggleActive = new JSONStorableAction("Stop HJ", () =>
                 {
@@ -768,6 +773,53 @@ namespace ClockwiseSilver {
 					}
 				}
 
+				bool wasPaused = false;
+
+				///////// paused
+				if (pause.val)
+				{
+					wasPaused = true;
+
+					while (hjRunning && pause.val)
+					{
+						handShift.x = handShiftXJSON.val; handShift.y = handShiftYJSON.val; handShift.z = handShiftZJSON.val;
+						Vector3 tPos;
+						if (baseUp)
+						{
+							tPos =
+								gen1Transform.position + penisBase.transform.TransformVector(handShift)
+								+ handControlTransform.right * knuckleDistance * knuckleSign + handControlTransform.up * (0.4f * knuckleDistance);
+						}
+						else
+						{
+							tPos =
+								gen2Transform.position + penisBase.transform.TransformVector(handShift)
+								+ handControlTransform.right * knuckleDistance * knuckleSign + handControlTransform.up * (0.4f * knuckleDistance);
+						}
+
+						handControlTransform.position =
+							Vector3.MoveTowards(handControlTransform.position,	tPos, dTime * 0.25f);
+
+						handAngle.x = handAngleXJSON.val + randomRotX; handAngle.y = handAngleYJSON.val; handAngle.z = handAngleZJSON.val + randomRotZ;
+						handControlTransform.rotation = Quaternion.RotateTowards(handControlTransform.rotation, startTargetRot * Quaternion.Euler(handAngle), dTime * 150);
+
+						float dMorphTime2 = dTime * 5;
+						handOpenMorph.morphValue = Mathf.LerpUnclamped(handOpenMorph.morphValue, 0f, dMorphTime2);
+						handCloseMorph.morphValue = Mathf.LerpUnclamped(handCloseMorph.morphValue, handCloseTarget, dMorphTime2);
+						thumbOutMorph.morphValue = Mathf.LerpUnclamped(thumbOutMorph.morphValue, thumbOutTarget, dMorphTime2);
+
+						if (bothHands)
+						{
+							handControl2Transform.position = Vector3.MoveTowards(handControl2Transform.position, tPos + (handControlTransform.forward * knuckleDistance), dTime * 0.5f);
+							handControl2Transform.rotation = Quaternion.RotateTowards(handControl2Transform.rotation, startTargetRot2 * Quaternion.Euler(handAngle), dTime * 150);
+							handOpenMorph2.morphValue = handOpenMorph.morphValue; handCloseMorph2.morphValue = handCloseMorph.morphValue; thumbOutMorph2.morphValue = thumbOutMorph.morphValue;
+						}
+
+						yield return new WaitForFixedUpdate();
+					}
+				}
+				////////// paused ^
+
 				float dMorphTime = dTime * 2;
 				handCloseMorph.morphValue = Mathf.LerpUnclamped(handCloseMorph.morphValue, handCloseTarget, dMorphTime);
 				thumbOutMorph.morphValue = Mathf.LerpUnclamped(thumbOutMorph.morphValue, thumbOutTarget, dMorphTime);
@@ -776,7 +828,7 @@ namespace ClockwiseSilver {
 
 				frontBackCurrent += dTime * frontBackSpeedJSON.val;
 				frontBackOutputJSON.val = frontBackCurrent;
-				if (frontBackCurrent > flipLimitJSON.val)
+				if (frontBackCurrent > flipLimitJSON.val || wasPaused)
 				{
 					LittleRandom(flipped);
 					tarPosBegin = handControlTransform.position;

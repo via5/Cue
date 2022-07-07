@@ -402,14 +402,14 @@
 		{
 			if (hand.anim != AnimationType.None)
 			{
-				int state = person_.Animator.PlayingStatus(hand.anim);
+				AnimationStatus state = person_.Animator.PlayingStatus(hand.anim);
 
-				if (state == Animator.Playing)
+				if (state == AnimationStatus.Playing)
 				{
 					if (Mood.ShouldStopSexAnimation(person_, hand.targetBodyPart.Person))
-						person_.Animator.StopType(hand.anim);
+						person_.Animator.PauseType(hand.anim);
 				}
-				else if (state == Animator.NotPlaying)
+				else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
 				{
 					if (Mood.CanStartSexAnimation(person_, hand.targetBodyPart.Person))
 					{

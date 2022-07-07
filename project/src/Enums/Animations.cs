@@ -157,3 +157,131 @@ namespace Cue
 		}
 	}
 }
+namespace Cue
+{
+	public struct AnimationStatus
+	{
+		public static readonly AnimationStatus None = AnimationStatus.CreateInternal(-1);
+		public static readonly AnimationStatus NotPlaying = AnimationStatus.CreateInternal(0);
+		public static readonly AnimationStatus Playing = AnimationStatus.CreateInternal(1);
+		public static readonly AnimationStatus Stopping = AnimationStatus.CreateInternal(2);
+		public static readonly AnimationStatus Paused = AnimationStatus.CreateInternal(3);
+
+		public const int Count = 4;
+		public int GetCount() { return 4; }
+
+
+		private static AnimationStatus[] values_ = new AnimationStatus[]
+		{
+			AnimationStatus.CreateInternal(0),
+			AnimationStatus.CreateInternal(1),
+			AnimationStatus.CreateInternal(2),
+			AnimationStatus.CreateInternal(3),
+		};
+
+		public static AnimationStatus[] Values
+		{
+			get { return values_; }
+		}
+
+		private static string[] names_ = new string[]
+		{
+			"notPlaying",
+			"playing",
+			"stopping",
+			"paused",
+		};
+
+		public static AnimationStatus FromString(string s)
+		{
+			for (int i = 0; i<names_.Length; ++i)
+			{
+				if (names_[i] == s)
+					return AnimationStatus.CreateInternal(i);
+			}
+
+			return None;
+		}
+
+		public static AnimationStatus[] FromStringMany(string s)
+		{
+			var list = new List<AnimationStatus>();
+			var ss = s.Split(' ');
+
+			foreach (string p in ss)
+			{
+				string tp = p.Trim();
+				if (tp == "")
+					continue;
+
+				var i = FromString(tp);
+				if (i != None)
+					list.Add(i);
+			}
+
+			return list.ToArray();
+		}
+
+		public string GetName(AnimationStatus i)
+		{
+			return ToString(i);
+		}
+
+		public static string ToString(AnimationStatus i)
+		{
+			if (i.v_ >= 0 && i.v_ < names_.Length)
+				return names_[i.v_];
+			else
+				return $"?{i.v_}";
+		}
+
+		public static string[] Names
+		{
+			get { return names_; }
+		}
+
+
+
+		private int v_;
+
+		private AnimationStatus(int value)
+		{
+			v_ = value;
+		}
+
+		public static AnimationStatus CreateInternal(int value)
+		{
+			return new AnimationStatus(value);
+		}
+
+		public int Int
+		{
+			get { return v_; }
+		}
+
+		public override string ToString()
+		{
+			return ToString(this);
+		}
+
+		public static bool operator==(AnimationStatus a, AnimationStatus b)
+		{
+			return (a.v_ == b.v_);
+		}
+
+		public static bool operator!=(AnimationStatus a, AnimationStatus b)
+		{
+			return (a.v_ != b.v_);
+		}
+
+		public override bool Equals(object o)
+		{
+			return (o is AnimationStatus) && (((AnimationStatus)o).v_ == v_);
+		}
+
+		public override int GetHashCode()
+		{
+			return v_;
+		}
+	}
+}

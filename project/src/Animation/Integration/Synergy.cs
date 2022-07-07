@@ -70,6 +70,16 @@ namespace Cue
 			StopNow(a);
 		}
 
+		public bool Pause(IAnimation a)
+		{
+			return false;
+		}
+
+		public bool Resume(IAnimation a)
+		{
+			return false;
+		}
+
 		public void MainSyncStopping(IAnimation a, Proc.ISync s)
 		{
 			// no-op

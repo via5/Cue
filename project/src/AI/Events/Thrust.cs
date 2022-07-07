@@ -227,14 +227,14 @@
 
 		private void CheckAnim()
 		{
-			int state = person_.Animator.PlayingStatus(anim_);
+			AnimationStatus state = person_.Animator.PlayingStatus(anim_);
 
-			if (state == Animator.Playing)
+			if (state == AnimationStatus.Playing)
 			{
 				if (Mood.ShouldStopSexAnimation(person_, receiver_?.Person))
 					person_.Animator.StopType(anim_);
 			}
-			else if (state == Animator.NotPlaying)
+			else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
 			{
 				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
 				{

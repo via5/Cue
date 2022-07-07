@@ -149,6 +149,16 @@ namespace Cue
 			StopNow(a, stopFlags);
 		}
 
+		public bool Pause(IAnimation a)
+		{
+			return false;
+		}
+
+		public bool Resume(IAnimation a)
+		{
+			return false;
+		}
+
 		public void MainSyncStopping(IAnimation a, Proc.ISync s)
 		{
 			// no-op

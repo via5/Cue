@@ -58,7 +58,7 @@ public class V
 }
 
 
-public string Generate(V[] vars, string name, string file, bool generateEmpty = true, string shortName="")
+public string Generate(V[] vars, string name, string file, bool generateEmpty = true, string shortName="", bool generateHeader=true)
 {
 	var values = new List<V>();
 	var durations = new List<V>();
@@ -85,13 +85,14 @@ public string Generate(V[] vars, string name, string file, bool generateEmpty = 
 	return Generate(
 		values.ToArray(), durations.ToArray(), bools.ToArray(),
 		floats.ToArray(), strings.ToArray(),
-		name, file, generateEmpty, shortName);
+		name, file, generateEmpty, shortName, generateHeader);
 }
 
 public string Generate(
 	V[] values,
 	V[] durations, V[] bools, V[] floats,
-	V[] strings, string name, string file, bool generateEmpty, string shortName)
+	V[] strings, string name, string file, bool generateEmpty, string shortName,
+	bool generateHeader)
 {
 	string defs = "";
 	string names = "";
@@ -193,10 +194,17 @@ public string Generate(
 		allNamesArray = "\r\n\r\n" + allNamesArray + "\r\n";
 	}
 
-	string s =
-		$"// auto generated from {file}Enums.tt\r\n" +
-		$"\r\n" +
-		$"using System.Collections.Generic;\r\n" +
+	string s = "";
+
+	if (generateHeader)
+	{
+		s +=
+			$"// auto generated from {file}Enums.tt\r\n" +
+			$"\r\n" +
+			$"using System.Collections.Generic;\r\n";
+	}
+
+	s +=
 		$"\r\n" +
 		$"namespace Cue\r\n" +
 		$"{{\r\n";

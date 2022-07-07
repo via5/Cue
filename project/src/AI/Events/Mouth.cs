@@ -206,14 +206,15 @@
 		{
 			if (target_ != null)
 			{
-				int state = person_.Animator.PlayingStatus(AnimationType.Blowjob);
+				AnimationStatus state = person_.Animator.PlayingStatus(
+					AnimationType.Blowjob);
 
-				if (state == Animator.Playing)
+				if (state == AnimationStatus.Playing)
 				{
 					if (Mood.ShouldStopSexAnimation(person_, target_))
 						person_.Animator.StopType(AnimationType.Blowjob);
 				}
-				else if (state == Animator.NotPlaying)
+				else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
 				{
 					if (Mood.CanStartSexAnimation(person_, target_))
 					{

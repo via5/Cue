@@ -3,11 +3,13 @@
 	abstract class ClockwiseHJAnimation : BuiltinAnimation
 	{
 		private const float WaitForDoneTime = 5;
+		private const string PluginName = "ClockwiseSilver.HJ";
 
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
 		private Sys.Vam.BoolParameter doReturn_ = null;
+		private Sys.Vam.BoolParameter pause_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.StringChooserParameter hand_ = null;
@@ -30,7 +32,7 @@
 
 		public override void Reset(Person p)
 		{
-			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
+			var active = new Sys.Vam.BoolParameter(p, PluginName, "isActive");
 			active.Value = false;
 		}
 
@@ -70,6 +72,8 @@
 				return false;
 			}
 
+			pause_.Value = false;
+
 			return DoStart(target);
 		}
 
@@ -83,6 +87,18 @@
 			active_.Value = false;
 			leftTarget_ = null;
 			rightTarget_ = null;
+		}
+
+		public override bool Pause()
+		{
+			pause_.Value = true;
+			return true;
+		}
+
+		public override bool Resume()
+		{
+			pause_.Value = false;
+			return true;
 		}
 
 		public override void Update(float s)
@@ -154,15 +170,17 @@
 		private void Init(Person p)
 		{
 			log_ = new Logger(Logger.Integration, p, "cwhj");
-			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "enabled");
-			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "isActive");
-			doReturn_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.HJ", "doReturn");
-			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.HJ", "isHJRoutine");
-			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "Atom");
-			hand_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.HJ", "handedness");
-			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Min");
-			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Speed Max");
-			volume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.HJ", "Audio Volume");
+
+			enabled_  = BOP(p, "enabled");
+			active_   = BOP(p, "isActive");
+			doReturn_ = BOP(p, "doReturn");
+			pause_    = BOP(p, "pause");
+			running_  = BOPRO(p, "isHJRoutine");
+			male_     = SCP(p, "Atom");
+			hand_     = SCP(p, "handedness");
+			speedMin_ = FP(p, "Speed Min");
+			speedMax_ = FP(p, "Speed Max");
+			volume_   = FP(p, "Audio Volume");
 
 			active_.Value = false;
 
@@ -171,6 +189,26 @@
 				wasSilent_ = true;
 				volume_.Value = 0;
 			}
+		}
+
+		private Sys.Vam.BoolParameter BOP(Person p, string param)
+		{
+			return new Sys.Vam.BoolParameter(p, PluginName, param);
+		}
+
+		private Sys.Vam.BoolParameterRO BOPRO(Person p, string param)
+		{
+			return new Sys.Vam.BoolParameterRO(p, PluginName, param);
+		}
+
+		private Sys.Vam.FloatParameter FP(Person p, string param)
+		{
+			return new Sys.Vam.FloatParameter(p, PluginName, param);
+		}
+
+		private Sys.Vam.StringChooserParameter SCP(Person p, string param)
+		{
+			return new Sys.Vam.StringChooserParameter(p, PluginName, param);
 		}
 
 		protected bool StartCommon(Person target, string hand)
