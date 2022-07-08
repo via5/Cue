@@ -230,75 +230,75 @@ namespace Cue
 		{
 			base.Update(s);
 
-			I.Start(I.UpdatePersonAnimator);
+			Instrumentation.Start(I.Animator);
 			{
 				if (hasBody_)
 					animator_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonBody);
+			Instrumentation.Start(I.Body);
 			{
 				if (hasBody_)
 					body_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonStatus);
+			Instrumentation.Start(I.Status);
 			{
 				if (hasBody_)
 					status_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonExcitement);
+			Instrumentation.Start(I.Excitement);
 			{
 				if (!IsPlayer)
 					excitement_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonGaze);
+			Instrumentation.Start(I.Gaze);
 			{
 				if (hasBody_)
 					gaze_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonVoice);
+			Instrumentation.Start(I.Voice);
 			{
 				if (hasBody_)
 					voice_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonMood);
+			Instrumentation.Start(I.Mood);
 			{
 				if (!IsPlayer)
 					mood_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonHoming);
+			Instrumentation.Start(I.Homing);
 			{
 				if (hasBody_)
 					homing_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdatePersonAI);
+			Instrumentation.Start(I.AI);
 			{
 				ai_.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 		}
 
 		public override void OnPluginState(bool b)

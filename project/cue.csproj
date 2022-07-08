@@ -139,6 +139,11 @@
       <DependentUpon>BodyPartsEnum.tt</DependentUpon>
     </Compile>
     <Compile Include="src\Enums\EnumValues.cs" />
+    <Compile Include="src\Enums\Instrumentation.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Instrumentation.tt</DependentUpon>
+    </Compile>
     <Compile Include="src\Enums\Moods.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -287,6 +292,10 @@
     <Content Include="src\Enums\BodyPartsEnum.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>BodyPartsEnum.cs</LastGenOutput>
+    </Content>
+    <Content Include="src\Enums\Instrumentation.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Instrumentation.cs</LastGenOutput>
     </Content>
     <Content Include="src\Enums\Moods.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

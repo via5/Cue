@@ -116,11 +116,27 @@ namespace Cue
 		public override string ToString()
 		{
 			return
-				$"calls={Calls,-3} " +
-				$"avg={AverageMs:00.000} " +
-				$"peak={PeakMS:00.000} " +
-				$"gc={MemoryChange,-9} " +
-				$"gcTotal={gcTotal_,-9}";
+				$"n={Calls,3} " +
+				$"avg={AverageMs,5:##0.00} " +
+				$"peak={PeakMS,5:##0.00} " +
+				$"gc={BytesToString(MemoryChange)} " +
+				$"gcTotal={BytesToString(gcTotal_)}";
+		}
+
+		private string BytesToString(long bytes)
+		{
+			string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+			double len = (double)bytes;
+			int order = 0;
+			while (len >= 1024 && order < sizes.Length - 1)
+			{
+				order++;
+				len = len / 1024;
+			}
+
+			// Adjust the format string to your preferences. For example "{0:0.#}{1}" would
+			// show a single decimal place, and no space.
+			return string.Format($"{len,7:###0.00} {sizes[order],-2}");
 		}
 	}
 
@@ -129,39 +145,34 @@ namespace Cue
 	{
 		public const bool AlwaysActive = false;
 
-		private Ticker[] tickers_ = new Ticker[I.TickerCount];
-		private int[] depth_ = new int[I.TickerCount]
+		private Ticker[] tickers_ = new Ticker[I.Count];
+		private int[] depth_ = new int[I.Count]
 		{
-			0, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1
+			0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0
 		};
+
 		private int[] stack_ = new int[4];
 		private int current_ = 0;
-
 		private bool enabled_ = false;
+		private static Instrumentation instance_ = new Instrumentation();
+
 
 		public Instrumentation()
 		{
-			tickers_[I.Update] = new Ticker("Update");
-			tickers_[I.UpdateInput] = new Ticker("Input");
-			tickers_[I.UpdateObjects] = new Ticker("Objects");
-			tickers_[I.UpdateObjectsAtoms] = new Ticker("Atoms");
-			tickers_[I.UpdatePersonAnimator] = new Ticker("Animator");
-			tickers_[I.UpdatePersonGaze] = new Ticker("Gaze");
-			tickers_[I.UpdatePersonVoice] = new Ticker("Voice");
-			tickers_[I.UpdatePersonExcitement] = new Ticker("Excitement");
-			tickers_[I.UpdatePersonMood] = new Ticker("Mood");
-			tickers_[I.UpdatePersonHoming] = new Ticker("Homing");
-			tickers_[I.UpdatePersonBody] = new Ticker("Body");
-			tickers_[I.UpdatePersonStatus] = new Ticker("Status");
-			tickers_[I.UpdatePersonAI] = new Ticker("AI");
-			tickers_[I.UpdateUi] = new Ticker("UI");
-			tickers_[I.FixedUpdate] = new Ticker("Fixed update");
-			tickers_[I.LateUpdate] = new Ticker("Late update");
+			instance_ = this;
+
+			foreach (var i in InstrumentationType.Values)
+				tickers_[i.Int] = new Ticker(i.ToString());
+		}
+
+		public static Instrumentation Instance
+		{
+			get { return instance_; }
 		}
 
 		public bool Updated
 		{
-			get { return tickers_[I.Update].Updated; }
+			get { return tickers_[I.Update.Int].Updated; }
 		}
 
 		public bool Enabled
@@ -170,7 +181,27 @@ namespace Cue
 			set { enabled_ = value; }
 		}
 
-		public void Start(int i)
+		public static void Reset()
+		{
+			instance_.DoReset();
+		}
+
+		public static void Start(InstrumentationType i)
+		{
+			instance_.DoStart(i);
+		}
+
+		public static void End()
+		{
+			instance_.DoEnd();
+		}
+
+		public static void UpdateTickers(float s)
+		{
+			instance_.DoUpdateTickers(s);
+		}
+
+		private void DoStart(InstrumentationType i)
 		{
 			if (!Enabled)
 				return;
@@ -181,19 +212,19 @@ namespace Cue
 				Cue.Instance.DisablePlugin();
 			}
 
-			if (i < 0 || i >= tickers_.Length)
+			if (i.Int < 0 || i.Int >= tickers_.Length)
 			{
 				Cue.LogErrorST($"bad index {i}");
 				Cue.Instance.DisablePlugin();
 			}
 
-			stack_[current_] = i;
+			stack_[current_] = i.Int;
 			++current_;
 
-			tickers_[i].Start();
+			tickers_[i.Int].Start();
 		}
 
-		public void End()
+		private void DoEnd()
 		{
 			if (!Enabled)
 				return;
@@ -206,7 +237,7 @@ namespace Cue
 			tickers_[i].End();
 		}
 
-		public void Reset()
+		private void DoReset()
 		{
 			current_ = 0;
 		}
@@ -226,7 +257,7 @@ namespace Cue
 			return tickers_[i];
 		}
 
-		public void UpdateTickers(float s)
+		private void DoUpdateTickers(float s)
 		{
 			if (!Enabled)
 				return;
@@ -237,7 +268,7 @@ namespace Cue
 	}
 
 
-	static class I
+	/*static class I
 	{
 		public const int Update = 0;
 		public const int UpdateInput = 1;
@@ -255,16 +286,13 @@ namespace Cue
 		public const int UpdateUi = 13;
 		public const int FixedUpdate = 14;
 		public const int LateUpdate = 15;
-		public const int TickerCount = 16;
+		public const int UpdateGazeEmergency = 16;
+		public const int UpdateGazePicker = 17;
+		public const int UpdateGazeTargets = 18;
+		public const int UpdateGazePostTarget = 19;
+		public const int TickerCount = 20;
 
 
-
-		private static Instrumentation instance_ = new Instrumentation();
-
-		public static Instrumentation Instance
-		{
-			get { return instance_; }
-		}
 
 		public static void Start(int i)
 		{
@@ -275,5 +303,5 @@ namespace Cue
 		{
 			instance_.End();
 		}
-	}
+	}*/
 }

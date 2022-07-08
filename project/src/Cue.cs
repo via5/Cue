@@ -195,6 +195,7 @@ namespace Cue
 				(s) => LogWarning(s),
 				(s) => LogError(s));
 
+
 			LogVerbose("cue: loading resources");
 			Resources.LoadAll();
 
@@ -387,13 +388,13 @@ namespace Cue
 			{
 				++frame_;
 
-				I.Instance.Reset();
+				Instrumentation.Reset();
 
-				I.Start(I.FixedUpdate);
+				Instrumentation.Start(I.FixedUpdate);
 				{
 					DoFixedUpdate(s);
 				}
-				I.End();
+				Instrumentation.End();
 			}
 		}
 
@@ -407,7 +408,7 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			I.Instance.Reset();
+			Instrumentation.Reset();
 
 			if (needSave_)
 			{
@@ -419,37 +420,38 @@ namespace Cue
 				}
 			}
 
-			I.Start(I.Update);
+			Instrumentation.Start(I.Update);
 			{
 				DoUpdate(s);
 			}
-			I.End();
+			Instrumentation.End();
 
-			I.Instance.UpdateTickers(s);
+
+			Instrumentation.UpdateTickers(s);
 			ui_?.PostUpdate();
 		}
 
 		private void DoUpdate(float s)
 		{
-			I.Start(I.UpdateInput);
+			Instrumentation.Start(I.Input);
 			{
 				DoUpdateInput(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdateObjects);
+			Instrumentation.Start(I.Objects);
 			{
 				DoUpdateObjects(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 
-			I.Start(I.UpdateUi);
+			Instrumentation.Start(I.UI);
 			{
 				DoUpdateUI(s);
 			}
-			I.End();
+			Instrumentation.End();
 
 			Sys.Update(s);
 		}
@@ -459,13 +461,13 @@ namespace Cue
 			// don't check paused, LateUpdate is used to keep some objects in
 			// the right place, like the strapon
 
-			I.Instance.Reset();
+			Instrumentation.Reset();
 
-			I.Start(I.LateUpdate);
+			Instrumentation.Start(I.LateUpdate);
 			{
 				DoLateUpdate(s);
 			}
-			I.End();
+			Instrumentation.End();
 		}
 
 		private void DoLateUpdate(float s)

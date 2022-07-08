@@ -154,11 +154,11 @@ namespace Cue
 
 		public virtual void Update(float s)
 		{
-			I.Start(I.UpdateObjectsAtoms);
+			Instrumentation.Start(I.Atoms);
 			{
 				Atom.Update(s);
 			}
-			I.End();
+			Instrumentation.End();
 		}
 
 		public void LateUpdate(float s)

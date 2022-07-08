@@ -135,7 +135,13 @@ namespace Cue
 			}
 			else
 			{
-				int emergency = CheckEmergency(s);
+				int emergency;
+
+				Instrumentation.Start(I.GazeEmergency);
+				{
+					emergency = CheckEmergency(s);
+				}
+				Instrumentation.End();
 
 				if (emergency >= 0)
 				{
@@ -151,7 +157,7 @@ namespace Cue
 						picker_.EmergencyStarted();
 					}
 
-					picker_.Update(s);
+					UpdatePicker(s);
 				}
 				else
 				{
@@ -171,7 +177,7 @@ namespace Cue
 						lastEmergency_ = -1;
 					}
 
-					if (picker_.Update(s))
+					if (UpdatePicker(s))
 					{
 						UpdateTargets();
 						picker_.NextTarget();
@@ -221,23 +227,40 @@ namespace Cue
 
 		private void UpdatePostTarget(float s)
 		{
-			if (person_.IsPlayer)
+			Instrumentation.Start(I.GazePostTarget);
 			{
-				gazer_.Enabled = false;
-			}
-			else if (CurrentTarget != null)
-			{
-				if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
+				if (person_.IsPlayer)
+				{
 					gazer_.Enabled = false;
-				else
-					gazer_.Enabled = gazerEnabled_;
+				}
+				else if (CurrentTarget != null)
+				{
+					if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
+						gazer_.Enabled = false;
+					else
+						gazer_.Enabled = gazerEnabled_;
 
-				gazer_.Variance = CurrentTarget.Variance;
+					gazer_.Variance = CurrentTarget.Variance;
+				}
+
+				eyes_.LookAt(CurrentTarget?.Position ?? Vector3.Zero);
+				eyes_.Update(s);
+				gazer_.Update(s);
 			}
+			Instrumentation.End();
+		}
 
-			eyes_.LookAt(CurrentTarget?.Position ?? Vector3.Zero);
-			eyes_.Update(s);
-			gazer_.Update(s);
+		private bool UpdatePicker(float s)
+		{
+			bool b;
+
+			Instrumentation.Start(I.GazePicker);
+			{
+				b = picker_.Update(s);
+			}
+			Instrumentation.End();
+
+			return b;
 		}
 
 		private void OnPersonalityChanged()
@@ -269,6 +292,15 @@ namespace Cue
 		}
 
 		private void UpdateTargets()
+		{
+			Instrumentation.Start(I.GazeTargets);
+			{
+				DoUpdateTargets();
+			}
+			Instrumentation.End();
+		}
+
+		private void DoUpdateTargets()
 		{
 			Clear();
 

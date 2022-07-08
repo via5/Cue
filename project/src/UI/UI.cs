@@ -110,7 +110,7 @@ namespace Cue
 
 		public void PostUpdate()
 		{
-			I.Instance.Enabled = false;
+			Instrumentation.Instance.Enabled = false;
 			sui_.UpdateTickers();
 		}
 	}

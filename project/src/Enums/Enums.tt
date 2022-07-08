@@ -327,6 +327,9 @@ public string MakeEnum(V[] names, string count, string indexType, bool generateE
 
 public string CamelCase(string s, bool firstUpper)
 {
+	if (s.ToUpper() == s)
+		return s;
+
 	var parts = s.Split(' ');
 
 	if (firstUpper)

@@ -1,0 +1,28 @@
+﻿<#@ include file="Enums.tt" #><#
+var vars = new V[]
+{
+
+V.Value("Update"),
+V.Value("Input"),
+V.Value("Objects"),
+V.Value("Atoms"),
+V.Value("Animator"),
+V.Value("Gaze"),
+V.Value("GazeEmergency"),
+V.Value("GazePicker"),
+V.Value("GazeTargets"),
+V.Value("GazePostTarget"),
+V.Value("Voice"),
+V.Value("Excitement"),
+V.Value("Mood"),
+V.Value("Body"),
+V.Value("Homing"),
+V.Value("Status"),
+V.Value("AI"),
+V.Value("UI"),
+V.Value("FixedUpdate"),
+V.Value("LateUpdate"),
+
+};
+
+#><#= Generate(vars, "InstrumentationType", "Instrumentation", false, "I") #>

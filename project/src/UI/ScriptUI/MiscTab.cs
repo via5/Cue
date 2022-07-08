@@ -33,7 +33,7 @@ namespace Cue
 
 	class MiscTimesTab : Tab
 	{
-		private VUI.Label[] tickers_ = new VUI.Label[I.TickerCount];
+		private VUI.Label[] tickers_ = new VUI.Label[I.Count];
 
 		public MiscTimesTab()
 			: base("Times", false)
@@ -43,9 +43,9 @@ namespace Cue
 			gl.HorizontalSpacing = 40;
 
 			var p = new VUI.Panel(gl);
-			var inst = I.Instance;
+			var inst = Instrumentation.Instance;
 
-			for (int i = 0; i < I.TickerCount; ++i)
+			for (int i = 0; i < I.Count; ++i)
 			{
 				var name = new VUI.Label(new string(' ', inst.Depth(i) * 2) + inst.Name(i));
 				name.Font = VUI.Style.Theme.MonospaceFont;
@@ -70,12 +70,12 @@ namespace Cue
 		{
 			if (IsVisibleOnScreen())
 			{
-				var inst = I.Instance;
+				var inst = Instrumentation.Instance;
 				inst.Enabled = true;
 
-				if (I.Instance.Updated)
+				if (inst.Updated)
 				{
-					for (int i = 0; i < I.TickerCount; ++i)
+					for (int i = 0; i < I.Count; ++i)
 						tickers_[i].Text = inst.Get(i).ToString();
 				}
 			}
