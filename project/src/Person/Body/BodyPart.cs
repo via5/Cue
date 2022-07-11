@@ -267,7 +267,11 @@ namespace Cue
 			if (!Exists || !other.Exists)
 				return false;
 
-			return DistanceToSurface(other) <= BodyParts.CloseToDistance;
+			// can't use DistanceToSurface() here, CloseTo() is used to check
+			// for personal space and it's way too slow
+			float d = Vector3.Distance(Position, other.Position);
+
+			return (d < BodyParts.PersonalSpaceDistance);
 		}
 
 		public float DistanceToSurface(BodyPart other, bool debug = false)

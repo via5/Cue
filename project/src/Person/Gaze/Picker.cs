@@ -27,7 +27,10 @@ namespace Cue
 		public const int YCount = 5;
 		public const int FrustumCount = XCount * YCount;
 
+		private const float UpdateGeoInterval = 1;
+		private const float CheckCanLookInterval = 0.5f;
 		private const float AvoidInterval = 5;
+
 		private readonly float[] FrustumWeights = new float[XCount * YCount]
 		{
 			0.1f, 0.1f, 0.1f, 0.1f, 0.1f,
@@ -49,6 +52,8 @@ namespace Cue
 		private readonly StringBuilder lastString_ = new StringBuilder();
 		private readonly StringBuilder avoidString_ = new StringBuilder();
 		private float timeSinceLastAvoid_ = 0;
+		private float updateGeoElapsed_ = UpdateGeoInterval;
+		private float canLookElapsed_ = CheckCanLookInterval;
 
 		public GazeTargetPicker(Person p)
 		{
@@ -188,11 +193,24 @@ namespace Cue
 			if (timeSinceLastAvoid_ > 2)
 				avoidString_.Length = 0;
 
-			bool needsTarget = false;
-
-			UpdateAvoidBoxes();
-			UpdateFrustums();
 			delay_.Update(s, 0);
+
+			updateGeoElapsed_ += s;
+			if (updateGeoElapsed_ >= UpdateGeoInterval)
+			{
+				updateGeoElapsed_ = 0;
+
+				Instrumentation.Start(I.PickerGeo);
+				{
+					UpdateAvoidBoxes();
+					UpdateFrustums();
+				}
+				Instrumentation.End();
+			}
+
+			canLookElapsed_ += s;
+
+			bool needsTarget = false;
 
 			if (delay_.Finished || !HasTarget)
 			{
@@ -204,49 +222,58 @@ namespace Cue
 			}
 			else if (HasTarget)
 			{
-				if (!CanLookAtTarget(CurrentTarget))
+				if (canLookElapsed_ >= CheckCanLookInterval)
 				{
-					// can't look at the current point anymore, must pick a new
-					// target
-					//
-					// the problem is that after a new target is found, the head
-					// will rotate towards it, along with the chest, which
-					// changes the gaze frustum positions
-					//
-					// if the player's eyes is located just right, a frustum
-					// that was valid when initially picked might become
-					// forbidden after the chest rotation
-					//
-					// when this happens, new targets are constantly picked
-					// because frustums always become forbidden after gazing
-					// has ended
-					//
-					// one fix would be to check if the frustum is allowed, but
-					// with the final chest rotation instead of the current one;
-					// that would require predicting the final rotation of the
-					// chest after the head has finished rotating towards the
-					// new target, which is mostly impossible
-					//
-					// instead, the avoid interval makes sure there's some delay
-					// before the next target so the head doesn't constantly
-					// move around; it's also arguably more natural, since the
-					// character isn't just immediately avoiding gaze like a
-					// whack-a-mole
+					canLookElapsed_ = 0;
 
-					avoidString_.Length = 0;
+					Instrumentation.Start(I.PickerCanLook);
+					{
+						if (!CanLookAtTarget(CurrentTarget))
+						{
+							// can't look at the current point anymore, must pick a new
+							// target
+							//
+							// the problem is that after a new target is found, the head
+							// will rotate towards it, along with the chest, which
+							// changes the gaze frustum positions
+							//
+							// if the player's eyes is located just right, a frustum
+							// that was valid when initially picked might become
+							// forbidden after the chest rotation
+							//
+							// when this happens, new targets are constantly picked
+							// because frustums always become forbidden after gazing
+							// has ended
+							//
+							// one fix would be to check if the frustum is allowed, but
+							// with the final chest rotation instead of the current one;
+							// that would require predicting the final rotation of the
+							// chest after the head has finished rotating towards the
+							// new target, which is mostly impossible
+							//
+							// instead, the avoid interval makes sure there's some delay
+							// before the next target so the head doesn't constantly
+							// move around; it's also arguably more natural, since the
+							// character isn't just immediately avoiding gaze like a
+							// whack-a-mole
 
-					if (timeSinceLastAvoid_ > AvoidInterval)
-					{
-						needsTarget = true;
-						delay_.Reset(0);
-						timeSinceLastAvoid_ = 0;
-						avoidString_.Append("avoiding");
+							avoidString_.Length = 0;
+
+							if (timeSinceLastAvoid_ > AvoidInterval)
+							{
+								needsTarget = true;
+								delay_.Reset(0);
+								timeSinceLastAvoid_ = 0;
+								avoidString_.Append("avoiding");
+							}
+							else
+							{
+								var left = AvoidInterval - timeSinceLastAvoid_;
+								avoidString_.AppendFormat("will avoid in {0:F2}s", left);
+							}
+						}
 					}
-					else
-					{
-						var left = AvoidInterval - timeSinceLastAvoid_;
-						avoidString_.AppendFormat("will avoid in {0:F2}s", left);
-					}
+					Instrumentation.End();
 				}
 			}
 

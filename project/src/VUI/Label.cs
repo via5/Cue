@@ -56,9 +56,10 @@ namespace VUI
 			{
 				if (text_ != value)
 				{
+					string oldText = text_;
 					text_ = value;
 
-					if (NeedsLayoutForTextChanged())
+					if (NeedsLayoutForTextChanged(oldText, text_))
 						NeedsLayout($"text changed");
 
 					if (textObject_ != null)
@@ -70,7 +71,7 @@ namespace VUI
 			}
 		}
 
-		private bool NeedsLayoutForTextChanged()
+		private bool NeedsLayoutForTextChanged(string oldText, string newText)
 		{
 			// optimization to avoid a relayout every time the text changes; a
 			// relayout occurs when:
@@ -79,6 +80,7 @@ namespace VUI
 			//  2) the bounds of the label are not fixed (like in a grid layout
 			//     with uniform sizes),
 			//  3) the text is too long
+			//  4) the text length is different or the font isn't monospace
 			//
 			// for 3), another optimization is for the ellipsis clip: if the
 			// ellipsis is already present, the text is already too long, so
@@ -91,6 +93,12 @@ namespace VUI
 			// can't grow anymore
 			if (FixedBounds())
 				return false;
+
+			if (Font == VUI.Style.Theme.MonospaceFont)
+			{
+				if (oldText.Length == newText.Length)
+					return false;
+			}
 
 			// text already too long
 			if (wrap_ == ClipEllipsis && EllipsisVisible())

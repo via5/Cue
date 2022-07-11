@@ -244,30 +244,54 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			zap_.Update(s);
-
-			for (int i = 0; i < all_.Length; ++i)
-				all_[i].Update(s);
-
-			zones_.Update(s);
-
-			var ps = person_.Personality;
-
-			temperature_.UpRate = person_.Mood.Get(MoodType.Excited) * ps.Get(PS.TemperatureExcitementRate);
-			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
-
-			temperature_.Target = U.Clamp(
-				person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
-				0, 1);
-
-			if (temperature_.Update(s))
+			Instrumentation.Start(I.BodyZap);
 			{
-				person_.Atom.Body.Sweat = temperature_.Value * ps.Get(PS.MaxSweat);
-				person_.Atom.Body.Flush = temperature_.Value * ps.Get(PS.MaxFlush);
-				person_.Atom.Hair.Loose = temperature_.Value;
+				zap_.Update(s);
 			}
+			Instrumentation.End();
 
-			person_.Voice.MaxIntensity = person_.Mood.MovementEnergy;
+
+			Instrumentation.Start(I.BodyParts);
+			{
+				for (int i = 0; i < all_.Length; ++i)
+					all_[i].Update(s);
+			}
+			Instrumentation.End();
+
+
+			Instrumentation.Start(I.BodyZones);
+			{
+				zones_.Update(s);
+			}
+			Instrumentation.End();
+
+
+			Instrumentation.Start(I.BodyTemperature);
+			{
+				var ps = person_.Personality;
+
+				temperature_.UpRate = person_.Mood.Get(MoodType.Excited) * ps.Get(PS.TemperatureExcitementRate);
+				temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
+
+				temperature_.Target = U.Clamp(
+					person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
+					0, 1);
+
+				if (temperature_.Update(s))
+				{
+					person_.Atom.Body.Sweat = temperature_.Value * ps.Get(PS.MaxSweat);
+					person_.Atom.Body.Flush = temperature_.Value * ps.Get(PS.MaxFlush);
+					person_.Atom.Hair.Loose = temperature_.Value;
+				}
+			}
+			Instrumentation.End();
+
+
+			Instrumentation.Start(I.BodyVoice);
+			{
+				person_.Voice.MaxIntensity = person_.Mood.MovementEnergy;
+			}
+			Instrumentation.End();
 		}
 
 		public void DebugAllLocks(List<string> list)

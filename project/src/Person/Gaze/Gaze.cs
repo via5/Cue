@@ -153,7 +153,7 @@ namespace Cue
 							$"gazer was {gazerEnabledBeforeEmergency_}");
 
 						lastEmergency_ = emergency;
-						UpdateTargets();
+						CheckEvents();
 						picker_.EmergencyStarted();
 					}
 
@@ -179,7 +179,7 @@ namespace Cue
 
 					if (UpdatePicker(s))
 					{
-						UpdateTargets();
+						CheckEvents();
 						picker_.NextTarget();
 						gazer_.Duration = gazeDuration_.Current;
 					}
@@ -291,16 +291,16 @@ namespace Cue
 			return -1;
 		}
 
-		private void UpdateTargets()
+		private void CheckEvents()
 		{
-			Instrumentation.Start(I.GazeTargets);
+			Instrumentation.Start(I.GazeEvents);
 			{
-				DoUpdateTargets();
+				DoCheckEvents();
 			}
 			Instrumentation.End();
 		}
 
-		private void DoUpdateTargets()
+		private void DoCheckEvents()
 		{
 			Clear();
 

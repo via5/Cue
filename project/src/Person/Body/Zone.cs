@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -7,7 +8,7 @@ namespace Cue
 		private const float UpdateInterval = 0.5f;
 
 		private Person person_;
-		private ErogenousZone[] zones_ = new ErogenousZone[SS.Count];
+		private ErogenousZone[] zones_ = null;
 		private float elapsed_ = 0;
 
 		public ErogenousZones(Person p)
@@ -22,6 +23,8 @@ namespace Cue
 
 		public void Init()
 		{
+			zones_ = new ErogenousZone[4];
+
 			zones_[SS.Penetration.Int] = new ErogenousZone(
 				person_, SS.Penetration, new ErogenousZone.Part[]
 				{
@@ -54,50 +57,56 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			for (int i = 0; i < zones_.Length; ++i)
+			Instrumentation.Start(I.ZoneDecay);
 			{
-				if (zones_[i] != null)
+				for (int i = 0; i < zones_.Length; ++i)
 					zones_[i].Decay(s);
 			}
+			Instrumentation.End();
 
 
 			elapsed_ += s;
 			if (elapsed_ < UpdateInterval)
 				return;
-
 			elapsed_ = 0;
 
-			for (int i = 0; i < zones_.Length; ++i)
+			Instrumentation.Start(I.ZoneUpdate);
 			{
-				if (zones_[i] != null)
+				for (int i = 0; i < zones_.Length; ++i)
 					zones_[i].Update();
 			}
+			Instrumentation.End();
 
-			BodyPartType[] ignore = BodyParts.GenitalParts;
 
-			for (int j = 0; j < Get(SS.Penetration).Sources.Length; ++j)
+			Instrumentation.Start(I.ZoneIgnore);
 			{
-				bool ignoreAll = false;
+				BodyPartType[] ignore = BodyParts.GenitalParts;
 
-				for (int i = 0; i < ignore.Length; ++i)
+				for (int j = 0; j < Get(SS.Penetration).Sources.Length; ++j)
 				{
-					BodyPartType targetBodyPart = ignore[i];
+					bool ignoreAll = false;
 
-					if (Get(SS.Penetration).Sources[j].IsAnyActiveForTarget(targetBodyPart))
-					{
-						ignoreAll = true;
-						break;
-					}
-				}
-
-				if (ignoreAll)
-				{
 					for (int i = 0; i < ignore.Length; ++i)
 					{
-						Get(SS.Genitals).Ignore(j, ignore[i]);
+						BodyPartType targetBodyPart = ignore[i];
+
+						if (Get(SS.Penetration).Sources[j].IsAnyActiveForTarget(targetBodyPart))
+						{
+							ignoreAll = true;
+							break;
+						}
+					}
+
+					if (ignoreAll)
+					{
+						for (int i = 0; i < ignore.Length; ++i)
+						{
+							Get(SS.Genitals).Ignore(j, ignore[i]);
+						}
 					}
 				}
 			}
+			Instrumentation.End();
 		}
 	}
 

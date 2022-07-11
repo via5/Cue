@@ -8,7 +8,7 @@ namespace Cue.Sys.Vam
 	{
 		private IAtom atom_;
 		private BodyPartType type_;
-		private VamColliderRegion[] colliders_ = null;
+		private VamColliderRegion[] regions_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
 		private Logger log_ = null;
 		private CueCollisionHandler[] handlers_ = null;
@@ -58,7 +58,7 @@ namespace Cue.Sys.Vam
 				foreach (var c in colliders)
 					cs.Add(new VamColliderRegion(this, c));
 
-				colliders_ = cs.ToArray();
+				regions_ = cs.ToArray();
 			}
 
 			if (ignoreBodyParts == null)
@@ -86,7 +86,7 @@ namespace Cue.Sys.Vam
 					cs.Add(new VamColliderRegion(this, c));
 				}
 
-				colliders_ = cs.ToArray();
+				regions_ = cs.ToArray();
 			}
 
 			if (ignoreBodyParts == null)
@@ -98,13 +98,13 @@ namespace Cue.Sys.Vam
 
 		protected void Set(Collider[] colliders, string[] ignoreBodyParts)
 		{
-			if (colliders_ != null)
+			if (regions_ != null)
 			{
-				foreach (var c in colliders_)
+				foreach (var c in regions_)
 					CueCollisionHandler.RemoveFromCollider(c.Collider);
 
 				handlers_ = null;
-				colliders_ = null;
+				regions_ = null;
 			}
 
 			if (colliders != null)
@@ -113,7 +113,7 @@ namespace Cue.Sys.Vam
 				foreach (var c in colliders)
 					cs.Add(new VamColliderRegion(this, c));
 
-				colliders_ = cs.ToArray();
+				regions_ = cs.ToArray();
 			}
 
 			if (ignoreBodyParts == null)
@@ -209,9 +209,9 @@ namespace Cue.Sys.Vam
 		{
 			var hs = new List<CueCollisionHandler>();
 
-			if (colliders_ != null)
+			if (regions_ != null)
 			{
-				foreach (var c in colliders_)
+				foreach (var c in regions_)
 				{
 					var h = CueCollisionHandler.AddToCollider(c.Collider, this);
 					if (h != null)
@@ -245,10 +245,9 @@ namespace Cue.Sys.Vam
 		{
 			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(this));
 
-			var cs = GetRegions();
-			if (cs != null)
+			if (regions_ != null)
 			{
-				foreach (var c in cs)
+				foreach (var c in regions_)
 				{
 					var cc = c as VamColliderRegion;
 					if (cc != null)
@@ -430,6 +429,19 @@ namespace Cue.Sys.Vam
 
 		public TriggerInfo[] GetTriggers()
 		{
+			TriggerInfo[] r;
+
+			Instrumentation.Start(I.Triggers);
+			{
+				r = DoGetTriggers();
+			}
+			Instrumentation.End();
+
+			return r;
+		}
+
+		private TriggerInfo[] DoGetTriggers()
+		{
 			if (!Exists)
 				return null;
 
@@ -539,8 +551,8 @@ namespace Cue.Sys.Vam
 				distanceRenderers_.Clear();
 			}
 
-			var thisColliders = GetRegions();
-			var otherColliders = (other as VamBodyPart)?.GetRegions();
+			var thisColliders = regions_;
+			var otherColliders = (other as VamBodyPart)?.regions_;
 
 			var thisPos = Position;
 			var thisPosU = U.ToUnity(thisPos);
@@ -711,11 +723,11 @@ namespace Cue.Sys.Vam
 
 		public bool ContainsTransform(Transform t, bool debug)
 		{
-			if (colliders_ != null)
+			if (regions_ != null)
 			{
-				for (int i = 0; i < colliders_.Length; ++i)
+				for (int i = 0; i < regions_.Length; ++i)
 				{
-					if (colliders_[i].Collider.transform == t)
+					if (regions_[i].Collider.transform == t)
 					{
 						if (debug)
 							Log.Error($"{t.name} is collider #{i}");
@@ -725,7 +737,7 @@ namespace Cue.Sys.Vam
 					else
 					{
 						if (debug)
-							Log.Error($"{t.name} not collider {colliders_[i].Collider.transform.name}");
+							Log.Error($"{t.name} not collider {regions_[i].Collider.transform.name}");
 					}
 				}
 			}
@@ -734,11 +746,6 @@ namespace Cue.Sys.Vam
 		}
 
 		protected abstract bool DoContainsTransform(Transform t, bool debug);
-
-		protected virtual VamBodyPartRegion[] GetRegions()
-		{
-			return colliders_;
-		}
 
 		public virtual bool CanApplyForce()
 		{

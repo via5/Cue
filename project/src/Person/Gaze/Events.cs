@@ -19,12 +19,14 @@ namespace Cue
 		protected Person person_;
 		protected Gaze g_;
 		protected GazeTargets targets_;
+		private InstrumentationType inst_;
 
-		protected BasicGazeEvent(Person p)
+		protected BasicGazeEvent(Person p, InstrumentationType inst)
 		{
 			person_ = p;
 			g_ = p.Gaze;
 			targets_ = p.Gaze.Targets;
+			inst_ = inst;
 		}
 
 		public static IGazeEvent[] All(Person p)
@@ -45,7 +47,15 @@ namespace Cue
 
 		public int Check(int flags)
 		{
-			return DoCheck(flags);
+			int r;
+
+			Instrumentation.Start(inst_);
+			{
+				r = DoCheck(flags);
+			}
+			Instrumentation.End();
+
+			return r;
 		}
 
 		protected virtual int DoCheck(int flags)
@@ -70,7 +80,7 @@ namespace Cue
 	class GazeAbove : BasicGazeEvent
 	{
 		public GazeAbove(Person p)
-			: base(p)
+			: base(p, I.GazeAbove)
 		{
 		}
 
@@ -114,7 +124,7 @@ namespace Cue
 		private float activeElapsed_ = 0;
 
 		public GazeGrabbed(Person p)
-			: base(p)
+			: base(p, I.GazeGrabbed)
 		{
 			head_ = person_.Body.Get(BP.Head);
 		}
@@ -173,7 +183,7 @@ namespace Cue
 		private float gazeDuration_ = -1;
 
 		public GazeZapped(Person p)
-			: base(p)
+			: base(p, I.GazeZapped)
 		{
 		}
 
@@ -408,7 +418,7 @@ namespace Cue
 	class GazeKissing : BasicGazeEvent
 	{
 		public GazeKissing(Person p)
-			: base(p)
+			: base(p, I.GazeKissing)
 		{
 		}
 
@@ -467,7 +477,7 @@ namespace Cue
 	class GazeMouth : BasicGazeEvent
 	{
 		public GazeMouth(Person p)
-			: base(p)
+			: base(p, I.GazeMouth)
 		{
 		}
 
@@ -518,7 +528,7 @@ namespace Cue
 	class GazeHands : BasicGazeEvent
 	{
 		public GazeHands(Person p)
-			: base(p)
+			: base(p, I.GazeHands)
 		{
 		}
 
@@ -609,7 +619,7 @@ namespace Cue
 
 
 		public GazeInteractions(Person p)
-			: base(p)
+			: base(p, I.GazeInteractions)
 		{
 		}
 
@@ -962,7 +972,7 @@ namespace Cue
 	class GazeRandom : BasicGazeEvent
 	{
 		public GazeRandom(Person p)
-			: base(p)
+			: base(p, I.GazeRandom)
 		{
 		}
 
@@ -1032,7 +1042,7 @@ namespace Cue
 	class GazeOtherPersons : BasicGazeEvent
 	{
 		public GazeOtherPersons(Person p)
-			: base(p)
+			: base(p, I.GazeOtherPersons)
 		{
 		}
 

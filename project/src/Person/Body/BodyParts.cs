@@ -2,7 +2,7 @@
 {
 	class BodyParts
 	{
-		public const float CloseToDistance = 0.05f;
+		public const float PersonalSpaceDistance = 0.25f;
 
 		private static BodyPartType[] fullLeftArm_ = new BodyPartType[]
 		{

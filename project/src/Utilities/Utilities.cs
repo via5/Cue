@@ -1,6 +1,7 @@
 ﻿using SimpleJSON;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Cue
 {
@@ -323,12 +324,18 @@ namespace Cue
 			}
 		}
 
+		private static Stopwatch w_ = new Stopwatch();
+
 		public static void DebugTimeThis(string what, Action a)
 		{
-			var start = Cue.Instance.Sys.RealtimeSinceStartup;
+			w_.Reset();
+			w_.Start();
+
 			a();
-			var end = Cue.Instance.Sys.RealtimeSinceStartup;
-			Cue.LogError(what + ": " + (end - start) + "s");
+
+			w_.Stop();
+			float ms = (float)((((double)w_.ElapsedTicks) / Stopwatch.Frequency) * 1000);
+			Cue.LogError($"{what}: {ms:0.00} ms");
 		}
 	}
 

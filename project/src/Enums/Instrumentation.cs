@@ -14,21 +14,42 @@ namespace Cue
 		public static readonly InstrumentationType Gaze = InstrumentationType.CreateInternal(5);
 		public static readonly InstrumentationType GazeEmergency = InstrumentationType.CreateInternal(6);
 		public static readonly InstrumentationType GazePicker = InstrumentationType.CreateInternal(7);
-		public static readonly InstrumentationType GazeTargets = InstrumentationType.CreateInternal(8);
-		public static readonly InstrumentationType GazePostTarget = InstrumentationType.CreateInternal(9);
-		public static readonly InstrumentationType Voice = InstrumentationType.CreateInternal(10);
-		public static readonly InstrumentationType Excitement = InstrumentationType.CreateInternal(11);
-		public static readonly InstrumentationType Mood = InstrumentationType.CreateInternal(12);
-		public static readonly InstrumentationType Body = InstrumentationType.CreateInternal(13);
-		public static readonly InstrumentationType Homing = InstrumentationType.CreateInternal(14);
-		public static readonly InstrumentationType Status = InstrumentationType.CreateInternal(15);
-		public static readonly InstrumentationType AI = InstrumentationType.CreateInternal(16);
-		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(17);
-		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(18);
-		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(19);
+		public static readonly InstrumentationType PickerGeo = InstrumentationType.CreateInternal(8);
+		public static readonly InstrumentationType PickerCanLook = InstrumentationType.CreateInternal(9);
+		public static readonly InstrumentationType GazeEvents = InstrumentationType.CreateInternal(10);
+		public static readonly InstrumentationType GazeAbove = InstrumentationType.CreateInternal(11);
+		public static readonly InstrumentationType GazeGrabbed = InstrumentationType.CreateInternal(12);
+		public static readonly InstrumentationType GazeZapped = InstrumentationType.CreateInternal(13);
+		public static readonly InstrumentationType GazeKissing = InstrumentationType.CreateInternal(14);
+		public static readonly InstrumentationType GazeMouth = InstrumentationType.CreateInternal(15);
+		public static readonly InstrumentationType GazeHands = InstrumentationType.CreateInternal(16);
+		public static readonly InstrumentationType GazeInteractions = InstrumentationType.CreateInternal(17);
+		public static readonly InstrumentationType GazeRandom = InstrumentationType.CreateInternal(18);
+		public static readonly InstrumentationType GazeOtherPersons = InstrumentationType.CreateInternal(19);
+		public static readonly InstrumentationType GazePostTarget = InstrumentationType.CreateInternal(20);
+		public static readonly InstrumentationType Voice = InstrumentationType.CreateInternal(21);
+		public static readonly InstrumentationType Excitement = InstrumentationType.CreateInternal(22);
+		public static readonly InstrumentationType Mood = InstrumentationType.CreateInternal(23);
+		public static readonly InstrumentationType Body = InstrumentationType.CreateInternal(24);
+		public static readonly InstrumentationType BodyZap = InstrumentationType.CreateInternal(25);
+		public static readonly InstrumentationType BodyParts = InstrumentationType.CreateInternal(26);
+		public static readonly InstrumentationType BodyZones = InstrumentationType.CreateInternal(27);
+		public static readonly InstrumentationType ZoneDecay = InstrumentationType.CreateInternal(28);
+		public static readonly InstrumentationType ZoneUpdate = InstrumentationType.CreateInternal(29);
+		public static readonly InstrumentationType ZoneIgnore = InstrumentationType.CreateInternal(30);
+		public static readonly InstrumentationType BodyTemperature = InstrumentationType.CreateInternal(31);
+		public static readonly InstrumentationType BodyVoice = InstrumentationType.CreateInternal(32);
+		public static readonly InstrumentationType Homing = InstrumentationType.CreateInternal(33);
+		public static readonly InstrumentationType Status = InstrumentationType.CreateInternal(34);
+		public static readonly InstrumentationType AI = InstrumentationType.CreateInternal(35);
+		public static readonly InstrumentationType Triggers = InstrumentationType.CreateInternal(36);
+		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(37);
+		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(38);
+		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(39);
+		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(40);
 
-		public const int Count = 20;
-		public int GetCount() { return 20; }
+		public const int Count = 41;
+		public int GetCount() { return 41; }
 	}
 
 
@@ -57,6 +78,27 @@ namespace Cue
 			InstrumentationType.CreateInternal(17),
 			InstrumentationType.CreateInternal(18),
 			InstrumentationType.CreateInternal(19),
+			InstrumentationType.CreateInternal(20),
+			InstrumentationType.CreateInternal(21),
+			InstrumentationType.CreateInternal(22),
+			InstrumentationType.CreateInternal(23),
+			InstrumentationType.CreateInternal(24),
+			InstrumentationType.CreateInternal(25),
+			InstrumentationType.CreateInternal(26),
+			InstrumentationType.CreateInternal(27),
+			InstrumentationType.CreateInternal(28),
+			InstrumentationType.CreateInternal(29),
+			InstrumentationType.CreateInternal(30),
+			InstrumentationType.CreateInternal(31),
+			InstrumentationType.CreateInternal(32),
+			InstrumentationType.CreateInternal(33),
+			InstrumentationType.CreateInternal(34),
+			InstrumentationType.CreateInternal(35),
+			InstrumentationType.CreateInternal(36),
+			InstrumentationType.CreateInternal(37),
+			InstrumentationType.CreateInternal(38),
+			InstrumentationType.CreateInternal(39),
+			InstrumentationType.CreateInternal(40),
 		};
 
 		public static InstrumentationType[] Values
@@ -74,18 +116,39 @@ namespace Cue
 			"gaze",
 			"gazeEmergency",
 			"gazePicker",
-			"gazeTargets",
+			"pickerGeo",
+			"pickerCanLook",
+			"gazeEvents",
+			"gazeAbove",
+			"gazeGrabbed",
+			"gazeZapped",
+			"gazeKissing",
+			"gazeMouth",
+			"gazeHands",
+			"gazeInteractions",
+			"gazeRandom",
+			"gazeOtherPersons",
 			"gazePostTarget",
 			"voice",
 			"excitement",
 			"mood",
 			"body",
+			"bodyZap",
+			"bodyParts",
+			"bodyZones",
+			"zoneDecay",
+			"zoneUpdate",
+			"zoneIgnore",
+			"bodyTemperature",
+			"bodyVoice",
 			"homing",
 			"status",
 			"AI",
+			"triggers",
 			"UI",
 			"fixedUpdate",
 			"lateUpdate",
+			"collisions",
 		};
 
 		public static InstrumentationType FromString(string s)

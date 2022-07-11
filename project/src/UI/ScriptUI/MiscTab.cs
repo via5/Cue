@@ -45,20 +45,20 @@ namespace Cue
 			var p = new VUI.Panel(gl);
 			var inst = Instrumentation.Instance;
 
-			for (int i = 0; i < I.Count; ++i)
+			foreach (var i in InstrumentationType.Values)
 			{
-				var name = new VUI.Label(new string(' ', inst.Depth(i) * 2) + inst.Name(i));
+				var name = new VUI.Label(new string(' ', inst.Depth(i) * 1) + inst.Name(i));
 				name.Font = VUI.Style.Theme.MonospaceFont;
-				name.FontSize = 22;
+				name.FontSize = 20;
 
 				var ticker = new VUI.Label();
 				ticker.Font = VUI.Style.Theme.MonospaceFont;
-				ticker.FontSize = 22;
+				ticker.FontSize = 20;
 
 				p.Add(name);
 				p.Add(ticker);
 
-				tickers_[i] = ticker;
+				tickers_[i.Int] = ticker;
 			}
 
 
@@ -75,8 +75,8 @@ namespace Cue
 
 				if (inst.Updated)
 				{
-					for (int i = 0; i < I.Count; ++i)
-						tickers_[i].Text = inst.Get(i).ToString();
+					foreach (var i in InstrumentationType.Values)
+						tickers_[i.Int].Text = inst.Get(i).ToString();
 				}
 			}
 		}

@@ -17,6 +17,7 @@ namespace Cue
 		private long avg_ = 0;
 		private long peak_ = 0;
 
+		private long lastTotal_ = 0;
 		private long lastPeak_ = 0;
 		private long lastCalls_ = 0;
 		private long lastGc_ = 0;
@@ -37,10 +38,10 @@ namespace Cue
 		{
 			updated_ = false;
 
+			gcStart_ = GC.GetTotalMemory(false);
+
 			w_.Reset();
 			w_.Start();
-
-			gcStart_ = GC.GetTotalMemory(false);
 		}
 
 		public void End()
@@ -64,6 +65,7 @@ namespace Cue
 				else
 					avg_ = ticks_ / calls_;
 
+				lastTotal_ = ticks_;
 				lastPeak_ = peak_;
 				lastCalls_ = calls_;
 				lastGc_ = gc_;
@@ -85,12 +87,14 @@ namespace Cue
 			get { return updated_; }
 		}
 
+		public float TotalMs
+		{
+			get { return ToMs(lastTotal_); }
+		}
+
 		public float AverageMs
 		{
-			get
-			{
-				return ToMs(avg_);
-			}
+			get { return ToMs(avg_); }
 		}
 
 		public float PeakMS
@@ -116,16 +120,17 @@ namespace Cue
 		public override string ToString()
 		{
 			return
-				$"n={Calls,3} " +
-				$"avg={AverageMs,5:##0.00} " +
-				$"peak={PeakMS,5:##0.00} " +
+				$"n={Calls,5} " +
+				$"tot={TotalMs,6:##0.00} " +
+				$"avg={AverageMs,6:##0.00} " +
+				$"peak={PeakMS,6:##0.00} " +
 				$"gc={BytesToString(MemoryChange)} " +
-				$"gcTotal={BytesToString(gcTotal_)}";
+				$"gct={BytesToString(gcTotal_)}";
 		}
 
 		private string BytesToString(long bytes)
 		{
-			string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+			string[] sizes = { "B", "K", "M", "G", "T" };
 			double len = (double)bytes;
 			int order = 0;
 			while (len >= 1024 && order < sizes.Length - 1)
@@ -136,7 +141,7 @@ namespace Cue
 
 			// Adjust the format string to your preferences. For example "{0:0.#}{1}" would
 			// show a single decimal place, and no space.
-			return string.Format($"{len,7:###0.00} {sizes[order],-2}");
+			return string.Format($"{len,7:###0.00} {sizes[order]}");
 		}
 	}
 
@@ -148,10 +153,24 @@ namespace Cue
 		private Ticker[] tickers_ = new Ticker[I.Count];
 		private int[] depth_ = new int[I.Count]
 		{
-			0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0
+			0,
+				1, 1,
+					2, 2, 2,
+						3, 3,
+							4, 4,
+						3,
+							4, 4, 4, 4, 4, 4, 4, 4, 4,
+						3,
+					2, 2, 2, 2,
+						3, 3, 3,
+							4, 4, 4,
+						3, 3,
+					2, 2, 2,
+				1, 1,
+			0, 0, 0
 		};
 
-		private int[] stack_ = new int[4];
+		private int[] stack_ = new int[6];
 		private int current_ = 0;
 		private bool enabled_ = false;
 		private static Instrumentation instance_ = new Instrumentation();
@@ -242,19 +261,19 @@ namespace Cue
 			current_ = 0;
 		}
 
-		public int Depth(int i)
+		public int Depth(InstrumentationType i)
 		{
-			return depth_[i];
+			return depth_[i.Int];
 		}
 
-		public string Name(int i)
+		public string Name(InstrumentationType i)
 		{
-			return tickers_[i].Name;
+			return tickers_[i.Int].Name;
 		}
 
-		public Ticker Get(int i)
+		public Ticker Get(InstrumentationType i)
 		{
-			return tickers_[i];
+			return tickers_[i.Int];
 		}
 
 		private void DoUpdateTickers(float s)
@@ -266,42 +285,4 @@ namespace Cue
 				tickers_[i].Update(s);
 		}
 	}
-
-
-	/*static class I
-	{
-		public const int Update = 0;
-		public const int UpdateInput = 1;
-		public const int UpdateObjects = 2;
-		public const int UpdateObjectsAtoms = 3;
-		public const int UpdatePersonAnimator = 4;
-		public const int UpdatePersonGaze = 5;
-		public const int UpdatePersonVoice = 6;
-		public const int UpdatePersonExcitement = 7;
-		public const int UpdatePersonMood = 8;
-		public const int UpdatePersonBody = 9;
-		public const int UpdatePersonHoming = 10;
-		public const int UpdatePersonStatus = 11;
-		public const int UpdatePersonAI = 12;
-		public const int UpdateUi = 13;
-		public const int FixedUpdate = 14;
-		public const int LateUpdate = 15;
-		public const int UpdateGazeEmergency = 16;
-		public const int UpdateGazePicker = 17;
-		public const int UpdateGazeTargets = 18;
-		public const int UpdateGazePostTarget = 19;
-		public const int TickerCount = 20;
-
-
-
-		public static void Start(int i)
-		{
-			instance_.Start(i);
-		}
-
-		public static void End()
-		{
-			instance_.End();
-		}
-	}*/
 }

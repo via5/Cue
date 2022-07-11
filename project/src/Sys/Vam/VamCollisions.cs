@@ -70,6 +70,15 @@ namespace Cue.Sys.Vam
 
 		public void OnCollisionStay(Collision c)
 		{
+			Instrumentation.Start(I.Collisions);
+			{
+				DoOnCollisionStay(c);
+			}
+			Instrumentation.End();
+		}
+
+		private void DoOnCollisionStay(Collision c)
+		{
 			try
 			{
 				if (!isActiveAndEnabled || bp_ == null ||
