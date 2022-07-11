@@ -355,7 +355,7 @@ namespace Cue.Sys.Vam
 		}
 
 
-		public IBodyPart BodyPartForTransform(Transform t, bool debug = false)
+		public VamBodyPart BodyPartForTransform(Transform t)
 		{
 			// all Persons in the scene are a VamAtom and have a VamBody, but
 			// there's also the special VamCameraAtom, which isn't an Atom at
@@ -409,26 +409,17 @@ namespace Cue.Sys.Vam
 			//   this uses the actual hands of the possessed atoms, so they
 			//   don't need special handling
 
-			if (debug)
-				Log.Error($"looking for {t.name} in cache");
 
 			// start by looking in the cache
 			{
 				VamBodyPart bp;
 
 				if (partMap_.TryGetValue(t, out bp))
-				{
-					if (debug)
-						Log.Error($"found {t.name} in cache in {bp}");
-
 					return bp.VamAtom.RealBodyPart(bp);
-				}
 			}
 
 
 			// not found, do a more expensive search
-			if (debug)
-				Log.Error($"{t.name} not in cache");
 
 
 			// find the parent atom for this transform, used to stop going up
@@ -440,7 +431,7 @@ namespace Cue.Sys.Vam
 			for (int i = 0; i < ps.Length; ++i)
 			{
 				var bp = (ps[i].Atom.Body as VamBasicBody)
-					.BodyPartForTransform(t, stop, debug);
+					.BodyPartForTransform(t, stop, false);
 
 				if (bp != null)
 				{

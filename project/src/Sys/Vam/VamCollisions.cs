@@ -5,6 +5,7 @@ namespace Cue.Sys.Vam
 {
 	class CueCollisionHandler : MonoBehaviour
 	{
+		private VamSys sys_ = null;
 		private VamBodyPart bp_ = null;
 		private Person person_ = null;
 		private Rigidbody rb_ = null;
@@ -36,6 +37,7 @@ namespace Cue.Sys.Vam
 					Cue.LogErrorST($"CueCollisionHandler: bp atom {ch.bp_.Atom} not found for {bp} ({U.QualifiedName(c)})");
 			}
 
+			ch.sys_ = Cue.Instance.VamSys;
 			ch.rb_ = rb;
 			ch.collider_ = c;
 
@@ -86,8 +88,12 @@ namespace Cue.Sys.Vam
 		{
 			Instrumentation.Start(I.Collisions);
 			{
-				if (CollisionWithThis(c))
-					active_ = false;
+				Instrumentation.Start(I.ColWithThis);
+				{
+					if (CollisionWithThis(c))
+						active_ = false;
+				}
+				Instrumentation.End();
 			}
 			Instrumentation.End();
 		}
@@ -105,10 +111,10 @@ namespace Cue.Sys.Vam
 		{
 			try
 			{
-				if (!isActiveAndEnabled || bp_ == null ||
+				if (!active_ ||
+					bp_ == null ||
 					CueMain.Instance.Sys.Paused ||
-					!CueMain.Instance.PluginEnabled ||
-					!active_)
+					!CueMain.Instance.PluginEnabled)
 				{
 					return;
 				}
@@ -132,9 +138,7 @@ namespace Cue.Sys.Vam
 				Instrumentation.Start(I.ColGetBP);
 				{
 					mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
-
-					sourcePart = Cue.Instance.VamSys
-						.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
+					sourcePart = sys_.BodyPartForTransform(c.rigidbody.transform);
 				}
 				Instrumentation.End();
 
@@ -179,9 +183,11 @@ namespace Cue.Sys.Vam
 			// rigidbody that collided with `c.collider`, so make sure this
 			// script is the correct one
 
-			for (int i = 0; i < c.contacts.Length; ++i)
+			var cs = c.contacts;
+
+			for (int i = 0; i < cs.Length; ++i)
 			{
-				if (c.contacts[i].thisCollider == collider_)
+				if (cs[i].thisCollider == collider_)
 					return true;
 			}
 

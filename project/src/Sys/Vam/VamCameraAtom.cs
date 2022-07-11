@@ -384,9 +384,9 @@ namespace Cue.Sys.Vam
 		public int NavState { get; }
 		public override Atom Atom { get { return null; } }
 
-		public override IBodyPart RealBodyPart(VamBodyPart bp)
+		public override VamBodyPart RealBodyPart(VamBodyPart bp)
 		{
-			return Cue.Instance.Player.Body.Get(bp.Type).Sys;
+			return Cue.Instance.Player.Body.Get(bp.Type).Sys as VamBodyPart;
 		}
 
 		public override void Destroy()

@@ -629,7 +629,7 @@ namespace Cue
 		}
 
 		static public void Assert(bool b, string s = null)
-		{
+		{/*
 			if (!b)
 			{
 				if (s == null)
@@ -641,7 +641,7 @@ namespace Cue
 					Instance.DisablePlugin();
 
 				throw new PluginGone();
-			}
+			}*/
 		}
 
 		private void test()

@@ -83,7 +83,7 @@ namespace Cue.Sys.Vam
 		public abstract void SetParentLink(IBodyPart bp);
 		public abstract void Update(float s);
 
-		public abstract IBodyPart RealBodyPart(VamBodyPart bp);
+		public abstract VamBodyPart RealBodyPart(VamBodyPart bp);
 	}
 
 
@@ -305,7 +305,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public override IBodyPart RealBodyPart(VamBodyPart bp)
+		public override VamBodyPart RealBodyPart(VamBodyPart bp)
 		{
 			return bp;
 		}
