@@ -16,6 +16,7 @@ namespace Cue
 			AddSubTab(new PersonBodyPartsTab(person_));
 			AddSubTab(new PersonBodyFingersTab(person_));
 			AddSubTab(new PersonBodyLocksTab(person_));
+			AddSubTab(new PersonBodyZonesTab(person_));
 		}
 	}
 
@@ -139,7 +140,7 @@ namespace Cue
 			var p = new VUI.Panel(gl);
 
 			p.Add(CreateLabel("Name", UnityEngine.FontStyle.Bold));
-			p.Add(CreateLabel("Trigger", UnityEngine.FontStyle.Bold));
+			p.Add(CreateLabel("Collision", UnityEngine.FontStyle.Bold));
 			p.Add(CreateLabel("Grabbed", UnityEngine.FontStyle.Bold));
 			p.Add(CreateLabel("Lock", UnityEngine.FontStyle.Bold));
 			p.Add(CreateLabel("Link", UnityEngine.FontStyle.Bold));
@@ -392,6 +393,56 @@ namespace Cue
 		{
 			person_.Body.DebugAllLocks(strings_);
 			list_.SetItems(strings_);
+		}
+	}
+
+
+	class PersonBodyZonesTab : Tab
+	{
+		private Person person_;
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private List<string> strings_ = new List<string>();
+
+		public PersonBodyZonesTab(Person person)
+			: base("Zones", false)
+		{
+			person_ = person;
+
+			Layout = new VUI.BorderLayout(10);
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
+			Add(list_, VUI.BorderLayout.Center);
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			strings_.Clear();
+
+			foreach (var z in person_.Body.Zones.All)
+			{
+				strings_.Add($"{z} {z.MainBodyPart} active={z.ActiveSources}");
+
+				foreach (var src in z.Sources)
+				{
+					if (src.StrictlyActiveCount > 0)
+					{
+						foreach (var bp in BodyPartType.Values)
+							AddPart(src, src.GetPart(bp));
+
+						AddPart(src, src.GetToyPart());
+						AddPart(src, src.GetExternalPart());
+					}
+				}
+			}
+
+
+			list_.SetItems(strings_);
+		}
+
+		private void AddPart(ErogenousZoneSource src, ErogenousZoneSource.Part part)
+		{
+			if (part.active)
+				strings_.Add($"    {src}.{part.bodyPart} mag={part.magnitude:0.00} elapsed={part.elapsed:0.00}");
 		}
 	}
 }

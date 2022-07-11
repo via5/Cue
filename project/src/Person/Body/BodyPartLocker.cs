@@ -19,8 +19,6 @@ namespace Cue
 		{
 			for (int i = 0; i < locks_.Count; ++i)
 			{
-				Cue.LogError($"checking {bp_} for {lockType} {strengthType}");
-
 				if (!locks_[i].CanLock(lockType, strengthType, BodyPartLock.NoKey))
 				{
 					// not an error

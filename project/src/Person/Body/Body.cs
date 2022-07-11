@@ -173,6 +173,11 @@ namespace Cue
 			get { return zap_; }
 		}
 
+		public ErogenousZones Zones
+		{
+			get { return zones_; }
+		}
+
 		public BodyPart Get(BodyPartType type)
 		{
 			if (type.Int < 0 || type.Int >= all_.Length)

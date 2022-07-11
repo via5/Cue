@@ -16,6 +16,11 @@ namespace Cue
 			person_ = p;
 		}
 
+		public ErogenousZone[] All
+		{
+			get { return zones_; }
+		}
+
 		public ErogenousZone Get(ZoneType i)
 		{
 			return zones_[i.Int];
@@ -113,7 +118,7 @@ namespace Cue
 
 	public class ErogenousZoneSource
 	{
-		class Part
+		public class Part
 		{
 			public BodyPartType bodyPart;
 			public bool active = false;
@@ -131,9 +136,9 @@ namespace Cue
 		private const int ToyPartIndex = BP.Count;
 		private const int ExternalPartIndex = BP.Count + 1;
 
-		private int totalActive_ = 0;
-		private int validActive_ = 0;
-		private int physicalActive_ = 0;
+		private List<Part> activeParts_ = new List<Part>();
+		private List<Part> validParts_ = new List<Part>();
+		private List<Part> physicalParts_ = new List<Part>();
 
 		private Person person_;
 		private int type_;  // Sys.TriggerInfo types
@@ -176,17 +181,17 @@ namespace Cue
 
 		public bool Active
 		{
-			get { return (validActive_ > 0); }
+			get { return (validParts_.Count > 0); }
 		}
 
 		public bool IsPhysical
 		{
-			get { return (physicalActive_ > 0); }
+			get { return (physicalParts_.Count > 0); }
 		}
 
 		public int StrictlyActiveCount
 		{
-			get { return totalActive_; }
+			get { return activeParts_.Count; }
 		}
 
 		public float Rate
@@ -209,17 +214,17 @@ namespace Cue
 			get { return max_; }
 		}
 
-		private Part GetExternalPart()
+		public Part GetExternalPart()
 		{
 			return parts_[ExternalPartIndex];
 		}
 
-		private Part GetToyPart()
+		public Part GetToyPart()
 		{
 			return parts_[ToyPartIndex];
 		}
 
-		private Part GetPart(BodyPartType bodyPart)
+		public Part GetPart(BodyPartType bodyPart)
 		{
 			if (bodyPart == BP.None)
 				return GetExternalPart();
@@ -274,12 +279,31 @@ namespace Cue
 
 		public void Decay(float s)
 		{
-			totalActive_ = 0;
-			validActive_ = 0;
-			physicalActive_ = 0;
+			int i = 0;
 
-			for (int i = 0; i < parts_.Length; ++i)
-				DoDecay(s, parts_[i]);
+			while (i < activeParts_.Count)
+			{
+				var part = activeParts_[i];
+
+				// todo, decay speed
+				part.elapsed = Math.Max(0, part.elapsed - (s * 2));
+				part.active = (part.elapsed > 0);
+
+				if (part.active)
+				{
+					++i;
+				}
+				else
+				{
+					part.magnitude = 0;
+
+					activeParts_.RemoveAt(i);
+					validParts_.Remove(part);
+
+					if (person_.Body.Get(part.targetBodyPart).IsPhysical)
+						physicalParts_.Remove(part);
+				}
+			}
 		}
 
 		public void Check(Person p, ZoneType zoneType)
@@ -289,7 +313,7 @@ namespace Cue
 			max_ = 0;
 			mag_ = 0;
 
-			if (totalActive_ > 0)
+			if (activeParts_.Count > 0)
 			{
 				var ss = p.Personality.Sensitivities.Get(zoneType);
 
@@ -323,18 +347,6 @@ namespace Cue
 				if (GetExternalPart().active)
 					mag_ = Math.Max(mag_, GetExternalPart().magnitude);
 			}
-		}
-
-		private void DoDecay(float s, Part part)
-		{
-			// todo, decay speed
-			part.elapsed = Math.Max(0, part.elapsed - (s * 2));
-			part.active = (part.elapsed > 0);
-
-			if (part.active)
-				Activated(part);
-			else
-				part.magnitude = 0;
 		}
 
 		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart, float mag)
@@ -380,26 +392,26 @@ namespace Cue
 
 		private void Activated(Part p)
 		{
-			++totalActive_;
+			activeParts_.Add(p);
 
 			if (!p.ignored)
-				++validActive_;
+				validParts_.Add(p);
 
 			if (p.targetBodyPart != BP.None)
 			{
 				if (person_.Body.Get(p.targetBodyPart).IsPhysical)
-					++physicalActive_;
+					physicalParts_.Add(p);
 			}
 		}
 
 		private void Ignored(Part p)
 		{
-			--validActive_;
+			validParts_.Remove(p);
 
 			if (p.targetBodyPart != BP.None)
 			{
 				if (person_.Body.Get(p.targetBodyPart).IsPhysical)
-					--physicalActive_;
+					physicalParts_.Remove(p);
 			}
 
 		}

@@ -141,7 +141,7 @@ namespace Cue
 
 			// Adjust the format string to your preferences. For example "{0:0.#}{1}" would
 			// show a single decimal place, and no space.
-			return string.Format($"{len,7:###0.00} {sizes[order]}");
+			return string.Format($"{len,6:###0.0} {sizes[order]}");
 		}
 	}
 
