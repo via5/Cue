@@ -48,7 +48,6 @@ namespace Cue.Sys.Vam
 	abstract class VamBasicBody : IBody
 	{
 		private VamAtom atom_;
-		private Dictionary<Transform, int> partMap_ = new Dictionary<Transform, int>();
 
 		protected VamBasicBody(VamAtom a)
 		{
@@ -74,23 +73,8 @@ namespace Cue.Sys.Vam
 		public abstract Hand GetLeftHand();
 		public abstract Hand GetRightHand();
 
-
-		public virtual IBodyPart BodyPartForTransformCached(Transform t)
-		{
-			int bp;
-			if (partMap_.TryGetValue(t, out bp))
-				return GetBodyParts()[bp];
-
-			return null;
-		}
-
-		public abstract IBodyPart BodyPartForTransform(
+		public abstract VamBodyPart BodyPartForTransform(
 			Transform t, Transform stop, bool debug);
-
-		protected void AddBodyPartCache(Transform t, int bodyPart)
-		{
-			partMap_.Add(t, bodyPart);
-		}
 	}
 
 
@@ -165,7 +149,7 @@ namespace Cue.Sys.Vam
 			return parts_[i.Int];
 		}
 
-		public override IBodyPart BodyPartForTransform(
+		public override VamBodyPart BodyPartForTransform(
 			Transform t, Transform stop, bool debug)
 		{
 			// see VamSys.BodyPartForTransform()
@@ -190,7 +174,6 @@ namespace Cue.Sys.Vam
 						if (debug)
 							Log.Error($"found {t.name}, is {check.name} in {vp}");
 
-						AddBodyPartCache(t, i);
 						return vp;
 					}
 				}

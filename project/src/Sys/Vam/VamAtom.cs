@@ -50,7 +50,44 @@ namespace Cue.Sys.Vam
 	}
 
 
-	public class VamAtom : IAtom
+	public abstract class VamBasicAtom : IAtom
+	{
+		public abstract string ID { get; }
+		public abstract bool Visible { get; set; }
+		public abstract bool IsPerson { get; }
+		public abstract bool IsMale { get; }
+		public abstract bool Possessed { get; }
+		public abstract bool Selected { get; }
+		public abstract bool Grabbed { get; }
+		public abstract bool Collisions { get; set; }
+		public abstract bool Physics { get; set; }
+		public abstract bool Hidden { get; set; }
+		public abstract float Scale { get; set; }
+		public abstract bool AutoBlink { get; set; }
+		public abstract Vector3 Position { get; set; }
+		public abstract Quaternion Rotation { get; set; }
+		public abstract string Warning { get; }
+		public abstract IBody Body { get; }
+		public abstract IHair Hair { get; }
+		public abstract Atom Atom { get; }
+
+
+		public abstract void Destroy();
+		public abstract IMorph GetMorph(string id);
+		public abstract void Init();
+		public abstract void LateUpdate(float s);
+		public abstract void OnPluginState(bool b);
+		public abstract void SetBodyDamping(int e);
+		public abstract void SetCollidersForKiss(bool b, IAtom other);
+		public abstract void SetDefaultControls(string why);
+		public abstract void SetParentLink(IBodyPart bp);
+		public abstract void Update(float s);
+
+		public abstract IBodyPart RealBodyPart(VamBodyPart bp);
+	}
+
+
+	public class VamAtom : VamBasicAtom
 	{
 		struct Damping
 		{
@@ -123,7 +160,7 @@ namespace Cue.Sys.Vam
 			cd_ = new VamCorruptionDetector(atom, OnCorruption);
 		}
 
-		public string Warning
+		public override string Warning
 		{
 			get { return ""; }
 		}
@@ -141,14 +178,14 @@ namespace Cue.Sys.Vam
 				return new FloatParameter(this, "scale", "scale");
 		}
 
-		public void Init()
+		public override void Init()
 		{
 			VamFixes.Run(atom_);
 			body_.Init();
 			CreateDampings();
 		}
 
-		public void Destroy()
+		public override void Destroy()
 		{
 			atom_.SetUID(atom_.uid + $"_cue_destroy");
 			SuperController.singleton.RemoveAtom(atom_);
@@ -159,23 +196,23 @@ namespace Cue.Sys.Vam
 			get { return log_; }
 		}
 
-		public string ID
+		public override string ID
 		{
 			get { return atom_.uid; }
 		}
 
-		public bool Visible
+		public override bool Visible
 		{
 			get { return atom_.on; }
 			set { atom_.SetOn(value); }
 		}
 
-		public bool IsPerson
+		public override bool IsPerson
 		{
 			get { return atom_.type == "Person"; }
 		}
 
-		public bool IsMale
+		public override bool IsMale
 		{
 			get
 			{
@@ -189,7 +226,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public bool Selected
+		public override bool Selected
 		{
 			get
 			{
@@ -197,69 +234,69 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public bool AutoBlink
+		public override bool AutoBlink
 		{
 			get { return autoBlink_; }
 			set { autoBlink_ = value; }
 		}
 
-		public IBody Body
+		public override IBody Body
 		{
 			get { return body_; }
 		}
 
-		public IHair Hair
+		public override IHair Hair
 		{
 			get { return hair_; }
 		}
 
-		public bool Grabbed
+		public override bool Grabbed
 		{
 			get { return atom_.mainController.isGrabbing; }
 		}
 
-		public Vector3 Position
+		public override Vector3 Position
 		{
 			get { return U.FromUnity(atom_.mainController.transform.position); }
 			set { atom_.mainController.MoveControl(U.ToUnity(value)); }
 		}
 
-		public Quaternion Rotation
+		public override Quaternion Rotation
 		{
 			get { return U.FromUnity(atom_.mainController.transform.rotation); }
 			set { atom_.mainController.transform.rotation = U.ToUnity(value); }
 		}
 
-		public bool Collisions
+		public override bool Collisions
 		{
 			get { return collisions_.Value; }
 			set { collisions_.Value = value; }
 		}
 
-		public bool Physics
+		public override bool Physics
 		{
 			get { return physics_.Value; }
 			set { physics_.Value = value; }
 		}
 
-		public bool Hidden
+		public override bool Hidden
 		{
 			get { return atom_.hidden; }
 			set { atom_.hidden = value; }
 		}
 
-		public float Scale
+		public override float Scale
 		{
 			get { return scale_.Value; }
 			set { scale_.Value = value; }
 		}
 
-		public Atom Atom
+		public override Atom Atom
 		{
 			get { return atom_; }
 		}
 
-		public bool Possessed
+		public override bool Possessed
 		{
 			get
 			{
@@ -268,7 +305,12 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public void SetDefaultControls(string why)
+		public override IBodyPart RealBodyPart(VamBodyPart bp)
+		{
+			return bp;
+		}
+
+		public override void SetDefaultControls(string why)
 		{
 			// this breaks possession, it stays enabled but control is lost
 			if (!Possessed)
@@ -331,7 +373,7 @@ namespace Cue.Sys.Vam
 			return false;
 		}
 
-		public void SetParentLink(IBodyPart bp)
+		public override void SetParentLink(IBodyPart bp)
 		{
 			var v = bp as VamBodyPart;
 			if (v == null)
@@ -411,13 +453,13 @@ namespace Cue.Sys.Vam
 			list.Add(d);
 		}
 
-		public void SetBodyDamping(int e)
+		public override void SetBodyDamping(int e)
 		{
 			for (int i = 0; i < damping_.Length; ++i)
 				damping_[i].Set(e);
 		}
 
-		public void SetCollidersForKiss(bool b, IAtom other)
+		public override void SetCollidersForKiss(bool b, IAtom other)
 		{
 			body_.SetCollidersForKiss(b, (other as VamAtom).body_);
 			(other as VamAtom).body_.SetCollidersForKiss(b, body_);
@@ -450,24 +492,24 @@ namespace Cue.Sys.Vam
 			SetControllerForMoving("rFootControl", b);
 		}
 
-		public IMorph GetMorph(string name)
+		public override IMorph GetMorph(string name)
 		{
 			return new VamMorph(this, name);
 		}
 
-		public void OnPluginState(bool b)
+		public override void OnPluginState(bool b)
 		{
 			body_?.OnPluginState(b);
 			hair_?.OnPluginState(b);
 		}
 
-		public void Update(float s)
+		public override void Update(float s)
 		{
 			hair_?.Update(s);
 			cd_.Update(s);
 		}
 
-		public void LateUpdate(float s)
+		public override void LateUpdate(float s)
 		{
 			body_?.LateUpdate(s);
 		}

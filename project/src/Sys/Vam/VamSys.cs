@@ -40,6 +40,7 @@ namespace Cue.Sys.Vam
 		private VamDebugRenderer debugRenderer_ = new VamDebugRenderer();
 		private Action deferredInit_ = null;
 		private Linker linker_ = new Linker();
+		private Dictionary<Transform, VamBodyPart> partMap_ = new Dictionary<Transform, VamBodyPart>();
 
 		public VamSys(MVRScript s)
 		{
@@ -353,6 +354,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+
 		public IBodyPart BodyPartForTransform(Transform t, bool debug = false)
 		{
 			// all Persons in the scene are a VamAtom and have a VamBody, but
@@ -407,24 +409,19 @@ namespace Cue.Sys.Vam
 			//   this uses the actual hands of the possessed atoms, so they
 			//   don't need special handling
 
-			var ps = Cue.Instance.ActivePersons;
-
 			if (debug)
 				Log.Error($"looking for {t.name} in cache");
 
-			// start by looking for a cached value in all persons
-			for (int i = 0; i < ps.Length; ++i)
+			// start by looking in the cache
 			{
-				var bp = (ps[i].Atom.Body as VamBasicBody).BodyPartForTransformCached(t);
-				if (bp != null)
+				VamBodyPart bp;
+
+				if (partMap_.TryGetValue(t, out bp))
 				{
 					if (debug)
 						Log.Error($"found {t.name} in cache in {bp}");
 
-					if (ps[i].Atom is VamCameraAtom)
-						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
-					else
-						return bp;
+					return bp.VamAtom.RealBodyPart(bp);
 				}
 			}
 
@@ -438,6 +435,8 @@ namespace Cue.Sys.Vam
 			// the transform's parent chain
 			var stop = t.GetComponentInParent<Atom>()?.transform;
 
+			var ps = Cue.Instance.ActivePersons;
+
 			for (int i = 0; i < ps.Length; ++i)
 			{
 				var bp = (ps[i].Atom.Body as VamBasicBody)
@@ -445,10 +444,8 @@ namespace Cue.Sys.Vam
 
 				if (bp != null)
 				{
-					if (ps[i].Atom is VamCameraAtom)
-						return Cue.Instance.Player.Body.Get(bp.Type).Sys;
-					else
-						return bp;
+					partMap_.Add(t, bp);
+					return bp.VamAtom.RealBodyPart(bp);
 				}
 			}
 

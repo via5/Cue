@@ -9,6 +9,7 @@ namespace Cue.Sys.Vam
 		private Person person_ = null;
 		private Rigidbody rb_ = null;
 		private Collider collider_ = null;
+		private bool active_ = false;
 
 		public static CueCollisionHandler AddToCollider(Collider c, VamBodyPart bp)
 		{
@@ -68,6 +69,29 @@ namespace Cue.Sys.Vam
 			return c.attachedRigidbody;
 		}
 
+		public void OnCollisionEnter(Collision c)
+		{
+			Instrumentation.Start(I.Collisions);
+			{
+				Instrumentation.Start(I.ColWithThis);
+				{
+					active_ = CollisionWithThis(c);
+				}
+				Instrumentation.End();
+			}
+			Instrumentation.End();
+		}
+
+		public void OnCollisionExit(Collision c)
+		{
+			Instrumentation.Start(I.Collisions);
+			{
+				if (CollisionWithThis(c))
+					active_ = false;
+			}
+			Instrumentation.End();
+		}
+
 		public void OnCollisionStay(Collision c)
 		{
 			Instrumentation.Start(I.Collisions);
@@ -83,23 +107,54 @@ namespace Cue.Sys.Vam
 			{
 				if (!isActiveAndEnabled || bp_ == null ||
 					CueMain.Instance.Sys.Paused ||
-					!CueMain.Instance.PluginEnabled)
+					!CueMain.Instance.PluginEnabled ||
+					!active_)
 				{
 					return;
 				}
 
-				if (!CollisionWithThis(c))
+
+				bool withThis;
+
+				Instrumentation.Start(I.ColWithThis);
+				{
+					withThis = CollisionWithThis(c);
+				}
+				Instrumentation.End();
+
+				if (!withThis)
 					return;
 
-				float mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
 
-				var sourcePart = Cue.Instance.VamSys
-					.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
+				float mag;
+				VamBodyPart sourcePart;
+
+				Instrumentation.Start(I.ColGetBP);
+				{
+					mag = Math.Max(0.01f, c.relativeVelocity.magnitude);
+
+					sourcePart = Cue.Instance.VamSys
+						.BodyPartForTransform(c.rigidbody.transform) as VamBodyPart;
+				}
+				Instrumentation.End();
+
 
 				if (sourcePart == null)
-					DoExternalCollision(c, mag);
+				{
+					Instrumentation.Start(I.ColExternal);
+					{
+						DoExternalCollision(c, mag);
+					}
+					Instrumentation.End();
+				}
 				else
-					DoPersonCollision(sourcePart, mag);
+				{
+					Instrumentation.Start(I.ColPerson);
+					{
+						DoPersonCollision(sourcePart, mag);
+					}
+					Instrumentation.End();
+				}
 			}
 			catch (PluginGone)
 			{

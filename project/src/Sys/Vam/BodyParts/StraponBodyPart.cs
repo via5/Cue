@@ -336,7 +336,7 @@ namespace Cue.Sys.Vam
 			}
 			else
 			{
-				anchor_ = VamAtom.FindCollider(anchorName);
+				anchor_ = (VamAtom as VamAtom).FindCollider(anchorName);
 
 				if (anchor_ == null)
 					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");

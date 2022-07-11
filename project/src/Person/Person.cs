@@ -216,14 +216,34 @@ namespace Cue
 
 			if (hasBody_)
 			{
-				body_.ResetMorphLimits();
-				animator_.FixedUpdate(s);
+				Instrumentation.Start(I.FUBody);
+				{
+					body_.ResetMorphLimits();
+				}
+				Instrumentation.End();
+
+				Instrumentation.Start(I.FUAnimator);
+				{
+					animator_.FixedUpdate(s);
+				}
+				Instrumentation.End();
 			}
 
-			ai_.FixedUpdate(s);
+			Instrumentation.Start(I.FUAI);
+			{
+				ai_.FixedUpdate(s);
+			}
+			Instrumentation.End();
+
 
 			if (hasBody_)
-				expression_.FixedUpdate(s);
+			{
+				Instrumentation.Start(I.FUExpressions);
+				{
+					expression_.FixedUpdate(s);
+				}
+				Instrumentation.End();
+			}
 		}
 
 		public override void Update(float s)

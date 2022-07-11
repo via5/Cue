@@ -6,7 +6,7 @@ namespace Cue.Sys.Vam
 {
 	public abstract class VamBodyPart : IBodyPart
 	{
-		private IAtom atom_;
+		private VamBasicAtom atom_;
 		private BodyPartType type_;
 		private VamColliderRegion[] regions_ = null;
 		private List<GrabInfo> grabCache_ = new List<GrabInfo>();
@@ -43,13 +43,13 @@ namespace Cue.Sys.Vam
 		private TriggerInfo[] triggers_ = null;
 
 
-		protected VamBodyPart(IAtom a, BodyPartType t)
+		protected VamBodyPart(VamBasicAtom a, BodyPartType t)
 		{
 			atom_ = a;
 			type_ = t;
 		}
 
-		protected VamBodyPart(IAtom a, BodyPartType t, Collider[] colliders, string[] ignoreBodyParts)
+		protected VamBodyPart(VamBasicAtom a, BodyPartType t, Collider[] colliders, string[] ignoreBodyParts)
 			: this(a, t)
 		{
 			if (colliders != null)
@@ -68,7 +68,7 @@ namespace Cue.Sys.Vam
 
 		}
 
-		protected VamBodyPart(IAtom a, BodyPartType t, string[] colliders, string[] ignoreBodyParts)
+		protected VamBodyPart(VamBasicAtom a, BodyPartType t, string[] colliders, string[] ignoreBodyParts)
 			: this(a, t)
 		{
 			if (colliders != null)
@@ -160,9 +160,9 @@ namespace Cue.Sys.Vam
 			get { return atom_; }
 		}
 
-		public VamAtom VamAtom
+		public VamBasicAtom VamAtom
 		{
-			get { return atom_ as VamAtom; }
+			get { return atom_; }
 		}
 
 		public bool Render

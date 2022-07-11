@@ -400,10 +400,19 @@ namespace Cue
 
 		private void DoFixedUpdate(float s)
 		{
-			Sys.FixedUpdate(s);
+			Instrumentation.Start(I.FUSys);
+			{
+				Sys.FixedUpdate(s);
+			}
+			Instrumentation.End();
 
-			for (int i = 0; i < everythingActive_.Count; ++i)
-				everythingActive_[i].FixedUpdate(s);
+
+			Instrumentation.Start(I.FUObjects);
+			{
+				for (int i = 0; i < everythingActive_.Count; ++i)
+					everythingActive_[i].FixedUpdate(s);
+			}
+			Instrumentation.End();
 		}
 
 		public void Update(float s)

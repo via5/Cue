@@ -41,8 +41,18 @@ V.Value("Update"),
 	V.Value("Triggers"),
 	V.Value("UI"),
 V.Value("FixedUpdate"),
+	V.Value("FUSys"),
+	V.Value("FUObjects"),
+		V.Value("FUBody"),
+		V.Value("FUAnimator"),
+		V.Value("FUAI"),
+		V.Value("FUExpressions"),
 V.Value("LateUpdate"),
 V.Value("Collisions"),
+	V.Value("ColWithThis"),
+	V.Value("ColGetBP"),
+	V.Value("ColExternal"),
+	V.Value("ColPerson"),
 
 };
 

@@ -4,7 +4,7 @@ namespace Cue.Sys.Vam
 {
 	class VamCameraEyes : VamBodyPart
 	{
-		public VamCameraEyes(IAtom a)
+		public VamCameraEyes(VamCameraAtom a)
 			: base(a, BP.Eyes)
 		{
 		}
@@ -45,7 +45,7 @@ namespace Cue.Sys.Vam
 
 	class VamCameraHead : VamBodyPart
 	{
-		public VamCameraHead(IAtom a)
+		public VamCameraHead(VamCameraAtom a)
 			: base(a, BP.Head)
 		{
 		}
@@ -91,7 +91,7 @@ namespace Cue.Sys.Vam
 		private MeshVR.Hands.HandOutput.Hand handOutputType_;
 
 		public VamCameraHand(
-			IAtom a, BodyPartType bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
+			VamCameraAtom a, BodyPartType bodyPart, MeshVR.Hands.HandOutput.Hand handOutputType,
 			Transform vrHand, Transform desktopHand)
 				: base(a, bodyPart)
 		{
@@ -286,7 +286,7 @@ namespace Cue.Sys.Vam
 			return new Hand();
 		}
 
-		public override IBodyPart BodyPartForTransform(Transform t, Transform stop, bool debug)
+		public override VamBodyPart BodyPartForTransform(Transform t, Transform stop, bool debug)
 		{
 			// see VamSys.BodyPartForTransform()
 
@@ -300,7 +300,7 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamCameraAtom : IAtom
+	class VamCameraAtom : VamBasicAtom
 	{
 		private VamCameraBody body_;
 		private VamHair hair_;
@@ -311,22 +311,22 @@ namespace Cue.Sys.Vam
 			hair_ = new VamHair(null);
 		}
 
-		public string Warning
+		public override string Warning
 		{
 			get { return ""; }
 		}
 
-		public string ID
+		public override string ID
 		{
 			get { return "Camera"; }
 		}
 
-		public bool IsPerson
+		public override bool IsPerson
 		{
 			get { return true; }
 		}
 
-		public bool IsMale
+		public override bool IsMale
 		{
 			get { return true; }
 		}
@@ -341,7 +341,7 @@ namespace Cue.Sys.Vam
 			get { return false; }
 		}
 
-		public bool Possessed
+		public override bool Possessed
 		{
 			get
 			{
@@ -358,41 +358,47 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public bool Selected
+		public override bool Selected
 		{
 			get { return false; }
 		}
 
-		public bool Grabbed
+		public override bool Grabbed
 		{
 			get { return false; }
 		}
 
-		public IBody Body { get { return body_; } }
-		public IHair Hair { get { return hair_; } }
+		public override IBody Body { get { return body_; } }
+		public override IHair Hair { get { return hair_; } }
 
-		public bool Visible { get { return true; } set { } }
-		public bool Collisions { get; set; }
-		public bool Physics { get; set; }
-		public bool Hidden { get; set; }
-		public float Scale { get; set; }
-		public bool AutoBlink { get; set; }
-		public Vector3 Position { get; set; }
-		public Quaternion Rotation { get; set; }
+		public override bool Visible { get { return true; } set { } }
+		public override bool Collisions { get; set; }
+		public override bool Physics { get; set; }
+		public override bool Hidden { get; set; }
+		public override float Scale { get; set; }
+		public override bool AutoBlink { get; set; }
+		public override Vector3 Position { get; set; }
+		public override Quaternion Rotation { get; set; }
 		public bool NavEnabled { get; set; }
 		public bool NavPaused { get; set; }
 		public int NavState { get; }
+		public override Atom Atom { get { return null; } }
 
-		public void Destroy()
+		public override IBodyPart RealBodyPart(VamBodyPart bp)
+		{
+			return Cue.Instance.Player.Body.Get(bp.Type).Sys;
+		}
+
+		public override void Destroy()
 		{
 		}
 
-		public IMorph GetMorph(string id)
+		public override IMorph GetMorph(string id)
 		{
 			return null;
 		}
 
-		public void Init()
+		public override void Init()
 		{
 			body_.Init();
 		}
@@ -405,23 +411,23 @@ namespace Cue.Sys.Vam
 		{
 		}
 
-		public void OnPluginState(bool b)
+		public override void OnPluginState(bool b)
 		{
 		}
 
-		public void SetDefaultControls(string why)
+		public override void SetDefaultControls(string why)
 		{
 		}
 
-		public void SetParentLink(IBodyPart bp)
+		public override void SetParentLink(IBodyPart bp)
 		{
 		}
 
-		public void SetBodyDamping(int e)
+		public override void SetBodyDamping(int e)
 		{
 		}
 
-		public void SetCollidersForKiss(bool b, IAtom other)
+		public override void SetCollidersForKiss(bool b, IAtom other)
 		{
 		}
 
@@ -429,11 +435,11 @@ namespace Cue.Sys.Vam
 		{
 		}
 
-		public void Update(float s)
+		public override void Update(float s)
 		{
 		}
 
-		public void LateUpdate(float s)
+		public override void LateUpdate(float s)
 		{
 		}
 

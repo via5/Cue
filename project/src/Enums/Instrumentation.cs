@@ -45,11 +45,21 @@ namespace Cue
 		public static readonly InstrumentationType Triggers = InstrumentationType.CreateInternal(36);
 		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(37);
 		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(38);
-		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(39);
-		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(40);
+		public static readonly InstrumentationType FUSys = InstrumentationType.CreateInternal(39);
+		public static readonly InstrumentationType FUObjects = InstrumentationType.CreateInternal(40);
+		public static readonly InstrumentationType FUBody = InstrumentationType.CreateInternal(41);
+		public static readonly InstrumentationType FUAnimator = InstrumentationType.CreateInternal(42);
+		public static readonly InstrumentationType FUAI = InstrumentationType.CreateInternal(43);
+		public static readonly InstrumentationType FUExpressions = InstrumentationType.CreateInternal(44);
+		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(45);
+		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(46);
+		public static readonly InstrumentationType ColWithThis = InstrumentationType.CreateInternal(47);
+		public static readonly InstrumentationType ColGetBP = InstrumentationType.CreateInternal(48);
+		public static readonly InstrumentationType ColExternal = InstrumentationType.CreateInternal(49);
+		public static readonly InstrumentationType ColPerson = InstrumentationType.CreateInternal(50);
 
-		public const int Count = 41;
-		public int GetCount() { return 41; }
+		public const int Count = 51;
+		public int GetCount() { return 51; }
 	}
 
 
@@ -99,6 +109,16 @@ namespace Cue
 			InstrumentationType.CreateInternal(38),
 			InstrumentationType.CreateInternal(39),
 			InstrumentationType.CreateInternal(40),
+			InstrumentationType.CreateInternal(41),
+			InstrumentationType.CreateInternal(42),
+			InstrumentationType.CreateInternal(43),
+			InstrumentationType.CreateInternal(44),
+			InstrumentationType.CreateInternal(45),
+			InstrumentationType.CreateInternal(46),
+			InstrumentationType.CreateInternal(47),
+			InstrumentationType.CreateInternal(48),
+			InstrumentationType.CreateInternal(49),
+			InstrumentationType.CreateInternal(50),
 		};
 
 		public static InstrumentationType[] Values
@@ -147,8 +167,18 @@ namespace Cue
 			"triggers",
 			"UI",
 			"fixedUpdate",
+			"fUSys",
+			"fUObjects",
+			"fUBody",
+			"fUAnimator",
+			"FUAI",
+			"fUExpressions",
 			"lateUpdate",
 			"collisions",
+			"colWithThis",
+			"colGetBP",
+			"colExternal",
+			"colPerson",
 		};
 
 		public static InstrumentationType FromString(string s)
