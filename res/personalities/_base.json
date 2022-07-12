@@ -660,7 +660,7 @@
 			[
 				{
 					"source": "player",
-					"modifier": 2
+					"modifier": 3
 				},
 				{
 					"source": "self",

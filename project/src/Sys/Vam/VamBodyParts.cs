@@ -235,7 +235,7 @@ namespace Cue.Sys.Vam
 					}
 					catch (Exception)
 					{
-						Log.Error($"failed to disable handler");
+						// eat it, happens on reload
 					}
 				}
 			}

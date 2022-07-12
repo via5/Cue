@@ -144,13 +144,18 @@
 
 		private bool TargetsForDouble(BodyPart left, BodyPart right)
 		{
-			if (left == null || right == null)
-				return false;
+			// double hj is disabled for now, cwhj doesn't work very well, and
+			// it's just annoying
 
-			if (left.Type != BP.Penis || right.Type != BP.Penis)
-				return false;
+			//if (left == null || right == null)
+			//	return false;
+			//
+			//if (left.Type != BP.Penis || right.Type != BP.Penis)
+			//	return false;
+			//
+			//return (left.Person == right.Person);
 
-			return (left.Person == right.Person);
+			return false;
 		}
 
 		private void Check(
@@ -183,30 +188,6 @@
 					canStartRight = true;
 				}
 
-				if (leftTarget == null)
-				{
-					Log.Verbose("no left target");
-					Stop(left_, stopFlags);
-				}
-				else
-				{
-					if (leftTarget == left_.targetBodyPart)
-					{
-						Log.Verbose("left target is the same as before");
-					}
-					else if (canStartLeft)
-					{
-						Log.Verbose($"new left target {leftTarget}");
-
-						Stop(left_, stopFlags);
-
-						if (leftTarget.Type == BP.Penis)
-							StartHJ(left_, leftTarget);
-						else if (leftTarget.Type == BP.Vagina)
-							StartFinger(left_, leftTarget);
-					}
-				}
-
 				if (rightTarget == null)
 				{
 					Log.Verbose("no right target");
@@ -228,6 +209,35 @@
 							StartHJ(right_, rightTarget);
 						else if (rightTarget.Type == BP.Vagina)
 							StartFinger(right_, rightTarget);
+					}
+				}
+
+				if (leftTarget == null)
+				{
+					Log.Verbose("no left target");
+					Stop(left_, stopFlags);
+				}
+				else
+				{
+					if (leftTarget == left_.targetBodyPart)
+					{
+						Log.Verbose("left target is the same as before");
+					}
+					else if (canStartLeft)
+					{
+						// todo: cwhj doesn't support two hands on two
+						// different persons
+						if (rightTarget == null)
+						{
+							Log.Verbose($"new left target {leftTarget}");
+
+							Stop(left_, stopFlags);
+
+							if (leftTarget.Type == BP.Penis)
+								StartHJ(left_, leftTarget);
+							else if (leftTarget.Type == BP.Vagina)
+								StartFinger(left_, leftTarget);
+						}
 					}
 				}
 			}
@@ -275,11 +285,7 @@
 				}
 
 				SetZoneEnabled(hand.targetBodyPart.Person, false);
-
-				if (hand.bp.Type == BP.LeftHand)
-					hand.targetBodyPart.Person.Homing.LeftHand = false;
-				else
-					hand.targetBodyPart.Person.Homing.RightHand = false;
+				SetHoming(hand, false);
 
 				hand.groped = false;
 				hand.targetBodyPart = null;
@@ -348,9 +354,9 @@
 			{
 				hand.targetBodyPart = targetBodyPart;
 				hand.anim = hand.hjAnimType;
-				SetZoneEnabled(targetBodyPart.Person, true);
 
-				targetBodyPart.Person.Homing.LeftHand = true;
+				SetZoneEnabled(targetBodyPart.Person, true);
+				SetHoming(hand, true);
 
 				if (hand.targetBodyPart.Person.Body.PenisSensitive)
 				{
@@ -431,6 +437,14 @@
 				target.Excitement.GetSource(SS.Genitals).AddEnabledFor(target);
 			else
 				target.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(target);
+		}
+
+		private void SetHoming(HandInfo hand, bool b)
+		{
+			if (hand.bp.Type == BP.LeftHand)
+				hand.targetBodyPart.Person.Homing.LeftHand = b;
+			else
+				hand.targetBodyPart.Person.Homing.RightHand = b;
 		}
 
 		private bool LockBoth(string why, Person target)

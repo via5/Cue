@@ -99,7 +99,7 @@
 					{
 						plane_ = Cue.Instance.Sys.CreateBoxGraphic(
 							"Gaze.Render.FrontPlane",
-							Vector3.Zero, new Vector3(5, 5, 0.01f),
+							Vector3.Zero, new Vector3(2, 2, 0.01f),
 							new Color(0, 0, 1, 0.1f));
 					}
 				}
@@ -119,7 +119,7 @@
 				return;
 
 			var p = person_.Gaze.Picker.FrontPlane;
-			plane_.Position = p.Point;
+			plane_.Position = person_.Body.Get(BP.Chest).Position;
 			plane_.Rotation = p.Rotation;
 		}
 	}

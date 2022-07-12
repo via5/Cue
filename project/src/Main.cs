@@ -258,12 +258,14 @@ namespace Cue
 
 	class CueMain : MVRScript
 	{
+		const float MaxDeltaTime = 0.1f;
 		static private CueMain instance_ = null;
 
 		private readonly CueToken token_ = new CueToken();
 		private Sys.ISys sys_ = null;
 		private Cue cue_ = null;
 		private bool inited_ = false;
+		private float lastFrameTime_ = 0;
 
 		private static float lastErrorTime_ = 0;
 		private static int errorCount_ = 0;
@@ -310,6 +312,7 @@ namespace Cue
 
 			try
 			{
+				lastFrameTime_ = Time.realtimeSinceStartup;
 				sys_ = new Sys.Vam.VamSys(this);
 				cue_ = new Cue();
 				sys_.OnReady(DoInit);
@@ -364,6 +367,34 @@ namespace Cue
 			}
 		}
 
+		private float GetTime()
+		{
+			// Time.deltaTime is capped at a pretty low value, controlled by
+			// Time.maximumDeltaTime, which cannot be changed since it also
+			// controls FixedUpdate()
+			//
+			// maximumDeltaTime depends on the physics rate setting, but it
+			// seems to be 0.033 at 72hz, and so everything slow down if the fps
+			// is lower than 30
+			//
+			// since cue relies on accurate timing for lots of things, like
+			// raising excitement over time, it has its own deltaTime, capped
+			// at a much higher value
+
+			if (lastFrameTime_ == 0)
+			{
+				lastFrameTime_ = Time.realtimeSinceStartup;
+				return 0;
+			}
+
+			float now = Time.realtimeSinceStartup;
+			float d = Math.Min(now - lastFrameTime_, MaxDeltaTime);
+
+			lastFrameTime_ = now;
+
+			return d * Time.timeScale;
+		}
+
 		public void Update()
 		{
 			if (!inited_)
@@ -371,7 +402,11 @@ namespace Cue
 
 			try
 			{
-				cue_.Update(Time.deltaTime);
+				float s = GetTime();
+				if (s == 0)
+					return;
+
+				cue_.Update(s);
 			}
 			catch(PluginGone e)
 			{

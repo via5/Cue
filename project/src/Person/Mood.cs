@@ -201,6 +201,11 @@ namespace Cue
 			moods_[i.Int].Value = U.Clamp(value, 0, 1);
 		}
 
+		public ForceableFloat GetDebugValue(MoodType i)
+		{
+			return moods_[i.Int];
+		}
+
 		public ForceableFloat GetValue(MoodType i)
 		{
 			if (i == MoodType.Excited)

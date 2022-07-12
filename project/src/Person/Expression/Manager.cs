@@ -16,6 +16,7 @@ namespace Cue
 		private Personality lastPersonality_ = null;
 		private bool enabled_ = true;
 		private bool isOrgasming_ = false;
+		private bool isZapped_ = false;
 
 		private float slapTime_ = 0;
 		private float slapElapsed_ = 0;
@@ -128,6 +129,36 @@ namespace Cue
 			return slapEasing_.Magnitude(slap);
 		}
 
+		private void EmergencyExpression(MoodType mood, float intensity)
+		{
+			bool foundActive = false;
+
+			for (int i = 0; i < exps_.Length; ++i)
+			{
+				if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(mood))
+				{
+					foundActive = true;
+					ActivateForEmergency(exps_[i], mood, intensity);
+				}
+				else if (exps_[i].Active)
+				{
+					exps_[i].Deactivate();
+				}
+			}
+
+			if (!foundActive)
+			{
+				for (int i = 0; i < exps_.Length; ++i)
+				{
+					if (exps_[i].Expression.IsMood(mood))
+					{
+						ActivateForEmergency(exps_[i], mood, intensity);
+						break;
+					}
+				}
+			}
+		}
+
 		public void FixedUpdate(float s)
 		{
 			if (slapTime_ > 0)
@@ -136,39 +167,26 @@ namespace Cue
 			if (lastPersonality_ != person_.Personality)
 				Init();
 
+
 			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
 			{
 				isOrgasming_ = true;
-				bool foundActive = false;
-
-				for (int i = 0; i < exps_.Length; ++i)
-				{
-					if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(MoodType.Orgasm))
-					{
-						foundActive = true;
-						ActivateForOrgasm(exps_[i]);
-					}
-					else if (exps_[i].Active)
-					{
-						exps_[i].Deactivate();
-					}
-				}
-
-				if (!foundActive)
-				{
-					for (int i = 0; i < exps_.Length; ++i)
-					{
-						if (exps_[i].Expression.IsMood(MoodType.Orgasm))
-						{
-							ActivateForOrgasm(exps_[i]);
-							break;
-						}
-					}
-				}
+				EmergencyExpression(MoodType.Orgasm, 1.0f);
 			}
 			else if (isOrgasming_ && person_.Mood.State != Mood.OrgasmState)
 			{
 				isOrgasming_ = false;
+			}
+
+
+			if (!isZapped_ && person_.Body.Zap.Intensity > 0)
+			{
+				isZapped_ = true;
+				EmergencyExpression(MoodType.Excited, person_.Body.Zap.Intensity);
+			}
+			else if (isZapped_ && person_.Body.Zap.Intensity == 0)
+			{
+				isZapped_ = false;
 			}
 
 
@@ -311,15 +329,17 @@ namespace Cue
 			return true;
 		}
 
-		private void ActivateForOrgasm(WeightedExpression e)
+		private void ActivateForEmergency(WeightedExpression e, MoodType mood, float intensity)
 		{
 			var ps = person_.Personality;
 
+			// todo, this uses orgasm settings
+
 			e.Set(
-				1, 1, 1,
+				1, intensity, 1,
 				ps.Get(PS.OrgasmExpressionRangeMin),
 				ps.Get(PS.OrgasmExpressionRangeMax),
-				MoodType.Orgasm);
+				mood);
 
 			e.Activate(1.0f, ps.Get(PS.OrgasmFirstExpressionTime));
 		}
