@@ -31,10 +31,13 @@ namespace Cue
 				}
 			}
 
-			for (int i = 0; i < locks_.Count; ++i)
+			if (strengthType == BodyPartLock.Strong)
 			{
-				if (locks_[i].IsWeakFor(lockType))
-					locks_[i].SetExpired();
+				for (int i = 0; i < locks_.Count; ++i)
+				{
+					if (locks_[i].IsWeakFor(lockType))
+						locks_[i].SetExpired();
+				}
 			}
 
 			var lk = new BodyPartLock(bp_, lockType, strengthType, why, key);
@@ -63,13 +66,20 @@ namespace Cue
 
 		public bool LockedFor(int lockType, ulong key = BodyPartLock.NoKey)
 		{
+			// a body part might have multiple weak locks from different events,
+			// like thrust and hand; allow animation if the key opens _any_
+			// lock, instead of preventing animation if one lock can't be opened
+
+			if (locks_.Count == 0)
+				return false;
+
 			for (int i = 0; i < locks_.Count; ++i)
 			{
-				if (locks_[i].Prevents(lockType, key))
-					return true;
+				if (!locks_[i].Prevents(lockType, key))
+					return false;
 			}
 
-			return false;
+			return true;
 		}
 
 		public string DebugLockString()

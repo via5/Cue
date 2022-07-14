@@ -12,8 +12,9 @@
 
 			public BodyPart targetBodyPart = null;
 			public bool groped = false;
-			public BodyPartLock[] sourceLock = null;
-			public BodyPartLock[] targetLock = null;
+			public BodyPartLock[] sourceLocks = null;
+			public BodyPartLock[] targetStrongLocks = null;
+			public BodyPartLock[] targetWeakLocks = null;
 			public AnimationType anim = AnimationType.None;
 			public bool forcedTrigger = false;
 			public bool wasGrabbed = false;
@@ -34,16 +35,22 @@
 			{
 				debug.Add($"{name} target", $"{targetBodyPart} groped={groped} anim={anim}");
 
-				if (sourceLock != null)
+				if (sourceLocks != null)
 				{
-					for (int i = 0; i < sourceLock.Length; ++i)
-						debug.Add($"{name} srcLock", sourceLock[i].ToString());
+					for (int i = 0; i < sourceLocks.Length; ++i)
+						debug.Add($"{name} srcLock", sourceLocks[i].ToString());
 				}
 
-				if (targetLock != null)
+				if (targetStrongLocks != null)
 				{
-					for (int i = 0; i < targetLock.Length; ++i)
-						debug.Add($"{name} tarLock", targetLock[i].ToString());
+					for (int i = 0; i < targetStrongLocks.Length; ++i)
+						debug.Add($"{name} tarStrLk", targetStrongLocks[i].ToString());
+				}
+
+				if (targetWeakLocks != null)
+				{
+					for (int i = 0; i < targetWeakLocks.Length; ++i)
+						debug.Add($"{name} tarWkLk", targetWeakLocks[i].ToString());
 				}
 			}
 		}
@@ -303,20 +310,28 @@
 
 		private void Unlock(HandInfo hand)
 		{
-			if (hand.sourceLock != null)
+			if (hand.sourceLocks != null)
 			{
-				for (int i = 0; i < hand.sourceLock.Length; ++i)
-					hand.sourceLock[i].Unlock();
+				for (int i = 0; i < hand.sourceLocks.Length; ++i)
+					hand.sourceLocks[i].Unlock();
 
-				hand.sourceLock = null;
+				hand.sourceLocks = null;
 			}
 
-			if (hand.targetLock != null)
+			if (hand.targetStrongLocks != null)
 			{
-				for (int i = 0; i < hand.targetLock.Length; ++i)
-					hand.targetLock[i].Unlock();
+				for (int i = 0; i < hand.targetStrongLocks.Length; ++i)
+					hand.targetStrongLocks[i].Unlock();
 
-				hand.targetLock = null;
+				hand.targetStrongLocks = null;
+			}
+
+			if (hand.targetWeakLocks != null)
+			{
+				for (int i = 0; i < hand.targetWeakLocks.Length; ++i)
+					hand.targetWeakLocks[i].Unlock();
+
+				hand.targetWeakLocks = null;
 			}
 		}
 
@@ -427,7 +442,7 @@
 					if (Mood.CanStartSexAnimation(person_, hand.targetBodyPart.Person))
 					{
 						if (!person_.Animator.PlayType(
-								hand.anim, new AnimationContext(hand.targetBodyPart.Person, hand.sourceLock[0].Key)))
+								hand.anim, new AnimationContext(hand.targetBodyPart.Person, hand.sourceLocks[0].Key)))
 						{
 							return false;
 						}
@@ -484,11 +499,11 @@
 
 		private bool LockSources(string why, HandInfo hand)
 		{
-			hand.sourceLock = BodyPartLock.LockMany(
+			hand.sourceLocks = BodyPartLock.LockMany(
 				person_, hand.sourceLockTypes,
 				BodyPartLock.Anim, why, BodyPartLock.Strong);
 
-			if (hand.sourceLock == null)
+			if (hand.sourceLocks == null)
 			{
 				Log.Error($"failed to lock sources for {why}");
 				Unlock(hand);
@@ -500,23 +515,39 @@
 
 		private bool LockTargets(string why, HandInfo hand, Person target)
 		{
-			BodyPartType[] locks;
+			BodyPartType[] strongLocks = null;
+			BodyPartType[] weakLocks = new BodyPartType[] { BP.Hips };
 
 			// don't lock genitals for females
 			if (target.Body.Get(BP.Penis).Exists)
-				locks = new BodyPartType[] { BP.Hips, BP.Penis };
-			else
-				locks = new BodyPartType[] { BP.Hips };
+				strongLocks = new BodyPartType[] { BP.Penis };
 
-			hand.targetLock = BodyPartLock.LockMany(
-				target, locks,
-				BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
-
-			if (hand.targetLock == null)
+			if (strongLocks != null)
 			{
-				Log.Error($"failed to lock targets for {why}");
-				Unlock(hand);
-				return false;
+				hand.targetStrongLocks = BodyPartLock.LockMany(
+					target, strongLocks,
+					BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Strong);
+
+				if (hand.targetStrongLocks == null)
+				{
+					Log.Error($"failed to lock strong targets for {why}");
+					Unlock(hand);
+					return false;
+				}
+			}
+
+			if (weakLocks != null)
+			{
+				hand.targetWeakLocks = BodyPartLock.LockMany(
+					target, weakLocks,
+					BodyPartLock.Anim, $"{hand.name} {why}", BodyPartLock.Weak);
+
+				if (hand.targetWeakLocks == null)
+				{
+					Log.Error($"failed to lock weak targets for {why}");
+					Unlock(hand);
+					return false;
+				}
 			}
 
 			return true;
@@ -541,8 +572,8 @@
 				}
 
 				ulong key = BodyPartLock.NoKey;
-				if (hand.targetLock != null && hand.targetLock.Length > 0)
-					key = hand.targetLock[0].Key;
+				if (hand.targetWeakLocks != null && hand.targetWeakLocks.Length > 0)
+					key = hand.targetWeakLocks[0].Key;
 
 				if (BetterTarget(tentative, g, key))
 				{

@@ -112,8 +112,9 @@
 				return false;
 			}
 
+			// weak lock, just to inhibit idle animation
 			lock_ = person_.Body.Get(BP.Hips).Lock(
-				BodyPartLock.Anim, "thrust", BodyPartLock.Strong);
+				BodyPartLock.Anim, "thrust", BodyPartLock.Weak);
 
 			if (lock_ == null)
 			{
