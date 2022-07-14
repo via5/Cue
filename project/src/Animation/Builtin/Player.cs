@@ -104,9 +104,8 @@ namespace Cue
 			return null;
 		}
 
-		public virtual string[] Debug()
+		public virtual void Debug(DebugLines debug)
 		{
-			return null;
 		}
 
 		public override string ToString()

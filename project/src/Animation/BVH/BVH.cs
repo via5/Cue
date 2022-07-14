@@ -187,9 +187,8 @@ namespace Cue.BVH
             return null;
         }
 
-        public string[] Debug()
-        {
-            return null;
+        public void Debug(DebugLines debug)
+		{
         }
 
         public override string ToString()

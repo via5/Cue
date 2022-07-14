@@ -82,7 +82,7 @@ namespace Cue
 
 		void Reset(Person p);
 		string[] GetAllForcesDebug();
-		string[] Debug();
+		void Debug(DebugLines debug);
 		string ToDetailedString();
 	}
 
@@ -118,9 +118,9 @@ namespace Cue
 			}
 		}
 
-		public string[] Debug()
+		public void Debug(DebugLines debug)
 		{
-			return anim_.Debug();
+			anim_.Debug(debug);
 		}
 
 		public override string ToString()

@@ -48,6 +48,10 @@
 			}
 		}
 
+		// double hj is disabled for now, cwhj doesn't work very well, and
+		// it's just annoying
+		private const bool EnableDoubleHJ = false;
+
 		private const float ManualStartDistance = 0.09f;
 		private const float AutoStartDistance = 0.06f;
 
@@ -144,16 +148,18 @@
 
 		private bool TargetsForDouble(BodyPart left, BodyPart right)
 		{
-			// double hj is disabled for now, cwhj doesn't work very well, and
-			// it's just annoying
+#pragma warning disable 0162
+			if (EnableDoubleHJ)
+			{
+				if (left == null || right == null)
+					return false;
 
-			//if (left == null || right == null)
-			//	return false;
-			//
-			//if (left.Type != BP.Penis || right.Type != BP.Penis)
-			//	return false;
-			//
-			//return (left.Person == right.Person);
+				if (left.Type != BP.Penis || right.Type != BP.Penis)
+					return false;
+
+				return (left.Person == right.Person);
+			}
+#pragma warning restore 0162
 
 			return false;
 		}
@@ -225,8 +231,9 @@
 					}
 					else if (canStartLeft)
 					{
-						// todo: cwhj doesn't support two hands on two
-						// different persons
+						// this can happen if double hj is disabled; since cwhj
+						// doesn't support two hands on two different persons,
+						// this is forbidden
 						if (rightTarget == null)
 						{
 							Log.Verbose($"new left target {leftTarget}");

@@ -14,8 +14,7 @@
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.StringChooserParameter hand_ = null;
 		protected Sys.Vam.FloatParameter volume_ = null;
-		protected Sys.Vam.FloatParameter speedMin_ = null;
-		protected Sys.Vam.FloatParameter speedMax_ = null;
+		protected Sys.Vam.FloatParameter speed_ = null;
 
 		private bool wasActive_ = false;
 		protected Person leftTarget_ = null;
@@ -136,24 +135,7 @@
 			if (!wasActive_)
 				return;
 
-			// speed
-			{
-				var minRangeMin = 1.0f;
-				var minRangeMax = 4.0f;
-
-				var maxRangeMin = 4.0f;
-				var maxRangeMax = 8.0f;
-
-				var minRange = minRangeMax - minRangeMin;
-				var maxRange = maxRangeMax - maxRangeMin;
-
-				var e = Mood.MultiMovementEnergy(Person, leftTarget_, rightTarget_);
-				var minSpeed = minRangeMin + minRange * e;
-				var maxSpeed = maxRangeMin + maxRange * e;
-
-				speedMin_.Value = minSpeed;
-				speedMax_.Value = maxSpeed;
-			}
+			UpdateSpeed(s);
 
 			if (wasSilent_ && Cue.Instance.Options.HJAudio)
 			{
@@ -167,6 +149,31 @@
 			}
 		}
 
+		private void UpdateSpeed(float s)
+		{
+			speed_.Value = speed_.DefaultValue + SpeedRange * MovementEnergy;
+		}
+
+		private float SpeedRange
+		{
+			get { return (speed_.Maximum - speed_.DefaultValue); }
+		}
+
+		private float MovementEnergy
+		{
+			get { return Mood.MultiMovementEnergy(Person, leftTarget_, rightTarget_); }
+		}
+
+		public override void Debug(DebugLines debug)
+		{
+			debug.Add("active", $"{Active}");
+			debug.Add("");
+			debug.Add("SpeedRange", $"{SpeedRange}");
+			debug.Add("MovementEnergy", $"{MovementEnergy}");
+			debug.Add("");
+			debug.Add("Speed", $"{speed_.Value}");
+		}
+
 		private void Init(Person p)
 		{
 			log_ = new Logger(Logger.Integration, p, "cwhj");
@@ -178,8 +185,7 @@
 			running_  = BOPRO(p, "isHJRoutine");
 			male_     = SCP(p, "Atom");
 			hand_     = SCP(p, "handedness");
-			speedMin_ = FP(p, "Speed Min");
-			speedMax_ = FP(p, "Speed Max");
+			speed_    = FP(p, "Speed");
 			volume_   = FP(p, "Audio Volume");
 
 			active_.Value = false;

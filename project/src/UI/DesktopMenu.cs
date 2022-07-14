@@ -13,6 +13,7 @@ namespace Cue
 		private VUI.Panel selButtons_ = null;
 		private VUI.CheckBox forceExcitement_ = null;
 		private VUI.FloatTextSlider excitement_ = null;
+		private VUI.Label playerWarning_ = null;
 		private VUI.Label fps_ = null;
 		private VUI.Panel custom_ = null;
 		private VUI.Panel tools_ = null;
@@ -65,6 +66,7 @@ namespace Cue
 				tools_.Add(new VUI.ToolButton("ui", Cue.Instance.OpenScriptUI));
 				forceExcitement_ = tools_.Add(new VUI.CheckBox("Ex", OnForceExcitement));
 				excitement_ = tools_.Add(new VUI.FloatTextSlider(OnExcitement));
+				playerWarning_ = tools_.Add(new VUI.Label("(disabled for player)"));
 				tools_.Add(new VUI.ToolButton("zap", OnTest));
 				fps_ = tools_.Add(new VUI.Label());
 				p.Add(tools_);
@@ -129,8 +131,19 @@ namespace Cue
 
 				var p = SelectedPerson;
 
-				if (p != null)
+				if (p == null || p.IsPlayer)
 				{
+					forceExcitement_.Enabled = false;
+					excitement_.Enabled = false;
+					playerWarning_.Visible = true;
+					excitement_.Value = 0;
+				}
+				else
+				{
+					forceExcitement_.Enabled = true;
+					excitement_.Enabled = true;
+					playerWarning_.Visible = false;
+
 					if (forceExcitement_ != null)
 						forceExcitement_.Checked = p.Mood.GetValue(MoodType.Excited).IsForced;
 

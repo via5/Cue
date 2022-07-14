@@ -209,6 +209,9 @@ namespace VUI
 				{
 					visible_ = value;
 					UpdateActiveState();
+
+					if (!visible_)
+						NeedsLayout("visibility changed to hidden", true);
 				}
 			}
 		}
@@ -779,12 +782,12 @@ namespace VUI
 			UpdateActiveState();
 		}
 
-		public void NeedsLayout(string why)
+		public void NeedsLayout(string why, bool force = false)
 		{
 			if (parent_ != null && parent_.Layout is AbsoluteLayout)
 				return;
 
-			if (IsVisibleOnScreen())
+			if (force || IsVisibleOnScreen())
 				NeedsLayoutImpl(TypeName + ": " + why);
 			else
 				SetDirty(true, TypeName + ": " + why);

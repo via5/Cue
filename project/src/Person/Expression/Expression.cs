@@ -101,7 +101,7 @@
 		{
 			return
 				$"{name_} {MoodString()} " +
-				$"{g_.Value:0.00}=>{target_:0.00} tv={target_.valid} " +
+				$"{g_.Value:0.00}=>{target_:0.00} " +
 				$"{target_.elapsed:0.00}/{target_.time:0.00}";
 		}
 

@@ -12,9 +12,7 @@
 		private Sys.Vam.StringChooserParameter male_ = null;
 		private Sys.Vam.FloatParameter sfxVolume_ = null;
 		private Sys.Vam.FloatParameter moanVolume_ = null;
-		private Sys.Vam.FloatParameter overallSpeed_ = null;
-		private Sys.Vam.FloatParameter speedMin_ = null;
-		private Sys.Vam.FloatParameter speedMax_ = null;
+		private Sys.Vam.FloatParameter speed_ = null;
 
 		private bool wasActive_ = false;
 
@@ -109,17 +107,32 @@
 			if (!wasActive_)
 				return;
 
-			// speed
-			{
-				var minRange = speedMin_.Maximum - speedMin_.DefaultValue;
-				var maxRange = speedMax_.Maximum - speedMax_.DefaultValue;
-				var range = overallSpeed_.Maximum - overallSpeed_.Minimum;
-				var p =  Mood.MultiMovementEnergy(Person, target_);
+			UpdateSpeed(s);
+		}
 
-				speedMin_.Value = speedMin_.DefaultValue + minRange * p;
-				speedMax_.Value = speedMax_.DefaultValue + maxRange * p;
-				overallSpeed_.Value = overallSpeed_.DefaultValue + range * p;
-			}
+		private void UpdateSpeed(float s)
+		{
+			speed_.Value = speed_.DefaultValue + SpeedRange * MovementEnergy;
+		}
+
+		private float SpeedRange
+		{
+			get { return speed_.Maximum - speed_.DefaultValue; }
+		}
+
+		private float MovementEnergy
+		{
+			get { return Mood.MultiMovementEnergy(Person, target_); }
+		}
+
+		public override void Debug(DebugLines debug)
+		{
+			debug.Add("active", $"{Active}");
+			debug.Add("");
+			debug.Add("SpeedRange", $"{SpeedRange}");
+			debug.Add("MovementEnergy", $"{MovementEnergy}");
+			debug.Add("");
+			debug.Add("Speed", $"{speed_.Value}");
 		}
 
 		private void Init(Person p)
@@ -132,10 +145,7 @@
 			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
 			moanVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
 			sfxVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
-
-			overallSpeed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Overall Speed");
-			speedMin_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Min");
-			speedMax_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Speed Max");
+			speed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Overall Speed");
 
 			active_.Value = false;
 

@@ -118,7 +118,7 @@ namespace Cue
 		public abstract float GetMaximum();
 		public abstract float GetRate(float penDampen);
 
-		public abstract void Debug(List<string> debug);
+		public abstract void Debug(DebugLines debug);
 	}
 
 
@@ -232,7 +232,7 @@ namespace Cue
 			return false;
 		}
 
-		public override void Debug(List<string> debug)
+		public override void Debug(DebugLines debug)
 		{
 			string damp = "";
 			if (person_.Excitement.NeedsPenetrationDamper() && zone_ != SS.Penetration)
@@ -261,7 +261,7 @@ namespace Cue
 			DebugZone(zone_, debug);
 		}
 
-		private void DebugZone(ZoneType zoneType, List<string> debug)
+		private void DebugZone(ZoneType zoneType, DebugLines debug)
 		{
 			var z = person_.Body.Zone(zoneType);
 			var srcs = z.Sources;
@@ -272,7 +272,7 @@ namespace Cue
 				if (s.StrictlyActiveCount == 0)
 					continue;
 
-				bool usable = UsableSource(s);
+				bool usable = UsableSource(s) && !person_.IsPlayer;
 
 				string line = "  ";
 				if (!usable)
@@ -420,7 +420,7 @@ namespace Cue
 			return rate;
 		}
 
-		public override void Debug(List<string> debug)
+		public override void Debug(DebugLines debug)
 		{
 			debug.Add($"others excitement:");
 
@@ -451,6 +451,7 @@ namespace Cue
 		private float totalRate_ = 0;
 		private float max_ = 0;
 		private float elapsed_ = 0;
+		private DebugLines debug_ = null;
 
 		public Excitement(Person p)
 		{
@@ -617,30 +618,39 @@ namespace Cue
 
 		public string[] Debug()
 		{
-			var debug = new List<string>();
+			if (debug_ == null)
+				debug_ = new DebugLines();
+
+			debug_.Clear();
+
+			if (person_.IsPlayer)
+			{
+				debug_.Add(">>>> excitement is disabled for player");
+				debug_.Add("");
+			}
 
 			for (int i = 0; i < sources_.Length; ++i)
-				sources_[i].Debug(debug);
+				sources_[i].Debug(debug_);
 
-			debug.Add("values:");
-			debug.Add($"  max: {max_:0.00000}");
-			debug.Add($"  physical: {physicalRate_.Value:0.00000}");
-			debug.Add($"  emotional: {emotionalRate_.Value:0.00000}");
+			debug_.Add("values:");
+			debug_.Add($"  max: {max_:0.00000}");
+			debug_.Add($"  physical: {physicalRate_.Value:0.00000}");
+			debug_.Add($"  emotional: {emotionalRate_.Value:0.00000}");
 
 			if (subtotalRate_ != totalRate_)
-				debug.Add($"  subtotal: {subtotalRate_:0.00000}");
+				debug_.Add($"  subtotal: {subtotalRate_:0.00000}");
 
 			if (person_.Personality.Get(PS.RateAdjustment) != 1)
-				debug.Add($"  rate adjustement: {person_.Personality.Get(PS.RateAdjustment)}");
+				debug_.Add($"  rate adjustement: {person_.Personality.Get(PS.RateAdjustment)}");
 
 			if (totalRate_ < 0)
-				debug.Add($"  total: {totalRate_:0.00000} (decaying)");
+				debug_.Add($"  total: {totalRate_:0.00000} (decaying)");
 			else if (totalRate_ == 0)
-				debug.Add($"  total: {totalRate_:0.00000} (stable)");
+				debug_.Add($"  total: {totalRate_:0.00000} (stable)");
 			else
-				debug.Add($"  total: {totalRate_:0.00000} (rising)");
+				debug_.Add($"  total: {totalRate_:0.00000} (rising)");
 
-			return debug.ToArray();
+			return debug_.MakeArray();
 		}
 	}
 }

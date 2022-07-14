@@ -2,7 +2,7 @@
 {
 	class WeightedExpression
 	{
-		private float FastTimeMin = 0.4f;
+		private float FastTimeMin = 0.3f;
 		private float FastTimeMax = 2.0f;
 		private float SlowTimeMin = 3.0f;
 		private float SlowTimeMax = 5.0f;
@@ -23,6 +23,7 @@
 		private float max_ = 1;
 		private float add_ = 0;
 		private MoodType mainMood_ = MoodType.None;
+		private IRandom rng_ = new NormalRandom(0.3f, 0.9f, 1, 5);
 
 		private Duration holdTime_;
 
@@ -188,8 +189,6 @@
 		{
 			return $"{e_.Name} ({e_.MoodString()}) w={weight_:0.00}";
 		}
-
-		IRandom rng_ = new NormalRandom(0.3f, 0.9f, 1, 5);
 
 		private float RandomTarget()
 		{

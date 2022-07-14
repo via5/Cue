@@ -300,8 +300,7 @@ namespace Cue
 
 			Instrumentation.Start(I.Mood);
 			{
-				if (!IsPlayer)
-					mood_.Update(s);
+				mood_.Update(s);
 			}
 			Instrumentation.End();
 

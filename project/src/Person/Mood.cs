@@ -11,6 +11,7 @@ namespace Cue
 		public const int PostOrgasmState = 3;
 
 		private readonly Person person_;
+		private bool wasPlayer_ = false;
 		private int state_ = NormalState;
 		private float elapsed_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
@@ -19,7 +20,6 @@ namespace Cue
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
-
 		private ForceableFloat[] moods_ = new ForceableFloat[MoodType.Count];
 
 
@@ -286,6 +286,26 @@ namespace Cue
 		public void Update(float s)
 		{
 			elapsed_ += s;
+
+			if (person_.IsPlayer)
+			{
+				if (!wasPlayer_)
+				{
+					baseTiredness_ = 0;
+					baseExcitement_.Value = 0;
+
+					for (int i = 0; i < moods_.Length; ++i)
+						moods_[i].Value = 0;
+
+					wasPlayer_ = true;
+				}
+
+				return;
+			}
+			else
+			{
+				wasPlayer_ = false;
+			}
 
 
 			switch (state_)

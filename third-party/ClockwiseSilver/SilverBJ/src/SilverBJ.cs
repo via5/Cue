@@ -150,7 +150,7 @@ namespace ClockwiseSilver {
 				heading = CreateTextField(new JSONStorableString("header5", "Advanced Options (Some Automated)"
 					+ "\nMin and Max Speed determine Intensity Range"));
                 heading.height = 10f;
-				frontBackSpeedJSON = Helpers.SetupSlider(this, "Speed", 1f, 0.8f, 10.0f, false);
+				frontBackSpeedJSON = Helpers.SetupSlider(this, "Speed", 1f, 0.8f, 5.5f, false);
 				minSpeedJSON = Helpers.SetupSlider(this, "Speed Min", 0.65f, 0.5f, 3.0f, false);
 				maxSpeedJSON = Helpers.SetupSlider(this, "Speed Max", 3f, 1.5f, 4.5f, false);
 				frontBackRangeJSON = Helpers.SetupSlider(this, "Range", 1.0f, 0.5f, 1.2f, false);

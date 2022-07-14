@@ -42,9 +42,8 @@ namespace Cue
 			return null;
 		}
 
-		public string[] Debug()
+		public void Debug(DebugLines debug)
 		{
-			return null;
 		}
 
 		public override string ToString()

@@ -155,14 +155,14 @@ namespace ClockwiseSilver {
 				heading = CreateTextField(new JSONStorableString("header4", "*Time between random variations \n*Hand speed"));
                 heading.height = 10f;
 				randomTimeJSON = Helpers.SetupSlider(this, "Random Time", 4.0f, 0f, 10.0f, false);
-				speedMultiJSON = Helpers.SetupSlider(this, "Overall Speed", 1f, 0.2f, 1.5f, false);
+				speedMultiJSON = Helpers.SetupSlider(this, "Overall Speed", 1f, 0.2f, 2.0f, false);
 				rangeMultiJSON = Helpers.SetupSlider(this, "Overall Range", 1f, 0.2f, 1.2f, false);
 				audioVolumeJSON = Helpers.SetupSlider(this, "Audio Volume", 0.45f, 0.01f, 1.0f, false);
 
 				heading = CreateTextField(new JSONStorableString("header5", "Advanced Options (Some Automated)"));
                 heading.height = 10f;
 				rotSpeedJSON = Helpers.SetupSlider(this, "Rotation Speed", 180f, 10f, 400f, false);
-				frontBackSpeedJSON = Helpers.SetupSlider(this, "Speed", 1f, 0.8f, 10.0f, false);
+				frontBackSpeedJSON = Helpers.SetupSlider(this, "Speed", 1f, 0.8f, 8.0f, false);
 				minSpeedJSON = Helpers.SetupSlider(this, "Speed Min", 0.875f, 0.1f, 10, false);
 				maxSpeedJSON = Helpers.SetupSlider(this, "Speed Max", 4.9f, 0.1f, 10, false);
 				frontBackRangeJSON = Helpers.SetupSlider(this, "Range", 1.0f, 0.1f, 10, false);

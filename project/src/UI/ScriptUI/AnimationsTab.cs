@@ -10,6 +10,7 @@ namespace Cue
 		private List<IAnimation> oldList_ = new List<IAnimation>();
 		private VUI.CheckBox all_ = new VUI.CheckBox("All");
 		private bool ignore_ = false;
+		private DebugLines debug_ = null;
 
 		public PersonAnimationsTab(Person person)
 			: base("Anim", false)
@@ -52,16 +53,13 @@ namespace Cue
 
 			UpdateList();
 
-			var d = anims_.Selected?.Debug();
+			if (debug_ == null)
+				debug_ = new DebugLines();
 
-			if (d == null)
-			{
-				list_.Clear();
-			}
-			else
-			{
-				list_.SetItems(d);
-			}
+			debug_.Clear();
+
+			anims_.Selected?.Debug(debug_);
+			list_.SetItems(debug_.MakeArray());
 		}
 
 		private void UpdateList()

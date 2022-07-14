@@ -41,7 +41,7 @@ namespace Cue
 			i_ = 0;
 		}
 
-		public void Add(string a, string b)
+		public void Add(string a, string b = "")
 		{
 			if (debug_ == null)
 				debug_ = new List<string[]>();
@@ -70,20 +70,29 @@ namespace Cue
 		private void MakeDebugLines()
 		{
 			int longest = 0;
-			for (int i = 0; i < i_; ++i)
-				longest = Math.Max(longest, debug_[i][0].Length);
+			bool hasSecondCol = false;
+
+			debugLines_.Clear();
 
 			for (int i = 0; i < i_; ++i)
 			{
-				string s = debug_[i][0].PadRight(longest, ' ') + "  " + debug_[i][1];
-				if (i >= debugLines_.Count)
-					debugLines_.Add(s);
-				else
-					debugLines_[i] = s;
+				if (!hasSecondCol && debug_[i][0].Length > 0)
+					hasSecondCol = true;
+
+				longest = Math.Max(longest, debug_[i][0].Length);
 			}
 
-			for (int i = i_; i < debugLines_.Count; ++i)
-				debugLines_[i] = "";
+			for (int i = 0; i < i_; ++i)
+			{
+				string s;
+
+				if (hasSecondCol)
+					s = debug_[i][0].PadRight(longest, ' ') + "  " + debug_[i][1];
+				else
+					s = debug_[i][0];
+
+				debugLines_.Add(s);
+			}
 		}
 	}
 
