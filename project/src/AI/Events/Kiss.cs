@@ -15,6 +15,7 @@ namespace Cue
 		public float startDistanceWithPlayer;
 		public float stopDistance;
 		public float stopDistanceWithPlayer;
+		public float stopHeadDistance;
 		public Duration duration;
 		public Duration wait;
 
@@ -32,6 +33,7 @@ namespace Cue
 			startDistanceWithPlayer = d.startDistanceWithPlayer;
 			stopDistance = d.stopDistance;
 			stopDistanceWithPlayer = d.stopDistanceWithPlayer;
+			stopHeadDistance = d.stopHeadDistance;
 			duration = d.duration.Clone();
 			wait = d.wait.Clone();
 		}
@@ -55,6 +57,7 @@ namespace Cue
 		private bool durationFinished_ = false;
 		private bool waitFinished_ = false;
 		private bool waitFinishedBecauseGrab_ = false;
+		private Vector3 startingHeadPos_;
 
 		public KissEvent()
 			: base("kiss")
@@ -65,10 +68,11 @@ namespace Cue
 		{
 			var d = new KissEventData();
 
-			d.startDistance = J.ReqFloat(o, "startDistance");
-			d.startDistanceWithPlayer = J.ReqFloat(o, "startDistanceWithPlayer");
-			d.stopDistance = J.ReqFloat(o, "stopDistance");
-			d.stopDistanceWithPlayer = J.ReqFloat(o, "stopDistanceWithPlayer");
+			d.startDistance = J.ReqFloat(o, "startLipsDistance");
+			d.startDistanceWithPlayer = J.ReqFloat(o, "startLipsDistanceWithPlayer");
+			d.stopDistance = J.ReqFloat(o, "stopLipsDistance");
+			d.stopDistanceWithPlayer = J.ReqFloat(o, "stopLipsDistanceWithPlayer");
+			d.stopHeadDistance = J.ReqFloat(o, "stopHeadDistanceFromStart");
 			d.duration = Duration.FromJSON(o, "duration", true);
 			d.wait = Duration.FromJSON(o, "interval", true);
 
@@ -126,6 +130,7 @@ namespace Cue
 			debug.Add("startDistanceWithPlayer", $"{d_.startDistanceWithPlayer:0.00}");
 			debug.Add("stopDistance", $"{d_.stopDistance:0.00}");
 			debug.Add("stopDistanceWithPlayer", $"{d_.stopDistanceWithPlayer:0.00}");
+			debug.Add("stopHeadDistance", $"{d_.stopHeadDistance:0.00}");
 			debug.Add("duration", $"{d_.duration.ToLiveString()}");
 			debug.Add("wait", $"{d_.wait.ToLiveString()}");
 			debug.Add("state", $"{(Active ? "active" : "waiting")}");
@@ -306,6 +311,8 @@ namespace Cue
 						target.Atom.SetCollidersForKiss(true, person_.Atom);
 
 						leading_ = true;
+						startingHeadPos_ = person_.Body.Get(BP.Head).Position;
+
 						return true;
 					}
 
@@ -480,8 +487,18 @@ namespace Cue
 
 			if (d >= sd)
 			{
-				Log.Info($"must stop: too far, {d}");
+				Log.Info($"must stop: lips too far, {d}");
 				return true;
+			}
+
+			if (leading_ && target_.IsPlayer)
+			{
+				var hd = Vector3.Distance(person_.Body.Get(BP.Head).Position, startingHeadPos_);
+				if (hd >= d_.stopHeadDistance)
+				{
+					Log.Info($"must stop: head to far, {hd}");
+					return true;
+				}
 			}
 
 			return false;
