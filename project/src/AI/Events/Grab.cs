@@ -18,6 +18,10 @@
 
 		public override void Debug(DebugLines debug)
 		{
+			debug.Add("grabbed", $"{head_.GrabbedByPlayer}");
+			debug.Add("wasGrabbed", $"{wasGrabbed_}");
+			debug.Add("lock", $"{headLock_}");
+
 		}
 
 		public override void Update(float s)

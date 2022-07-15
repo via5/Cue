@@ -29,15 +29,18 @@
 
 			public override string ToString()
 			{
-				string s = "";
-
-				s +=
-					$"{BodyPartType.ToString(ownBodyPart)} by " +
-					$"{Cue.Instance.GetObject(byObjectIndex)?.ID ?? "?"}" +
-					$"." +
-					$"{BodyPartType.ToString(byBodyPart)}";
-
-				return s;
+				if (Valid)
+				{
+					return
+						$"{BodyPartType.ToString(ownBodyPart)} by " +
+						$"{Cue.Instance.GetObject(byObjectIndex)?.ID ?? "?"}" +
+						$"." +
+						$"{BodyPartType.ToString(byBodyPart)}";
+				}
+				else
+				{
+					return "false";
+				}
 			}
 
 			public static implicit operator bool(PartResult pr)

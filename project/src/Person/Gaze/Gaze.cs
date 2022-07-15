@@ -235,7 +235,12 @@ namespace Cue
 				}
 				else if (CurrentTarget != null)
 				{
-					if (person_.Body.Get(BP.Head).LockedFor(BodyPartLock.Move))
+					var head = person_.Body.Get(BP.Head);
+
+					// the head gets locked when grabbed, but disabling gaze
+					// will make the head snap when grab stops; it's fine for
+					// other animations, but it's jarring for grabbing
+					if (head.LockedFor(BodyPartLock.Move) && !head.GrabbedByPlayer)
 						gazer_.Enabled = false;
 					else
 						gazer_.Enabled = gazerEnabled_;
