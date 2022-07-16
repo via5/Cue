@@ -68,8 +68,6 @@ namespace Cue.Sys.Vam
 
 			root_ = new GameObject("CueRoot");
 			root_.transform.SetParent(vamroot, false);
-
-			VamFixes.Run();
 		}
 
 		public Logger Log
@@ -301,6 +299,11 @@ namespace Cue.Sys.Vam
 				return FileManagerSecure.FileExists(
 					$"{PluginDataRoot}/devmode");
 			}
+		}
+
+		public void Init()
+		{
+			VamFixes.Run();
 		}
 
 		public void FixedUpdate(float s)

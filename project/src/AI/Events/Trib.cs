@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class ThrustEvent : BasicEvent
+	class TribEvent : BasicEvent
 	{
 		private const float FrottageDistance = 0.1f;
 
@@ -9,10 +9,8 @@
 		private bool running_ = false;
 		private BodyPartLock lock_ = null;
 
-		private BodyPartLock idleLock_ = null;
-
-		public ThrustEvent()
-			: base("thrust")
+		public TribEvent()
+			: base("trib")
 		{
 		}
 
@@ -37,12 +35,6 @@
 				{
 					if (!Start())
 						return;
-
-					if (idleLock_ != null)
-					{
-						idleLock_.Unlock();
-						idleLock_ = null;
-					}
 				}
 
 				CheckAnim();
@@ -50,26 +42,6 @@
 			else if (running_)
 			{
 				Stop();
-			}
-			else
-			{
-				if (idleLock_ == null)
-				{
-					if (person_.Status.Penetrated() || person_.Status.Penetrating())
-					{
-						idleLock_ = person_.Body.Get(BP.Hips).Lock(
-							BodyPartLock.Anim, "idle lock for pen",
-							BodyPartLock.Weak);
-					}
-				}
-				else
-				{
-					if (!person_.Status.Penetrated() && !person_.Status.Penetrating())
-					{
-						idleLock_.Unlock();
-						idleLock_ = null;
-					}
-				}
 			}
 		}
 
@@ -85,7 +57,7 @@
 
 			if (receiver_ == null)
 			{
-				Log.Info($"no penetration detected");
+				Log.Info($"no contact for trib");
 				active_ = false;
 				return false;
 			}
@@ -100,8 +72,8 @@
 				return false;
 			}
 
-			Log.Info($"starting thrust with {receiver_}");
-			receiver_.Person.Body.Zapped(person_, SS.Penetration);
+			Log.Info($"starting trib with {receiver_}");
+			receiver_.Person.Body.Zapped(person_, SS.Genitals);
 
 			person_.Body.Get(person_.Body.GenitalsBodyPart)
 				.AddForcedTrigger(
@@ -120,8 +92,8 @@
 
 		private void Stop()
 		{
-			Log.Verbose($"thrust: stopping");
-			person_.Animator.StopType(AnimationType.Thrust);
+			Log.Verbose($"trib: stopping");
+			person_.Animator.StopType(AnimationType.Trib);
 
 			person_.Body.Get(person_.Body.GenitalsBodyPart)
 				.RemoveForcedTrigger(
@@ -148,33 +120,33 @@
 		{
 			if (b)
 			{
-				person_.Excitement.GetSource(SS.Penetration).AddEnabledFor(receiver_?.Person);
+				person_.Excitement.GetSource(SS.Genitals).AddEnabledFor(receiver_?.Person);
 				if (receiver_ != null)
-					receiver_.Person.Excitement.GetSource(SS.Penetration).AddEnabledFor(person_);
+					receiver_.Person.Excitement.GetSource(SS.Genitals).AddEnabledFor(person_);
 			}
 			else
 			{
-				person_.Excitement.GetSource(SS.Penetration).RemoveEnabledFor(receiver_?.Person);
+				person_.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(receiver_?.Person);
 				if (receiver_ != null)
-					receiver_.Person.Excitement.GetSource(SS.Penetration).RemoveEnabledFor(person_);
+					receiver_.Person.Excitement.GetSource(SS.Genitals).RemoveEnabledFor(person_);
 			}
 		}
 
 		private void CheckAnim()
 		{
-			AnimationStatus state = person_.Animator.PlayingStatus(AnimationType.Thrust);
+			AnimationStatus state = person_.Animator.PlayingStatus(AnimationType.Trib);
 
 			if (state == AnimationStatus.Playing)
 			{
 				if (Mood.ShouldStopSexAnimation(person_, receiver_?.Person))
-					person_.Animator.StopType(AnimationType.Thrust);
+					person_.Animator.StopType(AnimationType.Trib);
 			}
 			else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
 			{
 				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
 				{
 					person_.Animator.PlayType(
-						AnimationType.Thrust, new AnimationContext(
+						AnimationType.Trib, new AnimationContext(
 							receiver_?.Person, lock_.Key));
 				}
 			}
@@ -182,16 +154,59 @@
 
 		private BodyPart FindReceiver()
 		{
+			var selfGen = person_.Body.Get(person_.Body.GenitalsBodyPart);
+
+			BodyPart closest = null;
+			float closestD = float.MaxValue;
+
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				if (p == person_)
 					continue;
 
 				if (PersonStatus.EitherPenetrating(person_, p))
-					return p.Body.Get(p.Body.GenitalsBodyPart);
+				{
+					Log.Info($"won't trib {p.ID} because penetration is active");
+					continue;
+				}
+
+				foreach (BodyPartType bp in BodyPartType.Values)
+				{
+					var otherPart = p.Body.Get(bp);
+					var d = selfGen.DistanceToSurface(otherPart);
+
+					if (d > FrottageDistance)
+						continue;
+
+					if (d < closestD)
+					{
+						if (BetterReceiver(closest, otherPart))
+						{
+							closest = otherPart;
+							closestD = d;
+						}
+					}
+				}
 			}
 
-			return null;
+			return closest;
+		}
+
+		private bool BetterReceiver(BodyPart tentative, BodyPart check)
+		{
+			if (tentative == null)
+			{
+				// first
+				return true;
+			}
+
+			if (check.Type == check.Person.Body.GenitalsBodyPart)
+			{
+				// prioritize genitals
+				return true;
+			}
+
+			return false;
 		}
 	}
 }

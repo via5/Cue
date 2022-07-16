@@ -55,6 +55,7 @@ namespace Cue
 				new KissEvent(),
 				new SmokeEvent(),
 				new ThrustEvent(),
+				new TribEvent(),
 				new HandEvent(),
 				new ZappedEvent(),
 				new SuckFingerEvent(),

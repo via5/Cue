@@ -2,7 +2,7 @@
 
 namespace Cue.Proc
 {
-	abstract class ThrustProcAnimation : BasicProcAnimation
+	abstract class BasicThrustProcAnimation : BasicProcAnimation
 	{
 		protected struct Config
 		{
@@ -41,7 +41,7 @@ namespace Cue.Proc
 		private Config config_;
 		private ForceConfig fconfig_;
 
-		protected ThrustProcAnimation(string name, Config c)
+		protected BasicThrustProcAnimation(string name, Config c)
 			: base(name)
 		{
 			config_ = c;
@@ -253,16 +253,16 @@ namespace Cue.Proc
 	}
 
 
-	class SexProcAnimation : ThrustProcAnimation
+	class ThrustProcAnimation : BasicThrustProcAnimation
 	{
-		public SexProcAnimation()
-			: base("cueSex", GetConfig())
+		public ThrustProcAnimation()
+			: base("cueThrust", GetConfig())
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new SexProcAnimation();
+			var a = new ThrustProcAnimation();
 			a.CopyFrom(this);
 			return a;
 		}
@@ -315,16 +315,16 @@ namespace Cue.Proc
 	}
 
 
-	class FrottageProcAnimation : ThrustProcAnimation
+	class TribProcAnimation : BasicThrustProcAnimation
 	{
-		public FrottageProcAnimation()
-			: base("cueFrottage", GetConfig())
+		public TribProcAnimation()
+			: base("cueTrib", GetConfig())
 		{
 		}
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new FrottageProcAnimation();
+			var a = new TribProcAnimation();
 			a.CopyFrom(this);
 			return a;
 		}

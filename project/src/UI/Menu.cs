@@ -211,14 +211,14 @@ namespace Cue
 		{
 			var list = new List<IItem>
 			{
-				Hand(), Mouth(), Thrust(), CanKiss(), Strapon()
+				Hand(), Mouth(), Thrust(), Trib(), CanKiss(), Strapon()
 			};
 
 			foreach (var m in Cue.Instance.Options.Menus)
 				list.Add(new CustomMenuItem(m));
 
-			list.Add(Genitals());
-			list.Add(Breasts());
+			//list.Add(Genitals());
+			//list.Add(Breasts());
 			list.Add(MovePlayer());
 
 			return list;
@@ -258,6 +258,18 @@ namespace Cue
 				},
 
 				(p) => p.AI.GetEvent<ThrustEvent>()?.Active ?? false);
+		}
+
+		public static IItem Trib()
+		{
+			return new CheckBoxItem("Trib",
+				(p, b) =>
+				{
+					if (p != null)
+						p.AI.GetEvent<TribEvent>().Active = b;
+				},
+
+				(p) => p.AI.GetEvent<TribEvent>()?.Active ?? false);
 		}
 
 		public static IItem CanKiss()

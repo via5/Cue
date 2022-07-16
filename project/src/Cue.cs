@@ -187,6 +187,8 @@ namespace Cue
 			var start = Sys.RealtimeSinceStartup;
 			LogVerbose($"cue: init (token {CueMain.Instance.Token})");
 
+			Sys.Init();
+
 			VUI.Root.Init(
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),

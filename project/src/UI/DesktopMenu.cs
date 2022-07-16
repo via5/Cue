@@ -48,7 +48,7 @@ namespace Cue
 
 			// sel row
 			{
-				selButtons_ = new VUI.Panel(new VUI.HorizontalFlow());
+				selButtons_ = new VUI.Panel(new VUI.HorizontalFlow(5));
 				p.Add(selButtons_);
 			}
 

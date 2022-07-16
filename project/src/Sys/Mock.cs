@@ -151,6 +151,10 @@ namespace Cue.Sys.Mock
 			return (float)(rnd_.NextDouble() * (last - first) + first);
 		}
 
+		public void Init()
+		{
+		}
+
 		public void FixedUpdate(float s)
 		{
 		}

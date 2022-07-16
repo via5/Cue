@@ -8,8 +8,8 @@ namespace Cue
 	{
 		public static readonly AnimationType None = AnimationType.CreateInternal(-1);
 		public static readonly AnimationType Idle = AnimationType.CreateInternal(0);
-		public static readonly AnimationType Sex = AnimationType.CreateInternal(1);
-		public static readonly AnimationType Frottage = AnimationType.CreateInternal(2);
+		public static readonly AnimationType Thrust = AnimationType.CreateInternal(1);
+		public static readonly AnimationType Trib = AnimationType.CreateInternal(2);
 		public static readonly AnimationType Orgasm = AnimationType.CreateInternal(3);
 		public static readonly AnimationType Smoke = AnimationType.CreateInternal(4);
 		public static readonly AnimationType SuckFinger = AnimationType.CreateInternal(5);
@@ -50,8 +50,8 @@ namespace Cue
 		private static string[] names_ = new string[]
 		{
 			"idle",
-			"sex",
-			"frottage",
+			"thrust",
+			"trib",
 			"orgasm",
 			"smoke",
 			"suckFinger",

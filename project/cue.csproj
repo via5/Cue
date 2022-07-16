@@ -105,6 +105,7 @@
     <Compile Include="src\AI\Events\Smoke.cs" />
     <Compile Include="src\AI\Events\SuckFinger.cs" />
     <Compile Include="src\AI\Events\Thrust.cs" />
+    <Compile Include="src\AI\Events\Trib.cs" />
     <Compile Include="src\AI\Events\Zap.cs" />
     <Compile Include="src\Animation\Animator.cs" />
     <Compile Include="src\Animation\Builtin\Finger.cs" />

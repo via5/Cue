@@ -11,20 +11,20 @@
 		},
 
 		{
-			"animation": "sex",
+			"animation": "thrust",
 			"type": "internal",
 			"options":
 			{
-				"name": "cueSex"
+				"name": "cueThrust"
 			}
 		},
 
 		{
-			"animation": "frottage",
+			"animation": "trib",
 			"type": "internal",
 			"options":
 			{
-				"name": "cueFrottage"
+				"name": "cueTrib"
 			}
 		},
 
