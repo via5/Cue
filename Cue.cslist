@@ -72,6 +72,15 @@ project\src\Person\Gaze\Gaze.cs
 project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
+project\src\Person\Gaze\Events\Above.cs
+project\src\Person\Gaze\Events\Grabbed.cs
+project\src\Person\Gaze\Events\Hands.cs
+project\src\Person\Gaze\Events\Interactions.cs
+project\src\Person\Gaze\Events\Kiss.cs
+project\src\Person\Gaze\Events\Mouth.cs
+project\src\Person\Gaze\Events\Others.cs
+project\src\Person\Gaze\Events\Random.cs
+project\src\Person\Gaze\Events\Zapped.cs
 project\src\Person\Voice\State.cs
 project\src\Person\Voice\StateBJ.cs
 project\src\Person\Voice\StateKiss.cs

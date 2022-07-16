@@ -178,6 +178,15 @@
     <Compile Include="src\Person\Expression\Manager.cs" />
     <Compile Include="src\Person\Expression\WeightedExpression.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
+    <Compile Include="src\Person\Gaze\Events\Above.cs" />
+    <Compile Include="src\Person\Gaze\Events\Grabbed.cs" />
+    <Compile Include="src\Person\Gaze\Events\Hands.cs" />
+    <Compile Include="src\Person\Gaze\Events\Interactions.cs" />
+    <Compile Include="src\Person\Gaze\Events\Kiss.cs" />
+    <Compile Include="src\Person\Gaze\Events\Mouth.cs" />
+    <Compile Include="src\Person\Gaze\Events\Others.cs" />
+    <Compile Include="src\Person\Gaze\Events\Random.cs" />
+    <Compile Include="src\Person\Gaze\Events\Zapped.cs" />
     <Compile Include="src\Person\Gaze\Gaze.cs" />
     <Compile Include="src\Person\Gaze\Picker.cs" />
     <Compile Include="src\Person\Gaze\Render.cs" />
