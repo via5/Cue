@@ -181,7 +181,7 @@
 			if (leftTarget == null && rightTarget == null)
 			{
 				Stop(stopFlags);
-				Log.Verbose("no target");
+				Log.Info("no target");
 				return;
 			}
 
@@ -577,7 +577,11 @@
 
 				if (BetterTarget(tentative, g, key))
 				{
-					if (d < tentativeDistance)
+					if (g.Type == BP.Penis && p.Status.Penetrating())
+					{
+						Log.Info($"skipping {g}, penetrating");
+					}
+					else if (d < tentativeDistance)
 					{
 						Log.Verbose($"{g} better target");
 						tentative = g;

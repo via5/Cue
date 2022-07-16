@@ -2,7 +2,7 @@
 {
 	class TribEvent : BasicEvent
 	{
-		private const float FrottageDistance = 0.1f;
+		private const float TribDistance = 0.1f;
 
 		private BodyPart receiver_ = null;
 		private bool active_ = false;
@@ -175,7 +175,7 @@
 					var otherPart = p.Body.Get(bp);
 					var d = selfGen.DistanceToSurface(otherPart);
 
-					if (d > FrottageDistance)
+					if (d > TribDistance)
 						continue;
 
 					if (d < closestD)

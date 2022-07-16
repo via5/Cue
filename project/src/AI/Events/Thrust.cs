@@ -2,8 +2,6 @@
 {
 	class ThrustEvent : BasicEvent
 	{
-		private const float FrottageDistance = 0.1f;
-
 		private BodyPart receiver_ = null;
 		private bool active_ = false;
 		private bool running_ = false;
