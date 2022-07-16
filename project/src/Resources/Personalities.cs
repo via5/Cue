@@ -143,6 +143,8 @@ namespace Cue
 							BP.None));
 					}
 
+					string name = en["name"].Value;
+
 					var c = new Expression.Config();
 
 					c.exclusive = en["exclusive"].AsBool;
@@ -150,13 +152,42 @@ namespace Cue
 					c.maxOnly = en["maxOnly"].AsBool;
 					c.minHoldTime = J.OptFloat(en, "minHoldTime", -1);
 					c.maxHoldTime = J.OptFloat(en, "maxHoldTime", -1);
+					c.forMale = true;
+					c.forFemale = true;
+
+					if (en.HasKey("sex"))
+					{
+						var s = en["sex"].Value;
+
+						if (s == "male")
+						{
+							c.forMale = true;
+							c.forFemale = false;
+						}
+						else if (s == "female")
+						{
+							c.forMale = false;
+							c.forFemale = true;
+						}
+						else if (s == "all" || s == "")
+						{
+							c.forMale = true;
+							c.forFemale = true;
+						}
+						else
+						{
+							throw new LoadFailed(
+								$"bad sex value '{s}' for expression {name}, " +
+								$"must be 'male', 'female', 'all' or empty");
+						}
+					}
 
 
 					es.Add(new Expression(
-						en["name"].Value,
+						name,
 						MoodType.FromStringMany(en["moods"].Value), c,
 						new MorphGroup(
-							en["name"].Value,
+							name,
 							BodyPartType.FromStringMany(en["bodyParts"].Value),
 							morphs.ToArray())));
 				}

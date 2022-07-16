@@ -32,8 +32,8 @@
 			{
 				"colliders": ["b2/2", "b3/1", "b1/1"],
 				"anchor": "pelvisF4/pelvisF4Joint",
-				"positionOffset": [0, 0.01, 0.003],
-				"rotationOffset": [-40, 0, 0]
+				"positionOffset": [0, 0.0, 0.02],
+				"rotationOffset": [0, 140, 90]
 			}
 		},
 

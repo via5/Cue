@@ -88,6 +88,7 @@
 			"name": "smile2",
 			"moods": "happy",
 			"bodyParts": "mouth",
+			"sex": "female",
 			"morphs":
 			[
 				{
@@ -124,6 +125,7 @@
 			"name": "curious",
 			"moods": "playful",
 			"bodyParts": "mouth",
+			"sex": "female",
 			"morphs":
 			[
 				{
@@ -180,8 +182,8 @@
 					"max": 1.7
 				},
 				{
-					"id": "PHMMouthCornerUpDown",
-					"max": -0.37
+					"id": "Mouth corner up",
+					"max": -0.8
 				},
 				{
 					"id": "CTRLEyesClosed",
@@ -231,6 +233,7 @@
 			"name": "stifled",
 			"moods": "excited",
 			"bodyParts": "mouth",
+			"sex": "female",
 			"exclusive": true,
 			"minExcitement": 0.7,
 			"minHoldTime": 2,
@@ -262,6 +265,7 @@
 			"name": "embarassed",
 			"moods": "excited",
 			"bodyParts": "mouth eyes",
+			"sex": "female",
 			"morphs":
 			[
 				{
@@ -321,8 +325,8 @@
 			"morphs":
 			[
 				{
-					"id": "Mouth Corner Up-Down",
-					"max": -0.5
+					"id": "Mouth corner up",
+					"max": -1
 				},
 
 				{

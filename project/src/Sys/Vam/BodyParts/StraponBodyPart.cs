@@ -14,6 +14,10 @@ namespace Cue.Sys.Vam
 
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
+		private CapsuleCollider anchorCC_ = null;
+		private SphereCollider anchorSC_ = null;
+		private Transform parent_ = null;
+		private Transform child_ = null;
 
 		private float postCreateElapsed_ = 0;
 		private bool postCreate_ = false;
@@ -231,17 +235,12 @@ namespace Cue.Sys.Vam
 				if (!Enabled || anchor_ == null)
 					return;
 
-				var gen = (Atom.Body as VamBody)?.GetPart(BP.Vagina);
-
-				var q = Quaternion.Identity;
-				if (gen != null)
-					q = gen.Rotation * rotationOffset_;
-
-				var v = U.FromUnity(anchor_.transform.position);
-				v += positionOffset_;
-
-				dildo_.Position = v;
-				dildo_.Rotation = q;
+				if (anchorCC_ != null)
+					SetFromCapsule();
+				else if (anchorSC_ != null)
+					SetFromSphere();
+				else
+					SetFromCollider();
 
 				if (postCreate_)
 				{
@@ -261,12 +260,52 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		private void SetFromCapsule()
+		{
+			parent_.position = anchorCC_.transform.position;
+			parent_.rotation = anchorCC_.transform.rotation;
+
+			if (anchorCC_.direction == 0)
+				child_.localRotation = UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.forward);
+			else if (anchorCC_.direction == 2)
+				child_.localRotation = UnityEngine.Quaternion.AngleAxis(90, UnityEngine.Vector3.right);
+
+			child_.localPosition = anchorCC_.center;
+
+			dildo_.Position = U.FromUnity(child_.position) + positionOffset_ + new Vector3(0, 0, anchorCC_.radius);
+			dildo_.Rotation = U.FromUnity(child_.rotation) * rotationOffset_;
+		}
+
+		private void SetFromSphere()
+		{
+			parent_.position = anchorSC_.transform.position;
+			parent_.rotation = anchorSC_.transform.rotation;
+
+			child_.localRotation = UnityEngine.Quaternion.identity;
+			child_.localPosition = anchorSC_.center;
+
+			dildo_.Position = U.FromUnity(child_.position) + positionOffset_ + new Vector3(0, 0, anchorSC_.radius);
+			dildo_.Rotation = U.FromUnity(child_.rotation) * rotationOffset_;
+		}
+
+		private void SetFromCollider()
+		{
+			dildo_.Position = U.FromUnity(anchor_.transform.position) + positionOffset_;
+			dildo_.Rotation = U.FromUnity(anchor_.transform.rotation) * rotationOffset_;
+		}
+
 		public override string ToString()
 		{
 			if (!Exists)
 				return "";
 
 			return $"dildo (" + base.ToString() + ")";
+		}
+
+		protected override void AddDebugRenderers()
+		{
+			base.AddDebugRenderers();
+			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(anchor_));
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)
@@ -337,6 +376,8 @@ namespace Cue.Sys.Vam
 			else
 			{
 				anchor_ = (VamAtom as VamAtom).FindCollider(anchorName);
+				anchorCC_ = anchor_ as CapsuleCollider;
+				anchorSC_ = anchor_ as SphereCollider;
 
 				if (anchor_ == null)
 					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
@@ -380,6 +421,18 @@ namespace Cue.Sys.Vam
 			}
 
 			Set(cs.ToArray(), d.mainController, IgnoreTransforms);
+
+			if (parent_ == null)
+			{
+				parent_ = new GameObject().transform;
+				parent_.SetParent(Cue.Instance.VamSys.RootTransform, false);
+
+				child_ = new GameObject().transform;
+				child_.SetParent(parent_, false);
+			}
+
+			foreach (var fc in d.freeControllers)
+				fc.interactableInPlayMode = false;
 		}
 	}
 }

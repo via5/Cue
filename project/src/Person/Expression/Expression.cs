@@ -42,6 +42,8 @@
 			public bool maxOnly;
 			public float minHoldTime;
 			public float maxHoldTime;
+			public bool forMale;
+			public bool forFemale;
 		}
 
 
@@ -94,6 +96,12 @@
 
 		public bool Init(Person p)
 		{
+			if (!config_.forFemale && !p.Atom.IsMale)
+				return false;
+
+			if (!config_.forMale && p.Atom.IsMale)
+				return false;
+
 			return g_.Init(p);
 		}
 
