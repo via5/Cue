@@ -23,9 +23,9 @@ namespace Cue
 				}
 				else
 				{
-					if (IsSceneIdle())
+					if (Cue.Instance.IsSceneIdle())
 					{
-						if (IsSceneEmpty())
+						if (Cue.Instance.IsSceneEmpty())
 						{
 							targets_.SetRandomWeightIfZero(
 								ps.Get(PS.IdleEmptyRandomWeight), "random, scene idle and empty");
@@ -45,22 +45,6 @@ namespace Cue
 			}
 
 			return Continue;
-		}
-
-		private bool IsSceneIdle()
-		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				if (!p.Mood.IsIdle)
-					return false;
-			}
-
-			return true;
-		}
-
-		private bool IsSceneEmpty()
-		{
-			return (Cue.Instance.ActivePersons.Length == 2);
 		}
 
 		public override string ToString()

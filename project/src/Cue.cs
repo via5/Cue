@@ -233,6 +233,22 @@ namespace Cue
 			LogInfo($"cue: running, version {Version.String}, init {(end - start):0.00}s");
 		}
 
+		public bool IsSceneIdle()
+		{
+			foreach (var p in ActivePersons)
+			{
+				if (!p.Mood.IsIdle)
+					return false;
+			}
+
+			return true;
+		}
+
+		public bool IsSceneEmpty()
+		{
+			return (ActivePersons.Length == 2);
+		}
+
 		private void CheckConfig()
 		{
 			var o = saver_.Load();
