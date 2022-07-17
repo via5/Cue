@@ -5,7 +5,7 @@ namespace Cue
 {
 	public class ExpressionManager
 	{
-		private const int MaxActive = 4;
+		private const int MaxActive = 3;
 		private const int MaxEmergency = 1;
 		private const float MoreCheckInterval = 1;
 
@@ -27,6 +27,11 @@ namespace Cue
 		public ExpressionManager(Person p)
 		{
 			person_ = p;
+		}
+
+		public WeightedExpression[] GetAllExpressions()
+		{
+			return exps_;
 		}
 
 		public Expression[] GetExpressionsForMood(MoodType mood)
@@ -376,7 +381,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Orgasm);
 						}
 
-						weight += 1;
+						weight += e.DefaultWeight;
 						intensity = 1;
 						min = ps.Get(PS.OrgasmExpressionRangeMin);
 						max = ps.Get(PS.OrgasmExpressionRangeMax);
@@ -392,7 +397,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Happy);
 						}
 
-						weight += m.Get(MoodType.Happy);
+						weight += e.DefaultWeight * m.Get(MoodType.Happy);
 						intensity = Math.Max(intensity, m.Get(MoodType.Happy));
 					}
 
@@ -404,7 +409,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Excited);
 						}
 
-						weight += m.Get(MoodType.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
+						weight += e.DefaultWeight * m.Get(MoodType.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
 						intensity = Math.Max(intensity, m.Get(MoodType.Excited));
 						intensity = Math.Min(intensity, ps.Get(PS.MaxExcitedExpression));
 					}
@@ -417,7 +422,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Playful);
 						}
 
-						weight += m.Get(MoodType.Playful);
+						weight += e.DefaultWeight * m.Get(MoodType.Playful);
 						intensity = Math.Max(intensity, m.Get(MoodType.Playful));
 					}
 
@@ -429,7 +434,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Angry);
 						}
 
-						weight += m.Get(MoodType.Angry);
+						weight += e.DefaultWeight * m.Get(MoodType.Angry);
 						intensity = Math.Max(intensity, m.Get(MoodType.Angry));
 					}
 
@@ -441,7 +446,7 @@ namespace Cue
 							highestMoodValue = m.Get(MoodType.Tired);
 						}
 
-						weight += expressionTiredness;
+						weight += e.DefaultWeight * expressionTiredness;
 						intensity = Math.Max(intensity, expressionTiredness);
 					}
 
@@ -474,33 +479,27 @@ namespace Cue
 			}
 		}
 
-		public string[] Debug()
+		public void Debug(DebugLines debug)
 		{
-			var s = new string[MaxActive + MaxEmergency + 1 + exps_.Length + 2];
-
-			int i = 0;
-
 			for (int j = 0; j < exps_.Length; ++j)
 			{
 				if (exps_[j].Active)
-					s[i++] = $"{exps_[j].ToDetailedString()}";
+					debug.Add(exps_[j].ToDetailedString());
 			}
 
-			while (i < MaxActive)
-				s[i++] = "none";
+			while (debug.Count < MaxActive)
+				debug.Add("none");
 
-			while (i < (MaxEmergency + MaxActive))
-				s[i++] = "none (emergency)";
+			while (debug.Count < (MaxEmergency + MaxActive))
+				debug.Add("none (emergency)");
 
-			s[i++] = "";
+			debug.Add("");
 
 			for (int j = 0; j < exps_.Length; ++j)
-				s[i++] = $"{exps_[j].ToDetailedString()}";
+				debug.Add(exps_[j].ToDetailedString());
 
-			s[i++] = "";
-			s[i++] = (needsMore_ ? "needs more" : "");
-
-			return s;
+			debug.Add("");
+			debug.Add((needsMore_ ? "needs more" : ""));
 		}
 	}
 }

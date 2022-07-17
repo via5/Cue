@@ -136,17 +136,23 @@ namespace Cue
 
 					foreach (JSONClass mn in en["morphs"].AsArray)
 					{
+						bool closesEyes = false;
+						if (en.HasKey("closesEyes"))
+							closesEyes = mn["closesEyes"].AsBool;
+
 						morphs.Add(new MorphGroup.MorphInfo(
 							mn["id"].Value,
 							J.OptFloat(mn, "min", 0),
 							J.OptFloat(mn, "max", 1.0f),
-							BP.None));
+							BP.None,
+							J.OptFloat(mn, "eyesClosed", Morph.NoEyesClosed)));
 					}
 
 					string name = en["name"].Value;
 
 					var c = new Expression.Config();
 
+					c.weight = J.OptFloat(en, "weight", 1.0f);
 					c.exclusive = en["exclusive"].AsBool;
 					c.minExcitement = en["minExcitement"].AsFloat;
 					c.maxOnly = en["maxOnly"].AsBool;
@@ -181,7 +187,6 @@ namespace Cue
 								$"must be 'male', 'female', 'all' or empty");
 						}
 					}
-
 
 					es.Add(new Expression(
 						name,

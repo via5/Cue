@@ -6,12 +6,14 @@ namespace Cue
 	{
 		private const int None = 0;
 		private const int Gaze = 1;
-		private const int Morphs = 2;
-		private const int Expression = 3;
+		private const int VamMorphs = 2;
+		private const int MorphGroups = 3;
+		private const int Expression = 4;
 
 		private Person person_;
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 		private int what_ = None;
+		private DebugLines debug_ = null;
 
 		public PersonDumpTab(Person person)
 			: base("Dump", false)
@@ -23,7 +25,8 @@ namespace Cue
 			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
 			p.Add(new VUI.Button("None", () => what_ = None));
 			p.Add(new VUI.Button("Gaze", () => what_ = Gaze));
-			p.Add(new VUI.Button("Morphs", () => what_ = Morphs));
+			p.Add(new VUI.Button("VAM Morphs", () => what_ = VamMorphs));
+			p.Add(new VUI.Button("Morph groups", () => what_ = MorphGroups));
 			p.Add(new VUI.Button("Expressions", () => what_ = Expression));
 
 			Add(p, VUI.BorderLayout.Top);
@@ -35,6 +38,11 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
+			if (debug_ == null)
+				debug_ = new DebugLines();
+
+			debug_.Clear();
+
 			switch (what_)
 			{
 				case None:
@@ -51,9 +59,15 @@ namespace Cue
 					break;
 				}
 
-				case Morphs:
+				case VamMorphs:
 				{
-					DumpMorphs();
+					DumpVamMorphs();
+					break;
+				}
+
+				case MorphGroups:
+				{
+					DumpMorphGroups();
 					break;
 				}
 
@@ -68,11 +82,10 @@ namespace Cue
 		private void DumpGaze()
 		{
 			var targets = person_.Gaze.Targets.All;
-			var items = new List<string>();
 
-			items.Add(person_.Gaze.LastString);
-			items.Add("picker: " + person_.Gaze.Picker.LastString);
-			items.Add("");
+			debug_.Add(person_.Gaze.LastString);
+			debug_.Add("picker: " + person_.Gaze.Picker.LastString);
+			debug_.Add("");
 
 			for (int i = 0; i < targets.Length; ++i)
 			{
@@ -85,30 +98,38 @@ namespace Cue
 					if (t.Failure != "")
 						s += $" (failed: {t.Failure})";
 
-					items.Add(s);
+					debug_.Add(s);
 				}
 			}
 
 			foreach (var a in person_.Gaze.Targets.GetAllAvoidForDebug())
-				items.Add($"Avoid: {a}");
+				debug_.Add($"Avoid: {a}");
 
-			list_.SetItems(items);
+			list_.SetItems(debug_.MakeArray());
 		}
 
-		private void DumpMorphs()
+		private void DumpVamMorphs()
 		{
-			var items = new List<string>();
 			var mm = Sys.Vam.VamMorphManager.Instance;
 
 			foreach (var m in mm.GetAll())
-				items.Add(m.ToString());
+				debug_.Add(m.ToString());
 
-			list_.SetItems(items);
+			list_.SetItems(debug_.MakeArray());
+		}
+
+		private void DumpMorphGroups()
+		{
+			foreach (var e in person_.Expression.GetAllExpressions())
+				e.Expression.MorphGroup.Debug(debug_);
+
+			list_.SetItems(debug_.MakeArray());
 		}
 
 		private void DumpExpression()
 		{
-			list_.SetItems(person_.Expression.Debug());
+			person_.Expression.Debug(debug_);
+			list_.SetItems(debug_.MakeArray());
 		}
 	}
 }

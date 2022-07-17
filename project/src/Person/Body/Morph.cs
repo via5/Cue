@@ -5,12 +5,20 @@ namespace Cue
 {
 	public class Morph
 	{
+		public const float NoEyesClosed = -9999;
+
+		public static bool HasEyesClosed(float f)
+		{
+			return (f > -1000);
+		}
+
+
 		private Person person_;
 		private Sys.IMorph m_;
 		private BodyPartType[] bodyParts_ = null;
 
-		public Morph(Person p, string id, BodyPartType bodyPart)
-			: this(p, p.Atom.GetMorph(id), bodyPart)
+		public Morph(Person p, string id, BodyPartType bodyPart, float eyesClosed = NoEyesClosed)
+			: this(p, p.Atom.GetMorph(id, eyesClosed), bodyPart)
 		{
 		}
 
@@ -82,7 +90,10 @@ namespace Cue
 
 		public override string ToString()
 		{
-			return m_?.ToString() ?? "no morph";
+			if (m_ == null)
+				return "no morph";
+
+			return m_.ToString();
 		}
 	}
 
@@ -94,14 +105,16 @@ namespace Cue
 			private string id_;
 			private float min_, max_;
 			private BodyPartType bodyPart_;
+			private float eyesClosed_;
 			private Morph m_ = null;
 
-			public MorphInfo(string id, float min, float max, BodyPartType bodyPart)
+			public MorphInfo(string id, float min, float max, BodyPartType bodyPart, float eyesClosed)
 			{
 				id_ = id;
 				min_ = min;
 				max_ = max;
 				bodyPart_ = bodyPart;
+				eyesClosed_ = eyesClosed;
 			}
 
 			public Morph Morph
@@ -111,12 +124,12 @@ namespace Cue
 
 			public MorphInfo Clone()
 			{
-				return new MorphInfo(id_, min_, max_, bodyPart_);
+				return new MorphInfo(id_, min_, max_, bodyPart_, eyesClosed_);
 			}
 
 			public bool Init(Person p)
 			{
-				m_ = new Morph(p, id_, bodyPart_);
+				m_ = new Morph(p, id_, bodyPart_, eyesClosed_);
 				return m_.Init();
 			}
 
@@ -132,6 +145,14 @@ namespace Cue
 			public void Reset()
 			{
 				m_?.Reset();
+			}
+
+			public override string ToString()
+			{
+				if (m_ == null)
+					return id_ + " (nomorph)";
+				else
+					return m_.ToString();
 			}
 		}
 
@@ -246,6 +267,32 @@ namespace Cue
 		public override string ToString()
 		{
 			return name_;
+		}
+
+		public void Debug(DebugLines debug)
+		{
+			debug.Add(ToDetailedString());
+
+			for (int i = 0; i < morphs_.Length; ++i)
+				debug.Add("    " + morphs_[i].ToString());
+		}
+
+		public string ToDetailedString()
+		{
+			string s = "";
+
+			for (int i = 0; i < bodyParts_.Length; ++i)
+			{
+				if (s.Length > 0)
+					s += ",";
+
+				s += bodyParts_[i].ToString();
+			}
+
+			if (s == "")
+				s = "none";
+
+			return name_ + ", bp:" + s;
 		}
 
 		private static BodyPartType[] FixedBodyParts(BodyPartType[] bodyParts)

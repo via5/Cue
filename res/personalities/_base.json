@@ -262,6 +262,36 @@
 		},
 
 		{
+			"name": "AAsex_browhiAA6",
+			"moods": "excited",
+			"bodyParts": "mouth eyes",
+			"weight": 0.5,
+			"morphs":
+			[
+				{
+					"id": "AAsex_browhiAA6",
+					"max": 0.7,
+					"eyesClosed": 1,
+				}
+			]
+		},
+
+		{
+			"name": "AAsex_closedAA1",
+			"moods": "excited",
+			"bodyParts": "mouth eyes",
+			"weight": 0.5,
+			"morphs":
+			[
+				{
+					"id": "AAsex_closedAA1",
+					"max": 1,
+					"eyesClosed": 1,
+				}
+			]
+		},
+
+		{
 			"name": "embarassed",
 			"moods": "excited",
 			"bodyParts": "mouth eyes",

@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class WeightedExpression
+	public class WeightedExpression
 	{
 		private float FastTimeMin = 0.3f;
 		private float FastTimeMax = 2.0f;

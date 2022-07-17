@@ -58,6 +58,11 @@ namespace Cue
 			++i_;
 		}
 
+		public int Count
+		{
+			get { return i_; }
+		}
+
 		public string[] MakeArray()
 		{
 			if (debug_ == null || debugLines_ == null)

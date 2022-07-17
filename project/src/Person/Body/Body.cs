@@ -72,6 +72,7 @@ namespace Cue
 
 		public const int CloseDelay = 2;
 		private const float MaxMorphs = 1.2f;
+		private const float MaxEyeMorphs = 1.0f;
 
 		private Person person_;
 		private Logger log_;
@@ -329,6 +330,8 @@ namespace Cue
 		{
 			for (int i = 0; i < morphsRemaining_.Length; ++i)
 				morphsRemaining_[i] = MaxMorphs;
+
+			morphsRemaining_[BP.Eyes.Int] = MaxEyeMorphs;
 		}
 
 		public float UseMorphs(BodyPartType[] bodyParts, float use)

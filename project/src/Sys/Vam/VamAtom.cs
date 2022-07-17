@@ -73,7 +73,7 @@ namespace Cue.Sys.Vam
 
 
 		public abstract void Destroy();
-		public abstract IMorph GetMorph(string id);
+		public abstract IMorph GetMorph(string id, float eyesClosed);
 		public abstract void Init();
 		public abstract void LateUpdate(float s);
 		public abstract void OnPluginState(bool b);
@@ -82,6 +82,7 @@ namespace Cue.Sys.Vam
 		public abstract void SetDefaultControls(string why);
 		public abstract void SetParentLink(IBodyPart bp);
 		public abstract void Update(float s);
+		public abstract string DebugString();
 
 		public abstract VamBodyPart RealBodyPart(VamBodyPart bp);
 	}
@@ -125,7 +126,10 @@ namespace Cue.Sys.Vam
 		private DAZCharacterSelector selector_ = null;
 		private VamBody body_ = null;
 		private VamHair hair_ = null;
+
 		private bool autoBlink_ = true;
+		private List<float> eyesClosed_ = new List<float>();
+		private float lastEyesClosed_ = 0;
 
 		private BoolParameter collisions_;
 		private BoolParameter physics_;
@@ -236,8 +240,17 @@ namespace Cue.Sys.Vam
 
 		public override bool AutoBlink
 		{
-			get { return autoBlink_; }
-			set { autoBlink_ = value; }
+			get
+			{
+				return autoBlink_;
+			}
+
+			set
+			{
+				autoBlink_ = value;
+				if (!value)
+					lastEyesClosed_ = 0;
+			}
 		}
 
 		public override IBody Body
@@ -466,9 +479,29 @@ namespace Cue.Sys.Vam
 		}
 
 
-		public void SetBlink(bool b)
+		public int AddEyesClosed()
 		{
-			blink_.Value = b;
+			eyesClosed_.Add(0);
+			return eyesClosed_.Count - 1;
+		}
+
+		public void SetEyesClosed(int i, float f)
+		{
+			eyesClosed_[i] = f;
+		}
+
+		private void CheckEyesClosed()
+		{
+			if (AutoBlink)
+			{
+				float f = 0;
+
+				for (int i = 0; i < eyesClosed_.Count; ++i)
+					f += eyesClosed_[i];
+
+				lastEyesClosed_ = f;
+				blink_.Value = (f < 0.5f);
+			}
 		}
 
 		void SetControllerForMoving(string id, bool b)
@@ -492,9 +525,9 @@ namespace Cue.Sys.Vam
 			SetControllerForMoving("rFootControl", b);
 		}
 
-		public override IMorph GetMorph(string name)
+		public override IMorph GetMorph(string name, float eyesClosed)
 		{
-			return new VamMorph(this, name);
+			return new VamMorph(this, name, eyesClosed);
 		}
 
 		public override void OnPluginState(bool b)
@@ -507,6 +540,7 @@ namespace Cue.Sys.Vam
 		{
 			hair_?.Update(s);
 			cd_.Update(s);
+			CheckEyesClosed();
 		}
 
 		public override void LateUpdate(float s)
@@ -543,6 +577,11 @@ namespace Cue.Sys.Vam
 		public override string ToString()
 		{
 			return ID;
+		}
+
+		public override string DebugString()
+		{
+			return $"eyesClosed={lastEyesClosed_:0.00}";
 		}
 
 		private void GetHead()

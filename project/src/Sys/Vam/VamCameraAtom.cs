@@ -393,7 +393,7 @@ namespace Cue.Sys.Vam
 		{
 		}
 
-		public override IMorph GetMorph(string id)
+		public override IMorph GetMorph(string id, float eyesClosed)
 		{
 			return null;
 		}
@@ -441,6 +441,11 @@ namespace Cue.Sys.Vam
 
 		public override void LateUpdate(float s)
 		{
+		}
+
+		public override string DebugString()
+		{
+			return "camera";
 		}
 
 		public bool HasCollider(Collider c)

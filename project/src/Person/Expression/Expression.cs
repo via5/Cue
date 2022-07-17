@@ -15,7 +15,7 @@
 			public override string ToString()
 			{
 				if (!valid)
-					return "-";
+					return "NA";
 
 				return $"{value:0.00}";
 			}
@@ -37,6 +37,7 @@
 
 		public struct Config
 		{
+			public float weight;
 			public bool exclusive;
 			public float minExcitement;
 			public bool maxOnly;
@@ -113,6 +114,11 @@
 				$"{target_.elapsed:0.00}/{target_.time:0.00}";
 		}
 
+		public MorphGroup MorphGroup
+		{
+			get { return g_; }
+		}
+
 		public string Name
 		{
 			get { return name_; }
@@ -126,6 +132,11 @@
 		public bool Exclusive
 		{
 			get { return config_.exclusive; }
+		}
+
+		public float DefaultWeight
+		{
+			get { return config_.weight; }
 		}
 
 		public BodyPartType[] BodyParts

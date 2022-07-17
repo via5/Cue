@@ -511,7 +511,7 @@ namespace Cue.Sys
 		IBody Body { get; }
 		IHair Hair { get; }
 
-		IMorph GetMorph(string id);
+		IMorph GetMorph(string id, float eyesClosed);
 
 		void SetDefaultControls(string why);
 		void SetParentLink(IBodyPart bp);
@@ -522,6 +522,8 @@ namespace Cue.Sys
 
 		void Update(float s);
 		void LateUpdate(float s);
+
+		string DebugString();
 	}
 
 	public interface IGraphic

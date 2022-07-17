@@ -169,7 +169,8 @@ namespace Cue.Sys.Vam
 		private DAZMorph m_;
 		private List<MorphInfo> subMorphs_ = new List<MorphInfo>();
 		private float multiplier_ = 1;
-		private bool eyes_ = false;
+		private int eyesIndex_ = -1;
+		private float eyesClosed_ = Morph.NoEyesClosed;
 
 		private int lastSetFrame_ = -1;
 		private float morphValueOnLastSet_ = -1;
@@ -178,7 +179,7 @@ namespace Cue.Sys.Vam
 
 		private static bool setFromCue_ = false;
 
-		public MorphInfo(VamAtom atom, string morphId, DAZMorph m)
+		public MorphInfo(VamAtom atom, string morphId, DAZMorph m, float eyesClosed)
 		{
 			atom_ = atom;
 			id_ = morphId;
@@ -190,7 +191,15 @@ namespace Cue.Sys.Vam
 				MorphValueHijack.Install(this);
 
 			if (morphId == "PHMEyesClosedR" || morphId == "PHMEyesClosedL")
-				eyes_ = true;
+			{
+				eyesIndex_ = atom_.AddEyesClosed();
+				eyesClosed_ = 1;
+			}
+			else if (Morph.HasEyesClosed(eyesClosed))
+			{
+				eyesIndex_ = atom_.AddEyesClosed();
+				eyesClosed_ = eyesClosed;
+			}
 		}
 
 		public static bool SetFromCue
@@ -334,6 +343,11 @@ namespace Cue.Sys.Vam
 			else
 				s += $"v={m_.morphValue:0.00} sub={subMorphs_.Count != 0}";
 
+			if (eyesIndex_ >= 0)
+				s += $" eyes={eyesIndex_}:{eyesClosed_:0.00}";
+			else
+				s += $" eyes=no";
+
 			return s;
 		}
 
@@ -345,8 +359,8 @@ namespace Cue.Sys.Vam
 
 				m_.morphValue = f;
 
-				if (eyes_ && atom_.AutoBlink)
-					atom_.SetBlink(f < 0.45f);
+				if (eyesIndex_ >= 0)
+					atom_.SetEyesClosed(eyesIndex_, f / eyesClosed_);
 			}
 			finally
 			{
@@ -362,7 +376,7 @@ namespace Cue.Sys.Vam
 				{
 					if (sm.targetType == DAZMorphFormulaTargetType.MorphValue)
 					{
-						var smm = VamMorphManager.Instance.Get(atom_, sm.target, m_.morphBank);
+						var smm = VamMorphManager.Instance.Get(atom_, sm.target, eyesClosed_, m_.morphBank);
 						smm.multiplier_ = sm.multiplier;
 						subMorphs_.Add(smm);
 					}
@@ -420,7 +434,7 @@ namespace Cue.Sys.Vam
 			return a;
 		}
 
-		public MorphInfo Get(VamAtom atom, string morphId, DAZMorphBank bank = null)
+		public MorphInfo Get(VamAtom atom, string morphId, float eyesClosed, DAZMorphBank bank = null)
 		{
 			string key = atom.ID + "/" + morphId;
 
@@ -438,7 +452,7 @@ namespace Cue.Sys.Vam
 			if (m == null)
 				Log.Error($"{atom.ID}: morph '{morphId}' not found");
 
-			mi = new MorphInfo(atom, morphId, m);
+			mi = new MorphInfo(atom, morphId, m, eyesClosed);
 			map_.Add(key, mi);
 
 			return mi;
@@ -456,13 +470,15 @@ namespace Cue.Sys.Vam
 	{
 		private VamAtom atom_;
 		private string name_;
+		private float eyesClosed_;
 		private MorphInfo morph_ = null;
 		private bool inited_ = false;
 
-		public VamMorph(VamAtom a, string name)
+		public VamMorph(VamAtom a, string name, float eyesClosed = Morph.NoEyesClosed)
 		{
 			atom_ = a;
 			name_ = name;
+			eyesClosed_ = eyesClosed;
 		}
 
 		public bool Valid
@@ -531,7 +547,7 @@ namespace Cue.Sys.Vam
 			if (inited_)
 				return;
 
-			morph_ = VamMorphManager.Instance.Get(atom_, name_);
+			morph_ = VamMorphManager.Instance.Get(atom_, name_, eyesClosed_);
 			if (morph_ == null)
 				atom_.Log.Error($"no morph '{name_}'");
 

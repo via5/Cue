@@ -21,6 +21,7 @@ namespace Cue
 		private VUI.Label speech_ = new VUI.Label();
 		private VUI.Label clothing_ = new VUI.Label();
 		private VUI.Label homing_ = new VUI.Label();
+		private VUI.Label atom_ = new VUI.Label();
 
 		private VUI.CheckBox forcePlayer_ = new VUI.CheckBox("Force as player");
 
@@ -83,6 +84,9 @@ namespace Cue
 			state.Add(new VUI.Label("Homing"));
 			state.Add(homing_);
 
+			state.Add(new VUI.Label("Atom"));
+			state.Add(atom_);
+
 
 			var buttons = new VUI.Panel(new VUI.VerticalFlow(10));
 			buttons.Add(forcePlayer_);
@@ -110,6 +114,7 @@ namespace Cue
 			speech_.Text = person_.Speech.ToString();
 			clothing_.Text = person_.Clothing.ToString();
 			homing_.Text = person_.Homing.ToString();
+			atom_.Text = person_.Atom.DebugString();
 
 			forcePlayer_.Checked = (Cue.Instance.ForcedPlayer == person_);
 		}

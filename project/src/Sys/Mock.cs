@@ -507,7 +507,7 @@ namespace Cue.Sys.Mock
 		{
 		}
 
-		public IMorph GetMorph(string id)
+		public IMorph GetMorph(string id, float eyesClosed)
 		{
 			return null;
 		}
@@ -539,6 +539,11 @@ namespace Cue.Sys.Mock
 
 		public void NavStop(string why)
 		{
+		}
+
+		public string DebugString()
+		{
+			return "mock";
 		}
 	}
 }
