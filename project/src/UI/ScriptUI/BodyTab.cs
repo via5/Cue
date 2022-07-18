@@ -85,9 +85,9 @@ namespace Cue
 				hasPenis_.Text = "no";
 			}
 
-			sweat_.Text = $"{person_.Atom.Body.Sweat:0.000000}";
-			flush_.Text = $"{person_.Atom.Body.Flush:0.000000}";
-			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.000000}";
+			sweat_.Text = $"{person_.Atom.Body.Sweat:0.00}";
+			flush_.Text = $"{person_.Atom.Body.Flush:0.00}";
+			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.00}";
 		}
 	}
 

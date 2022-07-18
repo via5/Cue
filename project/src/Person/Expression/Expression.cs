@@ -53,7 +53,7 @@
 		private MorphGroup g_;
 		private Config config_;
 		private TargetInfo target_;
-		private IEasing easing_ = new SinusoidalEasing();
+		private IEasing easing_ = new QuadInOutEasing();
 		private float value_ = 0;
 		private AutoInfo auto_ = new AutoInfo(0.1f, 0.5f, 2.0f);
 		private float add_ = 0;
