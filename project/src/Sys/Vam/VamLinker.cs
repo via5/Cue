@@ -55,7 +55,7 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			return $"{c_.transform.parent.name}.{c_.transform.name}";
+			return $"{BodyPart}:{U.QualifiedName(c_)}";
 		}
 	}
 

@@ -347,7 +347,11 @@ namespace Cue
 				if (link == null)
 					return null;
 
-				return person_.Body.Get(link.BodyPart.Type);
+				var p = Cue.Instance.PersonForAtom(link.BodyPart.Atom);
+				if (p == null)
+					return null;
+
+				return p.Body.Get(link.BodyPart.Type);
 			}
 		}
 

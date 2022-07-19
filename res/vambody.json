@@ -18,6 +18,10 @@
             "colliders":
 			[
                 "HeadHard1Hard",
+				"HeadHard3Hard",
+				"HeadHard5Hard",
+				"HeadHard7Hard",
+				"HeadHard8Hard",
                 "HeadHard10Hard",
                 "FaceCentral1Hard",
                 "TongueColliders/_Collider1",

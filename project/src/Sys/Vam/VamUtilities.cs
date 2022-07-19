@@ -465,6 +465,8 @@ namespace Cue.Sys.Vam
 				return "null";
 
 			string s = CleanedUp(t.name);
+			if (s == "")
+				s = t.name;
 
 			string ps = CleanedUp(t.parent.name);
 			if (ps == "")
