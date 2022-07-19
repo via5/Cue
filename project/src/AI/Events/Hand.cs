@@ -572,8 +572,8 @@
 				}
 
 				ulong key = BodyPartLock.NoKey;
-				if (hand.targetWeakLocks != null && hand.targetWeakLocks.Length > 0)
-					key = hand.targetWeakLocks[0].Key;
+				if (hand.targetStrongLocks != null && hand.targetStrongLocks.Length > 0)
+					key = hand.targetStrongLocks[0].Key;
 
 				if (BetterTarget(tentative, g, key))
 				{

@@ -9,7 +9,8 @@
 
 		private Person target_ = null;
 		private BodyPartLock[] sourceLocks_ = null;
-		private BodyPartLock[] targetLocks_ = null;
+		private BodyPartLock[] targetStrongLocks_ = null;
+		private BodyPartLock[] targetWeakLocks_ = null;
 		private bool hasForcedTrigger_ = false;
 		private bool wasGrabbed_;
 
@@ -35,10 +36,16 @@
 					debug.Add($"srcLock", sourceLocks_[i].ToString());
 			}
 
-			if (targetLocks_ != null)
+			if (targetStrongLocks_ != null)
 			{
-				for (int i = 0; i < targetLocks_.Length; ++i)
-					debug.Add($"tarLock", targetLocks_[i].ToString());
+				for (int i = 0; i < targetStrongLocks_.Length; ++i)
+					debug.Add($"tarStrLk", targetStrongLocks_[i].ToString());
+			}
+
+			if (targetWeakLocks_ != null)
+			{
+				for (int i = 0; i < targetWeakLocks_.Length; ++i)
+					debug.Add($"tarWkLk", targetWeakLocks_[i].ToString());
 			}
 		}
 
@@ -96,12 +103,20 @@
 				sourceLocks_ = null;
 			}
 
-			if (targetLocks_ != null)
+			if (targetStrongLocks_ != null)
 			{
-				for (int i = 0; i < targetLocks_.Length; ++i)
-					targetLocks_[i].Unlock();
+				for (int i = 0; i < targetStrongLocks_.Length; ++i)
+					targetStrongLocks_[i].Unlock();
 
-				targetLocks_ = null;
+				targetStrongLocks_ = null;
+			}
+
+			if (targetWeakLocks_ != null)
+			{
+				for (int i = 0; i < targetWeakLocks_.Length; ++i)
+					targetWeakLocks_[i].Unlock();
+
+				targetWeakLocks_ = null;
 			}
 		}
 
@@ -172,14 +187,26 @@
 				return false;
 			}
 
-			targetLocks_ = BodyPartLock.LockMany(
+			targetStrongLocks_ = BodyPartLock.LockMany(
 				t,
-				new BodyPartType[] { BP.Hips, BP.Penis },
+				new BodyPartType[] { BP.Penis },
 				BodyPartLock.Anim, "bj", BodyPartLock.Strong);
 
-			if (targetLocks_ == null)
+			if (targetStrongLocks_ == null)
 			{
-				Log.Error("failed to lock targets");
+				Log.Error("failed to lock strong targets");
+				Unlock();
+				return false;
+			}
+
+			targetWeakLocks_ = BodyPartLock.LockMany(
+				t,
+				new BodyPartType[] { BP.Hips },
+				BodyPartLock.Anim, "bj", BodyPartLock.Weak);
+
+			if (targetWeakLocks_ == null)
+			{
+				Log.Error("failed to lock weak targets");
 				Unlock();
 				return false;
 			}
@@ -220,7 +247,7 @@
 					{
 						if (!person_.Animator.PlayType(
 								AnimationType.Blowjob, new AnimationContext(
-									target_, targetLocks_[0].Key)))
+									target_, targetStrongLocks_[0].Key)))
 						{
 							return false;
 						}
@@ -244,7 +271,11 @@
 				{
 					Log.Verbose($"ok, {p} has penis");
 
-					if (!bp.LockedFor(BodyPartLock.Anim))
+					ulong key = BodyPartLock.NoKey;
+					if (targetStrongLocks_ != null && targetStrongLocks_.Length > 0)
+						key = targetStrongLocks_[0].Key;
+
+					if (!bp.LockedFor(BodyPartLock.Anim, key))
 					{
 						Log.Verbose($"ok, {p} is not locked");
 

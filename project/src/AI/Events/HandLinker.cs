@@ -151,7 +151,7 @@
 
 					if (lk == null)
 					{
-						Log.Info($"cannot link {info.Hand} to {close}, busy");
+						Log.Verbose($"cannot link {info.Hand} to {close}, busy");
 					}
 					else
 					{
