@@ -94,13 +94,7 @@ namespace Cue
 			var ps = person_.Personality;
 			var z = person_.Body.Zap;
 
-			// look at person zapping
-			float w = GetEyesWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
-			if (w >= 0)
-			{
-				targets_.SetWeight(
-					z.Source, BP.Eyes, w, $"self zapped by {z.Source}");
-			}
+			float w;
 
 			// look at body part being zapped
 			var targetPart = person_.Body.Zone(z.Zone).MainBodyPart;

@@ -56,12 +56,13 @@ namespace Cue
 			p.Add(new VUI.Label("Traits"));
 			p.Add(traits_);
 
-			p.Add(new VUI.Spacer());
-			p.Add(warning_);
+			var w = new VUI.Panel(new VUI.VerticalFlow(10));
+			w.Add(warning_);
 
 			Layout = new VUI.VerticalFlow(20);
 			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
 			Add(p);
+			Add(w);
 
 			personality_.SelectionChanged += OnPersonality;
 			traits_.Edited += OnTraits;
@@ -105,25 +106,27 @@ namespace Cue
 
 		private string MakeWarnings()
 		{
-			string s = person_.Homing.Warning;
+			string s = "";
 
-			if (person_.Voice.Warning != "")
-			{
-				if (s != "")
-					s += ", ";
-
-				s += person_.Voice.Warning;
-			}
-
-			if (person_.Atom.Warning != "")
-			{
-				if (s != "")
-					s += ", ";
-
-				s += person_.Atom.Warning;
-			}
+			AddWarning(ref s, person_.Homing.Warning);
+			AddWarning(ref s, person_.Voice.Warning);
+			AddWarning(ref s, person_.Atom.Warning);
+			AddWarning(ref s, ClockwiseHJAnimation.GetWarning(person_));
+			AddWarning(ref s, ClockwiseBJAnimation.GetWarning(person_));
+			AddWarning(ref s, ClockwiseKissAnimation.GetWarning(person_));
 
 			return s;
+		}
+
+		private void AddWarning(ref string s, string w)
+		{
+			if (w != "")
+			{
+				if (s != "")
+					s += "\n";
+
+				s += w;
+			}
 		}
 
 		private void RebuildPersonalities()

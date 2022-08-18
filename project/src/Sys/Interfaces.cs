@@ -20,26 +20,6 @@ namespace Cue.Sys
 	}
 
 
-	class LogLevels
-	{
-		public const int Error = 0;
-		public const int Warning = 1;
-		public const int Info = 2;
-		public const int Verbose = 3;
-
-		public static string ToShortString(int i)
-		{
-			switch (i)
-			{
-				case Error: return "E";
-				case Warning: return "W";
-				case Info: return "I";
-				case Verbose: return "V";
-				default: return $"?{i}";
-			}
-		}
-	}
-
 	public class FileInfo
 	{
 		public string path;

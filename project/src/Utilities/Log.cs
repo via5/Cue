@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Cue
 {
@@ -15,15 +16,24 @@ namespace Cue
 		public const int Sys = 0x100;
 		public const int Clothing = 0x200;
 		public const int Resources = 0x400;
+		public const int Main = 0x800;
 
 		public const int All = int.MaxValue;
 
+		public const int ErrorLevel = 0;
+		public const int WarningLevel = 1;
+		public const int InfoLevel = 2;
+		public const int VerboseLevel = 3;
+
 		private static int enabled_ =
 			Action | Event | AI | Command |
-			Object | Sys;
+			Object | Sys | Main;
+
+		private static Logger global_ = new Logger(Main, "cue");
 
 		private int type_;
 		private Func<string> prefix_;
+		private int level_ = InfoLevel;
 
 		public Logger(int type, string prefix)
 		{
@@ -49,9 +59,32 @@ namespace Cue
 			prefix_ = MakePrefix(a, prefix);
 		}
 
+		static public Logger Global
+		{
+			get { return global_; }
+		}
+
+		public int Level
+		{
+			get { return level_; }
+			set { level_ = value; }
+		}
+
 		public void Set(IObject o, string prefix)
 		{
 			prefix_ = MakePrefix(o, prefix);
+		}
+
+		public static string LevelToShortString(int i)
+		{
+			switch (i)
+			{
+				case ErrorLevel: return "E";
+				case WarningLevel: return "W";
+				case InfoLevel: return "I";
+				case VerboseLevel: return "V";
+				default: return $"?{i}";
+			}
 		}
 
 		private static Func<string> MakePrefix(IObject o, string prefix)
@@ -104,34 +137,49 @@ namespace Cue
 
 		public void Verbose(string s)
 		{
-			if (IsEnabled() && Cue.LogVerboseEnabled)
-				Cue.LogVerbose($"{Prefix}: {s}");
+			Log(VerboseLevel, s);
 		}
 
 		public void Info(string s)
 		{
-			if (IsEnabled())
-				Cue.LogInfo($"{Prefix}: {s}");
+			Log(InfoLevel, s);
 		}
 
 		public void Warning(string s)
 		{
-			Cue.LogWarning($"{Prefix}: {s}");
+			Log(WarningLevel, s);
 		}
 
 		public void Error(string s)
 		{
-			Cue.LogError($"{Prefix}: {s}");
+			Log(ErrorLevel, s);
 		}
 
 		public void ErrorST(string s)
 		{
-			Cue.LogErrorST($"{Prefix}: {s}");
+			Log(ErrorLevel, s + "\n" + new StackTrace(1).ToString());
 		}
 
-		private bool IsEnabled()
+		public void Log(int level, string s)
 		{
-			return Bits.IsSet(enabled_, type_);
+			if (IsEnabled(level))
+			{
+				if (Cue.Instance == null)
+					SuperController.LogError($"{Prefix}: {s}");
+				else
+					Cue.Instance.Sys.LogLines($"{Prefix}: {s}", level);
+			}
+		}
+
+		private bool IsEnabled(int level)
+		{
+			if (!Bits.IsSet(enabled_, type_))
+				return false;
+
+			if (level > level_)
+				return false;
+
+			return true;
 		}
 	}
 }

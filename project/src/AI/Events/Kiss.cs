@@ -78,7 +78,7 @@ namespace Cue
 
 			if (d.duration.Minimum < MinWait)
 			{
-				Cue.LogWarning(
+				Logger.Global.Warning(
 					$"kiss: duration minimum below hard minimum of " +
 					$"{MinWait}, overriding");
 
@@ -87,7 +87,7 @@ namespace Cue
 
 			if (d.wait.Minimum < MinWait)
 			{
-				Cue.LogWarning(
+				Logger.Global.Warning(
 					$"kiss: wait minimum below hard minimum of " +
 					$"{MinWait}, overriding");
 

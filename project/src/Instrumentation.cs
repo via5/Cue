@@ -231,13 +231,13 @@ namespace Cue
 
 			if (current_ < 0 || current_ >= stack_.Length)
 			{
-				Cue.LogErrorST($"bad current {current_}");
+				Logger.Global.ErrorST($"bad current {current_}");
 				Cue.Instance.DisablePlugin();
 			}
 
 			if (i.Int < 0 || i.Int >= tickers_.Length)
 			{
-				Cue.LogErrorST($"bad index {i}");
+				Logger.Global.ErrorST($"bad index {i}");
 				Cue.Instance.DisablePlugin();
 			}
 

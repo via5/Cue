@@ -13,6 +13,7 @@ namespace ClockwiseSilver {
 	public class BJ : MVRScript {
 		private const float GiveUpTime = 4;
 
+		public static string Version = "2";
 
 		private Atom her;
 		private Atom him;
@@ -27,6 +28,7 @@ namespace ClockwiseSilver {
 		private JSONStorableStringChooser maleChooserJSON;
 		private JSONStorableString infoString;
 		private UIDynamicTextField infoTextField;
+		private JSONStorableString version;
 
 		private float startRange, startSpeed, targetRange, targetSpeed, slerpScale = 0f;
 		private float frontBackTarget, frontBackCurrent, currentVolume, currentChance = 0f;
@@ -172,6 +174,9 @@ namespace ClockwiseSilver {
                 heading.height = 10f;
 				holdSpringPosJSON = Helpers.SetupSlider(this, "Hold Spring Pos", 4000f, 2000f, 10000f, true);
 				holdSpringRotJSON = Helpers.SetupSlider(this, "Hold Spring Rot", 400f, 200f, 1000f, true);
+
+				version = new JSONStorableString("version", Version);
+				RegisterString(version);
 			}
 			catch (Exception e) {
 				SuperController.LogError("Init Exception caught: " + e);

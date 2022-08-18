@@ -239,5 +239,10 @@ namespace Cue
 
 			return debug_.MakeArray();
 		}
+
+		public override string ToString()
+		{
+			return provider_.ToString();
+		}
 	}
 }

@@ -2,6 +2,9 @@
 {
 	class ClockwiseKissAnimation : BuiltinAnimation
 	{
+		private const string PluginName = "ClockwiseSilver.Kiss";
+		private const string PluginVersion = "2";
+
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
 		private Sys.Vam.BoolParameter active_ = null;
@@ -39,7 +42,10 @@
 		private const float TrackingSpeedTime = 3;
 
 		private string[] targetStorableCache_ =
-			Sys.Vam.Parameters.MakeStorableNamesCache("ClockwiseSilver.Kiss");
+			Sys.Vam.Parameters.MakeStorableNamesCache(PluginName);
+
+		private static CWVersionChecker versionChecker_ =
+			new CWVersionChecker(PluginName, PluginVersion);
 
 
 		public ClockwiseKissAnimation()
@@ -47,9 +53,14 @@
 		{
 		}
 
+		public static string GetWarning(Person p)
+		{
+			return versionChecker_.GetWarning(p);
+		}
+
 		public override void Reset(Person p)
 		{
-			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.Kiss", "isActive");
+			var active = new Sys.Vam.BoolParameter(p, PluginName, "isActive");
 			active.Value = false;
 		}
 
@@ -141,13 +152,13 @@
 		private bool TargetIsLeading(Person target)
 		{
 			var active = Sys.Vam.Parameters.GetBool(
-				target.VamAtom.Atom, "ClockwiseSilver.Kiss", "isActive",
+				target.VamAtom.Atom, PluginName, "isActive",
 				targetStorableCache_);
 
 			if (active != null && active.val)
 			{
 				var trackPos = Sys.Vam.Parameters.GetBool(
-					target.VamAtom.Atom, "ClockwiseSilver.Kiss", "trackPosition",
+					target.VamAtom.Atom, PluginName, "trackPosition",
 					targetStorableCache_);
 
 				if (trackPos != null)
@@ -162,49 +173,49 @@
 			log_ = new Logger(Logger.Integration, p, "cwkiss");
 
 			enabled_ = new Sys.Vam.BoolParameter(
-				p, "ClockwiseSilver.Kiss", "enabled");
+				p, PluginName, "enabled");
 
 			active_ = new Sys.Vam.BoolParameter(
-				p, "ClockwiseSilver.Kiss", "isActive");
+				p, PluginName, "isActive");
 
 			running_ = new Sys.Vam.BoolParameterRO(
-				p, "ClockwiseSilver.Kiss", "Is Kissing");
+				p, PluginName, "Is Kissing");
 
 			atom_ = new Sys.Vam.StringChooserParameter(
-				p, "ClockwiseSilver.Kiss", "atom");
+				p, PluginName, "atom");
 
 			target_ = new Sys.Vam.StringChooserParameter(
-				p, "ClockwiseSilver.Kiss", "kissTargetJSON");
+				p, PluginName, "kissTargetJSON");
 
 			trackPos_ = new Sys.Vam.BoolParameter(
-				p, "ClockwiseSilver.Kiss", "trackPosition");
+				p, PluginName, "trackPosition");
 
 			trackRot_ = new Sys.Vam.BoolParameter(
-				p, "ClockwiseSilver.Kiss", "trackRotation");
+				p, PluginName, "trackRotation");
 
 			headAngleX_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Head Angle X");
+				p, PluginName, "Head Angle X");
 
 			headAngleY_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Head Angle Y");
+				p, PluginName, "Head Angle Y");
 
 			headAngleZ_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Head Angle Z");
+				p, PluginName, "Head Angle Z");
 
 			lipDepth_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Lip Depth");
+				p, PluginName, "Lip Depth");
 
 			morphDuration_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Morph Duration");
+				p, PluginName, "Morph Duration");
 
 			morphSpeed_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Morph Speed");
+				p, PluginName, "Morph Speed");
 
 			trackingSpeed_ = new Sys.Vam.FloatParameter(
-				p, "ClockwiseSilver.Kiss", "Tracking Speed");
+				p, PluginName, "Tracking Speed");
 
 			closeEyes_ = new Sys.Vam.BoolParameter(
-				p, "ClockwiseSilver.Kiss", "closeEyes");
+				p, PluginName, "closeEyes");
 
 			active_.Value = false;
 		}

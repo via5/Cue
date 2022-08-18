@@ -231,7 +231,7 @@ namespace Cue.Proc
 
 			if (doc == null)
 			{
-				Cue.LogError($"failed to parse proc animation file '{file}'");
+				Logger.Global.Error($"failed to parse proc animation file '{file}'");
 				return null;
 			}
 
@@ -250,7 +250,7 @@ namespace Cue.Proc
 			}
 			catch (LoadFailed e)
 			{
-				Cue.LogError($"{file}: {e.Message}");
+				Logger.Global.Error($"{file}: {e.Message}");
 				return null;
 			}
 		}
@@ -267,7 +267,7 @@ namespace Cue.Proc
 
 				default:
 				{
-					Cue.LogInfo($"bad target type '{type}'");
+					Logger.Global.Info($"bad target type '{type}'");
 					return null;
 				}
 			}

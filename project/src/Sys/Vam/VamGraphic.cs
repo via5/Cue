@@ -518,11 +518,14 @@ namespace Cue.Sys.Vam
 
 			public ColliderRender(Collider c)
 			{
+				if (c == null)
+					Logger.Global.ErrorST($"null collider");
+
 				cc_ = c as CapsuleCollider;
 				sc_ = c as SphereCollider;
 
 				if (cc_ == null && sc_ == null)
-					Cue.LogError($"collider {c} not a capsule or sphere collider");
+					Logger.Global.Error($"collider {c} not a capsule or sphere collider");
 
 				parent_ = new GameObject().transform;
 				parent_.SetParent(Cue.Instance.VamSys.RootTransform, false);

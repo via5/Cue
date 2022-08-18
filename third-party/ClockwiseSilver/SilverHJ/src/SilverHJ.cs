@@ -13,6 +13,7 @@ namespace ClockwiseSilver {
 	public class HJ : MVRScript {
 		private const float GiveUpTime = 4;
 
+		public static string Version = "2";
 
 		private Atom her;
 		private Atom him;
@@ -26,6 +27,7 @@ namespace ClockwiseSilver {
 		private JSONStorable ejPlugin;
 		private JSONStorableBool isHJRoutine;
 		private UIDynamicPopup handPopup;
+		private JSONStorableString version;
 
 		private float startRange, startSpeed, targetRange, targetSpeed, slerpScale, knuckleDistance = 0f;
 		private float randomRotZ, randomRotTarget, randomRotX, frontBackTarget, frontBackCurrent = 0f;
@@ -181,6 +183,9 @@ namespace ClockwiseSilver {
 
 				frontBackOutputJSON = new JSONStorableFloat("frontBackOutput", 0f, 0f, 1f, true, true);
 				RegisterFloat(frontBackOutputJSON);
+
+				version = new JSONStorableString("version", Version);
+				RegisterString(version);
 			}
 			catch (Exception e) {
 				SuperController.LogError("Init Exception caught: " + e);

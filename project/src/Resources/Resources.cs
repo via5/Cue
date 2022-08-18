@@ -51,9 +51,9 @@ namespace Cue
 			var fileMap = new Dictionary<string, ResourceFile>();
 			var files = Cue.Instance.Sys.GetFiles(rootPath, pattern);
 
-			Cue.LogVerbose("found files:");
+			Logger.Global.Verbose("found files:");
 			foreach (var f in files)
-				Cue.LogVerbose($"  - {f}");
+				Logger.Global.Verbose($" - {f}");
 
 			foreach (var f in files)
 			{
@@ -63,7 +63,7 @@ namespace Cue
 
 				ResourceFile existing;
 				if (fileMap.TryGetValue(rf.name.ToLower(), out existing))
-					Cue.LogVerbose($"ignoring {rf.path}, overriden by {existing.path}");
+					Logger.Global.Verbose($"ignoring {rf.path}, overriden by {existing.path}");
 				else
 					fileMap.Add(rf.name.ToLower(), rf);
 			}
@@ -91,7 +91,7 @@ namespace Cue
 
 			if (doc == null)
 			{
-				Cue.LogError($"failed to parse file {f.path}");
+				Logger.Global.Error($"failed to parse file {f.path}");
 				return null;
 			}
 

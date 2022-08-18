@@ -64,9 +64,9 @@ namespace Cue
 				vr_ = vr;
 
 				if (vr_)
-					Cue.LogInfo("switched to vr");
+					Logger.Global.Info("switched to vr");
 				else
-					Cue.LogInfo("switched to desktop");
+					Logger.Global.Info("switched to desktop");
 
 				DestroyUI();
 				CreateUI();
@@ -88,7 +88,7 @@ namespace Cue
 
 		private void CreateUI()
 		{
-			Cue.LogInfo("creating ui");
+			Logger.Global.Info("creating ui");
 
 			if (vr_ || VRMenuDebug)
 				menu_ = new VRMenu(VRMenuDebug);
@@ -98,7 +98,7 @@ namespace Cue
 
 		private void DestroyUI()
 		{
-			Cue.LogInfo("destroying ui");
+			Logger.Global.Info("destroying ui");
 			menu_?.Destroy();
 		}
 

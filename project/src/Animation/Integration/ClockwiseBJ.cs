@@ -2,6 +2,9 @@
 {
 	class ClockwiseBJAnimation : BuiltinAnimation
 	{
+		private const string PluginName = "ClockwiseSilver.BJ";
+		private const string PluginVersion = "2";
+
 		private Logger log_;
 		private Person target_ = null;
 
@@ -16,14 +19,22 @@
 
 		private bool wasActive_ = false;
 
+		private static CWVersionChecker versionChecker_ =
+			new CWVersionChecker(PluginName, PluginVersion);
+
 		public ClockwiseBJAnimation()
 			: base("cwBJ")
 		{
 		}
 
+		public static string GetWarning(Person p)
+		{
+			return versionChecker_.GetWarning(p);
+		}
+
 		public override void Reset(Person p)
 		{
-			var active = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
+			var active = new Sys.Vam.BoolParameter(p, PluginName, "isActive");
 			active.Value = false;
 		}
 
@@ -138,14 +149,14 @@
 		private void Init(Person p)
 		{
 			log_ = new Logger(Logger.Integration, p, "cwbj");
-			enabled_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "enabled");
-			active_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "isActive");
-			doReturn_ = new Sys.Vam.BoolParameter(p, "ClockwiseSilver.BJ", "doReturn");
-			running_ = new Sys.Vam.BoolParameterRO(p, "ClockwiseSilver.BJ", "isBJRoutine");
-			male_ = new Sys.Vam.StringChooserParameter(p, "ClockwiseSilver.BJ", "Atom");
-			moanVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Moan Volume");
-			sfxVolume_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "SFX Volume");
-			speed_ = new Sys.Vam.FloatParameter(p, "ClockwiseSilver.BJ", "Overall Speed");
+			enabled_ = new Sys.Vam.BoolParameter(p, PluginName, "enabled");
+			active_ = new Sys.Vam.BoolParameter(p, PluginName, "isActive");
+			doReturn_ = new Sys.Vam.BoolParameter(p, PluginName, "doReturn");
+			running_ = new Sys.Vam.BoolParameterRO(p, PluginName, "isBJRoutine");
+			male_ = new Sys.Vam.StringChooserParameter(p, PluginName, "Atom");
+			moanVolume_ = new Sys.Vam.FloatParameter(p, PluginName, "Moan Volume");
+			sfxVolume_ = new Sys.Vam.FloatParameter(p, PluginName, "SFX Volume");
+			speed_ = new Sys.Vam.FloatParameter(p, PluginName, "Overall Speed");
 
 			active_.Value = false;
 

@@ -217,7 +217,7 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 
 			foreach (MoodType i in MoodType.Values)
-				AddForceable(p, person_.Mood.GetDebugValue(i), $"    {MoodType.ToString(i)}");
+				AddForceable(p, person_.Mood.GetValue(i), $"    {MoodType.ToString(i)}");
 
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));

@@ -263,6 +263,7 @@
 			"name": "AAsex_browhiAA6",
 			"moods": "excited",
 			"bodyParts": "mouth eyes",
+			"sex": "female",
 			"weight": 0.5,
 			"morphs":
 			[
@@ -277,6 +278,7 @@
 		{
 			"name": "AAsex_closedAA1",
 			"moods": "excited",
+			"sex": "female",
 			"bodyParts": "mouth eyes",
 			"weight": 0.5,
 			"morphs":
@@ -409,7 +411,7 @@
 		{
 			"type": "kiss",
 			"startLipsDistance": 0.1,
-			"startLipsDistanceWithPlayer": 0.15,
+			"startLipsDistanceWithPlayer": 0.1,
 			"stopLipsDistance": 0.1,
 			"stopLipsDistanceWithPlayer": 0.15,
 			"stopHeadDistanceFromStart": 0.15,
@@ -535,7 +537,7 @@
 
 	"zappedByPlayerBreastsEyesWeight": 50,
 	"zappedByPlayerBreastsTargetWeight": 10,
-	"zappedByPlayerBreastsExcitement": 0.4,
+	"zappedByPlayerBreastsExcitement": 0.0,
 	"zappedByPlayerGenitalsEyesWeight": 50,
 	"zappedByPlayerGenitalsTargetWeight": 10,
 	"zappedByPlayerGenitalsExcitement": 0.7,
@@ -543,13 +545,13 @@
 	"zappedByPlayerPenetrationTargetWeight": 10,
 	"zappedByPlayerPenetrationExcitement": 0.95,
 	"zappedByPlayerMouthEyesWeight": 20,
-	"zappedByPlayerMouthExcitement": 0.3,
+	"zappedByPlayerMouthExcitement": 0,
 	"zappedByPlayerLookUpWeight": 5,
 	"zappedByPlayerGazeDuration": [0.5, 0.3],
 
 	"zappedByOtherBreastsEyesWeight": 20,
 	"zappedByOtherBreastsTargetWeight": 5,
-	"zappedByOtherBreastsExcitement": 0.3,
+	"zappedByOtherBreastsExcitement": 0.0,
 	"zappedByOtherGenitalsEyesWeight": 20,
 	"zappedByOtherGenitalsTargetWeight": 5,
 	"zappedByOtherGenitalsExcitement": 0.5,
@@ -557,7 +559,7 @@
 	"zappedByOtherPenetrationTargetWeight": 5,
 	"zappedByOtherPenetrationExcitement": 0.7,
 	"zappedByOtherMouthEyesWeight": 5,
-	"zappedByOtherMouthExcitement": 0.3,
+	"zappedByOtherMouthExcitement": 0,
 	"zappedByOtherLookUpWeight": 5,
 	"zappedByOtherGazeDuration": [0.6, 0.4],
 

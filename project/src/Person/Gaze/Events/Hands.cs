@@ -57,9 +57,12 @@ namespace Cue
 			}
 			else
 			{
-				targets_.SetWeight(
-					t, BP.Eyes,
-					ps.Get(PS.HandjobEyesWeight), "handevent");
+				if (t != person_)
+				{
+					targets_.SetWeight(
+						t, BP.Eyes,
+						ps.Get(PS.HandjobEyesWeight), "handevent");
+				}
 
 				targets_.SetWeight(
 					t, t.Body.GenitalsBodyPart,

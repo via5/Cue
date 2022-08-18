@@ -38,7 +38,7 @@ namespace Cue
 			}
 			catch (Exception e)
 			{
-				Cue.LogError("failed to load custom menu, " + e.ToString());
+				Logger.Global.Error("failed to load custom menu, " + e.ToString());
 				return null;
 			}
 		}
@@ -223,7 +223,7 @@ namespace Cue
 		{
 			if (!menus_.Contains(m))
 			{
-				Cue.LogError($"custom menu '{m.Caption}' not found");
+				Logger.Global.Error($"custom menu '{m.Caption}' not found");
 				return;
 			}
 

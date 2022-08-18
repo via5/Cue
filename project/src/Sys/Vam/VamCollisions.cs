@@ -17,14 +17,14 @@ namespace Cue.Sys.Vam
 			var rb = FindRigidbody(c);
 			if (rb == null)
 			{
-				Cue.LogError($"{U.QualifiedName(c)} has no rigidbody");
+				Logger.Global.Error($"{U.QualifiedName(c)} has no rigidbody");
 				return null;
 			}
 
 			var ch = rb.gameObject.AddComponent<CueCollisionHandler>();
 			if (ch == null)
 			{
-				Cue.LogError($"failed to add handler to collider {U.QualifiedName(c)}");
+				Logger.Global.Error($"failed to add handler to collider {U.QualifiedName(c)}");
 				return null;
 			}
 
@@ -34,7 +34,7 @@ namespace Cue.Sys.Vam
 				ch.person_ = Cue.Instance.PersonForAtom(ch.bp_.Atom);
 
 				if (ch.person_ == null)
-					Cue.LogErrorST($"CueCollisionHandler: bp atom {ch.bp_.Atom} not found for {bp} ({U.QualifiedName(c)})");
+					Logger.Global.ErrorST($"CueCollisionHandler: bp atom {ch.bp_.Atom} not found for {bp} ({U.QualifiedName(c)})");
 			}
 
 			ch.sys_ = Cue.Instance.VamSys;
@@ -223,14 +223,14 @@ namespace Cue.Sys.Vam
 			var sourceIndex = sourcePerson?.PersonIndex ?? -1;
 			if (sourceIndex < 0)
 			{
-				Cue.LogError($"no source index");
+				Logger.Global.Error($"no source index");
 				return;
 			}
 
 			var targetPart = bp_;
 			if (targetPart == null)
 			{
-				Cue.LogError($"no target part");
+				Logger.Global.Error($"no target part");
 				return;
 			}
 

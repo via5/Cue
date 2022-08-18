@@ -67,7 +67,7 @@ namespace Cue.Sys.Mock
 		public void LogLines(string s, int level)
 		{
 			foreach (var line in s.Split('\n'))
-				Console.WriteLine("[" + LogLevels.ToShortString(level) + "] " + s);
+				Console.WriteLine("[" + Logger.LevelToShortString(level) + "] " + s);
 		}
 
 		public IInput Input
@@ -471,7 +471,7 @@ namespace Cue.Sys.Mock
 
 		public void Say(string s)
 		{
-			Cue.LogInfo(id_ + " says '" + s + "'");
+			Logger.Global.Info(id_ + " says '" + s + "'");
 		}
 
 		public List<IBodyPart> GetBodyParts()

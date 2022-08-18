@@ -9,6 +9,8 @@ namespace ClockwiseSilver {
 	public class Kiss : MVRScript {
 		private const float GiveUpTime = 4;
 
+		public static string Version = "2";
+
 		private FreeControllerV3 headControl;
         private Rigidbody lipTrigger, headRB, chestRB, targetBody;
 		private Transform targetBodyTransform, targetTransform, camTransform;
@@ -50,6 +52,7 @@ namespace ClockwiseSilver {
 		private float triggerOutDistance = 0.25f;
 		private float upDownStart, upDownTarget, upDownCurrent = 0f;
 		private float frontBackStart, frontBackTarget, frontBackCurrent = 0f;
+		private JSONStorableString version;
 
 
 		public override void Init() {
@@ -231,6 +234,9 @@ namespace ClockwiseSilver {
 
 				var btn = CreateButton("Reset Morphs", false);
                 btn.button.onClick.AddListener(() => { ZeroMorphs(); });
+
+				version = new JSONStorableString("version", Version);
+				RegisterString(version);
 			}
 			catch (Exception e) {
 				SuperController.LogError("Exception caught: " + e);

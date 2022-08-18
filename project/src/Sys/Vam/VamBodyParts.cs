@@ -250,7 +250,7 @@ namespace Cue.Sys.Vam
 				foreach (var c in regions_)
 				{
 					var cc = c as VamColliderRegion;
-					if (cc != null)
+					if (cc?.Collider != null)
 						AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(cc.Collider));
 				}
 			}

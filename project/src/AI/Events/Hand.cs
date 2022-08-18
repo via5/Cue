@@ -53,6 +53,11 @@
 						debug.Add($"{name} tarWkLk", targetWeakLocks[i].ToString());
 				}
 			}
+
+			public override string ToString()
+			{
+				return $"{name}, {bp}";
+			}
 		}
 
 		// double hj is disabled for now, cwhj doesn't work very well, and
@@ -155,20 +160,13 @@
 
 		private bool TargetsForDouble(BodyPart left, BodyPart right)
 		{
-#pragma warning disable 0162
-			if (EnableDoubleHJ)
-			{
-				if (left == null || right == null)
-					return false;
+			if (left == null || right == null)
+				return false;
 
-				if (left.Type != BP.Penis || right.Type != BP.Penis)
-					return false;
+			if (left.Type != BP.Penis || right.Type != BP.Penis)
+				return false;
 
-				return (left.Person == right.Person);
-			}
-#pragma warning restore 0162
-
-			return false;
+			return (left.Person == right.Person);
 		}
 
 		private void Check(
@@ -178,6 +176,18 @@
 			var leftTarget = FindTarget(left_, maxDistance);
 			var rightTarget = FindTarget(right_, maxDistance);
 
+
+			if (leftTarget == null)
+				Log.Verbose("no left target");
+			else
+				Log.Verbose($"left target: {leftTarget}");
+
+			if (rightTarget == null)
+				Log.Verbose("no right target");
+			else
+				Log.Verbose($"right target: {rightTarget}");
+
+
 			if (leftTarget == null && rightTarget == null)
 			{
 				Stop(stopFlags);
@@ -185,7 +195,7 @@
 				return;
 			}
 
-			if (TargetsForDouble(leftTarget, rightTarget))
+			if (TargetsForDouble(leftTarget, rightTarget) && EnableDoubleHJ)
 			{
 				Log.Verbose("check found double targets");
 				Stop(stopFlags);
@@ -223,6 +233,10 @@
 						else if (rightTarget.Type == BP.Vagina)
 							StartFinger(right_, rightTarget);
 					}
+					else
+					{
+						Log.Verbose("canStartRight false");
+					}
 				}
 
 				if (leftTarget == null)
@@ -241,7 +255,7 @@
 						// this can happen if double hj is disabled; since cwhj
 						// doesn't support two hands on two different persons,
 						// this is forbidden
-						if (rightTarget == null)
+						if (rightTarget == null || !TargetsForDouble(leftTarget, rightTarget))
 						{
 							Log.Verbose($"new left target {leftTarget}");
 
@@ -252,6 +266,14 @@
 							else if (leftTarget.Type == BP.Vagina)
 								StartFinger(left_, leftTarget);
 						}
+						else
+						{
+							Log.Verbose("has both left and right targets, can't work");
+						}
+					}
+					else
+					{
+						Log.Verbose("canStartLeft false");
 					}
 				}
 			}
@@ -563,11 +585,18 @@
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
 				var g = p.Body.Get(p.Body.GenitalsBodyPart);
+
+				if (!g.Exists)
+				{
+					Log.Verbose($"{g} doesn't exist");
+					continue;
+				}
+
 				var d = hand.bp.DistanceToSurface(g);
 
 				if (d > maxDistance)
 				{
-					Log.Verbose($"{g} too far {d}");
+					Log.Verbose($"{g} too far, {d:0.000} > {maxDistance:0.000}");
 					continue;
 				}
 
@@ -583,12 +612,19 @@
 					}
 					else if (d < tentativeDistance)
 					{
-						Log.Verbose($"{g} better target");
+						Log.Verbose(
+							$"{g} better target, " +
+							$"distance {d:0.000} < " +
+							$"{(tentativeDistance == float.MaxValue ? "(max)" : $"{tentativeDistance:0.000}")}");
+
 						tentative = g;
 					}
 					else
 					{
-						Log.Verbose($"{g} is farther than {tentative}");
+						Log.Verbose(
+							$"{g} is farther than {tentative} " +
+							"({d:0.000} >= " +
+							$"{(tentativeDistance == float.MaxValue ? "(max)" : $"{tentativeDistance:0.000}")}");
 					}
 				}
 			}

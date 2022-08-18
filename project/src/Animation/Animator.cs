@@ -28,7 +28,7 @@ namespace Cue
 					return a;
 			}
 
-			Cue.LogError($"builtin animation '{name}' not found");
+			Logger.Global.Error($"builtin animation '{name}' not found");
 
 			return null;
 		}

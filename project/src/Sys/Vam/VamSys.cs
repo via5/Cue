@@ -103,11 +103,11 @@ namespace Cue.Sys.Vam
 		public void LogLines(string s, int level)
 		{
 			var t = DateTime.Now.ToString("hh:mm:ss.fff");
-			string p = LogLevels.ToShortString(level);
+			string p = Logger.LevelToShortString(level);
 
 			foreach (var line in s.Split('\n'))
 			{
-				if (level == LogLevels.Error)
+				if (level == Logger.ErrorLevel)
 					SuperController.LogError($"{t} !![{p}] {line}");
 				else
 					SuperController.LogError($"{t}   [{p}] {line}");

@@ -150,7 +150,7 @@ namespace Cue
 			else if (s == "")
 				return Any;
 
-			Cue.LogError("bad style value '" + os + "'");
+			Logger.Global.Error("bad style value '" + os + "'");
 			return Any;
 		}
 
@@ -349,7 +349,7 @@ namespace Cue
 
 			w_.Stop();
 			float ms = (float)((((double)w_.ElapsedTicks) / Stopwatch.Frequency) * 1000);
-			Cue.LogError($"{what}: {ms:0.00} ms");
+			Logger.Global.Error($"{what}: {ms:0.00} ms");
 		}
 	}
 

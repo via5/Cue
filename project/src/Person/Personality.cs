@@ -79,7 +79,7 @@ namespace Cue
 			Person p = Cue.Instance.FindPerson(s);
 			if (p == null)
 			{
-				Cue.LogError($"specific modifier: cannot resolve '{s}'");
+				Logger.Global.Error($"specific modifier: cannot resolve '{s}'");
 				return Any;
 			}
 

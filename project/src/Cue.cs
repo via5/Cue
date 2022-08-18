@@ -11,6 +11,7 @@ namespace Cue
 	{
 		private static Cue instance_ = null;
 
+		private Logger log_;
 		private Options options_;
 		private float saveElapsed_ = 0;
 		private bool needSave_ = false;
@@ -42,13 +43,16 @@ namespace Cue
 		public Cue()
 		{
 			instance_ = this;
-			LogVerbose("cue: ctor");
+			log_ = new Logger(Logger.Main, "cue");
+			Log.Verbose("cue: ctor");
 
 			options_ = new Options();
 			saver_ = Sys.CreateLiveSaver();
 		}
 
 		public static Cue Instance { get { return instance_; } }
+
+		public Logger Log { get { return log_; } }
 
 		public Sys.ISys Sys { get { return CueMain.Instance.Sys; } }
 		public Sys.Vam.VamSys VamSys { get { return Sys as Sys.Vam.VamSys; } }
@@ -132,9 +136,9 @@ namespace Cue
 			set
 			{
 				if (value == null)
-					LogInfo($"unforcing player");
+					Log.Info($"unforcing player");
 				else
-					LogInfo($"forcing player to {value}");
+					Log.Info($"forcing player to {value}");
 
 				forcedPlayer_ = value;
 			}
@@ -185,52 +189,52 @@ namespace Cue
 		public void Init()
 		{
 			var start = Sys.RealtimeSinceStartup;
-			LogVerbose($"cue: init (token {CueMain.Instance.Token})");
+			Log.Verbose($"cue: init (token {CueMain.Instance.Token})");
 
 			Sys.Init();
 
 			VUI.Root.Init(
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
-				(s) => LogVerbose(s),
-				(s) => LogInfo(s),
-				(s) => LogWarning(s),
-				(s) => LogError(s));
+				(s) => Log.Verbose(s),
+				(s) => Log.Info(s),
+				(s) => Log.Warning(s),
+				(s) => Log.Error(s));
 
 
-			LogVerbose("cue: loading resources");
+			Log.Verbose("cue: loading resources");
 			Resources.LoadAll();
 
-			LogVerbose("cue: finding objects");
+			Log.Verbose("cue: finding objects");
 			FindObjects();
 
-			LogVerbose("cue: initializing persons");
+			Log.Verbose("cue: initializing persons");
 			InitPersons();
 
 			if (Sys.HasUI)
 				ui_ = new UI(Sys);
 
-			LogVerbose("cue: enabling plugin state");
+			Log.Verbose("cue: enabling plugin state");
 			OnPluginState(true);
 
-			LogVerbose("cue: checking config");
+			Log.Verbose("cue: checking config");
 			CheckConfig();
 
 			if (Sys.GetAtom("cue!test") != null)
 			{
 				try
 				{
-					LogVerbose("cue: test stuff");
+					Log.Verbose("cue: test stuff");
 					test();
 				}
 				catch (Exception e)
 				{
-					LogError("cue: test stuff failed, " + e.ToString());
+					Log.Error("cue: test stuff failed, " + e.ToString());
 				}
 			}
 
 			var end = Cue.Instance.Sys.RealtimeSinceStartup;
-			LogInfo($"cue: running, version {Version.String}, init {(end - start):0.00}s");
+			Log.Info($"cue: running, version {Version.String}, init {(end - start):0.00}s");
 		}
 
 		public bool IsSceneIdle()
@@ -543,7 +547,7 @@ namespace Cue
 		{
 			if (player_ != null && !player_.Possessed)
 			{
-				LogInfo($"{player_} no longer possessed");
+				Log.Info($"{player_} no longer possessed");
 				SetPlayer(null);
 			}
 
@@ -554,7 +558,7 @@ namespace Cue
 					var p = persons_[i];
 					if (p.Possessed)
 					{
-						LogInfo($"{p} now possessed");
+						Log.Info($"{p} now possessed");
 						SetPlayer(p);
 						break;
 					}
@@ -580,7 +584,7 @@ namespace Cue
 
 		public void OnPluginState(bool b)
 		{
-			LogVerbose($"cue: plugin state {b}");
+			Log.Verbose($"cue: plugin state {b}");
 
 			Sys.OnPluginState(b);
 			ui_?.OnPluginState(b);
@@ -588,62 +592,7 @@ namespace Cue
 			for (int i = 0; i < everythingActive_.Count; ++i)
 				everythingActive_[i].OnPluginState(b);
 
-			LogVerbose($"cue: plugin state {b} finished");
-		}
-
-		static public bool LogVerboseEnabled
-		{
-			get { return false; }
-		}
-
-		static public void LogVerbose(string s)
-		{
-			if (LogVerboseEnabled)
-			{
-				if (Instance == null)
-					SuperController.LogError(s);
-				else
-					Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Verbose);
-			}
-		}
-
-		static public void LogInfo(string s)
-		{
-			if (Instance == null)
-				SuperController.LogError(s);
-			else
-				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Info);
-		}
-
-		static public void LogWarning(string s)
-		{
-			if (Instance == null)
-				SuperController.LogError(s);
-			else
-				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Warning);
-		}
-
-		static public void LogError(string s)
-		{
-			if (Instance == null)
-				SuperController.LogError(s);
-			else
-				Instance.Sys.LogLines(s, global::Cue.Sys.LogLevels.Error);
-		}
-
-		static public void LogErrorST(string s)
-		{
-			if (Instance == null)
-			{
-				SuperController.LogError(
-					s + "\n" + new StackTrace(1).ToString());
-			}
-			else
-			{
-				Instance.Sys.LogLines(
-					s + "\n" + new StackTrace(1).ToString(),
-					global::Cue.Sys.LogLevels.Error);
-			}
+			Log.Verbose($"cue: plugin state {b} finished");
 		}
 
 		static public void Assert(bool b, string s = null)

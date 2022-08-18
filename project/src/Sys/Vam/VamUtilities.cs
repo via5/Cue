@@ -174,7 +174,7 @@ namespace Cue.Sys.Vam
 				{
 					var cc = t.GetComponent<Collider>();
 					if (cc == null)
-						Cue.LogError($"FindCollider: found {pathstring}, but not a collider");
+						Logger.Global.Error($"FindCollider: found {pathstring}, but not a collider");
 
 					return cc;
 				}
@@ -195,7 +195,7 @@ namespace Cue.Sys.Vam
 				var check = c.transform.parent;
 				if (check == null)
 				{
-					Cue.LogInfo("parent is not a collider");
+					Logger.Global.Info("parent is not a collider");
 					return null;
 				}
 
@@ -214,7 +214,7 @@ namespace Cue.Sys.Vam
 					check = check.parent;
 					if (check == null)
 					{
-						Cue.LogInfo("parent is not a collider");
+						Logger.Global.Info("parent is not a collider");
 						okay = false;
 						break;
 					}
@@ -353,7 +353,7 @@ namespace Cue.Sys.Vam
 					s += "\")";
 				}
 
-				Cue.LogInfo(new string(' ', indent * 2) + c.ToString() + s);
+				Logger.Global.Info(new string(' ', indent * 2) + c.ToString() + s);
 			}
 		}
 
@@ -364,21 +364,21 @@ namespace Cue.Sys.Vam
 
 		public static void DumpComponentsAndUp(GameObject o)
 		{
-			Cue.LogInfo($"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
+			Logger.Global.Info($"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
 
 			var rt = o.GetComponent<RectTransform>();
 			if (rt != null)
 			{
-				Cue.LogInfo("  rect: " + rt.rect.ToString());
-				Cue.LogInfo("  offsetMin: " + rt.offsetMin.ToString());
-				Cue.LogInfo("  offsetMax: " + rt.offsetMax.ToString());
-				Cue.LogInfo("  anchorMin: " + rt.anchorMin.ToString());
-				Cue.LogInfo("  anchorMax: " + rt.anchorMax.ToString());
-				Cue.LogInfo("  anchorPos: " + rt.anchoredPosition.ToString());
+				Logger.Global.Info("  rect: " + rt.rect.ToString());
+				Logger.Global.Info("  offsetMin: " + rt.offsetMin.ToString());
+				Logger.Global.Info("  offsetMax: " + rt.offsetMax.ToString());
+				Logger.Global.Info("  anchorMin: " + rt.anchorMin.ToString());
+				Logger.Global.Info("  anchorMax: " + rt.anchorMax.ToString());
+				Logger.Global.Info("  anchorPos: " + rt.anchoredPosition.ToString());
 			}
 
 			DumpComponents(o);
-			Cue.LogInfo("---");
+			Logger.Global.Info("---");
 
 			var parent = o?.transform?.parent?.gameObject;
 			if (parent != null)
@@ -398,19 +398,19 @@ namespace Cue.Sys.Vam
 		public static void DumpComponentsAndDown(
 			GameObject o, bool dumpRt = false, int indent = 0)
 		{
-			Cue.LogInfo(new string(' ', indent * 2) + $"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
+			Logger.Global.Info(new string(' ', indent * 2) + $"{o.name} {(o.activeInHierarchy ? "on" : "off")}");
 
 			if (dumpRt)
 			{
 				var rt = o.GetComponent<RectTransform>();
 				if (rt != null)
 				{
-					Cue.LogInfo(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
-					Cue.LogInfo(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->rect: " + rt.rect.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->offsetMin: " + rt.offsetMin.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->offsetMax: " + rt.offsetMax.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->anchorMin: " + rt.anchorMin.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->anchorMax: " + rt.anchorMax.ToString());
+					Logger.Global.Info(new string(' ', indent * 2) + "->anchorPos: " + rt.anchoredPosition.ToString());
 				}
 			}
 

@@ -134,7 +134,7 @@ namespace Cue
 			return slapEasing_.Magnitude(slap);
 		}
 
-		private void EmergencyExpression(MoodType mood, float intensity)
+		private void EmergencyExpression(MoodType mood, float intensity, float min, float max, float time)
 		{
 			bool foundActive = false;
 
@@ -143,7 +143,7 @@ namespace Cue
 				if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(mood))
 				{
 					foundActive = true;
-					ActivateForEmergency(exps_[i], mood, intensity);
+					ActivateForEmergency(exps_[i], mood, intensity, min, max, time);
 				}
 				else if (exps_[i].Active)
 				{
@@ -157,7 +157,7 @@ namespace Cue
 				{
 					if (exps_[i].Expression.IsMood(mood))
 					{
-						ActivateForEmergency(exps_[i], mood, intensity);
+						ActivateForEmergency(exps_[i], mood, intensity, min, max, time);
 						break;
 					}
 				}
@@ -172,11 +172,17 @@ namespace Cue
 			if (lastPersonality_ != person_.Personality)
 				Init();
 
+			var ps = person_.Personality;
 
 			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
 			{
 				isOrgasming_ = true;
-				EmergencyExpression(MoodType.Orgasm, 1.0f);
+
+				EmergencyExpression(
+					MoodType.Orgasm, 1.0f,
+					ps.Get(PS.OrgasmExpressionRangeMin),
+					ps.Get(PS.OrgasmExpressionRangeMax),
+					ps.Get(PS.OrgasmFirstExpressionTime));
 			}
 			else if (isOrgasming_ && person_.Mood.State != Mood.OrgasmState)
 			{
@@ -187,7 +193,11 @@ namespace Cue
 			if (!isZapped_ && person_.Body.Zap.Intensity > 0)
 			{
 				isZapped_ = true;
-				EmergencyExpression(MoodType.Excited, person_.Body.Zap.Intensity);
+
+				EmergencyExpression(
+					MoodType.Excited, 1,
+					0, person_.Body.Zap.Intensity,
+					0.5f);
 			}
 			else if (isZapped_ && person_.Body.Zap.Intensity == 0)
 			{
@@ -334,7 +344,9 @@ namespace Cue
 			return true;
 		}
 
-		private void ActivateForEmergency(WeightedExpression e, MoodType mood, float intensity)
+		private void ActivateForEmergency(
+			WeightedExpression e, MoodType mood, float intensity,
+			float min, float max, float time)
 		{
 			var ps = person_.Personality;
 
@@ -346,7 +358,7 @@ namespace Cue
 				ps.Get(PS.OrgasmExpressionRangeMax),
 				mood);
 
-			e.Activate(1.0f, ps.Get(PS.OrgasmFirstExpressionTime));
+			e.Activate(intensity, ps.Get(PS.OrgasmFirstExpressionTime));
 		}
 
 		private void UpdateExpressions()

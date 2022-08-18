@@ -1,9 +1,48 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
+	class CWVersionChecker
+	{
+		private string pluginName_;
+		private string expectedVersion_;
+
+		private Dictionary<string, Sys.Vam.StringParameter> versions_ =
+			new Dictionary<string, Sys.Vam.StringParameter>();
+
+		public CWVersionChecker(string pluginName, string expectedVersion)
+		{
+			pluginName_ = pluginName;
+			expectedVersion_ = expectedVersion;
+		}
+
+		public string GetWarning(Person p)
+		{
+			Sys.Vam.StringParameter v;
+
+			if (!versions_.TryGetValue(p.ID, out v))
+			{
+				Logger.Global.Info("!");
+				v = new Sys.Vam.StringParameter(p.VamAtom, pluginName_, "version");
+				versions_.Add(p.ID, v);
+			}
+
+			if (v.Check())
+			{
+				if (v.Value == expectedVersion_)
+					return "";
+			}
+
+			return $"bad {pluginName_} plugin, use the one from Cue/third-party";
+		}
+	};
+
+
 	abstract class ClockwiseHJAnimation : BuiltinAnimation
 	{
 		private const float WaitForDoneTime = 5;
 		private const string PluginName = "ClockwiseSilver.HJ";
+		private const string PluginVersion = "2";
 
 		private Logger log_;
 		private Sys.Vam.BoolParameter enabled_ = null;
@@ -24,9 +63,17 @@
 		private bool waitForDone_ = false;
 		private float waitForDoneElapsed_ = 0;
 
+		private static CWVersionChecker versionChecker_ =
+			new CWVersionChecker(PluginName, PluginVersion);
+
 		protected ClockwiseHJAnimation(string name)
 			: base(name)
 		{
+		}
+
+		public static string GetWarning(Person p)
+		{
+			return versionChecker_.GetWarning(p);
 		}
 
 		public override void Reset(Person p)

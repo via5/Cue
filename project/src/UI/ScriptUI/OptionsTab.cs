@@ -182,7 +182,7 @@
 				var o = Cue.Instance.Sys.ReadJSON(f);
 				if (o == null)
 				{
-					Cue.LogError("failed to read json");
+					Logger.Global.Error("failed to read json");
 					return;
 				}
 

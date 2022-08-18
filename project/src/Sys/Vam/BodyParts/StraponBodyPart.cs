@@ -305,7 +305,9 @@ namespace Cue.Sys.Vam
 		protected override void AddDebugRenderers()
 		{
 			base.AddDebugRenderers();
-			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(anchor_));
+
+			if (Exists)
+				AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(anchor_));
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)
