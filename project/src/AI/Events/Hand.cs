@@ -158,15 +158,32 @@
 			Check(ManualStartDistance, true, true);
 		}
 
-		private bool TargetsForDouble(BodyPart left, BodyPart right)
+		private bool WouldBeDoubleHJ(BodyPart left, BodyPart right)
 		{
-			if (left == null || right == null)
-				return false;
+			if (left != null && right != null)
+			{
+				if (left.Type == BP.Penis && right.Type == BP.Penis)
+				{
+					if (left.Person == right.Person)
+						return true;
+				}
+			}
 
-			if (left.Type != BP.Penis || right.Type != BP.Penis)
-				return false;
+			return false;
+		}
 
-			return (left.Person == right.Person);
+		private bool WouldBeTwoSeparateHJs(BodyPart left, BodyPart right)
+		{
+			if (left != null && right != null)
+			{
+				if (left.Type == BP.Penis || right.Type != BP.Penis)
+				{
+					if (left.Person != right.Person)
+						return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void Check(
@@ -195,7 +212,7 @@
 				return;
 			}
 
-			if (TargetsForDouble(leftTarget, rightTarget) && EnableDoubleHJ)
+			if (WouldBeDoubleHJ(leftTarget, rightTarget) && EnableDoubleHJ)
 			{
 				Log.Verbose("check found double targets");
 				Stop(stopFlags);
@@ -203,6 +220,19 @@
 			}
 			else
 			{
+				// this can happen if double hj is disabled; since cwhj
+				// doesn't support two hands on two different persons,
+				// this is forbidden
+				if (WouldBeTwoSeparateHJs(leftTarget, rightTarget))
+				{
+					if (canStartLeft)
+						rightTarget = null;
+					else
+						leftTarget = null;
+
+					Log.Verbose("would be two hj on two different persons, not supported yet");
+				}
+
 				if (left_.anim == AnimationType.HandjobBoth)
 				{
 					Log.Verbose("stopping because current is both and one target is gone");
@@ -252,10 +282,7 @@
 					}
 					else if (canStartLeft)
 					{
-						// this can happen if double hj is disabled; since cwhj
-						// doesn't support two hands on two different persons,
-						// this is forbidden
-						if (rightTarget == null || !TargetsForDouble(leftTarget, rightTarget))
+						if (rightTarget == null || !WouldBeDoubleHJ(leftTarget, rightTarget))
 						{
 							Log.Verbose($"new left target {leftTarget}");
 
@@ -268,7 +295,7 @@
 						}
 						else
 						{
-							Log.Verbose("has both left and right targets, can't work");
+							Log.Verbose("would be double hj, disabled");
 						}
 					}
 					else
