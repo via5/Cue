@@ -7,6 +7,9 @@ namespace Cue
 		private string pluginName_;
 		private string expectedVersion_;
 
+		private Dictionary<string, Sys.Vam.BoolParameter> enableds_ =
+			new Dictionary<string, Sys.Vam.BoolParameter>();
+
 		private Dictionary<string, Sys.Vam.StringParameter> versions_ =
 			new Dictionary<string, Sys.Vam.StringParameter>();
 
@@ -18,11 +21,34 @@ namespace Cue
 
 		public string GetWarning(Person p)
 		{
+			if (!EnabledExists(p))
+				return $"{pluginName_} missing";
+
+			if (!VersionOkay(p))
+				return $"bad {pluginName_} plugin, use the one from Cue/third-party";
+
+			return "";
+		}
+
+		private bool EnabledExists(Person p)
+		{
+			Sys.Vam.BoolParameter v;
+
+			if (!enableds_.TryGetValue(p.ID, out v))
+			{
+				v = new Sys.Vam.BoolParameter(p.VamAtom, pluginName_, "enabled");
+				enableds_.Add(p.ID, v);
+			}
+
+			return v.Check();
+		}
+
+		private bool VersionOkay(Person p)
+		{
 			Sys.Vam.StringParameter v;
 
 			if (!versions_.TryGetValue(p.ID, out v))
 			{
-				Logger.Global.Info("!");
 				v = new Sys.Vam.StringParameter(p.VamAtom, pluginName_, "version");
 				versions_.Add(p.ID, v);
 			}
@@ -30,10 +56,10 @@ namespace Cue
 			if (v.Check())
 			{
 				if (v.Value == expectedVersion_)
-					return "";
+					return true;
 			}
 
-			return $"bad {pluginName_} plugin, use the one from Cue/third-party";
+			return false;
 		}
 	};
 

@@ -310,7 +310,7 @@
 		{
 			"name": "angryMouth",
 			"moods": "angry",
-			"bodyParts": "mouth",
+			"bodyParts": "mouth eyes",
 			"morphs":
 			[
 				{
@@ -540,10 +540,10 @@
 	"zappedByPlayerBreastsExcitement": 0.0,
 	"zappedByPlayerGenitalsEyesWeight": 50,
 	"zappedByPlayerGenitalsTargetWeight": 10,
-	"zappedByPlayerGenitalsExcitement": 0.7,
+	"zappedByPlayerGenitalsExcitement": 0.5,
 	"zappedByPlayerPenetrationEyesWeight": 50,
 	"zappedByPlayerPenetrationTargetWeight": 10,
-	"zappedByPlayerPenetrationExcitement": 0.95,
+	"zappedByPlayerPenetrationExcitement": 0.7,
 	"zappedByPlayerMouthEyesWeight": 20,
 	"zappedByPlayerMouthExcitement": 0,
 	"zappedByPlayerLookUpWeight": 5,
