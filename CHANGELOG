@@ -1,4 +1,4 @@
-2      ?
+2.0     2022-08-22
 
 features:
   - Cue can now detect when body parts are rubbing against each other and at
@@ -14,6 +14,14 @@ features:
   - auto hands and head: moving hands or head close to genitals will start the
     appropriate event, can be disabled in options; each hand is independent and
     will start/stop if necessary after being grabbed and moved
+
+    limitations:
+       1) HJ with both hands on the same target is currently disabled because it
+          doesn't usually work well
+       2) HJs with both hands but on two different targets is also disabled
+          because the ClockwiseSilver plugin doesn't support it; a future
+          version of Cue might add _two_ instances of the plugin and control
+          them independently
 
   - hand linker: now uses a custom, internal implementation managed by Cue
     instead of VaM's Parent Link connection, and so can link more precisely
@@ -50,9 +58,10 @@ changes:
   - removed most voice settings from Cue, caused more problems than anything
   - hj/bj speed now changes based on excitement and have slightly more movements
   - many tweaks to thrust animation
-  - eyeTargetControl now always hidden, can only be selected from the person's
-    Select menu
+  - eyeTargetControl now always hidden because it was often in the way, can only
+    be selected from the person's Select menu
   - devmode only: all targets that are off are now hidden in play mode
+
 
 fixes:
   - many fixes for excitement not rising when it should; characters should be
