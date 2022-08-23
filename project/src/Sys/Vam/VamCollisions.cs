@@ -202,10 +202,6 @@ namespace Cue.Sys.Vam
 			if (VamBodyPart.IgnoreTrigger(a, null, bp_.Atom as VamAtom, bp_))
 				return;
 
-			//Cue.LogError(
-			//	$"{bp_} " +
-			//	$"{U.QualifiedName(c.collider)}");
-
 			bp_.AddExternalCollision(a, mag);
 		}
 
