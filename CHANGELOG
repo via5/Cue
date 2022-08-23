@@ -1,3 +1,9 @@
+2.1     2022-08-23
+
+fixes:
+  - fixed freeze with soft body physics
+
+
 2.0     2022-08-22
 
 features:
