@@ -256,6 +256,76 @@ namespace Cue
 	}
 
 
+	public class Pose
+	{
+		public class Controller
+		{
+			public class Parameter
+			{
+				public string name;
+				public string value;
+
+				public Parameter(string name, string value)
+				{
+					this.name = name;
+					this.value = value;
+				}
+			}
+
+			public string receiver;
+			public List<Parameter> ps = new List<Parameter>();
+
+			public Controller(string receiver)
+			{
+				this.receiver = receiver;
+			}
+
+			public Controller Clone()
+			{
+				var c = new Controller(receiver);
+
+				foreach (var p in ps)
+					c.ps.Add(new Parameter(p.name, p.value));
+
+				return c;
+			}
+		}
+
+		public string type;
+		public List<Controller> controllers = new List<Controller>();
+
+		public Pose(string type)
+		{
+			this.type = type;
+		}
+
+		public static Pose CreateDefault()
+		{
+			return new Pose("keyJoints");
+		}
+
+		public Pose Clone()
+		{
+			var p = new Pose(type);
+			p.CopyFrom(this);
+			return p;
+		}
+
+		private void CopyFrom(Pose p)
+		{
+			controllers.Clear();
+			foreach (var j in p.controllers)
+				controllers.Add(j.Clone());
+		}
+
+		public void Set(Person p)
+		{
+			p.Log.Info($"setting pose '{type}'");
+			p.Atom.SetPose(this);
+		}
+	}
+
+
 	public class Personality : EnumValueManager
 	{
 		private readonly string name_;
@@ -266,6 +336,7 @@ namespace Cue
 		private Sensitivities sensitivities_;
 		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
 		private Voice voiceProto_ = null;
+		private Pose pose_ = Pose.CreateDefault();
 
 		public Personality(string name)
 			: base(new PS())
@@ -278,6 +349,12 @@ namespace Cue
 		{
 			get { return origin_; }
 			set { origin_ = value; }
+		}
+
+		public Pose Pose
+		{
+			get { return pose_; }
+			set { pose_ = value; }
 		}
 
 		public Personality Clone(string newName, Person p)
@@ -305,6 +382,7 @@ namespace Cue
 				events_[kv.Key] = kv.Value.Clone();
 
 			voiceProto_ = ps.voiceProto_?.Clone();
+			pose_ = ps.pose_.Clone();
 		}
 
 		public void Init()

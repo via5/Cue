@@ -12,6 +12,7 @@ namespace Cue.Proc
 
 		float MovementEnergy { get; }
 		ulong LockKey { get; }
+		bool ApplyWhenOff { get; }
 
 		ITarget Clone();
 		void Reset();
@@ -84,6 +85,11 @@ namespace Cue.Proc
 		public virtual ulong LockKey
 		{
 			get { return parent_?.LockKey ?? BodyPartLock.NoKey; }
+		}
+
+		public virtual bool ApplyWhenOff
+		{
+			get { return parent_?.ApplyWhenOff ?? false; }
 		}
 
 		public abstract bool Done { get; }

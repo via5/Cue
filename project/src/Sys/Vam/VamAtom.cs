@@ -79,7 +79,7 @@ namespace Cue.Sys.Vam
 		public abstract void OnPluginState(bool b);
 		public abstract void SetBodyDamping(int e);
 		public abstract void SetCollidersForKiss(bool b, IAtom other);
-		public abstract void SetDefaultControls(string why);
+		public abstract void SetPose(Pose p);
 		public abstract void SetParentLink(IBodyPart bp);
 		public abstract void Update(float s);
 		public abstract string DebugString();
@@ -323,13 +323,44 @@ namespace Cue.Sys.Vam
 			return bp;
 		}
 
-		public override void SetDefaultControls(string why)
+		public override void SetPose(Pose p)
 		{
 			// this breaks possession, it stays enabled but control is lost
 			if (!Possessed)
 			{
-				log_.Info($"{ID}: setting default controls ({why})");
-				setOnlyKeyJointsOn_.Fire();
+				if (p.type == "keyJoints")
+				{
+					log_.Info($"setting key joints");
+					setOnlyKeyJointsOn_.Fire();
+				}
+				else
+				{
+					log_.Error($"{ID}: unknown pose type '{p.type}'");
+				}
+
+				foreach (var c in p.controllers)
+				{
+					if (c.receiver == "all")
+					{
+						foreach (var fc in atom_.freeControllers)
+						{
+							foreach (var param in c.ps)
+								SetController(fc, param.name, param.value);
+						}
+					}
+					else
+					{
+						var r = atom_.GetStorableByID(c.receiver);
+						if (r == null)
+						{
+							log_.Error($"receiver '{c.receiver}' not found");
+							continue;
+						}
+
+						foreach (var param in c.ps)
+							SetController(r, param.name, param.value);
+					}
+				}
 			}
 
 			ResetLinkToRB();
@@ -337,6 +368,64 @@ namespace Cue.Sys.Vam
 			// todo
 			if (Cue.Instance.Options.DevMode)
 				SetNotInteractable();
+		}
+
+		private void SetController(JSONStorable r, string target, string value)
+		{
+			var param = r.GetParam(target);
+			if (param == null)
+			{
+				log_.Error($"param '{target}' doesn't exist in receiver '{r.name}'");
+				return;
+			}
+
+			if (SetControllerFloat(param, value))
+				return;
+			else if (SetControllerSC(param, value))
+				return;
+
+			log_.Error($"unsupported param type for '{target}' in receiver '{r.name}'");
+		}
+
+		private bool SetControllerFloat(JSONStorableParam param, string value)
+		{
+			var fp = param as JSONStorableFloat;
+			if (fp == null)
+				return false;
+
+			if (value == "default")
+			{
+				log_.Info($"setting {param.storable.name}.{param.name} to default");
+				fp.SetValToDefault();
+			}
+			else
+			{
+				var f = float.Parse(value);
+				log_.Info($"setting {param.storable.name}.{param.name} to {f:0.00}");
+				fp.val = f;
+			}
+
+			return true;
+		}
+
+		private bool SetControllerSC(JSONStorableParam param, string value)
+		{
+			var scp = param as JSONStorableStringChooser;
+			if (scp == null)
+				return false;
+
+			if (value == "default")
+			{
+				log_.Info($"setting {param.storable.name}.{param.name} to default");
+				scp.SetValToDefault();
+			}
+			else
+			{
+				log_.Info($"setting {param.storable.name}.{param.name} to {value}");
+				scp.val = value;
+			}
+
+			return true;
 		}
 
 		private void ResetLinkToRB()

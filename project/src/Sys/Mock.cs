@@ -479,7 +479,7 @@ namespace Cue.Sys.Mock
 			return new List<IBodyPart>();
 		}
 
-		public void SetDefaultControls(string why)
+		public void SetPose(Pose p)
 		{
 		}
 

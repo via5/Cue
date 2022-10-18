@@ -493,7 +493,7 @@ namespace Cue.Sys
 
 		IMorph GetMorph(string id, float eyesClosed);
 
-		void SetDefaultControls(string why);
+		void SetPose(Pose p);
 		void SetParentLink(IBodyPart bp);
 		void SetBodyDamping(int e);
 		void SetCollidersForKiss(bool b, IAtom other);

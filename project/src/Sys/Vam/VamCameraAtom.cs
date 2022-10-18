@@ -415,7 +415,7 @@ namespace Cue.Sys.Vam
 		{
 		}
 
-		public override void SetDefaultControls(string why)
+		public override void SetPose(Pose p)
 		{
 		}
 

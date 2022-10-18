@@ -366,6 +366,24 @@ namespace Cue
 			}
 		}
 
+		public void Stop(Animation a, int stopFlags = Animation.NoStopFlags)
+		{
+			if (a == null)
+				return;
+
+			Log.Verbose($"stopping animation {a}");
+
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim == a)
+				{
+					Stop(playing_[i], stopFlags);
+					return;
+				}
+			}
+			Log.Verbose($"animation {a} is not playing, count={playing_.Count}");
+		}
+
 		private void Stop(PlayingAnimation a, int stopFlags = Animation.NoStopFlags)
 		{
 			Log.Info($"stopping animation {a}");

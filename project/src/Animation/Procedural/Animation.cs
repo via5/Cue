@@ -8,8 +8,9 @@ namespace Cue.Proc
 		private RootTargetGroup root_;
 		private ISync oldSync_ = null;
 		private bool mainSync_ = false;
+		private bool applyWhenOff_ = false;
 
-		public BasicProcAnimation(string name)
+		public BasicProcAnimation(string name, bool applyWhenOff=false)
 			: base(name)
 		{
 			root_ = new RootTargetGroup();
@@ -112,6 +113,11 @@ namespace Cue.Proc
 		public List<ITarget> Targets
 		{
 			get { return root_.Targets; }
+		}
+
+		public bool ApplyWhenOff
+		{
+			get { return applyWhenOff_; }
 		}
 
 		public ITarget FindTarget(string name)
@@ -218,8 +224,8 @@ namespace Cue.Proc
 
 	class ProcAnimation : BasicProcAnimation
 	{
-		public ProcAnimation(string name, bool hasMovement)
-			: base(name)
+		public ProcAnimation(string name, bool hasMovement, bool applyWhenOff)
+			: base(name, applyWhenOff)
 		{
 			HasMovement = hasMovement;
 		}
@@ -238,10 +244,11 @@ namespace Cue.Proc
 			var docRoot = doc.AsObject;
 			string name = docRoot["name"];
 			bool hasMovement = docRoot["hasMovement"].AsBool;
+			bool applyWhenOff = J.OptBool(docRoot, "applyWhenOff", false);
 
 			try
 			{
-				var a = new ProcAnimation(name, hasMovement);
+				var a = new ProcAnimation(name, hasMovement, applyWhenOff);
 
 				foreach (JSONClass n in docRoot["targets"].AsArray)
 					a.AddTarget(CreateTarget(n["type"], n));
@@ -275,7 +282,7 @@ namespace Cue.Proc
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ProcAnimation(Name, HasMovement);
+			var a = new ProcAnimation(Name, HasMovement, ApplyWhenOff);
 			a.CopyFrom(this);
 			return a;
 		}

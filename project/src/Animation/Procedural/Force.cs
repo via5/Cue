@@ -81,6 +81,7 @@ namespace Cue.Proc
 		private BodyPartType bodyPartType_;
 		private BodyPart bp_ = null;
 		private IEasing easing_;
+		private bool applyWhenOff_ = false;
 
 		private bool oneFrameFinished_ = false;
 		private Action beforeNext_ = null;
@@ -238,6 +239,8 @@ namespace Cue.Proc
 			vtarget_.Reset();
 			dtarget_.Reset();
 			needsNewsTarget_ = true;
+			applyWhenOff_ = ApplyWhenOff;
+
 			Next();
 		}
 
@@ -299,8 +302,11 @@ namespace Cue.Proc
 				if (bp_.LockedFor(BodyPartLock.Move, LockKey))
 					return false;
 
-				if (!bp_.CanApplyForce())
-					return false;
+				if (!applyWhenOff_)
+				{
+					if (!bp_.CanApplyForce())
+						return false;
+				}
 			}
 
 			return true;

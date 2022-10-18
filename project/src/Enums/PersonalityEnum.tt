@@ -8,8 +8,10 @@ V.Duration("GazeRandomInterval"),
 V.Duration("EmergencyGazeDuration"),
 
 V.Bool("GazeSaccade"),
+V.Bool("GazeBlink"),
 V.Duration("GazeSaccadeInterval"),
 V.Float("GazeSaccadeMovementRange"),
+V.Float("GazeEyeTargetMovementSpeed"),
 
 V.Float("AvoidGazePlayer"),
 V.Float("AvoidGazePlayerInsidePersonalSpace"),
@@ -27,6 +29,9 @@ V.Float("LookAboveMaxWeight"),
 V.Float("LookAboveMaxWeightOrgasm"),
 V.Float("LookAboveMinExcitement"),
 V.Float("LookAboveMinPhysicalRate"),
+V.Bool("LookAboveUseGazeEnergy"),
+
+V.Float("LookFrontWeight"),
 
 V.Float("IdleNaturalRandomWeight"),
 V.Float("IdleEmptyRandomWeight"),
@@ -128,7 +133,12 @@ V.Float("AngerExcitementFactorForHappiness"),
 V.Float("DefaultHappiness"),
 V.Float("DefaultAnger"),
 V.Float("DefaultPlayfulness"),
+V.Float("MaxHappyExpression"),
 V.Float("MaxExcitedExpression"),
+V.Float("MaxPlayfulExpression"),
+V.Float("MaxAngryExpression"),
+V.Float("MaxTiredExpression"),
+V.Float("MinTiredness"),
 
 V.Float("ExpressionMinHoldTime"),
 V.Float("ExpressionMaxHoldTime"),
@@ -163,7 +173,8 @@ V.Float("OrgasmTime"),
 V.Float("PostOrgasmTime"),
 V.Float("RateAdjustment"),
 V.Float("PenetrationDamper"),
-V.Float("MinCollisionMagnitude")
+V.Float("MinCollisionMagnitude"),
+V.String("IdleAnimation")
 
 };
 

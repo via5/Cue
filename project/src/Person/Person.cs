@@ -67,8 +67,6 @@ namespace Cue
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
 			homing_ = Integration.CreateHoming(this);
-
-			Atom.SetDefaultControls("init");
 		}
 
 		public void Init()
@@ -179,6 +177,8 @@ namespace Cue
 				voice_?.Destroy();
 				voice_ = personality_.CreateVoice();
 				voice_.Init(this);
+
+				personality_.Pose.Set(this);
 
 				PersonalityChanged?.Invoke();
 			}

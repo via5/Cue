@@ -427,6 +427,11 @@ namespace Cue.Proc
 			get { return key_; }
 		}
 
+		public override bool ApplyWhenOff
+		{
+			get { return anim_?.ApplyWhenOff ?? false; }
+		}
+
 		public override string ToString()
 		{
 			string s = $"root {Name}";

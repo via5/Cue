@@ -34,6 +34,7 @@ namespace Cue
 			return new List<IGazeEvent>()
 			{
 				new GazeAbove(p),
+				new GazeFront(p),
 				new GazeGrabbed(p),
 				new GazeZapped(p),
 				new GazeKissing(p),

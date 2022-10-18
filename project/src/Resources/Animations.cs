@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Cue
@@ -154,6 +155,17 @@ namespace Cue
 			}
 
 			return list;
+		}
+
+		public Animation Find(string name)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Sys?.Name == name)
+					return anims_[i];
+			}
+
+			return null;
 		}
 
 		private void Add(Animation a)

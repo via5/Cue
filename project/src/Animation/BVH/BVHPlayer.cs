@@ -191,7 +191,7 @@ namespace Cue.BVH
             if (anim_ == null)
                 return;
 
-            person_.Atom.SetDefaultControls("playing bvh");
+            //person_.Atom.SetDefaultControls("playing bvh");
             playing_ = false;
             anim_ = null;
         }
@@ -488,7 +488,7 @@ namespace Cue.BVH
 
             if (CheckAtEnd())
             {
-                person_.Atom.SetDefaultControls("bvh finished");
+                //person_.Atom.SetDefaultControls("bvh finished");
                 playing_ = false;
                 return;
             }

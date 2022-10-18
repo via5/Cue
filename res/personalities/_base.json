@@ -466,6 +466,8 @@
 	},
 
 	"gazeSaccade": true,
+	"gazeBlink": true,
+	"gazeEyeTargetMovementSpeed": 10.0,
 
 	"gazeSaccadeInterval":
 	{
@@ -488,9 +490,12 @@
 	"lookAboveMaxWeightOrgasm": 2,
 	"lookAboveMinExcitement": 0.35,
 	"lookAboveMinPhysicalRate": 0.001,
+	"lookAboveUseGazeEnergy": true,
 
 	"lookAtPlayerOnGrabWeight": -1,
 	"lookAtPlayerTimeAfterGrab": 3,
+
+	"lookFrontWeight": 0,
 
 	"idleNaturalRandomWeight": 0.4,
 	"idleEmptyRandomWeight": 0.05,
@@ -607,7 +612,12 @@
 	"defaultHappiness": 1,
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
+	"maxHappyExpression": 1,
 	"maxExcitedExpression": 1,
+	"maxPlayfulExpression": 1,
+	"maxAngryExpression": 1,
+	"maxTiredExpression": 1,
+	"minTiredness": 0,
 
 	"expressionMinHoldTime": 0,
 	"expressionMaxHoldTime": 3,
@@ -644,6 +654,7 @@
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 	"minCollisionMagnitude": 0.1,
+	"idleAnimation": "procStandIdle",
 
 	"slapMinExpressionChange": 0,
 	"slapMaxExpressionChange": 0.4,
@@ -714,5 +725,22 @@
 			"rate": 0.3,
 			"max": 0.10
 		}
-	]
+	],
+
+	"pose":
+	{
+		"type": "keyJoints",
+		"controllers":
+		[
+			{
+				"receiver": "all",
+				"parameters":
+				[
+					{
+						"name": "jointDriveMaxForce",
+						"value": "default"
+					}
+				]
+			},
+	}
 }

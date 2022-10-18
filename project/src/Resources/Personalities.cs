@@ -122,6 +122,7 @@ namespace Cue
 			ParseVoice(p, o, inherited);
 			ParseSensitivities(p.Sensitivities, o, inherited);
 			ParseEvents(p, o, inherited);
+			ParsePose(p, o, inherited);
 
 			if (o.HasKey("expressions"))
 			{
@@ -203,6 +204,58 @@ namespace Cue
 			}
 
 			return p;
+		}
+
+		private void ParsePose(Personality p, JSONClass o, bool inherited)
+		{
+			if (o.HasKey("pose"))
+			{
+				var po = o["pose"].AsObject;
+
+				var pose = new Pose(po["type"].Value);
+
+				if (po.HasKey("controllers"))
+				{
+					foreach (JSONClass co in po["controllers"].AsArray)
+					{
+						var receivers = new List<string>();
+
+						if (co.HasKey("receivers"))
+						{
+							foreach (JSONNode n in co["receivers"].AsArray)
+								receivers.Add(n.Value);
+						}
+						else
+						{
+							receivers.Add(co["receiver"].Value);
+						}
+
+						foreach (var r in receivers)
+						{
+							var c = new Pose.Controller(r);
+
+							if (co.HasKey("parameters"))
+							{
+								foreach (JSONClass ppo in co["parameters"].AsArray)
+								{
+									c.ps.Add(new Pose.Controller.Parameter(
+										ppo["name"].Value, ppo["value"].Value));
+								}
+							}
+
+							Log.Info($"controller {c.receiver}");
+							pose.controllers.Add(c);
+						}
+					}
+				}
+
+				p.Pose = pose;
+			}
+			else
+			{
+				if (!inherited)
+					throw new LoadFailed("missing pose");
+			}
 		}
 
 		private void ParseVoice(Personality p, JSONClass o, bool inherited)

@@ -411,6 +411,7 @@ namespace Cue
 
 						weight += e.DefaultWeight * m.Get(MoodType.Happy);
 						intensity = Math.Max(intensity, m.Get(MoodType.Happy));
+						intensity = Math.Min(intensity, ps.Get(PS.MaxHappyExpression));
 					}
 
 					if (e.IsMood(MoodType.Excited))
@@ -436,6 +437,7 @@ namespace Cue
 
 						weight += e.DefaultWeight * m.Get(MoodType.Playful);
 						intensity = Math.Max(intensity, m.Get(MoodType.Playful));
+						intensity = Math.Min(intensity, ps.Get(PS.MaxPlayfulExpression));
 					}
 
 					if (e.IsMood(MoodType.Angry))
@@ -448,6 +450,7 @@ namespace Cue
 
 						weight += e.DefaultWeight * m.Get(MoodType.Angry);
 						intensity = Math.Max(intensity, m.Get(MoodType.Angry));
+						intensity = Math.Min(intensity, ps.Get(PS.MaxAngryExpression));
 					}
 
 					if (e.IsMood(MoodType.Tired))
@@ -460,6 +463,7 @@ namespace Cue
 
 						weight += e.DefaultWeight * expressionTiredness;
 						intensity = Math.Max(intensity, expressionTiredness);
+						intensity = Math.Min(intensity, ps.Get(PS.MaxTiredExpression));
 					}
 
 					if (m.Get(MoodType.Excited) < e.MinExcitement)

@@ -113,6 +113,11 @@ namespace Cue
 			}
 		}
 
+		public void SetValue(float f)
+		{
+			base.Value = f;
+		}
+
 		public bool Update(float s)
 		{
 			if (target_ > Value)

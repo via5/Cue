@@ -22,6 +22,7 @@ namespace Cue
 		private bool eventsEnabled_ = true;
 		private IEvent[] events_ = null;
 		private bool hasIdlePose_ = false;
+		private Animation idle_ = null;
 
 		public PersonAI(Person p)
 		{
@@ -69,15 +70,32 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (Cue.Instance.Options.IdlePose && !hasIdlePose_)
+			if (ShouldIdle() && !hasIdlePose_)
 			{
 				hasIdlePose_ = true;
-				person_.Animator.PlayType(AnimationType.Idle);
+
+				if (idle_ == null)
+				{
+					var name = person_.Personality.GetString(PS.IdleAnimation);
+					idle_ = Resources.Animations.Find(name);
+
+					if (idle_ == null)
+						person_.Log.Error($"idle animation {name} not found");
+				}
+
+				if (idle_ == null)
+					person_.Animator.PlayType(AnimationType.Idle);
+				else
+					person_.Animator.Play(idle_);
 			}
-			else if (!Cue.Instance.Options.IdlePose && hasIdlePose_)
+			else if (!ShouldIdle() && hasIdlePose_)
 			{
 				hasIdlePose_ = false;
-				person_.Animator.StopType(AnimationType.Idle);
+
+				if (idle_ == null)
+					person_.Animator.StopType(AnimationType.Idle);
+				else
+					person_.Animator.Stop(idle_);
 			}
 
 			if (eventsEnabled_)
@@ -91,6 +109,18 @@ namespace Cue
 		{
 			for (int i = 0; i < events_.Length; ++i)
 				events_[i].OnPluginState(b);
+		}
+
+		private bool ShouldIdle()
+		{
+			if (!Cue.Instance.Options.IdlePose)
+				return false;
+
+			var name = person_.Personality.GetString(PS.IdleAnimation);
+			if (string.IsNullOrEmpty(name))
+				return false;
+
+			return true;
 		}
 	}
 }

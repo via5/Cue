@@ -7,11 +7,19 @@ namespace Cue
 		private Vector3 pos_ = new Vector3();
 		private bool hasPos_ = false;
 
-		public void SetPosition(Vector3 v)
+		public Vector3 Position
 		{
-			pos_ = v;
-			hasPos_ = true;
-			transform.position = Sys.Vam.U.ToUnity(v);
+			get
+			{
+				return Sys.Vam.U.FromUnity(transform.position);
+			}
+
+			set
+			{
+				pos_ = value;
+				hasPos_ = true;
+				transform.position = Sys.Vam.U.ToUnity(value);
+			}
 		}
 
 		public void LateUpdate()
@@ -115,7 +123,6 @@ namespace Cue
 			pos_ = p;
 			lookMode_.Value = "Target";
 			updatePosition_ = true;
-			eyesImpl_?.SetPosition(p);
 		}
 
 		public void LookAtNothing()
@@ -127,7 +134,7 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (updatePosition_)
-				eyesImpl_?.SetPosition(AdjustedPosition());
+				SetPosition(AdjustedPosition(), s);
 
 			if (saccade_)
 				UpdateSaccade(s);
@@ -158,6 +165,9 @@ namespace Cue
 		private void OnPersonalityChanged()
 		{
 			Saccade = person_.Personality.GetBool(PS.GazeSaccade);
+			Blink = person_.Personality.GetBool(PS.GazeBlink);
+			person_.Gaze.AutoBlink = person_.Personality.GetBool(PS.GazeBlink);
+
 			saccadeDuration_ = person_.Personality.GetDuration(
 				PS.GazeSaccadeInterval);
 		}
@@ -178,6 +188,18 @@ namespace Cue
 			}
 
 			return pos;
+		}
+
+		private void SetPosition(Vector3 pos, float s)
+		{
+			if (eyesImpl_ == null)
+				return;
+
+			var pos2 = Vector3.MoveTowards(
+				eyesImpl_.Position, pos,
+				person_.Personality.Get(PS.GazeEyeTargetMovementSpeed) * s);
+
+			eyesImpl_.Position = pos2;
 		}
 
 		public override string ToString()

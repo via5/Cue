@@ -51,6 +51,9 @@ namespace Cue
 			}
 
 			energyRampUpEasing_ = e;
+
+			if (tiredness_.Value < person_.Personality.Get(PS.MinTiredness))
+				tiredness_.SetValue(person_.Personality.Get(PS.MinTiredness));
 		}
 
 		public static bool ShouldStopSexAnimation(
@@ -291,7 +294,7 @@ namespace Cue
 			{
 				if (!wasPlayer_)
 				{
-					baseTiredness_ = 0;
+					SetBaseTiredness(0);
 					baseExcitement_.Value = 0;
 
 					for (int i = 0; i < moods_.Length; ++i)
@@ -331,9 +334,7 @@ namespace Cue
 						tiredness_.UpRate = ps.Get(PS.TirednessRateDuringPostOrgasm);
 						tiredness_.Target = 1;
 
-						baseTiredness_ += ps.Get(PS.OrgasmBaseTirednessIncrease);
-						baseTiredness_ = U.Clamp(baseTiredness_, 0, 1);
-
+						SetBaseTiredness(baseTiredness_ + ps.Get(PS.OrgasmBaseTirednessIncrease));
 						SetState(PostOrgasmState);
 					}
 
@@ -424,11 +425,7 @@ namespace Cue
 				if (timeSinceLastOrgasm_ > ps.Get(PS.DelayAfterOrgasmUntilTirednessDecay))
 				{
 					if (Get(MoodType.Excited) < ps.Get(PS.TirednessMaxExcitementForBaseDecay))
-					{
-						baseTiredness_ = U.Clamp(
-							baseTiredness_ - s * ps.Get(PS.TirednessBaseDecayRate),
-							0, 1);
-					}
+						SetBaseTiredness(baseTiredness_ - s * ps.Get(PS.TirednessBaseDecayRate));
 				}
 
 				tiredness_.DownRate = ps.Get(PS.TirednessBackToBaseRate);
@@ -528,6 +525,11 @@ namespace Cue
 		{
 			state_ = s;
 			elapsed_ = 0;
+		}
+
+		private void SetBaseTiredness(float f)
+		{
+			baseTiredness_ = U.Clamp(f, person_.Personality.Get(PS.MinTiredness), 1);
 		}
 	}
 }

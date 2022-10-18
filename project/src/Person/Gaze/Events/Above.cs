@@ -23,9 +23,18 @@ namespace Cue
 				{
 					if (person_.Excitement.PhysicalRate >= ps.Get(PS.LookAboveMinPhysicalRate))
 					{
-						targets_.SetAboveWeight(
-							person_.Mood.GazeEnergy * ps.Get(PS.LookAboveMaxWeight),
-							"normal state");
+						if (ps.GetBool(PS.LookAboveUseGazeEnergy))
+						{
+							targets_.SetAboveWeight(
+								person_.Mood.GazeEnergy * ps.Get(PS.LookAboveMaxWeight),
+								"normal state");
+						}
+						else
+						{
+							targets_.SetAboveWeight(
+								ps.Get(PS.LookAboveMaxWeight),
+								"normal state (ignore energy)");
+						}
 					}
 				}
 			}

@@ -179,6 +179,7 @@
     <Compile Include="src\Person\Expression\WeightedExpression.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Events\Above.cs" />
+    <Compile Include="src\Person\Gaze\Events\Front.cs" />
     <Compile Include="src\Person\Gaze\Events\Grabbed.cs" />
     <Compile Include="src\Person\Gaze\Events\Hands.cs" />
     <Compile Include="src\Person\Gaze\Events\Interactions.cs" />

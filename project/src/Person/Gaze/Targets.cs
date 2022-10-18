@@ -63,6 +63,9 @@ namespace Cue
 		// point above head
 		private LookatAbove above_;
 
+		// point in front
+		private LookatFront front_;
+
 		// all of the above in one array
 		private IGazeLookat[] all_ = new IGazeLookat[0];
 
@@ -75,6 +78,7 @@ namespace Cue
 			person_ = p;
 			random_ = new LookatRandomPoint(p);
 			above_ = new LookatAbove(p);
+			front_ = new LookatFront(p);
 		}
 
 		public Logger Log
@@ -85,6 +89,11 @@ namespace Cue
 		public IGazeLookat LookatAbove
 		{
 			get { return above_; }
+		}
+
+		public IGazeLookat LookatFront
+		{
+			get { return front_; }
 		}
 
 		public void Init()
@@ -119,6 +128,7 @@ namespace Cue
 				bodyParts_.Length +
 				1 +  // random
 				1 +  // above
+				1 +  // front
 				objects_.Length];
 
 			int i = 0;
@@ -131,6 +141,7 @@ namespace Cue
 
 			all[i++] = random_;
 			all[i++] = above_;
+			all[i++] = front_;
 
 			for (int oi = 0; oi < objects_.Length; ++oi)
 				all[i++] = objects_[oi];
@@ -185,6 +196,11 @@ namespace Cue
 		public void SetAboveWeight(float w, string why)
 		{
 			above_.SetWeight(w, why);
+		}
+
+		public void SetFrontWeight(float w, string why)
+		{
+			front_.SetWeight(w, why);
 		}
 
 		public void SetObjectWeight(IObject o, float w, string why)
@@ -478,6 +494,35 @@ namespace Cue
 		public override string ToString()
 		{
 			return $"look at position {pos_}";
+		}
+	}
+
+
+	class LookatFront : BasicGazeLookat
+	{
+		public LookatFront(Person p)
+			: base(p)
+		{
+		}
+
+		public override bool HasPosition
+		{
+			get { return true; }
+		}
+
+		public override Vector3 Position
+		{
+			get
+			{
+				var h =  person_.Body.Get(BP.Head);
+				var p = h.Position + h.Rotation.Rotate(new Vector3(0, 0, 1));
+				return p;
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"look at front {Position}";
 		}
 	}
 
