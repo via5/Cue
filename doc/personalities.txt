@@ -173,6 +173,13 @@ Controls what characters are looking at.
   saccade movement range; a random value between [-this, +this] is picked for
   both horizontal and vertical offsets
 
+- GazeBlink (bool)
+  whether blinking is enabled
+
+- GazeEyeTargetMovementSpeed (float)
+  speed at which the eyeTargetControl moves between targets (in units per
+  second)
+
 
 3.2 Gaze avoidance
 ------------------
@@ -231,11 +238,13 @@ Controls what characters are looking at.
 
 - LookAboveMaxWeight (float)
   looking at a target directly above the character's head when mood is normal
-  or post-orgasm; this weight is multiplied by the character's energy
+  or post-orgasm; this weight is multiplied by the character's energy (see
+  also LookAboveUseGazeEnergy)
 
 - LookAboveMaxWeightOrgasm (float)
   looking at a target directly above the character's head during orgasm; this
-  weight is multiplied by the character's energy
+  weight is multiplied by the character's energy (see also
+  LookAboveUseGazeEnergy)
 
 - LookAboveMinExcitement (float)
   excitement value below which looking up is disabled; avoids looking up for
@@ -246,6 +255,14 @@ Controls what characters are looking at.
   physical rate value below which looking up is disabled; avoids looking up
   when the excitement source is only emotional (note that rates are low values,
   typically below 0.02)
+
+- LookAboveUseGazeEnergy (bool)
+  whether the weight is multiplied by the gaze energy, so that tired characters
+  have less of a chance to look above; some personalities (like sleeping) may
+  want to look above regardless of energy
+
+- LookFrontWeight (float)
+  looking at a point directly in front of the head
 
 - IdleNaturalRandomWeight (float)
   looking at a random point when not busy and scene is idle
@@ -458,8 +475,12 @@ Controls what characters are looking at.
 - DefaultAnger (float)
   angry mood will usually be set to this value
 
+- MaxHappyExpression (float)
 - MaxExcitedExpression (float)
-  excited expression intensity will never rise above this value
+- MaxPlayfulExpression (float)
+- MaxAngryExpression (float)
+- MaxTiredExpression (float)
+  the given expression intensity will never rise above this value
 
 
 3.5.1 Anger management
@@ -628,6 +649,9 @@ goes back to base.
 - OrgasmBaseTirednessIncrease (float)
   added to the base value on each orgasm
 
+- MinTiredness (float)
+  tiredness will never go below this value; useful for the sleeping personality
+
 
 3.10 Sensitivity
 ----------------
@@ -692,6 +716,13 @@ of the mood decides the value at which the morph is driven.
 - morphs
   an array of morphs that are used in this expression, with an optional maximum
   value; this is a ghetto version of Vam's morph groups
+
+
+3.12 Miscellaneous
+-------------------
+
+- IdleAnimation (string)
+  the name of the idle animation to use
 
 
 4 Inheritance
