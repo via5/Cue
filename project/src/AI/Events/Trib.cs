@@ -2,7 +2,7 @@
 {
 	class TribEvent : BasicEvent
 	{
-		private const float TribDistance = 0.1f;
+		private const float TribDistance = 0.15f;
 
 		private BodyPart receiver_ = null;
 		private bool active_ = false;
@@ -55,13 +55,6 @@
 		{
 			receiver_ = FindReceiver();
 
-			if (receiver_ == null)
-			{
-				Log.Info($"no contact for trib");
-				active_ = false;
-				return false;
-			}
-
 			// weak lock, just to inhibit idle animation
 			lock_ = person_.Body.Get(BP.Hips).Lock(
 				BodyPartLock.Anim, "thrust", BodyPartLock.Weak);
@@ -72,17 +65,27 @@
 				return false;
 			}
 
-			Log.Info($"starting trib with {receiver_}");
-			receiver_.Person.Body.Zapped(person_, SS.Genitals);
+			if (receiver_ == null)
+			{
+				Log.Info($"starting trib with nobody");
 
-			person_.Body.Get(person_.Body.GenitalsBodyPart)
-				.AddForcedTrigger(
-					receiver_.Person.PersonIndex, receiver_.Type);
+				person_.Body.Get(person_.Body.GenitalsBodyPart)
+					.AddForcedTrigger(-1, BP.None);
+			}
+			else
+			{
+				Log.Info($"starting trib with {receiver_}");
+				receiver_.Person.Body.Zapped(person_, SS.Genitals);
 
-			receiver_.AddForcedTrigger(
-				person_.PersonIndex, person_.Body.GenitalsBodyPart);
+				person_.Body.Get(person_.Body.GenitalsBodyPart)
+					.AddForcedTrigger(
+						receiver_.Person.PersonIndex, receiver_.Type);
 
-			receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.SexReceiver);
+				receiver_.AddForcedTrigger(
+					person_.PersonIndex, person_.Body.GenitalsBodyPart);
+
+				receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.SexReceiver);
+			}
 
 			SetZoneEnabled(true);
 			running_ = true;
@@ -95,14 +98,22 @@
 			Log.Verbose($"trib: stopping");
 			person_.Animator.StopType(AnimationType.Trib);
 
-			person_.Body.Get(person_.Body.GenitalsBodyPart)
-				.RemoveForcedTrigger(
-					receiver_.Person.PersonIndex, receiver_.Type);
+			if (receiver_ == null)
+			{
+				person_.Body.Get(person_.Body.GenitalsBodyPart)
+					.RemoveForcedTrigger(-1, BP.None);
+			}
+			else
+			{
+				person_.Body.Get(person_.Body.GenitalsBodyPart)
+					.RemoveForcedTrigger(
+						receiver_.Person.PersonIndex, receiver_.Type);
 
-			receiver_.RemoveForcedTrigger(
-				person_.PersonIndex, person_.Body.GenitalsBodyPart);
+				receiver_.RemoveForcedTrigger(
+					person_.PersonIndex, person_.Body.GenitalsBodyPart);
 
-			receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.Normal);
+				receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.Normal);
+			}
 
 			SetZoneEnabled(false);
 
