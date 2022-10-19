@@ -85,6 +85,8 @@ namespace Cue
 
 			for (int i = 0; i < states_.Count; ++i)
 				states_[i].Init(this);
+
+			CheckMute(true);
 		}
 
 		public void Destroy()
@@ -169,23 +171,27 @@ namespace Cue
 			provider_.Update(s);
 		}
 
-		private void CheckMute()
+		private void CheckMute(bool force=false)
 		{
 			if (person_.IsPlayer && Cue.Instance.Options.MutePlayer)
 			{
-				if (!muted_)
+				if (!muted_ || force)
 				{
-					log_.Info("person is player, muting");
+					if (!force)
+						log_.Info("person is player, muting");
+
 					provider_.Muted = true;
 					muted_ = true;
 				}
 			}
 			else
 			{
-				if (muted_)
+				if (muted_ || force)
 				{
-					log_.Info("person is not player, unmuting");
-					provider_.Muted = true;
+					if (!force)
+						log_.Info("person is not player, unmuting");
+
+					provider_.Muted = false;
 					muted_ = false;
 				}
 			}
