@@ -211,7 +211,7 @@ namespace Cue
 		{
 			var list = new List<IItem>
 			{
-				Hand(), Mouth(), Thrust(), Trib(), CanKiss(), Strapon()
+				Hand(), Head(), Thrust(), Trib(), CanKiss(), Strapon()
 			};
 
 			foreach (var m in Cue.Instance.Options.Menus)
@@ -236,9 +236,9 @@ namespace Cue
 				(p) => p.AI.GetEvent<HandEvent>()?.Active ?? false);
 		}
 
-		public static IItem Mouth()
+		public static IItem Head()
 		{
-			return new CheckBoxItem("Mouth",
+			return new CheckBoxItem("Head",
 				(p, b) =>
 				{
 					if (p != null && !p.IsPlayer)

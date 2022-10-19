@@ -21,7 +21,7 @@
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
-		private VUI.CheckBox idlePose_, autoHands_, handLinking_;
+		private VUI.CheckBox idlePose_, autoHands_, autoHead_, handLinking_;
 		private VUI.CheckBox straponPhysical_, ignoreCamera_, devMode_;
 		private bool ignore_ = false;
 
@@ -47,8 +47,9 @@
 			p.Add(new VUI.Spacer(20));
 
 			autoHands_ = p.Add(new VUI.CheckBox("Auto hands", OnAutoHands, o.AutoHands));
+			autoHead_ = p.Add(new VUI.CheckBox("Auto head", OnAutoHead, o.AutoHead));
 			p.Add(new VUI.Label(
-				"Starts hand events automatically when a hand is close to " +
+				"Starts events automatically when a hand or head is close to " +
 				"genitals.",
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
@@ -107,6 +108,7 @@
 				excitement_.Value = o.Excitement;
 				idlePose_.Checked = o.IdlePose;
 				autoHands_.Checked = o.AutoHands;
+				autoHead_.Checked = o.AutoHead;
 				handLinking_.Checked = o.HandLinking;
 				straponPhysical_.Checked = o.StraponPhysical;
 				ignoreCamera_.Checked = o.IgnoreCamera;
@@ -134,6 +136,12 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.AutoHands = b;
+		}
+
+		private void OnAutoHead(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.AutoHead = b;
 		}
 
 		private void OnHandLinking(bool b)

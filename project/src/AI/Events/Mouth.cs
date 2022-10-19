@@ -130,6 +130,9 @@
 
 		private void CheckAutoStart()
 		{
+			if (!Cue.Instance.Options.AutoHead)
+				return;
+
 			if (GrabEnded())
 				Check(AutoStartDistance, Animation.StopNoReturn);
 		}
