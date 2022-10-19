@@ -82,27 +82,16 @@ namespace Cue
 				SetDone();
 		}
 
-		public override int CanRun()
+		protected override int DoCanRun()
 		{
-			if (HasEmergency())
+			if (v_.Person.Mood.State == Mood.OrgasmState)
 			{
 				SetLastState("ok");
 				return Emergency;
 			}
 
-			SetLastState("no orgasm");
+			SetLastState("orgasm not active");
 			return CannotRun;
-		}
-
-		public override bool HasEmergency()
-		{
-			if (v_.Person.Mood.State == Mood.OrgasmState)
-			{
-				SetLastState("ok");
-				return true;
-			}
-
-			return false;
 		}
 
 		protected override void DoDebug(DebugLines debug)

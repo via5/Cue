@@ -48,9 +48,16 @@ namespace Cue
 			DoSetSound();
 		}
 
-		protected override bool DoCanRun()
+		protected override int DoCanRun()
 		{
-			return IsKissing();
+			if (IsKissing())
+			{
+				SetLastState("ok");
+				return HighPriority;
+			}
+
+			SetLastState("kissing not active");
+			return CannotRun;
 		}
 
 		protected override void DoSetSound()

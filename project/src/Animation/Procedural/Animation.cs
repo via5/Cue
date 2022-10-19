@@ -192,6 +192,8 @@ namespace Cue.Proc
 					debug.Add(I(1) + ds[i]);
 			}
 
+			debug.Add($"applyWhenOff={applyWhenOff_}");
+
 			DebugTarget(debug, root_, 1);
 		}
 

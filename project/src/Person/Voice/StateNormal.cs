@@ -105,7 +105,7 @@ namespace Cue
 			intensityTargetRng_ = o.intensityTargetRng_.Clone();
 		}
 
-		public override int CanRun()
+		protected override int DoCanRun()
 		{
 			SetLastState("ok");
 			return LowPriority;

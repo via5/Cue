@@ -46,9 +46,16 @@ namespace Cue
 			DoSetSound();
 		}
 
-		protected override bool DoCanRun()
+		protected override int DoCanRun()
 		{
-			return BJActive();
+			if (BJActive())
+			{
+				SetLastState("ok");
+				return HighPriority;
+			}
+
+			SetLastState("bj not active");
+			return CannotRun;
 		}
 
 		protected override void DoSetSound()

@@ -16,7 +16,6 @@ namespace Cue
 		void EarlyUpdate(float s);
 		void Update(float s);
 		int CanRun();
-		bool HasEmergency();
 		void Debug(DebugLines debug);
 	}
 
@@ -69,11 +68,9 @@ namespace Cue
 			DoUpdate(s);
 		}
 
-		public abstract int CanRun();
-
-		public virtual bool HasEmergency()
+		public int CanRun()
 		{
-			return false;
+			return DoCanRun();
 		}
 
 		public void Debug(DebugLines debug)
@@ -118,6 +115,8 @@ namespace Cue
 			// no-op
 		}
 
+		protected abstract int DoCanRun();
+
 		protected abstract void DoDebug(DebugLines debug);
 	}
 
@@ -157,35 +156,9 @@ namespace Cue
 			voiceTime_ = o.voiceTime_;
 		}
 
-		public override int CanRun()
-		{
-			if (HasEmergency())
-			{
-				SetLastState("ok");
-				return Emergency;
-			}
-
-			SetLastState("not kissing");
-			return CannotRun;
-		}
-
-		public override bool HasEmergency()
-		{
-			if (!enabled_)
-				return false;
-
-			if (DoCanRun())
-			{
-				SetLastState("ok");
-				return true;
-			}
-
-			return false;
-		}
-
 		protected override void DoUpdate(float s)
 		{
-			if (!DoCanRun())
+			if (CanRun() == CannotRun)
 			{
 				SetDone();
 				return;
@@ -217,7 +190,6 @@ namespace Cue
 			debug.Add("lastRng", $"{lastRng_:0.00}/{voiceChance_:0.00}");
 		}
 
-		protected abstract bool DoCanRun();
 		protected abstract void DoSetSound();
 	}
 }

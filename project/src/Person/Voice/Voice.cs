@@ -10,10 +10,10 @@ namespace Cue
 		private Logger log_;
 		private List<IVoiceState> states_ = new List<IVoiceState>();
 		private IVoiceState current_ = null;
+		private int currentPrio_ = -1;
 
 		private float maxIntensity_ = 0;
 		private bool muted_ = false;
-		private bool emergency_ = false;
 
 		private DebugLines debug_ = new DebugLines();
 
@@ -119,56 +119,69 @@ namespace Cue
 			for (int i = 0; i < states_.Count; ++i)
 				states_[i].EarlyUpdate(s);
 
-			CheckMute();
-
-			if (!emergency_)
-			{
-				for (int i = 0; i < states_.Count; ++i)
-				{
-					if (states_[i].HasEmergency())
-					{
-						current_ = states_[i];
-						current_.Start();
-						emergency_ = true;
-						return;
-					}
-				}
-			}
+			if (current_ != null)
+				CheckForHigherPrio();
 
 			if (current_ != null)
 				current_.Update(s);
 
 			if (current_ == null || current_.Done)
+				Next();
+
+			provider_.Update(s);
+			CheckMute();
+		}
+
+		private void CheckForHigherPrio()
+		{
+			for (int i = 0; i < states_.Count; ++i)
 			{
-				emergency_ = false;
+				if (states_[i] == current_)
+					continue;
 
-				IVoiceState next = null;
-				int nextPrio = -1;
+				int prio = states_[i].CanRun();
 
-				for (int i = 0; i < states_.Count; ++i)
+				if (prio > currentPrio_)
 				{
-					int prio = states_[i].CanRun();
-					if (prio != VoiceState.CannotRun && prio > nextPrio)
-					{
-						next = states_[i];
-						nextPrio = prio;
-					}
+					SetCurrent(states_[i], prio);
+					break;
 				}
+			}
+		}
 
-				if (next == null)
+		private void Next()
+		{
+			IVoiceState next = null;
+			int nextPrio = -1;
+
+			for (int i = 0; i < states_.Count; ++i)
+			{
+				int prio = states_[i].CanRun();
+				if (prio != VoiceState.CannotRun && prio > nextPrio)
 				{
-					log_.Error("no state can run");
-					current_ = null;
-				}
-				else
-				{
-					emergency_ = (nextPrio == VoiceState.Emergency);
-					current_ = next;
-					current_.Start();
+					next = states_[i];
+					nextPrio = prio;
 				}
 			}
 
-			provider_.Update(s);
+			if (next == null)
+			{
+				log_.Error("no state can run");
+				SetCurrent(null, -1);
+			}
+			else
+			{
+				SetCurrent(next, nextPrio);
+			}
+		}
+
+		private void SetCurrent(IVoiceState s, int prio)
+		{
+			current_ = s;
+			currentPrio_ = prio;
+
+			if (current_ != null)
+				current_.Start();
 		}
 
 		private void CheckMute(bool force=false)

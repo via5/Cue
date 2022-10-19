@@ -137,7 +137,7 @@ namespace Cue
 			}
 		}
 
-		public override int CanRun()
+		protected override int DoCanRun()
 		{
 			if (cooldownElapsed_ < cooldown_)
 			{

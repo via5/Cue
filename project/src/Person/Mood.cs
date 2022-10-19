@@ -283,7 +283,8 @@ namespace Cue
 
 		public void ForceOrgasm()
 		{
-			DoOrgasm(false);
+			if (state_ == NormalState)
+				DoOrgasm(false);
 		}
 
 		public void Update(float s)
