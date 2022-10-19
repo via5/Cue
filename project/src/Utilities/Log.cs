@@ -25,7 +25,7 @@ namespace Cue
 		public const int InfoLevel = 2;
 		public const int VerboseLevel = 3;
 
-		private static int enabled_ =
+		private static int sEnabledTypes =
 			Action | Event | AI | Command |
 			Object | Sys | Main;
 
@@ -34,6 +34,7 @@ namespace Cue
 		private int type_;
 		private Func<string> prefix_;
 		private int level_ = InfoLevel;
+		private bool forceEnabled_ = false;
 
 		public Logger(int type, string prefix)
 		{
@@ -70,6 +71,12 @@ namespace Cue
 			set { level_ = value; }
 		}
 
+		public bool ForceEnabled
+		{
+			get { return forceEnabled_; }
+			set { forceEnabled_ = value; }
+		}
+
 		public void Set(IObject o, string prefix)
 		{
 			prefix_ = MakePrefix(o, prefix);
@@ -103,10 +110,10 @@ namespace Cue
 				return () => a.ID + (prefix == "" ? "" : "." + prefix);
 		}
 
-		public static int Enabled
+		public static int EnabledTypes
 		{
-			get { return enabled_; }
-			set { enabled_ = value; }
+			get { return sEnabledTypes; }
+			set { sEnabledTypes = value; }
 		}
 
 		public static string[] Names
@@ -173,7 +180,7 @@ namespace Cue
 
 		private bool IsEnabled(int level)
 		{
-			if (!Bits.IsSet(enabled_, type_))
+			if (!forceEnabled_ && !Bits.IsSet(sEnabledTypes, type_))
 				return false;
 
 			if (level > level_)

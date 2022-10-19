@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
@@ -372,19 +373,27 @@ namespace Cue.Sys.Vam
 
 		private void SetController(JSONStorable r, string target, string value)
 		{
-			var param = r.GetParam(target);
-			if (param == null)
+			try
 			{
-				log_.Error($"param '{target}' doesn't exist in receiver '{r.name}'");
-				return;
+				var param = r.GetParam(target);
+				if (param == null)
+				{
+					log_.Error($"param '{target}' doesn't exist in receiver '{r.name}'");
+					return;
+				}
+
+				if (SetControllerFloat(param, value))
+					return;
+				else if (SetControllerSC(param, value))
+					return;
+
+				log_.Error($"unsupported param type for '{target}' in receiver '{r.name}'");
 			}
-
-			if (SetControllerFloat(param, value))
-				return;
-			else if (SetControllerSC(param, value))
-				return;
-
-			log_.Error($"unsupported param type for '{target}' in receiver '{r.name}'");
+			catch (Exception)
+			{
+				// happens for some male-only controllers that also exist in
+				// females
+			}
 		}
 
 		private bool SetControllerFloat(JSONStorableParam param, string value)

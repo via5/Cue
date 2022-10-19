@@ -176,7 +176,7 @@
 		{
 			if (left != null && right != null)
 			{
-				if (left.Type == BP.Penis || right.Type != BP.Penis)
+				if (left.Type == BP.Penis && right.Type == BP.Penis)
 				{
 					if (left.Person != right.Person)
 						return true;

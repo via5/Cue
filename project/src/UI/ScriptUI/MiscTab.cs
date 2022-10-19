@@ -91,7 +91,7 @@ namespace Cue
 			: base("Log", false)
 		{
 			var names = Logger.Names;
-			var enabled = Logger.Enabled;
+			var enabled = Logger.EnabledTypes;
 
 			Layout = new VUI.VerticalFlow(0, false);
 
@@ -115,7 +115,7 @@ namespace Cue
 					e |= (1 << i);
 			}
 
-			Logger.Enabled = e;
+			Logger.EnabledTypes = e;
 			Cue.Instance.Save();
 		}
 	}
