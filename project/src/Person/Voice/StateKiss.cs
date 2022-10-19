@@ -6,6 +6,7 @@ namespace Cue
 	{
 		private KissEvent e_ = null;
 		private bool leading_ = false;
+		private bool audio_ = true;
 
 		private VoiceStateKiss()
 		{
@@ -54,7 +55,9 @@ namespace Cue
 
 		protected override void DoSetSound()
 		{
-			if (Cue.Instance.Options.KissAudio)
+			audio_ = Cue.Instance.Options.KissAudio;
+
+			if (audio_)
 			{
 				if (leading_)
 					v_.Provider.SetKissing();
@@ -65,6 +68,14 @@ namespace Cue
 			{
 				v_.Provider.SetSilent();
 			}
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			base.DoUpdate(s);
+
+			if (Cue.Instance.Options.KissAudio != audio_)
+				DoSetSound();
 		}
 
 		private bool IsKissing()

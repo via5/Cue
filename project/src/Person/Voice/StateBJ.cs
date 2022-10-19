@@ -5,6 +5,7 @@ namespace Cue
 	public class VoiceStateBJ : VoiceStateWithMoaning
 	{
 		private MouthEvent e_ = null;
+		private bool audio_ = true;
 
 		private VoiceStateBJ()
 		{
@@ -52,10 +53,20 @@ namespace Cue
 
 		protected override void DoSetSound()
 		{
-			if (Cue.Instance.Options.BJAudio)
+			audio_ = Cue.Instance.Options.BJAudio;
+
+			if (audio_)
 				v_.Provider.SetBJ(v_.MaxIntensity);
 			else
-				v_.Provider.SetSilent();
+				v_.Provider.SetBreathing();
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			base.DoUpdate(s);
+
+			if (Cue.Instance.Options.BJAudio != audio_)
+				DoSetSound();
 		}
 
 		private bool BJActive()

@@ -20,7 +20,8 @@ namespace Cue.VamMoan
 			public Sys.Vam.ActionParameter breathing;
 			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter kissing;
-			public Sys.Vam.ActionParameter[] bj;
+			public Sys.Vam.BoolParameter bjEnabled;         // >= v20
+			public Sys.Vam.ActionParameter[] bjIntensities; // <  v20
 			public Sys.Vam.ActionParameter[] intensities;
 			public Sys.Vam.FloatParameter availableIntensities;
 			public bool hasAvailableIntensities;
@@ -81,12 +82,14 @@ namespace Cue.VamMoan
 			p_.intensities = GetIntensities();
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
 			p_.orgasm = AP("Voice orgasm");
+			p_.bjEnabled = BP("Enable blowjob sounds");
 
-			p_.bj = new Sys.Vam.ActionParameter[]
+			p_.bjIntensities = new Sys.Vam.ActionParameter[]
 			{
 				AP("Voice blowjob"),
 				AP("Voice blowjob intense")
 			};
+
 
 			CheckVoice();
 
@@ -276,44 +279,59 @@ namespace Cue.VamMoan
 			int index = (int)(v * p_.intensities.Length);
 			index = U.Clamp(index, 0, p_.intensities.Length - 1);
 
-			currentAction_ = p_.intensities[index];
+			SetAction(p_.intensities[index], false);
+
 			Fire();
 		}
 
 		public void SetBreathing()
 		{
-			currentAction_ = p_.breathing;
+			SetAction(p_.breathing, false);
 			Fire();
 		}
 
 		public void SetSilent()
 		{
-			currentAction_ = p_.disabled;
+			SetAction(p_.disabled, false);
 			Fire();
 		}
 
 		public void SetOrgasm()
 		{
-			currentAction_ = p_.orgasm;
+			SetAction(p_.orgasm, false);
 			Fire();
 		}
 
 		public void SetKissing()
 		{
-			currentAction_ = p_.kissing;
+			SetAction(p_.kissing, false);
 			Fire();
 		}
 
 		public void SetBJ(float v)
 		{
-			if (p_.bj.Length == 0)
-				return;
+			if (p_.bjEnabled.Check())
+			{
+				SetAction(p_.breathing, true);
+			}
+			else
+			{
+				if (p_.bjIntensities.Length == 0)
+					return;
 
-			int index = (int)(v * p_.bj.Length);
-			index = U.Clamp(index, 0, p_.bj.Length - 1);
+				int index = (int)(v * p_.bjIntensities.Length);
+				index = U.Clamp(index, 0, p_.bjIntensities.Length - 1);
 
-			currentAction_ = p_.bj[index];
+				SetAction(p_.bjIntensities[index], false);
+			}
+
 			Fire();
+		}
+
+		private void SetAction(Sys.Vam.ActionParameter a, bool bj)
+		{
+			currentAction_ = a;
+			p_.bjEnabled.Value = bj;
 		}
 
 		private void Fire(bool force = false)
