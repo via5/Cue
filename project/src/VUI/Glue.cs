@@ -4,6 +4,8 @@ namespace VUI
 {
 	public class Glue
 	{
+		private static string prefix_;
+
 		public delegate MVRPluginManager PluginManagerDelegate();
 		private static PluginManagerDelegate getPluginManager_;
 
@@ -16,6 +18,7 @@ namespace VUI
 		private static bool inited_ = false;
 
 		public static void InitInternal(
+			string prefix,
 			PluginManagerDelegate getPluginManager,
 			StringDelegate getString = null,
 			LogDelegate logVerbose = null,
@@ -24,6 +27,7 @@ namespace VUI
 			LogDelegate logError = null)
 		{
 			inited_ = true;
+			prefix_ = prefix;
 			getPluginManager_ = getPluginManager;
 			getString_ = getString;
 			logVerbose_ = logVerbose;
@@ -35,6 +39,11 @@ namespace VUI
 		public static bool Initialized
 		{
 			get { return inited_; }
+		}
+
+		public static string Prefix
+		{
+			get { return prefix_; }
 		}
 
 		public static MVRPluginManager PluginManager

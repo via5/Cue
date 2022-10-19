@@ -194,6 +194,7 @@ namespace Cue
 			Sys.Init();
 
 			VUI.Root.Init(
+				"Cue",
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => Log.Verbose(s),

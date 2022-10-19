@@ -122,7 +122,8 @@ namespace Cue
 
 			public override void Activate()
 			{
-				Widget.Toggle();
+				if (Widget.Enabled)
+					Widget.Toggle();
 			}
 
 			private void OnChecked(bool b)

@@ -23,7 +23,9 @@ namespace Cue
 		{
 			sys_ = Cue.Instance.Sys;
 
-			var root = new VUI.Root(new VUI.OverlayRootSupport(10, Width, MinHeight));
+			var root = new VUI.Root(
+				new VUI.OverlayRootSupport(10, Width, MinHeight),
+				"CueDesktop");
 
 			var p = new VUI.Panel(new VUI.VerticalFlow(5));
 
