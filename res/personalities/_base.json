@@ -657,9 +657,17 @@
 	"idleAnimation": "procStandIdle",
 
 	"slapMinExpressionChange": 0,
-	"slapMaxExpressionChange": 0.4,
+	"slapMaxExpressionChange": 0.5,
 	"slapMinTime": 0.15,
-	"slapMaxTime": 0.35,
+	"slapMaxTime": 0.45,
+	"slapUpdateInterval":
+	{
+		"range":
+		{
+			"min": 3,
+			"max": 8,
+		}
+	},
 
 	"sensitivities":
 	[

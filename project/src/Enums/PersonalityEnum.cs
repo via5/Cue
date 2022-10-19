@@ -14,9 +14,10 @@ namespace Cue
 		public static readonly DurationIndex ZappedByPlayerGazeDuration = new DurationIndex(4);
 		public static readonly DurationIndex ZappedByOtherGazeDuration = new DurationIndex(5);
 		public static readonly DurationIndex OtherZappedGazeDuration = new DurationIndex(6);
+		public static readonly DurationIndex SlapUpdateInterval = new DurationIndex(7);
 
-		public const int DurationCount = 7;
-		public override int GetDurationCount() { return 7; }
+		public const int DurationCount = 8;
+		public override int GetDurationCount() { return 8; }
 
 		// bools
 		public static readonly BoolIndex GazeSaccade = new BoolIndex(0);
@@ -189,6 +190,7 @@ namespace Cue
 			"zappedByPlayerGazeDuration",
 			"zappedByOtherGazeDuration",
 			"otherZappedGazeDuration",
+			"slapUpdateInterval",
 		};
 
 		public static int DurationFromString(string s)
@@ -549,6 +551,7 @@ namespace Cue
 			"zappedByPlayerGazeDuration",
 			"zappedByOtherGazeDuration",
 			"otherZappedGazeDuration",
+			"slapUpdateInterval",
 			"gazeSaccade",
 			"gazeBlink",
 			"lookAboveUseGazeEnergy",

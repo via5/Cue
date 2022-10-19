@@ -423,7 +423,7 @@ namespace Cue.Proc
 
 	public class DurationSync : BasicSync
 	{
-		private const float SlapMinOffset = 0;
+		private const float SlapMinOffset = 0.2f;
 		private const float SlapMaxOffset = 0.5f;
 
 		public const int NoFlags = 0x00;

@@ -153,6 +153,7 @@ V.Float("SlapMinExpressionChange"),
 V.Float("SlapMaxExpressionChange"),
 V.Float("SlapMinTime"),
 V.Float("SlapMaxTime"),
+V.Duration("SlapUpdateInterval"),
 
 V.Float("MaxSweat"),
 V.Float("MaxFlush"),

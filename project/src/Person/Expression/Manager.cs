@@ -22,7 +22,10 @@ namespace Cue
 		private float slapElapsed_ = 0;
 		private float slapAmount_ = 0;
 		private bool slapUp_ = false;
-		private IEasing slapEasing_ = new SinusoidalEasing();
+		private IEasing slapEasing_ = new QuadInOutEasing();
+		private Duration slapUpdateInterval_ = new Duration(5);
+		private bool slapUpdate_ = true;
+		private bool slapping_ = false;
 
 		public ExpressionManager(Person p)
 		{
@@ -83,23 +86,34 @@ namespace Cue
 				NextActive();
 
 			lastPersonality_ = person_.Personality;
+			slapUpdateInterval_ = person_.Personality.GetDuration(PS.SlapUpdateInterval);
 		}
 
 		public void Slapped(float speed)
 		{
-			if (slapTime_ != 0)
+			if (slapping_)
 				return;
 
 			slapElapsed_ = 0;
 			slapUp_ = true;
+			slapping_ = true;
 
-			slapTime_ = U.RandomNormal(
-				person_.Personality.Get(PS.SlapMinTime),
-				person_.Personality.Get(PS.SlapMaxTime));
+			if (slapUpdate_)
+			{
+				slapUpdate_ = false;
 
-			slapAmount_ = U.RandomFloat(
-				person_.Personality.Get(PS.SlapMinExpressionChange),
-				person_.Personality.Get(PS.SlapMaxExpressionChange));
+				float minTime = person_.Personality.Get(PS.SlapMinTime);
+				float maxTime = person_.Personality.Get(PS.SlapMaxTime);
+
+				if (speed >= minTime && speed <= maxTime)
+					maxTime = speed;
+
+				slapTime_ = U.RandomNormal(minTime, maxTime);
+
+				slapAmount_ = U.RandomFloat(
+					person_.Personality.Get(PS.SlapMinExpressionChange),
+					person_.Personality.Get(PS.SlapMaxExpressionChange));
+			}
 		}
 
 		private float GetSlap()
@@ -124,7 +138,7 @@ namespace Cue
 					if (slap >= 1)
 					{
 						slap = 1;
-						slapTime_ = 0;
+						slapping_ = false;
 					}
 
 					slap = 1 - slap;
@@ -166,7 +180,11 @@ namespace Cue
 
 		public void FixedUpdate(float s)
 		{
-			if (slapTime_ > 0)
+			slapUpdateInterval_.Update(s, person_.Mood.MovementEnergy);
+			if (slapUpdateInterval_.Finished)
+				slapUpdate_ = true;
+
+			if (slapping_)
 				slapElapsed_ += s;
 
 			if (lastPersonality_ != person_.Personality)
@@ -497,6 +515,11 @@ namespace Cue
 
 		public void Debug(DebugLines debug)
 		{
+			debug.Add("slap:");
+			debug.Add($"  time={slapTime_:0.00} elapsed={slapElapsed_:0.00} amount={slapAmount_:0.00} up={slapUp_}");
+			debug.Add($"  interval={slapUpdateInterval_.ToLiveString()}");
+			debug.Add($"  update={slapUpdate_} slap={slapping_},{GetSlap():0.00}");
+
 			for (int j = 0; j < exps_.Length; ++j)
 			{
 				if (exps_[j].Active)
