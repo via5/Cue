@@ -88,7 +88,7 @@ namespace Cue
 
 		private void CreateUI()
 		{
-			Logger.Global.Info("creating ui");
+			Logger.Global.Verbose("creating ui");
 
 			if (vr_ || VRMenuDebug)
 				menu_ = new VRMenu(VRMenuDebug);
@@ -98,7 +98,7 @@ namespace Cue
 
 		private void DestroyUI()
 		{
-			Logger.Global.Info("destroying ui");
+			Logger.Global.Verbose("destroying ui");
 			menu_?.Destroy();
 		}
 

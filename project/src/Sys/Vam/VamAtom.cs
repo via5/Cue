@@ -330,7 +330,7 @@ namespace Cue.Sys.Vam
 			{
 				if (p.type == "keyJoints")
 				{
-					log_.Info($"setting key joints");
+					log_.Verbose($"setting key joints");
 					setOnlyKeyJointsOn_.Fire();
 				}
 				else
@@ -395,13 +395,13 @@ namespace Cue.Sys.Vam
 
 			if (value == "default")
 			{
-				log_.Info($"setting {param.storable.name}.{param.name} to default");
+				log_.Verbose($"setting {param.storable.name}.{param.name} to default");
 				fp.SetValToDefault();
 			}
 			else
 			{
 				var f = float.Parse(value);
-				log_.Info($"setting {param.storable.name}.{param.name} to {f:0.00}");
+				log_.Verbose($"setting {param.storable.name}.{param.name} to {f:0.00}");
 				fp.val = f;
 			}
 
@@ -416,12 +416,12 @@ namespace Cue.Sys.Vam
 
 			if (value == "default")
 			{
-				log_.Info($"setting {param.storable.name}.{param.name} to default");
+				log_.Verbose($"setting {param.storable.name}.{param.name} to default");
 				scp.SetValToDefault();
 			}
 			else
 			{
-				log_.Info($"setting {param.storable.name}.{param.name} to {value}");
+				log_.Verbose($"setting {param.storable.name}.{param.name} to {value}");
 				scp.val = value;
 			}
 

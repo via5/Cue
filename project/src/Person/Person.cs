@@ -44,6 +44,7 @@ namespace Cue
 		private IHoming homing_;
 
 		private bool hasBody_ = false;
+		private bool loadPose_ = true;
 
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
@@ -52,11 +53,10 @@ namespace Cue
 			personIndex_ = personIndex;
 
 			options_ = new PersonOptions(this);
-			personality_ = Resources.Personalities.Clone(Resources.DefaultPersonality, this);
+			SetPersonality(Resources.Personalities.Clone(Resources.DefaultPersonality, this));
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			body_ = new Body(this);
-			voice_ = personality_.CreateVoice();
 			gaze_ = new Gaze(this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);
@@ -93,6 +93,8 @@ namespace Cue
 		{
 			base.Load(r);
 
+			loadPose_ = J.OptBool(r, "loadPose", true);
+
 			if (r.HasKey("personality"))
 			{
 				var po = r["personality"].AsObject;
@@ -101,7 +103,7 @@ namespace Cue
 				{
 					var p = Resources.Personalities.Clone(po["name"], this);
 					if (p != null)
-						Personality = p;
+						SetPersonality(p);
 				}
 
 				personality_.Load(po);
@@ -112,12 +114,13 @@ namespace Cue
 		{
 			var o = base.ToJSON();
 
+			o.Add("id", ID);
+			o.Add("loadPose", new JSONData(loadPose_));
+
 			var p = personality_.ToJSON();
 			if (p.Count > 0)
 				o.Add("personality", p);
 
-			if (o.Count > 0)
-				o.Add("id", ID);
 
 			return o;
 		}
@@ -165,23 +168,30 @@ namespace Cue
 			{
 				return personality_;
 			}
+		}
 
-			set
-			{
-				if (personality_ != null)
-					personality_.Destroy();
+		public bool LoadPose
+		{
+			get { return loadPose_; }
+			set { loadPose_ = value; }
+		}
 
-				personality_ = value;
-				personality_.Init();
+		public void SetPersonality(Personality p)
+		{
+			if (personality_ != null)
+				personality_.Destroy();
 
-				voice_?.Destroy();
-				voice_ = personality_.CreateVoice();
-				voice_.Init(this);
+			personality_ = p;
+			personality_.Init();
 
+			voice_?.Destroy();
+			voice_ = personality_.CreateVoice();
+			voice_.Init(this);
+
+			if (loadPose_)
 				personality_.Pose.Set(this);
 
-				PersonalityChanged?.Invoke();
-			}
+			PersonalityChanged?.Invoke();
 		}
 
 		public ExpressionManager Expression

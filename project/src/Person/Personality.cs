@@ -320,7 +320,7 @@ namespace Cue
 
 		public void Set(Person p)
 		{
-			p.Log.Info($"setting pose '{type}'");
+			p.Log.Verbose($"setting pose '{type}'");
 			p.Atom.SetPose(this);
 		}
 	}

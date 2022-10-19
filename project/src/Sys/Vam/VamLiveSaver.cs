@@ -169,6 +169,8 @@ namespace Cue.Sys.Vam
 			if (atom_ != null)
 			{
 				atom_.SetOn(false);
+				atom_.hidden = true;
+
 				atom_.mainController.MoveControl(
 					new UnityEngine.Vector3(10000, 10000, 10000));
 			}

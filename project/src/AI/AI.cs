@@ -29,6 +29,7 @@ namespace Cue
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "ai");
 			events_ = BasicEvent.All();
+			p.PersonalityChanged += OnPersonalityChanged;
 		}
 
 		public void Init()
@@ -71,32 +72,9 @@ namespace Cue
 		public void Update(float s)
 		{
 			if (ShouldIdle() && !hasIdlePose_)
-			{
-				hasIdlePose_ = true;
-
-				if (idle_ == null)
-				{
-					var name = person_.Personality.GetString(PS.IdleAnimation);
-					idle_ = Resources.Animations.Find(name);
-
-					if (idle_ == null)
-						person_.Log.Error($"idle animation {name} not found");
-				}
-
-				if (idle_ == null)
-					person_.Animator.PlayType(AnimationType.Idle);
-				else
-					person_.Animator.Play(idle_);
-			}
+				StartIdling();
 			else if (!ShouldIdle() && hasIdlePose_)
-			{
-				hasIdlePose_ = false;
-
-				if (idle_ == null)
-					person_.Animator.StopType(AnimationType.Idle);
-				else
-					person_.Animator.Stop(idle_);
-			}
+				StopIdling();
 
 			if (eventsEnabled_)
 			{
@@ -121,6 +99,45 @@ namespace Cue
 				return false;
 
 			return true;
+		}
+
+		private void StartIdling()
+		{
+			hasIdlePose_ = true;
+
+			if (idle_ == null)
+			{
+				var name = person_.Personality.GetString(PS.IdleAnimation);
+				idle_ = Resources.Animations.Find(name);
+
+				if (idle_ == null)
+					person_.Log.Error($"idle animation {name} not found");
+			}
+
+			if (idle_ == null)
+				person_.Animator.PlayType(AnimationType.Idle);
+			else
+				person_.Animator.Play(idle_);
+		}
+
+		private void StopIdling()
+		{
+			hasIdlePose_ = false;
+
+			if (idle_ == null)
+			{
+				person_.Animator.StopType(AnimationType.Idle);
+			}
+			else
+			{
+				person_.Animator.Stop(idle_);
+				idle_ = null;
+			}
+		}
+
+		private void OnPersonalityChanged()
+		{
+			StopIdling();
 		}
 	}
 }

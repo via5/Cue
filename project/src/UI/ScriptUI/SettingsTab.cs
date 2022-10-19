@@ -35,6 +35,7 @@ namespace Cue
 	{
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
+		private VUI.CheckBox loadPose_ = new VUI.CheckBox("Load pose");
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
@@ -50,8 +51,12 @@ namespace Cue
 
 			var p = new VUI.Panel(gl);
 
+			var pp = new VUI.Panel(new VUI.HorizontalFlow(10));
+			pp.Add(personality_);
+			pp.Add(loadPose_);
+
 			p.Add(new VUI.Label("Personality"));
-			p.Add(personality_);
+			p.Add(pp);
 
 			p.Add(new VUI.Label("Traits"));
 			p.Add(traits_);
@@ -65,6 +70,7 @@ namespace Cue
 			Add(w);
 
 			personality_.SelectionChanged += OnPersonality;
+			loadPose_.Changed += OnLoadPose;
 			traits_.Edited += OnTraits;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
@@ -145,6 +151,7 @@ namespace Cue
 			}
 
 			personality_.SetItems(items, sel);
+			loadPose_.Checked = person_.LoadPose;
 		}
 
 		private void SelectPersonality(string name)
@@ -167,11 +174,20 @@ namespace Cue
 
 			if (item.Personality.Name != person_.Personality.Name)
 			{
-				person_.Personality = Resources.Personalities.Clone(
+				var p = Resources.Personalities.Clone(
 					item.Personality.Name, person_);
 
+				person_.SetPersonality(p);
 				Cue.Instance.Save();
 			}
+		}
+
+		private void OnLoadPose(bool b)
+		{
+			if (ignore_) return;
+
+			person_.LoadPose = b;
+			Cue.Instance.Save();
 		}
 
 		private void OnTraits(string s)
