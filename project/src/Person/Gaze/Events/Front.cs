@@ -10,7 +10,12 @@ namespace Cue
 		protected override int DoCheck(int flags)
 		{
 			var ps = person_.Personality;
-			targets_.SetFrontWeight(ps.Get(PS.LookFrontWeight), "front");
+
+			float w = ps.Get(PS.LookFrontWeight);
+
+			if (w > 0)
+				targets_.SetFrontWeight(w, "front");
+
 			return Continue;
 		}
 
