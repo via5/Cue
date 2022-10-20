@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VUI
 {
@@ -125,6 +126,7 @@ namespace VUI
 		private float vspacing_ = 0;
 		private bool uniformWidth_ = false;
 		private bool uniformHeight_ = true;
+		private bool hfill_ = false;
 		private int nextCol_ = 0;
 		private int nextRow_ = 0;
 
@@ -187,6 +189,12 @@ namespace VUI
 		{
 			get { return uniformWidth_; }
 			set { uniformWidth_ = value; }
+		}
+
+		public bool HorizontalFill
+		{
+			get { return hfill_; }
+			set { hfill_ = value; }
 		}
 
 		public List<bool> HorizontalStretch
@@ -299,7 +307,6 @@ namespace VUI
 				}
 			}
 
-
 			var extraHeight = new List<float>();
 
 			{
@@ -335,6 +342,32 @@ namespace VUI
 			float x = r.Left;
 			float y = r.Top;
 
+			var rowWidths = new List<float>();
+			for (int colIndex = 0; colIndex < widgets_.ColumnCount; ++colIndex)
+				rowWidths.Add(0);
+
+			for (int rowIndex = 0; rowIndex < widgets_.RowCount; ++rowIndex)
+			{
+				for (int colIndex = 0; colIndex < widgets_.ColumnCount; ++colIndex)
+				{
+					var ws = widgets_.Cell(colIndex, rowIndex);
+					var ps = d.sizes.Cell(colIndex, rowIndex);
+					var uniformWidth = d.widths[colIndex];
+
+					float ww = 0;
+					if (uniformWidth_)
+						ww = uniformWidth + extraWidth[colIndex];
+					else
+						ww = ps.Width + extraWidth[colIndex];
+
+					if (x + ww > r.Right)
+						ww = r.Right - x;
+
+					rowWidths[colIndex] = Math.Max(rowWidths[colIndex], ww);
+				}
+			}
+
+
 			for (int rowIndex = 0; rowIndex < widgets_.RowCount; ++rowIndex)
 			{
 				float tallestInRow = 0;
@@ -351,6 +384,8 @@ namespace VUI
 					float ww = 0;
 					if (uniformWidth_)
 						ww = uniformWidth + extraWidth[colIndex];
+					else if (hfill_)
+						ww = rowWidths[colIndex];
 					else
 						ww = ps.Width + extraWidth[colIndex];
 
@@ -376,6 +411,9 @@ namespace VUI
 						// a widget's size can never change again when uniform,
 						// unless the grid itself changes size
 						w.SetBounds(wr, uniformWidth_ && uniformHeight_);
+
+						if (Parent.Name == "bleh")
+							Glue.LogInfo($"row={rowIndex} col={colIndex} {w} {wr}");
 					}
 
 					x += uniformWidth + extraWidth[colIndex];

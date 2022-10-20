@@ -21,6 +21,7 @@ namespace Cue
 		private float baseTiredness_ = 0;
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
 		private ForceableFloat[] moods_ = new ForceableFloat[MoodType.Count];
+		private float maxExcitement_ = 1.0f;
 
 
 		public Mood(Person p)
@@ -254,6 +255,12 @@ namespace Cue
 			}
 		}
 
+		public float MaxExcitement
+		{
+			get { return maxExcitement_; }
+			set { maxExcitement_ = value; }
+		}
+
 		private float MovementEnergyForExcitement(float e)
 		{
 			var ps = person_.Personality;
@@ -466,8 +473,13 @@ namespace Cue
 					0, ex.Max);
 			}
 
+			baseExcitement_.Value = Math.Min(baseExcitement_.Value, maxExcitement_);
+
 			float zapped = person_.Body.Zap.Intensity * 0.9f;
-			Set(MoodType.Excited, Math.Max(BaseExcitement, zapped));
+			float e = Math.Max(BaseExcitement, zapped);
+			e = Math.Min(e, maxExcitement_);
+
+			Set(MoodType.Excited, e);
 		}
 
 		private float GetRate()

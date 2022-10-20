@@ -56,9 +56,7 @@
 
 			handLinking_ = p.Add(new VUI.CheckBox("Hand linking", OnHandLinking, o.HandLinking));
 			p.Add(new VUI.Label(
-				"Enables linking hands to body parts when they're close " +
-				"enough. Hands sometimes become impossible to move in Play " +
-				"Mode, but they can always be moved in Edit Mode.",
+				"Enables linking hands to body parts when they're close enough.",
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 

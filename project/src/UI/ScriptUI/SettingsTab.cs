@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -36,6 +37,7 @@ namespace Cue
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.CheckBox loadPose_ = new VUI.CheckBox("Load pose");
+		private VUI.IntTextSlider maxExcitement_;
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox();
 		private bool ignore_ = false;
@@ -46,28 +48,36 @@ namespace Cue
 		{
 			person_ = person;
 
-			var gl = new VUI.GridLayout(2, 10);
-			gl.HorizontalStretch = new List<bool>() { false, false };
+			var gl = new VUI.GridLayout(3, 10);
+			gl.HorizontalStretch = new List<bool>() { false, true, false };
+			gl.HorizontalFill = true;
 
-			var p = new VUI.Panel(gl);
-
-			var pp = new VUI.Panel(new VUI.HorizontalFlow(10));
+			var pp = new VUI.Panel(gl);
+			pp.Add(new VUI.Label("Personality"));
 			pp.Add(personality_);
 			pp.Add(loadPose_);
 
-			p.Add(new VUI.Label("Personality"));
-			p.Add(pp);
+			pp.Add(new VUI.Label("Max excitement"));
+			maxExcitement_ = pp.Add(new VUI.IntTextSlider(0, 100, OnMaxExcitement));
+			pp.Add(new VUI.Spacer());
 
-			p.Add(new VUI.Label("Traits"));
-			p.Add(traits_);
+			pp.Add(new VUI.Label("Traits"));
+			pp.Add(traits_);
+			pp.Add(new VUI.Spacer());
 
 			var w = new VUI.Panel(new VUI.VerticalFlow(10));
 			w.Add(warning_);
 
-			Layout = new VUI.VerticalFlow(20);
+			Layout = new VUI.VerticalFlow(40);
 			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
-			Add(p);
+			Add(pp);
+			Add(new VUI.Label(
+				"Load pose: if checked, some personalities like Sleeping " +
+				"will also set joints to Off and change their physics settings.",
+				UnityEngine.FontStyle.Italic, VUI.Label.Wrap));
 			Add(w);
+
+			maxExcitement_.ToStringCallback = v => $"{v}%";
 
 			personality_.SelectionChanged += OnPersonality;
 			loadPose_.Changed += OnLoadPose;
@@ -100,6 +110,8 @@ namespace Cue
 					RebuildPersonalities();
 				else
 					SelectPersonality(person_.Personality.Name);
+
+				maxExcitement_.Value = (int)Math.Round(person_.Mood.MaxExcitement * 100);
 
 				warning_.Text = MakeWarnings();
 				warning_.Visible = (warning_.Text.Length > 0);
@@ -187,6 +199,14 @@ namespace Cue
 			if (ignore_) return;
 
 			person_.LoadPose = b;
+			Cue.Instance.Save();
+		}
+
+		private void OnMaxExcitement(int i)
+		{
+			if (ignore_) return;
+
+			person_.Mood.MaxExcitement = i / 100.0f;
 			Cue.Instance.Save();
 		}
 

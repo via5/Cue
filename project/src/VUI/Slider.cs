@@ -613,6 +613,8 @@ namespace VUI
 
 	class IntTextSlider : BasicTextSlider<int>
 	{
+		private Func<int, string> toString_ = null;
+
 		public IntTextSlider(ValueCallback valueChanged = null)
 			: this(0, 0, 1, valueChanged)
 		{
@@ -628,6 +630,12 @@ namespace VUI
 		{
 		}
 
+		public Func<int, string> ToStringCallback
+		{
+			get { return toString_; }
+			set { toString_ = value; }
+		}
+
 		protected override int FromString(string s)
 		{
 			int f;
@@ -639,7 +647,10 @@ namespace VUI
 
 		protected override void ToString(int v, StringBuilder sb)
 		{
-			sb.Append(v);
+			if (toString_ == null)
+				sb.Append(v);
+			else
+				sb.Append(toString_(v));
 		}
 	}
 }
