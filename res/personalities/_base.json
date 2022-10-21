@@ -285,8 +285,8 @@
 			[
 				{
 					"id": "AAsex_closedAA1",
-					"max": 1,
-					"eyesClosed": 1,
+					"max": 0.8,
+					"eyesClosed": 0.8,
 				}
 			]
 		},

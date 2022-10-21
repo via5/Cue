@@ -47,13 +47,17 @@ namespace Cue
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
 		private IGazeLookat currentTarget_ = null;
-		private IGazeLookat forcedTarget_ = null;
 		private bool emergency_ = false;
 		private readonly StringBuilder lastString_ = new StringBuilder();
 		private readonly StringBuilder avoidString_ = new StringBuilder();
 		private float timeSinceLastAvoid_ = 0;
 		private float updateGeoElapsed_ = UpdateGeoInterval;
 		private float canLookElapsed_ = CheckCanLookInterval;
+
+		// temp target
+		private IGazeLookat tempTarget_ = null;
+		private float tempTargetTime_ = 0;
+		private float tempTargetElapsed_ = 0;
 
 		public GazeTargetPicker(Person p)
 		{
@@ -107,18 +111,34 @@ namespace Cue
 
 		public IGazeLookat CurrentTarget
 		{
-			get { return forcedTarget_ ?? currentTarget_; }
+			get { return tempTarget_ ?? currentTarget_; }
 		}
 
-		public IGazeLookat ForcedTarget
+		public void SetTemporaryTarget(IGazeLookat target, float time)
 		{
-			get { return forcedTarget_; }
-			set { forcedTarget_ = value; }
+			tempTarget_ = target;
+			tempTargetTime_ = time;
+			tempTargetElapsed_ = 0;
 		}
 
 		public bool HasTarget
 		{
 			get { return (CurrentTarget != null); }
+		}
+
+		public bool IsTargetTemporary
+		{
+			get { return (tempTarget_ != null); }
+		}
+
+		public float TemporaryTargetTime
+		{
+			get { return tempTargetTime_; }
+		}
+
+		public float TemporaryTargetElapsed
+		{
+			get { return tempTargetElapsed_; }
 		}
 
 		public Duration NextInterval
@@ -187,6 +207,16 @@ namespace Cue
 
 		public bool Update(float s)
 		{
+			if (tempTarget_ != null)
+			{
+				tempTargetElapsed_ += s;
+				if (tempTargetElapsed_ >= tempTargetTime_)
+				{
+					tempTarget_ = null;
+					tempTargetElapsed_ = 0;
+				}
+			}
+
 			timeSinceLastAvoid_ += s;
 
 			// so it's displayed in the ui for more than a frame

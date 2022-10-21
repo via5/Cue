@@ -389,6 +389,7 @@ namespace Cue
 		private VUI.Label gazerVariance_ = new VUI.Label();
 		private VUI.Label debug_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
+		private VUI.Label targetTemporary_ = new VUI.Label();
 		private VUI.Label targetEmergency_ = new VUI.Label();
 		private VUI.Label targetReluctant_ = new VUI.Label();
 		private VUI.Label avoid_ = new VUI.Label();
@@ -452,6 +453,9 @@ namespace Cue
 			p.Add(new VUI.Label("Type"));
 			p.Add(targetType_);
 
+			p.Add(new VUI.Label("Temporary"));
+			p.Add(targetTemporary_);
+
 			p.Add(new VUI.Label("Emergency"));
 			p.Add(targetEmergency_);
 
@@ -492,11 +496,11 @@ namespace Cue
 		{
 			var g = person_.Gaze;
 
-			eyesBlink_.Text = $"{g.Eyes.Blink}";
+			eyesBlink_.Text = $"{(g.Eyes.Blink ? "yes" : "no")}";
 			eyesPos_.Text = $"{g.Eyes.TargetPosition}";
 
 			gazerType_.Text = $"{g.Gazer.Name}";
-			gazerEnabled_.Text = $"{g.Gazer.Enabled}";
+			gazerEnabled_.Text = $"{(g.Gazer.Enabled ? "yes" : "no")}";
 			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
 			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}";
 			debug_.Text = g.DebugString();
@@ -504,14 +508,27 @@ namespace Cue
 			if (g.Picker.HasTarget)
 			{
 				targetType_.Text = $"{g.Picker.CurrentTarget}";
-				targetEmergency_.Text = $"{g.IsEmergency}";
-				targetReluctant_.Text = $"{g.Picker.CurrentTarget.Reluctant}";
+				targetEmergency_.Text = $"{(g.IsEmergency ? "yes" : "no")}";
+				targetReluctant_.Text = $"{(g.Picker.CurrentTarget.Reluctant ? "yes" : "no")}";
+
+				if (g.Picker.IsTargetTemporary)
+				{
+					targetTemporary_.Text =
+						$"yes " +
+						$"{g.Picker.TemporaryTargetElapsed:0.00}/" +
+						$"{g.Picker.TemporaryTargetTime:0.00}";
+				}
+				else
+				{
+					targetTemporary_.Text = "no";
+				}
 			}
 			else
 			{
 				targetType_.Text = "none";
 				targetEmergency_.Text = "no";
 				targetReluctant_.Text = "no";
+				targetTemporary_.Text = "no";
 			}
 
 			avoid_.Text = g.Picker.AvoidString;

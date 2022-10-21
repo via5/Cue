@@ -177,29 +177,37 @@ namespace Cue
 		{
 			orgasmInfos_.Clear();
 
-			if (Bits.IsSet(orgasms_, OrgasmsAll))
+			switch (orgasms_)
 			{
-				foreach (var p in Cue.Instance.ActivePersons)
+				case OrgasmsAll:
 				{
-					if (p.IsPlayer)
-						continue;
+					foreach (var p in Cue.Instance.ActivePersons)
+					{
+						if (p.IsPlayer)
+							continue;
 
-					orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
-				}
-			}
-			else if (Bits.IsSet(orgasms_, OrgasmsInvolved))
-			{
-				var player = Cue.Instance.Player;
-				if (player == null)
-					return;
-
-				foreach (var p in Cue.Instance.ActivePersons)
-				{
-					if (p.IsPlayer)
-						continue;
-
-					if (PersonStatus.EitherPenetrating(player, p))
 						orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
+					}
+
+					break;
+				}
+
+				case OrgasmsInvolved:
+				{
+					var player = Cue.Instance.Player;
+					if (player == null)
+						return;
+
+					foreach (var p in Cue.Instance.ActivePersons)
+					{
+						if (p.IsPlayer)
+							continue;
+
+						if (PersonStatus.EitherPenetrating(player, p))
+							orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
+					}
+
+					break;
 				}
 			}
 		}
@@ -207,39 +215,97 @@ namespace Cue
 		private void DoLookAt()
 		{
 			Log.Info($"look at");
+
+			switch (lookAt_)
+			{
+				case LookAtPlayerAll:
+				{
+					var player = Cue.Instance.Player;
+
+					if (player != null)
+					{
+						foreach (var p in Cue.Instance.ActivePersons)
+						{
+							if (p.IsPlayer)
+								continue;
+
+							Log.Info($"look at player for {p} (all)");
+
+							p.Gaze.SetTemporaryTarget(
+								p.Gaze.Targets.GetEyes(player.PersonIndex),
+								orgasmsTime_ + p.Personality.Get(PS.OrgasmTime));
+						}
+					}
+
+					break;
+				}
+
+				case LookAtPlayerInvolved:
+				{
+					var player = Cue.Instance.Player;
+
+					if (player != null)
+					{
+						foreach (var p in Cue.Instance.ActivePersons)
+						{
+							if (p.IsPlayer)
+								continue;
+
+							if (PersonStatus.EitherPenetrating(player, p))
+							{
+								Log.Info($"look at player for {p} (involved)");
+
+								p.Gaze.SetTemporaryTarget(
+									p.Gaze.Targets.GetEyes(player.PersonIndex),
+									orgasmsTime_ + p.Personality.Get(PS.OrgasmTime));
+							}
+						}
+					}
+
+					break;
+				}
+			}
 		}
 
 		private void DoEvents()
 		{
 			Log.Info($"doing events");
 
-			if (Bits.IsSet(events_, StopEventsAll))
+			switch (events_)
 			{
-				foreach (var p in Cue.Instance.ActivePersons)
+				case StopEventsAll:
 				{
-					if (p.IsPlayer)
-						continue;
-
-					Log.Info($"stop events for {p} (all)");
-					p.AI.StopAllEvents();
-				}
-			}
-			else if (Bits.IsSet(events_, StopEventsInvolved))
-			{
-				var player = Cue.Instance.Player;
-				if (player == null)
-					return;
-
-				foreach (var p in Cue.Instance.ActivePersons)
-				{
-					if (p.IsPlayer)
-						continue;
-
-					if (PersonStatus.EitherPenetrating(player, p))
+					foreach (var p in Cue.Instance.ActivePersons)
 					{
-						Log.Info($"stop events for {p} (involved)");
+						if (p.IsPlayer)
+							continue;
+
+						Log.Info($"stop events for {p} (all)");
 						p.AI.StopAllEvents();
 					}
+
+					break;
+				}
+
+				case StopEventsInvolved:
+				{
+					var player = Cue.Instance.Player;
+					if (player == null)
+						return;
+
+					foreach (var p in Cue.Instance.ActivePersons)
+					{
+						if (p.IsPlayer)
+							continue;
+
+						if (PersonStatus.EitherPenetrating(player, p))
+						{
+							Log.Info($"stop events for {p} (involved)");
+							p.AI.StopAllEvents();
+						}
+					}
+
+					break;
 				}
 			}
 		}

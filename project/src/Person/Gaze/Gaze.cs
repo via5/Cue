@@ -125,6 +125,11 @@ namespace Cue
 			set { person_.Atom.AutoBlink = value; }
 		}
 
+		public void SetTemporaryTarget(IGazeLookat target, float time)
+		{
+			picker_.SetTemporaryTarget(target, time);
+		}
+
 		public void Update(float s)
 		{
 			gazeDuration_.Update(s, person_.Mood.GazeEnergy);

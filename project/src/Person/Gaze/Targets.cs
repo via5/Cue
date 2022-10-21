@@ -122,6 +122,11 @@ namespace Cue
 			get { return all_; }
 		}
 
+		public IGazeLookat GetEyes(int personIndex)
+		{
+			return bodyParts_[personIndex, BP.Eyes.Int];
+		}
+
 		private IGazeLookat[] GetAll()
 		{
 			var all = new IGazeLookat[
