@@ -49,7 +49,7 @@ namespace Cue
 
 			if (g_.ShouldAvoidInsidePersonalSpace(t))
 			{
-				targets_.SetShouldAvoid(
+				targets_.SetReluctant(
 					t, true, g_.AvoidWeight(t),
 					"handevent, but avoid in ps");
 

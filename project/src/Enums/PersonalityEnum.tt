@@ -175,7 +175,10 @@ V.Float("PostOrgasmTime"),
 V.Float("RateAdjustment"),
 V.Float("PenetrationDamper"),
 V.Float("MinCollisionMagnitude"),
-V.String("IdleAnimation")
+V.String("IdleAnimation"),
+
+V.String("FinishLookAtTarget"),
+V.String("FinishLookAtIf"),
 
 };
 

@@ -8,6 +8,7 @@ namespace Cue
 		{
 			public Frustum frustum;
 			public bool avoid;
+			public bool reluctant;
 			public bool selected;
 			public float weight;
 
@@ -15,9 +16,17 @@ namespace Cue
 			{
 				frustum = f;
 				avoid = false;
+				reluctant = false;
 				selected = false;
 				weight = w;
 			}
+		}
+
+		public struct ObjectBox
+		{
+			public Box box;
+			public bool reluctant;
+			public bool avoid;
 		}
 
 		private Vector3 Near = new Vector3(2, 2, 0.1f);
@@ -43,9 +52,10 @@ namespace Cue
 		private Person person_;
 		private Logger log_;
 		private FrustumInfo[] frustums_ = new FrustumInfo[FrustumCount];
-		private Box[] avoidBoxes_ = new Box[0];
+		private ObjectBox[] objectBoxes_ = new ObjectBox[0];
 		private Duration delay_ = new Duration();
 		private IGazeLookat[] targets_ = new IGazeLookat[0];
+		private bool[] targetFailed_ = new bool[0];
 		private IGazeLookat currentTarget_ = null;
 		private bool emergency_ = false;
 		private readonly StringBuilder lastString_ = new StringBuilder();
@@ -104,9 +114,9 @@ namespace Cue
 			return frustums_[i];
 		}
 
-		public Box[] AvoidBoxes
+		public ObjectBox[] ObjectBoxes
 		{
-			get { return avoidBoxes_; }
+			get { return objectBoxes_; }
 		}
 
 		public IGazeLookat CurrentTarget
@@ -175,6 +185,7 @@ namespace Cue
 		public void SetTargets(IGazeLookat[] t)
 		{
 			targets_ = t;
+			targetFailed_ = new bool[t.Length];
 		}
 
 		public IGazeLookat[] Targets
@@ -194,6 +205,12 @@ namespace Cue
 				else if (t.Idling)
 				{
 					var f = FindFrustum(t.Position);
+					if (f != null && (f.avoid || f.reluctant))
+						return false;
+				}
+				else
+				{
+					var f = FindFrustum(t.Position);
 					if (f != null && f.avoid)
 						return false;
 				}
@@ -205,6 +222,12 @@ namespace Cue
 			return true;
 		}
 
+		public void AvoidNow()
+		{
+			canLookElapsed_ = CheckCanLookInterval;
+			timeSinceLastAvoid_ = AvoidInterval;
+		}
+
 		public bool Update(float s)
 		{
 			if (tempTarget_ != null)
@@ -213,6 +236,7 @@ namespace Cue
 				if (tempTargetElapsed_ >= tempTargetTime_)
 				{
 					tempTarget_ = null;
+					tempTargetTime_ = 0;
 					tempTargetElapsed_ = 0;
 				}
 			}
@@ -332,6 +356,9 @@ namespace Cue
 
 		public void NextTarget()
 		{
+			for (int i = 0; i < targetFailed_.Length; ++i)
+				targetFailed_[i] = false;
+
 			lastString_.Length = 0;
 
 			float total = 0;
@@ -361,6 +388,9 @@ namespace Cue
 
 				for (int j = 0; j < targets_.Length; ++j)
 				{
+					if (targetFailed_[j])
+						continue;
+
 					if (r < targets_[j].Weight)
 					{
 						//log_.Verbose($"trying {targets_[j]}");
@@ -390,14 +420,24 @@ namespace Cue
 						lastString_.Append(j);
 						lastString_.Append("=X");
 
+						targetFailed_[j] = true;
+
 						break;
 					}
 
 					r -= targets_[j].Weight;
 				}
+
+				total = 0;
+				for (int j = 0; j < targets_.Length; ++j)
+				{
+					if (!targetFailed_[j])
+						total += targets_[j].Weight;
+				}
 			}
 
 			lastString_.Append(" NONE");
+			currentTarget_ = person_.Gaze.Targets.RandomPoint;
 		}
 
 		private void OnPersonalityChanged()
@@ -413,12 +453,14 @@ namespace Cue
 			{
 				var fi = frustums_[i];
 				fi.avoid = false;
+				fi.reluctant = false;
 
-				for (int j = 0; j < avoidBoxes_.Length; ++j)
+				for (int j = 0; j < objectBoxes_.Length; ++j)
 				{
-					if (fi.frustum.TestPlanesAABB(avoidBoxes_[j]))
+					if (fi.frustum.TestPlanesAABB(objectBoxes_[j].box))
 					{
-						fi.avoid = true;
+						fi.avoid = objectBoxes_[j].avoid;
+						fi.reluctant = objectBoxes_[j].reluctant;
 						break;
 					}
 				}
@@ -454,28 +496,37 @@ namespace Cue
 
 		private void UpdateAvoidBoxes()
 		{
-			int avoidCount = 0;
+			int count = 0;
 
 			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
-				if (person_.Gaze.Targets.ShouldAvoid(Cue.Instance.Everything[i]))
-					++avoidCount;
+				if (person_.Gaze.Targets.IsReluctant(Cue.Instance.Everything[i]) ||
+					person_.Gaze.Targets.ShouldAvoid(Cue.Instance.Everything[i]))
+				{
+					++count;
+				}
 			}
 
-			if (avoidCount != avoidBoxes_.Length)
-				avoidBoxes_ = new Box[avoidCount];
+			if (count != objectBoxes_.Length)
+				objectBoxes_ = new ObjectBox[count];
 
 			int boxIndex = 0;
 			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
 				var o = Cue.Instance.Everything[i];
 
-				if (person_.Gaze.Targets.ShouldAvoid(o))
+				bool reluctant = person_.Gaze.Targets.IsReluctant(o);
+				bool avoid = person_.Gaze.Targets.ShouldAvoid(o);
+
+				if (reluctant || avoid)
 				{
 					if (o is Person)
-						avoidBoxes_[boxIndex] = CreatePersonAvoidBox(o as Person);
+						objectBoxes_[boxIndex].box = CreatePersonAvoidBox(o as Person);
 					else
-						avoidBoxes_[boxIndex] = CreateObjectAvoidBox(o as BasicObject);
+						objectBoxes_[boxIndex].box = CreateObjectAvoidBox(o as BasicObject);
+
+					objectBoxes_[boxIndex].reluctant = reluctant;
+					objectBoxes_[boxIndex].avoid = avoid;
 
 					++boxIndex;
 				}

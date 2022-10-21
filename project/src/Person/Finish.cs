@@ -34,10 +34,9 @@ namespace Cue
 		private const int DelayState = 1;
 		private const int ExcitementUpState = 2;
 
-
 		private Logger log_;
 		private float initialDelay_ = 0;
-		private int lookAt_ = LookAtPlayerInvolved;
+		private int lookAt_ = LookAtPersonality;
 		private int orgasms_ = OrgasmsInvolved;
 		private float orgasmsTime_ = 1;
 		private int events_ = StopEventsAll;
@@ -157,6 +156,9 @@ namespace Cue
 						float e = orgasmInfos_[i].initialExcitement + range * p;
 
 						orgasmInfos_[i].person.Mood.GetValue(MoodType.Excited).Value = e;
+
+						if (p >= 1)
+							orgasmInfos_[i].person.Mood.ForceOrgasm();
 					}
 
 					if (p >= 1)
@@ -203,7 +205,7 @@ namespace Cue
 						if (p.IsPlayer)
 							continue;
 
-						if (PersonStatus.EitherPenetrating(player, p))
+						if (p.Status.IsInvolvedWith(player))
 							orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
 					}
 
@@ -233,7 +235,7 @@ namespace Cue
 
 							p.Gaze.SetTemporaryTarget(
 								p.Gaze.Targets.GetEyes(player.PersonIndex),
-								orgasmsTime_ + p.Personality.Get(PS.OrgasmTime));
+								TotalTime(p));
 						}
 					}
 
@@ -251,15 +253,28 @@ namespace Cue
 							if (p.IsPlayer)
 								continue;
 
-							if (PersonStatus.EitherPenetrating(player, p))
+							if (p.Status.IsInvolvedWith(player))
 							{
 								Log.Info($"look at player for {p} (involved)");
 
 								p.Gaze.SetTemporaryTarget(
 									p.Gaze.Targets.GetEyes(player.PersonIndex),
-									orgasmsTime_ + p.Personality.Get(PS.OrgasmTime));
+									TotalTime(p));
 							}
 						}
+					}
+
+					break;
+				}
+
+				case LookAtPersonality:
+				{
+					foreach (var p in Cue.Instance.ActivePersons)
+					{
+						if (p.IsPlayer)
+							continue;
+
+						CheckLookAtPersonality(p);
 					}
 
 					break;
@@ -298,7 +313,7 @@ namespace Cue
 						if (p.IsPlayer)
 							continue;
 
-						if (PersonStatus.EitherPenetrating(player, p))
+						if (p.Status.IsInvolvedWith(player))
 						{
 							Log.Info($"stop events for {p} (involved)");
 							p.AI.StopAllEvents();
@@ -306,6 +321,77 @@ namespace Cue
 					}
 
 					break;
+				}
+			}
+		}
+
+		private float TotalTime(Person p)
+		{
+			return
+				orgasmsTime_ +
+				p.Personality.Get(PS.OrgasmTime) +
+				p.Personality.Get(PS.PostOrgasmTime);
+		}
+
+		private void CheckLookAtPersonality(Person p)
+		{
+			var ps = p.Personality;
+
+			var target = ps.GetString(PS.FinishLookAtTarget);
+			var cond = ps.GetString(PS.FinishLookAtIf);
+
+			Log.Info(
+				$"look at personality for {p}: " +
+				$"target={target} cond={cond}");
+
+			if (target == "player")
+			{
+				var player = Cue.Instance.Player;
+				if (player == null)
+				{
+					Log.Info($"  - target is player, but there's no player");
+					return;
+				}
+
+				bool doAction = false;
+
+				if (cond == "always")
+				{
+					Log.Info($"  - target is player, cond is always, doing action");
+					doAction = true;
+				}
+				else if (cond == "involved")
+				{
+					if (p.Status.IsInvolvedWith(player))
+					{
+						Log.Info($"  - target is player, cond is involved and is true, doing action");
+						doAction = true;
+					}
+					else
+					{
+						Log.Info($"  - target is player, cond is involved but is false, not doing action");
+					}
+				}
+				else
+				{
+					Log.Error($"  - bad cond '{cond}', not doing action");
+				}
+
+				if (doAction)
+				{
+					if (p.Gaze.ShouldAvoidDuringSex(player))
+					{
+						Log.Info($"  - avoiding player for {p} (ps, {cond})");
+						p.Gaze.SetTemporaryAvoid(player, TotalTime(p));
+					}
+					else
+					{
+						Log.Info($"  - looking at player for {p} (ps, {cond})");
+
+						p.Gaze.SetTemporaryTarget(
+							p.Gaze.Targets.GetEyes(player.PersonIndex),
+							TotalTime(p));
+					}
 				}
 			}
 		}

@@ -130,7 +130,7 @@
 		private Person person_;
 		private GazeTargetPicker r_;
 		private FrustumRenderer[] frustums_ = new FrustumRenderer[0];
-		private Sys.IGraphic[] avoid_ = new Sys.IGraphic[0];
+		private Sys.IGraphic[] boxes_ = new Sys.IGraphic[0];
 		private Sys.IGraphic lookAt_ = null;
 		private bool enabled_ = false;
 
@@ -163,8 +163,8 @@
 				for (int i = 0; i < frustums_.Length; ++i)
 					frustums_[i].Visible = value;
 
-				for (int i = 0; i < avoid_.Length; ++i)
-					avoid_[i].Visible = value;
+				for (int i = 0; i < boxes_.Length; ++i)
+					boxes_[i].Visible = value;
 
 				if (lookAt_ != null)
 					lookAt_.Visible = value;
@@ -187,7 +187,9 @@
 			{
 				var fi = r_.GetFrustum(i);
 
-				if (fi.avoid)
+				if (fi.avoid && fi.selected)
+					frustums_[i].Color = new Color(1, 0.2f, 0.2f, 0.1f);
+				else  if (fi.avoid)
 					frustums_[i].Color = new Color(1, 0, 0, 0.1f);
 				else if (fi.selected)
 					frustums_[i].Color = new Color(1, 1, 1, 0.3f);
@@ -200,28 +202,33 @@
 
 		private void UpdateAvoidBoxes()
 		{
-			var boxes = r_.AvoidBoxes;
+			var boxes = r_.ObjectBoxes;
 
-			if (boxes.Length != avoid_.Length)
+			if (boxes.Length != boxes_.Length)
 			{
-				for (int i = 0; i < avoid_.Length; ++i)
-					avoid_[i].Destroy();
+				for (int i = 0; i < boxes_.Length; ++i)
+					boxes_[i].Destroy();
 
-				avoid_ = new Sys.IGraphic[boxes.Length];
+				boxes_ = new Sys.IGraphic[boxes.Length];
 
 				for (int i = 0; i < boxes.Length; ++i)
-					avoid_[i] = CreateAvoid();
+					boxes_[i] = CreateObjectBox();
 			}
 
 
 			for (int i = 0; i < boxes.Length; ++i)
 			{
-				avoid_[i].Position =
+				boxes_[i].Position =
 					r_.Person.Body.Get(BP.Eyes).Position +
-					r_.ReferencePart.Rotation.Rotate(boxes[i].center);
+					r_.ReferencePart.Rotation.Rotate(boxes[i].box.center);
 
-				avoid_[i].Size = boxes[i].size;
-				avoid_[i].Visible = enabled_;
+				boxes_[i].Size = boxes[i].box.size;
+				boxes_[i].Visible = enabled_;
+
+				if (boxes[i].reluctant)
+					boxes_[i].Color = new Color(1, 1, 0, 0.1f);
+				else
+					boxes_[i].Color = new Color(1, 0, 0, 0.1f);
 			}
 		}
 
@@ -258,7 +265,7 @@
 			}
 		}
 
-		private Sys.IGraphic CreateAvoid()
+		private Sys.IGraphic CreateObjectBox()
 		{
 			var g = Cue.Instance.Sys.CreateBoxGraphic(
 				"Gaze.Render.Random.Avoid",

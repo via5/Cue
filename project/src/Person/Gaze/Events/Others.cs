@@ -18,7 +18,7 @@ namespace Cue
 
 				if (g_.ShouldAvoid(p))
 				{
-					targets_.SetShouldAvoid(p, true, g_.AvoidWeight(p), "avoid");
+					targets_.SetReluctant(p, true, g_.AvoidWeight(p), "avoid");
 				}
 				else if (person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze))
 				{

@@ -174,9 +174,11 @@ namespace Cue
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
 		public static readonly StringIndex IdleAnimation = new StringIndex(1);
+		public static readonly StringIndex FinishLookAtTarget = new StringIndex(2);
+		public static readonly StringIndex FinishLookAtIf = new StringIndex(3);
 
-		public const int StringCount = 2;
-		public override int GetStringCount() { return 2; }
+		public const int StringCount = 4;
+		public override int GetStringCount() { return 4; }
 
 
 
@@ -491,6 +493,8 @@ namespace Cue
 		{
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
+			"finishLookAtTarget",
+			"finishLookAtIf",
 		};
 
 		public static int StringFromString(string s)
@@ -696,6 +700,8 @@ namespace Cue
 			"minCollisionMagnitude",
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
+			"finishLookAtTarget",
+			"finishLookAtIf",
 		};
 
 		public static string[] AllNames

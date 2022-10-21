@@ -48,7 +48,7 @@ namespace Cue
 				// check avoidance for closeness
 				if (g_.ShouldAvoidInsidePersonalSpace(t))
 				{
-					targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "avoid in ps");
+					targets_.SetReluctant(t, true, g_.AvoidWeight(t), "avoid in ps");
 					return Continue;
 				}
 
@@ -160,7 +160,7 @@ namespace Cue
 
 				if (g_.ShouldAvoidDuringSex(t))
 				{
-					targets_.SetShouldAvoid(t, true, g_.AvoidWeight(t), "avoid during sex");
+					targets_.SetReluctant(t, true, g_.AvoidWeight(t), "avoid during sex");
 				}
 				else
 				{
@@ -300,7 +300,7 @@ namespace Cue
 
 				if (g_.ShouldAvoidUninvolvedHavingSex(source))
 				{
-					targets_.SetShouldAvoid(
+					targets_.SetReluctant(
 						source, true, g_.AvoidWeight(source),
 						"avoid others during sex");
 				}
@@ -331,7 +331,7 @@ namespace Cue
 
 				if (g_.ShouldAvoidUninvolvedHavingSex(target))
 				{
-					targets_.SetShouldAvoid(
+					targets_.SetReluctant(
 						target, true, g_.AvoidWeight(target),
 						"avoid others during sex");
 				}

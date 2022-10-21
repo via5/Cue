@@ -8,20 +8,22 @@ namespace Cue
 	{
 		public const float ExclusiveWeight = -1;
 
-		struct AvoidInfo
+		struct ObjectInfo
 		{
+			private bool reluctant_;
 			private bool avoid_;
 			private float weight_;
-			private string why_;
+			private string whyReluctant_;
+			private string whyAvoid_;
+
+			public bool Reluctant
+			{
+				get { return reluctant_; }
+			}
 
 			public bool Avoid
 			{
 				get { return avoid_; }
-			}
-
-			public bool ShouldLookAway
-			{
-				get { return (avoid_ && weight_ < 0); }
 			}
 
 			public float Weight
@@ -29,23 +31,36 @@ namespace Cue
 				get { return weight_; }
 			}
 
-			public string Why
+			public string WhyReluctant
 			{
-				get { return why_; }
+				get { return whyReluctant_; }
 			}
 
-			public void Set(bool avoid, float weight, string why)
+			public string WhyAvoid
+			{
+				get { return whyAvoid_; }
+			}
+
+			public void SetReluctant(bool reluctant, float weight, string why)
+			{
+				reluctant_ = reluctant;
+				weight_ = weight;
+				whyReluctant_ = why;
+			}
+
+			public void SetAvoid(bool avoid, string why)
 			{
 				avoid_ = avoid;
-				weight_ = weight;
-				why_ = why;
+				whyAvoid_ = why;
 			}
 
 			public void Clear()
 			{
+				reluctant_ = false;
 				avoid_ = false;
 				weight_ = 0;
-				why_ = "";
+				whyReluctant_ = "";
+				whyAvoid_ = "";
 			}
 		}
 
@@ -69,8 +84,13 @@ namespace Cue
 		// all of the above in one array
 		private IGazeLookat[] all_ = new IGazeLookat[0];
 
-		// an avoidance flag per object, indexed per ObjectIndex
-		private AvoidInfo[] avoid_ = new AvoidInfo[0];
+		// an avoidance/reluctance flag per object, indexed per ObjectIndex
+		private ObjectInfo[] infos_ = new ObjectInfo[0];
+
+		// temporary avoid
+		private IObject tempAvoid_ = null;
+		private float tempAvoidTime_ = 0;
+		private float tempAvoidElapsed_ = 0;
 
 
 		public GazeTargets(Person p)
@@ -96,6 +116,11 @@ namespace Cue
 			get { return front_; }
 		}
 
+		public IGazeLookat RandomPoint
+		{
+			get { return random_; }
+		}
+
 		public void Init()
 		{
 			bodyParts_ = new LookatPart[
@@ -114,7 +139,7 @@ namespace Cue
 				objects_[oi] = new LookatObject(person_, Cue.Instance.Everything[oi]);
 
 			all_ = GetAll();
-			avoid_ = new AvoidInfo[Cue.Instance.Everything.Count];
+			infos_ = new ObjectInfo[Cue.Instance.Everything.Count];
 		}
 
 		public IGazeLookat[] All
@@ -159,22 +184,74 @@ namespace Cue
 			for (int i = 0; i < all_.Length; ++i)
 				all_[i].Clear();
 
-			for (int i = 0; i < avoid_.Length; ++i)
-				avoid_[i].Clear();
+			for (int i = 0; i < infos_.Length; ++i)
+				infos_[i].Clear();
+		}
+
+		public void Update(float s)
+		{
+			if (tempAvoid_ != null)
+			{
+				tempAvoidElapsed_ += s;
+				if (tempAvoidElapsed_ >= tempAvoidTime_)
+				{
+					tempAvoid_ = null;
+					tempAvoidTime_ = 0;
+					tempAvoidElapsed_ = 0;
+				}
+			}
+		}
+
+		public void SetTemporaryAvoid(IObject p, float time)
+		{
+			tempAvoid_ = p;
+			tempAvoidTime_ = time;
+			tempAvoidElapsed_ = 0;
+		}
+
+		public IObject TemporaryAvoidTarget
+		{
+			get { return tempAvoid_; }
+		}
+
+		public float TemporaryAvoidTime
+		{
+			get { return tempAvoidTime_; }
+		}
+
+		public float TemporaryAvoidElapsed
+		{
+			get { return tempAvoidElapsed_; }
+		}
+
+		public bool IsReluctant(IObject o)
+		{
+			return infos_[o.ObjectIndex].Reluctant;
 		}
 
 		public bool ShouldAvoid(IObject o)
 		{
-			return avoid_[o.ObjectIndex].Avoid;
+			if (tempAvoid_ == o)
+				return true;
+
+			return infos_[o.ObjectIndex].Avoid;
 		}
 
-		public void SetShouldAvoid(IObject o, bool b, float weight, string why)
+		public void SetReluctant(IObject o, bool b, float weight, string why)
 		{
-			avoid_[o.ObjectIndex].Set(b, weight, why);
+			infos_[o.ObjectIndex].SetReluctant(b, weight, why);
 
 			if (o is Person && weight > 0)
-				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from avoid)");
+				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from reluctant)");
 		}
+
+		//public void SetShouldAvoid(IObject o, bool b, float weight, string why)
+		//{
+		//	avoid_[o.ObjectIndex].Set(b, weight, why);
+		//
+		//	if (o is Person && weight > 0)
+		//		SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from avoid)");
+		//}
 
 		public void SetWeightIfZero(Person p, BodyPartType bodyPart, float w, string why)
 		{
@@ -222,18 +299,30 @@ namespace Cue
 			Log.Error($"SetObjectWeight: {o} not in list");
 		}
 
-		public List<string> GetAllAvoidForDebug()
+		public List<string> GetAllInfosForDebug()
 		{
 			var list = new List<string>();
 
-			for (int i = 0; i < avoid_.Length; ++i)
+			for (int i = 0; i < infos_.Length; ++i)
 			{
-				if (avoid_[i].Avoid)
+				string s = "";
+
+				if (infos_[i].Reluctant)
+					s += $"reluctant w={infos_[i].Weight} ({infos_[i].WhyReluctant})";
+
+				if (infos_[i].Avoid)
 				{
-					list.Add(
-						$"{Cue.Instance.Everything[i]} w={avoid_[i].Weight} " +
-						$"({avoid_[i].Why})");
+					if (s != "")
+						s += ", ";
+
+					s += $"avoid ({infos_[i].WhyAvoid})";
 				}
+
+				if (s != "")
+					s = $"{Cue.Instance.Everything[i]} {s}";
+
+				if (s != "")
+					list.Add(s);
 			}
 
 			return list;
@@ -350,7 +439,7 @@ namespace Cue
 			get
 			{
 				if (Object != null)
-					return person_.Gaze.Targets.ShouldAvoid(Object);
+					return person_.Gaze.Targets.IsReluctant(Object);
 
 				return false;
 			}

@@ -531,7 +531,21 @@ namespace Cue
 				targetTemporary_.Text = "no";
 			}
 
-			avoid_.Text = g.Picker.AvoidString;
+			string avoidString = g.Picker.AvoidString;
+
+			if (g.Targets.TemporaryAvoidTarget != null)
+			{
+				if (avoidString != "")
+					avoidString += ", ";
+
+				avoidString +=
+					$"temp {g.Targets.TemporaryAvoidTarget} " +
+					$"{g.Targets.TemporaryAvoidElapsed:0.00}/" +
+					$"{g.Targets.TemporaryAvoidTime:0.00}";
+			}
+
+			avoid_.Text = avoidString;
+
 			next_.Text =
 				$"{g.Picker.NextInterval.Remaining:0.0} " +
 				$"({g.Picker.NextInterval.Minimum:0.0}-{g.Picker.NextInterval.Maximum:0.0})";

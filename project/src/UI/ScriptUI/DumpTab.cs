@@ -102,8 +102,8 @@ namespace Cue
 				}
 			}
 
-			foreach (var a in person_.Gaze.Targets.GetAllAvoidForDebug())
-				debug_.Add($"Avoid: {a}");
+			foreach (var a in person_.Gaze.Targets.GetAllInfosForDebug())
+				debug_.Add($"Infos: {a}");
 
 			list_.SetItems(debug_.MakeArray());
 		}

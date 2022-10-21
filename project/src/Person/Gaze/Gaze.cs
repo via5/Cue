@@ -130,9 +130,16 @@ namespace Cue
 			picker_.SetTemporaryTarget(target, time);
 		}
 
+		public void SetTemporaryAvoid(Person p, float time)
+		{
+			Targets.SetTemporaryAvoid(p, time);
+			Picker.AvoidNow();
+		}
+
 		public void Update(float s)
 		{
 			gazeDuration_.Update(s, person_.Mood.GazeEnergy);
+			Targets.Update(s);
 
 			if (forceLook_ != ForceLooks.None)
 			{

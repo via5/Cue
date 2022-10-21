@@ -63,6 +63,11 @@
 		{
 		}
 
+		public bool IsInvolvedWith(Person other)
+		{
+			return EitherPenetrating(person_, other);
+		}
+
 		public bool AnyInsidePersonalSpace()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)

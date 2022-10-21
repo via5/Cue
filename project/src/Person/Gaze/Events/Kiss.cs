@@ -23,7 +23,7 @@ namespace Cue
 						targets_.SetRandomWeight(
 							1, $"kissing {t.ID}, but avoid in ps");
 
-						targets_.SetShouldAvoid(
+						targets_.SetReluctant(
 							t, true, g_.AvoidWeight(t),
 							$"kissing, but avoid in ps");
 					}

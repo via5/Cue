@@ -654,6 +654,11 @@ namespace Cue
 			get { return new Color(0, 0, 1, 1); }
 		}
 
+		public static Color Yellow
+		{
+			get { return new Color(1, 1, 0, 1); }
+		}
+
 		public static Color Lerp(Color a, Color b, float f)
 		{
 			f = U.Clamp(f, 0, 1);
