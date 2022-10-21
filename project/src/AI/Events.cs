@@ -5,6 +5,7 @@ namespace Cue
 	public interface IEvent
 	{
 		string Name { get; }
+		bool Active { get; set; }
 
 		IEventData ParseEventData(JSONClass o);
 		void Init(Person p);
@@ -39,6 +40,8 @@ namespace Cue
 			get { return name_; }
 		}
 
+		public abstract bool Active { get; set; }
+
 		public static IEvent[] All()
 		{
 			// todo: there's an ordering problem, where GrabEvent locks the
@@ -59,7 +62,7 @@ namespace Cue
 				new HandEvent(),
 				new ZappedEvent(),
 				new SuckFingerEvent(),
-				new HandLinker(),
+				new HandLinker()
 			};
 		}
 

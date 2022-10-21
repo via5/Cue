@@ -16,6 +16,12 @@ namespace Cue
 		{
 		}
 
+		public override bool Active
+		{
+			get { return false; }
+			set { }
+		}
+
 		public override void Debug(DebugLines debug)
 		{
 			debug.Add("active", $"{active_}");

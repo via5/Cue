@@ -36,6 +36,7 @@ namespace Cue
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
 		private int frame_ = 0;
+		private Finish finish_;
 
 		private Sys.ILiveSaver saver_;
 
@@ -115,6 +116,7 @@ namespace Cue
 		public Options Options { get { return options_; } }
 		public UI UI { get { return ui_; } }
 		public int Frame { get { return frame_; } }
+		public Finish Finish { get { return finish_; } }
 
 		public Person Player
 		{
@@ -192,6 +194,7 @@ namespace Cue
 			Log.Verbose($"cue: init (token {CueMain.Instance.Token})");
 
 			Sys.Init();
+			finish_ = new Finish();
 
 			VUI.Root.Init(
 				"Cue",
@@ -475,6 +478,13 @@ namespace Cue
 			Instrumentation.Start(I.Objects);
 			{
 				DoUpdateObjects(s);
+			}
+			Instrumentation.End();
+
+
+			Instrumentation.Start(I.Finish);
+			{
+				Finish.Update(s);
 			}
 			Instrumentation.End();
 

@@ -166,7 +166,7 @@ namespace Cue
 
 		public Sys.TriggerInfo[] GetTriggers()
 		{
-			if (staleTriggers_)
+			if (Exists && staleTriggers_)
 				UpdateTriggers();
 
 			return triggers_;

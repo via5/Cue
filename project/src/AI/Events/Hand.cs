@@ -99,7 +99,7 @@
 			right_.Debug(debug);
 		}
 
-		public bool Active
+		public override bool Active
 		{
 			get
 			{
@@ -123,6 +123,12 @@
 		public Person RightTarget
 		{
 			get { return right_.targetBodyPart?.Person; }
+		}
+
+		public override void ForceStop()
+		{
+			if (Active)
+				Stop();
 		}
 
 		public override void Update(float s)

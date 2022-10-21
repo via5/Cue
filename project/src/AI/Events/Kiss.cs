@@ -109,9 +109,18 @@ namespace Cue
 			d_ = person_.Personality.CloneEventData(Name) as KissEventData;
 		}
 
-		public bool Active
+		public override bool Active
 		{
-			get { return target_ != null; }
+			get
+			{
+				return target_ != null;
+			}
+
+			set
+			{
+				if (Active && !value)
+					Stop();
+			}
 		}
 
 		public bool Leading

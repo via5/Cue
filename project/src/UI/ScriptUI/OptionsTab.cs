@@ -1,4 +1,6 @@
-﻿namespace Cue
+﻿using System.Collections.Generic;
+
+namespace Cue
 {
 	class OptionsTab : Tab
 	{
@@ -6,6 +8,7 @@
 			: base("Options", true)
 		{
 			AddSubTab(new MainOptionsTab());
+			AddSubTab(new FinishOptionsTab());
 			AddSubTab(new EffectsOptionsTab());
 			AddSubTab(new SoundOptionsTab());
 			AddSubTab(new MenuOptionsTab());
@@ -210,7 +213,7 @@
 		{
 			var o = Cue.Instance.Options;
 
-			var ly = new VUI.VerticalFlow(5);
+			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;
 
 			var top = new VUI.Panel(ly);
@@ -344,22 +347,15 @@
 		{
 			var o = Cue.Instance.Options;
 
-			var ly = new VUI.VerticalFlow(5);
+			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;
 
 			var p = new VUI.Panel(ly);
 
 			hjAudio_ = p.Add(new VUI.CheckBox("Play HJ sounds", OnHJAudio, o.HJAudio));
-			p.Add(new VUI.Spacer(20));
-
 			bjAudio_ = p.Add(new VUI.CheckBox("Play BJ sounds", OnBJAudio, o.BJAudio));
-			p.Add(new VUI.Spacer(20));
-
 			kissAudio_ = p.Add(new VUI.CheckBox("Play kissing sounds", OnKissAudio, o.KissAudio));
-			p.Add(new VUI.Spacer(20));
-
 			mutePlayer_ = p.Add(new VUI.CheckBox("Mute possessed atom", OnMutePlayer, o.MutePlayer));
-			p.Add(new VUI.Spacer(20));
 
 			Layout = new VUI.BorderLayout(20);
 			Add(p, VUI.BorderLayout.Top);
@@ -431,7 +427,7 @@
 		{
 			var o = Cue.Instance.Options;
 
-			var ly = new VUI.VerticalFlow(5);
+			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;
 
 			var p = new VUI.Panel(ly);
@@ -501,6 +497,178 @@
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.HairLoose = b;
+		}
+	}
+
+
+	class FinishOptionsTab : Tab
+	{
+		class EnumItem
+		{
+			public string text;
+			public int value;
+
+			public EnumItem(string t, int v)
+			{
+				text = t;
+				value = v;
+			}
+
+			public override string ToString()
+			{
+				return text;
+			}
+		}
+
+		private VUI.FloatTextBox initialDelay_;
+		private VUI.FloatTextBox orgasmsTime_;
+
+		private VUI.ComboBox<EnumItem> lookAt_;
+		private VUI.ComboBox<EnumItem> orgasms_;
+		private VUI.ComboBox<EnumItem> events_;
+		private bool ignore_ = false;
+
+		public FinishOptionsTab()
+			: base("Finish", false)
+		{
+			initialDelay_ = new VUI.FloatTextBox(OnInitialDelay);
+			orgasmsTime_ = new VUI.FloatTextBox(OnOrgasmsTime);
+			lookAt_ = new VUI.ComboBox<EnumItem>(OnLookAt);
+			orgasms_ = new VUI.ComboBox<EnumItem>(OnOrgasms);
+			events_ = new VUI.ComboBox<EnumItem>(OnEvents);
+
+			var ly = new VUI.GridLayout(2, 10);
+			ly.HorizontalStretch = new List<bool> { false, true };
+			ly.HorizontalFill = true;
+
+			var p = new VUI.Panel(ly);
+
+			var pp = new VUI.Panel(new VUI.HorizontalFlow(5));
+			initialDelay_.MaximumSize = new VUI.Size(100, VUI.Widget.DontCare);
+			pp.Add(initialDelay_);
+			pp.Add(new VUI.Label("s"));
+			p.Add(new VUI.Label("Initial delay"));
+			p.Add(pp);
+
+			pp = new VUI.Panel(new VUI.HorizontalFlow(5));
+			orgasmsTime_.MaximumSize = new VUI.Size(100, VUI.Widget.DontCare);
+			pp.Add(orgasmsTime_);
+			pp.Add(new VUI.Label("s"));
+			p.Add(new VUI.Label("Time to orgasm"));
+			p.Add(pp);
+
+			p.Add(new VUI.Spacer(30));
+			p.Add(new VUI.Spacer(30));
+
+			p.Add(new VUI.Label("Look at player"));
+			p.Add(lookAt_);
+
+			p.Add(new VUI.Label("Orgasms"));
+			p.Add(orgasms_);
+
+			p.Add(new VUI.Label("Events"));
+			p.Add(events_);
+
+
+
+			lookAt_.AddItem(new EnumItem("Do nothing", Finish.LookAtNothing));
+			lookAt_.AddItem(new EnumItem("Look at player if involved", Finish.LookAtPlayerInvolved));
+			lookAt_.AddItem(new EnumItem("Everybody look at player", Finish.LookAtPlayerAll));
+			lookAt_.AddItem(new EnumItem("Use personality", Finish.LookAtPersonality));
+
+			orgasms_.AddItem(new EnumItem("Do nothing", Finish.OrgasmsNothing));
+			orgasms_.AddItem(new EnumItem("Force orgasm if involved with player", Finish.OrgasmsInvolved));
+			orgasms_.AddItem(new EnumItem("Force orgasm for everybody", Finish.OrgasmsAll));
+			orgasms_.AddItem(new EnumItem("Use personality", Finish.OrgasmsPersonality));
+
+			events_.AddItem(new EnumItem("Do nothing", Finish.StopEventsNothing));
+			events_.AddItem(new EnumItem("Stop events if involved with player", Finish.StopEventsInvolved));
+			events_.AddItem(new EnumItem("Stop events for everybody", Finish.StopEventsAll));
+
+
+			var f = Cue.Instance.Finish;
+
+			try
+			{
+				ignore_ = true;
+
+				initialDelay_.Text = $"{f.InitialDelay:0.00}";
+				orgasmsTime_.Text = $"{f.OrgasmsTime:0.00}";
+
+				for (int i = 0; i < lookAt_.Count; ++i)
+				{
+					if (lookAt_.Items[i].value == f.LookAt)
+					{
+						lookAt_.Select(i);
+						break;
+					}
+				}
+
+				for (int i = 0; i < orgasms_.Count; ++i)
+				{
+					if (orgasms_.Items[i].value == f.Orgasms)
+					{
+						orgasms_.Select(i);
+						break;
+					}
+				}
+
+				for (int i = 0; i < events_.Count; ++i)
+				{
+					if (events_.Items[i].value == f.Events)
+					{
+						events_.Select(i);
+						break;
+					}
+				}
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+
+
+			Layout = new VUI.BorderLayout(20);
+			Add(p, VUI.BorderLayout.Top);
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+		}
+
+		private void OnInitialDelay(float s)
+		{
+			if (ignore_) return;
+			Cue.Instance.Finish.InitialDelay = s;
+		}
+
+		private void OnOrgasmsTime(float s)
+		{
+			if (ignore_) return;
+			Cue.Instance.Finish.OrgasmsTime = s;
+		}
+
+		private void OnLookAt(EnumItem i)
+		{
+			if (ignore_) return;
+			Cue.Instance.Finish.LookAt = i.value;
+		}
+
+		private void OnOrgasms(EnumItem i)
+		{
+			if (ignore_) return;
+			Cue.Instance.Finish.Orgasms = i.value;
+		}
+
+		private void OnEvents(EnumItem i)
+		{
+			if (ignore_) return;
+			Cue.Instance.Finish.Events = i.value;
 		}
 	}
 }

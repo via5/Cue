@@ -173,10 +173,18 @@ namespace VUI
 		private int focusflags_ = Root.FocusDefault;
 		private Insets textMargins_ = Insets.Zero;
 
-		public TextBox(string t = "", string placeholder = "")
+		public TextBox(string t = "", string placeholder = "", StringCallback edited = null)
 		{
 			text_ = t;
 			placeholder_ = placeholder;
+
+			if (edited != null)
+				Edited += edited;
+		}
+
+		public TextBox(StringCallback edited)
+			: this("", "", edited)
+		{
 		}
 
 		public CustomInputField InputField
@@ -459,6 +467,71 @@ namespace VUI
 			{
 				Glue.LogErrorST(e.ToString());
 			}
+		}
+	}
+
+
+	class FloatTextBox : TextBox
+	{
+		public delegate void FloatCallback(float f);
+
+		// after changes are committed
+		public event FloatCallback FloatEdited;
+
+		// for each character
+		public event FloatCallback FloatChanged;
+
+		// on enter, after Edited is fired
+		public event FloatCallback FloatSubmitted;
+
+
+
+		public FloatTextBox(string t = "", string placeholder = "", FloatCallback edited = null)
+			: base(t, placeholder)
+		{
+			if (edited != null)
+				FloatEdited += edited;
+
+			Edited += (s) =>
+			{
+				float f;
+				if (float.TryParse(s, out f))
+					FloatEdited?.Invoke(f);
+			};
+
+			Changed += (s) =>
+			{
+				float f;
+				if (float.TryParse(s, out f))
+					FloatChanged?.Invoke(f);
+			};
+
+			Submitted += (s) =>
+			{
+				float f;
+				if (float.TryParse(s, out f))
+					FloatSubmitted?.Invoke(f);
+			};
+
+			Validate += (v) =>
+			{
+				float f;
+
+				if (float.TryParse(v.text, out f))
+				{
+					v.text = $"{f:0.00}";
+					v.valid = true;
+				}
+				else
+				{
+					v.valid = false;
+				}
+			};
+		}
+
+		public FloatTextBox(FloatCallback edited)
+			: this("", "", edited)
+		{
 		}
 	}
 }

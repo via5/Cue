@@ -11,6 +11,7 @@ namespace Cue
 		void FixedUpdate(float s);
 		void Update(float s);
 		bool EventsEnabled { get; set; }
+		void StopAllEvents();
 		void OnPluginState(bool b);
 	}
 
@@ -58,6 +59,12 @@ namespace Cue
 		public IEvent[] Events
 		{
 			get { return events_; }
+		}
+
+		public void StopAllEvents()
+		{
+			foreach (var e in events_)
+				e.Active = false;
 		}
 
 		public void FixedUpdate(float s)

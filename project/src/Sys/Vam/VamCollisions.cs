@@ -11,6 +11,7 @@ namespace Cue.Sys.Vam
 		private Rigidbody rb_ = null;
 		private Collider collider_ = null;
 		private bool active_ = false;
+		private bool first_ = true;
 
 		public static CueCollisionHandler AddToCollider(Collider c, VamBodyPart bp)
 		{
@@ -102,7 +103,15 @@ namespace Cue.Sys.Vam
 		{
 			Instrumentation.Start(I.Collisions);
 			{
-				DoOnCollisionStay(c);
+				if (first_)
+				{
+					first_ = false;
+					active_ = CollisionWithThis(c);
+				}
+				else
+				{
+					DoOnCollisionStay(c);
+				}
 			}
 			Instrumentation.End();
 		}

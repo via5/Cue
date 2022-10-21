@@ -177,6 +177,7 @@
     <Compile Include="src\Person\Expression\Expression.cs" />
     <Compile Include="src\Person\Expression\Manager.cs" />
     <Compile Include="src\Person\Expression\WeightedExpression.cs" />
+    <Compile Include="src\Person\Finish.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Events\Above.cs" />
     <Compile Include="src\Person\Gaze\Events\Front.cs" />

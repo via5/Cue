@@ -11,6 +11,12 @@
 		{
 		}
 
+		public override bool Active
+		{
+			get { return wasGrabbed_; }
+			set { }
+		}
+
 		protected override void DoInit()
 		{
 			head_ = person_.Body.Get(BP.Head);
@@ -21,7 +27,6 @@
 			debug.Add("grabbed", $"{head_.GrabbedByPlayer}");
 			debug.Add("wasGrabbed", $"{wasGrabbed_}");
 			debug.Add("lock", $"{headLock_}");
-
 		}
 
 		public override void Update(float s)

@@ -21,7 +21,7 @@
 			debug.Add("running", $"{running_}");
 		}
 
-		public bool Active
+		public override bool Active
 		{
 			get { return active_; }
 			set { active_ = value; }

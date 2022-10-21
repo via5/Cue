@@ -44,23 +44,24 @@ namespace Cue
 		public static readonly InstrumentationType Status = InstrumentationType.CreateInternal(35);
 		public static readonly InstrumentationType AI = InstrumentationType.CreateInternal(36);
 		public static readonly InstrumentationType Triggers = InstrumentationType.CreateInternal(37);
-		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(38);
-		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(39);
-		public static readonly InstrumentationType FUSys = InstrumentationType.CreateInternal(40);
-		public static readonly InstrumentationType FUObjects = InstrumentationType.CreateInternal(41);
-		public static readonly InstrumentationType FUBody = InstrumentationType.CreateInternal(42);
-		public static readonly InstrumentationType FUAnimator = InstrumentationType.CreateInternal(43);
-		public static readonly InstrumentationType FUAI = InstrumentationType.CreateInternal(44);
-		public static readonly InstrumentationType FUExpressions = InstrumentationType.CreateInternal(45);
-		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(46);
-		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(47);
-		public static readonly InstrumentationType ColWithThis = InstrumentationType.CreateInternal(48);
-		public static readonly InstrumentationType ColGetBP = InstrumentationType.CreateInternal(49);
-		public static readonly InstrumentationType ColExternal = InstrumentationType.CreateInternal(50);
-		public static readonly InstrumentationType ColPerson = InstrumentationType.CreateInternal(51);
+		public static readonly InstrumentationType Finish = InstrumentationType.CreateInternal(38);
+		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(39);
+		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(40);
+		public static readonly InstrumentationType FUSys = InstrumentationType.CreateInternal(41);
+		public static readonly InstrumentationType FUObjects = InstrumentationType.CreateInternal(42);
+		public static readonly InstrumentationType FUBody = InstrumentationType.CreateInternal(43);
+		public static readonly InstrumentationType FUAnimator = InstrumentationType.CreateInternal(44);
+		public static readonly InstrumentationType FUAI = InstrumentationType.CreateInternal(45);
+		public static readonly InstrumentationType FUExpressions = InstrumentationType.CreateInternal(46);
+		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(47);
+		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(48);
+		public static readonly InstrumentationType ColWithThis = InstrumentationType.CreateInternal(49);
+		public static readonly InstrumentationType ColGetBP = InstrumentationType.CreateInternal(50);
+		public static readonly InstrumentationType ColExternal = InstrumentationType.CreateInternal(51);
+		public static readonly InstrumentationType ColPerson = InstrumentationType.CreateInternal(52);
 
-		public const int Count = 52;
-		public int GetCount() { return 52; }
+		public const int Count = 53;
+		public int GetCount() { return 53; }
 	}
 
 
@@ -121,6 +122,7 @@ namespace Cue
 			InstrumentationType.CreateInternal(49),
 			InstrumentationType.CreateInternal(50),
 			InstrumentationType.CreateInternal(51),
+			InstrumentationType.CreateInternal(52),
 		};
 
 		public static InstrumentationType[] Values
@@ -168,6 +170,7 @@ namespace Cue
 			"status",
 			"AI",
 			"triggers",
+			"finish",
 			"UI",
 			"fixedUpdate",
 			"fUSys",

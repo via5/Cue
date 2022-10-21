@@ -76,6 +76,12 @@
 		{
 		}
 
+		public override bool Active
+		{
+			get { return false; }
+			set { }
+		}
+
 		protected override void DoInit()
 		{
 			left_ = new HandInfo(person_.Body.Get(BP.LeftHand));

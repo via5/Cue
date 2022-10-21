@@ -132,6 +132,12 @@ namespace Cue
 		{
 		}
 
+		public override bool Active
+		{
+			get { return false; }
+			set { }
+		}
+
 		protected override void DoInit()
 		{
 			base.DoInit();

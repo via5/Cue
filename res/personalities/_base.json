@@ -653,7 +653,7 @@
 	"postOrgasmTime": 10,
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
-	"minCollisionMagnitude": 0.1,
+	"minCollisionMagnitude": 0.2,
 	"idleAnimation": "procStandIdle",
 
 	"slapMinExpressionChange": 0,

@@ -19,6 +19,12 @@ namespace Cue
 			wait_ = new Duration(15, 40);
 		}
 
+		public override bool Active
+		{
+			get { return false; }
+			set { }
+		}
+
 		public override void Debug(DebugLines debug)
 		{
 			string canRunReason = "";
