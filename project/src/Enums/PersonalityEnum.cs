@@ -167,18 +167,20 @@ namespace Cue
 		public static readonly FloatIndex RateAdjustment = new FloatIndex(135);
 		public static readonly FloatIndex PenetrationDamper = new FloatIndex(136);
 		public static readonly FloatIndex MinCollisionMagnitude = new FloatIndex(137);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(138);
 
-		public const int FloatCount = 138;
-		public override int GetFloatCount() { return 138; }
+		public const int FloatCount = 139;
+		public override int GetFloatCount() { return 139; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
 		public static readonly StringIndex IdleAnimation = new StringIndex(1);
 		public static readonly StringIndex FinishLookAtTarget = new StringIndex(2);
 		public static readonly StringIndex FinishLookAtIf = new StringIndex(3);
+		public static readonly StringIndex FinishOrgasm = new StringIndex(4);
 
-		public const int StringCount = 4;
-		public override int GetStringCount() { return 4; }
+		public const int StringCount = 5;
+		public override int GetStringCount() { return 5; }
 
 
 
@@ -439,6 +441,7 @@ namespace Cue
 			"rateAdjustment",
 			"penetrationDamper",
 			"minCollisionMagnitude",
+			"finishOrgasmMinExcitement",
 		};
 
 		public static int FloatFromString(string s)
@@ -495,6 +498,7 @@ namespace Cue
 			"idleAnimation",
 			"finishLookAtTarget",
 			"finishLookAtIf",
+			"finishOrgasm",
 		};
 
 		public static int StringFromString(string s)
@@ -698,10 +702,12 @@ namespace Cue
 			"rateAdjustment",
 			"penetrationDamper",
 			"minCollisionMagnitude",
+			"finishOrgasmMinExcitement",
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
 			"finishLookAtTarget",
 			"finishLookAtIf",
+			"finishOrgasm",
 		};
 
 		public static string[] AllNames

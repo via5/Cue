@@ -179,6 +179,8 @@ V.String("IdleAnimation"),
 
 V.String("FinishLookAtTarget"),
 V.String("FinishLookAtIf"),
+V.String("FinishOrgasm"),
+V.Float("FinishOrgasmMinExcitement")
 
 };
 

@@ -36,7 +36,7 @@ namespace Cue
 		private Person player_ = null;
 		private Person forcedPlayer_ = null;
 		private int frame_ = 0;
-		private Finish finish_;
+		private Finish finish_ = new Finish();
 
 		private Sys.ILiveSaver saver_;
 
@@ -194,7 +194,6 @@ namespace Cue
 			Log.Verbose($"cue: init (token {CueMain.Instance.Token})");
 
 			Sys.Init();
-			finish_ = new Finish();
 
 			VUI.Root.Init(
 				"Cue",
@@ -236,6 +235,8 @@ namespace Cue
 					Log.Error("cue: test stuff failed, " + e.ToString());
 				}
 			}
+
+			finish_.Init();
 
 			var end = Cue.Instance.Sys.RealtimeSinceStartup;
 			Log.Info($"cue: running, version {Version.String}, init {(end - start):0.00}s");
@@ -624,8 +625,10 @@ namespace Cue
 
 		private void test()
 		{
-			var p = FindPerson("Person");
+			var p = FindPerson("Person#3");
 			if (p != null)
+				ForcedPlayer = p;
+
 			{
 				//p.Gaze.Render.FrontPlane = true;
 				//p.Gaze.ForceLook = ForceLooks.Camera;

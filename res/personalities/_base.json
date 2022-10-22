@@ -671,6 +671,8 @@
 
 	"finishLookAtTarget": "player",
 	"finishLookAtIf": "involved",
+	"finishOrgasm": "involved",
+	"finishOrgasmMinExcitement": 0,
 
 
 	"sensitivities":

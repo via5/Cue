@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Cue
 {
@@ -7,12 +8,11 @@ namespace Cue
 		class OrgasmInfo
 		{
 			public Person person;
-			public float initialExcitement;
+			public float initialExcitement = 0;
 
-			public OrgasmInfo(Person p, float e)
+			public OrgasmInfo(Person p)
 			{
 				person = p;
-				initialExcitement = e;
 			}
 		}
 
@@ -43,12 +43,19 @@ namespace Cue
 
 		private int state_ = NoState;
 		private float elapsed_ = 0;
-		private List<OrgasmInfo> orgasmInfos_ = new List<OrgasmInfo>();
+		private OrgasmInfo[] orgasmInfos_;
 
 
 		public Finish()
 		{
 			log_ = new Logger(Logger.Object, "finish");
+		}
+
+		public void Init()
+		{
+			orgasmInfos_ = new OrgasmInfo[Cue.Instance.ActivePersons.Length];
+			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+				orgasmInfos_[i] = new OrgasmInfo(Cue.Instance.ActivePersons[i]);
 		}
 
 		public Logger Log
@@ -86,6 +93,14 @@ namespace Cue
 			set { events_ = value; }
 		}
 
+		private float TotalTime(Person p)
+		{
+			return
+				orgasmsTime_ +
+				p.Personality.Get(PS.OrgasmTime) +
+				p.Personality.Get(PS.PostOrgasmTime);
+		}
+
 		public void Start()
 		{
 			if (state_ != NoState)
@@ -99,11 +114,12 @@ namespace Cue
 			elapsed_ = 0;
 			state_ = DelayState;
 
-			GatherOrgasmInfos();
-
 			Log.Info("orgasm infos:");
-			foreach (var o in orgasmInfos_)
-				Log.Info($"{o.person} {o.initialExcitement:0.00}");
+			foreach (var i in orgasmInfos_)
+			{
+				i.initialExcitement = i.person.Mood.Get(MoodType.Excited);
+				Log.Info($"{i.person} {i.initialExcitement:0.00}");
+			}
 
 			Log.Info($"running delay {InitialDelay:0.00}");
 		}
@@ -124,7 +140,7 @@ namespace Cue
 					{
 						Log.Info($"delay finished");
 
-						DoLookAt();
+						CheckLookAt();
 						elapsed_ = 0;
 						state_ = ExcitementUpState;
 
@@ -141,32 +157,16 @@ namespace Cue
 					float p;
 
 					if (orgasmsTime_ <= 0)
-					{
-						Log.Info($"orgasmsTime_ is 0, setting to 100%");
 						p = 1;
-					}
 					else
-					{
 						p = U.Clamp(elapsed_ / orgasmsTime_, 0, 1);
-					}
 
-					for (int i = 0; i < orgasmInfos_.Count; ++i)
-					{
-						float range = 1 - orgasmInfos_[i].initialExcitement;
-						float e = orgasmInfos_[i].initialExcitement + range * p;
-
-						orgasmInfos_[i].person.Mood.GetValue(MoodType.Excited).Value = e;
-
-						if (p >= 1)
-							orgasmInfos_[i].person.Mood.ForceOrgasm();
-					}
+					CheckExcitement(p);
 
 					if (p >= 1)
 					{
 						Log.Info($"orgasms time finished");
-
-						// add reactions per personality
-						DoEvents();
+						CheckEvents();
 						state_ = NoState;
 					}
 
@@ -175,46 +175,7 @@ namespace Cue
 			}
 		}
 
-		private void GatherOrgasmInfos()
-		{
-			orgasmInfos_.Clear();
-
-			switch (orgasms_)
-			{
-				case OrgasmsAll:
-				{
-					foreach (var p in Cue.Instance.ActivePersons)
-					{
-						if (p.IsPlayer)
-							continue;
-
-						orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
-					}
-
-					break;
-				}
-
-				case OrgasmsInvolved:
-				{
-					var player = Cue.Instance.Player;
-					if (player == null)
-						return;
-
-					foreach (var p in Cue.Instance.ActivePersons)
-					{
-						if (p.IsPlayer)
-							continue;
-
-						if (p.Status.IsInvolvedWith(player))
-							orgasmInfos_.Add(new OrgasmInfo(p, p.Mood.Get(MoodType.Excited)));
-					}
-
-					break;
-				}
-			}
-		}
-
-		private void DoLookAt()
+		private void CheckLookAt()
 		{
 			Log.Info($"look at");
 
@@ -274,7 +235,7 @@ namespace Cue
 						if (p.IsPlayer)
 							continue;
 
-						CheckLookAtPersonality(p);
+						SetLookAtFromPersonality(p);
 					}
 
 					break;
@@ -282,7 +243,46 @@ namespace Cue
 			}
 		}
 
-		private void DoEvents()
+		private void CheckExcitement(float p)
+		{
+			for (int i = 0; i < orgasmInfos_.Length; ++i)
+			{
+				var o = orgasmInfos_[i];
+				if (o.person.IsPlayer)
+					continue;
+
+				switch (orgasms_)
+				{
+					case OrgasmsAll:
+					{
+						SetExcitement(o, p);
+						break;
+					}
+
+					case OrgasmsInvolved:
+					{
+						var player = Cue.Instance.Player;
+
+						if (player != null)
+						{
+							if (o.person.Status.IsInvolvedWith(player))
+								SetExcitement(o, p);
+						}
+
+						break;
+					}
+
+					case OrgasmsPersonality:
+					{
+						SetExcitementFromPersonality(o, p);
+						break;
+					}
+				}
+
+			}
+		}
+
+		private void CheckEvents()
 		{
 			Log.Info($"doing events");
 
@@ -325,15 +325,44 @@ namespace Cue
 			}
 		}
 
-		private float TotalTime(Person p)
+		private void SetExcitement(OrgasmInfo o, float p)
 		{
-			return
-				orgasmsTime_ +
-				p.Personality.Get(PS.OrgasmTime) +
-				p.Personality.Get(PS.PostOrgasmTime);
+			float range = 1 - o.initialExcitement;
+			float e = o.initialExcitement + range * p;
+
+			o.person.Mood.GetValue(MoodType.Excited).Value = e;
+
+			if (p >= 1)
+				o.person.Mood.ForceOrgasm();
 		}
 
-		private void CheckLookAtPersonality(Person p)
+		private void SetExcitementFromPersonality(OrgasmInfo o, float p)
+		{
+			var ps = o.person.Personality;
+
+			var orgasm = ps.GetString(PS.FinishOrgasm);
+			var minExcitement = ps.Get(PS.FinishOrgasmMinExcitement);
+
+			if (o.person.Mood.Get(MoodType.Excited) >= minExcitement)
+			{
+				if (orgasm == "involved")
+				{
+					var player = Cue.Instance.Player;
+
+					if (player != null)
+					{
+						if (o.person.Status.IsInvolvedWith(player))
+							SetExcitement(o, p);
+					}
+				}
+				else if (orgasm == "always")
+				{
+					SetExcitement(o, p);
+				}
+			}
+		}
+
+		private void SetLookAtFromPersonality(Person p)
 		{
 			var ps = p.Personality;
 
