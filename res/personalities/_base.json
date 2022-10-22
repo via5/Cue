@@ -669,10 +669,15 @@
 		}
 	},
 
-	"finishLookAtTarget": "player",
-	"finishLookAtIf": "involved",
+	"finishLookAtPlayer": "involved",
+	"finishLookAtPlayerAction": "gaze",
 	"finishOrgasm": "involved",
-	"finishOrgasmMinExcitement": 0,
+	"finishOrgasmMinExcitement": 0.8,
+	"finishMood": "involved",
+	"finishMoodHappy": -1,
+	"finishMoodPlayful": -1,
+	"finishMoodAngry": -1,
+	"finishMoodTired": -1,
 
 
 	"sensitivities":

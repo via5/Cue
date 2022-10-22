@@ -4,6 +4,52 @@ namespace Cue
 {
 	public class Mood
 	{
+		class MoodValue
+		{
+			private ForceableFloat v_ = new ForceableFloat();
+			private float temp_ = -1;
+			private float tempTime_ = 0;
+			private float tempElapsed_ = 0;
+
+			public ForceableFloat Forceable
+			{
+				get { return v_; }
+			}
+
+			public float Value
+			{
+				get { return v_.Value; }
+			}
+
+			public void Set(float v)
+			{
+				if (temp_ < 0)
+					v_.Value = v;
+			}
+
+			public void SetTemporary(float v, float time)
+			{
+				temp_ = v;
+				tempTime_ = time;
+				tempElapsed_ = 0;
+				v_.Value = temp_;
+			}
+
+			public void Update(float s)
+			{
+				if (temp_ >= 0)
+				{
+					tempElapsed_ += s;
+					if (tempElapsed_ >= tempTime_)
+					{
+						temp_ = -1;
+						tempTime_ = 0;
+						tempElapsed_ = 0;
+					}
+				}
+			}
+		}
+
 		public const float NoOrgasm = 10000;
 
 		public const int NormalState = 1;
@@ -20,7 +66,7 @@ namespace Cue
 		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
-		private ForceableFloat[] moods_ = new ForceableFloat[MoodType.Count];
+		private MoodValue[] moods_ = new MoodValue[MoodType.Count];
 		private float maxExcitement_ = 1.0f;
 
 
@@ -29,7 +75,7 @@ namespace Cue
 			person_ = p;
 
 			for (int i = 0; i < moods_.Length; ++i)
-				moods_[i] = new ForceableFloat();
+				moods_[i] = new MoodValue();
 
 			OnPersonalityChanged();
 			p.PersonalityChanged += OnPersonalityChanged;
@@ -200,14 +246,19 @@ namespace Cue
 			return moods_[i.Int].Value;
 		}
 
+		public void SetTemporary(MoodType i, float value, float time)
+		{
+			moods_[i.Int].SetTemporary(value, time);
+		}
+
 		private void Set(MoodType i, float value)
 		{
-			moods_[i.Int].Value = U.Clamp(value, 0, 1);
+			moods_[i.Int].Set(U.Clamp(value, 0, 1));
 		}
 
 		public ForceableFloat GetDebugValue(MoodType i)
 		{
-			return moods_[i.Int];
+			return moods_[i.Int].Forceable;
 		}
 
 		public ForceableFloat GetValue(MoodType i)
@@ -215,7 +266,7 @@ namespace Cue
 			if (i == MoodType.Excited)
 				return baseExcitement_;
 			else
-				return moods_[i.Int];
+				return moods_[i.Int].Forceable;
 		}
 
 
@@ -298,6 +349,9 @@ namespace Cue
 		{
 			elapsed_ += s;
 
+			for (int i = 0; i < moods_.Length; ++i)
+				moods_[i].Update(s);
+
 			if (person_.IsPlayer)
 			{
 				if (!wasPlayer_)
@@ -306,7 +360,7 @@ namespace Cue
 					baseExcitement_.Value = 0;
 
 					for (int i = 0; i < moods_.Length; ++i)
-						moods_[i].Value = 0;
+						moods_[i].Set(0);
 
 					wasPlayer_ = true;
 				}

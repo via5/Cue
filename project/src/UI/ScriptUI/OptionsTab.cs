@@ -526,7 +526,12 @@ namespace Cue
 		private VUI.ComboBox<EnumItem> lookAt_;
 		private VUI.ComboBox<EnumItem> orgasms_;
 		private VUI.ComboBox<EnumItem> events_;
+
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private DebugLines debug_ = null;
+
 		private bool ignore_ = false;
+
 
 		public FinishOptionsTab()
 			: base("Finish", false)
@@ -536,6 +541,15 @@ namespace Cue
 			lookAt_ = new VUI.ComboBox<EnumItem>(OnLookAt);
 			orgasms_ = new VUI.ComboBox<EnumItem>(OnOrgasms);
 			events_ = new VUI.ComboBox<EnumItem>(OnEvents);
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
+			list_.Visible = Cue.Instance.Options.DevMode;
+
+			Cue.Instance.Options.Changed += () =>
+			{
+				list_.Visible = Cue.Instance.Options.DevMode;
+			};
 
 			var ly = new VUI.GridLayout(2, 10);
 			ly.HorizontalStretch = new List<bool> { false, true };
@@ -630,6 +644,7 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout(20);
 			Add(p, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
 		}
 
 		public override bool DebugOnly
@@ -639,6 +654,16 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
+			if (Cue.Instance.Options.DevMode)
+			{
+				if (debug_ == null)
+					debug_ = new DebugLines();
+
+				debug_.Clear();
+				Cue.Instance.Finish.Debug(debug_);
+
+				list_.SetItems(debug_.MakeArray());
+			}
 		}
 
 		private void OnInitialDelay(float s)

@@ -177,10 +177,15 @@ V.Float("PenetrationDamper"),
 V.Float("MinCollisionMagnitude"),
 V.String("IdleAnimation"),
 
-V.String("FinishLookAtTarget"),
-V.String("FinishLookAtIf"),
+V.String("FinishLookAtPlayer"),
+V.String("FinishLookAtPlayerAction"),
 V.String("FinishOrgasm"),
-V.Float("FinishOrgasmMinExcitement")
+V.Float("FinishOrgasmMinExcitement"),
+V.String("FinishMood"),
+V.Float("FinishMoodHappy"),
+V.Float("FinishMoodPlayful"),
+V.Float("FinishMoodAngry"),
+V.Float("FinishMoodTired")
 
 };
 

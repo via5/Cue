@@ -168,19 +168,24 @@ namespace Cue
 		public static readonly FloatIndex PenetrationDamper = new FloatIndex(136);
 		public static readonly FloatIndex MinCollisionMagnitude = new FloatIndex(137);
 		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(138);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(139);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(140);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(141);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(142);
 
-		public const int FloatCount = 139;
-		public override int GetFloatCount() { return 139; }
+		public const int FloatCount = 143;
+		public override int GetFloatCount() { return 143; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
 		public static readonly StringIndex IdleAnimation = new StringIndex(1);
-		public static readonly StringIndex FinishLookAtTarget = new StringIndex(2);
-		public static readonly StringIndex FinishLookAtIf = new StringIndex(3);
+		public static readonly StringIndex FinishLookAtPlayer = new StringIndex(2);
+		public static readonly StringIndex FinishLookAtPlayerAction = new StringIndex(3);
 		public static readonly StringIndex FinishOrgasm = new StringIndex(4);
+		public static readonly StringIndex FinishMood = new StringIndex(5);
 
-		public const int StringCount = 5;
-		public override int GetStringCount() { return 5; }
+		public const int StringCount = 6;
+		public override int GetStringCount() { return 6; }
 
 
 
@@ -442,6 +447,10 @@ namespace Cue
 			"penetrationDamper",
 			"minCollisionMagnitude",
 			"finishOrgasmMinExcitement",
+			"finishMoodHappy",
+			"finishMoodPlayful",
+			"finishMoodAngry",
+			"finishMoodTired",
 		};
 
 		public static int FloatFromString(string s)
@@ -496,9 +505,10 @@ namespace Cue
 		{
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
-			"finishLookAtTarget",
-			"finishLookAtIf",
+			"finishLookAtPlayer",
+			"finishLookAtPlayerAction",
 			"finishOrgasm",
+			"finishMood",
 		};
 
 		public static int StringFromString(string s)
@@ -703,11 +713,16 @@ namespace Cue
 			"penetrationDamper",
 			"minCollisionMagnitude",
 			"finishOrgasmMinExcitement",
+			"finishMoodHappy",
+			"finishMoodPlayful",
+			"finishMoodAngry",
+			"finishMoodTired",
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
-			"finishLookAtTarget",
-			"finishLookAtIf",
+			"finishLookAtPlayer",
+			"finishLookAtPlayerAction",
 			"finishOrgasm",
+			"finishMood",
 		};
 
 		public static string[] AllNames
