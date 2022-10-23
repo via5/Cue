@@ -124,7 +124,9 @@ namespace Cue.Sys.Vam
 
 		public void OnPluginState(bool b)
 		{
-			if (!b)
+			if (b)
+				SetLoose(loose_);
+			else
 				Reset();
 		}
 

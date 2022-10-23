@@ -143,6 +143,7 @@ namespace Cue
 		private Person person_;
 		private int type_;  // Sys.TriggerInfo types
 		private readonly int sourcePersonIndex_;
+		private readonly float minMag_;
 		private readonly Part[] parts_ = new Part[BP.Count + 2];
 
 		private float rate_ = 0;
@@ -150,11 +151,12 @@ namespace Cue
 		private float max_ = 0;
 		private float mag_ = 0;
 
-		public ErogenousZoneSource(Person p, int type, int sourcePersonIndex)
+		public ErogenousZoneSource(Person p, int type, int sourcePersonIndex, float minMag)
 		{
 			type_ = type;
 			person_ = p;
 			sourcePersonIndex_ = sourcePersonIndex;
+			minMag_ = minMag;
 
 			foreach (BodyPartType i in BodyPartType.Values)
 				parts_[i.Int] = new Part(i);
@@ -369,7 +371,7 @@ namespace Cue
 			p.targetBodyPart = targetBodyPart;
 			p.magnitude = Math.Max(p.magnitude, mag);
 			p.elapsed = 1.0f;
-			p.ignored = (p.magnitude < person_.Personality.Get(PS.MinCollisionMagnitude));
+			p.ignored = (p.magnitude < minMag_);
 
 			if (!p.active)
 			{
@@ -493,14 +495,26 @@ namespace Cue
 			ToySourceIndex = Cue.Instance.ActivePersons.Length;
 			ExternalSourceIndex = Cue.Instance.ActivePersons.Length + 1;
 
+			float minMag = GetMinMag(type);
+
 			// include a toy and external ones at the end
 			sources_ = new ErogenousZoneSource[Cue.Instance.ActivePersons.Length + 2];
 
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
-				sources_[i] = new ErogenousZoneSource(person_, Sys.TriggerInfo.PersonType, i);
+				sources_[i] = new ErogenousZoneSource(person_, Sys.TriggerInfo.PersonType, i, minMag);
 
-			sources_[ToySourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.ToyType, - 1);
-			sources_[ExternalSourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.NoneType, -1);
+			sources_[ToySourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.ToyType, - 1, minMag);
+			sources_[ExternalSourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.NoneType, -1, minMag);
+		}
+
+		private float GetMinMag(ZoneType type)
+		{
+			var ps = person_.Personality;
+
+			if (type == SS.Penetration)
+				return ps.Get(PS.MinCollisionMagPenetration);
+			else
+				return ps.Get(PS.MinCollisionMag);
 		}
 
 		public override string ToString()

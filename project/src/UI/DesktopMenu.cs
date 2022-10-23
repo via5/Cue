@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Cue
 {
@@ -113,7 +114,6 @@ namespace Cue
 				fps_.Text = sys_.Fps;
 
 			UpdateWidgets();
-
 			base.Update();
 		}
 

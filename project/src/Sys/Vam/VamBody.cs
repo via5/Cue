@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Cue.Sys.Vam
@@ -72,6 +73,7 @@ namespace Cue.Sys.Vam
 		public abstract IBodyPart[] GetBodyParts();
 		public abstract Hand GetLeftHand();
 		public abstract Hand GetRightHand();
+		public abstract void Debug(DebugLines d);
 
 		public abstract VamBodyPart BodyPartForTransform(
 			Transform t, Transform stop, bool debug);
@@ -80,6 +82,16 @@ namespace Cue.Sys.Vam
 
 	class VamBody : VamBasicBody
 	{
+		struct FlushInfo
+		{
+			public const float MaxDistanceToWhite = 1.5f;
+			public const float MaxSaturation = 0.35f;
+
+			public HSVColor hsv;
+			public float distanceToWhite;
+			public float rawWhite, rawSaturation, white, saturation, p;
+		}
+
 		private StraponBodyPart strapon_ = null;
 		private FloatParameter gloss_ = null;
 		private ColorParameter color_ = null;
@@ -94,6 +106,8 @@ namespace Cue.Sys.Vam
 		private float flush_ = 0;
 		private IEasing flushEasing_ = new SineInEasing();
 		private bool colorEnabled_ = false;
+		private IEasing skinWhiteEasing_ = new QuadOutEasing();
+		private IEasing skinSaturationEasing_ = new QuartOutEasing();
 
 		private string[] mouthColliderNames_ = null;
 		private Collider[] mouthColliders_ = null;
@@ -132,6 +146,26 @@ namespace Cue.Sys.Vam
 
 			Cue.Instance.Options.Changed += CheckOptions;
 			CheckOptions();
+		}
+
+		public override void Debug(DebugLines d)
+		{
+			var fi = MakeFlushInfo();
+
+			d.Add($"gloss     {gloss_}");
+			d.Add($"color     {color_}");
+			d.Add($"initColor {initialColor_}");
+			d.Add($"flush:");
+			d.Add($"  - hsv             H={fi.hsv.H:0.00} S={fi.hsv.S:0.00} V={fi.hsv.V:0.00} (max S {FlushInfo.MaxSaturation:0.00})");
+			d.Add($"  - distanceToWhite {fi.distanceToWhite:0.000} (max {FlushInfo.MaxDistanceToWhite})");
+			d.Add($"  - raw             white={fi.rawWhite:0.000} saturation={fi.rawSaturation}");
+			d.Add($"  - eased           white={fi.white:0.000} saturation={fi.saturation}");
+			d.Add($"  - p               {fi.p:0.000}");
+		}
+
+		public Color CurrentColor
+		{
+			get { return color_.Value; }
 		}
 
 		public override IBodyPart[] GetBodyParts()
@@ -285,8 +319,16 @@ namespace Cue.Sys.Vam
 
 		public void OnPluginState(bool b)
 		{
-			if (!b)
+			if (b)
+			{
+				initialColor_ = color_.Value;
+				SetSweat(sweat_);
+				SetFlush(flush_);
+			}
+			else
+			{
 				Reset();
+			}
 
 			foreach (var p in parts_)
 				(p as VamBodyPart).OnPluginState(b);
@@ -356,9 +398,30 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		private FlushInfo MakeFlushInfo()
+		{
+			var i = new FlushInfo();
+
+			{
+				i.hsv = U.ToHSV(initialColor_);
+				i.distanceToWhite = Color.Distance(Color.White, initialColor_);
+
+				i.rawWhite = U.Clamp(FlushInfo.MaxDistanceToWhite - i.distanceToWhite, 0, 1);
+				i.rawSaturation = U.Clamp(1 - (i.hsv.S / FlushInfo.MaxSaturation), 0, 1);
+
+				i.white = skinWhiteEasing_.Magnitude(i.rawWhite);
+				i.saturation = skinSaturationEasing_.Magnitude(i.rawSaturation);
+
+				i.p = Math.Min(i.white, i.saturation);
+			}
+
+			return i;
+		}
+
 		private void SetFlush(float v)
 		{
-			LerpColor(Color.Red, v);
+			var fi = MakeFlushInfo();
+			LerpColor(Color.Red, v * fi.p);
 		}
 
 		private void Reset()
@@ -399,10 +462,10 @@ namespace Cue.Sys.Vam
 			{
 				colorEnabled_ = Cue.Instance.Options.SkinColor;
 
-				if (Cue.Instance.Options.SkinColor)
+				if (colorEnabled_)
 					SetFlush(flush_);
 				else if (color_.Parameter != null)
-					color_.Parameter.val = color_.Parameter.defaultVal;
+					color_.Parameter.val = U.ToHSV(initialColor_);
 			}
 		}
 	}

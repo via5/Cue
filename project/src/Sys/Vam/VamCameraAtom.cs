@@ -248,6 +248,11 @@ namespace Cue.Sys.Vam
 				(p as VamBodyPart).Init();
 		}
 
+		public override void Debug(DebugLines d)
+		{
+			// no-op
+		}
+
 		public override bool Exists
 		{
 			get { return false; }

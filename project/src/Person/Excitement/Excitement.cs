@@ -185,7 +185,8 @@ namespace Cue
 			{
 				var src = z.Sources[j];
 
-				if (UsableSource(src))
+				string dummy = null;
+				if (UsableSource(src, ref dummy))
 				{
 					float thisRate = src.Rate * src.Modifier;
 
@@ -199,37 +200,71 @@ namespace Cue
 			return rate;
 		}
 
-		public bool UsableSource(ErogenousZoneSource s)
+		public bool UsableSource(ErogenousZoneSource s, ref string why)
 		{
-			if (s.Active && (person_.Mood.Get(MoodType.Excited) <= s.Maximum))
+			if (!s.Active)
 			{
-				switch (s.Type)
-				{
-					case Sys.TriggerInfo.PersonType:
-					{
-						if (EnabledForPlayer && s.IsPlayer)
-							return true;
+				if (why != null)
+					why = $"source not active";
 
-						if (EnabledForOthers && !s.IsPlayer)
-							return true;
-
-						return false;
-					}
-
-					case Sys.TriggerInfo.ToyType:
-					{
-						return EnabledForToys;
-					}
-
-					case Sys.TriggerInfo.NoneType:
-					default:
-					{
-						return EnabledForExternal;
-					}
-				}
+				return false;
 			}
 
-			return false;
+			if (person_.Mood.Get(MoodType.Excited) > s.Maximum)
+			{
+				if (why != null)
+				{
+					why =
+						$"ex mood {person_.Mood.Get(MoodType.Excited):0.00} " +
+						$"more than max {s.Maximum}";
+				}
+
+				return false;
+			}
+
+			switch (s.Type)
+			{
+				case Sys.TriggerInfo.PersonType:
+				{
+					if (EnabledForPlayer && s.IsPlayer)
+						return true;
+
+					if (EnabledForOthers && !s.IsPlayer)
+						return true;
+
+					if (why != null)
+					{
+						why =
+							$"not enabled (efp={EnabledForPlayer} " +
+							$"efo={EnabledForOthers} isP={s.IsPlayer})";
+					}
+
+					return false;
+				}
+
+				case Sys.TriggerInfo.ToyType:
+				{
+					if (EnabledForToys)
+						return true;
+
+					if (why != null)
+						why = $"not enabled for toy";
+
+					return false;
+				}
+
+				case Sys.TriggerInfo.NoneType:
+				default:
+				{
+					if (EnabledForExternal)
+						return true;
+
+					if (why != null)
+						why = $"not enabled for external";
+
+					return false;
+				}
+			}
 		}
 
 		public override void Debug(DebugLines debug)
@@ -272,7 +307,8 @@ namespace Cue
 				if (s.StrictlyActiveCount == 0)
 					continue;
 
-				bool usable = UsableSource(s) && !person_.IsPlayer;
+				string why = "";
+				bool usable = UsableSource(s, ref why) && !person_.IsPlayer;
 
 				string line = "  ";
 				if (!usable)
@@ -309,7 +345,7 @@ namespace Cue
 					line += $" (not physical)";
 
 				if (!usable)
-					line += ")";
+					line += ") unusable: " + why;
 
 				debug.Add(line);
 			}
@@ -518,7 +554,8 @@ namespace Cue
 				{
 					var s = z.Sources[i];
 
-					if (pen.UsableSource(s))
+					string dummy = null;
+					if (pen.UsableSource(s, ref dummy))
 						return true;
 				}
 			}

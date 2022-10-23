@@ -31,11 +31,17 @@ namespace Cue
 		private VUI.Label flush_ = new VUI.Label();
 		private VUI.Label hairLoose_ = new VUI.Label();
 
+		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private DebugLines debug_ = null;
+
 
 		public PersonBodyStateTab(Person person)
 			: base("State", false)
 		{
 			person_ = person;
+
+			list_.Font = VUI.Style.Theme.MonospaceFont;
+			list_.FontSize = 22;
 
 			var gl = new VUI.GridLayout(4);
 			gl.HorizontalSpacing = 20;
@@ -67,8 +73,9 @@ namespace Cue
 
 
 
-			Layout = new VUI.BorderLayout();
+			Layout = new VUI.BorderLayout(20);
 			Add(p, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
 		}
 
 		protected override void DoUpdate(float s)
@@ -88,6 +95,13 @@ namespace Cue
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.00}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.00}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.00}";
+
+			if (debug_ == null)
+				debug_ = new DebugLines();
+
+			debug_.Clear();
+			person_.Atom.Body.Debug(debug_);
+			list_.SetItems(debug_.MakeArray());
 		}
 	}
 

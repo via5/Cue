@@ -166,15 +166,16 @@ namespace Cue
 		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(134);
 		public static readonly FloatIndex RateAdjustment = new FloatIndex(135);
 		public static readonly FloatIndex PenetrationDamper = new FloatIndex(136);
-		public static readonly FloatIndex MinCollisionMagnitude = new FloatIndex(137);
-		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(138);
-		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(139);
-		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(140);
-		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(141);
-		public static readonly FloatIndex FinishMoodTired = new FloatIndex(142);
+		public static readonly FloatIndex MinCollisionMag = new FloatIndex(137);
+		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(138);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(139);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(140);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(141);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(142);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(143);
 
-		public const int FloatCount = 143;
-		public override int GetFloatCount() { return 143; }
+		public const int FloatCount = 144;
+		public override int GetFloatCount() { return 144; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -445,7 +446,8 @@ namespace Cue
 			"postOrgasmTime",
 			"rateAdjustment",
 			"penetrationDamper",
-			"minCollisionMagnitude",
+			"minCollisionMag",
+			"minCollisionMagPenetration",
 			"finishOrgasmMinExcitement",
 			"finishMoodHappy",
 			"finishMoodPlayful",
@@ -711,7 +713,8 @@ namespace Cue
 			"postOrgasmTime",
 			"rateAdjustment",
 			"penetrationDamper",
-			"minCollisionMagnitude",
+			"minCollisionMag",
+			"minCollisionMagPenetration",
 			"finishOrgasmMinExcitement",
 			"finishMoodHappy",
 			"finishMoodPlayful",

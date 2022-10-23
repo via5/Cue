@@ -639,6 +639,16 @@ namespace Cue
 			get { return new Color(0, 0, 0, 0); }
 		}
 
+		public static Color White
+		{
+			get { return new Color(1, 1, 1, 1); }
+		}
+
+		public static Color Black
+		{
+			get { return new Color(0, 0, 0, 1); }
+		}
+
 		public static Color Red
 		{
 			get { return new Color(1, 0, 0, 1); }
