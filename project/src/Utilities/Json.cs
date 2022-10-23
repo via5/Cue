@@ -70,6 +70,19 @@ namespace Cue
 			return f;
 		}
 
+		public static bool OptInt(JSONClass o, string key, ref int i)
+		{
+			if (!o.HasKey(key))
+				return false;
+
+			var v = o[key].Value;
+
+			if (!int.TryParse(v, out i))
+				throw new LoadFailed($"bad int '{v}' for key '{key}'");
+
+			return true;
+		}
+
 		public static bool ReqBool(JSONClass o, string key)
 		{
 			if (!o.HasKey(key))

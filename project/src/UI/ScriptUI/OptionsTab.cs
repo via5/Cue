@@ -600,7 +600,18 @@ namespace Cue
 			events_.AddItem(new EnumItem("Stop events for everybody", Finish.StopEventsAll));
 
 
-			var f = Cue.Instance.Finish;
+			Layout = new VUI.BorderLayout(20);
+			Add(p, VUI.BorderLayout.Top);
+			Add(list_, VUI.BorderLayout.Center);
+
+
+			Cue.Instance.Options.Changed += OnOptionsChanged;
+			OnOptionsChanged();
+		}
+
+		private void OnOptionsChanged()
+		{
+			var f = Cue.Instance.Options.Finish;
 
 			try
 			{
@@ -640,11 +651,6 @@ namespace Cue
 			{
 				ignore_ = false;
 			}
-
-
-			Layout = new VUI.BorderLayout(20);
-			Add(p, VUI.BorderLayout.Top);
-			Add(list_, VUI.BorderLayout.Center);
 		}
 
 		public override bool DebugOnly
@@ -669,31 +675,31 @@ namespace Cue
 		private void OnInitialDelay(float s)
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.InitialDelay = s;
+			Cue.Instance.Options.Finish.InitialDelay = s;
 		}
 
 		private void OnOrgasmsTime(float s)
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.OrgasmsTime = s;
+			Cue.Instance.Options.Finish.OrgasmsTime = s;
 		}
 
 		private void OnLookAt(EnumItem i)
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.LookAt = i.value;
+			Cue.Instance.Options.Finish.LookAt = i.value;
 		}
 
 		private void OnOrgasms(EnumItem i)
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.Orgasms = i.value;
+			Cue.Instance.Options.Finish.Orgasms = i.value;
 		}
 
 		private void OnEvents(EnumItem i)
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.Events = i.value;
+			Cue.Instance.Options.Finish.Events = i.value;
 		}
 	}
 }

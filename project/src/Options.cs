@@ -75,6 +75,64 @@ namespace Cue
 	}
 
 
+	class FinishOptions
+	{
+		private float initialDelay_ = 0;
+		private int lookAt_ = Finish.LookAtPersonality;
+		private int orgasms_ = Finish.OrgasmsPersonality;
+		private float orgasmsTime_ = 1;
+		private int events_ = Finish.StopEventsAll;
+
+		public float InitialDelay
+		{
+			get { return initialDelay_; }
+			set { initialDelay_ = value; Cue.Instance.Options.FireOnChanged(); }
+		}
+
+		public int LookAt
+		{
+			get { return lookAt_; }
+			set { lookAt_ = value; Cue.Instance.Options.FireOnChanged(); }
+		}
+
+		public int Orgasms
+		{
+			get { return orgasms_; }
+			set { orgasms_ = value; Cue.Instance.Options.FireOnChanged(); }
+		}
+
+		public float OrgasmsTime
+		{
+			get { return orgasmsTime_; }
+			set { orgasmsTime_ = value; Cue.Instance.Options.FireOnChanged(); }
+		}
+
+		public int Events
+		{
+			get { return events_; }
+			set { events_ = value; Cue.Instance.Options.FireOnChanged(); }
+		}
+
+		public void Load(JSONClass o)
+		{
+			J.OptFloat(o, "finishInitialDelay", ref initialDelay_);
+			J.OptInt(o, "finishLookAt", ref lookAt_);
+			J.OptInt(o, "finishOrgasms", ref orgasms_);
+			J.OptFloat(o, "finishOrgasmsTime", ref orgasmsTime_);
+			J.OptInt(o, "finishEvents", ref events_);
+		}
+
+		public void Save(JSONClass o)
+		{
+			o["finishInitialDelay"] = new JSONData(initialDelay_);
+			o["finishLookAt"] = new JSONData(lookAt_);
+			o["finishOrgasms"] = new JSONData(orgasms_);
+			o["finishOrgasmsTime"] = new JSONData(orgasmsTime_);
+			o["finishEvents"] = new JSONData(events_);
+		}
+	}
+
+
 	class Options
 	{
 		public delegate void Handler();
@@ -100,6 +158,7 @@ namespace Cue
 		private bool idlePose_ = true;
 
 		private List<CustomMenu> menus_ = new List<CustomMenu>();
+		private FinishOptions finish_ = new FinishOptions();
 
 		public Options()
 		{
@@ -213,6 +272,11 @@ namespace Cue
 			set { idlePose_ = value; OnChanged(); }
 		}
 
+		public FinishOptions Finish
+		{
+			get { return finish_; }
+		}
+
 		public CustomMenu[] Menus
 		{
 			get { return menus_.ToArray(); }
@@ -266,6 +330,8 @@ namespace Cue
 			o["autoHead"] = new JSONData(autoHead_);
 			o["idlePose"] = new JSONData(idlePose_);
 
+			finish_.Save(o);
+
 			if (menus_.Count > 0)
 			{
 				var mo = new JSONArray();
@@ -316,6 +382,8 @@ namespace Cue
 			J.OptBool(o, "autoHead", ref autoHead_);
 			J.OptBool(o, "idlePose", ref idlePose_);
 
+			finish_.Load(o);
+
 			if (o.HasKey("menus"))
 			{
 				var a = o["menus"].AsArray;
@@ -333,6 +401,11 @@ namespace Cue
 
 			OnChanged();
 			OnMenusChanged();
+		}
+
+		public void FireOnChanged()
+		{
+			OnChanged();
 		}
 
 		private void OnChanged()

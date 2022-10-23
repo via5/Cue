@@ -379,11 +379,6 @@ namespace Cue
 		private const int ExcitementUpState = 2;
 
 		private Logger log_;
-		private float initialDelay_ = 0;
-		private int lookAt_ = LookAtPersonality;
-		private int orgasms_ = OrgasmsPersonality;
-		private float orgasmsTime_ = 1;
-		private int events_ = StopEventsAll;
 
 		private int state_ = NoState;
 		private float elapsed_ = 0;
@@ -402,45 +397,20 @@ namespace Cue
 				infos_[i] = new PersonFinish(Cue.Instance.ActivePersons[i]);
 		}
 
+		private FinishOptions Options
+		{
+			get { return Cue.Instance.Options.Finish; }
+		}
+
 		public Logger Log
 		{
 			get { return log_; }
 		}
 
-		public float InitialDelay
-		{
-			get { return initialDelay_; }
-			set { initialDelay_ = value; }
-		}
-
-		public int LookAt
-		{
-			get { return lookAt_; }
-			set { lookAt_ = value; }
-		}
-
-		public int Orgasms
-		{
-			get { return orgasms_; }
-			set { orgasms_ = value; }
-		}
-
-		public float OrgasmsTime
-		{
-			get { return orgasmsTime_; }
-			set { orgasmsTime_ = value; }
-		}
-
-		public int Events
-		{
-			get { return events_; }
-			set { events_ = value; }
-		}
-
 		public float GetTotalTime(Person p)
 		{
 			return
-				orgasmsTime_ +
+				Options.OrgasmsTime +
 				p.Personality.Get(PS.OrgasmTime) +
 				p.Personality.Get(PS.PostOrgasmTime);
 		}
@@ -471,16 +441,16 @@ namespace Cue
 				}
 				else
 				{
-					var lookAt = CreateLookAt(i.Person, lookAt_);
-					var orgasm = CreateOrgasm(i.Person, orgasms_);
-					var mood = CreateMood(i.Person, orgasms_);
-					var events = CreateEvents(i.Person, events_);
+					var lookAt = CreateLookAt(i.Person, Options.LookAt);
+					var orgasm = CreateOrgasm(i.Person, Options.Orgasms);
+					var mood = CreateMood(i.Person, Options.Orgasms);
+					var events = CreateEvents(i.Person, Options.Events);
 
 					i.Start(lookAt, orgasm, mood, events);
 				}
 			}
 
-			Log.Info($"running delay {InitialDelay:0.00}");
+			Log.Info($"running delay {Options.InitialDelay:0.00}");
 		}
 
 		public void Update(float s)
@@ -495,7 +465,7 @@ namespace Cue
 				case DelayState:
 				{
 					elapsed_ += s;
-					if (elapsed_ >= InitialDelay)
+					if (elapsed_ >= Options.InitialDelay)
 					{
 						Log.Info($"delay finished");
 
@@ -520,10 +490,10 @@ namespace Cue
 
 					float p;
 
-					if (orgasmsTime_ <= 0)
+					if (Options.OrgasmsTime <= 0)
 						p = 1;
 					else
-						p = U.Clamp(elapsed_ / orgasmsTime_, 0, 1);
+						p = U.Clamp(elapsed_ / Options.OrgasmsTime, 0, 1);
 
 					for (int i = 0; i < infos_.Length; ++i)
 						infos_[i].SetExcitement(p);
@@ -546,9 +516,9 @@ namespace Cue
 		public void Debug(DebugLines d)
 		{
 			d.Add(
-				$"delay={initialDelay_:0.00} lookat={lookAt_} " +
-				$"orgasms={orgasms_} orgasmsTime={orgasmsTime_} " +
-				$"events={events_} state={state_} elapsed={elapsed_}");
+				$"delay={Options.InitialDelay:0.00} lookat={Options.LookAt} " +
+				$"orgasms={Options.Orgasms} orgasmsTime={Options.OrgasmsTime} " +
+				$"events={Options.Events} state={state_} elapsed={elapsed_}");
 
 			for (int i = 0; i < infos_.Length; ++i)
 			{
