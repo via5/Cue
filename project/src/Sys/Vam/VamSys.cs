@@ -733,6 +733,25 @@ namespace Cue.Sys.Vam
 			t.RestoreFromJSON(n.AsObject);
 			return t;
 		}
+
+		public IAction RegisterAction(string name, Action f)
+		{
+			var a = new JSONStorableAction(name, () => f());
+			script_.RegisterAction(a);
+
+			return new VamAction(a);
+		}
+	}
+
+
+	public class VamAction : IAction
+	{
+		private JSONStorableAction a_;
+
+		public VamAction(JSONStorableAction a)
+		{
+			a_ = a;
+		}
 	}
 
 

@@ -79,6 +79,7 @@ namespace Cue.Sys
 		ILiveSaver CreateLiveSaver();
 		IActionTrigger CreateActionTrigger();
 		IActionTrigger LoadActionTrigger(JSONNode n);
+		IAction RegisterAction(string name, Action f);
 	}
 
 
@@ -525,5 +526,9 @@ namespace Cue.Sys
 		void Edit(Action onDone = null);
 		void Fire();
 		JSONNode ToJSON();
+	}
+
+	public interface IAction
+	{
 	}
 }

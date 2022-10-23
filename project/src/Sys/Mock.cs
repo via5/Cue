@@ -292,7 +292,13 @@ namespace Cue.Sys.Mock
 		{
 			return null;
 		}
+
+		public IAction RegisterAction(string name, Action f)
+		{
+			return null;
+		}
 	}
+
 
 	class MockInput : IInput
 	{

@@ -82,7 +82,7 @@ namespace Cue
 			PersonChanged();
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;
-			Cue.Instance.Options.MenusChanged += OnMenusChanged;
+			Cue.Instance.Options.Menus.TriggersChanged += OnMenusChanged;
 
 			OnOptionsChanged();
 			OnMenusChanged();
@@ -91,11 +91,11 @@ namespace Cue
 		public override void Destroy()
 		{
 			Cue.Instance.Options.Changed -= OnOptionsChanged;
-			Cue.Instance.Options.MenusChanged -= OnMenusChanged;
+			Cue.Instance.Options.Menus.TriggersChanged -= OnMenusChanged;
 			base.Destroy();
 		}
 
-		private void AddCustomButton(CustomMenu m)
+		private void AddCustomButton(CustomTrigger m)
 		{
 			custom_.Add(new VUI.Button(m.Caption, () =>
 			{
@@ -168,8 +168,8 @@ namespace Cue
 		private void OnMenusChanged()
 		{
 			custom_.RemoveAllChildren();
-			custom_.Visible = (Cue.Instance.Options.Menus.Length > 0);
-			foreach (var m in Cue.Instance.Options.Menus)
+			custom_.Visible = (Cue.Instance.Options.Menus.Triggers.Length > 0);
+			foreach (var m in Cue.Instance.Options.Menus.Triggers)
 				AddCustomButton(m);
 
 			selButtons_.RemoveAllChildren();

@@ -4,24 +4,30 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class CustomMenu
+	class CustomTrigger
 	{
+		private TriggersOptions parent_ = null;
 		private string caption_;
 		private Sys.IActionTrigger trigger_;
 
-		private CustomMenu(string caption, Sys.IActionTrigger trigger)
+		private CustomTrigger(string caption, Sys.IActionTrigger trigger)
 		{
 			caption_ = caption;
 			trigger_ = trigger;
 		}
 
-		public CustomMenu()
+		public CustomTrigger(string caption)
+			: this(caption, Cue.Instance.Sys.CreateActionTrigger())
 		{
-			caption_ = "Button";
-			trigger_ = Cue.Instance.Sys.CreateActionTrigger();
 		}
 
-		public static CustomMenu FromJSON(JSONClass n)
+		public TriggersOptions Parent
+		{
+			get { return parent_; }
+			set { parent_ = value; }
+		}
+
+		public static CustomTrigger FromJSON(JSONClass n)
 		{
 			try
 			{
@@ -34,7 +40,7 @@ namespace Cue
 				if (t == null)
 					throw new LoadFailed("failed to create trigger");
 
-				return new CustomMenu(c, t);
+				return new CustomTrigger(c, t);
 			}
 			catch (Exception e)
 			{
@@ -54,7 +60,7 @@ namespace Cue
 			{
 				caption_ = value;
 				trigger_.Name = value;
-				Cue.Instance.Options.ForceMenusChanged();
+				parent_?.FireTriggersChanged();
 			}
 		}
 
@@ -75,6 +81,94 @@ namespace Cue
 	}
 
 
+	class TriggersOptions
+	{
+		public delegate void Handler();
+		public event Handler TriggersChanged;
+
+		private string defaultCaption_;
+		private List<CustomTrigger> triggers_ = new List<CustomTrigger>();
+
+		public TriggersOptions(string defaultCaption="")
+		{
+			defaultCaption_ = defaultCaption;
+		}
+
+		public CustomTrigger[] Triggers
+		{
+			get { return triggers_.ToArray(); }
+		}
+
+		public void Save(JSONArray a)
+		{
+			if (triggers_.Count > 0)
+			{
+				foreach (var m in triggers_)
+					a.Add(m.ToJSON());
+			}
+		}
+
+		public void Load(JSONArray a)
+		{
+			triggers_.Clear();
+
+			foreach (var mo in a.Childs)
+			{
+				var m = CustomTrigger.FromJSON(mo.AsObject);
+				if (m != null)
+					Add(m);
+			}
+
+			OnTriggersChanged();
+		}
+
+		public CustomTrigger AddTrigger()
+		{
+			var m = new CustomTrigger(defaultCaption_);
+			Add(m);
+			OnTriggersChanged();
+			return m;
+		}
+
+		private void Add(CustomTrigger t)
+		{
+			triggers_.Add(t);
+			t.Parent = this;
+		}
+
+		public void RemoveTrigger(CustomTrigger m)
+		{
+			if (!triggers_.Contains(m))
+			{
+				Logger.Global.Error($"custom menu '{m.Caption}' not found");
+				return;
+			}
+
+			m.Parent = null;
+			triggers_.Remove(m);
+
+			OnTriggersChanged();
+		}
+
+		public void FireAll()
+		{
+			foreach (var t in triggers_)
+				t.Trigger.Fire();
+		}
+
+		public void FireTriggersChanged()
+		{
+			OnTriggersChanged();
+		}
+
+		private void OnTriggersChanged()
+		{
+			Cue.Instance.SaveLater();
+			TriggersChanged?.Invoke();
+		}
+	}
+
+
 	class FinishOptions
 	{
 		private float initialDelay_ = 0;
@@ -82,6 +176,7 @@ namespace Cue
 		private int orgasms_ = Finish.OrgasmsPersonality;
 		private float orgasmsTime_ = 1;
 		private int events_ = Finish.StopEventsAll;
+		private TriggersOptions triggers_ = new TriggersOptions();
 
 		public float InitialDelay
 		{
@@ -113,6 +208,11 @@ namespace Cue
 			set { events_ = value; Cue.Instance.Options.FireOnChanged(); }
 		}
 
+		public TriggersOptions Triggers
+		{
+			get { return triggers_; }
+		}
+
 		public void Load(JSONClass o)
 		{
 			J.OptFloat(o, "finishInitialDelay", ref initialDelay_);
@@ -120,6 +220,9 @@ namespace Cue
 			J.OptInt(o, "finishOrgasms", ref orgasms_);
 			J.OptFloat(o, "finishOrgasmsTime", ref orgasmsTime_);
 			J.OptInt(o, "finishEvents", ref events_);
+
+			if (o.HasKey("triggers"))
+				triggers_.Load(o["triggers"].AsArray);
 		}
 
 		public void Save(JSONClass o)
@@ -129,6 +232,10 @@ namespace Cue
 			o["finishOrgasms"] = new JSONData(orgasms_);
 			o["finishOrgasmsTime"] = new JSONData(orgasmsTime_);
 			o["finishEvents"] = new JSONData(events_);
+
+			var menusArray = new JSONArray();
+			triggers_.Save(menusArray);
+			o["triggers"] = menusArray;
 		}
 	}
 
@@ -136,7 +243,7 @@ namespace Cue
 	class Options
 	{
 		public delegate void Handler();
-		public event Handler Changed, MenusChanged;
+		public event Handler Changed;
 
 		private bool hjAudio_ = true;
 		private bool bjAudio_ = true;
@@ -157,8 +264,8 @@ namespace Cue
 		private bool autoHead_ = true;
 		private bool idlePose_ = true;
 
-		private List<CustomMenu> menus_ = new List<CustomMenu>();
 		private FinishOptions finish_ = new FinishOptions();
+		private TriggersOptions menus_ = new TriggersOptions("Button");
 
 		public Options()
 		{
@@ -277,34 +384,9 @@ namespace Cue
 			get { return finish_; }
 		}
 
-		public CustomMenu[] Menus
+		public TriggersOptions Menus
 		{
-			get { return menus_.ToArray(); }
-		}
-
-		public CustomMenu AddCustomMenu()
-		{
-			var m = new CustomMenu();
-			menus_.Add(m);
-			OnMenusChanged();
-			return m;
-		}
-
-		public void RemoveCustomMenu(CustomMenu m)
-		{
-			if (!menus_.Contains(m))
-			{
-				Logger.Global.Error($"custom menu '{m.Caption}' not found");
-				return;
-			}
-
-			menus_.Remove(m);
-			OnMenusChanged();
-		}
-
-		public void ForceMenusChanged()
-		{
-			OnMenusChanged();
+			get { return menus_; }
 		}
 
 		public JSONNode ToJSON()
@@ -332,23 +414,15 @@ namespace Cue
 
 			finish_.Save(o);
 
-			if (menus_.Count > 0)
-			{
-				var mo = new JSONArray();
-
-				foreach (var m in menus_)
-					mo.Add(m.ToJSON());
-
-				o["menus"] = mo;
-			}
+			var menusArray = new JSONArray();
+			menus_.Save(menusArray);
+			o["menus"] = menusArray;
 
 			return o;
 		}
 
 		public void Load(JSONClass o)
 		{
-			menus_.Clear();
-
 			if (o.HasKey("muteSfx"))
 			{
 				bool b = J.OptBool(o, "muteSfx", false);
@@ -385,22 +459,12 @@ namespace Cue
 			finish_.Load(o);
 
 			if (o.HasKey("menus"))
-			{
-				var a = o["menus"].AsArray;
-
-				foreach (var mo in a.Childs)
-				{
-					var m = CustomMenu.FromJSON(mo.AsObject);
-					if (m != null)
-						menus_.Add(m);
-				}
-			}
+				menus_.Load(o["menus"].AsArray);
 
 			if (Cue.Instance.Sys.ForceDevMode)
 				devMode_ = true;
 
 			OnChanged();
-			OnMenusChanged();
 		}
 
 		public void FireOnChanged()
@@ -412,12 +476,6 @@ namespace Cue
 		{
 			Cue.Instance.SaveLater();
 			Changed?.Invoke();
-		}
-
-		private void OnMenusChanged()
-		{
-			Cue.Instance.SaveLater();
-			MenusChanged?.Invoke();
 		}
 	}
 }

@@ -384,6 +384,8 @@ namespace Cue
 		private float elapsed_ = 0;
 		private PersonFinish[] infos_;
 
+		private Sys.IAction startAction_ = null;
+
 
 		public Finish()
 		{
@@ -395,6 +397,8 @@ namespace Cue
 			infos_ = new PersonFinish[Cue.Instance.ActivePersons.Length];
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
 				infos_[i] = new PersonFinish(Cue.Instance.ActivePersons[i]);
+
+			startAction_ = Cue.Instance.Sys.RegisterAction("Finish", OnFinishAction);
 		}
 
 		private FinishOptions Options
@@ -415,6 +419,11 @@ namespace Cue
 				p.Personality.Get(PS.PostOrgasmTime);
 		}
 
+		private void OnFinishAction()
+		{
+			Start();
+		}
+
 		public void Start()
 		{
 			if (state_ != NoState)
@@ -424,6 +433,8 @@ namespace Cue
 			}
 
 			Log.Info("starting");
+
+			Cue.Instance.Options.Finish.Triggers.FireAll();
 
 			elapsed_ = 0;
 			state_ = DelayState;

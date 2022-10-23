@@ -176,9 +176,9 @@ namespace Cue
 
 		public class CustomMenuItem : Item<VUI.Button>
 		{
-			private CustomMenu m_;
+			private CustomTrigger m_;
 
-			public CustomMenuItem(CustomMenu m)
+			public CustomMenuItem(CustomTrigger m)
 				: base(new VUI.Button(m.Caption), null)
 			{
 				m_ = m;
@@ -215,7 +215,7 @@ namespace Cue
 				Hand(), Head(), Thrust(), Trib(), CanKiss(), Strapon()
 			};
 
-			foreach (var m in Cue.Instance.Options.Menus)
+			foreach (var m in Cue.Instance.Options.Menus.Triggers)
 				list.Add(new CustomMenuItem(m));
 
 			//list.Add(Genitals());
@@ -352,7 +352,7 @@ namespace Cue
 			personSel_ = new CircularIndex<Person>(
 				Cue.Instance.ActivePersons, (p) => p.Body.Exists);
 
-			Cue.Instance.Options.MenusChanged += UpdateItems;
+			Cue.Instance.Options.Menus.TriggersChanged += UpdateItems;
 			UpdateItems();
 		}
 

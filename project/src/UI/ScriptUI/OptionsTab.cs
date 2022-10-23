@@ -21,6 +21,78 @@ namespace Cue
 	}
 
 
+	class TriggersPanel : VUI.Panel
+	{
+		private TriggersOptions opts_;
+		private string triggerNamePlaceholder_;
+		private VUI.Panel buttons_;
+
+		public TriggersPanel(
+			TriggersOptions opts, string addCaption, string infoCaption,
+			string triggerNamePlaceholder)
+		{
+			opts_ = opts;
+			triggerNamePlaceholder_ = triggerNamePlaceholder;
+
+			var center = new VUI.Panel(new VUI.BorderLayout(10));
+			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
+
+			controls.Add(new VUI.Button(addCaption, OnAdd));
+			controls.Add(new VUI.Label(infoCaption));
+			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			center.Add(controls, VUI.BorderLayout.Top);
+			center.Add(buttons_, VUI.BorderLayout.Center);
+
+			Layout = new VUI.BorderLayout();
+			Add(center, VUI.BorderLayout.Center);
+		}
+
+		public void Update()
+		{
+			if (buttons_.Children.Count != opts_.Triggers.Length)
+				Rebuild();
+		}
+
+		private void Rebuild()
+		{
+			buttons_.RemoveAllChildren();
+			foreach (var m in opts_.Triggers)
+				buttons_.Add(CreatePanel(m));
+		}
+
+		private VUI.Panel CreatePanel(CustomTrigger m)
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			var c = p.Add(new VUI.TextBox(m.Caption, triggerNamePlaceholder_));
+			c.Edited += (s) => { OnCaption(m, s); };
+			p.Add(new VUI.Button("Edit trigger", () => OnEditTrigger(m)));
+			p.Add(new VUI.ToolButton("X", () => OnDelete(m)));
+			return p;
+		}
+
+		private void OnAdd()
+		{
+			opts_.AddTrigger();
+		}
+
+		private void OnEditTrigger(CustomTrigger m)
+		{
+			m.Trigger.Edit(() => opts_.FireTriggersChanged());
+		}
+
+		private void OnCaption(CustomTrigger m, string s)
+		{
+			m.Caption = s;
+		}
+
+		private void OnDelete(CustomTrigger m)
+		{
+			opts_.RemoveTrigger(m);
+		}
+	}
+
+
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
@@ -205,13 +277,17 @@ namespace Cue
 	{
 		private VUI.CheckBox leftMenu_, rightMenu_;
 		private VUI.FloatTextSlider menuDelay_;
-		private VUI.Panel buttons_;
+		private TriggersPanel triggers_;
 		private bool ignore_ = false;
 
 		public MenuOptionsTab()
 			: base("Menu", false)
 		{
 			var o = Cue.Instance.Options;
+
+			triggers_ = new TriggersPanel(
+				o.Menus, "Add button", "Adds custom buttons to the menu.",
+				"Button name");
 
 			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;
@@ -232,19 +308,9 @@ namespace Cue
 
 			top.Add(new VUI.Spacer(20));
 
-			var center = new VUI.Panel(new VUI.BorderLayout(10));
-			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
-
-			controls.Add(new VUI.Button("Add button", OnAdd));
-			controls.Add(new VUI.Label("Adds custom buttons to the menu."));
-			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
-
-			center.Add(controls, VUI.BorderLayout.Top);
-			center.Add(buttons_, VUI.BorderLayout.Center);
-
 			Layout = new VUI.BorderLayout(20);
 			Add(top, VUI.BorderLayout.Top);
-			Add(center, VUI.BorderLayout.Center);
+			Add(triggers_, VUI.BorderLayout.Center);
 
 			o.Changed += OnOptionsChanged;
 			OnOptionsChanged();
@@ -257,25 +323,7 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			if (buttons_.Children.Count != Cue.Instance.Options.Menus.Length)
-				Rebuild();
-		}
-
-		private void Rebuild()
-		{
-			buttons_.RemoveAllChildren();
-			foreach (var m in Cue.Instance.Options.Menus)
-				buttons_.Add(CreatePanel(m));
-		}
-
-		private VUI.Panel CreatePanel(CustomMenu m)
-		{
-			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
-			var c = p.Add(new VUI.TextBox(m.Caption));
-			c.Edited += (s) => { OnCaption(m, s); };
-			p.Add(new VUI.Button("Edit trigger", () => OnEditTrigger(m)));
-			p.Add(new VUI.ToolButton("X", () => OnDelete(m)));
-			return p;
+			triggers_.Update();
 		}
 
 		private void OnOptionsChanged()
@@ -296,11 +344,6 @@ namespace Cue
 			}
 		}
 
-		private void OnAdd()
-		{
-			Cue.Instance.Options.AddCustomMenu();
-		}
-
 		private void OnMenuDelay(float f)
 		{
 			if (ignore_) return;
@@ -317,21 +360,6 @@ namespace Cue
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.RightMenu = b;
-		}
-
-		private void OnEditTrigger(CustomMenu m)
-		{
-			m.Trigger.Edit(() => Cue.Instance.Options.ForceMenusChanged());
-		}
-
-		private void OnCaption(CustomMenu m, string s)
-		{
-			m.Caption = s;
-		}
-
-		private void OnDelete(CustomMenu m)
-		{
-			Cue.Instance.Options.RemoveCustomMenu(m);
 		}
 	}
 
@@ -527,6 +555,8 @@ namespace Cue
 		private VUI.ComboBox<EnumItem> orgasms_;
 		private VUI.ComboBox<EnumItem> events_;
 
+		private TriggersPanel triggers_;
+
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 		private DebugLines debug_ = null;
 
@@ -542,47 +572,55 @@ namespace Cue
 			orgasms_ = new VUI.ComboBox<EnumItem>(OnOrgasms);
 			events_ = new VUI.ComboBox<EnumItem>(OnEvents);
 
+			triggers_ = new TriggersPanel(
+				Cue.Instance.Options.Finish.Triggers,
+				"Add trigger",
+				"These triggers will be fired when Finishing starts.",
+				"Trigger name");
+
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 			list_.FontSize = 22;
-			list_.Visible = Cue.Instance.Options.DevMode;
+			list_.Visible = false;// Cue.Instance.Options.DevMode;
 
 			Cue.Instance.Options.Changed += () =>
 			{
-				list_.Visible = Cue.Instance.Options.DevMode;
+				//list_.Visible = Cue.Instance.Options.DevMode;
 			};
 
 			var ly = new VUI.GridLayout(2, 10);
 			ly.HorizontalStretch = new List<bool> { false, true };
 			ly.HorizontalFill = true;
 
-			var p = new VUI.Panel(ly);
+			var settingsPanel = new VUI.Panel(ly);
 
 			var pp = new VUI.Panel(new VUI.HorizontalFlow(5));
 			initialDelay_.MaximumSize = new VUI.Size(100, VUI.Widget.DontCare);
 			pp.Add(initialDelay_);
 			pp.Add(new VUI.Label("s"));
-			p.Add(new VUI.Label("Initial delay"));
-			p.Add(pp);
+			settingsPanel.Add(new VUI.Label("Initial delay"));
+			settingsPanel.Add(pp);
 
 			pp = new VUI.Panel(new VUI.HorizontalFlow(5));
 			orgasmsTime_.MaximumSize = new VUI.Size(100, VUI.Widget.DontCare);
 			pp.Add(orgasmsTime_);
 			pp.Add(new VUI.Label("s"));
-			p.Add(new VUI.Label("Time to orgasm"));
-			p.Add(pp);
+			settingsPanel.Add(new VUI.Label("Time to orgasm"));
+			settingsPanel.Add(pp);
 
-			p.Add(new VUI.Spacer(30));
-			p.Add(new VUI.Spacer(30));
+			settingsPanel.Add(new VUI.Spacer(30));
+			settingsPanel.Add(new VUI.Spacer(30));
 
-			p.Add(new VUI.Label("Look at player"));
-			p.Add(lookAt_);
+			settingsPanel.Add(new VUI.Label("Look at player"));
+			settingsPanel.Add(lookAt_);
 
-			p.Add(new VUI.Label("Orgasms"));
-			p.Add(orgasms_);
+			settingsPanel.Add(new VUI.Label("Orgasms"));
+			settingsPanel.Add(orgasms_);
 
-			p.Add(new VUI.Label("Events"));
-			p.Add(events_);
+			settingsPanel.Add(new VUI.Label("Events"));
+			settingsPanel.Add(events_);
 
+			settingsPanel.Add(new VUI.Spacer(30));
+			settingsPanel.Add(new VUI.Spacer(30));
 
 
 			lookAt_.AddItem(new EnumItem("Do nothing", Finish.LookAtNothing));
@@ -600,9 +638,13 @@ namespace Cue
 			events_.AddItem(new EnumItem("Stop events for everybody", Finish.StopEventsAll));
 
 
-			Layout = new VUI.BorderLayout(20);
+			var p = new VUI.Panel(new VUI.VerticalFlow(20));
+			p.Add(settingsPanel);
+
+			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
-			Add(list_, VUI.BorderLayout.Center);
+			Add(triggers_, VUI.BorderLayout.Center);
+			//Add(list_, VUI.BorderLayout.Center);
 
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;
@@ -660,6 +702,8 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
+			triggers_.Update();
+
 			if (Cue.Instance.Options.DevMode)
 			{
 				if (debug_ == null)
