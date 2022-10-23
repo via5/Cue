@@ -580,11 +580,11 @@ namespace Cue
 
 			list_.Font = VUI.Style.Theme.MonospaceFont;
 			list_.FontSize = 22;
-			list_.Visible = false;// Cue.Instance.Options.DevMode;
+			list_.Visible = Cue.Instance.Options.DevMode;
 
 			Cue.Instance.Options.Changed += () =>
 			{
-				//list_.Visible = Cue.Instance.Options.DevMode;
+				list_.Visible = Cue.Instance.Options.DevMode;
 			};
 
 			var ly = new VUI.GridLayout(2, 10);
@@ -644,7 +644,7 @@ namespace Cue
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
 			Add(triggers_, VUI.BorderLayout.Center);
-			//Add(list_, VUI.BorderLayout.Center);
+			Add(list_, VUI.BorderLayout.Bottom);
 
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;

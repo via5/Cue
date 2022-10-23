@@ -212,7 +212,7 @@ namespace Cue
 		{
 			var list = new List<IItem>
 			{
-				Hand(), Head(), Thrust(), Trib(), CanKiss(), Strapon()
+				Hand(), Head(), Thrust(), Trib(), CanKiss(), Strapon(), Finish()
 			};
 
 			foreach (var m in Cue.Instance.Options.Menus.Triggers)
@@ -296,6 +296,14 @@ namespace Cue
 
 				(p) => p.Body.Strapon,
 				(p) => !p.Atom.IsMale);
+		}
+
+		public static IItem Finish()
+		{
+			return new ButtonItem("Finish", (p) =>
+			{
+				Cue.Instance.Finish.Start();
+			});
 		}
 
 		public static IItem Genitals()
