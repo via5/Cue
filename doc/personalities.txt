@@ -458,9 +458,11 @@ Controls what characters are looking at.
   orgasm and this character's excitement is above this value, its orgasm will be
   triggered
 
-- MinCollisionMagnitude (float)
+- MinCollisionMag (float)
+- MinCollisionMagPenetration (float)
   if the relative velocity of the collision between two body parts is lower than
-  this, excitement won't rise
+  this, excitement won't rise; collisions between genitals is controlled by
+  MinCollisionMagPenetration, all others are controlled by MinCollisionMag
 
 
 3.5 Mood
@@ -718,7 +720,57 @@ of the mood decides the value at which the morph is driven.
   value; this is a ghetto version of Vam's morph groups
 
 
-3.12 Miscellaneous
+3.12 Finish
+-----------
+These control the character's action when finishing. The term "involved"
+currently means that the character is penetrating the player, or vice versa.
+
+
+- FinishLookAtPlayer (string)
+  determines whether the action in `FinishLookAtPlayerAction` is executed; can
+  be "always", "involved" or "never"
+
+    - always:   action is always executed
+    - involved: action is executed only if involved
+    - never:    action is never executed
+
+- FinishLookAtPlayerAction (string)
+  if `FinishLookAtPlayer` is true, this action will be executed; can be "look",
+  "avoid" or "gaze"
+
+    - look:  the character will look at the player
+    - avoid: the character will look away from the player
+    - gaze:  the character uses `AvoidGazePlayerDuringSex` to determine whether
+             to look at or avoid the player
+
+- FinishOrgasm (string)
+  whether the character orgasms; can be "always", "involved" or "never"
+
+    - always:   the character will always orgasm
+    - involved: the character will orgasm only if involved
+    - never:    the character will never orgasm
+
+- FinishOrgasmMinExcitement (float)
+  affects `FinishOrgasm`, the character will orgasm only if excitement is
+  above this value
+
+- FinishMood (string)
+  can set the various moods to a specific value while finishing; can be
+  "always", "involved" or "never"
+
+    - always:   the moods are always set
+    - involved: the moods are set only if involved
+    - never:    the moods are never set
+
+- FinishMoodHappy (float),
+- FinishMoodPlayful (float)
+- FinishMoodAngry (float)
+- FinishMoodTired (float)
+  sets the corresponding mood to the given value; use -1 to leave the mood
+  unchanged
+
+
+3.13 Miscellaneous
 -------------------
 
 - IdleAnimation (string)

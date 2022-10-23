@@ -603,6 +603,10 @@ namespace Cue
 								doAction = true;
 						}
 					}
+					else if (opt == "" || opt == "never")
+					{
+						doAction = false;
+					}
 					else
 					{
 						Log.Error($"unknown lookat '{opt}'");
@@ -695,6 +699,10 @@ namespace Cue
 								doAction = true;
 						}
 					}
+					else if (opt == "" || opt == "never")
+					{
+						doAction = false;
+					}
 					else
 					{
 						Log.Error($"unknown orgasm opt '{opt}'");
@@ -736,6 +744,14 @@ namespace Cue
 						if (p.Status.IsInvolvedWith(player))
 							return new FinishMoodSet(p);
 					}
+				}
+				else if (opt == "" || opt == "never")
+				{
+					return new FinishMoodNothing(p);
+				}
+				else
+				{
+					Log.Error($"bad mood option '{opt}'");
 				}
 			}
 
