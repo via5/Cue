@@ -380,6 +380,45 @@
 		},
 
 
+		{
+			"name": "surprise",
+			"moods": "surprised",
+			"bodyParts": "mouth eyes",
+			"morphs":
+			[
+				{
+					"id": "Surprise",
+					"max": 0.8
+				}
+			]
+		},
+
+		{
+			"name": "surprise1",
+			"moods": "surprised",
+			"bodyParts": "mouth eyes",
+			"morphs":
+			[
+				{
+					"id": "Surprise1",
+					"max": 0.8
+				}
+			]
+		},
+
+		{
+			"name": "surprise1",
+			"moods": "surprised",
+			"bodyParts": "mouth eyes",
+			"morphs":
+			[
+				{
+					"id": "Surprise2",
+					"max": 0.8
+				}
+			]
+		},
+
 
 		{
 			"name": "eyesClosed",
@@ -611,11 +650,13 @@
 
 	"defaultHappiness": 1,
 	"defaultPlayfulness": 0,
+	"defaultSurprise": 0,
 	"defaultAnger": 0,
 	"maxHappyExpression": 1,
 	"maxExcitedExpression": 1,
 	"maxPlayfulExpression": 1,
 	"maxAngryExpression": 1,
+	"maxSurprisedExpression": 1,
 	"maxTiredExpression": 1,
 	"minTiredness": 0,
 
@@ -678,6 +719,7 @@
 	"finishMoodHappy": -1,
 	"finishMoodPlayful": -1,
 	"finishMoodAngry": -1,
+	"finishMoodSurprised": -1,
 	"finishMoodTired": -1,
 
 

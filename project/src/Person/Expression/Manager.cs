@@ -471,6 +471,19 @@ namespace Cue
 						intensity = Math.Min(intensity, ps.Get(PS.MaxAngryExpression));
 					}
 
+					if (e.IsMood(MoodType.Surprised))
+					{
+						if (m.Get(MoodType.Surprised) > highestMoodValue)
+						{
+							highestMood = MoodType.Surprised;
+							highestMoodValue = m.Get(MoodType.Surprised);
+						}
+
+						weight += e.DefaultWeight * m.Get(MoodType.Surprised);
+						intensity = Math.Max(intensity, m.Get(MoodType.Surprised));
+						intensity = Math.Min(intensity, ps.Get(PS.MaxSurprisedExpression));
+					}
+
 					if (e.IsMood(MoodType.Tired))
 					{
 						if (m.Get(MoodType.Tired) > highestMoodValue)

@@ -133,10 +133,12 @@ V.Float("AngerExcitementFactorForHappiness"),
 V.Float("DefaultHappiness"),
 V.Float("DefaultAnger"),
 V.Float("DefaultPlayfulness"),
+V.Float("DefaultSurprise"),
 V.Float("MaxHappyExpression"),
 V.Float("MaxExcitedExpression"),
 V.Float("MaxPlayfulExpression"),
 V.Float("MaxAngryExpression"),
+V.Float("MaxSurprisedExpression"),
 V.Float("MaxTiredExpression"),
 V.Float("MinTiredness"),
 
@@ -186,6 +188,7 @@ V.String("FinishMood"),
 V.Float("FinishMoodHappy"),
 V.Float("FinishMoodPlayful"),
 V.Float("FinishMoodAngry"),
+V.Float("FinishMoodSurprised"),
 V.Float("FinishMoodTired")
 
 };

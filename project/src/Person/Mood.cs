@@ -476,6 +476,8 @@ namespace Cue
 					Set(MoodType.Angry, ps.Get(PS.DefaultAnger));
 				}
 			}
+
+			Set(MoodType.Surprised, ps.Get(PS.DefaultSurprise));
 		}
 
 		private void UpdateTiredness(float s)

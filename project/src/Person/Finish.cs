@@ -197,11 +197,13 @@ namespace Cue
 			float happy   = ps.Get(PS.FinishMoodHappy);
 			float playful = ps.Get(PS.FinishMoodPlayful);
 			float angry   = ps.Get(PS.FinishMoodAngry);
+			float surprised = ps.Get(PS.FinishMoodSurprised);
 			float tired   = ps.Get(PS.FinishMoodTired);
 
 			SetMood(MoodType.Happy, happy);
 			SetMood(MoodType.Playful, playful);
 			SetMood(MoodType.Angry, angry);
+			SetMood(MoodType.Surprised, surprised);
 			SetMood(MoodType.Tired, tired);
 		}
 
@@ -223,12 +225,13 @@ namespace Cue
 			float happy = ps.Get(PS.FinishMoodHappy);
 			float playful = ps.Get(PS.FinishMoodPlayful);
 			float angry = ps.Get(PS.FinishMoodAngry);
+			float surprised = ps.Get(PS.FinishMoodSurprised);
 			float tired = ps.Get(PS.FinishMoodTired);
 
 			return
 				$"mood set, " +
 				$"happy={FS(happy)} playful={FS(playful)} " +
-				$"angry={FS(angry)} tired={FS(tired)}";
+				$"angry={FS(angry)} surprised={surprised} tired={FS(tired)}";
 		}
 
 		private string FS(float f)

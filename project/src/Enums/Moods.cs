@@ -11,11 +11,12 @@ namespace Cue
 		public static readonly MoodType Playful = MoodType.CreateInternal(1);
 		public static readonly MoodType Excited = MoodType.CreateInternal(2);
 		public static readonly MoodType Angry = MoodType.CreateInternal(3);
-		public static readonly MoodType Tired = MoodType.CreateInternal(4);
-		public static readonly MoodType Orgasm = MoodType.CreateInternal(5);
+		public static readonly MoodType Surprised = MoodType.CreateInternal(4);
+		public static readonly MoodType Tired = MoodType.CreateInternal(5);
+		public static readonly MoodType Orgasm = MoodType.CreateInternal(6);
 
-		public const int Count = 6;
-		public int GetCount() { return 6; }
+		public const int Count = 7;
+		public int GetCount() { return 7; }
 
 
 		private static MoodType[] values_ = new MoodType[]
@@ -26,6 +27,7 @@ namespace Cue
 			MoodType.CreateInternal(3),
 			MoodType.CreateInternal(4),
 			MoodType.CreateInternal(5),
+			MoodType.CreateInternal(6),
 		};
 
 		public static MoodType[] Values
@@ -39,6 +41,7 @@ namespace Cue
 			"playful",
 			"excited",
 			"angry",
+			"surprised",
 			"tired",
 			"orgasm",
 		};

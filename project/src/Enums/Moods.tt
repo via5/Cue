@@ -7,6 +7,7 @@ V.Value("Happy"),
 V.Value("Playful"),
 V.Value("Excited"),
 V.Value("Angry"),
+V.Value("Surprised"),
 V.Value("Tired"),
 V.Value("Orgasm")
 
