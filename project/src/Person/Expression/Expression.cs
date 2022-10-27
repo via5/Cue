@@ -49,7 +49,7 @@
 
 
 		private string name_;
-		private bool[] moods_ = new bool[MoodType.Count];
+		private MoodType mood_ = MoodType.None;
 		private MorphGroup g_;
 		private Config config_;
 		private TargetInfo target_;
@@ -59,37 +59,28 @@
 		private float add_ = 0;
 
 		public Expression(string name, MoodType mood, Config c, MorphGroup g)
-				: this(name, new MoodType[] { mood }, c, g)
-		{
-		}
-
-		public Expression(string name, MoodType[] moods, Config c, MorphGroup g)
-				: this(name)
+			: this(name, mood)
 		{
 			g_ = g;
 			config_ = c;
-
-			for (int i = 0; i < moods.Length; ++i)
-				moods_[moods[i].Int] = true;
 		}
 
-		private Expression(string name)
+		private Expression(string name, MoodType mood)
 		{
 			name_ = name;
+			mood_ = mood;
 			target_.valid = false;
 		}
 
 		public Expression Clone()
 		{
-			var e = new Expression(name_);
+			var e = new Expression(name_, mood_);
 			e.CopyFrom(this);
 			return e;
 		}
 
 		private void CopyFrom(Expression e)
 		{
-			moods_ = new bool[e.moods_.Length];
-			e.moods_.CopyTo(moods_, 0);
 			g_ = e.g_.Clone();
 			config_ = e.config_;
 			easing_ = e.easing_.Clone();
@@ -122,6 +113,7 @@
 		public string Name
 		{
 			get { return name_; }
+			set { name_ = value; }
 		}
 
 		public float Target
@@ -169,6 +161,11 @@
 			set { add_ = value; }
 		}
 
+		public MoodType Mood
+		{
+			get { return mood_; }
+		}
+
 		public void SetAuto(float range, float minTime, float maxTime)
 		{
 			auto_.range = range;
@@ -183,25 +180,12 @@
 
 		public string MoodString()
 		{
-			string s = "";
-
-			foreach (MoodType i in MoodType.Values)
-			{
-				if (moods_[i.Int])
-				{
-					if (s != "")
-						s += "|";
-
-					s += MoodType.ToString(i);
-				}
-			}
-
-			return s;
+			return MoodType.ToString(mood_);
 		}
 
 		public bool IsMood(MoodType t)
 		{
-			return moods_[t.Int];
+			return (mood_ == t);
 		}
 
 		public bool AffectsAnyBodyPart(BodyPartType[] bodyParts)

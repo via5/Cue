@@ -6,8 +6,11 @@
 	"defaultAnger": 0.4,
 	"lookAtPlayerTimeAfterGrab": 0,
 
-	"zappedByPlayerBreastsExcitement": 0.2,
+	"zappedByPlayerBreastsExcitement": 0,
 	"zappedByPlayerGenitalsExcitement": 0.25,
-	"zappedByPlayerPenetrationExcitement": 0.60,
-	"zappedByPlayerMouthExcitement": 0.1,
+	"zappedByPlayerPenetrationExcitement": 0.35,
+	"zappedByPlayerMouthExcitement": 0,
+
+	"finishMoodAngry": 1,
+	"finishMoodSurprised": 1
 }

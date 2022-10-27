@@ -490,7 +490,7 @@ namespace Cue
 						}
 
 						elapsed_ = 0;
-						state_ = NoState;// ExcitementUpState;
+						state_ = ExcitementUpState;
 
 						Log.Info($"running excitement up");
 					}

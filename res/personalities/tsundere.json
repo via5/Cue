@@ -27,5 +27,8 @@
 	"angerMaxExcitementForHappiness": 0.5,
 	"angerExcitementFactorForHappiness": 1,
 
-	"defaultHappiness": 0.5
+	"defaultHappiness": 0.5,
+
+	"finishMood": "involved",
+	"finishMoodSurprised": 1
 }

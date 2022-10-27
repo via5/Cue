@@ -5,4 +5,7 @@
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
 	"lookAtPlayerTimeAfterGrab": 0,
+
+	"finishMood": "involved",
+	"finishMoodSurprised": 1,
 }

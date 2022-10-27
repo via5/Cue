@@ -45,6 +45,12 @@
 
 	"zappedEnabled": false,
 
+	"finishLookAtPlayer": "involved",
+	"finishOrgasm": "never",
+	"finishMood": "involved",
+	"finishMoodAngry": 0.4,
+	"finishMoodSurprised": 0.4,
+
 	"gazeDuration":
 	{
 		"range":

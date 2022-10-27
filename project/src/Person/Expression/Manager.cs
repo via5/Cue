@@ -5,7 +5,8 @@ namespace Cue
 {
 	public class ExpressionManager
 	{
-		private const int MaxActive = 3;
+		private const int MaxActive = 4;
+		private const int MaxActivePerMood = 2;
 		private const int MaxEmergency = 1;
 		private const float MoreCheckInterval = 1;
 
@@ -157,7 +158,7 @@ namespace Cue
 				if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(mood))
 				{
 					foundActive = true;
-					ActivateForEmergency(exps_[i], mood, intensity, min, max, time);
+					ActivateForEmergency(exps_[i], intensity, min, max, time);
 				}
 				else if (exps_[i].Active)
 				{
@@ -171,7 +172,7 @@ namespace Cue
 				{
 					if (exps_[i].Expression.IsMood(mood))
 					{
-						ActivateForEmergency(exps_[i], mood, intensity, min, max, time);
+						ActivateForEmergency(exps_[i], intensity, min, max, time);
 						break;
 					}
 				}
@@ -337,7 +338,9 @@ namespace Cue
 					if (exps_[i].Active)
 					{
 						if (exps_[i].Expression.AffectsAnyBodyPart(e.Expression.BodyParts))
+						{
 							exps_[i].Deactivate();
+						}
 					}
 				}
 			}
@@ -363,7 +366,7 @@ namespace Cue
 		}
 
 		private void ActivateForEmergency(
-			WeightedExpression e, MoodType mood, float intensity,
+			WeightedExpression e, float intensity,
 			float min, float max, float time)
 		{
 			var ps = person_.Personality;
@@ -373,8 +376,7 @@ namespace Cue
 			e.Set(
 				1, intensity, 1,
 				ps.Get(PS.OrgasmExpressionRangeMin),
-				ps.Get(PS.OrgasmExpressionRangeMax),
-				mood);
+				ps.Get(PS.OrgasmExpressionRangeMax));
 
 			e.Activate(intensity, ps.Get(PS.OrgasmFirstExpressionTime));
 		}
@@ -387,6 +389,20 @@ namespace Cue
 			float expressionTiredness = U.Clamp(
 				m.Get(MoodType.Tired) * ps.Get(PS.ExpressionTirednessFactor),
 				0, 1);
+
+			// todo: this needs a rewrite, it was made when expressions had
+			// multiple moods, but can only have one mood now, and they're
+			// duplicated instead
+
+			int[] countPerMood = new int[MoodType.Count];
+			for (int i = 0; i < countPerMood.Length; ++i)
+				countPerMood[i] = 0;
+
+			for (int i = 0; i < exps_.Length; ++i)
+			{
+				if (exps_[i].Active)
+					++countPerMood[exps_[i].Expression.Mood.Int];
+			}
 
 
 			for (int i = 0; i < exps_.Length; ++i)
@@ -511,9 +527,12 @@ namespace Cue
 				}
 
 
+				if (countPerMood[e.Mood.Int] >= MaxActivePerMood)
+					weight = 0;
+
 				float speed = 1 - expressionTiredness;
 
-				we.Set(weight, intensity, speed, min, max, highestMood);
+				we.Set(weight, intensity, speed, min, max);
 			}
 		}
 

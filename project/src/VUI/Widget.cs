@@ -676,8 +676,12 @@ namespace VUI
 
 		public virtual void Create()
 		{
+			bool created = false;
+
 			if (mainObject_ == null)
 			{
+				created = true;
+
 				mainObject_ = new GameObject(ToString());
 				mainObject_.AddComponent<RectTransform>();
 				mainObject_.AddComponent<LayoutElement>();
@@ -710,7 +714,9 @@ namespace VUI
 				w.Create();
 
 			UpdateRenderState();
-			Created?.Invoke();
+
+			if (created)
+				Created?.Invoke();
 		}
 
 		private void UpdateRenderState()

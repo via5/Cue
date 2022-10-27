@@ -189,16 +189,38 @@ namespace Cue
 						}
 					}
 
-					es.Add(new Expression(
-						name,
-						MoodType.FromStringMany(en["moods"].Value), c,
-						new MorphGroup(
-							name,
-							BodyPartType.FromStringMany(en["bodyParts"].Value),
-							morphs.ToArray())));
+					foreach (var m in MoodType.FromStringMany(en["moods"].Value))
+					{
+						es.Add(new Expression(
+							name, m, c,
+							new MorphGroup(
+								name,
+								BodyPartType.FromStringMany(en["bodyParts"].Value),
+								morphs.ToArray())));
+					}
 				}
 
 				U.NatSort(es, (e) => e.Name);
+
+				if (es.Count > 0)
+				{
+					int add = 2;
+					string lastName = es[0].Name;
+
+					for (int i = 1; i < es.Count; ++i)
+					{
+						if (es[i].Name == lastName)
+						{
+							es[i].Name = $"{es[i].Name}({add})";
+							++add;
+						}
+						else
+						{
+							lastName = es[i].Name;
+							add = 2;
+						}
+					}
+				}
 
 				p.SetExpressions(es.ToArray());
 			}

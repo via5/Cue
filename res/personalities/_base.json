@@ -407,7 +407,7 @@
 		},
 
 		{
-			"name": "surprise1",
+			"name": "surprise2",
 			"moods": "surprised",
 			"bodyParts": "mouth eyes",
 			"morphs":
@@ -714,7 +714,7 @@
 	"finishLookAtPlayer": "involved",
 	"finishLookAtPlayerAction": "gaze",
 	"finishOrgasm": "involved",
-	"finishOrgasmMinExcitement": 0.8,
+	"finishOrgasmMinExcitement": 0,
 	"finishMood": "involved",
 	"finishMoodHappy": -1,
 	"finishMoodPlayful": -1,

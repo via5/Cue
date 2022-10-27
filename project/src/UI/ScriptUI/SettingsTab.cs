@@ -162,6 +162,8 @@ namespace Cue
 				items.Add(item);
 			}
 
+			U.NatSort(items, i => i.Personality.Name);
+
 			personality_.SetItems(items, sel);
 			loadPose_.Checked = person_.LoadPose;
 		}

@@ -625,7 +625,7 @@ namespace Cue
 
 		private void test()
 		{
-			var p = FindPerson("Person#3");
+			var p = FindPerson("Player");
 			if (p != null)
 				ForcedPlayer = p;
 

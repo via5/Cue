@@ -557,7 +557,7 @@ namespace Cue
 
 		private TriggersPanel triggers_;
 
-		private VUI.ListView<string> list_ = new VUI.ListView<string>();
+		private VUI.ListView<string> debugList_ = new VUI.ListView<string>();
 		private DebugLines debug_ = null;
 
 		private bool ignore_ = false;
@@ -578,13 +578,13 @@ namespace Cue
 				"These triggers will be fired when Finishing starts.",
 				"Trigger name");
 
-			list_.Font = VUI.Style.Theme.MonospaceFont;
-			list_.FontSize = 22;
-			list_.Visible = Cue.Instance.Options.DevMode;
+			debugList_.Font = VUI.Style.Theme.MonospaceFont;
+			debugList_.FontSize = 22;
+			debugList_.Visible = Cue.Instance.Options.DevMode;
 
 			Cue.Instance.Options.Changed += () =>
 			{
-				list_.Visible = Cue.Instance.Options.DevMode;
+				debugList_.Visible = Cue.Instance.Options.DevMode;
 			};
 
 			var ly = new VUI.GridLayout(2, 10);
@@ -641,10 +641,13 @@ namespace Cue
 			var p = new VUI.Panel(new VUI.VerticalFlow(20));
 			p.Add(settingsPanel);
 
+			var bottom = new VUI.Panel(new VUI.BorderLayout(10));
+			bottom.Add(triggers_, VUI.BorderLayout.Top);
+			bottom.Add(debugList_, VUI.BorderLayout.Center);
+
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
-			Add(triggers_, VUI.BorderLayout.Center);
-			Add(list_, VUI.BorderLayout.Bottom);
+			Add(bottom, VUI.BorderLayout.Center);
 
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;
@@ -712,7 +715,7 @@ namespace Cue
 				debug_.Clear();
 				Cue.Instance.Finish.Debug(debug_);
 
-				list_.SetItems(debug_.MakeArray());
+				debugList_.SetItems(debug_.MakeArray());
 			}
 		}
 

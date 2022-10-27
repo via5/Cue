@@ -22,7 +22,6 @@
 		private float min_ = 0;
 		private float max_ = 1;
 		private float add_ = 0;
-		private MoodType mainMood_ = MoodType.None;
 		private IRandom rng_ = new NormalRandom(0.3f, 0.9f, 1, 5);
 
 		private Duration holdTime_;
@@ -69,15 +68,13 @@
 		}
 
 		public void Set(
-			float weight, float intensity, float speed,
-			float min, float max, MoodType mainMood)
+			float weight, float intensity, float speed, float min, float max)
 		{
 			weight_ = weight;
 			intensity_ = intensity;
 			speed_ = speed;
 			min_ = min;
 			max_ = max;
-			mainMood_ = mainMood;
 		}
 
 		public bool Active
@@ -198,7 +195,7 @@
 			}
 			else
 			{
-				if (mainMood_ == MoodType.Excited)
+				if (e_.IsMood(MoodType.Excited))
 					return rng_.RandomFloat(min_, intensity_, intensity_);
 				else
 					return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);

@@ -55,6 +55,10 @@
 
 	"zappedEnabled": false,
 
+	"finishLookAtPlayer": "never",
+	"finishOrgasm": "never",
+	"finishMood": "never",
+
 	"gazeDuration":
 	{
 		"range":

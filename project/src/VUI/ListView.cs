@@ -91,6 +91,23 @@ namespace VUI
 
 			AddItemComponents();
 
+			// the pivot is initially (0.5, 1.0), which doesn't work for what
+			// happens in UpdateBounds()
+			Popup.popup.popupPanel.pivot = new Vector2(0.5f, 0.5f);
+
+			// when the popupPanel is first created, it's a child of Popup,
+			// but this changes the first time the list is visible on screen:
+			// the popupPanel becomes a direct child of WidgetObject and
+			// Popup is nowhere to be seen, it's removed from the hierarchy
+			//
+			// so this might be useless
+			var rt = Popup.GetComponent<RectTransform>();
+			rt.offsetMin = new Vector2(0, 0);
+			rt.offsetMax = new Vector2(0, 0);
+			rt.anchorMin = new Vector2(0, 0);
+			rt.anchorMax = new Vector2(1, 1);
+			rt.anchoredPosition = new Vector2(0, 0);
+
 			Style.Setup(this);
 		}
 
@@ -135,13 +152,7 @@ namespace VUI
 		public override void UpdateBounds()
 		{
 			base.UpdateBounds();
-
-			var rt = Popup.popup.popupPanel;
-			rt.offsetMin = new Vector2(ClientBounds.Left, ClientBounds.Top);
-			rt.offsetMax = new Vector2(ClientBounds.Right, ClientBounds.Bottom);
-			rt.anchorMin = new Vector2(0, 1);
-			rt.anchorMax = new Vector2(0, 1);
-			rt.anchoredPosition = new Vector2(ClientBounds.Center.X, 0);
+			Utilities.SetRectTransform(Popup.popup.popupPanel, ClientBounds);
 		}
 
 		protected override Size DoGetPreferredSize(
