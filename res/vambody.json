@@ -106,7 +106,26 @@
 
 		{
 			"part": "anus",
-			"type": "none"
+			"type": "collider",
+			"sex": "female",
+			"colliders":
+			[
+				"pelvis/JointAl",
+				"pelvis/JointAr"
+			],
+			"ignore": "$genitalsIgnore"
+		},
+
+		{
+			"part": "anus",
+			"type": "collider",
+			"sex": "male",
+			"colliders":
+			[
+				"pelvis/JointAlMale",
+				"pelvis/JointArMale"
+			],
+			"ignore": "$genitalsIgnore"
 		},
 
 		{

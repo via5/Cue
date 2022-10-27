@@ -627,12 +627,6 @@ namespace Cue
 						buttons_.Add(new VUI.Button(b.text, () => b.f()));
 				}
 			}
-
-			// there's a bug with ListView, where resizing dynamically doesn't
-			// move the list correctly, so hardcode a spacer so the list doesn't
-			// change heights
-			if (buttons_.Children.Count == 0)
-				buttons_.Add(new VUI.Spacer(40));
 		}
 	}
 }

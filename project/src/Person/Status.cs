@@ -157,6 +157,9 @@
 			if (body_.Get(BP.Vagina).Triggered)
 				return true;
 
+			if (body_.Get(BP.Anus).Triggered)
+				return true;
+
 			return false;
 		}
 

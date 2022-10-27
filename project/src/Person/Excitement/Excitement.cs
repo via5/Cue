@@ -205,7 +205,7 @@ namespace Cue
 			if (!s.Active)
 			{
 				if (why != null)
-					why = $"source not active";
+					why = $"mag too low";
 
 				return false;
 			}

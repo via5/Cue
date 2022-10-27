@@ -36,6 +36,10 @@ namespace Cue
 					new ErogenousZone.Part(BP.Vagina, ErogenousZone.Part.SourceToy),
 					new ErogenousZone.Part(BP.Vagina, BP.Penis),
 					new ErogenousZone.Part(BP.Penis, BP.Vagina),
+
+					new ErogenousZone.Part(BP.Anus, ErogenousZone.Part.SourceToy),
+					new ErogenousZone.Part(BP.Anus, BP.Penis),
+					new ErogenousZone.Part(BP.Penis, BP.Anus),
 				});
 
 			zones_[SS.Mouth.Int] = new ErogenousZone(
@@ -56,6 +60,7 @@ namespace Cue
 				person_, SS.Genitals, new ErogenousZone.Part[]
 				{
 					new ErogenousZone.Part(BP.Vagina),
+					new ErogenousZone.Part(BP.Anus),
 					new ErogenousZone.Part(BP.Penis)
 				});
 		}

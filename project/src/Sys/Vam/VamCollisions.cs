@@ -22,6 +22,9 @@ namespace Cue.Sys.Vam
 				return null;
 			}
 
+			// some colliders are disabled by default, make sure they all work
+			rb.detectCollisions = true;
+
 			var ch = rb.gameObject.AddComponent<CueCollisionHandler>();
 			if (ch == null)
 			{

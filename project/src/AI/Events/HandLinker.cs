@@ -2,7 +2,7 @@
 {
 	class HandLinker : BasicEvent
 	{
-		private const float Distance = 0.06f;
+		private const float Distance = 0.07f;
 
 
 		class HandInfo
@@ -66,10 +66,19 @@
 			}
 		}
 
+		struct DebugPart
+		{
+			public BodyPartType bp;
+			public string why;
+			public float distance;
+		}
+
 		private HandInfo left_ = null;
 		private HandInfo right_ = null;
 		private bool grabbingPerson_ = false;
 		private bool wasEnabled_ = false;
+
+		private DebugPart[,] debug_;
 
 		public HandLinker()
 			: base("handLinker")
@@ -82,8 +91,33 @@
 			set { }
 		}
 
+		public override void Debug(DebugLines debug)
+		{
+			for (int i = 0; i < debug_.GetLength(0); ++i)
+			{
+				for (int j = 0; j < debug_.GetLength(1); ++j)
+				{
+					var d = debug_[i, j];
+					debug.Add(
+						$"{Cue.Instance.ActivePersons[i]} " +
+						$"{BodyPartType.ToString(d.bp)} " +
+						$"{d.distance:0.000} {d.why}");
+				}
+			}
+		}
+
 		protected override void DoInit()
 		{
+			debug_ = new DebugPart[Cue.Instance.ActivePersons.Length, BP.Count];
+			for (int i = 0; i < debug_.GetLength(0); ++i)
+			{
+				foreach (var bp in BodyPartType.Values)
+				{
+					debug_[i, bp.Int] = new DebugPart();
+					debug_[i, bp.Int].bp = bp;
+				}
+			}
+
 			left_ = new HandInfo(person_.Body.Get(BP.LeftHand));
 			right_ = new HandInfo(person_.Body.Get(BP.RightHand));
 		}
@@ -168,6 +202,15 @@
 			}
 		}
 
+		private void ClearDebug(int p)
+		{
+			for (int b = 0; b < debug_.GetLength(1); ++b)
+			{
+				debug_[p, b].why = "";
+				debug_[p, b].distance = 0;
+			}
+		}
+
 		private Sys.IBodyPartRegion FindClose(BodyPart hand)
 		{
 			Sys.IBodyPartRegion closest = null;
@@ -177,16 +220,26 @@
 			{
 				// never link anything to the player
 				if (p.IsPlayer)
+				{
+					ClearDebug(p.PersonIndex);
 					continue;
+				}
 
 				foreach (var bp in p.Body.Parts)
 				{
-					if (!Valid(hand, bp))
+					debug_[p.PersonIndex, bp.Type.Int].distance = 0;
+
+					if (!Valid(hand, bp, ref debug_[p.PersonIndex, bp.Type.Int].why))
 						continue;
 
 					var r = bp.ClosestBodyPartRegion(hand.Position);
 					if (r.region == null)
+					{
+						debug_[p.PersonIndex, bp.Type.Int].why = "no region";
 						continue;
+					}
+
+					debug_[p.PersonIndex, bp.Type.Int].distance = r.distance;
 
 					if (r.distance < Distance)
 					{
@@ -198,7 +251,17 @@
 
 							closestDistance = r.distance;
 							closest = r.region;
+
+							debug_[p.PersonIndex, bp.Type.Int].why = "";
 						}
+						else
+						{
+							debug_[p.PersonIndex, bp.Type.Int].why = "farther";
+						}
+					}
+					else
+					{
+						debug_[p.PersonIndex, bp.Type.Int].why = "too far";
 					}
 				}
 			}
@@ -206,20 +269,20 @@
 			return closest;
 		}
 
-		private bool Valid(BodyPart hand, BodyPart other)
+		private bool Valid(BodyPart hand, BodyPart other, ref string why)
 		{
 			Log.Verbose($"check invalid: {hand} => {other}");
 
-			if (!ValidSelfLink(hand, other))
+			if (!ValidSelfLink(hand, other, ref why))
 				return false;
 
-			if (!ValidOtherLink(hand, other))
+			if (!ValidOtherLink(hand, other, ref why))
 				return false;
 
 			return true;
 		}
 
-		private bool ValidSelfLink(BodyPart hand, BodyPart other)
+		private bool ValidSelfLink(BodyPart hand, BodyPart other, ref string why)
 		{
 			// don't link a hand to parts of the same arm
 			if (hand.Person == other.Person)
@@ -228,7 +291,12 @@
 				{
 					if (IsBodyPartOnLeftArm(other.Type))
 					{
-						Log.Verbose($"invalid, {hand} is on same arm as {other}");
+						string s = $"invalid, {hand} is on same arm as {other}";
+
+						if (why != null)
+							why = s;
+
+						Log.Verbose(s);
 						return false;
 					}
 				}
@@ -236,7 +304,12 @@
 				{
 					if (IsBodyPartOnRightArm(other.Type))
 					{
-						Log.Verbose($"invalid, {hand} is on same arm as {other}");
+						string s = $"invalid, {hand} is on same arm as {other}";
+
+						if (why != null)
+							why = s;
+
+						Log.Verbose(s);
 						return false;
 					}
 				}
@@ -245,7 +318,7 @@
 			return true;
 		}
 
-		private bool ValidOtherLink(BodyPart hand, BodyPart other)
+		private bool ValidOtherLink(BodyPart hand, BodyPart other, ref string why)
 		{
 			// if hand A is linked to any part of arm B, never link hand B to
 			// any part of arm A, or the movements will compound and the hands
@@ -264,14 +337,24 @@
 					// trying to link to a left arm with a left hand
 
 					if (IsHandLinkedToArm(otherLeftHand, BodyParts.FullLeftArm))
+					{
+						if (why != null)
+							why = "left arm with left hand";
+
 						return false;
+					}
 				}
 				else
 				{
 					// trying to link to a left arm with a right hand
 
 					if (IsHandLinkedToArm(otherLeftHand, BodyParts.FullRightArm))
+					{
+						if (why != null)
+							why = "left arm with right hand";
+
 						return false;
+					}
 				}
 			}
 			else if (IsBodyPartOnRightArm(other.Type))
@@ -286,14 +369,24 @@
 					// trying to link to a right arm with a left hand
 
 					if (IsHandLinkedToArm(otherRightHand, BodyParts.FullLeftArm))
+					{
+						if (why != null)
+							why = "right arm with left hand";
+
 						return false;
+					}
 				}
 				else
 				{
 					// trying to link to a right arm with a right hand
 
 					if (IsHandLinkedToArm(otherRightHand, BodyParts.FullRightArm))
+					{
+						if (why != null)
+							why = "right arm with right hand";
+
 						return false;
+					}
 				}
 			}
 
