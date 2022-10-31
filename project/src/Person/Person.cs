@@ -91,17 +91,17 @@ namespace Cue
 				personality_.Load(po);
 			}
 
-			if (r.HasKey("maxExcitement"))
-				Mood.MaxExcitement = J.ReqFloat(r, "maxExcitement");
+			Mood.Load(r);
 		}
 
 		public override JSONNode ToJSON()
 		{
-			var o = base.ToJSON();
+			var o = base.ToJSON().AsObject;
 
 			o.Add("id", ID);
 			o.Add("loadPose", new JSONData(loadPose_));
-			o.Add("maxExcitement", new JSONData(Mood.MaxExcitement));
+
+			Mood.Save(o);
 
 			var p = personality_.ToJSON();
 			if (p.Count > 0)

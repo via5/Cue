@@ -38,8 +38,9 @@ namespace Cue
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.CheckBox loadPose_ = new VUI.CheckBox("Load pose");
 		private VUI.IntTextSlider maxExcitement_;
+		private VUI.CheckBox playOrgasm_;
 		private VUI.Label warning_ = new VUI.Label();
-		private VUI.TextBox traits_ = new VUI.TextBox();
+		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
 		private bool ignore_ = false;
 		private bool firstUpdate_ = true;
 
@@ -51,6 +52,11 @@ namespace Cue
 			var gl = new VUI.GridLayout(3, 10);
 			gl.HorizontalStretch = new List<bool>() { false, true, false };
 			gl.HorizontalFill = true;
+
+			playOrgasm_ = new VUI.CheckBox("Play orgasm animation", OnPlayOrgasm);
+			var orgasmPanel = new VUI.Panel(new VUI.HorizontalFlow(10));
+			orgasmPanel.Add(playOrgasm_);
+			orgasmPanel.Add(new VUI.Button("Edit actions...", OnEditOrgasmTrigger));
 
 			var pp = new VUI.Panel(gl);
 			pp.Add(new VUI.Label("Personality"));
@@ -65,17 +71,26 @@ namespace Cue
 			pp.Add(traits_);
 			pp.Add(new VUI.Spacer());
 
+			pp.Add(new VUI.Label("Orgasm"));
+			pp.Add(orgasmPanel);
+			pp.Add(new VUI.Spacer());
+
 			var w = new VUI.Panel(new VUI.VerticalFlow(10));
 			w.Add(warning_);
 
-			Layout = new VUI.VerticalFlow(40);
-			Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
-			Add(pp);
-			Add(new VUI.Label(
+			var p = new VUI.Panel(new VUI.VerticalFlow(40));
+
+			p.Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
+			p.Add(pp);
+			p.Add(new VUI.Label(
 				"Load pose: if checked, some personalities like Sleeping " +
 				"will also set joints to Off and change their physics settings.",
 				UnityEngine.FontStyle.Italic, VUI.Label.Wrap));
-			Add(w);
+
+			Layout = new VUI.BorderLayout(10);
+			Add(p, VUI.BorderLayout.Top);
+			Add(w, VUI.BorderLayout.Bottom);
+
 
 			maxExcitement_.ToStringCallback = v => $"{v}%";
 
@@ -112,6 +127,7 @@ namespace Cue
 					SelectPersonality(person_.Personality.Name);
 
 				maxExcitement_.Value = (int)Math.Round(person_.Mood.MaxExcitement * 100);
+				playOrgasm_.Checked = person_.Mood.PlayOrgasm;
 
 				warning_.Text = MakeWarnings();
 				warning_.Visible = (warning_.Text.Length > 0);
@@ -215,6 +231,17 @@ namespace Cue
 		private void OnTraits(string s)
 		{
 			person_.Traits = s.Split(' ');
+		}
+
+		private void OnEditOrgasmTrigger()
+		{
+			person_.Mood.OrgasmTrigger.Edit(() => Cue.Instance.Save());
+		}
+
+		private void OnPlayOrgasm(bool b)
+		{
+			if (ignore_) return;
+			person_.Mood.PlayOrgasm = playOrgasm_.Checked;
 		}
 	}
 }

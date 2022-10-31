@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
@@ -69,6 +70,9 @@ namespace Cue
 		private MoodValue[] moods_ = new MoodValue[MoodType.Count];
 		private float maxExcitement_ = 1.0f;
 
+		private CustomTrigger orgasmTrigger_;
+		private bool playOrgasm_ = true;
+
 
 		public Mood(Person p)
 		{
@@ -79,6 +83,46 @@ namespace Cue
 
 			OnPersonalityChanged();
 			p.PersonalityChanged += OnPersonalityChanged;
+
+			orgasmTrigger_ = new CustomTrigger("Orgasm");
+		}
+
+		public void Load(JSONClass o)
+		{
+			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
+			J.OptBool(o, "playOrgasm", ref playOrgasm_);
+
+			if (o.HasKey("orgasmTrigger"))
+				orgasmTrigger_ = CustomTrigger.FromJSON(o["orgasmTrigger"].AsObject);
+		}
+
+		public void Save(JSONClass o)
+		{
+			o.Add("maxExcitement", new JSONData(maxExcitement_));
+			o.Add("playOrgasm", new JSONData(playOrgasm_));
+			o.Add("orgasmTrigger", orgasmTrigger_.ToJSON());
+		}
+
+		public CustomTrigger OrgasmTrigger
+		{
+			get { return orgasmTrigger_; }
+		}
+
+		public bool PlayOrgasm
+		{
+			get
+			{
+				return playOrgasm_;
+			}
+
+			set
+			{
+				if (playOrgasm_ != value)
+				{
+					playOrgasm_ = value;
+					Cue.Instance.Save();
+				}
+			}
 		}
 
 		private void OnPersonalityChanged()
@@ -555,7 +599,10 @@ namespace Cue
 		{
 			person_.Log.Info("orgasm");
 
-			person_.Animator.PlayType(AnimationType.Orgasm);
+			if (playOrgasm_)
+				person_.Animator.PlayType(AnimationType.Orgasm);
+
+			orgasmTrigger_?.Fire();
 
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);

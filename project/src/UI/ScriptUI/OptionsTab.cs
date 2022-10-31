@@ -66,7 +66,7 @@ namespace Cue
 			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
 			var c = p.Add(new VUI.TextBox(m.Caption, triggerNamePlaceholder_));
 			c.Edited += (s) => { OnCaption(m, s); };
-			p.Add(new VUI.Button("Edit trigger", () => OnEditTrigger(m)));
+			p.Add(new VUI.Button("Edit actions...", () => OnEditTrigger(m)));
 			p.Add(new VUI.ToolButton("X", () => OnDelete(m)));
 			return p;
 		}
@@ -571,7 +571,7 @@ namespace Cue
 			lookAt_ = new VUI.ComboBox<EnumItem>(OnLookAt);
 			orgasms_ = new VUI.ComboBox<EnumItem>(OnOrgasms);
 			events_ = new VUI.ComboBox<EnumItem>(OnEvents);
-			trigger_ = new VUI.Button("Edit trigger", OnEditTrigger);
+			trigger_ = new VUI.Button("Edit actions...", OnEditTrigger);
 
 			debugList_.Font = VUI.Style.Theme.MonospaceFont;
 			debugList_.FontSize = 22;

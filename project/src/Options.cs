@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class CustomTrigger
+	public class CustomTrigger
 	{
 		private TriggersOptions parent_ = null;
 		private string caption_;
@@ -91,7 +91,7 @@ namespace Cue
 	}
 
 
-	class TriggersOptions
+	public class TriggersOptions
 	{
 		public delegate void Handler();
 		public event Handler TriggersChanged;
