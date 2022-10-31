@@ -112,6 +112,7 @@ namespace Cue
 
 		private CustomTrigger orgasmTrigger_;
 		private bool playOrgasm_ = true;
+		private Sys.IActionParameter orgasmAction_;
 
 
 		public Mood(Person p)
@@ -125,6 +126,8 @@ namespace Cue
 			p.PersonalityChanged += OnPersonalityChanged;
 
 			orgasmTrigger_ = new CustomTrigger("Orgasm");
+			orgasmAction_ = Cue.Instance.Sys.RegisterActionParameter(
+				$"{p.ID}.Orgasm", ForceOrgasm);
 		}
 
 		public void Load(JSONClass o)
