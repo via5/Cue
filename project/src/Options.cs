@@ -69,6 +69,16 @@ namespace Cue
 			get { return trigger_; }
 		}
 
+		public void Fire()
+		{
+			trigger_?.Fire();
+		}
+
+		public void Edit(Action onDone = null)
+		{
+			trigger_?.Edit(onDone);
+		}
+
 		public JSONNode ToJSON()
 		{
 			var o = new JSONClass();
@@ -176,7 +186,7 @@ namespace Cue
 		private int orgasms_ = Finish.OrgasmsPersonality;
 		private float orgasmsTime_ = 1;
 		private int events_ = Finish.StopEventsAll;
-		private TriggersOptions triggers_ = new TriggersOptions();
+		private CustomTrigger trigger_ = null;
 
 		public float InitialDelay
 		{
@@ -208,9 +218,9 @@ namespace Cue
 			set { events_ = value; Cue.Instance.Options.FireOnChanged(); }
 		}
 
-		public TriggersOptions Triggers
+		public CustomTrigger Trigger
 		{
-			get { return triggers_; }
+			get { return trigger_; }
 		}
 
 		public void Load(JSONClass o)
@@ -221,8 +231,10 @@ namespace Cue
 			J.OptFloat(o, "finishOrgasmsTime", ref orgasmsTime_);
 			J.OptInt(o, "finishEvents", ref events_);
 
-			if (o.HasKey("triggers"))
-				triggers_.Load(o["triggers"].AsArray);
+			if (o.HasKey("finishTrigger"))
+				trigger_ = CustomTrigger.FromJSON(o["finishTrigger"].AsObject);
+			else
+				trigger_ = new CustomTrigger("Finish");
 		}
 
 		public void Save(JSONClass o)
@@ -232,10 +244,7 @@ namespace Cue
 			o["finishOrgasms"] = new JSONData(orgasms_);
 			o["finishOrgasmsTime"] = new JSONData(orgasmsTime_);
 			o["finishEvents"] = new JSONData(events_);
-
-			var menusArray = new JSONArray();
-			triggers_.Save(menusArray);
-			o["triggers"] = menusArray;
+			o["finishTrigger"] = trigger_.ToJSON();
 		}
 	}
 

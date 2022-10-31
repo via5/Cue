@@ -438,7 +438,7 @@ namespace Cue
 
 			Log.Info("starting");
 
-			Cue.Instance.Options.Finish.Triggers.FireAll();
+			Cue.Instance.Options.Finish.Trigger.Fire();
 
 			elapsed_ = 0;
 			state_ = DelayState;

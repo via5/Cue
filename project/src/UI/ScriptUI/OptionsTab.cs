@@ -555,7 +555,7 @@ namespace Cue
 		private VUI.ComboBox<EnumItem> orgasms_;
 		private VUI.ComboBox<EnumItem> events_;
 
-		private TriggersPanel triggers_;
+		private VUI.Button trigger_;
 
 		private VUI.ListView<string> debugList_ = new VUI.ListView<string>();
 		private DebugLines debug_ = null;
@@ -571,12 +571,7 @@ namespace Cue
 			lookAt_ = new VUI.ComboBox<EnumItem>(OnLookAt);
 			orgasms_ = new VUI.ComboBox<EnumItem>(OnOrgasms);
 			events_ = new VUI.ComboBox<EnumItem>(OnEvents);
-
-			triggers_ = new TriggersPanel(
-				Cue.Instance.Options.Finish.Triggers,
-				"Add trigger",
-				"These triggers will be fired when Finishing starts.",
-				"Trigger name");
+			trigger_ = new VUI.Button("Edit trigger", OnEditTrigger);
 
 			debugList_.Font = VUI.Style.Theme.MonospaceFont;
 			debugList_.FontSize = 22;
@@ -592,6 +587,10 @@ namespace Cue
 			ly.HorizontalFill = true;
 
 			var settingsPanel = new VUI.Panel(ly);
+
+			var triggerPanel = new VUI.Panel(new VUI.HorizontalFlow(20));
+			triggerPanel.Add(trigger_);
+			triggerPanel.Add(new VUI.Label("(fired when Finishing starts)"));
 
 			var pp = new VUI.Panel(new VUI.HorizontalFlow(5));
 			initialDelay_.MaximumSize = new VUI.Size(100, VUI.Widget.DontCare);
@@ -619,6 +618,9 @@ namespace Cue
 			settingsPanel.Add(new VUI.Label("Events"));
 			settingsPanel.Add(events_);
 
+			settingsPanel.Add(new VUI.Label("Trigger"));
+			settingsPanel.Add(triggerPanel);
+
 			settingsPanel.Add(new VUI.Spacer(30));
 			settingsPanel.Add(new VUI.Spacer(30));
 
@@ -642,7 +644,6 @@ namespace Cue
 			p.Add(settingsPanel);
 
 			var bottom = new VUI.Panel(new VUI.BorderLayout(10));
-			bottom.Add(triggers_, VUI.BorderLayout.Top);
 			bottom.Add(debugList_, VUI.BorderLayout.Center);
 
 			Layout = new VUI.BorderLayout();
@@ -705,8 +706,6 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			triggers_.Update();
-
 			if (Cue.Instance.Options.DevMode)
 			{
 				if (debug_ == null)
@@ -747,6 +746,12 @@ namespace Cue
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.Finish.Events = i.value;
+		}
+
+		private void OnEditTrigger()
+		{
+			Cue.Instance.Options.Finish.Trigger.Edit(
+				() => Cue.Instance.Save());
 		}
 	}
 }
