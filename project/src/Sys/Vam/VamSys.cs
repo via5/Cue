@@ -734,19 +734,28 @@ namespace Cue.Sys.Vam
 			return t;
 		}
 
-		public IActionParameter RegisterActionParameter(string name, Action f)
+		public IActionParameter RegisterActionParameter(string name, Action a)
 		{
-			var p = new JSONStorableAction(name, () => f());
+			var p = new JSONStorableAction(name, () => a());
 			script_.RegisterAction(p);
 
 			return new VamActionParameter(p);
 		}
 
-		public IBoolParameter RegisterBoolParameter(string name, Action<bool> f)
+		public IBoolParameter RegisterBoolParameter(
+			string name, Action<bool> a, bool init)
 		{
-			var p = new JSONStorableBool(name, false, b => f(b));
+			var p = new JSONStorableBool(name, init, b => a(b));
 			script_.RegisterBool(p);
 			return new VamBoolParameter(p);
+		}
+
+		public IFloatParameter RegisterFloatParameter(
+			string name, Action<float> a, float init, float min, float max)
+		{
+			var p = new JSONStorableFloat(name, init, f => a(f), min, max, false);
+			script_.RegisterFloat(p);
+			return new VamFloatParameter(p);
 		}
 	}
 
@@ -771,6 +780,22 @@ namespace Cue.Sys.Vam
 		}
 
 		public bool Value
+		{
+			get { return p_.val; }
+			set { p_.val = value; }
+		}
+	}
+
+	public class VamFloatParameter : IFloatParameter
+	{
+		private JSONStorableFloat p_;
+
+		public VamFloatParameter(JSONStorableFloat p)
+		{
+			p_ = p;
+		}
+
+		public float Value
 		{
 			get { return p_.val; }
 			set { p_.val = value; }

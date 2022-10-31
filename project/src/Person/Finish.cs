@@ -135,7 +135,7 @@ namespace Cue
 			float range = 1 - initialExcitement_;
 			float e = initialExcitement_ + range * ep;
 
-			person_.Mood.GetValue(MoodType.Excited).Value = e;
+			person_.Mood.SetBaseExcitement(e);
 
 			if (ep >= 1)
 				person_.Mood.ForceOrgasm();

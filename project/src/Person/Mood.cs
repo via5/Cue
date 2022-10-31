@@ -12,6 +12,24 @@ namespace Cue
 			private float tempTime_ = 0;
 			private float tempElapsed_ = 0;
 
+			private Sys.IFloatParameter param_;
+			private Sys.IBoolParameter forceParam_;
+
+			public MoodValue(Person p, MoodType type)
+			{
+				if (p.IsInteresting)
+				{
+					param_ = Cue.Instance.Sys.RegisterFloatParameter(
+						$"{p.ID}.Mood.{MoodType.ToString(type)}.Value",
+						OnValue, 0, 0, 1);
+
+					forceParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+						$"{p.ID}.Mood.{MoodType.ToString(type)}.ForceValue",
+						b => OnForced(b),
+						v_.IsForced);
+				}
+			}
+
 			public ForceableFloat Forceable
 			{
 				get { return v_; }
@@ -48,6 +66,28 @@ namespace Cue
 						tempElapsed_ = 0;
 					}
 				}
+
+				if (param_ != null)
+					param_.Value = Value;
+
+				if (forceParam_ != null)
+					forceParam_.Value = v_.IsForced;
+			}
+
+			private void OnValue(float f)
+			{
+				if (v_.IsForced)
+					v_.SetForced(f);
+				else
+					Set(f);
+			}
+
+			private void OnForced(bool b)
+			{
+				if (b)
+					v_.SetForced(param_.Value);
+				else
+					v_.UnsetForced();
 			}
 		}
 
@@ -78,8 +118,8 @@ namespace Cue
 		{
 			person_ = p;
 
-			for (int i = 0; i < moods_.Length; ++i)
-				moods_[i] = new MoodValue();
+			foreach (var m in MoodType.Values)
+				moods_[m.Int] = new MoodValue(p, m);
 
 			OnPersonalityChanged();
 			p.PersonalityChanged += OnPersonalityChanged;
@@ -300,19 +340,20 @@ namespace Cue
 			moods_[i.Int].Set(U.Clamp(value, 0, 1));
 		}
 
-		public ForceableFloat GetDebugValue(MoodType i)
+		public ForceableFloat GetValue(MoodType i)
 		{
 			return moods_[i.Int].Forceable;
 		}
 
-		public ForceableFloat GetValue(MoodType i)
+		public void SetBaseExcitement(float f)
 		{
-			if (i == MoodType.Excited)
-				return baseExcitement_;
-			else
-				return moods_[i.Int].Forceable;
+			baseExcitement_.Value = f;
 		}
 
+		public ForceableFloat GetBaseExcitement()
+		{
+			return baseExcitement_;
+		}
 
 		public DampedFloat TirednessValue
 		{
@@ -423,7 +464,7 @@ namespace Cue
 				{
 					timeSinceLastOrgasm_ += s;
 
-					if (!GetValue(MoodType.Excited).IsForced && Get(MoodType.Excited) >= 1)
+					if (Get(MoodType.Excited) >= 1)
 						DoOrgasm();
 
 					break;

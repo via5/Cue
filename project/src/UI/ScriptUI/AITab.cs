@@ -170,6 +170,7 @@ namespace Cue
 		private VUI.Label gazeEnergy_ = new VUI.Label();
 		private VUI.Label gazeTiredness_ = new VUI.Label();
 		private VUI.Label movementEnergy_ = new VUI.Label();
+		private VUI.Label baseExcitement_ = new VUI.Label();
 
 		public PersonAIMoodTab(Person person)
 			: base("Mood", false)
@@ -218,6 +219,13 @@ namespace Cue
 
 			foreach (MoodType i in MoodType.Values)
 				AddForceable(p, person_.Mood.GetValue(i), $"    {MoodType.ToString(i)}");
+
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+			p.Add(new VUI.Spacer(20));
+
+			AddForceable(p, person_.Mood.GetBaseExcitement(), $"    base excitement");
 
 			p.Add(new VUI.Spacer(30));
 			p.Add(new VUI.Spacer(30));

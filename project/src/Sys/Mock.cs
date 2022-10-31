@@ -298,7 +298,15 @@ namespace Cue.Sys.Mock
 			return null;
 		}
 
-		public IBoolParameter RegisterBoolParameter(string name, Action<bool> f)
+		public IBoolParameter RegisterBoolParameter(
+			string name, Action<bool> f, bool init)
+		{
+			return null;
+		}
+
+		public IFloatParameter RegisterFloatParameter(
+			string name, Action<float> f,
+			float init, float min, float max)
 		{
 			return null;
 		}

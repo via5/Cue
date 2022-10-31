@@ -124,16 +124,21 @@ namespace Cue
 				if (CanDisable)
 				{
 					enabledParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-						$"{person_.ID}.{Name}.Enabled", b => Enabled = b);
+						$"{person_.ID}.{Name}.Enabled",
+						b => Enabled = b,
+						Enabled);
 				}
 
 				if (CanToggle)
 				{
 					activeParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-						$"{person_.ID}.{Name}.Active", b => Active = b);
+						$"{person_.ID}.{Name}.Active",
+						b => Active = b,
+						Active);
 
 					activeToggle_ = Cue.Instance.Sys.RegisterActionParameter(
-						$"{person_.ID}.{Name}.Toggle", () => Active = !Active);
+						$"{person_.ID}.{Name}.Toggle",
+						() => Active = !Active);
 				}
 			}
 		}

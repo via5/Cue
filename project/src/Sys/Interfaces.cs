@@ -81,7 +81,8 @@ namespace Cue.Sys
 		IActionTrigger LoadActionTrigger(JSONNode n);
 
 		IActionParameter RegisterActionParameter(string name, Action f);
-		IBoolParameter RegisterBoolParameter(string name, Action<bool> f);
+		IBoolParameter RegisterBoolParameter(string name, Action<bool> f, bool init);
+		IFloatParameter RegisterFloatParameter(string name, Action<float> a, float init, float min, float max);
 	}
 
 
@@ -541,5 +542,10 @@ namespace Cue.Sys
 	public interface IBoolParameter : IParameter
 	{
 		bool Value { get; set; }
+	}
+
+	public interface IFloatParameter : IParameter
+	{
+		float Value { get; set; }
 	}
 }
