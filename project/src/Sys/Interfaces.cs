@@ -79,7 +79,9 @@ namespace Cue.Sys
 		ILiveSaver CreateLiveSaver();
 		IActionTrigger CreateActionTrigger();
 		IActionTrigger LoadActionTrigger(JSONNode n);
-		IAction RegisterAction(string name, Action f);
+
+		IActionParameter RegisterActionParameter(string name, Action f);
+		IBoolParameter RegisterBoolParameter(string name, Action<bool> f);
 	}
 
 
@@ -528,7 +530,16 @@ namespace Cue.Sys
 		JSONNode ToJSON();
 	}
 
-	public interface IAction
+	public interface IParameter
 	{
+	}
+
+	public interface IActionParameter : IParameter
+	{
+	}
+
+	public interface IBoolParameter : IParameter
+	{
+		bool Value { get; set; }
 	}
 }

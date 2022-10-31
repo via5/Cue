@@ -6,6 +6,8 @@ namespace Cue
 	{
 		string Name { get; }
 		bool Active { get; set; }
+		bool CanToggle { get; }
+		bool CanDisable { get; }
 
 		IEventData ParseEventData(JSONClass o);
 		void Init(Person p);
@@ -23,6 +25,11 @@ namespace Cue
 		private string name_;
 		protected Person person_ = null;
 		private Logger log_;
+		private bool enabled_ = true;
+
+		private Sys.IBoolParameter enabledParam_ = null;
+		private Sys.IBoolParameter activeParam_ = null;
+		private Sys.IActionParameter activeToggle_ = null;
 
 		protected BasicEvent(string name)
 		{
@@ -41,6 +48,15 @@ namespace Cue
 		}
 
 		public abstract bool Active { get; set; }
+
+		public bool Enabled
+		{
+			get { return enabled_; }
+			set { enabled_ = value; }
+		}
+
+		public abstract bool CanToggle { get; }
+		public abstract bool CanDisable { get; }
 
 		public static IEvent[] All()
 		{
@@ -70,7 +86,7 @@ namespace Cue
 		{
 			foreach (var e in All())
 			{
-				if (e.Name == type)
+				if (e.Name.ToLower() == type.ToLower())
 					return e;
 			}
 
@@ -87,16 +103,39 @@ namespace Cue
 			return null;
 		}
 
+		public void ForceStop()
+		{
+			DoForceStop();
+		}
+
+		protected virtual void DoForceStop()
+		{
+			// no-op
+		}
+
 		public void Init(Person p)
 		{
 			person_ = p;
 			log_ = new Logger(Logger.Event, person_, "event." + Name);
 			DoInit();
-		}
 
-		public virtual void ForceStop()
-		{
-			// no-op
+			if (p.IsInteresting)
+			{
+				if (CanDisable)
+				{
+					enabledParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+						$"{person_.ID}.{Name}.Enabled", b => Enabled = b);
+				}
+
+				if (CanToggle)
+				{
+					activeParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+						$"{person_.ID}.{Name}.Active", b => Active = b);
+
+					activeToggle_ = Cue.Instance.Sys.RegisterActionParameter(
+						$"{person_.ID}.{Name}.Toggle", () => Active = !Active);
+				}
+			}
 		}
 
 		protected virtual void DoInit()
@@ -104,19 +143,39 @@ namespace Cue
 			// no-op
 		}
 
-		public virtual void OnPluginState(bool b)
+		public void OnPluginState(bool b)
+		{
+			DoOnPluginState(b);
+		}
+
+		protected virtual void DoOnPluginState(bool b)
 		{
 			// no-op
 		}
 
-		public virtual void FixedUpdate(float s)
+		public void FixedUpdate(float s)
+		{
+			DoFixedUpdate(s);
+		}
+
+		protected virtual void DoFixedUpdate(float s)
 		{
 			// no-op
 		}
 
-		public virtual void Update(float s)
+		public void Update(float s)
 		{
-			// no-op
+			DoUpdate(s);
+
+			if (enabledParam_ != null)
+				enabledParam_.Value = Enabled;
+
+			if (activeParam_ != null)
+				activeParam_.Value = Active;
+		}
+
+		protected virtual void DoUpdate(float s)
+		{
 		}
 
 		public override string ToString()

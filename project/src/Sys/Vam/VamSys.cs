@@ -734,23 +734,46 @@ namespace Cue.Sys.Vam
 			return t;
 		}
 
-		public IAction RegisterAction(string name, Action f)
+		public IActionParameter RegisterActionParameter(string name, Action f)
 		{
-			var a = new JSONStorableAction(name, () => f());
-			script_.RegisterAction(a);
+			var p = new JSONStorableAction(name, () => f());
+			script_.RegisterAction(p);
 
-			return new VamAction(a);
+			return new VamActionParameter(p);
+		}
+
+		public IBoolParameter RegisterBoolParameter(string name, Action<bool> f)
+		{
+			var p = new JSONStorableBool(name, false, b => f(b));
+			script_.RegisterBool(p);
+			return new VamBoolParameter(p);
 		}
 	}
 
 
-	public class VamAction : IAction
+	public class VamActionParameter : IActionParameter
 	{
-		private JSONStorableAction a_;
+		private JSONStorableAction p_;
 
-		public VamAction(JSONStorableAction a)
+		public VamActionParameter(JSONStorableAction p)
 		{
-			a_ = a;
+			p_ = p;
+		}
+	}
+
+	public class VamBoolParameter : IBoolParameter
+	{
+		private JSONStorableBool p_;
+
+		public VamBoolParameter(JSONStorableBool p)
+		{
+			p_ = p;
+		}
+
+		public bool Value
+		{
+			get { return p_.val; }
+			set { p_.val = value; }
 		}
 	}
 

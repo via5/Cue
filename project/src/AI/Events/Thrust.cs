@@ -10,7 +10,7 @@
 		private BodyPartLock idleLock_ = null;
 
 		public ThrustEvent()
-			: base("thrust")
+			: base("Thrust")
 		{
 		}
 
@@ -27,7 +27,10 @@
 			set { active_ = value; }
 		}
 
-		public override void Update(float s)
+		public override bool CanToggle { get { return true; } }
+		public override bool CanDisable { get { return false; } }
+
+		protected override void DoUpdate(float s)
 		{
 			if (active_)
 			{
@@ -71,7 +74,7 @@
 			}
 		}
 
-		public override void ForceStop()
+		protected override void DoForceStop()
 		{
 			if (Active)
 				Stop();

@@ -15,7 +15,7 @@
 		private bool wasGrabbed_;
 
 		public MouthEvent()
-			: base("mouth")
+			: base("Head")
 		{
 		}
 
@@ -64,6 +64,9 @@
 					Stop();
 			}
 		}
+
+		public override bool CanToggle { get { return true; } }
+		public override bool CanDisable { get { return false; } }
 
 		public Person Target
 		{
@@ -120,7 +123,7 @@
 			}
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			CheckAutoStart();
 
@@ -152,7 +155,7 @@
 			return false;
 		}
 
-		public override void ForceStop()
+		protected override void DoForceStop()
 		{
 			if (Active)
 				Stop();

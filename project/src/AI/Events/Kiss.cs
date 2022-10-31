@@ -60,7 +60,7 @@ namespace Cue
 		private Vector3 startingHeadPos_;
 
 		public KissEvent()
-			: base("kiss")
+			: base("Kiss")
 		{
 		}
 
@@ -123,6 +123,9 @@ namespace Cue
 			}
 		}
 
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return true; } }
+
 		public bool Leading
 		{
 			get { return leading_; }
@@ -151,12 +154,12 @@ namespace Cue
 			debug.Add("waitFinishedBecauseGrab", $"{waitFinishedBecauseGrab_}");
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			if (!person_.Body.Exists)
 				return;
 
-			if (!person_.Options.CanKiss)
+			if (!Enabled)
 			{
 				if (Active)
 					Stop();
@@ -186,7 +189,7 @@ namespace Cue
 			}
 		}
 
-		public override void ForceStop()
+		protected override void DoForceStop()
 		{
 			if (Active)
 				Stop();
@@ -378,7 +381,7 @@ namespace Cue
 
 		private string TryStartFrom(Person initiator)
 		{
-			if (!person_.Options.CanKiss)
+			if (!Enabled)
 				return $"target {person_.ID} kissing disabled";
 
 			if (target_ != null)
@@ -454,7 +457,7 @@ namespace Cue
 
 		private bool SelfCanStart(Person p)
 		{
-			if (!p.Options.CanKiss)
+			if (!Enabled)
 			{
 				lastResult_ = "kissing disabled";
 				return false;

@@ -4,22 +4,6 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class PersonOptions
-	{
-		private bool canKiss_ = true;
-
-		public PersonOptions(Person p)
-		{
-		}
-
-		public bool CanKiss
-		{
-			get { return canKiss_; }
-			set { canKiss_ = value; }
-		}
-	}
-
-
 	public class Person : BasicObject
 	{
 		public delegate void Callback();
@@ -27,7 +11,6 @@ namespace Cue
 
 		private readonly int personIndex_;
 
-		private PersonOptions options_;
 		private Personality personality_;
 		private Animator animator_;
 		private Excitement excitement_;
@@ -52,7 +35,6 @@ namespace Cue
 		{
 			personIndex_ = personIndex;
 
-			options_ = new PersonOptions(this);
 			SetPersonality(Resources.Personalities.Clone(Resources.DefaultPersonality, this));
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
@@ -133,7 +115,6 @@ namespace Cue
 			get { return personIndex_; }
 		}
 
-		public PersonOptions Options { get { return options_; } }
 		public Animator Animator { get { return animator_; } }
 		public Excitement Excitement { get { return excitement_; } }
 		public Body Body { get { return body_; } }

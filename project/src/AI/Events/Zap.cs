@@ -128,7 +128,7 @@ namespace Cue
 
 
 		public ZappedEvent()
-			: base("zapped")
+			: base("Zap")
 		{
 		}
 
@@ -137,6 +137,9 @@ namespace Cue
 			get { return false; }
 			set { }
 		}
+
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return false; } }
 
 		protected override void DoInit()
 		{
@@ -157,7 +160,7 @@ namespace Cue
 				zones_[i].Debug(debug);
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			for (int i = 0; i < zones_.Length; ++i)
 				zones_[i].Update(s);

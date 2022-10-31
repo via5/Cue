@@ -169,7 +169,7 @@ namespace Cue
 
 		public void Log(int level, string s)
 		{
-			if (IsEnabled(level))
+			if (IsEnabled(level) || level == ErrorLevel)
 			{
 				if (Cue.Instance == null)
 					SuperController.LogError($"{Prefix}: {s}");

@@ -14,7 +14,7 @@ namespace Cue
 		private bool cleanedUp_ = false;
 
 		public SmokeEvent()
-			: base("smoke")
+			: base("Smoke")
 		{
 			wait_ = new Duration(15, 40);
 		}
@@ -24,6 +24,9 @@ namespace Cue
 			get { return false; }
 			set { }
 		}
+
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return false; } }
 
 		public override void Debug(DebugLines debug)
 		{
@@ -116,7 +119,7 @@ namespace Cue
 			get { return MakeSmokeID(person_); }
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			CheckEnabled(s);
 			if (!enabled_)

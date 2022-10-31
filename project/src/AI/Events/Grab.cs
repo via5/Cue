@@ -7,7 +7,7 @@
 		private bool wasGrabbed_ = false;
 
 		public GrabEvent()
-			: base("grab")
+			: base("Grab")
 		{
 		}
 
@@ -16,6 +16,9 @@
 			get { return wasGrabbed_; }
 			set { }
 		}
+
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return false; } }
 
 		protected override void DoInit()
 		{
@@ -29,29 +32,43 @@
 			debug.Add("lock", $"{headLock_}");
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
+			if (!Enabled)
+			{
+				Stop();
+				return;
+			}
+
 			if (head_.GrabbedByPlayer)
 			{
 				if (!wasGrabbed_)
-				{
-					wasGrabbed_ = true;
-					headLock_ = head_.Lock(
-						BodyPartLock.Anim, "grabbed", BodyPartLock.Strong);
-				}
+					Start();
 			}
 			else
 			{
 				if (wasGrabbed_)
 				{
 					wasGrabbed_ = false;
-
-					if (headLock_ != null)
-					{
-						headLock_.Unlock();
-						headLock_ = null;
-					}
+					Stop();
 				}
+			}
+		}
+
+		private void Start()
+		{
+			wasGrabbed_ = true;
+
+			headLock_ = head_.Lock(
+				BodyPartLock.Anim, "grabbed", BodyPartLock.Strong);
+		}
+
+		private void Stop()
+		{
+			if (headLock_ != null)
+			{
+				headLock_.Unlock();
+				headLock_ = null;
 			}
 		}
 	}

@@ -71,9 +71,8 @@
 		private HandInfo left_ = null;
 		private HandInfo right_ = null;
 
-
 		public HandEvent()
-			: base("hand")
+			: base("Hand")
 		{
 		}
 
@@ -115,6 +114,9 @@
 			}
 		}
 
+		public override bool CanToggle { get { return true; } }
+		public override bool CanDisable { get { return false; } }
+
 		public Person LeftTarget
 		{
 			get { return left_.targetBodyPart?.Person; }
@@ -125,13 +127,13 @@
 			get { return right_.targetBodyPart?.Person; }
 		}
 
-		public override void ForceStop()
+		protected override void DoForceStop()
 		{
 			if (Active)
 				Stop();
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			CheckAutoStart();
 			CheckAnim();

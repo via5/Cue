@@ -12,7 +12,7 @@ namespace Cue
 		private bool active_ = false;
 
 		public SuckFingerEvent()
-			: base("suckFinger")
+			: base("SuckFinger")
 		{
 		}
 
@@ -22,14 +22,23 @@ namespace Cue
 			set { }
 		}
 
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return true; } }
+
 		public override void Debug(DebugLines debug)
 		{
 			debug.Add("active", $"{active_}");
 			debug.Add("mouthLock", $"{mouthLock_}");
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
+			if (!Enabled)
+			{
+				Stop();
+				return;
+			}
+
 			wait_ = Math.Max(wait_ - s, 0);
 			if (wait_ > 0)
 				return;
@@ -68,12 +77,18 @@ namespace Cue
 
 		private void Stop()
 		{
-			person_.Animator.StopType(AnimationType.SuckFinger);
+			if (active_)
+			{
+				person_.Animator.StopType(AnimationType.SuckFinger);
 
-			mouthLock_.Unlock();
-			mouthLock_ = null;
+				if (mouthLock_ != null)
+				{
+					mouthLock_.Unlock();
+					mouthLock_ = null;
+				}
 
-			active_ = false;
+				active_ = false;
+			}
 		}
 
 		private void UpdateActive(Sys.TriggerInfo[] triggers)

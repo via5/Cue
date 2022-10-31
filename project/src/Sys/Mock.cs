@@ -293,7 +293,12 @@ namespace Cue.Sys.Mock
 			return null;
 		}
 
-		public IAction RegisterAction(string name, Action f)
+		public IActionParameter RegisterActionParameter(string name, Action f)
+		{
+			return null;
+		}
+
+		public IBoolParameter RegisterBoolParameter(string name, Action<bool> f)
 		{
 			return null;
 		}

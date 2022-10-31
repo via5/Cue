@@ -279,10 +279,10 @@ namespace Cue
 				(p, b) =>
 				{
 					if (p != null)
-						p.Options.CanKiss = b;
+						p.AI.GetEvent<KissEvent>().Enabled = b;
 				},
 
-				(p) => p.Options.CanKiss);
+				(p) => p.AI.GetEvent<KissEvent>()?.Enabled ?? false);
 		}
 
 		public static IItem Strapon()

@@ -387,7 +387,7 @@ namespace Cue
 		private float elapsed_ = 0;
 		private PersonFinish[] infos_;
 
-		private Sys.IAction startAction_ = null;
+		private Sys.IActionParameter startAction_ = null;
 
 
 		public Finish()
@@ -401,7 +401,8 @@ namespace Cue
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
 				infos_[i] = new PersonFinish(Cue.Instance.ActivePersons[i]);
 
-			startAction_ = Cue.Instance.Sys.RegisterAction("Finish", OnFinishAction);
+			startAction_ = Cue.Instance.Sys.RegisterActionParameter(
+				"Finish", OnFinishAction);
 		}
 
 		private FinishOptions Options

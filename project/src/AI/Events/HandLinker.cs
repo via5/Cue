@@ -81,7 +81,7 @@
 		private DebugPart[,] debug_;
 
 		public HandLinker()
-			: base("handLinker")
+			: base("HandLinker")
 		{
 		}
 
@@ -90,6 +90,9 @@
 			get { return false; }
 			set { }
 		}
+
+		public override bool CanToggle { get { return false; } }
+		public override bool CanDisable { get { return false; } }
 
 		public override void Debug(DebugLines debug)
 		{
@@ -122,7 +125,7 @@
 			right_ = new HandInfo(person_.Body.Get(BP.RightHand));
 		}
 
-		public override void Update(float s)
+		protected override void DoUpdate(float s)
 		{
 			if (!Cue.Instance.Options.HandLinking)
 			{
