@@ -52,7 +52,8 @@
 		{
 			"minTimeForMoaning": 3,
 			"moaningAfter": 1.0,
-			"moaningTime": 3.0
+			"moaningTime": 2.0,
+			"rampDownTime": 3.0
 		}
 	},
 

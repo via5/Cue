@@ -599,6 +599,8 @@ Handles voice while the neck is grabbed.
 - moaningTime (float)
   time during which the moaning value is held
 
+- rampDownTime (float)
+  time during which moaning goes back to breathing
 
 
 3.6.1 MacGruber
