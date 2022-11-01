@@ -236,7 +236,7 @@ namespace Cue
 				if (p.Mood.GetValue(MoodType.Excited).IsForced)
 					p.Mood.GetValue(MoodType.Excited).SetForced(f);
 				else
-					p.Mood.GetValue(MoodType.Excited).Value = f;
+					p.Mood.SetBaseExcitement(f);
 
 				if (f >= 1)
 					p.Mood.ForceOrgasm();

@@ -29,6 +29,8 @@ namespace Cue
 			Action | Event | AI | Command |
 			Object | Sys | Main;
 
+		private static int sLevel = ErrorLevel;
+
 		private static Logger global_ = new Logger(Main, "cue");
 
 		private int type_;
@@ -116,6 +118,12 @@ namespace Cue
 			set { sEnabledTypes = value; }
 		}
 
+		public static int GlobalLevel
+		{
+			get { return sLevel; }
+			set { sLevel = value; }
+		}
+
 		public static string[] Names
 		{
 			get
@@ -183,7 +191,7 @@ namespace Cue
 			if (!forceEnabled_ && !Bits.IsSet(sEnabledTypes, type_))
 				return false;
 
-			if (level > level_)
+			if (level > level_ && level > sLevel)
 				return false;
 
 			return true;

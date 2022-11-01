@@ -186,8 +186,8 @@ namespace Cue
 
 			energyRampUpEasing_ = e;
 
-			if (tiredness_.Value < person_.Personality.Get(PS.MinTiredness))
-				tiredness_.SetValue(person_.Personality.Get(PS.MinTiredness));
+			tiredness_.SetValue(person_.Personality.Get(PS.MinTiredness));
+			SetBaseTiredness(person_.Personality.Get(PS.MinTiredness));
 		}
 
 		public static bool ShouldStopSexAnimation(

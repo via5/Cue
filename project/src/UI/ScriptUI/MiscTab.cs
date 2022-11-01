@@ -85,7 +85,25 @@ namespace Cue
 
 	class MiscLogTab : Tab
 	{
+		class LogLevelItem
+		{
+			public string text;
+			public int level;
+
+			public LogLevelItem(string text, int level)
+			{
+				this.text = text;
+				this.level = level;
+			}
+
+			public override string ToString()
+			{
+				return text;
+			}
+		}
+
 		private List<VUI.CheckBox> cbs_ = new List<VUI.CheckBox>();
+		private VUI.ComboBox<LogLevelItem> level_ = new VUI.ComboBox<LogLevelItem>();
 
 		public MiscLogTab()
 			: base("Log", false)
@@ -103,6 +121,24 @@ namespace Cue
 				cbs_.Add(cb);
 				Add(cb);
 			}
+
+			level_.AddItem(new LogLevelItem("Error", Logger.ErrorLevel));
+			level_.AddItem(new LogLevelItem("Warning", Logger.WarningLevel));
+			level_.AddItem(new LogLevelItem("Info", Logger.InfoLevel));
+			level_.AddItem(new LogLevelItem("Verbose", Logger.VerboseLevel));
+
+			for (int i = 0; i < level_.Count; ++i)
+			{
+				if (level_.Items[i].level == Logger.GlobalLevel)
+				{
+					level_.Select(i);
+					break;
+				}
+			}
+
+			level_.SelectionChanged += OnLevel;
+
+			Add(level_);
 		}
 
 		private void OnChecked(bool b)
@@ -117,6 +153,11 @@ namespace Cue
 
 			Logger.EnabledTypes = e;
 			Cue.Instance.Save();
+		}
+
+		private void OnLevel(LogLevelItem i)
+		{
+			Logger.GlobalLevel = i.level;
 		}
 	}
 

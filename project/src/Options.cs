@@ -186,7 +186,7 @@ namespace Cue
 		private int orgasms_ = Finish.OrgasmsPersonality;
 		private float orgasmsTime_ = 1;
 		private int events_ = Finish.StopEventsAll;
-		private CustomTrigger trigger_ = null;
+		private CustomTrigger trigger_ = new CustomTrigger("Finish");
 
 		public float InitialDelay
 		{
@@ -233,8 +233,6 @@ namespace Cue
 
 			if (o.HasKey("finishTrigger"))
 				trigger_ = CustomTrigger.FromJSON(o["finishTrigger"].AsObject);
-			else
-				trigger_ = new CustomTrigger("Finish");
 		}
 
 		public void Save(JSONClass o)

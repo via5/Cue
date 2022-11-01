@@ -230,17 +230,31 @@ namespace Cue
 			for (int i = 0; i < playing_.Count; ++i)
 			{
 				if (playing_[i].anim.Type == type)
-				{
-					if (playing_[i].stopping)
-						return AnimationStatus.Stopping;
-					else if (playing_[i].paused)
-						return AnimationStatus.Paused;
-					else
-						return AnimationStatus.Playing;
-				}
+					return PlayingStatus(playing_[i]);
 			}
 
 			return AnimationStatus.NotPlaying;
+		}
+
+		public AnimationStatus PlayingStatus(Animation a)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim == a)
+					return PlayingStatus(playing_[i]);
+			}
+
+			return AnimationStatus.NotPlaying;
+		}
+
+		private AnimationStatus PlayingStatus(PlayingAnimation a)
+		{
+			if (a.stopping)
+				return AnimationStatus.Stopping;
+			else if (a.paused)
+				return AnimationStatus.Paused;
+			else
+				return AnimationStatus.Playing;
 		}
 
 		public bool IsPlaying(Animation a)

@@ -24,6 +24,7 @@ namespace Cue
 		private IEvent[] events_ = null;
 		private bool hasIdlePose_ = false;
 		private Animation idle_ = null;
+		private bool stoppingIdle_ = false;
 
 		public PersonAI(Person p)
 		{
@@ -110,6 +111,26 @@ namespace Cue
 
 		private void StartIdling()
 		{
+			if (stoppingIdle_)
+			{
+				var s = AnimationStatus.NotPlaying;
+
+				if (idle_ == null)
+					s = person_.Animator.PlayingStatus(AnimationType.Idle);
+				else
+					s = person_.Animator.PlayingStatus(idle_);
+
+				if (s == AnimationStatus.NotPlaying)
+				{
+					idle_ = null;
+					stoppingIdle_ = false;
+				}
+				else
+				{
+					return;
+				}
+			}
+
 			hasIdlePose_ = true;
 
 			if (idle_ == null)
@@ -130,6 +151,7 @@ namespace Cue
 		private void StopIdling()
 		{
 			hasIdlePose_ = false;
+			stoppingIdle_ = true;
 
 			if (idle_ == null)
 			{
@@ -138,7 +160,6 @@ namespace Cue
 			else
 			{
 				person_.Animator.Stop(idle_);
-				idle_ = null;
 			}
 		}
 
