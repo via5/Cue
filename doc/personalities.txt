@@ -535,6 +535,91 @@ Controls what characters are looking at.
 Controls voices and breathing. The `provider` key can be either "macgruber" or
 "vammoan". Provider-specific options are within an `options` object.
 
+There are several different voice states, only one can be active at a time. Some
+can be configured.
+
+
+3.6.1 Normal state
+Breathes or moans based on excitement.
+
+- breathingRange (float)
+  when excitement is below this value, only breathing is used
+
+- breathingIntensityCutoff (float)
+  when excitement is above this value, breathing is never used
+
+- intensityWait (rng)
+  the range of random numbers used to generate an interval to wait for before
+  picking a new intensity
+
+- intensityTarget (rng)
+  a generator for the voice intensity, based on the character's excitement; this
+  is a normal rng by default, so that the chances of generating a low intensity
+  voice gets lower the higher the excitement rises
+
+- intensityTime (rng)
+  when a new intensity target is picked, time of the transition from the old
+  intensity to the new one
+
+
+3.6.2 Pause state
+Pauses breathing randomly.
+
+- minExcitement (float)
+  excitement above which pauses are enabled
+
+- cooldown (float)
+  minimum time before the next pause (Seconds)
+
+- timePaused (duration)
+  time during which the character doesn't breathe
+
+- timeHigh (duration)
+  once the pause is ended, time during which the character uses the highest
+  moaning value before returning to normal
+
+- chance
+   object containing 'value', the chance of pauses happening each time a new
+   intensity is picked, and 'rng', an RNG object
+
+
+3.6.3 Kiss state
+Handles voice while kissing is active.
+
+- enabled (bool)
+  whether the voice should be adjusted during this state
+
+- voiceTime (float)
+  time after which a random moan is possible and also time during which moaning
+  is active (seconds)
+
+- voiceChance (float)
+  chance of doing a random moan
+
+
+3.6.4 Orgasm state
+Handles voice during orgasm.
+
+- voice (string)
+  name of the orgasm state in VAMMoan
+
+
+3.6.5 BJ state
+Handles voice during BJ. Same as 3.6.3.
+
+3.6.6 Choked state
+Handles voice while the neck is grabbed.
+
+- minTimeForMoaning (float)
+  minimum time the choke must be active to moan once it's released (seconds)
+
+- moaningAfter (float)
+  moaning value once the choke is released [0, 1]
+
+- moaningTime (float)
+  time during which the moaning value is held
+
+
 
 3.6.1 MacGruber
 
@@ -562,51 +647,39 @@ When excitement is high enough, the 'pause' setting can create random periods
 during which voice is disabled, followed by periods of the highest intensity.
 
 
-- breathingRange
-  when excitement is below this value, only breathing is used
-
-- breathingIntensityCutoff
-  when excitement is above this value, breathing is never used
-
 - orgasmAction
   the name of the action to trigger during orgasm
-
-- intensityWait
-  the range of random numbers used to generate an interval to wait for before
-  picking a new intensity
-
-- intentisyTarget (rng)
-  a generator for the voice intensity, based on the character's excitement; this
-  is a normal rng by default, so that the chances of generating a low intensity
-  voice gets lower the higher the excitement rises
 
 - pause
   object containing this:
 
-    minExcitement      excitement above which pauses are enabled
-    time (duration)    random time range
-    chance             object containing 'value', the chance of pauses happening
-                       each time a new intensity is picked, and 'rng', an RNG
-                       object
 
 
 3.7 Appearance
---------------
-
-- MaxSweat (float)
-  maximum gloss factor; 1.0 should be realistic, but can go above or below
-
-- MaxFlush (float)
-  maximum lerp towards red; 1.0 should be realistic, but can go above or below
-
-
-3.8 Temperature
 ---------------
 Body temperature is defined by two numbers: the current value and the
 target value, both [0, 1]. `temperatureExcitementMax` is used to determine the
 target value based on excitement, and `temperatureExcitementRate` and
 `temperatureDecayRate` are rates at which the current value increases or
 decreases to reach the target
+
+Skin flush is based on body temperature and air. When breathing stops by
+grabbing the neck, air goes down towards 0 (see 3.8). `MaxFlush` and
+`MaxChokedFlush` are used to determine the amount of red added to the skin
+colour.
+
+- FlushRedMag (float)
+  maximum distance to lerp between the base skin colour and full red; MaxFlush
+  and MaxChokedFlush multiply this
+
+- MaxSweat (float)
+  maximum gloss factor; 1.0 should be realistic, but can go above or below
+
+- MaxFlush (float)
+  max flush magnitude for body temperature
+
+- MaxChokedFlush (float)
+  max flush magnitude for choking
 
 - TemperatureExcitementMax (float)
   the excitement value at which body temperature should be at 1.0 (its
@@ -621,6 +694,36 @@ decreases to reach the target
 - TemperatureDecayRate (float)
   rate at which the temperature decreases when the target is below the current
   temperature
+
+
+3.8 Choking
+-----------
+When the neck is grabbed, breathing stops and air goes down from 1.0 towards 0.0
+over time. Air goes back up when the neck is released. Air affects body colour
+(see 3.7) and choking affects mood and voice.
+
+
+- ChokedAirDownTime (float)
+  when choking is active, time until air is 0 (seconds)
+
+- ChokedAirUpTime (float)
+  when choking stops, time until air is back to 1 (seconds)
+
+- MinHappyChocked (float)
+  MaxHappyChocked (float)
+  MinPlayfulChocked (float)
+  MaxPlayfulChocked (float)
+  MinExcitedChocked (float)
+  MaxExcitedChocked (float)
+  MinAngryChocked (float)
+  MaxAngryChocked (float)
+  MinSurprisedChocked (float)
+  MaxSurprisedChocked (float)
+  MinTiredChocked (float)
+  MaxTiredChocked (float)
+  when choking becomes active, all moods are forced between these values, which
+  can be used for temporary expressions (like surprised)
+
 
 
 3.9 Tiredness

@@ -1,10 +1,8 @@
 ﻿using SimpleJSON;
-using System;
-using UnityThreading;
 
-namespace Cue.src.Person.Voice
+namespace Cue
 {
-	public class VoiceStateNotBreathing : VoiceState
+	public class VoiceStateChoked : VoiceState
 	{
 		private float minTimeForMoaning_ = 3;
 		private float moaningAfter_ = 1;
@@ -13,20 +11,20 @@ namespace Cue.src.Person.Voice
 		private bool wasBreathing_ = false;
 		private float elapsed_ = 0;
 
-		private VoiceStateNotBreathing()
+		private VoiceStateChoked()
 		{
 		}
 
-		public VoiceStateNotBreathing(JSONClass vo)
+		public VoiceStateChoked(JSONClass vo)
 		{
 			Load(vo, false);
 		}
 
 		public override void Load(JSONClass vo, bool inherited)
 		{
-			if (vo.HasKey("notBreathingState"))
+			if (vo.HasKey("chokedState"))
 			{
-				var o = J.ReqObject(vo, "notBreathingState");
+				var o = J.ReqObject(vo, "chokedState");
 
 				minTimeForMoaning_ = J.ReqFloat(o, "minTimeForMoaning");
 				moaningAfter_ = J.ReqFloat(o, "moaningAfter");
@@ -34,7 +32,7 @@ namespace Cue.src.Person.Voice
 			}
 			else if (!inherited)
 			{
-				throw new LoadFailed("missing notBreathingState");
+				throw new LoadFailed("missing chokedState");
 			}
 		}
 
@@ -45,12 +43,12 @@ namespace Cue.src.Person.Voice
 
 		public override IVoiceState Clone()
 		{
-			var s = new VoiceStateNotBreathing();
+			var s = new VoiceStateChoked();
 			s.CopyFrom(this);
 			return s;
 		}
 
-		private void CopyFrom(VoiceStateNotBreathing o)
+		private void CopyFrom(VoiceStateChoked o)
 		{
 			minTimeForMoaning_ = o.minTimeForMoaning_;
 			moaningAfter_ = o.moaningAfter_;

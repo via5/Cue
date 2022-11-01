@@ -44,7 +44,7 @@ namespace Cue
 				new VoiceStateOrgasm(o),
 				new VoiceStateKiss(o),
 				new VoiceStateBJ(o),
-				new VoiceStateNotBreathing(o)
+				new VoiceStateChoked(o)
 			};
 		}
 

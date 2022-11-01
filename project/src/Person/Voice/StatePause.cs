@@ -106,6 +106,8 @@ namespace Cue
 			inPause_ = true;
 
 			v_.Provider.SetSilent();
+			v_.MouthEnabled = false;
+			v_.ChestEnabled = false;
 		}
 
 		protected override void DoEarlyUpdate(float s)
@@ -123,6 +125,8 @@ namespace Cue
 				{
 					elapsed_ = 0;
 					v_.Provider.SetMoaning(1.0f);
+					v_.MouthEnabled = true;
+					v_.ChestEnabled = true;
 					time_ = timeHighRange_.RandomFloat(v_.MaxIntensity);
 					inPause_ = false;
 				}
