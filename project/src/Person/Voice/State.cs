@@ -40,7 +40,6 @@ namespace Cue
 			return new List<IVoiceState>()
 			{
 				new VoiceStateNormal(o),
-				new VoiceStateRandomPause(o),
 				new VoiceStateOrgasm(o),
 				new VoiceStateKiss(o),
 				new VoiceStateBJ(o),

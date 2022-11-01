@@ -466,7 +466,7 @@ namespace Cue
 		{
 			get
 			{
-				return MovementEnergyForExcitement(BaseExcitement);
+				return MovementEnergyForExcitement(Get(MoodType.Excited));
 			}
 		}
 

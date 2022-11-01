@@ -8,6 +8,7 @@ project\src\AI\Events.cs
 project\src\AI\Events\Grab.cs
 project\src\AI\Events\Hand.cs
 project\src\AI\Events\HandLinker.cs
+project\src\AI\Events\HoldBreath.cs
 project\src\AI\Events\Kiss.cs
 project\src\AI\Events\Mouth.cs
 project\src\AI\Events\Smoke.cs
@@ -85,11 +86,10 @@ project\src\Person\Gaze\Events\Random.cs
 project\src\Person\Gaze\Events\Zapped.cs
 project\src\Person\Voice\State.cs
 project\src\Person\Voice\StateBJ.cs
+project\src\Person\Voice\StateChoked.cs
 project\src\Person\Voice\StateKiss.cs
 project\src\Person\Voice\StateNormal.cs
-project\src\Person\Voice\StateNotBreathing.cs
 project\src\Person\Voice\StateOrgasm.cs
-project\src\Person\Voice\StatePause.cs
 project\src\Person\Voice\Voice.cs
 project\src\Resources\Animations.cs
 project\src\Resources\Objects.cs

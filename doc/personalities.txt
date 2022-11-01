@@ -562,28 +562,7 @@ Breathes or moans based on excitement.
   intensity to the new one
 
 
-3.6.2 Pause state
-Pauses breathing randomly.
-
-- minExcitement (float)
-  excitement above which pauses are enabled
-
-- cooldown (float)
-  minimum time before the next pause (Seconds)
-
-- timePaused (duration)
-  time during which the character doesn't breathe
-
-- timeHigh (duration)
-  once the pause is ended, time during which the character uses the highest
-  moaning value before returning to normal
-
-- chance
-   object containing 'value', the chance of pauses happening each time a new
-   intensity is picked, and 'rng', an RNG object
-
-
-3.6.3 Kiss state
+3.6.2 Kiss state
 Handles voice while kissing is active.
 
 - enabled (bool)
@@ -597,17 +576,18 @@ Handles voice while kissing is active.
   chance of doing a random moan
 
 
-3.6.4 Orgasm state
+3.6.3 Orgasm state
 Handles voice during orgasm.
 
 - voice (string)
   name of the orgasm state in VAMMoan
 
 
-3.6.5 BJ state
+3.6.4 BJ state
 Handles voice during BJ. Same as 3.6.3.
 
-3.6.6 Choked state
+
+3.6.5 Choked state
 Handles voice while the neck is grabbed.
 
 - minTimeForMoaning (float)
@@ -873,7 +853,62 @@ currently means that the character is penetrating the player, or vice versa.
   unchanged
 
 
-3.13 Miscellaneous
+3.13 Events
+-----------
+Cue uses events for various things, like thrust or hands, but also reacting
+to zaps, kissing, grabbing, etc. Some events are configurable.
+
+
+3.13.1 Kiss
+-----------
+- startLipsDistance (float)
+  distance between the lips of two characters (not including the player) below
+  which kissing activates
+
+- startLipsDistanceWithPlayer (float)
+  distance between the lips of the player and other characters below which
+  kissing activates
+
+- stopLipsDistance (float)
+  distance between the lips of two characters that are currently kissing (not
+  including the player) above which kissing stops
+
+- stopLipsDistanceWithPlayer (float)
+  distance between the lips of the player and the other character that is
+  currently kissing above which kissing stops
+
+- stopHeadDistanceFromStart (float)
+  distance from the initial head position when kissing started above which
+  kissing stops
+
+- duration (duration)
+  time of the kissing event; note that kissing never stops if the player is
+  involved
+
+- interval (duration)
+  cooldown period during which kissing cannot start again for this character
+
+
+3.13.2 Hold breath
+------------------
+Pauses breathing randomly.
+
+- minExcitement (float)
+  excitement above which pauses are enabled
+
+- cooldown (float)
+  minimum time before the next pause (seconds)
+
+- holdTime (duration)
+  time during which the character doesn't breathe
+
+- chance (float)
+  changeRng (rng)
+  every time the cooldown elapses, a random number is generated with changeRng;
+  if it's below `chance`, the event activates
+
+
+3.14 Miscellaneous
 -------------------
 
 - IdleAnimation (string)

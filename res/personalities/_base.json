@@ -32,24 +32,6 @@
 				"range": [0, 2]
 			}
 		}
-		"pauseState":
-		{
-			"minExcitement": 0.8,
-			"cooldown": 10,
-			"timePaused":
-			{
-				"range": [3, 5]
-			},
-			"timeHigh":
-			{
-				"range": [3, 5]
-			},
-			"chance":
-			{
-				"value": 0.2,
-				"rng": "uniform"
-			},
-		},
 		"kissState":
 		{
 			"enabled": true,
@@ -465,7 +447,19 @@
 				},
 				"rng": "normal"
 			}
-		}
+		},
+
+		{
+			"type": "holdbreath",
+			"minExcitement": 0.7,
+			"cooldown": 10,
+			"holdTime":
+			{
+				"range": [3, 5]
+			},
+			"chance": 0.2,
+			"chanceRng": "uniform"
+		},
 	],
 
 
