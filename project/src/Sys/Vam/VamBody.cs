@@ -68,6 +68,7 @@ namespace Cue.Sys.Vam
 		public virtual bool Exists { get { return true; } }
 		public abstract float Sweat { get; set; }
 		public abstract float Flush { get; set; }
+		public abstract float FlushMag { get; set; }
 		public abstract bool Strapon { get; set; }
 
 		public abstract IBodyPart[] GetBodyParts();
@@ -104,6 +105,7 @@ namespace Cue.Sys.Vam
 		private bool glossEnabled_ = false;
 
 		private float flush_ = 0;
+		private float flushMag_ = 0.15f;
 		private IEasing flushEasing_ = new SineInEasing();
 		private bool colorEnabled_ = false;
 		private IEasing skinWhiteEasing_ = new QuadOutEasing();
@@ -368,6 +370,13 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public override float FlushMag
+		{
+			get { return flushMag_; }
+			set { flushMag_ = value; }
+		}
+
+
 		private void LerpColor(Color target, float f)
 		{
 			var p = color_.Parameter;
@@ -375,7 +384,7 @@ namespace Cue.Sys.Vam
 			if (p != null)
 			{
 				var c = Color.Lerp(
-					initialColor_, target, flushEasing_.Magnitude(f) * 0.07f);
+					initialColor_, target, flushEasing_.Magnitude(f) * flushMag_);
 
 				var cd = Color.Distance(c, U.FromHSV(p.val));
 

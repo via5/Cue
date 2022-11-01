@@ -14,6 +14,7 @@ namespace Cue
 
 		private float maxIntensity_ = 0;
 		private bool muted_ = false;
+		private string mutedWhy_ = "";
 
 		private DebugLines debug_ = new DebugLines();
 
@@ -116,6 +117,8 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			MaxIntensity = person_.Mood.MovementEnergy;
+
 			for (int i = 0; i < states_.Count; ++i)
 				states_[i].EarlyUpdate(s);
 
@@ -186,12 +189,12 @@ namespace Cue
 
 		private void CheckMute(bool force=false)
 		{
-			if (person_.IsPlayer && Cue.Instance.Options.MutePlayer)
+			if (ShouldMute())
 			{
 				if (!muted_ || force)
 				{
 					if (!force)
-						log_.Info("person is player, muting");
+						log_.Info($"muting: {mutedWhy_}");
 
 					provider_.Muted = true;
 					muted_ = true;
@@ -202,12 +205,23 @@ namespace Cue
 				if (muted_ || force)
 				{
 					if (!force)
-						log_.Info("person is not player, unmuting");
+						log_.Info("unmuting");
 
 					provider_.Muted = false;
 					muted_ = false;
 				}
 			}
+		}
+
+		private bool ShouldMute()
+		{
+			if (person_.IsPlayer && Cue.Instance.Options.MutePlayer)
+			{
+				mutedWhy_ = "person is player";
+				return true;
+			}
+
+			return false;
 		}
 
 		public Person Person
@@ -219,6 +233,12 @@ namespace Cue
 		{
 			get { return provider_.MouthEnabled; }
 			set { provider_.MouthEnabled = value; }
+		}
+
+		public bool ChestEnabled
+		{
+			get { return provider_.ChestEnabled; }
+			set { provider_.ChestEnabled = value; }
 		}
 
 		public float MaxIntensity
@@ -240,6 +260,7 @@ namespace Cue
 			debug_.Add("", "");
 
 			debug_.Add("maxIntensity", $"{maxIntensity_:0.00}");
+			debug_.Add("muted", $"{(muted_ ? "yes: " + mutedWhy_ : "no")}");
 			debug_.Add("", "");
 
 			if (current_ == null)

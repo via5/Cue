@@ -91,6 +91,7 @@ namespace Cue.MacGruber
 
 		private Parameters p_ = new Parameters();
 		private bool mouthEnabled_ = true;
+		private bool chestEnabled_ = true;
 
 		private float oldVolume_ = 0;
 		private bool muted_ = false;
@@ -334,13 +335,49 @@ namespace Cue.MacGruber
 
 			set
 			{
-				mouthEnabled_ = value;
-
-				if (!mouthEnabled_)
+				if (mouthEnabled_ != value)
 				{
-					p_.mouthMorph.min.Value = 0;
-					p_.mouthMorph.max.Value = 0;
-					p_.lipsMorphMax.Value = 0;
+					mouthEnabled_ = value;
+
+					if (mouthEnabled_)
+					{
+						p_.mouthMorph.min.Value = p_.mouthMorph.min.DefaultValue;
+						p_.mouthMorph.max.Value = p_.mouthMorph.max.DefaultValue;
+						p_.lipsMorphMax.Value = p_.lipsMorphMax.DefaultValue;
+					}
+					else
+					{
+						p_.mouthMorph.min.Value = 0;
+						p_.mouthMorph.max.Value = 0;
+						p_.lipsMorphMax.Value = 0;
+					}
+				}
+			}
+		}
+
+		public bool ChestEnabled
+		{
+			get
+			{
+				return chestEnabled_;
+			}
+
+			set
+			{
+				if (chestEnabled_ != value)
+				{
+					chestEnabled_ = value;
+
+					if (chestEnabled_)
+					{
+						p_.chestMorph.min.Value = p_.chestMorph.min.DefaultValue;
+						p_.chestMorph.max.Value = p_.chestMorph.max.DefaultValue;
+					}
+					else
+					{
+						p_.chestMorph.min.Value = 0;
+						p_.chestMorph.max.Value = 0;
+					}
 				}
 			}
 		}

@@ -35,10 +35,10 @@ namespace Cue
 		{
 			personIndex_ = personIndex;
 
+			body_ = new Body(this);
 			SetPersonality(Resources.Personalities.Clone(Resources.DefaultPersonality, this));
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
-			body_ = new Body(this);
 			gaze_ = new Gaze(this);
 			mood_ = new Mood(this);
 			ai_ = new PersonAI(this);

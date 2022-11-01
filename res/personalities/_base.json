@@ -65,6 +65,12 @@
 			"enabled": true,
 			"voiceChance": 0.2,
 			"voiceTime": 2
+		},
+		"notBreathingState":
+		{
+			"minTimeForMoaning": 3,
+			"moaningAfter": 1.0,
+			"moaningTime": 3.0
 		}
 	},
 
@@ -394,19 +400,6 @@
 		},
 
 		{
-			"name": "surprise1",
-			"moods": "surprised",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "Surprise1",
-					"max": 0.8
-				}
-			]
-		},
-
-		{
 			"name": "surprise2",
 			"moods": "surprised",
 			"bodyParts": "mouth eyes",
@@ -660,6 +653,19 @@
 	"maxTiredExpression": 1,
 	"minTiredness": 0,
 
+	"minHappyChocked": 0,
+	"maxHappyChocked": 0.2,
+	"minPlayfulChocked": 0,
+	"maxPlayfulChocked": 0,
+	"minExcitedChocked": 0,
+	"maxExcitedChocked": 1,
+	"minAngryChocked": 0,
+	"maxAngryChocked": 1,
+	"minSurprisedChocked": 1,
+	"maxSurprisedChocked": 1,
+	"minTiredChocked": 0,
+	"maxTiredChocked": 1,
+
 	"expressionMinHoldTime": 0,
 	"expressionMaxHoldTime": 3,
 	"excitedExpressionWeightModifier": 2,
@@ -670,7 +676,11 @@
 	"orgasmSyncMinExcitement": 0.9,
 
 	"maxSweat": 1,
-	"maxFlush": 1,
+	"maxFlush": 0.5,
+	"maxChokedFlush": 1,
+	"flushRedMag": 0.15,
+	"chokedAirDownTime": 10,
+	"chokedAirUpTime": 5,
 
 	"temperatureExcitementRate": 0.015,
 	"temperatureDecayRate": 0.005,

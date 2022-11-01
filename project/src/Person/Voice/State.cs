@@ -40,11 +40,17 @@ namespace Cue
 			return new List<IVoiceState>()
 			{
 				new VoiceStateNormal(o),
-				new VoiceStatePause(o),
+				new VoiceStateRandomPause(o),
 				new VoiceStateOrgasm(o),
 				new VoiceStateKiss(o),
-				new VoiceStateBJ(o)
+				new VoiceStateBJ(o),
+				new VoiceStateNotBreathing(o)
 			};
+		}
+
+		public Person Person
+		{
+			get { return v_.Person; }
 		}
 
 		public void Init(Voice v)
@@ -54,6 +60,9 @@ namespace Cue
 
 		public void Start()
 		{
+			v_.MouthEnabled = true;
+			v_.ChestEnabled = true;
+
 			DoStart();
 		}
 

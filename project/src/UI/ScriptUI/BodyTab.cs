@@ -30,6 +30,8 @@ namespace Cue
 		private VUI.Label sweat_ = new VUI.Label();
 		private VUI.Label flush_ = new VUI.Label();
 		private VUI.Label hairLoose_ = new VUI.Label();
+		private VUI.Label breathing_ = new VUI.Label();
+		private VUI.CheckBox forceNotBreathing_ = new VUI.CheckBox("Force");
 
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 		private DebugLines debug_ = null;
@@ -71,7 +73,20 @@ namespace Cue
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
 
+			p.Add(new VUI.Label("Breathing"));
+			p.Add(breathing_);
+			p.Add(forceNotBreathing_);
+			p.Add(new VUI.Spacer(0));
 
+			AddForceable(p, person_.Body.DampedAir, "Air");
+
+			forceNotBreathing_.Changed += (b) =>
+			{
+				if (b)
+					person_.Body.BreathingBool.SetForced(false);
+				else
+					person_.Body.BreathingBool.UnsetForced();
+			};
 
 			Layout = new VUI.BorderLayout(20);
 			Add(p, VUI.BorderLayout.Top);
@@ -95,6 +110,7 @@ namespace Cue
 			sweat_.Text = $"{person_.Atom.Body.Sweat:0.00}";
 			flush_.Text = $"{person_.Atom.Body.Flush:0.00}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.00}";
+			breathing_.Text = $"{(person_.Body.Breathing ? "yes" : "no")}";
 
 			if (debug_ == null)
 				debug_ = new DebugLines();

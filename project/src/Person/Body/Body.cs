@@ -82,7 +82,8 @@ namespace Cue
 		private float[] morphsRemaining_ = new float[BP.Count];
 		private ErogenousZones zones_;
 		private ZapInfo zap_ = new ZapInfo();
-
+		private ForceableBool breathing_ = new ForceableBool(true);
+		private DampedFloat air_ = new DampedFloat();
 
 		public Body(Person p)
 		{
@@ -90,6 +91,9 @@ namespace Cue
 			log_ = new Logger(Logger.Object, p, $"body");
 			temperature_ = new DampedFloat();
 			zones_ = new ErogenousZones(p);
+
+			air_.Target = 1;
+			air_.SetValue(1);
 
 			var parts = p.Atom.Body.GetBodyParts();
 			var all = new List<BodyPart>();
@@ -157,6 +161,23 @@ namespace Cue
 		public DampedFloat DampedTemperature
 		{
 			get { return temperature_; }
+		}
+
+		public bool Breathing
+		{
+			get { return breathing_.Value; }
+			set { breathing_.Value = value; }
+		}
+
+		public ForceableBool BreathingBool
+		{
+			get { return breathing_; }
+			set { breathing_ = value; }
+		}
+
+		public DampedFloat DampedAir
+		{
+			get { return air_; }
 		}
 
 		public Hand LeftHand
@@ -271,6 +292,22 @@ namespace Cue
 			}
 			Instrumentation.End();
 
+			bool updateBody = false;
+
+			Instrumentation.Start(I.BodyVoice);
+			{
+				air_.DownRate = 1.0f / person_.Personality.Get(PS.ChokedAirDownTime);
+				air_.UpRate = 1.0f / person_.Personality.Get(PS.ChokedAirUpTime);
+
+				if (Breathing)
+					air_.Target = 1;
+				else
+					air_.Target = 0;
+
+				if (air_.Update(s))
+					updateBody = true;
+			}
+			Instrumentation.End();
 
 			Instrumentation.Start(I.BodyTemperature);
 			{
@@ -282,22 +319,30 @@ namespace Cue
 				temperature_.Target = U.Clamp(
 					person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
 					0, 1);
-
 				if (temperature_.Update(s))
+					updateBody = true;
+
+				if (updateBody)
 				{
+					person_.Atom.Body.FlushMag = ps.Get(PS.FlushRedMag);
 					person_.Atom.Body.Sweat = temperature_.Value * ps.Get(PS.MaxSweat);
-					person_.Atom.Body.Flush = temperature_.Value * ps.Get(PS.MaxFlush);
+					person_.Atom.Body.Flush = MakeFlush();
 					person_.Atom.Hair.Loose = temperature_.Value;
 				}
 			}
 			Instrumentation.End();
+		}
 
+		private float MakeFlush()
+		{
+			var ps = person_.Personality;
 
-			Instrumentation.Start(I.BodyVoice);
-			{
-				person_.Voice.MaxIntensity = person_.Mood.MovementEnergy;
-			}
-			Instrumentation.End();
+			float temp = temperature_.Value * ps.Get(PS.MaxFlush);
+			float air = (1.0f - air_.Value) * ps.Get(PS.MaxChokedFlush);
+
+			float f = Math.Max(temp, air);
+
+			return U.Clamp(f, 0, 1);
 		}
 
 		public void DebugAllLocks(List<string> list)

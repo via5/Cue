@@ -201,6 +201,7 @@
     <Compile Include="src\Person\Voice\State.cs" />
     <Compile Include="src\Person\Voice\StateKiss.cs" />
     <Compile Include="src\Person\Voice\StateNormal.cs" />
+    <Compile Include="src\Person\Voice\StateNotBreathing.cs" />
     <Compile Include="src\Person\Voice\StateOrgasm.cs" />
     <Compile Include="src\Person\Voice\StatePause.cs" />
     <Compile Include="src\Person\Voice\Voice.cs" />

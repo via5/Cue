@@ -76,6 +76,7 @@ namespace Cue
 		string Name { get; }
 		bool Muted { set; }
 		bool MouthEnabled { get; set; }
+		bool ChestEnabled { get; set; }
 
 		string Warning { get; }
 	}

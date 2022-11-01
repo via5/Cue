@@ -461,6 +461,7 @@ namespace Cue.Sys
 		bool Exists { get; }
 		float Sweat { get; set; }
 		float Flush { get; set; }
+		float FlushMag { get; set; }
 		bool Strapon { get; set; }
 	}
 

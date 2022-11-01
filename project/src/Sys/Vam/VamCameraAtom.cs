@@ -264,6 +264,12 @@ namespace Cue.Sys.Vam
 			set { }
 		}
 
+		public override float FlushMag
+		{
+			get { return 0; }
+			set { }
+		}
+
 		public override float Flush
 		{
 			get { return 0; }

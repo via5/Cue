@@ -8,10 +8,10 @@ namespace Cue
 		private float forced_;
 		private bool isForced_;
 
-		public ForceableFloat()
+		public ForceableFloat(float value=0)
 		{
-			value_ = 0;
-			forced_ = 0;
+			value_ = value;
+			forced_ = value;
 			isForced_ = false;
 		}
 
@@ -58,6 +58,66 @@ namespace Cue
 				return $"{forced_:0.000000} (forced)";
 			else
 				return $"{value_:0.000000}";
+		}
+	}
+
+
+	public class ForceableBool
+	{
+		private bool value_;
+		private bool forced_;
+		private bool isForced_;
+
+		public ForceableBool(bool value = false)
+		{
+			value_ = value;
+			forced_ = value;
+			isForced_ = false;
+		}
+
+		public bool Value
+		{
+			get
+			{
+				if (isForced_)
+					return forced_;
+				else
+					return value_;
+			}
+
+			set
+			{
+				value_ = value;
+			}
+		}
+
+		public bool IsForced
+		{
+			get { return isForced_; }
+		}
+
+		public bool UnforcedValue
+		{
+			get { return value_; }
+		}
+
+		public void SetForced(bool value)
+		{
+			isForced_ = true;
+			forced_ = value;
+		}
+
+		public void UnsetForced()
+		{
+			isForced_ = false;
+		}
+
+		public override string ToString()
+		{
+			if (isForced_)
+				return $"{forced_} (forced)";
+			else
+				return $"{value_}";
 		}
 	}
 

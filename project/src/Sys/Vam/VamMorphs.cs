@@ -450,7 +450,13 @@ namespace Cue.Sys.Vam
 				m = bank.GetMorph(morphId);
 
 			if (m == null)
+			{
 				Log.Error($"{atom.ID}: morph '{morphId}' not found");
+			}
+			else if (m.hasBoneModificationFormulas || m.hasBoneRotationFormulas)
+			{
+				Log.Warning($"{atom.ID}: morph '{morphId}' has bone morphs");
+			}
 
 			mi = new MorphInfo(atom, morphId, m, eyesClosed);
 			map_.Add(key, mi);

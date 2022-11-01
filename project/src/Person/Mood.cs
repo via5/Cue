@@ -7,7 +7,8 @@ namespace Cue
 	{
 		class MoodValue
 		{
-			private ForceableFloat v_ = new ForceableFloat();
+			private MoodType mood_;
+			private DampedFloat v_ = new DampedFloat();
 			private float temp_ = -1;
 			private float tempTime_ = 0;
 			private float tempElapsed_ = 0;
@@ -17,6 +18,8 @@ namespace Cue
 
 			public MoodValue(Person p, MoodType type)
 			{
+				mood_ = type;
+
 				if (p.IsInteresting)
 				{
 					param_ = Cue.Instance.Sys.RegisterFloatParameter(
@@ -30,20 +33,28 @@ namespace Cue
 				}
 			}
 
-			public ForceableFloat Forceable
+			public DampedFloat Damped
 			{
 				get { return v_; }
 			}
 
 			public float Value
 			{
-				get { return v_.Value; }
+				get
+				{
+					if (temp_ < 0)
+						return v_.Value;
+					else
+						return temp_;
+				}
 			}
 
-			public void Set(float v)
+			public void Set(float v, bool fast=false)
 			{
-				if (temp_ < 0)
-					v_.Value = v;
+				v_.Target = v;
+
+				if (fast)
+					v_.SetValue(v);
 			}
 
 			public void SetTemporary(float v, float time)
@@ -51,11 +62,12 @@ namespace Cue
 				temp_ = v;
 				tempTime_ = time;
 				tempElapsed_ = 0;
-				v_.Value = temp_;
 			}
 
 			public void Update(float s)
 			{
+				v_.Update(s);
+
 				if (temp_ >= 0)
 				{
 					tempElapsed_ += s;
@@ -91,6 +103,17 @@ namespace Cue
 			}
 		}
 
+		struct Choked
+		{
+			public float minMood, maxMood;
+
+			public Choked(float min, float max)
+			{
+				minMood = min;
+				maxMood = max;
+			}
+		}
+
 		public const float NoOrgasm = 10000;
 
 		public const int NormalState = 1;
@@ -109,6 +132,8 @@ namespace Cue
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
 		private MoodValue[] moods_ = new MoodValue[MoodType.Count];
 		private float maxExcitement_ = 1.0f;
+
+		private Choked[] choked_ = new Choked[MoodType.Count];
 
 		private CustomTrigger orgasmTrigger_;
 		private bool playOrgasm_ = true;
@@ -170,8 +195,9 @@ namespace Cue
 
 		private void OnPersonalityChanged()
 		{
-			var es = person_.Personality.GetString(
-					PS.MovementEnergyRampUpAfterOrgasmEasing);
+			var ps = person_.Personality;
+
+			var es = ps.GetString(PS.MovementEnergyRampUpAfterOrgasmEasing);
 
 			var e = EasingFactory.FromString(es);
 
@@ -186,8 +212,48 @@ namespace Cue
 
 			energyRampUpEasing_ = e;
 
-			tiredness_.SetValue(person_.Personality.Get(PS.MinTiredness));
-			SetBaseTiredness(person_.Personality.Get(PS.MinTiredness));
+			foreach (var m in MoodType.Values)
+				choked_[m.Int] = new Choked(0, 1);
+
+			SetChoked(
+				MoodType.Happy,
+				PS.MinHappyChocked, PS.MaxHappyChocked);
+
+			SetChoked(
+				MoodType.Playful,
+				PS.MinPlayfulChocked, PS.MaxPlayfulChocked);
+
+			SetChoked(
+				MoodType.Excited,
+				PS.MinExcitedChocked, PS.MaxExcitedChocked);
+
+			SetChoked(
+				MoodType.Angry,
+				PS.MinAngryChocked, PS.MaxAngryChocked);
+
+			SetChoked(
+				MoodType.Surprised,
+				PS.MinSurprisedChocked, PS.MaxSurprisedChocked);
+
+			SetChoked(
+				MoodType.Tired,
+				PS.MinTiredChocked, PS.MaxTiredChocked);
+
+			moods_[MoodType.Happy.Int].Set(ps.Get(PS.DefaultHappiness), true);
+			moods_[MoodType.Angry.Int].Set(ps.Get(PS.DefaultAnger), true);
+			moods_[MoodType.Playful.Int].Set(ps.Get(PS.DefaultPlayfulness), true);
+			moods_[MoodType.Surprised.Int].Set(ps.Get(PS.DefaultSurprise), true);
+
+			tiredness_.SetValue(ps.Get(PS.MinTiredness));
+			SetBaseTiredness(ps.Get(PS.MinTiredness));
+		}
+
+		private void SetChoked(
+			MoodType m,
+			BasicEnumValues.FloatIndex min, BasicEnumValues.FloatIndex max)
+		{
+			var ps = person_.Personality;
+			choked_[m.Int] = new Choked(ps.Get(min), ps.Get(max));
 		}
 
 		public static bool ShouldStopSexAnimation(
@@ -340,12 +406,22 @@ namespace Cue
 
 		private void Set(MoodType i, float value)
 		{
-			moods_[i.Int].Set(U.Clamp(value, 0, 1));
+			if (!person_.Body.Breathing)
+			{
+				value = U.Clamp(
+					value, choked_[i.Int].minMood, choked_[i.Int].maxMood);
+
+				moods_[i.Int].Set(U.Clamp(value, 0, 1), true);
+			}
+			else
+			{
+				moods_[i.Int].Set(U.Clamp(value, 0, 1));
+			}
 		}
 
-		public ForceableFloat GetValue(MoodType i)
+		public DampedFloat GetDamped(MoodType i)
 		{
-			return moods_[i.Int].Forceable;
+			return moods_[i.Int].Damped;
 		}
 
 		public void SetBaseExcitement(float f)

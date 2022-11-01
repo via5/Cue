@@ -87,6 +87,7 @@ project\src\Person\Voice\State.cs
 project\src\Person\Voice\StateBJ.cs
 project\src\Person\Voice\StateKiss.cs
 project\src\Person\Voice\StateNormal.cs
+project\src\Person\Voice\StateNotBreathing.cs
 project\src\Person\Voice\StateOrgasm.cs
 project\src\Person\Voice\StatePause.cs
 project\src\Person\Voice\Voice.cs

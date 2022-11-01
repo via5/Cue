@@ -21,6 +21,7 @@ namespace Cue.VamMoan
 			public Sys.Vam.ActionParameter orgasm;
 			public Sys.Vam.ActionParameter kissing;
 			public Sys.Vam.BoolParameter bjEnabled;         // >= v20
+			public Sys.Vam.BoolParameter breathingEnabled;
 			public Sys.Vam.ActionParameter[] bjIntensities; // <  v20
 			public Sys.Vam.ActionParameter[] intensities;
 			public Sys.Vam.FloatParameter availableIntensities;
@@ -83,6 +84,7 @@ namespace Cue.VamMoan
 			p_.availableIntensities = FP("VAMM IntensitiesCount");
 			p_.orgasm = AP("Voice orgasm");
 			p_.bjEnabled = BP("Enable blowjob sounds");
+			p_.breathingEnabled = BP("Enable breathing animation");
 
 			p_.bjIntensities = new Sys.Vam.ActionParameter[]
 			{
@@ -266,6 +268,12 @@ namespace Cue.VamMoan
 		{
 			get { return p_.autoJaw.Value; }
 			set { p_.autoJaw.Value = value; }
+		}
+
+		public bool ChestEnabled
+		{
+			get { return p_.breathingEnabled.Value; }
+			set { p_.breathingEnabled.Value = value; }
 		}
 
 		public string Warning

@@ -3,7 +3,7 @@ using System;
 
 namespace Cue
 {
-	public class VoiceStatePause : VoiceState
+	public class VoiceStateRandomPause : VoiceState
 	{
 		private float minExcitement_ = 0;
 		private float cooldown_ = 0;
@@ -19,11 +19,11 @@ namespace Cue
 		private bool inPause_ = false;
 
 
-		private VoiceStatePause()
+		private VoiceStateRandomPause()
 		{
 		}
 
-		public VoiceStatePause(JSONClass vo)
+		public VoiceStateRandomPause(JSONClass vo)
 		{
 			Load(vo, false);
 		}
@@ -84,12 +84,12 @@ namespace Cue
 
 		public override IVoiceState Clone()
 		{
-			var s = new VoiceStatePause();
+			var s = new VoiceStateRandomPause();
 			s.CopyFrom(this);
 			return s;
 		}
 
-		private void CopyFrom(VoiceStatePause o)
+		private void CopyFrom(VoiceStateRandomPause o)
 		{
 			minExcitement_ = o.minExcitement_;
 			cooldown_ = o.cooldown_;

@@ -2,7 +2,7 @@ namespace Cue
 {
 	class GazeGrabbed : BasicGazeEvent
 	{
-		private BodyPart head_;
+		private BodyPart head_, neck_;
 		private bool active_ = false;
 		private float activeElapsed_ = 0;
 
@@ -10,6 +10,7 @@ namespace Cue
 			: base(p, I.GazeGrabbed)
 		{
 			head_ = person_.Body.Get(BP.Head);
+			neck_ = person_.Body.Get(BP.Neck);
 		}
 
 		protected override int DoCheck(int flags)
@@ -36,7 +37,7 @@ namespace Cue
 
 			if (ps.Get(PS.LookAtPlayerOnGrabWeight) != 0)
 			{
-				if (head_.GrabbedByPlayer && Cue.Instance.Player.IsInteresting)
+				if (Grabbed())
 				{
 					active_ = true;
 					activeElapsed_ = 0;
@@ -51,6 +52,17 @@ namespace Cue
 			}
 
 			return active_;
+		}
+
+		private bool Grabbed()
+		{
+			if (Cue.Instance.Player.IsInteresting)
+			{
+				if (head_.GrabbedByPlayer || neck_.GrabbedByPlayer)
+					return true;
+			}
+
+			return false;
 		}
 
 		public override string ToString()

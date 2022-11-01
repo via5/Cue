@@ -70,7 +70,7 @@ namespace Cue
 				forceExcitement_ = tools_.Add(new VUI.CheckBox("Ex", OnForceExcitement));
 				excitement_ = tools_.Add(new VUI.FloatTextSlider(OnExcitement));
 				playerWarning_ = tools_.Add(new VUI.Label("(disabled for player)"));
-				tools_.Add(new VUI.ToolButton("finish", OnTest));
+				tools_.Add(new VUI.ToolButton("breathing", OnTest));
 				fps_ = tools_.Add(new VUI.Label());
 				p.Add(tools_);
 			}
@@ -147,7 +147,7 @@ namespace Cue
 					playerWarning_.Visible = false;
 
 					if (forceExcitement_ != null)
-						forceExcitement_.Checked = p.Mood.GetValue(MoodType.Excited).IsForced;
+						forceExcitement_.Checked = p.Mood.GetDamped(MoodType.Excited).IsForced;
 
 					if (excitement_ != null)
 						excitement_.Value = p.Mood.Get(MoodType.Excited);
@@ -209,7 +209,11 @@ namespace Cue
 		private void OnTest()
 		{
 			if (ignore_) return;
-			Cue.Instance.Finish.Start();
+
+			if (Cue.Instance.ActivePersons[0].Body.Breathing)
+				Cue.Instance.ActivePersons[0].Body.BreathingBool.SetForced(false);
+			else
+				Cue.Instance.ActivePersons[0].Body.BreathingBool.UnsetForced();
 		}
 
 		private void OnForceExcitement(bool b)
@@ -220,9 +224,9 @@ namespace Cue
 			if (p != null)
 			{
 				if (b)
-					p.Mood.GetValue(MoodType.Excited).SetForced(excitement_.Value);
+					p.Mood.GetDamped(MoodType.Excited).SetForced(excitement_.Value);
 				else
-					p.Mood.GetValue(MoodType.Excited).UnsetForced();
+					p.Mood.GetDamped(MoodType.Excited).UnsetForced();
 			}
 		}
 
@@ -233,8 +237,8 @@ namespace Cue
 			var p = SelectedPerson;
 			if (p != null)
 			{
-				if (p.Mood.GetValue(MoodType.Excited).IsForced)
-					p.Mood.GetValue(MoodType.Excited).SetForced(f);
+				if (p.Mood.GetDamped(MoodType.Excited).IsForced)
+					p.Mood.GetDamped(MoodType.Excited).SetForced(f);
 				else
 					p.Mood.SetBaseExcitement(f);
 
