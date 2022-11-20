@@ -281,7 +281,7 @@ namespace Cue
 		{
 			if (p != null)
 			{
-				if (p.Mood.MovementEnergy == 0 && p.Mood.BaseExcitement > 0)
+				if (p.Mood.MovementEnergy == 0 && p.Mood.Get(MoodType.Excited) > 0)
 					return false;
 			}
 
@@ -324,14 +324,14 @@ namespace Cue
 				return 1;
 
 			return mostTired.Mood.MovementEnergyForExcitement(
-					mostExcited.Mood.BaseExcitement);
+					mostExcited.Mood.Get(MoodType.Excited));
 		}
 
 		private static Person HighestExcitement(Person current, Person check)
 		{
 			if (current == null)
 				return check;
-			else if (check.Mood.BaseExcitement > current.Mood.BaseExcitement)
+			else if (check.Mood.Get(MoodType.Excited) > current.Mood.Get(MoodType.Excited))
 				return check;
 			else
 				return current;
@@ -492,7 +492,7 @@ namespace Cue
 			}
 
 			var tf = ps.Get(PS.MovementEnergyTirednessFactor);
-			return U.Clamp(e - (Get(MoodType.Tired) * tf), 0, max);
+			return U.Clamp(e - (Get(MoodType.Tired) * tf), 0.01f, max);
 		}
 
 		public bool IsIdle
