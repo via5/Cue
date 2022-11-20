@@ -428,8 +428,8 @@
 			"startLipsDistance": 0.1,
 			"startLipsDistanceWithPlayer": 0.1,
 			"stopLipsDistance": 0.1,
-			"stopLipsDistanceWithPlayer": 0.15,
-			"stopHeadDistanceFromStart": 0.15,
+			"stopLipsDistanceWithPlayer": 0.1,
+			"stopHeadDistanceFromStart": 0.1,
 			"duration":
 			{
 				"range":

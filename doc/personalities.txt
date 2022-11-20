@@ -622,18 +622,11 @@ Controls the dataset used depending on excitement.
 
 3.6.2 VAMMoan
 
-Controls when the breathing and/or intensity actions are used. Cue picks a
-new random intensity value based on excitement every `intensityWait` seconds.
-
-When excitement is high enough, the 'pause' setting can create random periods
-during which voice is disabled, followed by periods of the highest intensity.
+Controls options for VAMMoan.
 
 
 - orgasmAction
   the name of the action to trigger during orgasm
-
-- pause
-  object containing this:
 
 
 

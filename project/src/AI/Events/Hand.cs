@@ -65,7 +65,7 @@
 		private const bool EnableDoubleHJ = false;
 
 		private const float ManualStartDistance = 0.09f;
-		private const float AutoStartDistance = 0.06f;
+		private const float AutoStartDistance = 0.04f;
 
 		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;

@@ -13,28 +13,12 @@
 		private Sys.Vam.StringChooserParameter target_ = null;
 		private Sys.Vam.BoolParameter trackPos_ = null;
 		private Sys.Vam.BoolParameter trackRot_ = null;
-		private Sys.Vam.FloatParameter headAngleX_ = null;
-		private Sys.Vam.FloatParameter headAngleY_ = null;
-		private Sys.Vam.FloatParameter headAngleZ_ = null;
-		private Sys.Vam.FloatParameter lipDepth_ = null;
 		private Sys.Vam.FloatParameter morphDuration_ = null;
 		private Sys.Vam.FloatParameter morphSpeed_ = null;
 		private Sys.Vam.FloatParameter trackingSpeed_ = null;
 		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
 		private float elapsed_ = 0;
-
-		private const float StartHeadAngleXWithPlayer = -45;
-		private const float StartHeadAngleYWithPlayer = 0;
-		private const float StartHeadAngleZWithPlayer = 0;
-		private const float StartHeadAngleXLeader = -10;
-		private const float StartHeadAngleYLeader = 0;
-		private const float StartHeadAngleZLeader = -20;
-		private const float StartHeadAngleX = -30;
-		private const float StartHeadAngleY = 0;
-		private const float StartHeadAngleZ = -40;
-		private const float StartLipDepthLeader = 0.02f;
-		private const float StartLipDepth = 0;
 
 		private const float StartTrackingSpeed = 0.1f;
 		private const float StopTrackingSpeed = 0.1f;
@@ -193,18 +177,6 @@
 			trackRot_ = new Sys.Vam.BoolParameter(
 				p, PluginName, "trackRotation");
 
-			headAngleX_ = new Sys.Vam.FloatParameter(
-				p, PluginName, "Head Angle X");
-
-			headAngleY_ = new Sys.Vam.FloatParameter(
-				p, PluginName, "Head Angle Y");
-
-			headAngleZ_ = new Sys.Vam.FloatParameter(
-				p, PluginName, "Head Angle Z");
-
-			lipDepth_ = new Sys.Vam.FloatParameter(
-				p, PluginName, "Lip Depth");
-
 			morphDuration_ = new Sys.Vam.FloatParameter(
 				p, PluginName, "Morph Duration");
 
@@ -229,31 +201,6 @@
 			target_.Value = "";
 			atom_.Value = target.ID;
 			target_.Value = "LipTrigger";
-
-			if (target.IsPlayer)
-			{
-				headAngleX_.Value = StartHeadAngleXWithPlayer;
-				headAngleY_.Value = StartHeadAngleYWithPlayer;
-				headAngleZ_.Value = StartHeadAngleZWithPlayer;
-				lipDepth_.Value = 0;
-			}
-			else
-			{
-				if (leader)
-				{
-					lipDepth_.Value = StartLipDepthLeader;
-					headAngleX_.Value = StartHeadAngleXLeader;
-					headAngleY_.Value = StartHeadAngleYLeader;
-					headAngleZ_.Value = StartHeadAngleZLeader;
-				}
-				else
-				{
-					lipDepth_.Value = StartLipDepth;
-					headAngleX_.Value = StartHeadAngleX;
-					headAngleY_.Value = StartHeadAngleY;
-					headAngleZ_.Value = StartHeadAngleZ;
-				}
-			}
 
 			closeEyes_.Value = !Person.Gaze.ShouldAvoid(target);
 
