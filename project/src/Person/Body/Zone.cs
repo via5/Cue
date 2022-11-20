@@ -316,7 +316,7 @@ namespace Cue
 		public void Check(Person p, ZoneType zoneType)
 		{
 			rate_ = 0;
-			mod_ = 1;
+			mod_ = 0;
 			max_ = 0;
 			mag_ = 0;
 
@@ -354,6 +354,9 @@ namespace Cue
 				if (GetExternalPart().active)
 					mag_ = Math.Max(mag_, GetExternalPart().magnitude);
 			}
+
+			if (mod_ == 0)
+				mod_ = 1;
 		}
 
 		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart, float mag)
