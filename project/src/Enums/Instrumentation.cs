@@ -19,49 +19,50 @@ namespace Cue
 		public static readonly InstrumentationType GazeEvents = InstrumentationType.CreateInternal(10);
 		public static readonly InstrumentationType GazeAbove = InstrumentationType.CreateInternal(11);
 		public static readonly InstrumentationType GazeFront = InstrumentationType.CreateInternal(12);
-		public static readonly InstrumentationType GazeGrabbed = InstrumentationType.CreateInternal(13);
-		public static readonly InstrumentationType GazeZapped = InstrumentationType.CreateInternal(14);
-		public static readonly InstrumentationType GazeKissing = InstrumentationType.CreateInternal(15);
-		public static readonly InstrumentationType GazeMouth = InstrumentationType.CreateInternal(16);
-		public static readonly InstrumentationType GazeHands = InstrumentationType.CreateInternal(17);
-		public static readonly InstrumentationType GazeInteractions = InstrumentationType.CreateInternal(18);
-		public static readonly InstrumentationType GazeRandom = InstrumentationType.CreateInternal(19);
-		public static readonly InstrumentationType GazeOtherPersons = InstrumentationType.CreateInternal(20);
-		public static readonly InstrumentationType GazePostTarget = InstrumentationType.CreateInternal(21);
-		public static readonly InstrumentationType Voice = InstrumentationType.CreateInternal(22);
-		public static readonly InstrumentationType Excitement = InstrumentationType.CreateInternal(23);
-		public static readonly InstrumentationType Mood = InstrumentationType.CreateInternal(24);
-		public static readonly InstrumentationType Body = InstrumentationType.CreateInternal(25);
-		public static readonly InstrumentationType BodyZap = InstrumentationType.CreateInternal(26);
-		public static readonly InstrumentationType BodyParts = InstrumentationType.CreateInternal(27);
-		public static readonly InstrumentationType BodyZones = InstrumentationType.CreateInternal(28);
-		public static readonly InstrumentationType ZoneDecay = InstrumentationType.CreateInternal(29);
-		public static readonly InstrumentationType ZoneUpdate = InstrumentationType.CreateInternal(30);
-		public static readonly InstrumentationType ZoneIgnore = InstrumentationType.CreateInternal(31);
-		public static readonly InstrumentationType BodyTemperature = InstrumentationType.CreateInternal(32);
-		public static readonly InstrumentationType BodyVoice = InstrumentationType.CreateInternal(33);
-		public static readonly InstrumentationType Homing = InstrumentationType.CreateInternal(34);
-		public static readonly InstrumentationType Status = InstrumentationType.CreateInternal(35);
-		public static readonly InstrumentationType AI = InstrumentationType.CreateInternal(36);
-		public static readonly InstrumentationType Triggers = InstrumentationType.CreateInternal(37);
-		public static readonly InstrumentationType Finish = InstrumentationType.CreateInternal(38);
-		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(39);
-		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(40);
-		public static readonly InstrumentationType FUSys = InstrumentationType.CreateInternal(41);
-		public static readonly InstrumentationType FUObjects = InstrumentationType.CreateInternal(42);
-		public static readonly InstrumentationType FUBody = InstrumentationType.CreateInternal(43);
-		public static readonly InstrumentationType FUAnimator = InstrumentationType.CreateInternal(44);
-		public static readonly InstrumentationType FUAI = InstrumentationType.CreateInternal(45);
-		public static readonly InstrumentationType FUExpressions = InstrumentationType.CreateInternal(46);
-		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(47);
-		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(48);
-		public static readonly InstrumentationType ColWithThis = InstrumentationType.CreateInternal(49);
-		public static readonly InstrumentationType ColGetBP = InstrumentationType.CreateInternal(50);
-		public static readonly InstrumentationType ColExternal = InstrumentationType.CreateInternal(51);
-		public static readonly InstrumentationType ColPerson = InstrumentationType.CreateInternal(52);
+		public static readonly InstrumentationType GazeDown = InstrumentationType.CreateInternal(13);
+		public static readonly InstrumentationType GazeGrabbed = InstrumentationType.CreateInternal(14);
+		public static readonly InstrumentationType GazeZapped = InstrumentationType.CreateInternal(15);
+		public static readonly InstrumentationType GazeKissing = InstrumentationType.CreateInternal(16);
+		public static readonly InstrumentationType GazeMouth = InstrumentationType.CreateInternal(17);
+		public static readonly InstrumentationType GazeHands = InstrumentationType.CreateInternal(18);
+		public static readonly InstrumentationType GazeInteractions = InstrumentationType.CreateInternal(19);
+		public static readonly InstrumentationType GazeRandom = InstrumentationType.CreateInternal(20);
+		public static readonly InstrumentationType GazeOtherPersons = InstrumentationType.CreateInternal(21);
+		public static readonly InstrumentationType GazePostTarget = InstrumentationType.CreateInternal(22);
+		public static readonly InstrumentationType Voice = InstrumentationType.CreateInternal(23);
+		public static readonly InstrumentationType Excitement = InstrumentationType.CreateInternal(24);
+		public static readonly InstrumentationType Mood = InstrumentationType.CreateInternal(25);
+		public static readonly InstrumentationType Body = InstrumentationType.CreateInternal(26);
+		public static readonly InstrumentationType BodyZap = InstrumentationType.CreateInternal(27);
+		public static readonly InstrumentationType BodyParts = InstrumentationType.CreateInternal(28);
+		public static readonly InstrumentationType BodyZones = InstrumentationType.CreateInternal(29);
+		public static readonly InstrumentationType ZoneDecay = InstrumentationType.CreateInternal(30);
+		public static readonly InstrumentationType ZoneUpdate = InstrumentationType.CreateInternal(31);
+		public static readonly InstrumentationType ZoneIgnore = InstrumentationType.CreateInternal(32);
+		public static readonly InstrumentationType BodyTemperature = InstrumentationType.CreateInternal(33);
+		public static readonly InstrumentationType BodyVoice = InstrumentationType.CreateInternal(34);
+		public static readonly InstrumentationType Homing = InstrumentationType.CreateInternal(35);
+		public static readonly InstrumentationType Status = InstrumentationType.CreateInternal(36);
+		public static readonly InstrumentationType AI = InstrumentationType.CreateInternal(37);
+		public static readonly InstrumentationType Triggers = InstrumentationType.CreateInternal(38);
+		public static readonly InstrumentationType Finish = InstrumentationType.CreateInternal(39);
+		public static readonly InstrumentationType UI = InstrumentationType.CreateInternal(40);
+		public static readonly InstrumentationType FixedUpdate = InstrumentationType.CreateInternal(41);
+		public static readonly InstrumentationType FUSys = InstrumentationType.CreateInternal(42);
+		public static readonly InstrumentationType FUObjects = InstrumentationType.CreateInternal(43);
+		public static readonly InstrumentationType FUBody = InstrumentationType.CreateInternal(44);
+		public static readonly InstrumentationType FUAnimator = InstrumentationType.CreateInternal(45);
+		public static readonly InstrumentationType FUAI = InstrumentationType.CreateInternal(46);
+		public static readonly InstrumentationType FUExpressions = InstrumentationType.CreateInternal(47);
+		public static readonly InstrumentationType LateUpdate = InstrumentationType.CreateInternal(48);
+		public static readonly InstrumentationType Collisions = InstrumentationType.CreateInternal(49);
+		public static readonly InstrumentationType ColWithThis = InstrumentationType.CreateInternal(50);
+		public static readonly InstrumentationType ColGetBP = InstrumentationType.CreateInternal(51);
+		public static readonly InstrumentationType ColExternal = InstrumentationType.CreateInternal(52);
+		public static readonly InstrumentationType ColPerson = InstrumentationType.CreateInternal(53);
 
-		public const int Count = 53;
-		public int GetCount() { return 53; }
+		public const int Count = 54;
+		public int GetCount() { return 54; }
 	}
 
 
@@ -123,6 +124,7 @@ namespace Cue
 			InstrumentationType.CreateInternal(50),
 			InstrumentationType.CreateInternal(51),
 			InstrumentationType.CreateInternal(52),
+			InstrumentationType.CreateInternal(53),
 		};
 
 		public static InstrumentationType[] Values
@@ -145,6 +147,7 @@ namespace Cue
 			"gazeEvents",
 			"gazeAbove",
 			"gazeFront",
+			"gazeDown",
 			"gazeGrabbed",
 			"gazeZapped",
 			"gazeKissing",

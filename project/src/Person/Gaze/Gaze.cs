@@ -357,7 +357,11 @@ namespace Cue
 
 		public bool ShouldAvoid(Person p)
 		{
-			return ShouldAvoidImpl(p, PS.AvoidGazePlayer, PS.AvoidGazeOthers);
+			return ShouldAvoidImpl(p,
+				PS.AvoidGazePlayerMinExcitement,
+				PS.AvoidGazePlayerMaxExcitement,
+				PS.AvoidGazeOthersMinExcitement,
+				PS.AvoidGazeOthersMaxExcitement);
 		}
 
 		public float AvoidWeight(Person p)
@@ -373,22 +377,28 @@ namespace Cue
 		public bool ShouldAvoidInsidePersonalSpace(Person p)
 		{
 			return ShouldAvoidImpl(p,
-				PS.AvoidGazePlayerInsidePersonalSpace,
-				PS.AvoidGazeOthersInsidePersonalSpace);
+				PS.AvoidGazePlayerInsidePersonalSpaceMinExcitement,
+				PS.AvoidGazePlayerInsidePersonalSpaceMaxExcitement,
+				PS.AvoidGazeOthersInsidePersonalSpaceMinExcitement,
+				PS.AvoidGazeOthersInsidePersonalSpaceMaxExcitement);
 		}
 
 		public bool ShouldAvoidDuringSex(Person p)
 		{
 			return ShouldAvoidImpl(p,
-				PS.AvoidGazePlayerDuringSex,
-				PS.AvoidGazeOthersDuringSex);
+				PS.AvoidGazePlayerDuringSexMinExcitement,
+				PS.AvoidGazePlayerDuringSexMaxExcitement,
+				PS.AvoidGazeOthersDuringSexMinExcitement,
+				PS.AvoidGazeOthersDuringSexMaxExcitement);
 		}
 
 		public bool ShouldAvoidUninvolvedHavingSex(Person p)
 		{
 			return ShouldAvoidImpl(p,
-				PS.AvoidGazePlayerDuringSex,
-				PS.AvoidGazeUninvolvedHavingSex);
+				PS.AvoidGazePlayerDuringSexMinExcitement,
+				PS.AvoidGazePlayerDuringSexMaxExcitement,
+				PS.AvoidGazeUninvolvedHavingSexMinExcitement,
+				PS.AvoidGazeUninvolvedHavingSexMaxExcitement);
 		}
 
 		public void OnPluginState(bool b)
@@ -398,15 +408,17 @@ namespace Cue
 
 		private bool ShouldAvoidImpl(
 			Person p,
-			BasicEnumValues.FloatIndex avoidPlayer,
-			BasicEnumValues.FloatIndex avoidOthers)
+			BasicEnumValues.FloatIndex avoidPlayerMinExcitement,
+			BasicEnumValues.FloatIndex avoidPlayerMaxExcitement,
+			BasicEnumValues.FloatIndex avoidOthersMinExcitement,
+			BasicEnumValues.FloatIndex avoidOthersMaxExcitement)
 		{
 			var ps = person_.Personality;
 			float ex = person_.Mood.Get(MoodType.Excited);
 
 			if (p != null && p.IsPlayer)
 			{
-				if (ex >= ps.Get(avoidPlayer))
+				if (ex < ps.Get(avoidPlayerMinExcitement) || ex > ps.Get(avoidPlayerMaxExcitement))
 					return false;
 
 				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazePlayerDelayAfterOrgasm))
@@ -416,7 +428,7 @@ namespace Cue
 			}
 			else
 			{
-				if (ex >= ps.Get(avoidOthers))
+				if (ex < ps.Get(avoidOthersMinExcitement) || ex > ps.Get(avoidOthersMaxExcitement))
 					return false;
 
 				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazeOthersDelayAfterOrgasm))

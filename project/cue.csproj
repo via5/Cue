@@ -30,7 +30,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-	<CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -43,7 +43,7 @@
     <LangVersion>6</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-	<CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -55,7 +55,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-	<CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -199,6 +199,7 @@
     <Compile Include="src\Person\Finish.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Events\Above.cs" />
+    <Compile Include="src\Person\Gaze\Events\Down.cs" />
     <Compile Include="src\Person\Gaze\Events\Front.cs" />
     <Compile Include="src\Person\Gaze\Events\Grabbed.cs" />
     <Compile Include="src\Person\Gaze\Events\Hands.cs" />

@@ -81,6 +81,9 @@ namespace Cue
 		// point in front
 		private LookatFront front_;
 
+		// point below
+		private LookatDown down_;
+
 		// all of the above in one array
 		private IGazeLookat[] all_ = new IGazeLookat[0];
 
@@ -99,6 +102,7 @@ namespace Cue
 			random_ = new LookatRandomPoint(p);
 			above_ = new LookatAbove(p);
 			front_ = new LookatFront(p);
+			down_ = new LookatDown(p);
 		}
 
 		public Logger Log
@@ -114,6 +118,11 @@ namespace Cue
 		public IGazeLookat LookatFront
 		{
 			get { return front_; }
+		}
+
+		public IGazeLookat LookatDown
+		{
+			get { return down_; }
 		}
 
 		public IGazeLookat RandomPoint
@@ -159,6 +168,7 @@ namespace Cue
 				1 +  // random
 				1 +  // above
 				1 +  // front
+				1 +  // down
 				objects_.Length];
 
 			int i = 0;
@@ -172,6 +182,7 @@ namespace Cue
 			all[i++] = random_;
 			all[i++] = above_;
 			all[i++] = front_;
+			all[i++] = down_;
 
 			for (int oi = 0; oi < objects_.Length; ++oi)
 				all[i++] = objects_[oi];
@@ -245,14 +256,6 @@ namespace Cue
 				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from reluctant)");
 		}
 
-		//public void SetShouldAvoid(IObject o, bool b, float weight, string why)
-		//{
-		//	avoid_[o.ObjectIndex].Set(b, weight, why);
-		//
-		//	if (o is Person && weight > 0)
-		//		SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from avoid)");
-		//}
-
 		public void SetWeightIfZero(Person p, BodyPartType bodyPart, float w, string why)
 		{
 			if (bodyParts_[p.PersonIndex, bodyPart.Int].Weight == 0)
@@ -283,6 +286,11 @@ namespace Cue
 		public void SetFrontWeight(float w, string why)
 		{
 			front_.SetWeight(w, why);
+		}
+
+		public void SetDownWeight(float w, string why)
+		{
+			down_.SetWeight(w, why);
 		}
 
 		public void SetObjectWeight(IObject o, float w, string why)
@@ -620,6 +628,34 @@ namespace Cue
 		}
 	}
 
+
+	class LookatDown : BasicGazeLookat
+	{
+		public LookatDown(Person p)
+			: base(p)
+		{
+		}
+
+		public override bool HasPosition
+		{
+			get { return true; }
+		}
+
+		public override Vector3 Position
+		{
+			get
+			{
+				var h = person_.Body.Get(BP.Hips);
+				var p = h.Position + h.Rotation.Rotate(new Vector3(0, 0, 1));
+				return p;
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"look down {Position}";
+		}
+	}
 
 	class LookatRandomPoint : BasicGazeLookat
 	{

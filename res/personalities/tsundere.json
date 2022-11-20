@@ -6,19 +6,26 @@
 
 	"lookAtPlayerTimeAfterGrab": 0,
 
-	"avoidGazePlayer": 0.4,
-	"avoidGazePlayerInsidePersonalSpace": 0.4,
-	"avoidGazePlayerDuringSex": 0.4,
+	"avoidGazePlayerMinExcitement": 0,
+	"avoidGazePlayerMaxExcitement": 0.4,
+	"avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
+	"avoidGazePlayerInsidePersonalSpaceMaxExcitement": 0.4,
+	"avoidGazePlayerDuringSexMinExcitement": 0,
+	"avoidGazePlayerDuringSexMaxExcitement": 0.4,
 	"avoidGazePlayerDelayAfterOrgasm": 15,
 	"avoidGazePlayerWeight": 0.1,
 
-	"avoidGazeOthers": 0,
-	"avoidGazeOthersInsidePersonalSpace": 0,
-	"avoidGazeOthersDuringSex": 0,
+	"avoidGazeOthersMinExcitement": 0,
+	"avoidGazeOthersMaxExcitement": 0,
+	"avoidGazeOthersInsidePersonalSpaceMinExcitement": 0,
+	"avoidGazeOthersInsidePersonalSpaceMaxExcitement": 0,
+	"avoidGazeOthersDuringSexMinExcitement": 0,
+	"avoidGazeOthersDuringSexMaxExcitement": 0,
 	"avoidGazeOthersDelayAfterOrgasm": 0,
 	"avoidGazeOthersWeight": 0.1,
 
-	"avoidGazeUninvolvedHavingSex": 0.4,
+	"avoidGazeUninvolvedHavingSexMinExcitement": 0,
+	"avoidGazeUninvolvedHavingSexMaxExcitement": 0.4,
 
 	"avoidGazeAnger": 0.5,
 	"angerWhenPlayerInteracts": 0.8,

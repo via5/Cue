@@ -75,6 +75,7 @@ project\src\Person\Gaze\Picker.cs
 project\src\Person\Gaze\Render.cs
 project\src\Person\Gaze\Targets.cs
 project\src\Person\Gaze\Events\Above.cs
+project\src\Person\Gaze\Events\Down.cs
 project\src\Person\Gaze\Events\Front.cs
 project\src\Person\Gaze\Events\Grabbed.cs
 project\src\Person\Gaze\Events\Hands.cs

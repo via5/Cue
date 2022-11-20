@@ -523,6 +523,7 @@
 	"lookAtPlayerTimeAfterGrab": 3,
 
 	"lookFrontWeight": 0,
+	"lookDownWeight": 0,
 
 	"idleNaturalRandomWeight": 0.4,
 	"idleEmptyRandomWeight": 0.05,
@@ -615,19 +616,26 @@
 	"movementEnergyRampUpAfterOrgasm": 30,
 	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
 
-	"avoidGazePlayer": 0,
-	"avoidGazePlayerInsidePersonalSpace": 0,
-	"avoidGazePlayerDuringSex": 0,
+	"avoidGazePlayerMinExcitement": 0,
+	"avoidGazePlayerMaxExcitement": 0,
+	"avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
+	"avoidGazePlayerInsidePersonalSpaceMaxExcitement": 0,
+	"avoidGazePlayerDuringSexMinExcitement": 0,
+	"avoidGazePlayerDuringSexMaxExcitement": 0,
 	"avoidGazePlayerDelayAfterOrgasm": 0,
 	"avoidGazePlayerWeight": 0,
 
-	"avoidGazeOthers": 0,
-	"avoidGazeOthersInsidePersonalSpace": 0,
-	"avoidGazeOthersDuringSex": 0,
+	"avoidGazeOthersMinExcitement": 0,
+	"avoidGazeOthersMaxExcitement": 0,
+	"avoidGazeOthersInsidePersonalSpaceMinExcitement": 0,
+	"avoidGazeOthersInsidePersonalSpaceMaxExcitement": 0,
+	"avoidGazeOthersDuringSexMinExcitement": 0,
+	"avoidGazeOthersDuringSexMaxExcitement": 0,
 	"avoidGazeOthersDelayAfterOrgasm": 0,
 	"avoidGazeOthersWeight": 0,
 
-	"avoidGazeUninvolvedHavingSex": 0,
+	"avoidGazeUninvolvedHavingSexMinExcitement": 0,
+	"avoidGazeUninvolvedHavingSexMaxExcitement": 0,
 
 	"avoidGazeAnger": 0,
 	"angerWhenPlayerInteracts": 0,

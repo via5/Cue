@@ -35,6 +35,7 @@ namespace Cue
 			{
 				new GazeAbove(p),
 				new GazeFront(p),
+				new GazeDown(p),
 				new GazeGrabbed(p),
 				new GazeZapped(p),
 				new GazeKissing(p),
