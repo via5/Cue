@@ -162,8 +162,12 @@ namespace Cue
 				intensityTime_ = intensityTimeRange_.RandomFloat(
 					v_.MaxIntensity);
 
+				float min = 0;
+				if (v_.MaxIntensity >= breathingIntensityCutoff_)
+					min = breathingRange_ + 0.01f;
+
 				intensityTarget_ = intensityTargetRng_.RandomFloat(
-					0, v_.MaxIntensity, v_.MaxIntensity);
+					min, v_.MaxIntensity, 1.0f);
 			}
 		}
 

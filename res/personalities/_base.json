@@ -52,8 +52,7 @@
 		{
 			"minTimeForMoaning": 3,
 			"moaningAfter": 1.0,
-			"moaningTime": 2.0,
-			"rampDownTime": 3.0
+			"moaningTime": 3.0
 		}
 	},
 
@@ -453,12 +452,13 @@
 		{
 			"type": "holdbreath",
 			"minExcitement": 0.7,
-			"cooldown": 10,
+			"cooldown": 30,
 			"holdTime":
 			{
-				"range": [3, 5]
+				"range": [3, 5],
+				"comment": "min must be >= voice.chokedState.minTimeForMoaning to get the moan"
 			},
-			"chance": 0.2,
+			"chance": 0.1,
 			"chanceRng": "uniform"
 		},
 	],

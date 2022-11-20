@@ -492,6 +492,9 @@ namespace Cue
 			}
 
 			var tf = ps.Get(PS.MovementEnergyTirednessFactor);
+
+			// note: max can be 0, so Clamp() can still return 0 even if min is
+			// higher
 			return U.Clamp(e - (Get(MoodType.Tired) * tf), 0.01f, max);
 		}
 

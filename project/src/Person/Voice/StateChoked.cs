@@ -7,7 +7,6 @@ namespace Cue
 		private float minTimeForMoaning_ = 3;
 		private float moaningAfter_ = 1;
 		private float moaningTime_ = 3;
-		private float rampDownTime_ = 3;
 
 		private bool wasBreathing_ = false;
 		private float elapsed_ = 0;
@@ -30,7 +29,6 @@ namespace Cue
 				minTimeForMoaning_ = J.ReqFloat(o, "minTimeForMoaning");
 				moaningAfter_ = J.ReqFloat(o, "moaningAfter");
 				moaningTime_ = J.ReqFloat(o, "moaningTime");
-				rampDownTime_ = J.ReqFloat(o, "rampDownTime");
 			}
 			else if (!inherited)
 			{
@@ -40,7 +38,7 @@ namespace Cue
 
 		public override string Name
 		{
-			get { return "notBreathing"; }
+			get { return "choked"; }
 		}
 
 		public override IVoiceState Clone()
@@ -55,7 +53,6 @@ namespace Cue
 			minTimeForMoaning_ = o.minTimeForMoaning_;
 			moaningAfter_ = o.moaningAfter_;
 			moaningTime_ = o.moaningTime_;
-			rampDownTime_ = o.rampDownTime_;
 		}
 
 		protected override void DoStart()
@@ -108,14 +105,11 @@ namespace Cue
 				}
 				else
 				{
-					float p = (elapsed_ - moaningTime_) / rampDownTime_;
-					v_.Provider.SetMoaning(moaningAfter_ * (1 - p));
-
-					if (elapsed_ >= (moaningTime_ + rampDownTime_))
-					{
-						v_.Provider.SetBreathing();
-						SetDone();
-					}
+					// no ramp down, just go to the next state, which will
+					// decide what to do next; ramping down to 0 doesn't work
+					// if excitement is high
+					SetDone();
+					return;
 				}
 			}
 			else
@@ -135,10 +129,11 @@ namespace Cue
 		{
 			if (!Person.Body.Breathing)
 			{
-				SetLastState("ok, not breathing");
+				SetLastState("ok, choked");
 				return Emergency;
 			}
 
+			SetLastState("breathing");
 			return CannotRun;
 		}
 
@@ -147,7 +142,6 @@ namespace Cue
 			debug.Add("minTimeForMoaning", $"{minTimeForMoaning_}");
 			debug.Add("moaningAfter", $"{moaningAfter_}");
 			debug.Add("moaningTime", $"{moaningTime_}");
-			debug.Add("rampDownTime", $"{rampDownTime_}");
 			debug.Add("is breathing", $"{Person.Body.Breathing}");
 			debug.Add("wasBreathing", $"{wasBreathing_}");
 			debug.Add("elapsed", $"{elapsed_:0.00}");

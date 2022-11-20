@@ -238,9 +238,14 @@ namespace Cue
 			if (p != null)
 			{
 				if (p.Mood.GetDamped(MoodType.Excited).IsForced)
+				{
 					p.Mood.GetDamped(MoodType.Excited).SetForced(f);
+				}
 				else
+				{
+					p.Mood.GetBaseExcitement().Value = f;
 					p.Mood.GetDamped(MoodType.Excited).SetValue(f);
+				}
 
 				if (f >= 1)
 					p.Mood.ForceOrgasm();
