@@ -72,13 +72,14 @@ namespace Cue
 		protected override bool DoHasEmergency(float s)
 		{
 			active_ = false;
+			float minIntensity = person_.Personality.Get(PS.ZappedGazeMinIntensity);
 
 			// find anybody zapped, including self
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
 			{
 				var p = Cue.Instance.ActivePersons[i];
 
-				if (p.Body.Zap.Intensity > 0 && p.Body.Zap.Source != person_)
+				if (p.Body.Zap.Intensity >= minIntensity && p.Body.Zap.Source != person_)
 				{
 					active_ = true;
 					gazeDuration_ = -1;
@@ -93,6 +94,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 			var z = person_.Body.Zap;
+			bool sourceIsPlayer = (z.Source?.IsPlayer ?? false);
 
 			float w;
 
@@ -100,7 +102,7 @@ namespace Cue
 			var targetPart = person_.Body.Zone(z.Zone).MainBodyPart;
 			if (targetPart != null)
 			{
-				w = GetTargetWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
+				w = GetTargetWeight(sourceIsPlayer, z.Zone) * z.Intensity;
 				if (w >= 0)
 				{
 					targets_.SetWeight(
@@ -110,7 +112,7 @@ namespace Cue
 			}
 
 			// look up
-			if (z.Source.IsPlayer)
+			if (sourceIsPlayer)
 			{
 				targets_.SetAboveWeight(
 					ps.Get(PS.ZappedByPlayerLookUpWeight) * z.Intensity,
@@ -123,7 +125,7 @@ namespace Cue
 					$"self zapped by {z.Source}");
 			}
 
-			if (z.Source.IsPlayer)
+			if (sourceIsPlayer)
 				SetGazeDuration(PS.ZappedByPlayerGazeDuration, z.Intensity);
 			else
 				SetGazeDuration(PS.ZappedByOtherGazeDuration, z.Intensity);
@@ -149,11 +151,14 @@ namespace Cue
 					$"other {other} zapped by {z.Source}");
 			}
 
-			// look at person zapping
-			targets_.SetWeight(
-				z.Source, BP.Eyes,
-				ps.Get(PS.OtherZappedSourceWeight) * z.Intensity,
-				$"{z.Source} is zapping {other}");
+			if (z.Source != null)
+			{
+				// look at person zapping
+				targets_.SetWeight(
+					z.Source, BP.Eyes,
+					ps.Get(PS.OtherZappedSourceWeight) * z.Intensity,
+					$"{z.Source} is zapping {other}");
+			}
 
 			SetGazeDuration(PS.OtherZappedGazeDuration, z.Intensity);
 		}

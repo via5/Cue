@@ -83,6 +83,8 @@ V.Float("ZappedTentativeTime"),
 V.Float("ZappedCooldown"),
 V.Float("ZappedTime"),
 
+V.Float("ZappedGazeMinIntensity"),
+
 V.Float("ZappedByPlayerBreastsEyesWeight"),
 V.Float("ZappedByPlayerBreastsTargetWeight"),
 V.Float("ZappedByPlayerBreastsExcitement"),

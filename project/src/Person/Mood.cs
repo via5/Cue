@@ -404,7 +404,7 @@ namespace Cue
 			moods_[i.Int].SetTemporary(value, time);
 		}
 
-		private void Set(MoodType i, float value)
+		private void Set(MoodType i, float value, bool fast=false)
 		{
 			if (!person_.Body.Breathing)
 			{
@@ -415,7 +415,7 @@ namespace Cue
 			}
 			else
 			{
-				moods_[i.Int].Set(U.Clamp(value, 0, 1));
+				moods_[i.Int].Set(U.Clamp(value, 0, 1), fast);
 			}
 		}
 
@@ -698,11 +698,17 @@ namespace Cue
 
 			baseExcitement_.Value = Math.Min(baseExcitement_.Value, maxExcitement_);
 
-			float zapped = person_.Body.Zap.Intensity * 0.9f;
-			float e = Math.Max(BaseExcitement, zapped);
-			e = Math.Min(e, maxExcitement_);
-
-			Set(MoodType.Excited, e);
+			if (person_.Body.Zap.Active)
+			{
+				float zapped = person_.Body.Zap.Intensity * 0.9f;
+				float e = Math.Max(BaseExcitement, zapped);
+				e = Math.Min(e, maxExcitement_);
+				Set(MoodType.Excited, e, true);
+			}
+			else
+			{
+				Set(MoodType.Excited, BaseExcitement);
+			}
 		}
 
 		private float GetRate()

@@ -80,6 +80,12 @@ namespace Cue
 
 			AddForceable(p, person_.Body.DampedAir, "Air");
 
+			p.Add(new VUI.Button("Zap", OnZap));
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
+
 			forceNotBreathing_.Changed += (b) =>
 			{
 				if (b)
@@ -91,6 +97,11 @@ namespace Cue
 			Layout = new VUI.BorderLayout(20);
 			Add(p, VUI.BorderLayout.Top);
 			Add(list_, VUI.BorderLayout.Center);
+		}
+
+		private void OnZap()
+		{
+			person_.Body.Zapped(null, SS.Genitals);
 		}
 
 		protected override void DoUpdate(float s)

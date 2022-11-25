@@ -903,7 +903,95 @@ Pauses breathing randomly.
   if it's below `chance`, the event activates
 
 
-3.14 Miscellaneous
+3.14 Zap
+--------
+When breasts, genitals or mouth are being touched, or when penetration is
+active, a character can get "zapped". This happens when the zone hasn't been
+active for at least `zappedCooldown` seconds. Zapping temporarily increases
+excitement to a higher value to get expressions and can trigger gazes.
+
+
+- zappedEnabled (bool)
+  whether zapping is enabled
+
+- zappedTentativeTime (float)
+  minimum time that the zone has to be active before zapping, prevents
+  zapping when the zone is just momentarily touched (seconds); note that a
+  higher value reduces the number of false positives, but increases the reaction
+  time
+
+- zappedCooldown (float)
+  minimum time before a zap can happen again, regardless of the zone (seconds)
+
+- zappedTime (float)
+  when zapping starts, the excitement value is immediately set to a higher
+  value and will go down towards the base excitement over `zappedTime` seconds
+
+- zappedGazeMinIntensity (float)
+  minimum zap intensity to trigger gaze events
+
+- zappedByPlayerBreastsEyesWeight (float)
+  zappedByPlayerGenitalsEyesWeight (float)
+  zappedByPlayerPenetrationEyesWeight (float)
+  zappedByPlayerMouthEyesWeight (float)
+  zappedByPlayerLookUpWeight (float)
+  weight for looking at the eyes of the character that triggered the zap when
+  that character is the player
+
+- zappedByOtherBreastsEyesWeight (float)
+  zappedByOtherGenitalsEyesWeight (float)
+  zappedByOtherPenetrationEyesWeight (float)
+  zappedByOtherMouthEyesWeight (float)
+  zappedByOtherLookUpWeight (float)
+  weight for looking at the eyes of the character that triggered the zap when
+  that character is not the player
+
+- zappedByPlayerBreastsTargetWeight (float)
+  zappedByPlayerGenitalsTargetWeight (float)
+  zappedByPlayerPenetrationTargetWeight (float)
+  weight for looking at the zone that triggered the zap when the source is the
+  player
+
+- zappedByOtherBreastsTargetWeight (float)
+  zappedByOtherGenitalsTargetWeight (float)
+  zappedByOtherPenetrationTargetWeight (float)
+  weight for looking at the zone that triggered the zap when the source is not
+  the player
+
+- zappedByPlayerBreastsExcitement (float)
+  zappedByPlayerGenitalsExcitement (float)
+  zappedByPlayerPenetrationExcitement (float)
+  zappedByPlayerMouthExcitement (float)
+  when the given zone is zapped by the player, excitement will be immediately
+  set to the given value
+
+- zappedByOtherBreastsExcitement (float)
+  zappedByOtherGenitalsExcitement (float)
+  zappedByOtherPenetrationExcitement (float)
+  zappedByOtherMouthExcitement (float)
+  when the given zone is zapped by a character that is not the player,
+  excitement will be immediately set to the given value
+
+- zappedByPlayerGazeDuration (duration)
+  when the zap was triggered by the player, time it takes to move the head to
+  look at whatever is being looked at; allows for quick head snap for zapping
+
+- zappedByOtherGazeDuration (duration)
+  when the zap was not triggered by the player, time it takes to move the head
+  to look at whatever is being looked at; allows for quick head snap for zapping
+
+- otherZappedEyesWeight (float)
+  otherZappedTargetWeight (float)
+  otherZappedSourceWeight (float)
+  when another character is being zapped, weight for looking at their eyes,
+  the zone being zapped or the eyes of the source of the zap
+
+- otherZappedGazeDuration (duration)
+  when another character is being zapped, time it takes to move the head
+  to look at whatever is being looked at
+
+
+3.15 Miscellaneous
 -------------------
 
 - IdleAnimation (string)

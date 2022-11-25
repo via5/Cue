@@ -564,9 +564,11 @@
 
 
 	"zappedEnabled": true,
-	"zappedTentativeTime": 2,
+	"zappedTentativeTime": 1.5,
 	"zappedCooldown": 30,
 	"zappedTime": 3,
+
+	"zappedGazeMinIntensity": 0.3,
 
 	"zappedByPlayerBreastsEyesWeight": 50,
 	"zappedByPlayerBreastsTargetWeight": 10,
@@ -580,7 +582,7 @@
 	"zappedByPlayerMouthEyesWeight": 20,
 	"zappedByPlayerMouthExcitement": 0,
 	"zappedByPlayerLookUpWeight": 5,
-	"zappedByPlayerGazeDuration": [0.5, 0.3],
+	"zappedByPlayerGazeDuration": [0.4, 0.2],
 
 	"zappedByOtherBreastsEyesWeight": 20,
 	"zappedByOtherBreastsTargetWeight": 5,

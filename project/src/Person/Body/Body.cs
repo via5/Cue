@@ -59,13 +59,25 @@ namespace Cue
 				}
 			}
 
+			public bool Active
+			{
+				get { return (zone_ != SS.None); }
+			}
+
 			public string DebugLine(Person self)
 			{
-				if (source_ == null)
+				if (zone_ == SS.None)
 					return "no";
 
+				string s;
+
+				if (source_ == null)
+					s = "null";
+				else
+					s = source_.ToString();
+
 				return
-					$"{source_} on {self.Body.Zone(zone_)} at {Intensity:0.00}, " +
+					$"{s} on {self.Body.Zone(zone_)} at {Intensity:0.00}, " +
 					$"max={maxIntensity_:0.00} time={time_:0.00}";
 			}
 		}
@@ -231,6 +243,8 @@ namespace Cue
 
 		public void Zapped(Person source, ZoneType zone, float intensity, float time)
 		{
+			intensity = U.Clamp(intensity, 0, person_.Mood.MaxExcitement);
+
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{
 				zap_.Set(source, zone, intensity, time);
@@ -242,7 +256,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (other.IsPlayer)
+			if (other != null && other.IsPlayer)
 			{
 				if (zone == SS.Genitals)
 					return ps.Get(PS.ZappedByPlayerGenitalsExcitement);

@@ -209,16 +209,17 @@ namespace Cue
 			}
 
 
-			if (!isZapped_ && person_.Body.Zap.Intensity > 0)
+			if (!isZapped_ && person_.Body.Zap.Active)
 			{
 				isZapped_ = true;
 
 				EmergencyExpression(
-					MoodType.Excited, 1,
-					0, person_.Body.Zap.Intensity,
+					MoodType.Excited,
+					person_.Body.Zap.Intensity,
+					person_.Body.Zap.Intensity, person_.Body.Zap.Intensity,
 					0.5f);
 			}
-			else if (isZapped_ && person_.Body.Zap.Intensity == 0)
+			else if (isZapped_ && !person_.Body.Zap.Active)
 			{
 				isZapped_ = false;
 			}
@@ -371,14 +372,8 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			// todo, this uses orgasm settings
-
-			e.Set(
-				1, intensity, 1,
-				ps.Get(PS.OrgasmExpressionRangeMin),
-				ps.Get(PS.OrgasmExpressionRangeMax));
-
-			e.Activate(intensity, ps.Get(PS.OrgasmFirstExpressionTime));
+			e.Set(1, intensity, 1, min, max);
+			e.Activate(intensity, time);
 		}
 
 		private void UpdateExpressions()
