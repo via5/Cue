@@ -34,21 +34,9 @@
 		}
 
 
-		private static BodyPartType[] breasts_ = new BodyPartType[]
-		{
-			BP.LeftBreast,
-			BP.RightBreast
-		};
-
-		public static BodyPartType[] BreastParts
-		{
-			get { return breasts_; }
-		}
-
-
 		private static BodyPartType[] genitals_ = new BodyPartType[]
 		{
-			BP.Vagina, BP.Penis
+			BP.Vagina, BP.Penis, BP.Anus
 		};
 
 		public static BodyPartType[] GenitalParts
@@ -71,47 +59,15 @@
 		}
 
 
-		private static BodyPartType[] groped_ = new BodyPartType[]
-		{
-			BP.Head, BP.LeftBreast, BP.RightBreast, BP.Vagina, BP.Penis
-		};
-
-		public static BodyPartType[] GropedParts
-		{
-			get { return groped_; }
-		}
-
-
-		private static BodyPartType[] gropedBy_ = new BodyPartType[]
+		private static BodyPartType[] groping_ = new BodyPartType[]
 		{
 			BP.LeftHand, BP.RightHand, BP.LeftFoot, BP.RightFoot
 		};
 
-		public static BodyPartType[] GropedByParts
+		public static BodyPartType[] GropingParts
 		{
-			get { return gropedBy_; }
+			get { return groping_; }
 		}
 
-
-		private static BodyPartType[] penetrated_ = new BodyPartType[]
-		{
-			BP.Vagina, BP.Anus
-		};
-
-		public static BodyPartType[] PenetratedParts
-		{
-			get { return penetrated_; }
-		}
-
-
-		private static BodyPartType[] penetratedBy_ = new BodyPartType[]
-		{
-			BP.Penis
-		};
-
-		public static BodyPartType[] PenetratedByParts
-		{
-			get { return penetratedBy_; }
-		}
 	}
 }

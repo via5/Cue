@@ -63,11 +63,6 @@
 		{
 		}
 
-		public bool IsInvolvedWith(Person other)
-		{
-			return EitherPenetrating(person_, other);
-		}
-
 		public bool AnyInsidePersonalSpace()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
@@ -106,7 +101,7 @@
 
 		public bool InteractingWith(Person other)
 		{
-			if (InsidePersonalSpace(other) || PenetratedBy(other) || GropedBy(other))
+			if (InsidePersonalSpace(other) || PenetratedBy(other) || HeadTouchedBy(other) || GropedBy(other))
 				return true;
 
 			// special case for unpossessed, because it's just the camera and
@@ -123,16 +118,15 @@
 			return false;
 		}
 
-		public PartResult Groped()
+		public bool Groped()
 		{
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
-				PartResult pr = GropedBy(p);
-				if (pr)
-					return pr;
+				if (GropedBy(p))
+					return true;
 			}
 
-			return PartResult.None;
+			return false;
 		}
 
 		public Person PenetratedBy()
@@ -193,39 +187,25 @@
 			return a.Status.PenetratedBy(b) || b.Status.PenetratedBy(a);
 		}
 
-		public PartResult GropedByAny(BodyPartType triggerBodyPart)
+		public bool HeadTouchedBy(Person p)
 		{
-			return GropedByAny(new BodyPartType[] { triggerBodyPart });
+			return CheckParts(p, new BodyPartType[] { BP.Head }, BodyParts.GropingParts);
 		}
 
-		public PartResult GropedByAny(BodyPartType[] triggerBodyParts)
+		public bool GropedBy(Person p)
 		{
-			foreach (var p in Cue.Instance.ActivePersons)
-			{
-				var pr = GropedBy(p, triggerBodyParts);
-				if (pr.Valid)
-					return pr;
-			}
-
-			return PartResult.None;
+			return
+				GropedBy(p, SS.Mouth) ||
+				GropedBy(p, SS.Breasts) ||
+				GropedBy(p, SS.Genitals);
 		}
 
-		public PartResult GropedBy(Person p)
-		{
-			return GropedBy(p, BodyParts.GropedParts);
-		}
-
-		public PartResult GropedBy(Person p, BodyPartType triggerBodyPart)
-		{
-			return GropedBy(p, new BodyPartType[] { triggerBodyPart });
-		}
-
-		public PartResult GropedBy(Person p, BodyPartType[] triggerBodyParts)
+		public bool GropedBy(Person p, ZoneType z)
 		{
 			if (p == person_)
-				return PartResult.None;
+				return false;
 
-			return CheckParts(p, triggerBodyParts, BodyParts.GropedByParts);
+			return person_.Body.Zone(z).Sources[p.PersonIndex].Active;
 		}
 
 		public bool PenetratedBy(Person p)

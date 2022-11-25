@@ -31,6 +31,7 @@ namespace Cue
 		private VUI.Label traits_ = new VUI.Label();
 		private VUI.Label interacting_ = new VUI.Label();
 		private VUI.Label close_ = new VUI.Label();
+		private VUI.Label head_ = new VUI.Label();
 		private VUI.Label groped_ = new VUI.Label();
 		private VUI.Label penetrated_ = new VUI.Label();
 		private VUI.Label penetrating_ = new VUI.Label();
@@ -61,6 +62,9 @@ namespace Cue
 
 			state.Add(new VUI.Label("Close"));
 			state.Add(close_);
+
+			state.Add(new VUI.Label("Head touched by"));
+			state.Add(head_);
 
 			state.Add(new VUI.Label("Groped by"));
 			state.Add(groped_);
@@ -96,8 +100,8 @@ namespace Cue
 			enabled_.Text = es;
 			traits_.Text = string.Join(", ", person_.Traits);
 
-			string interacting = null, close = null, groped = null;
-			string penetrated = null, penetrating = null;
+			string interacting = null, close = null, head = null;
+			string groped = null, penetrated = null, penetrating = null;
 
 			foreach (var p in Cue.Instance.ActivePersons)
 			{
@@ -119,6 +123,16 @@ namespace Cue
 						close += ", ";
 
 					close += p.ID;
+				}
+
+				if (person_.Status.HeadTouchedBy(p))
+				{
+					if (head == null)
+						head = "";
+					else
+						head = ", ";
+
+					head += p.ID;
 				}
 
 				if (person_.Status.GropedBy(p))
@@ -155,6 +169,7 @@ namespace Cue
 			interacting_.Text = interacting ?? "nobody";
 			close_.Text = close ?? "nobody";
 			groped_.Text = groped ?? "nobody";
+			head_.Text = head ?? "nobody";
 			penetrated_.Text = penetrated ?? "nobody";
 			penetrating_.Text = penetrating ?? "nobody";
 			zapped_.Text = person_.Body.Zap.DebugLine(person_);

@@ -542,6 +542,11 @@ namespace Cue
 			}
 		}
 
+		private bool IsInvolvedWith(Person p, Person other)
+		{
+			return PersonStatus.EitherPenetrating(p, other);
+		}
+
 		private IFinishLookAt CreateLookAt(Person p, int lookAt)
 		{
 			switch (lookAt)
@@ -557,7 +562,7 @@ namespace Cue
 
 					if (player != null)
 					{
-						if (p.Status.IsInvolvedWith(player))
+						if (IsInvolvedWith(p, player))
 							return new FinishLookAtPlayer(p);
 					}
 
@@ -584,7 +589,7 @@ namespace Cue
 					{
 						if (player != null)
 						{
-							if (p.Status.IsInvolvedWith(player))
+							if (IsInvolvedWith(p, player))
 								doAction = true;
 						}
 					}
@@ -651,7 +656,7 @@ namespace Cue
 
 					if (player != null)
 					{
-						if (p.Status.IsInvolvedWith(player))
+						if (IsInvolvedWith(p, player))
 							return new FinishOrgasmSet(p);
 					}
 
@@ -680,7 +685,7 @@ namespace Cue
 
 						if (player != null)
 						{
-							if (p.Status.IsInvolvedWith(player))
+							if (IsInvolvedWith(p, player))
 								doAction = true;
 						}
 					}
@@ -726,7 +731,7 @@ namespace Cue
 
 					if (player != null)
 					{
-						if (p.Status.IsInvolvedWith(player))
+						if (IsInvolvedWith(p, player))
 							return new FinishMoodSet(p);
 					}
 				}
@@ -757,7 +762,7 @@ namespace Cue
 					var player = Cue.Instance.Player;
 					if (player != null)
 					{
-						if (p.Status.IsInvolvedWith(player))
+						if (IsInvolvedWith(p, player))
 							return new FinishEventsStop(p);
 					}
 

@@ -198,10 +198,9 @@ namespace Cue
 			var head = b.Get(BP.Head);
 			var lips = b.Get(BP.Lips);
 
-			PersonStatus.PartResult g = person_.Status.Groped();
-			if (g)
+			if (person_.Status.Groped())
 			{
-				if (reason != null) reason = "groped, " + g.ToString();
+				if (reason != null) reason = "groped";
 				return false;
 			}
 
@@ -220,12 +219,6 @@ namespace Cue
 			if (lips.LockedFor(BodyPartLock.Morph))
 			{
 				if (reason != null) reason = "lips locked";
-				return false;
-			}
-
-			if (person_.Status.GropedByAny(BP.Head))
-			{
-				if (reason != null) reason = "head groped";
 				return false;
 			}
 
