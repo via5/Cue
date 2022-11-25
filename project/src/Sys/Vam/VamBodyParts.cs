@@ -543,6 +543,9 @@ namespace Cue.Sys.Vam
 
 		public BodyPartRegionInfo ClosestBodyPartRegion(IBodyPart other, bool debug, Vector3 forceOtherPos, bool doForceOtherPos)
 		{
+			if (Render)
+				debug = true;
+
 			if (distanceRenderers_ != null)
 			{
 				foreach (var d in distanceRenderers_)
@@ -567,8 +570,8 @@ namespace Cue.Sys.Vam
 			{
 				float closest = float.MaxValue;
 
-				VamBodyPartRegion thisDebug = null;
-				VamBodyPartRegion otherDebug = null;
+				VamBodyPartRegion thisRegion = null;
+				VamBodyPartRegion otherRegion = null;
 
 				try
 				{
@@ -588,8 +591,8 @@ namespace Cue.Sys.Vam
 
 							if (d < closest)
 							{
-								thisDebug = thisColliders[i];
-								otherDebug = otherColliders[j];
+								thisRegion = thisColliders[i];
+								otherRegion = otherColliders[j];
 								closest = d;
 							}
 						}
@@ -610,8 +613,8 @@ namespace Cue.Sys.Vam
 						{
 							Log.Error(
 								$"both valid, " +
-								$"closest is {thisDebug.FullName} " +
-								$"{otherDebug.FullName} " +
+								$"closest is {thisRegion.FullName} " +
+								$"{otherRegion.FullName} " +
 								$"{closest}");
 						}
 					}
@@ -622,7 +625,7 @@ namespace Cue.Sys.Vam
 					Log.Error(e.ToString());
 				}
 
-				return new BodyPartRegionInfo(otherDebug, closest);
+				return new BodyPartRegionInfo(otherRegion, closest);
 			}
 			else if (thisCollidersValid)
 			{

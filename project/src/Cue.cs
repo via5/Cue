@@ -362,6 +362,12 @@ namespace Cue
 		{
 			for (int i = 0; i < persons_.Count; ++i)
 				persons_[i].Init();
+
+			for (int i = 0; i < persons_.Count; ++i)
+			{
+				if (persons_[i].ID == "cue#forceplayer")
+					ForcedPlayer = persons_[i];
+			}
 		}
 
 		private void AddPerson(Sys.IAtom a)

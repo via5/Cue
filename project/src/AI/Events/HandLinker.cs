@@ -250,7 +250,11 @@
 						{
 							Log.Verbose(
 								$"FindClose: tentative {r.region} better " +
-								$"than {(closest?.ToString() ?? "(none)")}");
+								$"than {(closest?.ToString() ?? "(none)")}, " +
+								$"r.distance={r.distance:0.00} " +
+								$"closestDistance={closestDistance} " +
+								$"handPos={hand.Position} " +
+								$"partPos={bp.Position}");
 
 							closestDistance = r.distance;
 							closest = r.region;
