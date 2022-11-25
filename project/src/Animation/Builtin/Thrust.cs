@@ -123,6 +123,22 @@
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
 					DurationSync.Loop)));
+
+			// target forces
+
+			RootGroup.AddTarget(new Force(
+				"", Force.RelativeTorque, BP.Head,
+				new Vector3(headTorqueMin_, 0, 0),
+				new Vector3(headTorqueMax_, 0, 0),
+				config_.durationInterval, new Vector3(headTorqueWin_, 0, 0),
+				new ParentTargetSync(), Force.ApplyOnTarget));
+
+			RootGroup.AddTarget(new Force(
+				"", Force.RelativeTorque, BP.Chest,
+				new Vector3(chestTorqueMin_ * 0.75f, 0, 0),
+				new Vector3(chestTorqueMax_ * 0.75f, 0, 0),
+				config_.durationInterval, new Vector3(chestTorqueWin_, 0, 0),
+				new ParentTargetSync(), Force.ApplyOnTarget));
 		}
 
 		protected Person Receiver

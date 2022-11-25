@@ -77,7 +77,11 @@ namespace Cue.Proc
 		private const float BusyResetTime = 1;
 		private const float NotBusyCatchUpTime = 1;
 
+		public const int ApplyOnSource = 1;
+		public const int ApplyOnTarget = 2;
+
 		private int type_;
+		private int applyOn_ = ApplyOnSource;
 		private BodyPartType bodyPartType_;
 		private BodyPart bp_ = null;
 		private IEasing easing_;
@@ -105,8 +109,8 @@ namespace Cue.Proc
 		public Force(
 			string name, int type, BodyPartType bodyPart,
 			Vector3 min, Vector3 max, float next, Vector3 window,
-			ISync sync, IEasing easing = null)
-				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, easing)
+			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
+				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, applyOn, easing)
 		{
 		}
 
@@ -115,8 +119,8 @@ namespace Cue.Proc
 		public Force(
 			string name, int type, BodyPart bodyPart,
 			Vector3 min, Vector3 max, Duration next, Vector3 window,
-			ISync sync, IEasing easing = null)
-				: this(name, type, bodyPart.Type, min, max, next, window, sync, easing)
+			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
+				: this(name, type, bodyPart.Type, min, max, next, window, sync, applyOn, easing)
 		{
 			bp_ = bodyPart;
 		}
@@ -124,13 +128,14 @@ namespace Cue.Proc
 		public Force(
 			string name, int type, BodyPartType bodyPart,
 			Vector3 min, Vector3 max, Duration next, Vector3 window,
-			ISync sync, IEasing easing = null)
+			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
 				: base(name, sync)
 		{
 			type_ = type;
 			bodyPartType_ = bodyPart;
 			vtarget_ = new VectorTarget(min, max, window);
 			next_ = next ?? new Duration();
+			applyOn_ = applyOn;
 			easing_ = easing ?? new SinusoidalEasing();
 		}
 
@@ -224,7 +229,7 @@ namespace Cue.Proc
 			var f = new Force(
 				Name, type_, bodyPartType_,
 				vtarget_.min, vtarget_.max, next_.Clone(),
-				vtarget_.window, Sync.Clone());
+				vtarget_.window, Sync.Clone(), applyOn_);
 
 			f.beforeNext_ = beforeNext_;
 
@@ -234,7 +239,25 @@ namespace Cue.Proc
 		protected override void DoStart(Person p, AnimationContext cx)
 		{
 			if (bp_ == null)
-				bp_ = p.Body.Get(bodyPartType_);
+			{
+				switch (applyOn_)
+				{
+					case ApplyOnSource:
+					{
+						bp_ = p.Body.Get(bodyPartType_);
+						break;
+					}
+
+					case ApplyOnTarget:
+					{
+						var t = cx.ps as Person;
+						if (t != null)
+							bp_ = t.Body.Get(bodyPartType_);
+
+						break;
+					}
+				}
+			}
 
 			vtarget_.Reset();
 			dtarget_.Reset();
@@ -488,10 +511,25 @@ namespace Cue.Proc
 				(Name == "" ? "" : $" '{Name}'");
 		}
 
+		private string ApplyOnToString(int a)
+		{
+			switch (a)
+			{
+				case ApplyOnSource:
+					return "source";
+
+				case ApplyOnTarget:
+					return "target";
+
+				default:
+					return "apply on ?";
+			}
+		}
+
 		public override string ToDetailedString()
 		{
 			return
-				$"{TypeToString(type_)} {Name} {bp_}\n" +
+				$"{TypeToString(type_)} {Name} {bp_} ({ApplyOnToString(applyOn_)})\n" +
 				$"usedir={useDir_} {(useDir_ ? dtarget_.ToString() : vtarget_.ToString())}\n" +
 				$"next={next_}\n" +
 				$"lerped={LerpedForce()} busy={wasBusy_} e={MovementEnergy}";

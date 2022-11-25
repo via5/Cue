@@ -116,7 +116,7 @@ namespace Cue.Proc.Tests
 				"", Force.AbsoluteForce, bp,
 				new Vector3(4, 4, 4), new Vector3(4, 4, 4),
 				null, Vector3.Zero,
-				new ParentTargetSync(),
+				new ParentTargetSync(), Force.ApplyOnSource,
 				new LinearEasing());
 
 			g.AddTarget(f);
