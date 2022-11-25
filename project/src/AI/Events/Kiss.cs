@@ -46,6 +46,7 @@ namespace Cue
 		private const float MinDurationAfterGrab = 30;
 
 		private string lastResult_ = "";
+		private string lastPlayerResult_ = "";
 		private BodyPartLock[] locks_ = null;
 		private Person target_ = null;
 		private bool leading_ = false;
@@ -58,6 +59,7 @@ namespace Cue
 		private bool waitFinished_ = false;
 		private bool waitFinishedBecauseGrab_ = false;
 		private Vector3 startingHeadPos_;
+		private bool debugEnabled_ = false;
 
 		public KissEvent()
 			: base("Kiss")
@@ -138,6 +140,8 @@ namespace Cue
 
 		public override void Debug(DebugLines debug)
 		{
+			debugEnabled_ = true;
+
 			debug.Add("startDistance", $"{d_.startDistance:0.00}");
 			debug.Add("startDistanceWithPlayer", $"{d_.startDistanceWithPlayer:0.00}");
 			debug.Add("stopDistance", $"{d_.stopDistance:0.00}");
@@ -150,43 +154,48 @@ namespace Cue
 			debug.Add("waitFinished", $"{waitFinished_}");
 			debug.Add("elapsed", $"{elapsed_:0.00}");
 			debug.Add("last", $"{lastResult_}");
+			debug.Add("last for player", $"{lastPlayerResult_}");
 			debug.Add("minDuration", $"{minDuration_}");
 			debug.Add("waitFinishedBecauseGrab", $"{waitFinishedBecauseGrab_}");
 		}
 
 		protected override void DoUpdate(float s)
 		{
-			if (!person_.Body.Exists)
-				return;
-
-			if (!Enabled)
+			if (person_.Body.Exists)
 			{
-				if (Active)
-					Stop();
+				if (Enabled)
+				{
+					elapsed_ += s;
 
-				return;
+					if (Active)
+					{
+						d_.duration.Update(s, Mood.MultiMovementEnergy(person_, target_));
+						if (d_.duration.Finished)
+							durationFinished_ = true;
+
+						if (elapsed_ >= MinWait)
+							UpdateActive();
+					}
+					else
+					{
+						d_.wait.Update(s, person_.Mood.MovementEnergy);
+						if (d_.wait.Finished)
+							waitFinished_ = true;
+
+						if (elapsed_ >= MinWait)
+							UpdateInactive();
+					}
+				}
+				else
+				{
+					if (Active)
+						Stop();
+
+					return;
+				}
 			}
 
-			elapsed_ += s;
-
-			if (Active)
-			{
-				d_.duration.Update(s, Mood.MultiMovementEnergy(person_, target_));
-				if (d_.duration.Finished)
-					durationFinished_ = true;
-
-				if (elapsed_ >= MinWait)
-					UpdateActive();
-			}
-			else
-			{
-				d_.wait.Update(s, person_.Mood.MovementEnergy);
-				if (d_.wait.Finished)
-					waitFinished_ = true;
-
-				if (elapsed_ >= MinWait)
-					UpdateInactive();
-			}
+			debugEnabled_ = false;
 		}
 
 		protected override void DoForceStop()
@@ -313,12 +322,27 @@ namespace Cue
 				else
 					startDistance = d_.startDistance;
 
-				if (d <= startDistance)
+				if (playerOnly && debugEnabled_)
+				{
+					lastPlayerResult_ =
+						$"srcLips={srcLips} pLips={targetLips.Position} " +
+						$"d={d} sd={startDistance}";
+				}
+
+				if (d > startDistance)
+				{
+					if (playerOnly && debugEnabled_)
+						lastPlayerResult_ += ", too far";
+				}
+				else
 				{
 					foundClose = true;
 
 					if (TryStartWith(target))
 					{
+						if (playerOnly && debugEnabled_)
+							lastPlayerResult_ += ", ok";
+
 						person_.Atom.SetCollidersForKiss(true, target.Atom);
 						target.Atom.SetCollidersForKiss(true, person_.Atom);
 
@@ -326,6 +350,11 @@ namespace Cue
 						startingHeadPos_ = person_.Body.Get(BP.Head).Position;
 
 						return true;
+					}
+					else
+					{
+						if (playerOnly && debugEnabled_)
+							lastPlayerResult_ += ", trystart failed, " + lastResult_;
 					}
 
 					Unlock();

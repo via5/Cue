@@ -874,7 +874,7 @@ to zaps, kissing, grabbing, etc. Some events are configurable.
 
 - stopHeadDistanceFromStart (float)
   distance from the initial head position when kissing started above which
-  kissing stops
+  kissing stops; only with player
 
 - duration (duration)
   time of the kissing event; note that kissing never stops if the player is
