@@ -1,5 +1,6 @@
 ﻿#if MOCK
 
+using Cue.Sys.Vam;
 using SimpleJSON;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,17 @@ namespace Cue.Sys.Mock
 		public bool Collision { get; set; }
 
 		public void Destroy()
+		{
+		}
+	}
+
+	class MockLineGraphic : MockGraphic, ILineGraphic
+	{
+		public void Set(Vector3 from, Vector3 to)
+		{
+		}
+
+		public void SetDirection(Vector3 pos, Vector3 dir, float length)
 		{
 		}
 	}
@@ -271,6 +283,11 @@ namespace Cue.Sys.Mock
 		public IGraphic CreateBoxGraphic(string name, Vector3 pos, Vector3 size, Color c)
 		{
 			return new MockGraphic();
+		}
+
+		public ILineGraphic CreateLineGraphic(string name, Vector3 pos1, Vector3 pos2, Color c)
+		{
+			return new MockLineGraphic();
 		}
 
 		public IGraphic CreateSphereGraphic(string name, Vector3 pos, float radius, Color c)

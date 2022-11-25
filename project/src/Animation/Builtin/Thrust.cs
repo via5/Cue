@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cue.Proc
+﻿namespace Cue.Proc
 {
 	abstract class BasicThrustProcAnimation : BasicProcAnimation
 	{
@@ -19,6 +17,33 @@ namespace Cue.Proc
 			public Vector3 hipTorqueMin;
 			public Vector3 hipTorqueMax;
 			public Vector3 hipTorqueWin;
+		}
+
+		private struct Render
+		{
+			public Sys.IGraphic bp, targetBp;
+			public Sys.ILineGraphic dir;
+
+			public void Destroy()
+			{
+				if (bp != null)
+				{
+					bp.Destroy();
+					bp = null;
+				}
+
+				if (targetBp != null)
+				{
+					targetBp.Destroy();
+					targetBp = null;
+				}
+
+				if (dir != null)
+				{
+					dir.Destroy();
+					dir = null;
+				}
+			}
 		}
 
 		private const float DirectionChangeMaxDistance = 0.01f;
@@ -40,6 +65,8 @@ namespace Cue.Proc
 		private Person receiver_ = null;
 		private Config config_;
 		private ForceConfig fconfig_;
+
+		private Render render_ = new Render();
 
 		protected BasicThrustProcAnimation(string name, Config c)
 			: base(name)
@@ -148,6 +175,80 @@ namespace Cue.Proc
 			return true;
 		}
 
+		public override void Update(float s)
+		{
+			base.Update(s);
+			CheckDebug();
+		}
+
+		public override void Stopped()
+		{
+			base.Stopped();
+			render_.Destroy();
+		}
+
+		private void CheckDebug()
+		{
+			if (DebugRender)
+			{
+				if (render_.bp == null)
+				{
+					render_.bp = Cue.Instance.Sys.CreateBoxGraphic(
+						"thrustBp",
+						new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f)),
+						new Color(0, 0, 1, 0.2f));
+				}
+
+				if (render_.targetBp == null)
+				{
+					render_.targetBp = Cue.Instance.Sys.CreateBoxGraphic(
+						"thrustTargetBp",
+						new Box(Vector3.Zero, new Vector3(0.01f, 0.01f, 0.01f)),
+						new Color(0, 0, 1, 0.2f));
+				}
+
+				if (render_.dir == null)
+				{
+					render_.dir = Cue.Instance.Sys.CreateLineGraphic(
+						"thrustDir",
+						Vector3.Zero, Vector3.Zero,
+						new Color(1, 0, 0, 0.2f));
+				}
+
+				var thisBP = GetThisBP();
+				render_.bp.Position = thisBP.Position;
+				render_.bp.Rotation = thisBP.Rotation;
+				render_.bp.Visible = true;
+
+				if (receiver_ == null)
+				{
+					render_.targetBp.Visible = false;
+					render_.dir.Visible = false;
+				}
+				else
+				{
+					var targetBP = GetTargetBP();
+					render_.targetBp.Position = targetBP.Position;
+					render_.targetBp.Rotation = targetBP.Rotation;
+					render_.targetBp.Visible = true;
+
+					render_.dir.SetDirection(thisBP.Position, lastDir_, 0.1f);
+					render_.dir.Visible = true;
+				}
+			}
+			else
+			{
+				if (render_.bp != null)
+					render_.bp.Visible = false;
+
+				if (render_.targetBp != null)
+					render_.targetBp.Visible = false;
+
+				if (render_.dir != null)
+					render_.dir.Visible = false;
+			}
+		}
+
 		protected abstract ForceConfig GetForceConfig(Person self, Person receiver);
 		protected abstract bool DoStart();
 
@@ -158,6 +259,25 @@ namespace Cue.Proc
 				if (hipForce_.Done || alwaysUpdate)
 					UpdateForce(hipForce_);
 			}
+		}
+
+		private BodyPart GetThisBP()
+		{
+			// use anus instead of genitals
+			//
+			// problems start happening at high excitement because the genitals
+			// can be stuck pretty far forwards, sometimes even _behind_ the
+			// target genitals, which breaks the direction
+			//
+			// the anus is positioned behind the genitals and its relationship
+			// with the genitals is pretty good
+
+			return Person.Body.Get(BP.Anus);
+		}
+
+		private BodyPart GetTargetBP()
+		{
+			return receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
 		}
 
 		// gets the direction between the genitals so the forces go that way
@@ -179,8 +299,8 @@ namespace Cue.Proc
 				return rot.Rotate(new Vector3(0, 0, 1)).Normalized;
 			}
 
-			var thisBP = Person.Body.Get(Person.Body.GenitalsBodyPart);
-			var targetBP = receiver_.Body.Get(receiver_.Body.GenitalsBodyPart);
+			var thisBP = GetThisBP();
+			var targetBP = GetTargetBP();
 
 			// direction between genitals
 			var currentDir = (targetBP.Position - thisBP.Position).Normalized;
@@ -306,8 +426,8 @@ namespace Cue.Proc
 			var c = new Config();
 
 			c.durationMin = 1.0f;
-			c.durationMax = 0.17f;
-			c.durationWin = 0.1f;
+			c.durationMax = 0.12f;
+			c.durationWin = 0.06f;
 			c.durationInterval = 10;
 
 			return c;

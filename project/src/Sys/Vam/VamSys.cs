@@ -281,6 +281,11 @@ namespace Cue.Sys.Vam
 			return new VamBoxGraphic(name, pos, size, c);
 		}
 
+		public ILineGraphic CreateLineGraphic(string name, Vector3 pos1, Vector3 pos2, Color c)
+		{
+			return new VamLineGraphic(name, pos1, pos2, c);
+		}
+
 		public IGraphic CreateSphereGraphic(
 			string name, Vector3 pos, float radius, Color c)
 		{

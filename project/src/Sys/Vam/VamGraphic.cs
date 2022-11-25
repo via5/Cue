@@ -198,12 +198,18 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamLineGraphic : VamBasicGraphic
+	class VamLineGraphic : VamBasicGraphic, ILineGraphic
 	{
 		private IGraphic fromBox_, toBox_;
 		private IGraphic line_;
+		private bool showToBox_ = true;
 
 		public VamLineGraphic(string name, Color c)
+			: this(name, Vector3.Zero, Vector3.Zero, c)
+		{
+		}
+
+		public VamLineGraphic(string name, Vector3 p1, Vector3 p2, Color c)
 		{
 			fromBox_ = Cue.Instance.Sys.CreateBoxGraphic(
 				$"{name}.lineFromBox",
@@ -219,6 +225,8 @@ namespace Cue.Sys.Vam
 				$"{name}.line",
 				Vector3.Zero, Vector3.Zero,
 				c);
+
+			Set(p1, p2);
 		}
 
 		public override bool Visible
@@ -231,7 +239,7 @@ namespace Cue.Sys.Vam
 			set
 			{
 				fromBox_.Visible = value;
-				toBox_.Visible = value;
+				toBox_.Visible = value && showToBox_;
 				line_.Visible = value;
 			}
 		}
@@ -283,10 +291,24 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+		public void SetDirection(Vector3 pos, Vector3 dir, float length)
+		{
+			fromBox_.Position = pos;
+			toBox_.Visible = false;
+			showToBox_ = false;
+
+			line_.Position = pos + dir * (length / 2);
+			line_.Size = new Vector3(0.0005f, 0.0005f, length);
+			line_.Rotation = U.FromUnity(UnityEngine.Quaternion.LookRotation(U.ToUnity(dir)));
+		}
+
 		public void Set(Vector3 from, Vector3 to)
 		{
 			fromBox_.Position = from;
+
 			toBox_.Position = to;
+			toBox_.Visible = true;
+			showToBox_ = true;
 
 			line_.Position = from + (to - from) / 2;
 			line_.Size = new Vector3(0.0005f, 0.0005f, Vector3.Distance(from, to));

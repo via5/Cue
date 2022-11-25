@@ -37,6 +37,12 @@ namespace Cue
 			get { return true; }
 		}
 
+		public bool DebugRender
+		{
+			get { return false; }
+			set { }
+		}
+
 		public string[] GetAllForcesDebug()
 		{
 			return null;

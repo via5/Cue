@@ -162,7 +162,13 @@ namespace Cue.BVH
             get { return true; }
         }
 
-        public bool LocalRotations
+		public bool DebugRender
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool LocalRotations
         {
             get { return localRotations_; }
         }

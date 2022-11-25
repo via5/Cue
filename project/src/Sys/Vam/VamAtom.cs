@@ -507,8 +507,8 @@ namespace Cue.Sys.Vam
 		{
 			var list = new List<Damping>();
 
-			float strongPos = 250;
-			float strongRot = 30;
+			float strongPos = 1000;
+			float strongRot = 100;
 
 			float weakPos = 100;
 			float weakRot = 10;

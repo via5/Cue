@@ -8,6 +8,7 @@ namespace Cue
 		private VUI.ComboBox<IAnimation> anims_ = new VUI.ComboBox<IAnimation>();
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 		private List<IAnimation> oldList_ = new List<IAnimation>();
+		private VUI.CheckBox setDebug_ = new VUI.CheckBox("Debug");
 		private VUI.CheckBox all_ = new VUI.CheckBox("All");
 		private bool ignore_ = false;
 		private DebugLines debug_ = null;
@@ -22,7 +23,12 @@ namespace Cue
 
 			var top = new VUI.Panel(new VUI.BorderLayout(5));
 			top.Add(anims_, VUI.BorderLayout.Center);
-			top.Add(all_, VUI.BorderLayout.Right);
+
+			var right = new VUI.Panel(new VUI.HorizontalFlow(5));
+			right.Add(setDebug_);
+			right.Add(all_);
+
+			top.Add(right, VUI.BorderLayout.Right);
 
 			Layout = new VUI.BorderLayout(10);
 			Add(top, VUI.BorderLayout.Top);
@@ -31,6 +37,7 @@ namespace Cue
 			UpdateList();
 
 			list_.SelectionChanged += (s) => Changed();
+			setDebug_.Changed += (b) => SetDebug(b);
 			all_.Changed += (b) => Changed();
 		}
 
@@ -60,6 +67,19 @@ namespace Cue
 
 			anims_.Selected?.Debug(debug_);
 			list_.SetItems(debug_.MakeArray());
+
+			var a = anims_.Selected;
+			if (a == null)
+				setDebug_.Checked = false;
+			else
+				setDebug_.Checked = a.DebugRender;
+		}
+
+		private void SetDebug(bool b)
+		{
+			var a = anims_.Selected;
+			if (a != null)
+				a.DebugRender = b;
 		}
 
 		private void UpdateList()

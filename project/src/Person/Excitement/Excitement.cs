@@ -205,7 +205,13 @@ namespace Cue
 			if (!s.Active)
 			{
 				if (why != null)
-					why = $"mag too low";
+				{
+					// this can actually be either because the mag is too low
+					// or because the zone is ignored, like genitals during
+					// penetration; there's no good way of figuring out which
+					// one for now
+					why = $"ignored";
+				}
 
 				return false;
 			}

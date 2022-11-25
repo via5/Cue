@@ -79,6 +79,7 @@ namespace Cue
 		float InitFrame { get; }
 		float FirstFrame { get; }
 		float LastFrame { get; }
+		bool DebugRender { get; set; }
 
 		void Reset(Person p);
 		string[] GetAllForcesDebug();

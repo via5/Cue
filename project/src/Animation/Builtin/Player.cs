@@ -9,6 +9,7 @@ namespace Cue
 		private bool hasMovement_;
 		private Person person_ = null;
 		private Logger log_;
+		private bool debugRender_ = false;
 
 		protected BuiltinAnimation(string name)
 		{
@@ -46,6 +47,12 @@ namespace Cue
 		{
 			get { return hasMovement_; }
 			set { hasMovement_ = value; }
+		}
+
+		public bool DebugRender
+		{
+			get { return debugRender_; }
+			set { debugRender_ = value; }
 		}
 
 		public abstract bool Done { get; }
