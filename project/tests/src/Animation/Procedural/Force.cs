@@ -98,7 +98,6 @@ namespace Cue.Proc.Tests
 		}
 	}
 
-
 	[TestClass]
 	public class ForceTests
 	{
@@ -112,12 +111,12 @@ namespace Cue.Proc.Tests
 				new Duration(2), null, null, null,
 				DurationSync.Loop | DurationSync.ResetBetween));
 
-			var f = new Force(
+			var f = Force.CreateTestForce(
 				"", Force.AbsoluteForce, bp,
 				new Vector3(4, 4, 4), new Vector3(4, 4, 4),
 				null, Vector3.Zero,
 				new ParentTargetSync(), Force.ApplyOnSource,
-				new LinearEasing());
+				new LinearEasing(), new LinearEasing());
 
 			g.AddTarget(f);
 

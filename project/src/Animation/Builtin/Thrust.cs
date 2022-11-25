@@ -1,4 +1,6 @@
-﻿namespace Cue.Proc
+﻿using System.Collections.Generic;
+
+namespace Cue.Proc
 {
 	abstract class BasicThrustProcAnimation : BasicProcAnimation
 	{
@@ -65,8 +67,30 @@
 		private Person receiver_ = null;
 		private Config config_;
 		private ForceConfig fconfig_;
+		private Force[] forces_ = new Force[0];
 
 		private Render render_ = new Render();
+
+		private IEasing downEasing_ = new SinusoidalEasing();
+		private IEasing[] upEasings_ = new IEasing[]
+		{
+			new SinusoidalEasing(),
+			new CubicInEasing(),
+			new QuintInEasing()
+		};
+
+		private Duration easingChange_ = new Duration(0, 5);
+
+		private IEasing UpEasing()
+		{
+			return upEasings_[0];
+		}
+
+		private IEasing DownEasing()
+		{
+			return downEasing_;
+		}
+
 
 		protected BasicThrustProcAnimation(string name, Config c)
 			: base(name)
@@ -86,26 +110,30 @@
 			RootGroup.AddTarget(new Force(
 				"hipForce", Force.AbsoluteForce, BP.Hips,
 				Vector3.Zero, Vector3.Zero, config_.durationInterval, Vector3.Zero,
-				new ParentTargetSync()));
+				new ParentTargetSync(), Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
 
 			RootGroup.AddTarget(new Force(
 				"hipTorque", Force.RelativeTorque, BP.Hips,
 				Vector3.Zero, Vector3.Zero, config_.durationInterval, Vector3.Zero,
-				new ParentTargetSync()));
+				new ParentTargetSync(), Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeTorque, BP.Chest,
 				new Vector3(chestTorqueMin_, 0, 0),
 				new Vector3(chestTorqueMax_, 0, 0),
 				config_.durationInterval, new Vector3(chestTorqueWin_, 0, 0),
-				new ParentTargetSync()));
+				new ParentTargetSync(), Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeTorque, BP.Head,
 				new Vector3(headTorqueMin_, 0, 0),
 				new Vector3(headTorqueMax_, 0, 0),
 				config_.durationInterval, new Vector3(headTorqueWin_, 0, 0),
-				new ParentTargetSync()));
+				new ParentTargetSync(), Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
 
 
 			RootGroup.AddTarget(new Force(
@@ -114,7 +142,10 @@
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
-					DurationSync.Loop)));
+					DurationSync.Loop),
+				Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
+
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeForce, BP.Head,
@@ -122,7 +153,9 @@
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
-					DurationSync.Loop)));
+					DurationSync.Loop),
+				Force.ApplyOnSource,
+				UpEasing(), DownEasing()));
 
 			// target forces
 
@@ -131,14 +164,16 @@
 				new Vector3(headTorqueMin_, 0, 0),
 				new Vector3(headTorqueMax_, 0, 0),
 				config_.durationInterval, new Vector3(headTorqueWin_, 0, 0),
-				new ParentTargetSync(), Force.ApplyOnTarget));
+				new ParentTargetSync(), Force.ApplyOnTarget,
+				UpEasing(), DownEasing()));
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeTorque, BP.Chest,
 				new Vector3(chestTorqueMin_ * 0.75f, 0, 0),
 				new Vector3(chestTorqueMax_ * 0.75f, 0, 0),
 				config_.durationInterval, new Vector3(chestTorqueWin_, 0, 0),
-				new ParentTargetSync(), Force.ApplyOnTarget));
+				new ParentTargetSync(), Force.ApplyOnTarget,
+				UpEasing(), DownEasing()));
 		}
 
 		protected Person Receiver
@@ -181,6 +216,17 @@
 					fconfig_.hipTorqueWin);
 			}
 
+
+			var list = new List<Force>();
+			foreach (var t in RootGroup.Targets)
+			{
+				var f = t as Force;
+				if (f != null)
+					list.Add(f);
+			}
+
+			forces_ = list.ToArray();
+
 			if (!base.Start(p, cx))
 				return false;
 
@@ -194,7 +240,24 @@
 		public override void Update(float s)
 		{
 			base.Update(s);
+			CheckEasings(s);
 			CheckDebug();
+		}
+
+		private void CheckEasings(float s)
+		{
+			easingChange_.Update(s, 1.0f);
+
+			if (easingChange_.Finished)
+			{
+				if (upEasings_.Length > 0)
+				{
+					int e = U.RandomInt(0, upEasings_.Length - 1);
+
+					for (int i = 0; i < forces_.Length; ++i)
+						forces_[i].SetEasings(upEasings_[e], downEasing_);
+				}
+			}
 		}
 
 		public override void Stopped()

@@ -84,12 +84,13 @@ namespace Cue.Proc
 		private int applyOn_ = ApplyOnSource;
 		private BodyPartType bodyPartType_;
 		private BodyPart bp_ = null;
-		private IEasing easing_;
+		private IEasing easingUp_, easingDown_;
 		private bool applyWhenOff_ = false;
 
 		private bool oneFrameFinished_ = false;
 		private Action beforeNext_ = null;
 
+		private bool goingUp_ = false;
 		private bool wasBusy_ = false;
 		private Vector3 forceBeforeBusy_, forceAfterBusy_;
 		private float busyElapsed_ = 0;
@@ -109,26 +110,43 @@ namespace Cue.Proc
 		public Force(
 			string name, int type, BodyPartType bodyPart,
 			Vector3 min, Vector3 max, float next, Vector3 window,
-			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
-				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, applyOn, easing)
+			ISync sync, int applyOn = ApplyOnSource)
+				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, applyOn, null, null)
+		{
+		}
+
+		public Force(
+			string name, int type, BodyPartType bodyPart,
+			Vector3 min, Vector3 max, float next, Vector3 window,
+			ISync sync, int applyOn, IEasing easingUp, IEasing easingDown)
+				: this(name, type, bodyPart, min, max, new Duration(next), window, sync, applyOn, easingUp, easingDown)
 		{
 		}
 
 		// used in tests
 		//
-		public Force(
+		public static Force CreateTestForce(
 			string name, int type, BodyPart bodyPart,
 			Vector3 min, Vector3 max, Duration next, Vector3 window,
-			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
-				: this(name, type, bodyPart.Type, min, max, next, window, sync, applyOn, easing)
+			ISync sync, int applyOn, IEasing easingUp, IEasing easingDown)
 		{
-			bp_ = bodyPart;
+			var f = new Force(name, type, bodyPart.Type, min, max, next, window, sync, applyOn, easingUp, easingDown);
+			f.bp_ = bodyPart;
+			return f;
 		}
 
 		public Force(
 			string name, int type, BodyPartType bodyPart,
 			Vector3 min, Vector3 max, Duration next, Vector3 window,
-			ISync sync, int applyOn = ApplyOnSource, IEasing easing = null)
+			ISync sync, int applyOn = ApplyOnSource)
+				: this(name, type, bodyPart, min, max, next, window, sync, applyOn, null, null)
+		{
+		}
+
+		public Force(
+			string name, int type, BodyPartType bodyPart,
+			Vector3 min, Vector3 max, Duration next, Vector3 window,
+			ISync sync, int applyOn, IEasing easingUp, IEasing easingDown)
 				: base(name, sync)
 		{
 			type_ = type;
@@ -136,7 +154,8 @@ namespace Cue.Proc
 			vtarget_ = new VectorTarget(min, max, window);
 			next_ = next ?? new Duration();
 			applyOn_ = applyOn;
-			easing_ = easing ?? new SinusoidalEasing();
+			easingUp_ = easingUp ?? new SinusoidalEasing();
+			easingDown_ = easingDown ?? new SinusoidalEasing();
 		}
 
 		public static Force Create(int type, JSONClass o)
@@ -229,7 +248,8 @@ namespace Cue.Proc
 			var f = new Force(
 				Name, type_, bodyPartType_,
 				vtarget_.min, vtarget_.max, next_.Clone(),
-				vtarget_.window, Sync.Clone(), applyOn_);
+				vtarget_.window, Sync.Clone(), applyOn_,
+				easingUp_.Clone(), easingDown_.Clone());
 
 			f.beforeNext_ = beforeNext_;
 
@@ -263,6 +283,7 @@ namespace Cue.Proc
 			dtarget_.Reset();
 			needsNewsTarget_ = true;
 			applyWhenOff_ = ApplyWhenOff;
+			goingUp_ = true;
 
 			Next();
 		}
@@ -273,6 +294,7 @@ namespace Cue.Proc
 			vtarget_.Reset();
 			dtarget_.Reset();
 			needsNewsTarget_ = true;
+			goingUp_ = true;
 			next_.Reset(MovementEnergy);
 			Next();
 		}
@@ -316,6 +338,12 @@ namespace Cue.Proc
 			vtarget_.max = max;
 			vtarget_.window = win;
 			useDir_ = false;
+		}
+
+		public void SetEasings(IEasing up, IEasing down)
+		{
+			easingUp_ = up;
+			easingDown_ = down;
 		}
 
 		private bool CanAppyForce()
@@ -412,6 +440,8 @@ namespace Cue.Proc
 					else
 						vtarget_.Swap();
 
+					goingUp_ = !goingUp_;
+
 					break;
 				}
 
@@ -424,6 +454,7 @@ namespace Cue.Proc
 				case BasicSync.Looping:
 				{
 					Next();
+					goingUp_ = !goingUp_;
 					break;
 				}
 
@@ -473,15 +504,23 @@ namespace Cue.Proc
 				return LerpedForVector();
 		}
 
+		private IEasing GetEasing()
+		{
+			if (goingUp_)
+				return easingUp_;
+			else
+				return easingDown_;
+		}
+
 		private float LerpedForDir()
 		{
-			float f = easing_.Magnitude(Sync.Magnitude);
+			float f = GetEasing().Magnitude(Sync.Magnitude);
 			return U.Lerp(dtarget_.last, dtarget_.target, f);
 		}
 
 		private Vector3 LerpedForVector()
 		{
-			float f = easing_.Magnitude(Sync.Magnitude);
+			float f = GetEasing().Magnitude(Sync.Magnitude);
 			return Vector3.Lerp(vtarget_.last, vtarget_.target, f);
 		}
 
@@ -531,7 +570,8 @@ namespace Cue.Proc
 			return
 				$"{TypeToString(type_)} {Name} {bp_} ({ApplyOnToString(applyOn_)})\n" +
 				$"usedir={useDir_} {(useDir_ ? dtarget_.ToString() : vtarget_.ToString())}\n" +
-				$"next={next_}\n" +
+				$"easings: up={easingUp_} down={easingDown_}\n" +
+				$"next={next_}, {(goingUp_ ? "up" : "down")}\n" +
 				$"lerped={LerpedForce()} busy={wasBusy_} e={MovementEnergy}";
 		}
 
