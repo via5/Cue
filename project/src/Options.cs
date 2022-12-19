@@ -181,7 +181,7 @@ namespace Cue
 
 	class FinishOptions
 	{
-		private float initialDelay_ = 0;
+		private float initialDelay_ = 5;
 		private int lookAt_ = Finish.LookAtPersonality;
 		private int orgasms_ = Finish.OrgasmsPersonality;
 		private float orgasmsTime_ = 1;

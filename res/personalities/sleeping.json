@@ -8,6 +8,7 @@
 	"maxTiredExpression": 1,
 	"minTiredness": 1,
 	"idleAnimation": "procIdleSleeping",
+	"maxEmotionalRate": 0,
 
 	"gazeSaccade": false,
 	"gazeBlink": false,

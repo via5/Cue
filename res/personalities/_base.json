@@ -198,7 +198,8 @@
 			"morphs":
 			[
 				{
-					"id": "Shock"
+					"id": "Shock",
+					"max": 0.9
 				}
 			]
 		},
@@ -210,7 +211,8 @@
 			"morphs":
 			[
 				{
-					"id": "Scream"
+					"id": "Scream",
+					"max": 0.8
 				}
 			]
 		},
@@ -657,6 +659,7 @@
 	"maxSurprisedExpression": 1,
 	"maxTiredExpression": 1,
 	"minTiredness": 0,
+	"maxEmotionalRate": 1,
 
 	"minHappyChoked": 0,
 	"maxHappyChoked": 0.2,

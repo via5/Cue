@@ -452,7 +452,7 @@ namespace Cue
 						new FinishLookAtNothing(i.Person),
 						new FinishOrgasmNothing(i.Person),
 						new FinishMoodNothing(i.Person),
-						new FinishEventsNothing(i.Person));
+						new FinishEventsStop(i.Person));
 				}
 				else
 				{

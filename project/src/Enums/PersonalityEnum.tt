@@ -151,6 +151,7 @@ V.Float("MaxAngryExpression"),
 V.Float("MaxSurprisedExpression"),
 V.Float("MaxTiredExpression"),
 V.Float("MinTiredness"),
+V.Float("MaxEmotionalRate"),
 
 V.Float("MinHappyChoked"),
 V.Float("MaxHappyChoked"),

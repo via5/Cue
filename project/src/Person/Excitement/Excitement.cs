@@ -641,11 +641,13 @@ namespace Cue
 
 		private float GetEmotionalRate()
 		{
+			var ps = person_.Personality;
+
 			float rate = 0;
 
 			float dampen = 1;
 			if (NeedsPenetrationDamper())
-				dampen = person_.Personality.Get(PS.PenetrationDamper);
+				dampen = ps.Get(PS.PenetrationDamper);
 
 			for (int i = 0; i < sources_.Length; ++i)
 			{
@@ -655,12 +657,16 @@ namespace Cue
 				rate += sources_[i].GetRate(dampen);
 			}
 
+			rate = U.Clamp(rate, 0, ps.Get(PS.MaxEmotionalRate));
+
 			return rate;
 		}
 
 
 		public string[] Debug()
 		{
+			var ps = person_.Personality;
+
 			if (debug_ == null)
 				debug_ = new DebugLines();
 
@@ -678,13 +684,13 @@ namespace Cue
 			debug_.Add("values:");
 			debug_.Add($"  max: {max_:0.00000}");
 			debug_.Add($"  physical: {physicalRate_.Value:0.00000}");
-			debug_.Add($"  emotional: {emotionalRate_.Value:0.00000}");
+			debug_.Add($"  emotional: {emotionalRate_.Value:0.00000} (max {ps.Get(PS.MaxEmotionalRate):0.00000} from personality)");
 
 			if (subtotalRate_ != totalRate_)
 				debug_.Add($"  subtotal: {subtotalRate_:0.00000}");
 
 			if (person_.Personality.Get(PS.RateAdjustment) != 1)
-				debug_.Add($"  rate adjustement: {person_.Personality.Get(PS.RateAdjustment)}");
+				debug_.Add($"  rate adjustement: {ps.Get(PS.RateAdjustment)}");
 
 			if (totalRate_ < 0)
 				debug_.Add($"  total: {totalRate_:0.00000} (decaying)");
