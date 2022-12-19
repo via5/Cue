@@ -164,9 +164,9 @@ namespace Cue
 				$"pi={sourcePersonIndex} bp={sourceBodyPart}");
 		}
 
-		public Sys.TriggerInfo[] GetTriggers()
+		public Sys.TriggerInfo[] GetTriggers(bool forceUpdate = false)
 		{
-			if (Exists && staleTriggers_)
+			if (forceUpdate || (Exists && staleTriggers_))
 				UpdateTriggers();
 
 			return triggers_;

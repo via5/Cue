@@ -8,6 +8,7 @@
 		private BodyPart neck_ = null;
 		private bool headWasGrabbed_ = false;
 		private bool neckWasGrabbed_ = false;
+		private bool neckWasGrabbedWithHead_ = false;
 
 		public GrabEvent()
 			: base("Grab")
@@ -16,7 +17,7 @@
 
 		public override bool Active
 		{
-			get { return headWasGrabbed_ || neckWasGrabbed_; }
+			get { return headWasGrabbed_ || neckWasGrabbed_ || neckWasGrabbedWithHead_; }
 			set { }
 		}
 
@@ -37,6 +38,7 @@
 			debug.Add("");
 			debug.Add("neck grabbed", $"{neck_.GrabbedByPlayer}");
 			debug.Add("neckWasGrabbed", $"{neckWasGrabbed_}");
+			debug.Add("neckWasGrabbedWithHead", $"{neckWasGrabbedWithHead_}");
 			debug.Add("neck lock", $"{neckLock_}");
 		}
 
@@ -44,44 +46,106 @@
 		{
 			if (!Enabled)
 			{
+				headWasGrabbed_ = false;
 				StopHead();
-				StopNeck();
+
+				bool fromHead = neckWasGrabbedWithHead_;
+				neckWasGrabbed_ = false;
+				neckWasGrabbedWithHead_ = false;
+				StopNeck(fromHead);
+
 				return;
 			}
 
-			if (head_.GrabbedByPlayer)
+
+			// unfortunately, grabbing the neck is usually difficult because
+			// it's off, and vam always grabs the head instead since it's
+			// close enough and is on
+			//
+			// the first check is for a regular neck grab, which can happen,
+			// but is rare
+			//
+			// the second check is for a head grab, but it also checks if the
+			// head is being triggered by the same hand; this is perfect, just
+			// barely touching the neck with the tips of the fingers will
+			// trigger it, but it's good enough for now
+
+			CheckNeck();
+			CheckHead();
+		}
+
+		private void CheckNeck()
+		{
+			if (!neckWasGrabbed_)
 			{
-				if (!headWasGrabbed_)
-					StartHead();
+				if (neck_.GrabbedByPlayer)
+				{
+					neckWasGrabbed_ = true;
+					StartNeck(false);
+				}
 			}
 			else
 			{
-				if (headWasGrabbed_)
+				if (!neck_.GrabbedByPlayer)
+				{
+					neckWasGrabbed_ = false;
+					StopNeck(false);
+				}
+			}
+		}
+
+		private void CheckHead()
+		{
+			if (!headWasGrabbed_)
+			{
+				// check head
+				var pr = head_.GrabbedByPlayer;
+
+				if (pr)
+				{
+					headWasGrabbed_ = true;
+					StartHead();
+				}
+
+				// check neck
+				if (!neckWasGrabbedWithHead_)
+				{
+					var ts = neck_.GetTriggers(true);
+
+					if (ts != null)
+					{
+						for (int i = 0; i < ts.Length; ++i)
+						{
+							if (ts[i].PersonIndex == Cue.Instance.Player.PersonIndex)
+							{
+								if (ts[i].BodyPart == pr.byBodyPart)
+								{
+									neckWasGrabbedWithHead_ = true;
+									StartNeck(true);
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				if (!head_.GrabbedByPlayer)
 				{
 					headWasGrabbed_ = false;
 					StopHead();
-				}
-			}
 
-			if (neck_.GrabbedByPlayer)
-			{
-				if (!neckWasGrabbed_)
-					StartNeck();
-			}
-			else
-			{
-				if (neckWasGrabbed_)
-				{
-					neckWasGrabbed_ = false;
-					StopNeck();
+					if (neckWasGrabbedWithHead_)
+					{
+						neckWasGrabbedWithHead_ = false;
+						StopNeck(true);
+					}
 				}
 			}
 		}
 
 		private void StartHead()
 		{
-			headWasGrabbed_ = true;
-
 			headLock_ = head_.Lock(
 				BodyPartLock.Anim, "grabbed", BodyPartLock.Strong);
 		}
@@ -95,13 +159,15 @@
 			}
 		}
 
-		private void StartNeck()
+		private void StartNeck(bool fromHead)
 		{
-			neckWasGrabbed_ = true;
-
-			// force a grab on the head to disable mg's gaze, see also
-			// GazeGrabbed.DoCheck()
-			head_.VamSys.Controller.isGrabbing = true;
+			if (!fromHead)
+			{
+				// force a grab on the head to disable mg's gaze, see also
+				// GazeGrabbed.DoCheck(); only do this if the grab doesn't
+				// actually come from the head
+				head_.VamSys.Controller.isGrabbing = true;
+			}
 
 			neckLock_ = head_.Lock(
 				BodyPartLock.Anim, "grabbed", BodyPartLock.Strong);
@@ -109,7 +175,7 @@
 			person_.Body.Breathing = false;
 		}
 
-		private void StopNeck()
+		private void StopNeck(bool fromHead)
 		{
 			if (neckLock_ != null)
 			{
@@ -117,9 +183,12 @@
 				neckLock_ = null;
 			}
 
-			// see StartNeck()
-			if (!headWasGrabbed_)
-				head_.VamSys.Controller.isGrabbing = true;
+			if (!fromHead)
+			{
+				// see StartNeck()
+				if (!headWasGrabbed_)
+					head_.VamSys.Controller.isGrabbing = true;
+			}
 
 			person_.Body.Breathing = true;
 		}
