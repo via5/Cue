@@ -313,7 +313,7 @@ namespace Cue
 
 			var mouthDistance = U.Lerp(
 				DistanceFromMouthShort, DistanceFromMouthTall,
-				Person.Atom.Scale);
+				Person.Body.Scale);
 
 			targetRot_ = GetTargetRotation();
 
@@ -322,7 +322,7 @@ namespace Cue
 				head.Rotation.Rotate(new Vector3(0, 0, mouthDistance));
 
 			midPointDistance_ = U.Lerp(
-				MidPointRangeShort, MidPointRangeTall, Person.Atom.Scale);
+				MidPointRangeShort, MidPointRangeTall, Person.Body.Scale);
 		}
 
 		private void StartMoveToMouth()
@@ -541,7 +541,7 @@ namespace Cue
 			state_ = Adjusting;
 			adjustStopDistance_ = U.Lerp(
 				AdjustDistanceRangeShort, AdjustDistanceRangeTall,
-				Person.Atom.Scale);
+				Person.Body.Scale);
 		}
 
 		private void Adjust(float s)

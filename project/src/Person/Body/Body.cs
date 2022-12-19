@@ -154,6 +154,11 @@ namespace Cue
 			get { return (HasPenis && Get(BP.Penis).IsPhysical); }
 		}
 
+		public float Scale
+		{
+			get { return person_.Atom.Scale; }
+		}
+
 		public BodyPartType GenitalsBodyPart
 		{
 			get { return (HasPenis ? BP.Penis : BP.Vagina); }

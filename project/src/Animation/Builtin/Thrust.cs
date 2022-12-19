@@ -419,7 +419,7 @@ namespace Cue.Proc
 			float scaleMax = 1.0f;
 			float scaleRange = scaleMax - scaleMin;
 
-			float scale = U.Clamp(receiver_.Atom.Scale, scaleMin, scaleMax);
+			float scale = U.Clamp(receiver_.Body.Scale, scaleMin, scaleMax);
 			float scaleF = (scale - scaleMin) / scaleRange;
 
 

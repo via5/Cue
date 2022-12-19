@@ -65,7 +65,7 @@
 		private const bool EnableDoubleHJ = false;
 
 		private const float ManualStartDistance = 0.09f;
-		private const float AutoStartDistance = 0.04f;
+		private const float AutoStartDistance = 0.037f;
 
 		private bool doManualCheck_ = false;
 		private HandInfo left_ = null;
@@ -610,7 +610,7 @@
 			return true;
 		}
 
-		private BodyPart FindTarget(HandInfo hand, float maxDistance)
+		private BodyPart FindTarget(HandInfo hand, float nominalMaxDistance)
 		{
 			BodyPart tentative = null;
 			float tentativeDistance = float.MaxValue;
@@ -628,6 +628,8 @@
 				}
 
 				var d = hand.bp.DistanceToSurface(g);
+
+				float maxDistance = nominalMaxDistance * U.Clamp(person_.Body.Scale, 0.5f, 1.0f);
 
 				if (d > maxDistance)
 				{

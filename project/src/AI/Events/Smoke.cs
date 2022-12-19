@@ -254,7 +254,7 @@ namespace Cue
 			cig_.Atom.Hidden = true;
 			cig_.Visible = true;
 
-			o.Atom.Scale = person_.Atom.Scale * 0.8f;
+			o.Atom.Scale = person_.Body.Scale * 0.8f;
 		}
 	}
 }
