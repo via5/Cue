@@ -148,18 +148,18 @@ namespace Cue
 		public static readonly FloatIndex MaxSurprisedExpression = new FloatIndex(116);
 		public static readonly FloatIndex MaxTiredExpression = new FloatIndex(117);
 		public static readonly FloatIndex MinTiredness = new FloatIndex(118);
-		public static readonly FloatIndex MinHappyChocked = new FloatIndex(119);
-		public static readonly FloatIndex MaxHappyChocked = new FloatIndex(120);
-		public static readonly FloatIndex MinPlayfulChocked = new FloatIndex(121);
-		public static readonly FloatIndex MaxPlayfulChocked = new FloatIndex(122);
-		public static readonly FloatIndex MinExcitedChocked = new FloatIndex(123);
-		public static readonly FloatIndex MaxExcitedChocked = new FloatIndex(124);
-		public static readonly FloatIndex MinAngryChocked = new FloatIndex(125);
-		public static readonly FloatIndex MaxAngryChocked = new FloatIndex(126);
-		public static readonly FloatIndex MinSurprisedChocked = new FloatIndex(127);
-		public static readonly FloatIndex MaxSurprisedChocked = new FloatIndex(128);
-		public static readonly FloatIndex MinTiredChocked = new FloatIndex(129);
-		public static readonly FloatIndex MaxTiredChocked = new FloatIndex(130);
+		public static readonly FloatIndex MinHappyChoked = new FloatIndex(119);
+		public static readonly FloatIndex MaxHappyChoked = new FloatIndex(120);
+		public static readonly FloatIndex MinPlayfulChoked = new FloatIndex(121);
+		public static readonly FloatIndex MaxPlayfulChoked = new FloatIndex(122);
+		public static readonly FloatIndex MinExcitedChoked = new FloatIndex(123);
+		public static readonly FloatIndex MaxExcitedChoked = new FloatIndex(124);
+		public static readonly FloatIndex MinAngryChoked = new FloatIndex(125);
+		public static readonly FloatIndex MaxAngryChoked = new FloatIndex(126);
+		public static readonly FloatIndex MinSurprisedChoked = new FloatIndex(127);
+		public static readonly FloatIndex MaxSurprisedChoked = new FloatIndex(128);
+		public static readonly FloatIndex MinTiredChoked = new FloatIndex(129);
+		public static readonly FloatIndex MaxTiredChoked = new FloatIndex(130);
 		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(131);
 		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(132);
 		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(133);
@@ -456,18 +456,18 @@ namespace Cue
 			"maxSurprisedExpression",
 			"maxTiredExpression",
 			"minTiredness",
-			"minHappyChocked",
-			"maxHappyChocked",
-			"minPlayfulChocked",
-			"maxPlayfulChocked",
-			"minExcitedChocked",
-			"maxExcitedChocked",
-			"minAngryChocked",
-			"maxAngryChocked",
-			"minSurprisedChocked",
-			"maxSurprisedChocked",
-			"minTiredChocked",
-			"maxTiredChocked",
+			"minHappyChoked",
+			"maxHappyChoked",
+			"minPlayfulChoked",
+			"maxPlayfulChoked",
+			"minExcitedChoked",
+			"maxExcitedChoked",
+			"minAngryChoked",
+			"maxAngryChoked",
+			"minSurprisedChoked",
+			"maxSurprisedChoked",
+			"minTiredChoked",
+			"maxTiredChoked",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
 			"excitedExpressionWeightModifier",
@@ -751,18 +751,18 @@ namespace Cue
 			"maxSurprisedExpression",
 			"maxTiredExpression",
 			"minTiredness",
-			"minHappyChocked",
-			"maxHappyChocked",
-			"minPlayfulChocked",
-			"maxPlayfulChocked",
-			"minExcitedChocked",
-			"maxExcitedChocked",
-			"minAngryChocked",
-			"maxAngryChocked",
-			"minSurprisedChocked",
-			"maxSurprisedChocked",
-			"minTiredChocked",
-			"maxTiredChocked",
+			"minHappyChoked",
+			"maxHappyChoked",
+			"minPlayfulChoked",
+			"maxPlayfulChoked",
+			"minExcitedChoked",
+			"maxExcitedChoked",
+			"minAngryChoked",
+			"maxAngryChoked",
+			"minSurprisedChoked",
+			"maxSurprisedChoked",
+			"minTiredChoked",
+			"maxTiredChoked",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
 			"excitedExpressionWeightModifier",

@@ -217,27 +217,27 @@ namespace Cue
 
 			SetChoked(
 				MoodType.Happy,
-				PS.MinHappyChocked, PS.MaxHappyChocked);
+				PS.MinHappyChoked, PS.MaxHappyChoked);
 
 			SetChoked(
 				MoodType.Playful,
-				PS.MinPlayfulChocked, PS.MaxPlayfulChocked);
+				PS.MinPlayfulChoked, PS.MaxPlayfulChoked);
 
 			SetChoked(
 				MoodType.Excited,
-				PS.MinExcitedChocked, PS.MaxExcitedChocked);
+				PS.MinExcitedChoked, PS.MaxExcitedChoked);
 
 			SetChoked(
 				MoodType.Angry,
-				PS.MinAngryChocked, PS.MaxAngryChocked);
+				PS.MinAngryChoked, PS.MaxAngryChoked);
 
 			SetChoked(
 				MoodType.Surprised,
-				PS.MinSurprisedChocked, PS.MaxSurprisedChocked);
+				PS.MinSurprisedChoked, PS.MaxSurprisedChoked);
 
 			SetChoked(
 				MoodType.Tired,
-				PS.MinTiredChocked, PS.MaxTiredChocked);
+				PS.MinTiredChoked, PS.MaxTiredChoked);
 
 			moods_[MoodType.Happy.Int].Set(ps.Get(PS.DefaultHappiness), true);
 			moods_[MoodType.Angry.Int].Set(ps.Get(PS.DefaultAnger), true);
