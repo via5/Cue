@@ -25,6 +25,18 @@ namespace Cue.Sys.Vam
 			// some colliders are disabled by default, make sure they all work
 			rb.detectCollisions = true;
 
+			Person person = null;
+			if (bp != null)
+			{
+				person = Cue.Instance.PersonForAtom(bp.Atom);
+
+				if (person == null)
+				{
+					Logger.Global.ErrorST($"CueCollisionHandler: bp atom {bp.Atom} not found for {bp} ({U.QualifiedName(c)})");
+					return null;
+				}
+			}
+
 			var ch = rb.gameObject.AddComponent<CueCollisionHandler>();
 			if (ch == null)
 			{
@@ -33,14 +45,7 @@ namespace Cue.Sys.Vam
 			}
 
 			ch.bp_ = bp;
-			if (ch.bp_ != null)
-			{
-				ch.person_ = Cue.Instance.PersonForAtom(ch.bp_.Atom);
-
-				if (ch.person_ == null)
-					Logger.Global.ErrorST($"CueCollisionHandler: bp atom {ch.bp_.Atom} not found for {bp} ({U.QualifiedName(c)})");
-			}
-
+			ch.person_ = person;
 			ch.sys_ = Cue.Instance.VamSys;
 			ch.rb_ = rb;
 			ch.collider_ = c;

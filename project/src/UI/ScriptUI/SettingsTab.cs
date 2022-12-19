@@ -41,6 +41,8 @@ namespace Cue
 		private VUI.CheckBox playOrgasm_;
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
+		private VUI.CheckBox strapon_ = new VUI.CheckBox("");
+		private VUI.Label straponWarning_ = new VUI.Label("Only available for female characters");
 		private bool ignore_ = false;
 		private bool firstUpdate_ = true;
 
@@ -58,6 +60,11 @@ namespace Cue
 			orgasmPanel.Add(playOrgasm_);
 			orgasmPanel.Add(new VUI.Button("Edit actions...", OnEditOrgasmTrigger));
 
+			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(10));
+			straponPanel.Add(strapon_);
+			straponPanel.Add(straponWarning_);
+
+
 			var pp = new VUI.Panel(gl);
 			pp.Add(new VUI.Label("Personality"));
 			pp.Add(personality_);
@@ -69,6 +76,10 @@ namespace Cue
 
 			pp.Add(new VUI.Label("Traits"));
 			pp.Add(traits_);
+			pp.Add(new VUI.Spacer());
+
+			pp.Add(new VUI.Label("Strapon"));
+			pp.Add(straponPanel);
 			pp.Add(new VUI.Spacer());
 
 			pp.Add(new VUI.Label("Orgasm"));
@@ -97,6 +108,7 @@ namespace Cue
 			personality_.SelectionChanged += OnPersonality;
 			loadPose_.Changed += OnLoadPose;
 			traits_.Edited += OnTraits;
+			strapon_.Changed += OnStrapon;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 			warning_.Visible = false;
@@ -128,6 +140,18 @@ namespace Cue
 
 				maxExcitement_.Value = (int)Math.Round(person_.Mood.MaxExcitement * 100);
 				playOrgasm_.Checked = person_.Mood.PlayOrgasm;
+				strapon_.Checked = person_.Body.Strapon;
+
+				if (person_.Atom.IsMale)
+				{
+					strapon_.Enabled = false;
+					straponWarning_.Visible = true;
+				}
+				else
+				{
+					strapon_.Enabled = true;
+					straponWarning_.Visible = false;
+				}
 
 				warning_.Text = MakeWarnings();
 				warning_.Visible = (warning_.Text.Length > 0);
@@ -231,6 +255,11 @@ namespace Cue
 		private void OnTraits(string s)
 		{
 			person_.Traits = s.Split(' ');
+		}
+
+		private void OnStrapon(bool b)
+		{
+			person_.Body.Strapon = b;
 		}
 
 		private void OnEditOrgasmTrigger()

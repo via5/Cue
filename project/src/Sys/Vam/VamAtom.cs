@@ -137,7 +137,7 @@ namespace Cue.Sys.Vam
 		private FloatParameter scale_;
 		private BoolParameter blink_;
 		private VamCorruptionDetector cd_;
-		private List<Collider> allColliders_;
+		private List<Collider> allColliders_ = null;
 		private Damping[] damping_;
 
 		public VamAtom(Atom atom)
@@ -646,12 +646,22 @@ namespace Cue.Sys.Vam
 			body_?.LateUpdate(s);
 		}
 
-		private void GetAllColliders()
+		private void GetAllColliders(bool clearCache = false)
 		{
-			if (allColliders_ != null)
-				return;
+			if (clearCache)
+			{
+				if (allColliders_ == null)
+					allColliders_ = new List<Collider>();
+				else
+					allColliders_.Clear();
+			}
+			else
+			{
+				if (allColliders_ != null)
+					return;
 
-			allColliders_ = new List<Collider>();
+				allColliders_ = new List<Collider>();
+			}
 
 			foreach (var c in Atom.GetComponentsInChildren<Collider>())
 				allColliders_.Add(c);
@@ -666,9 +676,9 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		public Collider FindCollider(string pathstring)
+		public Collider FindCollider(string pathstring, bool clearCache=false)
 		{
-			GetAllColliders();
+			GetAllColliders(clearCache);
 			return U.FindCollider(allColliders_, pathstring);
 		}
 

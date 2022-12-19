@@ -265,7 +265,8 @@ namespace Cue
 		private Sys.ISys sys_ = null;
 		private Cue cue_ = null;
 		private bool inited_ = false;
-		private float lastFrameTime_ = 0;
+		private float lastUpdateTime_ = 0;
+		private float lastFixedUpdateTime_ = 0;
 
 		private static float lastErrorTime_ = 0;
 		private static int errorCount_ = 0;
@@ -312,7 +313,9 @@ namespace Cue
 
 			try
 			{
-				lastFrameTime_ = Time.realtimeSinceStartup;
+				lastUpdateTime_ = Time.realtimeSinceStartup;
+				lastFixedUpdateTime_ = Time.realtimeSinceStartup;
+
 				sys_ = new Sys.Vam.VamSys(this);
 				cue_ = new Cue();
 				sys_.OnReady(DoInit);
@@ -348,6 +351,24 @@ namespace Cue
 			}
 		}
 
+		private float GetFixedUpdateTime()
+		{
+			// see GetUpdateTime()
+
+			if (lastFixedUpdateTime_ == 0)
+			{
+				lastFixedUpdateTime_ = Time.realtimeSinceStartup;
+				return 0;
+			}
+
+			float now = Time.realtimeSinceStartup;
+			float d = Math.Min(now - lastFixedUpdateTime_, MaxDeltaTime);
+
+			lastFixedUpdateTime_ = now;
+
+			return d * Time.timeScale;
+		}
+
 		public void FixedUpdate()
 		{
 			if (!inited_)
@@ -355,7 +376,11 @@ namespace Cue
 
 			try
 			{
-				cue_.FixedUpdate(Time.deltaTime);
+				float s = GetFixedUpdateTime();
+				if (s == 0)
+					return;
+
+				cue_.FixedUpdate(s);
 			}
 			catch(PluginGone e)
 			{
@@ -367,7 +392,7 @@ namespace Cue
 			}
 		}
 
-		private float GetTime()
+		private float GetUpdateTime()
 		{
 			// Time.deltaTime is capped at a pretty low value, controlled by
 			// Time.maximumDeltaTime, which cannot be changed since it also
@@ -381,16 +406,16 @@ namespace Cue
 			// raising excitement over time, it has its own deltaTime, capped
 			// at a much higher value
 
-			if (lastFrameTime_ == 0)
+			if (lastUpdateTime_ == 0)
 			{
-				lastFrameTime_ = Time.realtimeSinceStartup;
+				lastUpdateTime_ = Time.realtimeSinceStartup;
 				return 0;
 			}
 
 			float now = Time.realtimeSinceStartup;
-			float d = Math.Min(now - lastFrameTime_, MaxDeltaTime);
+			float d = Math.Min(now - lastUpdateTime_, MaxDeltaTime);
 
-			lastFrameTime_ = now;
+			lastUpdateTime_ = now;
 
 			return d * Time.timeScale;
 		}
@@ -402,7 +427,7 @@ namespace Cue
 
 			try
 			{
-				float s = GetTime();
+				float s = GetUpdateTime();
 				if (s == 0)
 					return;
 

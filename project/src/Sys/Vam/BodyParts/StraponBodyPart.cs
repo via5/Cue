@@ -199,8 +199,8 @@ namespace Cue.Sys.Vam
 					return;
 				}
 
-				DoInit();
 				SetEnabled(true);
+				DoInit();
 			}
 		}
 
@@ -296,10 +296,12 @@ namespace Cue.Sys.Vam
 
 		public override string ToString()
 		{
-			if (!Exists)
-				return "";
-
-			return $"dildo (" + base.ToString() + ")";
+			if (!base.Exists)
+				return "dildo (non existent)";
+			else if (!enabled_)
+				return "dildo (disabled)";
+			else
+				return $"dildo (" + base.ToString() + ")";
 		}
 
 		protected override void AddDebugRenderers()
@@ -351,7 +353,10 @@ namespace Cue.Sys.Vam
 			{
 				foreach (JSONNode cn in colliderNames)
 				{
-					var c = (dildo_.Atom as VamAtom).FindCollider(cn.Value.Trim());
+					// cache has to be cleared because the dildo might have been
+					// loaded as hidden, which doesn't find the colliders, for
+					// whatever reason
+					var c = (dildo_.Atom as VamAtom).FindCollider(cn.Value.Trim(), true);
 
 					if (c == null)
 					{

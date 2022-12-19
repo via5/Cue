@@ -212,7 +212,7 @@ namespace Cue
 		{
 			var list = new List<IItem>
 			{
-				Hand(), Head(), Thrust(), Trib(), CanKiss(), Strapon(), Finish()
+				Hand(), Head(), Thrust(), Trib(), CanKiss(), Finish()
 			};
 
 			foreach (var m in Cue.Instance.Options.Menus.Triggers)
@@ -283,19 +283,6 @@ namespace Cue
 				},
 
 				(p) => p.AI.GetEvent<KissEvent>()?.Enabled ?? false);
-		}
-
-		public static IItem Strapon()
-		{
-			return new CheckBoxItem("Strapon",
-				(p, b) =>
-				{
-					if (p != null)
-						p.Body.Strapon = b;
-				},
-
-				(p) => p.Body.Strapon,
-				(p) => !p.Atom.IsMale);
 		}
 
 		public static IItem Finish()
