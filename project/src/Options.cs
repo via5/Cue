@@ -270,6 +270,7 @@ namespace Cue
 		private bool autoHands_ = true;
 		private bool autoHead_ = true;
 		private bool idlePose_ = true;
+		private bool choking_ = true;
 
 		private FinishOptions finish_ = new FinishOptions();
 		private TriggersOptions menus_ = new TriggersOptions("Button");
@@ -386,6 +387,12 @@ namespace Cue
 			set { idlePose_ = value; OnChanged(); }
 		}
 
+		public bool Choking
+		{
+			get { return choking_; }
+			set { choking_ = value; OnChanged(); }
+		}
+
 		public FinishOptions Finish
 		{
 			get { return finish_; }
@@ -418,6 +425,7 @@ namespace Cue
 			o["autoHands"] = new JSONData(autoHands_);
 			o["autoHead"] = new JSONData(autoHead_);
 			o["idlePose"] = new JSONData(idlePose_);
+			o["choking"] = new JSONData(choking_);
 			o["version"] = new JSONData(Version.String);
 
 			finish_.Save(o);
@@ -463,6 +471,7 @@ namespace Cue
 			J.OptBool(o, "autoHands", ref autoHands_);
 			J.OptBool(o, "autoHead", ref autoHead_);
 			J.OptBool(o, "idlePose", ref idlePose_);
+			J.OptBool(o, "choking", ref choking_);
 
 			finish_.Load(o);
 

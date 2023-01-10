@@ -161,6 +161,9 @@
 
 		private void StartNeck(bool fromHead)
 		{
+			if (!Cue.Instance.Options.Choking)
+				return;
+
 			if (!fromHead)
 			{
 				// force a grab on the head to disable mg's gaze, see also

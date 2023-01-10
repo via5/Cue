@@ -97,7 +97,8 @@ namespace Cue
 	{
 		private VUI.FloatTextSlider excitement_;
 		private VUI.CheckBox idlePose_, autoHands_, autoHead_, handLinking_;
-		private VUI.CheckBox straponPhysical_, ignoreCamera_, devMode_;
+		private VUI.CheckBox choking_, straponPhysical_, ignoreCamera_;
+		private VUI.CheckBox devMode_;
 		private bool ignore_ = false;
 
 		public MainOptionsTab()
@@ -132,6 +133,12 @@ namespace Cue
 			handLinking_ = p.Add(new VUI.CheckBox("Hand linking", OnHandLinking, o.HandLinking));
 			p.Add(new VUI.Label(
 				"Enables linking hands to body parts when they're close enough.",
+				VUI.Label.Wrap));
+			p.Add(new VUI.Spacer(20));
+
+			choking_ = p.Add(new VUI.CheckBox("Choking", OnChoking, o.Choking));
+			p.Add(new VUI.Label(
+				"Enables simulated and playful choking when grabbing the neck.",
 				VUI.Label.Wrap));
 			p.Add(new VUI.Spacer(20));
 
@@ -184,6 +191,7 @@ namespace Cue
 				autoHands_.Checked = o.AutoHands;
 				autoHead_.Checked = o.AutoHead;
 				handLinking_.Checked = o.HandLinking;
+				choking_.Checked = o.Choking;
 				straponPhysical_.Checked = o.StraponPhysical;
 				ignoreCamera_.Checked = o.IgnoreCamera;
 				devMode_.Checked = o.DevMode;
@@ -222,6 +230,12 @@ namespace Cue
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.HandLinking = b;
+		}
+
+		private void OnChoking(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.Choking = b;
 		}
 
 		private void OnStraponPhysical(bool b)
