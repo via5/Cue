@@ -99,9 +99,19 @@ namespace Cue
 			get { return part_.Position; }
 		}
 
+		public Vector3 Center
+		{
+			get { return part_.Center; }
+		}
+
 		public Quaternion Rotation
 		{
 			get { return part_.Rotation; }
+		}
+
+		public Quaternion CenterRotation
+		{
+			get { return part_.CenterRotation; }
 		}
 
 		public BodyPartLocker Locker

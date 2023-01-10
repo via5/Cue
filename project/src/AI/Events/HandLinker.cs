@@ -235,7 +235,7 @@
 					if (!Valid(hand, bp, ref debug_[p.PersonIndex, bp.Type.Int].why))
 						continue;
 
-					var r = bp.ClosestBodyPartRegion(hand.Position);
+					var r = bp.ClosestBodyPartRegion(hand.Center);
 					if (r.region == null)
 					{
 						debug_[p.PersonIndex, bp.Type.Int].why = "no region";
@@ -253,7 +253,7 @@
 								$"than {(closest?.ToString() ?? "(none)")}, " +
 								$"r.distance={r.distance:0.00} " +
 								$"closestDistance={closestDistance} " +
-								$"handPos={hand.Position} " +
+								$"handPos={hand.Center} " +
 								$"partPos={bp.Position}");
 
 							closestDistance = r.distance;

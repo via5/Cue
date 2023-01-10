@@ -291,6 +291,7 @@
 			"type": "rigidbody",
 			"name": "lHand",
 			"controller": "lHandControl",
+			"positionCollider": "lHand/lCarpal1/Collider3",
 			"colliders":
 			[
 				"lHand/_Collider",
@@ -339,6 +340,7 @@
 			"type": "rigidbody",
 			"name": "rHand",
 			"controller": "rHandControl",
+			"centerCollider": "rHand/rCarpal1/Collider3",
 			"colliders":
 			[
 				"rHand/_Collider",

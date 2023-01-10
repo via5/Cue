@@ -34,7 +34,9 @@ namespace Cue.Sys.Vam
 		public abstract Vector3 ControlPosition { get; set; }
 		public abstract Quaternion ControlRotation { get; set; }
 		public abstract Vector3 Position { get; }
+		public virtual Vector3 Center { get { return Position; } }
 		public abstract Quaternion Rotation { get; }
+		public virtual Quaternion CenterRotation { get { return Rotation; } }
 
 		private List<VamDebugRenderer.IDebugRender> renderers_ = null;
 		private List<VamDebugRenderer.IDebugRender> distanceRenderers_ = null;
@@ -243,7 +245,10 @@ namespace Cue.Sys.Vam
 
 		protected virtual void AddDebugRenderers()
 		{
-			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(this));
+			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddPositionRender(this));
+
+			if (Position != Center)
+				AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddCenterRender(this));
 
 			if (regions_ != null)
 			{

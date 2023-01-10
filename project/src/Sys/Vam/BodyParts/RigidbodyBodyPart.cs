@@ -8,10 +8,12 @@ namespace Cue.Sys.Vam
 		private Rigidbody[] rbs_;
 		private Rigidbody forForce_;
 		private FreeControllerV3 fc_ = null;
+		private Collider center_ = null;
 
 		public RigidbodyBodyPart(
 			VamAtom a, BodyPartType type, Rigidbody[] rbs, FreeControllerV3 fc,
-			string[] colliders, Rigidbody forForce, string[] ignoreBodyParts)
+			string[] colliders, Rigidbody forForce, string[] ignoreBodyParts,
+			string centerCollider)
 				: base(a, type, colliders, ignoreBodyParts)
 		{
 			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartType.ToString(Type)}");
@@ -24,6 +26,15 @@ namespace Cue.Sys.Vam
 
 			if (forForce_ == null && rbs_ != null && rbs_.Length > 0)
 				forForce_ = rbs_[0];
+
+			if (!string.IsNullOrEmpty(centerCollider))
+			{
+				center_ = a.FindCollider(centerCollider);
+
+				Cue.Assert(center_ != null,
+					$"centerCollider {centerCollider} not found in " +
+					$"{a.ID} {BodyPartType.ToString(Type)}");
+			}
 		}
 
 		public override Rigidbody Rigidbody
@@ -63,9 +74,31 @@ namespace Cue.Sys.Vam
 			get { return U.FromUnity(Rigidbody.position); }
 		}
 
+		public override Vector3 Center
+		{
+			get
+			{
+				if (center_ != null)
+					return U.FromUnity(center_.bounds.center);
+
+				return Position;
+			}
+		}
+
 		public override Quaternion Rotation
 		{
 			get { return U.FromUnity(Rigidbody.rotation); }
+		}
+
+		public override Quaternion CenterRotation
+		{
+			get
+			{
+				if (center_ != null)
+					return U.FromUnity(center_.transform.rotation);
+
+				return Rotation;
+			}
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)

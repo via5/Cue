@@ -393,11 +393,14 @@ namespace Cue.Sys.Vam
 			private IGraphic g_;
 
 			public BoxRender(string name, Vector3 scale)
+				: this(name, scale, new Color(1, 1, 1, 0.1f))
+			{
+			}
+
+			public BoxRender(string name, Vector3 scale, Color c)
 			{
 				g_ = Cue.Instance.Sys.CreateBoxGraphic(
-					MakeDebugName(name),
-					Vector3.Zero, scale,
-					new Color(1, 1, 1, 0.1f));
+					MakeDebugName(name), Vector3.Zero, scale, c);
 			}
 
 			public void Destroy()
@@ -512,11 +515,11 @@ namespace Cue.Sys.Vam
 		}
 
 
-		class BodyPartRender : BoxRender
+		class BodyPartPositionRender : BoxRender
 		{
 			private IBodyPart bp_;
 
-			public BodyPartRender(IBodyPart bp)
+			public BodyPartPositionRender(IBodyPart bp)
 				: base(BodyPartType.ToString(bp.Type), new Vector3(0.005f, 0.005f, 0.005f))
 			{
 				bp_ = bp;
@@ -529,6 +532,26 @@ namespace Cue.Sys.Vam
 			}
 		}
 
+
+		class BodyPartCenterRender : BoxRender
+		{
+			private IBodyPart bp_;
+
+			public BodyPartCenterRender(IBodyPart bp)
+				: base(
+					  BodyPartType.ToString(bp.Type),
+					  new Vector3(0.005f, 0.005f, 0.005f),
+					  new Color(1, 0, 0, 0.1f))
+			{
+				bp_ = bp;
+			}
+
+			protected override void DoUpdate(IGraphic g)
+			{
+				g.Position = bp_.Center;
+				g.Rotation = bp_.CenterRotation;
+			}
+		}
 
 
 		class ColliderRender : IDebugRender
@@ -649,9 +672,14 @@ namespace Cue.Sys.Vam
 			return AddRender(new ColliderRender(c));
 		}
 
-		public IDebugRender AddRender(IBodyPart bp)
+		public IDebugRender AddPositionRender(IBodyPart bp)
 		{
-			return AddRender(new BodyPartRender(bp));
+			return AddRender(new BodyPartPositionRender(bp));
+		}
+
+		public IDebugRender AddCenterRender(IBodyPart bp)
+		{
+			return AddRender(new BodyPartCenterRender(bp));
 		}
 
 		public void RemoveRender(IDebugRender r)

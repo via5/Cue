@@ -16,7 +16,9 @@ namespace Cue.Proc.Tests
 		public Vector3 ControlPosition { get; set; }
 		public Quaternion ControlRotation { get; set; }
 		public Vector3 Position { get; }
+		public Vector3 Center { get; }
 		public Quaternion Rotation { get; }
+		public Quaternion CenterRotation { get; }
 
 		public Sys.IBodyPartRegion Link { get { return null; } }
 		public bool IsLinked { get; }

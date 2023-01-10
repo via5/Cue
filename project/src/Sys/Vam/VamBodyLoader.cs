@@ -178,6 +178,7 @@ namespace Cue.Sys.Vam
 			public string forceReceiver;
 			public string rigidbody;
 			public string closestRigidbody;
+			public string centerCollider;
 			public bool useTrigger;
 		}
 
@@ -244,6 +245,7 @@ namespace Cue.Sys.Vam
 			ps.forceReceiver = J.OptString(o, "forceReceiver");
 			ps.rigidbody = J.OptString(o, "rigidbody");
 			ps.closestRigidbody = J.OptString(o, "closestRigidbody");
+			ps.centerCollider = J.OptString(o, "centerCollider");
 			ps.useTrigger = J.OptBool(o, "useTrigger", true);
 
 			var type = J.ReqString(o, "type");
@@ -404,7 +406,8 @@ namespace Cue.Sys.Vam
 
 			return new RigidbodyBodyPart(
 				atom_, ps.bodyPart, rbs.ToArray(), fc,
-				ps.colliders.ToArray(), fr, ps.ignore.ToArray());
+				ps.colliders.ToArray(), fr, ps.ignore.ToArray(),
+				ps.centerCollider);
 		}
 
 		private IBodyPart CreateTrigger(PartSettings ps)

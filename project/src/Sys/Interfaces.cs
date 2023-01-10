@@ -409,7 +409,9 @@ namespace Cue.Sys
 		Vector3 ControlPosition { get; set; }
 		Quaternion ControlRotation { get; set; }
 		Vector3 Position { get; }
+		Vector3 Center { get; }
 		Quaternion Rotation { get; }
+		Quaternion CenterRotation { get; }
 
 		IBodyPartRegion Link { get; }
 		bool IsLinked { get; }
