@@ -49,6 +49,11 @@ namespace Cue
 				}
 			}
 
+			public bool IsForced
+			{
+				get { return v_.IsForced; }
+			}
+
 			public void Set(float v, bool fast=false)
 			{
 				v_.Target = v;
@@ -352,6 +357,11 @@ namespace Cue
 			return moods_[i.Int].Value;
 		}
 
+		public bool IsExcitementForced
+		{
+			get { return moods_[MoodType.Excited.Int].IsForced; }
+		}
+
 		public void SetTemporary(MoodType i, float value, float time)
 		{
 			moods_[i.Int].SetTemporary(value, time);
@@ -494,7 +504,10 @@ namespace Cue
 					timeSinceLastOrgasm_ += s;
 
 					if (Get(MoodType.Excited) >= 1)
-						DoOrgasm();
+					{
+						if (!IsExcitementForced)
+							DoOrgasm();
+					}
 
 					break;
 				}

@@ -10,7 +10,7 @@
 		private Sys.Vam.BoolParameter active_ = null;
 		private Sys.Vam.BoolParameterRO running_ = null;
 		private Sys.Vam.StringChooserParameter atom_ = null;
-		private Sys.Vam.StringChooserParameter target_ = null;
+		private Sys.Vam.StringChooserParameter targetParam_ = null;
 		private Sys.Vam.BoolParameter trackPos_ = null;
 		private Sys.Vam.BoolParameter trackRot_ = null;
 		private Sys.Vam.FloatParameter headAngleX_ = null;
@@ -18,6 +18,9 @@
 		private Sys.Vam.FloatParameter headAngleZ_ = null;
 		private Sys.Vam.FloatParameter morphDuration_ = null;
 		private Sys.Vam.FloatParameter morphSpeed_ = null;
+		private Sys.Vam.FloatParameter lipMorph_ = null;
+		private Sys.Vam.FloatParameter upDownSpeed_ = null;
+		private Sys.Vam.FloatParameter frontBackSpeed_ = null;
 		private Sys.Vam.FloatParameter trackingSpeed_ = null;
 		private Sys.Vam.BoolParameter closeEyes_ = null;
 		private bool wasKissing_ = false;
@@ -38,11 +41,18 @@
 		private const float DefaultTrackingSpeed = 0.1f;
 		private const float TrackingSpeedTime = 3;
 
+		private const float MaxMorphSpeed = 5.0f;
+		private const float MaxLipMorph = 1.0f;
+		private const float MaxUpDownSpeed = 1.0f;
+		private const float MaxFrontBackSpeed = 1.0f;
+
 		private string[] targetStorableCache_ =
 			Sys.Vam.Parameters.MakeStorableNamesCache(PluginName);
 
 		private static CWVersionChecker versionChecker_ =
 			new CWVersionChecker(PluginName, PluginVersion);
+
+		private Person target_ = null;
 
 
 		public ClockwiseKissAnimation()
@@ -181,7 +191,7 @@
 			atom_ = new Sys.Vam.StringChooserParameter(
 				p, PluginName, "atom");
 
-			target_ = new Sys.Vam.StringChooserParameter(
+			targetParam_ = new Sys.Vam.StringChooserParameter(
 				p, PluginName, "kissTargetJSON");
 
 			trackPos_ = new Sys.Vam.BoolParameter(
@@ -205,6 +215,15 @@
 			morphSpeed_ = new Sys.Vam.FloatParameter(
 				p, PluginName, "Morph Speed");
 
+			lipMorph_ = new Sys.Vam.FloatParameter(
+				p, PluginName, "Lip Morph Max");
+
+			upDownSpeed_ = new Sys.Vam.FloatParameter(
+				p, PluginName, "Up Down Speed");
+
+			frontBackSpeed_ = new Sys.Vam.FloatParameter(
+				p, PluginName, "Front Back Speed");
+
 			trackingSpeed_ = new Sys.Vam.FloatParameter(
 				p, PluginName, "Tracking Speed");
 
@@ -220,9 +239,9 @@
 
 			// force reset
 			atom_.Value = "";
-			target_.Value = "";
+			targetParam_.Value = "";
 			atom_.Value = target.ID;
-			target_.Value = "LipTrigger";
+			targetParam_.Value = "LipTrigger";
 
 			if (target.IsPlayer)
 			{
@@ -252,6 +271,7 @@
 			trackPos_.Value = leader && Person.Body.Get(BP.Head).CanApplyForce();
 			trackRot_.Value = Person.Body.Get(BP.Head).CanApplyForce();
 			active_.Value = true;
+			target_ = target;
 			elapsed_ = 0;
 		}
 
@@ -268,6 +288,7 @@
 			else
 			{
 				log_.Info($"kiss stopped");
+				Stop();
 			}
 
 			wasKissing_ = b;
@@ -288,11 +309,24 @@
 
 			if (active_.Value)
 			{
-				log_.Info("stopping");
+				Stop();
+			}
+		}
 
-				trackingSpeed_.Value = StopTrackingSpeed;
-				active_.Value = false;
-				elapsed_ = 0;
+		private void Stop()
+		{
+			log_.Info("stopping");
+			trackingSpeed_.Value = StopTrackingSpeed;
+			active_.Value = false;
+			target_ = null;
+			elapsed_ = 0;
+		}
+
+		private float MovementEnergy
+		{
+			get
+			{
+				return Mood.MultiMovementEnergy(Person, target_);
 			}
 		}
 
@@ -309,20 +343,23 @@
 
 			if (k && active_.Value)
 			{
-				var ps = Person.Personality;
+				float energy = MovementEnergy;
 
 				// don't go too low
-				var range =
-					(morphDuration_.DefaultValue - morphDuration_.Minimum) * 0.6f;
+				var range = (morphDuration_.DefaultValue - morphDuration_.Minimum) * 0.6f;
+				morphDuration_.Value = morphDuration_.DefaultValue - range * energy;
 
-				morphDuration_.Value =
-					morphDuration_.DefaultValue -
-					range * Person.Mood.MovementEnergy;
+				range = MaxMorphSpeed - morphSpeed_.DefaultValue;
+				morphSpeed_.Value = morphSpeed_.DefaultValue + range * energy;
 
-				range = morphSpeed_.Maximum - morphSpeed_.DefaultValue;
-				morphSpeed_.Value =
-					morphSpeed_.DefaultValue +
-					range * Person.Mood.MovementEnergy;
+				range = MaxLipMorph - lipMorph_.DefaultValue;
+				lipMorph_.Value = lipMorph_.DefaultValue + range * energy;
+
+				range = MaxUpDownSpeed - upDownSpeed_.DefaultValue;
+				upDownSpeed_.Value = upDownSpeed_.DefaultValue + range * energy;
+
+				range = MaxFrontBackSpeed - frontBackSpeed_.DefaultValue;
+				frontBackSpeed_.Value = frontBackSpeed_.DefaultValue + range * energy;
 			}
 
 			if (k)

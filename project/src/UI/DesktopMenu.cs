@@ -247,7 +247,7 @@ namespace Cue
 					p.Mood.GetDamped(MoodType.Excited).SetValue(f);
 				}
 
-				if (f >= 1)
+				if (f >= 1 && !p.Mood.GetDamped(MoodType.Excited).IsForced)
 					p.Mood.ForceOrgasm();
 			}
 		}
