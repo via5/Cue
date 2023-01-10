@@ -249,8 +249,8 @@
 			closeEyes_.Value = !Person.Gaze.ShouldAvoid(target);
 
 			trackingSpeed_.Value = StartTrackingSpeed;
-			trackPos_.Value = leader;
-			trackRot_.Value = true;
+			trackPos_.Value = leader && Person.Body.Get(BP.Head).CanApplyForce();
+			trackRot_.Value = Person.Body.Get(BP.Head).CanApplyForce();
 			active_.Value = true;
 			elapsed_ = 0;
 		}

@@ -38,7 +38,6 @@ namespace Cue
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.CheckBox loadPose_ = new VUI.CheckBox("Load pose");
 		private VUI.IntTextSlider maxExcitement_;
-		private VUI.CheckBox playOrgasm_;
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
 		private VUI.CheckBox strapon_ = new VUI.CheckBox("");
@@ -54,16 +53,11 @@ namespace Cue
 			var gl = new VUI.GridLayout(3, 10);
 			gl.HorizontalStretch = new List<bool>() { false, true, false };
 			gl.HorizontalFill = true;
-
-			playOrgasm_ = new VUI.CheckBox("Play orgasm animation", OnPlayOrgasm);
-			var orgasmPanel = new VUI.Panel(new VUI.HorizontalFlow(10));
-			orgasmPanel.Add(playOrgasm_);
-			orgasmPanel.Add(new VUI.Button("Edit actions...", OnEditOrgasmTrigger));
+			gl.UniformHeight = false;
 
 			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(10));
 			straponPanel.Add(strapon_);
 			straponPanel.Add(straponWarning_);
-
 
 			var pp = new VUI.Panel(gl);
 			pp.Add(new VUI.Label("Personality"));
@@ -82,10 +76,6 @@ namespace Cue
 			pp.Add(straponPanel);
 			pp.Add(new VUI.Spacer());
 
-			pp.Add(new VUI.Label("Orgasm"));
-			pp.Add(orgasmPanel);
-			pp.Add(new VUI.Spacer());
-
 			var w = new VUI.Panel(new VUI.VerticalFlow(10));
 			w.Add(warning_);
 
@@ -98,8 +88,11 @@ namespace Cue
 				"will also set joints to Off and change their physics settings.",
 				UnityEngine.FontStyle.Italic, VUI.Label.Wrap));
 
+			p.Add(new VUI.Spacer(20));
+
 			Layout = new VUI.BorderLayout(10);
 			Add(p, VUI.BorderLayout.Top);
+			Add(new VUI.Spacer(1), VUI.BorderLayout.Center);
 			Add(w, VUI.BorderLayout.Bottom);
 
 
@@ -138,8 +131,7 @@ namespace Cue
 				else
 					SelectPersonality(person_.Personality.Name);
 
-				maxExcitement_.Value = (int)Math.Round(person_.Mood.MaxExcitement * 100);
-				playOrgasm_.Checked = person_.Mood.PlayOrgasm;
+				maxExcitement_.Value = (int)Math.Round(person_.Options.MaxExcitement * 100);
 				strapon_.Checked = person_.Body.Strapon;
 
 				if (person_.Atom.IsMale)
@@ -248,7 +240,7 @@ namespace Cue
 		{
 			if (ignore_) return;
 
-			person_.Mood.MaxExcitement = i / 100.0f;
+			person_.Options.MaxExcitement = i / 100.0f;
 			Cue.Instance.Save();
 		}
 
@@ -261,16 +253,122 @@ namespace Cue
 		{
 			person_.Body.Strapon = b;
 		}
+	}
 
-		private void OnEditOrgasmTrigger()
+
+	class PersonAnimationsTab : Tab
+	{
+		private class AnimationOptions
 		{
-			person_.Mood.OrgasmTrigger.Edit(() => Cue.Instance.Save());
+			private PersonOptions.AnimationOptions o_;
+			private VUI.CheckBox cb_;
+
+			public AnimationOptions(PersonOptions.AnimationOptions o, VUI.CheckBox cb)
+			{
+				o_ = o;
+				cb_ = cb;
+			}
+
+			public void Update(float s)
+			{
+				cb_.Checked = o_.Play;
+			}
 		}
 
-		private void OnPlayOrgasm(bool b)
+		private Person person_;
+		private VUI.CheckBox idlePose_;
+		private VUI.Label idlePoseWarning_;
+		private List<AnimationOptions> animOptions_ = new List<AnimationOptions>();
+		private bool ignore_ = false;
+
+		public PersonAnimationsTab(Person person)
+			: base("Animations", false)
 		{
-			if (ignore_) return;
-			person_.Mood.PlayOrgasm = playOrgasm_.Checked;
+			person_ = person;
+
+			var gl = new VUI.GridLayout(2, 10);
+			gl.HorizontalStretch = new List<bool>() { false, true, false };
+			gl.HorizontalFill = true;
+			var ao = new VUI.Panel(gl);
+
+			idlePose_ = new VUI.CheckBox("Play animation", (b) =>
+			{
+				if (ignore_) return;
+				person_.Options.IdlePose = b;
+			});
+
+			idlePoseWarning_ = new VUI.Label("Idle animation disabled in the main options");
+			idlePoseWarning_.Visible = false;
+			idlePoseWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
+			idlePoseWarning_.WrapMode = VUI.Label.Wrap;
+
+			var ip = new VUI.Panel(new VUI.HorizontalFlow(10));
+			ip.Add(idlePose_);
+			ip.Add(idlePoseWarning_);
+
+			ao.Add(new VUI.Label("Idle"));
+			ao.Add(ip);
+
+			foreach (var o in person_.Options.GetAnimationOptions())
+				AddAnimationOptions(ao, o);
+
+			var p = new VUI.Panel(new VUI.VerticalFlow(40));
+
+			p.Add(new VUI.Label($"Animations for {person.ID}", UnityEngine.FontStyle.Bold));
+			p.Add(ao);
+
+			Layout = new VUI.BorderLayout(10);
+			Add(p, VUI.BorderLayout.Top);
+			Add(new VUI.Spacer(1), VUI.BorderLayout.Center);
+		}
+
+		private void AddAnimationOptions(VUI.Panel p, PersonOptions.AnimationOptions o)
+		{
+			var cb = new VUI.CheckBox("Play animation", (b) =>
+			{
+				if (ignore_) return;
+				o.Play = b;
+			});
+
+			var ap = new VUI.Panel(new VUI.HorizontalFlow(10));
+			ap.Add(cb);
+			ap.Add(new VUI.Button("Start actions...", () =>
+			{
+				o.TriggerOn.Edit(() => Cue.Instance.Save());
+			}));
+
+			ap.Add(new VUI.Button("Stop actions...", () =>
+			{
+				o.TriggerOff.Edit(() => Cue.Instance.Save());
+			}));
+
+			p.Add(new VUI.Label(o.Name));
+			p.Add(ap);
+
+			animOptions_.Add(new AnimationOptions(o, cb));
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			try
+			{
+				ignore_ = true;
+
+				idlePose_.Checked = person_.Options.IdlePose;
+				idlePoseWarning_.Visible = !Cue.Instance.Options.IdlePose;
+
+				for (int i = 0; i < animOptions_.Count; ++i)
+					animOptions_[i].Update(s);
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 	}
 }

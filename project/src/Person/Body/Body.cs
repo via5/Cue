@@ -248,7 +248,7 @@ namespace Cue
 
 		public void Zapped(Person source, ZoneType zone, float intensity, float time)
 		{
-			intensity = U.Clamp(intensity, 0, person_.Mood.MaxExcitement);
+			intensity = U.Clamp(intensity, 0, person_.Options.MaxExcitement);
 
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{

@@ -32,6 +32,11 @@ namespace VUI
 			get { return new Size(150, 40); }
 		}
 
+		public Size TabButtonMinimumSize
+		{
+			get { return new Size(120, 40); }
+		}
+
 		public Size ButtonPadding
 		{
 			get { return new Size(20, 0); }

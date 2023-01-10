@@ -278,8 +278,6 @@ namespace Cue.Sys.Vam
 		private static Dictionary<Collider, VamAtom> atomCache_ =
 			new Dictionary<Collider, VamAtom>();
 
-		private static List<VamAtom> privateAtoms_ = new List<VamAtom>();
-
 		public static VamAtom AtomForCollider(Collider c)
 		{
 			VamAtom va;
@@ -292,7 +290,7 @@ namespace Cue.Sys.Vam
 				a = AtomForColliderFast(c);
 				if (a != null)
 				{
-					va = GetVamAtom(a);
+					va = Cue.Instance.VamSys.GetAtom(a);
 					atomCache_.Add(c, va);
 
 					return va;
@@ -306,7 +304,7 @@ namespace Cue.Sys.Vam
 				a = p.GetComponent<Atom>();
 				if (a != null)
 				{
-					va = GetVamAtom(a);
+					va = Cue.Instance.VamSys.GetAtom(a);
 					atomCache_.Add(c, va);
 					return va;
 				}
@@ -315,27 +313,6 @@ namespace Cue.Sys.Vam
 			}
 
 			return null;
-		}
-
-		private static VamAtom GetVamAtom(Atom a)
-		{
-			var os = Cue.Instance.ActiveObjects;
-
-			for (int i = 0; i < os.Length; ++i)
-			{
-				if ((os[i].Atom as VamAtom)?.Atom == a)
-					return os[i].Atom as VamAtom;
-			}
-
-			for (int i = 0; i < privateAtoms_.Count; ++i)
-			{
-				if (privateAtoms_[i].Atom == a)
-					return privateAtoms_[i];
-			}
-
-			var va = new VamAtom(a);
-			privateAtoms_.Add(va);
-			return va;
 		}
 
 		private static Atom AtomForColliderFast(Collider c)

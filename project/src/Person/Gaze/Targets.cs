@@ -64,6 +64,14 @@ namespace Cue
 			}
 		}
 
+
+		public interface ICustomTarget
+		{
+			string Name { get; }
+			Vector3 Position { get; }
+		}
+
+
 		private Person person_;
 
 		// per body part, per person
@@ -83,6 +91,9 @@ namespace Cue
 
 		// point below
 		private LookatDown down_;
+
+		// custom targets
+		private LookatPosition[] custom_ = new LookatPosition[0];
 
 		// all of the above in one array
 		private IGazeLookat[] all_ = new IGazeLookat[0];
@@ -149,6 +160,17 @@ namespace Cue
 
 			all_ = GetAll();
 			infos_ = new ObjectInfo[Cue.Instance.Everything.Count];
+			person_.Gaze.Picker.SetTargets(all_);
+		}
+
+		public void SetCustomPositions(ICustomTarget[] positions)
+		{
+			custom_ = new LookatPosition[positions.Length];
+			for (int i = 0; i < positions.Length; ++i)
+				custom_[i] = new LookatPosition(person_, positions[i]);
+
+			all_ = GetAll();
+			person_.Gaze.Picker.SetTargets(all_);
 		}
 
 		public IGazeLookat[] All
@@ -169,6 +191,7 @@ namespace Cue
 				1 +  // above
 				1 +  // front
 				1 +  // down
+				custom_.Length +
 				objects_.Length];
 
 			int i = 0;
@@ -183,6 +206,9 @@ namespace Cue
 			all[i++] = above_;
 			all[i++] = front_;
 			all[i++] = down_;
+
+			for (int ci = 0; ci < custom_.Length; ++ci)
+				all[i++] = custom_[ci];
 
 			for (int oi = 0; oi < objects_.Length; ++oi)
 				all[i++] = objects_[oi];
@@ -293,6 +319,14 @@ namespace Cue
 			down_.SetWeight(w, why);
 		}
 
+		public void SetCustomWeight(int i, float w, string why)
+		{
+			if (i < 0 || i >= custom_.Length)
+				return;
+
+			custom_[i].SetWeight(w, why);
+		}
+
 		public void SetObjectWeight(IObject o, float w, string why)
 		{
 			for (int i = 0; i < objects_.Length; ++i)
@@ -366,7 +400,7 @@ namespace Cue
 	{
 		protected Person person_;
 		private float weight_ = 0;
-		private string why_, failure_;
+		private string why_ = "", failure_ = "";
 		private bool set_ = false;
 
 		protected BasicGazeLookat(Person p)
@@ -420,6 +454,7 @@ namespace Cue
 		public void SetFailed(string why)
 		{
 			failure_ = why;
+			set_ = true;
 		}
 
 		public void SetWeight(float f, string why)
@@ -575,12 +610,12 @@ namespace Cue
 
 	class LookatPosition : BasicGazeLookat
 	{
-		private Vector3 pos_;
+		private readonly GazeTargets.ICustomTarget target_;
 
-		public LookatPosition(Person p, Vector3 pos)
+		public LookatPosition(Person p, GazeTargets.ICustomTarget t)
 			: base(p)
 		{
-			pos_ = pos;
+			target_ = t;
 		}
 
 		public override bool HasPosition
@@ -590,12 +625,12 @@ namespace Cue
 
 		public override Vector3 Position
 		{
-			get { return pos_; }
+			get { return target_.Position; }
 		}
 
 		public override string ToString()
 		{
-			return $"look at position {pos_}";
+			return $"look at {target_.Name} {target_.Position}";
 		}
 	}
 
@@ -707,6 +742,32 @@ namespace Cue
 				return $"random point {pos_}";
 			else
 				return "random point (none)";
+		}
+	}
+
+	class LookatCustom : BasicGazeLookat
+	{
+		private Vector3 pos_;
+
+		public LookatCustom(Person p, Vector3 pos)
+			: base(p)
+		{
+			pos_ = pos;
+		}
+
+		public override bool HasPosition
+		{
+			get { return true; }
+		}
+
+		public override Vector3 Position
+		{
+			get { return pos_; }
+		}
+
+		public override string ToString()
+		{
+			return $"look at position {pos_}";
 		}
 	}
 }

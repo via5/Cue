@@ -15,6 +15,7 @@ namespace Cue
 		public const int NoGazer = 0x01;
 		public const int NoRandom = 0x02;
 		public const int Busy = 0x04;
+		public const int Stop = 0x08;
 
 		protected Person person_;
 		protected Gaze g_;
@@ -43,7 +44,8 @@ namespace Cue
 				new GazeHands(p),
 				new GazeInteractions(p),
 				new GazeRandom(p),
-				new GazeOtherPersons(p)
+				new GazeOtherPersons(p),
+				new GazeCustom(p)
 			}.ToArray();
 		}
 

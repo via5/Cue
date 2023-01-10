@@ -87,7 +87,6 @@ namespace Cue
 		public void Init()
 		{
 			targets_.Init();
-			picker_.SetTargets(targets_.All);
 			events_ = BasicGazeEvent.All(person_);
 			gazeDuration_ = person_.Personality.GetDuration(PS.GazeDuration).Clone();
 		}
@@ -247,12 +246,7 @@ namespace Cue
 				}
 				else if (CurrentTarget != null)
 				{
-					var head = person_.Body.Get(BP.Head);
-
-					// the head gets locked when grabbed, but disabling gaze
-					// will make the head snap when grab stops; it's fine for
-					// other animations, but it's jarring for grabbing
-					if (head.LockedFor(BodyPartLock.Move) && !head.GrabbedByPlayer)
+					if (MustDisableGaze())
 						gazer_.Enabled = false;
 					else
 						gazer_.Enabled = gazerEnabled_;
@@ -265,6 +259,22 @@ namespace Cue
 				gazer_.Update(s);
 			}
 			Instrumentation.End();
+		}
+
+		private bool MustDisableGaze()
+		{
+			var head = person_.Body.Get(BP.Head);
+
+			// the head gets locked when grabbed, but disabling gaze
+			// will make the head snap when grab stops; it's fine for
+			// other animations, but it's jarring for grabbing
+			if (head.LockedFor(BodyPartLock.Move) && !head.GrabbedByPlayer)
+				return true;
+
+			if (!head.CanApplyForce())
+				return true;
+
+			return false;
 		}
 
 		private bool UpdatePicker(float s)
@@ -336,6 +346,9 @@ namespace Cue
 				{
 					var e = events_[i];
 					flags |= e.Check(flags);
+
+					if (Bits.IsSet(flags, BasicGazeEvent.Stop))
+						break;
 				}
 			}
 
@@ -418,7 +431,7 @@ namespace Cue
 
 			if (p != null && p.IsPlayer)
 			{
-				if (ex < ps.Get(avoidPlayerMinExcitement) || ex > ps.Get(avoidPlayerMaxExcitement))
+				if (ex < ps.Get(avoidPlayerMinExcitement) || ex >= ps.Get(avoidPlayerMaxExcitement))
 					return false;
 
 				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazePlayerDelayAfterOrgasm))
@@ -428,7 +441,7 @@ namespace Cue
 			}
 			else
 			{
-				if (ex < ps.Get(avoidOthersMinExcitement) || ex > ps.Get(avoidOthersMaxExcitement))
+				if (ex < ps.Get(avoidOthersMinExcitement) || ex >= ps.Get(avoidOthersMaxExcitement))
 					return false;
 
 				if (person_.Mood.TimeSinceLastOrgasm < ps.Get(PS.AvoidGazeOthersDelayAfterOrgasm))

@@ -91,6 +91,8 @@
 
 				target_.Homing.Mouth = false;
 				target_ = null;
+
+				person_.Options.GetAnimationOption(PersonOptions.Head).Trigger(false);
 			}
 
 			person_.Animator.StopType(AnimationType.Blowjob, stopFlags);
@@ -231,13 +233,14 @@
 			target_ = t;
 
 			Log.Info($"started with {target_}");
+			person_.Options.GetAnimationOption(PersonOptions.Head).Trigger(true);
 
 			return true;
 		}
 
 		private bool CheckAnim()
 		{
-			if (target_ != null)
+			if (target_ != null && person_.Options.GetAnimationOption(PersonOptions.Head).Play)
 			{
 				AnimationStatus state = person_.Animator.PlayingStatus(
 					AnimationType.Blowjob);

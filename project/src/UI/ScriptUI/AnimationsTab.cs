@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class PersonAnimationsTab : Tab
+	class PersonDebugAnimationsTab : Tab
 	{
 		private Person person_;
 		private VUI.ComboBox<IAnimation> anims_ = new VUI.ComboBox<IAnimation>();
@@ -13,7 +13,7 @@ namespace Cue
 		private bool ignore_ = false;
 		private DebugLines debug_ = null;
 
-		public PersonAnimationsTab(Person person)
+		public PersonDebugAnimationsTab(Person person)
 			: base("Anim", false)
 		{
 			person_ = person;

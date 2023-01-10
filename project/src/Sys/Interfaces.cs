@@ -32,9 +32,12 @@ namespace Cue.Sys
 		}
 	}
 
+	public delegate void Callback();
 
 	public interface ISys
 	{
+		event Callback AtomsChanged;
+
 		void ClearLog();
 		void LogLines(string s, int level);
 		IAtom GetAtom(string id);
@@ -475,6 +478,7 @@ namespace Cue.Sys
 	public interface IAtom
 	{
 		string ID { get; }
+		string Data { get; }
 		bool Visible { get; set; }
 		bool IsPerson { get; }
 		bool IsMale { get; }

@@ -332,6 +332,11 @@ namespace Cue.Sys.Vam
 			get { return "Camera"; }
 		}
 
+		public override string Data
+		{
+			get { return ""; }
+		}
+
 		public override bool IsPerson
 		{
 			get { return true; }

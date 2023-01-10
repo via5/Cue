@@ -102,6 +102,9 @@ namespace Cue
 			if (!Cue.Instance.Options.IdlePose)
 				return false;
 
+			if (!person_.Options.IdlePose)
+				return false;
+
 			var name = person_.Personality.GetString(PS.IdleAnimation);
 			if (string.IsNullOrEmpty(name))
 				return false;

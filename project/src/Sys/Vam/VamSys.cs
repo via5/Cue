@@ -41,6 +41,9 @@ namespace Cue.Sys.Vam
 		private Action deferredInit_ = null;
 		private Linker linker_ = new Linker();
 		private Dictionary<Transform, VamBodyPart> partMap_ = new Dictionary<Transform, VamBodyPart>();
+		private List<VamAtom> atomsCache_ = new List<VamAtom>();
+
+		public event Callback AtomsChanged;
 
 		public VamSys(MVRScript s)
 		{
@@ -119,13 +122,31 @@ namespace Cue.Sys.Vam
 			get { return input_; }
 		}
 
+		public VamAtom AtomFromCache(Atom a)
+		{
+			for (int i = 0; i < atomsCache_.Count; ++i)
+			{
+				if (atomsCache_[i].Atom == a)
+					return atomsCache_[i];
+			}
+
+			var va = new VamAtom(a);
+			atomsCache_.Add(va);
+			return va;
+		}
+
+		public VamAtom GetAtom(Atom a)
+		{
+			return AtomFromCache(a);
+		}
+
 		public IAtom GetAtom(string id)
 		{
 			var a = SuperController.singleton.GetAtomByUid(id);
 			if (a == null)
 				return null;
 
-			return new VamAtom(a);
+			return AtomFromCache(a);
 		}
 
 		public List<IAtom> GetAtoms(bool alsoOff = false)
@@ -135,7 +156,7 @@ namespace Cue.Sys.Vam
 			foreach (var a in SuperController.singleton.GetAtoms())
 			{
 				if (a.on || alsoOff)
-					list.Add(new VamAtom(a));
+					list.Add(AtomFromCache(a));
 			}
 
 			list.Add(cameraAtom_);
@@ -170,7 +191,7 @@ namespace Cue.Sys.Vam
 
 		public IAtom ContainingAtom
 		{
-			get { return new VamAtom(script_.containingAtom); }
+			get { return AtomFromCache(script_.containingAtom); }
 		}
 
 		public Vector3 CameraPosition
@@ -342,6 +363,36 @@ namespace Cue.Sys.Vam
 				Physics.IgnoreLayerCollision(i, VamBoxGraphic.Layer, b);
 
 			VamMorphManager.Instance.OnPluginState(b);
+
+			var sc = SuperController.singleton;
+
+			if (b)
+			{
+				sc.onAtomAddedHandlers += OnAtomAdded;
+				sc.onAtomRemovedHandlers += OnAtomRemoved;
+				sc.onAtomUIDRenameHandlers += OnAtomRenamed;
+			}
+			else
+			{
+				sc.onAtomAddedHandlers -= OnAtomAdded;
+				sc.onAtomRemovedHandlers -= OnAtomRemoved;
+				sc.onAtomUIDRenameHandlers -= OnAtomRenamed;
+			}
+		}
+
+		private void OnAtomAdded(Atom a)
+		{
+			AtomsChanged?.Invoke();
+		}
+
+		private void OnAtomRemoved(Atom a)
+		{
+			AtomsChanged?.Invoke();
+		}
+
+		private void OnAtomRenamed(string oldName, string newName)
+		{
+			AtomsChanged?.Invoke();
 		}
 
 		public void OnReady(Action f)

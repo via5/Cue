@@ -265,6 +265,8 @@ namespace Cue
 			person_.Atom.SetCollidersForKiss(false, target_.Atom);
 			target_ = null;
 			leading_ = false;
+
+			person_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(false);
 		}
 
 		private void Next()
@@ -349,6 +351,9 @@ namespace Cue
 						leading_ = true;
 						startingHeadPos_ = person_.Body.Get(BP.Head).Position;
 
+						person_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(true);
+						target_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(true);
+
 						return true;
 					}
 					else
@@ -384,13 +389,16 @@ namespace Cue
 				return false;
 			}
 
-			if (!person_.Animator.PlayType(
-				AnimationType.Kiss, new AnimationContext(target, locks_[0].Key)))
+			if (person_.Options.GetAnimationOption(PersonOptions.Kiss).Play)
 			{
-				elapsed_ = 0;
-				lastResult_ = $"kiss animation failed to start";
-				target.AI.GetEvent<KissEvent>().Unlock();
-				return false;
+				if (!person_.Animator.PlayType(
+					AnimationType.Kiss, new AnimationContext(target, locks_[0].Key)))
+				{
+					elapsed_ = 0;
+					lastResult_ = $"kiss animation failed to start";
+					target.AI.GetEvent<KissEvent>().Unlock();
+					return false;
+				}
 			}
 
 			if (!target.AI.GetEvent<KissEvent>().StartedFrom(person_, minDuration_))
@@ -424,15 +432,18 @@ namespace Cue
 
 		private bool StartedFrom(Person initiator, float minDuration)
 		{
-			if (!person_.Animator.PlayType(
-				AnimationType.Kiss, new AnimationContext(
-					initiator, locks_[0].Key)))
+			if (person_.Options.GetAnimationOption(PersonOptions.Kiss).Play)
 			{
-				// animations can fail on player
-				if (!person_.IsPlayer)
+				if (!person_.Animator.PlayType(
+					AnimationType.Kiss, new AnimationContext(
+						initiator, locks_[0].Key)))
 				{
-					lastResult_ = $"kiss animation failed to start";
-					return false;
+					// animations can fail on player
+					if (!person_.IsPlayer)
+					{
+						lastResult_ = $"kiss animation failed to start";
+						return false;
+					}
 				}
 			}
 

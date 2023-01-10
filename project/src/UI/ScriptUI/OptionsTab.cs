@@ -160,6 +160,7 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(p, VUI.BorderLayout.Top);
+			Add(new VUI.Label(Version.DisplayString), VUI.BorderLayout.Bottom);
 
 			o.Changed += OnOptionsChanged;
 			OnOptionsChanged();

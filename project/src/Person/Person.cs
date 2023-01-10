@@ -4,6 +4,206 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	public class PersonOptions
+	{
+		public const int Orgasm = 0;
+		public const int HandjobLeft = 1;
+		public const int HandjobRight = 2;
+		public const int LeftFinger = 3;
+		public const int RightFinger = 4;
+		public const int Head = 5;
+		public const int Thrust = 6;
+		public const int Trib = 7;
+		public const int Kiss = 8;
+
+
+		public class AnimationOptions
+		{
+			private readonly int type_;
+			private readonly string name_;
+			private readonly string key_;
+			private CustomTrigger triggerOn_, triggerOff_;
+			private bool play_ = true;
+			private readonly Sys.IActionParameter action_;
+
+			public AnimationOptions(Person p, int type, string name, Action f = null)
+			{
+				type_ = type;
+				name_ = name;
+				key_ = name.ToLower();
+				triggerOn_ = new CustomTrigger($"{name}.on");
+				triggerOff_ = new CustomTrigger($"{name}.on");
+
+				if (f == null)
+					action_ = null;
+				else
+					action_ = Cue.Instance.Sys.RegisterActionParameter($"{p.ID}.{name}", f);
+			}
+
+			public void Load(JSONClass o)
+			{
+				if (o.HasKey(key_))
+				{
+					var ao = o[key_].AsObject;
+
+					J.OptBool(ao, "play", ref play_);
+
+					if (ao.HasKey("triggerOn"))
+						triggerOn_ = CustomTrigger.FromJSON(ao["triggerOn"].AsObject);
+
+					if (ao.HasKey("triggerOff"))
+						triggerOff_ = CustomTrigger.FromJSON(ao["triggerOff"].AsObject);
+				}
+			}
+
+			public void Save(JSONClass o)
+			{
+				var ao = new JSONClass();
+
+				ao.Add("play", new JSONData(play_));
+				ao.Add("triggerOn", triggerOn_.ToJSON());
+				ao.Add("triggerOff", triggerOff_.ToJSON());
+
+				o[key_] = ao;
+			}
+
+			public int Type
+			{
+				get { return type_; }
+			}
+
+			public string Name
+			{
+				get { return name_; }
+			}
+
+			public CustomTrigger TriggerOn
+			{
+				get { return triggerOn_; }
+			}
+
+			public CustomTrigger TriggerOff
+			{
+				get { return triggerOff_; }
+			}
+
+			public void Trigger(bool on)
+			{
+				if (on)
+					triggerOn_.Fire();
+				else
+					TriggerOff.Fire();
+			}
+
+			public bool Play
+			{
+				get
+				{
+					return play_;
+				}
+
+				set
+				{
+					if (play_ != value)
+					{
+						play_ = value;
+						OnChange();
+					}
+				}
+			}
+
+			private void OnChange()
+			{
+				Cue.Instance.Save();
+			}
+		}
+
+
+		private readonly Person person_;
+		private float maxExcitement_ = 1.0f;
+		private List<AnimationOptions> anims_ = new List<AnimationOptions>();
+		private bool idlePose_ = true;
+
+		public PersonOptions(Person p)
+		{
+			person_ = p;
+
+			anims_.Add(new AnimationOptions(p, Orgasm, "Orgasm", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, HandjobLeft, "Left HJ", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, HandjobRight, "Right HJ", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, LeftFinger, "Left Finger", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, RightFinger, "Right Finger", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, Head, "Head"));
+			anims_.Add(new AnimationOptions(p, Thrust, "Thrust"));
+			anims_.Add(new AnimationOptions(p, Trib, "Trib"));
+			anims_.Add(new AnimationOptions(p, Kiss, "Kiss"));
+		}
+
+		public void Load(JSONClass o)
+		{
+			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
+			J.OptBool(o, "idlePose", ref idlePose_);
+
+			foreach (var a in anims_)
+				a.Load(o);
+		}
+
+		public void Save(JSONClass o)
+		{
+			o.Add("maxExcitement", new JSONData(maxExcitement_));
+			o.Add("idlePose", new JSONData(idlePose_));
+
+			foreach (var a in anims_)
+				a.Save(o);
+		}
+
+		public float MaxExcitement
+		{
+			get { return maxExcitement_; }
+			set { maxExcitement_ = value; OnChange(); }
+		}
+
+		public bool IdlePose
+		{
+			get { return idlePose_; }
+			set { idlePose_ = value; OnChange(); }
+		}
+
+		public List<AnimationOptions> GetAnimationOptions()
+		{
+			return anims_;
+		}
+
+		public AnimationOptions GetAnimationOption(int type)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == type)
+					return anims_[i];
+			}
+
+			return null;
+		}
+
+		public void Trigger(int type, bool on)
+		{
+			var a = GetAnimationOption(type);
+			if (a == null)
+				return;
+
+			if (on)
+				a.TriggerOn.Fire();
+			else
+				a.TriggerOff.Fire();
+		}
+
+		private void OnChange()
+		{
+			Cue.Instance.Save();
+		}
+	}
+
+
 	public class Person : BasicObject
 	{
 		public delegate void Callback();
@@ -21,6 +221,7 @@ namespace Cue
 		private IAI ai_ = null;
 		private ExpressionManager expression_;
 		private PersonStatus status_;
+		private PersonOptions options_;
 
 		private ISpeaker speech_;
 		private IClothing clothing_;
@@ -36,7 +237,7 @@ namespace Cue
 			personIndex_ = personIndex;
 
 			body_ = new Body(this);
-			SetPersonality(Resources.Personalities.Clone(Resources.DefaultPersonality, this));
+			SetPersonality(Resources.Personalities.Clone(Resources.DefaultPersonality, this), false);
 			animator_ = new Animator(this);
 			excitement_ = new Excitement(this);
 			gaze_ = new Gaze(this);
@@ -45,6 +246,7 @@ namespace Cue
 
 			expression_ = new ExpressionManager(this);
 			status_ = new PersonStatus(this);
+			options_ = new PersonOptions(this);
 
 			speech_ = Integration.CreateSpeaker(this);
 			clothing_ = Integration.CreateClothing(this);
@@ -90,8 +292,13 @@ namespace Cue
 
 				personality_.Load(po);
 			}
+			else
+			{
+				if (loadPose_)
+					personality_.Pose.Set(this);
+			}
 
-			Mood.Load(r);
+			Options.Load(r);
 		}
 
 		public override JSONNode ToJSON()
@@ -101,7 +308,7 @@ namespace Cue
 			o.Add("id", ID);
 			o.Add("loadPose", new JSONData(loadPose_));
 
-			Mood.Save(o);
+			Options.Save(o);
 
 			var p = personality_.ToJSON();
 			if (p.Count > 0)
@@ -160,7 +367,7 @@ namespace Cue
 			set { loadPose_ = value; }
 		}
 
-		public void SetPersonality(Personality p)
+		public void SetPersonality(Personality p, bool canLoadPose = true)
 		{
 			if (personality_ != null)
 				personality_.Destroy();
@@ -172,7 +379,7 @@ namespace Cue
 			voice_ = personality_.CreateVoice();
 			voice_.Init(this);
 
-			if (loadPose_)
+			if (loadPose_ && canLoadPose)
 				personality_.Pose.Set(this);
 
 			PersonalityChanged?.Invoke();
@@ -186,6 +393,11 @@ namespace Cue
 		public PersonStatus Status
 		{
 			get { return status_; }
+		}
+
+		public PersonOptions Options
+		{
+			get { return options_; }
 		}
 
 		public bool IsInteresting

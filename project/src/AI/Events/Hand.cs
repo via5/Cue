@@ -1,5 +1,7 @@
 ﻿namespace Cue
 {
+	using AnimationOptions = PersonOptions.AnimationOptions;
+
 	class HandEvent : BasicEvent
 	{
 		class HandInfo
@@ -339,8 +341,11 @@
 		{
 			Log.Verbose($"stopping {hand.name}");
 
+			AnimationOptions ao = null;
+
 			if (hand.anim != AnimationType.None)
 			{
+				ao = GetAnimationOption(hand);
 				person_.Animator.StopType(hand.anim, stopFlags);
 				hand.anim = AnimationType.None;
 			}
@@ -363,6 +368,7 @@
 			}
 
 			Unlock(hand);
+			ao?.Trigger(false);
 		}
 
 		private void Unlock(HandInfo hand)
@@ -444,6 +450,8 @@
 
 					hand.forcedTrigger = true;
 				}
+
+				GetAnimationOption(hand)?.Trigger(true);
 			}
 			else
 			{
@@ -467,11 +475,34 @@
 					.AddForcedTrigger(person_.PersonIndex, hand.bp.Type);
 
 				hand.forcedTrigger = true;
+
+				GetAnimationOption(hand)?.Trigger(true);
 			}
 			else
 			{
 				Log.Info($"failed to start {hand.name} fingering, can't lock");
 			}
+		}
+
+		private AnimationOptions GetAnimationOption(HandInfo hand)
+		{
+			if (hand.bp.Type == BP.LeftHand)
+			{
+				if (hand.anim == AnimationType.HandjobLeft)
+					return person_.Options.GetAnimationOption(PersonOptions.HandjobLeft);
+				else if (hand.anim == AnimationType.LeftFinger)
+					return person_.Options.GetAnimationOption(PersonOptions.LeftFinger);
+			}
+			else
+			{
+				if (hand.anim == AnimationType.HandjobRight)
+					return person_.Options.GetAnimationOption(PersonOptions.HandjobRight);
+				else if (hand.anim == AnimationType.RightFinger)
+					return person_.Options.GetAnimationOption(PersonOptions.RightFinger);
+			}
+
+			Log.Error($"unknown animation option for hand {hand}");
+			return null;
 		}
 
 		private void CheckAnim()
@@ -487,21 +518,26 @@
 		{
 			if (hand.anim != AnimationType.None)
 			{
-				AnimationStatus state = person_.Animator.PlayingStatus(hand.anim);
+				bool play = GetAnimationOption(hand)?.Play ?? true;
 
-				if (state == AnimationStatus.Playing)
+				if (play)
 				{
-					if (Mood.ShouldStopSexAnimation(person_, hand.targetBodyPart.Person))
-						person_.Animator.PauseType(hand.anim);
-				}
-				else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
-				{
-					if (Mood.CanStartSexAnimation(person_, hand.targetBodyPart.Person))
+					AnimationStatus state = person_.Animator.PlayingStatus(hand.anim);
+
+					if (state == AnimationStatus.Playing)
 					{
-						if (!person_.Animator.PlayType(
-								hand.anim, new AnimationContext(hand.targetBodyPart.Person, hand.sourceLocks[0].Key)))
+						if (Mood.ShouldStopSexAnimation(person_, hand.targetBodyPart.Person))
+							person_.Animator.PauseType(hand.anim);
+					}
+					else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
+					{
+						if (Mood.CanStartSexAnimation(person_, hand.targetBodyPart.Person))
 						{
-							return false;
+							if (!person_.Animator.PlayType(
+									hand.anim, new AnimationContext(hand.targetBodyPart.Person, hand.sourceLocks[0].Key)))
+							{
+								return false;
+							}
 						}
 					}
 				}

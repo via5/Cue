@@ -131,13 +131,8 @@ namespace Cue
 		private float baseTiredness_ = 0;
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
 		private MoodValue[] moods_ = new MoodValue[MoodType.Count];
-		private float maxExcitement_ = 1.0f;
 
 		private Choked[] choked_ = new Choked[MoodType.Count];
-
-		private CustomTrigger orgasmTrigger_;
-		private bool playOrgasm_ = true;
-		private Sys.IActionParameter orgasmAction_;
 
 
 		public Mood(Person p)
@@ -149,48 +144,6 @@ namespace Cue
 
 			OnPersonalityChanged();
 			p.PersonalityChanged += OnPersonalityChanged;
-
-			orgasmTrigger_ = new CustomTrigger("Orgasm");
-			orgasmAction_ = Cue.Instance.Sys.RegisterActionParameter(
-				$"{p.ID}.Orgasm", ForceOrgasm);
-		}
-
-		public void Load(JSONClass o)
-		{
-			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
-			J.OptBool(o, "playOrgasm", ref playOrgasm_);
-
-			if (o.HasKey("orgasmTrigger"))
-				orgasmTrigger_ = CustomTrigger.FromJSON(o["orgasmTrigger"].AsObject);
-		}
-
-		public void Save(JSONClass o)
-		{
-			o.Add("maxExcitement", new JSONData(maxExcitement_));
-			o.Add("playOrgasm", new JSONData(playOrgasm_));
-			o.Add("orgasmTrigger", orgasmTrigger_.ToJSON());
-		}
-
-		public CustomTrigger OrgasmTrigger
-		{
-			get { return orgasmTrigger_; }
-		}
-
-		public bool PlayOrgasm
-		{
-			get
-			{
-				return playOrgasm_;
-			}
-
-			set
-			{
-				if (playOrgasm_ != value)
-				{
-					playOrgasm_ = value;
-					Cue.Instance.Save();
-				}
-			}
 		}
 
 		private void OnPersonalityChanged()
@@ -470,12 +423,6 @@ namespace Cue
 			}
 		}
 
-		public float MaxExcitement
-		{
-			get { return maxExcitement_; }
-			set { maxExcitement_ = value; }
-		}
-
 		private float MovementEnergyForExcitement(float e)
 		{
 			var ps = person_.Personality;
@@ -565,6 +512,7 @@ namespace Cue
 
 						SetBaseTiredness(baseTiredness_ + ps.Get(PS.OrgasmBaseTirednessIncrease));
 						SetState(PostOrgasmState);
+						person_.Options.GetAnimationOption(PersonOptions.Orgasm).Trigger(false);
 					}
 
 					break;
@@ -696,13 +644,14 @@ namespace Cue
 					0, ex.Max);
 			}
 
-			baseExcitement_.Value = Math.Min(baseExcitement_.Value, maxExcitement_);
+			baseExcitement_.Value = Math.Min(
+				baseExcitement_.Value, person_.Options.MaxExcitement);
 
 			if (person_.Body.Zap.Active)
 			{
 				float zapped = person_.Body.Zap.Intensity * 0.9f;
 				float e = Math.Max(BaseExcitement, zapped);
-				e = Math.Min(e, maxExcitement_);
+				e = Math.Min(e, person_.Options.MaxExcitement);
 				Set(MoodType.Excited, e, true);
 			}
 			else
@@ -728,10 +677,10 @@ namespace Cue
 		{
 			person_.Log.Info("orgasm");
 
-			if (playOrgasm_)
+			if (person_.Options.GetAnimationOption(PersonOptions.Orgasm).Play)
 				person_.Animator.PlayType(AnimationType.Orgasm);
 
-			orgasmTrigger_?.Fire();
+			person_.Options.GetAnimationOption(PersonOptions.Orgasm).Trigger(true);
 
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);

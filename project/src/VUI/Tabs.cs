@@ -73,7 +73,7 @@ namespace VUI
 
 			return new Size(
 				DontCare,
-				m.ButtonMinimumSize.Height + m.SelectedTabPadding.Height);
+				m.TabButtonMinimumSize.Height + m.SelectedTabPadding.Height);
 		}
 
 		private void UpdateChildren()
@@ -97,6 +97,32 @@ namespace VUI
 	}
 
 
+	class TabButton : Button
+	{
+		public TabButton(string text)
+			: base(text)
+		{
+		}
+
+		protected override Size DoGetPreferredSize(
+			float maxWidth, float maxHeight)
+		{
+			var s = Root.FitText(
+				Font, FontSize, Text, new Size(maxWidth, maxHeight));
+
+			s += Style.Metrics.ButtonPadding;
+
+			return Size.Max(s, Style.Metrics.TabButtonMinimumSize);
+		}
+
+		protected override Size DoGetMinimumSize()
+		{
+			var s = Root.TextSize(Font, FontSize, Text);
+			return Size.Max(s, Style.Metrics.TabButtonMinimumSize);
+		}
+	}
+
+
 	class Tabs : Widget
 	{
 		public override string TypeName { get { return "Tabs"; } }
@@ -104,7 +130,7 @@ namespace VUI
 		class Tab
 		{
 			private readonly Tabs tabs_;
-			private readonly Button button_;
+			private readonly TabButton button_;
 			private readonly Panel panel_;
 			private readonly Widget widget_;
 			private bool selected_ = false;
@@ -112,7 +138,7 @@ namespace VUI
 			public Tab(Tabs tabs, string text, Widget w)
 			{
 				tabs_ = tabs;
-				button_ = new Button(text);
+				button_ = new TabButton(text);
 				panel_ = new Panel();
 				widget_ = w;
 
@@ -150,7 +176,7 @@ namespace VUI
 				if (selected_)
 				{
 					button_.MinimumSize =
-						Style.Metrics.ButtonMinimumSize +
+						Style.Metrics.TabButtonMinimumSize +
 						Style.Metrics.SelectedTabPadding;
 
 					button_.BackgroundColor =
@@ -164,7 +190,7 @@ namespace VUI
 				}
 				else
 				{
-					button_.MinimumSize = new Size(DontCare, DontCare);
+					button_.MinimumSize = Style.Metrics.TabButtonMinimumSize;
 
 					button_.BackgroundColor =
 						Style.Theme.ButtonBackgroundColor;

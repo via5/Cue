@@ -53,6 +53,10 @@ namespace Cue.Sys.Mock
 		private readonly MockInput input_ = new MockInput();
 		private readonly Random rnd_ = new Random();
 
+#pragma warning disable CS0067  // unused
+		public event Callback AtomsChanged;
+#pragma warning restore CS0067
+
 		public MockSys()
 		{
 			instance_ = this;
@@ -402,6 +406,11 @@ namespace Cue.Sys.Mock
 		public string ID
 		{
 			get { return id_; }
+		}
+
+		public string Data
+		{
+			get { return ""; }
 		}
 
 		public bool Visible

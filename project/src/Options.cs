@@ -418,6 +418,7 @@ namespace Cue
 			o["autoHands"] = new JSONData(autoHands_);
 			o["autoHead"] = new JSONData(autoHead_);
 			o["idlePose"] = new JSONData(idlePose_);
+			o["version"] = new JSONData(Version.String);
 
 			finish_.Save(o);
 

@@ -115,6 +115,7 @@
 
 			SetZoneEnabled(true);
 			running_ = true;
+			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(true);
 
 			return true;
 		}
@@ -143,6 +144,8 @@
 
 			running_ = false;
 			receiver_ = null;
+
+			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(false);
 		}
 
 		private void SetZoneEnabled(bool b)
@@ -163,20 +166,23 @@
 
 		private void CheckAnim()
 		{
-			AnimationStatus state = person_.Animator.PlayingStatus(AnimationType.Thrust);
+			if (person_.Options.GetAnimationOption(PersonOptions.Thrust).Play)
+			{
+				AnimationStatus state = person_.Animator.PlayingStatus(AnimationType.Thrust);
 
-			if (state == AnimationStatus.Playing)
-			{
-				if (Mood.ShouldStopSexAnimation(person_, receiver_?.Person))
-					person_.Animator.StopType(AnimationType.Thrust);
-			}
-			else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
-			{
-				if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
+				if (state == AnimationStatus.Playing)
 				{
-					person_.Animator.PlayType(
-						AnimationType.Thrust, new AnimationContext(
-							receiver_?.Person, lock_.Key));
+					if (Mood.ShouldStopSexAnimation(person_, receiver_?.Person))
+						person_.Animator.StopType(AnimationType.Thrust);
+				}
+				else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
+				{
+					if (Mood.CanStartSexAnimation(person_, receiver_?.Person))
+					{
+						person_.Animator.PlayType(
+							AnimationType.Thrust, new AnimationContext(
+								receiver_?.Person, lock_.Key));
+					}
 				}
 			}
 		}

@@ -199,6 +199,7 @@
     <Compile Include="src\Person\Finish.cs" />
     <Compile Include="src\Person\Gaze\Events.cs" />
     <Compile Include="src\Person\Gaze\Events\Above.cs" />
+    <Compile Include="src\Person\Gaze\Events\Custom.cs" />
     <Compile Include="src\Person\Gaze\Events\Down.cs" />
     <Compile Include="src\Person\Gaze\Events\Front.cs" />
     <Compile Include="src\Person\Gaze\Events\Grabbed.cs" />

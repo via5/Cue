@@ -334,10 +334,11 @@ namespace Cue
 			person_ = p;
 
 			AddSubTab(new PersonSettingsTab(person_));
+			AddSubTab(new PersonAnimationsTab(person_));
 			AddSubTab(new PersonStateTab(person_));
 			AddSubTab(new PersonAITab(person_));
 			AddSubTab(new PersonBodyTab(person_));
-			AddSubTab(new PersonAnimationsTab(person_));
+			AddSubTab(new PersonDebugAnimationsTab(person_));
 			AddSubTab(new PersonDumpTab(person_));
 
 			for (int i = 1; i < 6; ++i)

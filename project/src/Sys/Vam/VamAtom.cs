@@ -54,6 +54,7 @@ namespace Cue.Sys.Vam
 	public abstract class VamBasicAtom : IAtom
 	{
 		public abstract string ID { get; }
+		public abstract string Data { get; }
 		public abstract bool Visible { get; set; }
 		public abstract bool IsPerson { get; }
 		public abstract bool IsMale { get; }
@@ -139,6 +140,7 @@ namespace Cue.Sys.Vam
 		private VamCorruptionDetector cd_;
 		private List<Collider> allColliders_ = null;
 		private Damping[] damping_;
+		private StringParameter dataParameter_ = null;
 
 		public VamAtom(Atom atom)
 		{
@@ -204,6 +206,20 @@ namespace Cue.Sys.Vam
 		public override string ID
 		{
 			get { return atom_.uid; }
+		}
+
+		public override string Data
+		{
+			get
+			{
+				if (atom_.type != "UIText")
+					return "";
+
+				if (dataParameter_ == null)
+					dataParameter_ = new StringParameter(this, "Text", "text");
+
+				return dataParameter_.Value;
+			}
 		}
 
 		public override bool Visible

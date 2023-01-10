@@ -138,7 +138,7 @@ namespace Cue.Sys.Vam
 					if (!kv.Value || kv.Key == null)
 						continue;
 
-					var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform) as VamBodyPart;
+					var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform);
 
 					if (bp == null)
 					{

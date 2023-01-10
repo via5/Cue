@@ -527,10 +527,10 @@
 	"lookFrontWeight": 0,
 	"lookDownWeight": 0,
 
-	"idleNaturalRandomWeight": 0.4,
+	"idleNaturalRandomWeight": 0.2,
 	"idleEmptyRandomWeight": 0.05,
 	"naturalRandomWeight": 0.0001,
-	"naturalOtherEyesWeight": 0.2,
+	"naturalOtherEyesWeight": 0.4,
 	"busyOtherEyesWeight": 0.5,
 	"naturalPlayerEyesWeight": 1.5,
 	"busyPlayerEyesWeight": 1,
