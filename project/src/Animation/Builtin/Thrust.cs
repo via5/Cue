@@ -10,6 +10,7 @@ namespace Cue.Proc
 			public float durationMax;
 			public float durationWin;
 			public float durationInterval;
+			public bool checkDirection;
 		}
 
 		protected struct ForceConfig
@@ -435,7 +436,12 @@ namespace Cue.Proc
 		private void UpdateForce(Force f)
 		{
 			var p = GetForceFactor();
-			var dir = GetDirection();
+			Vector3 dir;
+
+			if (config_.checkDirection)
+				dir = GetDirection();
+			else
+				dir = new Vector3(0, 0, -1);
 
 			float fmin = fconfig_.hipForceMin * p;
 			float fmax = fconfig_.hipForceMax * p;
@@ -508,6 +514,7 @@ namespace Cue.Proc
 			c.durationMax = 0.12f;
 			c.durationWin = 0.06f;
 			c.durationInterval = 10;
+			c.checkDirection = true;
 
 			return c;
 		}
@@ -555,6 +562,7 @@ namespace Cue.Proc
 			c.durationMax = 0.08f;
 			c.durationWin = 0.08f;
 			c.durationInterval = 10;
+			c.checkDirection = false;
 
 			return c;
 		}
