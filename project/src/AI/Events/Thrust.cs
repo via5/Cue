@@ -30,6 +30,11 @@
 		public override bool CanToggle { get { return true; } }
 		public override bool CanDisable { get { return false; } }
 
+		public Person Receiver
+		{
+			get { return receiver_?.Person; }
+		}
+
 		protected override void DoUpdate(float s)
 		{
 			if (active_)
@@ -111,11 +116,11 @@
 			receiver_.AddForcedTrigger(
 				person_.PersonIndex, person_.Body.GenitalsBodyPart);
 
-			receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.SexReceiver);
-
 			SetZoneEnabled(true);
 			running_ = true;
 			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(true);
+
+			Body.SetSexDamping();
 
 			return true;
 		}
@@ -132,8 +137,6 @@
 			receiver_.RemoveForcedTrigger(
 				person_.PersonIndex, person_.Body.GenitalsBodyPart);
 
-			receiver_.Person.Atom.SetBodyDamping(Sys.BodyDamping.Normal);
-
 			SetZoneEnabled(false);
 
 			if (lock_ != null)
@@ -143,6 +146,7 @@
 			}
 
 			running_ = false;
+			Body.SetSexDamping();
 			receiver_ = null;
 
 			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(false);

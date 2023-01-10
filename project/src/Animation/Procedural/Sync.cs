@@ -15,6 +15,7 @@ namespace Cue.Proc
 		bool Finished { get; }
 		float Magnitude { get; }
 		float Energy { set; }
+		float CurrentDurationTime { get; }
 
 		bool Slaps { get; set; }
 		Person[] SlapTargets { get; set; }
@@ -111,6 +112,7 @@ namespace Cue.Proc
 		public abstract float Magnitude { get; }
 		public abstract float Energy { set; }
 		public abstract bool Finished { get; }
+		public abstract float CurrentDurationTime { get; }
 
 		public bool Slaps
 		{
@@ -187,6 +189,7 @@ namespace Cue.Proc
 		public override float Magnitude { get { return 0; } }
 		public override float Energy { set { } }
 		public override bool Finished { get { return true; } }
+		public override float CurrentDurationTime { get { return 0; } }
 
 		public NoSync(bool slaps = false)
 			: base(slaps)
@@ -236,6 +239,11 @@ namespace Cue.Proc
 			set { }
 		}
 
+		public override float CurrentDurationTime
+		{
+			get { return Target?.Parent?.Sync?.CurrentDurationTime ?? 0; }
+		}
+
 		public override bool Finished
 		{
 			get { return Target?.Parent?.Sync.Finished ?? true; }
@@ -270,7 +278,10 @@ namespace Cue.Proc
 			other_ = sync as BasicSync;
 		}
 
-		public override string Name { get { return "syncother"; } }
+		public override string Name
+		{
+			get { return "syncother"; }
+		}
 
 		public override int State
 		{
@@ -285,6 +296,11 @@ namespace Cue.Proc
 		public override float Energy
 		{
 			set { }
+		}
+
+		public override float CurrentDurationTime
+		{
+			get { return other_.CurrentDurationTime; }
 		}
 
 		public override bool Finished
@@ -327,7 +343,9 @@ namespace Cue.Proc
 
 		protected override string DoToDetailedString()
 		{
-			return $"{other_}";
+			return
+				$"waiting={waiting_} mag={mag_}\n" +
+				other_.ToDetailedString();
 		}
 	}
 
@@ -375,6 +393,11 @@ namespace Cue.Proc
 		public override bool Finished
 		{
 			get { return (elapsed_ >= duration_); }
+		}
+
+		public override float CurrentDurationTime
+		{
+			get { return duration_; }
 		}
 
 		public new static ElapsedSync Create(JSONClass o)
@@ -529,6 +552,11 @@ namespace Cue.Proc
 
 				return CurrentEasing()?.Magnitude(p) ?? 0;
 			}
+		}
+
+		public override float CurrentDurationTime
+		{
+			get { return CurrentDuration().Current; }
 		}
 
 		public Duration CurrentDuration()

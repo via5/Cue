@@ -11,12 +11,14 @@ namespace Cue.Proc
 			public float durationWin;
 			public float durationInterval;
 			public bool checkDirection;
+			public float hipBackForceMaxDuration;
 		}
 
 		protected struct ForceConfig
 		{
 			public float hipForceMin;
 			public float hipForceMax;
+			public float hipForceWin;
 			public Vector3 hipTorqueMin;
 			public Vector3 hipTorqueMax;
 			public Vector3 hipTorqueWin;
@@ -373,17 +375,21 @@ namespace Cue.Proc
 		//
 		private Vector3 GetDirection()
 		{
-			if (receiver_ == null)
+			Vector3 currentDir;
+
+			if (config_.checkDirection && receiver_ != null)
+			{
+				var thisBP = GetThisBP();
+				var targetBP = GetTargetBP();
+
+				// direction between genitals
+				currentDir = (targetBP.Position - thisBP.Position).Normalized;
+			}
+			else
 			{
 				var rot = Person.Body.Get(BP.Hips).Rotation;
-				return rot.Rotate(new Vector3(0, 0, 1)).Normalized;
+				currentDir = rot.Rotate(new Vector3(0, 0, 1)).Normalized;
 			}
-
-			var thisBP = GetThisBP();
-			var targetBP = GetTargetBP();
-
-			// direction between genitals
-			var currentDir = (targetBP.Position - thisBP.Position).Normalized;
 
 			Vector3 dir;
 
@@ -436,17 +442,32 @@ namespace Cue.Proc
 		private void UpdateForce(Force f)
 		{
 			var p = GetForceFactor();
-			Vector3 dir;
-
-			if (config_.checkDirection)
-				dir = GetDirection();
-			else
-				dir = new Vector3(0, 0, -1);
+			var dir = GetDirection();
 
 			float fmin = fconfig_.hipForceMin * p;
 			float fmax = fconfig_.hipForceMax * p;
 
-			f.SetRangeWithDirection(fmin, fmax, 0, dir);
+			f.SetRangeWithDirection(fmin, fmax, fconfig_.hipForceWin, dir);
+			hipForce_.Backforce = HipBackForce;
+		}
+
+		private bool HipBackForce
+		{
+			get
+			{
+				if (config_.hipBackForceMaxDuration > 0)
+				{
+					var sync = RootGroup?.Sync;
+					if (sync != null)
+					{
+						float t = sync.CurrentDurationTime;
+						if (t < config_.hipBackForceMaxDuration)
+							return true;
+					}
+				}
+
+				return false;
+			}
 		}
 
 		public override string ToDetailedString()
@@ -489,6 +510,7 @@ namespace Cue.Proc
 
 			c.hipForceMin = 600;
 			c.hipForceMax = 1500;
+			c.hipForceWin = 300;
 
 			if (self.Body.HasPenis)
 			{
@@ -515,6 +537,7 @@ namespace Cue.Proc
 			c.durationWin = 0.06f;
 			c.durationInterval = 10;
 			c.checkDirection = true;
+			c.hipBackForceMaxDuration = 0;
 
 			return c;
 		}
@@ -544,8 +567,9 @@ namespace Cue.Proc
 		{
 			var c = new ForceConfig();
 
-			c.hipForceMin = 300;
-			c.hipForceMax = 800;
+			c.hipForceMin = 200;
+			c.hipForceMax = 400;
+			c.hipForceWin = 50;
 
 			c.hipTorqueMin = new Vector3(-20, 0, 0);
 			c.hipTorqueMax = new Vector3(-150, 0, 0);
@@ -559,10 +583,11 @@ namespace Cue.Proc
 			var c = new Config();
 
 			c.durationMin = 0.5f;
-			c.durationMax = 0.08f;
-			c.durationWin = 0.08f;
+			c.durationMax = 0.12f;
+			c.durationWin = 0.12f;
 			c.durationInterval = 10;
 			c.checkDirection = false;
+			c.hipBackForceMaxDuration = 0.15f;
 
 			return c;
 		}

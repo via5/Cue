@@ -3,6 +3,28 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	static class BodyDamping
+	{
+		public const int Normal = 0;
+		public const int SexReceiver = 1;
+
+		public static string ToString(int i)
+		{
+			switch (i)
+			{
+				case Normal:
+					return "normal";
+
+				case SexReceiver:
+					return "sex receiver";
+
+				default:
+					return $"?{i}";
+			}
+		}
+	}
+
+
 	public class Body
 	{
 		public class ZapInfo
@@ -96,6 +118,7 @@ namespace Cue
 		private ZapInfo zap_ = new ZapInfo();
 		private ForceableBool breathing_ = new ForceableBool(true);
 		private DampedFloat air_ = new DampedFloat();
+		private int damping_ = BodyDamping.Normal;
 
 		public Body(Person p)
 		{
@@ -152,6 +175,11 @@ namespace Cue
 		public bool PenisSensitive
 		{
 			get { return (HasPenis && Get(BP.Penis).IsPhysical); }
+		}
+
+		public int Damping
+		{
+			get { return damping_; }
 		}
 
 		public float Scale
@@ -231,6 +259,53 @@ namespace Cue
 		public ErogenousZone Zone(ZoneType i)
 		{
 			return zones_.Get(i);
+		}
+
+		public void SetDamping(int i)
+		{
+			damping_ = i;
+			person_.Atom.SetBodyDamping(i);
+		}
+
+		public static void SetSexDamping()
+		{
+			foreach (var p in Cue.Instance.ActivePersons)
+			{
+				if (p.AI.GetEvent<ThrustEvent>().Active ||
+					p.AI.GetEvent<TribEvent>().Active)
+				{
+					p.Body.SetDamping(BodyDamping.Normal);
+				}
+				else
+				{
+					bool found = false;
+
+					foreach (var pp in Cue.Instance.ActivePersons)
+					{
+						if (pp == p)
+							continue;
+
+						var thrust = pp.AI.GetEvent<ThrustEvent>();
+						if (thrust.Active && thrust.Receiver == p)
+						{
+							p.Body.SetDamping(BodyDamping.SexReceiver);
+							found = true;
+							break;
+						}
+
+						var trib = pp.AI.GetEvent<TribEvent>();
+						if (trib.Active && trib.Receiver == p)
+						{
+							p.Body.SetDamping(BodyDamping.SexReceiver);
+							found = true;
+							break;
+						}
+					}
+
+					if (!found)
+						p.Body.SetDamping(BodyDamping.Normal);
+				}
+			}
 		}
 
 		public void Slapped(float speed)

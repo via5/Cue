@@ -105,6 +105,7 @@ namespace Cue.Proc
 		private VectorTarget vtarget_;
 		private DirTarget dtarget_;
 		private bool useDir_ = false;
+		private bool backforce_ = false;
 
 
 		public Force(
@@ -315,6 +316,12 @@ namespace Cue.Proc
 			base.RequestStop();
 		}
 
+		public bool Backforce
+		{
+			get { return backforce_; }
+			set { backforce_ = value; }
+		}
+
 		public void SetRangeWithDirection(
 			float min, float max, float win, Vector3 dir)
 		{
@@ -514,8 +521,15 @@ namespace Cue.Proc
 
 		private float LerpedForDir()
 		{
-			float f = GetEasing().Magnitude(Sync.Magnitude);
-			return U.Lerp(dtarget_.last, dtarget_.target, f);
+			float target = dtarget_.target;
+
+			if (Backforce && !goingUp_)
+				target = -dtarget_.last;
+
+			float mag = GetEasing().Magnitude(Sync.Magnitude);
+			float f = U.Lerp(dtarget_.last, target, mag);
+
+			return f;
 		}
 
 		private Vector3 LerpedForVector()
@@ -569,7 +583,7 @@ namespace Cue.Proc
 		{
 			return
 				$"{TypeToString(type_)} {Name} {bp_} ({ApplyOnToString(applyOn_)})\n" +
-				$"usedir={useDir_} {(useDir_ ? dtarget_.ToString() : vtarget_.ToString())}\n" +
+				$"usedir={useDir_} {(useDir_ ? dtarget_.ToString() : vtarget_.ToString())} backforce={Backforce}\n" +
 				$"easings: up={easingUp_} down={easingDown_}\n" +
 				$"next={next_}, {(goingUp_ ? "up" : "down")}\n" +
 				$"lerped={LerpedForce()} busy={wasBusy_} e={MovementEnergy}";

@@ -471,12 +471,6 @@ namespace Cue.Sys
 		bool Strapon { get; set; }
 	}
 
-	static class BodyDamping
-	{
-		public const int Normal = 0;
-		public const int SexReceiver = 1;
-	}
-
 	public interface IAtom
 	{
 		string ID { get; }

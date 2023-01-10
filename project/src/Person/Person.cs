@@ -270,7 +270,7 @@ namespace Cue
 			AI.Init();
 
 			Atom.Init();
-			Atom.SetBodyDamping(Sys.BodyDamping.Normal);
+			Atom.SetBodyDamping(BodyDamping.Normal);
 		}
 
 		public override void Load(JSONClass r)

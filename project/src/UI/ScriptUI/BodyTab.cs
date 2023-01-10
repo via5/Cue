@@ -32,6 +32,7 @@ namespace Cue
 		private VUI.Label hairLoose_ = new VUI.Label();
 		private VUI.Label breathing_ = new VUI.Label();
 		private VUI.CheckBox forceNotBreathing_ = new VUI.CheckBox("Force");
+		private VUI.Label damping_ = new VUI.Label();
 
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
 		private DebugLines debug_ = null;
@@ -80,6 +81,11 @@ namespace Cue
 
 			AddForceable(p, person_.Body.DampedAir, "Air");
 
+			p.Add(new VUI.Label("Damping"));
+			p.Add(damping_);
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
 			p.Add(new VUI.Button("Zap", OnZap));
 			p.Add(new VUI.Spacer(0));
 			p.Add(new VUI.Spacer(0));
@@ -122,6 +128,7 @@ namespace Cue
 			flush_.Text = $"{person_.Atom.Body.Flush:0.00}";
 			hairLoose_.Text = $"{person_.Atom.Hair.Loose:0.00}";
 			breathing_.Text = $"{(person_.Body.Breathing ? "yes" : "no")}";
+			damping_.Text = BodyDamping.ToString(person_.Body.Damping);
 
 			if (debug_ == null)
 				debug_ = new DebugLines();
