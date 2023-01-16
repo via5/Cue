@@ -46,7 +46,10 @@ namespace Cue.Sys.Vam
 			}
 
 			if (slider_.value > 0 && slider_.value != last_)
-				Corrupted?.Invoke();
+			{
+				if (!atom_.collisionEnabled)
+					Corrupted?.Invoke();
+			}
 		}
 	}
 
