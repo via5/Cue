@@ -57,11 +57,15 @@ namespace Cue.Proc
 		private const float ForceChangeMaxAmount = 0.02f;
 
 		private float chestTorqueMin_ = -10;
-		private float chestTorqueMax_ = -100;
+		private float chestTorqueMax_ = -45;
 		private float chestTorqueWin_ = 40;
+		private float chestForceMin_ = -150;
+		private float chestForceMax_ = 150;
 		private float headTorqueMin_ = 0;
 		private float headTorqueMax_ = -10;
 		private float headTorqueWin_ = 5;
+		private float headForceMin_ = -20;
+		private float headForceMax_ = 20;
 		private Force hipForce_ = null;
 		private Force hipTorque_ = null;
 
@@ -141,7 +145,7 @@ namespace Cue.Proc
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeForce, BP.Chest,
-				new Vector3(0, 0, -300), new Vector3(0, 0, 300), null, Vector3.Zero,
+				new Vector3(0, 0, chestForceMin_), new Vector3(0, 0, chestForceMax_), null, Vector3.Zero,
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
@@ -152,7 +156,8 @@ namespace Cue.Proc
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeForce, BP.Head,
-				new Vector3(0, 0, -100), new Vector3(0, 0, 100), null, Vector3.Zero,
+				new Vector3(0, 0, headForceMin_), new Vector3(0, 0, headForceMax_),
+				null, Vector3.Zero,
 				new DurationSync(
 					new Duration(0.5f, 3), null,
 					new Duration(0, 3), null,
@@ -164,8 +169,8 @@ namespace Cue.Proc
 
 			RootGroup.AddTarget(new Force(
 				"", Force.RelativeTorque, BP.Head,
-				new Vector3(headTorqueMin_, 0, 0),
-				new Vector3(headTorqueMax_, 0, 0),
+				new Vector3(headTorqueMin_ * 0.5f, 0, 0),
+				new Vector3(headTorqueMax_ * 0.5f, 0, 0),
 				config_.durationInterval, new Vector3(headTorqueWin_, 0, 0),
 				new ParentTargetSync(), Force.ApplyOnTarget,
 				UpEasing(), DownEasing()));

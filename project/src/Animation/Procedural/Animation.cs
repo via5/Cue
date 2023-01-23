@@ -44,7 +44,7 @@ namespace Cue.Proc
 				}
 				else
 				{
-					Log.Verbose($"{this}: syncing with {other.Animator.MainSync}");
+					Log.Verbose($"{this}.{root_.Sync}: syncing with {other.Animator.MainSync.Target}.{other.Animator.MainSync}");
 					oldSync_ = root_.Sync;
 					root_.Sync = new SyncOther(other.Animator.MainSync);
 				}
@@ -52,11 +52,11 @@ namespace Cue.Proc
 
 			if (Person.Animator.MainSync != null)
 			{
-				Log.Error($"{this}: already has a main sync");
+				Log.Error($"{this}.{root_.Sync}: already has a main sync");
 			}
 			else
 			{
-				Log.Verbose($"{this} is main sync");
+				Log.Verbose($"{this}.{root_.Sync} is main sync");
 				Person.Animator.SetMainSync(root_.Sync);
 				mainSync_ = true;
 			}
@@ -99,6 +99,7 @@ namespace Cue.Proc
 					{
 						Log.Verbose($"setting old sync {oldSync_}");
 						root_.Sync = oldSync_;
+						Person.Animator.SetMainSync(root_.Sync);
 						oldSync_ = null;
 					}
 				}

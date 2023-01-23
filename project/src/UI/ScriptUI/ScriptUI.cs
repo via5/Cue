@@ -13,7 +13,7 @@ namespace Cue
 
 		public ScriptUI()
 		{
-			tabs_.UpdateInterval = 0.3f;
+			tabs_.UpdateInterval = 0.1f;
 
 			misc_ = new MiscTab();
 
