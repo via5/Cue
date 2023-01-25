@@ -271,6 +271,8 @@ namespace Cue
 		private bool autoHead_ = true;
 		private bool idlePose_ = true;
 		private bool choking_ = true;
+		private bool divLeftHand_ = true;
+		private bool divRightHand_ = true;
 
 		private FinishOptions finish_ = new FinishOptions();
 		private TriggersOptions menus_ = new TriggersOptions("Button");
@@ -393,6 +395,18 @@ namespace Cue
 			set { choking_ = value; OnChanged(); }
 		}
 
+		public bool DiviningRodLeftHand
+		{
+			get { return divLeftHand_; }
+			set { divLeftHand_ = value; OnChanged(); }
+		}
+
+		public bool DiviningRodRightHand
+		{
+			get { return divRightHand_; }
+			set { divRightHand_ = value; OnChanged(); }
+		}
+
 		public FinishOptions Finish
 		{
 			get { return finish_; }
@@ -426,6 +440,8 @@ namespace Cue
 			o["autoHead"] = new JSONData(autoHead_);
 			o["idlePose"] = new JSONData(idlePose_);
 			o["choking"] = new JSONData(choking_);
+			o["divLeftHand"] = new JSONData(divLeftHand_);
+			o["divRightHand"] = new JSONData(divRightHand_);
 			o["version"] = new JSONData(Version.String);
 
 			finish_.Save(o);
@@ -471,6 +487,8 @@ namespace Cue
 			J.OptBool(o, "autoHands", ref autoHands_);
 			J.OptBool(o, "autoHead", ref autoHead_);
 			J.OptBool(o, "idlePose", ref idlePose_);
+			J.OptBool(o, "divLeftHand", ref divLeftHand_);
+			J.OptBool(o, "divRightHand", ref divRightHand_);
 			J.OptBool(o, "choking", ref choking_);
 
 			finish_.Load(o);

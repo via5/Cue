@@ -8,6 +8,7 @@ namespace Cue
 			: base("Options", true)
 		{
 			AddSubTab(new MainOptionsTab());
+			AddSubTab(new IntegrationOptionsTab());
 			AddSubTab(new FinishOptionsTab());
 			AddSubTab(new EffectsOptionsTab());
 			AddSubTab(new SoundOptionsTab());
@@ -456,6 +457,76 @@ namespace Cue
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.MutePlayer = b;
+		}
+	}
+
+
+	class IntegrationOptionsTab : Tab
+	{
+		private VUI.CheckBox divLeftHand_, divRightHand_;
+		private bool ignore_ = false;
+
+		public IntegrationOptionsTab()
+			: base("Integration", false)
+		{
+			var o = Cue.Instance.Options;
+
+			var ly = new VUI.VerticalFlow(10);
+			ly.Expand = false;
+
+			var p = new VUI.Panel(ly);
+
+			p.Add(new VUI.Label("Divining Rod", UnityEngine.FontStyle.Bold));
+
+			divLeftHand_ = p.Add(new VUI.CheckBox(
+				"Auto left hand", OnDivLeftHand, o.DiviningRodLeftHand));
+
+			divRightHand_ = p.Add(new VUI.CheckBox(
+				"Auto right hand", OnDivRightHand, o.DiviningRodRightHand));
+
+			Layout = new VUI.BorderLayout(20);
+			Add(p, VUI.BorderLayout.Top);
+
+			o.Changed += OnOptionsChanged;
+			OnOptionsChanged();
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+		}
+
+		private void OnOptionsChanged()
+		{
+			try
+			{
+				ignore_ = true;
+
+				var o = Cue.Instance.Options;
+
+				divLeftHand_.Checked = o.DiviningRodLeftHand;
+				divRightHand_.Checked = o.DiviningRodRightHand;
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		private void OnDivLeftHand(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.DiviningRodLeftHand = b;
+		}
+
+		private void OnDivRightHand(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.DiviningRodRightHand = b;
 		}
 	}
 

@@ -137,14 +137,30 @@
 
 		public bool LeftHand
 		{
-			get { return leftHand_.active; }
-			set { Set(leftHand_, value); }
+			get
+			{
+				return leftHand_.active;
+			}
+
+			set
+			{
+				if (Cue.Instance.Options.DiviningRodLeftHand)
+					Set(leftHand_, value);
+			}
 		}
 
 		public bool RightHand
 		{
-			get { return rightHand_.active; }
-			set { Set(rightHand_, value); }
+			get
+			{
+				return rightHand_.active;
+			}
+
+			set
+			{
+				if (Cue.Instance.Options.DiviningRodRightHand)
+					Set(rightHand_, value);
+			}
 		}
 
 		public string Warning
