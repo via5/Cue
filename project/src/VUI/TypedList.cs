@@ -58,11 +58,16 @@ namespace VUI
 
 		public void AddItem(ItemType i, bool select = false)
 		{
-			AddItemNoUpdate(new Item(i));
+			InsertItem(i, -1, select);
+		}
+
+		public void InsertItem(ItemType item, int index, bool select = false)
+		{
+			InsertItemNoUpdate(new Item(item), index);
 			UpdateChoices();
 
 			if (select)
-				Select(i);
+				Select(item);
 		}
 
 		private bool ItemsEqual(ItemType a, ItemType b)
@@ -160,7 +165,7 @@ namespace VUI
 				if (ItemsEqual(items[i], sel))
 					selIndex = i;
 
-				AddItemNoUpdate(new Item(items[i]));
+				InsertItemNoUpdate(new Item(items[i]), -1);
 			}
 
 			UpdateChoices();
@@ -315,9 +320,12 @@ namespace VUI
 			popup_.popup.visible = visible;
 		}
 
-		private void AddItemNoUpdate(Item i)
+		private void InsertItemNoUpdate(Item i, int index)
 		{
-			items_.Add(i);
+			if (index < 0)
+				items_.Add(i);
+			else
+				items_.Insert(index, i);
 		}
 
 		private void OnSelectionChanged(string s)

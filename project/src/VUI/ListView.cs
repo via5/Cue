@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,6 +10,8 @@ namespace VUI
 	interface IListView
 	{
 		void OnItemActivatedInternal();
+		void OnItemRightClickedInternal();
+		void SetHoveredInternal(ListViewItem from, ListViewItem hovered);
 	}
 
 
@@ -22,27 +25,66 @@ namespace VUI
 
 	// added to the item prefab
 	//
-	class ListViewItem : MonoBehaviour, IPointerClickHandler
+	class ListViewItem : MonoBehaviour,
+		IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 	{
+		private IListView GetListView()
+		{
+			var lists = GetComponentsInParent<ListViewComponent>();
+			if (lists.Length == 0)
+			{
+				Glue.LogError("ListViewItem: no ListViewComponent in parents");
+				return null;
+			}
+
+			return lists[0]?.List;
+		}
+
+		public void OnPointerEnter(PointerEventData eventData)
+		{
+			try
+			{
+				GetListView()?.SetHoveredInternal(this, this);
+			}
+			catch (Exception e)
+			{
+				Glue.LogError("exception in ListViewItem.OnPointerEnter");
+				Glue.LogError(e.ToString());
+			}
+		}
+
+		public void OnPointerExit(PointerEventData eventData)
+		{
+			try
+			{
+				GetListView()?.SetHoveredInternal(this, null);
+			}
+			catch (Exception e)
+			{
+				Glue.LogError("exception in ListViewItem.OnPointerExit");
+				Glue.LogError(e.ToString());
+			}
+		}
+
 		public void OnPointerClick(PointerEventData eventData)
 		{
-			if (eventData.button == PointerEventData.InputButton.Left)
+			try
 			{
-				if (eventData.clickCount == 2)
+				if (eventData.button == PointerEventData.InputButton.Left)
 				{
-					var lists = GetComponentsInParent<ListViewComponent>();
-					if (lists.Length == 0)
-					{
-						Glue.LogError("ListViewItem: no ListViewComponent in parents");
-						return;
-					}
-
-					var list = lists[0];
-					if (list.List == null)
-						Glue.LogError("ListViewItem: parent list is null");
-					else
-						list.List.OnItemActivatedInternal();
+					if (eventData.clickCount == 2)
+						GetListView()?.OnItemActivatedInternal();
 				}
+				else if (eventData.button == PointerEventData.InputButton.Right)
+				{
+					if (eventData.clickCount == 1)
+						GetListView()?.OnItemRightClickedInternal();
+				}
+			}
+			catch (Exception e)
+			{
+				Glue.LogError("exception in ListViewItem.OnPointerClick");
+				Glue.LogError(e.ToString());
 			}
 		}
 	}
@@ -55,6 +97,12 @@ namespace VUI
 
 		public event ItemCallback ItemActivated;
 		public event IndexCallback ItemIndexActivated;
+
+		public event ItemCallback ItemRightClicked;
+		public event IndexCallback ItemIndexRightClicked;
+
+		private ListViewItem hovered_ = null;
+
 
 		public ListView(List<ItemType> items = null)
 			: this(items, null)
@@ -70,6 +118,7 @@ namespace VUI
 			: base(items, selectionChanged)
 		{
 			Borders = new Insets(2);
+			Events.PointerDown += OnPointerDown;
 		}
 
 		protected override GameObject CreateGameObject()
@@ -173,6 +222,61 @@ namespace VUI
 				ItemActivated?.Invoke(s);
 				ItemIndexActivated?.Invoke(SelectedIndex);
 			}
+		}
+
+		public void OnItemRightClickedInternal()
+		{
+			var s = hovered_;
+			if (s == null)
+			{
+				Glue.LogError("right clicked null");
+			}
+			else if (hovered_ != null)
+			{
+				if (ItemRightClicked != null || ItemIndexRightClicked != null)
+				{
+					int i = GetListViewItemIndex(hovered_);
+
+					if (i >= 0 && i < Count)
+					{
+						ItemRightClicked?.Invoke(Items[i]);
+						ItemIndexRightClicked?.Invoke(i);
+					}
+				}
+			}
+		}
+
+		private int GetListViewItemIndex(ListViewItem item)
+		{
+			int i = 0;
+
+			foreach (Transform t in item.transform.parent)
+			{
+				if (t == item.transform)
+					return i;
+
+				++i;
+			}
+
+			return -1;
+		}
+
+		public void SetHoveredInternal(ListViewItem from, ListViewItem hovered)
+		{
+			if (hovered == null)
+			{
+				if (hovered_ == from)
+					hovered_ = null;
+			}
+			else
+			{
+				hovered_ = hovered;
+			}
+		}
+
+		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
 		}
 	}
 }

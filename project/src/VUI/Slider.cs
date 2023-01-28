@@ -31,6 +31,7 @@ namespace VUI
 				ValueChanged += changed;
 
 			Events.Wheel += HandleWheelInternal;
+			Events.PointerDown += OnPointerDown;
 		}
 
 		public bool Horizontal
@@ -160,6 +161,11 @@ namespace VUI
 			slider_.rangeAdjustEnabled = false;
 			SetDirection();
 
+			// the MouseCallbacks on slider_ added by Widget.Create() don't
+			// seem to work at all, it needs to be added on the sub slider
+			// object
+			slider_.slider.gameObject.AddComponent<MouseCallbacks>().Widget = this;
+
 			ignore_ = true;
 			Set(value_, min_, max_);
 			ignore_ = false;
@@ -194,7 +200,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return new Size(200, 40);
+			return Style.Metrics.SliderMinimumSize;
 		}
 
 		protected override void DoPolish()
@@ -214,10 +220,15 @@ namespace VUI
 			ValueChanged?.Invoke(value_);
 		}
 
-		public bool HandleWheelInternal(WheelEvent e)
+		public void HandleWheelInternal(WheelEvent e)
 		{
 			DoTick(Math.Sign(e.Delta.Y));
-			return false;
+			e.Bubble = false;
+		}
+
+		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
 		}
 
 		protected abstract T GetValue();

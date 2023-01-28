@@ -32,6 +32,26 @@ namespace VUI
 			get { return new Size(150, 40); }
 		}
 
+		public Size TextBoxMinimumSize
+		{
+			get { return new Size(100, 40); }
+		}
+
+		public Size TextBoxPreferredSize
+		{
+			get { return new Size(200, 40); }
+		}
+
+		public int TextBoxHorizontalPadding
+		{
+			get { return 20; }
+		}
+
+		public Size SliderMinimumSize
+		{
+			get { return new Size(150, 40); }
+		}
+
 		public Size TabButtonMinimumSize
 		{
 			get { return new Size(120, 40); }
@@ -916,6 +936,8 @@ namespace VUI
 					rt.offsetMin.x + (rt.offsetMax.x - rt.offsetMin.x) / 2,
 					rt.offsetMin.y + (rt.offsetMax.y - rt.offsetMin.y) / 2);
 			}
+
+			e.labelText.alignment = TextAnchor.MiddleLeft;
 
 			Adjust(e.labelText, info);
 		}

@@ -101,6 +101,12 @@ namespace VUI
 			}
 		}
 
+		public override void OnPointerDownInternal(PointerEventData d, bool source)
+		{
+			GetRoot().SetFocus(this);
+			base.OnPointerDownInternal(d, source);
+		}
+
 		protected override void SetDirty(bool b, string why = "")
 		{
 			base.SetDirty(b, why);
@@ -132,6 +138,9 @@ namespace VUI
 
 		static private TextGenerator tg_ = null;
 		static private TextGenerationSettings ts_ = new TextGenerationSettings();
+
+		public delegate void FocusHandler(Widget blurred, Widget focused);
+		public event FocusHandler FocusChanged;
 
 		private Rectangle bounds_;
 		private Insets margins_ = new Insets(5);
@@ -204,6 +213,8 @@ namespace VUI
 			floating_ = new RootPanel(this, "floating");
 			tooltips_ = new TooltipManager(this);
 
+			content_.Clickthrough = false;
+
 			AttachTo(support);
 		}
 
@@ -251,7 +262,15 @@ namespace VUI
 			if (focused_ == w)
 				return;
 
+			Widget oldFocus = focused_;
+
+			if (focused_ != null)
+				focused_.OnBlurInternal(w);
+
 			focused_ = w;
+
+			if (focused_ != null)
+				focused_.OnFocusInternal(oldFocus);
 
 			// used by the filter textbox in the combobox so clicking it doesn't
 			// close the combobox
@@ -262,6 +281,8 @@ namespace VUI
 
 				openedPopup_ = null;
 			}
+
+			FocusChanged?.Invoke(oldFocus, focused_);
 		}
 
 		public void AttachTo(IRootSupport support)
@@ -463,6 +484,19 @@ namespace VUI
 			{
 				return ToLocal(Input.mousePosition);
 			}
+		}
+
+		public Widget WidgetAt(Point p)
+		{
+			var w = FloatingPanel.WidgetAt(p);
+			if (w != null)
+				return w;
+
+			w = ContentPanel.WidgetAt(p);
+			if (w != null)
+				return w;
+
+			return null;
 		}
 
 		private void ShowOverlay()

@@ -79,7 +79,7 @@ namespace Cue
 				else if (w.Delta.Y < 0)
 					NextWidget();
 
-				return true;
+				w.Bubble = true;
 			};
 
 			SetRoot(root);

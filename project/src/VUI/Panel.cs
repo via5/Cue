@@ -22,6 +22,8 @@ namespace VUI
 		{
 			if (ly != null)
 				Layout = ly;
+
+			WantsFocus = false;
 		}
 
 		public bool Clickthrough
@@ -39,6 +41,11 @@ namespace VUI
 					SetBackground();
 				}
 			}
+		}
+
+		protected override bool IsTransparent()
+		{
+			return clickthrough_;
 		}
 
 		public Color BackgroundColor

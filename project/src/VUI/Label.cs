@@ -37,6 +37,7 @@ namespace VUI
 			align_ = align;
 			FontStyle = fs;
 			wrap_ = wrapMode;
+			WantsFocus = false;
 		}
 
 		public Label(string t, FontStyle fs, int wrapMode=Overflow)

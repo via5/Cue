@@ -33,6 +33,7 @@ namespace VUI
 		public ComboBoxList(List<ItemType> items, ItemCallback selectionChanged)
 			: base(items, selectionChanged)
 		{
+			Events.PointerDown += OnPointerDown;
 		}
 
 		public GameObject Arrow
@@ -246,6 +247,11 @@ namespace VUI
 		private void OnFilterChanged(string s)
 		{
 			Popup.popup.filter = s;
+		}
+
+		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
 		}
 	}
 

@@ -43,6 +43,7 @@ namespace VUI
 		private Color textColor_ = Style.Theme.TextColor;
 		private readonly Tooltip tooltip_;
 		private Events events_ = new Events();
+		private bool wantsFocus_ = true;
 
 		private bool dirty_ = true;
 
@@ -179,6 +180,12 @@ namespace VUI
 			get { return events_; }
 		}
 
+		public bool WantsFocus
+		{
+			get { return wantsFocus_; }
+			set { wantsFocus_ = value; }
+		}
+
 		public bool Render
 		{
 			get
@@ -214,6 +221,43 @@ namespace VUI
 						NeedsLayout("visibility changed to hidden", true);
 				}
 			}
+		}
+
+		public virtual Widget WidgetAt(Point p)
+		{
+			if (!IsVisibleOnScreen())
+				return null;
+
+			if (AbsoluteClientBounds.Contains(p))
+			{
+				for (int i = 0; i < children_.Count; ++i)
+				{
+					var w = children_[i].WidgetAt(p);
+					if (w != null)
+						return w;
+				}
+
+				if (!IsTransparent())
+					return this;
+			}
+
+			return null;
+		}
+
+		public bool HasParent(Widget w)
+		{
+			if (w == null)
+				return false;
+
+			if (w == this)
+				return true;
+
+			return Parent?.HasParent(w) ?? false;
+		}
+
+		protected virtual bool IsTransparent()
+		{
+			return false;
 		}
 
 		protected virtual void UpdateActiveState()
@@ -570,7 +614,10 @@ namespace VUI
 
 		public override string ToString()
 		{
-			return $"{TypeName} {name_}";
+			if (string.IsNullOrEmpty(name_))
+				return $"{TypeName}";
+			else
+				return $"{TypeName}.{name_}";
 		}
 
 		public virtual string DebugLine
@@ -881,6 +928,16 @@ namespace VUI
 		}
 
 
+		public void OnFocusInternal(Widget w)
+		{
+			events_.FireFocus(w);
+		}
+
+		public void OnBlurInternal(Widget w)
+		{
+			events_.FireBlur(w);
+		}
+
 		public void OnPointerEnterInternal(PointerEventData d)
 		{
 			GetRoot()?.WidgetEntered(this);
@@ -893,32 +950,42 @@ namespace VUI
 			events_.FirePointerExit(this, d);
 		}
 
-		public void OnPointerDownInternal(PointerEventData d)
+		public virtual void OnPointerDownInternal(PointerEventData d, bool setFocus=true)
 		{
-			GetRoot()?.PointerDown(this);
-			bool? bubble = events_.FirePointerDown(this, d);
-			if (bubble ?? false && parent_ != null)
-				parent_.OnPointerDownInternal(d);
+			if (setFocus)
+			{
+				GetRoot()?.PointerDown(this);
+
+				if (WantsFocus)
+				{
+					GetRoot().SetFocus(this);
+					setFocus = false;
+				}
+			}
+
+			bool bubble = events_.FirePointerDown(this, d);
+			if (bubble && parent_ != null)
+				parent_.OnPointerDownInternal(d, setFocus);
 		}
 
 		public void OnPointerUpInternal(PointerEventData d)
 		{
-			bool? bubble = events_.FirePointerUp(this, d);
-			if (bubble ?? false && parent_ != null)
+			bool bubble = events_.FirePointerUp(this, d);
+			if (bubble && parent_ != null)
 				parent_.OnPointerUpInternal(d);
 		}
 
 		public void OnPointerClickInternal(PointerEventData d)
 		{
-			bool? bubble = events_.FirePointerClick(this, d);
-			if (bubble ?? false && parent_ != null)
+			bool bubble = events_.FirePointerClick(this, d);
+			if (bubble && parent_ != null)
 				parent_.OnPointerClickInternal(d);
 		}
 
 		public void OnPointerMoveInternal()
 		{
-			bool? bubble = events_.FirePointerMove(this, null);
-			if (bubble ?? true && parent_ != null)
+			bool bubble = events_.FirePointerMove(this, null);
+			if (bubble && parent_ != null)
 				parent_.OnPointerMoveInternal();
 		}
 
@@ -939,8 +1006,8 @@ namespace VUI
 
 		public void OnWheelInternal(PointerEventData d)
 		{
-			bool? bubble = events_.FireWheel(this, d);
-			if (bubble ?? true && parent_ != null)
+			bool bubble = events_.FireWheel(this, d);
+			if (bubble && parent_ != null)
 				parent_.OnWheelInternal(d);
 		}
 	}

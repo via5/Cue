@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -125,7 +126,7 @@ namespace VUI
 			ValueChanged?.Invoke(value_);
 		}
 
-		private bool OnPointerDown(PointerEvent e)
+		private void OnPointerDown(PointerEvent e)
 		{
 			var r = AbsoluteClientBounds;
 			var p = e.Pointer - r.TopLeft;
@@ -150,7 +151,7 @@ namespace VUI
 			var d = e.EventData as PointerEventData;
 			SuperController.singleton.StartCoroutine(StartDrag(d));
 
-			return false;
+			e.Bubble = false;
 		}
 
 		private IEnumerator StartDrag(PointerEventData d)
@@ -516,7 +517,7 @@ namespace VUI
 					panel_ = new Panel("TreeViewNode", new AbsoluteLayout());
 					tree_.Add(panel_);
 					panel_.Create();
-					panel_.Events.PointerClick += (e) => true;
+					panel_.Events.PointerClick += (e) => { e.Bubble = true; };
 				}
 			}
 
@@ -560,7 +561,7 @@ namespace VUI
 					label_.WrapMode = VUI.Label.Clip;
 					panel_.Add(label_);
 					label_.Create();
-					label_.Events.PointerClick += (e) => true;
+					label_.Events.PointerClick += (e) => { e.Bubble = true; };
 				}
 			}
 
@@ -637,8 +638,11 @@ namespace VUI
 			Events.PointerMove += OnHover;
 			Events.PointerExit += OnExit;
 			Events.PointerClick += OnClick;
+			Events.PointerDown += OnPointerDown;
 
 			vsb_.ValueChanged += OnVerticalScroll;
+
+			WantsFocus = true;
 		}
 
 		private float FullItemHeight
@@ -920,7 +924,7 @@ namespace VUI
 			return new Size(300, 200);
 		}
 
-		private bool OnWheel(WheelEvent e)
+		private void OnWheel(WheelEvent e)
 		{
 			try
 			{
@@ -932,7 +936,7 @@ namespace VUI
 				ignoreVScroll_ = false;
 			}
 
-			return false;
+			e.Bubble = false;
 		}
 
 		private Node NodeAt(Point p)
@@ -952,14 +956,12 @@ namespace VUI
 			return null;
 		}
 
-		private bool OnHover(PointerEvent e)
+		private void OnHover(PointerEvent e)
 		{
-			if (!IsVisibleOnScreen())
-				return false;
+			if (IsVisibleOnScreen())
+				SetHovered(NodeAt(e.Pointer));
 
-			SetHovered(NodeAt(e.Pointer));
-
-			return false;
+			e.Bubble = false;
 		}
 
 		private void OnExit(PointerEvent e)
@@ -967,7 +969,7 @@ namespace VUI
 			SetHovered(null);
 		}
 
-		private bool OnClick(PointerEvent e)
+		private void OnClick(PointerEvent e)
 		{
 			var n = NodeAt(e.Pointer);
 
@@ -977,7 +979,12 @@ namespace VUI
 				ItemClicked?.Invoke(n.Item);
 			}
 
-			return false;
+			e.Bubble = false;
+		}
+
+		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
 		}
 
 		private void SetHovered(Node n)

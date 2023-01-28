@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace VUI
 {
@@ -43,6 +42,9 @@ namespace VUI
 
 			if (clicked != null)
 				Clicked += clicked;
+
+			Events.PointerDown += OnPointerDown;
+			Events.PointerClick += OnPointerClick;
 		}
 
 		public string Text
@@ -114,9 +116,7 @@ namespace VUI
 		public void Click()
 		{
 			if (button_ != null)
-			{
 				button_.button.onClick?.Invoke();
-			}
 		}
 
 		protected override GameObject CreateGameObject()
@@ -128,7 +128,6 @@ namespace VUI
 		protected override void DoCreate()
 		{
 			button_ = WidgetObject.GetComponent<UIDynamicButton>();
-			button_.button.onClick.AddListener(OnClicked);
 			button_.buttonText.text = text_;
 			button_.buttonText.alignment = Label.ToTextAnchor(align_);
 
@@ -193,18 +192,25 @@ namespace VUI
 				button_.gameObject.SetActive(b);
 		}
 
-		private void OnClicked()
+		private void OnPointerDown(PointerEvent e)
 		{
-			try
+			e.Bubble = false;
+		}
+
+		private void OnPointerClick(PointerEvent e)
+		{
+			if (e.Button == PointerEvent.LeftButton)
 			{
-				GetRoot().SetFocus(this);
 				Clicked?.Invoke();
 				button_.button.OnDeselect(new UnityEngine.EventSystems.BaseEventData(null));
 			}
-			catch (Exception e)
-			{
-				Glue.LogErrorST(e.ToString());
-			}
+
+			e.Bubble = false;
+		}
+
+		public override string ToString()
+		{
+			return $"{base.ToString()} '{text_}'";
 		}
 	}
 

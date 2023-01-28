@@ -114,6 +114,8 @@ namespace VUI
 		public const int AlignCenter = 0x10;
 		public const int AlignRight = 0x20;
 
+		public const int AlignDefault = AlignLeft | AlignTop;
+
 		private int align_;
 		private bool expand_;
 
@@ -153,8 +155,13 @@ namespace VUI
 	{
 		public override string TypeName { get { return "horflow"; } }
 
-		public HorizontalFlow(int spacing = 0, int align = AlignLeft| AlignTop)
+		public HorizontalFlow(int spacing = 0, int align = AlignDefault)
 			: base(spacing, align, false)
+		{
+		}
+
+		public HorizontalFlow(int spacing, int align, bool expand)
+			: base(spacing, align, expand)
 		{
 		}
 
@@ -310,7 +317,7 @@ namespace VUI
 	{
 		public override string TypeName { get { return "verflow"; } }
 
-		public VerticalFlow(int spacing = 0, bool expand = true, int align = AlignLeft | AlignTop)
+		public VerticalFlow(int spacing = 0, bool expand = true, int align = AlignDefault)
 			: base(spacing, align, expand)
 		{
 		}

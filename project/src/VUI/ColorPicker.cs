@@ -21,6 +21,8 @@ namespace VUI
 
 			if (callback != null)
 				Changed += callback;
+
+			Events.PointerDown += OnPointerDown;
 		}
 
 		public Color Color
@@ -146,6 +148,11 @@ namespace VUI
 		{
 			base.DoPolish();
 			Style.Polish(this);
+		}
+
+		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
 		}
 
 		private void OnChanged(Color color)
