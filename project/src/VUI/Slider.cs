@@ -562,9 +562,18 @@ namespace VUI
 
 		private void UpdateText()
 		{
-			sb_.Length = 0;
-			ToString(slider_.Value, sb_);
-			text_.Text = sb_.ToString();
+			try
+			{
+				changingText_ = true;
+
+				sb_.Length = 0;
+				ToString(slider_.Value, sb_);
+				text_.Text = sb_.ToString();
+			}
+			finally
+			{
+				changingText_ = false;
+			}
 		}
 
 		protected abstract T FromString(string s);

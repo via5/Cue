@@ -113,10 +113,7 @@ namespace Cue.Sys.Vam
 			if (ho != null)
 			{
 				if (ho.hand == handOutputType_)
-				{
-					Log.Info($"{t}");
 					return true;
-				}
 			}
 
 			return false;
