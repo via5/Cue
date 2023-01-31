@@ -28,11 +28,13 @@ namespace VUI
 		private float topOffset_ = 0;
 
 		private static List<Transform> destroy_ = new List<Transform>();
+		private static bool cleaningUp_ = false;
 
 		public static void Cleanup()
 		{
 			try
 			{
+				cleaningUp_ = true;
 				destroy_.Clear();
 
 				ScriptUIRootSupport.DoCleanup();
@@ -42,22 +44,32 @@ namespace VUI
 				OverlayRootSupport.DoCleanup();
 
 				foreach (var t in destroy_)
-				{
-					var temp = new GameObject().transform;
-					t.transform.SetParent(temp);
-					UnityEngine.Object.Destroy(temp.gameObject);
-				}
+					DoDestroy(t);
 			}
 			catch (Exception e)
 			{
 				Glue.LogError("exception during vui cleanup:");
 				Glue.LogError(e.ToString());
 			}
+			finally
+			{
+				cleaningUp_ = false;
+			}
 		}
 
 		protected static void DestroyRootObject(Transform t)
 		{
-			destroy_.Add(t);
+			if (cleaningUp_)
+				destroy_.Add(t);
+			else
+				DoDestroy(t);
+		}
+
+		private static void DoDestroy(Transform t)
+		{
+			var temp = new GameObject().transform;
+			t.transform.SetParent(temp);
+			UnityEngine.Object.Destroy(temp.gameObject);
 		}
 
 		protected static GameObject CreateRootObject(string prefix)
@@ -229,14 +241,20 @@ namespace VUI
 	{
 		private const float StyleCheckInterval = 1;
 
-		private Transform t_;
-		private List<Transform> restore_ = new List<Transform>();
+		private readonly Transform t_;
+		private GameObject root_ = null;
+		private readonly List<Transform> restore_ = new List<Transform>();
 		private Style.RootRestore rr_ = null;
 		private float styleCheck_ = 0;
 
 		public TransformUIRootSupport(Transform t)
 		{
 			t_ = t;
+		}
+
+		private static string RootObjectPrefix
+		{
+			get { return Glue.Prefix + ".TransformUIRootSupport."; }
 		}
 
 		public static void DoCleanup()
@@ -246,11 +264,22 @@ namespace VUI
 
 		public override Transform RootParent
 		{
-			get { return t_; }
+			get
+			{
+				return root_.transform;
+			}
 		}
 
 		protected override bool DoInit()
 		{
+			foreach (Transform t in t_)
+			{
+				if (t.name.StartsWith(RootObjectPrefix))
+					DestroyRootObject(t);
+			}
+
+			CreateRoot();
+
 			var rt = t_.GetComponent<RectTransform>();
 
 			var bounds = Rectangle.FromPoints(
@@ -271,6 +300,22 @@ namespace VUI
 			SetBounds(bounds, topOffset);
 
 			return true;
+		}
+
+		private void CreateRoot()
+		{
+			root_ = CreateRootObject(RootObjectPrefix);
+			root_.transform.SetParent(t_, false);
+
+			var rt = root_.AddComponent<RectTransform>();
+			if (rt == null)
+				rt = root_.GetComponent<RectTransform>();
+
+			rt.offsetMin = new Vector2(0, 0);
+			rt.offsetMax = new Vector2(0, 0);
+			rt.anchoredPosition = new Vector2(0, 0);
+			rt.anchorMin = new Vector2(0, 0);
+			rt.anchorMax = new Vector2(1, 1);
 		}
 
 		public override void Destroy()
@@ -300,6 +345,9 @@ namespace VUI
 					Style.RevertRoot(t_, rr_);
 				}
 			}
+
+			if (root_ != null)
+				root_.SetActive(b);
 		}
 
 		public override void SetSize(Vector2 v)

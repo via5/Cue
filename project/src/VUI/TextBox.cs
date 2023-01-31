@@ -14,9 +14,11 @@ namespace VUI
 		private const float DoubleClickTime = 0.5f;
 
 		public delegate void EventCallback(PointerEventData data);
-		public event EventCallback Down, Up, Click, DoubleClick, TripleClick;
+		public event EventCallback PointerDown, PointerUp, Click, DoubleClick, TripleClick;
 		public event EventCallback Focused, Blurred;
 
+		public delegate void KeyCallback();
+		public event KeyCallback UpArrow, DownArrow;
 
 		private bool selected_ = false;
 		private float lastClick_ = 0;
@@ -40,6 +42,11 @@ namespace VUI
 					Blurred?.Invoke(null);
 				}
 			}
+
+			if (Input.GetKeyDown(KeyCode.DownArrow))
+				DownArrow?.Invoke();
+			else if (Input.GetKeyDown(KeyCode.UpArrow))
+				UpArrow?.Invoke();
 		}
 
 		public override void OnPointerDown(PointerEventData data)
@@ -91,7 +98,7 @@ namespace VUI
 		private void HandleOnPointerDown(PointerEventData data)
 		{
 			base.OnPointerDown(data);
-			Down?.Invoke(data);
+			PointerDown?.Invoke(data);
 
 			if (!selected_)
 			{
@@ -147,7 +154,7 @@ namespace VUI
 		{
 			base.OnPointerUp(data);
 
-			Up?.Invoke(data);
+			PointerUp?.Invoke(data);
 
 			if (clickCount_ == 1)
 				Click?.Invoke(data);
@@ -278,6 +285,55 @@ namespace VUI
 				ignore_ = true;
 				list_.Remove(s);
 				ItemsChanged();
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		public string Complete(string s)
+		{
+			for (int i = 0; i < list_.Count; ++i)
+			{
+				if (list_[i].StartsWith(s, StringComparison.OrdinalIgnoreCase))
+				{
+					SelectQuiet(i);
+					return list_[i];
+				}
+			}
+
+			return null;
+		}
+
+		public string Next()
+		{
+			if (listView_.Count == 0)
+				return "";
+
+			if (listView_.SelectedIndex < (listView_.Count - 1))
+				SelectQuiet(listView_.SelectedIndex + 1);
+
+			return listView_.Selected;
+		}
+
+		public string Previous()
+		{
+			if (listView_.Count == 0)
+				return "";
+
+			if (listView_.SelectedIndex > 0)
+				SelectQuiet(listView_.SelectedIndex - 1);
+
+			return listView_.Selected;
+		}
+
+		private void SelectQuiet(int i)
+		{
+			try
+			{
+				ignore_ = true;
+				listView_.Select(i);
 			}
 			finally
 			{
@@ -449,6 +505,7 @@ namespace VUI
 		private string placeholder_ = "";
 		private CustomInputField input_ = null;
 		private bool ignore_ = false;
+		private bool ignoreAc_ = false;
 		private int focusflags_ = Root.FocusDefault;
 		private Insets textMargins_ = Insets.Zero;
 		private AutoComplete ac_;
@@ -568,10 +625,12 @@ namespace VUI
 			text.alignment = TextAnchor.MiddleLeft;
 
 			input_ = field.AddComponent<CustomInputField>();
-			input_.Down += OnMouseDown;
+			input_.PointerDown += OnMouseDown;
 			input_.Focused += OnFocused;
 			input_.DoubleClick += OnDoubleClick;
 			input_.TripleClick += OnTripleClick;
+			input_.DownArrow += OnDownArrow;
+			input_.UpArrow += OnUpArrow;
 			input_.textComponent = text;
 			input_.text = text_;
 			input_.onEndEdit.AddListener(OnEdited);
@@ -711,6 +770,40 @@ namespace VUI
 			input_.SelectAllText();
 		}
 
+		private void OnDownArrow()
+		{
+			if (ac_.Enabled)
+			{
+				try
+				{
+					ignoreAc_ = true;
+					Text = ac_.Next();
+					SelectAll();
+				}
+				finally
+				{
+					ignoreAc_ = false;
+				}
+			}
+		}
+
+		private void OnUpArrow()
+		{
+			if (ac_.Enabled)
+			{
+				try
+				{
+					ignoreAc_ = true;
+					Text = ac_.Previous();
+					SelectAll();
+				}
+				finally
+				{
+					ignoreAc_ = false;
+				}
+			}
+		}
+
 		private void OnValueChanged(string s)
 		{
 			if (Validate != null)
@@ -722,12 +815,50 @@ namespace VUI
 					return;
 
 				text_ = s;
+
+				if (ac_.Enabled && !ignoreAc_)
+				{
+					if (!Input.GetKey(KeyCode.Backspace) && !Input.GetKey(KeyCode.Delete))
+					{
+						var c = ac_.Complete(s);
+
+						if (c != null)
+						{
+							bool resetIgnore = (ignore_ == false);
+
+							try
+							{
+								ignore_ = true;
+								text_ = c;
+								input_.text = c;
+								Select(s.Length, text_.Length);
+							}
+							finally
+							{
+								if (resetIgnore)
+									ignore_ = false;
+							}
+						}
+					}
+				}
+
 				Changed?.Invoke(s);
 			}
 			catch (Exception e)
 			{
 				Glue.LogErrorST(e.ToString());
 			}
+		}
+
+		public void Select(int begin, int end)
+		{
+			input_.selectionAnchorPosition = begin;
+			input_.selectionFocusPosition = end;
+		}
+
+		public void SelectAll()
+		{
+			input_.SelectAllText();
 		}
 
 		private void OnEdited(string s)
