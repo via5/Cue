@@ -58,7 +58,10 @@ namespace Cue.Sys
 		string GetResourcePath(string path);
 		List<FileInfo> GetFiles(string path, string pattern);
 		void SaveFileDialog(string ext, Action<string> f);
+		void SaveFileDialog(string ext, string file, Action<string> f);
 		void LoadFileDialog(string ext, Action<string> f);
+		bool FileExists(string path);
+		string MakePluginDataPath(string file);
 		JSONNode ReadJSON(string path);
 		void WriteJSON(string path, JSONNode content);
 		void HardReset();

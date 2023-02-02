@@ -163,6 +163,9 @@ namespace Cue
 			var export = new VUI.Panel(new VUI.HorizontalFlow(10));
 			export.Add(new VUI.Button("Export options...", OnExport));
 			export.Add(new VUI.Button("Import options...", OnImport));
+			export.Add(new VUI.Button("Save as default...", OnSaveDefault,
+				"Default options are loaded when Cue is first added."));
+
 			p.Add(new VUI.Spacer(20));
 			p.Add(export);
 
@@ -271,10 +274,13 @@ namespace Cue
 
 		private void OnImport()
 		{
-			Cue.Instance.Sys.LoadFileDialog("options", (f) =>
+			Cue.Instance.Sys.LoadFileDialog(Options.DefaultExtension, (f) =>
 			{
 				if (string.IsNullOrEmpty(f))
 					return;
+
+				if (f.IndexOf(".") == -1)
+					f = f.TrimEnd() + Options.DefaultExtension;
 
 				var o = Cue.Instance.Sys.ReadJSON(f);
 				if (o == null)
@@ -285,6 +291,40 @@ namespace Cue
 
 				Cue.Instance.Options.Load(o.AsObject);
 			});
+		}
+
+		private void OnSaveDefault()
+		{
+			string path = Cue.Instance.Sys.MakePluginDataPath(Options.DefaultFile);
+
+			if (Cue.Instance.Sys.FileExists(path))
+			{
+				var d = new VUI.TaskDialog(
+					Cue.Instance.UI.ScriptUI.Root,
+					"Replace default options file",
+					$"The default options file already exists.",
+					$"{path}");
+
+				d.AddButton(VUI.ButtonBox.OK, "Replace");
+				d.AddButton(VUI.ButtonBox.Cancel, "Cancel");
+
+				d.RunDialog((r) =>
+				{
+					if (r == VUI.ButtonBox.OK)
+						DoSaveDefault(path);
+				});
+			}
+			else
+			{
+				DoSaveDefault(path);
+			}
+		}
+
+		private void DoSaveDefault(string path)
+		{
+			var o = Cue.Instance.Options.ToJSON();
+			Cue.Instance.Sys.WriteJSON(path, o);
+			Cue.Instance.Log.Info($"new defaults saved in {path}");
 		}
 	}
 

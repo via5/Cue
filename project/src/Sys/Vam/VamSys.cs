@@ -722,6 +722,11 @@ namespace Cue.Sys.Vam
 
 		public void SaveFileDialog(string ext, Action<string> f)
 		{
+			SaveFileDialog(ext, "", f);
+		}
+
+		public void SaveFileDialog(string ext, string file, Action<string> f)
+		{
 			FileManagerSecure.CreateDirectory(PluginDataPath);
 			var shortcuts = FileManagerSecure.GetShortCutsForDirectory(
 				PluginDataPath);
@@ -745,6 +750,9 @@ namespace Cue.Sys.Vam
 			var browser = SuperController.singleton.mediaFileBrowserUI;
 			browser.SetTextEntry(true);
 			browser.ActivateFileNameField();
+
+			if (!string.IsNullOrEmpty(file))
+				browser.fileEntryField.text = file;
 		}
 
 		public void LoadFileDialog(string ext, Action<string> f)
@@ -775,6 +783,16 @@ namespace Cue.Sys.Vam
 		public void WriteJSON(string path, JSONNode content)
 		{
 			SuperController.singleton.SaveJSON(content.AsObject, path);
+		}
+
+		public bool FileExists(string path)
+		{
+			return FileManagerSecure.FileExists(path);
+		}
+
+		public string MakePluginDataPath(string file)
+		{
+			return PluginDataPath + "\\" + file;
 		}
 
 		public IActionTrigger CreateActionTrigger()

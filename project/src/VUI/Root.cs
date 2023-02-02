@@ -548,11 +548,12 @@ namespace VUI
 			return ts_;
 		}
 
-		public static float TextLength(Font font, int fontSize, string s)
+		public static float TextLength(Font font, int fontSize, FontStyle fontStyle, string s)
 		{
 			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.fontStyle = fontStyle;
 			ts.horizontalOverflow = HorizontalWrapMode.Overflow;
 			ts.verticalOverflow = VerticalWrapMode.Overflow;
 			ts.generateOutOfBounds = false;
@@ -561,11 +562,12 @@ namespace VUI
 			return GetTG().GetPreferredWidth(s, ts);
 		}
 
-		public static Size TextSize(Font font, int fontSize, string s)
+		public static Size TextSize(Font font, int fontSize, FontStyle fontStyle, string s)
 		{
 			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.fontStyle = fontStyle;
 			ts.horizontalOverflow = HorizontalWrapMode.Overflow;
 			ts.verticalOverflow = VerticalWrapMode.Overflow;
 
@@ -588,11 +590,12 @@ namespace VUI
 			return size;
 		}
 
-		public static Size FitText(Font font, int fontSize, string s, Size maxSize)
+		public static Size FitText(Font font, int fontSize, FontStyle fontStyle, string s, Size maxSize)
 		{
 			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.fontStyle = fontStyle;
 
 			var extents = new Vector2();
 
@@ -618,6 +621,9 @@ namespace VUI
 				ts.verticalOverflow = VerticalWrapMode.Truncate;
 			}
 
+			ts.textAnchor = TextAnchor.UpperLeft;
+			ts.pivot = Vector2.zero;
+			ts.richText = false;
 			ts.generationExtents = extents;
 			ts.generateOutOfBounds = false;
 			ts.resizeTextForBestFit = false;

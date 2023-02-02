@@ -2,6 +2,8 @@
 {
 	class Dialog : Panel
 	{
+		protected const float WidthAdjust = 0.8f;
+
 		public override string TypeName { get { return "Dialog"; } }
 
 		public delegate void CloseHandler(int result);
@@ -24,10 +26,10 @@
 
 			content_.Margins = new Insets(10, 20, 10, 10);
 			title_.BackgroundColor = Style.Theme.DialogTitleBackgroundColor;
-			title_.Padding = new Insets(0, 5, 0, 10);
+			title_.Padding = new Insets(5, 5, 0, 10);
 
 			MinimumSize = new Size(600, 200);
-			MaximumSize = r.Bounds.Size * 0.8f;
+			MaximumSize = r.Bounds.Size * WidthAdjust;
 
 			Add(title_, BorderLayout.Top);
 			Add(content_, BorderLayout.Center);
@@ -48,11 +50,11 @@
 			return root_;
 		}
 
-		public void RunDialog(CloseHandler h = null)
+		public virtual void RunDialog(CloseHandler h = null)
 		{
 			root_.OverlayVisible = true;
 
-			var ps = GetRealPreferredSize(root_.Bounds.Width, root_.Bounds.Height);
+			var ps = GetRealPreferredSize(root_.Bounds.Width * WidthAdjust, root_.Bounds.Height);
 			SetBounds(new Rectangle(
 				root_.Bounds.Center.X - (ps.Width / 2),
 				root_.Bounds.Center.Y - (ps.Height / 2),
@@ -246,17 +248,23 @@
 
 	class TaskDialog : Dialog
 	{
+		private const int ButtonPadding = 20;
+
 		public override string TypeName { get { return "TaskDialog"; } }
+
+		VUI.Label lb;
 
 		public TaskDialog(Root r, string title, string mainText, string secondaryText="")
 			: base(r, title)
 		{
 			ContentPanel.Layout = new VerticalFlow(10);
 
-			ContentPanel.Add(new Label(mainText));
+			lb = ContentPanel.Add(new Label(mainText, Label.Wrap));
 
 			if (secondaryText != "")
 				ContentPanel.Add(new Label(secondaryText));
+
+			ContentPanel.Add(new Spacer(20));
 		}
 
 		public void AddButton(int id, string text, string description="")
@@ -267,7 +275,8 @@
 
 			var b = new Button(s);
 			b.Alignment = Label.AlignLeft | Label.AlignVCenter;
-			b.Padding = new Insets(10, 0, 0, 0);
+			b.Padding = new Insets(ButtonPadding);
+			b.FontStyle = UnityEngine.FontStyle.Bold;
 
 			b.Clicked += () =>
 			{

@@ -242,7 +242,7 @@ namespace VUI
 				{
 					if (TextTooLong())
 					{
-						var ellipsisSize = Root.TextSize(Font, FontSize, "...");
+						var ellipsisSize = TextSize("...");
 
 						var cr = MakeClipRect();
 						cr.Width -= (ellipsisSize.Width + 5);
@@ -306,20 +306,14 @@ namespace VUI
 			float maxWidth, float maxHeight)
 		{
 			if (wrap_ == Wrap)
-			{
-				return Root.FitText(
-					Font, FontSize, text_, new Size(maxWidth, maxHeight));
-			}
+				return FitText(text_, new Size(maxWidth, maxHeight));
 			else
-			{
-				return Root.FitText(
-					Font, FontSize, text_, new Size(DontCare, maxHeight));
-			}
+				return FitText(text_, new Size(DontCare, maxHeight));
 		}
 
 		protected override Size DoGetMinimumSize()
 		{
-			return Root.TextSize(Font, FontSize, text_) + new Size(0, 5);
+			return TextSize(text_) + new Size(0, 5);
 		}
 
 		protected override void DoSetRender(bool b)
@@ -344,7 +338,7 @@ namespace VUI
 		private bool TextTooLong()
 		{
 			// todo: wrap mode
-			var tl = Root.TextLength(Font, FontSize, text_);
+			var tl = TextLength(text_);
 			return (tl > Bounds.Width);
 		}
 

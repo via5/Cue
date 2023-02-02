@@ -91,8 +91,8 @@ namespace VUI
 			label_.FontSize = tt.FontSize;
 			label_.Polish();
 
-			return Root.FitText(
-				null, label_.FontSize, label_.Text, new Size(
+			return label_.FitText(
+				label_.Text, new Size(
 					Style.Metrics.MaxTooltipWidth, Widget.DontCare));
 		}
 	}

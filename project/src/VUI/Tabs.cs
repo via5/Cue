@@ -107,8 +107,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			var s = Root.FitText(
-				Font, FontSize, Text, new Size(maxWidth, maxHeight));
+			var s = FitText(Text, new Size(maxWidth, maxHeight));
 
 			s += Style.Metrics.ButtonPadding;
 
@@ -117,7 +116,7 @@ namespace VUI
 
 		protected override Size DoGetMinimumSize()
 		{
-			var s = Root.TextSize(Font, FontSize, Text);
+			var s = TextSize(Text);
 			return Size.Max(s, Style.Metrics.TabButtonMinimumSize);
 		}
 	}

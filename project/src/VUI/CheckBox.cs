@@ -78,8 +78,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			var s = Root.FitText(
-				Font, FontSize, text_, new Size(maxWidth, maxHeight));
+			var s = FitText(text_, new Size(maxWidth, maxHeight));
 
 			s.Width += Style.Metrics.ToggleLabelSpacing + 35;
 

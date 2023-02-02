@@ -898,6 +898,22 @@ namespace VUI
 		}
 
 
+		public float TextLength(string s)
+		{
+			return Root.TextLength(Font, FontSize, FontStyle, s);
+		}
+
+		public Size TextSize(string s)
+		{
+			return Root.TextSize(Font, FontSize, FontStyle, s);
+		}
+
+		public Size FitText(string s, Size maxSize)
+		{
+			return Root.FitText(Font, FontSize, FontStyle, s, maxSize);
+		}
+
+
 		protected virtual GameObject CreateGameObject()
 		{
 			var o = new GameObject("Widget");

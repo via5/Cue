@@ -57,9 +57,7 @@ namespace Cue.Sys.Vam
 				{
 					try
 					{
-						var o = JSON.Parse(s);
-						if (o?.AsObject != null)
-							return o.AsObject;
+						return JSON.Parse(s)?.AsObject;
 					}
 					catch (Exception e)
 					{
@@ -68,7 +66,7 @@ namespace Cue.Sys.Vam
 				}
 			}
 
-			return new JSONClass();
+			return null;
 		}
 
 		private void FindAtom()
@@ -116,18 +114,18 @@ namespace Cue.Sys.Vam
 					yield return DoCreateAtom();
 				}
 
-				Log.Info($"looking for atom");
+				Log.Verbose($"looking for atom");
 
 				for (int tries = 0; tries < 10; ++tries)
 				{
 					atom_ = GetAtom();
 					if (atom_ != null)
 					{
-						Log.Info($"atom created");
+						Log.Verbose($"atom created");
 						break;
 					}
 
-					Log.Info($"waiting");
+					Log.Verbose($"waiting");
 					yield return new WaitForSeconds(0.5f);
 				}
 

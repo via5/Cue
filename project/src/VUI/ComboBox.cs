@@ -86,11 +86,7 @@ namespace VUI
 			float widest = 0;
 
 			foreach (var i in InternalItems)
-			{
-				widest = Math.Max(
-					widest,
-					Root.TextLength(Font, FontSize, i.Text) + 50);
-			}
+				widest = Math.Max(widest, TextLength(i.Text) + 50);
 
 			return new Size(Math.Max(200, widest), 40);
 		}

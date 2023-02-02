@@ -690,7 +690,7 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			var tl = Root.TextLength(Font, FontSize, text_);
+			var tl = TextLength(text_);
 			var w = tl + Style.Metrics.TextBoxHorizontalPadding;
 
 			return new Size(

@@ -260,6 +260,10 @@ namespace Cue.Sys.Mock
 		{
 		}
 
+		public void SaveFileDialog(string ext, string file, Action<string> f)
+		{
+		}
+
 		public void LoadFileDialog(string ext, Action<string> f)
 		{
 		}
@@ -271,6 +275,16 @@ namespace Cue.Sys.Mock
 
 		public void WriteJSON(string path, JSONNode content)
 		{
+		}
+
+		public bool FileExists(string file)
+		{
+			return false;
+		}
+
+		public string MakePluginDataPath(string file)
+		{
+			return null;
 		}
 
 		public IObjectCreator CreateObjectCreator(

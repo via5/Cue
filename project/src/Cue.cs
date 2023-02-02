@@ -11,7 +11,7 @@ namespace Cue
 	{
 		private static Cue instance_ = null;
 
-		private Logger log_;
+		private Logger log_, vuiLog_;
 		private Options options_;
 		private float saveElapsed_ = 0;
 		private bool needSave_ = false;
@@ -45,6 +45,8 @@ namespace Cue
 		{
 			instance_ = this;
 			log_ = new Logger(Logger.Main, "cue");
+			vuiLog_ = new Logger(Logger.Main, "vui");
+
 			Log.Verbose("cue: ctor");
 
 			options_ = new Options();
@@ -199,10 +201,10 @@ namespace Cue
 				"Cue",
 				() => CueMain.Instance.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
-				(s) => Log.Verbose(s),
-				(s) => Log.Info(s),
-				(s) => Log.Warning(s),
-				(s) => Log.Error(s));
+				(s) => vuiLog_.Verbose(s),
+				(s) => vuiLog_.Info(s),
+				(s) => vuiLog_.Warning(s),
+				(s) => vuiLog_.Error(s));
 
 
 			Log.Verbose("cue: loading resources");
@@ -262,10 +264,40 @@ namespace Cue
 		{
 			var o = saver_.Load();
 
-			if (o != null)
-				Load(o);
+			if (o == null)
+			{
+				Log.Verbose("no livesaver, trying defaults");
 
+				var oo = GetDefaults();
+				if (oo != null)
+					Options.Load(oo);
+			}
+			else
+			{
+				Load(o);
+			}
+
+			loaded_ = true;
 			Save();
+		}
+
+		private JSONClass GetDefaults()
+		{
+			string path = Sys.MakePluginDataPath(Options.DefaultFile);
+
+			if (!Sys.FileExists(path))
+			{
+				Log.Verbose($"no default options at {path}");
+				return null;
+			}
+
+			var o = Sys.ReadJSON(path)?.AsObject;
+			if (o == null)
+				Log.Error($"can't read default options at {path}");
+
+			Log.Info($"loading default options from {path}");
+
+			return o;
 		}
 
 		public void Save()
@@ -273,8 +305,9 @@ namespace Cue
 			if (!loaded_)
 				return;
 
-			var oo = new JSONClass();
-			Save(oo);
+			Log.Verbose("saving");
+
+			var oo = CreateSaveJSON();
 			saver_.Save(oo);
 		}
 
@@ -284,9 +317,9 @@ namespace Cue
 			saveElapsed_ = 0;
 		}
 
-		private void Save(JSONClass json)
+		private JSONClass CreateSaveJSON()
 		{
-			json.Add("version", Version.String);
+			var json = new JSONClass();
 
 			var a = new JSONArray();
 
@@ -319,12 +352,12 @@ namespace Cue
 				json.Add("ui", ui);
 
 			json.Add("options", options_.ToJSON());
+
+			return json;
 		}
 
 		private void Load(JSONClass c)
 		{
-			loaded_ = true;
-
 			if (c.HasKey("options"))
 				options_.Load(c["options"].AsObject);
 

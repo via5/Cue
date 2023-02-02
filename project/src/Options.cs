@@ -249,6 +249,9 @@ namespace Cue
 
 	class Options
 	{
+		public const string DefaultExtension = "json";
+		public const string DefaultFile = "Default.json";
+
 		public delegate void Handler();
 		public event Handler Changed;
 
