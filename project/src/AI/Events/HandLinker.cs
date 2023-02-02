@@ -125,7 +125,17 @@
 			right_ = new HandInfo(person_.Body.Get(BP.RightHand));
 		}
 
+		protected override void DoUpdatePaused(float s)
+		{
+			RealUpdate(s);
+		}
+
 		protected override void DoUpdate(float s)
+		{
+			RealUpdate(s);
+		}
+
+		private void RealUpdate(float s)
 		{
 			if (!Cue.Instance.Options.HandLinking)
 			{

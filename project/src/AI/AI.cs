@@ -10,6 +10,7 @@ namespace Cue
 		void Init();
 		void FixedUpdate(float s);
 		void Update(float s);
+		void UpdatePaused(float s);
 		bool EventsEnabled { get; set; }
 		void StopAllEvents();
 		void OnPluginState(bool b);
@@ -88,6 +89,15 @@ namespace Cue
 			{
 				for (int i = 0; i < events_.Length; ++i)
 					events_[i].Update(s);
+			}
+		}
+
+		public void UpdatePaused(float s)
+		{
+			if (eventsEnabled_)
+			{
+				for (int i = 0; i < events_.Length; ++i)
+					events_[i].UpdatePaused(s);
 			}
 		}
 

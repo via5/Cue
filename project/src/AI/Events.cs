@@ -14,6 +14,7 @@ namespace Cue
 		void OnPluginState(bool b);
 		void FixedUpdate(float s);
 		void Update(float s);
+		void UpdatePaused(float s);
 		void ForceStop();
 		void Debug(DebugLines debug);
 		DebugButtons DebugButtons();
@@ -182,6 +183,17 @@ namespace Cue
 
 		protected virtual void DoUpdate(float s)
 		{
+			// no-op
+		}
+
+		public void UpdatePaused(float s)
+		{
+			DoUpdatePaused(s);
+		}
+
+		protected virtual void DoUpdatePaused(float s)
+		{
+			// no-op
 		}
 
 		public override string ToString()

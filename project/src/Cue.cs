@@ -584,7 +584,15 @@ namespace Cue
 			if (forcedPlayer_ == null)
 				CheckPossess(s);
 
-			if (!Sys.Paused)
+			if (Sys.Paused)
+			{
+				for (int i = 0; i < everythingActive_.Count; ++i)
+				{
+					if (everythingActive_[i].Visible)
+						everythingActive_[i].UpdatePaused(s);
+				}
+			}
+			else
 			{
 				for (int i = 0; i < everythingActive_.Count; ++i)
 				{

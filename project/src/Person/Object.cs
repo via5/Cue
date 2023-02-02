@@ -22,6 +22,7 @@ namespace Cue
 		void Destroy();
 		void FixedUpdate(float s);
 		void Update(float s);
+		void UpdatePaused(float s);
 		void OnPluginState(bool b);
 
 		JSONNode ToJSON();
@@ -159,6 +160,11 @@ namespace Cue
 				Atom.Update(s);
 			}
 			Instrumentation.End();
+		}
+
+		public virtual void UpdatePaused(float s)
+		{
+			// no-op
 		}
 
 		public void LateUpdate(float s)

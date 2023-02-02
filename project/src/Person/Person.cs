@@ -526,6 +526,17 @@ namespace Cue
 			Instrumentation.End();
 		}
 
+		public override void UpdatePaused(float s)
+		{
+			base.UpdatePaused(s);
+
+			Instrumentation.Start(I.AI);
+			{
+				ai_.UpdatePaused(s);
+			}
+			Instrumentation.End();
+		}
+
 		public override void OnPluginState(bool b)
 		{
 			base.OnPluginState(b);
