@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cue
+﻿namespace Cue
 {
 	class DesktopMenu : BasicMenu
 	{
-		private float Width = 1200;
+		private float Width = 1000;
 		private float MinHeight = 90;
 
 		private readonly Sys.ISys sys_;

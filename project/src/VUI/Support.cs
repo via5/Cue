@@ -706,18 +706,29 @@ namespace VUI
 	//
 	class OverlayRootSupport : BasicRootSupport
 	{
+		private const float MonitorOffset = 240;
+
 		private float topOffset_;
 		private Vector2 size_;
 
 		private GameObject panel_ = null;
 		private GameObject ui_ = null;
+		private RectTransform rt_ = null;
 		private Canvas canvas_ = null;
 		private CanvasScaler scaler_ = null;
+		private bool monitorWasVisible_ = false;
+		private MeshVR.PerfMon perf_ = null;
 
 		public OverlayRootSupport(float topOffset, float width, float height)
 		{
 			topOffset_ = topOffset;
 			size_ = new Vector2(width, height);
+
+			perf_ = SuperController.singleton.transform.root
+				.GetComponentInChildren<MeshVR.PerfMon>();
+
+			if (perf_ == null)
+				Glue.LogError("OverlayRootSupport: no perfmon");
 		}
 
 		private static string RootObjectPrefix
@@ -755,7 +766,7 @@ namespace VUI
 
 			ui_ = new GameObject("OverlayRootSupportUI");
 			ui_.transform.SetParent(panel_.transform, false);
-			ui_.AddComponent<RectTransform>();
+			rt_ = ui_.AddComponent<RectTransform>();
 
 			var bg = ui_.AddComponent<Image>();
 			bg.color = new Color(0, 0, 0, 0.8f);
@@ -769,22 +780,22 @@ namespace VUI
 
 		private void SetRect()
 		{
-			var rt = ui_.GetComponent<RectTransform>();
-			if (rt == null)
+			rt_.anchorMin = new Vector2(1, 1);
+			rt_.anchorMax = new Vector2(1, 1);
+
+			bool withOffset = false;
+			if (perf_ != null)
 			{
-				Glue.LogError("null rt");
-				return;
+				monitorWasVisible_ = perf_.on;
+				withOffset = monitorWasVisible_;
 			}
 
-			rt.anchorMin = new Vector2(1, 1);
-			rt.anchorMax = new Vector2(1, 1);
-			rt.offsetMin = new Vector2(-size_.x, -(size_.y + topOffset_));
-			rt.offsetMax = new Vector2(0, -topOffset_);
+			SetPosition(withOffset);
 
 			var bounds = Rectangle.FromPoints(
-				0, 0, rt.rect.width, rt.rect.height);
+				0, 0, rt_.rect.width, rt_.rect.height);
 
-			var topOffset = rt.offsetMin.y - rt.offsetMax.y;
+			var topOffset = rt_.offsetMin.y - rt_.offsetMax.y;
 
 			SetBounds(bounds, topOffset);
 		}
@@ -808,6 +819,29 @@ namespace VUI
 				SetActive(ShowUI);
 
 			scaler_.scaleFactor = SuperController.singleton.monitorUIScale / 2;
+
+			if (perf_ != null)
+			{
+				if (monitorWasVisible_ != perf_.on)
+				{
+					monitorWasVisible_ = perf_.on;
+					SetPosition(monitorWasVisible_);
+				}
+			}
+		}
+
+		private void SetPosition(bool withOffset)
+		{
+			if (withOffset)
+			{
+				rt_.offsetMin = new Vector2(-size_.x - MonitorOffset, -(size_.y + topOffset_));
+				rt_.offsetMax = new Vector2(-MonitorOffset, -topOffset_);
+			}
+			else
+			{
+				rt_.offsetMin = new Vector2(-size_.x, -(size_.y + topOffset_));
+				rt_.offsetMax = new Vector2(0, -topOffset_);
+			}
 		}
 
 		public override void Destroy()

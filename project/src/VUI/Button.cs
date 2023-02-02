@@ -44,7 +44,6 @@ namespace VUI
 				Clicked += clicked;
 
 			Events.PointerDown += OnPointerDown;
-			Events.PointerClick += OnPointerClick;
 		}
 
 		public string Text
@@ -128,6 +127,7 @@ namespace VUI
 		protected override void DoCreate()
 		{
 			button_ = WidgetObject.GetComponent<UIDynamicButton>();
+			button_.button.onClick.AddListener(OnClicked);
 			button_.buttonText.text = text_;
 			button_.buttonText.alignment = Label.ToTextAnchor(align_);
 
@@ -197,15 +197,10 @@ namespace VUI
 			e.Bubble = false;
 		}
 
-		private void OnPointerClick(PointerEvent e)
+		private void OnClicked()
 		{
-			if (e.Button == PointerEvent.LeftButton)
-			{
-				Clicked?.Invoke();
-				button_.button.OnDeselect(new UnityEngine.EventSystems.BaseEventData(null));
-			}
-
-			e.Bubble = false;
+			Clicked?.Invoke();
+			button_.button.OnDeselect(new UnityEngine.EventSystems.BaseEventData(null));
 		}
 
 		public override string ToString()

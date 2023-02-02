@@ -1,5 +1,4 @@
-﻿using MeshVR;
-using MVR.FileManagementSecure;
+﻿using MVR.FileManagementSecure;
 using SimpleJSON;
 using System;
 using System.Collections;
@@ -36,7 +35,7 @@ namespace Cue.Sys.Vam
 		private GameObject root_;
 		private VamCameraAtom cameraAtom_ = new VamCameraAtom();
 		private bool wasVR_ = false;
-		private PerfMon perf_ = null;
+		private MeshVR.PerfMon perf_ = null;
 		private VamDebugRenderer debugRenderer_ = new VamDebugRenderer();
 		private Action deferredInit_ = null;
 		private Linker linker_ = new Linker();
@@ -64,7 +63,7 @@ namespace Cue.Sys.Vam
 			}
 
 			perf_ = SuperController.singleton.transform.root
-				.GetComponentInChildren<PerfMon>();
+				.GetComponentInChildren<MeshVR.PerfMon>();
 
 			if (perf_ == null)
 				Log.Error("no perfmon");
@@ -186,7 +185,7 @@ namespace Cue.Sys.Vam
 
 		public void SetMenuVisible(bool b)
 		{
-			GlobalSceneOptions.singleton.disableNavigation = b;
+			MeshVR.GlobalSceneOptions.singleton.disableNavigation = b;
 		}
 
 		public IAtom ContainingAtom
