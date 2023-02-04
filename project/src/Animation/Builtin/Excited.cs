@@ -223,7 +223,7 @@ namespace Cue.Proc
 						{
 							lastStartRng_ = startRng_.RandomFloat(0, 1, ex);
 
-							if (lastStartRng_ >= 0)//0.5f)
+							if (lastStartRng_ > 0.5f)
 								Start();
 						}
 						else
