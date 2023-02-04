@@ -13,6 +13,7 @@ namespace Cue
 			new ClockwiseHJBothAnimation(),
 			new ClockwiseHJLeftAnimation(),
 			new ClockwiseHJRightAnimation(),
+			new Proc.Excited(),
 			new Proc.ThrustProcAnimation(),
 			new Proc.TribProcAnimation(),
 			new Proc.SuckFingerProcAnimation(),

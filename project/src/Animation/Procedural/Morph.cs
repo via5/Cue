@@ -8,11 +8,7 @@ namespace Cue.Proc
 	{
 		public const int NoFlags = 0x00;
 		public const int StartHigh = 0x01;
-
-		public const int NoForceTarget = 0;
-		public const int ForceToZero = 1;
-		public const int ForceToRangePercent = 2;
-		public const int ForceIgnore = 3;
+		public const int ResetBetween = 0x02;
 
 		private BodyPartType bodyPartType_;
 		private BodyPart bp_ = null;
@@ -139,7 +135,7 @@ namespace Cue.Proc
 
 			if (morph_ != null)
 			{
-				if (bp_ != null && !bp_.LockedFor(BodyPartLock.Morph, LockKey))
+				if (bp_ == null || !bp_.LockedFor(BodyPartLock.Morph, LockKey))
 					morph_.Reset();
 			}
 		}
@@ -229,10 +225,11 @@ namespace Cue.Proc
 			}
 
 			var d = v - mid_;
+			bool busy = false;
 
 			if (bp_ != null)
 			{
-				bool busy = bp_.LockedFor(BodyPartLock.Morph, LockKey);
+				busy = bp_.LockedFor(BodyPartLock.Morph, LockKey);
 
 				if (!wasBusy_ && busy)
 				{
@@ -243,10 +240,10 @@ namespace Cue.Proc
 				{
 					wasBusy_ = false;
 				}
-
-				if (!busy)
-					morph_.Value = v;
 			}
+
+			if (!busy)
+				morph_.Value = v;
 
 			d = Math.Abs(d);
 
@@ -269,31 +266,40 @@ namespace Cue.Proc
 
 		private void Next(bool resetBetween, bool forceHigh = false)
 		{
-			if (resetBetween)
-				last_ = mid_;
-			else
-				last_ = morph_.Value;
-
-			if (limitHit_ && timeActive_ >= 10)
+			if (!resetBetween && Bits.IsSet(flags_, ResetBetween))
 			{
-				// force a reset to allow other morphs to take over the prio
-				r_ = mid_;
-				timeActive_ = 0;
+				var temp = r_;
+				r_ = last_;
+				last_ = temp;
 			}
 			else
 			{
-				float range = Math.Abs(max_ - min_) * intensity_;
-				float r;
-
-				if (forceHigh)
-					r = range;
+				if (resetBetween)
+					last_ = mid_;
 				else
-					r = U.RandomFloat(0, range);
+					last_ = morph_.Value;
 
-				if (min_ < max_)
-					r_ = min_ + r;
+				if (limitHit_ && timeActive_ >= 10)
+				{
+					// force a reset to allow other morphs to take over the prio
+					r_ = mid_;
+					timeActive_ = 0;
+				}
 				else
-					r_ = min_ - r;
+				{
+					float range = Math.Abs(max_ - min_) * intensity_;
+					float r;
+
+					if (forceHigh)
+						r = range;
+					else
+						r = U.RandomFloat(0, range);
+
+					if (min_ < max_)
+						r_ = min_ + r;
+					else
+						r_ = min_ - r;
+				}
 			}
 		}
 

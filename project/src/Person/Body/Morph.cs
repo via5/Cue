@@ -108,6 +108,11 @@ namespace Cue
 			private float eyesClosed_;
 			private Morph m_ = null;
 
+			public MorphInfo(string id, float min, float max)
+				: this(id, min, max, BP.None, Morph.NoEyesClosed)
+			{
+			}
+
 			public MorphInfo(string id, float min, float max, BodyPartType bodyPart, float eyesClosed)
 			{
 				id_ = id;

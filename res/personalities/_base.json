@@ -714,7 +714,9 @@
 	"penetrationDamper": 0.5,
 	"minCollisionMag": 0.1,
 	"minCollisionMagPenetration": 0.2,
+
 	"idleAnimation": "procStandIdle",
+	"excitedAnimation": "cueExcited",
 
 	"slapMinExpressionChange": 0,
 	"slapMaxExpressionChange": 0.5,

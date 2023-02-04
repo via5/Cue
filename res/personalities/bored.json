@@ -5,6 +5,7 @@
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
 	"maxExcitedExpression": 0.1,
+	"excitedAnimation": "",
 
 	"lookAboveMaxWeight": 0,
 	"lookAboveMaxWeightOrgasm": 0,

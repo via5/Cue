@@ -17,6 +17,7 @@ project\src\AI\Events\Thrust.cs
 project\src\AI\Events\Trib.cs
 project\src\AI\Events\Zap.cs
 project\src\Animation\Animator.cs
+project\src\Animation\Builtin\Excited.cs
 project\src\Animation\Builtin\Finger.cs
 project\src\Animation\Builtin\Player.cs
 project\src\Animation\Builtin\Smoke.cs

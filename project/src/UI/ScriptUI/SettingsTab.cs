@@ -276,8 +276,8 @@ namespace Cue
 		}
 
 		private Person person_;
-		private VUI.CheckBox idlePose_;
-		private VUI.Label idlePoseWarning_;
+		private VUI.CheckBox idlePose_, excitedPose_;
+		private VUI.Label idlePoseWarning_, excitedPoseWarning_;
 		private List<AnimationOptions> animOptions_ = new List<AnimationOptions>();
 		private bool ignore_ = false;
 
@@ -291,23 +291,45 @@ namespace Cue
 			gl.HorizontalFill = true;
 			var ao = new VUI.Panel(gl);
 
-			idlePose_ = new VUI.CheckBox("Play animation", (b) =>
 			{
-				if (ignore_) return;
-				person_.Options.IdlePose = b;
-			});
+				idlePose_ = new VUI.CheckBox("Play animation", (b) =>
+				{
+					if (ignore_) return;
+					person_.Options.IdlePose = b;
+				});
 
-			idlePoseWarning_ = new VUI.Label("Idle animation disabled in the main options");
-			idlePoseWarning_.Visible = false;
-			idlePoseWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
-			idlePoseWarning_.WrapMode = VUI.Label.Wrap;
+				idlePoseWarning_ = new VUI.Label("Idle animation disabled in the main options");
+				idlePoseWarning_.Visible = false;
+				idlePoseWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
+				idlePoseWarning_.WrapMode = VUI.Label.Wrap;
 
-			var ip = new VUI.Panel(new VUI.HorizontalFlow(10));
-			ip.Add(idlePose_);
-			ip.Add(idlePoseWarning_);
+				var ip = new VUI.Panel(new VUI.HorizontalFlow(10));
+				ip.Add(idlePose_);
+				ip.Add(idlePoseWarning_);
 
-			ao.Add(new VUI.Label("Idle"));
-			ao.Add(ip);
+				ao.Add(new VUI.Label("Idle"));
+				ao.Add(ip);
+			}
+
+			{
+				excitedPose_ = new VUI.CheckBox("Play animation", (b) =>
+				{
+					if (ignore_) return;
+					person_.Options.ExcitedPose = b;
+				});
+
+				excitedPoseWarning_ = new VUI.Label("Excited animation disabled in the main options");
+				excitedPoseWarning_.Visible = false;
+				excitedPoseWarning_.TextColor = new UnityEngine.Color(1, 0, 0);
+				excitedPoseWarning_.WrapMode = VUI.Label.Wrap;
+
+				var ip = new VUI.Panel(new VUI.HorizontalFlow(10));
+				ip.Add(excitedPose_);
+				ip.Add(excitedPoseWarning_);
+
+				ao.Add(new VUI.Label("Excited"));
+				ao.Add(ip);
+			}
 
 			foreach (var o in person_.Options.GetAnimationOptions())
 				AddAnimationOptions(ao, o);
@@ -361,6 +383,9 @@ namespace Cue
 
 				idlePose_.Checked = person_.Options.IdlePose;
 				idlePoseWarning_.Visible = !Cue.Instance.Options.IdlePose;
+
+				excitedPose_.Checked = person_.Options.ExcitedPose;
+				excitedPoseWarning_.Visible = !Cue.Instance.Options.ExcitedPose;
 
 				for (int i = 0; i < animOptions_.Count; ++i)
 					animOptions_[i].Update(s);

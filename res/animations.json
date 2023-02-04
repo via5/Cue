@@ -20,6 +20,15 @@
 		},
 
 		{
+			"animation": "excited",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueExcited"
+			}
+		},
+
+		{
 			"animation": "thrust",
 			"type": "internal",
 			"options":

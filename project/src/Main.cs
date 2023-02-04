@@ -41,7 +41,7 @@ namespace Cue
 
 			sys_ = new Sys.Mock.MockSys();
 			cue_ = new Cue();
-			cue_.Init();
+			//cue_.Init();
 		}
 
 		public void Run()
@@ -49,12 +49,12 @@ namespace Cue
 			float deltaTime = 0;
 			long last = 0;
 
-			var r = new NormalRandom(0.3f, 0.9f, 1, 5);
+			var r = new NormalRandom(0.2f, 0.3f, 1, 1);
 
 			for (int i = 0; i < 10; ++i)
 			{
 				Console.WriteLine($"intensity: {i/10.0f}");
-				NormalTest(r, 0, i / 10.0f, i / 10.0f);
+				NormalTest(r, 0, 1, i / 10.0f);
 			}
 
 			//TestIntensities();

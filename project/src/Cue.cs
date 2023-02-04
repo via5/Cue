@@ -541,7 +541,7 @@ namespace Cue
 		public void LateUpdate(float s)
 		{
 			// don't check paused, LateUpdate is used to keep some objects in
-			// the right place, like the strapon
+			// the right place, like the strapon, and for hand linking
 
 			Instrumentation.Reset();
 

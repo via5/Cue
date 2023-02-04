@@ -97,8 +97,9 @@ namespace Cue
 	class MainOptionsTab : Tab
 	{
 		private VUI.FloatTextSlider excitement_;
-		private VUI.CheckBox idlePose_, autoHands_, autoHead_, handLinking_;
-		private VUI.CheckBox choking_, straponPhysical_, ignoreCamera_;
+		private VUI.CheckBox idlePose_, excitedPose_, autoHands_, autoHead_;
+		private VUI.CheckBox handLinking_, choking_, straponPhysical_;
+		private VUI.CheckBox ignoreCamera_;
 		private VUI.CheckBox devMode_;
 		private bool ignore_ = false;
 
@@ -118,6 +119,7 @@ namespace Cue
 			p.Add(new VUI.Spacer(20));
 
 			idlePose_ = p.Add(new VUI.CheckBox("Idle animation", OnIdlePose, o.IdlePose));
+			excitedPose_ = p.Add(new VUI.CheckBox("Excited animation", OnExcitedPose, o.ExcitedPose));
 			p.Add(new VUI.Label(
 				"Moves body parts around randomly.",
 				VUI.Label.Wrap));
@@ -192,6 +194,7 @@ namespace Cue
 
 				excitement_.Value = o.Excitement;
 				idlePose_.Checked = o.IdlePose;
+				excitedPose_.Checked = o.ExcitedPose;
 				autoHands_.Checked = o.AutoHands;
 				autoHead_.Checked = o.AutoHead;
 				handLinking_.Checked = o.HandLinking;
@@ -216,6 +219,12 @@ namespace Cue
 		{
 			if (ignore_) return;
 			Cue.Instance.Options.IdlePose = b;
+		}
+
+		private void OnExcitedPose(bool b)
+		{
+			if (ignore_) return;
+			Cue.Instance.Options.ExcitedPose = b;
 		}
 
 		private void OnAutoHands(bool b)

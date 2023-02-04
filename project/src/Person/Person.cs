@@ -123,6 +123,7 @@ namespace Cue
 		private float maxExcitement_ = 1.0f;
 		private List<AnimationOptions> anims_ = new List<AnimationOptions>();
 		private bool idlePose_ = true;
+		private bool excitedPose_ = true;
 
 		public PersonOptions(Person p)
 		{
@@ -143,6 +144,7 @@ namespace Cue
 		{
 			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
 			J.OptBool(o, "idlePose", ref idlePose_);
+			J.OptBool(o, "excitedPose", ref excitedPose_);
 
 			foreach (var a in anims_)
 				a.Load(o);
@@ -152,6 +154,7 @@ namespace Cue
 		{
 			o.Add("maxExcitement", new JSONData(maxExcitement_));
 			o.Add("idlePose", new JSONData(idlePose_));
+			o.Add("excitedPose", new JSONData(excitedPose_));
 
 			foreach (var a in anims_)
 				a.Save(o);
@@ -167,6 +170,12 @@ namespace Cue
 		{
 			get { return idlePose_; }
 			set { idlePose_ = value; OnChange(); }
+		}
+
+		public bool ExcitedPose
+		{
+			get { return excitedPose_; }
+			set { excitedPose_ = value; OnChange(); }
 		}
 
 		public List<AnimationOptions> GetAnimationOptions()

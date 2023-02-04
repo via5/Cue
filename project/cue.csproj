@@ -127,6 +127,7 @@
     <Compile Include="src\AI\Events\Trib.cs" />
     <Compile Include="src\AI\Events\Zap.cs" />
     <Compile Include="src\Animation\Animator.cs" />
+    <Compile Include="src\Animation\Builtin\Excited.cs" />
     <Compile Include="src\Animation\Builtin\Finger.cs" />
     <Compile Include="src\Animation\Builtin\Player.cs" />
     <Compile Include="src\Animation\Builtin\Smoke.cs" />

@@ -209,13 +209,14 @@ namespace Cue
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
 		public static readonly StringIndex IdleAnimation = new StringIndex(1);
-		public static readonly StringIndex FinishLookAtPlayer = new StringIndex(2);
-		public static readonly StringIndex FinishLookAtPlayerAction = new StringIndex(3);
-		public static readonly StringIndex FinishOrgasm = new StringIndex(4);
-		public static readonly StringIndex FinishMood = new StringIndex(5);
+		public static readonly StringIndex ExcitedAnimation = new StringIndex(2);
+		public static readonly StringIndex FinishLookAtPlayer = new StringIndex(3);
+		public static readonly StringIndex FinishLookAtPlayerAction = new StringIndex(4);
+		public static readonly StringIndex FinishOrgasm = new StringIndex(5);
+		public static readonly StringIndex FinishMood = new StringIndex(6);
 
-		public const int StringCount = 6;
-		public override int GetStringCount() { return 6; }
+		public const int StringCount = 7;
+		public override int GetStringCount() { return 7; }
 
 
 
@@ -565,6 +566,7 @@ namespace Cue
 		{
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
+			"excitedAnimation",
 			"finishLookAtPlayer",
 			"finishLookAtPlayerAction",
 			"finishOrgasm",
@@ -809,6 +811,7 @@ namespace Cue
 			"finishMoodTired",
 			"movementEnergyRampUpAfterOrgasmEasing",
 			"idleAnimation",
+			"excitedAnimation",
 			"finishLookAtPlayer",
 			"finishLookAtPlayerAction",
 			"finishOrgasm",
