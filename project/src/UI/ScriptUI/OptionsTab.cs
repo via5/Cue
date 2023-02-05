@@ -24,26 +24,23 @@ namespace Cue
 
 	class TriggersPanel : VUI.Panel
 	{
-		private TriggersOptions opts_;
-		private string triggerNamePlaceholder_;
-		private VUI.Panel buttons_;
+		private CustomMenuItems opts_;
+		private VUI.Panel widgets_;
 
 		public TriggersPanel(
-			TriggersOptions opts, string addCaption, string infoCaption,
-			string triggerNamePlaceholder)
+			CustomMenuItems opts, string addCaption, string infoCaption)
 		{
 			opts_ = opts;
-			triggerNamePlaceholder_ = triggerNamePlaceholder;
 
 			var center = new VUI.Panel(new VUI.BorderLayout(10));
 			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
 
 			controls.Add(new VUI.Button(addCaption, OnAdd));
 			controls.Add(new VUI.Label(infoCaption));
-			buttons_ = new VUI.Panel(new VUI.VerticalFlow(10));
+			widgets_ = new VUI.Panel(new VUI.VerticalFlow(10));
 
 			center.Add(controls, VUI.BorderLayout.Top);
-			center.Add(buttons_, VUI.BorderLayout.Center);
+			center.Add(widgets_, VUI.BorderLayout.Center);
 
 			Layout = new VUI.BorderLayout();
 			Add(center, VUI.BorderLayout.Center);
@@ -51,45 +48,20 @@ namespace Cue
 
 		public void Update()
 		{
-			if (buttons_.Children.Count != opts_.Triggers.Length)
+			if (widgets_.Children.Count != opts_.Items.Length)
 				Rebuild();
 		}
 
 		private void Rebuild()
 		{
-			buttons_.RemoveAllChildren();
-			foreach (var m in opts_.Triggers)
-				buttons_.Add(CreatePanel(m));
-		}
-
-		private VUI.Panel CreatePanel(CustomTrigger m)
-		{
-			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
-			var c = p.Add(new VUI.TextBox(m.Caption, triggerNamePlaceholder_));
-			c.Edited += (s) => { OnCaption(m, s); };
-			p.Add(new VUI.Button("Edit actions...", () => OnEditTrigger(m)));
-			p.Add(new VUI.ToolButton("X", () => OnDelete(m)));
-			return p;
+			widgets_.RemoveAllChildren();
+			foreach (var m in opts_.Items)
+				widgets_.Add(m.CreateConfigWidget());
 		}
 
 		private void OnAdd()
 		{
-			opts_.AddTrigger();
-		}
-
-		private void OnEditTrigger(CustomTrigger m)
-		{
-			m.Trigger.Edit(() => opts_.FireTriggersChanged());
-		}
-
-		private void OnCaption(CustomTrigger m, string s)
-		{
-			m.Caption = s;
-		}
-
-		private void OnDelete(CustomTrigger m)
-		{
-			opts_.RemoveTrigger(m);
+			opts_.AddCustomItem();
 		}
 	}
 
@@ -351,8 +323,8 @@ namespace Cue
 			var o = Cue.Instance.Options;
 
 			triggers_ = new TriggersPanel(
-				o.Menus, "Add button", "Adds custom buttons to the menu.",
-				"Button name");
+				o.CustomMenuItems, "Add button",
+				"Adds custom buttons to the menu.");
 
 			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;
@@ -885,7 +857,7 @@ namespace Cue
 
 		private void OnEditTrigger()
 		{
-			Cue.Instance.Options.Finish.Trigger.Edit(
+			Cue.Instance.Options.Finish.Button.Edit(
 				() => Cue.Instance.Save());
 		}
 	}

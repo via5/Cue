@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	class Panel : Widget
+	public class Panel : Widget
 	{
 		public override string TypeName { get { return "Panel"; } }
 

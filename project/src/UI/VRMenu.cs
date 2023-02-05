@@ -89,13 +89,13 @@ namespace Cue
 			SetWidget(widgetSel_.Index);
 			PersonChanged();
 
-			Cue.Instance.Options.Menus.TriggersChanged += Rebuild;
+			Cue.Instance.Options.CustomMenuItems.Changed += Rebuild;
 		}
 
 		public override void Destroy()
 		{
 			base.Destroy();
-			Cue.Instance.Options.Menus.TriggersChanged -= Rebuild;
+			Cue.Instance.Options.CustomMenuItems.Changed -= Rebuild;
 		}
 
 		private void Rebuild()
@@ -108,7 +108,8 @@ namespace Cue
 
 			float height =
 				minHeight_ +
-				Cue.Instance.Options.Menus.Triggers.Length * VUI.Style.Metrics.ButtonMinimumSize.Height;
+				Cue.Instance.Options.CustomMenuItems.Items.Length *
+				VUI.Style.Metrics.ButtonMinimumSize.Height;
 
 			Root.RootSupport.SetSize(new UnityEngine.Vector3(Width, height));
 			Root.SupportBoundsChanged();

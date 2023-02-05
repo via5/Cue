@@ -5,7 +5,7 @@ using System;
 
 namespace VUI
 {
-	interface IRootSupport
+	public interface IRootSupport
 	{
 		bool Init();
 		void Destroy();

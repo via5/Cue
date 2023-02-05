@@ -174,15 +174,14 @@ namespace Cue
 		}
 
 
-		public class CustomMenuItem : Item<VUI.Button>
+		public class CustomMenuItem : Item<VUI.Panel>
 		{
-			private CustomTrigger m_;
+			private ICustomMenuItem item_;
 
-			public CustomMenuItem(CustomTrigger m)
-				: base(new VUI.Button(m.Caption), null)
+			public CustomMenuItem(ICustomMenuItem item)
+				: base(item.CreateMenuWidget(), null)
 			{
-				m_ = m;
-				Widget.Clicked += OnClicked;
+				item_ = item;
 			}
 
 			public override bool Selected
@@ -198,12 +197,7 @@ namespace Cue
 
 			public override void Activate()
 			{
-				Widget.Click();
-			}
-
-			private void OnClicked()
-			{
-				m_.Trigger.Fire();
+				item_.Activate();
 			}
 		}
 
@@ -215,7 +209,7 @@ namespace Cue
 				Hand(), Head(), Thrust(), Trib(), CanKiss(), Finish()
 			};
 
-			foreach (var m in Cue.Instance.Options.Menus.Triggers)
+			foreach (var m in Cue.Instance.Options.CustomMenuItems.Items)
 				list.Add(new CustomMenuItem(m));
 
 			//list.Add(Genitals());
@@ -347,7 +341,7 @@ namespace Cue
 			personSel_ = new CircularIndex<Person>(
 				Cue.Instance.ActivePersons, (p) => p.Body.Exists);
 
-			Cue.Instance.Options.Menus.TriggersChanged += UpdateItems;
+			Cue.Instance.Options.CustomMenuItems.Changed += UpdateItems;
 			UpdateItems();
 		}
 

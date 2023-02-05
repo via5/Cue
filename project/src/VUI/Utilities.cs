@@ -416,7 +416,7 @@ namespace VUI
 		}
 	}
 
-	struct Point
+	public struct Point
 	{
 		public float X, Y;
 
@@ -470,7 +470,7 @@ namespace VUI
 		}
 	}
 
-	struct Size
+	public struct Size
 	{
 		public float Width, Height;
 
@@ -539,7 +539,7 @@ namespace VUI
 	}
 
 
-	struct Rectangle
+	public struct Rectangle
 	{
 		public float Left, Top, Right, Bottom;
 
@@ -702,7 +702,7 @@ namespace VUI
 	}
 
 
-	struct Insets
+	public struct Insets
 	{
 		public float Left, Top, Right, Bottom;
 

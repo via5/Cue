@@ -139,20 +139,20 @@ namespace VUI
 	}
 
 
-	interface IWidget
+	public interface IWidget
 	{
 		void Remove();
 	}
 
 
-	interface IEvent
+	public interface IEvent
 	{
 		BaseEventData EventData { get; }
 		bool Bubble { get; set; }
 	}
 
 
-	abstract class BasicEvent : IEvent
+	public abstract class BasicEvent : IEvent
 	{
 		private bool bubble_;
 
@@ -174,7 +174,7 @@ namespace VUI
 	}
 
 
-	class FocusEvent : BasicEvent
+	public class FocusEvent : BasicEvent
 	{
 		private readonly Widget other_;
 
@@ -190,7 +190,7 @@ namespace VUI
 		}
 	}
 
-	abstract class MouseEvent : BasicEvent
+	public abstract class MouseEvent : BasicEvent
 	{
 		private readonly Widget w_;
 		private readonly PointerEventData d_;
@@ -219,7 +219,7 @@ namespace VUI
 		}
 	}
 
-	class WheelEvent : MouseEvent
+	public class WheelEvent : MouseEvent
 	{
 		private readonly Point d_;
 
@@ -235,7 +235,7 @@ namespace VUI
 		}
 	}
 
-	class DragEvent : MouseEvent
+	public class DragEvent : MouseEvent
 	{
 		public DragEvent(Widget w, PointerEventData d)
 			: base(w, d, false)
@@ -243,7 +243,7 @@ namespace VUI
 		}
 	}
 
-	class PointerEvent : MouseEvent
+	public class PointerEvent : MouseEvent
 	{
 		public const int NoButton = -1;
 		public const int LeftButton = 0;
@@ -266,7 +266,7 @@ namespace VUI
 	}
 
 
-	class Events
+	public class Events
 	{
 		public delegate void FocusHandler(FocusEvent e);
 		public event FocusHandler Focus, Blur;

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	abstract class Widget : IDisposable, IWidget
+	public abstract class Widget : IDisposable, IWidget
 	{
 		public virtual string TypeName { get { return "Widget"; } }
 

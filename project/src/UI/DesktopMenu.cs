@@ -79,25 +79,22 @@
 			PersonChanged();
 
 			Cue.Instance.Options.Changed += OnOptionsChanged;
-			Cue.Instance.Options.Menus.TriggersChanged += OnMenusChanged;
+			Cue.Instance.Options.CustomMenuItems.Changed += OnCustomMenusChanged;
 
 			OnOptionsChanged();
-			OnMenusChanged();
+			OnCustomMenusChanged();
 		}
 
 		public override void Destroy()
 		{
 			Cue.Instance.Options.Changed -= OnOptionsChanged;
-			Cue.Instance.Options.Menus.TriggersChanged -= OnMenusChanged;
+			Cue.Instance.Options.CustomMenuItems.Changed -= OnCustomMenusChanged;
 			base.Destroy();
 		}
 
-		private void AddCustomButton(CustomTrigger m)
+		private void AddCustomItem(ICustomMenuItem item)
 		{
-			custom_.Add(new VUI.Button(m.Caption, () =>
-			{
-				m.Trigger.Fire();
-			}));
+			custom_.Add(item.CreateMenuWidget());
 		}
 
 		public override void CheckInput(float s)
@@ -162,12 +159,14 @@
 			UpdateRootSize();
 		}
 
-		private void OnMenusChanged()
+		private void OnCustomMenusChanged()
 		{
+			var items = Cue.Instance.Options.CustomMenuItems.Items;
+
 			custom_.RemoveAllChildren();
-			custom_.Visible = (Cue.Instance.Options.Menus.Triggers.Length > 0);
-			foreach (var m in Cue.Instance.Options.Menus.Triggers)
-				AddCustomButton(m);
+			custom_.Visible = (items.Length > 0);
+			foreach (var item in items)
+				AddCustomItem(item);
 
 			selButtons_.RemoveAllChildren();
 			foreach (var i in Items)

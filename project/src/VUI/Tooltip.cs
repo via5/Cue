@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	class Tooltip
+	public class Tooltip
 	{
 		private string text_ = "";
 		private int fontSize_ = -1;
@@ -47,7 +47,7 @@ namespace VUI
 	}
 
 
-	class TooltipWidget : Panel
+	public class TooltipWidget : Panel
 	{
 		public override string TypeName { get { return "TooltipWidget"; } }
 
@@ -98,7 +98,7 @@ namespace VUI
 	}
 
 
-	class TooltipManager
+	public class TooltipManager
 	{
 		private readonly Root root_;
 		private readonly TooltipWidget widget_ = new TooltipWidget();

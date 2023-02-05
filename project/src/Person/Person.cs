@@ -11,7 +11,7 @@ namespace Cue
 			private readonly AnimationType type_;
 			private readonly string name_;
 			private readonly string key_;
-			private CustomTrigger triggerOn_, triggerOff_;
+			private CustomButtonItem triggerOn_, triggerOff_;
 			private bool play_ = true;
 			private readonly Sys.IActionParameter action_;
 
@@ -20,8 +20,8 @@ namespace Cue
 				type_ = type;
 				name_ = name;
 				key_ = name.ToLower();
-				triggerOn_ = new CustomTrigger($"{name}.on");
-				triggerOff_ = new CustomTrigger($"{name}.on");
+				triggerOn_ = new CustomButtonItem($"{name}.on");
+				triggerOff_ = new CustomButtonItem($"{name}.on");
 
 				if (f == null)
 					action_ = null;
@@ -38,10 +38,10 @@ namespace Cue
 					J.OptBool(ao, "play", ref play_);
 
 					if (ao.HasKey("triggerOn"))
-						triggerOn_ = CustomTrigger.FromJSON(ao["triggerOn"].AsObject);
+						triggerOn_ = CustomButtonItem.FromJSON(ao["triggerOn"].AsObject);
 
 					if (ao.HasKey("triggerOff"))
-						triggerOff_ = CustomTrigger.FromJSON(ao["triggerOff"].AsObject);
+						triggerOff_ = CustomButtonItem.FromJSON(ao["triggerOff"].AsObject);
 				}
 			}
 
@@ -66,12 +66,12 @@ namespace Cue
 				get { return name_; }
 			}
 
-			public CustomTrigger TriggerOn
+			public CustomButtonItem TriggerOn
 			{
 				get { return triggerOn_; }
 			}
 
-			public CustomTrigger TriggerOff
+			public CustomButtonItem TriggerOff
 			{
 				get { return triggerOff_; }
 			}
@@ -79,9 +79,9 @@ namespace Cue
 			public void Trigger(bool on)
 			{
 				if (on)
-					triggerOn_.Fire();
+					triggerOn_.Activate();
 				else
-					triggerOff_.Fire();
+					triggerOff_.Activate();
 			}
 
 			public bool Play
@@ -194,9 +194,9 @@ namespace Cue
 				return;
 
 			if (on)
-				a.TriggerOn.Fire();
+				a.TriggerOn.Activate();
 			else
-				a.TriggerOff.Fire();
+				a.TriggerOff.Activate();
 		}
 
 		private void OnChange()

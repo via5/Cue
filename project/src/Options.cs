@@ -4,30 +4,72 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class CustomTrigger
+	public interface ICustomMenuItem
 	{
-		private TriggersOptions parent_ = null;
-		private string caption_;
-		private Sys.IActionTrigger trigger_;
+		CustomMenuItems Parent { get; set; }
+		VUI.Panel CreateConfigWidget();
+		VUI.Panel CreateMenuWidget();
+		void Activate();
+		JSONNode ToJSON();
+	}
 
-		private CustomTrigger(string caption, Sys.IActionTrigger trigger)
-		{
-			caption_ = caption;
-			trigger_ = trigger;
-		}
 
-		public CustomTrigger(string caption)
-			: this(caption, Cue.Instance.Sys.CreateActionTrigger())
-		{
-		}
+	public abstract class BasicCustomMenuItem : ICustomMenuItem
+	{
+		private CustomMenuItems parent_ = null;
 
-		public TriggersOptions Parent
+		public CustomMenuItems Parent
 		{
 			get { return parent_; }
 			set { parent_ = value; }
 		}
 
-		public static CustomTrigger FromJSON(JSONClass n)
+		public VUI.Panel CreateConfigWidget()
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			DoCreateConfigWidget(p);
+			return p;
+		}
+
+		public VUI.Panel CreateMenuWidget()
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			DoCreateMenuWidget(p);
+			return p;
+		}
+
+		public abstract void Activate();
+
+		public JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+			DoToJSON(o);
+			return o;
+		}
+
+		protected abstract void DoCreateConfigWidget(VUI.Panel p);
+		protected abstract void DoCreateMenuWidget(VUI.Panel p);
+		protected abstract void DoToJSON(JSONClass o);
+	}
+
+
+	public class CustomButtonItem : BasicCustomMenuItem
+	{
+		private string caption_;
+		private Sys.IActionTrigger trigger_;
+
+		private CustomButtonItem(string caption, Sys.IActionTrigger trigger)
+		{
+			caption_ = caption;
+			trigger_ = trigger;
+		}
+
+		public CustomButtonItem(string caption)
+			: this(caption, Cue.Instance.Sys.CreateActionTrigger())
+		{
+		}
+
+		public static CustomButtonItem FromJSON(JSONClass n)
 		{
 			try
 			{
@@ -40,7 +82,7 @@ namespace Cue
 				if (t == null)
 					throw new LoadFailed("failed to create trigger");
 
-				return new CustomTrigger(c, t);
+				return new CustomButtonItem(c, t);
 			}
 			catch (Exception e)
 			{
@@ -60,7 +102,7 @@ namespace Cue
 			{
 				caption_ = value;
 				trigger_.Name = value;
-				parent_?.FireTriggersChanged();
+				Parent?.FireTriggersChanged();
 			}
 		}
 
@@ -69,7 +111,7 @@ namespace Cue
 			get { return trigger_; }
 		}
 
-		public void Fire()
+		public override void Activate()
 		{
 			trigger_?.Fire();
 		}
@@ -79,52 +121,84 @@ namespace Cue
 			trigger_?.Edit(onDone);
 		}
 
-		public JSONNode ToJSON()
+		public override string ToString()
 		{
-			var o = new JSONClass();
+			return $"CustomButtonItem.[{Caption}]";
+		}
 
+		protected override void DoCreateConfigWidget(VUI.Panel p)
+		{
+			var c = p.Add(new VUI.TextBox(Caption, "Button name"));
+			c.Edited += OnCaption;
+			p.Add(new VUI.Button("Edit actions...", OnEditTrigger));
+			p.Add(new VUI.ToolButton("X", OnDelete));
+		}
+
+		protected override void DoCreateMenuWidget(VUI.Panel p)
+		{
+			p.Add(new VUI.Button(Caption, () =>
+			{
+				Activate();
+			}));
+		}
+
+		protected override void DoToJSON(JSONClass o)
+		{
 			o["caption"] = caption_;
 			o["trigger"] = trigger_.ToJSON();
+		}
 
-			return o;
+		private void OnEditTrigger()
+		{
+			Trigger.Edit(() => Parent.FireTriggersChanged());
+		}
+
+		private void OnCaption(string s)
+		{
+			Caption = s;
+		}
+
+		private void OnDelete()
+		{
+			Parent.RemoveItem(this);
 		}
 	}
 
 
-	public class TriggersOptions
+	public class CustomMenuItems
 	{
 		public delegate void Handler();
-		public event Handler TriggersChanged;
+		public event Handler Changed;
 
 		private string defaultCaption_;
-		private List<CustomTrigger> triggers_ = new List<CustomTrigger>();
+		private List<ICustomMenuItem> items_ = new List<ICustomMenuItem>();
 
-		public TriggersOptions(string defaultCaption="")
+		public CustomMenuItems(string defaultCaption="")
 		{
 			defaultCaption_ = defaultCaption;
 		}
 
-		public CustomTrigger[] Triggers
+		public ICustomMenuItem[] Items
 		{
-			get { return triggers_.ToArray(); }
+			get { return items_.ToArray(); }
 		}
 
 		public void Save(JSONArray a)
 		{
-			if (triggers_.Count > 0)
+			if (items_.Count > 0)
 			{
-				foreach (var m in triggers_)
+				foreach (var m in items_)
 					a.Add(m.ToJSON());
 			}
 		}
 
 		public void Load(JSONArray a)
 		{
-			triggers_.Clear();
+			items_.Clear();
 
 			foreach (var mo in a.Childs)
 			{
-				var m = CustomTrigger.FromJSON(mo.AsObject);
+				var m = CustomButtonItem.FromJSON(mo.AsObject);
 				if (m != null)
 					Add(m);
 			}
@@ -132,38 +206,32 @@ namespace Cue
 			OnTriggersChanged();
 		}
 
-		public CustomTrigger AddTrigger()
+		public ICustomMenuItem AddCustomItem()
 		{
-			var m = new CustomTrigger(defaultCaption_);
+			var m = new CustomButtonItem(defaultCaption_);
 			Add(m);
 			OnTriggersChanged();
 			return m;
 		}
 
-		private void Add(CustomTrigger t)
+		private void Add(ICustomMenuItem t)
 		{
-			triggers_.Add(t);
+			items_.Add(t);
 			t.Parent = this;
 		}
 
-		public void RemoveTrigger(CustomTrigger m)
+		public void RemoveItem(ICustomMenuItem m)
 		{
-			if (!triggers_.Contains(m))
+			if (!items_.Contains(m))
 			{
-				Logger.Global.Error($"custom menu '{m.Caption}' not found");
+				Logger.Global.Error($"custom menu '{m}' not found");
 				return;
 			}
 
 			m.Parent = null;
-			triggers_.Remove(m);
+			items_.Remove(m);
 
 			OnTriggersChanged();
-		}
-
-		public void FireAll()
-		{
-			foreach (var t in triggers_)
-				t.Trigger.Fire();
 		}
 
 		public void FireTriggersChanged()
@@ -174,7 +242,7 @@ namespace Cue
 		private void OnTriggersChanged()
 		{
 			Cue.Instance.SaveLater();
-			TriggersChanged?.Invoke();
+			Changed?.Invoke();
 		}
 	}
 
@@ -186,7 +254,7 @@ namespace Cue
 		private int orgasms_ = Finish.OrgasmsPersonality;
 		private float orgasmsTime_ = 1;
 		private int events_ = Finish.StopEventsAll;
-		private CustomTrigger trigger_ = new CustomTrigger("Finish");
+		private CustomButtonItem button_ = new CustomButtonItem("Finish");
 
 		public float InitialDelay
 		{
@@ -218,9 +286,9 @@ namespace Cue
 			set { events_ = value; Cue.Instance.Options.FireOnChanged(); }
 		}
 
-		public CustomTrigger Trigger
+		public CustomButtonItem Button
 		{
-			get { return trigger_; }
+			get { return button_; }
 		}
 
 		public void Load(JSONClass o)
@@ -232,7 +300,7 @@ namespace Cue
 			J.OptInt(o, "finishEvents", ref events_);
 
 			if (o.HasKey("finishTrigger"))
-				trigger_ = CustomTrigger.FromJSON(o["finishTrigger"].AsObject);
+				button_ = CustomButtonItem.FromJSON(o["finishTrigger"].AsObject);
 		}
 
 		public void Save(JSONClass o)
@@ -242,7 +310,7 @@ namespace Cue
 			o["finishOrgasms"] = new JSONData(orgasms_);
 			o["finishOrgasmsTime"] = new JSONData(orgasmsTime_);
 			o["finishEvents"] = new JSONData(events_);
-			o["finishTrigger"] = trigger_.ToJSON();
+			o["finishTrigger"] = button_.ToJSON();
 		}
 	}
 
@@ -279,7 +347,7 @@ namespace Cue
 		private bool divRightHand_ = true;
 
 		private FinishOptions finish_ = new FinishOptions();
-		private TriggersOptions menus_ = new TriggersOptions("Button");
+		private CustomMenuItems menus_ = new CustomMenuItems("Button");
 
 		public Options()
 		{
@@ -422,7 +490,7 @@ namespace Cue
 			get { return finish_; }
 		}
 
-		public TriggersOptions Menus
+		public CustomMenuItems CustomMenuItems
 		{
 			get { return menus_; }
 		}

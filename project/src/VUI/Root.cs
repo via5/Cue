@@ -128,7 +128,7 @@ namespace VUI
 	class BadInit : Exception { }
 
 
-	class Root
+	public class Root
 	{
 		public const int FocusDefault = 0x0;
 		public const int FocusKeepPopup = 0x01;

@@ -47,6 +47,8 @@ namespace VUI
 				Tooltip.Text = tooltip;
 
 			Events.PointerDown += OnPointerDown;
+			Events.PointerUp += OnPointerUp;
+			Events.PointerClick += OnPointerClick;
 		}
 
 		public string Text
@@ -195,6 +197,16 @@ namespace VUI
 		}
 
 		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
+		}
+
+		private void OnPointerUp(PointerEvent e)
+		{
+			e.Bubble = false;
+		}
+
+		private void OnPointerClick(PointerEvent e)
 		{
 			e.Bubble = false;
 		}

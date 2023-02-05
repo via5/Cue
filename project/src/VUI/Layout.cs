@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace VUI
 {
-	interface LayoutData
+	public interface LayoutData
 	{
 	}
 
-	abstract class Layout
+	public abstract class Layout
 	{
 		public abstract string TypeName { get; }
 
