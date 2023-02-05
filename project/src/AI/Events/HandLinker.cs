@@ -9,11 +9,23 @@
 		{
 			private BodyPart hand_;
 			private BodyPartLock lk_ = null;
+			private BodyPart target_ = null;
 			private bool grabbed_ = false;
+			private AnimationType anim_ = AnimationType.None;
 
 			public HandInfo(BodyPart h)
 			{
 				hand_ = h;
+			}
+
+			public Logger Log
+			{
+				get { return hand_.Log; }
+			}
+
+			public Person Person
+			{
+				get { return hand_.Person; }
 			}
 
 			public BodyPart Hand
@@ -46,16 +58,79 @@
 			public void LinkTo(Sys.IBodyPartRegion region, BodyPartLock lk)
 			{
 				hand_.LinkTo(region);
+				target_ = Body.ResolveBodyPart(region);
 				lk_ = lk;
+
+				if (target_ != null)
+				{
+					if (hand_.Type == BP.LeftHand)
+					{
+						if (region.BodyPart.Type == BP.LeftBreast ||
+							region.BodyPart.Type == BP.RightBreast)
+						{
+							Log.Verbose("will start left hand on breast");
+							anim_ = AnimationType.LeftHandOnBreast;
+						}
+					}
+					else if (hand_.Type == BP.RightHand)
+					{
+						if (region.BodyPart.Type == BP.LeftBreast ||
+							region.BodyPart.Type == BP.RightBreast)
+						{
+							Log.Verbose("will start right hand on breast");
+							anim_ = AnimationType.RightHandOnBreast;
+						}
+					}
+				}
 			}
 
 			public void Unlink()
 			{
 				if (lk_ != null)
 				{
+					Log.Verbose("unlinking");
+
 					lk_.Unlock();
 					lk_ = null;
 					hand_.Unlink();
+
+					if (anim_ != AnimationType.None)
+					{
+						Log.Verbose($"stopping {anim_}");
+						Person.Animator.StopType(anim_);
+						anim_ = AnimationType.None;
+					}
+
+					target_ = null;
+				}
+			}
+
+			public void Update(float s)
+			{
+				if (anim_ != AnimationType.None)
+				{
+					bool play = true;// GetAnimationOption(hand)?.Play ?? true;
+
+					if (play)
+					{
+						AnimationStatus state = Person.Animator.PlayingStatus(anim_);
+
+						if (state == AnimationStatus.Playing)
+						{
+							if (Mood.ShouldStopSexAnimation(Person, target_.Person))
+								Person.Animator.PauseType(anim_);
+						}
+						else if (state == AnimationStatus.NotPlaying || state == AnimationStatus.Paused)
+						{
+							if (Mood.CanStartSexAnimation(Person, target_.Person))
+							{
+								if (!Person.Animator.PlayType(anim_, new AnimationContext(target_.Person, lk_.Key )))
+								{
+									anim_ = AnimationType.None;
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -77,6 +152,7 @@
 		private HandInfo right_ = null;
 		private bool grabbingPerson_ = false;
 		private bool wasEnabled_ = false;
+		private bool firstUpdate_ = true;
 
 		private DebugPart[,] debug_;
 
@@ -137,6 +213,16 @@
 
 		private void RealUpdate(float s)
 		{
+			if (firstUpdate_)
+			{
+				firstUpdate_ = false;
+				if (Cue.Instance.Options.HandLinking)
+				{
+					DoCheck(left_);
+					DoCheck(right_);
+				}
+			}
+
 			if (!Cue.Instance.Options.HandLinking)
 			{
 				if (wasEnabled_)
@@ -180,6 +266,9 @@
 				Check(left_);
 				Check(right_);
 			}
+
+			left_.Update(s);
+			right_.Update(s);
 		}
 
 		private void Check(HandInfo info)
@@ -195,22 +284,27 @@
 			}
 			else if (info.GrabStopped())
 			{
-				var close = FindClose(info.Hand);
+				DoCheck(info);
+			}
+		}
 
-				if (close != null)
+		private void DoCheck(HandInfo info)
+		{
+			var close = FindClose(info.Hand);
+
+			if (close != null)
+			{
+				var lk = info.Hand.Lock(
+					BodyPartLock.Anim, "hand linker", BodyPartLock.Weak);
+
+				if (lk == null)
 				{
-					var lk = info.Hand.Lock(
-						BodyPartLock.Anim, "HandLocker", BodyPartLock.Weak);
-
-					if (lk == null)
-					{
-						Log.Verbose($"cannot link {info.Hand} to {close}, busy");
-					}
-					else
-					{
-						Log.Info($"linking {info.Hand} => {close.BodyPart}");
-						info.LinkTo(close, lk);
-					}
+					Log.Verbose($"cannot link {info.Hand} to {close}, busy");
+				}
+				else
+				{
+					Log.Info($"linking {info.Hand} => {close.BodyPart}");
+					info.LinkTo(close, lk);
 				}
 			}
 		}

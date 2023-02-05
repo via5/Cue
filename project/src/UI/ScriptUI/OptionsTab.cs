@@ -111,7 +111,7 @@ namespace Cue
 
 			var o = Cue.Instance.Options;
 
-			var ep = new VUI.Panel(new VUI.HorizontalFlow());
+			var ep = new VUI.Panel(new VUI.HorizontalFlow(10));
 			ep.Add(new VUI.Label("Global excitement speed"));
 			excitement_ = ep.Add(new VUI.FloatTextSlider(0, 10, OnExcitementChanged));
 

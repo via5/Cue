@@ -134,6 +134,24 @@
 			{
 				"name": "cwBJ"
 			}
+		},
+
+		{
+			"animation": "leftHandOnBreast",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueLeftHandOnBreast"
+			}
+		},
+
+		{
+			"animation": "rightHandOnBreast",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueRightHandOnBreast"
+			}
 		}
 	]
 }

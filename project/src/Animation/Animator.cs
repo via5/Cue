@@ -19,6 +19,8 @@ namespace Cue
 			new Proc.SuckFingerProcAnimation(),
 			new Proc.LeftFingerProcAnimation(),
 			new Proc.RightFingerProcAnimation(),
+			new Proc.LeftHandOnBreastProcAnimation(),
+			new Proc.RightHandOnBreastProcAnimation()
 		};
 
 		public static IAnimation Get(string name)

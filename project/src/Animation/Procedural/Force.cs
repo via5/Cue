@@ -38,8 +38,10 @@ namespace Cue.Proc
 			public override string ToString()
 			{
 				return
-					$"last={last} target={target}\n" +
-					$"min={min} max={max} win={window}";
+					$"last={last}\n" +
+					$"target={target}\n" +
+					$"min={min} max={max}\n" +
+					$"win={window}";
 			}
 		}
 
@@ -64,8 +66,10 @@ namespace Cue.Proc
 			public override string ToString()
 			{
 				return
-					$"last={last} target={target}\n" +
-					$"min={min} max={max} win={window} dir={dir}";
+					$"last={last}\n" +
+					$"target={target}\n" +
+					$"min={min} max={max}\n" +
+					$"win={window} dir={dir}";
 			}
 		}
 

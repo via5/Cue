@@ -256,6 +256,30 @@ namespace Cue
 			return all_[type.Int];
 		}
 
+		public BodyPart FindBodyPart(Sys.IBodyPart sys)
+		{
+			for (int i = 0; i < all_.Length; ++i)
+			{
+				if (all_[i].Sys == sys)
+					return all_[i];
+			}
+
+			return null;
+		}
+
+		public static BodyPart ResolveBodyPart(Sys.IBodyPartRegion region)
+		{
+			var p = Cue.Instance.PersonForAtom(region?.BodyPart?.Atom);
+			if (p == null)
+				return null;
+
+			var bp = p.Body.FindBodyPart(region?.BodyPart);
+			if (bp == null)
+				return null;
+
+			return bp;
+		}
+
 		public ErogenousZone Zone(ZoneType i)
 		{
 			return zones_.Get(i);

@@ -93,4 +93,114 @@
 			return a;
 		}
 	}
+
+
+	public abstract class HandOnBreastProcAnimation : BasicProcAnimation
+	{
+		public HandOnBreastProcAnimation(string name, BodyPartType bp)
+				: base(name)
+		{
+			var torqueMin = new Vector3(-7, -7, -7);
+			var torqueMax = new Vector3(7, 7, 7);
+
+			var forceMin = new Vector3(-25, -30, -30);
+			var forceMax = new Vector3(25, 30, 30);
+
+
+			AddForce(Force.RelativeTorque, bp,
+				new Vector3(torqueMin.X, 0, 0),
+				new Vector3(torqueMax.X, 0, 0));
+
+			AddForce(Force.RelativeTorque, bp,
+				new Vector3(0, torqueMin.Y, 0),
+				new Vector3(0, torqueMax.Y, 0));
+
+			AddForce(Force.RelativeTorque, bp,
+				new Vector3(0, 0, torqueMin.Z),
+				new Vector3(0, 0, torqueMax.Z));
+
+
+			AddForce(Force.RelativeForce, bp,
+				new Vector3(forceMin.X, 0, 0),
+				new Vector3(forceMax.X, 0, 0));
+
+			AddForce(Force.RelativeForce, bp,
+				new Vector3(0, forceMin.Y, 0),
+				new Vector3(0, forceMax.Y, 0));
+
+			AddForce(Force.RelativeForce, bp,
+				new Vector3(0, 0, forceMin.Z),
+				new Vector3(0, 0, forceMax.Z));
+
+			string morph = (bp == BP.LeftHand ? "Left" : "Right");
+
+			AddMorph(bp, $"{morph} Fingers Grasp", -0.2f, 0.3f);
+			AddMorph(bp, $"{morph} Fingers In-Out", -1, 1);
+		}
+
+		private void AddForce(int forceType, BodyPartType bp, Vector3 min, Vector3 max)
+		{
+			var g = new ConcurrentTargetGroup(
+				"g", new Duration(), new Duration(), true,
+				new DurationSync(
+					new Duration(0.3f, 2),
+					new Duration(0.3f, 2),
+					new Duration(0, 2), new Duration(0, 2),
+					DurationSync.Loop));
+
+			g.AddTarget(new Force(
+				"", forceType, bp, min, max,
+				null, Vector3.Zero, new ParentTargetSync()));
+
+			AddTarget(g);
+		}
+
+		private void AddMorph(BodyPartType bp, string name, float min, float max)
+		{
+			var g = new ConcurrentTargetGroup(
+				"g", new Duration(), new Duration(), true,
+				new DurationSync(
+					new Duration(0.3f, 2),
+					new Duration(0.3f, 2),
+					new Duration(0, 3), new Duration(0, 3),
+					DurationSync.Loop));
+
+			g.AddTarget(new MorphTarget(
+				bp, name, min, max, new ParentTargetSync()));
+
+			AddTarget(g);
+		}
+	}
+
+
+	public class LeftHandOnBreastProcAnimation : HandOnBreastProcAnimation
+	{
+		public LeftHandOnBreastProcAnimation()
+				: base("cueLeftHandOnBreast", BP.LeftHand)
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new LeftHandOnBreastProcAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+	}
+
+
+	public class RightHandOnBreastProcAnimation : HandOnBreastProcAnimation
+	{
+		public RightHandOnBreastProcAnimation()
+				: base("cueRightHandOnBreast", BP.RightHand)
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new RightHandOnBreastProcAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+	}
 }
