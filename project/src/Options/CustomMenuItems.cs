@@ -1,0 +1,248 @@
+﻿using SimpleJSON;
+using System;
+using System.Collections.Generic;
+
+namespace Cue
+{
+	public interface ICustomMenuItem
+	{
+		CustomMenuItems Parent { get; set; }
+		VUI.Panel CreateConfigWidget();
+		VUI.Panel CreateMenuWidget();
+		void Activate();
+		JSONNode ToJSON();
+	}
+
+
+	public abstract class BasicCustomMenuItem : ICustomMenuItem
+	{
+		private CustomMenuItems parent_ = null;
+
+		public CustomMenuItems Parent
+		{
+			get { return parent_; }
+			set { parent_ = value; }
+		}
+
+		public VUI.Panel CreateConfigWidget()
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			DoCreateConfigWidget(p);
+			return p;
+		}
+
+		public VUI.Panel CreateMenuWidget()
+		{
+			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
+			DoCreateMenuWidget(p);
+			return p;
+		}
+
+		public abstract void Activate();
+
+		public JSONNode ToJSON()
+		{
+			var o = new JSONClass();
+			DoToJSON(o);
+			return o;
+		}
+
+		protected abstract void DoCreateConfigWidget(VUI.Panel p);
+		protected abstract void DoCreateMenuWidget(VUI.Panel p);
+		protected abstract void DoToJSON(JSONClass o);
+	}
+
+
+	public class CustomButtonItem : BasicCustomMenuItem
+	{
+		private string caption_;
+		private Sys.IActionTrigger trigger_;
+
+		private CustomButtonItem(string caption, Sys.IActionTrigger trigger)
+		{
+			caption_ = caption;
+			trigger_ = trigger;
+		}
+
+		public CustomButtonItem(string caption)
+			: this(caption, Cue.Instance.Sys.CreateActionTrigger())
+		{
+		}
+
+		public static CustomButtonItem FromJSON(JSONClass n)
+		{
+			try
+			{
+				var c = J.ReqString(n, "caption");
+
+				if (!n.HasKey("trigger"))
+					throw new LoadFailed("missing trigger");
+
+				var t = Cue.Instance.Sys.LoadActionTrigger(n["trigger"].AsObject);
+				if (t == null)
+					throw new LoadFailed("failed to create trigger");
+
+				return new CustomButtonItem(c, t);
+			}
+			catch (Exception e)
+			{
+				Logger.Global.Error("failed to load custom menu, " + e.ToString());
+				return null;
+			}
+		}
+
+		public string Caption
+		{
+			get
+			{
+				return caption_;
+			}
+
+			set
+			{
+				caption_ = value;
+				trigger_.Name = value;
+				Parent?.FireTriggersChanged();
+			}
+		}
+
+		public Sys.IActionTrigger Trigger
+		{
+			get { return trigger_; }
+		}
+
+		public override void Activate()
+		{
+			trigger_?.Fire();
+		}
+
+		public void Edit(Action onDone = null)
+		{
+			trigger_?.Edit(onDone);
+		}
+
+		public override string ToString()
+		{
+			return $"CustomButtonItem.[{Caption}]";
+		}
+
+		protected override void DoCreateConfigWidget(VUI.Panel p)
+		{
+			var c = p.Add(new VUI.TextBox(Caption, "Button name"));
+			c.Edited += OnCaption;
+			p.Add(new VUI.Button("Edit actions...", OnEditTrigger));
+			p.Add(new VUI.ToolButton("X", OnDelete));
+		}
+
+		protected override void DoCreateMenuWidget(VUI.Panel p)
+		{
+			p.Add(new VUI.Button(Caption, () =>
+			{
+				Activate();
+			}));
+		}
+
+		protected override void DoToJSON(JSONClass o)
+		{
+			o["caption"] = caption_;
+			o["trigger"] = trigger_.ToJSON();
+		}
+
+		private void OnEditTrigger()
+		{
+			Trigger.Edit(() => Parent.FireTriggersChanged());
+		}
+
+		private void OnCaption(string s)
+		{
+			Caption = s;
+		}
+
+		private void OnDelete()
+		{
+			Parent.RemoveItem(this);
+		}
+	}
+
+
+	public class CustomMenuItems
+	{
+		public delegate void Handler();
+		public event Handler Changed;
+
+		private string defaultCaption_;
+		private List<ICustomMenuItem> items_ = new List<ICustomMenuItem>();
+
+		public CustomMenuItems(string defaultCaption = "")
+		{
+			defaultCaption_ = defaultCaption;
+		}
+
+		public ICustomMenuItem[] Items
+		{
+			get { return items_.ToArray(); }
+		}
+
+		public void Save(JSONArray a)
+		{
+			if (items_.Count > 0)
+			{
+				foreach (var m in items_)
+					a.Add(m.ToJSON());
+			}
+		}
+
+		public void Load(JSONArray a)
+		{
+			items_.Clear();
+
+			foreach (var mo in a.Childs)
+			{
+				var m = CustomButtonItem.FromJSON(mo.AsObject);
+				if (m != null)
+					Add(m);
+			}
+
+			OnTriggersChanged();
+		}
+
+		public ICustomMenuItem AddCustomItem()
+		{
+			var m = new CustomButtonItem(defaultCaption_);
+			Add(m);
+			OnTriggersChanged();
+			return m;
+		}
+
+		private void Add(ICustomMenuItem t)
+		{
+			items_.Add(t);
+			t.Parent = this;
+		}
+
+		public void RemoveItem(ICustomMenuItem m)
+		{
+			if (!items_.Contains(m))
+			{
+				Logger.Global.Error($"custom menu '{m}' not found");
+				return;
+			}
+
+			m.Parent = null;
+			items_.Remove(m);
+
+			OnTriggersChanged();
+		}
+
+		public void FireTriggersChanged()
+		{
+			OnTriggersChanged();
+		}
+
+		private void OnTriggersChanged()
+		{
+			Cue.Instance.SaveLater();
+			Changed?.Invoke();
+		}
+	}
+}

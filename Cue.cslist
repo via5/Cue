@@ -1,7 +1,6 @@
 project\src\Cue.cs
 project\src\Instrumentation.cs
 project\src\Main.cs
-project\src\Options.cs
 project\src\Version.cs
 project\src\AI\AI.cs
 project\src\AI\Events.cs
@@ -53,6 +52,9 @@ project\src\Integration\MacGruber.cs
 project\src\Integration\Objects.cs
 project\src\Integration\Vam.cs
 project\src\Integration\VAMMoan.cs
+project\src\Options\CustomMenuItems.cs
+project\src\Options\Options.cs
+project\src\Options\PersonOptions.cs
 project\src\Person\Finish.cs
 project\src\Person\Mood.cs
 project\src\Person\Object.cs

@@ -185,7 +185,9 @@
     <Compile Include="src\Integration\Vam.cs" />
     <Compile Include="src\Integration\VAMMoan.cs" />
     <Compile Include="src\Main.cs" />
-    <Compile Include="src\Options.cs" />
+    <Compile Include="src\Options\CustomMenuItems.cs" />
+    <Compile Include="src\Options\Options.cs" />
+    <Compile Include="src\Options\PersonOptions.cs" />
     <Compile Include="src\Person\Body\Body.cs" />
     <Compile Include="src\Person\Body\BodyPart.cs" />
     <Compile Include="src\Person\Body\BodyParts.cs" />
