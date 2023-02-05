@@ -15,6 +15,8 @@ namespace Cue
 		public const int Thrust = 6;
 		public const int Trib = 7;
 		public const int Kiss = 8;
+		public const int LeftHandOnBreast = 9;
+		public const int RightHandOnBreast = 10;
 
 
 		public class AnimationOptions
@@ -92,7 +94,7 @@ namespace Cue
 				if (on)
 					triggerOn_.Fire();
 				else
-					TriggerOff.Fire();
+					triggerOff_.Fire();
 			}
 
 			public bool Play
@@ -130,14 +132,16 @@ namespace Cue
 			person_ = p;
 
 			anims_.Add(new AnimationOptions(p, Orgasm, "Orgasm", p.Mood.ForceOrgasm));
-			anims_.Add(new AnimationOptions(p, HandjobLeft, "Left HJ", p.Mood.ForceOrgasm));
-			anims_.Add(new AnimationOptions(p, HandjobRight, "Right HJ", p.Mood.ForceOrgasm));
-			anims_.Add(new AnimationOptions(p, LeftFinger, "Left Finger", p.Mood.ForceOrgasm));
-			anims_.Add(new AnimationOptions(p, RightFinger, "Right Finger", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, HandjobLeft, "Left HJ"));
+			anims_.Add(new AnimationOptions(p, HandjobRight, "Right HJ"));
+			anims_.Add(new AnimationOptions(p, LeftFinger, "Left Finger"));
+			anims_.Add(new AnimationOptions(p, RightFinger, "Right Finger"));
 			anims_.Add(new AnimationOptions(p, Head, "Head"));
 			anims_.Add(new AnimationOptions(p, Thrust, "Thrust"));
 			anims_.Add(new AnimationOptions(p, Trib, "Trib"));
 			anims_.Add(new AnimationOptions(p, Kiss, "Kiss"));
+			anims_.Add(new AnimationOptions(p, LeftHandOnBreast, "Left hand on breast"));
+			anims_.Add(new AnimationOptions(p, RightHandOnBreast, "Right hand on breast"));
 		}
 
 		public void Load(JSONClass o)

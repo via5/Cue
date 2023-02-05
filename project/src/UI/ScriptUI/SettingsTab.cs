@@ -292,7 +292,7 @@ namespace Cue
 			var ao = new VUI.Panel(gl);
 
 			{
-				idlePose_ = new VUI.CheckBox("Play animation", (b) =>
+				idlePose_ = new VUI.CheckBox("Play", (b) =>
 				{
 					if (ignore_) return;
 					person_.Options.IdlePose = b;
@@ -312,7 +312,7 @@ namespace Cue
 			}
 
 			{
-				excitedPose_ = new VUI.CheckBox("Play animation", (b) =>
+				excitedPose_ = new VUI.CheckBox("Play", (b) =>
 				{
 					if (ignore_) return;
 					person_.Options.ExcitedPose = b;
@@ -346,7 +346,7 @@ namespace Cue
 
 		private void AddAnimationOptions(VUI.Panel p, PersonOptions.AnimationOptions o)
 		{
-			var cb = new VUI.CheckBox("Play animation", (b) =>
+			var cb = new VUI.CheckBox("Play", (b) =>
 			{
 				if (ignore_) return;
 				o.Play = b;

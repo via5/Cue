@@ -82,6 +82,8 @@
 						}
 					}
 				}
+
+				GetAnimationOption()?.Trigger(true);
 			}
 
 			public void Unlink()
@@ -102,6 +104,7 @@
 					}
 
 					target_ = null;
+					GetAnimationOption()?.Trigger(false);
 				}
 			}
 
@@ -109,7 +112,7 @@
 			{
 				if (anim_ != AnimationType.None)
 				{
-					bool play = true;// GetAnimationOption(hand)?.Play ?? true;
+					bool play = GetAnimationOption()?.Play ?? true;
 
 					if (play)
 					{
@@ -138,6 +141,14 @@
 			{
 				if (lk_ != null && lk_.Expired)
 					Unlink();
+			}
+
+			private PersonOptions.AnimationOptions GetAnimationOption()
+			{
+				if (hand_.Type == BP.LeftHand)
+					return Person.Options.GetAnimationOption(PersonOptions.LeftHandOnBreast);
+				else
+					return Person.Options.GetAnimationOption(PersonOptions.RightHandOnBreast);
 			}
 		}
 
