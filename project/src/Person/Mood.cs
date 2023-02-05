@@ -525,7 +525,7 @@ namespace Cue
 
 						SetBaseTiredness(baseTiredness_ + ps.Get(PS.OrgasmBaseTirednessIncrease));
 						SetState(PostOrgasmState);
-						person_.Options.GetAnimationOption(PersonOptions.Orgasm).Trigger(false);
+						person_.Options.GetAnimationOption(AnimationType.Orgasm).Trigger(false);
 					}
 
 					break;
@@ -690,10 +690,10 @@ namespace Cue
 		{
 			person_.Log.Info("orgasm");
 
-			if (person_.Options.GetAnimationOption(PersonOptions.Orgasm).Play)
+			if (person_.Options.GetAnimationOption(AnimationType.Orgasm).Play)
 				person_.Animator.PlayType(AnimationType.Orgasm);
 
-			person_.Options.GetAnimationOption(PersonOptions.Orgasm).Trigger(true);
+			person_.Options.GetAnimationOption(AnimationType.Orgasm).Trigger(true);
 
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);

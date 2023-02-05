@@ -266,7 +266,7 @@ namespace Cue
 			target_ = null;
 			leading_ = false;
 
-			person_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(false);
+			person_.Options.GetAnimationOption(AnimationType.Kiss).Trigger(false);
 		}
 
 		private void Next()
@@ -351,8 +351,8 @@ namespace Cue
 						leading_ = true;
 						startingHeadPos_ = person_.Body.Get(BP.Head).Position;
 
-						person_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(true);
-						target_.Options.GetAnimationOption(PersonOptions.Kiss).Trigger(true);
+						person_.Options.GetAnimationOption(AnimationType.Kiss).Trigger(true);
+						target_.Options.GetAnimationOption(AnimationType.Kiss).Trigger(true);
 
 						return true;
 					}
@@ -389,7 +389,7 @@ namespace Cue
 				return false;
 			}
 
-			if (person_.Options.GetAnimationOption(PersonOptions.Kiss).Play)
+			if (person_.Options.GetAnimationOption(AnimationType.Kiss).Play)
 			{
 				if (!person_.Animator.PlayType(
 					AnimationType.Kiss, new AnimationContext(target, locks_[0].Key)))
@@ -432,7 +432,7 @@ namespace Cue
 
 		private bool StartedFrom(Person initiator, float minDuration)
 		{
-			if (person_.Options.GetAnimationOption(PersonOptions.Kiss).Play)
+			if (person_.Options.GetAnimationOption(AnimationType.Kiss).Play)
 			{
 				if (!person_.Animator.PlayType(
 					AnimationType.Kiss, new AnimationContext(

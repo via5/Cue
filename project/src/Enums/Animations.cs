@@ -23,9 +23,11 @@ namespace Cue
 		public static readonly AnimationType Blowjob = AnimationType.CreateInternal(13);
 		public static readonly AnimationType LeftHandOnBreast = AnimationType.CreateInternal(14);
 		public static readonly AnimationType RightHandOnBreast = AnimationType.CreateInternal(15);
+		public static readonly AnimationType LeftHandOnChest = AnimationType.CreateInternal(16);
+		public static readonly AnimationType RightHandOnChest = AnimationType.CreateInternal(17);
 
-		public const int Count = 16;
-		public int GetCount() { return 16; }
+		public const int Count = 18;
+		public int GetCount() { return 18; }
 
 
 		private static AnimationType[] values_ = new AnimationType[]
@@ -46,6 +48,8 @@ namespace Cue
 			AnimationType.CreateInternal(13),
 			AnimationType.CreateInternal(14),
 			AnimationType.CreateInternal(15),
+			AnimationType.CreateInternal(16),
+			AnimationType.CreateInternal(17),
 		};
 
 		public static AnimationType[] Values
@@ -71,6 +75,8 @@ namespace Cue
 			"blowjob",
 			"leftHandOnBreast",
 			"rightHandOnBreast",
+			"leftHandOnChest",
+			"rightHandOnChest",
 		};
 
 		public static AnimationType FromString(string s)

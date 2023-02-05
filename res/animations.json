@@ -152,6 +152,24 @@
 			{
 				"name": "cueRightHandOnBreast"
 			}
+		},
+
+		{
+			"animation": "leftHandOnChest",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueLeftHandOnChest"
+			}
+		},
+
+		{
+			"animation": "rightHandOnChest",
+			"type": "internal",
+			"options":
+			{
+				"name": "cueRightHandOnChest"
+			}
 		}
 	]
 }

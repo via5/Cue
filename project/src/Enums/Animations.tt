@@ -18,7 +18,10 @@ V.Value("HandjobLeft"),
 V.Value("HandjobRight"),
 V.Value("Blowjob"),
 V.Value("LeftHandOnBreast"),
-V.Value("RightHandOnBreast")
+V.Value("RightHandOnBreast"),
+V.Value("LeftHandOnChest"),
+V.Value("RightHandOnChest"),
+
 };
 
 #><#= Generate(vars, "AnimationType", "Animations", false) #><#

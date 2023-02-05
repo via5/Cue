@@ -6,29 +6,16 @@ namespace Cue
 {
 	public class PersonOptions
 	{
-		public const int Orgasm = 0;
-		public const int HandjobLeft = 1;
-		public const int HandjobRight = 2;
-		public const int LeftFinger = 3;
-		public const int RightFinger = 4;
-		public const int Head = 5;
-		public const int Thrust = 6;
-		public const int Trib = 7;
-		public const int Kiss = 8;
-		public const int LeftHandOnBreast = 9;
-		public const int RightHandOnBreast = 10;
-
-
 		public class AnimationOptions
 		{
-			private readonly int type_;
+			private readonly AnimationType type_;
 			private readonly string name_;
 			private readonly string key_;
 			private CustomTrigger triggerOn_, triggerOff_;
 			private bool play_ = true;
 			private readonly Sys.IActionParameter action_;
 
-			public AnimationOptions(Person p, int type, string name, Action f = null)
+			public AnimationOptions(Person p, AnimationType type, string name, Action f = null)
 			{
 				type_ = type;
 				name_ = name;
@@ -69,7 +56,7 @@ namespace Cue
 				o[key_] = ao;
 			}
 
-			public int Type
+			public AnimationType Type
 			{
 				get { return type_; }
 			}
@@ -131,17 +118,19 @@ namespace Cue
 		{
 			person_ = p;
 
-			anims_.Add(new AnimationOptions(p, Orgasm, "Orgasm", p.Mood.ForceOrgasm));
-			anims_.Add(new AnimationOptions(p, HandjobLeft, "Left HJ"));
-			anims_.Add(new AnimationOptions(p, HandjobRight, "Right HJ"));
-			anims_.Add(new AnimationOptions(p, LeftFinger, "Left Finger"));
-			anims_.Add(new AnimationOptions(p, RightFinger, "Right Finger"));
-			anims_.Add(new AnimationOptions(p, Head, "Head"));
-			anims_.Add(new AnimationOptions(p, Thrust, "Thrust"));
-			anims_.Add(new AnimationOptions(p, Trib, "Trib"));
-			anims_.Add(new AnimationOptions(p, Kiss, "Kiss"));
-			anims_.Add(new AnimationOptions(p, LeftHandOnBreast, "Left hand on breast"));
-			anims_.Add(new AnimationOptions(p, RightHandOnBreast, "Right hand on breast"));
+			anims_.Add(new AnimationOptions(p, AnimationType.Orgasm, "Orgasm", p.Mood.ForceOrgasm));
+			anims_.Add(new AnimationOptions(p, AnimationType.HandjobLeft, "Left HJ"));
+			anims_.Add(new AnimationOptions(p, AnimationType.HandjobRight, "Right HJ"));
+			anims_.Add(new AnimationOptions(p, AnimationType.LeftFinger, "Left Finger"));
+			anims_.Add(new AnimationOptions(p, AnimationType.RightFinger, "Right Finger"));
+			anims_.Add(new AnimationOptions(p, AnimationType.Blowjob, "Head"));
+			anims_.Add(new AnimationOptions(p, AnimationType.Thrust, "Thrust"));
+			anims_.Add(new AnimationOptions(p, AnimationType.Trib, "Trib"));
+			anims_.Add(new AnimationOptions(p, AnimationType.Kiss, "Kiss"));
+			anims_.Add(new AnimationOptions(p, AnimationType.LeftHandOnBreast, "Left hand on breast"));
+			anims_.Add(new AnimationOptions(p, AnimationType.RightHandOnBreast, "Right hand on breast"));
+			anims_.Add(new AnimationOptions(p, AnimationType.LeftHandOnChest, "Left hand on chest"));
+			anims_.Add(new AnimationOptions(p, AnimationType.RightHandOnChest, "Right hand on chest"));
 		}
 
 		public void Load(JSONClass o)
@@ -187,7 +176,7 @@ namespace Cue
 			return anims_;
 		}
 
-		public AnimationOptions GetAnimationOption(int type)
+		public AnimationOptions GetAnimationOption(AnimationType type)
 		{
 			for (int i = 0; i < anims_.Count; ++i)
 			{
@@ -198,7 +187,7 @@ namespace Cue
 			return null;
 		}
 
-		public void Trigger(int type, bool on)
+		public void Trigger(AnimationType type, bool on)
 		{
 			var a = GetAnimationOption(type);
 			if (a == null)

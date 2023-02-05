@@ -489,16 +489,16 @@
 			if (hand.bp.Type == BP.LeftHand)
 			{
 				if (hand.anim == AnimationType.HandjobLeft)
-					return person_.Options.GetAnimationOption(PersonOptions.HandjobLeft);
+					return person_.Options.GetAnimationOption(AnimationType.HandjobLeft);
 				else if (hand.anim == AnimationType.LeftFinger)
-					return person_.Options.GetAnimationOption(PersonOptions.LeftFinger);
+					return person_.Options.GetAnimationOption(AnimationType.LeftFinger);
 			}
 			else
 			{
 				if (hand.anim == AnimationType.HandjobRight)
-					return person_.Options.GetAnimationOption(PersonOptions.HandjobRight);
+					return person_.Options.GetAnimationOption(AnimationType.HandjobRight);
 				else if (hand.anim == AnimationType.RightFinger)
-					return person_.Options.GetAnimationOption(PersonOptions.RightFinger);
+					return person_.Options.GetAnimationOption(AnimationType.RightFinger);
 			}
 
 			Log.Error($"unknown animation option for hand {hand}");

@@ -118,7 +118,7 @@
 
 			SetZoneEnabled(true);
 			running_ = true;
-			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(true);
+			person_.Options.GetAnimationOption(AnimationType.Thrust).Trigger(true);
 
 			Body.SetSexDamping();
 
@@ -149,7 +149,7 @@
 			Body.SetSexDamping();
 			receiver_ = null;
 
-			person_.Options.GetAnimationOption(PersonOptions.Thrust).Trigger(false);
+			person_.Options.GetAnimationOption(AnimationType.Thrust).Trigger(false);
 		}
 
 		private void SetZoneEnabled(bool b)
@@ -170,7 +170,7 @@
 
 		private void CheckAnim()
 		{
-			if (person_.Options.GetAnimationOption(PersonOptions.Thrust).Play)
+			if (person_.Options.GetAnimationOption(AnimationType.Thrust).Play)
 			{
 				AnimationStatus state = person_.Animator.PlayingStatus(AnimationType.Thrust);
 

@@ -71,6 +71,13 @@
 							Log.Verbose("will start left hand on breast");
 							anim_ = AnimationType.LeftHandOnBreast;
 						}
+						else if (
+							region.BodyPart.Type == BP.Chest ||
+							region.BodyPart.Type == BP.Belly)
+						{
+							Log.Verbose("will start left hand on chest");
+							anim_ = AnimationType.LeftHandOnChest;
+						}
 					}
 					else if (hand_.Type == BP.RightHand)
 					{
@@ -80,10 +87,18 @@
 							Log.Verbose("will start right hand on breast");
 							anim_ = AnimationType.RightHandOnBreast;
 						}
+						else if (
+							region.BodyPart.Type == BP.Chest ||
+							region.BodyPart.Type == BP.Belly)
+						{
+							Log.Verbose("will start right hand on chest");
+							anim_ = AnimationType.RightHandOnChest;
+						}
 					}
 				}
 
-				GetAnimationOption()?.Trigger(true);
+				if (anim_ != AnimationType.None)
+					Person.Options.GetAnimationOption(anim_)?.Trigger(true);
 			}
 
 			public void Unlink()
@@ -99,12 +114,14 @@
 					if (anim_ != AnimationType.None)
 					{
 						Log.Verbose($"stopping {anim_}");
+
 						Person.Animator.StopType(anim_);
+						Person.Options.GetAnimationOption(anim_)?.Trigger(false);
+
 						anim_ = AnimationType.None;
 					}
 
 					target_ = null;
-					GetAnimationOption()?.Trigger(false);
 				}
 			}
 
@@ -112,7 +129,7 @@
 			{
 				if (anim_ != AnimationType.None)
 				{
-					bool play = GetAnimationOption()?.Play ?? true;
+					bool play = Person.Options.GetAnimationOption(anim_)?.Play ?? true;
 
 					if (play)
 					{
@@ -141,14 +158,6 @@
 			{
 				if (lk_ != null && lk_.Expired)
 					Unlink();
-			}
-
-			private PersonOptions.AnimationOptions GetAnimationOption()
-			{
-				if (hand_.Type == BP.LeftHand)
-					return Person.Options.GetAnimationOption(PersonOptions.LeftHandOnBreast);
-				else
-					return Person.Options.GetAnimationOption(PersonOptions.RightHandOnBreast);
 			}
 		}
 
