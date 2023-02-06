@@ -27,16 +27,17 @@ namespace Cue
 		private CustomMenuItems opts_;
 		private VUI.Panel widgets_;
 
-		public TriggersPanel(
-			CustomMenuItems opts, string addCaption, string infoCaption)
+		public TriggersPanel(CustomMenuItems opts)
 		{
 			opts_ = opts;
 
 			var center = new VUI.Panel(new VUI.BorderLayout(10));
 			var controls = new VUI.Panel(new VUI.HorizontalFlow(20));
 
-			controls.Add(new VUI.Button(addCaption, OnAdd));
-			controls.Add(new VUI.Label(infoCaption));
+			controls.Add(new VUI.Button("Add button", OnAddButton));
+			controls.Add(new VUI.Button("Add toggle", OnAddToggle));
+			controls.Add(new VUI.Label("Adds custom widgets to the menu."));
+
 			widgets_ = new VUI.Panel(new VUI.VerticalFlow(10));
 
 			center.Add(controls, VUI.BorderLayout.Top);
@@ -59,9 +60,14 @@ namespace Cue
 				widgets_.Add(m.CreateConfigWidget());
 		}
 
-		private void OnAdd()
+		private void OnAddButton()
 		{
-			opts_.AddCustomItem();
+			opts_.AddCustomItem(new CustomButtonItem("Button"));
+		}
+
+		private void OnAddToggle()
+		{
+			opts_.AddCustomItem(new CustomToggleItem("Toggle"));
 		}
 	}
 
@@ -322,9 +328,7 @@ namespace Cue
 		{
 			var o = Cue.Instance.Options;
 
-			triggers_ = new TriggersPanel(
-				o.CustomMenuItems, "Add button",
-				"Adds custom buttons to the menu.");
+			triggers_ = new TriggersPanel(o.CustomMenuItems);
 
 			var ly = new VUI.VerticalFlow(10);
 			ly.Expand = false;

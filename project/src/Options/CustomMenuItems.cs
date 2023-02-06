@@ -18,6 +18,26 @@ namespace Cue
 	{
 		private CustomMenuItems parent_ = null;
 
+		public static ICustomMenuItem FromJSON(JSONClass n)
+		{
+			try
+			{
+				var type = J.OptString(n, "type", "button");
+
+				if (type == "button")
+					return CustomButtonItem.FromJSON(n);
+				else if (type == "toggle")
+					return CustomToggleItem.FromJSON(n);
+				else
+					throw new LoadFailed($"unknown custom item type {type}");
+			}
+			catch (Exception e)
+			{
+				Logger.Global.Error("failed to load custom menu, " + e.ToString());
+				return null;
+			}
+		}
+
 		public CustomMenuItems Parent
 		{
 			get { return parent_; }
@@ -69,26 +89,18 @@ namespace Cue
 		{
 		}
 
-		public static CustomButtonItem FromJSON(JSONClass n)
+		public static new CustomButtonItem FromJSON(JSONClass o)
 		{
-			try
-			{
-				var c = J.ReqString(n, "caption");
+			var c = J.ReqString(o, "caption");
 
-				if (!n.HasKey("trigger"))
-					throw new LoadFailed("missing trigger");
+			if (!o.HasKey("trigger"))
+				throw new LoadFailed("missing trigger");
 
-				var t = Cue.Instance.Sys.LoadActionTrigger(n["trigger"].AsObject);
-				if (t == null)
-					throw new LoadFailed("failed to create trigger");
+			var t = Cue.Instance.Sys.LoadActionTrigger(o["trigger"].AsObject);
+			if (t == null)
+				throw new LoadFailed("failed to create trigger");
 
-				return new CustomButtonItem(c, t);
-			}
-			catch (Exception e)
-			{
-				Logger.Global.Error("failed to load custom menu, " + e.ToString());
-				return null;
-			}
+			return new CustomButtonItem(c, t);
 		}
 
 		public string Caption
@@ -144,6 +156,7 @@ namespace Cue
 
 		protected override void DoToJSON(JSONClass o)
 		{
+			o["type"] = "button";
 			o["caption"] = caption_;
 			o["trigger"] = trigger_.ToJSON();
 		}
@@ -165,17 +178,160 @@ namespace Cue
 	}
 
 
+	public class CustomToggleItem : BasicCustomMenuItem
+	{
+		private string caption_;
+		private bool value_ = false;
+		private Sys.IActionTrigger triggerOn_, triggerOff_;
+
+		public CustomToggleItem(string caption)
+			: this(caption, null, null)
+		{
+		}
+
+		private CustomToggleItem(
+			string caption,
+			Sys.IActionTrigger triggerOn, Sys.IActionTrigger triggerOff)
+		{
+			caption_ = caption;
+			triggerOn_ = triggerOn ?? Cue.Instance.Sys.CreateActionTrigger();
+			triggerOff_ = triggerOff ?? Cue.Instance.Sys.CreateActionTrigger();
+		}
+
+		public static new CustomToggleItem FromJSON(JSONClass n)
+		{
+			try
+			{
+				var c = J.ReqString(n, "caption");
+
+				if (!n.HasKey("triggerOn"))
+					throw new LoadFailed("missing triggerOn");
+
+				if (!n.HasKey("triggerOff"))
+					throw new LoadFailed("missing triggerOff");
+
+				var on = Cue.Instance.Sys.LoadActionTrigger(n["triggerOn"].AsObject);
+				if (on == null)
+					throw new LoadFailed("failed to create triggerOn");
+
+				var off = Cue.Instance.Sys.LoadActionTrigger(n["triggerOff"].AsObject);
+				if (off == null)
+					throw new LoadFailed("failed to create triggerOff");
+
+				return new CustomToggleItem(c, on, off);
+			}
+			catch (Exception e)
+			{
+				Logger.Global.Error("failed to load custom menu, " + e.ToString());
+				return null;
+			}
+		}
+
+		public string Caption
+		{
+			get
+			{
+				return caption_;
+			}
+
+			set
+			{
+				caption_ = value;
+				triggerOn_.Name = value + ".on";
+				triggerOff_.Name = value + ".off";
+				Parent?.FireTriggersChanged();
+			}
+		}
+
+		public Sys.IActionTrigger TriggerOn
+		{
+			get { return triggerOn_; }
+		}
+
+		public Sys.IActionTrigger TriggerOff
+		{
+			get { return triggerOff_; }
+		}
+
+		public override void Activate()
+		{
+			SetValue(!value_);
+		}
+
+		public void SetValue(bool b)
+		{
+			if (b)
+			{
+				value_ = true;
+				triggerOn_?.Fire();
+			}
+			else
+			{
+				value_ = false;
+				triggerOff_?.Fire();
+			}
+		}
+
+		public override string ToString()
+		{
+			return $"CustomButtonItem.[{Caption}]";
+		}
+
+		protected override void DoCreateConfigWidget(VUI.Panel p)
+		{
+			var c = p.Add(new VUI.TextBox(Caption, "Toggle name"));
+			c.Edited += OnCaption;
+			p.Add(new VUI.Button("Edit On actions...", OnEditTriggerOn));
+			p.Add(new VUI.Button("Edit Off actions...", OnEditTriggerOff));
+			p.Add(new VUI.ToolButton("X", OnDelete));
+		}
+
+		protected override void DoCreateMenuWidget(VUI.Panel p)
+		{
+			p.Add(new VUI.CheckBox(Caption, (b) =>
+			{
+				SetValue(b);
+			}));
+		}
+
+		protected override void DoToJSON(JSONClass o)
+		{
+			o["type"] = "toggle";
+			o["caption"] = caption_;
+			o["triggerOn"] = triggerOn_.ToJSON();
+			o["triggerOff"] = triggerOff_.ToJSON();
+		}
+
+		private void OnEditTriggerOn()
+		{
+			TriggerOn.Edit(() => Parent.FireTriggersChanged());
+		}
+
+		private void OnEditTriggerOff()
+		{
+			TriggerOff.Edit(() => Parent.FireTriggersChanged());
+		}
+
+		private void OnCaption(string s)
+		{
+			Caption = s;
+		}
+
+		private void OnDelete()
+		{
+			Parent.RemoveItem(this);
+		}
+	}
+
+
 	public class CustomMenuItems
 	{
 		public delegate void Handler();
 		public event Handler Changed;
-
-		private string defaultCaption_;
 		private List<ICustomMenuItem> items_ = new List<ICustomMenuItem>();
 
-		public CustomMenuItems(string defaultCaption = "")
+		public CustomMenuItems()
 		{
-			defaultCaption_ = defaultCaption;
 		}
 
 		public ICustomMenuItem[] Items
@@ -198,7 +354,7 @@ namespace Cue
 
 			foreach (var mo in a.Childs)
 			{
-				var m = CustomButtonItem.FromJSON(mo.AsObject);
+				var m = BasicCustomMenuItem.FromJSON(mo.AsObject);
 				if (m != null)
 					Add(m);
 			}
@@ -206,12 +362,10 @@ namespace Cue
 			OnTriggersChanged();
 		}
 
-		public ICustomMenuItem AddCustomItem()
+		public void AddCustomItem(ICustomMenuItem item)
 		{
-			var m = new CustomButtonItem(defaultCaption_);
-			Add(m);
+			Add(item);
 			OnTriggersChanged();
-			return m;
 		}
 
 		private void Add(ICustomMenuItem t)

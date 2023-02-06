@@ -102,7 +102,7 @@ namespace Cue
 		private bool divRightHand_ = true;
 
 		private FinishOptions finish_ = new FinishOptions();
-		private CustomMenuItems menus_ = new CustomMenuItems("Button");
+		private CustomMenuItems menus_ = new CustomMenuItems();
 
 		public Options()
 		{
