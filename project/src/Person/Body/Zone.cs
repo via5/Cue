@@ -34,10 +34,12 @@ namespace Cue
 				person_, SS.Penetration, new ErogenousZone.Part[]
 				{
 					new ErogenousZone.Part(BP.Vagina, ErogenousZone.Part.SourceToy),
+					new ErogenousZone.Part(BP.Vagina, ErogenousZone.Part.SourceExternal),
 					new ErogenousZone.Part(BP.Vagina, BP.Penis),
 					new ErogenousZone.Part(BP.Penis, BP.Vagina),
 
 					new ErogenousZone.Part(BP.Anus, ErogenousZone.Part.SourceToy),
+					new ErogenousZone.Part(BP.Anus, ErogenousZone.Part.SourceExternal),
 					new ErogenousZone.Part(BP.Anus, BP.Penis),
 					new ErogenousZone.Part(BP.Penis, BP.Anus),
 				});
@@ -138,8 +140,8 @@ namespace Cue
 			}
 		}
 
-		private const int ToyPartIndex = BP.Count;
-		private const int ExternalPartIndex = BP.Count + 1;
+		private readonly BodyPartType ToyPartIndex = BodyPartType.CreateInternal(BP.Count);
+		private readonly BodyPartType ExternalPartIndex = BodyPartType.CreateInternal(BP.Count + 1);
 
 		private List<Part> activeParts_ = new List<Part>();
 		private List<Part> validParts_ = new List<Part>();
@@ -167,8 +169,8 @@ namespace Cue
 				parts_[i.Int] = new Part(i);
 
 			// hack
-			parts_[BP.Count] = new Part(BodyPartType.CreateInternal(BP.Count));
-			parts_[BP.Count + 1] = new Part(BodyPartType.CreateInternal(BP.Count + 1));
+			parts_[ToyPartIndex.Int] = new Part(ToyPartIndex);
+			parts_[ExternalPartIndex.Int] = new Part(ExternalPartIndex);
 		}
 
 		public int PersonIndex
@@ -223,12 +225,12 @@ namespace Cue
 
 		public Part GetExternalPart()
 		{
-			return parts_[ExternalPartIndex];
+			return parts_[ExternalPartIndex.Int];
 		}
 
 		public Part GetToyPart()
 		{
-			return parts_[ToyPartIndex];
+			return parts_[ToyPartIndex.Int];
 		}
 
 		public Part GetPart(BodyPartType bodyPart)
@@ -336,17 +338,10 @@ namespace Cue
 				}
 
 				foreach (var i in BodyPartType.Values)
-				{
-					var part = parts_[i.Int];
+					CheckBodyPart(p, ss, i);
 
-					if (part.active)
-					{
-						mod_ = Math.Max(
-							mod_, ss.GetModifier(p, sourcePersonIndex_, i));
-
-						mag_ = Math.Max(mag_, part.magnitude);
-					}
-				}
+				CheckBodyPart(p, ss, ToyPartIndex);
+				CheckBodyPart(p, ss, ExternalPartIndex);
 
 				if (GetToyPart().active)
 					mag_ = Math.Max(mag_, GetToyPart().magnitude);
@@ -357,6 +352,22 @@ namespace Cue
 
 			if (mod_ == 0)
 				mod_ = 1;
+		}
+
+		private void CheckBodyPart(Person p, Sensitivity ss, BodyPartType bp)
+		{
+			var part = parts_[bp.Int];
+
+			if (bp.Int >= BP.Count)
+				bp = BP.None;
+
+			if (part.active)
+			{
+				mod_ = Math.Max(
+					mod_, ss.GetModifier(p, type_, sourcePersonIndex_, bp));
+
+				mag_ = Math.Max(mag_, part.magnitude);
+			}
 		}
 
 		public void SetFromPerson(BodyPartType sourceBodyPart, BodyPartType targetBodyPart, float mag)
@@ -485,8 +496,8 @@ namespace Cue
 			}
 		}
 
-		private int ToySourceIndex = -1;
-		private int ExternalSourceIndex = -1;
+		public readonly int ToySourceIndex;
+		public readonly int ExternalSourceIndex;
 
 		private Person person_;
 		private ZoneType type_;
@@ -511,7 +522,7 @@ namespace Cue
 			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
 				sources_[i] = new ErogenousZoneSource(person_, Sys.TriggerInfo.PersonType, i, minMag);
 
-			sources_[ToySourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.ToyType, - 1, minMag);
+			sources_[ToySourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.ToyType, -1, minMag);
 			sources_[ExternalSourceIndex] = new ErogenousZoneSource(person_, Sys.TriggerInfo.NoneType, -1, minMag);
 		}
 

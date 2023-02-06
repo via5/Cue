@@ -750,7 +750,15 @@
 			"physicalRate": 0.0025,
 			"physicalMax": 1.0,
 			"nonPhysicalRate": 0.0012,
-			"nonPhysicalMax": 1.0
+			"nonPhysicalMax": 1.0,
+
+			"modifiers":
+			[
+				{
+					"source": "external",
+					"modifier": 4
+				},
+			]
 		},
 
 		{

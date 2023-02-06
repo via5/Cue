@@ -101,7 +101,8 @@
 				"pelvis/JointGl",
 				"pelvis/JointGr"
 			],
-			"ignore": "$genitalsIgnore"
+			"ignore": "$genitalsIgnore",
+			"triggers": ["DeeperVaginaTrigger"]
 		},
 
 		{

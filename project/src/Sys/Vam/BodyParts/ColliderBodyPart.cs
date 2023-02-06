@@ -8,10 +8,12 @@ namespace Cue.Sys.Vam
 		private FreeControllerV3 fc_;
 		private Rigidbody rb2_, closestRb_;
 		private Collider main_ = null;
+		private CollisionTriggerEventHandler[] hs_ = null;
 
 		public ColliderBodyPart(
 			VamAtom a, BodyPartType type, Collider[] cs, FreeControllerV3 fc,
-			Rigidbody rb, Rigidbody closestRb, string[] ignoreBodyParts)
+			Rigidbody rb, Rigidbody closestRb, string[] ignoreBodyParts,
+			string[] triggers)
 				: base(a, type, cs, ignoreBodyParts)
 		{
 			fc_ = fc;
@@ -20,11 +22,48 @@ namespace Cue.Sys.Vam
 
 			if (cs != null && cs.Length > 0)
 				main_ = cs[0];
+
+			var hs = new List<CollisionTriggerEventHandler>();
+
+			foreach (var tn in triggers)
+			{
+				var t = FindTrigger(tn);
+				if (t != null)
+					hs.Add(t);
+			}
+
+			if (hs.Count > 0)
+				hs_ = hs.ToArray();
 		}
 
 		protected ColliderBodyPart(VamAtom a, BodyPartType type)
 			: base(a, type)
 		{
+		}
+
+		private CollisionTriggerEventHandler FindTrigger(string name)
+		{
+			var o = U.FindChildRecursive(VamAtom.Atom.transform, name);
+			if (o == null)
+			{
+				Log.Error($"trigger {name} not found");
+				return null;
+			}
+
+			var t = o.GetComponentInChildren<CollisionTriggerEventHandler>();
+			if (t == null)
+			{
+				Log.Error($"trigger {name} has no event handler");
+				return null;
+			}
+
+			if (t.thisRigidbody == null)
+			{
+				Log.Error($"trigger {name} has no rb");
+				return null;
+			}
+
+			return t;
 		}
 
 		protected void Set(Collider[] cs, FreeControllerV3 fc, string[] ignoreBodyParts)
@@ -82,6 +121,11 @@ namespace Cue.Sys.Vam
 		public override Quaternion Rotation
 		{
 			get { return ControlRotation; }
+		}
+
+		protected override CollisionTriggerEventHandler[] GetTriggerHandlers()
+		{
+			return hs_;
 		}
 
 		protected override bool DoContainsTransform(Transform t, bool debug)

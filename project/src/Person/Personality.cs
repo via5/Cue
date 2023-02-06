@@ -9,6 +9,8 @@ namespace Cue
 		public const int Any = -2;
 		public const int Player = -3;
 		public const int Self = -4;
+		public const int Toy = -5;
+		public const int External = -6;
 
 		private string sourceName_;
 		private int sourceIndex_ = Unresolved;
@@ -38,19 +40,35 @@ namespace Cue
 				sourceIndex_ = Resolve(sourceName_);
 		}
 
-		public bool AppliesTo(Person self, int sourcePersonIndex, BodyPartType sourcePart)
+		public bool AppliesTo(Person self, int triggerType, int sourcePersonIndex, BodyPartType sourcePart)
 		{
 			if (sourceIndex_ == Player)
 			{
+				if (triggerType != Sys.TriggerInfo.PersonType)
+					return false;
+
 				if (sourcePersonIndex != Cue.Instance.Player.PersonIndex)
 					return false;
 			}
 			else if (sourceIndex_ == Self)
 			{
+				if (triggerType != Sys.TriggerInfo.PersonType)
+					return false;
+
 				if (sourcePersonIndex != self.PersonIndex)
 					return false;
 			}
-			else if (sourceIndex_ != Any)
+			else if (sourceIndex_ == Toy)
+			{
+				if (triggerType != Sys.TriggerInfo.ToyType)
+					return false;
+			}
+			else if (sourceIndex_ == External)
+			{
+				if (triggerType != Sys.TriggerInfo.NoneType)
+					return false;
+			}
+			else if (sourceIndex_ != Any)  // this must be last
 			{
 				if (sourceIndex_ != sourcePersonIndex)
 					return false;
@@ -75,6 +93,10 @@ namespace Cue
 				return Player;
 			else if (s == "self")
 				return Self;
+			else if (s == "toy")
+				return Toy;
+			else if (s == "external")
+				return External;
 
 			Person p = Cue.Instance.FindPerson(s);
 			if (p == null)
@@ -108,6 +130,10 @@ namespace Cue
 				return "player";
 			else if (i == Self)
 				return "self";
+			else if (i == Toy)
+				return "toy";
+			else if (i == External)
+				return "external";
 			else
 				return Cue.Instance.GetPerson(i)?.ID ?? "?";
 		}
@@ -193,13 +219,13 @@ namespace Cue
 				modifiers_[i].Resolve();
 		}
 
-		public float GetModifier(Person self, int sourcePersonIndex, BodyPartType sourcePart)
+		public float GetModifier(Person self, int triggerType, int sourcePersonIndex, BodyPartType sourcePart)
 		{
 			for (int i = 0; i < modifiers_.Length; ++i)
 			{
 				var m = modifiers_[i];
 
-				if (m.AppliesTo(self, sourcePersonIndex, sourcePart))
+				if (m.AppliesTo(self, triggerType, sourcePersonIndex, sourcePart))
 					return m.Modifier;
 			}
 

@@ -218,6 +218,16 @@ namespace Cue
 			caption_ = caption;
 			triggerOn_ = triggerOn ?? Cue.Instance.Sys.CreateActionTrigger();
 			triggerOff_ = triggerOff ?? Cue.Instance.Sys.CreateActionTrigger();
+
+			try
+			{
+				SetValue(false);
+			}
+			catch (Exception e)
+			{
+				Cue.Instance.Log.Error("exception when resetting custom toggle item on load");
+				Cue.Instance.Log.Error(e.ToString());
+			}
 		}
 
 		public static new CustomToggleItem FromJSON(JSONClass n)

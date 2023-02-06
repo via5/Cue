@@ -6,24 +6,22 @@ namespace Cue.Sys.Vam
 	class TriggerBodyPart : VamBodyPart
 	{
 		private CollisionTriggerEventHandler h_;
+		private CollisionTriggerEventHandler[] hs_ = null;
 		private Trigger trigger_ = null;
 		private FreeControllerV3 fc_ = null;
 		private Transform t_ = null;
-		private bool useTrigger_ = true;
 
-		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts, bool useTrigger)
+		protected TriggerBodyPart(VamAtom a, BodyPartType type, string[] ignoreBodyParts)
 			: base(a, type, (Collider[])null, ignoreBodyParts)
 		{
-			useTrigger_ = useTrigger;
 		}
 
 		public TriggerBodyPart(
 			VamAtom a, BodyPartType type, CollisionTriggerEventHandler h,
 			FreeControllerV3 fc, Transform tr,
-			string[] ignoreBodyParts, string[] colliders, bool useTrigger)
+			string[] ignoreBodyParts, string[] colliders)
 				: base(a, type, colliders, ignoreBodyParts)
 		{
-			useTrigger_ = useTrigger;
 			Init(h, fc, tr);
 		}
 
@@ -40,6 +38,9 @@ namespace Cue.Sys.Vam
 			trigger_ = h?.collisionTrigger?.trigger;
 			fc_ = fc;
 			t_ = tr;
+
+			if (h_ != null)
+				hs_ = new CollisionTriggerEventHandler[] { h_ };
 		}
 
 		public override Rigidbody Rigidbody
@@ -124,43 +125,9 @@ namespace Cue.Sys.Vam
 			get { return ControlRotation; }
 		}
 
-		protected override void UpdateTriggers()
+		protected override CollisionTriggerEventHandler[] GetTriggerHandlers()
 		{
-			base.UpdateTriggers();
-
-			if (useTrigger_)
-			{
-				if (!trigger_.active)
-					return;
-
-				foreach (var kv in h_.collidingWithDictionary)
-				{
-					if (!kv.Value || kv.Key == null)
-						continue;
-
-					var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform);
-
-					if (bp == null)
-					{
-						var a = U.AtomForCollider(kv.Key);
-						AddExternalCollision(a, 1.0f);
-					}
-					else
-					{
-						if (VamBodyPart.IgnoreTrigger(
-								bp.Atom as VamAtom, bp, Atom as VamAtom, this))
-						{
-							continue;
-						}
-
-						var p = Cue.Instance.PersonForAtom(bp.Atom);
-						if (p == null)
-							return;
-
-						AddPersonCollision(p.PersonIndex, bp.Type, 1.0f);
-					}
-				}
-			}
+			return hs_;
 		}
 
 		public string ToDetailedString()

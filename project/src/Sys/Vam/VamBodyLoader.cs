@@ -175,11 +175,11 @@ namespace Cue.Sys.Vam
 			public string controller;
 			public List<string> colliders;
 			public List<string> ignore;
+			public List<string> triggers;
 			public string forceReceiver;
 			public string rigidbody;
 			public string closestRigidbody;
 			public string centerCollider;
-			public bool useTrigger;
 		}
 
 		private IBodyPart LoadPart(bool male, JSONClass o, Func<string, JSONNode> getVar)
@@ -196,6 +196,7 @@ namespace Cue.Sys.Vam
 			ps.names = new List<string>();
 			ps.ignore = new List<string>();
 			ps.colliders = new List<string>();
+			ps.triggers = new List<string>();
 
 			ps.bodyPart = BodyPartType.FromString(J.ReqString(o, "part"));
 			if (ps.bodyPart == BP.None)
@@ -222,6 +223,12 @@ namespace Cue.Sys.Vam
 					ps.colliders.Add(n.Value);
 			}
 
+			if (o.HasKey("triggers"))
+			{
+				foreach (var n in o["triggers"].AsArray.Childs)
+					ps.triggers.Add(n.Value);
+			}
+
 			if (o.HasKey("ignore"))
 			{
 				JSONNode parent;
@@ -246,7 +253,6 @@ namespace Cue.Sys.Vam
 			ps.rigidbody = J.OptString(o, "rigidbody");
 			ps.closestRigidbody = J.OptString(o, "closestRigidbody");
 			ps.centerCollider = J.OptString(o, "centerCollider");
-			ps.useTrigger = J.OptBool(o, "useTrigger", true);
 
 			var type = J.ReqString(o, "type");
 
@@ -446,7 +452,7 @@ namespace Cue.Sys.Vam
 
 			return new TriggerBodyPart(
 				atom_, ps.bodyPart, t, fc, t.thisRigidbody.transform,
-				ps.ignore.ToArray(), ps.colliders.ToArray(), ps.useTrigger);
+				ps.ignore.ToArray(), ps.colliders.ToArray());
 		}
 
 		private IBodyPart CreateCollider(PartSettings ps)
@@ -490,7 +496,7 @@ namespace Cue.Sys.Vam
 
 			return new ColliderBodyPart(
 				atom_, ps.bodyPart, cs.ToArray(), fc, rb, closestRb,
-				ps.ignore.ToArray());
+				ps.ignore.ToArray(), ps.triggers.ToArray());
 		}
 	}
 }

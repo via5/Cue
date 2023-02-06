@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Cue
 {
@@ -37,7 +36,7 @@ namespace Cue
 
 		public bool EnabledForExternal
 		{
-			get { return (enabledForExternal_ > 0); }
+			get { return true || (enabledForExternal_ > 0); }
 		}
 
 		public virtual bool AllowDecay

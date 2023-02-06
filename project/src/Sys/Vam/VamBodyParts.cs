@@ -482,9 +482,60 @@ namespace Cue.Sys.Vam
 			return triggers_;
 		}
 
+		protected virtual CollisionTriggerEventHandler[] GetTriggerHandlers()
+		{
+			return null;
+		}
+
 		protected virtual void UpdateTriggers()
 		{
-			// no-op
+			var hs = GetTriggerHandlers();
+			if (hs == null)
+				return;
+
+			for (int i = 0; i < hs.Length; ++i)
+			{
+				var h = hs[i];
+				var t = h?.collisionTrigger?.trigger;
+
+				//Cue.Instance.Log.Error($"{this} {h} {t}");
+
+				if (h == null || t == null)
+					continue;
+
+				if (!t.active)
+					continue;
+
+				if (h.collidingWithDictionary.Count == 0)
+				{
+					AddExternalCollision(null, 1.0f);
+				}
+				else
+				{
+					foreach (var kv in h.collidingWithDictionary)
+					{
+						if (!kv.Value || kv.Key == null)
+							continue;
+
+						var bp = Cue.Instance.VamSys.BodyPartForTransform(kv.Key.transform);
+
+						if (bp == null)
+						{
+							var a = U.AtomForCollider(kv.Key);
+							AddExternalCollision(a, 1.0f);
+						}
+						else
+						{
+							if (IgnoreTrigger(bp.Atom as VamAtom, bp, Atom as VamAtom, this))
+								continue;
+
+							var p = Cue.Instance.PersonForAtom(bp.Atom);
+							if (p != null)
+								AddPersonCollision(p.PersonIndex, bp.Type, 1.0f);
+						}
+					}
+				}
+			}
 		}
 
 		public void AddPersonCollision(int sourcePersonIndex, BodyPartType sourceBodyPart, float f)

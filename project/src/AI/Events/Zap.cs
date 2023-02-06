@@ -8,21 +8,21 @@ namespace Cue
 		{
 			class Source
 			{
-				public int personIndex;
+				public int sourceIndex;
 				public float tentativeElapsed = 0;
 				public float inactiveElapsed = 10000;
 				public bool active = false;
 
-				public Source(int i)
+				public Source(int sourceIndex)
 				{
-					personIndex = i;
+					this.sourceIndex = sourceIndex;
 				}
 
-				public bool CheckActive(float s, Person self, Person other, ZoneType zone)
+				public bool CheckActive(float s, Person self, ZoneType zone)
 				{
 					if (active)
 					{
-						if (!self.Body.Zone(zone).Sources[other.PersonIndex].Active)
+						if (!self.Body.Zone(zone).Sources[sourceIndex].Active)
 						{
 							active = false;
 							inactiveElapsed = 0;
@@ -30,7 +30,7 @@ namespace Cue
 					}
 					else
 					{
-						if (self.Body.Zone(zone).Sources[other.PersonIndex].Active)
+						if (self.Body.Zone(zone).Sources[sourceIndex].Active)
 						{
 							if (inactiveElapsed >= self.Personality.Get(PS.ZappedCooldown))
 							{
@@ -58,16 +58,27 @@ namespace Cue
 					return false;
 				}
 
-				public string DebugLine(Person self, Person other, ZoneType zone)
+				public string DebugLine(Person self, ZoneType zone)
 				{
 					var ps = self.Personality;
 
+					string from;
+
+					if (sourceIndex >= 0 && sourceIndex < Cue.Instance.ActivePersons.Length)
+						from = Cue.Instance.ActivePersons[sourceIndex].ID;
+					else if (sourceIndex == self.Body.Zone(SS.Penetration).ToySourceIndex)
+						from = "toy";
+					else if (sourceIndex == self.Body.Zone(SS.Penetration).ExternalSourceIndex)
+						from = "external";
+					else
+						from = "?";
+
 					return
-						$"from={Cue.Instance.ActivePersons[personIndex].ID} " +
+						$"src={from} " +
 						$"tent={tentativeElapsed:0.00}/{ps.Get(PS.ZappedTentativeTime)} " +
 						$"inact={inactiveElapsed:0.00}/{ps.Get(PS.ZappedCooldown)} " +
-						$"active={active} " +
-						$"trig={self.Body.Zone(zone).Sources[other.PersonIndex].Active}";
+						$"A={active} " +
+						$"T={self.Body.Zone(zone).Sources[sourceIndex].Active}";
 				}
 			}
 
@@ -82,9 +93,28 @@ namespace Cue
 				name_ = n;
 				zone_ = zone;
 
-				sources_ = new Source[Cue.Instance.ActivePersons.Length];
+				sources_ = new Source[Cue.Instance.ActivePersons.Length + 2];
 				for (int i = 0; i < sources_.Length; ++i)
 					sources_[i] = new Source(i);
+
+				sources_[ToySourceIndex] = new Source(ToySourceIndex);
+				sources_[ExternalSourceIndex] = new Source(ExternalSourceIndex);
+			}
+
+			private int ToySourceIndex
+			{
+				get
+				{
+					return person_.Body.Zone(SS.Penetration).ToySourceIndex;
+				}
+			}
+
+			private int ExternalSourceIndex
+			{
+				get
+				{
+					return person_.Body.Zone(SS.Penetration).ToySourceIndex;
+				}
 			}
 
 			public string Name
@@ -96,28 +126,29 @@ namespace Cue
 			{
 				for (int i = 0; i < sources_.Length; ++i)
 				{
-					var p = Cue.Instance.ActivePersons[i];
-					if (p == person_)
+					if (i == person_.PersonIndex)
 						continue;
 
-					debug.Add(ZoneType.ToString(zone_), sources_[i].DebugLine(person_, p, zone_));
+					debug.Add(ZoneType.ToString(zone_), sources_[i].DebugLine(person_, zone_));
 				}
 			}
 
 			public void Update(float s)
 			{
-				var ps = person_.Personality;
-
-				for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+				for (int i=0; i<sources_.Length;++i)
 				{
-					var p = Cue.Instance.ActivePersons[i];
-					if (p == person_)
+					if (i == person_.PersonIndex)
 						continue;
 
-					if (sources_[i].CheckActive(s, person_, p, zone_))
+					Person source = null;
+
+					if (i >= 0 && i < Cue.Instance.ActivePersons.Length)
+						source = Cue.Instance.ActivePersons[i];
+
+					if (sources_[i].CheckActive(s, person_, zone_))
 					{
-						person_.Body.Zapped(p, zone_);
-						break;
+						person_.Body.Zapped(source, zone_);
+						return;
 					}
 				}
 			}
