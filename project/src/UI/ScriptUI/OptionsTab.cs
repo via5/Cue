@@ -26,6 +26,7 @@ namespace Cue
 	{
 		private CustomMenuItems opts_;
 		private VUI.Panel widgets_;
+		private bool stale_ = true;
 
 		public TriggersPanel(CustomMenuItems opts)
 		{
@@ -45,12 +46,17 @@ namespace Cue
 
 			Layout = new VUI.BorderLayout();
 			Add(center, VUI.BorderLayout.Center);
+
+			opts_.Changed += () => stale_ = true;
 		}
 
 		public void Update()
 		{
-			if (widgets_.Children.Count != opts_.Items.Length)
+			if (stale_)
+			{
+				stale_ = false;
 				Rebuild();
+			}
 		}
 
 		private void Rebuild()

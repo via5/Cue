@@ -10,6 +10,9 @@ namespace Cue
 		VUI.Panel CreateConfigWidget();
 		VUI.Panel CreateMenuWidget();
 		void Activate();
+		void Remove();
+		void MoveUp();
+		void MoveDown();
 		JSONNode ToJSON();
 	}
 
@@ -46,8 +49,18 @@ namespace Cue
 
 		public VUI.Panel CreateConfigWidget()
 		{
-			var p = new VUI.Panel(new VUI.HorizontalFlow(10));
-			DoCreateConfigWidget(p);
+			var p = new VUI.Panel(new VUI.BorderLayout());
+
+			var left = new VUI.Panel(new VUI.HorizontalFlow(10));
+			DoCreateConfigWidget(left);
+			p.Add(left, VUI.BorderLayout.Left);
+
+			var right = new VUI.Panel(new VUI.HorizontalFlow(10));
+			right.Add(new VUI.ToolButton("X", Remove));
+			right.Add(new VUI.ToolButton("\x2191", MoveUp));
+			right.Add(new VUI.ToolButton("\x2193", MoveDown));
+			p.Add(right, VUI.BorderLayout.Right);
+
 			return p;
 		}
 
@@ -59,6 +72,21 @@ namespace Cue
 		}
 
 		public abstract void Activate();
+
+		public void Remove()
+		{
+			Parent.RemoveItem(this);
+		}
+
+		public void MoveUp()
+		{
+			Parent.MoveItemUp(this);
+		}
+
+		public void MoveDown()
+		{
+			Parent.MoveItemDown(this);
+		}
 
 		public JSONNode ToJSON()
 		{
@@ -143,7 +171,6 @@ namespace Cue
 			var c = p.Add(new VUI.TextBox(Caption, "Button name"));
 			c.Edited += OnCaption;
 			p.Add(new VUI.Button("Edit actions...", OnEditTrigger));
-			p.Add(new VUI.ToolButton("X", OnDelete));
 		}
 
 		protected override void DoCreateMenuWidget(VUI.Panel p)
@@ -169,11 +196,6 @@ namespace Cue
 		private void OnCaption(string s)
 		{
 			Caption = s;
-		}
-
-		private void OnDelete()
-		{
-			Parent.RemoveItem(this);
 		}
 	}
 
@@ -283,7 +305,6 @@ namespace Cue
 			c.Edited += OnCaption;
 			p.Add(new VUI.Button("Edit On actions...", OnEditTriggerOn));
 			p.Add(new VUI.Button("Edit Off actions...", OnEditTriggerOff));
-			p.Add(new VUI.ToolButton("X", OnDelete));
 		}
 
 		protected override void DoCreateMenuWidget(VUI.Panel p)
@@ -315,11 +336,6 @@ namespace Cue
 		private void OnCaption(string s)
 		{
 			Caption = s;
-		}
-
-		private void OnDelete()
-		{
-			Parent.RemoveItem(this);
 		}
 	}
 
@@ -386,6 +402,39 @@ namespace Cue
 			items_.Remove(m);
 
 			OnTriggersChanged();
+		}
+
+		public void MoveItemUp(ICustomMenuItem item)
+		{
+			int i = IndexOfItem(item);
+			if (i < 0 || i >= items_.Count)
+				return;
+
+			if (i > 0)
+			{
+				items_.RemoveAt(i);
+				items_.Insert(i - 1, item);
+				FireTriggersChanged();
+			}
+		}
+
+		public void MoveItemDown(ICustomMenuItem item)
+		{
+			int i = IndexOfItem(item);
+			if (i < 0 || i >= items_.Count)
+				return;
+
+			if ((i + 1) < items_.Count)
+			{
+				items_.RemoveAt(i);
+				items_.Insert(i + 1, item);
+				FireTriggersChanged();
+			}
+		}
+
+		public int IndexOfItem(ICustomMenuItem item)
+		{
+			return items_.IndexOf(item);
 		}
 
 		public void FireTriggersChanged()
