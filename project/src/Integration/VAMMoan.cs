@@ -290,7 +290,6 @@ namespace Cue.VamMoan
 			index = U.Clamp(index, 0, p_.intensities.Length - 1);
 
 			SetAction(p_.intensities[index], false);
-
 			Fire();
 		}
 

@@ -25,6 +25,7 @@ namespace Cue.Proc
 			private Person p_ = null;
 
 			private int state_ = NoState;
+			private bool mustStop_ = false;
 			private float elapsed_ = 0;
 			private float timeUp_ = 0;
 			private float timeDown_ = 0;
@@ -77,6 +78,7 @@ namespace Cue.Proc
 				state_ = StoppingState;
 				elapsed_ = 0;
 				stopValue_ = g_.Value;
+				mustStop_ = true;
 			}
 
 			private void Stopped()
@@ -187,7 +189,9 @@ namespace Cue.Proc
 
 					case StoppedState:
 					{
-						state_ = NoState;
+						if (!mustStop_)
+							state_ = NoState;
+
 						break;
 					}
 				}

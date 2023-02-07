@@ -564,5 +564,34 @@ namespace Cue.Sys.Vam
 		{
 			return $"{morph_}";
 		}
+
+		public void Dump()
+		{
+			Cue.Instance.Log.Info($"morph {name_}:");
+
+			GetMorph();
+			var m = morph_.DAZMorph;
+
+			if (m == null)
+			{
+				Cue.Instance.Log.Info($"  - not found");
+				return;
+			}
+
+
+			if (m.deltas != null)
+				Cue.Instance.Log.Info(" - has deltas");
+
+			Cue.Instance.Log.Info(" - formulas:");
+
+			foreach (var sm in m.formulas)
+			{
+				if (sm.targetType == DAZMorphFormulaTargetType.MorphValue)
+				{
+					var smm = VamMorphManager.Instance.Get(atom_, sm.target, eyesClosed_, m.morphBank);
+					Cue.Instance.Log.Info($"    - {smm.ID} mult={sm.multiplier}");
+				}
+			}
+		}
 	}
 }

@@ -133,6 +133,7 @@ namespace Cue
 	{
 		private bool enabled_ = false;
 		private float voiceChance_ = 0;
+		private float voiceChanceMinExcitement_ = 0.2f;
 		private float voiceTime_ = 0;
 		private float elapsed_ = 0;
 
@@ -150,6 +151,11 @@ namespace Cue
 				voiceChance_ = J.ReqFloat(o, "voiceChance");
 			else if (!inherited)
 				throw new LoadFailed("missing voiceChance");
+
+			if (o.HasKey("voiceChanceMinExcitement"))
+				voiceChanceMinExcitement_ = J.ReqFloat(o, "voiceChanceMinExcitement");
+			else if (!inherited)
+				throw new LoadFailed("missing voiceChanceMinExcitement");
 
 			if (o.HasKey("voiceTime"))
 				voiceTime_ = J.ReqFloat(o, "voiceTime");
@@ -178,7 +184,7 @@ namespace Cue
 				elapsed_ = 0;
 
 				lastRng_ = U.RandomFloat(0, 1);
-				if (lastRng_ <= voiceChance_)
+				if (ShouldMoan())
 				{
 					moaning_ = true;
 					v_.Provider.SetMoaning(v_.MaxIntensity);
@@ -191,10 +197,21 @@ namespace Cue
 			}
 		}
 
+		private bool ShouldMoan()
+		{
+			if (Person.Mood.Get(MoodType.Excited) >= voiceChanceMinExcitement_)
+			{
+				if (lastRng_ <= voiceChance_)
+					return true;
+			}
+
+			return false;
+		}
+
 		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("elapsed", $"{elapsed_:0.00}/{voiceTime_:0.00}");
-			debug.Add("moaning", $"{moaning_:0.00}");
+			debug.Add("moaning", $"{moaning_} minEx={voiceChanceMinExcitement_} ex={Person.Mood.Get(MoodType.Excited):0.00}");
 			debug.Add("lastRng", $"{lastRng_:0.00}/{voiceChance_:0.00}");
 		}
 

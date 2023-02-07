@@ -302,26 +302,26 @@ namespace Cue
 
 		private static BodyPartType[] FixedBodyParts(BodyPartType[] bodyParts)
 		{
-			if (bodyParts == null)
-				return null;
-
-			List<BodyPartType> fixedBodyParts = null;
-
-			for (int i = 0; i < bodyParts.Length; ++i)
+			if (bodyParts != null)
 			{
-				if (bodyParts[i] != BP.None)
-				{
-					if (fixedBodyParts == null)
-						fixedBodyParts = new List<BodyPartType>();
+				List<BodyPartType> fixedBodyParts = null;
 
-					fixedBodyParts.Add(bodyParts[i]);
+				for (int i = 0; i < bodyParts.Length; ++i)
+				{
+					if (bodyParts[i] != BP.None)
+					{
+						if (fixedBodyParts == null)
+							fixedBodyParts = new List<BodyPartType>();
+
+						fixedBodyParts.Add(bodyParts[i]);
+					}
 				}
+
+				if (fixedBodyParts != null)
+					return fixedBodyParts.ToArray();
 			}
 
-			if (fixedBodyParts == null)
-				return null;
-
-			return fixedBodyParts.ToArray();
+			return new BodyPartType[0];
 		}
 	}
 }

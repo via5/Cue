@@ -36,6 +36,7 @@
 		{
 			"enabled": true,
 			"voiceChance": 0.2,
+			"voiceChanceMinExcitement": 0.2,
 			"voiceTime": 2
 		},
 		"orgasmState":
@@ -46,6 +47,7 @@
 		{
 			"enabled": true,
 			"voiceChance": 0.2,
+			"voiceChanceMinExcitement": 0.2,
 			"voiceTime": 2
 		},
 		"chokedState":
@@ -420,6 +422,38 @@
 				}
 			]
 		},
+
+		{
+			"name": "rollup",
+			"moods": "excited",
+			"sex": "female",
+			"minExcitement": 0.8,
+			"minHoldTime": 2,
+			"maxOnly": true,
+			"weight": 0.3,
+			"morphs":
+			[
+				{
+					"id": "Eyeball Depth L",
+					"max": 1.0
+				},
+
+				{
+					"id": "Eyeball Rotate Vertical L",
+					"max": -3.5
+				},
+
+				{
+					"id": "Eyeball Depth R",
+					"max": 1.0
+				},
+
+				{
+					"id": "Eyeball Rotate Vertical R",
+					"max": -3.5
+				}
+			]
+		}
 	],
 
 	"events":
@@ -427,7 +461,7 @@
 		{
 			"type": "kiss",
 			"startLipsDistance": 0.1,
-			"startLipsDistanceWithPlayer": 0.1,
+			"startLipsDistanceWithPlayer": 0.15,
 			"stopLipsDistance": 0.1,
 			"stopLipsDistanceWithPlayer": 0.15,
 			"stopHeadDistanceFromStart": 0.15,

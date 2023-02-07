@@ -244,7 +244,7 @@ namespace Cue
 		public float MaxIntensity
 		{
 			get { return maxIntensity_; }
-			set { maxIntensity_ = value; }
+			private set { maxIntensity_ = value; }
 		}
 
 		public string Warning
