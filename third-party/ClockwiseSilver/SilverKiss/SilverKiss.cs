@@ -9,7 +9,7 @@ namespace ClockwiseSilver {
 	public class Kiss : MVRScript {
 		private const float GiveUpTime = 4;
 
-		public static string Version = "2";
+		public static string Version = "3";
 
 		private FreeControllerV3 headControl;
         private Rigidbody lipTrigger, headRB, chestRB, targetBody;
@@ -40,7 +40,7 @@ namespace ClockwiseSilver {
 		private float[] targetsTongue;
 		private float openTimer, morphTimer = 0f;
 		private float giveUpTimer = GiveUpTime;
-		private float mouthOpenWideMax = 0.8f;
+		private JSONStorableFloat mouthOpenWideMin, mouthOpenWideMax;
 		private float mouthOpenWideTarget = 0.8f;
 		private float tongueLengthTarget = 0.15f;
 		private float tongueRaiseMin = 0.3f;
@@ -231,6 +231,14 @@ namespace ClockwiseSilver {
 				tongueLengthJSON = new JSONStorableFloat("Tongue Length", 0.15f, 0f, 1f, false);
 				RegisterFloat(tongueLengthJSON);
 				CreateSlider(tongueLengthJSON, false);
+
+				mouthOpenWideMin = new JSONStorableFloat("Mouth Open Min", 0, 0, 1, false);
+				RegisterFloat(mouthOpenWideMin);
+				CreateSlider(mouthOpenWideMin, false);
+
+				mouthOpenWideMax = new JSONStorableFloat("Mouth Open Max", 0.8f, 0, 1, false);
+				RegisterFloat(mouthOpenWideMax);
+				CreateSlider(mouthOpenWideMax, false);
 
 				var btn = CreateButton("Reset Morphs", false);
                 btn.button.onClick.AddListener(() => { ZeroMorphs(); });
@@ -430,7 +438,7 @@ namespace ClockwiseSilver {
 			}
 			else if (isOpen)
 			{
-				mouthOpenWideTarget = mouthOpenWideMax;
+				mouthOpenWideTarget = mouthOpenWideMax.val;
 				tongueLengthTarget = tongueLengthJSON.val;
 				tongueRaiseTarget = tongueRaiseMax;
 
@@ -457,7 +465,7 @@ namespace ClockwiseSilver {
 			}
 			else
 			{
-				mouthOpenWideTarget = 0f;
+				mouthOpenWideTarget = mouthOpenWideMin.val;
 				tongueLengthTarget = 0f;
 				tongueRaiseTarget = tongueRaiseMin;
 				eyesClosedTarget = eyesClosedMinJSON.val;
@@ -509,7 +517,7 @@ namespace ClockwiseSilver {
 					//Update Morphs
 					float dTime = Time.deltaTime * morphSpeed * 3;
 
-				mouthOpenWide.morphValue = Mathf.Lerp(mouthOpenWide.morphValue, mouthOpenWideTarget, dTime);
+					mouthOpenWide.morphValue = Mathf.Lerp(mouthOpenWide.morphValue, mouthOpenWideTarget, dTime);
 					tongueLength.morphValue = Mathf.Lerp(tongueLength.morphValue, tongueLengthTarget, dTime);
 					tongueRaise.morphValue = Mathf.Lerp(tongueRaise.morphValue, tongueRaiseTarget, dTime);
 

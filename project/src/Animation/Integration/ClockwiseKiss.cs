@@ -1,50 +1,101 @@
 ﻿namespace Cue
 {
-	class ClockwiseKissAnimation : BuiltinAnimation
+	public abstract class BasicClockwiseKissAnimation : BuiltinAnimation
 	{
 		private const string PluginName = "ClockwiseSilver.Kiss";
-		private const string PluginVersion = "2";
+		private const string PluginVersion = "3";
 
 		private Logger log_;
-		private Sys.Vam.BoolParameter enabled_ = null;
-		private Sys.Vam.BoolParameter active_ = null;
-		private Sys.Vam.BoolParameterRO running_ = null;
-		private Sys.Vam.StringChooserParameter atom_ = null;
-		private Sys.Vam.StringChooserParameter targetParam_ = null;
-		private Sys.Vam.BoolParameter trackPos_ = null;
-		private Sys.Vam.BoolParameter trackRot_ = null;
-		private Sys.Vam.FloatParameter headAngleX_ = null;
-		private Sys.Vam.FloatParameter headAngleY_ = null;
-		private Sys.Vam.FloatParameter headAngleZ_ = null;
-		private Sys.Vam.FloatParameter morphDuration_ = null;
-		private Sys.Vam.FloatParameter morphSpeed_ = null;
-		private Sys.Vam.FloatParameter lipMorph_ = null;
-		private Sys.Vam.FloatParameter upDownSpeed_ = null;
-		private Sys.Vam.FloatParameter frontBackSpeed_ = null;
-		private Sys.Vam.FloatParameter trackingSpeed_ = null;
-		private Sys.Vam.BoolParameter closeEyes_ = null;
-		private bool wasKissing_ = false;
-		private float elapsed_ = 0;
 
-		private const float StartHeadAngleXWithPlayer = -45;
-		private const float StartHeadAngleYWithPlayer = 0;
-		private const float StartHeadAngleZWithPlayer = 0;
-		private const float StartHeadAngleXLeader = -10;
-		private const float StartHeadAngleYLeader = 0;
-		private const float StartHeadAngleZLeader = -20;
-		private const float StartHeadAngleX = -30;
-		private const float StartHeadAngleY = 0;
-		private const float StartHeadAngleZ = -40;
+		private class Params
+		{
+			public Sys.Vam.BoolParameter enabled = null;
+			public Sys.Vam.BoolParameter active = null;
+			public Sys.Vam.BoolParameterRO running = null;
+			public Sys.Vam.StringChooserParameter atom = null;
+			public Sys.Vam.StringChooserParameter targetParam = null;
+			public Sys.Vam.BoolParameter trackPos = null;
+			public Sys.Vam.BoolParameter trackRot = null;
+			public Sys.Vam.FloatParameter headAngleX = null;
+			public Sys.Vam.FloatParameter headAngleY = null;
+			public Sys.Vam.FloatParameter headAngleZ = null;
+			public Sys.Vam.FloatParameter morphDuration = null;
+			public Sys.Vam.FloatParameter morphSpeed = null;
+			public Sys.Vam.FloatParameter lipMorph = null;
+			public Sys.Vam.FloatParameter tongueMorph = null;
+			public Sys.Vam.FloatParameter tongueLength = null;
+			public Sys.Vam.FloatParameter mouthOpenMin = null;
+			public Sys.Vam.FloatParameter mouthOpenMax = null;
+			public Sys.Vam.FloatParameter upDownSpeed = null;
+			public Sys.Vam.FloatParameter frontBackSpeed = null;
+			public Sys.Vam.FloatParameter trackingSpeed = null;
+			public Sys.Vam.BoolParameter closeEyes = null;
+		}
 
-		private const float StartTrackingSpeed = 0.1f;
-		private const float StopTrackingSpeed = 0.1f;
-		private const float DefaultTrackingSpeed = 0.1f;
-		private const float TrackingSpeedTime = 3;
+		protected class Config
+		{
+			public readonly float StartHeadAngleXWithPlayer = -45;
+			public readonly float StartHeadAngleYWithPlayer = 0;
+			public readonly float StartHeadAngleZWithPlayer = 0;
+			public readonly float StartHeadAngleXLeader = -10;
+			public readonly float StartHeadAngleYLeader = 0;
+			public readonly float StartHeadAngleZLeader = -20;
+			public readonly float StartHeadAngleX = -30;
+			public readonly float StartHeadAngleY = 0;
+			public readonly float StartHeadAngleZ = -40;
 
-		private const float MaxMorphSpeed = 5.0f;
-		private const float MaxLipMorph = 1.0f;
-		private const float MaxUpDownSpeed = 1.0f;
-		private const float MaxFrontBackSpeed = 1.0f;
+			public readonly float StartTrackingSpeed = 0.1f;
+			public readonly float StopTrackingSpeed = 0.1f;
+			public readonly float DefaultTrackingSpeed = 0.1f;
+			public readonly float TrackingSpeedTime = 3;
+
+			public readonly float MaxMorphSpeed = 5.0f;
+			public readonly float MaxLipMorph = 1.0f;
+			public readonly float MaxTongueMorph = 0.8f;
+			public readonly float MaxTongueLength = 0.2f;
+			public readonly float MouthOpenMin = 0;
+			public readonly float MouthOpenMax = 0.8f;
+			public readonly float MaxUpDownSpeed = 1.0f;
+			public readonly float MaxFrontBackSpeed = 1.0f;
+
+			public Config()
+			{
+			}
+
+			public Config(
+				float maxLipMorph, float maxTongueMorph, float maxTongueLength,
+				float mouthOpenMin, float mouthOpenMax)
+			{
+				MaxLipMorph = maxLipMorph;
+				MaxTongueMorph = maxTongueMorph;
+				MaxTongueLength = maxTongueLength;
+				MouthOpenMin = mouthOpenMin;
+				MouthOpenMax = mouthOpenMax;
+			}
+
+			public void Debug(DebugLines debug)
+			{
+				debug.Add("StartHeadAngleXWithPlayer", $"{StartHeadAngleXWithPlayer:0.00}");
+				debug.Add("StartHeadAngleYWithPlayer", $"{StartHeadAngleYWithPlayer:0.00}");
+				debug.Add("StartHeadAngleZWithPlayer", $"{StartHeadAngleZWithPlayer:0.00}");
+				debug.Add("StartHeadAngleXLeader", $"{StartHeadAngleXLeader:0.00}");
+				debug.Add("StartHeadAngleYLeader", $"{StartHeadAngleYLeader:0.00}");
+				debug.Add("StartHeadAngleZLeader", $"{StartHeadAngleZLeader:0.00}");
+				debug.Add("StartHeadAngleX", $"{StartHeadAngleX:0.00}");
+				debug.Add("StartHeadAngleY", $"{StartHeadAngleY:0.00}");
+				debug.Add("StartHeadAngleZ", $"{StartHeadAngleZ:0.00}");
+				debug.Add("StartTrackingSpeed", $"{StartTrackingSpeed:0.00}");
+				debug.Add("StopTrackingSpeed", $"{StopTrackingSpeed:0.00}");
+				debug.Add("DefaultTrackingSpeed", $"{DefaultTrackingSpeed:0.00}");
+				debug.Add("TrackingSpeedTime", $"{TrackingSpeedTime:0.00}");
+				debug.Add("MaxMorphSpeed", $"{MaxMorphSpeed:0.00}");
+				debug.Add("MaxLipMorph", $"{MaxLipMorph:0.00}");
+				debug.Add("MaxTongueMorph", $"{MaxTongueMorph:0.00}");
+				debug.Add("MaxTongueLength", $"{MaxTongueLength:0.00}");
+				debug.Add("MaxUpDownSpeed", $"{MaxUpDownSpeed:0.00}");
+				debug.Add("MaxFrontBackSpeed", $"{MaxFrontBackSpeed:0.00}");
+			}
+		}
 
 		private string[] targetStorableCache_ =
 			Sys.Vam.Parameters.MakeStorableNamesCache(PluginName);
@@ -53,11 +104,15 @@
 			new CWVersionChecker(PluginName, PluginVersion);
 
 		private Person target_ = null;
+		private readonly Params p_ = new Params();
+		private readonly Config c_;
+		private bool wasKissing_ = false;
+		private float elapsed_ = 0;
 
-
-		public ClockwiseKissAnimation()
-			: base("cwKiss")
+		protected BasicClockwiseKissAnimation(string name, Config c)
+			: base(name)
 		{
+			c_ = c;
 		}
 
 		public static string GetWarning(Person p)
@@ -71,27 +126,20 @@
 			active.Value = false;
 		}
 
-		public override BuiltinAnimation Clone()
-		{
-			var a = new ClockwiseKissAnimation();
-			a.CopyFrom(this);
-			return a;
-		}
-
 		public override bool Done
 		{
-			get { return !running_.Value; }
+			get { return !p_.running.Value; }
 		}
 
 		private bool CanStart()
 		{
-			if (!active_.Check())
+			if (!p_.active.Check())
 			{
 				log_.Verbose("can't start, plugin not found");
 				return false;
 			}
 
-			if (running_.Value)
+			if (p_.running.Value)
 			{
 				log_.Verbose("can't start, already active");
 				return false;
@@ -144,6 +192,11 @@
 				// matter
 				leader = false;
 			}
+			else if (!CanLead())
+			{
+				// this animation cannot lead
+				leader = false;
+			}
 
 			if (leader && TargetIsLeading(target))
 			{
@@ -155,6 +208,8 @@
 
 			return true;
 		}
+
+		protected abstract bool CanLead();
 
 		private bool TargetIsLeading(Person target)
 		{
@@ -179,98 +234,109 @@
 		{
 			log_ = new Logger(Logger.Integration, p, "cwkiss");
 
-			enabled_ = new Sys.Vam.BoolParameter(
+			p_.enabled = new Sys.Vam.BoolParameter(
 				p, PluginName, "enabled");
 
-			active_ = new Sys.Vam.BoolParameter(
+			p_.active = new Sys.Vam.BoolParameter(
 				p, PluginName, "isActive");
 
-			running_ = new Sys.Vam.BoolParameterRO(
+			p_.running = new Sys.Vam.BoolParameterRO(
 				p, PluginName, "Is Kissing");
 
-			atom_ = new Sys.Vam.StringChooserParameter(
+			p_.atom = new Sys.Vam.StringChooserParameter(
 				p, PluginName, "atom");
 
-			targetParam_ = new Sys.Vam.StringChooserParameter(
+			p_.targetParam = new Sys.Vam.StringChooserParameter(
 				p, PluginName, "kissTargetJSON");
 
-			trackPos_ = new Sys.Vam.BoolParameter(
+			p_.trackPos = new Sys.Vam.BoolParameter(
 				p, PluginName, "trackPosition");
 
-			trackRot_ = new Sys.Vam.BoolParameter(
+			p_.trackRot = new Sys.Vam.BoolParameter(
 				p, PluginName, "trackRotation");
 
-			headAngleX_ = new Sys.Vam.FloatParameter(
+			p_.headAngleX = new Sys.Vam.FloatParameter(
 				p, PluginName, "Head Angle X");
 
-			headAngleY_ = new Sys.Vam.FloatParameter(
+			p_.headAngleY = new Sys.Vam.FloatParameter(
 				p, PluginName, "Head Angle Y");
 
-			headAngleZ_ = new Sys.Vam.FloatParameter(
+			p_.headAngleZ = new Sys.Vam.FloatParameter(
 				p, PluginName, "Head Angle Z");
 
-			morphDuration_ = new Sys.Vam.FloatParameter(
+			p_.morphDuration = new Sys.Vam.FloatParameter(
 				p, PluginName, "Morph Duration");
 
-			morphSpeed_ = new Sys.Vam.FloatParameter(
+			p_.morphSpeed = new Sys.Vam.FloatParameter(
 				p, PluginName, "Morph Speed");
 
-			lipMorph_ = new Sys.Vam.FloatParameter(
+			p_.lipMorph = new Sys.Vam.FloatParameter(
 				p, PluginName, "Lip Morph Max");
 
-			upDownSpeed_ = new Sys.Vam.FloatParameter(
+			p_.tongueMorph = new Sys.Vam.FloatParameter(
+				p, PluginName, "Tongue Morph Max");
+
+			p_.tongueLength = new Sys.Vam.FloatParameter(
+				p, PluginName, "Tongue Length");
+
+			p_.mouthOpenMin = new Sys.Vam.FloatParameter(
+				p, PluginName, "Mouth Open Min");
+
+			p_.mouthOpenMax = new Sys.Vam.FloatParameter(
+				p, PluginName, "Mouth Open Max");
+
+			p_.upDownSpeed = new Sys.Vam.FloatParameter(
 				p, PluginName, "Up Down Speed");
 
-			frontBackSpeed_ = new Sys.Vam.FloatParameter(
+			p_.frontBackSpeed = new Sys.Vam.FloatParameter(
 				p, PluginName, "Front Back Speed");
 
-			trackingSpeed_ = new Sys.Vam.FloatParameter(
+			p_.trackingSpeed = new Sys.Vam.FloatParameter(
 				p, PluginName, "Tracking Speed");
 
-			closeEyes_ = new Sys.Vam.BoolParameter(
+			p_.closeEyes = new Sys.Vam.BoolParameter(
 				p, PluginName, "closeEyes");
 
-			active_.Value = false;
+			p_.active.Value = false;
 		}
 
 		private void DoKiss(Person target, bool leader)
 		{
-			enabled_.Value = true;
+			p_.enabled.Value = true;
 
 			// force reset
-			atom_.Value = "";
-			targetParam_.Value = "";
-			atom_.Value = target.ID;
-			targetParam_.Value = "LipTrigger";
+			p_.atom.Value = "";
+			p_.targetParam.Value = "";
+			p_.atom.Value = target.ID;
+			p_.targetParam.Value = "LipTrigger";
 
 			if (target.IsPlayer)
 			{
-				headAngleX_.Value = StartHeadAngleXWithPlayer;
-				headAngleY_.Value = StartHeadAngleYWithPlayer;
-				headAngleZ_.Value = StartHeadAngleZWithPlayer;
+				p_.headAngleX.Value = c_.StartHeadAngleXWithPlayer;
+				p_.headAngleY.Value = c_.StartHeadAngleYWithPlayer;
+				p_.headAngleZ.Value = c_.StartHeadAngleZWithPlayer;
 			}
 			else
 			{
 				if (leader)
 				{
-					headAngleX_.Value = StartHeadAngleXLeader;
-					headAngleY_.Value = StartHeadAngleYLeader;
-					headAngleZ_.Value = StartHeadAngleZLeader;
+					p_.headAngleX.Value = c_.StartHeadAngleXLeader;
+					p_.headAngleY.Value = c_.StartHeadAngleYLeader;
+					p_.headAngleZ.Value = c_.StartHeadAngleZLeader;
 				}
 				else
 				{
-					headAngleX_.Value = StartHeadAngleX;
-					headAngleY_.Value = StartHeadAngleY;
-					headAngleZ_.Value = StartHeadAngleZ;
+					p_.headAngleX.Value = c_.StartHeadAngleX;
+					p_.headAngleY.Value = c_.StartHeadAngleY;
+					p_.headAngleZ.Value = c_.StartHeadAngleZ;
 				}
 			}
 
-			closeEyes_.Value = !Person.Gaze.ShouldAvoid(target);
-
-			trackingSpeed_.Value = StartTrackingSpeed;
-			trackPos_.Value = leader && Person.Body.Get(BP.Head).CanApplyForce();
-			trackRot_.Value = Person.Body.Get(BP.Head).CanApplyForce();
-			active_.Value = true;
+			p_.closeEyes.Value = !Person.Gaze.ShouldAvoid(target);
+			p_.trackingSpeed.Value = c_.StartTrackingSpeed;
+			p_.trackPos.Value = leader && Person.Body.Get(BP.Head).CanApplyForce();
+			p_.trackRot.Value = Person.Body.Get(BP.Head).CanApplyForce();
+			p_.active.Value = true;
 			target_ = target;
 			elapsed_ = 0;
 		}
@@ -296,7 +362,7 @@
 
 		private Person GetTarget()
 		{
-			var atom = atom_.Value;
+			var atom = p_.atom.Value;
 			if (atom != "")
 				return Cue.Instance.FindPerson(atom);
 
@@ -307,7 +373,7 @@
 		{
 			base.RequestStop(stopFlags);
 
-			if (active_.Value)
+			if (p_.active.Value)
 			{
 				Stop();
 			}
@@ -316,8 +382,8 @@
 		private void Stop()
 		{
 			log_.Info("stopping");
-			trackingSpeed_.Value = StopTrackingSpeed;
-			active_.Value = false;
+			p_.trackingSpeed.Value = c_.StopTrackingSpeed;
+			p_.active.Value = false;
 			target_ = null;
 			elapsed_ = 0;
 		}
@@ -334,40 +400,118 @@
 		{
 			base.Update(s);
 
-			var k = running_.Value;
+			var k = p_.running.Value;
 			if (wasKissing_ != k)
 				SetActive(k);
 
 			if (k)
 				elapsed_ += s;
 
-			if (k && active_.Value)
+			if (k && p_.active.Value)
 			{
 				float energy = MovementEnergy;
 
 				// don't go too low
-				var range = (morphDuration_.DefaultValue - morphDuration_.Minimum) * 0.6f;
-				morphDuration_.Value = morphDuration_.DefaultValue - range * energy;
+				var range = (p_.morphDuration.DefaultValue - p_.morphDuration.Minimum) * 0.6f;
+				p_.morphDuration.Value = p_.morphDuration.DefaultValue - range * energy;
 
-				range = MaxMorphSpeed - morphSpeed_.DefaultValue;
-				morphSpeed_.Value = morphSpeed_.DefaultValue + range * energy;
+				range = c_.MaxMorphSpeed - p_.morphSpeed.DefaultValue;
+				p_.morphSpeed.Value = p_.morphSpeed.DefaultValue + range * energy;
 
-				range = MaxLipMorph - lipMorph_.DefaultValue;
-				lipMorph_.Value = lipMorph_.DefaultValue + range * energy;
+				if (c_.MaxLipMorph < p_.lipMorph.DefaultValue)
+				{
+					p_.lipMorph.Value = c_.MaxLipMorph;
+				}
+				else
+				{
+					range = c_.MaxLipMorph - p_.lipMorph.DefaultValue;
+					p_.lipMorph.Value = p_.lipMorph.DefaultValue + range * energy;
+				}
 
-				range = MaxUpDownSpeed - upDownSpeed_.DefaultValue;
-				upDownSpeed_.Value = upDownSpeed_.DefaultValue + range * energy;
+				if (Person.ID == "Person#2")
+					Log.Info($"{p_.tongueMorph.Value} {c_.MaxTongueMorph}");
 
-				range = MaxFrontBackSpeed - frontBackSpeed_.DefaultValue;
-				frontBackSpeed_.Value = frontBackSpeed_.DefaultValue + range * energy;
+				p_.tongueMorph.Value = c_.MaxTongueMorph;
+				p_.tongueLength.Value = c_.MaxTongueLength;
+				p_.mouthOpenMin.Value = c_.MouthOpenMin;
+				p_.mouthOpenMax.Value = c_.MouthOpenMax;
+
+				range = c_.MaxUpDownSpeed - p_.upDownSpeed.DefaultValue;
+				p_.upDownSpeed.Value = p_.upDownSpeed.DefaultValue + range * energy;
+
+				range = c_.MaxFrontBackSpeed - p_.frontBackSpeed.DefaultValue;
+				p_.frontBackSpeed.Value = p_.frontBackSpeed.DefaultValue + range * energy;
 			}
 
 			if (k)
 			{
-				trackingSpeed_.Value = U.Lerp(
-					StartTrackingSpeed, DefaultTrackingSpeed,
-					(elapsed_ / TrackingSpeedTime));
+				p_.trackingSpeed.Value = U.Lerp(
+					c_.StartTrackingSpeed, c_.DefaultTrackingSpeed,
+					(elapsed_ / c_.TrackingSpeedTime));
 			}
+		}
+
+		public override void Debug(DebugLines debug)
+		{
+			base.Debug(debug);
+
+			debug.Add(Name);
+			debug.Add("active", $"{wasKissing_}");
+			debug.Add("target", $"{(target_ == null ? "(none)" : target_.ToString())}");
+			debug.Add("elapsed", $"{elapsed_}");
+			debug.Add("");
+
+			c_.Debug(debug);
+		}
+	}
+
+	class ClockwiseKissAnimation : BasicClockwiseKissAnimation
+	{
+		public ClockwiseKissAnimation()
+			: base("cwKiss", MakeConfig())
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new ClockwiseKissAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		protected override bool CanLead()
+		{
+			return true;
+		}
+
+		private static Config MakeConfig()
+		{
+			return new Config();
+		}
+	}
+
+	class ClockwiseKissAnimationSleeping : BasicClockwiseKissAnimation
+	{
+		public ClockwiseKissAnimationSleeping()
+			: base("cwKissSleeping", MakeConfig())
+		{
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new ClockwiseKissAnimationSleeping();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		protected override bool CanLead()
+		{
+			return false;
+		}
+
+		private static Config MakeConfig()
+		{
+			return new Config(0, 0, 0, 0.5f, 0.5f);
 		}
 	}
 }

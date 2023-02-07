@@ -73,6 +73,15 @@
 		{
 			"animation": "excited",
 			"type": "none"
+		},
+
+		{
+			"animation": "kiss",
+			"type": "internal",
+			"options":
+			{
+				"name": "cwKissSleeping",
+			}
 		}
 	],
 

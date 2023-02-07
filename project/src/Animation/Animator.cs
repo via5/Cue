@@ -9,6 +9,7 @@ namespace Cue
 		{
 			new SmokeAnimation(),
 			new ClockwiseKissAnimation(),
+			new ClockwiseKissAnimationSleeping(),
 			new ClockwiseBJAnimation(),
 			new ClockwiseHJBothAnimation(),
 			new ClockwiseHJLeftAnimation(),
