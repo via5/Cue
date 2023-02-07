@@ -250,12 +250,18 @@ namespace VUI
 			if (ignore_) return;
 
 			s = s.Trim();
-			if (string.IsNullOrEmpty(s) || list_.IndexOf(s) != -1)
+			if (string.IsNullOrEmpty(s))
 				return;
 
 			try
 			{
 				ignore_ = true;
+
+				// move to top
+				int i = list_.IndexOf(s);
+				if (i >= 0 && i < list_.Count)
+					list_.RemoveAt(i);
+
 				list_.Insert(0, s);
 
 				while (list_.Count > Max)
@@ -294,6 +300,9 @@ namespace VUI
 
 		public string Complete(string s)
 		{
+			if (string.IsNullOrEmpty(s))
+				return null;
+
 			for (int i = 0; i < list_.Count; ++i)
 			{
 				if (list_[i].StartsWith(s, StringComparison.OrdinalIgnoreCase))
