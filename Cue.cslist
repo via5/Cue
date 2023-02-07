@@ -96,7 +96,6 @@ project\src\Person\Voice\StateKiss.cs
 project\src\Person\Voice\StateNormal.cs
 project\src\Person\Voice\StateOrgasm.cs
 project\src\Person\Voice\Voice.cs
-project\src\Resources\Animations.cs
 project\src\Resources\Objects.cs
 project\src\Resources\Personalities.cs
 project\src\Resources\Resources.cs

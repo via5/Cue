@@ -22,7 +22,6 @@ namespace Cue
 		private readonly Person person_;
 		private readonly AnimationType type_;
 		private bool running_ = false;
-		private Animation anim_ = null;
 		private bool stopping_ = false;
 
 		public PersistentAnimation(Person p, AnimationType type)
@@ -49,68 +48,35 @@ namespace Cue
 			if (!DoShouldRun())
 				return false;
 
-			var name = GetAnimationName();
-			if (string.IsNullOrEmpty(name))
+			if (!person_.Personality.Animations.Has(AnimationType.Excited))
 				return false;
 
 			return true;
 		}
 
 		protected abstract bool DoShouldRun();
-		protected abstract string GetAnimationName();
 
 		private void Start()
 		{
 			if (stopping_)
 			{
-				var s = AnimationStatus.NotPlaying;
+				var s = person_.Animator.PlayingStatus(type_);
 
-				if (anim_ == null)
-					s = person_.Animator.PlayingStatus(type_);
-				else
-					s = person_.Animator.PlayingStatus(anim_);
-
-				if (s == AnimationStatus.NotPlaying)
-				{
-					anim_ = null;
-					stopping_ = false;
-				}
-				else
-				{
+				if (s != AnimationStatus.NotPlaying)
 					return;
-				}
+
+				stopping_ = false;
 			}
 
 			running_ = true;
-
-			if (anim_ == null)
-			{
-				var name = GetAnimationName();
-				anim_ = Resources.Animations.Find(name);
-
-				if (anim_ == null)
-					person_.Log.Error($"persistent animation {name} not found");
-			}
-
-			if (anim_ == null)
-				person_.Animator.PlayType(type_);
-			else
-				person_.Animator.Play(anim_);
+			person_.Animator.PlayType(type_);
 		}
 
 		public void Stop()
 		{
 			running_ = false;
 			stopping_ = true;
-
-			if (anim_ == null)
-			{
-				person_.Animator.StopType(type_);
-			}
-			else
-			{
-				person_.Animator.Stop(anim_);
-			}
+			person_.Animator.StopType(type_);
 		}
 	}
 
@@ -132,11 +98,6 @@ namespace Cue
 
 			return true;
 		}
-
-		protected override string GetAnimationName()
-		{
-			return Person.Personality.GetString(PS.IdleAnimation);
-		}
 	}
 
 
@@ -156,11 +117,6 @@ namespace Cue
 				return false;
 
 			return true;
-		}
-
-		protected override string GetAnimationName()
-		{
-			return Person.Personality.GetString(PS.ExcitedAnimation);
 		}
 	}
 

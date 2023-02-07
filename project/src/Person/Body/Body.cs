@@ -352,7 +352,7 @@ namespace Cue
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{
 				zap_.Set(source, zone, intensity, time);
-				Log.Info($"zapped: {zap_.DebugLine(person_)}");
+				Log.Verbose($"zapped: {zap_.DebugLine(person_)}");
 			}
 		}
 

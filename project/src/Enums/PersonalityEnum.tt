@@ -207,9 +207,6 @@ V.Float("PenetrationDamper"),
 V.Float("MinCollisionMag"),
 V.Float("MinCollisionMagPenetration"),
 
-V.String("IdleAnimation"),
-V.String("ExcitedAnimation"),
-
 V.String("FinishLookAtPlayer"),
 V.String("FinishLookAtPlayerAction"),
 V.String("FinishOrgasm"),

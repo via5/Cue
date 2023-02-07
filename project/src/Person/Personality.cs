@@ -352,6 +352,123 @@ namespace Cue
 	}
 
 
+	public class AnimationFactory
+	{
+		private readonly Personality ps_;
+		private readonly Logger log_;
+		private readonly List<Animation> anims_ = new List<Animation>();
+
+		public AnimationFactory(Personality ps)
+		{
+			ps_ = ps;
+			log_ = new Logger(Logger.Animation, $"[{ps.Name}].anims");
+		}
+
+		public AnimationFactory Clone(Personality ps)
+		{
+			var f = new AnimationFactory(ps);
+			f.CopyFrom(this);
+			return f;
+		}
+
+		private void CopyFrom(AnimationFactory f)
+		{
+			foreach (var a in f.anims_)
+				anims_.Add(a);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
+		}
+
+		public bool Has(AnimationType type)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == type)
+					return true;
+			}
+
+			return false;
+		}
+
+		public Animation GetAny(AnimationType type, int style)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == type)
+				{
+					if (MovementStyles.Match(anims_[i].MovementStyle, style))
+						return anims_[i];
+				}
+			}
+
+			return null;
+		}
+
+		public List<Animation> GetAll()
+		{
+			return GetAll(AnimationType.None, MovementStyles.Any);
+		}
+
+		public List<Animation> GetAll(AnimationType type, int style)
+		{
+			if (type == AnimationType.None && style == MovementStyles.Any)
+				return anims_;
+
+			var list = new List<Animation>();
+
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == type)
+				{
+					if (style == MovementStyles.Any ||
+						MovementStyles.Match(anims_[i].MovementStyle, style))
+					{
+						list.Add(anims_[i]);
+					}
+				}
+			}
+
+			return list;
+		}
+
+		public Animation Find(string name)
+		{
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Sys?.Name == name)
+					return anims_[i];
+			}
+
+			return null;
+		}
+
+		public void Add(Animation a)
+		{
+			bool replaced = false;
+
+			for (int i = 0; i < anims_.Count; ++i)
+			{
+				if (anims_[i].Type == a.Type)
+				{
+					anims_.RemoveAt(i);
+					replaced = true;
+					break;
+				}
+			}
+
+			if (replaced)
+				log_.Info($"{a} (replaced)");
+			else
+				log_.Info($"{a}");
+
+			anims_.Add(a);
+		}
+	}
+
+
 	public class Personality : EnumValueManager
 	{
 		private readonly string name_;
@@ -363,12 +480,14 @@ namespace Cue
 		private Dictionary<string, IEventData> events_ = new Dictionary<string, IEventData>();
 		private Voice voiceProto_ = null;
 		private Pose pose_ = Pose.CreateDefault();
+		private AnimationFactory anims_;
 
 		public Personality(string name)
 			: base(new PS())
 		{
 			name_ = name;
 			sensitivities_ = new Sensitivities();
+			anims_ = new AnimationFactory(this);
 		}
 
 		public string Origin
@@ -409,6 +528,7 @@ namespace Cue
 
 			voiceProto_ = ps.voiceProto_?.Clone();
 			pose_ = ps.pose_.Clone();
+			anims_ = ps.anims_.Clone(this);
 		}
 
 		public void Init()
@@ -475,6 +595,11 @@ namespace Cue
 		public Sensitivities Sensitivities
 		{
 			get { return sensitivities_; }
+		}
+
+		public AnimationFactory Animations
+		{
+			get { return anims_; }
 		}
 
 		public Expression[] GetExpressions()

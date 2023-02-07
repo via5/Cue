@@ -16,7 +16,6 @@ namespace Cue
 
 	class Resources
 	{
-		private static AnimationResources animations_ = new AnimationResources();
 		private static ObjectResources objects_ = new ObjectResources();
 		private static PersonalityResources personalities_ = new PersonalityResources();
 
@@ -24,14 +23,8 @@ namespace Cue
 
 		public static void LoadAll()
 		{
-			animations_.Load();
 			objects_.Load();
 			personalities_.Load();
-		}
-
-		public static AnimationResources Animations
-		{
-			get { return animations_; }
 		}
 
 		public static ObjectResources Objects

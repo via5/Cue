@@ -127,6 +127,39 @@ namespace Cue
 	}
 
 
+	public class DummyAnimation : BuiltinAnimation
+	{
+		private bool stop_ = false;
+
+		public DummyAnimation()
+			: base("dummy")
+		{
+		}
+
+		public override bool Done
+		{
+			get { return stop_; }
+		}
+
+		public override void RequestStop(int stopFlags)
+		{
+			stop_ = true;
+		}
+
+		public override BuiltinAnimation Clone()
+		{
+			var a = new DummyAnimation();
+			a.CopyFrom(this);
+			return a;
+		}
+
+		public override void Debug(DebugLines debug)
+		{
+			debug.Add("dummy empty animation");
+		}
+	}
+
+
 	class BuiltinPlayer : IPlayer
 	{
 		class Playing

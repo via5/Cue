@@ -123,6 +123,7 @@ namespace Cue
 			ParseSensitivities(p.Sensitivities, o, inherited);
 			ParseEvents(p, o, inherited);
 			ParsePose(p, o, inherited);
+			ParseAnimations(p, o, inherited);
 
 			if (o.HasKey("expressions"))
 			{
@@ -324,6 +325,88 @@ namespace Cue
 			{
 				throw new LoadFailed("missing sensitivities");
 			}
+		}
+
+		private void ParseAnimations(Personality p, JSONClass o, bool inherited)
+		{
+			if (o.HasKey("animations"))
+			{
+				foreach (var an in o["animations"].AsArray.Childs)
+				{
+					var a = ParseAnimation(an.AsObject);
+
+					if (a != null)
+						p.Animations.Add(a);
+				}
+			}
+		}
+
+		private Animation ParseAnimation(JSONClass o)
+		{
+			IAnimation a = CreateIntegrationAnimation(o);
+			if (a == null)
+				return null;
+
+			if (o.HasKey("enabled") && !o["enabled"].AsBool)
+				return null;
+
+			if (!o.HasKey("animation"))
+			{
+				log_.Error("object missing 'animation'");
+				return null;
+			}
+
+			AnimationType type = AnimationType.FromString(o["animation"].Value);
+			if (type == AnimationType.None)
+			{
+				log_.Error($"bad animation type '{o["animation"].Value}'");
+				return null;
+			}
+
+			int ms = MovementStyles.Any;
+			if (o.HasKey("sex"))
+				ms = MovementStyles.FromString(o["sex"]);
+			else if (o.HasKey("style"))
+				ms = MovementStyles.FromString(o["style"]);
+
+			return new Animation(type, ms, a);
+		}
+
+		private IAnimation CreateIntegrationAnimation(JSONClass o)
+		{
+			if (!o.HasKey("type"))
+			{
+				log_.Error("object missing 'type'");
+				return null;
+			}
+
+			string type = o["type"];
+
+			JSONClass options;
+
+			if (o.HasKey("options"))
+				options = o["options"].AsObject;
+			else
+				options = new JSONClass();
+
+			IAnimation a = null;
+
+			if (type == "bvh")
+				a = BVH.Animation.Create(options);
+			else if (type == "timeline")
+				a = TimelineAnimation.Create(options);
+			else if (type == "synergy")
+				a = SynergyAnimation.Create(options);
+			else if (type == "proc")
+				a = Proc.ProcAnimation.Create(options);
+			else if (type == "internal")
+				a = BuiltinAnimations.Get(options["name"].Value);
+			else if (type == "none")
+				return new DummyAnimation();
+			else
+				log_.Error($"unknown animation type '{type}'");
+
+			return a;
 		}
 
 		private Sensitivity ParseSensitivity(JSONClass o)

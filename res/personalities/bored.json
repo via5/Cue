@@ -5,7 +5,6 @@
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
 	"maxExcitedExpression": 0.1,
-	"excitedAnimation": "",
 
 	"lookAboveMaxWeight": 0,
 	"lookAboveMaxWeightOrgasm": 0,
@@ -51,6 +50,14 @@
 	"finishMood": "involved",
 	"finishMoodAngry": 0.4,
 	"finishMoodSurprised": 0.4,
+
+	"animations":
+	[
+		{
+			"animation": "excited",
+			"type": "none"
+		}
+	],
 
 	"gazeDuration":
 	{

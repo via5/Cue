@@ -7,8 +7,6 @@
 	"maxExcitedExpression": 0,
 	"maxTiredExpression": 1,
 	"minTiredness": 1,
-	"idleAnimation": "procIdleSleeping",
-	"excitedAnimation": "",
 	"maxEmotionalRate": 0,
 
 	"gazeSaccade": false,
@@ -60,6 +58,23 @@
 	"finishLookAtPlayer": "never",
 	"finishOrgasm": "never",
 	"finishMood": "never",
+
+	"animations":
+	[
+		{
+			"animation": "idle",
+			"type": "proc",
+			"options":
+			{
+				"file": "animations/idleSleeping.json"
+			}
+		},
+
+		{
+			"animation": "excited",
+			"type": "none"
+		}
+	],
 
 	"gazeDuration":
 	{

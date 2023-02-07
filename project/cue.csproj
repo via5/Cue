@@ -229,7 +229,6 @@
     <Compile Include="src\Person\Voice\StateOrgasm.cs" />
     <Compile Include="src\Person\Voice\Voice.cs" />
     <Compile Include="src\Person\Voice\StateBJ.cs" />
-    <Compile Include="src\Resources\Animations.cs" />
     <Compile Include="src\Resources\Objects.cs" />
     <Compile Include="src\Resources\Personalities.cs" />
     <Compile Include="src\Resources\Resources.cs" />

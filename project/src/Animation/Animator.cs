@@ -296,7 +296,7 @@ namespace Cue
 				}
 			}
 
-			var a = Resources.Animations.GetAny(type, person_.MovementStyle);
+			var a = person_.Personality.Animations.GetAny(type, person_.MovementStyle);
 			if (a == null)
 			{
 				if (!failed_.Contains(type))
