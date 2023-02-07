@@ -103,8 +103,8 @@
 			var torqueMin = new Vector3(-7, -7, -7);
 			var torqueMax = new Vector3(7, 7, 7);
 
-			var forceMin = new Vector3(-25, -30, -30);
-			var forceMax = new Vector3(25, 30, 30);
+			var forceMin = new Vector3(-15, -20, -20);
+			var forceMax = new Vector3(15, 20, 20);
 
 
 			AddForce(Force.RelativeTorque, bp,
