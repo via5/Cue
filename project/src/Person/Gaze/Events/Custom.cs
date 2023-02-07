@@ -72,7 +72,10 @@ namespace Cue
 		protected override int DoCheck(int flags)
 		{
 			if (customTargets_.Length == 0)
+			{
+				SetLastResult("no custom targets");
 				return Continue;
+			}
 
 			for (int i = 0; i < customTargets_.Length; ++i)
 			{
@@ -84,7 +87,10 @@ namespace Cue
 			}
 
 			if (customTargets_.Length == 0)
+			{
+				SetLastResult("no custom targets");
 				return Continue;
+			}
 
 			if (hasExclusive_)
 			{
@@ -99,6 +105,7 @@ namespace Cue
 						i, customTargets_[i].Weight, "custom exclusive");
 				}
 
+				SetLastResult("found exclusive; stop");
 				return Stop;
 			}
 			else
@@ -108,6 +115,8 @@ namespace Cue
 					targets_.SetCustomWeight(
 						i, customTargets_[i].Weight, "custom");
 				}
+
+				SetLastResult("normal, no exclusive");
 			}
 
 			return Continue;

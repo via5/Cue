@@ -784,6 +784,7 @@
 	"zappedByPlayerMouthEyesWeight": 20,
 	"zappedByPlayerMouthExcitement": 0,
 	"zappedByPlayerLookUpWeight": 5,
+	"zappedByPlayerLookAwayMaxExcitement": 0,
 	"zappedByPlayerGazeDuration": [0.4, 0.2],
 
 	"zappedByOtherBreastsEyesWeight": 20,
@@ -798,6 +799,7 @@
 	"zappedByOtherMouthEyesWeight": 5,
 	"zappedByOtherMouthExcitement": 0,
 	"zappedByOtherLookUpWeight": 5,
+	"zappedByOtherLookAwayMaxExcitement": 0,
 	"zappedByOtherGazeDuration": [0.6, 0.4],
 
 	"otherZappedEyesWeight": 20,

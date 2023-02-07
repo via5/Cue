@@ -2,6 +2,8 @@ namespace Cue
 {
 	class GazeHands : BasicGazeEvent
 	{
+		private HandEvent event_ = null;
+
 		public GazeHands(Person p)
 			: base(p, I.GazeHands)
 		{
@@ -9,8 +11,12 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
+			if (event_ == null)
+				event_ = person_.AI.GetEvent<HandEvent>();
+
+			var e = event_;
+
 			int ret = Continue;
-			var e = person_.AI.GetEvent<HandEvent>();
 
 			if (e.Active)
 			{
@@ -39,6 +45,11 @@ namespace Cue
 				if (e.LeftTarget == person_ || e.RightTarget == person_)
 					ret |= CheckTarget(t);
 			}
+
+			if (ret != Continue)
+				SetLastResult("found something");
+			else
+				SetLastResult("nothing");
 
 			return ret;
 		}

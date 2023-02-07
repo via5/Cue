@@ -2,6 +2,8 @@ namespace Cue
 {
 	class GazeMouth : BasicGazeEvent
 	{
+		private MouthEvent event_ = null;
+
 		public GazeMouth(Person p)
 			: base(p, I.GazeMouth)
 		{
@@ -9,8 +11,11 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
+			if (event_ == null)
+				event_ = person_.AI.GetEvent<MouthEvent>();
+
 			var ps = person_.Personality;
-			var e = person_.AI.GetEvent<MouthEvent>();
+			var e = event_;
 
 			if (e.Active)
 			{
@@ -24,6 +29,7 @@ namespace Cue
 							t, true, g_.AvoidWeight(t),
 							$"mouthevent, but avoid in ps");
 
+						SetLastResult("active, but avoid in ps");
 						return Continue | NoGazer | Busy;
 					}
 					else
@@ -36,9 +42,18 @@ namespace Cue
 							t, t.Body.GenitalsBodyPart,
 							ps.Get(PS.BlowjobGenitalsWeight), "mouthevent");
 
+						SetLastResult("active");
 						return Continue | NoGazer | Busy | NoRandom;
 					}
 				}
+				else
+				{
+					SetLastResult("active but no target");
+				}
+			}
+			else
+			{
+				SetLastResult("not active");
 			}
 
 			return Continue;

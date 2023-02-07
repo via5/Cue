@@ -17,6 +17,17 @@
 	"avoidGazePlayerDelayAfterOrgasm": 15,
 	"avoidGazePlayerWeight": 0.1,
 
+	"zappedByPlayerLookAwayMaxExcitement": 0.6,
+	"zappedByOtherLookAwayMaxExcitement": 0.6,
+
 	"finishMood": "involved",
 	"finishMoodSurprised": 1,
+
+	"voice":
+	{
+		"normalState":
+		{
+			"breathingRange": 0.2
+		}
+	}
 }

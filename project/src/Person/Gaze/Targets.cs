@@ -282,6 +282,11 @@ namespace Cue
 				SetWeightIfZero(o as Person, BP.Eyes, weight, why + " (from reluctant)");
 		}
 
+		public void SetAvoid(IObject o, bool b, string why)
+		{
+			infos_[o.ObjectIndex].SetAvoid(b, why);
+		}
+
 		public void SetWeightIfZero(Person p, BodyPartType bodyPart, float w, string why)
 		{
 			if (bodyParts_[p.PersonIndex, bodyPart.Int].Weight == 0)
@@ -317,6 +322,12 @@ namespace Cue
 		public void SetDownWeight(float w, string why)
 		{
 			down_.SetWeight(w, why);
+		}
+
+		public void SetDownWeightIfNotSet(float w, string why)
+		{
+			if (!down_.WasSet)
+				down_.SetWeight(w, why);
 		}
 
 		public void SetCustomWeight(int i, float w, string why)
@@ -681,7 +692,7 @@ namespace Cue
 			get
 			{
 				var h = person_.Body.Get(BP.Hips);
-				var p = h.Position + h.Rotation.Rotate(new Vector3(0, 0, 1));
+				var p = h.Position + h.Rotation.Rotate(new Vector3(0, 0, 0.3f));
 				return p;
 			}
 		}

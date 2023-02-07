@@ -14,7 +14,14 @@ namespace Cue
 			float w = ps.Get(PS.LookFrontWeight);
 
 			if (w > 0)
+			{
 				targets_.SetFrontWeight(w, "front");
+				SetLastResult("normal");
+			}
+			else
+			{
+				SetLastResult("weight is 0");
+			}
 
 			return Continue;
 		}

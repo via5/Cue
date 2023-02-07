@@ -185,7 +185,6 @@ namespace Cue
 		private VUI.Label gazeEnergy_ = new VUI.Label();
 		private VUI.Label gazeTiredness_ = new VUI.Label();
 		private VUI.Label movementEnergy_ = new VUI.Label();
-		private VUI.Label baseExcitement_ = new VUI.Label();
 
 		public PersonAIMoodTab(Person person)
 			: base("Mood", false)

@@ -63,6 +63,7 @@ namespace Cue
 		private float timeSinceLastAvoid_ = 0;
 		private float updateGeoElapsed_ = UpdateGeoInterval;
 		private float canLookElapsed_ = CheckCanLookInterval;
+		private bool forceNewTarget_ = false;
 
 		// temp target
 		private IGazeLookat tempTarget_ = null;
@@ -213,6 +214,12 @@ namespace Cue
 					var f = FindFrustum(t.Position);
 					if (f != null && f.avoid)
 						return false;
+
+					if (t.Object != null)
+					{
+						if (Person.Gaze.Targets.ShouldAvoid(t.Object))
+							return false;
+					}
 				}
 			}
 
@@ -226,6 +233,11 @@ namespace Cue
 		{
 			canLookElapsed_ = CheckCanLookInterval;
 			timeSinceLastAvoid_ = AvoidInterval;
+		}
+
+		public void ForceNewTarget()
+		{
+			forceNewTarget_ = true;
 		}
 
 		public bool Update(float s)
@@ -266,9 +278,11 @@ namespace Cue
 
 			bool needsTarget = false;
 
-			if (delay_.Finished || !HasTarget)
+			if (delay_.Finished || !HasTarget || forceNewTarget_)
 			{
 				needsTarget = true;
+				forceNewTarget_ = false;
+				updateGeoElapsed_ = UpdateGeoInterval;
 
 				// don't allow avoidance after a new target is picked naturally
 				// so the gaze doesn't change immediately
@@ -497,11 +511,16 @@ namespace Cue
 		private void UpdateAvoidBoxes()
 		{
 			int count = 0;
+			var everything = Cue.Instance.Everything;
 
 			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
 			{
-				if (person_.Gaze.Targets.IsReluctant(Cue.Instance.Everything[i]) ||
-					person_.Gaze.Targets.ShouldAvoid(Cue.Instance.Everything[i]))
+				var o = everything[i];
+				if (o == person_)
+					continue;
+
+				if (person_.Gaze.Targets.IsReluctant(o) ||
+					person_.Gaze.Targets.ShouldAvoid(o))
 				{
 					++count;
 				}
@@ -511,9 +530,11 @@ namespace Cue
 				objectBoxes_ = new ObjectBox[count];
 
 			int boxIndex = 0;
-			for (int i = 0; i < Cue.Instance.Everything.Count; ++i)
+			for (int i = 0; i < everything.Count; ++i)
 			{
-				var o = Cue.Instance.Everything[i];
+				var o = everything[i];
+				if (o == person_)
+					continue;
 
 				bool reluctant = person_.Gaze.Targets.IsReluctant(o);
 				bool avoid = person_.Gaze.Targets.ShouldAvoid(o);

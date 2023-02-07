@@ -13,4 +13,12 @@
 
 	"finishMoodAngry": 1,
 	"finishMoodSurprised": 1,
+
+	"voice":
+	{
+		"normalState":
+		{
+			"breathingRange": 0.35
+		}
+	}
 }

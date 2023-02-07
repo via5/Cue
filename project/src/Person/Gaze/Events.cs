@@ -6,6 +6,8 @@ namespace Cue
 	{
 		int Check(int flags);
 		bool HasEmergency(float s);
+		void ResetBeforeCheck();
+		string DebugLine();
 	}
 
 
@@ -21,6 +23,7 @@ namespace Cue
 		protected Gaze g_;
 		protected GazeTargets targets_;
 		private InstrumentationType inst_;
+		private string lastResult_ = "";
 
 		protected BasicGazeEvent(Person p, InstrumentationType inst)
 		{
@@ -49,6 +52,11 @@ namespace Cue
 			}.ToArray();
 		}
 
+		public void ResetBeforeCheck()
+		{
+			lastResult_ = "not checked";
+		}
+
 		public int Check(int flags)
 		{
 			int r;
@@ -67,14 +75,34 @@ namespace Cue
 			return Continue;
 		}
 
+		protected void SetLastResult(string s)
+		{
+			lastResult_ = s;
+		}
+
 		public bool HasEmergency(float s)
 		{
-			return DoHasEmergency(s);
+			bool b = DoHasEmergency(s);
+
+			if (b)
+			{
+				if (lastResult_ != "")
+					lastResult_ += " ";
+
+				lastResult_ += " (emergency)";
+			}
+
+			return b;
 		}
 
 		protected virtual bool DoHasEmergency(float s)
 		{
 			return false;
+		}
+
+		public string DebugLine()
+		{
+			return $"{this}: {lastResult_}";
 		}
 
 		public override abstract string ToString();

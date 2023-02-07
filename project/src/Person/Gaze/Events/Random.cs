@@ -14,12 +14,14 @@ namespace Cue
 			if (Bits.IsSet(flags, NoRandom))
 			{
 				targets_.SetRandomWeightIfZero(0, "random, but busy");
+				SetLastResult("no, busy");
 			}
 			else
 			{
 				if (person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze))
 				{
 					targets_.SetRandomWeightIfZero(0, "random, but tired");
+					SetLastResult("yes, but tired");
 				}
 				else
 				{
@@ -29,17 +31,23 @@ namespace Cue
 						{
 							targets_.SetRandomWeightIfZero(
 								ps.Get(PS.IdleEmptyRandomWeight), "random, scene idle and empty");
+
+							SetLastResult("yes, idle and empty");
 						}
 						else
 						{
 							targets_.SetRandomWeightIfZero(
 								ps.Get(PS.IdleNaturalRandomWeight), "random, scene idle");
+
+							SetLastResult("yes, idle");
 						}
 					}
 					else
 					{
 						targets_.SetRandomWeightIfZero(
 							ps.Get(PS.NaturalRandomWeight), "random");
+
+						SetLastResult("yes");
 					}
 				}
 			}

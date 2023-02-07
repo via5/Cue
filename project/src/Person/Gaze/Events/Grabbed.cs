@@ -26,6 +26,12 @@ namespace Cue
 				// don't disable gazer, mg won't affect the head while it's
 				// being grabbed, and it snaps the head back to its original
 				// position when it's re-enabled
+
+				SetLastResult("active");
+			}
+			else
+			{
+				SetLastResult("not active");
 			}
 
 			return Continue;
@@ -41,6 +47,7 @@ namespace Cue
 				{
 					active_ = true;
 					activeElapsed_ = 0;
+					SetLastResult("grabbed");
 				}
 				else if (active_)
 				{
@@ -48,6 +55,8 @@ namespace Cue
 
 					if (activeElapsed_ > ps.Get(PS.LookAtPlayerTimeAfterGrab))
 						active_ = false;
+					else
+						SetLastResult("look after grab");
 				}
 			}
 

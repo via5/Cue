@@ -12,5 +12,13 @@
 	"zappedByPlayerMouthExcitement": 0,
 
 	"finishMoodAngry": 1,
-	"finishMoodSurprised": 1
+	"finishMoodSurprised": 1,
+
+	"voice":
+	{
+		"normalState":
+		{
+			"breathingRange": 0.2
+		}
+	}
 }

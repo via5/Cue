@@ -58,6 +58,7 @@ namespace Cue
 				maxIntensity_ = 0;
 				time_ = 0;
 				elapsed_ = 0;
+				zone_ = SS.None;
 			}
 
 			public Person Source
@@ -352,6 +353,7 @@ namespace Cue
 			if (person_.Personality.GetBool(PS.ZappedEnabled))
 			{
 				zap_.Set(source, zone, intensity, time);
+				person_.Gaze.Picker.ForceNewTarget();
 				Log.Verbose($"zapped: {zap_.DebugLine(person_)}");
 			}
 		}

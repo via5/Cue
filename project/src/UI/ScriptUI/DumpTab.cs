@@ -105,6 +105,11 @@ namespace Cue
 			foreach (var a in person_.Gaze.Targets.GetAllInfosForDebug())
 				debug_.Add($"Infos: {a}");
 
+			debug_.Add("");
+
+			foreach (var e in person_.Gaze.Events)
+				debug_.Add(e.DebugLine());
+
 			list_.SetItems(debug_.MakeArray());
 		}
 

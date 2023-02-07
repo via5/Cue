@@ -67,7 +67,7 @@
 				forceExcitement_ = tools_.Add(new VUI.CheckBox("Ex", OnForceExcitement));
 				excitement_ = tools_.Add(new VUI.FloatTextSlider(OnExcitement));
 				playerWarning_ = tools_.Add(new VUI.Label("(disabled for player)"));
-				tools_.Add(new VUI.ToolButton("breathing", OnTest));
+				tools_.Add(new VUI.ToolButton("zap", OnTest));
 				fps_ = tools_.Add(new VUI.Label());
 				p.Add(tools_);
 			}
@@ -206,10 +206,8 @@
 		{
 			if (ignore_) return;
 
-			if (Cue.Instance.ActivePersons[0].Body.Breathing)
-				Cue.Instance.ActivePersons[0].Body.BreathingBool.SetForced(false);
-			else
-				Cue.Instance.ActivePersons[0].Body.BreathingBool.UnsetForced();
+			Cue.Instance.ActivePersons[0].Body.Zapped(
+				Cue.Instance.Player, SS.Genitals);
 		}
 
 		private void OnForceExcitement(bool b)

@@ -60,6 +60,8 @@ namespace Cue
 				}
 			}
 
+			SetLastResult("unknown");
+
 			return Continue;
 		}
 

@@ -34,6 +34,8 @@ namespace Cue
 				r |= CheckPerson(t);
 			}
 
+			SetLastResult("unknown");
+
 			return r;
 		}
 

@@ -14,7 +14,14 @@
 			float w = ps.Get(PS.LookDownWeight);
 
 			if (w > 0)
-				targets_.SetDownWeight(w, "down");
+			{
+				targets_.SetDownWeightIfNotSet(w, "down");
+				SetLastResult("normal");
+			}
+			else
+			{
+				SetLastResult("weight is 0");
+			}
 
 			return Continue;
 		}

@@ -2,6 +2,8 @@ namespace Cue
 {
 	class GazeKissing : BasicGazeEvent
 	{
+		private KissEvent event_ = null;
+
 		public GazeKissing(Person p)
 			: base(p, I.GazeKissing)
 		{
@@ -9,8 +11,11 @@ namespace Cue
 
 		protected override int DoCheck(int flags)
 		{
+			if (event_ == null)
+				event_ = person_.AI.GetEvent<KissEvent>();
+
 			var ps = person_.Personality;
-			var k = person_.AI.GetEvent<KissEvent>();
+			var k = event_;
 
 			if (k.Active)
 			{
@@ -26,11 +31,15 @@ namespace Cue
 						targets_.SetReluctant(
 							t, true, g_.AvoidWeight(t),
 							$"kissing, but avoid in ps");
+
+						SetLastResult("active, but avoid in ps");
 					}
 					else
 					{
 						targets_.SetWeight(
 							t, BP.Eyes, GazeTargets.ExclusiveWeight, "kissing");
+
+						SetLastResult("active");
 					}
 
 					// don't use NoGazer:
@@ -47,6 +56,14 @@ namespace Cue
 					//    target is picked, the gazer would stay disabled and
 					//    the head would stay still for a while
 				}
+				else
+				{
+					SetLastResult("active but no target");
+				}
+			}
+			else
+			{
+				SetLastResult("not active");
 			}
 
 			return Continue;

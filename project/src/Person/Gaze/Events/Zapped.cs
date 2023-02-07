@@ -14,6 +14,24 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
+			if (!active_)
+			{
+				float minIntensity = person_.Personality.Get(PS.ZappedGazeMinIntensity);
+
+				// find anybody zapped, including self
+				for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+				{
+					var p = Cue.Instance.ActivePersons[i];
+
+					if (p.Body.Zap.Intensity >= minIntensity && p.Body.Zap.Source != person_)
+					{
+						active_ = true;
+						gazeDuration_ = -1;
+						break;
+					}
+				}
+			}
+
 			if (active_)
 			{
 				Person other = null;
@@ -50,44 +68,30 @@ namespace Cue
 				{
 					DoSelfZapped();
 					active_ = true;
+					SetLastResult("self zapped");
 				}
 				else if (other != null)
 				{
 					DoOtherZapped(other);
 					active_ = true;
+					SetLastResult("other zapped");
 				}
 				else
 				{
 					active_ = false;
 					gazeDuration_ = -1;
+					SetLastResult("not active");
 				}
 
 				if (active_)
 					person_.Gaze.Gazer.Duration = gazeDuration_;
 			}
-
-			return Continue;
-		}
-
-		protected override bool DoHasEmergency(float s)
-		{
-			active_ = false;
-			float minIntensity = person_.Personality.Get(PS.ZappedGazeMinIntensity);
-
-			// find anybody zapped, including self
-			for (int i = 0; i < Cue.Instance.ActivePersons.Length; ++i)
+			else
 			{
-				var p = Cue.Instance.ActivePersons[i];
-
-				if (p.Body.Zap.Intensity >= minIntensity && p.Body.Zap.Source != person_)
-				{
-					active_ = true;
-					gazeDuration_ = -1;
-					break;
-				}
+				SetLastResult("not active");
 			}
 
-			return active_;
+			return Continue;
 		}
 
 		private void DoSelfZapped()
@@ -96,13 +100,34 @@ namespace Cue
 			var z = person_.Body.Zap;
 			bool sourceIsPlayer = (z.Source?.IsPlayer ?? false);
 
-			float w;
+			// look at person zapping
+			if (z.Source != person_)
+			{
+				float w = GetEyesWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
+				if (w >= 0)
+				{
+					targets_.SetWeight(
+						z.Source, BP.Eyes, w, $"self zapped by {z.Source}");
+				}
+
+				float lookAwayMaxEx;
+				if (z.Source.IsPlayer)
+					lookAwayMaxEx = ps.Get(PS.ZappedByPlayerLookAwayMaxExcitement);
+				else
+					lookAwayMaxEx = ps.Get(PS.ZappedByOtherLookAwayMaxExcitement);
+
+				if (person_.Mood.Get(MoodType.Excited) < lookAwayMaxEx)
+				{
+					targets_.SetAvoid(z.Source, true, $"look away from zapped source {z.Source}");
+					targets_.SetAvoid(person_, true, $"look away from self");
+				}
+			}
 
 			// look at body part being zapped
 			var targetPart = person_.Body.Zone(z.Zone).MainBodyPart;
 			if (targetPart != null)
 			{
-				w = GetTargetWeight(sourceIsPlayer, z.Zone) * z.Intensity;
+				float w = GetTargetWeight(sourceIsPlayer, z.Zone) * z.Intensity;
 				if (w >= 0)
 				{
 					targets_.SetWeight(
@@ -112,18 +137,25 @@ namespace Cue
 			}
 
 			// look up
-			if (sourceIsPlayer)
+			if (person_.Mood.Get(MoodType.Excited) >= ps.Get(PS.LookAboveMinExcitement))
 			{
-				targets_.SetAboveWeight(
-					ps.Get(PS.ZappedByPlayerLookUpWeight) * z.Intensity,
-					$"self zapped by {z.Source}");
+				if (sourceIsPlayer)
+				{
+					targets_.SetAboveWeight(
+						ps.Get(PS.ZappedByPlayerLookUpWeight) * z.Intensity,
+						$"self zapped by {z.Source}");
+				}
+				else
+				{
+					targets_.SetAboveWeight(
+						ps.Get(PS.ZappedByOtherLookUpWeight) * z.Intensity,
+						$"self zapped by {z.Source}");
+				}
 			}
-			else
-			{
-				targets_.SetAboveWeight(
-					ps.Get(PS.ZappedByOtherLookUpWeight) * z.Intensity,
-					$"self zapped by {z.Source}");
-			}
+
+			// disable look down, it feels like looking down at body parts
+			// and some personalities want to avoid that
+			targets_.SetDownWeight(0, "self zapped, disabled");
 
 			if (sourceIsPlayer)
 				SetGazeDuration(PS.ZappedByPlayerGazeDuration, z.Intensity);

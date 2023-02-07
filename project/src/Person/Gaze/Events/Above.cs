@@ -16,6 +16,8 @@ namespace Cue
 				targets_.SetAboveWeight(
 					person_.Mood.GazeEnergy * ps.Get(PS.LookAboveMaxWeightOrgasm),
 					"orgasm state");
+
+				SetLastResult("orgasm state");
 			}
 			else
 			{
@@ -28,14 +30,26 @@ namespace Cue
 							targets_.SetAboveWeight(
 								person_.Mood.GazeEnergy * ps.Get(PS.LookAboveMaxWeight),
 								"normal state");
+
+							SetLastResult("normal state");
 						}
 						else
 						{
 							targets_.SetAboveWeight(
 								ps.Get(PS.LookAboveMaxWeight),
 								"normal state (ignore energy)");
+
+							SetLastResult("normal state (ignore energy)");
 						}
 					}
+					else
+					{
+						SetLastResult("physical rate too low");
+					}
+				}
+				else
+				{
+					SetLastResult("excitement too low");
 				}
 			}
 

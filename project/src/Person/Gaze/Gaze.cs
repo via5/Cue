@@ -107,6 +107,11 @@ namespace Cue
 			return null;
 		}
 
+		public IGazeEvent[] Events
+		{
+			get { return events_; }
+		}
+
 		public bool IsEmergency
 		{
 			get { return lastEmergency_ != -1; }
@@ -335,6 +340,9 @@ namespace Cue
 
 			gazerEnabled_ = true;
 			int flags = 0;
+
+			for (int i = 0; i < events_.Length; ++i)
+				events_[i].ResetBeforeCheck();
 
 			if (lastEmergency_ >= 0)
 			{
