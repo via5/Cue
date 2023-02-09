@@ -706,7 +706,7 @@ namespace VUI
 	//
 	class OverlayRootSupport : BasicRootSupport
 	{
-		private const float MonitorOffset = 240;
+		private const float MonitorOffset = 280;
 
 		private float topOffset_;
 		private Vector2 size_;
