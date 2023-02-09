@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace VUI
 {
@@ -29,6 +28,8 @@ namespace VUI
 			dragging_ = true;
 			dragStart_ = e.Pointer;
 			initialBounds_ = AbsoluteClientBounds;
+
+			SetCapture();
 		}
 
 		public void OnDrag(DragEvent e)
@@ -62,6 +63,7 @@ namespace VUI
 		public void OnDragEnd(DragEvent e)
 		{
 			dragging_ = false;
+			ReleaseCapture();
 		}
 	}
 
@@ -198,11 +200,16 @@ namespace VUI
 
 		public class Item
 		{
+			public delegate void CheckedHandler(bool b);
+			public event CheckedHandler CheckedChanged;
+
 			private Item parent_ = null;
 			private string text_;
 			private List<Item> children_ = null;
 			private bool expanded_ = false;
 			private bool visible_ = true;
+			private bool checkable_ = false;
+			private bool checked_ = false;
 
 			public Item(string text = "")
 			{
@@ -228,8 +235,70 @@ namespace VUI
 
 			public string Text
 			{
-				get { return text_; }
-				set { text_ = value ?? ""; }
+				get
+				{
+					return text_;
+				}
+
+				set
+				{
+					string s;
+
+					if (string.IsNullOrEmpty(value))
+						s = "";
+					else
+						s = value;
+
+					if (text_ != s)
+					{
+						text_ = s;
+						NodesChanged();
+					}
+				}
+			}
+
+			public bool Checkable
+			{
+				get
+				{
+					return checkable_;
+				}
+
+				set
+				{
+					if (checkable_ != value)
+					{
+						checkable_ = value;
+						NodesChanged();
+					}
+				}
+			}
+
+			public bool Checked
+			{
+				get
+				{
+					return checked_;
+				}
+
+				set
+				{
+					if (checked_ != value)
+					{
+						SetCheckedInternal(value);
+
+						if (checkable_)
+							NodesChanged();
+					}
+				}
+			}
+
+			public void SetCheckedInternal(bool b)
+			{
+				checked_ = b;
+
+				if (checkable_)
+					CheckedChanged?.Invoke(checked_);
 			}
 
 			public bool Visible
@@ -406,6 +475,11 @@ namespace VUI
 				}
 			}
 
+			public void FireCheckedChanged(bool b)
+			{
+				CheckedChanged?.Invoke(b);
+			}
+
 			public string DebugString()
 			{
 				string s = "";
@@ -445,8 +519,10 @@ namespace VUI
 			private Item item_ = null;
 			private Panel panel_ = null;
 			private ToolButton toggle_ = null;
+			private CheckBox checkbox_ = null;
 			private Label label_ = null;
 			private bool hovered_ = false;
+			private bool ignore_ = false;
 
 			public Node(TreeView t)
 			{
@@ -470,6 +546,19 @@ namespace VUI
 			}
 
 			public void Set(Item i, Rectangle r, int indent)
+			{
+				try
+				{
+					ignore_ = true;
+					DoSet(i, r, indent);
+				}
+				finally
+				{
+					ignore_ = false;
+				}
+			}
+
+			private void DoSet(Item i, Rectangle r, int indent)
 			{
 				item_ = i;
 
@@ -501,6 +590,14 @@ namespace VUI
 					}
 
 
+					if (tree_.CheckBoxes)
+					{
+						if (checkbox_ == null && item_.Checkable)
+							CreateCheckbox(r);
+
+						UpdateCheckbox(r);
+					}
+
 					if (label_ == null)
 						CreateLabel(r);
 
@@ -521,12 +618,6 @@ namespace VUI
 				}
 			}
 
-			private void UpdatePanel(Rectangle r)
-			{
-				panel_.SetBounds(r);
-				panel_.Render = true;
-			}
-
 			private void CreateToggle(Rectangle r)
 			{
 				if (toggle_ == null)
@@ -537,20 +628,14 @@ namespace VUI
 				}
 			}
 
-			private void UpdateToggle(Rectangle r)
+			private void CreateCheckbox(Rectangle r)
 			{
-				if (item_ == null)
-					return;
-
-				if (item_.Expanded)
-					toggle_.Text = "-";
-				else
-					toggle_.Text = "+";
-
-				var tr = r;
-				tr.Width = Style.Metrics.TreeToggleWidth;
-				toggle_.SetBounds(tr);
-				toggle_.Render = true;
+				if (checkbox_ == null)
+				{
+					checkbox_ = new CheckBox("", OnChecked);
+					panel_.Add(checkbox_);
+					checkbox_.Create();
+				}
 			}
 
 			private void CreateLabel(Rectangle r)
@@ -565,13 +650,73 @@ namespace VUI
 				}
 			}
 
+			private void UpdatePanel(Rectangle r)
+			{
+				panel_.SetBounds(r);
+				panel_.Render = true;
+			}
+
+			private void UpdateToggle(Rectangle r)
+			{
+				if (item_ == null)
+					return;
+
+				if (item_.Parent == tree_.RootItem && !tree_.RootToggles)
+				{
+					toggle_.Render = false;
+				}
+				else
+				{
+					if (item_.Expanded)
+						toggle_.Text = "-";
+					else
+						toggle_.Text = "+";
+
+					var tr = r;
+					tr.Width = Style.Metrics.TreeToggleWidth;
+					toggle_.SetBounds(tr);
+					toggle_.Render = true;
+				}
+			}
+
+			private void UpdateCheckbox(Rectangle r)
+			{
+				if (item_ == null)
+					return;
+
+				if (item_.Checkable)
+				{
+					var tr = r;
+
+					if (item_.Parent != tree_.RootItem || tree_.RootToggles)
+						tr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
+
+					tr.Width = Style.Metrics.TreeToggleWidth;
+
+					checkbox_.SetBounds(tr);
+					checkbox_.Checked = item_.Checked;
+					checkbox_.Render = true;
+				}
+				else
+				{
+					if (checkbox_ != null)
+						checkbox_.Render = false;
+				}
+			}
+
 			private void UpdateLabel(Rectangle r)
 			{
 				if (item_ == null)
 					return;
 
 				var lr = r;
-				lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
+
+				if (item_.Parent != tree_.RootItem || tree_.RootToggles)
+					lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
+
+				if (tree_.CheckBoxes && item_.Checkable)
+					lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeCheckboxSpacing;
+
 				label_.Text = item_.Text;
 				label_.SetBounds(lr);
 			}
@@ -581,9 +726,9 @@ namespace VUI
 				if (panel_ == null)
 					return;
 
-				if (hovered_)
+				if (item_ != null && hovered_)
 					panel_.BackgroundColor = Style.Theme.HighlightBackgroundColor;
-				else if (item_?.Selected ?? false)
+				else if (item_ != null && item_.Selected)
 					panel_.BackgroundColor = Style.Theme.SelectionBackgroundColor;
 				else
 					panel_.BackgroundColor = new Color(0, 0, 0, 0);
@@ -593,6 +738,14 @@ namespace VUI
 			{
 				if (item_ != null)
 					item_.Toggle();
+			}
+
+			private void OnChecked(bool b)
+			{
+				if (ignore_) return;
+
+				if (item_ != null)
+					item_.SetCheckedInternal(b);
 			}
 		}
 
@@ -614,6 +767,8 @@ namespace VUI
 		private readonly InternalRootItem root_;
 		private List<Node> nodes_ = new List<Node>();
 		private ScrollBar vsb_ = new ScrollBar();
+		private bool checkboxes_ = false;
+		private bool rootToggles_ = true;
 		private int topItemIndex_ = 0;
 		private int itemCount_ = 0;
 		private int visibleCount_ = 0;
@@ -622,6 +777,7 @@ namespace VUI
 		private Item selected_ = null;
 		private Timer staleTimer_ = null;
 		private string filterString_ = "";
+		private string filterStringLc_ = "";
 		private Func<Item, bool> filterFunc_ = null;
 
 		public TreeView()
@@ -693,6 +849,18 @@ namespace VUI
 			get { return selected_; }
 		}
 
+		public bool CheckBoxes
+		{
+			get { return checkboxes_; }
+			set { checkboxes_ = value; }
+		}
+
+		public bool RootToggles
+		{
+			get { return rootToggles_; }
+			set { rootToggles_ = value; }
+		}
+
 		public string Filter
 		{
 			get
@@ -705,6 +873,7 @@ namespace VUI
 				if (filterString_ != value)
 				{
 					filterString_ = value ?? "";
+					filterStringLc_ = filterString_.ToLower();
 					VisibilityChangedInternal(null);
 				}
 			}
@@ -769,12 +938,25 @@ namespace VUI
 			}
 		}
 
+		private bool BuiltinFilterFunc(Item i)
+		{
+			Regex re = null;
+
+			if (Utilities.IsRegex(filterString_))
+				re = Utilities.CreateRegex(filterString_);
+
+			if (re == null)
+				return i.Text.ToLower().Contains(filterStringLc_);
+			else
+				return re.IsMatch(i.Text);
+		}
+
 		private Func<Item, bool> GetFilterFunc()
 		{
 			Func<Item, bool> f = null;
 
 			if (filterFunc_ == null && filterString_ != "")
-				f = (i) => i.Text.ToLower().Contains(filterString_.ToLower());
+				f = BuiltinFilterFunc;
 			else
 				f = filterFunc_;
 
@@ -959,7 +1141,11 @@ namespace VUI
 		private void OnHover(PointerEvent e)
 		{
 			if (IsVisibleOnScreen())
-				SetHovered(NodeAt(e.Pointer));
+			{
+				var w = GetRoot().WidgetAt(e.Pointer);
+				if (w.HasParent(this))
+					SetHovered(NodeAt(e.Pointer));
+			}
 
 			e.Bubble = false;
 		}

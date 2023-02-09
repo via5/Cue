@@ -28,6 +28,8 @@ namespace VUI
 				Changed += changed;
 
 			Events.PointerDown += OnPointerDown;
+			Events.PointerUp += OnPointerUp;
+			Events.PointerClick += OnPointerClick;
 		}
 
 		public bool Checked
@@ -107,6 +109,16 @@ namespace VUI
 		}
 
 		private void OnPointerDown(PointerEvent e)
+		{
+			e.Bubble = false;
+		}
+
+		private void OnPointerUp(PointerEvent e)
+		{
+			e.Bubble = false;
+		}
+
+		private void OnPointerClick(PointerEvent e)
 		{
 			e.Bubble = false;
 		}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -168,6 +169,29 @@ namespace VUI
 				return val;
 		}
 
+		public static bool IsRegex(string s)
+		{
+			return (s.Length >= 2 && s[0] == '/' && s[s.Length - 1] == '/');
+		}
+
+		public static Regex CreateRegex(string s)
+		{
+			if (s.Length >= 2 && s[0] == '/' && s[s.Length - 1] == '/')
+			{
+				try
+				{
+					return new Regex(
+						s.Substring(1, s.Length - 2), RegexOptions.IgnoreCase);
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+			}
+
+			return null;
+		}
+
 		public static void DebugTimeThis(string what, Action a)
 		{
 			var start = Time.realtimeSinceStartup;
@@ -268,6 +292,41 @@ namespace VUI
 			SetRectTransform(o.GetComponent<RectTransform>(), r);
 		}
 
+		public static Rectangle RectTransformBounds(Root root, RectTransform rt)
+		{
+			var r = RectTransformToScreenSpace(rt, Camera.main);
+			return root.ToLocal(Rectangle.FromRect(r));
+		}
+
+		private static Rect RectTransformToScreenSpace(RectTransform transform, Camera cam, bool cutDecimals = false)
+		{
+			var worldCorners = new Vector3[4];
+			var screenCorners = new Vector3[4];
+
+			transform.GetWorldCorners(worldCorners);
+
+			for (int i = 0; i < 4; i++)
+			{
+				screenCorners[i] = cam.WorldToScreenPoint(worldCorners[i]);
+				if (cutDecimals)
+				{
+					screenCorners[i].x = (int)screenCorners[i].x;
+					screenCorners[i].y = (int)screenCorners[i].y;
+				}
+			}
+
+			var r = new Rect(screenCorners[0].x,
+							screenCorners[0].y,
+							screenCorners[2].x - screenCorners[0].x,
+							screenCorners[2].y - screenCorners[0].y);
+
+			var temp = r.yMin;
+			r.yMin = r.yMax;
+			r.yMax = temp;
+
+			return r;
+		}
+
 		public static GameObject FindChildRecursive(Component c, string name)
 		{
 			return FindChildRecursive(c.gameObject, name);
@@ -324,8 +383,8 @@ namespace VUI
 
 				string s = new string(' ', indent * 2) + c.ToString();
 
-				if (c is Image)
-					s += $" {(c as Image).color}";
+				if (c is UnityEngine.UI.Image)
+					s += $" {(c as UnityEngine.UI.Image).color}";
 				else if (c is Text)
 					s += $" '{(c as Text).text}'";
 
@@ -545,25 +604,35 @@ namespace VUI
 
 		public static Rectangle Zero
 		{
-			get { return FromPoints(0, 0, 0, 0); }
+			get { return new Rectangle(0, 0, 0, 0); }
 		}
 
 		public Rectangle(Rectangle r)
-			: this(r.Left, r.Top, r.Size)
+			: this(r.Left, r.Top, r.Right, r.Bottom)
 		{
 		}
 
 		public Rectangle(Point p, Size s)
-			: this(p.X, p.Y, s)
+			: this(p.X, p.Y, p.X + s.Width, p.Y + s.Height)
+		{
+		}
+
+		public Rectangle(Point topLeft, Point bottomRight)
+			: this(topLeft.X, topLeft.Y, bottomRight.X, bottomRight.Y)
 		{
 		}
 
 		public Rectangle(float x, float y, Size s)
+			: this(x, y, x + s.Width, y + s.Height)
 		{
-			Left = x;
-			Top = y;
-			Right = Left + s.Width;
-			Bottom = Top + s.Height;
+		}
+
+		private Rectangle(float left, float top, float right, float bottom)
+		{
+			Left = left;
+			Top = top;
+			Right = right;
+			Bottom = bottom;
 		}
 
 		static public Rectangle FromSize(float x, float y, float w, float h)
@@ -686,6 +755,11 @@ namespace VUI
 			return
 				p.X >= Left && p.X <= Right &&
 				p.Y >= Top && p.Y <= Bottom;
+		}
+
+		public static Rectangle FromRect(UnityEngine.Rect r)
+		{
+			return FromPoints(r.xMin, r.yMin, r.xMax, r.yMax);
 		}
 
 		public UnityEngine.Rect ToRect()

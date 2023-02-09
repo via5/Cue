@@ -172,12 +172,18 @@ namespace VUI
 				text.alignment = TextAnchor.MiddleLeft;
 
 			Style.Setup(this);
+
+			foreach (var bg in Popup.popup.popupPanel.GetComponentsInChildren<UnityEngine.UI.Image>())
+				bg.color = Style.Theme.BackgroundColor;
 		}
 
 		protected override void DoPolish()
 		{
 			base.DoPolish();
 			Style.Polish(this);
+
+			foreach (var bg in Popup.popup.popupPanel.GetComponentsInChildren<UnityEngine.UI.Image>())
+				bg.color = Style.Theme.BackgroundColor;
 		}
 
 		public override void UpdateBounds()
@@ -195,7 +201,7 @@ namespace VUI
 		protected virtual void OnOpen()
 		{
 			GetRoot().SetFocus(this);
-			GetRoot().SetOpenedPopup(Popup.popup);
+			GetRoot().SetOpenedPopup(this, Popup.popup);
 			Utilities.BringToTop(Popup.popup.popupPanel);
 
 			UpdateFilterBounds();
@@ -300,6 +306,7 @@ namespace VUI
 			IndexCallback selectionIndexChanged = null)
 		{
 			buttons_ = new Panel(new VerticalFlow());
+
 			up_ = new CustomButton(Utilities.UpArrow, OnUp);
 			up_.FontSize = Style.Theme.ComboBoxNavTextSize;
 			down_ = new CustomButton(Utilities.DownArrow, OnDown);

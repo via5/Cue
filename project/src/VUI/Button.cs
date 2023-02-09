@@ -166,7 +166,7 @@ namespace VUI
 
 			rt.offsetMax = new Vector2(
 				rt.offsetMax.x + 2 + Padding.Right,
-				rt.offsetMax.y + Padding.Top);
+				rt.offsetMax.y + 2 +  Padding.Top);
 
 			// add padding around the text instead
 			rt = button_.buttonText.GetComponent<RectTransform>();

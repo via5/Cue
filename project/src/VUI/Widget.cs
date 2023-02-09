@@ -223,16 +223,16 @@ namespace VUI
 			}
 		}
 
-		public virtual Widget WidgetAt(Point p)
+		public Widget WidgetAtInternal(Point p)
 		{
 			if (!IsVisibleOnScreen())
 				return null;
 
-			if (AbsoluteClientBounds.Contains(p))
+			if (BoundsContainPoint(p))
 			{
 				for (int i = 0; i < children_.Count; ++i)
 				{
-					var w = children_[i].WidgetAt(p);
+					var w = children_[i].WidgetAtInternal(p);
 					if (w != null)
 						return w;
 				}
@@ -242,6 +242,11 @@ namespace VUI
 			}
 
 			return null;
+		}
+
+		protected virtual bool BoundsContainPoint(Point p)
+		{
+			return AbsoluteClientBounds.Contains(p);
 		}
 
 		public bool HasParent(Widget w)
@@ -300,7 +305,7 @@ namespace VUI
 			if (mainObject_ == null)
 				return render_ && visible_;
 			else
-				return mainObject_.activeInHierarchy;
+				return render_ && mainObject_.activeInHierarchy;
 		}
 
 		public bool Enabled
@@ -428,10 +433,13 @@ namespace VUI
 
 			set
 			{
-				borderColor_ = value;
+				if (borderColor_ != value)
+				{
+					borderColor_ = value;
 
-				if (borderGraphics_ != null)
-					borderGraphics_.Color = value;
+					if (borderGraphics_ != null)
+						borderGraphics_.Color = value;
+				}
 			}
 		}
 
@@ -503,6 +511,16 @@ namespace VUI
 		{
 			bounds_ = r;
 			fixedBounds_ = isFixed;
+		}
+
+		public void SetCapture()
+		{
+			GetRoot()?.SetCapture(this);
+		}
+
+		public void ReleaseCapture()
+		{
+			GetRoot()?.ReleaseCapture(this);
 		}
 
 		public List<Widget> Children
@@ -956,51 +974,76 @@ namespace VUI
 
 		public void OnPointerEnterInternal(PointerEventData d)
 		{
-			GetRoot()?.WidgetEntered(this);
-			events_.FirePointerEnter(this, d);
+			if (IsVisibleOnScreen())
+			{
+				GetRoot()?.WidgetEntered(this);
+				events_.FirePointerEnter(this, d);
+			}
 		}
 
 		public void OnPointerExitInternal(PointerEventData d)
 		{
-			GetRoot()?.WidgetExited(this);
-			events_.FirePointerExit(this, d);
+			if (IsVisibleOnScreen())
+			{
+				GetRoot()?.WidgetExited(this);
+				events_.FirePointerExit(this, d);
+			}
 		}
 
 		public virtual void OnPointerDownInternal(PointerEventData d, bool setFocus=true)
 		{
-			if (setFocus)
-			{
-				GetRoot()?.PointerDown(this);
+			bool bubble = true;
 
-				if (WantsFocus)
+			if (IsVisibleOnScreen())
+			{
+				if (setFocus)
 				{
-					GetRoot().SetFocus(this);
-					setFocus = false;
+					GetRoot()?.PointerDown(this);
+
+					if (WantsFocus)
+					{
+						GetRoot().SetFocus(this);
+						setFocus = false;
+					}
 				}
+
+				bubble = events_.FirePointerDown(this, d);
 			}
 
-			bool bubble = events_.FirePointerDown(this, d);
+
 			if (bubble && parent_ != null)
 				parent_.OnPointerDownInternal(d, setFocus);
 		}
 
 		public void OnPointerUpInternal(PointerEventData d)
 		{
-			bool bubble = events_.FirePointerUp(this, d);
+			bool bubble = true;
+
+			if (IsVisibleOnScreen())
+				bubble = events_.FirePointerUp(this, d);
+
 			if (bubble && parent_ != null)
 				parent_.OnPointerUpInternal(d);
 		}
 
 		public void OnPointerClickInternal(PointerEventData d)
 		{
-			bool bubble = events_.FirePointerClick(this, d);
+			bool bubble = true;
+
+			if (IsVisibleOnScreen())
+				bubble = events_.FirePointerClick(this, d);
+
 			if (bubble && parent_ != null)
 				parent_.OnPointerClickInternal(d);
 		}
 
 		public void OnPointerMoveInternal()
 		{
-			bool bubble = events_.FirePointerMove(this, null);
+			bool bubble = true;
+
+			if (IsVisibleOnScreen())
+				bubble = events_.FirePointerMove(this, null);
+
 			if (bubble && parent_ != null)
 				parent_.OnPointerMoveInternal();
 		}
@@ -1022,7 +1065,11 @@ namespace VUI
 
 		public void OnWheelInternal(PointerEventData d)
 		{
-			bool bubble = events_.FireWheel(this, d);
+			bool bubble = true;
+
+			if (IsVisibleOnScreen())
+				bubble = events_.FireWheel(this, d);
+
 			if (bubble && parent_ != null)
 				parent_.OnWheelInternal(d);
 		}

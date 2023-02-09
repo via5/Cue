@@ -34,7 +34,7 @@ namespace VUI
 	{
 		public override string TypeName { get { return "Overlay"; } }
 
-		private Image graphics_ = null;
+		private UnityEngine.UI.Image graphics_ = null;
 
 		public Overlay(Rectangle b)
 		{
@@ -45,7 +45,7 @@ namespace VUI
 		{
 			base.DoCreate();
 
-			graphics_ = MainObject.AddComponent<Image>();
+			graphics_ = MainObject.AddComponent<UnityEngine.UI.Image>();
 			graphics_.color = new Color(0, 0, 0, 0.7f);
 			graphics_.raycastTarget = true;
 
@@ -151,8 +151,10 @@ namespace VUI
 		private bool visible_ = true;
 		private GameObject rootObject_ = null;
 
+		private Widget openedPopupWidget_ = null;
 		private UIPopup openedPopup_ = null;
 		private Widget focused_ = null;
+		private Widget captured_ = null;
 		private Point lastMouse_ = new Point(-10000, -10000);
 		private List<Widget> track_ = new List<Widget>();
 
@@ -214,6 +216,7 @@ namespace VUI
 			tooltips_ = new TooltipManager(this);
 
 			content_.Clickthrough = false;
+			content_.BackgroundColor = VUI.Style.Theme.BackgroundColor;
 
 			AttachTo(support);
 		}
@@ -252,8 +255,9 @@ namespace VUI
 			get { return rootObject_.transform; }
 		}
 
-		public void SetOpenedPopup(UIPopup p)
+		public void SetOpenedPopup(Widget w, UIPopup p)
 		{
+			openedPopupWidget_ = w;
 			openedPopup_ = p;
 		}
 
@@ -279,10 +283,25 @@ namespace VUI
 				if (openedPopup_.visible)
 					openedPopup_.Toggle();
 
-				openedPopup_ = null;
+				SetOpenedPopup(null, null);
 			}
 
 			FocusChanged?.Invoke(oldFocus, focused_);
+		}
+
+		public void SetCapture(Widget w)
+		{
+			if (captured_ == null)
+				captured_ = w;
+		}
+
+		public void ReleaseCapture(Widget w)
+		{
+			if (captured_ == w)
+			{
+				captured_ = null;
+				UpdateTracking(true);
+			}
 		}
 
 		public void AttachTo(IRootSupport support)
@@ -351,7 +370,7 @@ namespace VUI
 			tooltips_?.Destroy();
 			support_?.Destroy();
 
-			openedPopup_ = null;
+			SetOpenedPopup(null, null);
 			focused_ = null;
 		}
 
@@ -425,25 +444,33 @@ namespace VUI
 					content_.Update(forceLayout);
 					floating_.Update(forceLayout);
 
-					var mp = MousePosition;
-
-					if (track_.Count > 0 && mp != lastMouse_)
-					{
-						for (int i = 0; i < track_.Count; ++i)
-						{
-							var r = track_[i].AbsoluteClientBounds;
-							if (r.Contains(mp))
-								track_[i].OnPointerMoveInternal();
-						}
-					}
-
-					lastMouse_ = mp;
+					UpdateTracking();
 				}
 			}
 			catch (Exception e)
 			{
 				Glue.LogErrorST(e.ToString());
 			}
+		}
+
+		private void UpdateTracking(bool force=false)
+		{
+			var mp = MousePosition;
+
+			if (track_.Count > 0 && (mp != lastMouse_ || force))
+			{
+				for (int i = 0; i < track_.Count; ++i)
+				{
+					if (captured_ == null || captured_ == track_[i])
+					{
+						var r = track_[i].AbsoluteClientBounds;
+						if (r.Contains(mp))
+							track_[i].OnPointerMoveInternal();
+					}
+				}
+			}
+
+			lastMouse_ = mp;
 		}
 
 		public void SupportBoundsChanged()
@@ -478,6 +505,14 @@ namespace VUI
 			return support_.ToLocal(v);
 		}
 
+		public Rectangle ToLocal(Rectangle v)
+		{
+			var tl = support_.ToLocal(new Vector2(v.Left, v.Top));
+			var br = support_.ToLocal(new Vector2(v.Right, v.Bottom));
+
+			return new Rectangle(tl, br);
+		}
+
 		public Point MousePosition
 		{
 			get
@@ -488,11 +523,23 @@ namespace VUI
 
 		public Widget WidgetAt(Point p)
 		{
-			var w = FloatingPanel.WidgetAt(p);
+			if (openedPopup_ != null)
+			{
+				if (openedPopup_.visible)
+				{
+					var r = Utilities.RectTransformBounds(
+						this, openedPopup_.popupPanel);
+
+					if (r.Contains(p))
+						return openedPopupWidget_;
+				}
+			}
+
+			var w = FloatingPanel.WidgetAtInternal(p);
 			if (w != null)
 				return w;
 
-			w = ContentPanel.WidgetAt(p);
+			w = ContentPanel.WidgetAtInternal(p);
 			if (w != null)
 				return w;
 
@@ -590,7 +637,7 @@ namespace VUI
 			return size;
 		}
 
-		public static Size FitText(Font font, int fontSize, FontStyle fontStyle, string s, Size maxSize)
+		public static Size FitText(Font font, int fontSize, FontStyle fontStyle, string s, Size maxSize, bool vertOverflow=false)
 		{
 			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
@@ -618,7 +665,11 @@ namespace VUI
 			else
 			{
 				extents.y = maxSize.Height;
-				ts.verticalOverflow = VerticalWrapMode.Truncate;
+
+				if (vertOverflow)
+					ts.verticalOverflow = VerticalWrapMode.Overflow;
+				else
+					ts.verticalOverflow = VerticalWrapMode.Truncate;
 			}
 
 			ts.textAnchor = TextAnchor.UpperLeft;
@@ -647,8 +698,11 @@ namespace VUI
 			if (maxSize.Width != Widget.DontCare)
 				size.Width = Math.Min(size.Width, maxSize.Width);
 
-			if (maxSize.Height != Widget.DontCare)
-				size.Height = Math.Min(size.Height, maxSize.Height);
+			if (!vertOverflow)
+			{
+				if (maxSize.Height != Widget.DontCare)
+					size.Height = Math.Min(size.Height, maxSize.Height);
+			}
 
 			return size;
 		}

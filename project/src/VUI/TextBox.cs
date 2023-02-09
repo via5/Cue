@@ -646,7 +646,7 @@ namespace VUI
 			input_.onValueChanged.AddListener(OnValueChanged);
 			input_.lineType = CustomInputField.LineType.SingleLine;
 
-			var image = WidgetObject.AddComponent<Image>();
+			var image = WidgetObject.AddComponent<UnityEngine.UI.Image>();
 			image.raycastTarget = false;
 
 			// placeholder

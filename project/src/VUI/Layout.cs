@@ -114,6 +114,7 @@ namespace VUI
 		public const int AlignCenter = 0x10;
 		public const int AlignRight = 0x20;
 
+		public const int AlignLeftVCenter = AlignLeft | AlignVCenter;
 		public const int AlignDefault = AlignLeft | AlignTop;
 
 		private int align_;

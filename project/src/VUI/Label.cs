@@ -23,7 +23,9 @@ namespace VUI
 		private string text_;
 		private int align_;
 		private Text textObject_ = null;
-		private Text ellipsis_ = null;
+		private Transform ellipsis_ = null;
+		private Text ellipsisText_ = null;
+		private UnityEngine.UI.Image ellipsisBackground_ = null;
 		private int wrap_ = Overflow;
 		private bool autoTooltip_ = false;
 
@@ -177,10 +179,10 @@ namespace VUI
 
 		private HorizontalWrapMode GetHorizontalOverflow()
 		{
-			if (wrap_ == Wrap)
-				return HorizontalWrapMode.Wrap;
-			else
+			if (wrap_ == Overflow)
 				return HorizontalWrapMode.Overflow;
+			else
+				return HorizontalWrapMode.Wrap;
 		}
 
 		protected override void DoPolish()
@@ -196,45 +198,24 @@ namespace VUI
 			UpdateClip();
 		}
 
-		private Rectangle MakeClipRect()
-		{
-			var root = GetRoot();
-			if (root == null)
-				return Rectangle.Zero;
-
-			var rb = root.RootSupport.Bounds;
-			var ar = AbsoluteClientBounds;
-
-			return Rectangle.FromSize(
-				ar.Left - rb.Width / 2 - 2,
-				rb.Bottom - ar.Top - ar.Height + root.RootSupport.TopOffset,
-				ar.Width,
-				ar.Height);
-		}
-
 		private void UpdateClip()
 		{
 			if (textObject_ == null)
 				return;
 
 			if (!IsVisibleOnScreen())
-			{
-				ClearClip();
 				return;
-			}
 
 			switch (wrap_)
 			{
 				case Wrap:
 				case Overflow:
 				{
-					ClearClip();
 					break;
 				}
 
 				case Clip:
 				{
-					SetClip(MakeClipRect());
 					break;
 				}
 
@@ -243,20 +224,24 @@ namespace VUI
 					if (TextTooLong())
 					{
 						var ellipsisSize = TextSize("...");
-
-						var cr = MakeClipRect();
-						cr.Width -= (ellipsisSize.Width + 5);
-
-						SetClip(cr);
+						ellipsisSize.Width += 5;
 
 						if (ellipsis_ == null)
 							CreateEllipsis();
 
 						var r = Rectangle.FromSize(
-							RelativeBounds.Width - ellipsisSize.Width, 0,
-							ellipsisSize.Width, ellipsisSize.Height);
+							ClientBounds.Left + ClientBounds.Width - ellipsisSize.Width,
+							ClientBounds.Top + ClientBounds.Height - ellipsisSize.Height - 5,
+							ellipsisSize.Width,
+							ellipsisSize.Height);
 
 						ellipsis_.gameObject.SetActive(true);
+
+						if (BackgroundColor.a == 0)
+							ellipsisBackground_.color = Style.Theme.BackgroundColor;
+						else
+							ellipsisBackground_.color = BackgroundColor;
+
 						Utilities.SetRectTransform(ellipsis_, r);
 
 						if (autoTooltip_)
@@ -269,8 +254,6 @@ namespace VUI
 
 						if (ellipsis_ != null)
 							ellipsis_.gameObject.SetActive(false);
-
-						ClearClip();
 					}
 
 					break;
@@ -278,26 +261,52 @@ namespace VUI
 			}
 		}
 
-		private void ClearClip()
-		{
-			textObject_.SetClipRect(Rect.zero, false);
-		}
-
-		private void SetClip(Rectangle r)
-		{
-			textObject_.SetClipRect(r.ToRect(), true);
-		}
-
 		private void CreateEllipsis()
 		{
-			var go = new GameObject("ellipsis");
+			var go = new GameObject("ellipsisParent");
 			go.AddComponent<RectTransform>();
 			go.AddComponent<LayoutElement>();
-			ellipsis_ = go.AddComponent<Text>();
+
+			{
+				var b = new GameObject("background");
+				ellipsisBackground_ = b.AddComponent<UnityEngine.UI.Image>();
+
+				var rt = b.GetComponent<RectTransform>();
+				if (rt == null)
+					rt = b.AddComponent<RectTransform>();
+
+				rt.offsetMin = new Vector2(0, 0);
+				rt.offsetMax = new Vector2(0, 0);
+				rt.anchorMin = new Vector2(0, 0);
+				rt.anchorMax = new Vector2(1, 1);
+
+				b.transform.SetParent(go.transform, false);
+			}
+
+			{
+				var e = new GameObject("ellipsis");
+
+				var rt = e.GetComponent<RectTransform>();
+				if (rt == null)
+					rt = e.AddComponent<RectTransform>();
+
+				rt.offsetMin = new Vector2(0, 0);
+				rt.offsetMax = new Vector2(0, 0);
+				rt.anchorMin = new Vector2(0, 0);
+				rt.anchorMax = new Vector2(1, 1);
+
+				ellipsisText_ = e.AddComponent<Text>();
+				ellipsisText_.text = "...";
+				ellipsisText_.raycastTarget = false;
+				ellipsisText_.alignment = TextAnchor.MiddleCenter;
+
+				e.transform.SetParent(go.transform, false);
+			}
+
 			go.SetActive(true);
 			go.transform.SetParent(MainObject.transform, false);
-			ellipsis_.text = "...";
-			ellipsis_.raycastTarget = false;
+
+			ellipsis_ = go.transform;
 
 			Polish();
 		}
@@ -337,9 +346,8 @@ namespace VUI
 
 		private bool TextTooLong()
 		{
-			// todo: wrap mode
-			var tl = TextLength(text_);
-			return (tl > Bounds.Width);
+			var tl = Root.FitText(Font, FontSize, FontStyle, text_, ClientBounds.Size, true);
+			return (tl.Width > ClientBounds.Width) || (tl.Height > ClientBounds.Height);
 		}
 
 		public static TextAnchor ToTextAnchor(int a)
