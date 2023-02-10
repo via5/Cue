@@ -85,6 +85,12 @@ namespace VUI
 			base.Destroy();
 		}
 
+		protected override void DoSetRender(bool b)
+		{
+			if (bgObject_ != null)
+				bgObject_.gameObject.SetActive(b);
+		}
+
 		private void SetBackground()
 		{
 			if (MainObject == null)

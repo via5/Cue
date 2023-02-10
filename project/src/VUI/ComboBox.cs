@@ -172,18 +172,31 @@ namespace VUI
 				text.alignment = TextAnchor.MiddleLeft;
 
 			Style.Setup(this);
-
-			foreach (var bg in Popup.popup.popupPanel.GetComponentsInChildren<UnityEngine.UI.Image>())
-				bg.color = Style.Theme.BackgroundColor;
+			FixBackgroundColor();
 		}
 
 		protected override void DoPolish()
 		{
 			base.DoPolish();
 			Style.Polish(this);
+			FixBackgroundColor();
+		}
 
-			foreach (var bg in Popup.popup.popupPanel.GetComponentsInChildren<UnityEngine.UI.Image>())
-				bg.color = Style.Theme.BackgroundColor;
+		private void FixBackgroundColor()
+		{
+			// there's something weird with the combobox panel background color,
+			// it seems to have some transparency applied that can't be removed
+			//
+			// this applies ComboBoxBackgroundColor to the background, which is
+			// slightly lighter than the default background
+			//
+			// it's not perfect, but it's close enough
+
+			var panel = Popup.popup.popupPanel;
+			var images = panel.GetComponentsInChildren<UnityEngine.UI.Image>();
+
+			foreach (var bg in images)
+				bg.color = Style.Theme.ComboBoxBackgroundColor;
 		}
 
 		public override void UpdateBounds()

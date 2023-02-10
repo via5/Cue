@@ -231,6 +231,17 @@ namespace VUI
 			get { return new Color(0.12f, 0.12f, 0.12f); }
 		}
 
+		public Color ComboBoxBackgroundColor
+		{
+			// see ComboBox.FixBackgroundColor()
+			get { return new Color(0.146f, 0.146f, 0.146f); }
+		}
+
+		public Color OverlayBackgroundColor
+		{
+			get { return new Color(0, 0, 0, 0.8f); }
+		}
+
 		public Color ButtonBackgroundColor
 		{
 			get { return new Color(0.25f, 0.25f, 0.25f); }
@@ -542,13 +553,10 @@ namespace VUI
 		}
 
 
+		// this used to remember the background color because SetupRoot()
+		// changed it, but that's gone now, so it doesn't remember anything
 		public class RootRestore
 		{
-			public Color originalBg;
-
-			public RootRestore()
-			{
-			}
 		}
 
 
@@ -562,23 +570,7 @@ namespace VUI
 				{
 					// clamp the whole script ui
 					ClampScrollView(scrollView);
-
-					// main background color
-					ForComponent<UnityEngine.UI.Image>(scrollView, (bg) =>
-					{
-						rr.originalBg = bg.color;
-						bg.color = theme_.BackgroundColor;
-					});
 				});
-			}
-			else
-			{
-				var bg = t.GetComponent<UnityEngine.UI.Image>();
-				if (bg != null)
-				{
-					rr.originalBg = bg.color;
-					bg.color = theme_.BackgroundColor;
-				}
 			}
 
 			return rr;
@@ -605,21 +597,7 @@ namespace VUI
 				{
 					// unclamp the whole script ui
 					UnclampScrollView(scrollView);
-
-					// main background color
-					if (rr != null)
-					{
-						var bg = scrollView.GetComponent<UnityEngine.UI.Image>();
-						if (bg != null)
-							bg.color = rr.originalBg;
-					}
 				});
-			}
-			else
-			{
-				var bg = t.GetComponent<UnityEngine.UI.Image>();
-				if (bg != null)
-					bg.color = rr.originalBg;
 			}
 		}
 

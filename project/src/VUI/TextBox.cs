@@ -394,12 +394,17 @@ namespace VUI
 			panel_.Visible = true;
 			panel_.BringToTop();
 			panel_.DoLayout();
+
+			panel_.GetRoot().SetOpenedPopup(listView_, listView_.Popup.popup);
 		}
 
 		public void Hide()
 		{
 			if (panel_ != null)
+			{
 				panel_.Visible = false;
+				panel_.GetRoot().SetOpenedPopup(listView_, null);
+			}
 		}
 
 		private void Save()
@@ -456,8 +461,10 @@ namespace VUI
 			if (string.IsNullOrEmpty(s))
 				return;
 
+			Add(s);
 			tb_.Text = s;
 			tb_.Blur();
+
 			Hide();
 		}
 
@@ -909,13 +916,17 @@ namespace VUI
 				if (oldText_ != text_)
 				{
 					Edited?.Invoke(text_);
-					ac_.Add(text_);
+
+					if (!ac_.Visible)
+						ac_.Add(text_);
+
 					oldText_ = text_;
 				}
 
 				if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 				{
 					Submitted?.Invoke(text_);
+					ac_.Add(text_);
 					ac_.Hide();
 				}
 			}

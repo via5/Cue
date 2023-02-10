@@ -141,6 +141,7 @@ namespace VUI
 		private MVRScript s_ = null;
 		private MVRScriptUI sui_ = null;
 		private Style.RootRestore rr_ = null;
+		private GameObject root_ = null;
 
 		public ScriptUIRootSupport(MVRScript s)
 		{
@@ -152,6 +153,11 @@ namespace VUI
 			sui_ = sui;
 		}
 
+		private static string RootObjectPrefix
+		{
+			get { return Glue.Prefix + ".ScriptUIRootSupport."; }
+		}
+
 		public static void DoCleanup()
 		{
 			// no-op
@@ -159,7 +165,7 @@ namespace VUI
 
 		public override Transform RootParent
 		{
-			get { return sui_?.fullWidthUIContent; }
+			get { return root_.transform; }
 		}
 
 		protected override bool DoInit()
@@ -180,6 +186,12 @@ namespace VUI
 				}
 			}
 
+			foreach (Transform t in sui_.fullWidthUIContent)
+			{
+				if (t.name.StartsWith(RootObjectPrefix))
+					DestroyRootObject(t);
+			}
+
 			var scrollView = sui_.GetComponentInChildren<ScrollRect>();
 			var scrollViewRT = scrollView.GetComponent<RectTransform>();
 
@@ -195,6 +207,7 @@ namespace VUI
 			Glue.LogVerbose("scriptui support: ready, initing");
 
 			rr_ = Style.SetupRoot(sui_.transform);
+			CreateRoot();
 
 			var bounds = Rectangle.FromPoints(
 					1, 1,
@@ -208,21 +221,54 @@ namespace VUI
 			return true;
 		}
 
+		private void CreateRoot()
+		{
+			root_ = CreateRootObject(RootObjectPrefix);
+			root_.transform.SetParent(sui_?.fullWidthUIContent, false);
+
+			var rt = root_.AddComponent<RectTransform>();
+			if (rt == null)
+				rt = root_.GetComponent<RectTransform>();
+
+			root_.AddComponent<LayoutElement>().ignoreLayout = true;
+
+			var bg = root_.AddComponent<UnityEngine.UI.Image>();
+			bg.color = Style.Theme.BackgroundColor;
+			bg.raycastTarget = true;
+
+			var scrollView = sui_.GetComponentInChildren<ScrollRect>();
+			var scrollViewRT = scrollView.GetComponent<RectTransform>();
+
+			var rect = Rectangle.FromRect(scrollViewRT.rect);
+
+			rt.offsetMin = new Vector2(rect.Left, rect.Top);
+			rt.offsetMax = new Vector2(rect.Right, rect.Bottom);
+			rt.anchorMin = new Vector2(0, 1);
+			rt.anchorMax = new Vector2(0, 1);
+			rt.anchoredPosition = new Vector2(0, 0);
+			rt.pivot = new Vector2(0, 1);
+		}
+
 		public override void Destroy()
 		{
-			if (sui_ != null)
+			if (sui_ != null && rr_ != null)
 				Style.RevertRoot(sui_.transform, rr_);
+
+			SetActive(false);
 		}
 
 		public override void SetActive(bool b)
 		{
-			if (sui_ != null)
+			if (sui_ != null && rr_ != null)
 			{
 				if (b)
 					rr_ = Style.SetupRoot(sui_.transform);
 				else
 					Style.RevertRoot(sui_.transform, rr_);
 			}
+
+			if (root_ != null)
+				root_.SetActive(b);
 		}
 
 		public override void SetSize(Vector2 v)
@@ -316,6 +362,10 @@ namespace VUI
 			rt.anchoredPosition = new Vector2(0, 0);
 			rt.anchorMin = new Vector2(0, 0);
 			rt.anchorMax = new Vector2(1, 1);
+
+			var bg = root_.AddComponent<UnityEngine.UI.Image>();
+			bg.color = Style.Theme.BackgroundColor;
+			bg.raycastTarget = true;
 		}
 
 		public override void Destroy()
@@ -769,7 +819,7 @@ namespace VUI
 			rt_ = ui_.AddComponent<RectTransform>();
 
 			var bg = ui_.AddComponent<UnityEngine.UI.Image>();
-			bg.color = new Color(0, 0, 0, 0.8f);
+			bg.color = Style.Theme.OverlayBackgroundColor;
 			bg.raycastTarget = true;
 
 			SuperController.singleton.AddCanvas(canvas_);

@@ -216,7 +216,6 @@ namespace VUI
 			tooltips_ = new TooltipManager(this);
 
 			content_.Clickthrough = false;
-			content_.BackgroundColor = VUI.Style.Theme.BackgroundColor;
 
 			AttachTo(support);
 		}
@@ -257,8 +256,11 @@ namespace VUI
 
 		public void SetOpenedPopup(Widget w, UIPopup p)
 		{
-			openedPopupWidget_ = w;
-			openedPopup_ = p;
+			if (w == null || openedPopupWidget_ == w)
+			{
+				openedPopupWidget_ = w;
+				openedPopup_ = p;
+			}
 		}
 
 		public void SetFocus(Widget w, int flags = FocusDefault)
@@ -283,7 +285,7 @@ namespace VUI
 				if (openedPopup_.visible)
 					openedPopup_.Toggle();
 
-				SetOpenedPopup(null, null);
+				SetOpenedPopup(openedPopupWidget_, null);
 			}
 
 			FocusChanged?.Invoke(oldFocus, focused_);
@@ -417,6 +419,11 @@ namespace VUI
 					}
 				}
 			}
+		}
+
+		public Widget Focused
+		{
+			get { return focused_; }
 		}
 
 		public void TrackPointer(Widget w, bool b)
