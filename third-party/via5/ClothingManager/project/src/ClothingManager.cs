@@ -159,7 +159,7 @@ namespace ClothingManager
 				Log.Verbose($"but still not in cache");
 			}
 
-			Log.Warning($"no meta for {id}");
+			Log.Verbose($"no meta for {id}");
 
 			return null;
 		}

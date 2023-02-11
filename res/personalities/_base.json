@@ -461,7 +461,7 @@
 		{
 			"type": "kiss",
 			"startLipsDistance": 0.1,
-			"startLipsDistanceWithPlayer": 0.15,
+			"startLipsDistanceWithPlayer": 0.12,
 			"stopLipsDistance": 0.1,
 			"stopLipsDistanceWithPlayer": 0.15,
 			"stopHeadDistanceFromStart": 0.15,
