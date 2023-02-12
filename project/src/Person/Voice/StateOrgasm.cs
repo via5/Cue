@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	public class VoiceStateOrgasm : VoiceState
+	public class VoiceStateOrgasm : BasicVoiceState
 	{
 		private const int OrgasmAction = 1;
 		private const int MoaningAction = 2;
@@ -19,40 +19,31 @@ namespace Cue
 			Load(vo, false);
 		}
 
-		public override void Load(JSONClass vo, bool inherited)
+		protected override void DoLoad(JSONClass o, bool inherited)
 		{
-			if (vo.HasKey("orgasmState"))
+			string v = J.OptString(o, "voice", "");
+			if (v == "orgasm")
 			{
-				var o = vo["orgasmState"].AsObject;
-
-				string v = J.OptString(o, "voice", "");
-				if (v == "orgasm")
-				{
-					action_ = OrgasmAction;
-				}
-				else if (v == "moaning")
-				{
-					action_ = MoaningAction;
-
-					if (o.HasKey("moaningIntensity"))
-						moaningIntensity_ = J.ReqFloat(o, "moaningIntensity");
-					else if (!inherited)
-						throw new LoadFailed("missing moaningIntensity");
-				}
-				else if (v != "")
-				{
-					throw new LoadFailed("bad orgasmState voice, must be 'orgasm' or 'moaning'");
-				}
+				action_ = OrgasmAction;
 			}
-			else if (!inherited)
+			else if (v == "moaning")
 			{
-				throw new LoadFailed("missing orgasmState");
+				action_ = MoaningAction;
+
+				if (o.HasKey("moaningIntensity"))
+					moaningIntensity_ = J.ReqFloat(o, "moaningIntensity");
+				else if (!inherited)
+					throw new LoadFailed("missing moaningIntensity");
+			}
+			else if (v != "")
+			{
+				throw new LoadFailed("bad orgasmState voice, must be 'orgasm' or 'moaning'");
 			}
 		}
 
 		public override string Name
 		{
-			get { return "orgasm"; }
+			get { return "orgasmState"; }
 		}
 
 		public override IVoiceState Clone()
@@ -64,6 +55,7 @@ namespace Cue
 
 		private void CopyFrom(VoiceStateOrgasm o)
 		{
+			base.CopyFrom(o);
 			action_ = o.action_;
 			moaningIntensity_ = o.moaningIntensity_;
 		}

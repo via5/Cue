@@ -3,7 +3,7 @@ using SimpleJSON;
 
 namespace Cue
 {
-	public class VoiceStateNormal : VoiceState
+	public class VoiceStateNormal : BasicVoiceState
 	{
 		private const float DefaultBreathingIntensityCutoff = 0.6f;
 		private const float DefaultBreathingMax = 0.2f;
@@ -33,60 +33,51 @@ namespace Cue
 			Load(vo, false);
 		}
 
-		public override void Load(JSONClass vo, bool inherited)
+		protected override void DoLoad(JSONClass o, bool inherited)
 		{
-			if (vo.HasKey("normalState"))
+			if (o.HasKey("breathingRange"))
 			{
-				var o = J.ReqObject(vo, "normalState");
+				breathingRange_ = U.Clamp(
+					J.OptFloat(o, "breathingRange", DefaultBreathingMax),
+					0, 1);
+			}
 
-				if (o.HasKey("breathingRange"))
-				{
-					breathingRange_ = U.Clamp(
-						J.OptFloat(o, "breathingRange", DefaultBreathingMax),
-						0, 1);
-				}
+			if (o.HasKey("breathingIntensityCutoff"))
+			{
+				breathingIntensityCutoff_ = U.Clamp(
+					J.OptFloat(o, "breathingIntensityCutoff", DefaultBreathingIntensityCutoff),
+					0, 1);
+			}
 
-				if (o.HasKey("breathingIntensityCutoff"))
-				{
-					breathingIntensityCutoff_ = U.Clamp(
-						J.OptFloat(o, "breathingIntensityCutoff", DefaultBreathingIntensityCutoff),
-						0, 1);
-				}
+			if (o.HasKey("intensityWait"))
+				intensityWaitRange_ = RandomRange.Create(o, "intensityWait");
+			else if (!inherited)
+				throw new LoadFailed("missing intensityWait");
 
-				if (o.HasKey("intensityWait"))
-					intensityWaitRange_ = RandomRange.Create(o, "intensityWait");
-				else if (!inherited)
-					throw new LoadFailed("missing intensityWait");
+			if (o.HasKey("intensityTime"))
+				intensityTimeRange_ = RandomRange.Create(o, "intensityTime");
+			else if (!inherited)
+				throw new LoadFailed("missing intensityTime");
 
-				if (o.HasKey("intensityTime"))
-					intensityTimeRange_ = RandomRange.Create(o, "intensityTime");
-				else if (!inherited)
-					throw new LoadFailed("missing intensityTime");
+			if (o.HasKey("intensityTarget"))
+			{
+				var ot = o["intensityTarget"].AsObject;
+				if (!ot.HasKey("rng"))
+					throw new LoadFailed("intensityTarget missing rng");
 
-				if (o.HasKey("intensityTarget"))
-				{
-					var ot = o["intensityTarget"].AsObject;
-					if (!ot.HasKey("rng"))
-						throw new LoadFailed("intensityTarget missing rng");
-
-					intensityTargetRng_ = BasicRandom.FromJSON(ot["rng"].AsObject);
-					if (intensityTargetRng_ == null)
-						throw new LoadFailed("bad intensityTarget rng");
-				}
-				else if (!inherited)
-				{
-					throw new LoadFailed("missing intensityTarget");
-				}
+				intensityTargetRng_ = BasicRandom.FromJSON(ot["rng"].AsObject);
+				if (intensityTargetRng_ == null)
+					throw new LoadFailed("bad intensityTarget rng");
 			}
 			else if (!inherited)
 			{
-				throw new LoadFailed("missing normalState");
+				throw new LoadFailed("missing intensityTarget");
 			}
 		}
 
 		public override string Name
 		{
-			get { return "normal"; }
+			get { return "normalState"; }
 		}
 
 		public override IVoiceState Clone()
@@ -98,6 +89,7 @@ namespace Cue
 
 		private void CopyFrom(VoiceStateNormal o)
 		{
+			base.CopyFrom(o);
 			breathingRange_ = o.breathingRange_;
 			breathingIntensityCutoff_ = o.breathingIntensityCutoff_;
 			intensityWaitRange_ = o.intensityWaitRange_.Clone();

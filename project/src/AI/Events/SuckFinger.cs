@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class SuckFingerEvent : BasicEvent
+	class SuckFingerEvent : BasicEvent<EmptyEventData>
 	{
 		private const float CheckInterval = 0.5f;
 		private const float WaitAfterFailure = 2;
@@ -25,7 +25,7 @@ namespace Cue
 		public override bool CanToggle { get { return false; } }
 		public override bool CanDisable { get { return true; } }
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("active", $"{active_}");
 			debug.Add("mouthLock", $"{mouthLock_}");

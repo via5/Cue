@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
@@ -80,22 +81,32 @@ namespace Cue
 
 		private static ResourceFile LoadResourceFile(Sys.FileInfo f)
 		{
-			var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(f.path));
-
-			if (doc == null)
+			try
 			{
-				Logger.Global.Error($"failed to parse file {f.path}");
+				var doc = JSON.Parse(Cue.Instance.Sys.ReadFileIntoString(f.path));
+
+				if (doc == null)
+				{
+					Logger.Global.Error($"failed to parse file {f.path}");
+					return null;
+				}
+
+				var rf = new ResourceFile();
+				rf.path = f.path;
+				rf.origin = f.origin;
+				rf.root = doc;
+				rf.name = doc.AsObject["name"].Value;
+				rf.inherit = doc.AsObject["inherit"].Value;
+
+				return rf;
+			}
+			catch (Exception e)
+			{
+				Logger.Global.Error($"failed to load resource file {f.path}");
+				Logger.Global.Error(e.ToString());
+
 				return null;
 			}
-
-			var rf = new ResourceFile();
-			rf.path = f.path;
-			rf.origin = f.origin;
-			rf.root = doc;
-			rf.name = doc.AsObject["name"].Value;
-			rf.inherit = doc.AsObject["inherit"].Value;
-
-			return rf;
 		}
 
 		private static void FixPriorities(Dictionary<string, ResourceFile> files)

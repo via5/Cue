@@ -17,22 +17,9 @@ namespace Cue
 			Load(vo, false);
 		}
 
-		public override void Load(JSONClass vo, bool inherited)
-		{
-			if (vo.HasKey("kissState"))
-			{
-				var o = J.ReqObject(vo, "kissState");
-				LoadWithMoaning(o, inherited);
-			}
-			else if (!inherited)
-			{
-				throw new LoadFailed("missing kissState");
-			}
-		}
-
 		public override string Name
 		{
-			get { return "kiss"; }
+			get { return "kissState"; }
 		}
 
 		public override IVoiceState Clone()

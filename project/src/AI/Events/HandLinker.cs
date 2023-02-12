@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class HandLinker : BasicEvent
+	class HandLinker : BasicEvent<EmptyEventData>
 	{
 		private const float Distance = 0.07f;
 
@@ -190,7 +190,7 @@
 		public override bool CanToggle { get { return false; } }
 		public override bool CanDisable { get { return false; } }
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			for (int i = 0; i < debug_.GetLength(0); ++i)
 			{

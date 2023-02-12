@@ -510,7 +510,6 @@ namespace Cue.MacGruber
 			lookatAtom_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Atom");
 			lookatControl_ = new Sys.Vam.StringChooserParameter(p, "MacGruber.Gaze", "LookAt Control");
 
-			enabled_.Value = false;
 			refAtom_.Value = p.ID;
 			refControl_.Value = "chestControl";
 			maxAngleVer_.Value = 70;

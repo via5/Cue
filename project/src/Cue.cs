@@ -564,16 +564,19 @@ namespace Cue
 		{
 			Sys.Input.Update(s);
 
-			if (Sys.Input.HardReset)
+			if (Options.DevMode)
 			{
-				Sys.HardReset();
-				throw new PluginGone();
-			}
+				if (Sys.Input.HardReset)
+				{
+					Sys.HardReset();
+					throw new PluginGone();
+				}
 
-			if (Sys.Input.ReloadPlugin)
-			{
-				ReloadPlugin();
-				throw new PluginGone();
+				if (Sys.Input.ReloadPlugin)
+				{
+					ReloadPlugin();
+					throw new PluginGone();
+				}
 			}
 
 			ui_?.CheckInput(s);
@@ -655,19 +658,19 @@ namespace Cue
 		}
 
 		static public void Assert(bool b, string s = null)
-		{/*
+		{
 			if (!b)
 			{
 				if (s == null)
-					LogErrorST("assertion failed");
+					Logger.Global.ErrorST("assertion failed");
 				else
-					LogErrorST($"assertion failed: {s}");
+					Logger.Global.ErrorST($"assertion failed: {s}");
 
 				if (Instance != null)
 					Instance.DisablePlugin();
 
 				throw new PluginGone();
-			}*/
+			}
 		}
 
 		private void test()

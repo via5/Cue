@@ -133,7 +133,7 @@ namespace Cue
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, person_, "ai");
-			events_ = BasicEvent.All();
+			events_ = AllEvents();
 			anims_ = new PersistentAnimation[]
 			{
 				new IdlePersistentAnimation(person_),
@@ -141,6 +141,43 @@ namespace Cue
 			};
 
 			p.PersonalityChanged += OnPersonalityChanged;
+		}
+
+		public static IEvent[] AllEvents()
+		{
+			// todo: there's an ordering problem, where GrabEvent locks the
+			// head when grabbed, but MouthEvent tries to lock when the grab
+			// is released
+			//
+			// GrabEvent is at the top right now, which fixes this, but it's
+			// not a fix
+
+			return new IEvent[]
+			{
+				new GrabEvent(),
+				new MouthEvent(),
+				new KissEvent(),
+				new SmokeEvent(),
+				new ThrustEvent(),
+				new TribEvent(),
+				new HandEvent(),
+				new ZappedEvent(),
+				new SuckFingerEvent(),
+				new HandLinker(),
+				new HoldBreathEvent()
+			};
+		}
+
+		public static IEvent CreateEvent(string type)
+		{
+			foreach (var e in AllEvents())
+			{
+				if (e.Name.ToLower() == type.ToLower())
+					return e;
+			}
+
+			Cue.Instance.Log.Error($"PersonAI.CreateEvent(): event '{type}' not found");
+			return null;
 		}
 
 		public void Init()

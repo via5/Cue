@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	public class VoiceStateChoked : VoiceState
+	public class VoiceStateChoked : BasicVoiceState
 	{
 		private float minTimeForMoaning_ = 3;
 		private float moaningAfter_ = 1;
@@ -20,25 +20,16 @@ namespace Cue
 			Load(vo, false);
 		}
 
-		public override void Load(JSONClass vo, bool inherited)
+		protected override void DoLoad(JSONClass o, bool inherited)
 		{
-			if (vo.HasKey("chokedState"))
-			{
-				var o = J.ReqObject(vo, "chokedState");
-
-				minTimeForMoaning_ = J.ReqFloat(o, "minTimeForMoaning");
-				moaningAfter_ = J.ReqFloat(o, "moaningAfter");
-				moaningTime_ = J.ReqFloat(o, "moaningTime");
-			}
-			else if (!inherited)
-			{
-				throw new LoadFailed("missing chokedState");
-			}
+			minTimeForMoaning_ = J.ReqFloat(o, "minTimeForMoaning");
+			moaningAfter_ = J.ReqFloat(o, "moaningAfter");
+			moaningTime_ = J.ReqFloat(o, "moaningTime");
 		}
 
 		public override string Name
 		{
-			get { return "choked"; }
+			get { return "chokedState"; }
 		}
 
 		public override IVoiceState Clone()
@@ -50,6 +41,7 @@ namespace Cue
 
 		private void CopyFrom(VoiceStateChoked o)
 		{
+			base.CopyFrom(o);
 			minTimeForMoaning_ = o.minTimeForMoaning_;
 			moaningAfter_ = o.moaningAfter_;
 			moaningTime_ = o.moaningTime_;

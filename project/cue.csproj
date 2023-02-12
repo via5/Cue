@@ -267,7 +267,6 @@
     <Compile Include="src\UI\ScriptUI\ScriptUI.cs" />
     <Compile Include="src\UI\ScriptUI\SettingsTab.cs" />
     <Compile Include="src\UI\ScriptUI\StateTab.cs" />
-    <Compile Include="src\UI\ScriptUI\UnityTab.cs" />
     <Compile Include="src\UI\UI.cs" />
     <Compile Include="src\UI\VRMenu.cs" />
     <Compile Include="src\Utilities\Duration.cs" />

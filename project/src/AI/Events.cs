@@ -1,7 +1,36 @@
 ﻿using SimpleJSON;
+using System;
 
 namespace Cue
 {
+	public interface IEventData
+	{
+		BasicEventData Clone();
+	}
+
+	public abstract class BasicEventData : IEventData
+	{
+		public bool enabled = true;
+
+		public abstract BasicEventData Clone();
+
+		protected void CopyFrom(BasicEventData d)
+		{
+			enabled = d.enabled;
+		}
+	}
+
+	public class EmptyEventData : BasicEventData
+	{
+		public override BasicEventData Clone()
+		{
+			var d = new EmptyEventData();
+			d.CopyFrom(this);
+			return d;
+		}
+	}
+
+
 	public interface IEvent
 	{
 		string Name { get; }
@@ -9,7 +38,7 @@ namespace Cue
 		bool CanToggle { get; }
 		bool CanDisable { get; }
 
-		IEventData ParseEventData(JSONClass o);
+		BasicEventData ParseEventData(JSONClass o);
 		void Init(Person p);
 		void OnPluginState(bool b);
 		void FixedUpdate(float s);
@@ -21,12 +50,12 @@ namespace Cue
 	}
 
 
-	abstract class BasicEvent : IEvent
+	abstract class BasicEvent<DataType> : IEvent where DataType : BasicEventData, new()
 	{
 		private string name_;
 		protected Person person_ = null;
 		private Logger log_;
-		private bool enabled_ = true;
+		private DataType d_ = null;
 
 		private Sys.IBoolParameter enabledParam_ = null;
 		private Sys.IBoolParameter activeParam_ = null;
@@ -43,6 +72,11 @@ namespace Cue
 			get { return log_; }
 		}
 
+		protected DataType Data
+		{
+			get { return d_; }
+		}
+
 		public string Name
 		{
 			get { return name_; }
@@ -52,57 +86,32 @@ namespace Cue
 
 		public bool Enabled
 		{
-			get { return enabled_; }
-			set { enabled_ = value; }
+			get
+			{
+				Cue.Assert(d_ != null);
+				return d_.enabled;
+			}
+			set { d_.enabled = value; }
 		}
 
 		public abstract bool CanToggle { get; }
 		public abstract bool CanDisable { get; }
 
-		public static IEvent[] All()
+		public BasicEventData ParseEventData(JSONClass o)
 		{
-			// todo: there's an ordering problem, where GrabEvent locks the
-			// head when grabbed, but MouthEvent tries to lock when the grab
-			// is released
-			//
-			// GrabEvent is at the top right now, which fixes this, but it's
-			// not a fix
+			var d = new DataType();
 
-			return new IEvent[]
-			{
-				new GrabEvent(),
-				new MouthEvent(),
-				new KissEvent(),
-				new SmokeEvent(),
-				new ThrustEvent(),
-				new TribEvent(),
-				new HandEvent(),
-				new ZappedEvent(),
-				new SuckFingerEvent(),
-				new HandLinker(),
-				new HoldBreathEvent()
-			};
+			d.enabled = J.OptBool(o, "enabled", true);
+
+			if (d.enabled)
+				DoParseEventData(o, d);
+
+			return d;
 		}
 
-		public static IEvent Create(string type)
+		protected virtual void DoParseEventData(JSONClass o, DataType d)
 		{
-			foreach (var e in All())
-			{
-				if (e.Name.ToLower() == type.ToLower())
-					return e;
-			}
-
-			return null;
-		}
-
-		public IEventData ParseEventData(JSONClass o)
-		{
-			return DoParseEventData(o);
-		}
-
-		protected virtual IEventData DoParseEventData(JSONClass o)
-		{
-			return null;
+			// no-op
 		}
 
 		public void ForceStop()
@@ -117,32 +126,59 @@ namespace Cue
 
 		public void Init(Person p)
 		{
-			person_ = p;
-			log_ = new Logger(Logger.Event, person_, "event." + Name);
-			DoInit();
-
-			if (p.IsInteresting)
+			try
 			{
-				if (CanDisable)
-				{
-					enabledParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-						$"{person_.ID}.{Name}.Enabled",
-						b => Enabled = b,
-						Enabled);
-				}
+				person_ = p;
+				log_ = new Logger(Logger.Event, person_, "event." + Name);
 
-				if (CanToggle)
-				{
-					activeParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-						$"{person_.ID}.{Name}.Active",
-						b => Active = b,
-						Active);
+				OnPersonalityChanged();
+				person_.PersonalityChanged += OnPersonalityChanged;
 
-					activeToggle_ = Cue.Instance.Sys.RegisterActionParameter(
-						$"{person_.ID}.{Name}.Toggle",
-						() => Active = !Active);
+				DoInit();
+
+				if (p.IsInteresting)
+				{
+					if (CanDisable)
+					{
+						enabledParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+							$"{person_.ID}.{Name}.Enabled",
+							b => Enabled = b,
+							Enabled);
+					}
+
+					if (CanToggle)
+					{
+						activeParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+							$"{person_.ID}.{Name}.Active",
+							b => Active = b,
+							Active);
+
+						activeToggle_ = Cue.Instance.Sys.RegisterActionParameter(
+							$"{person_.ID}.{Name}.Toggle",
+							() => Active = !Active);
+					}
 				}
 			}
+			catch (Exception e)
+			{
+				Log.Error($"failed to init event {Name}");
+				Log.Error(e.ToString());
+			}
+		}
+
+		private void OnPersonalityChanged()
+		{
+			d_ = person_.Personality.CloneEventData(Name) as DataType;
+			if (d_ == null)
+			{
+				Cue.Assert(
+					typeof(DataType) == typeof(EmptyEventData),
+					$"no event data for event '{Name}'");
+
+				d_ = new EmptyEventData() as DataType;
+			}
+
+			Cue.Assert(d_ != null);
 		}
 
 		protected virtual void DoInit()
@@ -162,6 +198,9 @@ namespace Cue
 
 		public void FixedUpdate(float s)
 		{
+			if (!Enabled)
+				return;
+
 			DoFixedUpdate(s);
 		}
 
@@ -172,6 +211,9 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (!Enabled)
+				return;
+
 			DoUpdate(s);
 
 			if (enabledParam_ != null)
@@ -188,6 +230,9 @@ namespace Cue
 
 		public void UpdatePaused(float s)
 		{
+			if (!Enabled)
+				return;
+
 			DoUpdatePaused(s);
 		}
 
@@ -201,8 +246,17 @@ namespace Cue
 			return name_;
 		}
 
-		public virtual void Debug(DebugLines debug)
+		public void Debug(DebugLines debug)
 		{
+			debug.Add("enabled", $"{d_.enabled}");
+
+			if (d_.enabled)
+				DoDebug(debug);
+		}
+
+		protected virtual void DoDebug(DebugLines debug)
+		{
+			// no-op
 		}
 
 		public virtual DebugButtons DebugButtons()

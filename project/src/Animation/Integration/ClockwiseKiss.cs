@@ -92,6 +92,8 @@
 				debug.Add("MaxLipMorph", $"{MaxLipMorph:0.00}");
 				debug.Add("MaxTongueMorph", $"{MaxTongueMorph:0.00}");
 				debug.Add("MaxTongueLength", $"{MaxTongueLength:0.00}");
+				debug.Add("MouthOpenMin", $"{MouthOpenMin:0.00}");
+				debug.Add("MouthOpenMax", $"{MouthOpenMax:0.00}");
 				debug.Add("MaxUpDownSpeed", $"{MaxUpDownSpeed:0.00}");
 				debug.Add("MaxFrontBackSpeed", $"{MaxFrontBackSpeed:0.00}");
 			}
@@ -230,7 +232,7 @@
 			return false;
 		}
 
-		private void Init(Person p)
+		protected virtual void Init(Person p)
 		{
 			log_ = new Logger(Logger.Integration, p, "cwkiss");
 
@@ -482,6 +484,16 @@
 		protected override bool CanLead()
 		{
 			return true;
+		}
+
+		protected override void Init(Person p)
+		{
+			base.Init(p);
+
+			var autoJawMorphs = new Sys.Vam.BoolParameter(
+				p, "AutoJawMouthMorph", "enabled");
+
+			autoJawMorphs.Value = false;
 		}
 
 		private static Config MakeConfig()

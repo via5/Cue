@@ -23,7 +23,6 @@ namespace Cue
 				tabs_.AddTab(new PersonTab(p));
 
 			tabs_.AddTab(misc_);
-			tabs_.AddTab(new UnityTab());
 			tabs_.CheckDebugTabs();
 
 			Cue.Instance.Options.Changed += () => { tabs_.CheckDebugTabs(); };

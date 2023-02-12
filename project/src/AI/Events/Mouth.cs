@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class MouthEvent : BasicEvent
+	class MouthEvent : BasicEvent<EmptyEventData>
 	{
 		private const float ManualStartDistance = 0.4f;
 		private const float AutoStartDistance = 0.025f;
@@ -25,7 +25,7 @@
 			head_ = person_.Body.Get(BP.Head);
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("active", $"{Active}");
 			debug.Add("bjTarget", $"{target_}");
@@ -58,7 +58,7 @@
 
 			set
 			{
-				if (value)
+				if (value && Enabled)
 					Check(ManualStartDistance);
 				else
 					Stop();

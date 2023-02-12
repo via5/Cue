@@ -11,6 +11,7 @@
 		},
 		"normalState":
 		{
+			"enabled": true,
 			"breathingRange": 0.1,
 			"breathingIntensityCutoff": 0.6,
 			"intensityWait":
@@ -41,6 +42,7 @@
 		},
 		"orgasmState":
 		{
+			"enabled": true,
 			"voice": "orgasm"
 		},
 		"bjState":
@@ -52,6 +54,7 @@
 		},
 		"chokedState":
 		{
+			"enabled": true,
 			"minTimeForMoaning": 3,
 			"moaningAfter": 1.0,
 			"moaningTime": 3.0
@@ -460,6 +463,7 @@
 	[
 		{
 			"type": "kiss",
+			"canInitiate": true,
 			"startLipsDistance": 0.1,
 			"startLipsDistanceWithPlayer": 0.12,
 			"stopLipsDistance": 0.1,
@@ -469,7 +473,7 @@
 			{
 				"range":
 				{
-					"min": 2,
+					"min": 10,
 					"max": 100
 				},
 				"rng": "normal"
@@ -694,6 +698,7 @@
 		}
 	},
 
+	"gazeEnabled": true,
 	"gazeSaccade": true,
 	"gazeBlink": true,
 	"gazeEyeTargetMovementSpeed": 10.0,

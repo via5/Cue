@@ -3,6 +3,7 @@
 var vars = new V[]
 {
 
+V.Bool("GazeEnabled"),
 V.Duration("GazeDuration"),
 V.Duration("GazeRandomInterval"),
 V.Duration("EmergencyGazeDuration"),

@@ -45,6 +45,8 @@ namespace Cue
 				return new MacGruber.Voice(options);
 			else if (provider == "vammoan")
 				return new VamMoan.Voice(options);
+			else if (provider == "none")
+				return new NoVoice(options);
 			else
 				return null;
 		}

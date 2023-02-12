@@ -20,7 +20,7 @@ namespace Cue
 	}
 
 
-	public abstract class VoiceState : IVoiceState
+	public abstract class BasicVoiceState : IVoiceState
 	{
 		public const int CannotRun = 0;
 		public const int LowPriority = 1;
@@ -28,12 +28,40 @@ namespace Cue
 		public const int Emergency = 3;
 
 		protected Voice v_ = null;
+		private bool enabled_ = false;
 		private bool done_ = false;
 		private string lastState_ = "";
 
 		public abstract IVoiceState Clone();
 
-		public abstract void Load(JSONClass vo, bool inherited);
+		public void Load(JSONClass vo, bool inherited)
+		{
+			if (vo.HasKey(Name))
+			{
+				var o = J.ReqObject(vo, Name);
+
+				if (o.HasKey("enabled"))
+					enabled_ = J.ReqBool(o, "enabled");
+				else if (!inherited)
+					throw new LoadFailed("missing enabled");
+
+				if (enabled_)
+					DoLoad(o, inherited);
+			}
+			else if (!inherited)
+			{
+				throw new LoadFailed($"missing state {Name}");
+			}
+		}
+
+		protected virtual void DoLoad(JSONClass o, bool inherited)
+		{
+		}
+
+		protected void CopyFrom(BasicVoiceState o)
+		{
+			enabled_ = o.enabled_;
+		}
 
 		public static List<IVoiceState> CreateAll(JSONClass o)
 		{
@@ -78,12 +106,18 @@ namespace Cue
 
 		public int CanRun()
 		{
+			if (!enabled_)
+				return CannotRun;
+
 			return DoCanRun();
 		}
 
 		public void Debug(DebugLines debug)
 		{
-			DoDebug(debug);
+			debug.Add("enabled", $"{enabled_}");
+
+			if (enabled_)
+				DoDebug(debug);
 		}
 
 		public abstract string Name { get; }
@@ -129,9 +163,8 @@ namespace Cue
 	}
 
 
-	public abstract class VoiceStateWithMoaning : VoiceState
+	public abstract class VoiceStateWithMoaning : BasicVoiceState
 	{
-		private bool enabled_ = false;
 		private float voiceChance_ = 0;
 		private float voiceChanceMinExcitement_ = 0.2f;
 		private float voiceTime_ = 0;
@@ -140,13 +173,8 @@ namespace Cue
 		private bool moaning_ = false;
 		private float lastRng_ = 0;
 
-		protected void LoadWithMoaning(JSONClass o, bool inherited)
+		protected override void DoLoad(JSONClass o, bool inherited)
 		{
-			if (o.HasKey("enabled"))
-				enabled_ = J.ReqBool(o, "enabled");
-			else if (!inherited)
-				throw new LoadFailed("missing enabled");
-
 			if (o.HasKey("voiceChance"))
 				voiceChance_ = J.ReqFloat(o, "voiceChance");
 			else if (!inherited)
@@ -165,7 +193,7 @@ namespace Cue
 
 		protected void CopyFrom(VoiceStateWithMoaning o)
 		{
-			enabled_ = o.enabled_;
+			base.CopyFrom(o);
 			voiceChance_ = o.voiceChance_;
 			voiceTime_ = o.voiceTime_;
 		}

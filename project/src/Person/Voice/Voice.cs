@@ -3,8 +3,105 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	public class NoVoice : IVoice
+	{
+		public NoVoice(JSONClass options)
+		{
+		}
+
+		public string Name
+		{
+			get { return "none"; }
+		}
+
+		public bool Muted
+		{
+			set { }
+		}
+
+		public bool MouthEnabled
+		{
+			get { return false; }
+			set { }
+		}
+
+		public bool ChestEnabled
+		{
+			get { return false; }
+			set { }
+		}
+
+		public string Warning
+		{
+			get { return null; }
+		}
+
+		public IVoice Clone()
+		{
+			return new NoVoice(null);
+		}
+
+		public void Debug(DebugLines debug)
+		{
+			// no-op
+		}
+
+		public void Destroy()
+		{
+			// no-op
+		}
+
+		public void Init(Person p)
+		{
+			// no-op
+		}
+
+		public void Load(JSONClass o, bool inherited)
+		{
+			// no-op
+		}
+
+		public void SetBJ(float v)
+		{
+			// no-op
+		}
+
+		public void SetBreathing()
+		{
+			// no-op
+		}
+
+		public void SetKissing()
+		{
+			// no-op
+		}
+
+		public void SetMoaning(float v)
+		{
+			// no-op
+		}
+
+		public void SetOrgasm()
+		{
+			// no-op
+		}
+
+		public void SetSilent()
+		{
+			// no-op
+		}
+
+		public void Update(float s)
+		{
+			// no-op
+		}
+	}
+
+
 	public class Voice
 	{
+		private const float NothingCheckInterval = 1;
+
 		private Person person_ = null;
 		private IVoice provider_ = null;
 		private Logger log_;
@@ -15,6 +112,9 @@ namespace Cue
 		private float maxIntensity_ = 0;
 		private bool muted_ = false;
 		private string mutedWhy_ = "";
+
+		private bool nothingCanRun_ = false;
+		private float nothingElapsed_ = 0;
 
 		private DebugLines debug_ = new DebugLines();
 
@@ -52,7 +152,7 @@ namespace Cue
 			if (states_.Count == 0)
 			{
 				Cue.Assert(!inherited);
-				states_.AddRange(VoiceState.CreateAll(o));
+				states_.AddRange(BasicVoiceState.CreateAll(o));
 			}
 			else
 			{
@@ -117,6 +217,16 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (nothingCanRun_)
+			{
+				nothingElapsed_ += s;
+				if (nothingElapsed_ < NothingCheckInterval)
+					return;
+
+				nothingElapsed_ = 0;
+				nothingCanRun_ = false;
+			}
+
 			MaxIntensity = person_.Mood.MovementEnergy;
 
 			for (int i = 0; i < states_.Count; ++i)
@@ -129,7 +239,15 @@ namespace Cue
 				current_.Update(s);
 
 			if (current_ == null || current_.Done)
+			{
 				Next();
+
+				if (current_ == null)
+				{
+					nothingCanRun_ = true;
+					nothingElapsed_ = 0;
+				}
+			}
 
 			provider_.Update(s);
 			CheckMute();
@@ -160,7 +278,7 @@ namespace Cue
 			for (int i = 0; i < states_.Count; ++i)
 			{
 				int prio = states_[i].CanRun();
-				if (prio != VoiceState.CannotRun && prio > nextPrio)
+				if (prio != BasicVoiceState.CannotRun && prio > nextPrio)
 				{
 					next = states_[i];
 					nextPrio = prio;
@@ -169,7 +287,7 @@ namespace Cue
 
 			if (next == null)
 			{
-				log_.Error("no state can run");
+				log_.Verbose("no state can run");
 				SetCurrent(null, -1);
 			}
 			else

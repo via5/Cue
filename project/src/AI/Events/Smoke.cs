@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class SmokeEvent : BasicEvent
+	class SmokeEvent : BasicEvent<EmptyEventData>
 	{
 		private const float EnableCheckInterval = 2;
 
@@ -28,7 +28,7 @@ namespace Cue
 		public override bool CanToggle { get { return false; } }
 		public override bool CanDisable { get { return false; } }
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			string canRunReason = "";
 			string canRun = "";

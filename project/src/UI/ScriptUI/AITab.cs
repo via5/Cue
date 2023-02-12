@@ -403,6 +403,7 @@ namespace Cue
 		private Person person_;
 		private PersonAI ai_;
 
+		private VUI.Label enabled_ = new VUI.Label();
 		private VUI.Label eyesBlink_ = new VUI.Label();
 		private VUI.Label eyesPos_ = new VUI.Label();
 		private VUI.Label gazerType_ = new VUI.Label();
@@ -431,6 +432,12 @@ namespace Cue
 			gl.HorizontalStretch = new List<bool>() { false, true };
 
 			var p = new VUI.Panel(gl);
+
+			p.Add(new VUI.Label("Enabled", UnityEngine.FontStyle.Bold));
+			p.Add(enabled_);
+
+			p.Add(new VUI.Spacer());
+			p.Add(new VUI.Spacer());
 
 			p.Add(new VUI.Label("Eyes",	UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Spacer());
@@ -517,6 +524,8 @@ namespace Cue
 		protected override void DoUpdate(float s)
 		{
 			var g = person_.Gaze;
+
+			enabled_.Text = $"{(person_.Personality.GetBool(PS.GazeEnabled) ? "yes" : "no")}";
 
 			eyesBlink_.Text = $"{(g.Eyes.Blink ? "yes" : "no")}";
 			eyesPos_.Text = $"{g.Eyes.TargetPosition}";

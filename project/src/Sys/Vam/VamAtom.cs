@@ -353,7 +353,7 @@ namespace Cue.Sys.Vam
 					log_.Verbose($"setting key joints");
 					setOnlyKeyJointsOn_.Fire();
 				}
-				else
+				else if (p.type != "none")
 				{
 					log_.Error($"{ID}: unknown pose type '{p.type}'");
 				}

@@ -1,6 +1,7 @@
 {
 	"name": "Sleeping",
 	"inherit": "standard",
+
 	"defaultHappiness": 0,
 	"defaultPlayfulness": 0,
 	"defaultAnger": 0,
@@ -9,6 +10,7 @@
 	"minTiredness": 1,
 	"maxEmotionalRate": 0,
 
+	"gazeEnabled": false,
 	"gazeSaccade": false,
 	"gazeBlink": false,
 	"gazeEyeTargetMovementSpeed": 0.3,
@@ -107,13 +109,18 @@
 	{
 		"normalState":
 		{
+			"enabled": true,
 			"breathingRange": 1
 		},
 		"orgasmState":
 		{
+			"enabled": true,
 			"voice": "moaning",
 			"moaningIntensity": 0.3
 		}
+		"kissState": { "enabled": false },
+		"bjState": { "enabled": false },
+		"chokedState": { "enabled": false }
 	},
 
 	"expressions":

@@ -1,26 +1,20 @@
 ﻿using SimpleJSON;
-using System;
 
 namespace Cue
 {
-	public interface IEventData
+	class KissEventData : BasicEventData
 	{
-		IEventData Clone();
-	}
+		public bool canInitiate = true;
+		public float startDistance = 0;
+		public float startDistanceWithPlayer = 0;
+		public float stopDistance = 0;
+		public float stopDistanceWithPlayer = 0;
+		public float stopHeadDistance = 0;
+		public Duration duration = null;
+		public Duration wait = null;
 
 
-	class KissEventData : IEventData
-	{
-		public float startDistance;
-		public float startDistanceWithPlayer;
-		public float stopDistance;
-		public float stopDistanceWithPlayer;
-		public float stopHeadDistance;
-		public Duration duration;
-		public Duration wait;
-
-
-		public IEventData Clone()
+		public override BasicEventData Clone()
 		{
 			var d = new KissEventData();
 			d.CopyFrom(this);
@@ -29,18 +23,20 @@ namespace Cue
 
 		private void CopyFrom(KissEventData d)
 		{
+			base.CopyFrom(d);
+			canInitiate = d.canInitiate;
 			startDistance = d.startDistance;
 			startDistanceWithPlayer = d.startDistanceWithPlayer;
 			stopDistance = d.stopDistance;
 			stopDistanceWithPlayer = d.stopDistanceWithPlayer;
 			stopHeadDistance = d.stopHeadDistance;
-			duration = d.duration.Clone();
-			wait = d.wait.Clone();
+			duration = d.duration?.Clone();
+			wait = d.wait?.Clone();
 		}
 	}
 
 
-	class KissEvent : BasicEvent
+	class KissEvent : BasicEvent<KissEventData>
 	{
 		private const float MinWait = 2;
 		private const float MinDurationAfterGrab = 30;
@@ -51,7 +47,6 @@ namespace Cue
 		private Person target_ = null;
 		private bool leading_ = false;
 		private bool wasGrabbed_ = false;
-		private KissEventData d_ = null;
 
 		private float elapsed_ = MinWait;
 		private float minDuration_ = 0;
@@ -66,10 +61,9 @@ namespace Cue
 		{
 		}
 
-		protected override IEventData DoParseEventData(JSONClass o)
+		protected override void DoParseEventData(JSONClass o, KissEventData d)
 		{
-			var d = new KissEventData();
-
+			d.canInitiate = J.ReqBool(o, "canInitiate");
 			d.startDistance = J.ReqFloat(o, "startLipsDistance");
 			d.startDistanceWithPlayer = J.ReqFloat(o, "startLipsDistanceWithPlayer");
 			d.stopDistance = J.ReqFloat(o, "stopLipsDistance");
@@ -95,20 +89,11 @@ namespace Cue
 
 				d.wait.SetRange(MinWait, d.wait.Maximum);
 			}
-
-			return d;
 		}
 
 		protected override void DoInit()
 		{
-			OnPersonalityChanged();
-			person_.PersonalityChanged += OnPersonalityChanged;
 			Next();
-		}
-
-		private void OnPersonalityChanged()
-		{
-			d_ = person_.Personality.CloneEventData(Name) as KissEventData;
 		}
 
 		public override bool Active
@@ -138,17 +123,20 @@ namespace Cue
 			get { return target_; }
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debugEnabled_ = true;
 
-			debug.Add("startDistance", $"{d_.startDistance:0.00}");
-			debug.Add("startDistanceWithPlayer", $"{d_.startDistanceWithPlayer:0.00}");
-			debug.Add("stopDistance", $"{d_.stopDistance:0.00}");
-			debug.Add("stopDistanceWithPlayer", $"{d_.stopDistanceWithPlayer:0.00}");
-			debug.Add("stopHeadDistance", $"{d_.stopHeadDistance:0.00}");
-			debug.Add("duration", $"{d_.duration.ToLiveString()}");
-			debug.Add("wait", $"{d_.wait.ToLiveString()}");
+			var d = Data;
+
+			debug.Add("canInitiate", $"{d.canInitiate}");
+			debug.Add("startDistance", $"{d.startDistance:0.00}");
+			debug.Add("startDistanceWithPlayer", $"{d.startDistanceWithPlayer:0.00}");
+			debug.Add("stopDistance", $"{d.stopDistance:0.00}");
+			debug.Add("stopDistanceWithPlayer", $"{d.stopDistanceWithPlayer:0.00}");
+			debug.Add("stopHeadDistance", $"{d.stopHeadDistance:0.00}");
+			debug.Add("duration", $"{d.duration.ToLiveString()}");
+			debug.Add("wait", $"{d.wait.ToLiveString()}");
 			debug.Add("state", $"{(Active ? "active" : "waiting")}");
 			debug.Add("durationFinished", $"{durationFinished_}");
 			debug.Add("waitFinished", $"{waitFinished_}");
@@ -169,8 +157,8 @@ namespace Cue
 
 					if (Active)
 					{
-						d_.duration.Update(s, Mood.MultiMovementEnergy(person_, target_));
-						if (d_.duration.Finished)
+						Data.duration.Update(s, Mood.MultiMovementEnergy(person_, target_));
+						if (Data.duration.Finished)
 							durationFinished_ = true;
 
 						if (elapsed_ >= MinWait)
@@ -178,8 +166,8 @@ namespace Cue
 					}
 					else
 					{
-						d_.wait.Update(s, person_.Mood.MovementEnergy);
-						if (d_.wait.Finished)
+						Data.wait.Update(s, person_.Mood.MovementEnergy);
+						if (Data.wait.Finished)
 							waitFinished_ = true;
 
 						if (elapsed_ >= MinWait)
@@ -218,7 +206,7 @@ namespace Cue
 
 		private void UpdateInactive()
 		{
-			if (TryStartWithPlayer())
+			if (SelfCanStart() && TryStartWithPlayer())
 			{
 				Next();
 				return;
@@ -228,7 +216,7 @@ namespace Cue
 			{
 				lastResult_ = "";
 
-				if (SelfCanStart(person_))
+				if (SelfCanStart())
 				{
 					Next();
 					if (!TryStartWithAnyone())
@@ -281,8 +269,8 @@ namespace Cue
 			waitFinished_ = false;
 			waitFinishedBecauseGrab_ = false;
 
-			d_.duration.Reset(1);
-			d_.wait.Reset(1);
+			Data.duration.Reset(1);
+			Data.wait.Reset(1);
 		}
 
 		private bool TryStartWithPlayer()
@@ -320,9 +308,9 @@ namespace Cue
 				float startDistance;
 
 				if (target.IsPlayer)
-					startDistance = d_.startDistanceWithPlayer;
+					startDistance = Data.startDistanceWithPlayer;
 				else
-					startDistance = d_.startDistance;
+					startDistance = Data.startDistance;
 
 				if (playerOnly && debugEnabled_)
 				{
@@ -495,7 +483,7 @@ namespace Cue
 			}
 		}
 
-		private bool SelfCanStart(Person p)
+		private bool SelfCanStart()
 		{
 			if (!Enabled)
 			{
@@ -506,6 +494,12 @@ namespace Cue
 			if (Active)
 			{
 				lastResult_ = "kissing already active";
+				return false;
+			}
+
+			if (!Data.canInitiate)
+			{
+				lastResult_ = "cannot initiate";
 				return false;
 			}
 
@@ -535,7 +529,7 @@ namespace Cue
 
 			var d = Vector3.Distance(srcLips.Position, targetLips.Position);
 			var hasPlayer = (person_.IsPlayer || target_.IsPlayer);
-			var sd = (hasPlayer ? d_.stopDistanceWithPlayer : d_.stopDistance);
+			var sd = (hasPlayer ? Data.stopDistanceWithPlayer : Data.stopDistance);
 
 			if (d >= sd)
 			{
@@ -546,7 +540,7 @@ namespace Cue
 			if (leading_ && target_.IsPlayer)
 			{
 				var hd = Vector3.Distance(person_.Body.Get(BP.Head).Position, startingHeadPos_);
-				if (hd >= d_.stopHeadDistance)
+				if (hd >= Data.stopHeadDistance)
 				{
 					Log.Info($"must stop: head to far, {hd}");
 					return true;

@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class ZappedEvent : BasicEvent
+	class ZappedEvent : BasicEvent<EmptyEventData>
 	{
 		class ZapZone
 		{
@@ -185,7 +185,7 @@ namespace Cue
 			};
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			for (int i = 0; i < zones_.Length; ++i)
 				zones_[i].Debug(debug);

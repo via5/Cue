@@ -24,6 +24,8 @@ namespace Cue
 		private Person person_;
 		private Logger log_;
 
+		private bool wasEnabled_ = false;
+
 		// controls where the eyes are looking at
 		private IEyes eyes_;
 
@@ -76,6 +78,11 @@ namespace Cue
 		public GazeRender Render
 		{
 			get { return render_; }
+		}
+
+		public bool Enabled
+		{
+			get { return person_.Personality.GetBool(PS.GazeEnabled); }
 		}
 
 		public IEyes Eyes { get { return eyes_; } }
@@ -142,6 +149,19 @@ namespace Cue
 
 		public void Update(float s)
 		{
+			if (!Enabled)
+			{
+				if (wasEnabled_)
+				{
+					wasEnabled_ = false;
+					gazer_.Enabled = false;
+				}
+
+				return;
+			}
+
+			wasEnabled_ = true;
+
 			gazeDuration_.Update(s, person_.Mood.GazeEnergy);
 			Targets.Update(s);
 
@@ -309,7 +329,7 @@ namespace Cue
 		public string DebugString()
 		{
 			return
-				$"e={gazerEnabled_},ebe={gazerEnabledBeforeEmergency_}";
+				$"e={Enabled},ge={gazerEnabled_},ebe={gazerEnabledBeforeEmergency_}";
 		}
 
 		private int CheckEmergency(float s)

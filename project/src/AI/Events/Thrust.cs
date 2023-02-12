@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class ThrustEvent : BasicEvent
+	class ThrustEvent : BasicEvent<EmptyEventData>
 	{
 		private BodyPart receiver_ = null;
 		private bool active_ = false;
@@ -14,7 +14,7 @@
 		{
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("receiver", $"{receiver_}");
 			debug.Add("active", $"{active_}");
@@ -24,7 +24,7 @@
 		public override bool Active
 		{
 			get { return active_; }
-			set { active_ = value; }
+			set { active_ = Enabled && value; }
 		}
 
 		public override bool CanToggle { get { return true; } }

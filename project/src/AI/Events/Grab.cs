@@ -1,6 +1,6 @@
 ﻿namespace Cue
 {
-	class GrabEvent : BasicEvent
+	class GrabEvent : BasicEvent<EmptyEventData>
 	{
 		private BodyPartLock headLock_ = null;
 		private BodyPartLock neckLock_ = null;
@@ -9,6 +9,7 @@
 		private bool headWasGrabbed_ = false;
 		private bool neckWasGrabbed_ = false;
 		private bool neckWasGrabbedWithHead_ = false;
+		private bool wasEnabled_ = false;
 
 		public GrabEvent()
 			: base("Grab")
@@ -30,7 +31,7 @@
 			neck_ = person_.Body.Get(BP.Neck);
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("head grabbed", $"{head_.GrabbedByPlayer}");
 			debug.Add("headWasGrabbed", $"{headWasGrabbed_}");
@@ -46,17 +47,23 @@
 		{
 			if (!Enabled)
 			{
-				headWasGrabbed_ = false;
-				StopHead();
+				if (wasEnabled_)
+				{
+					wasEnabled_ = false;
 
-				bool fromHead = neckWasGrabbedWithHead_;
-				neckWasGrabbed_ = false;
-				neckWasGrabbedWithHead_ = false;
-				StopNeck(fromHead);
+					headWasGrabbed_ = false;
+					StopHead();
+
+					bool fromHead = neckWasGrabbedWithHead_;
+					neckWasGrabbed_ = false;
+					neckWasGrabbedWithHead_ = false;
+					StopNeck(fromHead);
+				}
 
 				return;
 			}
 
+			wasEnabled_ = true;
 
 			// unfortunately, grabbing the neck is usually difficult because
 			// it's off, and vam always grabs the head instead since it's

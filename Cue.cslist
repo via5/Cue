@@ -136,7 +136,6 @@ project\src\UI\ScriptUI\OptionsTab.cs
 project\src\UI\ScriptUI\ScriptUI.cs
 project\src\UI\ScriptUI\SettingsTab.cs
 project\src\UI\ScriptUI\StateTab.cs
-project\src\UI\ScriptUI\UnityTab.cs
 project\src\Utilities\Duration.cs
 project\src\Utilities\Easings.cs
 project\src\Utilities\Floats.cs

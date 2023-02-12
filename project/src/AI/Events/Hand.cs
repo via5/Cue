@@ -2,7 +2,7 @@
 {
 	using AnimationOptions = PersonOptions.AnimationOptions;
 
-	class HandEvent : BasicEvent
+	class HandEvent : BasicEvent<EmptyEventData>
 	{
 		class HandInfo
 		{
@@ -93,7 +93,7 @@
 				BodyParts.FullRightArm);
 		}
 
-		public override void Debug(DebugLines debug)
+		protected override void DoDebug(DebugLines debug)
 		{
 			debug.Add("active", $"{Active}");
 			left_.Debug(debug);
@@ -109,7 +109,7 @@
 
 			set
 			{
-				if (value)
+				if (value && Enabled)
 					doManualCheck_ = true;
 				else
 					Stop();

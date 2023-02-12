@@ -3,7 +3,7 @@ using System;
 
 namespace Cue
 {
-	class HoldBreathEventData : IEventData
+	class HoldBreathEventData : BasicEventData
 	{
 		public float minExcitement = 0;
 		public float cooldown = 0;
@@ -11,7 +11,7 @@ namespace Cue
 		public float chance = 0;
 		public IRandom rng = new UniformRandom();
 
-		public IEventData Clone()
+		public override BasicEventData Clone()
 		{
 			var d = new HoldBreathEventData();
 			d.CopyFrom(this);
@@ -20,6 +20,7 @@ namespace Cue
 
 		private void CopyFrom(HoldBreathEventData d)
 		{
+			base.CopyFrom(d);
 			minExcitement = d.minExcitement;
 			cooldown = d.cooldown;
 			holdTime = d.holdTime.Clone();
@@ -28,9 +29,8 @@ namespace Cue
 		}
 	}
 
-	class HoldBreathEvent : BasicEvent
+	class HoldBreathEvent : BasicEvent<HoldBreathEventData>
 	{
-		private HoldBreathEventData d_ = null;
 		private bool active_ = false;
 		private float time_ = 0;
 		private float elapsed_ = 0;
@@ -43,51 +43,38 @@ namespace Cue
 		{
 		}
 
-		protected override IEventData DoParseEventData(JSONClass o)
+		protected override void DoParseEventData(JSONClass o, HoldBreathEventData d)
 		{
-			var d = new HoldBreathEventData();
-
 			d.minExcitement = J.ReqFloat(o, "minExcitement");
 			d.cooldown = J.ReqFloat(o, "cooldown");
 			d.holdTime = RandomRange.Create(o, "holdTime");
 
 			d.chance = J.ReqFloat(o, "chance");
 			d.rng = BasicRandom.FromJSON(o["chanceRng"]);
-
-			return d;
 		}
 
 		public override bool Active
 		{
 			get { return active_; }
-			set { active_ = value; }
+			set { active_ = Enabled && value; }
 		}
 
 		public override bool CanToggle { get { return true; } }
 		public override bool CanDisable { get { return true; } }
 
-		protected override void DoInit()
+		protected override void DoDebug(DebugLines debug)
 		{
-			OnPersonalityChanged();
-			person_.PersonalityChanged += OnPersonalityChanged;
-		}
+			var d = Data;
 
-		private void OnPersonalityChanged()
-		{
-			d_ = person_.Personality.CloneEventData(Name) as HoldBreathEventData;
-		}
-
-		public override void Debug(DebugLines debug)
-		{
 			debug.Add("active", $"{active_}");
 			debug.Add("elapsed", $"{elapsed_:0.00}");
-			debug.Add("minExcitement", $"{d_.minExcitement:0.00}");
-			debug.Add("holdTime", $"{d_.holdTime}");
-			debug.Add("chance", $"{d_.chance:0.00}");
-			debug.Add("rng", $"{d_.rng}");
+			debug.Add("minExcitement", $"{d.minExcitement:0.00}");
+			debug.Add("holdTime", $"{d.holdTime}");
+			debug.Add("chance", $"{d.chance:0.00}");
+			debug.Add("rng", $"{d.rng}");
 			debug.Add("lastRng", $"{lastRng_}");
 			debug.Add("elapsed", $"{elapsed_:0.00}/{time_:0.00}");
-			debug.Add("cooldown", $"{cooldownElapsed_:0.00}/{d_.cooldown:0.00}");
+			debug.Add("cooldown", $"{cooldownElapsed_:0.00}/{d.cooldown:0.00}");
 			debug.Add("last state", lastState_);
 		}
 
@@ -111,7 +98,7 @@ namespace Cue
 			}
 			else
 			{
-				cooldownElapsed_ = Math.Min(cooldownElapsed_ + s, d_.cooldown);
+				cooldownElapsed_ = Math.Min(cooldownElapsed_ + s, Data.cooldown);
 
 				if (CheckRun())
 					Start();
@@ -120,22 +107,22 @@ namespace Cue
 
 		private bool CheckRun()
 		{
-			if (cooldownElapsed_ < d_.cooldown)
+			if (cooldownElapsed_ < Data.cooldown)
 			{
-				lastState_ = $"cooldown {cooldownElapsed_: 0.00}/{d_.cooldown: 0.00}";
+				lastState_ = $"cooldown {cooldownElapsed_: 0.00}/{Data.cooldown: 0.00}";
 				return false;
 			}
 
-			if (person_.Mood.Get(MoodType.Excited) < d_.minExcitement)
+			if (person_.Mood.Get(MoodType.Excited) < Data.minExcitement)
 			{
 				lastState_ = "excitement too low";
 				return false;
 			}
 
-			lastRng_ = d_.rng.RandomFloat(0, 1, person_.Mood.MovementEnergy);
-			if (lastRng_ >= d_.chance)
+			lastRng_ = Data.rng.RandomFloat(0, 1, person_.Mood.MovementEnergy);
+			if (lastRng_ >= Data.chance)
 			{
-				lastState_ = $"rng failed, {lastRng_:0.00} >= {d_.chance:0.00}";
+				lastState_ = $"rng failed, {lastRng_:0.00} >= {Data.chance:0.00}";
 				return false;
 			}
 
@@ -148,7 +135,7 @@ namespace Cue
 			person_.Body.Breathing = false;
 
 			elapsed_ = 0;
-			time_ = d_.holdTime.RandomFloat(person_.Mood.MovementEnergy);
+			time_ = Data.holdTime.RandomFloat(person_.Mood.MovementEnergy);
 			active_ = true;
 		}
 

@@ -124,12 +124,20 @@ namespace Cue
 			ParseEvents(p, o, inherited);
 			ParsePose(p, o, inherited);
 			ParseAnimations(p, o, inherited);
+			ParseExpressions(p, o, inherited);
 
+			return p;
+		}
+
+		private void ParseExpressions(Personality p, JSONClass o, bool inherited)
+		{
 			if (o.HasKey("expressions"))
 			{
 				var es = new List<Expression>();
 
-				if (inherited)
+				bool inh = o["expressionsInherit"]?.AsBool ?? true;
+
+				if (inherited && inh)
 					es.AddRange(p.GetExpressions());
 
 				foreach (JSONClass en in o["expressions"].AsArray)
@@ -225,8 +233,6 @@ namespace Cue
 
 				p.SetExpressions(es.ToArray());
 			}
-
-			return p;
 		}
 
 		private void ParsePose(Personality p, JSONClass o, bool inherited)
@@ -478,7 +484,7 @@ namespace Cue
 			{
 				foreach (var eo in o["events"].AsArray.Childs)
 				{
-					var e = BasicEvent.Create(eo["type"].Value);
+					var e = PersonAI.CreateEvent(eo["type"].Value);
 					if (e == null)
 						throw new LoadFailed($"unknown event '{eo["type"].Value}'");
 

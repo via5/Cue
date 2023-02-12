@@ -170,7 +170,7 @@ namespace Cue
 
 		private void AddWarning(ref string s, string w)
 		{
-			if (w != "")
+			if (!string.IsNullOrEmpty(w))
 			{
 				if (s != "")
 					s += "\n";

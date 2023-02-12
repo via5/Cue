@@ -81,34 +81,41 @@ namespace Cue
 
 		private void DumpGaze()
 		{
-			var targets = person_.Gaze.Targets.All;
-
-			debug_.Add(person_.Gaze.LastString);
-			debug_.Add("picker: " + person_.Gaze.Picker.LastString);
-			debug_.Add("");
-
-			for (int i = 0; i < targets.Length; ++i)
+			if (person_.Personality.GetBool(PS.GazeEnabled))
 			{
-				var t = targets[i];
+				var targets = person_.Gaze.Targets.All;
 
-				if (t.WasSet)
+				debug_.Add(person_.Gaze.LastString);
+				debug_.Add("picker: " + person_.Gaze.Picker.LastString);
+				debug_.Add("");
+
+				for (int i = 0; i < targets.Length; ++i)
 				{
-					string s = $"#{i}  {t} w={t.Weight:0.00}: {t.Why}";
+					var t = targets[i];
 
-					if (t.Failure != "")
-						s += $" (failed: {t.Failure})";
+					if (t.WasSet)
+					{
+						string s = $"#{i}  {t} w={t.Weight:0.00}: {t.Why}";
 
-					debug_.Add(s);
+						if (t.Failure != "")
+							s += $" (failed: {t.Failure})";
+
+						debug_.Add(s);
+					}
 				}
+
+				foreach (var a in person_.Gaze.Targets.GetAllInfosForDebug())
+					debug_.Add($"Infos: {a}");
+
+				debug_.Add("");
+
+				foreach (var e in person_.Gaze.Events)
+					debug_.Add(e.DebugLine());
 			}
-
-			foreach (var a in person_.Gaze.Targets.GetAllInfosForDebug())
-				debug_.Add($"Infos: {a}");
-
-			debug_.Add("");
-
-			foreach (var e in person_.Gaze.Events)
-				debug_.Add(e.DebugLine());
+			else
+			{
+				debug_.Add("gaze disabled");
+			}
 
 			list_.SetItems(debug_.MakeArray());
 		}
