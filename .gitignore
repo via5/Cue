@@ -6,3 +6,6 @@
 /project/tests/bin
 /project/TestResults
 /project/packages
+/third-party/via5/ClothingManager/project/obj
+/third-party/via5/ClothingManager/project/.vs
+/third-party/via5/ClothingManager/project/bin

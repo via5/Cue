@@ -264,7 +264,7 @@ namespace ClothingManager
 
 			if (wrap_ != null && s != wrap_.currentWrapName)
 			{
-				Log.Info($"state {wrap_.currentWrapName}->{s}");
+				Log.Verbose($"state {wrap_.currentWrapName}->{s}");
 				wrap_.currentWrapName = s;
 			}
 		}

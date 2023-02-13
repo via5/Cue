@@ -198,9 +198,6 @@ namespace Cue
 
 		public void FixedUpdate(float s)
 		{
-			if (!Enabled)
-				return;
-
 			DoFixedUpdate(s);
 		}
 
@@ -211,9 +208,6 @@ namespace Cue
 
 		public void Update(float s)
 		{
-			if (!Enabled)
-				return;
-
 			DoUpdate(s);
 
 			if (enabledParam_ != null)
@@ -230,9 +224,6 @@ namespace Cue
 
 		public void UpdatePaused(float s)
 		{
-			if (!Enabled)
-				return;
-
 			DoUpdatePaused(s);
 		}
 

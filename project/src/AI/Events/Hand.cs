@@ -137,6 +137,9 @@
 
 		protected override void DoUpdate(float s)
 		{
+			if (!Enabled)
+				return;
+
 			CheckAutoStart();
 			CheckAnim();
 

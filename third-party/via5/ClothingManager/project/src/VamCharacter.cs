@@ -90,7 +90,7 @@ namespace ClothingManager
 			foreach (var p in cs_)
 				p.Value.SetGenitalsState(s);
 
-			Log.Info($"genitals {States.ToString(genitalsState_)}->{States.ToString(s)}");
+			Log.Verbose($"genitals {States.ToString(genitalsState_)}->{States.ToString(s)}");
 
 			genitalsState_ = s;
 			genitalsStateParam_.valNoCallback = States.ToString(s);
@@ -109,7 +109,7 @@ namespace ClothingManager
 			foreach (var p in cs_)
 				p.Value.SetBreastsState(s);
 
-			Log.Info($"breasts {States.ToString(breastsState_)}->{States.ToString(s)}");
+			Log.Verbose($"breasts {States.ToString(breastsState_)}->{States.ToString(s)}");
 
 			breastsState_ = s;
 			breastsStateParam_.valNoCallback = States.ToString(s);

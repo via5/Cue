@@ -223,11 +223,17 @@
 
 		protected override void DoUpdatePaused(float s)
 		{
+			if (!Enabled)
+				return;
+
 			RealUpdate(s);
 		}
 
 		protected override void DoUpdate(float s)
 		{
+			if (!Enabled)
+				return;
+
 			RealUpdate(s);
 		}
 

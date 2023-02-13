@@ -193,6 +193,9 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
+			if (!Enabled)
+				return;
+
 			for (int i = 0; i < zones_.Length; ++i)
 				zones_[i].Update(s);
 		}

@@ -68,7 +68,7 @@ namespace ClothingManager
 
 		private void Load(List<Item> list, string metaFile)
 		{
-			Log.Info($"loading {metaFile}");
+			Log.Verbose($"loading {metaFile}");
 			var doc = JSON.Parse(FileManagerSecure.ReadAllText(metaFile));
 
 			if (doc == null)

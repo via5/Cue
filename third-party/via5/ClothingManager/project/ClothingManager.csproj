@@ -42,55 +42,55 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <Aliases>global, mscorlib</Aliases>
-      <HintPath>..\..\..\..\VaM_Data\Managed\mscorlib.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
-      <HintPath>..\..\..\..\VaM_Data\Managed\System.Core.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\System.Core.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.AIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\VaM_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>$(VAMROOT)\VaM_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
