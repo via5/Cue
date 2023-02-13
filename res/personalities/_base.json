@@ -443,7 +443,7 @@
 
 				{
 					"id": "Eyeball Rotate Vertical L",
-					"max": -3.5
+					"max": -2.7
 				},
 
 				{
@@ -453,7 +453,7 @@
 
 				{
 					"id": "Eyeball Rotate Vertical R",
-					"max": -3.5
+					"max": -2.7
 				}
 			]
 		}
