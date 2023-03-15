@@ -83,7 +83,7 @@ namespace VUI
 					DoLayout();
 					var t = Time.realtimeSinceStartup - start;
 
-					Glue.LogVerbose($"layout {Name}: {t:0.000:}s");
+					Log.Info($"layout {Name}: {t:0.000:}s");
 
 					dirty_ = false;
 				}
@@ -99,7 +99,7 @@ namespace VUI
 		{
 			if (!dirty_)
 			{
-				Glue.LogVerbose($"{Name} needs layout: {why}");
+				Log.Info($"{Name} needs layout: {why}");
 				dirty_ = true;
 			}
 		}
@@ -145,6 +145,7 @@ namespace VUI
 		public delegate void FocusHandler(Widget blurred, Widget focused);
 		public event FocusHandler FocusChanged;
 
+		private readonly Logger log_;
 		private Rectangle bounds_;
 		private Insets margins_ = new Insets(5);
 		private RootPanel content_;
@@ -172,22 +173,35 @@ namespace VUI
 			}
 		}
 
+		private Root(string prefix)
+		{
+			log_ = new Logger("vui.root." + prefix);
+		}
+
 		public Root(MVRScript s, string prefix="")
+			: this(prefix)
 		{
 			CheckInit(s, prefix);
 			Create(new ScriptUIRootSupport(s));
 		}
 
 		public Root(MVRScriptUI sui, string prefix="")
+			: this(prefix)
 		{
 			CheckInit(null, prefix);
 			Create(new ScriptUIRootSupport(sui));
 		}
 
 		public Root(IRootSupport support, string prefix="")
+			: this(prefix)
 		{
 			CheckInit(null, prefix);
 			Create(support);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		private void CheckInit(MVRScript s, string prefix)
@@ -197,7 +211,7 @@ namespace VUI
 
 			if (s == null)
 			{
-				SuperController.LogError(
+				SuperController.LogMessage(
 					"vui: must call Init() manually when Root is not created " +
 					"from a MVRScript or a MVRScriptUI");
 
@@ -330,18 +344,18 @@ namespace VUI
 
 		public void AttachTo(IRootSupport support)
 		{
-			Glue.LogVerbose($"root: attaching to {support}");
+			Log.Verbose($"root: attaching to {support}");
 
 			support_ = support;
 
-			if (support_.Init())
+			if (support_.Init(this))
 			{
-				Glue.LogVerbose("root: support is already ready");
+				Log.Verbose("root: support is already ready");
 				OnSupportReady();
 			}
 			else
 			{
-				Glue.LogVerbose("root: support is not ready, creating timer");
+				Log.Verbose("root: support is not ready, creating timer");
 				checkReadyTimer_ = TimerManager.Instance.CreateTimer(
 					0.5f, CheckSupportReady, Timer.Repeat);
 			}
@@ -349,13 +363,13 @@ namespace VUI
 
 		private void CheckSupportReady()
 		{
-			if (support_.Init())
+			if (support_.Init(this))
 			{
-				Glue.LogVerbose("root: support is finally ready");
+				Log.Verbose("root: support is finally ready");
 				checkReadyTimer_.Destroy();
 				checkReadyTimer_ = null;
 				OnSupportReady();
-				Glue.LogVerbose("root: all done");
+				Log.Verbose("root: all done");
 			}
 		}
 
@@ -375,7 +389,7 @@ namespace VUI
 			var text = SuperController.singleton.GetComponentInChildren<Text>();
 			if (text == null)
 			{
-				Glue.LogError($"no text component in supercontroller");
+				Log.Error($"no text component in supercontroller");
 			}
 			else
 			{
@@ -437,7 +451,7 @@ namespace VUI
 					if (visible_)
 					{
 						content_.NeedsLayout("root visibility changed");
-						floating_.NeedsLayout("root visibility changed");
+						floating_?.NeedsLayout("root visibility changed");
 					}
 				}
 			}
@@ -471,14 +485,14 @@ namespace VUI
 				if (ready_)
 				{
 					content_.Update(forceLayout);
-					floating_.Update(forceLayout);
+					floating_?.Update(forceLayout);
 
 					UpdateTracking();
 				}
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -505,10 +519,10 @@ namespace VUI
 		public void SupportBoundsChanged()
 		{
 			bounds_ = new Rectangle(0, 0, support_.Bounds.Size);
-			Glue.LogVerbose($"root: bounds {bounds_}");
+			Log.Verbose($"root: bounds {bounds_}");
 
 			content_.SetBounds(bounds_);
-			floating_.SetBounds(bounds_);
+			floating_?.SetBounds(bounds_);
 
 			ForceRelayout("support bounds changed");
 		}

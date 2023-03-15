@@ -94,7 +94,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Logger.Global.Error("timer: exception during callback");
+				Logger.Global.ErrorST(e.ToString());
 			}
 
 			if (Bits.IsSet(flags_, Repeat))

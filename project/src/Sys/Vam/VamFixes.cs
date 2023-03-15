@@ -63,7 +63,7 @@ namespace Cue.Sys.Vam
 			var ct = a.GetComponentInChildren<CollisionTrigger>();
 			if (ct == null)
 			{
-				SuperController.LogError($"dildo {a.uid} has no CollisionTrigger");
+				Logger.SafeLogError($"dildo {a.uid} has no CollisionTrigger");
 				return;
 			}
 
@@ -76,7 +76,7 @@ namespace Cue.Sys.Vam
 
 			if (o == null)
 			{
-				SuperController.LogError($"dildo {a.uid} has no object");
+				Logger.SafeLogError($"dildo {a.uid} has no object");
 				return;
 			}
 
@@ -87,7 +87,7 @@ namespace Cue.Sys.Vam
 
 			if (d1 == null)
 			{
-				SuperController.LogError($"dildo {a.uid} has no dildo1");
+				Logger.SafeLogError($"dildo {a.uid} has no dildo1");
 				return;
 			}
 
@@ -96,7 +96,7 @@ namespace Cue.Sys.Vam
 
 			if (h == null)
 			{
-				SuperController.LogError($"dildo {a.uid} has no CollisionTriggerEventHandler");
+				Logger.SafeLogError($"dildo {a.uid} has no CollisionTriggerEventHandler");
 				return;
 			}
 

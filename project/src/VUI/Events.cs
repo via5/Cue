@@ -17,6 +17,11 @@ namespace VUI
 			set { widget_ = value; }
 		}
 
+		public Logger Log
+		{
+			get { return widget_?.Log ?? Logger.Global; }
+		}
+
 		public void OnPointerEnter(PointerEventData d)
 		{
 			try
@@ -26,7 +31,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -39,7 +44,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -52,7 +57,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -65,7 +70,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -84,7 +89,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -100,7 +105,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -113,7 +118,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -126,7 +131,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -139,7 +144,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 	}

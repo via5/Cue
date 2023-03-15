@@ -160,6 +160,7 @@ project\src\VUI\Image.cs
 project\src\VUI\Label.cs
 project\src\VUI\Layout.cs
 project\src\VUI\ListView.cs
+project\src\VUI\Log.cs
 project\src\VUI\Menu.cs
 project\src\VUI\Misc.cs
 project\src\VUI\Panel.cs

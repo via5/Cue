@@ -354,13 +354,13 @@ namespace VUI
 				}
 
 				if (sel == -1)
-					Glue.LogError("combobox: selected item '" + s + "' not found");
+					Log.Error("combobox: selected item '" + s + "' not found");
 
 				Select(sel);
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 	}

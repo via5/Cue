@@ -9,6 +9,7 @@ namespace VUI
 	//
 	interface IListView
 	{
+		Logger Log { get; }
 		void OnItemActivatedInternal();
 		void OnItemRightClickedInternal();
 		void SetHoveredInternal(ListViewItem from, ListViewItem hovered);
@@ -28,12 +29,24 @@ namespace VUI
 	class ListViewItem : MonoBehaviour,
 		IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 	{
+		public Logger Log
+		{
+			get
+			{
+				var lists = GetComponentsInParent<ListViewComponent>();
+				if (lists == null || lists.Length == 0)
+					return Logger.Global;
+				else
+					return lists[0]?.List?.Log ?? Logger.Global;
+			}
+		}
+
 		private IListView GetListView()
 		{
 			var lists = GetComponentsInParent<ListViewComponent>();
 			if (lists.Length == 0)
 			{
-				Glue.LogError("ListViewItem: no ListViewComponent in parents");
+				Log.Error("ListViewItem: no ListViewComponent in parents");
 				return null;
 			}
 
@@ -48,8 +61,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogError("exception in ListViewItem.OnPointerEnter");
-				Glue.LogError(e.ToString());
+				Log.Error("exception in ListViewItem.OnPointerEnter");
+				Log.Error(e.ToString());
 			}
 		}
 
@@ -61,8 +74,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogError("exception in ListViewItem.OnPointerExit");
-				Glue.LogError(e.ToString());
+				Log.Error("exception in ListViewItem.OnPointerExit");
+				Log.Error(e.ToString());
 			}
 		}
 
@@ -83,8 +96,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogError("exception in ListViewItem.OnPointerClick");
-				Glue.LogError(e.ToString());
+				Log.Error("exception in ListViewItem.OnPointerClick");
+				Log.Error(e.ToString());
 			}
 		}
 	}
@@ -166,13 +179,13 @@ namespace VUI
 			var go = Popup.popup.popupButtonPrefab?.gameObject;
 			if (go == null)
 			{
-				Glue.LogError("ListView: prefab object null");
+				Log.Error("ListView: prefab object null");
 			}
 			else
 			{
 				var item = go.AddComponent<ListViewItem>();
 				if (item == null)
-					Glue.LogError("ListView: can't add ListViewItem component");
+					Log.Error("ListView: can't add ListViewItem component");
 			}
 
 			// adding the component on this doesn't work, GetComponentsInParent()
@@ -180,13 +193,13 @@ namespace VUI
 			var viewport = Utilities.FindChildRecursive(WidgetObject, "Viewport");
 			if (viewport == null)
 			{
-				Glue.LogError("ListView: no viewport");
+				Log.Error("ListView: no viewport");
 			}
 			else
 			{
 				var c = viewport.AddComponent<ListViewComponent>();
 				if (c == null)
-					Glue.LogError("ListView: can't add component");
+					Log.Error("ListView: can't add component");
 				else
 					c.List = this;
 			}
@@ -214,7 +227,7 @@ namespace VUI
 			var s = Selected;
 			if (s == null)
 			{
-				Glue.LogError("selected null");
+				Log.Error("selected null");
 			}
 			else
 			{
@@ -228,7 +241,7 @@ namespace VUI
 			var s = hovered_;
 			if (s == null)
 			{
-				Glue.LogError("right clicked null");
+				Log.Error("right clicked null");
 			}
 			else if (hovered_ != null)
 			{

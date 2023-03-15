@@ -107,7 +107,7 @@ namespace VUI
 		public static void LogInfo(string s)
 		{
 			if (logInfo_ == null)
-				SuperController.LogError(s);
+				SuperController.LogMessage(s);
 			else
 				logInfo_(s);
 		}
@@ -115,7 +115,7 @@ namespace VUI
 		public static void LogWarning(string s)
 		{
 			if (logWarning_ == null)
-				SuperController.LogError(s);
+				SuperController.LogMessage(s);
 			else
 				logWarning_(s);
 		}
@@ -128,7 +128,7 @@ namespace VUI
 		public static void LogError(string s)
 		{
 			if (logError_ == null)
-				SuperController.LogError(s);
+				SuperController.LogMessage(s);
 			else
 				logError_(s);
 		}

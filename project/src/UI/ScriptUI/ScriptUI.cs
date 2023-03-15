@@ -27,7 +27,7 @@ namespace Cue
 
 			Cue.Instance.Options.Changed += () => { tabs_.CheckDebugTabs(); };
 
-			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI);
+			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI, "cue.scriptui");
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
 

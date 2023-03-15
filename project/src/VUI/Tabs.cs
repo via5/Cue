@@ -297,7 +297,7 @@ namespace VUI
 			var i = IndexOfWidget(w);
 			if (i == -1)
 			{
-				Glue.LogError($"Select: widget '{w}' not found");
+				Log.Error($"Select: widget '{w}' not found");
 				return;
 			}
 
@@ -309,7 +309,7 @@ namespace VUI
 			var i = IndexOfCaption(caption);
 			if (i == -1)
 			{
-				Glue.LogError($"Select: caption '{caption}' not found");
+				Log.Error($"Select: caption '{caption}' not found");
 				return;
 			}
 
@@ -343,7 +343,7 @@ namespace VUI
 			var i = IndexOfWidget(w);
 			if (i == -1)
 			{
-				Glue.LogError("SetTabVisible: widget not found");
+				Log.Error("SetTabVisible: widget not found");
 				return;
 			}
 

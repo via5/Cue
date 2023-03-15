@@ -72,10 +72,8 @@ namespace VUI
 			label_.Tooltip.Text = "";
 		}
 
-		public override void Create()
+		protected override void DoPostCreate()
 		{
-			base.Create();
-
 			foreach (var c in MainObject.GetComponentsInChildren<Graphic>())
 				c.raycastTarget = false;
 		}
@@ -108,7 +106,7 @@ namespace VUI
 		public TooltipManager(Root root)
 		{
 			root_ = root;
-			root_.FloatingPanel.Add(widget_);
+			root_.FloatingPanel?.Add(widget_);
 		}
 
 		public void Destroy()

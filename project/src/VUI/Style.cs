@@ -370,8 +370,9 @@ namespace VUI
 
 	class Style
 	{
-		private static Theme theme_ = new Theme();
-		private static Metrics metrics_ = new Metrics();
+		private static readonly Logger log_ = new Logger("vui.style");
+		private static readonly Theme theme_ = new Theme();
+		private static readonly Metrics metrics_ = new Metrics();
 
 		private class Info
 		{
@@ -442,21 +443,27 @@ namespace VUI
 		}
 
 
-		static public Theme Theme
+		public static Logger Log
+		{
+			get { return log_; }
+		}
+
+		public static Theme Theme
 		{
 			get { return theme_; }
 		}
 
-		static public Metrics Metrics
+		public static Metrics Metrics
 		{
 			get { return metrics_; }
 		}
+
 
 		private static void ForComponent<T>(Component o, Action<T> f)
 		{
 			if (o == null)
 			{
-				Glue.LogErrorST("ForComponent null");
+				Log.ErrorST("ForComponent null");
 				return;
 			}
 
@@ -467,7 +474,7 @@ namespace VUI
 		{
 			if (o == null)
 			{
-				Glue.LogErrorST("ForComponent null");
+				Log.ErrorST("ForComponent null");
 				return;
 			}
 
@@ -475,7 +482,7 @@ namespace VUI
 
 			if (c == null)
 			{
-				Glue.LogErrorST(
+				Log.ErrorST(
 					"component " + typeof(T).ToString() + " not found " +
 					"in " + o.name);
 
@@ -489,7 +496,7 @@ namespace VUI
 		{
 			if (o == null)
 			{
-				Glue.LogErrorST("ForComponents null");
+				Log.ErrorST("ForComponents null");
 				return;
 			}
 
@@ -497,7 +504,7 @@ namespace VUI
 
 			if (cs.Length == 0)
 			{
-				Glue.LogErrorST(
+				Log.ErrorST(
 					"component " + typeof(T).ToString() + " not found " +
 					"in " + o.name);
 
@@ -512,7 +519,7 @@ namespace VUI
 		{
 			if (o == null)
 			{
-				Glue.LogErrorST("ForComponentInChildren null");
+				Log.ErrorST("ForComponentInChildren null");
 				return;
 			}
 
@@ -523,7 +530,7 @@ namespace VUI
 		{
 			if (o == null)
 			{
-				Glue.LogErrorST("ForComponentInChildren null");
+				Log.ErrorST("ForComponentInChildren null");
 				return;
 			}
 
@@ -531,7 +538,7 @@ namespace VUI
 
 			if (c == null)
 			{
-				Glue.LogErrorST(
+				Log.ErrorST(
 					"component " + typeof(T).ToString() + " not found in " +
 					"children of " + o.name);
 
@@ -545,7 +552,7 @@ namespace VUI
 		{
 			if (parent == null)
 			{
-				Glue.LogErrorST("ForChildRecursive null");
+				Log.ErrorST("ForChildRecursive null");
 				return;
 			}
 
@@ -553,7 +560,7 @@ namespace VUI
 
 			if (c == null)
 			{
-				Glue.LogErrorST(
+				Log.ErrorST(
 					"child " + name + " not found in " + parent.name);
 
 				return;
@@ -737,7 +744,7 @@ namespace VUI
 
 			if (labelTextParent == null)
 			{
-				Glue.LogError("ComboBox has no labelText parent");
+				Log.Error("ComboBox has no labelText parent");
 			}
 			else
 			{
@@ -756,7 +763,7 @@ namespace VUI
 
 			if (cb.Popup?.popup?.topButton == null)
 			{
-				Glue.LogError("ComboBox has no topButton");
+				Log.Error("ComboBox has no topButton");
 			}
 			else
 			{
@@ -786,7 +793,7 @@ namespace VUI
 
 			if (cb.Popup.popup.popupPanel == null)
 			{
-				Glue.LogError("ComboBox has no popupPanel");
+				Log.Error("ComboBox has no popupPanel");
 			}
 			else
 			{
@@ -901,7 +908,7 @@ namespace VUI
 		{
 			var input = e.InputField;
 			if (input == null)
-				Glue.LogError("TextBox has no InputField");
+				Log.Error("TextBox has no InputField");
 			else
 				Adjust(input, new Info(e));
 		}
@@ -919,7 +926,7 @@ namespace VUI
 
 			var input = e.InputField;
 			if (input == null)
-				Glue.LogError("TextBox has no InputField");
+				Log.Error("TextBox has no InputField");
 			else
 				Polish(input, new Info(e));
 		}
@@ -1049,7 +1056,7 @@ namespace VUI
 
 			if (e.buttonText == null)
 			{
-				Glue.LogError("UIDynamicButton has no buttonText");
+				Log.Error("UIDynamicButton has no buttonText");
 			}
 			else
 			{
@@ -1069,7 +1076,7 @@ namespace VUI
 
 			if (e.popup == null)
 			{
-				Glue.LogError("UIDynamicPopup has no popup");
+				Log.Error("UIDynamicPopup has no popup");
 			}
 			else
 			{
@@ -1084,7 +1091,7 @@ namespace VUI
 		private static void Polish(UIDynamicPopup e, Info info)
 		{
 			if (e.popup == null)
-				Glue.LogError("UIDynamicPopup has no popup");
+				Log.Error("UIDynamicPopup has no popup");
 			else
 				Polish(e.popup, info);
 		}
@@ -1123,7 +1130,7 @@ namespace VUI
 			var text = input.textComponent;
 			if (text == null)
 			{
-				Glue.LogError("InputField has no textComponent");
+				Log.Error("InputField has no textComponent");
 			}
 			else
 			{
@@ -1146,7 +1153,7 @@ namespace VUI
 			// placeholder
 			if (input.placeholder == null)
 			{
-				Glue.LogError("InputField has no placeholder");
+				Log.Error("InputField has no placeholder");
 			}
 			else
 			{
@@ -1182,7 +1189,7 @@ namespace VUI
 				// popup
 				if (e.topButton == null)
 				{
-					Glue.LogError("UIPopup has no topButton");
+					Log.Error("UIPopup has no topButton");
 				}
 				else
 				{
@@ -1193,7 +1200,7 @@ namespace VUI
 				// popup
 				if (e.popupButtonPrefab == null)
 				{
-					Glue.LogError("UIPopup has no popupButtonPrefab");
+					Log.Error("UIPopup has no popupButtonPrefab");
 				}
 				else
 				{
@@ -1249,7 +1256,7 @@ namespace VUI
 				// background color of the popup, behind the items
 				if (e.popupPanel == null)
 				{
-					Glue.LogError("UIPopup has no popupPanel");
+					Log.Error("UIPopup has no popupPanel");
 				}
 				else
 				{
@@ -1270,7 +1277,7 @@ namespace VUI
 				// topButton is the actual combobox the user clicks to open the
 				// popup
 				if (e.topButton == null)
-					Glue.LogError("UIPopup has no topButton");
+					Log.Error("UIPopup has no topButton");
 				else
 					Polish(e.topButton, Button.Polishing.Default, info);
 
@@ -1278,7 +1285,7 @@ namespace VUI
 				// popup
 				if (e.popupButtonPrefab == null)
 				{
-					Glue.LogError("UIPopup has no popupButtonPrefab");
+					Log.Error("UIPopup has no popupButtonPrefab");
 				}
 				else
 				{
@@ -1330,7 +1337,7 @@ namespace VUI
 		private static void Adjust(UIDynamicColorPicker picker, Info info)
 		{
 			if (picker.colorPicker == null)
-				Glue.LogError("UIDynamicColorPicker has no colorPicker");
+				Log.Error("UIDynamicColorPicker has no colorPicker");
 			else
 				Adjust(picker.colorPicker, info);
 
@@ -1366,7 +1373,7 @@ namespace VUI
 			// label on top
 			if (picker.labelText == null)
 			{
-				Glue.LogError("UIDynamicColorPicker has no labelText");
+				Log.Error("UIDynamicColorPicker has no labelText");
 			}
 			else
 			{
@@ -1376,7 +1383,7 @@ namespace VUI
 
 
 			if (picker.colorPicker == null)
-				Glue.LogError("UIDynamicColorPicker has no colorPicker");
+				Log.Error("UIDynamicColorPicker has no colorPicker");
 			else
 				Polish(picker.colorPicker, info);
 
@@ -1410,17 +1417,17 @@ namespace VUI
 
 
 			if (picker.redSlider == null)
-				Glue.LogError("HSVColorPIcker has no redSlider");
+				Log.Error("HSVColorPIcker has no redSlider");
 			else
 				sliders.Add(picker.redSlider);
 
 			if (picker.greenSlider == null)
-				Glue.LogError("HSVColorPIcker has no greenSlider");
+				Log.Error("HSVColorPIcker has no greenSlider");
 			else
 				sliders.Add(picker.greenSlider);
 
 			if (picker.blueSlider == null)
-				Glue.LogError("HSVColorPIcker has no blueSlider");
+				Log.Error("HSVColorPIcker has no blueSlider");
 			else
 				sliders.Add(picker.blueSlider);
 
@@ -1438,7 +1445,7 @@ namespace VUI
 
 				if (parent == null)
 				{
-					Glue.LogError("color picker slider " + slider.name + " has no parent");
+					Log.Error("color picker slider " + slider.name + " has no parent");
 				}
 				else
 				{
@@ -1513,7 +1520,7 @@ namespace VUI
 
 				if (parent == null)
 				{
-					Glue.LogError("color picker slider " + slider.name + " has no parent");
+					Log.Error("color picker slider " + slider.name + " has no parent");
 				}
 				else
 				{
@@ -1546,7 +1553,7 @@ namespace VUI
 
 							if (field.textComponent == null)
 							{
-								Glue.LogError("InputField has no textComponent");
+								Log.Error("InputField has no textComponent");
 							}
 							else
 							{

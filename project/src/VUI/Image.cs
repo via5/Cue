@@ -359,15 +359,6 @@ namespace VUI
 			set { tex_ = value; UpdateTexture();  }
 		}
 
-		protected override GameObject CreateGameObject()
-		{
-			return new GameObject();
-		}
-
-		protected override void DoCreate()
-		{
-		}
-
 		protected override void AfterUpdateBounds()
 		{
 			if (image_ == null)

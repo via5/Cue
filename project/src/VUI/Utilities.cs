@@ -199,7 +199,7 @@ namespace VUI
 			var end = Time.realtimeSinceStartup;
 			var d = end - start;
 
-			Glue.LogError($"{what}: {d:0.00000} s");
+			Logger.Global.Info($"{what}: {d:0.00000} s");
 		}
 
 		public static void BringToTop(GameObject o)
@@ -384,7 +384,7 @@ namespace VUI
 			{
 				if (c == null)
 				{
-					Glue.LogError(new string(' ', indent * 2) + "null?");
+					Logger.Global.Info(new string(' ', indent * 2) + "null?");
 					continue;
 				}
 
@@ -395,7 +395,7 @@ namespace VUI
 				else if (c is Text)
 					s += $" '{(c as Text).text}'";
 
-				Glue.LogError(s);
+				Logger.Global.Info(s);
 			}
 		}
 
@@ -406,14 +406,14 @@ namespace VUI
 
 		public static void DumpComponentsAndUp(GameObject o)
 		{
-			Glue.LogError(o.name);
+			Logger.Global.Info(o.name);
 
 			var rt = o.GetComponent<RectTransform>();
 			if (rt != null)
-				Glue.LogError(ToString(rt, 2));
+				Logger.Global.Info(ToString(rt, 2));
 
 			DumpComponents(o);
-			Glue.LogError("---");
+			Logger.Global.Info("---");
 
 			var parent = o?.transform?.parent?.gameObject;
 			if (parent != null)
@@ -428,13 +428,13 @@ namespace VUI
 		public static void DumpComponentsAndDown(
 			GameObject o, bool dumpRt = false, int indent = 0)
 		{
-			Glue.LogError(new string(' ', indent * 2) + o.name);
+			Logger.Global.Info(new string(' ', indent * 2) + o.name);
 
 			if (dumpRt)
 			{
 				var rt = o.GetComponent<RectTransform>();
 				if (rt != null)
-					Glue.LogError(ToString(rt, indent * 2));
+					Logger.Global.Info(ToString(rt, indent * 2));
 			}
 
 			DumpComponents(o, indent);
@@ -457,11 +457,11 @@ namespace VUI
 
 			if (rt == null)
 			{
-				Glue.LogError(new string(' ', indent * 2) + o.name);
+				Logger.Global.Info(new string(' ', indent * 2) + o.name);
 			}
 			else
 			{
-				Glue.LogError(new string(' ', indent * 2) + o.name + " " +
+				Logger.Global.Info(new string(' ', indent * 2) + o.name + " " +
 					"omin=" + rt.offsetMin.ToString() + " " +
 					"omax=" + rt.offsetMax.ToString() + " " +
 					"amin=" + rt.anchorMin.ToString() + " " +
@@ -475,7 +475,7 @@ namespace VUI
 
 		public static void DumpChildren(GameObject o, int indent = 0)
 		{
-			Glue.LogError(new string(' ', indent * 2) + o.name);
+			Logger.Global.Info(new string(' ', indent * 2) + o.name);
 
 			foreach (Transform c in o.transform)
 				DumpChildren(c.gameObject, indent + 1);

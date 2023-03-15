@@ -303,6 +303,7 @@
     <Compile Include="src\VUI\Label.cs" />
     <Compile Include="src\VUI\Layout.cs" />
     <Compile Include="src\VUI\ListView.cs" />
+    <Compile Include="src\VUI\Log.cs" />
     <Compile Include="src\VUI\Menu.cs" />
     <Compile Include="src\VUI\Misc.cs" />
     <Compile Include="src\VUI\Panel.cs" />

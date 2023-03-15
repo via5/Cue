@@ -23,7 +23,7 @@
 
 			var root = new VUI.Root(
 				new VUI.OverlayRootSupport(10, Width, MinHeight),
-				"CueDesktop");
+				"cue.desktopui");
 
 			var p = new VUI.Panel(new VUI.VerticalFlow(5));
 

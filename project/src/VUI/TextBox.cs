@@ -20,10 +20,21 @@ namespace VUI
 		public delegate void KeyCallback();
 		public event KeyCallback UpArrow, DownArrow;
 
+		private TextBox parent_ = null;
 		private bool selected_ = false;
 		private float lastClick_ = 0;
 		private int clickCount_ = 0;
 		private Vector2 lastClickPos_ = NoPos;
+
+		public Logger Log
+		{
+			get { return parent_?.Log ?? Logger.Global; }
+		}
+
+		public TextBox Parent
+		{
+			set { parent_ = value; }
+		}
 
 		protected override void LateUpdate()
 		{
@@ -57,7 +68,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -69,7 +80,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -81,7 +92,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -625,13 +636,6 @@ namespace VUI
 			input_?.ActivateInputField();
 		}
 
-		protected override GameObject CreateGameObject()
-		{
-			var go = base.CreateGameObject();
-
-			return go;
-		}
-
 		protected override void DoCreate()
 		{
 			var field = new GameObject("TextBoxInputField");
@@ -645,6 +649,7 @@ namespace VUI
 			text.alignment = TextAnchor.MiddleLeft;
 
 			input_ = field.AddComponent<CustomInputField>();
+			input_.Parent = this;
 			input_.PointerDown += OnMouseDown;
 			input_.Focused += OnFocused;
 			input_.DoubleClick += OnDoubleClick;
@@ -736,7 +741,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -866,7 +871,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 
@@ -936,7 +941,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 

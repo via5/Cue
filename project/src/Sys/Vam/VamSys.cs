@@ -110,9 +110,9 @@ namespace Cue.Sys.Vam
 			foreach (var line in s.Split('\n'))
 			{
 				if (level == Logger.ErrorLevel)
-					SuperController.LogError($"{t} !![{p}] {line}");
+					SuperController.LogMessage($"{t} !![{p}] {line}");
 				else
-					SuperController.LogError($"{t}   [{p}] {line}");
+					SuperController.LogMessage($"{t}   [{p}] {line}");
 			}
 		}
 
@@ -528,7 +528,7 @@ namespace Cue.Sys.Vam
 				return;
 
 			ClearLog();
-			SuperController.LogError("reloading");
+			Logger.SafeLogInfo("reloading");
 			pui.reloadButton?.onClick?.Invoke();
 		}
 
@@ -543,14 +543,14 @@ namespace Cue.Sys.Vam
 
 			if (atomUI == null)
 			{
-				SuperController.LogError("no AtomUI");
+				Logger.SafeLogError("no AtomUI");
 				return;
 			}
 
 			var tabs = atomUI.GetComponentInChildren<UITabSelector>();
 			if (tabs == null)
 			{
-				SuperController.LogError("no UITabSelector");
+				Logger.SafeLogError("no UITabSelector");
 				return;
 			}
 
@@ -559,19 +559,19 @@ namespace Cue.Sys.Vam
 			var scui = pui.GetComponentInChildren<MVRScriptControllerUI>();
 			if (scui == null)
 			{
-				SuperController.LogError("no MVRScriptControllerUI");
+				Logger.SafeLogError("no MVRScriptControllerUI");
 				return;
 			}
 
 			if (scui.openUIButton == null)
 			{
-				SuperController.LogError("no openUIButton");
+				Logger.SafeLogError("no openUIButton");
 				return;
 			}
 
 			if (scui.openUIButton.onClick == null)
 			{
-				SuperController.LogError("openUIButton.onClick is null");
+				Logger.SafeLogError("openUIButton.onClick is null");
 				return;
 			}
 
@@ -591,7 +591,7 @@ namespace Cue.Sys.Vam
 			Transform uit = CueMain.Instance.UITransform;
 			if (uit?.parent == null)
 			{
-				SuperController.LogError("no main ui, selecting atom");
+				Logger.SafeLogInfo("no main ui, selecting atom");
 
 				SuperController.singleton.gameMode = SuperController.GameMode.Edit;
 				SuperController.singleton.SelectController(
@@ -600,7 +600,7 @@ namespace Cue.Sys.Vam
 				uit = CueMain.Instance.UITransform;
 				if (uit?.parent == null)
 				{
-					SuperController.LogError("sill no main ui, can't reload, open main UI once");
+					Logger.SafeLogError("sill no main ui, can't reload, open main UI once");
 					return null;
 				}
 			}
@@ -611,7 +611,7 @@ namespace Cue.Sys.Vam
 					return pui;
 			}
 
-			SuperController.LogError("no MVRPluginUI found for this plugin");
+			Logger.SafeLogError("no MVRPluginUI found for this plugin");
 			return null;
 		}
 

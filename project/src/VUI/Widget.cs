@@ -60,6 +60,14 @@ namespace VUI
 			tooltip_ = new Tooltip();
 		}
 
+		public Logger Log
+		{
+			get
+			{
+				return GetRoot()?.Log ?? Logger.Global;
+			}
+		}
+
 		public virtual void Dispose()
 		{
 			Destroy();
@@ -314,7 +322,7 @@ namespace VUI
 		public bool IsVisibleOnScreen()
 		{
 			if (mainObject_ == null)
-				return visible_ && RenderInHierarchy;
+				return false;
 			else
 				return mainObject_.activeInHierarchy && RenderInHierarchy;
 		}
@@ -683,7 +691,10 @@ namespace VUI
 				var list = new List<string>();
 
 				list.Add(TypeName);
-				list.Add(name_);
+
+				if (name_ != "")
+					list.Add(name_);
+
 				list.Add("b=" + Bounds.ToString());
 				list.Add("rb=" + RelativeBounds.ToString());
 				list.Add("ps=" + GetRealPreferredSize(DontCare, DontCare).ToString());
@@ -706,7 +717,7 @@ namespace VUI
 			where T : Widget
 		{
 			if (w.parent_ != null)
-				Glue.LogWarningST("widget already has a parent");
+				Log.WarningST("widget already has a parent");
 
 			w.parent_ = this;
 			children_.Add(w);
@@ -719,7 +730,7 @@ namespace VUI
 		{
 			if (!children_.Remove(w))
 			{
-				Glue.LogError(
+				Log.Error(
 					"can't remove widget '" + w.Name + "' from " +
 					"'" + Name + "', not found");
 
@@ -738,7 +749,7 @@ namespace VUI
 		{
 			if (parent_ == null)
 			{
-				Glue.LogError("can't remove '" + Name + ", no parent");
+				Log.Error("can't remove '" + Name + ", no parent");
 				return;
 			}
 
@@ -759,8 +770,8 @@ namespace VUI
 
 		public void DoLayout()
 		{
-			DoLayoutImpl();
 			Create();
+			DoLayoutImpl();
 			UpdateBounds();
 		}
 
@@ -777,11 +788,12 @@ namespace VUI
 			SetDirty(false);
 		}
 
-		public virtual void Create()
+		public void Create()
 		{
 			bool created = false;
+			Root root = GetRoot();
 
-			if (mainObject_ == null)
+			if (mainObject_ == null && root != null)
 			{
 				created = true;
 
@@ -791,9 +803,14 @@ namespace VUI
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
 
 				if (parent_?.MainObject == null)
-					mainObject_.transform.SetParent(GetRoot().WidgetParentTransform, false);
+				{
+					Log.Error($"{DebugLine} parent has no object");
+					mainObject_.transform.SetParent(root.WidgetParentTransform, false);
+				}
 				else
+				{
 					mainObject_.transform.SetParent(parent_.MainObject.transform, false);
+				}
 
 				widgetObject_ = CreateGameObject();
 				widgetObject_.AddComponent<MouseCallbacks>().Widget = this;
@@ -806,6 +823,32 @@ namespace VUI
 				if (widgetObjectRT_ == null)
 					widgetObjectRT_ = widgetObject_.AddComponent<RectTransform>();
 
+				UpdateActiveState();
+			}
+
+			foreach (var w in children_)
+			{
+				if (w.visible_ && w.RenderInHierarchy)
+					w.Create();
+			}
+
+			UpdateRenderState();
+
+			if (created)
+			{
+				Created?.Invoke();
+
+				if (root.Focused == this)
+					DoFocus();
+			}
+
+			DoPostCreate();
+		}
+
+		private void CreateBorderGraphics()
+		{
+			if (graphicsObject_ == null)
+			{
 				graphicsObject_ = new GameObject("WidgetBorders");
 				graphicsObject_.transform.SetParent(mainObject_.transform, false);
 
@@ -814,19 +857,13 @@ namespace VUI
 				borderGraphics_.Borders = borders_;
 				borderGraphics_.Color = borderColor_;
 
-				UpdateActiveState();
+				SetBorderBounds();
 			}
+		}
 
-			foreach (var w in children_)
-				w.Create();
-
-			UpdateRenderState();
-
-			if (created)
-				Created?.Invoke();
-
-			if (GetRoot()?.Focused == this)
-				DoFocus();
+		protected virtual void DoPostCreate()
+		{
+			// no-op
 		}
 
 		private void UpdateRenderState()
@@ -846,7 +883,10 @@ namespace VUI
 				return;
 
 			if (!borders_.Empty)
+			{
+				CreateBorderGraphics();
 				borderGraphics_?.gameObject?.SetActive(b);
+			}
 
 			DoSetRender(b);
 
@@ -871,7 +911,8 @@ namespace VUI
 			var r = new Rectangle(0, 0, Bounds.Size);
 			r.Deflate(Margins);
 
-			Utilities.SetRectTransform(borderGraphicsRT_, r);
+			if (borderGraphicsRT_ != null)
+				Utilities.SetRectTransform(borderGraphicsRT_, r);
 		}
 
 		protected virtual void SetWidgetObjectBounds()
@@ -888,7 +929,10 @@ namespace VUI
 			SetWidgetObjectBounds();
 
 			foreach (var w in children_)
-				w.UpdateBounds();
+			{
+				if (w.MainObject != null)
+					w.UpdateBounds();
+			}
 
 			UpdateActiveState();
 
@@ -921,7 +965,7 @@ namespace VUI
 			dirty_ = b;
 
 			if (why != "")
-				Glue.LogVerbose("SetDirty: " + why);
+				Log.Verbose("SetDirty: " + why);
 		}
 
 		protected virtual void NeedsLayoutImpl(string why)
@@ -932,7 +976,7 @@ namespace VUI
 
 		public void Dump()
 		{
-			Glue.LogVerbose(DumpString());
+			Log.Verbose(DumpString());
 		}
 
 		public string DumpString()
@@ -993,10 +1037,7 @@ namespace VUI
 
 		protected virtual GameObject CreateGameObject()
 		{
-			var o = new GameObject("Widget");
-			o.AddComponent<RectTransform>();
-			o.AddComponent<LayoutElement>();
-			return o;
+			return new GameObject("Widget");
 		}
 
 		protected virtual void DoCreate()

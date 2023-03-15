@@ -7,7 +7,7 @@ namespace VUI
 {
 	public interface IRootSupport
 	{
-		bool Init();
+		bool Init(Root r);
 		void Destroy();
 		void SetActive(bool b);
 		void Update(float s);
@@ -23,6 +23,7 @@ namespace VUI
 
 	abstract class BasicRootSupport : IRootSupport
 	{
+		private Root root_ = null;
 		private Canvas canvas_ = null;
 		private Rectangle bounds_ = Rectangle.Zero;
 		private float topOffset_ = 0;
@@ -48,8 +49,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogError("exception during vui cleanup:");
-				Glue.LogError(e.ToString());
+				Logger.Global.Error("exception during vui cleanup:");
+				Logger.Global.Error(e.ToString());
 			}
 			finally
 			{
@@ -89,6 +90,11 @@ namespace VUI
 		}
 
 
+		public Logger Log
+		{
+			get { return root_?.Log ?? Logger.Global; }
+		}
+
 		public abstract Transform RootParent { get; }
 
 		public abstract void Destroy();
@@ -100,8 +106,9 @@ namespace VUI
 			// no-op
 		}
 
-		public bool Init()
+		public bool Init(Root r)
 		{
+			root_ = r;
 			return DoInit();
 		}
 
@@ -174,14 +181,14 @@ namespace VUI
 			{
 				if (s_.UITransform == null)
 				{
-					Glue.LogVerbose("scriptui support: not ready, no UITransform");
+					Log.Verbose("scriptui support: not ready, no UITransform");
 					return false;
 				}
 
 				sui_ = s_.UITransform.GetComponentInChildren<MVRScriptUI>();
 				if (sui_ == null)
 				{
-					Glue.LogVerbose("scriptui support: not ready, no scriptui");
+					Log.Verbose("scriptui support: not ready, no scriptui");
 					return false;
 				}
 			}
@@ -197,14 +204,14 @@ namespace VUI
 
 			if (scrollViewRT.rect.width <= 0 || scrollViewRT.rect.height <= 0)
 			{
-				Glue.LogVerbose(
+				Log.Verbose(
 					$"scriptui support: not ready, scroll view size is " +
 					$"{scrollViewRT.rect}");
 
 				return false;
 			}
 
-			Glue.LogVerbose("scriptui support: ready, initing");
+			Log.Verbose("scriptui support: ready, initing");
 
 			rr_ = Style.SetupRoot(sui_.transform);
 			CreateRoot();
@@ -764,7 +771,7 @@ namespace VUI
 				.GetComponentInChildren<MeshVR.PerfMon>();
 
 			if (perf_ == null)
-				Glue.LogError("OverlayRootSupport: no perfmon");
+				Log.Error("OverlayRootSupport: no perfmon");
 		}
 
 		private static string RootObjectPrefix

@@ -322,12 +322,12 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch (Exception e)
 			{
-				SuperController.LogError(e.ToString());
-				SuperController.LogError("cue: Init failed, disabling");
+				Logger.SafeLogError(e.ToString());
+				Logger.SafeLogError("cue: Init failed, disabling");
 				DisablePlugin();
 			}
 		}
@@ -341,12 +341,12 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
-				SuperController.LogError(e.ToString());
-				SuperController.LogError("cue: DoInit failed, disabling");
+				Logger.SafeLogError(e.ToString());
+				Logger.SafeLogError("cue: DoInit failed, disabling");
 				DisablePlugin();
 			}
 		}
@@ -384,7 +384,7 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
@@ -435,7 +435,7 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
@@ -454,7 +454,7 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
@@ -474,7 +474,7 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
@@ -494,7 +494,7 @@ namespace Cue
 			}
 			catch(PluginGone e)
 			{
-				SuperController.LogError("plugin disabled");
+				Logger.SafeLogError("plugin disabled");
 			}
 			catch(Exception e)
 			{
@@ -544,7 +544,7 @@ namespace Cue
 
 		public static void OnException(Exception e)
 		{
-			SuperController.LogError(e.ToString());
+			Logger.SafeLogError(e.ToString());
 
 			var now = Cue.Instance.Sys.RealtimeSinceStartup;
 
@@ -553,7 +553,7 @@ namespace Cue
 				++errorCount_;
 				if (errorCount_ > MaxErrors)
 				{
-					SuperController.LogError(
+					Logger.SafeLogError(
 						$"more than {MaxErrors} errors in the last " +
 						"second, disabling plugin");
 

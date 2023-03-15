@@ -180,10 +180,27 @@ namespace Cue
 			if (IsEnabled(level) || level == ErrorLevel)
 			{
 				if (Cue.Instance == null)
-					SuperController.LogError($"{Prefix}: {s}");
+				{
+					if (level == ErrorLevel || level == WarningLevel)
+						Logger.SafeLogError($"{Prefix}: {s}");
+					else
+						Logger.SafeLogInfo($"{Prefix}: {s}");
+				}
 				else
+				{
 					Cue.Instance.Sys.LogLines($"{Prefix}: {s}", level);
+				}
 			}
+		}
+
+		public static void SafeLogError(string s)
+		{
+			SuperController.LogMessage(s);
+		}
+
+		public static void SafeLogInfo(string s)
+		{
+			SuperController.LogMessage(s);
 		}
 
 		private bool IsEnabled(int level)

@@ -66,7 +66,7 @@ namespace VUI
 					text_ = value;
 
 					if (NeedsLayoutForTextChanged(oldText, text_))
-						NeedsLayout($"text changed");
+						NeedsLayout($"text changed from '{oldText}' to {value}'");
 
 					if (textObject_ != null)
 					{

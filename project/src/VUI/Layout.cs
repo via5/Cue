@@ -16,6 +16,17 @@ namespace VUI
 		private readonly List<Widget> children_ = new List<Widget>();
 		private float spacing_ = 0;
 
+		public Logger Log
+		{
+			get
+			{
+				if (parent_ == null)
+					return Logger.Global;
+				else
+					return parent_.Log;
+			}
+		}
+
 		public Widget Parent
 		{
 			get { return parent_; }
@@ -37,7 +48,7 @@ namespace VUI
 		{
 			if (Contains(w))
 			{
-				Glue.LogError("layout already has widget " + w.Name);
+				Log.Error("layout already has widget " + w.Name);
 				return;
 			}
 
@@ -49,7 +60,7 @@ namespace VUI
 		{
 			if (!children_.Remove(w))
 			{
-				Glue.LogError(
+				Log.Error(
 					"can't remove '" + w.Name + "' from layout, not found");
 
 				return;

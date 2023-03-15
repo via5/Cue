@@ -31,6 +31,14 @@ namespace VUI
 				text_ = text;
 			}
 
+			public Logger Log
+			{
+				get
+				{
+					return parent_?.Log ?? Logger.Global;
+				}
+			}
+
 			public virtual TreeView TreeView
 			{
 				get
@@ -75,8 +83,8 @@ namespace VUI
 					}
 					catch (Exception e)
 					{
-						Glue.LogError($"tree view item exception in Tooltip");
-						Glue.LogError(e.ToString());
+						Log.Error($"tree view item exception in Tooltip");
+						Log.Error(e.ToString());
 						return "";
 					}
 				}
@@ -306,8 +314,8 @@ namespace VUI
 					}
 					catch (Exception e)
 					{
-						Glue.LogError($"tree view item NeedsChildren exception");
-						Glue.LogError(e.ToString());
+						Log.Error($"tree view item NeedsChildren exception");
+						Log.Error(e.ToString());
 					}
 				}
 			}
@@ -386,8 +394,8 @@ namespace VUI
 					}
 					catch (Exception e)
 					{
-						Glue.LogError("tree view item GetHasChildren exception");
-						Glue.LogError(e.ToString());
+						Log.Error("tree view item GetHasChildren exception");
+						Log.Error(e.ToString());
 						return false;
 					}
 				}
@@ -1100,7 +1108,7 @@ namespace VUI
 			int i = 0;
 			if (!AbsoluteItemIndex(root_, item, ref i) || i < 0)
 			{
-				Glue.LogError($"TreeView: ScrollTo item not found: {item}");
+				Log.Error($"TreeView: ScrollTo item not found: {item}");
 				return;
 			}
 
@@ -1246,8 +1254,8 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogError("TreeView: exception thrown while updating nodes");
-				Glue.LogError(e.ToString());
+				Log.Error("TreeView: exception thrown while updating nodes");
+				Log.Error(e.ToString());
 			}
 		}
 

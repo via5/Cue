@@ -68,13 +68,13 @@ namespace VUI
 			var d = data as Data;
 			if (d == null)
 			{
-				Glue.LogErrorST("BorderLayout: missing layout data");
+				Log.ErrorST("BorderLayout: missing layout data");
 				d = DefaultSide;
 			}
 
 			if (d.side < 0 || d.side > 5)
 			{
-				Glue.LogError(
+				Log.Error(
 					"bad border layout side " + d.side.ToString());
 
 				return;
@@ -92,7 +92,7 @@ namespace VUI
 					return;
 			}
 
-			Glue.LogError(
+			Log.Error(
 				"border layout: can't remove '" + w.Name + "', not found");
 		}
 

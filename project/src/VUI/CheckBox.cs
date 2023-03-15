@@ -130,7 +130,7 @@ namespace VUI
 			}
 			catch (Exception e)
 			{
-				Glue.LogErrorST(e.ToString());
+				Log.ErrorST(e.ToString());
 			}
 		}
 	}

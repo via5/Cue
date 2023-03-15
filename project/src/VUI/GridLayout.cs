@@ -269,13 +269,13 @@ namespace VUI
 
 			if (d.row < 0)
 			{
-				Glue.LogError("gridlayout: bad row");
+				Log.Error("gridlayout: bad row");
 				return;
 			}
 
 			if (d.col < 0)
 			{
-				Glue.LogError("gridlayout: bad col");
+				Log.Error("gridlayout: bad col");
 				return;
 			}
 
@@ -428,7 +428,7 @@ namespace VUI
 						w.SetBounds(wr, uniformWidth_ && uniformHeight_);
 
 						if (Parent.Name == "bleh")
-							Glue.LogInfo($"row={rowIndex} col={colIndex} {w} {wr}");
+							Log.Info($"row={rowIndex} col={colIndex} {w} {wr}");
 					}
 
 					x += uniformWidth + extraWidth[colIndex];

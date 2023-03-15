@@ -298,12 +298,12 @@ namespace Cue
 					$"The default options file already exists.",
 					$"{path}");
 
-				d.AddButton(VUI.ButtonBox.OK, "Replace");
-				d.AddButton(VUI.ButtonBox.Cancel, "Cancel");
+				d.AddButton(VUI.Buttons.OK, "Replace");
+				d.AddButton(VUI.Buttons.Cancel, "Cancel");
 
 				d.RunDialog((r) =>
 				{
-					if (r == VUI.ButtonBox.OK)
+					if (r == VUI.Buttons.OK)
 						DoSaveDefault(path);
 				});
 			}

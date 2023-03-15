@@ -32,7 +32,7 @@ namespace Cue
 				minHeight_ = MinDesktopHeight;
 				root = new VUI.Root(
 					new VUI.OverlayRootSupport(10, Width, MinDesktopHeight),
-					"CueVRDebug");
+					"cue.vrui.debug");
 			}
 			else
 			{
@@ -44,7 +44,7 @@ namespace Cue
 					new UnityEngine.Vector2(0, 0),
 					new UnityEngine.Vector2(Width, MinVRHeight));
 
-				root = new VUI.Root(vrSupport_, "CueVR");
+				root = new VUI.Root(vrSupport_, "cue.vrui");
 			}
 
 			var ly = new VUI.VerticalFlow();

@@ -112,10 +112,8 @@ namespace VUI
 			return new Size(Math.Max(200, widest), 40);
 		}
 
-		public override void Create()
+		protected override void DoPostCreate()
 		{
-			base.Create();
-
 			if (filterable_)
 			{
 				filter_.Create();
@@ -192,7 +190,7 @@ namespace VUI
 				}
 				catch (Exception e)
 				{
-					Glue.LogErrorST(e.ToString());
+					Log.ErrorST(e.ToString());
 				}
 			};
 
@@ -289,7 +287,7 @@ namespace VUI
 			var parent = FilterParent();
 			if (parent == null)
 			{
-				Glue.LogError("ComboBox: no filter parent");
+				Log.Error("ComboBox: no filter parent");
 				return;
 			}
 
