@@ -33,6 +33,12 @@ namespace VUI
 
 		private string text_ = "";
 		private UIDynamicButton button_ = null;
+		private RectTransform buttonRT_ = null;
+		private RectTransform buttonTextRT_ = null;
+		private Icon icon_ = null;
+		protected ImageObject image_ = null;
+		private Texture tex_ = null;
+		private Size iconSize_ = new Size(DontCare, DontCare);
 		private int align_ = Label.AlignCenter | Label.AlignVCenter;
 		private Polishing polishing_ = Polishing.Default;
 
@@ -66,11 +72,34 @@ namespace VUI
 
 					if (button_ != null)
 					{
-						button_.buttonText.text = value;
+						SetTextOrIcon();
 						NeedsLayout("text changed");
 					}
 				}
 			}
+		}
+
+		public Icon Icon
+		{
+			get
+			{
+				return icon_;
+			}
+
+			set
+			{
+				if (icon_ != value)
+				{
+					icon_ = value;
+					IconChanged();
+				}
+			}
+		}
+
+		public Size IconSize
+		{
+			get { return iconSize_; }
+			set { iconSize_ = value; UpdateImage(); }
 		}
 
 		public int Alignment
@@ -117,6 +146,26 @@ namespace VUI
 			}
 		}
 
+		public Color DisabledBackgroundColor
+		{
+			get
+			{
+				return polishing_.disabledBackgroundColor;
+			}
+
+			set
+			{
+				polishing_.disabledBackgroundColor = value;
+				Polish();
+			}
+		}
+
+		public void SetBorderless()
+		{
+			BackgroundColor = new Color(0, 0, 0, 0);
+			DisabledBackgroundColor = new Color(0, 0, 0, 0);
+		}
+
 		public void Click()
 		{
 			if (button_ != null)
@@ -133,15 +182,22 @@ namespace VUI
 		{
 			button_ = WidgetObject.GetComponent<UIDynamicButton>();
 			button_.button.onClick.AddListener(OnClicked);
-			button_.buttonText.text = text_;
 			button_.buttonText.alignment = Label.ToTextAnchor(align_);
 
+			buttonRT_ = button_.GetComponent<RectTransform>();
+			buttonTextRT_ = button_.buttonText.GetComponent<RectTransform>();
+
 			Style.Setup(this, polishing_);
+
+			SetTextOrIcon();
 		}
 
 		protected override void DoSetEnabled(bool b)
 		{
 			button_.button.interactable = b;
+
+			if (image_ != null)
+				image_.SetEnabled(b);
 		}
 
 		protected override void DoPolish()
@@ -150,28 +206,33 @@ namespace VUI
 			Style.Polish(this, polishing_);
 		}
 
-		public override void UpdateBounds()
+		protected override void AfterUpdateBounds()
 		{
-			base.UpdateBounds();
-
 			// padding must go inside the button so it's applied to the text
 			// instead of around the button itself
 
 			// remove padding around the button itself
-			var rt = button_.GetComponent<RectTransform>();
+			buttonRT_.offsetMin = new Vector2(
+				buttonRT_.offsetMin.x - 2 - Padding.Left,
+				buttonRT_.offsetMin.y - 1 - Padding.Bottom);
 
-			rt.offsetMin = new Vector2(
-				rt.offsetMin.x - 2 - Padding.Left,
-				rt.offsetMin.y - 1 - Padding.Bottom);
-
-			rt.offsetMax = new Vector2(
-				rt.offsetMax.x + 2 + Padding.Right,
-				rt.offsetMax.y + 2 +  Padding.Top);
+			buttonRT_.offsetMax = new Vector2(
+				buttonRT_.offsetMax.x + 2 + Padding.Right,
+				buttonRT_.offsetMax.y + 2 +  Padding.Top);
 
 			// add padding around the text instead
-			rt = button_.buttonText.GetComponent<RectTransform>();
-			rt.offsetMin = new Vector2(Padding.Left, Padding.Bottom);
-			rt.offsetMax = new Vector2(-Padding.Right, -Padding.Top);
+			buttonTextRT_.offsetMin = new Vector2(Padding.Left, Padding.Bottom);
+			buttonTextRT_.offsetMax = new Vector2(-Padding.Right, -Padding.Top);
+
+			if (icon_ != null)
+			{
+				if (image_ == null)
+					image_ = new ImageObject(this);
+
+				image_.Texture = tex_;
+				image_.SetEnabled(Enabled);
+				UpdateImage();
+			}
 		}
 
 		protected override Size DoGetPreferredSize(
@@ -194,6 +255,46 @@ namespace VUI
 		{
 			if (button_ != null)
 				button_.gameObject.SetActive(b);
+
+			if (image_ != null)
+				image_.SetRender(b);
+		}
+
+		private void IconChanged()
+		{
+			if (icon_ != null)
+				icon_.GetTexture(SetTexture);
+		}
+
+		private void SetTexture(Texture t)
+		{
+			tex_ = t;
+
+			if (image_ != null)
+			{
+				UpdateImage();
+				image_.Texture = t;
+			}
+
+			SetTextOrIcon();
+			NeedsLayout("texture changed");
+		}
+
+		private void UpdateImage()
+		{
+			if (image_ != null)
+				image_.Size = iconSize_;
+		}
+
+		private void SetTextOrIcon()
+		{
+			if (button_?.button == null)
+				return;
+
+			if (tex_ == null)
+				button_.buttonText.text = text_;
+			else
+				button_.buttonText.text = "";
 		}
 
 		private void OnPointerDown(PointerEvent e)
@@ -238,12 +339,48 @@ namespace VUI
 		protected override Size DoGetPreferredSize(
 			float maxWidth, float maxHeight)
 		{
-			return new Size(TextLength(Text) + 20, 40);
+			if (image_ == null)
+			{
+				return new Size(TextLength(Text) + 20, 40);
+			}
+			else
+			{
+				var s = Size.Zero;
+
+				if (IconSize.Width == DontCare)
+				{
+					if (image_.Texture == null)
+						s.Width = 20;
+					else
+						s.Width = image_.Texture.width;
+				}
+				else
+				{
+					s.Width = IconSize.Width;
+				}
+
+				if (IconSize.Height == DontCare)
+				{
+					if (image_.Texture == null)
+						s.Height = 20;
+					else
+						s.Height = image_.Texture.height;
+				}
+				else
+				{
+					s.Height = IconSize.Height;
+				}
+
+				return s;
+			}
 		}
 
 		protected override Size DoGetMinimumSize()
 		{
-			return new Size(50, DontCare);
+			if (image_ == null || (IconSize.Width == DontCare && IconSize.Height == DontCare))
+				return new Size(40, DontCare);
+			else
+				return new Size(IconSize.Width, IconSize.Height);
 		}
 	}
 

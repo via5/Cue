@@ -135,7 +135,7 @@ namespace VUI
 			Popup.popup.alwaysOpen = true;
 			Popup.popup.topButton.gameObject.SetActive(false);
 			Popup.popup.backgroundImage.gameObject.SetActive(false);
-			Popup.popup.onValueChangeHandlers += (string s) => { GetRoot().SetFocus(this); };
+			Popup.popup.onValueChangeHandlers += (string s) => { Focus(); };
 			Popup.popup.topBottomBuffer = 3;
 
 			AddItemComponents();
@@ -198,9 +198,8 @@ namespace VUI
 			Style.Polish(this);
 		}
 
-		public override void UpdateBounds()
+		protected override void AfterUpdateBounds()
 		{
-			base.UpdateBounds();
 			Utilities.SetRectTransform(Popup.popup.popupPanel, ClientBounds);
 		}
 

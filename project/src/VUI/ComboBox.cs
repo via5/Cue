@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,7 +18,7 @@ namespace VUI
 		private TextBox filter_ = null;
 		private bool filterable_ = false;
 		private bool accuratePreferredSize_ = true;
-		private int popupHeight_ = -1;
+		private int popupHeight_ = -1, popupWidth_ = -1;
 
 
 		public ComboBoxList(List<ItemType> items = null)
@@ -69,6 +70,26 @@ namespace VUI
 			}
 		}
 
+		public int PopupWidth
+		{
+			get
+			{
+				return popupWidth_;
+			}
+
+			set
+			{
+				popupWidth_ = value;
+
+				if (Popup?.popup?.popupPanel  != null)
+				{
+					var sd = Popup.popup.popupPanel.sizeDelta;
+					sd.x = popupWidth_;
+					Popup.popup.popupPanel.sizeDelta = sd;
+				}
+			}
+		}
+
 		public override void SetItems(ItemType[] items, ItemType sel = null)
 		{
 			base.SetItems(items, sel);
@@ -108,6 +129,15 @@ namespace VUI
 				Glue.PluginManager.configurableFilterablePopupPrefab).gameObject;
 		}
 
+		private IEnumerator CoSetPosition()
+		{
+			yield return new WaitForEndOfFrame();
+			//yield return new WaitForEndOfFrame();
+
+			Popup.popup.popupPanel.offsetMin = new Vector2(
+				0, Popup.popup.popupPanel.offsetMin.y);
+		}
+
 		protected override void DoCreate()
 		{
 			base.DoCreate();
@@ -126,6 +156,13 @@ namespace VUI
 			if (popupHeight_ >= 0)
 				Popup.popupPanelHeight = popupHeight_;
 
+			if (popupWidth_ >= 0)
+			{
+				var sd = Popup.popup.popupPanel.sizeDelta;
+				sd.x = popupWidth_;
+				Popup.popup.popupPanel.sizeDelta = sd;
+			}
+
 			Popup.popup.onOpenPopupHandlers += () =>
 			{
 				var rt2 = borders_.gameObject.GetComponent<RectTransform>();
@@ -134,6 +171,15 @@ namespace VUI
 					0, 0, new Size(
 					Popup.popup.popupPanel.rect.width,
 					Popup.popup.popupPanel.rect.height)));
+
+				if (popupWidth_ >= 0)
+				{
+					//var sd = Popup.popup.popupPanel.sizeDelta;
+					//sd.x = popupWidth_;
+					//Popup.popup.popupPanel.sizeDelta = sd;
+
+					SuperController.singleton.StartCoroutine(CoSetPosition());
+				}
 			};
 
 			var h = Popup.popup.topButton.gameObject.AddComponent<MouseHandler>();
@@ -199,10 +245,8 @@ namespace VUI
 				bg.color = Style.Theme.ComboBoxBackgroundColor;
 		}
 
-		public override void UpdateBounds()
+		protected override void AfterUpdateBounds()
 		{
-			base.UpdateBounds();
-
 			var rect = arrowObject_.GetComponent<RectTransform>();
 			rect.offsetMin = new Vector2(0, 0);
 			rect.offsetMax = new Vector2(Bounds.Width - 10, Bounds.Height);
@@ -213,7 +257,7 @@ namespace VUI
 
 		protected virtual void OnOpen()
 		{
-			GetRoot().SetFocus(this);
+			Focus();
 			GetRoot().SetOpenedPopup(this, Popup.popup);
 			Utilities.BringToTop(Popup.popup.popupPanel);
 
@@ -354,6 +398,11 @@ namespace VUI
 			Select(sel);
 		}
 
+		public ComboBoxList<ItemType> List
+		{
+			get { return list_; }
+		}
+
 		private void OnOpened()
 		{
 			Opened?.Invoke();
@@ -389,6 +438,12 @@ namespace VUI
 		{
 			get { return list_.PopupHeight; }
 			set { list_.PopupHeight = value; }
+		}
+
+		public int PopupWidth
+		{
+			get { return list_.PopupWidth; }
+			set { list_.PopupWidth = value; }
 		}
 
 		public void AddItem(ItemType i, bool select=false)

@@ -197,7 +197,9 @@ namespace VUI
 			var start = Time.realtimeSinceStartup;
 			a();
 			var end = Time.realtimeSinceStartup;
-			Glue.LogError(what + ": " + (end - start) + "s");
+			var d = end - start;
+
+			Glue.LogError($"{what}: {d:0.00000} s");
 		}
 
 		public static void BringToTop(GameObject o)
@@ -275,21 +277,26 @@ namespace VUI
 
 		public static void SetRectTransform(RectTransform rt, Rectangle r)
 		{
-			rt.offsetMin = new Vector2((int)r.Left, (int)r.Top);
-			rt.offsetMax = new Vector2((int)r.Right, (int)r.Bottom);
+			var center = new Point(
+				Mathf.Round(r.Left) + Mathf.Round((r.Right - r.Left)) / 2,
+				Mathf.Round(r.Top) + Mathf.Round((r.Bottom - r.Top)) / 2);
+
+			rt.offsetMin = new Vector2(Mathf.Round(r.Left), Mathf.Round(r.Top));
+			rt.offsetMax = new Vector2(Mathf.Round(r.Right),Mathf.Round(r.Bottom));
 			rt.anchorMin = new Vector2(0, 1);
 			rt.anchorMax = new Vector2(0, 1);
-			rt.anchoredPosition = new Vector2(r.Center.X, -r.Center.Y);
+			rt.anchoredPosition = new Vector2(center.X, -center.Y);
 		}
 
-		public static void SetRectTransform(Component c, Rectangle r)
+		public static void SetLayoutElement(LayoutElement e, Size s)
 		{
-			SetRectTransform(c.GetComponent<RectTransform>(), r);
-		}
-
-		public static void SetRectTransform(GameObject o, Rectangle r)
-		{
-			SetRectTransform(o.GetComponent<RectTransform>(), r);
+			e.minWidth = Mathf.Round(s.Width);
+			e.preferredWidth = Mathf.Round(s.Width);
+			e.flexibleWidth = Mathf.Round(s.Width);
+			e.minHeight = Mathf.Round(s.Height);
+			e.preferredHeight = Mathf.Round(s.Height);
+			e.flexibleHeight = Mathf.Round(s.Height);
+			e.ignoreLayout = true;
 		}
 
 		public static Rectangle RectTransformBounds(Root root, RectTransform rt)
@@ -511,6 +518,11 @@ namespace VUI
 		public override string ToString()
 		{
 			return $"{X} {Y}";
+		}
+
+		public static Point operator +(Point a, Point b)
+		{
+			return new Point(a.X + b.X, a.Y + b.Y);
 		}
 
 		public static Point operator -(Point a, Point b)

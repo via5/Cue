@@ -16,7 +16,7 @@ namespace VUI
 
 		public bool HasValue
 		{
-			get { return textFunc_ != null || text_ != ""; }
+			get { return textFunc_ != null || !string.IsNullOrEmpty(text_); }
 		}
 
 		public Func<string> TextFunc
@@ -85,10 +85,10 @@ namespace VUI
 			base.Destroy();
 		}
 
-		public Size Set(Tooltip tt)
+		public Size Set(string text, int fontSize)
 		{
-			label_.Text = tt.GetText();
-			label_.FontSize = tt.FontSize;
+			label_.Text = text;
+			label_.FontSize = fontSize;
 			label_.Polish();
 
 			return label_.FitText(
@@ -149,10 +149,18 @@ namespace VUI
 			if (mp == Root.NoMousePos)
 				return;
 
+			var text = w.Tooltip.GetText();
+			if (text == "")
+			{
+				// some tooltips have a TextFunc, but it returns an empty
+				// string
+				return;
+			}
+
 			active_ = w;
 
 			// size of text
-			var size = widget_.Set(w.Tooltip);
+			var size = widget_.Set(text, w.Tooltip.FontSize);
 
 			// widget is size of text plus its insets
 			size += widget_.Insets.Size;
@@ -169,6 +177,9 @@ namespace VUI
 			{
 				// tooltip would extend past the right edge
 				p.X = av.Width - size.Width;
+
+				if (p.X < 0)
+					p.X = 0;
 			}
 
 			if (p.Y + size.Height >= av.Height)
@@ -176,6 +187,9 @@ namespace VUI
 				// tooltip would extend past the bottom edge; make sure it's
 				// above the mouse cursor
 				p.Y = mp.Y - size.Height;
+
+				if (p.Y < 0)
+					p.Y = 0;
 			}
 
 			widget_.SetBounds(new Rectangle(p.X, p.Y, size));

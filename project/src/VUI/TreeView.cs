@@ -3,197 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace VUI
 {
-	class ScrollBarHandle : Button
-	{
-		public delegate void Handler();
-		public event Handler Moved;
-
-		private Point dragStart_;
-		private Rectangle initialBounds_;
-		private bool dragging_ = false;
-
-		public ScrollBarHandle()
-		{
-			Events.DragStart += OnDragStart;
-			Events.Drag += OnDrag;
-			Events.DragEnd += OnDragEnd;
-		}
-
-		public void OnDragStart(DragEvent e)
-		{
-			dragging_ = true;
-			dragStart_ = e.Pointer;
-			initialBounds_ = AbsoluteClientBounds;
-
-			SetCapture();
-		}
-
-		public void OnDrag(DragEvent e)
-		{
-			if (!dragging_)
-				return;
-
-			var p = e.Pointer;
-			var delta = p - dragStart_;
-
-			var r = Rectangle.FromSize(
-				initialBounds_.Left,
-				initialBounds_.Top + (delta.Y),
-				initialBounds_.Width,
-				initialBounds_.Height);
-
-			var box = Parent.AbsoluteClientBounds;
-
-			if (r.Top < box.Top)
-				r.MoveTo(r.Left, box.Top);
-
-			if (r.Bottom > box.Bottom)
-				r.MoveTo(r.Left, box.Bottom - r.Height);
-
-			SetBounds(r);
-			UpdateBounds();
-
-			Moved?.Invoke();
-		}
-
-		public void OnDragEnd(DragEvent e)
-		{
-			dragging_ = false;
-			ReleaseCapture();
-		}
-	}
-
-
-	class ScrollBar : Panel
-	{
-		public delegate void ValueHandler(float v);
-		public event ValueHandler ValueChanged;
-
-		private ScrollBarHandle handle_ = new ScrollBarHandle();
-		private float range_ = 0;
-		private float value_ = 0;
-
-		public ScrollBar()
-		{
-			Borders = new Insets(1, 0, 0, 0);
-			Layout = new AbsoluteLayout();
-			Clickthrough = false;
-			Add(handle_);
-
-			Events.PointerDown += OnPointerDown;
-			handle_.Moved += OnHandleMoved;
-		}
-
-		public float Range
-		{
-			get { return range_; }
-			set { range_ = value; }
-		}
-
-		public float Value
-		{
-			get { return value_; }
-			set { value_ = value; }
-		}
-
-		public override void UpdateBounds()
-		{
-			var r = AbsoluteClientBounds;
-			var h = Math.Max(r.Height - range_, 50);
-
-			var cb = ClientBounds;
-			var avh = cb.Height - handle_.ClientBounds.Height;
-			var p = range_ == 0 ? 0 : (value_ / range_);
-			r.Top += Borders.Top + p * avh;
-			r.Bottom = r.Top + h;
-
-			handle_.SetBounds(r);
-			DoLayoutImpl();
-
-			base.UpdateBounds();
-		}
-
-		private void OnHandleMoved()
-		{
-			var r = ClientBounds;
-			var hr = handle_.RelativeBounds;
-			var top = hr.Top - Borders.Top;
-			var h = r.Height - hr.Height;
-			var p = (top / h);
-			value_ = p * range_;
-			ValueChanged?.Invoke(value_);
-		}
-
-		private void OnPointerDown(PointerEvent e)
-		{
-			var r = AbsoluteClientBounds;
-			var p = e.Pointer - r.TopLeft;
-			var y = r.Top + p.Y - handle_.ClientBounds.Height / 2;
-
-			if (y < 0)
-				y = 0;
-			else if (y + handle_.ClientBounds.Height > ClientBounds.Height)
-				y = ClientBounds.Height - handle_.ClientBounds.Height;
-
-			var cb = handle_.AbsoluteClientBounds;
-			var h = cb.Height;
-			cb.Top = y;
-			cb.Bottom = y + h;
-
-			handle_.SetBounds(cb);
-			DoLayoutImpl();
-			base.UpdateBounds();
-
-			OnHandleMoved();
-
-			var d = e.EventData as PointerEventData;
-			SuperController.singleton.StartCoroutine(StartDrag(d));
-
-			e.Bubble = false;
-		}
-
-		private IEnumerator StartDrag(PointerEventData d)
-		{
-			yield return new WaitForEndOfFrame();
-
-			var o = handle_.WidgetObject.gameObject;
-
-			d.pointerPress = o;
-			d.pointerDrag = o;
-			d.rawPointerPress = o;
-			d.pointerEnter = o;
-			d.selectedObject = o;
-			d.hovered.Clear();
-
-			List<RaycastResult> rc = new List<RaycastResult>();
-			EventSystem.current.RaycastAll(d, rc);
-
-			foreach (var r in rc)
-			{
-				d.hovered.Add(r.gameObject);
-
-				if (r.gameObject == o)
-				{
-					d.pointerCurrentRaycast = r;
-					d.pointerPressRaycast = r;
-					break;
-				}
-			}
-
-			ExecuteEvents.Execute(
-				handle_.WidgetObject.gameObject, d, ExecuteEvents.pointerEnterHandler);
-
-			ExecuteEvents.Execute(
-				handle_.WidgetObject.gameObject, d, ExecuteEvents.pointerDownHandler);
-		}
-	}
-
-
-
 	class TreeView : Panel
 	{
 		public override string TypeName { get { return "TreeView"; } }
@@ -210,6 +22,9 @@ namespace VUI
 			private bool visible_ = true;
 			private bool checkable_ = false;
 			private bool checked_ = false;
+			private Texture icon_ = null;
+			private string tooltip_ = null;
+			private bool gotChildren_ = false;
 
 			public Item(string text = "")
 			{
@@ -233,6 +48,50 @@ namespace VUI
 				set { parent_ = value; }
 			}
 
+			public int IndexInParent
+			{
+				get
+				{
+					if (parent_?.Children != null)
+					{
+						for (int i = 0; i < parent_.Children.Count; ++i)
+						{
+							if (parent_.Children[i] == this)
+								return i;
+						}
+					}
+
+					return -1;
+				}
+			}
+
+			public string Tooltip
+			{
+				get
+				{
+					try
+					{
+						return GetTooltip();
+					}
+					catch (Exception e)
+					{
+						Glue.LogError($"tree view item exception in Tooltip");
+						Glue.LogError(e.ToString());
+						return "";
+					}
+				}
+
+				set
+				{
+					tooltip_ = value;
+				}
+			}
+
+			protected virtual string GetTooltip()
+			{
+				return tooltip_;
+			}
+
 			public string Text
 			{
 				get
@@ -242,12 +101,7 @@ namespace VUI
 
 				set
 				{
-					string s;
-
-					if (string.IsNullOrEmpty(value))
-						s = "";
-					else
-						s = value;
+					string s = value ?? "";
 
 					if (text_ != s)
 					{
@@ -293,6 +147,23 @@ namespace VUI
 				}
 			}
 
+			public Texture Icon
+			{
+				get
+				{
+					return icon_;
+				}
+
+				set
+				{
+					if (icon_ != value)
+					{
+						icon_ = value;
+						NodesChanged();
+					}
+				}
+			}
+
 			public void SetCheckedInternal(bool b)
 			{
 				checked_ = b;
@@ -317,8 +188,18 @@ namespace VUI
 
 			public List<Item> Children
 			{
-				get { return children_; }
+				get
+				{
+					NeedsChildren();
+					return children_;
+				}
 			}
+
+			public List<Item> GetInternalChildren()
+			{
+				return children_;
+			}
+
 
 			public bool Expanded
 			{
@@ -329,7 +210,7 @@ namespace VUI
 
 				set
 				{
-					expanded_ = value;
+					SetExpanded(value);
 					NodesChanged();
 				}
 			}
@@ -345,6 +226,20 @@ namespace VUI
 				{
 					TreeView?.SetSelectedInternal(this, value);
 				}
+			}
+
+			public bool IsContainedBy(Item item)
+			{
+				var i = this;
+				while (i != null)
+				{
+					if (item == i)
+						return true;
+
+					i = i.Parent;
+				}
+
+				return false;
 			}
 
 			public void Toggle()
@@ -391,9 +286,40 @@ namespace VUI
 				TreeView?.VisibilityChangedInternal(this);
 			}
 
-			private void SetExpandedRecursive(bool b, bool visibleOnly)
+			private void SetExpanded(bool b)
 			{
 				expanded_ = b;
+
+				if (expanded_)
+					NeedsChildren();
+			}
+
+			private void NeedsChildren()
+			{
+				if (!gotChildren_)
+				{
+					gotChildren_ = true;
+
+					try
+					{
+						GetChildren();
+					}
+					catch (Exception e)
+					{
+						Glue.LogError($"tree view item NeedsChildren exception");
+						Glue.LogError(e.ToString());
+					}
+				}
+			}
+
+			protected virtual void GetChildren()
+			{
+				// no-op
+			}
+
+			private void SetExpandedRecursive(bool b, bool visibleOnly)
+			{
+				SetExpanded(b);
 
 				if (children_ != null)
 				{
@@ -450,29 +376,88 @@ namespace VUI
 				return false;
 			}
 
-			public virtual bool HasChildren
+			public bool HasChildren
 			{
-				get { return children_ != null && children_.Count > 0; }
+				get
+				{
+					try
+					{
+						return GetHasChildren();
+					}
+					catch (Exception e)
+					{
+						Glue.LogError("tree view item GetHasChildren exception");
+						Glue.LogError(e.ToString());
+						return false;
+					}
+				}
 			}
 
-			public void Add(Item child)
+			protected virtual bool GetHasChildren()
+			{
+				if (children_ == null)
+					return false;
+
+				for (int i = 0; i < children_.Count; ++i)
+				{
+					if (children_[i].Visible)
+						return true;
+				}
+
+				return false;
+			}
+
+			public T Add<T>(T item) where T : Item
+			{
+				return Insert(children_?.Count ?? 0, item);
+			}
+
+			public T Insert<T>(int index, T item) where T : Item
 			{
 				if (children_ == null)
 					children_ = new List<Item>();
 
-				children_.Add(child);
-				child.Parent = this;
+				children_.Insert(index, item);
+				item.Parent = this;
+				gotChildren_ = true;
+
+				NodesChanged();
+
+				return item;
+			}
+
+			public void Remove(Item child)
+			{
+				if (children_ == null)
+					return;
+
+				if (child.Parent != this)
+					return;
+
+				children_.Remove(child);
+				TreeView?.NodeRemovedInternal(child);
 			}
 
 			public void Clear()
 			{
-				if (children_ != null)
+				if (children_ != null && children_.Count > 0)
 				{
+					TreeView?.NodeAboutToGetClearedInternal(this);
+
 					for (int i=0; i<children_.Count; ++i)
 						children_[i].Parent = null;
 
+					expanded_ = false;
 					children_.Clear();
+					NodesChanged();
 				}
+
+				gotChildren_ = false;
+			}
+
+			public void UpdateToggle()
+			{
+				NodesChanged();
 			}
 
 			public void FireCheckedChanged(bool b)
@@ -520,6 +505,7 @@ namespace VUI
 			private Panel panel_ = null;
 			private ToolButton toggle_ = null;
 			private CheckBox checkbox_ = null;
+			private Image icon_ = null;
 			private Label label_ = null;
 			private bool hovered_ = false;
 			private bool ignore_ = false;
@@ -574,6 +560,7 @@ namespace VUI
 
 					UpdatePanel(r);
 
+					r.Left += Style.Metrics.TreeViewLeftMargin;
 					r.Left += indent * Style.Metrics.TreeIndentSize;
 
 					if (item_.HasChildren)
@@ -598,6 +585,14 @@ namespace VUI
 						UpdateCheckbox(r);
 					}
 
+					if (tree_.Icons)
+					{
+						if (icon_ == null)
+							CreateIcon(r);
+
+						UpdateIcon(r);
+					}
+
 					if (label_ == null)
 						CreateLabel(r);
 
@@ -612,6 +607,9 @@ namespace VUI
 				if (panel_ == null)
 				{
 					panel_ = new Panel("TreeViewNode", new AbsoluteLayout());
+					panel_.Tooltip.TextFunc = () => item_?.Tooltip ?? "";
+					panel_.Clickthrough = false;
+
 					tree_.Add(panel_);
 					panel_.Create();
 					panel_.Events.PointerClick += (e) => { e.Bubble = true; };
@@ -623,6 +621,10 @@ namespace VUI
 				if (toggle_ == null)
 				{
 					toggle_ = new ToolButton("", OnToggle);
+					toggle_.BackgroundColor = new Color(0, 0, 0, 0);
+					toggle_.Borders = new Insets(1);
+					toggle_.BorderColor = Style.Theme.TreeViewToggleBorderColor;
+
 					panel_.Add(toggle_);
 					toggle_.Create();
 				}
@@ -638,12 +640,24 @@ namespace VUI
 				}
 			}
 
+			private void CreateIcon(Rectangle r)
+			{
+				if (icon_ == null)
+				{
+					icon_ = new Image();
+					panel_.Add(icon_);
+					icon_.Create();
+				}
+			}
+
 			private void CreateLabel(Rectangle r)
 			{
 				if (label_ == null)
 				{
 					label_ = new Label();
-					label_.WrapMode = VUI.Label.Clip;
+					label_.WrapMode = tree_.LabelWrap;
+					label_.FontSize = tree_.FontSize;
+
 					panel_.Add(label_);
 					label_.Create();
 					label_.Events.PointerClick += (e) => { e.Bubble = true; };
@@ -652,6 +666,7 @@ namespace VUI
 
 			private void UpdatePanel(Rectangle r)
 			{
+				panel_.Tooltip.FontSize = tree_.FontSize;
 				panel_.SetBounds(r);
 				panel_.Render = true;
 			}
@@ -673,7 +688,11 @@ namespace VUI
 						toggle_.Text = "+";
 
 					var tr = r;
+
+					tr.Top += 2;
+					tr.Bottom -= 2;
 					tr.Width = Style.Metrics.TreeToggleWidth;
+
 					toggle_.SetBounds(tr);
 					toggle_.Render = true;
 				}
@@ -689,9 +708,9 @@ namespace VUI
 					var tr = r;
 
 					if (item_.Parent != tree_.RootItem || tree_.RootToggles)
-						tr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
+						tr.Left += Style.Metrics.TreeCheckBoxWidth + Style.Metrics.TreeToggleSpacing;
 
-					tr.Width = Style.Metrics.TreeToggleWidth;
+					tr.Width = Style.Metrics.TreeCheckBoxWidth;
 
 					checkbox_.SetBounds(tr);
 					checkbox_.Checked = item_.Checked;
@@ -702,6 +721,22 @@ namespace VUI
 					if (checkbox_ != null)
 						checkbox_.Render = false;
 				}
+			}
+
+			private void UpdateIcon(Rectangle r)
+			{
+				if (item_ == null)
+					return;
+
+				var tr = r;
+
+				tr.Left += Style.Metrics.TreeIconWidth + Style.Metrics.TreeIconSpacing;
+				tr.Right = tr.Left + Style.Metrics.TreeIconWidth;
+				tr.Bottom = tr.Top + Style.Metrics.TreeIconWidth;
+
+				icon_.SetBounds(tr);
+				icon_.Texture = item_.Icon;
+				icon_.Render = true;
 			}
 
 			private void UpdateLabel(Rectangle r)
@@ -715,7 +750,10 @@ namespace VUI
 					lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeToggleSpacing;
 
 				if (tree_.CheckBoxes && item_.Checkable)
-					lr.Left += Style.Metrics.TreeToggleWidth + Style.Metrics.TreeCheckboxSpacing;
+					lr.Left += Style.Metrics.TreeCheckBoxWidth + Style.Metrics.TreeCheckboxSpacing;
+
+				if (tree_.Icons)
+					lr.Left += Style.Metrics.TreeIconWidth + Style.Metrics.TreeIconSpacing;
 
 				label_.Text = item_.Text;
 				label_.SetBounds(lr);
@@ -760,6 +798,12 @@ namespace VUI
 		}
 
 
+		public const int ScrollToNone = 0;
+		public const int ScrollToTop = 1;
+		public const int ScrollToCenter = 2;
+		public const int ScrollToBottom = 3;
+		public const int ScrollToNearest = 4;
+
 		public delegate void ItemCallback(Item i);
 		public event ItemCallback SelectionChanged;
 		public event ItemCallback ItemClicked;
@@ -768,6 +812,7 @@ namespace VUI
 		private List<Node> nodes_ = new List<Node>();
 		private ScrollBar vsb_ = new ScrollBar();
 		private bool checkboxes_ = false;
+		private bool icons_ = false;
 		private bool rootToggles_ = true;
 		private int topItemIndex_ = 0;
 		private int itemCount_ = 0;
@@ -779,6 +824,8 @@ namespace VUI
 		private string filterString_ = "";
 		private string filterStringLc_ = "";
 		private Func<Item, bool> filterFunc_ = null;
+		private bool doubleClickToggle_ = false;
+		private int labelWrap_ = VUI.Label.ClipEllipsis;
 
 		public TreeView()
 		{
@@ -794,6 +841,7 @@ namespace VUI
 			Events.PointerMove += OnHover;
 			Events.PointerExit += OnExit;
 			Events.PointerClick += OnClick;
+			Events.PointerDoubleClick += OnDoubleClick;
 			Events.PointerDown += OnPointerDown;
 
 			vsb_.ValueChanged += OnVerticalScroll;
@@ -811,11 +859,6 @@ namespace VUI
 			}
 		}
 
-		private float InternalPadding
-		{
-			get { return Style.Metrics.TreeInternalPadding; }
-		}
-
 		private void OnVerticalScroll(float v)
 		{
 			if (ignoreVScroll_) return;
@@ -824,19 +867,32 @@ namespace VUI
 
 		private void SetTopItem(int index, bool updateSb, bool rebuild = true)
 		{
-			topItemIndex_ = Utilities.Clamp(index, 0, Math.Max(itemCount_ - visibleCount_, 0));
+			int newTop = Utilities.Clamp(index, 0, Math.Max(itemCount_ - visibleCount_, 0));
 
-			if (updateSb)
+			if (newTop != topItemIndex_)
 			{
-				float v = topItemIndex_ * (FullItemHeight);
-				if (v + FullItemHeight > vsb_.Range)
-					v = vsb_.Range;
+				topItemIndex_ = newTop;
 
-				vsb_.Value = v;
+				if (updateSb)
+				{
+					float v = topItemIndex_ * (FullItemHeight);
+					if (v + FullItemHeight > vsb_.Range)
+						v = vsb_.Range;
+
+					try
+					{
+						ignoreVScroll_ = true;
+						vsb_.Value = v;
+					}
+					finally
+					{
+						ignoreVScroll_ = false;
+					}
+				}
+
+				if (rebuild)
+					Rebuild();
 			}
-
-			if (rebuild)
-				Rebuild();
 		}
 
 		public Item RootItem
@@ -855,10 +911,28 @@ namespace VUI
 			set { checkboxes_ = value; }
 		}
 
+		public bool Icons
+		{
+			get { return icons_; }
+			set { icons_ = value; }
+		}
+
 		public bool RootToggles
 		{
 			get { return rootToggles_; }
 			set { rootToggles_ = value; }
+		}
+
+		public bool DoubleClickToggle
+		{
+			get { return doubleClickToggle_; }
+			set { doubleClickToggle_ = value; }
+		}
+
+		public int LabelWrap
+		{
+			get { return labelWrap_; }
+			set { labelWrap_ = value; }
 		}
 
 		public string Filter
@@ -904,10 +978,50 @@ namespace VUI
 				staleTimer_ = Timer.Create(Timer.Immediate, OnStale);
 		}
 
+		public void NodeRemovedInternal(Item i)
+		{
+			NodesChangedInternal(i);
+
+			if (Selected != null && Selected.IsContainedBy(i))
+				SelectedGone();
+
+			i.Parent = null;
+		}
+
+		public void NodeAboutToGetClearedInternal(Item node)
+		{
+			if (Selected != null && Selected.IsContainedBy(node))
+				SelectedGone();
+		}
+
 		public void VisibilityChangedInternal(Item i)
 		{
 			if (staleTimer_ == null && WidgetObject != null)
 				staleTimer_ = Timer.Create(Timer.Immediate, OnStale);
+
+			if (!i.Visible && Selected != null && Selected.IsContainedBy(i))
+				SelectedGone();
+		}
+
+		private void SelectedGone()
+		{
+			var ns = Selected?.Parent;
+			bool found = false;
+
+			while (ns != null)
+			{
+				if (ns.Visible)
+				{
+					Select(ns);
+					found = true;
+					break;
+				}
+
+				ns = ns.Parent;
+			}
+
+			if (!found)
+				Select(RootItem);
 		}
 
 		private void OnStale()
@@ -963,6 +1077,110 @@ namespace VUI
 			return f;
 		}
 
+		public void Select(Item item, bool expandParents = true, int scrollTo = ScrollToNone)
+		{
+			SetSelectedInternal(item, true);
+
+			if (expandParents)
+			{
+				Item parent = item?.Parent;
+				while (parent != null)
+				{
+					parent.Expanded = true;
+					parent = parent.Parent;
+				}
+
+				if (scrollTo != ScrollToNone)
+					ScrollTo(item, scrollTo);
+			}
+		}
+
+		public void ScrollTo(Item item, int where)
+		{
+			int i = 0;
+			if (!AbsoluteItemIndex(root_, item, ref i) || i < 0)
+			{
+				Glue.LogError($"TreeView: ScrollTo item not found: {item}");
+				return;
+			}
+
+			if (i >= 0)
+				Glue.PluginManager.StartCoroutine(CoScrollTo(i, where));
+		}
+
+		private IEnumerator CoScrollTo(int index, int where)
+		{
+			yield return new WaitForEndOfFrame();
+			DoScrollTo(index, where);
+		}
+
+		private void DoScrollTo(int i, int where)
+		{
+			switch (where)
+			{
+				case ScrollToCenter:
+				{
+					i = Math.Max(i - nodes_.Count / 2, 0);
+					break;
+				}
+
+				case ScrollToBottom:
+				{
+					i = Math.Max(i - nodes_.Count + 1, 0);
+					break;
+				}
+
+				case ScrollToNearest:
+				{
+					if (i > (topItemIndex_ + nodes_.Count))
+					{
+						// scroll to bottom
+						i = Math.Max(i - nodes_.Count + 1, 0);
+					}
+					else if (i >= topItemIndex_)
+					{
+						// already visible, don't scroll
+						i = -1;
+					}
+					else
+					{
+						// scroll to top, no-op
+					}
+
+					break;
+				}
+
+				case ScrollToTop:  // fall-through
+				default:
+				{
+					// nothing
+					break;
+				}
+			}
+
+			if (i != -1)
+				SetTopItem(i, true, true);
+		}
+
+		private bool AbsoluteItemIndex(Item parent, Item item, ref int index)
+		{
+			if (parent.Expanded && parent.Children != null)
+			{
+				foreach (var c in parent.Children)
+				{
+					if (c == item)
+						return true;
+
+					++index;
+
+					if (AbsoluteItemIndex(c, item, ref index))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
 		public void SetSelectedInternal(Item item, bool b)
 		{
 			var old = selected_;
@@ -973,9 +1191,7 @@ namespace VUI
 				selected_ = null;
 
 			for (int i = 0; i < nodes_.Count; ++i)
-			{
 				nodes_[i].UpdateState();
-			}
 
 			if (selected_ != old)
 				SelectionChanged?.Invoke(selected_);
@@ -991,11 +1207,11 @@ namespace VUI
 				cx.av = AbsoluteClientBounds;
 				cx.nodeIndex = 0;
 				cx.itemIndex = 0;
-				cx.x = cx.av.Left + InternalPadding;
-				cx.y = cx.av.Top + InternalPadding;
+				cx.x = cx.av.Left;
+				cx.y = cx.av.Top + Style.Metrics.TreeViewTopMargin;
 				cx.indent = 0;
 
-				int nodeCount = (int)(cx.av.Height / FullItemHeight);
+				int nodeCount = Math.Max(0, (int)(cx.av.Height / FullItemHeight));
 
 				while (nodes_.Count < nodeCount)
 					nodes_.Add(new Node(this));
@@ -1019,12 +1235,12 @@ namespace VUI
 
 				if (missingHeight <= 0)
 				{
-					vsb_.Visible = false;
+					SetScrollbarVisibility(false);
 					vsb_.Range = 0;
 				}
 				else
 				{
-					vsb_.Visible = true;
+					SetScrollbarVisibility(true);
 					vsb_.Range = missingHeight + Style.Metrics.TreeItemHeight;
 				}
 			}
@@ -1032,6 +1248,15 @@ namespace VUI
 			{
 				Glue.LogError("TreeView: exception thrown while updating nodes");
 				Glue.LogError(e.ToString());
+			}
+		}
+
+		private void SetScrollbarVisibility(bool b)
+		{
+			if (vsb_.Visible != b)
+			{
+				vsb_.Visible = b;
+				UpdateBounds();
 			}
 		}
 
@@ -1055,8 +1280,11 @@ namespace VUI
 
 						var r = Rectangle.FromPoints(
 							x, y,
-							cx.av.Right - InternalPadding - Style.Metrics.ScrollBarWidth,
+							cx.av.Right,
 							y + Style.Metrics.TreeItemHeight);
+
+						if (vsb_.Visible)
+							r.Right -= Style.Metrics.ScrollBarWidth;
 
 						node.Set(child, r, cx.indent);
 
@@ -1088,16 +1316,13 @@ namespace VUI
 			//Style.Polish(this);
 		}
 
-		public override void UpdateBounds()
+		protected override void BeforeUpdateBounds()
 		{
 			var r = AbsoluteClientBounds;
-			r.Left = r.Right - Style.Metrics.ScrollBarWidth;
+			r.Left = r.Right - vsb_.GetRealMinimumSize().Width;
 			vsb_.SetBounds(r);
-			//hsb_.Set(0, 0, 10);
 
 			UpdateNodes();
-
-			base.UpdateBounds();
 		}
 
 		protected override Size DoGetPreferredSize(
@@ -1106,18 +1331,22 @@ namespace VUI
 			return new Size(300, 200);
 		}
 
+		protected override Size DoGetMinimumSize()
+		{
+			var m = Style.Metrics;
+
+			float w =
+				m.TreeToggleWidth + m.TreeToggleSpacing +
+				m.TreeCheckBoxWidth + m.TreeCheckboxSpacing +
+				m.TreeIconWidth + m.TreeIconSpacing +
+				50;
+
+			return new Size(w, 200);
+		}
+
 		private void OnWheel(WheelEvent e)
 		{
-			try
-			{
-				ignoreVScroll_ = true;
-				SetTopItem(topItemIndex_ + (int)-e.Delta.Y, true);
-			}
-			finally
-			{
-				ignoreVScroll_ = false;
-			}
-
+			SetTopItem(topItemIndex_ + (int)-e.Delta.Y, true);
 			e.Bubble = false;
 		}
 
@@ -1157,15 +1386,37 @@ namespace VUI
 
 		private void OnClick(PointerEvent e)
 		{
-			var n = NodeAt(e.Pointer);
-
-			if (n?.Item != null)
+			if (e.Button == PointerEvent.LeftButton)
 			{
-				n.Item.Selected = true;
-				ItemClicked?.Invoke(n.Item);
-			}
+				var n = NodeAt(e.Pointer);
 
-			e.Bubble = false;
+				if (n?.Item != null)
+				{
+					n.Item.Selected = true;
+					ItemClicked?.Invoke(n.Item);
+				}
+
+				e.Bubble = false;
+			}
+		}
+
+		private void OnDoubleClick(PointerEvent e)
+		{
+			if (e.Button == PointerEvent.LeftButton)
+			{
+				if (doubleClickToggle_)
+				{
+					var n = NodeAt(e.Pointer);
+
+					if (n?.Item != null)
+					{
+						n.Item.Selected = true;
+						n.Item.Toggle();
+					}
+
+					e.Bubble = false;
+				}
+			}
 		}
 
 		private void OnPointerDown(PointerEvent e)

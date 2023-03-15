@@ -56,6 +56,13 @@ namespace VUI
 				SelectionChanged += selectionChanged;
 		}
 
+		public void ScrollToTop()
+		{
+			var sr = popup_.popup.popupPanel.GetComponentInChildren<ScrollRect>();
+			if (sr != null)
+				sr.verticalNormalizedPosition = 1;
+		}
+
 		public void AddItem(ItemType i, bool select = false)
 		{
 			InsertItem(i, -1, select);

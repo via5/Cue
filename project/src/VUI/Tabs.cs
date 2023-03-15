@@ -61,10 +61,9 @@ namespace VUI
 			}
 		}
 
-		public override void UpdateBounds()
+		protected override void BeforeUpdateBounds()
 		{
 			UpdateChildren();
-			base.UpdateBounds();
 		}
 
 		protected override Size DoGetMinimumSize()

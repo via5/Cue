@@ -111,40 +111,12 @@ namespace VUI
 
 		protected override Size DoGetPreferredSize(float maxWidth, float maxHeight)
 		{
-			var left = SideSize(Left, maxWidth, maxHeight);
-			var right = SideSize(Right, maxWidth, maxHeight);
-			var top = SideSize(Top, maxWidth, maxHeight);
-			var bottom = SideSize(Bottom, maxWidth, maxHeight);
+			return GetSize(maxWidth, maxHeight, true);
+		}
 
-			var center = new Size();
-			foreach (var w in sides_[Center])
-			{
-				if (!w.Visible)
-					continue;
-
-				var ps = w.GetRealPreferredSize(maxWidth, maxHeight);
-				center = Size.Max(center, ps);
-			}
-
-			int hn =
-				(left.Width > 0 ? 1 : 0) +
-				(center.Width > 0 ? 1 : 0) +
-				(right.Width > 0 ? 1 : 0);
-
-			int vn =
-				(top.Height > 0 ? 1 : 0) +
-				(center.Height > 0 ? 1 : 0) +
-				(bottom.Height > 0 ? 1 : 0);
-
-			float width = left.Width + center.Width + right.Width;
-			float height = top.Height + center.Height + bottom.Height;
-
-			width = Math.Max(width, Math.Max(top.Width, bottom.Width));
-			height = Math.Max(height, Math.Max(left.Height, right.Height));
-
-			return new Size(
-				width + (Math.Max(hn - 1, 0) * Spacing),
-				height + (Math.Max(vn - 1, 0) * Spacing));
+		protected override Size DoGetMinimumSize()
+		{
+			return GetSize(-1, -1, false);
 		}
 
 		private float DoTop(Rectangle av)
@@ -166,8 +138,8 @@ namespace VUI
 				r.Right = r.Left + av.Width;
 				r.Bottom = r.Top + wh;
 
-				var lw = SideWidth(Left, av.Height);
-				var rw = SideWidth(Right, av.Height);
+				var lw = SideWidth(Left, av.Height, true);
+				var rw = SideWidth(Right, av.Height, true);
 
 				if (corners_[TopLeft] != Top)
 				{
@@ -213,8 +185,8 @@ namespace VUI
 				r.Right = r.Left + av.Width;
 				r.Bottom = r.Top + wh;
 
-				var lw = SideWidth(Left, av.Height);
-				var rw = SideWidth(Right, av.Height);
+				var lw = SideWidth(Left, av.Height, true);
+				var rw = SideWidth(Right, av.Height, true);
 
 				if (corners_[BottomLeft] != Bottom)
 				{
@@ -261,8 +233,8 @@ namespace VUI
 				r.Right = r.Left + ww;
 				r.Bottom = r.Top + av.Height;
 
-				var th = SideHeight(Top, av.Width);
-				var bh = SideHeight(Bottom, av.Width);
+				var th = SideHeight(Top, av.Width, true);
+				var bh = SideHeight(Bottom, av.Width, true);
 
 				if (corners_[TopLeft] != Left)
 				{
@@ -309,8 +281,8 @@ namespace VUI
 				r.Right = r.Left + ww;
 				r.Bottom = r.Top + av.Height;
 
-				var th = SideHeight(Top, av.Width);
-				var bh = SideHeight(Bottom, av.Width);
+				var th = SideHeight(Top, av.Width, true);
+				var bh = SideHeight(Bottom, av.Width, true);
 
 				if (corners_[TopRight] != Right)
 				{
@@ -348,14 +320,58 @@ namespace VUI
 			}
 		}
 
-		private Size SideSize(int side, float maxWidth, float maxHeight)
+		private Size GetSize(float maxWidth, float maxHeight, bool preferred)
 		{
+			var left = SideSize(Left, maxWidth, maxHeight, preferred);
+			var right = SideSize(Right, maxWidth, maxHeight, preferred);
+			var top = SideSize(Top, maxWidth, maxHeight, preferred);
+			var bottom = SideSize(Bottom, maxWidth, maxHeight, preferred);
+
+			var center = new Size();
+			foreach (var w in sides_[Center])
+			{
+				if (!w.Visible)
+					continue;
+
+				Size ps;
+
+				if (preferred)
+					ps = w.GetRealPreferredSize(maxWidth, maxHeight);
+				else
+					ps = w.GetRealMinimumSize();
+
+				center = Size.Max(center, ps);
+			}
+
+			int hn =
+				(left.Width > 0 ? 1 : 0) +
+				(center.Width > 0 ? 1 : 0) +
+				(right.Width > 0 ? 1 : 0);
+
+			int vn =
+				(top.Height > 0 ? 1 : 0) +
+				(center.Height > 0 ? 1 : 0) +
+				(bottom.Height > 0 ? 1 : 0);
+
+			float width = left.Width + center.Width + right.Width;
+			float height = top.Height + center.Height + bottom.Height;
+
+			width = Math.Max(width, Math.Max(top.Width, bottom.Width));
+			height = Math.Max(height, Math.Max(left.Height, right.Height));
+
 			return new Size(
-				SideWidth(side, maxHeight),
-				SideHeight(side, maxWidth));
+				width + (Math.Max(hn - 1, 0) * Spacing),
+				height + (Math.Max(vn - 1, 0) * Spacing));
 		}
 
-		private float SideWidth(int side, float maxHeight)
+		private Size SideSize(int side, float maxWidth, float maxHeight, bool preferred)
+		{
+			return new Size(
+				SideWidth(side, maxHeight, preferred),
+				SideHeight(side, maxWidth, preferred));
+		}
+
+		private float SideWidth(int side, float maxHeight, bool preferred)
 		{
 			float widest = 0;
 
@@ -364,14 +380,20 @@ namespace VUI
 				if (!w.Visible)
 					continue;
 
-				float ww = w.GetRealPreferredSize(DontCare, maxHeight).Width;
+				float ww;
+
+				if (preferred)
+					ww = w.GetRealPreferredSize(DontCare, maxHeight).Width;
+				else
+					ww = w.GetRealMinimumSize().Width;
+
 				widest = Math.Max(widest, ww);
 			}
 
 			return widest;
 		}
 
-		private float SideHeight(int side, float maxWidth)
+		private float SideHeight(int side, float maxWidth, bool preferred)
 		{
 			float tallest = 0;
 
@@ -380,7 +402,13 @@ namespace VUI
 				if (!w.Visible)
 					continue;
 
-				float wh = w.GetRealPreferredSize(maxWidth, DontCare).Height;
+				float wh;
+
+				if (preferred)
+					wh = w.GetRealPreferredSize(maxWidth, DontCare).Height;
+				else
+					wh = w.GetRealMinimumSize().Height;
+
 				tallest = Math.Max(tallest, wh);
 			}
 

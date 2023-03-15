@@ -395,6 +395,8 @@ namespace VUI
 			panel_.BringToTop();
 			panel_.DoLayout();
 
+			listView_.ScrollToTop();
+
 			panel_.GetRoot().SetOpenedPopup(listView_, listView_.Popup.popup);
 		}
 
@@ -532,6 +534,8 @@ namespace VUI
 			placeholder_ = placeholder;
 			ac_ = new AutoComplete(this);
 
+			Borders = new Insets(1);
+
 			if (edited != null)
 				Edited += edited;
 
@@ -618,7 +622,7 @@ namespace VUI
 
 		protected override void DoFocus()
 		{
-			input_.ActivateInputField();
+			input_?.ActivateInputField();
 		}
 
 		protected override GameObject CreateGameObject()
@@ -728,7 +732,7 @@ namespace VUI
 		{
 			try
 			{
-				GetRoot().SetFocus(this, focusflags_);
+				Focus(focusflags_);
 			}
 			catch (Exception e)
 			{
@@ -939,7 +943,12 @@ namespace VUI
 		private void OnBlur(FocusEvent e)
 		{
 			if (!ac_.Enabled || !ac_.Visible || !e.Other.HasParent(ac_.Widget))
+			{
+				if (ac_.Enabled && ac_.Visible)
+					ac_.Add(text_);
+
 				ac_.Hide();
+			}
 		}
 	}
 

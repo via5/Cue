@@ -74,7 +74,13 @@ namespace VUI
 			try
 			{
 				if (widget_ != null)
-					widget_.OnPointerClickInternal(d);
+				{
+					// vr has clickCount to 0
+					if (d.clickCount == 0 || d.clickCount == 1)
+						widget_.OnPointerClickInternal(d);
+					else if (d.clickCount == 2)
+						widget_.OnPointerDoubleClickInternal(d);
+				}
 			}
 			catch (Exception e)
 			{
@@ -322,22 +328,25 @@ namespace VUI
 		public delegate void PointerHandler(PointerEvent e);
 		public event PointerHandler PointerEnter, PointerExit;
 
-		private void DoFirePointer(Widget w, PointerEventData d, PointerHandler h)
+		private bool DoFirePointer(Widget w, PointerEventData d, PointerHandler h, bool defBubble = false)
 		{
 			if (h != null)
 			{
-				var e = new PointerEvent(w, d, false);
+				var e = new PointerEvent(w, d, defBubble);
 				h.Invoke(e);
+				return e.Bubble;
 			}
+
+			return defBubble;
 		}
 
-		public void FirePointerEnter(Widget w, PointerEventData d) { DoFirePointer(w, d, PointerEnter); }
-		public void FirePointerExit(Widget w, PointerEventData d) { DoFirePointer(w, d, PointerExit); }
+		public bool FirePointerEnter(Widget w, PointerEventData d, bool defBubble = false) { return DoFirePointer(w, d, PointerEnter, defBubble); }
+		public bool FirePointerExit(Widget w, PointerEventData d) { return DoFirePointer(w, d, PointerExit); }
 
 
 		public delegate void BubblePointerHandler(PointerEvent e);
 		public event BubblePointerHandler PointerDown, PointerUp, PointerClick;
-		public event BubblePointerHandler PointerMove;
+		public event BubblePointerHandler PointerDoubleClick, PointerMove;
 
 		private bool DoFireBubblePointer(Widget w, PointerEventData d, BubblePointerHandler h)
 		{
@@ -354,6 +363,7 @@ namespace VUI
 		public bool FirePointerDown(Widget w, PointerEventData d) { return DoFireBubblePointer(w, d, PointerDown); }
 		public bool FirePointerUp(Widget w, PointerEventData d) { return DoFireBubblePointer(w, d, PointerUp); }
 		public bool FirePointerClick(Widget w, PointerEventData d) { return DoFireBubblePointer(w, d, PointerClick); }
+		public bool FirePointerDoubleClick(Widget w, PointerEventData d) { return DoFireBubblePointer(w, d, PointerDoubleClick); }
 		public bool FirePointerMove(Widget w, PointerEventData d) { return DoFireBubblePointer(w, d, PointerMove); }
 	}
 }

@@ -34,26 +34,24 @@ namespace VUI
 
 		public bool Checked
 		{
-			get
-			{
-				return checked_;
-			}
-
-			set
-			{
-				if (checked_ != value)
-				{
-					checked_ = value;
-
-					if (toggle_ != null)
-						toggle_.toggle.isOn = value;
-				}
-			}
+			get { return checked_; }
+			set { SetChecked(value); }
 		}
 
 		public void Toggle()
 		{
 			Checked = !Checked;
+		}
+
+		protected virtual void SetChecked(bool b)
+		{
+			if (checked_ != b)
+			{
+				checked_ = b;
+
+				if (toggle_ != null)
+					toggle_.toggle.isOn = b;
+			}
 		}
 
 		protected override GameObject CreateGameObject()
@@ -133,6 +131,55 @@ namespace VUI
 			catch (Exception e)
 			{
 				Glue.LogErrorST(e.ToString());
+			}
+		}
+	}
+
+
+	class RadioButton : CheckBox
+	{
+		private bool ignore_ = false;
+		private string group_ = "";
+
+		public RadioButton(string text, ChangedCallback changed, bool initial = false, string group = "")
+			: base(text, changed, initial)
+		{
+			group_ = group;
+		}
+
+		public void UncheckInternal()
+		{
+			try
+			{
+				ignore_ = true;
+				Checked = false;
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		protected override void SetChecked(bool b)
+		{
+			base.SetChecked(b);
+
+			if (ignore_) return;
+
+			if (b)
+			{
+				var cs = Parent?.Children;
+
+				if (cs != null)
+				{
+					for (int i = 0; i < cs.Count; ++i)
+					{
+						var c = cs[i] as RadioButton;
+
+						if (c != null && c != this && c.group_ == group_)
+							c.UncheckInternal();
+					}
+				}
 			}
 		}
 	}

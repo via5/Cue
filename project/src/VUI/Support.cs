@@ -285,13 +285,10 @@ namespace VUI
 
 	class TransformUIRootSupport : BasicRootSupport
 	{
-		private const float StyleCheckInterval = 1;
-
 		private readonly Transform t_;
 		private GameObject root_ = null;
 		private readonly List<Transform> restore_ = new List<Transform>();
 		private Style.RootRestore rr_ = null;
-		private float styleCheck_ = 0;
 
 		public TransformUIRootSupport(Transform t)
 		{
@@ -403,17 +400,6 @@ namespace VUI
 		public override void SetSize(Vector2 v)
 		{
 			// no-op
-		}
-
-		public override void Update(float s)
-		{
-			styleCheck_ += s;
-
-			if (styleCheck_ >= StyleCheckInterval)
-			{
-				styleCheck_ = 0;
-				Style.CheckRoot(t_, rr_);
-			}
 		}
 
 		protected override Canvas GetCanvas()

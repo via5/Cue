@@ -19,7 +19,7 @@ namespace VUI
 
 		public float MaxTooltipWidth
 		{
-			get { return 800; }
+			get { return 1000; }
 		}
 
 		public float TooltipBorderOffset
@@ -74,13 +74,6 @@ namespace VUI
 			get { return 5; }
 		}
 
-		// padding around the whole tree
-		//
-		public float TreeInternalPadding
-		{
-			get { return 5; }
-		}
-
 		// height of a tree item
 		//
 		public float TreeItemHeight
@@ -95,16 +88,44 @@ namespace VUI
 			get { return 2; }
 		}
 
+		// padding to the left of all items
+		//
+		public float TreeViewLeftMargin
+		{
+			get { return 10; }
+		}
+
+		// padding to the top of the tree
+		//
+		public float TreeViewTopMargin
+		{
+			get { return 0; }
+		}
+
 		// width of one indent for a tree item
 		//
 		public float TreeIndentSize
 		{
-			get { return 35; }
+			get { return 25; }
 		}
 
 		// width of the + button
 		//
 		public float TreeToggleWidth
+		{
+			get { return 30; }
+		}
+
+		// width of the checkbox
+		//
+		public float TreeCheckBoxWidth
+		{
+			get { return 30; }
+		}
+
+		// width of the icon
+		//
+		public float TreeIconWidth
 		{
 			get { return 30; }
 		}
@@ -123,9 +144,32 @@ namespace VUI
 			get { return 10; }
 		}
 
+		// space between the checkbox and the icon
+		//
+		public float TreeIconSpacing
+		{
+			get { return 10; }
+		}
+
+		// width of the bar
+		//
 		public float ScrollBarWidth
 		{
 			get { return 40; }
+		}
+
+		// max distance from handle, resets the scroll position if it's exceeded
+		//
+		public float ScrollBarMaxDragDistance
+		{
+			get { return 175; }
+		}
+
+		// width/height of the splitter handle
+		//
+		public float SplitterHandleSize
+		{
+			get { return 10; }
 		}
 	}
 
@@ -193,12 +237,12 @@ namespace VUI
 
 		public Color EditableTextColor
 		{
-			get { return Color.black; }
+			get { return TextColor; }
 		}
 
 		public Color DisabledEditableTextColor
 		{
-			get { return Color.black; }
+			get { return new Color(0.6f, 0.6f, 0.6f); }
 		}
 
 		public Color PlaceholderTextColor
@@ -213,12 +257,12 @@ namespace VUI
 
 		public Color EditableBackgroundColor
 		{
-			get { return new Color(0.84f, 0.84f, 0.84f); }
+			get { return new Color(0, 0, 0, 0); }
 		}
 
 		public Color DisabledEditableBackgroundColor
 		{
-			get { return new Color(0.60f, 0.60f, 0.60f); }
+			get { return new Color(0, 0, 0, 0); }
 		}
 
 		public Color EditableSelectionBackgroundColor
@@ -235,6 +279,11 @@ namespace VUI
 		{
 			// see ComboBox.FixBackgroundColor()
 			get { return new Color(0.146f, 0.146f, 0.146f); }
+		}
+
+		public Color ScrollBarBackgroundColor
+		{
+			get { return new Color(0.10f, 0.10f, 0.10f); }
 		}
 
 		public Color OverlayBackgroundColor
@@ -259,12 +308,12 @@ namespace VUI
 
 		public Color HighlightBackgroundColor
 		{
-			get { return new Color(0.35f, 0.35f, 0.35f); }
+			get { return new Color(0.20f, 0.20f, 0.20f); }
 		}
 
 		public Color SelectionBackgroundColor
 		{
-			get { return new Color(0.4f, 0.4f, 0.4f); }
+			get { return new Color(0.08f, 0.13f, 0.32f); }
 		}
 
 		public Color ActiveOverlayColor
@@ -284,7 +333,7 @@ namespace VUI
 
 		public Color DialogTitleBackgroundColor
 		{
-			get { return new Color(0.10f, 0.10f, 0.10f); }
+			get { return new Color(0.05f, 0.05f, 0.05f); }
 		}
 
 		public Color SelectedTabBackgroundColor
@@ -305,6 +354,16 @@ namespace VUI
 		public Color TabTextColor
 		{
 			get { return TextColor; }
+		}
+
+		public Color SplitterHandleBackgroundColor
+		{
+			get { return new Color(0.15f, 0.15f, 0.15f); }
+		}
+
+		public Color TreeViewToggleBorderColor
+		{
+			get { return new Color(0.25f, 0.25f, 0.25f); }
 		}
 	}
 
@@ -574,19 +633,6 @@ namespace VUI
 			}
 
 			return rr;
-		}
-
-		// vam will sometime restore the original background color, especially
-		// if part of the ui is loaded on demand, like the morphs panel
-		//
-		public static void CheckRoot(Transform t, RootRestore rr)
-		{
-			var bg = t.GetComponent<UnityEngine.UI.Image>();
-			if (bg != null)
-			{
-				if (bg.color != theme_.BackgroundColor)
-					bg.color = theme_.BackgroundColor;
-			}
 		}
 
 		public static void RevertRoot(Transform t, RootRestore rr)

@@ -2,6 +2,17 @@
 
 namespace VUI
 {
+	public interface IIconProvider
+	{
+		Icon ResizeWE { get; }
+	}
+
+	public class NullIconProvider : IIconProvider
+	{
+		public Icon ResizeWE { get { return null; } }
+	}
+
+
 	public class Glue
 	{
 		private static string prefix_;
@@ -15,6 +26,10 @@ namespace VUI
 		public delegate void LogDelegate(string s);
 		private static LogDelegate logInfo_, logWarning_, logError_, logVerbose_;
 
+		public delegate IIconProvider IconProviderDelegate();
+		public static IconProviderDelegate iconProvider_;
+		private static NullIconProvider nullIcons_ = new NullIconProvider();
+
 		private static bool inited_ = false;
 
 		public static void InitInternal(
@@ -24,7 +39,8 @@ namespace VUI
 			LogDelegate logVerbose = null,
 			LogDelegate logInfo = null,
 			LogDelegate logWarning = null,
-			LogDelegate logError = null)
+			LogDelegate logError = null,
+			IconProviderDelegate icons = null)
 		{
 			inited_ = true;
 			prefix_ = prefix;
@@ -34,6 +50,11 @@ namespace VUI
 			logInfo_ = logInfo;
 			logWarning_ = logWarning;
 			logError_ = logError;
+
+			if (icons == null)
+				iconProvider_ = () => nullIcons_;
+			else
+				iconProvider_ = icons;
 		}
 
 		public static bool Initialized
@@ -54,6 +75,17 @@ namespace VUI
 					return null;
 				else
 					return getPluginManager_();
+			}
+		}
+
+		public static IIconProvider IconProvider
+		{
+			get
+			{
+				if (iconProvider_ == null)
+					return null;
+				else
+					return iconProvider_();
 			}
 		}
 

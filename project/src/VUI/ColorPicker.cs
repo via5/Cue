@@ -80,7 +80,7 @@ namespace VUI
 			// small buttons at the bottom are too low
 			b.Height -= 11;
 
-			Utilities.SetRectTransform(WidgetObject, b);
+			Utilities.SetRectTransform(WidgetObjectRT, b);
 
 			// make the sliders on the right a bit smaller
 			int offset = 25;
@@ -107,10 +107,8 @@ namespace VUI
 			}
 		}
 
-		public override void UpdateBounds()
+		protected override void AfterUpdateBounds()
 		{
-			base.UpdateBounds();
-
 			try
 			{
 				ignore_ = true;

@@ -23,11 +23,10 @@ namespace VUI
 		private string text_;
 		private int align_;
 		private Text textObject_ = null;
-		private Transform ellipsis_ = null;
-		private Text ellipsisText_ = null;
-		private UnityEngine.UI.Image ellipsisBackground_ = null;
+		private Rectangle lastClip_ = Rectangle.Zero;
 		private int wrap_ = Overflow;
 		private bool autoTooltip_ = false;
+		private bool hasEllipsis_ = false;
 
 		public Label(
 			string t = "",
@@ -108,16 +107,11 @@ namespace VUI
 			}
 
 			// text already too long
-			if (wrap_ == ClipEllipsis && EllipsisVisible())
+			if (wrap_ == ClipEllipsis && hasEllipsis_)
 				return false;
 
 			// check if text is longer than current bounds
 			return TextTooLong();
-		}
-
-		private bool EllipsisVisible()
-		{
-			return (ellipsis_?.gameObject?.activeInHierarchy ?? false);
 		}
 
 		public int Alignment
@@ -170,6 +164,7 @@ namespace VUI
 			textObject_.text = text_;
 			textObject_.horizontalOverflow = GetHorizontalOverflow();
 			textObject_.maskable = true;
+			textObject_.resizeTextForBestFit = false;
 
 			// needed for tooltips
 			textObject_.raycastTarget = true;
@@ -179,10 +174,10 @@ namespace VUI
 
 		private HorizontalWrapMode GetHorizontalOverflow()
 		{
-			if (wrap_ == Overflow)
-				return HorizontalWrapMode.Overflow;
-			else
+			if (wrap_ == Wrap || wrap_ == ClipEllipsis)
 				return HorizontalWrapMode.Wrap;
+			else
+				return HorizontalWrapMode.Overflow;
 		}
 
 		protected override void DoPolish()
@@ -191,31 +186,54 @@ namespace VUI
 			Style.Polish(this);
 		}
 
-		public override void UpdateBounds()
+		protected override void AfterUpdateBounds()
 		{
-			base.UpdateBounds();
+			base.AfterUpdateBounds();
 			textObject_.alignment = ToTextAnchor(align_);
 			UpdateClip();
 		}
 
+		private Rectangle MakeClipRect()
+		{
+			var root = GetRoot();
+			if (root == null)
+				return Rectangle.Zero;
+
+			var rb = root.RootSupport.Bounds;
+			var ar = AbsoluteClientBounds;
+
+			return Rectangle.FromSize(
+				ar.Left - rb.Width / 2 - 2,
+				rb.Bottom - ar.Top - ar.Height + root.RootSupport.TopOffset,
+				ar.Width,
+				ar.Height);
+		}
+
 		private void UpdateClip()
 		{
+			hasEllipsis_ = false;
+
 			if (textObject_ == null)
 				return;
 
 			if (!IsVisibleOnScreen())
+			{
+				ClearClip();
 				return;
+			}
 
 			switch (wrap_)
 			{
 				case Wrap:
 				case Overflow:
 				{
+					ClearClip();
 					break;
 				}
 
 				case Clip:
 				{
+					SetClip(MakeClipRect());
 					break;
 				}
 
@@ -223,37 +241,25 @@ namespace VUI
 				{
 					if (TextTooLong())
 					{
-						var ellipsisSize = TextSize("...");
-						ellipsisSize.Width += 5;
+						var ss = Root.ClipTextEllipsis(
+							Font, FontSize, FontStyle, ToTextAnchor(align_),
+							text_, ClientBounds.Size, false);
 
-						if (ellipsis_ == null)
-							CreateEllipsis();
-
-						var r = Rectangle.FromSize(
-							ClientBounds.Left + ClientBounds.Width - ellipsisSize.Width,
-							ClientBounds.Top + ClientBounds.Height - ellipsisSize.Height - 5,
-							ellipsisSize.Width,
-							ellipsisSize.Height);
-
-						ellipsis_.gameObject.SetActive(true);
-
-						if (BackgroundColor.a == 0)
-							ellipsisBackground_.color = Style.Theme.BackgroundColor;
-						else
-							ellipsisBackground_.color = BackgroundColor;
-
-						Utilities.SetRectTransform(ellipsis_, r);
+						hasEllipsis_ = (ss != text_);
+						textObject_.text = ss;
 
 						if (autoTooltip_)
 							Tooltip.Text = text_;
 					}
 					else
 					{
+						hasEllipsis_ = false;
+						textObject_.text = text_;
+
+						ClearClip();
+
 						if (autoTooltip_)
 							Tooltip.Text = "";
-
-						if (ellipsis_ != null)
-							ellipsis_.gameObject.SetActive(false);
 					}
 
 					break;
@@ -261,54 +267,22 @@ namespace VUI
 			}
 		}
 
-		private void CreateEllipsis()
+		private void ClearClip()
 		{
-			var go = new GameObject("ellipsisParent");
-			go.AddComponent<RectTransform>();
-			go.AddComponent<LayoutElement>();
+			lastClip_ = Rectangle.Zero;
+			textObject_.SetClipRect(Rect.zero, false);
+		}
 
+		private void SetClip(Rectangle r)
+		{
+			if ((int)r.Left != (int)lastClip_.Left ||
+				(int)r.Top != (int)lastClip_.Top ||
+				(int)r.Right != (int)lastClip_.Right ||
+				(int)r.Bottom != (int)lastClip_.Bottom)
 			{
-				var b = new GameObject("background");
-				ellipsisBackground_ = b.AddComponent<UnityEngine.UI.Image>();
-
-				var rt = b.GetComponent<RectTransform>();
-				if (rt == null)
-					rt = b.AddComponent<RectTransform>();
-
-				rt.offsetMin = new Vector2(0, 0);
-				rt.offsetMax = new Vector2(0, 0);
-				rt.anchorMin = new Vector2(0, 0);
-				rt.anchorMax = new Vector2(1, 1);
-
-				b.transform.SetParent(go.transform, false);
+				lastClip_ = r;
+				textObject_.SetClipRect(r.ToRect(), true);
 			}
-
-			{
-				var e = new GameObject("ellipsis");
-
-				var rt = e.GetComponent<RectTransform>();
-				if (rt == null)
-					rt = e.AddComponent<RectTransform>();
-
-				rt.offsetMin = new Vector2(0, 0);
-				rt.offsetMax = new Vector2(0, 0);
-				rt.anchorMin = new Vector2(0, 0);
-				rt.anchorMax = new Vector2(1, 1);
-
-				ellipsisText_ = e.AddComponent<Text>();
-				ellipsisText_.text = "...";
-				ellipsisText_.raycastTarget = false;
-				ellipsisText_.alignment = TextAnchor.MiddleCenter;
-
-				e.transform.SetParent(go.transform, false);
-			}
-
-			go.SetActive(true);
-			go.transform.SetParent(MainObject.transform, false);
-
-			ellipsis_ = go.transform;
-
-			Polish();
 		}
 
 		protected override Size DoGetPreferredSize(
@@ -333,9 +307,6 @@ namespace VUI
 
 			if (textObject_ != null)
 				textObject_.gameObject.SetActive(b);
-
-			if (ellipsis_ != null)
-				ellipsis_.gameObject.SetActive(b);
 		}
 
 		protected override void UpdateActiveState()
@@ -346,7 +317,7 @@ namespace VUI
 
 		private bool TextTooLong()
 		{
-			var tl = Root.FitText(Font, FontSize, FontStyle, text_, ClientBounds.Size, true);
+			var tl = TextSize(text_, ClientBounds.Size, true);
 			return (tl.Width > ClientBounds.Width) || (tl.Height > ClientBounds.Height);
 		}
 
@@ -380,6 +351,11 @@ namespace VUI
 			{
 				return base.DebugLine + " '" + text_ + "'";
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"{base.ToString()} '{text_}'";
 		}
 	}
 }

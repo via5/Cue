@@ -77,13 +77,16 @@ namespace VUI
 		{
 			if (dirty_ || forceLayout)
 			{
-				var start = Time.realtimeSinceStartup;
-				DoLayout();
-				var t = Time.realtimeSinceStartup - start;
+				if (root_.RootSupport.RootParent.gameObject.activeInHierarchy)
+				{
+					var start = Time.realtimeSinceStartup;
+					DoLayout();
+					var t = Time.realtimeSinceStartup - start;
 
-				Glue.LogVerbose($"layout {Name}: {t:0.000:}s");
+					Glue.LogVerbose($"layout {Name}: {t:0.000:}s");
 
-				dirty_ = false;
+					dirty_ = false;
+				}
 			}
 		}
 
@@ -103,7 +106,7 @@ namespace VUI
 
 		public override void OnPointerDownInternal(PointerEventData d, bool source)
 		{
-			GetRoot().SetFocus(this);
+			Focus();
 			base.OnPointerDownInternal(d, source);
 		}
 
@@ -137,7 +140,7 @@ namespace VUI
 		private bool ready_ = false;
 
 		static private TextGenerator tg_ = null;
-		static private TextGenerationSettings ts_ = new TextGenerationSettings();
+		static private TextGenerationSettings defaultTs_ = new TextGenerationSettings();
 
 		public delegate void FocusHandler(Widget blurred, Widget focused);
 		public event FocusHandler FocusChanged;
@@ -225,7 +228,7 @@ namespace VUI
 			if (string.IsNullOrEmpty(prefix))
 				prefix = script.name;
 
-			Init(prefix , () => script.manager, null, null, null, null, null);
+			Init(prefix , () => script.manager, null, null, null, null, null, null);
 		}
 
 		public static void Init(
@@ -235,11 +238,12 @@ namespace VUI
 			Glue.LogDelegate logVerbose = null,
 			Glue.LogDelegate logInfo = null,
 			Glue.LogDelegate logWarning = null,
-			Glue.LogDelegate logError = null)
+			Glue.LogDelegate logError = null,
+			Glue.IconProviderDelegate icons = null)
 		{
 			Glue.InitInternal(
 				prefix, getPluginManager, getString,
-				logVerbose, logInfo, logWarning, logError);
+				logVerbose, logInfo, logWarning, logError, icons);
 
 			BasicRootSupport.Cleanup();
 		}
@@ -256,7 +260,7 @@ namespace VUI
 
 		public void SetOpenedPopup(Widget w, UIPopup p)
 		{
-			if (w == null || openedPopupWidget_ == w)
+			if (w == null || openedPopupWidget_ == null || openedPopupWidget_ == w)
 			{
 				openedPopupWidget_ = w;
 				openedPopup_ = p;
@@ -301,9 +305,27 @@ namespace VUI
 		{
 			if (captured_ == w)
 			{
+				Widget old = captured_;
+
 				captured_ = null;
 				UpdateTracking(true);
+
+				var h = WidgetAt(MousePosition);
+
+				if (old != null)
+				{
+					if (h == null || !h.HasParent(old))
+						old.OnPointerExitInternalSynth();
+				}
+
+				if (h != null)
+					h.OnPointerEnterInternalSynth();
 			}
+		}
+
+		public Widget Captured
+		{
+			get { return captured_; }
 		}
 
 		public void AttachTo(IRootSupport support)
@@ -345,7 +367,7 @@ namespace VUI
 			rootObject_.transform.SetParent(support_.RootParent, false);
 
 			var rt = rootObject_.AddComponent<RectTransform>();
-			Utilities.SetRectTransform(rootObject_, support_.Bounds);
+			Utilities.SetRectTransform(rootObject_.GetComponent<RectTransform>(), support_.Bounds);
 			rootObject_.AddComponent<LayoutElement>().ignoreLayout = true;
 
 			SupportBoundsChanged();
@@ -358,7 +380,7 @@ namespace VUI
 			else
 			{
 				tg_ = text.cachedTextGenerator;
-				ts_ = text.GetGenerationSettings(new Vector2());
+				defaultTs_ = text.GetGenerationSettings(new Vector2());
 			}
 
 			Update(true);
@@ -589,7 +611,7 @@ namespace VUI
 			Tooltips.Hide();
 		}
 
-		static private TextGenerator GetTG()
+		static public TextGenerator GetTG()
 		{
 			if (tg_ == null)
 				tg_ = new TextGenerator();
@@ -597,9 +619,9 @@ namespace VUI
 			return tg_;
 		}
 
-		static private TextGenerationSettings GetTS()
+		static public TextGenerationSettings GetTS()
 		{
-			return ts_;
+			return defaultTs_;
 		}
 
 		public static float TextLength(Font font, int fontSize, FontStyle fontStyle, string s)
@@ -644,8 +666,12 @@ namespace VUI
 			return size;
 		}
 
-		public static Size FitText(Font font, int fontSize, FontStyle fontStyle, string s, Size maxSize, bool vertOverflow=false)
+		public static Size TextSize(
+			Font font, int fontSize, FontStyle fontStyle, string s,
+			Size maxSize, bool vertOverflow = false)
 		{
+			// much of this is the same as ClipTextEllipsis() below
+
 			var ts = GetTS();
 			ts.font = font ?? Style.Theme.DefaultFont;
 			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
@@ -687,19 +713,20 @@ namespace VUI
 			ts.resizeTextForBestFit = false;
 
 			var size = Size.Zero;
+			var lines = s.Split('\n');
 
-			foreach (var line in s.Split('\n'))
+			foreach (var line in lines)
 			{
 				// todo: line spacing, but this is broken, really
 				if (size.Height > 0)
 					size.Height += 1;
 
-				size.Width = Math.Max(size.Width, GetTG().GetPreferredWidth(line, ts));
+				size.Width = Math.Max(size.Width, GetWidth(line, ts));
 
 				if (line == "")
-					size.Height += GetTG().GetPreferredHeight("W", ts);
+					size.Height += GetHeight("W", ts);
 				else
-					size.Height += GetTG().GetPreferredHeight(line, ts);
+					size.Height += GetHeight(line, ts);
 			}
 
 			if (maxSize.Width != Widget.DontCare)
@@ -712,6 +739,255 @@ namespace VUI
 			}
 
 			return size;
+		}
+
+		public static Size FitText(
+			Font font, int fontSize, FontStyle fontStyle, TextAnchor anchor,
+			string s, Size maxSize, bool vertOverflow = false)
+		{
+			// much of this is the same as ClipTextEllipsis() below
+
+			var ts = GetTS();
+
+			ts.font = font ?? Style.Theme.DefaultFont;
+			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.fontStyle = fontStyle;
+
+			var extents = new Vector2();
+
+			if (maxSize.Width == Widget.DontCare)
+			{
+				extents.x = 10000;
+				ts.horizontalOverflow = HorizontalWrapMode.Overflow;
+			}
+			else
+			{
+				extents.x = maxSize.Width;
+				ts.horizontalOverflow = HorizontalWrapMode.Wrap;
+			}
+
+			if (maxSize.Height == Widget.DontCare)
+			{
+				extents.y = 10000;
+				ts.verticalOverflow = VerticalWrapMode.Overflow;
+			}
+			else
+			{
+				extents.y = maxSize.Height;
+
+				if (vertOverflow)
+					ts.verticalOverflow = VerticalWrapMode.Overflow;
+				else
+					ts.verticalOverflow = VerticalWrapMode.Truncate;
+			}
+
+			ts.textAnchor = anchor;
+			ts.alignByGeometry = false;
+			ts.pivot = Vector2.zero;
+			ts.richText = false;
+			ts.generationExtents = extents;
+			ts.generateOutOfBounds = false;
+			ts.resizeTextForBestFit = false;
+			ts.updateBounds = true;
+
+			var size = Size.Zero;
+			var tg = GetTG();
+
+			float lineHeight = tg.GetPreferredHeight("W", ts);
+			tg.PopulateWithErrors(s, ts, null);
+
+			int lineCount = Math.Max(tg.lineCount, 1);
+
+			if (tg.verts != null)
+			{
+				for (int i = 0; i < tg.verts.Count; ++i)
+					size.Width = Math.Max(size.Width, tg.verts[i].position.x);
+			}
+
+			size.Height =  lineCount * lineHeight + (lineCount - 1) * ts.lineSpacing;
+
+			if (maxSize.Width != Widget.DontCare)
+				size.Width = Math.Min(size.Width, maxSize.Width);
+
+			if (!vertOverflow)
+			{
+				if (maxSize.Height != Widget.DontCare)
+					size.Height = Math.Min(size.Height, maxSize.Height);
+			}
+
+			return size;
+		}
+
+		public static string ClipTextEllipsis(
+			Font font, int fontSize, FontStyle fontStyle, TextAnchor anchor,
+			string s, Size maxSize, bool vertOverflow = false)
+		{
+			var ts = GetTS();
+
+			ts.font = font ?? Style.Theme.DefaultFont;
+			ts.fontSize = (fontSize < 0 ? Style.Theme.DefaultFontSize : fontSize);
+			ts.fontStyle = fontStyle;
+
+			var extents = new Vector2();
+
+			if (maxSize.Width == Widget.DontCare)
+			{
+				extents.x = 10000;
+				ts.horizontalOverflow = HorizontalWrapMode.Overflow;
+			}
+			else
+			{
+				extents.x = maxSize.Width;
+				ts.horizontalOverflow = HorizontalWrapMode.Wrap;
+			}
+
+			if (maxSize.Height == Widget.DontCare)
+			{
+				extents.y = 10000;
+				ts.verticalOverflow = VerticalWrapMode.Overflow;
+			}
+			else
+			{
+				extents.y = maxSize.Height;
+
+				if (vertOverflow)
+					ts.verticalOverflow = VerticalWrapMode.Overflow;
+				else
+					ts.verticalOverflow = VerticalWrapMode.Truncate;
+			}
+
+			ts.textAnchor = anchor;
+			ts.alignByGeometry = false;
+			ts.pivot = Vector2.zero;
+			ts.richText = false;
+			ts.generationExtents = extents;
+			ts.generateOutOfBounds = false;
+			ts.resizeTextForBestFit = false;
+			ts.updateBounds = true;
+
+			var size = Size.Zero;
+			var tg = GetTG();
+
+			float lineHeight = tg.GetPreferredHeight("W", ts);
+			float ellipsisWidth = tg.GetPreferredHeight("...", ts);
+
+			tg.PopulateWithErrors(s, ts, null);
+
+			// number of lines that fit in the given rectangle
+			int lineCount = Math.Max(tg.lineCount, 1);
+
+			// calculate the width of the generated text by finding the
+			// right-most vertex; rectExtents seems to always contain whatever
+			// was given in generationExents and so is useless
+			if (tg.verts != null)
+			{
+				for (int i = 0; i < tg.verts.Count; ++i)
+					size.Width = Math.Max(size.Width, tg.verts[i].position.x);
+			}
+
+			// height of the generated text, simpler than going through verts
+			size.Height = lineCount * lineHeight + (lineCount - 1) * ts.lineSpacing;
+
+			// clamp size to max
+			if (maxSize.Width != Widget.DontCare)
+				size.Width = Math.Min(size.Width, maxSize.Width);
+
+			if (!vertOverflow)
+			{
+				if (maxSize.Height != Widget.DontCare)
+					size.Height = Math.Min(size.Height, maxSize.Height);
+			}
+
+			var chars = tg.GetCharactersArray();
+			var lines = tg.GetLinesArray();
+			var verts = tg.verts;
+
+			if (lines.Length > 0 && verts.Count > 0)
+			{
+				var ss = "";
+
+				// all lines but the last one can be rendered in full
+				for (int i = 0; i < (lines.Length - 1); ++i)
+				{
+					var beginChar = lines[i].startCharIdx;
+					var endChar = lines[i + 1].startCharIdx;
+
+					ss += s.Substring(beginChar, endChar - beginChar);
+				}
+
+				float lastLineWidth = 0;
+
+				// get all the characters that fit in the last line
+				{
+					var lastLine = lines[lines.Length - 1];
+					int beginChar = lastLine.startCharIdx;
+					int endChar = -1;
+
+					for (int j = beginChar; j < s.Length; ++j)
+					{
+						// vertex index of this character
+						var vi = j * 4;
+
+						// if the vertex index is larger than the count, it means
+						// this character was not rendered and so the string must
+						// cut there
+						//
+						// for whatever reason, it looks like there's always one
+						// character too many
+						if (vi >= (verts.Count - 4))
+						{
+							endChar = j;
+							break;
+						}
+
+						// get the right-most vertex to find the width of this
+						// line
+						for (int k = 0; k < 4; ++k)
+							lastLineWidth = Math.Max(lastLineWidth, verts[vi + k].position.x);
+					}
+
+					if (endChar == -1)
+						endChar = s.Length;
+
+					ss += s.Substring(beginChar, endChar - beginChar);
+				}
+
+				if (ss != s)
+				{
+					// if the string is different, it was cut and needs an
+					// ellipsis
+
+					// the last line doesn't necessarily end right at the edge
+					// of the rectangle, unity word wraps correctly and could
+					// have a line that ends short because it has a space
+					// followed by a very long word
+					//
+					// if the ellipsis fits on the last line, just append it;
+					// if not, cut the last three characters to make space
+					//
+					// always trim the end so the ellipsis doesn't look like
+					// it's in the middle of nowhere
+
+					if (lastLineWidth + ellipsisWidth < maxSize.Width)
+						s = ss.TrimEnd() + "...";
+					else if (ss.Length >= 3)
+						s = ss.Substring(0, ss.Length - 3).TrimEnd() + "...";
+					else
+						s = "...";
+				}
+			}
+
+			return s;
+		}
+
+		private static float GetWidth(string line, TextGenerationSettings ts)
+		{
+			return GetTG().GetPreferredWidth(line, ts);
+		}
+
+		private static float GetHeight(string line, TextGenerationSettings ts)
+		{
+			return GetTG().GetPreferredHeight(line, ts);
 		}
 	}
 }

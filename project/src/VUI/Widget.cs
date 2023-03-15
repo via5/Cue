@@ -30,6 +30,11 @@ namespace VUI
 		private GameObject graphicsObject_ = null;
 		private WidgetBorderGraphics borderGraphics_ = null;
 
+		private RectTransform widgetObjectRT_ = null;
+		private RectTransform mainObjectRT_ = null;
+		private RectTransform borderGraphicsRT_ = null;
+		private LayoutElement mainObjectLE_ = null;
+
 		private bool render_ = true;
 		private bool visible_ = true;
 		private bool enabled_ = true;
@@ -44,6 +49,7 @@ namespace VUI
 		private readonly Tooltip tooltip_;
 		private Events events_ = new Events();
 		private bool wantsFocus_ = true;
+		private bool didLayoutWhileRendered_ = false;
 
 		private bool dirty_ = true;
 
@@ -175,6 +181,11 @@ namespace VUI
 			get { return widgetObject_; }
 		}
 
+		public RectTransform WidgetObjectRT
+		{
+			get { return widgetObjectRT_; }
+		}
+
 		public Events Events
 		{
 			get { return events_; }
@@ -284,7 +295,7 @@ namespace VUI
 
 		private Widget AnyDirtyChild()
 		{
-			if (!visible_)
+			if (!visible_ || !render_)
 				return null;
 
 			if (dirty_)
@@ -303,9 +314,23 @@ namespace VUI
 		public bool IsVisibleOnScreen()
 		{
 			if (mainObject_ == null)
-				return render_ && visible_;
+				return visible_ && RenderInHierarchy;
 			else
-				return render_ && mainObject_.activeInHierarchy;
+				return mainObject_.activeInHierarchy && RenderInHierarchy;
+		}
+
+		private bool RenderInHierarchy
+		{
+			get
+			{
+				if (!render_)
+					return false;
+
+				if (Parent != null)
+					return Parent.RenderInHierarchy;
+
+				return true;
+			}
 		}
 
 		public bool Enabled
@@ -562,7 +587,15 @@ namespace VUI
 
 		public Size GetRealMinimumSize()
 		{
-			return Size.Max(DoGetMinimumSize(), minSize_);
+			var s = Size.Zero;
+
+			if (layout_ != null)
+				s = layout_.GetMinimumSize();
+
+			s = Size.Max(s, DoGetMinimumSize());
+			s = Size.Max(s, minSize_);
+
+			return s;
 		}
 
 		public Size MinimumSize
@@ -620,12 +653,17 @@ namespace VUI
 			return null;
 		}
 
-		public void Focus()
+		public void Focus(int focusFlags = 0)
 		{
-			DoFocus();
+			GetRoot()?.SetFocus(this, focusFlags);
 		}
 
 		protected virtual void DoFocus()
+		{
+			// no-op
+		}
+
+		protected virtual void DoBlur()
 		{
 			// no-op
 		}
@@ -748,8 +786,8 @@ namespace VUI
 				created = true;
 
 				mainObject_ = new GameObject(ToString());
-				mainObject_.AddComponent<RectTransform>();
-				mainObject_.AddComponent<LayoutElement>();
+				mainObjectRT_ = mainObject_.AddComponent<RectTransform>();
+				mainObjectLE_ = mainObject_.AddComponent<LayoutElement>();
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
 
 				if (parent_?.MainObject == null)
@@ -764,15 +802,19 @@ namespace VUI
 				DoCreate();
 				DoSetEnabled(enabled_);
 
+				widgetObjectRT_ = widgetObject_.GetComponent<RectTransform>();
+				if (widgetObjectRT_ == null)
+					widgetObjectRT_ = widgetObject_.AddComponent<RectTransform>();
+
 				graphicsObject_ = new GameObject("WidgetBorders");
 				graphicsObject_.transform.SetParent(mainObject_.transform, false);
 
 				borderGraphics_ = graphicsObject_.AddComponent<WidgetBorderGraphics>();
+				borderGraphicsRT_ = borderGraphics_.GetComponent<RectTransform>();
 				borderGraphics_.Borders = borders_;
 				borderGraphics_.Color = borderColor_;
 
 				UpdateActiveState();
-				SetBackground();
 			}
 
 			foreach (var w in children_)
@@ -782,16 +824,25 @@ namespace VUI
 
 			if (created)
 				Created?.Invoke();
+
+			if (GetRoot()?.Focused == this)
+				DoFocus();
 		}
 
 		private void UpdateRenderState()
 		{
 			SetRender(render_);
+
+			if (render_ && !didLayoutWhileRendered_)
+			{
+				didLayoutWhileRendered_ = true;
+				NeedsLayout("first render true");
+			}
 		}
 
 		private void SetRender(bool b)
 		{
-			if (widgetObject_ == null || !visible_)
+			if (widgetObject_ == null)
 				return;
 
 			if (!borders_.Empty)
@@ -810,20 +861,9 @@ namespace VUI
 		private void SetMainObjectBounds()
 		{
 			var r = RelativeBounds;
-			Utilities.SetRectTransform(mainObject_, r);
 
-			var layoutElement = mainObject_.GetComponent<LayoutElement>();
-			layoutElement.minWidth = r.Width;
-			layoutElement.preferredWidth = r.Width;
-			layoutElement.flexibleWidth = r.Width;
-			layoutElement.minHeight = r.Height;
-			layoutElement.preferredHeight = r.Height;
-			layoutElement.flexibleHeight = r.Height;
-			layoutElement.ignoreLayout = true;
-		}
-
-		private void SetBackground()
-		{
+			Utilities.SetRectTransform(mainObjectRT_, r);
+			Utilities.SetLayoutElement(mainObjectLE_, r.Size);
 		}
 
 		private void SetBorderBounds()
@@ -831,17 +871,17 @@ namespace VUI
 			var r = new Rectangle(0, 0, Bounds.Size);
 			r.Deflate(Margins);
 
-			Utilities.SetRectTransform(borderGraphics_, r);
+			Utilities.SetRectTransform(borderGraphicsRT_, r);
 		}
 
 		protected virtual void SetWidgetObjectBounds()
 		{
-			Utilities.SetRectTransform(widgetObject_, ClientBounds);
+			Utilities.SetRectTransform(widgetObjectRT_, ClientBounds);
 		}
 
-		public virtual void UpdateBounds()
+		public void UpdateBounds()
 		{
-			SetBackground();
+			BeforeUpdateBounds();
 
 			SetMainObjectBounds();
 			SetBorderBounds();
@@ -851,6 +891,18 @@ namespace VUI
 				w.UpdateBounds();
 
 			UpdateActiveState();
+
+			AfterUpdateBounds();
+		}
+
+		protected virtual void BeforeUpdateBounds()
+		{
+			// no-op
+		}
+
+		protected virtual void AfterUpdateBounds()
+		{
+			// no-op
 		}
 
 		public void NeedsLayout(string why, bool force = false)
@@ -926,9 +978,16 @@ namespace VUI
 			return Root.TextSize(Font, FontSize, FontStyle, s);
 		}
 
-		public Size FitText(string s, Size maxSize)
+		public Size TextSize(string s, Size maxSize, bool vertOverflow = false)
 		{
-			return Root.FitText(Font, FontSize, FontStyle, s, maxSize);
+			return Root.TextSize(Font, FontSize, FontStyle, s, maxSize, vertOverflow);
+		}
+
+		public Size FitText(string s, Size maxSize, bool vertOverflow = false)
+		{
+			return Root.FitText(
+				Font, FontSize, FontStyle, TextAnchor.UpperLeft,
+				s, maxSize, vertOverflow);
 		}
 
 
@@ -964,30 +1023,64 @@ namespace VUI
 
 		public void OnFocusInternal(Widget w)
 		{
+			if (WidgetObject!=null)
+				DoFocus();
+
 			events_.FireFocus(w);
 		}
 
 		public void OnBlurInternal(Widget w)
 		{
+			if (WidgetObject != null)
+				DoBlur();
+
 			events_.FireBlur(w);
 		}
 
-		public void OnPointerEnterInternal(PointerEventData d)
+		public void OnPointerEnterInternal(PointerEventData d, bool manualBubble = false)
 		{
+			bool bubble = true;
+
 			if (IsVisibleOnScreen())
 			{
-				GetRoot()?.WidgetEntered(this);
-				events_.FirePointerEnter(this, d);
+				var r = GetRoot();
+				var c = r?.Captured;
+
+				if (c == null || c == this)
+				{
+					GetRoot()?.WidgetEntered(this);
+					bubble = events_.FirePointerEnter(this, d, manualBubble);
+				}
 			}
+
+			if (manualBubble && bubble && parent_ != null)
+				parent_.OnPointerEnterInternal(d, manualBubble);
+		}
+
+		public void OnPointerEnterInternalSynth()
+		{
+			var d = new PointerEventData(EventSystem.current);
+			OnPointerEnterInternal(d, true);
 		}
 
 		public void OnPointerExitInternal(PointerEventData d)
 		{
 			if (IsVisibleOnScreen())
 			{
-				GetRoot()?.WidgetExited(this);
-				events_.FirePointerExit(this, d);
+				var r = GetRoot();
+
+				if (r?.Captured != this)
+				{
+					r?.WidgetExited(this);
+					events_.FirePointerExit(this, d);
+				}
 			}
+		}
+
+		public void OnPointerExitInternalSynth()
+		{
+			var d = new PointerEventData(EventSystem.current);
+			OnPointerExitInternal(d);
 		}
 
 		public virtual void OnPointerDownInternal(PointerEventData d, bool setFocus=true)
@@ -1002,7 +1095,7 @@ namespace VUI
 
 					if (WantsFocus)
 					{
-						GetRoot().SetFocus(this);
+						Focus();
 						setFocus = false;
 					}
 				}
@@ -1035,6 +1128,17 @@ namespace VUI
 
 			if (bubble && parent_ != null)
 				parent_.OnPointerClickInternal(d);
+		}
+
+		public void OnPointerDoubleClickInternal(PointerEventData d)
+		{
+			bool bubble = true;
+
+			if (IsVisibleOnScreen())
+				bubble = events_.FirePointerDoubleClick(this, d);
+
+			if (bubble && parent_ != null)
+				parent_.OnPointerDoubleClickInternal(d);
 		}
 
 		public void OnPointerMoveInternal()
