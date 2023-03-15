@@ -83,7 +83,7 @@ namespace VUI
 					DoLayout();
 					var t = Time.realtimeSinceStartup - start;
 
-					Log.Info($"layout {Name}: {t:0.000:}s");
+					Log.Verbose($"layout {Name}: {t:0.000:}s");
 
 					dirty_ = false;
 				}
@@ -99,7 +99,7 @@ namespace VUI
 		{
 			if (!dirty_)
 			{
-				Log.Info($"{Name} needs layout: {why}");
+				Log.Verbose($"{Name} needs layout: {why}");
 				dirty_ = true;
 			}
 		}

@@ -803,14 +803,9 @@ namespace VUI
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
 
 				if (parent_?.MainObject == null)
-				{
-					Log.Error($"{DebugLine} parent has no object");
 					mainObject_.transform.SetParent(root.WidgetParentTransform, false);
-				}
 				else
-				{
 					mainObject_.transform.SetParent(parent_.MainObject.transform, false);
-				}
 
 				widgetObject_ = CreateGameObject();
 				widgetObject_.AddComponent<MouseCallbacks>().Widget = this;
