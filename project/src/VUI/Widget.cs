@@ -865,10 +865,10 @@ namespace VUI
 		{
 			SetRender(render_);
 
-			if (render_ && !didLayoutWhileRendered_)
+			if (RenderInHierarchy && !didLayoutWhileRendered_)
 			{
 				didLayoutWhileRendered_ = true;
-				NeedsLayout("first render true");
+				NeedsLayout("first render true", true);
 			}
 		}
 
