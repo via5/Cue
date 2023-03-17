@@ -56,24 +56,24 @@ namespace VUI
 			// left
 			Line(vh,
 				new Point(rt.rect.xMin, -rt.rect.yMin),
-				new Point(rt.rect.xMin + borders_.Left, -rt.rect.yMax),
+				new Point(rt.rect.xMin + borders_.Left + 1, -rt.rect.yMax),
 				color_);
 
 			// top
 			Line(vh,
 				new Point(rt.rect.xMin, -rt.rect.yMin),
-				new Point(rt.rect.xMax, -rt.rect.yMin - borders_.Top),
+				new Point(rt.rect.xMax, -rt.rect.yMin - borders_.Top - 1),
 				color_);
 
 			// right
 			Line(vh,
-				new Point(rt.rect.xMax - borders_.Right, -rt.rect.yMin),
+				new Point(rt.rect.xMax - borders_.Right - 1, -rt.rect.yMin),
 				new Point(rt.rect.xMax, -rt.rect.yMax),
 				color_);
 
 			// bottom
 			Line(vh,
-				new Point(rt.rect.xMin, -rt.rect.yMax + borders_.Bottom),
+				new Point(rt.rect.xMin, -rt.rect.yMax + borders_.Bottom + 1),
 				new Point(rt.rect.xMax, -rt.rect.yMax),
 				color_);
 		}
@@ -83,10 +83,10 @@ namespace VUI
 			Color32 c32 = c;
 			var i = vh.currentVertCount;
 
-			vh.AddVert(new Vector3(a.X, a.Y), c32, new Vector2(0f, 0f));
-			vh.AddVert(new Vector3(a.X, b.Y), c32, new Vector2(0f, 1f));
-			vh.AddVert(new Vector3(b.X, b.Y), c32, new Vector2(1f, 1f));
-			vh.AddVert(new Vector3(b.X, a.Y), c32, new Vector2(1f, 0f));
+			vh.AddVert(new Vector3(Mathf.Round(a.X), Mathf.Round(a.Y)), c32, new Vector2(0f, 0f));
+			vh.AddVert(new Vector3(Mathf.Round(a.X), Mathf.Round(b.Y)), c32, new Vector2(0f, 1f));
+			vh.AddVert(new Vector3(Mathf.Round(b.X), Mathf.Round(b.Y)), c32, new Vector2(1f, 1f));
+			vh.AddVert(new Vector3(Mathf.Round(b.X), Mathf.Round(a.Y)), c32, new Vector2(1f, 0f));
 
 			vh.AddTriangle(i + 0, i + 1, i + 2);
 			vh.AddTriangle(i + 2, i + 3, i + 0);
