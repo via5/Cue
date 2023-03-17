@@ -345,6 +345,13 @@ namespace Cue.Sys.Mock
 		{
 			return null;
 		}
+
+		public IStringListParameter RegisterStringListParameter(
+			string name, Action<string> f, string[] values,
+			string init, string displayName)
+		{
+			return null;
+		}
 	}
 
 

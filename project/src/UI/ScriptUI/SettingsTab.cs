@@ -131,6 +131,8 @@ namespace Cue
 				else
 					SelectPersonality(person_.Personality.Name);
 
+				loadPose_.Checked = person_.LoadPose;
+
 				maxExcitement_.Value = (int)Math.Round(person_.Options.MaxExcitement * 100);
 				strapon_.Checked = person_.Body.Strapon;
 
@@ -217,23 +219,13 @@ namespace Cue
 		private void OnPersonality(PersonalityItem item)
 		{
 			if (ignore_) return;
-
-			if (item.Personality.Name != person_.Personality.Name)
-			{
-				var p = Resources.Personalities.Clone(
-					item.Personality.Name, person_);
-
-				person_.SetPersonality(p);
-				Cue.Instance.Save();
-			}
+			person_.SetPersonality(item.Personality.Name);
 		}
 
 		private void OnLoadPose(bool b)
 		{
 			if (ignore_) return;
-
 			person_.LoadPose = b;
-			Cue.Instance.Save();
 		}
 
 		private void OnMaxExcitement(int i)

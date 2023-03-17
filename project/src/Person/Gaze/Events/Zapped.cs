@@ -101,7 +101,7 @@ namespace Cue
 			bool sourceIsPlayer = (z.Source?.IsPlayer ?? false);
 
 			// look at person zapping
-			if (z.Source != person_)
+			if (z.Source != null && z.Source != person_)
 			{
 				float w = GetEyesWeight(z.Source.IsPlayer, z.Zone) * z.Intensity;
 				if (w >= 0)

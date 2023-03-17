@@ -23,7 +23,7 @@ namespace Cue
 				triggerOn_ = new CustomButtonItem($"{name}.on");
 				triggerOff_ = new CustomButtonItem($"{name}.on");
 
-				if (f == null)
+				if (f == null || !p.Body.Exists)
 					action_ = null;
 				else
 					action_ = Cue.Instance.Sys.RegisterActionParameter($"{p.ID}.{name}", f);
@@ -114,6 +114,10 @@ namespace Cue
 		private bool idlePose_ = true;
 		private bool excitedPose_ = true;
 
+		private Sys.IFloatParameter maxExcitementParam_;
+		private Sys.IBoolParameter idlePoseParam_;
+		private Sys.IBoolParameter excitedPoseParam_;
+
 		public PersonOptions(Person p)
 		{
 			person_ = p;
@@ -133,6 +137,37 @@ namespace Cue
 			anims_.Add(new AnimationOptions(p, AnimationType.RightHandOnChest, "Right hand on chest"));
 		}
 
+		public void Init()
+		{
+			if (person_.Body.Exists)
+			{
+				maxExcitementParam_ = Cue.Instance.Sys.RegisterFloatParameter(
+					$"{person_.ID}.MaxExcitement", OnMaxExcitementParam, maxExcitement_,
+					0, 1);
+
+				idlePoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+					$"{person_.ID}.IdlePose", OnIdlePoseParam, idlePose_);
+
+				excitedPoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+					$"{person_.ID}.ExcitedPose", OnExcitedPoseParam, excitedPose_);
+			}
+		}
+
+		private void OnMaxExcitementParam(float f)
+		{
+			MaxExcitement = U.Clamp(f, 0, 1);
+		}
+
+		private void OnIdlePoseParam(bool b)
+		{
+			IdlePose = b;
+		}
+
+		private void OnExcitedPoseParam(bool b)
+		{
+			ExcitedPose = b;
+		}
+
 		public void Load(JSONClass o)
 		{
 			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
@@ -141,6 +176,15 @@ namespace Cue
 
 			foreach (var a in anims_)
 				a.Load(o);
+
+			if (maxExcitementParam_ != null)
+				maxExcitementParam_.Value = maxExcitement_;
+
+			if (idlePoseParam_ != null)
+				idlePoseParam_.Value = idlePose_;
+
+			if (excitedPoseParam_ != null)
+				excitedPoseParam_.Value = excitedPose_;
 		}
 
 		public void Save(JSONClass o)
@@ -155,20 +199,65 @@ namespace Cue
 
 		public float MaxExcitement
 		{
-			get { return maxExcitement_; }
-			set { maxExcitement_ = value; OnChange(); }
+			get
+			{
+				return maxExcitement_;
+			}
+
+			set
+			{
+				if (maxExcitement_ != value)
+				{
+					maxExcitement_ = value;
+
+					if (maxExcitementParam_ != null)
+						maxExcitementParam_.Value = maxExcitement_;
+
+					OnChange();
+				}
+			}
 		}
 
 		public bool IdlePose
 		{
-			get { return idlePose_; }
-			set { idlePose_ = value; OnChange(); }
+			get
+			{
+				return idlePose_;
+			}
+
+			set
+			{
+				if (idlePose_ != value)
+				{
+					idlePose_ = value;
+
+					if (idlePoseParam_ != null)
+						idlePoseParam_.Value = idlePose_;
+
+					OnChange();
+				}
+			}
 		}
 
 		public bool ExcitedPose
 		{
-			get { return excitedPose_; }
-			set { excitedPose_ = value; OnChange(); }
+			get
+			{
+				return excitedPose_;
+			}
+
+			set
+			{
+				if (excitedPose_ != value)
+				{
+					excitedPose_ = value;
+
+					if (excitedPoseParam_ != null)
+						excitedPoseParam_.Value = excitedPose_;
+
+					OnChange();
+				}
+			}
 		}
 
 		public List<AnimationOptions> GetAnimationOptions()

@@ -830,6 +830,14 @@ namespace Cue.Sys.Vam
 			script_.RegisterFloat(p);
 			return new VamFloatParameter(p);
 		}
+
+		public IStringListParameter RegisterStringListParameter(
+			string name, Action<string> a, string[] values, string init, string displayName)
+		{
+			var p = new JSONStorableStringChooser(name, new List<string>(values), init, displayName, s => a(s));
+			script_.RegisterStringChooser(p);
+			return new VamStringListParameter(p);
+		}
 	}
 
 
@@ -869,6 +877,22 @@ namespace Cue.Sys.Vam
 		}
 
 		public float Value
+		{
+			get { return p_.val; }
+			set { p_.val = value; }
+		}
+	}
+
+	public class VamStringListParameter : IStringListParameter
+	{
+		private JSONStorableStringChooser p_;
+
+		public VamStringListParameter(JSONStorableStringChooser p)
+		{
+			p_ = p;
+		}
+
+		public string Value
 		{
 			get { return p_.val; }
 			set { p_.val = value; }

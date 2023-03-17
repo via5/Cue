@@ -459,6 +459,7 @@ namespace Cue
 				hjAudio_.Checked = o.HJAudio;
 				bjAudio_.Checked = o.BJAudio;
 				kissAudio_.Checked = o.KissAudio;
+				mutePlayer_.Checked = o.MutePlayer;
 			}
 			finally
 			{

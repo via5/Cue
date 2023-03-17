@@ -68,7 +68,7 @@ namespace Cue
 			if (e_ == null)
 				e_ = v_.Person.AI.GetEvent<MouthEvent>();
 
-			return e_.Active;
+			return e_?.Active ?? false;
 		}
 
 		protected override void DoDebug(DebugLines debug)

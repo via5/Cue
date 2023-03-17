@@ -90,6 +90,7 @@ namespace Cue.Sys
 		IActionParameter RegisterActionParameter(string name, Action f);
 		IBoolParameter RegisterBoolParameter(string name, Action<bool> f, bool init);
 		IFloatParameter RegisterFloatParameter(string name, Action<float> a, float init, float min, float max);
+		IStringListParameter RegisterStringListParameter(string name, Action<string> f, string[] values, string init, string displayName);
 	}
 
 
@@ -558,5 +559,10 @@ namespace Cue.Sys
 	public interface IFloatParameter : IParameter
 	{
 		float Value { get; set; }
+	}
+
+	public interface IStringListParameter : IParameter
+	{
+		string Value { get; set; }
 	}
 }

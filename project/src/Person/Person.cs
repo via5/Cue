@@ -10,6 +10,7 @@ namespace Cue
 		private readonly int personIndex_;
 
 		private Personality personality_;
+		private Sys.IStringListParameter personalityParam_;
 		private Animator animator_;
 		private Excitement excitement_;
 		private Body body_;
@@ -27,6 +28,7 @@ namespace Cue
 
 		private bool hasBody_ = false;
 		private bool loadPose_ = true;
+		private Sys.IBoolParameter loadPoseParam_;
 
 
 		public Person(int objectIndex, int personIndex, Sys.IAtom atom)
@@ -69,6 +71,19 @@ namespace Cue
 
 			Atom.Init();
 			Atom.SetBodyDamping(BodyDamping.Normal);
+
+			if (hasBody_)
+			{
+				personalityParam_ = Cue.Instance.Sys.RegisterStringListParameter(
+					$"{ID}.Personality", OnPersonalityParam,
+					Resources.Personalities.AllNames().ToArray(), Personality.Name,
+					"Personality");
+
+				loadPoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+					$"{ID}.LoadPose", OnLoadPoseParam, loadPose_);
+			}
+
+			Options.Init();
 		}
 
 		public override void Load(JSONClass r)
@@ -76,6 +91,9 @@ namespace Cue
 			base.Load(r);
 
 			loadPose_ = J.OptBool(r, "loadPose", true);
+
+			if (loadPoseParam_ != null)
+				loadPoseParam_.Value = loadPose_;
 
 			if (r.HasKey("personality"))
 			{
@@ -161,8 +179,23 @@ namespace Cue
 
 		public bool LoadPose
 		{
-			get { return loadPose_; }
-			set { loadPose_ = value; }
+			get
+			{
+				return loadPose_;
+			}
+
+			set
+			{
+				if (loadPose_ != value)
+				{
+					loadPose_ = value;
+
+					if (loadPoseParam_ != null)
+						loadPoseParam_.Value = value;
+
+					Cue.Instance.Save();
+				}
+			}
 		}
 
 		public void SetPersonality(Personality p, bool canLoadPose = true)
@@ -171,6 +204,10 @@ namespace Cue
 				personality_.Destroy();
 
 			personality_ = p;
+
+			if (personalityParam_ != null)
+				personalityParam_.Value = p.Name;
+
 			personality_.Init();
 
 			voice_?.Destroy();
@@ -181,6 +218,29 @@ namespace Cue
 				personality_.Pose.Set(this);
 
 			PersonalityChanged?.Invoke();
+		}
+
+		public void SetPersonality(string name, bool canLoadPose = true)
+		{
+			if (name != Personality.Name)
+			{
+				var p = Resources.Personalities.Clone(name, this);
+				if (p != null)
+				{
+					SetPersonality(p, canLoadPose);
+					Cue.Instance.Save();
+				}
+			}
+		}
+
+		private void OnPersonalityParam(string s)
+		{
+			SetPersonality(s);
+		}
+
+		private void OnLoadPoseParam(bool b)
+		{
+			LoadPose = b;
 		}
 
 		public ExpressionManager Expression

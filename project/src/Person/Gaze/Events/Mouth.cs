@@ -14,6 +14,8 @@ namespace Cue
 			if (event_ == null)
 				event_ = person_.AI.GetEvent<MouthEvent>();
 
+			if (event_ == null) return Continue;
+
 			var ps = person_.Personality;
 			var e = event_;
 
