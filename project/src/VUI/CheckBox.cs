@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VUI
@@ -125,7 +126,7 @@ namespace VUI
 		{
 			try
 			{
-				checked_ = b;
+				SetChecked(b);
 				Changed?.Invoke(b);
 			}
 			catch (Exception e)
@@ -138,13 +139,49 @@ namespace VUI
 
 	class RadioButton : CheckBox
 	{
-		private bool ignore_ = false;
-		private string group_ = "";
+		public class Group
+		{
+			private List<RadioButton> list_ = new List<RadioButton>();
 
-		public RadioButton(string text, ChangedCallback changed, bool initial = false, string group = "")
+			public Group(string name)
+			{
+			}
+
+			public void Add(RadioButton b)
+			{
+				list_.Add(b);
+			}
+
+			public void Remove(RadioButton b)
+			{
+				list_.Remove(b);
+			}
+
+			public void Check(RadioButton b)
+			{
+				for (int i = 0; i < list_.Count; ++i)
+				{
+					var o = list_[i];
+					if (o != b)
+						o.UncheckInternal();
+				}
+			}
+		}
+
+		private bool ignore_ = false;
+		private Group group_ = null;
+
+		public RadioButton(string text, ChangedCallback changed, bool initial = false, Group g = null)
 			: base(text, changed, initial)
 		{
-			group_ = group;
+			group_ = g;
+			group_?.Add(this);
+		}
+
+		protected override void Destroy()
+		{
+			base.Destroy();
+			group_?.Remove(this);
 		}
 
 		public void UncheckInternal()
@@ -167,20 +204,7 @@ namespace VUI
 			if (ignore_) return;
 
 			if (b)
-			{
-				var cs = Parent?.Children;
-
-				if (cs != null)
-				{
-					for (int i = 0; i < cs.Count; ++i)
-					{
-						var c = cs[i] as RadioButton;
-
-						if (c != null && c != this && c.group_ == group_)
-							c.UncheckInternal();
-					}
-				}
-			}
+				group_?.Check(this);
 		}
 	}
 }

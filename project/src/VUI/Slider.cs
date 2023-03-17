@@ -23,7 +23,7 @@ namespace VUI
 
 		public BasicSlider(T tickValue, T pageValue, ValueCallback changed = null)
 		{
-			Borders = new Insets(2);
+			Borders = new Insets(1);
 			tickValue_ = tickValue;
 			pageValue_ = pageValue;
 

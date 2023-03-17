@@ -298,7 +298,7 @@ namespace VUI
 
 		public Color SliderBackgroundColor
 		{
-			get { return new Color(0.20f, 0.20f, 0.20f); }
+			get { return new Color(0, 0, 0, 0); }
 		}
 
 		public Color DisabledButtonBackgroundColor
@@ -308,7 +308,7 @@ namespace VUI
 
 		public Color HighlightBackgroundColor
 		{
-			get { return new Color(0.20f, 0.20f, 0.20f); }
+			get { return new Color(0.30f, 0.30f, 0.30f); }
 		}
 
 		public Color SelectionBackgroundColor
@@ -904,6 +904,17 @@ namespace VUI
 			Polish(e);
 		}
 
+		public static void SetupPlaceholder(TextBox e)
+		{
+			if (e.InputField.placeholder != null)
+			{
+				var info = new Info(e);
+
+				AdjustPlaceholder(e.InputField, info);
+				PolishPlaceholder(e.InputField, info);
+			}
+		}
+
 		public static void Adjust(TextBox e)
 		{
 			var input = e.InputField;
@@ -1122,6 +1133,10 @@ namespace VUI
 		{
 			// field
 			input.caretWidth = 2;
+
+			// placeholder
+			if (input.placeholder != null)
+				AdjustPlaceholder(input, info);
 		}
 
 		private static void Polish(InputField input, Info info)
@@ -1151,27 +1166,31 @@ namespace VUI
 			input.selectionColor = theme_.EditableSelectionBackgroundColor;
 
 			// placeholder
-			if (input.placeholder == null)
-			{
-				Log.Error("InputField has no placeholder");
-			}
-			else
-			{
-				ForComponent<Text>(input.placeholder, (ph) =>
-				{
-					if (info.Enabled)
-						ph.color = theme_.PlaceholderTextColor;
-					else
-						ph.color = theme_.DisabledPlaceholderTextColor;
+			if (input.placeholder != null)
+				PolishPlaceholder(input, info);
+		}
 
-					if (info.SetFont)
-					{
-						ph.font = info.Font;
-						ph.fontSize = info.FontSize;
-						ph.fontStyle = FontStyle.Italic;
-					}
-				});
-			}
+		private static void AdjustPlaceholder(InputField input, Info info)
+		{
+			// no-op
+		}
+
+		private static void PolishPlaceholder(InputField input, Info info)
+		{
+			ForComponent<Text>(input.placeholder, (ph) =>
+			{
+				if (info.Enabled)
+					ph.color = theme_.PlaceholderTextColor;
+				else
+					ph.color = theme_.DisabledPlaceholderTextColor;
+
+				if (info.SetFont)
+				{
+					ph.font = info.Font;
+					ph.fontSize = info.FontSize;
+					ph.fontStyle = FontStyle.Italic;
+				}
+			});
 		}
 
 

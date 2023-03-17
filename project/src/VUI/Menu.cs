@@ -54,7 +54,7 @@ namespace VUI
 
 		public RadioMenuItem(
 			string text, RadioButton.ChangedCallback changed,
-			bool initial = false, string group = "")
+			bool initial = false, RadioButton.Group group = null)
 		{
 			radio_ = new RadioButton(text, changed, initial, group);
 			radio_.Padding = new Insets(10, 5, 5, 5);

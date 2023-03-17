@@ -532,6 +532,8 @@ namespace VUI
 		private string text_ = "";
 		private string oldText_ = null;
 		private string placeholder_ = "";
+		private GameObject field_ = null;
+		private Text fieldText_ = null;
 		private CustomInputField input_ = null;
 		private bool ignore_ = false;
 		private bool ignoreAc_ = false;
@@ -594,10 +596,7 @@ namespace VUI
 
 			set
 			{
-				placeholder_ = value;
-
-				if (input_ != null)
-					input_.placeholder.GetComponent<Text>().text = placeholder_;
+				SetPlaceholder(value);
 			}
 		}
 
@@ -638,17 +637,17 @@ namespace VUI
 
 		protected override void DoCreate()
 		{
-			var field = new GameObject("TextBoxInputField");
-			field.transform.SetParent(WidgetObject.transform, false);
-			field.AddComponent<RectTransform>();
+			field_ = new GameObject("TextBoxInputField");
+			field_.transform.SetParent(WidgetObject.transform, false);
+			field_.AddComponent<RectTransform>();
 
-			var text = field.AddComponent<Text>();
-			text.color = Style.Theme.TextColor;
-			text.fontSize = Style.Theme.DefaultFontSize;
-			text.font = Style.Theme.DefaultFont;
-			text.alignment = TextAnchor.MiddleLeft;
+			fieldText_ = field_.AddComponent<Text>();
+			fieldText_.color = Style.Theme.TextColor;
+			fieldText_.fontSize = Style.Theme.DefaultFontSize;
+			fieldText_.font = Style.Theme.DefaultFont;
+			fieldText_.alignment = TextAnchor.MiddleLeft;
 
-			input_ = field.AddComponent<CustomInputField>();
+			input_ = field_.AddComponent<CustomInputField>();
 			input_.Parent = this;
 			input_.PointerDown += OnMouseDown;
 			input_.Focused += OnFocused;
@@ -656,7 +655,7 @@ namespace VUI
 			input_.TripleClick += OnTripleClick;
 			input_.DownArrow += OnDownArrow;
 			input_.UpArrow += OnUpArrow;
-			input_.textComponent = text;
+			input_.textComponent = fieldText_;
 			input_.text = text_;
 			input_.onEndEdit.AddListener(OnEdited);
 			input_.onValueChanged.AddListener(OnValueChanged);
@@ -665,26 +664,50 @@ namespace VUI
 			var image = WidgetObject.AddComponent<UnityEngine.UI.Image>();
 			image.raycastTarget = false;
 
-			// placeholder
-			var go = new GameObject("TextBoxPlaceholder");
-			go.transform.SetParent(input_.transform.parent, false);
-
-			text = go.AddComponent<Text>();
-			text.supportRichText = false;
-			text.horizontalOverflow = HorizontalWrapMode.Overflow;
-			text.raycastTarget = false;
-
-			var rt = text.rectTransform;
-			rt.anchorMin = new Vector2(0, 0);
-			rt.anchorMax = new Vector2(1, 1);
-			rt.offsetMin = new Vector2(5, 0);
-			rt.offsetMax = new Vector2(0, -5);
-
-			input_.placeholder = text;
-			input_.placeholder.GetComponent<Text>().text = placeholder_;
+			if (placeholder_ != "")
+				CreatePlaceholder();
 
 			Style.Setup(this);
 			UpdateTextRect();
+		}
+
+		private void SetPlaceholder(string s)
+		{
+			if (placeholder_ != s)
+			{
+				placeholder_ = s;
+
+				if (input_ != null && placeholder_ != "")
+				{
+					CreatePlaceholder();
+					input_.placeholder.GetComponent<Text>().text = placeholder_;
+				}
+			}
+		}
+
+		private void CreatePlaceholder()
+		{
+			if (input_.placeholder == null)
+			{
+				var go = new GameObject("TextBoxPlaceholder");
+				go.transform.SetParent(input_.transform.parent, false);
+
+				var text = go.AddComponent<Text>();
+				text.supportRichText = false;
+				text.horizontalOverflow = HorizontalWrapMode.Overflow;
+				text.raycastTarget = false;
+
+				var rt = text.rectTransform;
+				rt.anchorMin = new Vector2(0, 0);
+				rt.anchorMax = new Vector2(1, 1);
+				rt.offsetMin = new Vector2(5, 0);
+				rt.offsetMax = new Vector2(0, -5);
+
+				input_.placeholder = text;
+				input_.placeholder.GetComponent<Text>().text = placeholder_;
+
+				Style.SetupPlaceholder(this);
+			}
 		}
 
 		private void UpdateTextRect()
