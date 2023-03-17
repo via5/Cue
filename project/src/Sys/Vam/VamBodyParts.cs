@@ -582,14 +582,17 @@ namespace Cue.Sys.Vam
 			return DistanceToSurface(other, debug, Vector3.Zero, false);
 		}
 
-		private UnityEngine.Vector3 ClosestPoint(VamBodyPartRegion c, Vector3 p)
+		private UnityEngine.Vector3 ClosestPoint(VamBodyPartRegion r, Vector3 p)
 		{
-			var cc = (c as VamColliderRegion);
-			Cue.Assert(cc != null);
+			var cr = (r as VamColliderRegion);
+			Cue.Assert(cr != null);
+
+			var c = cr.Collider;
+			if (c == null || !c.enabled)
+				return new UnityEngine.Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 
 			return Physics.ClosestPoint(
-				U.ToUnity(p), cc.Collider,
-				cc.Collider.transform.position, cc.Collider.transform.rotation);
+				U.ToUnity(p), c, c.transform.position, c.transform.rotation);
 		}
 
 		public BodyPartRegionInfo ClosestBodyPartRegion(Vector3 pos)
