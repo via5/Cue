@@ -82,8 +82,6 @@ namespace Cue
 				loadPoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
 					$"{ID}.LoadPose", OnLoadPoseParam, loadPose_);
 			}
-
-			Options.Init();
 		}
 
 		public override void Load(JSONClass r)

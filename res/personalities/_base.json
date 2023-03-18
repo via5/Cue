@@ -893,9 +893,13 @@
 	"maxSweat": 1,
 	"maxFlush": 0.5,
 	"maxChokedFlush": 1,
-	"flushRedMag": 0.15,
 	"chokedAirDownTime": 15,
 	"chokedAirUpTime": 5,
+
+	"flushBaseColorRed": 1,
+	"flushBaseColorGreen": 0,
+	"flushBaseColorBlue": 0,
+	"flushMultiplier": 0.15,
 
 	"temperatureExcitementRate": 0.015,
 	"temperatureDecayRate": 0.005,

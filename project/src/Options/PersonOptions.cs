@@ -109,14 +109,21 @@ namespace Cue
 
 
 		private readonly Person person_;
-		private float maxExcitement_ = 1.0f;
 		private List<AnimationOptions> anims_ = new List<AnimationOptions>();
-		private bool idlePose_ = true;
-		private bool excitedPose_ = true;
 
-		private Sys.IFloatParameter maxExcitementParam_;
-		private Sys.IBoolParameter idlePoseParam_;
-		private Sys.IBoolParameter excitedPoseParam_;
+		private readonly FloatOption maxExcitement_;
+		private readonly BoolOption idlePose_;
+		private readonly BoolOption excitedPose_;
+		private readonly FloatOption sweatMultiplier_;
+		private readonly FloatOption flushMultiplier_;
+		private readonly FloatOption hairLooseMultiplier_;
+
+		private readonly Dictionary<string, BoolOption> bools_ =
+			new Dictionary<string, BoolOption>();
+
+		private readonly Dictionary<string, FloatOption> floats_ =
+			new Dictionary<string, FloatOption>();
+
 
 		public PersonOptions(Person p)
 		{
@@ -135,63 +142,65 @@ namespace Cue
 			anims_.Add(new AnimationOptions(p, AnimationType.RightHandOnBreast, "Right hand on breast"));
 			anims_.Add(new AnimationOptions(p, AnimationType.LeftHandOnChest, "Left hand on chest"));
 			anims_.Add(new AnimationOptions(p, AnimationType.RightHandOnChest, "Right hand on chest"));
+
+			maxExcitement_ = AddFloat("maxExcitement", 1.0f, 0.0f, 1.0f);
+			idlePose_ = AddBool("idlePose", true);
+			excitedPose_ = AddBool("excitedPose", true);
+
+			sweatMultiplier_ = AddFloat("sweatMultiplier", 1.0f, 0.0f, 1.0f);
+			flushMultiplier_ = AddFloat("flushMultiplier", 1.0f, 0.0f, 5.0f);
+			hairLooseMultiplier_ = AddFloat("hairLooseMultiplier", 1.0f, 0.0f, 5.0f);
 		}
 
-		public void Init()
+		private BoolOption AddBool(string name, bool init, string paramName = null)
 		{
-			if (person_.Body.Exists)
-			{
-				maxExcitementParam_ = Cue.Instance.Sys.RegisterFloatParameter(
-					$"{person_.ID}.MaxExcitement", OnMaxExcitementParam, maxExcitement_,
-					0, 1);
+			if (paramName == null)
+				paramName = name;
 
-				idlePoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-					$"{person_.ID}.IdlePose", OnIdlePoseParam, idlePose_);
-
-				excitedPoseParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-					$"{person_.ID}.ExcitedPose", OnExcitedPoseParam, excitedPose_);
-			}
+			var o = new BoolOption($"{person_.ID}.{paramName}", init);
+			o.Changed += (b) => OnChanged();
+			bools_.Add(name, o);
+			return o;
 		}
 
-		private void OnMaxExcitementParam(float f)
+		private FloatOption AddFloat(string name, float init, float min, float max, string paramName = null)
 		{
-			MaxExcitement = U.Clamp(f, 0, 1);
-		}
+			if (paramName == null)
+				paramName = name;
 
-		private void OnIdlePoseParam(bool b)
-		{
-			IdlePose = b;
-		}
-
-		private void OnExcitedPoseParam(bool b)
-		{
-			ExcitedPose = b;
+			var o = new FloatOption($"{person_.ID}.{paramName}", init, min, max);
+			o.Changed += (f) => OnChanged();
+			floats_.Add(name, o);
+			return o;
 		}
 
 		public void Load(JSONClass o)
 		{
-			J.OptFloat(o, "maxExcitement", ref maxExcitement_);
-			J.OptBool(o, "idlePose", ref idlePose_);
-			J.OptBool(o, "excitedPose", ref excitedPose_);
+			foreach (var bo in bools_)
+			{
+				bool b = false;
+				if (J.OptBool(o, bo.Key, ref b))
+					bo.Value.Value = b;
+			}
+
+			foreach (var fo in floats_)
+			{
+				float f = 0;
+				if (J.OptFloat(o, fo.Key, ref f))
+					fo.Value.Value = f;
+			}
 
 			foreach (var a in anims_)
 				a.Load(o);
-
-			if (maxExcitementParam_ != null)
-				maxExcitementParam_.Value = maxExcitement_;
-
-			if (idlePoseParam_ != null)
-				idlePoseParam_.Value = idlePose_;
-
-			if (excitedPoseParam_ != null)
-				excitedPoseParam_.Value = excitedPose_;
 		}
 
 		public void Save(JSONClass o)
 		{
-			o.Add("maxExcitement", new JSONData(maxExcitement_));
-			o.Add("idlePose", new JSONData(idlePose_));
-			o.Add("excitedPose", new JSONData(excitedPose_));
+			foreach (var bo in bools_)
+				o[bo.Key] = new JSONData(bo.Value.Value);
+
+			foreach (var fo in floats_)
+				o[fo.Key] = new JSONData(fo.Value.Value);
 
 			foreach (var a in anims_)
 				a.Save(o);
@@ -199,65 +208,58 @@ namespace Cue
 
 		public float MaxExcitement
 		{
-			get
-			{
-				return maxExcitement_;
-			}
+			get { return maxExcitement_.Value; }
+			set { maxExcitement_.Value = value; }
+		}
 
-			set
-			{
-				if (maxExcitement_ != value)
-				{
-					maxExcitement_ = value;
-
-					if (maxExcitementParam_ != null)
-						maxExcitementParam_.Value = maxExcitement_;
-
-					OnChange();
-				}
-			}
+		public FloatOption MaxExcitementOption
+		{
+			get { return maxExcitement_; }
 		}
 
 		public bool IdlePose
 		{
-			get
-			{
-				return idlePose_;
-			}
-
-			set
-			{
-				if (idlePose_ != value)
-				{
-					idlePose_ = value;
-
-					if (idlePoseParam_ != null)
-						idlePoseParam_.Value = idlePose_;
-
-					OnChange();
-				}
-			}
+			get { return idlePose_.Value; }
+			set { idlePose_.Value = value; }
 		}
 
 		public bool ExcitedPose
 		{
-			get
-			{
-				return excitedPose_;
-			}
+			get { return excitedPose_.Value; }
+			set { excitedPose_.Value = value; }
+		}
 
-			set
-			{
-				if (excitedPose_ != value)
-				{
-					excitedPose_ = value;
+		public float SweatMultiplier
+		{
+			get { return sweatMultiplier_.Value; }
+			set { sweatMultiplier_.Value = value; }
+		}
 
-					if (excitedPoseParam_ != null)
-						excitedPoseParam_.Value = excitedPose_;
+		public FloatOption SweatMultiplierOption
+		{
+			get { return sweatMultiplier_; }
+		}
 
-					OnChange();
-				}
-			}
+		public float FlushMultiplier
+		{
+			get { return flushMultiplier_.Value; }
+			set { flushMultiplier_.Value = value; }
+		}
+
+		public FloatOption FlushMultiplierOption
+		{
+			get { return flushMultiplier_; }
+		}
+
+		public float HairLooseMultiplier
+		{
+			get { return hairLooseMultiplier_.Value; }
+			set { hairLooseMultiplier_.Value = value; }
+		}
+
+		public FloatOption HairLooseMultiplierOption
+		{
+			get { return hairLooseMultiplier_; }
 		}
 
 		public List<AnimationOptions> GetAnimationOptions()
@@ -288,7 +290,7 @@ namespace Cue
 				a.TriggerOff.Activate();
 		}
 
-		private void OnChange()
+		private void OnChanged()
 		{
 			Cue.Instance.Save();
 		}

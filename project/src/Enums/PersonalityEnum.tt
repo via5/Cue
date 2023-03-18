@@ -184,12 +184,17 @@ V.Float("SlapMinTime"),
 V.Float("SlapMaxTime"),
 V.Duration("SlapUpdateInterval"),
 
-V.Float("FlushRedMag"),
 V.Float("MaxSweat"),
 V.Float("MaxFlush"),
 V.Float("MaxChokedFlush"),
 V.Float("ChokedAirDownTime"),
 V.Float("ChokedAirUpTime"),
+
+V.Float("FlushBaseColorRed"),
+V.Float("FlushBaseColorGreen"),
+V.Float("FlushBaseColorBlue"),
+V.Float("FlushMultiplier"),
+
 V.Float("TemperatureExcitementMax", new Limit(0, 1)),
 V.Float("TemperatureExcitementRate"),
 V.Float("TemperatureDecayRate"),

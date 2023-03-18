@@ -33,7 +33,7 @@ namespace Cue.Sys.Vam
 					rigidityRolloff_.val = rigidityRolloff_.defaultVal;
 			}
 
-			public void SetLoose(float f)
+			public void SetLoose(float f, bool force = false)
 			{
 				// both these values are expensive to change; cling is [0, 1]
 				// and rolloff is [0, 16], so only change them if they're
@@ -55,7 +55,7 @@ namespace Cue.Sys.Vam
 						float range = max - min;
 						float nv = max - (range * f);
 
-						if (Math.Abs(styleCling_.val - nv) > ClingTreshold)
+						if (force || Math.Abs(styleCling_.val - nv) > ClingTreshold)
 							styleCling_.val = nv;
 					}
 				}
@@ -70,7 +70,7 @@ namespace Cue.Sys.Vam
 						float range = Math.Min(max - min, 4);
 						float nv = min + (range * f);
 
-						if (Math.Abs(rigidityRolloff_.val - nv) > RolloffTreshold)
+						if (force || Math.Abs(rigidityRolloff_.val - nv) > RolloffTreshold)
 							rigidityRolloff_.val = nv;
 					}
 				}
@@ -81,6 +81,7 @@ namespace Cue.Sys.Vam
 		private VamAtom atom_;
 		private DAZCharacterSelector char_;
 		private float loose_ = 0;
+		private float looseMultiplier_ = 1.0f;
 		private bool enabled_ = false;
 		private List<HairItem> list_ = new List<HairItem>();
 		private Logger log_;
@@ -125,34 +126,35 @@ namespace Cue.Sys.Vam
 		public void OnPluginState(bool b)
 		{
 			if (b)
-				SetLoose(loose_);
+				SetLoose(loose_, looseMultiplier_);
 			else
 				Reset();
 		}
 
 		public float Loose
 		{
-			get
-			{
-				return loose_;
-			}
+			get { return loose_; }
+		}
 
-			set
+		public void SetLoose(float v, float multiplier)
+		{
+			if (loose_ != v || looseMultiplier_ != multiplier)
 			{
-				if (loose_ != value)
-				{
-					loose_ = value;
-					SetLoose(value);
-				}
+				bool force = (looseMultiplier_ != multiplier);
+
+				loose_ = v;
+				looseMultiplier_ = multiplier;
+
+				SetLooseInternal(loose_ * looseMultiplier_, force);
 			}
 		}
 
-		private void SetLoose(float v)
+		private void SetLooseInternal(float v, bool force=false)
 		{
 			if (Cue.Instance.Options.HairLoose)
 			{
 				for (int i = 0; i < list_.Count; ++i)
-					list_[i].SetLoose(v);
+					list_[i].SetLoose(v, force);
 			}
 		}
 
@@ -177,7 +179,7 @@ namespace Cue.Sys.Vam
 
 				if (Cue.Instance.Options.HairLoose)
 				{
-					SetLoose(loose_);
+					SetLoose(loose_, looseMultiplier_);
 				}
 				else
 				{

@@ -258,19 +258,11 @@ namespace Cue.Sys.Vam
 		public override float Sweat
 		{
 			get { return 0; }
-			set { }
-		}
-
-		public override float FlushMag
-		{
-			get { return 0; }
-			set { }
 		}
 
 		public override float Flush
 		{
 			get { return 0; }
-			set { }
 		}
 
 		public override bool Strapon
@@ -304,6 +296,16 @@ namespace Cue.Sys.Vam
 				return right_;
 			else
 				return null;
+		}
+
+		public override void SetSweat(float f, float multiplier)
+		{
+			// no-op
+		}
+
+		public override void SetFlush(float f, float multiplier, Color baseColor)
+		{
+			// no-op
 		}
 	}
 

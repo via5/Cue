@@ -3,6 +3,115 @@ using System.Collections.Generic;
 
 namespace Cue
 {
+	public class BoolOption
+	{
+		public delegate void Handler(bool b);
+		public event Handler Changed;
+
+		private readonly string name_;
+		private readonly Sys.IBoolParameter param_;
+		private bool value_;
+
+		public BoolOption(string name, bool init)
+		{
+			name_ = name;
+			value_ = init;
+			param_ = Cue.Instance.Sys.RegisterBoolParameter(
+				name_, OnParam, value_);
+		}
+
+		public bool Value
+		{
+			get
+			{
+				return value_;
+			}
+
+			set
+			{
+				if (value != value_)
+				{
+					value_ = value;
+
+					if (param_ != null)
+						param_.Value = value;
+
+					Changed?.Invoke(value_);
+				}
+			}
+		}
+
+		private void OnParam(bool b)
+		{
+			Value = b;
+		}
+	}
+
+
+	public class FloatOption
+	{
+		public delegate void Handler(float f);
+		public event Handler Changed;
+
+		private readonly string name_;
+		private readonly float init_, min_, max_;
+		private readonly Sys.IFloatParameter param_;
+		private float value_;
+
+		public FloatOption(string name, float init, float min, float max)
+		{
+			name_ = name;
+			init_ = init;
+			min_ = min;
+			max_ = max;
+			value_ = init;
+			param_ = Cue.Instance.Sys.RegisterFloatParameter(
+				name_, OnParam, value_, min, max);
+		}
+
+		public float Minimum
+		{
+			get { return min_; }
+		}
+
+		public float Maximum
+		{
+			get { return max_; }
+		}
+
+		public float Value
+		{
+			get
+			{
+				return value_;
+			}
+
+			set
+			{
+				if (value != value_)
+				{
+					value_ = value;
+
+					if (param_ != null)
+						param_.Value = value;
+
+					Changed?.Invoke(value_);
+				}
+			}
+		}
+
+		public void Reset()
+		{
+			Value = init_;
+		}
+
+		private void OnParam(float f)
+		{
+			Value = f;
+		}
+	}
+
+
 	class FinishOptions
 	{
 		private float initialDelay_ = 5;
@@ -73,121 +182,34 @@ namespace Cue
 
 	class Options
 	{
-		class BoolOption
-		{
-			private readonly Options o_;
-			private readonly string name_;
-			private readonly Sys.IBoolParameter param_;
-			private bool value_;
-
-			public BoolOption(Options o, string name, bool init)
-			{
-				o_ = o;
-				name_ = name;
-				value_ = init;
-				param_ = Cue.Instance.Sys.RegisterBoolParameter(
-					name_, OnParam, value_);
-			}
-
-			public bool Value
-			{
-				get
-				{
-					return value_;
-				}
-
-				set
-				{
-					if (value != value_)
-					{
-						value_ = value;
-
-						if (param_ != null)
-							param_.Value = value;
-
-						o_.ChangedInternal();
-					}
-				}
-			}
-
-			private void OnParam(bool b)
-			{
-				Value = b;
-			}
-		}
-
-		class FloatOption
-		{
-			private readonly Options o_;
-			private readonly string name_;
-			private readonly Sys.IFloatParameter param_;
-			private float value_;
-
-			public FloatOption(Options o, string name, float init, float min, float max)
-			{
-				o_ = o;
-				name_ = name;
-				value_ = init;
-				param_ = Cue.Instance.Sys.RegisterFloatParameter(
-					name_, OnParam, value_, min, max);
-			}
-
-			public float Value
-			{
-				get
-				{
-					return value_;
-				}
-
-				set
-				{
-					if (value != value_)
-					{
-						value_ = value;
-
-						if (param_ != null)
-							param_.Value = value;
-
-						o_.ChangedInternal();
-					}
-				}
-			}
-
-			private void OnParam(float f)
-			{
-				Value = f;
-			}
-		}
-
-
 		public const string DefaultExtension = "json";
 		public const string DefaultFile = "Default.json";
 
 		public delegate void Handler();
 		public event Handler Changed;
 
-		private BoolOption hjAudio_;
-		private BoolOption bjAudio_;
-		private BoolOption kissAudio_;
-		private BoolOption skinColor_;
-		private BoolOption skinGloss_;
-		private BoolOption hairLoose_;
-		private BoolOption handLinking_;
-		private BoolOption devMode_;
-		private FloatOption excitement_;
-		private FloatOption menuDelay_;
-		private BoolOption leftMenu_;
-		private BoolOption rightMenu_;
-		private BoolOption straponPhysical_;
-		private BoolOption ignoreCamera_;
-		private BoolOption mutePlayer_;
-		private BoolOption autoHands_;
-		private BoolOption autoHead_;
-		private BoolOption idlePose_;
-		private BoolOption excitedPose_;
-		private BoolOption choking_;
-		private BoolOption divLeftHand_;
-		private BoolOption divRightHand_;
+		private readonly BoolOption hjAudio_;
+		private readonly BoolOption bjAudio_;
+		private readonly BoolOption kissAudio_;
+		private readonly BoolOption skinColor_;
+		private readonly BoolOption skinGloss_;
+		private readonly BoolOption hairLoose_;
+		private readonly BoolOption handLinking_;
+		private readonly BoolOption devMode_;
+		private readonly FloatOption excitement_;
+		private readonly FloatOption menuDelay_;
+		private readonly BoolOption leftMenu_;
+		private readonly BoolOption rightMenu_;
+		private readonly BoolOption straponPhysical_;
+		private readonly BoolOption ignoreCamera_;
+		private readonly BoolOption mutePlayer_;
+		private readonly BoolOption autoHands_;
+		private readonly BoolOption autoHead_;
+		private readonly BoolOption idlePose_;
+		private readonly BoolOption excitedPose_;
+		private readonly BoolOption choking_;
+		private readonly BoolOption divLeftHand_;
+		private readonly BoolOption divRightHand_;
 
 		private readonly Dictionary<string, BoolOption> bools_ =
 			new Dictionary<string, BoolOption>();
@@ -195,8 +217,8 @@ namespace Cue
 		private readonly Dictionary<string, FloatOption> floats_ =
 			new Dictionary<string, FloatOption>();
 
-		private FinishOptions finish_ = new FinishOptions();
-		private CustomMenuItems menus_ = new CustomMenuItems();
+		private readonly FinishOptions finish_ = new FinishOptions();
+		private readonly CustomMenuItems menus_ = new CustomMenuItems();
 
 
 		public Options()
@@ -231,7 +253,8 @@ namespace Cue
 			if (paramName == null)
 				paramName = name;
 
-			var o = new BoolOption(this, "CueOption." + paramName, init);
+			var o = new BoolOption("CueOption." + paramName, init);
+			o.Changed += (b) => OnChanged();
 			bools_.Add(name, o);
 			return o;
 		}
@@ -241,7 +264,8 @@ namespace Cue
 			if (paramName == null)
 				paramName = name;
 
-			var o = new FloatOption(this, "CueOption." + paramName, init, min, max);
+			var o = new FloatOption("CueOption." + paramName, init, min, max);
+			o.Changed += (f) => OnChanged();
 			floats_.Add(name, o);
 			return o;
 		}
@@ -453,15 +477,10 @@ namespace Cue
 			OnChanged();
 		}
 
-		private void ChangedInternal()
+		private void OnChanged()
 		{
 			Cue.Instance.SaveLater();
 			Changed?.Invoke();
-		}
-
-		private void OnChanged()
-		{
-			ChangedInternal();
 		}
 	}
 }

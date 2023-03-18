@@ -689,6 +689,34 @@ namespace Cue
 				Math.Abs(c2.a - c1.a);
 		}
 
+		public static bool operator ==(Color a, Color b)
+		{
+			return
+				(a.r == b.r) &&
+				(a.g == b.g) &&
+				(a.b == b.b) &&
+				(a.a == b.a);
+		}
+
+		public static bool operator !=(Color a, Color b)
+		{
+			return !(a == b);
+		}
+
+		public override bool Equals(object o)
+		{
+			if (!(o is Color))
+				return false;
+
+			var c = (Color)o;
+			return (this == c);
+		}
+
+		public override int GetHashCode()
+		{
+			return HashHelper.GetHashCode(r, g, b, a);
+		}
+
 		public override string ToString()
 		{
 			return $"rgba({r:0.00},{g:0.00},{b:0.00},{a:0.00})";

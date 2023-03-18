@@ -176,38 +176,41 @@ namespace Cue
 		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(143);
 		public static readonly FloatIndex SlapMinTime = new FloatIndex(144);
 		public static readonly FloatIndex SlapMaxTime = new FloatIndex(145);
-		public static readonly FloatIndex FlushRedMag = new FloatIndex(146);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(147);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(148);
-		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(149);
-		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(150);
-		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(151);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(152);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(153);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(154);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(155);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(156);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(157);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(158);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(159);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(160);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(161);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(162);
-		public static readonly FloatIndex OrgasmTime = new FloatIndex(163);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(164);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(165);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(166);
-		public static readonly FloatIndex MinCollisionMag = new FloatIndex(167);
-		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(168);
-		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(169);
-		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(170);
-		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(171);
-		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(172);
-		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(173);
-		public static readonly FloatIndex FinishMoodTired = new FloatIndex(174);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(146);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(147);
+		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(148);
+		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(149);
+		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(150);
+		public static readonly FloatIndex FlushBaseColorRed = new FloatIndex(151);
+		public static readonly FloatIndex FlushBaseColorGreen = new FloatIndex(152);
+		public static readonly FloatIndex FlushBaseColorBlue = new FloatIndex(153);
+		public static readonly FloatIndex FlushMultiplier = new FloatIndex(154);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(155);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(156);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(157);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(158);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(159);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(160);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(161);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(162);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(163);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(164);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(165);
+		public static readonly FloatIndex OrgasmTime = new FloatIndex(166);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(167);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(168);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(169);
+		public static readonly FloatIndex MinCollisionMag = new FloatIndex(170);
+		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(171);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(172);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(173);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(174);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(175);
+		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(176);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(177);
 
-		public const int FloatCount = 175;
-		public override int GetFloatCount() { return 175; }
+		public const int FloatCount = 178;
+		public override int GetFloatCount() { return 178; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -487,12 +490,15 @@ namespace Cue
 			"slapMaxExpressionChange",
 			"slapMinTime",
 			"slapMaxTime",
-			"flushRedMag",
 			"maxSweat",
 			"maxFlush",
 			"maxChokedFlush",
 			"chokedAirDownTime",
 			"chokedAirUpTime",
+			"flushBaseColorRed",
+			"flushBaseColorGreen",
+			"flushBaseColorBlue",
+			"flushMultiplier",
 			"temperatureExcitementMax",
 			"temperatureExcitementRate",
 			"temperatureDecayRate",
@@ -785,12 +791,15 @@ namespace Cue
 			"slapMaxExpressionChange",
 			"slapMinTime",
 			"slapMaxTime",
-			"flushRedMag",
 			"maxSweat",
 			"maxFlush",
 			"maxChokedFlush",
 			"chokedAirDownTime",
 			"chokedAirUpTime",
+			"flushBaseColorRed",
+			"flushBaseColorGreen",
+			"flushBaseColorBlue",
+			"flushMultiplier",
 			"temperatureExcitementMax",
 			"temperatureExcitementRate",
 			"temperatureDecayRate",

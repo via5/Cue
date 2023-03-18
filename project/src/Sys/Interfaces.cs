@@ -442,7 +442,8 @@ namespace Cue.Sys
 
 	public interface IHair
 	{
-		float Loose { get; set; }
+		float Loose { get; }
+		void SetLoose(float f, float multiplier);
 	}
 
 	public interface IMorph
@@ -469,9 +470,13 @@ namespace Cue.Sys
 		void Debug(DebugLines d);
 
 		bool Exists { get; }
-		float Sweat { get; set; }
-		float Flush { get; set; }
-		float FlushMag { get; set; }
+
+		float Sweat { get; }
+		float Flush { get; }
+
+		void SetSweat(float f, float multiplier);
+		void SetFlush(float f, float multiplier, Color baseColor);
+
 		bool Strapon { get; set; }
 	}
 

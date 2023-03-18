@@ -66,10 +66,12 @@ namespace Cue.Sys.Vam
 		}
 
 		public virtual bool Exists { get { return true; } }
-		public abstract float Sweat { get; set; }
-		public abstract float Flush { get; set; }
-		public abstract float FlushMag { get; set; }
+		public abstract float Sweat { get; }
+		public abstract float Flush { get; }
 		public abstract bool Strapon { get; set; }
+
+		public abstract void SetSweat(float f, float multiplier);
+		public abstract void SetFlush(float f, float multiplier, Color baseColor);
 
 		public abstract IBodyPart[] GetBodyParts();
 		public abstract Hand GetLeftHand();
@@ -101,11 +103,13 @@ namespace Cue.Sys.Vam
 		private Hand leftHand_, rightHand_;
 
 		private float sweat_ = 0;
+		private float sweatMultiplier_ = 1.0f;
 		private IEasing sweatEasing_ = new CubicInEasing();
 		private bool glossEnabled_ = false;
 
 		private float flush_ = 0;
-		private float flushMag_ = 0.15f;
+		private float flushMultiplier_ = 1.0f;
+		private Color flushBaseColor_ = Color.Red;
 		private IEasing flushEasing_ = new SineInEasing();
 		private bool colorEnabled_ = false;
 		private IEasing skinWhiteEasing_ = new QuadOutEasing();
@@ -158,6 +162,7 @@ namespace Cue.Sys.Vam
 			d.Add($"color     {color_}");
 			d.Add($"initColor {initialColor_}");
 			d.Add($"flush:");
+			d.Add($"  - baseColor       {flushBaseColor_}");
 			d.Add($"  - hsv             H={fi.hsv.H:0.00} S={fi.hsv.S:0.00} V={fi.hsv.V:0.00} (max S {FlushInfo.MaxSaturation:0.00})");
 			d.Add($"  - distanceToWhite {fi.distanceToWhite:0.000} (max {FlushInfo.MaxDistanceToWhite})");
 			d.Add($"  - raw             white={fi.rawWhite:0.000} saturation={fi.rawSaturation}");
@@ -324,8 +329,8 @@ namespace Cue.Sys.Vam
 			if (b)
 			{
 				initialColor_ = color_.Value;
-				SetSweat(sweat_);
-				SetFlush(flush_);
+				SetSweat(sweat_, sweatMultiplier_);
+				SetFlush(flush_, flushMultiplier_, flushBaseColor_);
 			}
 			else
 			{
@@ -338,64 +343,27 @@ namespace Cue.Sys.Vam
 
 		public override float Sweat
 		{
-			get
-			{
-				return sweat_;
-			}
-
-			set
-			{
-				if (sweat_ != value)
-				{
-					sweat_ = value;
-					SetSweat(value);
-				}
-			}
+			get { return sweat_; }
 		}
 
 		public override float Flush
 		{
-			get
-			{
-				return flush_;
-			}
-
-			set
-			{
-				if (flush_ != value)
-				{
-					flush_ = value;
-					SetFlush(value);
-				}
-			}
+			get { return flush_; }
 		}
 
-		public override float FlushMag
+
+		public override void SetSweat(float f, float multiplier)
 		{
-			get { return flushMag_; }
-			set { flushMag_ = value; }
-		}
-
-
-		private void LerpColor(Color target, float f)
-		{
-			var p = color_.Parameter;
-
-			if (p != null)
+			if (sweat_ != f || sweatMultiplier_ != multiplier)
 			{
-				var c = Color.Lerp(
-					initialColor_, target, flushEasing_.Magnitude(f) * flushMag_);
+				sweat_ = f;
+				sweatMultiplier_ = multiplier;
 
-				var cd = Color.Distance(c, U.FromHSV(p.val));
-
-				// changing body colours seem to allocate memory to update
-				// textures, avoid for small changes
-				if (cd >= 0.02f)
-					SetColor(U.ToHSV(c));
+				SetSweatInternal(f * multiplier);
 			}
 		}
 
-		private void SetSweat(float v)
+		private void SetSweatInternal(float v)
 		{
 			var p = gloss_.Parameter;
 			if (p != null)
@@ -403,8 +371,27 @@ namespace Cue.Sys.Vam
 				float def = p.defaultVal;
 				float range = (p.max - def);
 
-				SetGloss(def + sweatEasing_.Magnitude(sweat_) * range);
+				SetGloss(def + sweatEasing_.Magnitude(v) * range);
 			}
+		}
+
+
+		public override void SetFlush(float f, float multiplier, Color baseColor)
+		{
+			if (flush_ != f || flushMultiplier_ != multiplier || flushBaseColor_ != baseColor)
+			{
+				flush_ = f;
+				flushMultiplier_ = multiplier;
+				flushBaseColor_ = baseColor;
+
+				SetFlushInternal(f, multiplier, baseColor);
+			}
+		}
+
+		private void SetFlushInternal(float f, float multiplier, Color baseColor)
+		{
+			var fi = MakeFlushInfo();
+			LerpColor(baseColor, f * fi.p, multiplier);
 		}
 
 		private FlushInfo MakeFlushInfo()
@@ -427,10 +414,23 @@ namespace Cue.Sys.Vam
 			return i;
 		}
 
-		private void SetFlush(float v)
+		private void LerpColor(Color target, float f, float multiplier)
 		{
-			var fi = MakeFlushInfo();
-			LerpColor(Color.Red, v * fi.p);
+			var p = color_.Parameter;
+
+			if (p != null)
+			{
+				var c = Color.Lerp(
+					initialColor_, target,
+					flushEasing_.Magnitude(f) * multiplier);
+
+				var cd = Color.Distance(c, U.FromHSV(p.val));
+
+				// changing body colours seem to allocate memory to update
+				// textures, avoid for small changes
+				if (cd >= 0.02f)
+					SetColor(U.ToHSV(c));
+			}
 		}
 
 		private void Reset()
@@ -461,7 +461,7 @@ namespace Cue.Sys.Vam
 				glossEnabled_ = Cue.Instance.Options.SkinGloss;
 
 				if (Cue.Instance.Options.SkinGloss)
-					SetSweat(sweat_);
+					SetSweat(sweat_, sweatMultiplier_);
 				else if (gloss_.Parameter != null)
 					gloss_.Parameter.val = gloss_.Parameter.defaultVal;
 			}
@@ -472,7 +472,7 @@ namespace Cue.Sys.Vam
 				colorEnabled_ = Cue.Instance.Options.SkinColor;
 
 				if (colorEnabled_)
-					SetFlush(flush_);
+					SetFlush(flush_, flushMultiplier_, flushBaseColor_);
 				else if (color_.Parameter != null)
 					color_.Parameter.val = U.ToHSV(initialColor_);
 			}

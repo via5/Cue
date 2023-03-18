@@ -15,7 +15,7 @@ namespace Cue
 		private Options options_;
 		private float saveElapsed_ = 0;
 		private bool needSave_ = false;
-		private const float SaveLaterDelay = 1;
+		private const float SaveLaterDelay = 0.2f;
 
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<Person> activePersons_ = new List<Person>();

@@ -397,7 +397,6 @@ namespace Cue
 			}
 			Instrumentation.End();
 
-
 			Instrumentation.Start(I.BodyParts);
 			{
 				for (int i = 0; i < all_.Length; ++i)
@@ -405,52 +404,74 @@ namespace Cue
 			}
 			Instrumentation.End();
 
-
 			Instrumentation.Start(I.BodyZones);
 			{
 				zones_.Update(s);
 			}
 			Instrumentation.End();
 
-			bool updateBody = false;
-
 			Instrumentation.Start(I.BodyVoice);
 			{
-				air_.DownRate = 1.0f / person_.Personality.Get(PS.ChokedAirDownTime);
-				air_.UpRate = 1.0f / person_.Personality.Get(PS.ChokedAirUpTime);
-
-				if (Breathing)
-					air_.Target = 1;
-				else
-					air_.Target = 0;
-
-				if (air_.Update(s))
-					updateBody = true;
+				UpdateAir(s);
 			}
 			Instrumentation.End();
 
 			Instrumentation.Start(I.BodyTemperature);
 			{
-				var ps = person_.Personality;
-
-				temperature_.UpRate = person_.Mood.Get(MoodType.Excited) * ps.Get(PS.TemperatureExcitementRate);
-				temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
-
-				temperature_.Target = U.Clamp(
-					person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
-					0, 1);
-				if (temperature_.Update(s))
-					updateBody = true;
-
-				if (updateBody)
-				{
-					person_.Atom.Body.FlushMag = ps.Get(PS.FlushRedMag);
-					person_.Atom.Body.Sweat = temperature_.Value * ps.Get(PS.MaxSweat);
-					person_.Atom.Body.Flush = MakeFlush();
-					person_.Atom.Hair.Loose = temperature_.Value;
-				}
+				UpdateTemperature(s);
 			}
 			Instrumentation.End();
+		}
+
+		private void UpdateAir(float s)
+		{
+			air_.DownRate = 1.0f / person_.Personality.Get(PS.ChokedAirDownTime);
+			air_.UpRate = 1.0f / person_.Personality.Get(PS.ChokedAirUpTime);
+
+			if (Breathing)
+				air_.Target = 1;
+			else
+				air_.Target = 0;
+
+			air_.Update(s);
+		}
+
+		private void UpdateTemperature(float s)
+		{
+			var ps = person_.Personality;
+
+			temperature_.UpRate = person_.Mood.Get(MoodType.Excited) * ps.Get(PS.TemperatureExcitementRate);
+			temperature_.DownRate = ps.Get(PS.TemperatureDecayRate);
+
+			temperature_.Target = U.Clamp(
+				person_.Mood.Get(MoodType.Excited) / ps.Get(PS.TemperatureExcitementMax),
+				0, 1);
+
+			temperature_.Update(s);
+
+			person_.Atom.Body.SetSweat(
+				MakeSweat(),
+				person_.Options.SweatMultiplier);
+
+			person_.Atom.Body.SetFlush(
+				MakeFlush(),
+				person_.Options.FlushMultiplier * ps.Get(PS.FlushMultiplier),
+				new Color(
+					ps.Get(PS.FlushBaseColorRed),
+					ps.Get(PS.FlushBaseColorGreen),
+					ps.Get(PS.FlushBaseColorBlue),
+					1.0f));
+
+			person_.Atom.Hair.SetLoose(
+				temperature_.Value,
+				person_.Options.HairLooseMultiplier);
+		}
+
+		private float MakeSweat()
+		{
+			var ps = person_.Personality;
+
+			return temperature_.Value * ps.Get(PS.MaxSweat);
 		}
 
 		private float MakeFlush()
