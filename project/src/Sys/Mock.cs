@@ -352,6 +352,11 @@ namespace Cue.Sys.Mock
 		{
 			return null;
 		}
+
+		public IColorParameter RegisterColorParameter(string name, Action<Color> a, Color init)
+		{
+			return null;
+		}
 	}
 
 

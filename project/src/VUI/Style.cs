@@ -1378,6 +1378,30 @@ namespace VUI
 					});
 				});
 			}
+
+
+			// make the sliders on the right a bit smaller
+			int offset = 25;
+
+			{
+				// shrink the right column with the sliders
+				var right = Utilities.FindChildRecursive(picker, "RightColumn");
+				var rt = right.GetComponent<RectTransform>();
+				rt.offsetMin = new Vector2(rt.offsetMin.x + offset, rt.offsetMin.y);
+			}
+
+			{
+				// move the hue slider to the right
+				var rt = picker.colorPicker.hueImage.transform.parent.GetComponent<RectTransform>();
+				rt.offsetMin = new Vector2(rt.offsetMin.x + offset, rt.offsetMin.y);
+				rt.offsetMax = new Vector2(rt.offsetMax.x + offset, rt.offsetMax.y);
+			}
+
+			{
+				// expand the saturation image to use the new space
+				var rt = picker.colorPicker.saturationImage.GetComponent<RectTransform>();
+				rt.offsetMax = new Vector2(rt.offsetMax.x + offset, rt.offsetMax.y - 5);
+			}
 		}
 
 		private static void Polish(UIDynamicColorPicker picker, Info info)
@@ -1396,7 +1420,11 @@ namespace VUI
 			}
 			else
 			{
-				picker.labelText.color = info.TextColor;
+				if (info.Enabled)
+					picker.labelText.color = info.TextColor;
+				else
+					picker.labelText.color = Theme.DisabledTextColor;
+
 				picker.labelText.alignment = TextAnchor.MiddleLeft;
 			}
 

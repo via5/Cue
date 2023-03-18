@@ -34,22 +34,9 @@ namespace Cue
 
 	class PersonSettingsTab : Tab
 	{
-		class FloatOptionWidget
-		{
-			public VUI.IntTextSlider slider;
-			public FloatOption o;
-
-			public FloatOptionWidget(VUI.IntTextSlider slider, FloatOption o)
-			{
-				this.slider = slider;
-				this.o = o;
-			}
-		}
-
 		private Person person_;
 		private VUI.ComboBox<PersonalityItem> personality_ = new VUI.ComboBox<PersonalityItem>();
 		private VUI.CheckBox loadPose_ = new VUI.CheckBox("Load pose");
-		private readonly List<FloatOptionWidget> floatWidgets_ = new List<FloatOptionWidget>();
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
 		private VUI.CheckBox strapon_ = new VUI.CheckBox("");
@@ -67,7 +54,8 @@ namespace Cue
 			gl.HorizontalFill = true;
 			gl.UniformHeight = true;
 
-			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(10));
+			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(
+				10, VUI.FlowLayout.AlignLeft | VUI.FlowLayout.AlignVCenter));
 			straponPanel.Add(strapon_);
 			straponPanel.Add(straponWarning_);
 
@@ -90,10 +78,6 @@ namespace Cue
 			pp.Add(new VUI.Spacer(20));
 			pp.Add(new VUI.Spacer(20));
 
-			AddPercentFloatOption(pp, "Sweat", person_.Options.SweatMultiplierOption);
-			AddPercentFloatOption(pp, "Flush", person_.Options.FlushMultiplierOption);
-			AddPercentFloatOption(pp, "Hair loose", person_.Options.HairLooseMultiplierOption);
-
 			var w = new VUI.Panel(new VUI.VerticalFlow(10));
 			w.Add(warning_);
 
@@ -102,7 +86,6 @@ namespace Cue
 			p.Add(new VUI.Label($"Settings for {person.ID}", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Spacer(20));
 			p.Add(pp);
-			p.Add(new VUI.Spacer(20));
 			p.Add(new VUI.Label(
 				"Load pose: if checked, some personalities like Sleeping " +
 				"will also set joints to Off and change their physics settings.",
@@ -124,29 +107,6 @@ namespace Cue
 			warning_.Visible = false;
 			warning_.TextColor = new UnityEngine.Color(1, 0, 0);
 			warning_.WrapMode = VUI.Label.Wrap;
-		}
-
-		private void AddPercentFloatOption(VUI.Panel p, string caption, FloatOption o)
-		{
-			p.Add(new VUI.Label(caption));
-
-			var slider = p.Add(new VUI.IntTextSlider(
-				(int)(o.Minimum * 100), (int)(o.Maximum * 100),
-				(i) =>
-				{
-					if (ignore_) return;
-					o.Value = i / 100.0f;
-				}));
-
-			slider.ToStringCallback = v => $"{v}%";
-
-			var rp = new VUI.Panel(new VUI.HorizontalFlow());
-			rp.Add(new VUI.ToolButton("R", () => { o.Reset(); }));
-
-			p.Add(rp);
-
-
-			floatWidgets_.Add(new FloatOptionWidget(slider, o));
 		}
 
 		public override bool DebugOnly
@@ -172,12 +132,6 @@ namespace Cue
 					SelectPersonality(person_.Personality.Name);
 
 				loadPose_.Checked = person_.LoadPose;
-
-				for (int i = 0; i < floatWidgets_.Count; ++i)
-				{
-					var w = floatWidgets_[i];
-					w.slider.Value = (int)Math.Round(w.o.Value * 100);
-				}
 
 				strapon_.Checked = person_.Body.Strapon;
 
@@ -273,38 +227,6 @@ namespace Cue
 			person_.LoadPose = b;
 		}
 
-		private void OnMaxExcitement(int i)
-		{
-			if (ignore_) return;
-
-			person_.Options.MaxExcitement = i / 100.0f;
-			Cue.Instance.SaveLater();
-		}
-
-		private void OnSweatMultiplier(int i)
-		{
-			if (ignore_) return;
-
-			person_.Options.SweatMultiplier = i / 100.0f;
-			Cue.Instance.SaveLater();
-		}
-
-		private void OnFlushMultiplier(int i)
-		{
-			if (ignore_) return;
-
-			person_.Options.FlushMultiplier = i / 100.0f;
-			Cue.Instance.SaveLater();
-		}
-
-		private void OnHairLooseMultiplier(int i)
-		{
-			if (ignore_) return;
-
-			person_.Options.HairLooseMultiplier = i / 100.0f;
-			Cue.Instance.SaveLater();
-		}
-
 		private void OnTraits(string s)
 		{
 			person_.Traits = s.Split(' ');
@@ -313,6 +235,75 @@ namespace Cue
 		private void OnStrapon(bool b)
 		{
 			person_.Body.Strapon = b;
+		}
+	}
+
+
+	class PersonEffectsTab : Tab
+	{
+		private Person person_;
+		private VUI.CheckBox overrideFlushBaseColor_;
+		private VUI.ColorPicker flushBaseColor_;
+		//private bool ignore_ = false;
+
+		public PersonEffectsTab(Person person)
+			: base("Effects", false)
+		{
+			person_ = person;
+
+			var gl = new VUI.GridLayout(3, 10);
+			gl.HorizontalStretch = new List<bool>() { false, false, false };
+			gl.HorizontalFill = true;
+			gl.UniformHeight = true;
+
+			var pp = new VUI.Panel(gl);
+			AddPercentFloatOption(pp, "Sweat multiplier", person_.Options.SweatMultiplierOption);
+			AddPercentFloatOption(pp, "Flush multiplier", person_.Options.FlushMultiplierOption);
+			AddPercentFloatOption(pp, "Hair loose multiplier", person_.Options.HairLooseMultiplierOption);
+
+			var cp = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			overrideFlushBaseColor_ = cp.Add(new VUI.CheckBox(
+				"Override flush target color",
+				(b) => person_.Options.OverrideFlushBaseColor = b));
+
+			flushBaseColor_ = cp.Add(new VUI.ColorPicker(
+				"Flush target color",
+				(c) => person_.Options.FlushBaseColor = Sys.Vam.U.FromUnity(c)));
+
+			var p = new VUI.Panel(new VUI.VerticalFlow(10));
+
+			p.Add(new VUI.Label($"Effects for {person.ID}", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer(20));
+			p.Add(pp);
+			p.Add(new VUI.Spacer(20));
+			p.Add(cp);
+
+			Layout = new VUI.BorderLayout(10);
+			Add(p, VUI.BorderLayout.Top);
+		}
+
+		public override bool DebugOnly
+		{
+			get { return false; }
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			try
+			{
+				//ignore_ = true;
+
+				overrideFlushBaseColor_.Checked = person_.Options.OverrideFlushBaseColor;
+				flushBaseColor_.Enabled = person_.Options.OverrideFlushBaseColor;
+
+				flushBaseColor_.Color = Sys.Vam.U.ToUnity(
+					person_.Options.FlushBaseColor);
+			}
+			finally
+			{
+				//ignore_ = false;
+			}
 		}
 	}
 

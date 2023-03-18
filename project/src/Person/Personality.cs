@@ -617,6 +617,15 @@ namespace Cue
 			return voiceProto_.Clone();
 		}
 
+		public Color GetFlushBaseColor()
+		{
+			return new Color(
+				Get(PS.FlushBaseColorRed),
+				Get(PS.FlushBaseColorGreen),
+				Get(PS.FlushBaseColorBlue),
+				1.0f);
+		}
+
 		public override string ToString()
 		{
 			return $"{Name}";

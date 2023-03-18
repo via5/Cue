@@ -34,9 +34,12 @@ namespace VUI
 
 			set
 			{
-				color_ = value;
-				if (picker_ != null)
-					SetColor();
+				if (color_ != value)
+				{
+					color_ = value;
+					if (picker_ != null)
+						SetColor();
+				}
 			}
 		}
 
@@ -81,30 +84,6 @@ namespace VUI
 			b.Height -= 11;
 
 			Utilities.SetRectTransform(WidgetObjectRT, b);
-
-			// make the sliders on the right a bit smaller
-			int offset = 25;
-
-
-			{
-				// shrink the right column with the sliders
-				var right = Utilities.FindChildRecursive(WidgetObject, "RightColumn");
-				var rt = right.GetComponent<RectTransform>();
-				rt.offsetMin = new Vector2(rt.offsetMin.x + offset, rt.offsetMin.y);
-			}
-
-			{
-				// move the hue slider to the right
-				var rt = picker_.colorPicker.hueImage.transform.parent.GetComponent<RectTransform>();
-				rt.offsetMin = new Vector2(rt.offsetMin.x + offset, rt.offsetMin.y);
-				rt.offsetMax = new Vector2(rt.offsetMax.x + offset, rt.offsetMax.y);
-			}
-
-			{
-				// expand the saturation image to use the new space
-				var rt = picker_.colorPicker.saturationImage.GetComponent<RectTransform>();
-				rt.offsetMax = new Vector2(rt.offsetMax.x + offset, rt.offsetMax.y);
-			}
 		}
 
 		protected override void AfterUpdateBounds()
@@ -116,18 +95,74 @@ namespace VUI
 				// color has to be set again here because the bounds of the
 				// saturation image have changed and the handle needs to be moved
 				// back in bounds
-
-				// force a change by setting the color to something that's
-				// guaranteed to be different
-				var different = HSVColorPicker.RGBToHSV(
-					1.0f - color_.r, color_.g, color_.b);
-				picker_.colorPicker.SetHSV(different);
-
-				SetColor();
+				ForcePickerUpdate();
 			}
 			finally
 			{
 				ignore_ = false;
+			}
+		}
+
+		private void ForcePickerUpdate()
+		{
+			// force a change by setting the color to something that's
+			// guaranteed to be different
+			var different = HSVColorPicker.RGBToHSV(
+				1.0f - color_.r, color_.g, color_.b);
+
+			picker_.colorPicker.SetHSV(different);
+
+			SetColor();
+		}
+
+		private UnityEngine.UI.Image oldImage_ = null;
+
+		protected override void DoSetEnabled(bool b)
+		{
+			base.DoSetEnabled(b);
+
+			foreach (var bn in picker_.GetComponentsInChildren<UnityEngine.UI.Button>())
+			{
+				bn.interactable = b;
+			}
+
+			foreach (var bn in picker_.GetComponentsInChildren<UnityEngine.UI.Slider>())
+			{
+				bn.interactable = b;
+			}
+
+			foreach (var bn in picker_.GetComponentsInChildren<UnityEngine.UI.InputField>())
+			{
+				bn.interactable = b;
+			}
+
+
+			if (b)
+			{
+				if (oldImage_ != null)
+				{
+					oldImage_.gameObject.SetActive(true);
+					picker_.colorPicker.Selector = oldImage_;
+				}
+
+				try
+				{
+					ignore_ = true;
+					ForcePickerUpdate();
+				}
+				finally
+				{
+					ignore_ = false;
+				}
+			}
+			else
+			{
+				oldImage_ = picker_.colorPicker.Selector;
+
+				if (oldImage_ != null)
+					oldImage_.gameObject.SetActive(false);
+
+				picker_.colorPicker.Selector = null;
 			}
 		}
 
@@ -155,6 +190,12 @@ namespace VUI
 
 		private void OnChanged(Color color)
 		{
+			// clamp the saturation image, it can have a stray line at the
+			// bottom; this needs to be done every time the color changes
+			// because the texture is recreated
+			picker_.colorPicker.saturationImage.sprite.texture.wrapMode =
+				TextureWrapMode.Clamp;
+
 			if (ignore_) return;
 
 			try

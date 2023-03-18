@@ -647,6 +647,11 @@ namespace Cue.Sys.Vam
 			return FromUnity(UnityEngine.Color.HSVToRGB(hsv.H, hsv.S, hsv.V));
 		}
 
+		public static Color FromHSV(float h, float s, float v)
+		{
+			return FromUnity(UnityEngine.Color.HSVToRGB(h, s, v));
+		}
+
 		public static HSVColor ToHSV(Color c)
 		{
 			var hsv = new HSVColor();

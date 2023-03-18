@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 
 namespace Cue
@@ -241,12 +242,29 @@ namespace Cue
 			}
 		}
 
+		class FloatOptionWidget
+		{
+			public VUI.IntTextSlider slider;
+			public FloatOption o;
+
+			public FloatOptionWidget(VUI.IntTextSlider slider, FloatOption o)
+			{
+				this.slider = slider;
+				this.o = o;
+			}
+		}
+
 
 		private string title_;
 		private SubTabs subTabs_ = null;
+		private bool ignore_ = false;
 
 		private List<ForceableFloatWidgets> forceables_ =
 			new List<ForceableFloatWidgets>();
+
+		private readonly List<FloatOptionWidget> floatWidgets_ =
+			new List<FloatOptionWidget>();
+
 
 		protected Tab(string title, bool hasSubTabs)
 		{
@@ -292,6 +310,29 @@ namespace Cue
 			forceables_.Add(w);
 		}
 
+		protected void AddPercentFloatOption(VUI.Panel p, string caption, FloatOption o)
+		{
+			p.Add(new VUI.Label(caption));
+
+			var slider = p.Add(new VUI.IntTextSlider(
+				(int)(o.Minimum * 100), (int)(o.Maximum * 100),
+				(i) =>
+				{
+					if (ignore_) return;
+					o.Value = i / 100.0f;
+				}));
+
+			slider.ToStringCallback = v => $"{v}%";
+
+			var rp = new VUI.Panel(new VUI.HorizontalFlow());
+			rp.Add(new VUI.ToolButton("R", () => { o.Reset(); }));
+
+			p.Add(rp);
+
+
+			floatWidgets_.Add(new FloatOptionWidget(slider, o));
+		}
+
 		public void Update(float s)
 		{
 			if (subTabs_ != null)
@@ -301,6 +342,21 @@ namespace Cue
 
 			for (int i = 0; i < forceables_.Count; ++i)
 				forceables_[i].Update(s);
+
+			try
+			{
+				ignore_ = true;
+
+				for (int i = 0; i < floatWidgets_.Count; ++i)
+				{
+					var w = floatWidgets_[i];
+					w.slider.Value = (int)Math.Round(w.o.Value * 100);
+				}
+			}
+			finally
+			{
+				ignore_ = false;
+			}
 		}
 
 		protected virtual void DoUpdate(float s)
@@ -333,15 +389,13 @@ namespace Cue
 			person_ = p;
 
 			AddSubTab(new PersonSettingsTab(person_));
+			AddSubTab(new PersonEffectsTab(person_));
 			AddSubTab(new PersonAnimationsTab(person_));
 			AddSubTab(new PersonStateTab(person_));
 			AddSubTab(new PersonAITab(person_));
 			AddSubTab(new PersonBodyTab(person_));
 			AddSubTab(new PersonDebugAnimationsTab(person_));
 			AddSubTab(new PersonDumpTab(person_));
-
-			for (int i = 1; i < 6; ++i)
-				SubTabs.TabsWidget.SetTabVisible(i, false);
 		}
 
 		public override bool DebugOnly

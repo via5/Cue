@@ -3,18 +3,27 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	public class BoolOption
+	public interface IOption
+	{
+		void Load(JSONClass o, string key);
+		JSONNode Save();
+		void Reset();
+	}
+
+	public class BoolOption : IOption
 	{
 		public delegate void Handler(bool b);
 		public event Handler Changed;
 
 		private readonly string name_;
+		private readonly bool init_;
 		private readonly Sys.IBoolParameter param_;
 		private bool value_;
 
 		public BoolOption(string name, bool init)
 		{
 			name_ = name;
+			init_ = init;
 			value_ = init;
 			param_ = Cue.Instance.Sys.RegisterBoolParameter(
 				name_, OnParam, value_);
@@ -41,6 +50,23 @@ namespace Cue
 			}
 		}
 
+		public void Load(JSONClass o, string key)
+		{
+			bool b = false;
+			if (J.OptBool(o, key, ref b))
+				Value = b;
+		}
+
+		public JSONNode Save()
+		{
+			return new JSONData(Value);
+		}
+
+		public void Reset()
+		{
+			Value = init_;
+		}
+
 		private void OnParam(bool b)
 		{
 			Value = b;
@@ -48,7 +74,7 @@ namespace Cue
 	}
 
 
-	public class FloatOption
+	public class FloatOption : IOption
 	{
 		public delegate void Handler(float f);
 		public event Handler Changed;
@@ -105,9 +131,104 @@ namespace Cue
 			Value = init_;
 		}
 
+		public void Load(JSONClass o, string key)
+		{
+			float f = 0;
+			if (J.OptFloat(o, key, ref f))
+				Value = f;
+		}
+
+		public JSONNode Save()
+		{
+			return new JSONData(Value);
+		}
+
 		private void OnParam(float f)
 		{
 			Value = f;
+		}
+	}
+
+
+	public class ColorOption : IOption
+	{
+		public delegate void Handler(Color c);
+		public event Handler Changed;
+
+		private readonly string name_;
+		private readonly Color init_;
+		private readonly Sys.IColorParameter param_;
+		private Color value_;
+
+		public ColorOption(string name, Color init)
+		{
+			name_ = name;
+			init_ = init;
+			value_ = init;
+			param_ = Cue.Instance.Sys.RegisterColorParameter(
+				name_, OnParam, value_);
+		}
+
+		public Color Value
+		{
+			get
+			{
+				return value_;
+			}
+
+			set
+			{
+				if (value != value_)
+				{
+					value_ = value;
+
+					if (param_ != null)
+						param_.Value = value;
+
+					Changed?.Invoke(value_);
+				}
+			}
+		}
+
+		public void Load(JSONClass o, string key)
+		{
+			if (o.HasKey(key))
+			{
+				var co = o[key]?.AsObject;
+				if (co != null)
+				{
+					var c = init_;
+
+					c.r = J.OptFloat(co, "r", c.r);
+					c.g = J.OptFloat(co, "g", c.g);
+					c.b = J.OptFloat(co, "b", c.b);
+					c.a = J.OptFloat(co, "a", c.a);
+
+					Value = c;
+				}
+			}
+		}
+
+		public JSONNode Save()
+		{
+			var o = new JSONClass();
+
+			o.Add("r", new JSONData(value_.r));
+			o.Add("g", new JSONData(value_.g));
+			o.Add("b", new JSONData(value_.b));
+			o.Add("a", new JSONData(value_.a));
+
+			return o;
+		}
+
+		public void Reset()
+		{
+			Value = init_;
+		}
+
+		private void OnParam(Color b)
+		{
+			Value = b;
 		}
 	}
 

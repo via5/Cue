@@ -94,7 +94,7 @@ namespace Cue.Sys.Vam
 
 		public void ClearLog()
 		{
-			SuperController.singleton.ClearErrors();
+			SuperController.singleton.ClearMessages();
 		}
 
 		public ILiveSaver CreateLiveSaver()
@@ -831,6 +831,14 @@ namespace Cue.Sys.Vam
 			return new VamFloatParameter(p);
 		}
 
+		public IColorParameter RegisterColorParameter(
+			string name, Action<Color> a, Color init)
+		{
+			var p = new JSONStorableColor(name, U.ToHSV(init), (h, s, v) => a(U.FromHSV(h, s, v)));
+			script_.RegisterColor(p);
+			return new VamColorParameter(p);
+		}
+
 		public IStringListParameter RegisterStringListParameter(
 			string name, Action<string> a, string[] values, string init, string displayName)
 		{
@@ -880,6 +888,22 @@ namespace Cue.Sys.Vam
 		{
 			get { return p_.val; }
 			set { p_.val = value; }
+		}
+	}
+
+	public class VamColorParameter : IColorParameter
+	{
+		private JSONStorableColor p_;
+
+		public VamColorParameter(JSONStorableColor p)
+		{
+			p_ = p;
+		}
+
+		public Color Value
+		{
+			get { return U.FromHSV(p_.val); }
+			set { p_.val = U.ToHSV(value); }
 		}
 	}
 

@@ -117,12 +117,11 @@ namespace Cue
 		private readonly FloatOption sweatMultiplier_;
 		private readonly FloatOption flushMultiplier_;
 		private readonly FloatOption hairLooseMultiplier_;
+		private readonly BoolOption overrideFlushBaseColor_;
+		private readonly ColorOption flushBaseColor_;
 
-		private readonly Dictionary<string, BoolOption> bools_ =
-			new Dictionary<string, BoolOption>();
-
-		private readonly Dictionary<string, FloatOption> floats_ =
-			new Dictionary<string, FloatOption>();
+		private readonly Dictionary<string, IOption> options_ =
+			new Dictionary<string, IOption>();
 
 
 		public PersonOptions(Person p)
@@ -148,8 +147,11 @@ namespace Cue
 			excitedPose_ = AddBool("excitedPose", true);
 
 			sweatMultiplier_ = AddFloat("sweatMultiplier", 1.0f, 0.0f, 1.0f);
-			flushMultiplier_ = AddFloat("flushMultiplier", 1.0f, 0.0f, 5.0f);
+			flushMultiplier_ = AddFloat("flushMultiplier", 1.0f, 0.0f, 10.0f);
 			hairLooseMultiplier_ = AddFloat("hairLooseMultiplier", 1.0f, 0.0f, 5.0f);
+
+			overrideFlushBaseColor_ = AddBool("overrideFlushBaseColor", false);
+			flushBaseColor_ = AddColor("flushBaseColor", Color.Red);
 		}
 
 		private BoolOption AddBool(string name, bool init, string paramName = null)
@@ -159,7 +161,7 @@ namespace Cue
 
 			var o = new BoolOption($"{person_.ID}.{paramName}", init);
 			o.Changed += (b) => OnChanged();
-			bools_.Add(name, o);
+			options_.Add(name, o);
 			return o;
 		}
 
@@ -170,25 +172,25 @@ namespace Cue
 
 			var o = new FloatOption($"{person_.ID}.{paramName}", init, min, max);
 			o.Changed += (f) => OnChanged();
-			floats_.Add(name, o);
+			options_.Add(name, o);
+			return o;
+		}
+
+		private ColorOption AddColor(string name, Color init, string paramName = null)
+		{
+			if (paramName == null)
+				paramName = name;
+
+			var o = new ColorOption($"{person_.ID}.{paramName}", init);
+			o.Changed += (c) => OnChanged();
+			options_.Add(name, o);
 			return o;
 		}
 
 		public void Load(JSONClass o)
 		{
-			foreach (var bo in bools_)
-			{
-				bool b = false;
-				if (J.OptBool(o, bo.Key, ref b))
-					bo.Value.Value = b;
-			}
-
-			foreach (var fo in floats_)
-			{
-				float f = 0;
-				if (J.OptFloat(o, fo.Key, ref f))
-					fo.Value.Value = f;
-			}
+			foreach (var oo in options_)
+				oo.Value.Load(o, oo.Key);
 
 			foreach (var a in anims_)
 				a.Load(o);
@@ -196,11 +198,8 @@ namespace Cue
 
 		public void Save(JSONClass o)
 		{
-			foreach (var bo in bools_)
-				o[bo.Key] = new JSONData(bo.Value.Value);
-
-			foreach (var fo in floats_)
-				o[fo.Key] = new JSONData(fo.Value.Value);
+			foreach (var oo in options_)
+				o[oo.Key] = oo.Value.Save();
 
 			foreach (var a in anims_)
 				a.Save(o);
@@ -260,6 +259,18 @@ namespace Cue
 		public FloatOption HairLooseMultiplierOption
 		{
 			get { return hairLooseMultiplier_; }
+		}
+
+		public bool OverrideFlushBaseColor
+		{
+			get { return overrideFlushBaseColor_.Value; }
+			set { overrideFlushBaseColor_.Value = value; }
+		}
+
+		public Color FlushBaseColor
+		{
+			get { return flushBaseColor_.Value; }
+			set { flushBaseColor_.Value = value; }
 		}
 
 		public List<AnimationOptions> GetAnimationOptions()

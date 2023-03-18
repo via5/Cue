@@ -456,15 +456,19 @@ namespace Cue
 			person_.Atom.Body.SetFlush(
 				MakeFlush(),
 				person_.Options.FlushMultiplier * ps.Get(PS.FlushMultiplier),
-				new Color(
-					ps.Get(PS.FlushBaseColorRed),
-					ps.Get(PS.FlushBaseColorGreen),
-					ps.Get(PS.FlushBaseColorBlue),
-					1.0f));
+				GetFlushBaseColor());
 
 			person_.Atom.Hair.SetLoose(
 				temperature_.Value,
 				person_.Options.HairLooseMultiplier);
+		}
+
+		private Color GetFlushBaseColor()
+		{
+			if (person_.Options.OverrideFlushBaseColor)
+				return person_.Options.FlushBaseColor;
+			else
+				return person_.Personality.GetFlushBaseColor();
 		}
 
 		private float MakeSweat()
