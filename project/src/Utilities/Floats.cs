@@ -52,6 +52,12 @@ namespace Cue
 			isForced_ = false;
 		}
 
+		public void UnsetForced(float newValue)
+		{
+			isForced_ = false;
+			Value = newValue;
+		}
+
 		public override string ToString()
 		{
 			if (isForced_)

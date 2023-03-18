@@ -147,7 +147,7 @@ namespace Cue
 			excitedPose_ = AddBool("excitedPose", true);
 
 			sweatMultiplier_ = AddFloat("sweatMultiplier", 1.0f, 0.0f, 1.0f);
-			flushMultiplier_ = AddFloat("flushMultiplier", 1.0f, 0.0f, 10.0f);
+			flushMultiplier_ = AddFloat("flushMultiplier", 1.0f, 0.0f, 20.0f);
 			hairLooseMultiplier_ = AddFloat("hairLooseMultiplier", 1.0f, 0.0f, 5.0f);
 
 			overrideFlushBaseColor_ = AddBool("overrideFlushBaseColor", false);

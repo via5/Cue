@@ -244,6 +244,7 @@ namespace Cue
 		private Person person_;
 		private VUI.CheckBox overrideFlushBaseColor_;
 		private VUI.ColorPicker flushBaseColor_;
+		private VUI.Panel testPanel_;
 		//private bool ignore_ = false;
 
 		public PersonEffectsTab(Person person)
@@ -252,7 +253,7 @@ namespace Cue
 			person_ = person;
 
 			var gl = new VUI.GridLayout(3, 10);
-			gl.HorizontalStretch = new List<bool>() { false, false, false };
+			gl.HorizontalStretch = new List<bool>() { false, true, false };
 			gl.HorizontalFill = true;
 			gl.UniformHeight = true;
 
@@ -271,13 +272,28 @@ namespace Cue
 				"Flush target color",
 				(c) => person_.Options.FlushBaseColor = Sys.Vam.U.FromUnity(c)));
 
+
+			testPanel_ = new VUI.Panel(new VUI.VerticalFlow(10));
+			testPanel_.Margins = new VUI.Insets(30);
+			testPanel_.Padding = new VUI.Insets(10);
+			testPanel_.Borders = new VUI.Insets(1);
+			var test = testPanel_.Add(new VUI.CheckBox("Test mode", OnTestMode));
+			testPanel_.Add(new VUI.Label(
+				"Enable this to force the body temperature to the highest " +
+				"so the values can be tested. Don't forget to uncheck.",
+				UnityEngine.FontStyle.Italic, VUI.Label.Wrap));
+
+
 			var p = new VUI.Panel(new VUI.VerticalFlow(10));
+			p.Events.PointerClick += (e) => test.Toggle();
 
 			p.Add(new VUI.Label($"Effects for {person.ID}", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Spacer(20));
 			p.Add(pp);
 			p.Add(new VUI.Spacer(20));
 			p.Add(cp);
+			p.Add(new VUI.Spacer(60));
+			p.Add(testPanel_);
 
 			Layout = new VUI.BorderLayout(10);
 			Add(p, VUI.BorderLayout.Top);
@@ -286,6 +302,20 @@ namespace Cue
 		public override bool DebugOnly
 		{
 			get { return false; }
+		}
+
+		private void OnTestMode(bool b)
+		{
+			if (b)
+			{
+				person_.Body.DampedTemperature.SetForced(1.0f);
+				testPanel_.BackgroundColor = new UnityEngine.Color(0, 0.2f, 0);
+			}
+			else
+			{
+				person_.Body.DampedTemperature.UnsetForced(0);
+				testPanel_.BackgroundColor = new UnityEngine.Color(0, 0, 0, 0);
+			}
 		}
 
 		protected override void DoUpdate(float s)
