@@ -274,6 +274,7 @@ namespace Cue
 
 
 			testPanel_ = new VUI.Panel(new VUI.VerticalFlow(10));
+
 			testPanel_.Margins = new VUI.Insets(30);
 			testPanel_.Padding = new VUI.Insets(10);
 			testPanel_.Borders = new VUI.Insets(1);
@@ -283,9 +284,11 @@ namespace Cue
 				"so the values can be tested. Don't forget to uncheck.",
 				UnityEngine.FontStyle.Italic, VUI.Label.Wrap));
 
+			testPanel_.Clickthrough = false;
+			testPanel_.Events.PointerClick += (e) => test.Toggle();
+
 
 			var p = new VUI.Panel(new VUI.VerticalFlow(10));
-			p.Events.PointerClick += (e) => test.Toggle();
 
 			p.Add(new VUI.Label($"Effects for {person.ID}", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Spacer(20));
