@@ -482,7 +482,10 @@ namespace Cue
 					try
 					{
 						if (p.Resume(a.anim.Sys))
+						{
+							a.paused = false;
 							return true;
+						}
 
 						Log.Error($"player '{p.Name}' failed to resume {a}, stopping");
 						Stop(a);

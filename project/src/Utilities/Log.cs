@@ -177,14 +177,14 @@ namespace Cue
 
 		public void Log(int level, string s)
 		{
-			if (IsEnabled(level) || level == ErrorLevel)
+			if (IsEnabled(level))
 			{
 				if (Cue.Instance == null)
 				{
 					if (level == ErrorLevel || level == WarningLevel)
-						Logger.SafeLogError($"{Prefix}: {s}");
+						SafeLogError($"{Prefix}: {s}");
 					else
-						Logger.SafeLogInfo($"{Prefix}: {s}");
+						SafeLogInfo($"{Prefix}: {s}");
 				}
 				else
 				{
@@ -205,6 +205,9 @@ namespace Cue
 
 		private bool IsEnabled(int level)
 		{
+			if (level == ErrorLevel)
+				return true;
+
 			if (!forceEnabled_ && !Bits.IsSet(sEnabledTypes, type_))
 				return false;
 
