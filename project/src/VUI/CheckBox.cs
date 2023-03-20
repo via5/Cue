@@ -33,6 +33,25 @@ namespace VUI
 			Events.PointerClick += OnPointerClick;
 		}
 
+		public string Text
+		{
+			get
+			{
+				return text_;
+			}
+
+			set
+			{
+				if (text_ != value)
+				{
+					text_ = value;
+
+					if (toggle_ != null)
+						toggle_.labelText.text = text_;
+				}
+			}
+		}
+
 		public bool Checked
 		{
 			get { return checked_; }

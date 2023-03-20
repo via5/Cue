@@ -123,6 +123,7 @@ namespace VUI
 				r.Deflate(Margins);
 
 				Utilities.SetRectTransform(bgObjectRT_, r);
+				bgObject_.gameObject.SetActive(IsVisibleOnScreen());
 			}
 		}
 	}

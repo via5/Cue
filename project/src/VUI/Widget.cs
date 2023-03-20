@@ -852,6 +852,8 @@ namespace VUI
 				borderGraphics_.Borders = borders_;
 				borderGraphics_.Color = borderColor_;
 
+				borderGraphicsRT_.gameObject.SetActive(IsVisibleOnScreen());
+
 				SetBorderBounds();
 			}
 		}
