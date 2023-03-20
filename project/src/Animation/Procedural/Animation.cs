@@ -5,16 +5,21 @@ namespace Cue.Proc
 {
 	public abstract class BasicProcAnimation : BuiltinAnimation
 	{
+		public const int NoMultiplier = 0;
+		public const int ScaleMultiplier = 1;
+
 		private RootTargetGroup root_;
+		private int multiplier_;
 		private ISync oldSync_ = null;
 		private bool mainSync_ = false;
 		private bool applyWhenOff_ = false;
 
-		public BasicProcAnimation(string name, bool applyWhenOff=false)
+		public BasicProcAnimation(string name, bool applyWhenOff = false, int multiplier = NoMultiplier)
 			: base(name)
 		{
 			root_ = new RootTargetGroup();
 			root_.ParentAnimation = this;
+			multiplier_ = multiplier;
 		}
 
 		protected void CopyFrom(BasicProcAnimation o)
@@ -22,6 +27,7 @@ namespace Cue.Proc
 			base.CopyFrom(o);
 			root_ = (RootTargetGroup)o.root_.Clone();
 			root_.ParentAnimation = this;
+			multiplier_ = o.multiplier_;
 		}
 
 		public override bool Done
@@ -126,6 +132,26 @@ namespace Cue.Proc
 			return root_.FindTarget(name);
 		}
 
+		public int MultiplierType
+		{
+			get { return multiplier_; }
+		}
+
+		public float Multiplier
+		{
+			get
+			{
+				if (multiplier_ == ScaleMultiplier)
+				{
+					var b = Person?.Body;
+					if (b != null)
+						return b.Scale;
+				}
+
+				return 1.0f;
+			}
+		}
+
 		public override bool Start(Person p, AnimationContext cx)
 		{
 			base.Start(p, cx);
@@ -193,7 +219,9 @@ namespace Cue.Proc
 					debug.Add(I(1) + ds[i]);
 			}
 
-			debug.Add($"    applyWhenOff={applyWhenOff_}");
+			debug.Add($"    " +
+				$"applyWhenOff={applyWhenOff_} " +
+				$"multType={MultiplierType} mult={Multiplier:0.00}");
 
 			DebugTarget(debug, root_, 1);
 		}
@@ -227,8 +255,8 @@ namespace Cue.Proc
 
 	class ProcAnimation : BasicProcAnimation
 	{
-		public ProcAnimation(string name, bool hasMovement, bool applyWhenOff)
-			: base(name, applyWhenOff)
+		public ProcAnimation(string name, bool hasMovement, bool applyWhenOff, int multiplier)
+			: base(name, applyWhenOff, multiplier)
 		{
 			HasMovement = hasMovement;
 		}
@@ -247,11 +275,16 @@ namespace Cue.Proc
 			var docRoot = doc.AsObject;
 			string name = docRoot["name"];
 			bool hasMovement = docRoot["hasMovement"].AsBool;
+			string multiplierS = J.OptString(docRoot, "multiplier", "");
 			bool applyWhenOff = J.OptBool(docRoot, "applyWhenOff", false);
+
+			int multiplier = NoMultiplier;
+			if (multiplierS == "scale")
+				multiplier = ScaleMultiplier;
 
 			try
 			{
-				var a = new ProcAnimation(name, hasMovement, applyWhenOff);
+				var a = new ProcAnimation(name, hasMovement, applyWhenOff, multiplier);
 
 				foreach (JSONClass n in docRoot["targets"].AsArray)
 					a.AddTarget(CreateTarget(n["type"], n));
@@ -285,7 +318,7 @@ namespace Cue.Proc
 
 		public override BuiltinAnimation Clone()
 		{
-			var a = new ProcAnimation(Name, HasMovement, ApplyWhenOff);
+			var a = new ProcAnimation(Name, HasMovement, ApplyWhenOff, MultiplierType);
 			a.CopyFrom(this);
 			return a;
 		}

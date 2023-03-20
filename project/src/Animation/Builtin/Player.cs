@@ -210,7 +210,7 @@ namespace Cue
 			get { return false; }
 		}
 
-		public IAnimation[] GetPlaying()
+		public IAnimation[] GetPlayingDebug()
 		{
 			var a = new IAnimation[playing_.Count];
 

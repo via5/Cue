@@ -64,7 +64,7 @@ namespace Cue
 		string Name { get; }
 		bool UsesFrames { get; }
 
-		IAnimation[] GetPlaying();
+		IAnimation[] GetPlayingDebug();
 		bool CanPlay(IAnimation a);
 		bool Play(IAnimation a, int flags, AnimationContext cx);
 		void RequestStop(IAnimation a, int stopFlags = Animation.NoStopFlags);
@@ -222,12 +222,15 @@ namespace Cue
 			sync_ = s;
 		}
 
-		public Animation[] GetPlaying()
+		public IAnimation[] GetPlayingDebug()
 		{
-			var list = new List<Animation>();
+			var list = new List<IAnimation>();
 
-			for (int i = 0; i < playing_.Count; ++i)
-				list.Add(playing_[i].anim);
+			foreach (var p in players_)
+			{
+				foreach (var a in p.GetPlayingDebug())
+					list.Add(a);
+			}
 
 			return list.ToArray();
 		}
@@ -244,6 +247,17 @@ namespace Cue
 		}
 
 		public AnimationStatus PlayingStatus(Animation a)
+		{
+			for (int i = 0; i < playing_.Count; ++i)
+			{
+				if (playing_[i].anim == a)
+					return PlayingStatus(playing_[i]);
+			}
+
+			return AnimationStatus.NotPlaying;
+		}
+
+		public AnimationStatus PlayingStatus(IAnimation a)
 		{
 			for (int i = 0; i < playing_.Count; ++i)
 			{

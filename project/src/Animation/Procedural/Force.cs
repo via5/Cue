@@ -637,6 +637,13 @@ namespace Cue.Proc
 		private void CalculateWindow(
 			float min, float max, float size, out float wMin, out float wMax)
 		{
+			float mult = Multiplier;
+
+			min = min * mult;
+			max = max * mult;
+			size = size * mult;
+
+
 			var range = max - min;
 
 			if (min < max)

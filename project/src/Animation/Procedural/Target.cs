@@ -11,6 +11,7 @@ namespace Cue.Proc
 		bool Done { get; }
 
 		float MovementEnergy { get; }
+		float Multiplier { get; }
 		ulong LockKey { get; }
 		bool ApplyWhenOff { get; }
 
@@ -88,6 +89,11 @@ namespace Cue.Proc
 		public virtual float MovementEnergy
 		{
 			get { return parent_?.MovementEnergy ?? 1.0f; }
+		}
+
+		public virtual float Multiplier
+		{
+			get { return parent_?.Multiplier ?? 1.0f; }
 		}
 
 		public virtual ulong LockKey

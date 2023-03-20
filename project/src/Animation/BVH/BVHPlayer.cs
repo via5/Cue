@@ -97,7 +97,7 @@ namespace Cue.BVH
             return playing_;
         }
 
-        public IAnimation[] GetPlaying()
+        public IAnimation[] GetPlayingDebug()
         {
             if (playing_)
                 return new IAnimation[] { anim_ };

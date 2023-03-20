@@ -5,9 +5,9 @@ namespace Cue
 	class PersonDebugAnimationsTab : Tab
 	{
 		private Person person_;
-		private VUI.ComboBox<Animation> anims_ = new VUI.ComboBox<Animation>();
+		private VUI.ComboBox<IAnimation> anims_ = new VUI.ComboBox<IAnimation>();
 		private VUI.ListView<string> list_ = new VUI.ListView<string>();
-		private List<Animation> oldList_ = new List<Animation>();
+		private List<IAnimation> oldList_ = new List<IAnimation>();
 		private VUI.CheckBox setDebug_ = new VUI.CheckBox("Debug");
 		private VUI.CheckBox all_ = new VUI.CheckBox("All");
 		private bool ignore_ = false;
@@ -72,32 +72,43 @@ namespace Cue
 			if (a == null)
 				setDebug_.Checked = false;
 			else
-				setDebug_.Checked = a.Sys.DebugRender;
+				setDebug_.Checked = a.DebugRender;
 		}
 
 		private void SetDebug(bool b)
 		{
 			var a = anims_.Selected;
 			if (a != null)
-				a.Sys.DebugRender = b;
+				a.DebugRender = b;
 		}
 
 		private void UpdateList()
 		{
 			if (ignore_) return;
 
-			var items = new List<Animation>();
+			var items = new List<IAnimation>();
 			var oldSel = anims_.Selected;
+
+			items.AddRange(person_.Animator.GetPlayingDebug());
 
 			if (all_.Checked)
 			{
 				foreach (var a in person_.Personality.Animations.GetAll())
-					items.Add(a);
-			}
-			else
-			{
-				foreach (var a in person_.Animator.GetPlaying())
-					items.Add(a);
+				{
+					bool found = false;
+
+					foreach (var cc in items)
+					{
+						if (cc.Name == a.Sys.Name)
+						{
+							found = true;
+							break;
+						}
+					}
+
+					if (!found)
+						items.Add(a.Sys);
+				}
 			}
 
 			if (!ListsEqual(items, oldList_))
@@ -107,7 +118,7 @@ namespace Cue
 			}
 		}
 
-		private bool ListsEqual(List<Animation> a, List<Animation> b)
+		private bool ListsEqual(List<IAnimation> a, List<IAnimation> b)
 		{
 			if (a.Count != b.Count)
 				return false;

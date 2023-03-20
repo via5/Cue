@@ -1,6 +1,7 @@
 {
 	"name": "procStandIdle",
 	"hasMovement": false,
+	"multiplier": "scale",
 	"targets":
 	[
 		{

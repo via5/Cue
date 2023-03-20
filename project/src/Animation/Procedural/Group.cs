@@ -422,6 +422,11 @@ namespace Cue.Proc
 			}
 		}
 
+		public override float Multiplier
+		{
+			get { return anim_.Multiplier; }
+		}
+
 		public override ulong LockKey
 		{
 			get { return key_; }

@@ -92,7 +92,7 @@ namespace Cue
 			return playing_.Value;
 		}
 
-		public IAnimation[] GetPlaying()
+		public IAnimation[] GetPlayingDebug()
 		{
 			if (playing_.Value)
 				return new IAnimation[] { current_ };

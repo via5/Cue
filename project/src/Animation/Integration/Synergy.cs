@@ -26,7 +26,7 @@ namespace Cue
 			get { return false; }
 		}
 
-		public IAnimation[] GetPlaying()
+		public IAnimation[] GetPlayingDebug()
 		{
 			if (playing_.Value)
 				return new IAnimation[] { anim_ };

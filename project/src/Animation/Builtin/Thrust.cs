@@ -100,7 +100,7 @@ namespace Cue.Proc
 
 
 		protected BasicThrustProcAnimation(string name, Config c)
-			: base(name)
+			: base(name, false, ScaleMultiplier)
 		{
 			config_ = c;
 
