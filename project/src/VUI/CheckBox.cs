@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VUI
 {
-	class CheckBox : Widget
+	public class CheckBox : Widget
 	{
 		public override string TypeName { get { return "CheckBox"; } }
 
@@ -156,7 +156,7 @@ namespace VUI
 	}
 
 
-	class RadioButton : CheckBox
+	public class RadioButton : CheckBox
 	{
 		public class Group
 		{

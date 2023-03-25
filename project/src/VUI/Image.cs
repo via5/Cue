@@ -145,7 +145,7 @@ namespace VUI
 	}
 
 
-	class ImageObject
+	public class ImageObject
 	{
 		private static Material emptyMat_ = null;
 

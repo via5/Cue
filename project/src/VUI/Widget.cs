@@ -7,18 +7,64 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	public abstract class Widget : IDisposable, IWidget
+	public class DropShadow
+	{
+		private Color c_;
+		private Vector2 distance_;
+		private Shadow shadow_;
+
+		public DropShadow()
+		{
+		}
+
+		public void Set(GameObject o, Color c, Vector2 distance)
+		{
+			c_ = c;
+			distance_ = distance;
+
+			if (o != null)
+				Create(o);
+		}
+
+		public void Create(GameObject o)
+		{
+			if (o == null)
+				return;
+
+			if (shadow_ == null)
+			{
+				var image = o.GetComponent<UnityEngine.UI.Image>();
+				if (image == null)
+					image = o.AddComponent<UnityEngine.UI.Image>();
+
+				shadow_ = o.AddComponent<Shadow>();
+			}
+
+			shadow_.effectColor = c_;
+			shadow_.effectDistance = distance_;
+			shadow_.useGraphicAlpha = true;
+		}
+	}
+
+
+	public abstract class Widget : IDisposable
 	{
 		public virtual string TypeName { get { return "Widget"; } }
 
 		public delegate void Callback();
 		public event Callback Created;
 
+		public delegate ContextMenu ContextCallback();
+		public event ContextCallback CreateContextMenu;
+
 		public const float DontCare = -1;
+
+		public const int ContextMenuObject = 0;
+		public const int ContextMenuCallback = 1;
 
 		private Widget parent_ = null;
 		private string name_ = "";
-		private readonly List<Widget> children_ = new List<Widget>();
+		private List<Widget> children_ = null;
 		private Layout layout_ = null;
 		private Rectangle bounds_ = new Rectangle();
 		private Size minSize_ = new Size(DontCare, DontCare);
@@ -35,6 +81,10 @@ namespace VUI
 		private RectTransform borderGraphicsRT_ = null;
 		private LayoutElement mainObjectLE_ = null;
 
+		private DropShadow dropShadow_ = null;
+		private ContextMenu context_ = null;
+		private int contextMode_ = ContextMenuObject;
+
 		private bool render_ = true;
 		private bool visible_ = true;
 		private bool enabled_ = true;
@@ -46,18 +96,19 @@ namespace VUI
 		private FontStyle fontStyle_ = FontStyle.Normal;
 		private int fontSize_ = -1;
 		private Color textColor_ = Style.Theme.TextColor;
-		private readonly Tooltip tooltip_;
+		private Tooltip tooltip_ = null;
 		private Events events_ = new Events();
 		private bool wantsFocus_ = true;
 		private bool didLayoutWhileRendered_ = false;
+		private bool bringToTop_ = false;
 
 		private bool dirty_ = true;
-
+		private bool destroyed_ = false;
+		private bool inCheckDestroyed_ = false;
 
 		public Widget(string name = "")
 		{
 			name_ = name;
-			tooltip_ = new Tooltip();
 		}
 
 		public Logger Log
@@ -75,8 +126,15 @@ namespace VUI
 
 		protected virtual void Destroy()
 		{
-			foreach (var c in children_)
-				c.Destroy();
+			destroyed_ = true;
+
+			if (children_ != null)
+			{
+				foreach (var c in children_)
+					c.Destroy();
+
+				children_.Clear();
+			}
 
 			if (mainObject_ != null)
 			{
@@ -86,6 +144,8 @@ namespace VUI
 				graphicsObject_ = null;
 				borderGraphics_ = null;
 			}
+
+			parent_ = null;
 		}
 
 		public static string S(string s, params object[] ps)
@@ -97,11 +157,13 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return layout_;
 			}
 
 			set
 			{
+				CheckDestroyed();
 				layout_ = value;
 
 				if (layout_ != null)
@@ -115,11 +177,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return font_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (font_ != value)
 				{
 					font_ = value;
@@ -132,11 +197,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return fontStyle_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (fontStyle_ != value)
 				{
 					fontStyle_ = value;
@@ -149,11 +217,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return fontSize_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (fontSize_ != value)
 				{
 					fontSize_ = value;
@@ -166,11 +237,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return textColor_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (textColor_ != value)
 				{
 					textColor_ = value;
@@ -179,41 +253,109 @@ namespace VUI
 			}
 		}
 
+		public void SetDropShadow(Color color, Vector2 distance)
+		{
+			CheckDestroyed();
+
+			if (dropShadow_ == null)
+				dropShadow_ = new DropShadow();
+
+			dropShadow_.Set(MainObject, color, distance);
+		}
+
+		public ContextMenu ContextMenu
+		{
+			get
+			{
+				CheckDestroyed();
+				return context_;
+			}
+
+			set
+			{
+				CheckDestroyed();
+				context_ = value;
+			}
+		}
+
+		public int ContextMenuMode
+		{
+			get
+			{
+				CheckDestroyed();
+				return contextMode_;
+			}
+
+			set
+			{
+				CheckDestroyed();
+				contextMode_ = value;
+			}
+		}
+
 		public GameObject MainObject
 		{
-			get { return mainObject_; }
+			get
+			{
+				CheckDestroyed();
+				return mainObject_;
+			}
 		}
 
 		public GameObject WidgetObject
 		{
-			get { return widgetObject_; }
+			get
+			{
+				CheckDestroyed();
+				return widgetObject_;
+			}
 		}
 
 		public RectTransform WidgetObjectRT
 		{
-			get { return widgetObjectRT_; }
+			get
+			{
+				CheckDestroyed();
+				return widgetObjectRT_;
+			}
 		}
 
 		public Events Events
 		{
-			get { return events_; }
+			get
+			{
+				CheckDestroyed();
+				return events_;
+			}
 		}
 
 		public bool WantsFocus
 		{
-			get { return wantsFocus_; }
-			set { wantsFocus_ = value; }
+			get
+			{
+				CheckDestroyed();
+				return wantsFocus_;
+			}
+
+			set
+			{
+				CheckDestroyed();
+				wantsFocus_ = value;
+			}
 		}
 
 		public bool Render
 		{
 			get
 			{
+				CheckDestroyed();
 				return render_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (render_ != value)
 				{
 					render_ = value;
@@ -226,11 +368,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return visible_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (visible_ != value)
 				{
 					visible_ = value;
@@ -244,16 +389,21 @@ namespace VUI
 
 		public Widget WidgetAtInternal(Point p)
 		{
+			CheckDestroyed();
+
 			if (!IsVisibleOnScreen())
 				return null;
 
 			if (BoundsContainPoint(p))
 			{
-				for (int i = 0; i < children_.Count; ++i)
+				if (children_ != null)
 				{
-					var w = children_[i].WidgetAtInternal(p);
-					if (w != null)
-						return w;
+					for (int i = 0; i < children_.Count; ++i)
+					{
+						var w = children_[i].WidgetAtInternal(p);
+						if (w != null)
+							return w;
+					}
 				}
 
 				if (!IsTransparent())
@@ -270,6 +420,8 @@ namespace VUI
 
 		public bool HasParent(Widget w)
 		{
+			CheckDestroyed();
+
 			if (w == null)
 				return false;
 
@@ -287,7 +439,7 @@ namespace VUI
 		protected virtual void UpdateActiveState()
 		{
 			if (mainObject_ != null)
-				mainObject_.SetActive(visible_);
+				mainObject_.SetActive(visible_ && (GetRoot() != null));
 
 			if (render_ && visible_)
 			{
@@ -309,11 +461,14 @@ namespace VUI
 			if (dirty_)
 				return this;
 
-			foreach (var c in children_)
+			if (children_ != null)
 			{
-				var w = c.AnyDirtyChild();
-				if (w != null)
-					return w;
+				foreach (var c in children_)
+				{
+					var w = c.AnyDirtyChild();
+					if (w != null)
+						return w;
+				}
 			}
 
 			return null;
@@ -321,6 +476,8 @@ namespace VUI
 
 		public bool IsVisibleOnScreen()
 		{
+			CheckDestroyed();
+
 			if (mainObject_ == null)
 				return false;
 			else
@@ -345,6 +502,8 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
+
 				if (!enabled_)
 					return false;
 
@@ -356,6 +515,8 @@ namespace VUI
 
 			set
 			{
+				CheckDestroyed();
+
 				if (enabled_ != value)
 				{
 					enabled_ = value;
@@ -374,12 +535,17 @@ namespace VUI
 			if (WidgetObject != null)
 				Polish();
 
-			foreach (var c in children_)
-				c.PolishRecursive();
+			if (children_ != null)
+			{
+				foreach (var c in children_)
+					c.PolishRecursive();
+			}
 		}
 
 		public void Polish()
 		{
+			CheckDestroyed();
+
 			if (WidgetObject != null)
 				DoPolish();
 		}
@@ -393,6 +559,7 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return enabled_;
 			}
 		}
@@ -401,11 +568,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return margins_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (margins_ != value)
 				{
 					margins_ = value;
@@ -418,11 +588,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return borders_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (borders_ != value)
 				{
 					borders_ = value;
@@ -439,11 +612,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return padding_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (padding_ != value)
 				{
 					padding_ = value;
@@ -454,18 +630,25 @@ namespace VUI
 
 		public Insets Insets
 		{
-			get { return margins_ + borders_ + padding_; }
+			get
+			{
+				CheckDestroyed();
+				return margins_ + borders_ + padding_;
+			}
 		}
 
 		public Color BorderColor
 		{
 			get
 			{
+				CheckDestroyed();
 				return borderColor_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (borderColor_ != value)
 				{
 					borderColor_ = value;
@@ -478,16 +661,30 @@ namespace VUI
 
 		public Tooltip Tooltip
 		{
-			get { return tooltip_; }
+			get
+			{
+				CheckDestroyed();
+
+				if (tooltip_ == null)
+					tooltip_ = new Tooltip();
+
+				return tooltip_;
+			}
 		}
 
 		public Rectangle Bounds
 		{
-			get { return new Rectangle(bounds_); }
+			get
+			{
+				CheckDestroyed();
+				return new Rectangle(bounds_);
+			}
 		}
 
 		public bool FixedBounds()
 		{
+			CheckDestroyed();
+
 			if (fixedBounds_)
 				return true;
 
@@ -496,13 +693,19 @@ namespace VUI
 
 		public bool StrictlyFixedBounds
 		{
-			get { return fixedBounds_; }
+			get
+			{
+				CheckDestroyed();
+				return fixedBounds_;
+			}
 		}
 
 		public Rectangle AbsoluteClientBounds
 		{
 			get
 			{
+				CheckDestroyed();
+
 				var r = new Rectangle(Bounds);
 
 				r.Deflate(Margins);
@@ -517,6 +720,8 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
+
 				var r = new Rectangle(0, 0, Bounds.Size);
 
 				r.Deflate(Margins);
@@ -531,6 +736,8 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
+
 				var r = new Rectangle(Bounds);
 
 				if (parent_ != null)
@@ -542,32 +749,46 @@ namespace VUI
 
 		public void SetBounds(Rectangle r, bool isFixed = false)
 		{
+			CheckDestroyed();
 			bounds_ = r;
 			fixedBounds_ = isFixed;
 		}
 
 		public void SetCapture()
 		{
+			CheckDestroyed();
 			GetRoot()?.SetCapture(this);
 		}
 
 		public void ReleaseCapture()
 		{
+			CheckDestroyed();
 			GetRoot()?.ReleaseCapture(this);
 		}
 
-		public List<Widget> Children
+		public Widget[] GetChildren()
 		{
-			get { return new List<Widget>(children_); }
+			CheckDestroyed();
+
+			if (children_ != null)
+				return children_.ToArray();
+
+			return new Widget[0];
 		}
 
 		public Widget Parent
 		{
-			get { return parent_; }
+			get
+			{
+				CheckDestroyed();
+				return parent_;
+			}
 		}
 
 		public Size GetRealPreferredSize(float maxWidth, float maxHeight)
 		{
+			CheckDestroyed();
+
 			var s = new Size();
 
 			if (layout_ != null)
@@ -595,6 +816,8 @@ namespace VUI
 
 		public Size GetRealMinimumSize()
 		{
+			CheckDestroyed();
+
 			var s = Size.Zero;
 
 			if (layout_ != null)
@@ -610,11 +833,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return minSize_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (minSize_ != value)
 				{
 					NeedsLayout("min size changed");
@@ -627,11 +853,14 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return maxSize_;
 			}
 
 			set
 			{
+				CheckDestroyed();
+
 				if (maxSize_ != value)
 				{
 					maxSize_ = value;
@@ -644,26 +873,31 @@ namespace VUI
 		{
 			get
 			{
+				CheckDestroyed();
 				return name_;
 			}
 
 			set
 			{
+				CheckDestroyed();
 				name_ = value;
 			}
 		}
 
 		public virtual Root GetRoot()
 		{
+			CheckDestroyed();
+
 			if (parent_ != null)
 				return parent_.GetRoot();
 
 			return null;
 		}
 
-		public void Focus(int focusFlags = 0)
+		public void Focus()
 		{
-			GetRoot()?.SetFocus(this, focusFlags);
+			CheckDestroyed();
+			GetRoot()?.SetFocus(this);
 		}
 
 		protected virtual void DoFocus()
@@ -708,27 +942,35 @@ namespace VUI
 		}
 
 
-		public void AddGeneric(IWidget w, LayoutData d = null)
+		private List<Widget> GetChildrenForWrite()
 		{
-			Add((Widget)w, d);
+			if (children_ == null)
+				children_ = new List<Widget>();
+
+			return children_;
 		}
 
 		public T Add<T>(T w, LayoutData d = null)
 			where T : Widget
 		{
+			CheckDestroyed();
+
 			if (w.parent_ != null)
 				Log.WarningST("widget already has a parent");
 
 			w.parent_ = this;
-			children_.Add(w);
+			GetChildrenForWrite().Add(w);
 			layout_?.Add(w, d);
 			NeedsLayout("widget added (" + w.TypeName + ")");
+
 			return w;
 		}
 
 		public void Remove(Widget w)
 		{
-			if (!children_.Remove(w))
+			CheckDestroyed();
+
+			if (children_ == null || !children_.Remove(w))
 			{
 				Log.Error(
 					"can't remove widget '" + w.Name + "' from " +
@@ -737,16 +979,17 @@ namespace VUI
 				return;
 			}
 
-			layout_.Remove(w);
+			layout_?.Remove(w);
 			w.parent_ = null;
+			w.UpdateActiveState();
 
 			NeedsLayout("widget removed (" + w.TypeName + ")");
-
-			w.Destroy();
 		}
 
 		public void Remove()
 		{
+			CheckDestroyed();
+
 			if (parent_ == null)
 			{
 				Log.Error("can't remove '" + Name + ", no parent");
@@ -756,33 +999,101 @@ namespace VUI
 			parent_.Remove(this);
 		}
 
+		public void DestroyAllChildren()
+		{
+			CheckDestroyed();
+
+			if (children_ != null)
+			{
+				while (children_.Count > 0)
+				{
+					var w = children_[0];
+
+					Remove(w);
+					w.Destroy();
+				}
+			}
+		}
+
 		public void RemoveAllChildren()
 		{
-			while (children_.Count > 0)
-				Remove(children_[0]);
+			CheckDestroyed();
+
+			if (children_ != null)
+			{
+				while (children_.Count > 0)
+					Remove(children_[0]);
+			}
 		}
 
 		public void BringToTop()
 		{
+			CheckDestroyed();
+
+			bringToTop_ = true;
+
 			if (widgetObject_ != null)
 				Utilities.BringToTop(widgetObject_);
 		}
 
 		public void DoLayout()
 		{
+			CheckDestroyed();
 			Create();
 			DoLayoutImpl();
 			UpdateBounds();
+		}
+
+		public void ShowContextMenu(Point p)
+		{
+			CheckDestroyed();
+
+			ContextMenu m = null;
+
+			switch (contextMode_)
+			{
+				case ContextMenuObject:
+				{
+					m = context_;
+					break;
+				}
+
+				case ContextMenuCallback:
+				{
+					m = GetContextMenu();
+					break;
+				}
+			}
+
+			if (m == null)
+				return;
+
+			var root = GetRoot();
+			if (root == null)
+				return;
+
+			m.RunMenu(root, p);
+		}
+
+		protected virtual ContextMenu GetContextMenu()
+		{
+			if (CreateContextMenu != null)
+				return CreateContextMenu.Invoke();
+
+			return null;
 		}
 
 		protected void DoLayoutImpl()
 		{
 			layout_?.DoLayout();
 
-			foreach (var w in children_)
+			if (children_ != null)
 			{
-				if (w.IsVisibleOnScreen())
-					w.DoLayoutImpl();
+				foreach (var w in children_)
+				{
+					if (w.IsVisibleOnScreen())
+						w.DoLayoutImpl();
+				}
 			}
 
 			SetDirty(false);
@@ -790,10 +1101,12 @@ namespace VUI
 
 		public void Create()
 		{
+			CheckDestroyed();
+
 			bool created = false;
 			Root root = GetRoot();
 
-			if (mainObject_ == null && root != null)
+			if (mainObject_ == null)
 			{
 				created = true;
 
@@ -803,9 +1116,11 @@ namespace VUI
 				mainObject_.AddComponent<MouseCallbacks>().Widget = this;
 
 				if (parent_?.MainObject == null)
-					mainObject_.transform.SetParent(root.WidgetParentTransform, false);
+					mainObject_.transform.SetParent(root?.WidgetParentTransform, false);
 				else
 					mainObject_.transform.SetParent(parent_.MainObject.transform, false);
+
+				dropShadow_?.Create(MainObject);
 
 				widgetObject_ = CreateGameObject();
 				widgetObject_.AddComponent<MouseCallbacks>().Widget = this;
@@ -821,23 +1136,29 @@ namespace VUI
 				UpdateActiveState();
 			}
 
-			foreach (var w in children_)
+			if (children_ != null)
 			{
-				if (w.visible_ && w.RenderInHierarchy)
-					w.Create();
+				foreach (var w in children_)
+				{
+					if (w.visible_ && w.RenderInHierarchy)
+						w.Create();
+				}
 			}
-
-			UpdateRenderState();
 
 			if (created)
 			{
+				UpdateRenderState();
+
 				Created?.Invoke();
 
-				if (root.Focused == this)
+				if (root?.Focused == this)
 					DoFocus();
-			}
 
-			DoPostCreate();
+				if (bringToTop_)
+					Utilities.BringToTop(widgetObject_);
+
+				DoPostCreate();
+			}
 		}
 
 		private void CreateBorderGraphics()
@@ -880,15 +1201,17 @@ namespace VUI
 				return;
 
 			if (!borders_.Empty)
-			{
 				CreateBorderGraphics();
-				borderGraphics_?.gameObject?.SetActive(b);
-			}
+
+			borderGraphics_?.gameObject?.SetActive(b);
 
 			DoSetRender(b);
 
-			foreach (var c in children_)
-				c.SetRender(b && c.render_);
+			if (children_ != null)
+			{
+				foreach (var c in children_)
+					c.SetRender(b && c.render_);
+			}
 		}
 
 		protected virtual void DoSetRender(bool b)
@@ -919,16 +1242,21 @@ namespace VUI
 
 		public void UpdateBounds()
 		{
+			CheckDestroyed();
+
 			BeforeUpdateBounds();
 
 			SetMainObjectBounds();
 			SetBorderBounds();
 			SetWidgetObjectBounds();
 
-			foreach (var w in children_)
+			if (children_ != null)
 			{
-				if (w.MainObject != null)
-					w.UpdateBounds();
+				foreach (var w in children_)
+				{
+					if (w.MainObject != null)
+						w.UpdateBounds();
+				}
 			}
 
 			UpdateActiveState();
@@ -948,6 +1276,8 @@ namespace VUI
 
 		public void NeedsLayout(string why, bool force = false)
 		{
+			CheckDestroyed();
+
 			if (parent_ != null && parent_.Layout is AbsoluteLayout)
 				return;
 
@@ -1001,31 +1331,39 @@ namespace VUI
 
 		private void DumpChildren(List<string> lines, int indent)
 		{
-			foreach (var w in children_)
+			if (children_ != null)
 			{
-				lines.Add(new string(' ', indent * 2) + w.DebugLine);
-				w.DumpChildren(lines, indent + 1);
+				foreach (var w in children_)
+				{
+					lines.Add(new string(' ', indent * 2) + w.DebugLine);
+					w.DumpChildren(lines, indent + 1);
+				}
 			}
 		}
 
 
 		public float TextLength(string s)
 		{
+			CheckDestroyed();
 			return Root.TextLength(Font, FontSize, FontStyle, s);
 		}
 
 		public Size TextSize(string s)
 		{
+			CheckDestroyed();
 			return Root.TextSize(Font, FontSize, FontStyle, s);
 		}
 
 		public Size TextSize(string s, Size maxSize, bool vertOverflow = false)
 		{
+			CheckDestroyed();
 			return Root.TextSize(Font, FontSize, FontStyle, s, maxSize, vertOverflow);
 		}
 
 		public Size FitText(string s, Size maxSize, bool vertOverflow = false)
 		{
+			CheckDestroyed();
+
 			return Root.FitText(
 				Font, FontSize, FontStyle, TextAnchor.UpperLeft,
 				s, maxSize, vertOverflow);
@@ -1061,6 +1399,8 @@ namespace VUI
 
 		public void OnFocusInternal(Widget w)
 		{
+			CheckDestroyed();
+
 			if (WidgetObject!=null)
 				DoFocus();
 
@@ -1069,6 +1409,8 @@ namespace VUI
 
 		public void OnBlurInternal(Widget w)
 		{
+			CheckDestroyed();
+
 			if (WidgetObject != null)
 				DoBlur();
 
@@ -1077,6 +1419,8 @@ namespace VUI
 
 		public void OnPointerEnterInternal(PointerEventData d, bool manualBubble = false)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1097,12 +1441,16 @@ namespace VUI
 
 		public void OnPointerEnterInternalSynth()
 		{
+			CheckDestroyed();
+
 			var d = new PointerEventData(EventSystem.current);
 			OnPointerEnterInternal(d, true);
 		}
 
 		public void OnPointerExitInternal(PointerEventData d)
 		{
+			CheckDestroyed();
+
 			if (IsVisibleOnScreen())
 			{
 				var r = GetRoot();
@@ -1117,12 +1465,16 @@ namespace VUI
 
 		public void OnPointerExitInternalSynth()
 		{
+			CheckDestroyed();
+
 			var d = new PointerEventData(EventSystem.current);
 			OnPointerExitInternal(d);
 		}
 
 		public virtual void OnPointerDownInternal(PointerEventData d, bool setFocus=true)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1148,6 +1500,8 @@ namespace VUI
 
 		public void OnPointerUpInternal(PointerEventData d)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1155,10 +1509,22 @@ namespace VUI
 
 			if (bubble && parent_ != null)
 				parent_.OnPointerUpInternal(d);
+
+			if (d.button == PointerEventData.InputButton.Right)
+			{
+				var r = GetRoot();
+				if (r != null)
+				{
+					var mp = r.ToLocal(d.position);
+					ShowContextMenu(mp);
+				}
+			}
 		}
 
 		public void OnPointerClickInternal(PointerEventData d)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1170,6 +1536,8 @@ namespace VUI
 
 		public void OnPointerDoubleClickInternal(PointerEventData d)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1181,6 +1549,8 @@ namespace VUI
 
 		public void OnPointerMoveInternal()
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1192,21 +1562,26 @@ namespace VUI
 
 		public void OnBeginDragInternal(PointerEventData d)
 		{
+			CheckDestroyed();
 			events_.FireDragStart(this, d);
 		}
 
 		public void OnDragInternal(PointerEventData d)
 		{
+			CheckDestroyed();
 			events_.FireDrag(this, d);
 		}
 
 		public void OnEndDragInternal(PointerEventData d)
 		{
+			CheckDestroyed();
 			events_.FireDragEnd(this, d);
 		}
 
 		public void OnWheelInternal(PointerEventData d)
 		{
+			CheckDestroyed();
+
 			bool bubble = true;
 
 			if (IsVisibleOnScreen())
@@ -1214,6 +1589,24 @@ namespace VUI
 
 			if (bubble && parent_ != null)
 				parent_.OnWheelInternal(d);
+		}
+
+		private void CheckDestroyed()
+		{
+			if (inCheckDestroyed_)
+				return;
+
+			try
+			{
+				inCheckDestroyed_ = true;
+
+				if (destroyed_)
+					Log.ErrorST($"{this}: widget is destroyed");
+			}
+			finally
+			{
+				inCheckDestroyed_ = false;
+			}
 		}
 	}
 }

@@ -19,12 +19,22 @@ namespace VUI
 
 		public float MaxTooltipWidth
 		{
-			get { return 1000; }
+			get { return 1200; }
 		}
 
 		public float TooltipBorderOffset
 		{
 			get { return 10; }
+		}
+
+		public float TooltipPadding
+		{
+			get { return 10; }
+		}
+
+		public Vector2 DropShadowDistance
+		{
+			get { return new Vector2(10, -10); }
 		}
 
 		public Size ButtonMinimumSize
@@ -171,6 +181,11 @@ namespace VUI
 		{
 			get { return 10; }
 		}
+
+		public Size ContextMenuMinimumSize
+		{
+			get { return new Size(300, Widget.DontCare); }
+		}
 	}
 
 
@@ -222,7 +237,7 @@ namespace VUI
 
 		public Color BorderColor
 		{
-			get { return new Color(0.5f, 0.5f, 0.5f); }
+			get { return new Color(0.3f, 0.3f, 0.3f); }
 		}
 
 		public Color TextColor
@@ -267,12 +282,17 @@ namespace VUI
 
 		public Color EditableSelectionBackgroundColor
 		{
-			get { return new Color(0.6f, 0.6f, 0.6f); }
+			get { return new Color(0.30f, 0.30f, 0.30f); }
 		}
 
 		public Color BackgroundColor
 		{
 			get { return new Color(0.12f, 0.12f, 0.12f); }
+		}
+
+		public Color DropShadowColor
+		{
+			get { return new Color(0, 0, 0, 0.5f); }
 		}
 
 		public Color ComboBoxBackgroundColor
@@ -898,20 +918,20 @@ namespace VUI
 		}
 
 
-		public static void Setup(TextBox e)
+		public static void Setup(TextBox e, TextBox.Polishing p)
 		{
 			Adjust(e);
-			Polish(e);
+			Polish(e, p);
 		}
 
-		public static void SetupPlaceholder(TextBox e)
+		public static void SetupPlaceholder(TextBox e, TextBox.Polishing p)
 		{
 			if (e.InputField.placeholder != null)
 			{
 				var info = new Info(e);
 
 				AdjustPlaceholder(e.InputField, info);
-				PolishPlaceholder(e.InputField, info);
+				PolishPlaceholder(e.InputField, p, info);
 			}
 		}
 
@@ -924,22 +944,22 @@ namespace VUI
 				Adjust(input, new Info(e));
 		}
 
-		public static void Polish(TextBox e)
+		public static void Polish(TextBox e, TextBox.Polishing p)
 		{
 			// textbox background
 			ForComponentInChildren<UnityEngine.UI.Image>(e.WidgetObject, (bg) =>
 			{
 				if (e.Enabled)
-					bg.color = theme_.EditableBackgroundColor;
+					bg.color = p.backgroundColor;
 				else
-					bg.color = theme_.DisabledEditableBackgroundColor;
+					bg.color = p.disabledBackgroundColor;
 			});
 
 			var input = e.InputField;
 			if (input == null)
 				Log.Error("TextBox has no InputField");
 			else
-				Polish(input, new Info(e));
+				Polish(input, p, new Info(e));
 		}
 
 
@@ -1139,7 +1159,7 @@ namespace VUI
 				AdjustPlaceholder(input, info);
 		}
 
-		private static void Polish(InputField input, Info info)
+		private static void Polish(InputField input, TextBox.Polishing p, Info info)
 		{
 			// textbox text
 			var text = input.textComponent;
@@ -1150,9 +1170,9 @@ namespace VUI
 			else
 			{
 				if (info.Enabled)
-					text.color = theme_.EditableTextColor;
+					text.color = info.TextColor;
 				else
-					text.color = theme_.DisabledEditableTextColor;
+					text.color = p.disabledTextColor;
 
 				if (info.SetFont)
 				{
@@ -1163,11 +1183,11 @@ namespace VUI
 			}
 
 			// field
-			input.selectionColor = theme_.EditableSelectionBackgroundColor;
+			input.selectionColor = p.selectionBackgroundColor;
 
 			// placeholder
 			if (input.placeholder != null)
-				PolishPlaceholder(input, info);
+				PolishPlaceholder(input, p, info);
 		}
 
 		private static void AdjustPlaceholder(InputField input, Info info)
@@ -1175,14 +1195,15 @@ namespace VUI
 			// no-op
 		}
 
-		private static void PolishPlaceholder(InputField input, Info info)
+		private static void PolishPlaceholder(
+			InputField input, TextBox.Polishing p, Info info)
 		{
 			ForComponent<Text>(input.placeholder, (ph) =>
 			{
 				if (info.Enabled)
-					ph.color = theme_.PlaceholderTextColor;
+					ph.color = p.placeholderTextColor;
 				else
-					ph.color = theme_.DisabledPlaceholderTextColor;
+					ph.color = p.disabledPlaceholderTextColor;
 
 				if (info.SetFont)
 				{

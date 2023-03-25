@@ -1007,8 +1007,11 @@ namespace VUI
 			if (staleTimer_ == null && WidgetObject != null)
 				staleTimer_ = Timer.Create(Timer.Immediate, OnStale);
 
-			if (!i.Visible && Selected != null && Selected.IsContainedBy(i))
-				SelectedGone();
+			if (i != null)
+			{
+				if (!i.Visible && Selected != null && Selected.IsContainedBy(i))
+					SelectedGone();
+			}
 		}
 
 		private void SelectedGone()

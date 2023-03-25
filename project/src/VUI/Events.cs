@@ -151,12 +151,6 @@ namespace VUI
 	}
 
 
-	public interface IWidget
-	{
-		void Remove();
-	}
-
-
 	public interface IEvent
 	{
 		BaseEventData EventData { get; }

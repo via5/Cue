@@ -2,7 +2,7 @@
 
 namespace VUI
 {
-	class Button : Widget
+	public class Button : Widget
 	{
 		public override string TypeName { get { return "Button"; } }
 
@@ -118,6 +118,23 @@ namespace VUI
 			}
 		}
 
+		public Color DisabledTextColor
+		{
+			get
+			{
+				return polishing_.disabledTextColor;
+			}
+
+			set
+			{
+				if (polishing_.disabledTextColor != value)
+				{
+					polishing_.disabledTextColor = value;
+					Polish();
+				}
+			}
+		}
+
 		public Color BackgroundColor
 		{
 			get
@@ -127,22 +144,11 @@ namespace VUI
 
 			set
 			{
-				polishing_.backgroundColor = value;
-				Polish();
-			}
-		}
-
-		public Color HighlightBackgroundColor
-		{
-			get
-			{
-				return polishing_.highlightBackgroundColor;
-			}
-
-			set
-			{
-				polishing_.highlightBackgroundColor = value;
-				Polish();
+				if (polishing_.backgroundColor != value)
+				{
+					polishing_.backgroundColor = value;
+					Polish();
+				}
 			}
 		}
 
@@ -155,8 +161,28 @@ namespace VUI
 
 			set
 			{
-				polishing_.disabledBackgroundColor = value;
-				Polish();
+				if (polishing_.disabledBackgroundColor != value)
+				{
+					polishing_.disabledBackgroundColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color HighlightBackgroundColor
+		{
+			get
+			{
+				return polishing_.highlightBackgroundColor;
+			}
+
+			set
+			{
+				if (polishing_.highlightBackgroundColor != value)
+				{
+					polishing_.highlightBackgroundColor = value;
+					Polish();
+				}
 			}
 		}
 

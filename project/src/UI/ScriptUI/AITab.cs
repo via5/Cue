@@ -646,7 +646,7 @@ namespace Cue
 
 		private void OnSelection(IEvent e)
 		{
-			buttons_.RemoveAllChildren();
+			buttons_.DestroyAllChildren();
 
 			if (e != null)
 			{

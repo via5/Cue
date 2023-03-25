@@ -59,8 +59,12 @@ namespace VUI
 
 			Borders = new Insets(1);
 			BackgroundColor = Style.Theme.BackgroundColor;
-			Padding = new Insets(5);
+			Padding = new Insets(Style.Metrics.TooltipPadding);
 			Visible = false;
+
+			SetDropShadow(
+				Style.Theme.DropShadowColor,
+				Style.Metrics.DropShadowDistance);
 
 			label_ = new Label();
 			label_.WrapMode = VUI.Label.Wrap;

@@ -27,8 +27,8 @@
 	"avoidGazeUninvolvedHavingSexMinExcitement": 0,
 	"avoidGazeUninvolvedHavingSexMaxExcitement": 0.4,
 
-	"avoidGazeAnger": 0.5,
-	"angerWhenPlayerInteracts": 0.8,
+	"avoidGazeAnger": 0.8,
+	"angerWhenPlayerInteracts": 1,
 	"angerMaxExcitementForAnger": 0.6,
 	"angerExcitementFactorForAnger": 2,
 	"angerMaxExcitementForHappiness": 0.5,

@@ -80,7 +80,7 @@ namespace VUI
 			var av = AbsoluteClientBounds;
 			float left = av.Left;
 
-			foreach (var b in Children)
+			foreach (var b in GetChildren())
 			{
 				if (!b.Visible)
 					continue;

@@ -171,11 +171,12 @@ namespace VUI
 
 		private void OnHandleMoved()
 		{
-			var r = ClientBounds;
+			var r = AbsoluteClientBounds;
 			var hr = handle_.RelativeBounds;
 			var top = hr.Top - Borders.Top;
 			var h = r.Height - hr.Height;
 			var p = (top / h);
+
 			value_ = p * range_;
 			ValueChanged?.Invoke(value_);
 		}
@@ -286,7 +287,12 @@ namespace VUI
 			get { return panel_; }
 		}
 
-		public void Set(int rows, float rowSize)
+		public ScrollBar VerticalScrollbar
+		{
+			get { return sb_; }
+		}
+
+		public void Set(int rows, float rowSize, float scrollPos = 0)
 		{
 			top_ = 0;
 			rows_ = rows;
@@ -310,7 +316,8 @@ namespace VUI
 				}
 			}
 
-			sb_.Value = 0;
+			sb_.Value = scrollPos;
+			OnScrollbar(scrollPos);
 		}
 
 		private void OnWheel(WheelEvent e)

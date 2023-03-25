@@ -271,6 +271,10 @@ namespace Cue.Sys.Vam
 		public void SetFromHijacker(float f)
 		{
 			float maxDelta = UnityEngine.Time.fixedDeltaTime * MaxChangeSpeed;
+
+			if (lastSetFrame_ == -1 || (Cue.Instance.Frame - lastSetFrame_) > 200)
+				maxDelta = 10000;
+
 			DoSet(f, maxDelta);
 		}
 

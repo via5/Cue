@@ -61,7 +61,7 @@ namespace Cue
 
 		private void Rebuild()
 		{
-			widgets_.RemoveAllChildren();
+			widgets_.DestroyAllChildren();
 			foreach (var m in opts_.Items)
 				widgets_.Add(m.CreateConfigWidget());
 		}

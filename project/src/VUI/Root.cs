@@ -131,11 +131,16 @@ namespace VUI
 	class BadInit : Exception { }
 
 
+	public interface IPopup
+	{
+		Widget PopupWidgetAtInternal(Point p);
+		bool PopupContainsWidgetInternal(Widget w);
+		void ClosePopupInternal();
+	}
+
+
 	public class Root
 	{
-		public const int FocusDefault = 0x0;
-		public const int FocusKeepPopup = 0x01;
-
 		private IRootSupport support_ = null;
 		private bool ready_ = false;
 
@@ -155,8 +160,7 @@ namespace VUI
 		private bool visible_ = true;
 		private GameObject rootObject_ = null;
 
-		private Widget openedPopupWidget_ = null;
-		private UIPopup openedPopup_ = null;
+		private IPopup openedPopup_ = null;
 		private Widget focused_ = null;
 		private Widget captured_ = null;
 		private Point lastMouse_ = new Point(-10000, -10000);
@@ -272,16 +276,12 @@ namespace VUI
 			get { return rootObject_.transform; }
 		}
 
-		public void SetOpenedPopup(Widget w, UIPopup p)
+		public void SetOpenedPopup(IPopup popup)
 		{
-			if (w == null || openedPopupWidget_ == null || openedPopupWidget_ == w)
-			{
-				openedPopupWidget_ = w;
-				openedPopup_ = p;
-			}
+			openedPopup_ = popup;
 		}
 
-		public void SetFocus(Widget w, int flags = FocusDefault)
+		public void SetFocus(Widget w)
 		{
 			if (focused_ == w)
 				return;
@@ -296,14 +296,10 @@ namespace VUI
 			if (focused_ != null)
 				focused_.OnFocusInternal(oldFocus);
 
-			// used by the filter textbox in the combobox so clicking it doesn't
-			// close the combobox
-			if (!Bits.IsSet(flags, FocusKeepPopup) && openedPopup_ != null)
+			if (openedPopup_ != null && (focused_ == null || !openedPopup_.PopupContainsWidgetInternal(focused_)))
 			{
-				if (openedPopup_.visible)
-					openedPopup_.Toggle();
-
-				SetOpenedPopup(openedPopupWidget_, null);
+				openedPopup_.ClosePopupInternal();
+				SetOpenedPopup(null);
 			}
 
 			FocusChanged?.Invoke(oldFocus, focused_);
@@ -408,7 +404,7 @@ namespace VUI
 			tooltips_?.Destroy();
 			support_?.Destroy();
 
-			SetOpenedPopup(null, null);
+			SetOpenedPopup(null);
 			focused_ = null;
 		}
 
@@ -568,14 +564,9 @@ namespace VUI
 		{
 			if (openedPopup_ != null)
 			{
-				if (openedPopup_.visible)
-				{
-					var r = Utilities.RectTransformBounds(
-						this, openedPopup_.popupPanel);
-
-					if (r.Contains(p))
-						return openedPopupWidget_;
-				}
+				var pw = openedPopup_.PopupWidgetAtInternal(p);
+				if (pw != null)
+					return pw;
 			}
 
 			var w = FloatingPanel.WidgetAtInternal(p);

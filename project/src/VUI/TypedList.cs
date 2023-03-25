@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace VUI
 {
-	class TypedList<ItemType> : Widget
+	class TypedList<ItemType> : Widget, IPopup
 		where ItemType : class
 	{
 		public override string TypeName { get { return "TypedList"; } }
@@ -244,6 +244,34 @@ namespace VUI
 		public int SelectedIndex
 		{
 			get { return selection_; }
+		}
+
+		public void ClosePopupInternal()
+		{
+			if (Popup?.popup != null)
+			{
+				if (Popup.popup.visible)
+					Popup.popup.Toggle();
+			}
+		}
+
+		public bool PopupContainsWidgetInternal(Widget w)
+		{
+			return w.HasParent(this);
+		}
+
+		public Widget PopupWidgetAtInternal(Point p)
+		{
+			if (Popup?.popup != null && Popup.popup.visible)
+			{
+				var r = Utilities.RectTransformBounds(
+					GetRoot(), Popup.popup.popupPanel);
+
+				if (r.Contains(p))
+					return this;
+			}
+
+			return null;
 		}
 
 		protected override void DoCreate()

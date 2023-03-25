@@ -388,7 +388,7 @@ namespace VUI
 				listView_.ItemRightClicked += OnRightClick;
 				listView_.SetItems(list_);
 
-				panel_ = new Panel(new VUI.BorderLayout());
+				panel_ = new Panel(new BorderLayout());
 				panel_.Add(listView_, BorderLayout.Center);
 				panel_.BackgroundColor = Style.Theme.BackgroundColor;
 				panel_.Clickthrough = false;
@@ -408,7 +408,7 @@ namespace VUI
 
 			listView_.ScrollToTop();
 
-			panel_.GetRoot().SetOpenedPopup(listView_, listView_.Popup.popup);
+			panel_.GetRoot().SetOpenedPopup(listView_);
 		}
 
 		public void Hide()
@@ -416,7 +416,7 @@ namespace VUI
 			if (panel_ != null)
 			{
 				panel_.Visible = false;
-				panel_.GetRoot().SetOpenedPopup(listView_, null);
+				panel_.GetRoot().SetOpenedPopup(null);
 			}
 		}
 
@@ -505,6 +505,31 @@ namespace VUI
 	{
 		public override string TypeName { get { return "TextBox"; } }
 
+		public struct Polishing
+		{
+			public Color disabledTextColor;
+			public Color backgroundColor, disabledBackgroundColor;
+			public Color selectionBackgroundColor;
+			public Color placeholderTextColor, disabledPlaceholderTextColor;
+
+			public static Polishing Default
+			{
+				get
+				{
+					var p = new Polishing();
+
+					p.disabledTextColor = Style.Theme.DisabledEditableTextColor;
+					p.backgroundColor = Style.Theme.EditableBackgroundColor;
+					p.disabledBackgroundColor = Style.Theme.DisabledEditableBackgroundColor;
+					p.selectionBackgroundColor = Style.Theme.EditableSelectionBackgroundColor;
+					p.placeholderTextColor = Style.Theme.PlaceholderTextColor;
+					p.disabledPlaceholderTextColor = Style.Theme.DisabledPlaceholderTextColor;
+
+					return p;
+				}
+			}
+		}
+
 		public class Validation
 		{
 			public string text;
@@ -537,8 +562,8 @@ namespace VUI
 		private CustomInputField input_ = null;
 		private bool ignore_ = false;
 		private bool ignoreAc_ = false;
-		private int focusflags_ = Root.FocusDefault;
 		private Insets textMargins_ = Insets.Zero;
+		private Polishing polishing_ = Polishing.Default;
 		private AutoComplete ac_;
 
 		public TextBox(string t = "", string placeholder = "", StringCallback edited = null)
@@ -547,6 +572,7 @@ namespace VUI
 			placeholder_ = placeholder;
 			ac_ = new AutoComplete(this);
 
+			TextColor = Style.Theme.EditableTextColor;
 			Borders = new Insets(1);
 
 			if (edited != null)
@@ -605,12 +631,6 @@ namespace VUI
 			get { return ac_; }
 		}
 
-		public int FocusFlags
-		{
-			get { return focusflags_; }
-			set { focusflags_ = value; }
-		}
-
 		public Insets TextMargins
 		{
 			get
@@ -622,6 +642,108 @@ namespace VUI
 			{
 				textMargins_ = value;
 				UpdateTextRect();
+			}
+		}
+
+		public Color DisabledTextColor
+		{
+			get
+			{
+				return polishing_.disabledTextColor;
+			}
+
+			set
+			{
+				if (polishing_.disabledTextColor != value)
+				{
+					polishing_.disabledTextColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color BackgroundColor
+		{
+			get
+			{
+				return polishing_.backgroundColor;
+			}
+
+			set
+			{
+				if (polishing_.backgroundColor != value)
+				{
+					polishing_.backgroundColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color DisabledBackgroundColor
+		{
+			get
+			{
+				return polishing_.disabledBackgroundColor;
+			}
+
+			set
+			{
+				if (polishing_.disabledBackgroundColor != value)
+				{
+					polishing_.disabledBackgroundColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color SelectionBackgroundColor
+		{
+			get
+			{
+				return polishing_.selectionBackgroundColor;
+			}
+
+			set
+			{
+				if (polishing_.selectionBackgroundColor != value)
+				{
+					polishing_.selectionBackgroundColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color PlaceholderTextColor
+		{
+			get
+			{
+				return polishing_.placeholderTextColor;
+			}
+
+			set
+			{
+				if (polishing_.placeholderTextColor != value)
+				{
+					polishing_.placeholderTextColor = value;
+					Polish();
+				}
+			}
+		}
+
+		public Color DisabledPlaceholderTextColor
+		{
+			get
+			{
+				return polishing_.disabledPlaceholderTextColor;
+			}
+
+			set
+			{
+				if (polishing_.disabledPlaceholderTextColor != value)
+				{
+					polishing_.disabledPlaceholderTextColor = value;
+					Polish();
+				}
 			}
 		}
 
@@ -642,9 +764,6 @@ namespace VUI
 			field_.AddComponent<RectTransform>();
 
 			fieldText_ = field_.AddComponent<Text>();
-			fieldText_.color = Style.Theme.TextColor;
-			fieldText_.fontSize = Style.Theme.DefaultFontSize;
-			fieldText_.font = Style.Theme.DefaultFont;
 			fieldText_.alignment = TextAnchor.MiddleLeft;
 
 			input_ = field_.AddComponent<CustomInputField>();
@@ -667,7 +786,7 @@ namespace VUI
 			if (placeholder_ != "")
 				CreatePlaceholder();
 
-			Style.Setup(this);
+			Style.Setup(this, polishing_);
 			UpdateTextRect();
 		}
 
@@ -706,7 +825,7 @@ namespace VUI
 				input_.placeholder = text;
 				input_.placeholder.GetComponent<Text>().text = placeholder_;
 
-				Style.SetupPlaceholder(this);
+				Style.SetupPlaceholder(this, polishing_);
 			}
 		}
 
@@ -732,7 +851,7 @@ namespace VUI
 		protected override void DoPolish()
 		{
 			base.DoPolish();
-			Style.Polish(this);
+			Style.Polish(this, polishing_);
 		}
 
 		protected override Size DoGetPreferredSize(
@@ -760,7 +879,7 @@ namespace VUI
 		{
 			try
 			{
-				Focus(focusflags_);
+				Focus();
 			}
 			catch (Exception e)
 			{
@@ -1042,6 +1161,57 @@ namespace VUI
 		public FloatTextBox(FloatCallback edited)
 			: this("", "", edited)
 		{
+		}
+	}
+
+
+	class SearchBox : Panel
+	{
+		public delegate void Handler(string s);
+		public event Handler Changed;
+
+		private TextBox box_;
+		private ToolButton clear_;
+
+		public SearchBox(string placeholder)
+		{
+			Layout = new BorderLayout();
+
+			box_ = new TextBox("", placeholder);
+			box_.TextMargins = new Insets(0, 0, 44, 0);
+			box_.Changed += (s) => Changed?.Invoke(s);
+
+			var clearPanel = new Panel(new HorizontalFlow(
+				0, FlowLayout.AlignRight | FlowLayout.AlignVCenter));
+
+			clear_ = new ToolButton("X");
+			clear_.Margins = new Insets(0, 2, 3, 1);
+			clear_.MaximumSize = new Size(35, 35);
+			clear_.Clicked += () => box_.Text = "";
+
+			clearPanel.Add(clear_);
+
+			Add(box_, BorderLayout.Center);
+			Add(clearPanel, BorderLayout.Center);
+		}
+
+		public string Text
+		{
+			get
+			{
+				return box_?.Text ?? "";
+			}
+
+			set
+			{
+				if (box_ != null)
+					box_.Text = value;
+			}
+		}
+
+		public TextBox TextBox
+		{
+			get { return box_; }
 		}
 	}
 }

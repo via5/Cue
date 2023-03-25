@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace VUI
 {
-	interface IMenuItem
+	public interface IMenuItem
 	{
 		Widget Widget { get; }
 		Menu Parent { get; set; }
 	}
 
-	abstract class BasicMenuItem : IMenuItem
+	public abstract class BasicMenuItem : IMenuItem
 	{
 		private Menu parent_ = null;
 		public abstract Widget Widget { get; }
@@ -22,7 +22,7 @@ namespace VUI
 		}
 	}
 
-	class ButtonMenuItem : BasicMenuItem
+	public class ButtonMenuItem : BasicMenuItem
 	{
 		private readonly Button button_;
 
@@ -48,7 +48,7 @@ namespace VUI
 	}
 
 
-	class RadioMenuItem : BasicMenuItem
+	public class RadioMenuItem : BasicMenuItem
 	{
 		private readonly RadioButton radio_;
 
@@ -76,7 +76,7 @@ namespace VUI
 	}
 
 
-	class Menu : Panel
+	public class Menu : Panel
 	{
 		public delegate void Handler(IMenuItem item);
 		public event Handler Activated;
@@ -114,12 +114,66 @@ namespace VUI
 			foreach (var i in items_)
 				i.Parent = null;
 
-			RemoveAllChildren();
+			DestroyAllChildren();
 		}
 
-		public void ItemActivatedInternal(IMenuItem item)
+		public virtual void ItemActivatedInternal(IMenuItem item)
 		{
 			Activated?.Invoke(item);
+		}
+	}
+
+
+	public class ContextMenu : Menu, IPopup
+	{
+		public ContextMenu()
+		{
+			Borders = new Insets(1);
+			BackgroundColor = Style.Theme.BackgroundColor;
+			Clickthrough = false;
+			MinimumSize = Style.Metrics.ContextMenuMinimumSize;
+		}
+
+		public void RunMenu(Root root, Point p)
+		{
+			root.FloatingPanel.Add(this);
+
+			var s = GetRealPreferredSize(
+				root.FloatingPanel.Bounds.Width,
+				root.FloatingPanel.Bounds.Height);
+
+			var r = Bounds;
+			r.Left = p.X;
+			r.Top = p.Y;
+			r.Right = r.Left + s.Width;
+			r.Bottom = r.Top + s.Height;
+
+			SetBounds(r);
+			DoLayout();
+			BringToTop();
+
+			GetRoot().SetOpenedPopup(this);
+		}
+
+		public void ClosePopupInternal()
+		{
+			GetRoot()?.FloatingPanel?.Remove(this);
+		}
+
+		public bool PopupContainsWidgetInternal(Widget w)
+		{
+			return w.HasParent(this);
+		}
+
+		public Widget PopupWidgetAtInternal(Point p)
+		{
+			return WidgetAtInternal(p);
+		}
+
+		public override void ItemActivatedInternal(IMenuItem item)
+		{
+			ClosePopupInternal();
+			base.ItemActivatedInternal(item);
 		}
 	}
 
@@ -160,6 +214,7 @@ namespace VUI
 			panel_.Borders = new Insets(1);
 			panel_.Clickthrough = false;
 			panel_.Visible = false;
+			panel_.SetDropShadow(Style.Theme.DropShadowColor, Style.Metrics.DropShadowDistance);
 
 			if (!autoSize_)
 				panel_.MinimumSize = Size;

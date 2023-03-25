@@ -15,7 +15,7 @@ namespace VUI
 
 		private GameObject arrowObject_ = null;
 		private WidgetBorderGraphics borders_ = null;
-		private TextBox filter_ = null;
+		private SearchBox filter_ = null;
 		private bool filterable_ = false;
 		private bool accuratePreferredSize_ = true;
 		private int popupHeight_ = -1, popupWidth_ = -1;
@@ -112,15 +112,6 @@ namespace VUI
 			return new Size(Math.Max(200, widest), 40);
 		}
 
-		protected override void DoPostCreate()
-		{
-			if (filterable_)
-			{
-				filter_.Create();
-				filter_.MainObject.transform.SetParent(FilterParent(), false);
-			}
-		}
-
 		protected override GameObject CreateGameObject()
 		{
 			return UnityEngine.Object.Instantiate(
@@ -142,9 +133,11 @@ namespace VUI
 
 			if (filterable_)
 			{
-				filter_ = new TextBox("", "Filter");
-				filter_.FocusFlags = Root.FocusKeepPopup;
+				filter_ = new SearchBox("Filter");
+				filter_.BackgroundColor = Style.Theme.BackgroundColor;
 				filter_.Changed += OnFilterChanged;
+				filter_.Borders = new Insets(1, 0, 1, 1);
+				Add(filter_);
 			}
 			else
 			{
@@ -219,6 +212,15 @@ namespace VUI
 			FixBackgroundColor();
 		}
 
+		protected override void DoPostCreate()
+		{
+			if (filter_ != null)
+			{
+				filter_.Create();
+				filter_.MainObject.transform.SetParent(FilterParent(), false);
+			}
+		}
+
 		protected override void DoPolish()
 		{
 			base.DoPolish();
@@ -256,7 +258,7 @@ namespace VUI
 		protected virtual void OnOpen()
 		{
 			Focus();
-			GetRoot().SetOpenedPopup(this, Popup.popup);
+			GetRoot().SetOpenedPopup(this);
 			Utilities.BringToTop(Popup.popup.popupPanel);
 
 			UpdateFilterBounds();
@@ -295,8 +297,22 @@ namespace VUI
 			var r = rt.rect;
 			var h = filter_.GetRealPreferredSize(DontCare, DontCare).Height;
 
-			filter_.SetBounds(Rectangle.FromPoints(
-				0, r.height, r.width, r.height + h));
+			float left = rt.rect.xMin;
+			var pp = rt.parent;
+			while (pp != null)
+			{
+				var pprt = pp.GetComponent<RectTransform>();
+				if (pprt != null)
+					left += pprt.rect.xMin;
+
+				pp = pp.parent;
+			}
+
+			filter_.SetBounds(Rectangle.FromSize(
+				AbsoluteClientBounds.Left,
+				AbsoluteClientBounds.Top + r.height,
+				r.width,
+				h));
 
 			filter_.UpdateBounds();
 		}
