@@ -398,10 +398,10 @@ namespace VUI
 
 		public void Destroy()
 		{
+			tooltips_?.Destroy();
 			content_?.Destroy();
 			floating_?.Destroy();
 			overlay_?.Destroy();
-			tooltips_?.Destroy();
 			support_?.Destroy();
 
 			SetOpenedPopup(null);
