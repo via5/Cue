@@ -51,8 +51,7 @@ namespace Cue
 			var p = new VUI.Panel(ly);
 
 			name_ = p.Add(new VUI.Label(
-				"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
-				UnityEngine.FontStyle.Bold));
+				"", VUI.Align.VCenterCenter, UnityEngine.FontStyle.Bold));
 
 			p.Add(new VUI.Spacer(10));
 

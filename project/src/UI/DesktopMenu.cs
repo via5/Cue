@@ -35,7 +35,7 @@
 					VUI.BorderLayout.Left);
 
 				name_ = top.Add(new VUI.Label(
-					"", VUI.Label.AlignCenter | VUI.Label.AlignVCenter,
+					"", VUI.Align.VCenterCenter,
 					UnityEngine.FontStyle.Bold),
 					VUI.BorderLayout.Center);
 

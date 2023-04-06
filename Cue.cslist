@@ -156,6 +156,7 @@ project\src\VUI\Events.cs
 project\src\VUI\FlowLayout.cs
 project\src\VUI\Glue.cs
 project\src\VUI\GridLayout.cs
+project\src\VUI\Icon.cs
 project\src\VUI\Image.cs
 project\src\VUI\Label.cs
 project\src\VUI\Layout.cs

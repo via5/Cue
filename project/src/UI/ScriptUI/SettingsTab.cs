@@ -54,8 +54,7 @@ namespace Cue
 			gl.HorizontalFill = true;
 			gl.UniformHeight = true;
 
-			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(
-				10, VUI.FlowLayout.AlignLeft | VUI.FlowLayout.AlignVCenter));
+			var straponPanel = new VUI.Panel(new VUI.HorizontalFlow(10, VUI.Align.VCenterLeft));
 			straponPanel.Add(strapon_);
 			straponPanel.Add(straponWarning_);
 
