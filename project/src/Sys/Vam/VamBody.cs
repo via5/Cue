@@ -126,13 +126,27 @@ namespace Cue.Sys.Vam
 		{
 			CueCollisionHandler.RemoveAll(Atom.Atom.transform);
 
+			// note that both parameters can fail if this is an atom that was
+			// added after cue was loaded
+			//
+			// this happens because VamSys has a callback for
+			// onAtomAddedHandlers so gaze can pick up new custom targets on the
+			// fly, but it ends up in VamSys.AtomFromCache(), which can create
+			// a real VamAtom and its VamBody if it's a person atom
+			//
+			// it's not the purpose of the callback (it's just for gaze) and
+			// the VamBody is created too quickly, before the skin stuff has
+			// had time to load in vam
+			//
+			// so just ignore it
+
 			gloss_ = new FloatParameter(a, "skin", "Gloss");
 			if (!gloss_.Check(true))
-				Log.Error("no skin gloss parameter");
+				Log.Verbose("no skin gloss parameter");
 
 			color_ = new ColorParameter(a, "skin", "Skin Color");
 			if (!color_.Check(true))
-				Log.Error("no skin color parameter");
+				Log.Verbose("no skin color parameter");
 
 			initialColor_ = color_.Value;
 

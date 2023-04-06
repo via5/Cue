@@ -381,16 +381,28 @@ namespace Cue.Sys.Vam
 
 		private void OnAtomAdded(Atom a)
 		{
-			AtomsChanged?.Invoke();
+			FireAtomsChanged();
 		}
 
 		private void OnAtomRemoved(Atom a)
 		{
-			AtomsChanged?.Invoke();
+			FireAtomsChanged();
 		}
 
 		private void OnAtomRenamed(string oldName, string newName)
 		{
+			FireAtomsChanged();
+		}
+
+		private void FireAtomsChanged()
+		{
+			SuperController.singleton.StartCoroutine(CoFireAtomsChanged());
+		}
+
+		private IEnumerator CoFireAtomsChanged()
+		{
+			yield return new WaitForEndOfFrame();
+			yield return new WaitForEndOfFrame();
 			AtomsChanged?.Invoke();
 		}
 

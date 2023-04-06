@@ -688,7 +688,7 @@ namespace Cue
 
 		private void DoOrgasm(bool syncOthers = true)
 		{
-			person_.Log.Info("orgasm");
+			person_.Log.Verbose("orgasm");
 
 			if (person_.Options.GetAnimationOption(AnimationType.Orgasm).Play)
 				person_.Animator.PlayType(AnimationType.Orgasm);
@@ -720,7 +720,7 @@ namespace Cue
 					{
 						if (p.Mood.TimeSinceLastOrgasm >= 5)
 						{
-							person_.Log.Info($"{p} is at {e}, min is {min}, syncing orgasm");
+							person_.Log.Verbose($"{p} is at {e}, min is {min}, syncing orgasm");
 							p.Mood.ForceOrgasm();
 						}
 					}
