@@ -135,6 +135,31 @@ namespace VUI
 		}
 	}
 
+
+	public static class Align
+	{
+		public const int Top = 0x01;
+		public const int VCenter = 0x02;
+		public const int Bottom = 0x04;
+
+		public const int Left = 0x08;
+		public const int Center = 0x10;
+		public const int Right = 0x20;
+
+		public const int TopLeft = Top | Left;
+		public const int TopCenter = Top | Center;
+		public const int TopRight = Top | Right;
+
+		public const int VCenterLeft = VCenter | Left;
+		public const int VCenterCenter = VCenter | Center;
+		public const int VCenterRight = VCenter | Right;
+
+		public const int BottomLeft = Bottom | Left;
+		public const int BottomCenter = Bottom | Center;
+		public const int BottomRight = Bottom | Right;
+	}
+
+
 	class Utilities
 	{
 		public const string AddSymbol = "+";
@@ -861,6 +886,61 @@ namespace VUI
 			return
 				Left.ToString() + "," + Top.ToString() + "," +
 				Right.ToString() + "," + Bottom.ToString();
+		}
+	}
+
+
+	static class Path
+	{
+		public static string Filename(string f)
+		{
+			var slash = f.LastIndexOfAny(new char[] { '/', '\\' });
+			if (slash == -1)
+				return f;
+
+			return f.Substring(slash + 1);
+		}
+
+		public static string Parent(string f)
+		{
+			var slash = f.LastIndexOfAny(new char[] { '/', '\\' });
+			if (slash == -1)
+				return "";
+
+			return f.Substring(0, slash);
+		}
+
+		public static string Stem(string f)
+		{
+			var n = Filename(f);
+
+			var dot = n.LastIndexOf('.');
+			if (dot == -1)
+				return n;
+
+			return n.Substring(0, dot);
+		}
+
+		public static string Extension(string f)
+		{
+			var dot = f.LastIndexOf('.');
+			if (dot == -1)
+				return "";
+
+			return f.Substring(dot);
+		}
+
+		public static string Join(string a, string b)
+		{
+			a = a.Replace('\\', '/');
+			b = b.Replace('\\', '/');
+
+			if (a.EndsWith("/") && b.StartsWith("/"))
+				return a + b.Substring(1);
+			else if (a.EndsWith("/") || b.StartsWith("/"))
+				return a + b;
+			else
+				return a + "/" + b;
 		}
 	}
 

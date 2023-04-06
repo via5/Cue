@@ -84,6 +84,7 @@ namespace VUI
 		private DropShadow dropShadow_ = null;
 		private ContextMenu context_ = null;
 		private int contextMode_ = ContextMenuObject;
+		private Icon cursor_ = null;
 
 		private bool render_ = true;
 		private bool visible_ = true;
@@ -101,6 +102,7 @@ namespace VUI
 		private bool wantsFocus_ = true;
 		private bool didLayoutWhileRendered_ = false;
 		private bool bringToTop_ = false;
+		private bool hovered_ = false;
 
 		private bool dirty_ = true;
 		private bool destroyed_ = false;
@@ -293,6 +295,12 @@ namespace VUI
 			}
 		}
 
+		public Icon Cursor
+		{
+			get { return cursor_; }
+			set { cursor_ = value; }
+		}
+
 		public GameObject MainObject
 		{
 			get
@@ -450,6 +458,25 @@ namespace VUI
 						"visibility changed, dirty child:\n" +
 						dirtyChild.DebugLine);
 				}
+			}
+
+			if (!render_ || !visible_ || (GetRoot() == null))
+				OnHiddenInternal();
+		}
+
+		public void OnHiddenInternal()
+		{
+			if (hovered_)
+			{
+				hovered_ = false;
+				ClearCursor();
+				OnPointerExitInternalSynth(true);
+			}
+
+			if (children_ != null)
+			{
+				foreach (var c in children_)
+					c.OnHiddenInternal();
 			}
 		}
 
@@ -1212,6 +1239,9 @@ namespace VUI
 				foreach (var c in children_)
 					c.SetRender(b && c.render_);
 			}
+
+			if (!b)
+				OnHiddenInternal();
 		}
 
 		protected virtual void DoSetRender(bool b)
@@ -1397,6 +1427,33 @@ namespace VUI
 		}
 
 
+		private void SetCursor()
+		{
+			if (cursor_ != null)
+			{
+				cursor_.GetTexture((t) =>
+				{
+					if (hovered_ && t != null)
+					{
+						UnityEngine.Cursor.SetCursor(
+							t as Texture2D,
+							new Vector2(t.width / 2, t.height / 2),
+							CursorMode.Auto);
+					}
+				});
+			}
+		}
+
+		private void ClearCursor()
+		{
+			if (cursor_ != null)
+			{
+				UnityEngine.Cursor.SetCursor(
+					null, new Vector2(0, 0), CursorMode.Auto);
+			}
+		}
+
+
 		public void OnFocusInternal(Widget w)
 		{
 			CheckDestroyed();
@@ -1433,6 +1490,9 @@ namespace VUI
 					GetRoot()?.WidgetEntered(this);
 					bubble = events_.FirePointerEnter(this, d, manualBubble);
 				}
+
+				hovered_ = true;
+				SetCursor();
 			}
 
 			if (manualBubble && bubble && parent_ != null)
@@ -1447,11 +1507,14 @@ namespace VUI
 			OnPointerEnterInternal(d, true);
 		}
 
-		public void OnPointerExitInternal(PointerEventData d)
+		public void OnPointerExitInternal(PointerEventData d, bool force = false)
 		{
 			CheckDestroyed();
 
-			if (IsVisibleOnScreen())
+			hovered_ = false;
+			ClearCursor();
+
+			if (force || IsVisibleOnScreen())
 			{
 				var r = GetRoot();
 
@@ -1463,12 +1526,12 @@ namespace VUI
 			}
 		}
 
-		public void OnPointerExitInternalSynth()
+		public void OnPointerExitInternalSynth(bool force = false)
 		{
 			CheckDestroyed();
 
 			var d = new PointerEventData(EventSystem.current);
-			OnPointerExitInternal(d);
+			OnPointerExitInternal(d, force);
 		}
 
 		public virtual void OnPointerDownInternal(PointerEventData d, bool setFocus=true)

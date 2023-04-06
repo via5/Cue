@@ -9,7 +9,7 @@
 		{
 			w_ = w;
 
-			title_ = new Label(title, Label.AlignCenter | Label.AlignVCenter);
+			title_ = new Label(title, Align.VCenterCenter);
 			title_.FontStyle = UnityEngine.FontStyle.Bold;
 
 			var buttons = new Panel(new HorizontalFlow(5));
@@ -163,7 +163,7 @@
 
 		public ButtonBox(int buttons)
 		{
-			Layout = new HorizontalFlow(10, HorizontalFlow.AlignRight);
+			Layout = new HorizontalFlow(10, Align.Right);
 
 			AddButton(buttons, Buttons.OK, S("OK"));
 			AddButton(buttons, Buttons.Cancel, S("Cancel"));
@@ -233,9 +233,7 @@
 		public MessageDialog(Root r, int buttons, string title, string text)
 			: base(r, buttons, title)
 		{
-			ContentPanel.Add(
-				new Label(text, Label.AlignLeft | Label.AlignTop),
-				BorderLayout.Center);
+			ContentPanel.Add(new Label(text, VUI.Align.TopLeft), BorderLayout.Center);
 		}
 	}
 
@@ -329,7 +327,7 @@
 				text += "\n" + description;
 
 			var b = new Button(s);
-			b.Alignment = Label.AlignLeft | Label.AlignVCenter;
+			b.Alignment = Align.VCenterLeft;
 			b.Padding = new Insets(ButtonPadding);
 			b.FontStyle = UnityEngine.FontStyle.Bold;
 

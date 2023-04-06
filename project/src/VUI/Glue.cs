@@ -2,14 +2,16 @@
 
 namespace VUI
 {
-	public interface IIconProvider
+	public interface ICursorProvider
 	{
-		Icon ResizeWE { get; }
+		Cursor ResizeWE { get; }
+		Cursor Beam { get; }
 	}
 
-	public class NullIconProvider : IIconProvider
+	public class NullCursorProvider : ICursorProvider
 	{
-		public Icon ResizeWE { get { return null; } }
+		public Cursor ResizeWE { get { return null; } }
+		public Cursor Beam { get { return null; } }
 	}
 
 
@@ -26,9 +28,9 @@ namespace VUI
 		public delegate void LogDelegate(string s);
 		private static LogDelegate logInfo_, logWarning_, logError_, logVerbose_;
 
-		public delegate IIconProvider IconProviderDelegate();
-		public static IconProviderDelegate iconProvider_;
-		private static NullIconProvider nullIcons_ = new NullIconProvider();
+		public delegate ICursorProvider CursorProviderDelegate();
+		public static CursorProviderDelegate cursorProvider_;
+		private static NullCursorProvider nullCursors_ = new NullCursorProvider();
 
 		private static bool inited_ = false;
 
@@ -40,7 +42,7 @@ namespace VUI
 			LogDelegate logInfo = null,
 			LogDelegate logWarning = null,
 			LogDelegate logError = null,
-			IconProviderDelegate icons = null)
+			CursorProviderDelegate cursors = null)
 		{
 			inited_ = true;
 			prefix_ = prefix;
@@ -51,10 +53,10 @@ namespace VUI
 			logWarning_ = logWarning;
 			logError_ = logError;
 
-			if (icons == null)
-				iconProvider_ = () => nullIcons_;
+			if (cursors == null)
+				cursorProvider_ = () => nullCursors_;
 			else
-				iconProvider_ = icons;
+				cursorProvider_ = cursors;
 		}
 
 		public static bool Initialized
@@ -78,14 +80,14 @@ namespace VUI
 			}
 		}
 
-		public static IIconProvider IconProvider
+		public static ICursorProvider CursorProvider
 		{
 			get
 			{
-				if (iconProvider_ == null)
+				if (cursorProvider_ == null)
 					return null;
 				else
-					return iconProvider_();
+					return cursorProvider_();
 			}
 		}
 

@@ -7,13 +7,7 @@ namespace VUI
 	{
 		public override string TypeName { get { return "Label"; } }
 
-		public const int AlignLeft = 0x01;
-		public const int AlignCenter = 0x02;
-		public const int AlignRight = 0x04;
-		public const int AlignTop = 0x08;
-		public const int AlignVCenter = 0x10;
-		public const int AlignBottom = 0x20;
-		public const int AlignDefault = AlignLeft | AlignVCenter;
+		public const int AlignDefault = Align.VCenterLeft;
 
 		public const int Wrap = 0;
 		public const int Overflow = 1;
@@ -323,23 +317,23 @@ namespace VUI
 
 		public static TextAnchor ToTextAnchor(int a)
 		{
-			if (a == (AlignLeft | AlignTop))
+			if (a == (Align.Left | Align.Top))
 				return TextAnchor.UpperLeft;
-			else if (a == (AlignLeft | AlignVCenter))
+			else if (a == (Align.Left | Align.VCenter))
 				return TextAnchor.MiddleLeft;
-			else if (a == (AlignLeft | AlignBottom))
+			else if (a == (Align.Left | Align.Bottom))
 				return TextAnchor.LowerLeft;
-			else if (a == (AlignCenter | AlignTop))
+			else if (a == (Align.Center | Align.Top))
 				return TextAnchor.UpperCenter;
-			else if (a == (AlignCenter | AlignVCenter))
+			else if (a == (Align.Center | Align.VCenter))
 				return TextAnchor.MiddleCenter;
-			else if (a == (AlignCenter | AlignBottom))
+			else if (a == (Align.Center | Align.Bottom))
 				return TextAnchor.LowerCenter;
-			else if (a == (AlignRight | AlignTop))
+			else if (a == (Align.Right | Align.Top))
 				return TextAnchor.UpperRight;
-			else if (a == (AlignRight | AlignVCenter))
+			else if (a == (Align.Right | Align.VCenter))
 				return TextAnchor.MiddleRight;
-			else if (a == (AlignRight | AlignBottom))
+			else if (a == (Align.Right | Align.Bottom))
 				return TextAnchor.LowerRight;
 			else
 				return TextAnchor.MiddleLeft;

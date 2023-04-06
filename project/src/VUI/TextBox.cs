@@ -198,6 +198,8 @@ namespace VUI
 		private bool ignore_ = false;
 		private bool enabled_ = false;
 		private string file_ = null;
+		private float height_ = 500;
+		private bool completeString_ = false;
 
 		public AutoComplete(TextBox tb)
 		{
@@ -212,6 +214,12 @@ namespace VUI
 		public bool Visible
 		{
 			get { return panel_?.Visible ?? false; }
+		}
+
+		public float Height
+		{
+			get { return height_; }
+			set { height_ = value; }
 		}
 
 		public bool Enabled
@@ -251,6 +259,12 @@ namespace VUI
 						Reload();
 				}
 			}
+		}
+
+		public bool CompleteString
+		{
+			get { return completeString_; }
+			set { completeString_ = value; }
 		}
 
 		public void Add(string s)
@@ -353,7 +367,7 @@ namespace VUI
 			try
 			{
 				ignore_ = true;
-				listView_.Select(i);
+				listView_?.Select(i);
 			}
 			finally
 			{
@@ -399,7 +413,7 @@ namespace VUI
 
 			var r = tb_.AbsoluteClientBounds;
 			r.Top += r.Height;
-			r.Bottom = r.Top + 500;
+			r.Bottom = r.Top + height_;
 
 			panel_.SetBounds(r);
 			panel_.Visible = true;
@@ -561,7 +575,8 @@ namespace VUI
 		private Text fieldText_ = null;
 		private CustomInputField input_ = null;
 		private bool ignore_ = false;
-		private bool ignoreAc_ = false;
+		private bool ignoreAcForCompletion_ = false;
+		private bool ignoreAcForAdd_ = false;
 		private Insets textMargins_ = Insets.Zero;
 		private Polishing polishing_ = Polishing.Default;
 		private AutoComplete ac_;
@@ -574,6 +589,7 @@ namespace VUI
 
 			TextColor = Style.Theme.EditableTextColor;
 			Borders = new Insets(1);
+			Cursor = Glue.CursorProvider.Beam;
 
 			if (edited != null)
 				Edited += edited;
@@ -602,12 +618,20 @@ namespace VUI
 			{
 				if (text_ != value)
 				{
-					text_ = value;
-
-					if (input_ != null)
+					try
 					{
-						input_.text = value;
-						OnEdited(text_);
+						ignoreAcForAdd_ = true;
+						text_ = value;
+
+						if (input_ != null)
+						{
+							input_.text = value;
+							OnEdited(text_);
+						}
+					}
+					finally
+					{
+						ignoreAcForAdd_ = false;
 					}
 				}
 			}
@@ -943,13 +967,13 @@ namespace VUI
 			{
 				try
 				{
-					ignoreAc_ = true;
+					ignoreAcForCompletion_ = true;
 					Text = ac_.Next();
 					SelectAll();
 				}
 				finally
 				{
-					ignoreAc_ = false;
+					ignoreAcForCompletion_ = false;
 				}
 			}
 		}
@@ -960,13 +984,13 @@ namespace VUI
 			{
 				try
 				{
-					ignoreAc_ = true;
+					ignoreAcForCompletion_ = true;
 					Text = ac_.Previous();
 					SelectAll();
 				}
 				finally
 				{
-					ignoreAc_ = false;
+					ignoreAcForCompletion_ = false;
 				}
 			}
 		}
@@ -983,27 +1007,30 @@ namespace VUI
 
 				text_ = s;
 
-				if (ac_.Enabled && !ignoreAc_)
+				if (ac_.CompleteString)
 				{
-					if (!Input.GetKey(KeyCode.Backspace) && !Input.GetKey(KeyCode.Delete))
+					if (ac_.Enabled && !ignoreAcForCompletion_)
 					{
-						var c = ac_.Complete(s);
-
-						if (c != null)
+						if (!Input.GetKey(KeyCode.Backspace) && !Input.GetKey(KeyCode.Delete))
 						{
-							bool resetIgnore = (ignore_ == false);
+							var c = ac_.Complete(s);
 
-							try
+							if (c != null)
 							{
-								ignore_ = true;
-								text_ = c;
-								input_.text = c;
-								Select(s.Length, text_.Length);
-							}
-							finally
-							{
-								if (resetIgnore)
-									ignore_ = false;
+								bool resetIgnore = (ignore_ == false);
+
+								try
+								{
+									ignore_ = true;
+									text_ = c;
+									input_.text = c;
+									Select(s.Length, text_.Length);
+								}
+								finally
+								{
+									if (resetIgnore)
+										ignore_ = false;
+								}
 							}
 						}
 					}
@@ -1068,7 +1095,7 @@ namespace VUI
 				{
 					Edited?.Invoke(text_);
 
-					if (!ac_.Visible)
+					if (!ac_.Visible && !ignoreAcForAdd_)
 						ac_.Add(text_);
 
 					oldText_ = text_;
@@ -1181,9 +1208,7 @@ namespace VUI
 			box_.TextMargins = new Insets(0, 0, 44, 0);
 			box_.Changed += (s) => Changed?.Invoke(s);
 
-			var clearPanel = new Panel(new HorizontalFlow(
-				0, FlowLayout.AlignRight | FlowLayout.AlignVCenter));
-
+			var clearPanel = new Panel(new HorizontalFlow(0, Align.VCenterRight));
 			clear_ = new ToolButton("X");
 			clear_.Margins = new Insets(0, 2, 3, 1);
 			clear_.MaximumSize = new Size(35, 35);
@@ -1212,6 +1237,11 @@ namespace VUI
 		public TextBox TextBox
 		{
 			get { return box_; }
+		}
+
+		public AutoComplete AutoComplete
+		{
+			get { return box_.AutoComplete; }
 		}
 	}
 }

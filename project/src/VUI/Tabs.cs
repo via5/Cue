@@ -143,7 +143,7 @@ namespace VUI
 				panel_.Layout = new BorderLayout();
 				panel_.Add(widget_, BorderLayout.Center);
 
-				button_.Alignment = Label.AlignCenter | Label.AlignVCenter;
+				button_.Alignment = Align.VCenterCenter;
 				button_.Clicked += () => { tabs_.SelectImpl(this); };
 			}
 

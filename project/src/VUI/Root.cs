@@ -257,11 +257,11 @@ namespace VUI
 			Glue.LogDelegate logInfo = null,
 			Glue.LogDelegate logWarning = null,
 			Glue.LogDelegate logError = null,
-			Glue.IconProviderDelegate icons = null)
+			Glue.CursorProviderDelegate cursors = null)
 		{
 			Glue.InitInternal(
 				prefix, getPluginManager, getString,
-				logVerbose, logInfo, logWarning, logError, icons);
+				logVerbose, logInfo, logWarning, logError, cursors);
 
 			BasicRootSupport.Cleanup();
 		}
@@ -449,6 +449,12 @@ namespace VUI
 						content_.NeedsLayout("root visibility changed");
 						floating_?.NeedsLayout("root visibility changed");
 					}
+					else
+					{
+						tooltips_.Hide();
+						content_.OnHiddenInternal();
+						floating_.OnHiddenInternal();
+					}
 				}
 			}
 		}
@@ -508,6 +514,9 @@ namespace VUI
 					}
 				}
 			}
+
+			if (mp != lastMouse_)
+				Tooltips.MouseMoved(mp);
 
 			lastMouse_ = mp;
 		}

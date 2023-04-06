@@ -39,7 +39,7 @@ namespace VUI
 		protected ImageObject image_ = null;
 		private Texture tex_ = null;
 		private Size iconSize_ = new Size(DontCare, DontCare);
-		private int align_ = Label.AlignCenter | Label.AlignVCenter;
+		private int align_ = Align.VCenterCenter;
 		private Polishing polishing_ = Polishing.Default;
 
 		public Button(string t = "", Callback clicked = null, string tooltip = null)

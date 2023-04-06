@@ -67,8 +67,8 @@ namespace VUI
 				Style.Metrics.DropShadowDistance);
 
 			label_ = new Label();
-			label_.WrapMode = VUI.Label.Wrap;
-			label_.Alignment = VUI.Label.AlignLeft | VUI.Label.AlignTop;
+			label_.WrapMode = Label.Wrap;
+			label_.Alignment = Align.TopLeft;
 
 			Add(label_, BorderLayout.Center);
 
@@ -117,6 +117,12 @@ namespace VUI
 		{
 			Hide();
 			widget_.Destroy();
+		}
+
+		public void MouseMoved(Point mp)
+		{
+			if (timer_ != null)
+				timer_.Restart();
 		}
 
 		public void WidgetEntered(Widget w)

@@ -26,14 +26,16 @@ namespace VUI
 	{
 		private readonly Button button_;
 
-		public ButtonMenuItem(string text)
+		public ButtonMenuItem(string text, string tooltip = null)
 		{
 			button_ = new Button(text);
 			button_.BackgroundColor = new Color(0, 0, 0, 0);
 			button_.Padding = new Insets(10, 5, 5, 5);
-			button_.Alignment = Label.AlignLeft | Label.AlignVCenter;
-
+			button_.Alignment = Align.VCenterLeft;
 			button_.Clicked += () => Parent?.ItemActivatedInternal(this);
+
+			if (tooltip != null)
+				button_.Tooltip.Text = tooltip;
 		}
 
 		public Button Button
@@ -48,20 +50,49 @@ namespace VUI
 	}
 
 
+	public class CheckBoxMenuItem : BasicMenuItem
+	{
+		private readonly CheckBox cb_;
+
+		public CheckBoxMenuItem(
+			string text, CheckBox.ChangedCallback changed,
+			bool initial = false, string tooltip = null)
+		{
+			cb_ = new CheckBox(text, changed, initial);
+			cb_.Padding = new Insets(10, 5, 5, 5);
+			cb_.Changed += (b) => Parent?.ItemActivatedInternal(this);
+
+			if (tooltip != null)
+				cb_.Tooltip.Text = tooltip;
+		}
+
+		public CheckBox CheckBox
+		{
+			get { return cb_; }
+		}
+
+		public override Widget Widget
+		{
+			get { return cb_; }
+		}
+	}
+
+
 	public class RadioMenuItem : BasicMenuItem
 	{
 		private readonly RadioButton radio_;
 
 		public RadioMenuItem(
 			string text, RadioButton.ChangedCallback changed,
-			bool initial = false, RadioButton.Group group = null)
+			bool initial = false, RadioButton.Group group = null,
+			string tooltip = null)
 		{
 			radio_ = new RadioButton(text, changed, initial, group);
 			radio_.Padding = new Insets(10, 5, 5, 5);
-			//checkbox_.BackgroundColor = new Color(0, 0, 0, 0);
-			//checkbox_.Alignment = Label.AlignLeft | Label.AlignVCenter;
-
 			radio_.Changed += (b) => Parent?.ItemActivatedInternal(this);
+
+			if (tooltip != null)
+				radio_.Tooltip.Text = tooltip;
 		}
 
 		public RadioButton RadioButton
@@ -311,9 +342,9 @@ namespace VUI
 			{
 				panel_.GetRoot().FloatingPanel.BackgroundColor =
 					Style.Theme.ActiveOverlayColor;
-			}
 
-			panel_.GetRoot().FloatingPanel.Clickthrough = false;
+				panel_.GetRoot().FloatingPanel.Clickthrough = false;
+			}
 
 			panel_.DoLayout();
 
@@ -331,9 +362,9 @@ namespace VUI
 			{
 				panel_.GetRoot().FloatingPanel.BackgroundColor =
 					new UnityEngine.Color(0, 0, 0, 0);
-			}
 
-			panel_.GetRoot().FloatingPanel.Clickthrough = true;
+				panel_.GetRoot().FloatingPanel.Clickthrough = true;
+			}
 
 			button_.BackgroundColor = oldBackground_;
 			Toggled?.Invoke(panel_.Visible);

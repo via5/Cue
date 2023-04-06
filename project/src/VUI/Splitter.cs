@@ -11,7 +11,6 @@ namespace VUI
 		private Point dragStart_;
 		private float initialPos_ = 0;
 		private bool dragging_ = false;
-		private bool on_ = false;
 
 		public SplitterHandle(Splitter sp)
 		{
@@ -19,35 +18,13 @@ namespace VUI
 
 			Clickthrough = false;
 			BackgroundColor = Style.Theme.SplitterHandleBackgroundColor;
+			Cursor = Glue.CursorProvider.ResizeWE;
 
 			Events.PointerDown += OnPointerDown;
 			Events.PointerUp += OnPointerUp;
 			Events.DragStart += OnDragStart;
 			Events.Drag += OnDrag;
 			Events.DragEnd += OnDragEnd;
-			Events.PointerEnter += OnPointerEnter;
-			Events.PointerExit += OnPointerExit;
-		}
-
-		private void OnPointerEnter(PointerEvent e)
-		{
-			on_ = true;
-
-			Glue.IconProvider.ResizeWE?.GetTexture((t) =>
-			{
-				if (on_)
-				{
-					Cursor.SetCursor(
-						t as Texture2D,
-						new Vector2(t.width / 2, t.height / 2), CursorMode.ForceSoftware);
-				}
-			});
-		}
-
-		private void OnPointerExit(PointerEvent e)
-		{
-			on_ = false;
-			Cursor.SetCursor(null, new Vector2(0, 0), CursorMode.Auto);
 		}
 
 		public void OnPointerDown(PointerEvent e)

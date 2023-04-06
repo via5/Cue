@@ -1,171 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace VUI
 {
-	public class Icon
-	{
-		private Texture texture_ = null;
-		private readonly string path_ = null;
-		private readonly int w_ = 0, h_ = 0;
-		private readonly Texture def_ = null;
-		private readonly List<Action<Texture>> callbacks_ = new List<Action<Texture>>();
-		private bool loading_ = false;
-
-		public Icon(Texture t)
-		{
-			texture_ = t;
-		}
-
-		public Icon(string path, Texture def = null)
-			: this(path, 0, 0, def)
-		{
-		}
-
-		public Icon(string path, int w, int h, Texture def = null)
-		{
-			path_ = path;
-			w_ = w;
-			h_ = h;
-			def_ = def;
-		}
-
-		public Texture CachedTexture
-		{
-			get { return texture_; }
-		}
-
-		public void GetTexture(Action<Texture> f)
-		{
-			if (texture_ != null)
-			{
-				f(texture_);
-			}
-			else
-			{
-				if (GetFromCache())
-				{
-					f(texture_);
-				}
-				else
-				{
-					callbacks_.Add(f);
-
-					if (!loading_)
-					{
-						loading_ = true;
-						Load();
-					}
-				}
-			}
-		}
-
-		private bool GetFromCache()
-		{
-			if (path_ == null)
-			{
-				texture_ = def_;
-				return true;
-			}
-			else
-			{
-				var tex = ImageLoaderThreaded.singleton.GetCachedThumbnail(path_);
-				if (tex != null)
-				{
-					texture_ = tex;
-
-					if (w_ != 0 && h_ != 0)
-						texture_ = ScaleTexture(texture_, w_, h_);
-
-					texture_.wrapMode = TextureWrapMode.Clamp;
-
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private void Load()
-		{
-			ImageLoaderThreaded.QueuedImage q = new ImageLoaderThreaded.QueuedImage();
-			q.imgPath = path_;
-
-			q.callback = (tt) =>
-			{
-				Texture tex = tt.tex;
-				if (tex == null)
-				{
-					texture_ = def_;
-				}
-				else
-				{
-					texture_ = tex;
-
-					if (w_ != 0 && h_ != 0)
-						texture_ = ScaleTexture(texture_, w_, h_);
-
-					texture_.wrapMode = TextureWrapMode.Clamp;
-				}
-
-				RunCallbacks();
-			};
-
-			//ImageLoaderThreaded.singleton.ClearCacheThumbnail(q.imgPath);
-			ImageLoaderThreaded.singleton.QueueThumbnail(q);
-		}
-
-		private void RunCallbacks()
-		{
-			foreach (var f in callbacks_)
-				f(texture_);
-
-			callbacks_.Clear();
-		}
-
-		private static Texture2D ScaleTexture(Texture src, int width, int height)
-		{
-			RenderTexture rt = RenderTexture.GetTemporary(width, height);
-			Graphics.Blit(src, rt);
-
-			RenderTexture currentActiveRT = RenderTexture.active;
-			RenderTexture.active = rt;
-			Texture2D tex = new Texture2D(rt.width, rt.height);
-
-			tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
-			tex.Apply();
-
-			RenderTexture.ReleaseTemporary(rt);
-			RenderTexture.active = currentActiveRT;
-
-			return tex;
-		}
-	}
-
-
 	public class ImageObject
 	{
 		private static Material emptyMat_ = null;
 
 		private readonly Widget parent_;
+		private readonly GameObject o_;
 		private readonly RectTransform rt_ = null;
 		private readonly RawImage raw_ = null;
 		private Texture tex_ = null;
 		private Texture grey_ = null;
 		private Size size_ = new Size(Widget.DontCare, Widget.DontCare);
+		private int align_ = Image.AlignDefault;
 		private bool enabled_ = true;
 
-		public ImageObject(Widget parent)
+		public ImageObject(Widget parent, int align = Image.AlignDefault)
 		{
 			parent_ = parent;
+			align_ = align;
 
-			var rawObject = new GameObject();
-			rawObject.transform.SetParent(parent.WidgetObject.transform, false);
+			o_ = new GameObject();
+			o_.transform.SetParent(parent.WidgetObject.transform, false);
 
-			raw_ = rawObject.AddComponent<RawImage>();
-			rt_ = rawObject.GetComponent<RectTransform>();
+			raw_ = o_.AddComponent<RawImage>();
+			rt_ = o_.GetComponent<RectTransform>();
 
 			rt_.anchorMin = new Vector2(0, 0);
 			rt_.anchorMax = new Vector2(1, 1);
@@ -180,6 +42,11 @@ namespace VUI
 
 			raw_.material = emptyMat_;
 			UpdateTexture();
+		}
+
+		public GameObject GameObject
+		{
+			get { return o_; }
 		}
 
 		public Texture Texture
@@ -206,6 +73,12 @@ namespace VUI
 		{
 			get { return size_; }
 			set { size_ = value; UpdateAspect(); }
+		}
+
+		public int Alignment
+		{
+			get { return align_; }
+			set { align_ = value; UpdateAspect(); }
 		}
 
 		public void SetRender(bool b)
@@ -277,8 +150,61 @@ namespace VUI
 					maxSize.Width, maxSize.Height);
 			}
 
-			rt_.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, scaled.Width);
-			rt_.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, scaled.Height);
+			Vector2 anchorMin;
+			Vector2 anchorMax;
+			Vector2 offsetMin;
+			Vector2 offsetMax;
+
+			if (Bits.IsSet(align_, Align.Right))
+			{
+				anchorMin.x = 1;
+				anchorMax.x = 1;
+				offsetMin.x = -scaled.Width;
+				offsetMax.x = 0;
+			}
+			else if (Bits.IsSet(align_, Align.Center))
+			{
+				anchorMin.x = 0.5f;
+				anchorMax.x = 0.5f;
+				offsetMin.x = -scaled.Width / 2;
+				offsetMax.x = scaled.Width / 2;
+			}
+			else  // left
+			{
+				anchorMin.x = 0;
+				anchorMax.x = 0;
+				offsetMin.x = 0;
+				offsetMax.x = scaled.Width;
+			}
+
+
+			if (Bits.IsSet(align_, Align.Bottom))
+			{
+				anchorMin.y = 0;
+				anchorMax.y = 0;
+				offsetMin.y = 0;
+				offsetMax.y = scaled.Height;
+			}
+			else if (Bits.IsSet(align_, Align.VCenter))
+			{
+				anchorMin.y = 0.5f;
+				anchorMax.y = 0.5f;
+				offsetMin.y = -scaled.Height / 2;
+				offsetMax.y = scaled.Height / 2;
+			}
+			else  // top
+			{
+				anchorMin.y = 1;
+				anchorMax.y = 1;
+				offsetMin.y = -scaled.Height;
+				offsetMax.y = 0;
+			}
+
+
+			rt_.anchorMin = anchorMin;
+			rt_.anchorMax = anchorMax;
+			rt_.offsetMin = offsetMin;
+			rt_.offsetMax = offsetMax;
 		}
 
 		private void UpdateTexture()
@@ -346,27 +272,61 @@ namespace VUI
 	}
 
 
-	class Image : Widget
+	class Image : Panel
 	{
+		public const int AlignDefault = Align.VCenterCenter;
+
 		public override string TypeName { get { return "Image"; } }
 
 		private ImageObject image_ = null;
 		private Texture tex_ = null;
+		private int align_ = AlignDefault;
+
+
+		public Image(int align = AlignDefault)
+			: this(null, align)
+		{
+		}
+
+		public Image(Texture t, int align = AlignDefault)
+		{
+			tex_ = t;
+			align_ = align;
+		}
 
 		public Texture Texture
 		{
 			get { return tex_; }
-			set { tex_ = value; UpdateTexture();  }
+			set { tex_ = value; TextureChanged();  }
+		}
+
+		public int Alignment
+		{
+			get
+			{
+				return align_;
+			}
+
+			set
+			{
+				if (align_ != value)
+				{
+					align_ = value;
+
+					if (image_ != null)
+						image_.Alignment = align_;
+				}
+			}
 		}
 
 		protected override void AfterUpdateBounds()
 		{
-			if (image_ == null)
-				image_ = new ImageObject(this);
+			base.AfterUpdateBounds();
 
-			image_.Texture = tex_;
-			image_.SetEnabled(Enabled);
-			image_.UpdateAspect();
+			if (image_ == null)
+				image_ = new ImageObject(this, align_);
+
+			TextureChanged();
 		}
 
 		protected override void DoSetRender(bool b)
@@ -387,10 +347,22 @@ namespace VUI
 			return ImageObject.SGetPreferredSize(tex_, maxWidth, maxHeight);
 		}
 
-		private void UpdateTexture()
+		private void CheckBounds()
 		{
 			if (image_ != null)
+			{
+				image_.SetEnabled(Enabled);
+				image_.UpdateAspect();
+			}
+		}
+
+		private void TextureChanged()
+		{
+			if (image_ != null)
+			{
 				image_.Texture = tex_;
+				CheckBounds();
+			}
 		}
 	}
 }

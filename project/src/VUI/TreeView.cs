@@ -252,7 +252,8 @@ namespace VUI
 
 			public void Toggle()
 			{
-				Expanded = !Expanded;
+				if (HasChildren)
+					Expanded = !Expanded;
 			}
 
 			public void ExpandAll()
@@ -1059,7 +1060,16 @@ namespace VUI
 			}
 			else
 			{
+				int oldTop = topItemIndex_;
 				SetTopItem(topItemIndex_, true, false);
+
+				if (oldTop != topItemIndex_)
+				{
+					Log.Info($"top changed from {oldTop} to {topItemIndex_}, updating");
+					UpdateNodes();
+					UpdateBounds();
+				}
+
 			}
 		}
 

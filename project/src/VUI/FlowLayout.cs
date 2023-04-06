@@ -5,16 +5,7 @@ namespace VUI
 {
 	abstract class FlowLayout : Layout
 	{
-		public const int AlignTop = 0x01;
-		public const int AlignVCenter = 0x02;
-		public const int AlignBottom = 0x04;
-
-		public const int AlignLeft = 0x08;
-		public const int AlignCenter = 0x10;
-		public const int AlignRight = 0x20;
-
-		public const int AlignLeftVCenter = AlignLeft | AlignVCenter;
-		public const int AlignDefault = AlignLeft | AlignTop;
+		public const int AlignDefault = Align.Left | Align.Top;
 
 		private int align_;
 		private bool expand_;
@@ -40,11 +31,11 @@ namespace VUI
 
 		protected int MakeAlign(int a)
 		{
-			if ((a & (AlignTop | AlignVCenter | AlignBottom)) == 0)
-				a |= AlignTop;
+			if ((a & (Align.Top | Align.VCenter | Align.Bottom)) == 0)
+				a |= Align.Top;
 
-			if ((a & (AlignLeft | AlignCenter | AlignRight)) == 0)
-				a |= AlignLeft;
+			if ((a & (Align.Left | Align.Center | Align.Right)) == 0)
+				a |= Align.Left;
 
 			return a;
 		}
@@ -93,11 +84,11 @@ namespace VUI
 				}
 				else if (wr.Height < r.Height)
 				{
-					if (Bits.IsSet(Alignment, AlignVCenter))
+					if (Bits.IsSet(Alignment, Align.VCenter))
 					{
 						wr.MoveTo(wr.Left, r.Top + (r.Height / 2) - (wr.Height / 2));
 					}
-					else if (Bits.IsSet(Alignment, AlignBottom))
+					else if (Bits.IsSet(Alignment, Align.Bottom))
 					{
 						wr.MoveTo(wr.Left, r.Bottom - wr.Height);
 					}
@@ -158,7 +149,7 @@ namespace VUI
 				}
 			}
 
-			if (Bits.IsSet(Alignment, AlignCenter))
+			if (Bits.IsSet(Alignment, Align.Center))
 			{
 				float offset = (av.Width / 2) - (totalWidth / 2);
 				for (int i = 0; i < bounds.Count; ++i)
@@ -167,7 +158,7 @@ namespace VUI
 						bounds[i] = bounds[i].Value.TranslateCopy(offset, 0);
 				}
 			}
-			else if (Bits.IsSet(Alignment, AlignRight))
+			else if (Bits.IsSet(Alignment, Align.Right))
 			{
 				float offset = av.Width - totalWidth;
 				for (int i = 0; i < bounds.Count; ++i)
@@ -266,11 +257,11 @@ namespace VUI
 				}
 				else if (wr.Width < r.Width)
 				{
-					if (Bits.IsSet(Alignment, AlignCenter))
+					if (Bits.IsSet(Alignment, Align.Center))
 					{
 						wr.MoveTo(r.Left + (r.Width / 2) - (wr.Width / 2), wr.Top);
 					}
-					else if (Bits.IsSet(Alignment, AlignRight))
+					else if (Bits.IsSet(Alignment, Align.Right))
 					{
 						wr.MoveTo(r.Right - wr.Width, wr.Top);
 					}
@@ -331,7 +322,7 @@ namespace VUI
 				}
 			}
 
-			if (Bits.IsSet(Alignment, AlignVCenter))
+			if (Bits.IsSet(Alignment, Align.VCenter))
 			{
 				float offset = (av.Height / 2) - (totalHeight / 2);
 				for (int i = 0; i < bounds.Count; ++i)
@@ -340,7 +331,7 @@ namespace VUI
 						bounds[i] = bounds[i].Value.TranslateCopy(0, offset);
 				}
 			}
-			else if (Bits.IsSet(Alignment, AlignBottom))
+			else if (Bits.IsSet(Alignment, Align.Bottom))
 			{
 				float offset = av.Height - totalHeight;
 				for (int i = 0; i < bounds.Count; ++i)

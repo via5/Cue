@@ -183,7 +183,7 @@ namespace VUI
 
 		private void OnPointerDown(PointerEvent e)
 		{
-			if (!Enabled)
+			if (!Enabled || e.Button != PointerEvent.LeftButton)
 				return;
 
 			var r = AbsoluteClientBounds;
@@ -290,6 +290,11 @@ namespace VUI
 		public ScrollBar VerticalScrollbar
 		{
 			get { return sb_; }
+		}
+
+		public int Top
+		{
+			get { return top_; }
 		}
 
 		public void Set(int rows, float rowSize, float scrollPos = 0)
