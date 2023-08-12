@@ -514,8 +514,8 @@ namespace Cue.Proc
 			var c = new ForceConfig();
 
 			c.hipForceMin = 300;
-			c.hipForceMax = 850;
-			c.hipForceWin = 100;
+			c.hipForceMax = 1250;
+			c.hipForceWin = 300;
 
 			if (self.Body.HasPenis)
 			{
@@ -538,7 +538,7 @@ namespace Cue.Proc
 			var c = new Config();
 
 			c.durationMin = 1.0f;
-			c.durationMax = 0.12f;
+			c.durationMax = 0.09f;
 			c.durationWin = 0.06f;
 			c.durationInterval = 10;
 			c.checkDirection = true;
@@ -587,7 +587,7 @@ namespace Cue.Proc
 		{
 			var c = new Config();
 
-			c.durationMin = 0.5f;
+			c.durationMin = 1.0f;
 			c.durationMax = 0.12f;
 			c.durationWin = 0.12f;
 			c.durationInterval = 10;

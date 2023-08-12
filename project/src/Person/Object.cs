@@ -9,6 +9,7 @@ namespace Cue
 		string ID { get; }
 		bool IsPlayer { get; }
 		bool Visible { get; set; }
+		bool CanLookAt { get; set; }
 		Sys.IAtom Atom { get; }
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
@@ -40,7 +41,7 @@ namespace Cue
 		private Sys.ObjectParameters ps_ = null;
 		private string[] traits_ = new string[0];
 		private IPossesser possesser_ = null;
-
+		private bool canLookAt_ = true;
 
 		public BasicObject(int index, Sys.IAtom atom, Sys.ObjectParameters ps = null)
 		{
@@ -90,6 +91,12 @@ namespace Cue
 		{
 			get { return atom_.Visible; }
 			set { atom_.Visible = value; }
+		}
+
+		public bool CanLookAt
+		{
+			get { return canLookAt_; }
+			set { canLookAt_ = value; }
 		}
 
 		public Vector3 Position

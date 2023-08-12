@@ -27,7 +27,7 @@ namespace Cue
 		private IHoming homing_;
 
 		private bool hasBody_ = false;
-		private bool loadPose_ = true;
+		private bool loadPose_ = false;
 		private Sys.IBoolParameter loadPoseParam_;
 
 

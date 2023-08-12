@@ -19,9 +19,9 @@ namespace Cue
 		public const int Busy = 0x04;
 		public const int Stop = 0x08;
 
-		protected Person person_;
-		protected Gaze g_;
-		protected GazeTargets targets_;
+		protected readonly Person person_;
+		protected readonly Gaze g_;
+		protected readonly GazeTargets targets_;
 		private InstrumentationType inst_;
 		private string lastResult_ = "";
 

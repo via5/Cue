@@ -485,12 +485,16 @@ namespace Cue.Sys.Vam
 				VamBodyPart bp;
 
 				if (partMap_.TryGetValue(t, out bp))
+				{
+					if (bp == null)
+						return null;
+
 					return bp.VamAtom.RealBodyPart(bp);
+				}
 			}
 
 
 			// not found, do a more expensive search
-
 
 			// find the parent atom for this transform, used to stop going up
 			// the transform's parent chain
@@ -510,6 +514,7 @@ namespace Cue.Sys.Vam
 				}
 			}
 
+			partMap_.Add(t, null);
 			return null;
 		}
 

@@ -196,6 +196,9 @@ namespace Cue
 
 		public bool CanLookAtTarget(IGazeLookat t)
 		{
+			if (t?.Object != null && !t.Object.CanLookAt)
+				return false;
+
 			// don't use avoidance for emergencies
 			if (!emergency_)
 			{

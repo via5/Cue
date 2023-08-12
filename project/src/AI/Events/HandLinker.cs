@@ -316,6 +316,9 @@
 
 		private void DoCheck(HandInfo info)
 		{
+			if (!info.Hand.CanApplyForce())
+				return;
+
 			var close = FindClose(info.Hand);
 
 			if (close != null)

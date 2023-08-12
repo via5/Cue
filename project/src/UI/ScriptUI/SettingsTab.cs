@@ -40,6 +40,7 @@ namespace Cue
 		private VUI.Label warning_ = new VUI.Label();
 		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
 		private VUI.CheckBox strapon_ = new VUI.CheckBox("");
+		private VUI.CheckBox canLookAt_ = new VUI.CheckBox("");
 		private VUI.Label straponWarning_ = new VUI.Label("Only available for female characters");
 		private bool ignore_ = false;
 		private bool firstUpdate_ = true;
@@ -73,6 +74,10 @@ namespace Cue
 
 			AddPercentFloatOption(pp, "Max excitement", person_.Options.MaxExcitementOption);
 
+			pp.Add(new VUI.Label("Can look at"));
+			pp.Add(canLookAt_);
+			pp.Add(new VUI.Spacer());
+
 			pp.Add(new VUI.Spacer(20));
 			pp.Add(new VUI.Spacer(20));
 			pp.Add(new VUI.Spacer(20));
@@ -101,6 +106,7 @@ namespace Cue
 			loadPose_.Changed += OnLoadPose;
 			traits_.Edited += OnTraits;
 			strapon_.Changed += OnStrapon;
+			canLookAt_.Changed += OnCanLookAt;
 
 			traits_.MinimumSize = new VUI.Size(500, DontCare);
 			warning_.Visible = false;
@@ -133,6 +139,7 @@ namespace Cue
 				loadPose_.Checked = person_.LoadPose;
 
 				strapon_.Checked = person_.Body.Strapon;
+				canLookAt_.Checked = person_.CanLookAt;
 
 				if (person_.Atom.IsMale)
 				{
@@ -228,12 +235,20 @@ namespace Cue
 
 		private void OnTraits(string s)
 		{
+			if (ignore_) return;
 			person_.Traits = s.Split(' ');
 		}
 
 		private void OnStrapon(bool b)
 		{
+			if (ignore_) return;
 			person_.Body.Strapon = b;
+		}
+
+		private void OnCanLookAt(bool b)
+		{
+			if (ignore_) return;
+			person_.CanLookAt = b;
 		}
 	}
 

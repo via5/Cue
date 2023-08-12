@@ -633,9 +633,6 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			if (person_.ID == "Person")
-				list_.Name = "eventsList";
-
 			debug_.Clear();
 
 			if (events_.Selected != null)

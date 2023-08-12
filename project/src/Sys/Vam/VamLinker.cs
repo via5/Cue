@@ -66,8 +66,6 @@ namespace Cue.Sys.Vam
 		{
 			private VamBodyPart from_;
 			private VamBodyPartRegion to_;
-			private Vector3 lastPos_;
-			private Quaternion lastRot_;
 
 			private GameObject parent_, self_;
 
@@ -75,8 +73,6 @@ namespace Cue.Sys.Vam
 			{
 				from_ = from;
 				to_ = to;
-				lastPos_ = to_.Position;
-				lastRot_ = to_.Rotation;
 
 				parent_ = new GameObject();
 				self_ = new GameObject();
@@ -108,20 +104,28 @@ namespace Cue.Sys.Vam
 
 			public void LateUpdate(float s)
 			{
-				Vector3 p = to_.Position;
-				Quaternion q = to_.Rotation;
+				const float MaxMove = 0.02f;
+				const float MaxRot = 4.0f;
 
-				var dPos = p - lastPos_;
-				var dRot = U.FromUnity(U.ToUnity(q) * UnityEngine.Quaternion.Inverse(U.ToUnity(lastRot_)));
+				parent_.transform.position = UnityEngine.Vector3.MoveTowards(
+					parent_.transform.position,
+					U.ToUnity(to_.Position),
+					MaxMove);
 
-				parent_.transform.position = U.ToUnity(to_.Position);
-				parent_.transform.rotation = U.ToUnity(to_.Rotation);
+				parent_.transform.rotation = UnityEngine.Quaternion.RotateTowards(
+					parent_.transform.rotation,
+					U.ToUnity(to_.Rotation),
+					MaxRot);
 
-				from_.ControlPosition = U.FromUnity(self_.transform.position);
-				from_.ControlRotation = U.FromUnity(self_.transform.rotation);
+				from_.ControlPosition = Vector3.MoveTowards(
+					from_.ControlPosition,
+					U.FromUnity(self_.transform.position),
+					MaxMove);
 
-				lastPos_ = p;
-				lastRot_ = q;
+				from_.ControlRotation = U.FromUnity(UnityEngine.Quaternion.RotateTowards(
+					U.ToUnity(from_.ControlRotation),
+					self_.transform.rotation,
+					MaxRot));
 			}
 		}
 

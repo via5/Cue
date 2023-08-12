@@ -1,7 +1,6 @@
 ﻿using SimpleJSON;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Cue
 {
@@ -10,6 +9,9 @@ namespace Cue
 	class Cue
 	{
 		private static Cue instance_ = null;
+
+		public delegate void PlayerChangedCallback(Person oldPerson, Person newPerson);
+		public event PlayerChangedCallback PlayerChanged;
 
 		private Logger log_, vuiLog_;
 		private Options options_;
@@ -144,7 +146,7 @@ namespace Cue
 				else
 					Log.Info($"forcing player to {value}");
 
-				forcedPlayer_ = value;
+				SetPlayer(value, true);
 			}
 		}
 
@@ -610,7 +612,7 @@ namespace Cue
 			if (player_ != null && !player_.Possessed)
 			{
 				Log.Info($"{player_} no longer possessed");
-				SetPlayer(null);
+				SetPlayer(null, false);
 			}
 
 			if (player_ == null)
@@ -621,14 +623,14 @@ namespace Cue
 					if (p.Possessed)
 					{
 						Log.Info($"{p} now possessed");
-						SetPlayer(p);
+						SetPlayer(p, false);
 						break;
 					}
 				}
 			}
 		}
 
-		private void SetPlayer(Person p)
+		private void SetPlayer(Person p, bool forced)
 		{
 			if (p != null)
 			{
@@ -636,7 +638,21 @@ namespace Cue
 					e.ForceStop();
 			}
 
-			player_ = p;
+			Person old;
+
+			if (forced)
+			{
+				old = forcedPlayer_;
+				forcedPlayer_ = p;
+			}
+			else
+			{
+				old = player_;
+				player_ = p;
+			}
+
+			if (p != old)
+				PlayerChanged?.Invoke(old, p);
 		}
 
 		private void DoUpdateUI(float s)

@@ -591,7 +591,7 @@ namespace Cue.MacGruber
 			if (d <= far)
 			{
 				float max = verOffset_.Maximum;
-				float range = (max - def);
+				float range = (max - def) / 2;
 				float p = (far - d) / far;
 				float v = def + range * p;
 
