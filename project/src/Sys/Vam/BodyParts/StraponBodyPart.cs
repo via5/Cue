@@ -14,6 +14,7 @@ namespace Cue.Sys.Vam
 
 		private IObject dildo_ = null;
 		private Collider anchor_ = null;
+		private CapsuleCollider extremity_ = null;
 		private CapsuleCollider anchorCC_ = null;
 		private SphereCollider anchorSC_ = null;
 		private Transform parent_ = null;
@@ -25,6 +26,7 @@ namespace Cue.Sys.Vam
 
 		private Vector3 positionOffset_ = Vector3.Zero;
 		private Quaternion rotationOffset_ = Quaternion.Identity;
+
 
 		public StraponBodyPart(VamAtom a)
 			: base(a, BP.Penis)
@@ -75,6 +77,21 @@ namespace Cue.Sys.Vam
 		{
 			get { return dildo_.Atom.Rotation; }
 			set { Log.Error("cannot rotate colliders"); }
+		}
+
+		public override Vector3 Extremity
+		{
+			get
+			{
+				if (extremity_ == null || dildo_ == null)
+					return base.Extremity;
+
+				var size = (extremity_.height / 2 + 0.005f) * dildo_.Atom.Scale;
+				var fwd = extremity_.transform.up * size;
+				var pos = extremity_.transform.position + extremity_.center + fwd;
+
+				return U.FromUnity(pos);
+			}
 		}
 
 		private bool Enabled
@@ -145,7 +162,7 @@ namespace Cue.Sys.Vam
 
 			if (b)
 			{
-				oc.Create(Atom, StraponID, (o) =>
+				oc.Create(Atom, StraponID, (o, e) =>
 				{
 					Log.Error("strapon created");
 				});
@@ -167,7 +184,7 @@ namespace Cue.Sys.Vam
 				return;
 			}
 
-			oc.Create(Atom, DildoID, (o) =>
+			oc.Create(Atom, DildoID, (o, e) =>
 			{
 				if (o == null)
 				{
@@ -175,11 +192,11 @@ namespace Cue.Sys.Vam
 					return;
 				}
 
-				SetDildo(o);
+				SetDildo(o, e);
 			});
 		}
 
-		private void SetDildo(IObject a)
+		private void SetDildo(IObject a, bool existing)
 		{
 			if (a == null)
 			{
@@ -200,7 +217,7 @@ namespace Cue.Sys.Vam
 				}
 
 				SetEnabled(true);
-				DoInit();
+				DoInit(existing);
 			}
 		}
 
@@ -210,7 +227,7 @@ namespace Cue.Sys.Vam
 			SetClothingActive(b);
 		}
 
-		public void LateUpdate(float s)
+		public override void LateUpdate(float s)
 		{
 			if (dildo_ == null)
 				return;
@@ -227,7 +244,7 @@ namespace Cue.Sys.Vam
 					Log.Info($"dildo {dildo_.ID} turned on");
 
 					if (Rigidbody == null)
-						DoInit();
+						DoInit(true);
 
 					SetEnabled(true);
 				}
@@ -256,7 +273,7 @@ namespace Cue.Sys.Vam
 			{
 				// dildo can get deleted at any time
 				Log.Error($"looks like dildo got deleted");
-				SetDildo(null);
+				SetDildo(null, false);
 			}
 		}
 
@@ -334,10 +351,12 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		private void DoInit()
+		private void DoInit(bool existing)
 		{
 			dildo_.Atom.Collisions = false;
-			dildo_.Atom.Scale = Atom.Scale;
+
+			if (!existing)
+				dildo_.Atom.Scale = Atom.Scale;
 
 			postCreate_ = true;
 			postCreateElapsed_ = 0;
@@ -360,7 +379,7 @@ namespace Cue.Sys.Vam
 
 					if (c == null)
 					{
-						Log.Error($"{Atom.ID}: dildo collider {cn.Value} not found");
+						Log.Error($"dildo collider {cn.Value} not found in {dildo_.Atom.ID}");
 						continue;
 					}
 
@@ -375,7 +394,7 @@ namespace Cue.Sys.Vam
 			}
 
 
-			var anchorName = dildo_.Parameters.Object["anchor"].Value;
+			var anchorName = dildo_.Parameters.Object["anchor"].Value.Trim();
 			if (string.IsNullOrEmpty(anchorName))
 			{
 				Log.Warning("dildo is missing anchor parameter");
@@ -387,9 +406,34 @@ namespace Cue.Sys.Vam
 				anchorSC_ = anchor_ as SphereCollider;
 
 				if (anchor_ == null)
-					Log.Error($"dildo anchor {anchor_} not found in {Atom.ID}");
+					Log.Error($"dildo anchor {anchorName} not found in {Atom.ID}");
 				else
 					Log.Info($"dildo anchor: {U.QualifiedName(anchor_)}");
+			}
+
+
+			var extremityName = dildo_.Parameters.Object["extremity"].Value.Trim();
+			if (string.IsNullOrEmpty(extremityName))
+			{
+				Log.Warning("dildo is missing extremity parameter");
+			}
+			else
+			{
+				var c = (dildo_.Atom as VamAtom).FindCollider(extremityName);
+
+				if (c == null)
+				{
+					Log.Error($"dildo extremity {extremityName} not found in {dildo_.Atom.ID}");
+				}
+				else
+				{
+					extremity_ = c as CapsuleCollider;
+
+					if (extremity_ == null)
+						Log.Error($"dildo extremity {extremityName} is not a capsule collider");
+					else
+						Log.Info($"dildo extremity: {U.QualifiedName(extremity_)}");
+				}
 			}
 
 

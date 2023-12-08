@@ -234,7 +234,7 @@ namespace Cue
 				return;
 			}
 
-			oc.Create(person_.Atom, CigaretteID, (o) =>
+			oc.Create(person_.Atom, CigaretteID, (o, e) =>
 			{
 				if (o == null)
 				{

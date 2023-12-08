@@ -92,8 +92,7 @@ namespace Cue.VamMoan
 				AP("Voice blowjob intense")
 			};
 
-			// default is 1.0, but is set to 0.5 in the plugin
-			oldVolume_ = 0.5f; // p_.volume.DefaultValue;
+			oldVolume_ = p_.volume.Value;
 
 			CheckVoice();
 

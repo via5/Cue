@@ -24,7 +24,7 @@ namespace ClockwiseSilver {
 			}
 			return choices;
         }
-		
+
 		public static List<string> GetMaleChoices(JSONStorableStringChooser chooser=null)
         {
 			List<string> choices = SuperController.singleton.GetAtoms().Where(a => a.category == "People" && !a.GetComponentInChildren<DAZCharacter>().name.Contains("female")).Select(a => a.name).ToList();
@@ -38,14 +38,14 @@ namespace ClockwiseSilver {
 			}
 			return choices;
         }
-		
+
 		public static List<string> GetMaleAndToyChoices(JSONStorableStringChooser chooser=null)
         {
             List<string> choices = new List<string>();
-			List<string> mChoices = SuperController.singleton.GetAtoms().Where(a => a.category == "People" && !a.GetComponentInChildren<DAZCharacter>().name.Contains("female")).Select(a => a.name).ToList();
-            List<string> dChoices = SuperController.singleton.GetAtoms().Where(atom => atom.name.StartsWith("Dildo")).Select(atom => atom.name).ToList();
-			List<string> cChoices = SuperController.singleton.GetAtoms().Where(atom => atom.name.StartsWith("Cock")).Select(atom => atom.name).ToList();			
-			
+				List<string> mChoices = SuperController.singleton.GetAtoms().Where(a => a.on && a.category == "People" && !a.GetComponentInChildren<DAZCharacter>().name.Contains("female")).Select(a => a.name).ToList();
+            List<string> dChoices = SuperController.singleton.GetAtoms().Where(atom => atom.on && atom.name.StartsWith("Dildo")).Select(atom => atom.name).ToList();
+			List<string> cChoices = SuperController.singleton.GetAtoms().Where(atom => atom.on && atom.name.StartsWith("Cock")).Select(atom => atom.name).ToList();
+
 			for (int i = 0; i < mChoices.Count; i++)
 			{
 				choices.Add(mChoices[i]);
@@ -58,7 +58,7 @@ namespace ClockwiseSilver {
 			{
 				choices.Add(cChoices[i]);
 			}
-			
+
 			if (chooser != null)
 			{
 				chooser.choices = choices;
@@ -69,58 +69,58 @@ namespace ClockwiseSilver {
 			}
 			return choices;
         }
-		
+
 		public static string[] CommonFreeControllers()
 		{
 			return new string[] { "lHandControl", "rHandControl", "lFootControl", "rFootControl",
 				"lArmControl", "rArmControl", "lElbowControl", "rElbowControl",	"lThighControl", "rThighControl", "pelvisControl",
 				"hipControl", "chestControl", "neckControl", "headControl", "abdomenControl", "abdomen2Control"};
 		}
-		
+
 		public static string[] CommonRigidbodies()
 		{
 			return new string[] { "lHand", "rHand", "lShldr", "rShldr", "lForeArm", "rForeArm", "lFoot", "rFoot",
 				"lThigh", "rThigh", "pelvis", "hip", "chest", "neck", "head", "abdomen", "abdomen2"};
 		}
-		
+
 		public static string RigidbodyToFreeController(string rigidbodyName)
 		{
 			return rigidbodyName.Replace("Shldr", "Arm").Replace("ForeArm", "Elbow") + "Control";
 		}
-		
+
 		public static string FreeControllerToRigidbody(string freeControllerName)
 		{
 			return freeControllerName.Replace("Arm", "Shldr").Replace("Elbow", "ForeArm").Replace("Control", "");
 		}
-		
+
 		public static float Rollover(float x)
 		{
 			if (x > 360f) { return x - 360f; }
 			else if (x < 0f) { return 360f - x; }
 			return x;
 		}
-		
+
 		//----------------------------------------------------------Easings
 		public static float QuadraticInOut(float x)
 		{
 			if ((x *= 2f) < 1f) return 0.5f * x * x;
             return -0.5f * ((x -= 1f) * (x - 2f) - 1f);
 		}
-		
+
 		public static float QuartOut(float x)
 		{
 			return 1 - Mathf.Pow(1 - x, 4);
 		}
-		
+
 		//----------------------------------------------------------UI
-		
+
 		public static JSONStorableString SetupHeader(MVRScript script, string label, string text, bool right, float height=10f)
 		{
 			JSONStorableString header = new JSONStorableString(label, text);
 			script.CreateTextField(header, right).height = height;
 			return header;
 		}
-		
+
 		//----------------------------------------------------------MacGruber Utils
 		//Credit MacGruber 2020
 		public static JSONStorable FindPlugin(MVRScript self, string fullClassName)
@@ -146,7 +146,7 @@ namespace ClockwiseSilver {
 			script.RegisterBool(storable);
 			return storable;
 		}
-		
+
 		// Create VaM-UI Float slider
 		public static JSONStorableFloat SetupSlider(MVRScript script, string label, float defaultValue, float minValue, float maxValue, bool rightSide)
 		{
@@ -156,7 +156,7 @@ namespace ClockwiseSilver {
 			script.RegisterFloat(storable);
 			return storable;
 		}
-		
+
 		// Create VaM-UI ColorPicker
 		public static JSONStorableColor SetupColor(MVRScript script, string label, Color color, bool rightSide)
 		{
@@ -167,7 +167,7 @@ namespace ClockwiseSilver {
 			script.RegisterColor(storable);
 			return storable;
 		}
-		
+
 		// Get directory path where the plugin is located. Based on Alazi's & VAMDeluxe's method.
 		public static string GetPluginPath(MVRScript self)
 		{

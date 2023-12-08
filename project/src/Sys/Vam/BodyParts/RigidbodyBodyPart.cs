@@ -9,11 +9,12 @@ namespace Cue.Sys.Vam
 		private Rigidbody forForce_;
 		private FreeControllerV3 fc_ = null;
 		private Collider center_ = null;
+		private CapsuleCollider extremity_ = null;
 
 		public RigidbodyBodyPart(
 			VamAtom a, BodyPartType type, Rigidbody[] rbs, FreeControllerV3 fc,
 			string[] colliders, Rigidbody forForce, string[] ignoreBodyParts,
-			string centerCollider)
+			string centerCollider, string extremityCollider)
 				: base(a, type, colliders, ignoreBodyParts)
 		{
 			Cue.Assert(rbs != null, $"null rbs in {a.ID} {BodyPartType.ToString(Type)}");
@@ -34,6 +35,23 @@ namespace Cue.Sys.Vam
 				Cue.Assert(center_ != null,
 					$"centerCollider {centerCollider} not found in " +
 					$"{a.ID} {BodyPartType.ToString(Type)}");
+			}
+
+			if (!string.IsNullOrEmpty(extremityCollider))
+			{
+				var c = a.FindCollider(extremityCollider);
+
+				if (c == null)
+				{
+					Log.Error($"extremity collider {extremityCollider} not found");
+				}
+				else
+				{
+					extremity_ = c as CapsuleCollider;
+
+					if (extremity_ == null)
+						Log.Error($"extremity collider {U.QualifiedName(c)} is not a capsule collidder");
+				}
 			}
 		}
 
@@ -98,6 +116,21 @@ namespace Cue.Sys.Vam
 					return U.FromUnity(center_.transform.rotation);
 
 				return Rotation;
+			}
+		}
+
+		public override Vector3 Extremity
+		{
+			get
+			{
+				if (extremity_ == null)
+					return base.Extremity;
+
+				var size = extremity_.radius + 0.002f;
+				var fwd = extremity_.transform.right * size;
+				var pos = extremity_.transform.position + extremity_.center + fwd;
+
+				return U.FromUnity(pos);
 			}
 		}
 

@@ -101,6 +101,7 @@ namespace Cue.Sys.Vam
 		private Color initialColor_;
 		private IBodyPart[] parts_;
 		private Hand leftHand_, rightHand_;
+		private VamBodyPart penis_ = null;
 
 		private float sweat_ = 0;
 		private float sweatMultiplier_ = 1.0f;
@@ -160,6 +161,7 @@ namespace Cue.Sys.Vam
 			strapon_ = parts_[BP.Penis.Int] as StraponBodyPart;
 			mouthColliderNames_ = ld.MouthColliders;
 			tongueColliderNames_ = ld.TongueColliders;
+			penis_ = parts_[BP.Penis.Int] as VamBodyPart;
 
 			// too slow to do it on demand
 			GetKissColliders();
@@ -197,6 +199,7 @@ namespace Cue.Sys.Vam
 		public void LateUpdate(float s)
 		{
 			strapon_?.LateUpdate(s);
+			penis_?.LateUpdate(s);
 		}
 
 		public IBodyPart GetPart(BodyPartType i)

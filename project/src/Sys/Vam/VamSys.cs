@@ -540,13 +540,20 @@ namespace Cue.Sys.Vam
 
 		public void ReloadPlugin()
 		{
-			var pui = GetPluginUI(CueMain.PluginCslist);
-			if (pui == null)
-				return;
+			SuperController.singleton.StartCoroutine(CoReloadPlugin());
+		}
 
-			ClearLog();
-			Logger.SafeLogInfo("reloading");
-			pui.reloadButton?.onClick?.Invoke();
+		private IEnumerator CoReloadPlugin()
+		{
+			yield return new WaitForEndOfFrame();
+
+			var pui = GetPluginUI(CueMain.PluginCslist);
+			if (pui != null)
+			{
+				ClearLog();
+				Logger.SafeLogInfo("reloading");
+				pui.reloadButton?.onClick?.Invoke();
+			}
 		}
 
 		public void OpenScriptUI()

@@ -171,11 +171,23 @@
 			Check(ManualStartDistance, true, true);
 		}
 
+		private bool IsHandjob(BodyPart bp)
+		{
+			return (bp.Type == BP.Penis && bp.IsAvailable);
+		}
+
+		private bool IsFinger(BodyPart bp)
+		{
+			return
+				bp.Type == BP.Vagina ||
+				(bp.Type == BP.Penis && !bp.IsAvailable);
+		}
+
 		private bool WouldBeDoubleHJ(BodyPart left, BodyPart right)
 		{
 			if (left != null && right != null)
 			{
-				if (left.Type == BP.Penis && right.Type == BP.Penis)
+				if (IsHandjob(left) && IsHandjob(right))
 				{
 					if (left.Person == right.Person)
 						return true;
@@ -189,7 +201,7 @@
 		{
 			if (left != null && right != null)
 			{
-				if (left.Type == BP.Penis && right.Type == BP.Penis)
+				if (IsHandjob(left) && IsHandjob(right))
 				{
 					if (left.Person != right.Person)
 						return true;
@@ -267,13 +279,13 @@
 					}
 					else if (canStartRight)
 					{
-						Log.Verbose($"right target now {rightTarget}");
+						Log.Verbose($"right target now {rightTarget}, av={rightTarget.IsAvailable}");
 
 						Stop(right_, stopFlags);
 
-						if (rightTarget.Type == BP.Penis)
+						if (IsHandjob(rightTarget))
 							StartHJ(right_, rightTarget);
-						else if (rightTarget.Type == BP.Vagina)
+						else if (IsFinger(rightTarget))
 							StartFinger(right_, rightTarget);
 					}
 					else
@@ -297,13 +309,13 @@
 					{
 						if (rightTarget == null || !WouldBeDoubleHJ(leftTarget, rightTarget))
 						{
-							Log.Verbose($"new left target {leftTarget}");
+							Log.Verbose($"new left target {leftTarget}, av={leftTarget.IsAvailable}");
 
 							Stop(left_, stopFlags);
 
-							if (leftTarget.Type == BP.Penis)
+							if (IsHandjob(leftTarget))
 								StartHJ(left_, leftTarget);
-							else if (leftTarget.Type == BP.Vagina)
+							else if (IsFinger(leftTarget))
 								StartFinger(left_, leftTarget);
 						}
 						else
@@ -615,7 +627,7 @@
 			BodyPartType[] weakLocks = new BodyPartType[] { BP.Hips };
 
 			// don't lock genitals for females
-			if (target.Body.Get(BP.Penis).Exists)
+			if (target.Body.Get(BP.Penis).Exists && target.Body.Get(BP.Penis).IsAvailable)
 				strongLocks = new BodyPartType[] { BP.Penis };
 
 			if (strongLocks != null)
@@ -682,7 +694,7 @@
 
 				if (BetterTarget(tentative, g, key))
 				{
-					if (g.Type == BP.Penis && p.Status.Penetrating())
+					if (IsHandjob(g) && p.Status.Penetrating())
 					{
 						Log.Info($"skipping {g}, penetrating");
 					}
@@ -723,6 +735,10 @@
 				Log.Verbose($"BetterTarget: {check} is first");
 				return true;
 			}
+
+
+			if (!tentative.IsAvailable && check.IsAvailable)
+				return true;
 
 			Log.Verbose($"BetterTarget: {tentative} still better than {check}");
 			return false;

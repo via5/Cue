@@ -382,6 +382,12 @@ namespace Cue
 			Instrumentation.End();
 		}
 
+		public override void LateUpdate(float s)
+		{
+			base.LateUpdate(s);
+			Body.LateUpdate(s);
+		}
+
 		public override void UpdatePaused(float s)
 		{
 			base.UpdatePaused(s);

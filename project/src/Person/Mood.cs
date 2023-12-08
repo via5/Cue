@@ -694,6 +694,7 @@ namespace Cue
 				person_.Animator.PlayType(AnimationType.Orgasm);
 
 			person_.Options.GetAnimationOption(AnimationType.Orgasm).Trigger(true);
+			person_.Body.DoOrgasm();
 
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);

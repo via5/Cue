@@ -180,6 +180,16 @@ namespace Cue.Sys.Vam
 			get { return selector_ != null && selector_.useAdvancedColliders; }
 		}
 
+		public DAZCharacter Character
+		{
+			get { return char_; }
+		}
+
+		public DAZCharacterSelector Selector
+		{
+			get { return selector_; }
+		}
+
 		private FloatParameter FindScale()
 		{
 			if (IsPerson)

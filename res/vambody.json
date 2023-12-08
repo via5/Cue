@@ -520,7 +520,8 @@
 			"sex": "male",
 			"name": "Gen1",
 			"controller": "penisBaseControl",
-			"colliders": ["Gen1Hard", "Gen3aHard"]
+			"colliders": ["Gen1Hard", "Gen3aHard"],
+			"extremity": "Gen3bHard"
 		},
 
 		{

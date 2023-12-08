@@ -62,6 +62,11 @@ namespace Cue
 			get { return part_.IsPhysical; }
 		}
 
+		public bool IsAvailable
+		{
+			get { return part_.IsAvailable; }
+		}
+
 		public string Name
 		{
 			get { return BodyPartType.ToString(type_); }
@@ -102,6 +107,11 @@ namespace Cue
 		public Vector3 Center
 		{
 			get { return part_.Center; }
+		}
+
+		public Vector3 Extremity
+		{
+			get { return part_.Extremity; }
 		}
 
 		public Quaternion Rotation

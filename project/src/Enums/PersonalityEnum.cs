@@ -198,19 +198,20 @@ namespace Cue
 		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(165);
 		public static readonly FloatIndex OrgasmTime = new FloatIndex(166);
 		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(167);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(168);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(169);
-		public static readonly FloatIndex MinCollisionMag = new FloatIndex(170);
-		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(171);
-		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(172);
-		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(173);
-		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(174);
-		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(175);
-		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(176);
-		public static readonly FloatIndex FinishMoodTired = new FloatIndex(177);
+		public static readonly FloatIndex OrgasmFluidTime = new FloatIndex(168);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(169);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(170);
+		public static readonly FloatIndex MinCollisionMag = new FloatIndex(171);
+		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(172);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(173);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(174);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(175);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(176);
+		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(177);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(178);
 
-		public const int FloatCount = 178;
-		public override int GetFloatCount() { return 178; }
+		public const int FloatCount = 179;
+		public override int GetFloatCount() { return 179; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -512,6 +513,7 @@ namespace Cue
 			"excitementPostOrgasm",
 			"orgasmTime",
 			"postOrgasmTime",
+			"orgasmFluidTime",
 			"rateAdjustment",
 			"penetrationDamper",
 			"minCollisionMag",
@@ -813,6 +815,7 @@ namespace Cue
 			"excitementPostOrgasm",
 			"orgasmTime",
 			"postOrgasmTime",
+			"orgasmFluidTime",
 			"rateAdjustment",
 			"penetrationDamper",
 			"minCollisionMag",

@@ -1,0 +1,72 @@
+{
+   "storables" : [
+	  {
+		 "id" : "PhysicsMaterialControl",
+		 "dynamicFriction" : "0.6",
+		 "staticFriction" : "0.6",
+		 "bounciness" : "0",
+		 "frictionCombine" : "Average",
+		 "bounceCombine" : "Average"
+	  },
+	  {
+		 "id" : "CollisionTrigger",
+		 "triggerEnabled" : "false",
+		 "invertAtomFilter" : "false",
+		 "useRelativeVelocityFilter" : "false",
+		 "invertRelativeVelocityFilter" : "false",
+		 "relativeVelocityFilter" : "1",
+		 "trigger" : {
+			"startActions" : [
+			],
+			"transitionActions" : [
+			],
+			"endActions" : [
+			]
+		 }
+	  },
+	  {
+		 "id" : "scale",
+		 "scale" : "1"
+	  },
+	  {
+		 "id" : "asset",
+		 "importLightmaps" : "true",
+		 "importLightProbes" : "true",
+		 "registerCanvases" : "true",
+		 "showCanvases" : "true",
+		 "loadDll" : "true",
+		 "assetName" : "assets/vamparticles/fluids101/hzm_fluid_male.prefab",
+		 "assetUrl" : "hazmhox.fluids101.11:/Custom/Assets/hazmhox/particles/fluids101/fluids_101.assetbundle",
+		 "assetDllUrl" : ""
+	  },
+	  {
+		 "id" : "PluginManager",
+		 "plugins" : {
+			"plugin#0" : "Custom/Scripts/Fluids101/fluid_male_editor.cs"
+		 }
+	  },
+	  {
+		 "id" : "plugin#0_FluidEditorMalePlugin.FluidEditorMale",
+		 "enabled" : "true",
+		 "Enable fluid shadows" : "false",
+		 "Alternative motion mode" : "false",
+		 "Fluid opacity" : "0.15",
+		 "Stream amount" : "279.629",
+		 "Stream speed" : "1",
+		 "Stream force" : "1.297281",
+		 "Stream thickness" : "1.526793",
+		 "Fluid thickness" : "2.387551",
+		 "Fluid stickiness" : "0.99",
+		 "Fluid lifetime (min)" : "15",
+		 "Fluid lifetime (max)" : "20",
+		 "pluginLabel" : "",
+		 "Fluid appearance" : "Unlit",
+		 "Stream type" : "Pumping",
+		 "Fluid color" : {
+			"h" : "0.1277777",
+			"s" : "0.2216981",
+			"v" : "1"
+		 }
+	  }
+	 ]
+}

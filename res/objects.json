@@ -21,6 +21,15 @@
 		},
 
 		{
+			"name": "maleFluid",
+			"type": "cua",
+			"options":
+			{
+				"preset": "objects/maleFluid.json"
+			}
+		},
+
+		{
 			"name": "dildo",
 			"type": "atom",
 			"options":
@@ -32,6 +41,7 @@
 			{
 				"colliders": ["b2/2", "b3/1", "b1/1"],
 				"anchor": "pelvisF4/pelvisF4Joint",
+				"extremity": "b3/3",
 				"positionOffset": [0, 0.0, 0.02],
 				"rotationOffset": [0, 140, 90]
 			}

@@ -1,0 +1,19 @@
+{
+	"name": "Quiet",
+	"inherit": "standard",
+	"defaultHappiness": 0.1,
+	"defaultPlayfulness": 0,
+	"defaultSurprise": 0.1,
+	"defaultAnger": 0,
+
+	"finishMood": "involved",
+	"finishMoodSurprised": 1,
+
+	"voice":
+	{
+		"normalState":
+		{
+			"breathingRange": 0.2
+		}
+	}
+}

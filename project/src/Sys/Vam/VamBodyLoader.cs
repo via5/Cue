@@ -180,6 +180,7 @@ namespace Cue.Sys.Vam
 			public string rigidbody;
 			public string closestRigidbody;
 			public string centerCollider;
+			public string extremity;
 		}
 
 		private IBodyPart LoadPart(bool male, JSONClass o, Func<string, JSONNode> getVar)
@@ -228,6 +229,8 @@ namespace Cue.Sys.Vam
 				foreach (var n in o["triggers"].AsArray.Childs)
 					ps.triggers.Add(n.Value);
 			}
+
+			ps.extremity = J.OptString(o, "extremity");
 
 			if (o.HasKey("ignore"))
 			{
@@ -413,7 +416,7 @@ namespace Cue.Sys.Vam
 			return new RigidbodyBodyPart(
 				atom_, ps.bodyPart, rbs.ToArray(), fc,
 				ps.colliders.ToArray(), fr, ps.ignore.ToArray(),
-				ps.centerCollider);
+				ps.centerCollider, ps.extremity);
 		}
 
 		private IBodyPart CreateTrigger(PartSettings ps)

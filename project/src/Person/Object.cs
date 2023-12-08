@@ -174,7 +174,7 @@ namespace Cue
 			// no-op
 		}
 
-		public void LateUpdate(float s)
+		public virtual void LateUpdate(float s)
 		{
 			Atom.LateUpdate(s);
 		}

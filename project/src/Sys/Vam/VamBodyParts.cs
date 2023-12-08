@@ -25,6 +25,52 @@ namespace Cue.Sys.Vam
 		public virtual bool Exists { get { return true; } }
 		public virtual bool IsPhysical { get { return true; } }
 
+		private int anatomyMaterialCheck_ = -1;
+		private DAZSkinV2 skin_ = null;
+
+		private bool GetAnatomyEnabled()
+		{
+			// can't use disableAnatomy parameter, it's overridden by the
+			// clothing/hair setting, and it's not remembered anywhere
+			//
+
+			if (anatomyMaterialCheck_ == -1)
+			{
+				anatomyMaterialCheck_ = -2;
+
+				var c = (atom_ as VamAtom)?.Character;
+				var s = (atom_ as VamAtom)?.Selector;
+
+				var slots = s.maleAnatomyOnMaterialSlots;
+				if (slots.Length > 0)
+				{
+					var i = slots[0];
+
+					if (i >= 0 && i < c.skin.materialsEnabled.Length)
+					{
+						skin_ = c.skin;
+						anatomyMaterialCheck_ = i;
+					}
+				}
+			}
+
+			if (anatomyMaterialCheck_ < 0)
+				return true;
+
+			return skin_.materialsEnabled[anatomyMaterialCheck_];
+		}
+
+		public virtual bool IsAvailable
+		{
+			get
+			{
+				if (Type == BP.Penis && IsPhysical)
+					return GetAnatomyEnabled();
+
+				return true;
+			}
+		}
+
 		public virtual Rigidbody Rigidbody { get { return null; } }
 		public virtual FreeControllerV3 Controller { get { return null; } }
 
@@ -37,9 +83,11 @@ namespace Cue.Sys.Vam
 		public virtual Vector3 Center { get { return Position; } }
 		public abstract Quaternion Rotation { get; }
 		public virtual Quaternion CenterRotation { get { return Rotation; } }
+		public virtual Vector3 Extremity { get { return Position; } }
 
 		private List<VamDebugRenderer.IDebugRender> renderers_ = null;
 		private List<VamDebugRenderer.IDebugRender> distanceRenderers_ = null;
+		private VamDebugRenderer.PointRender extremityDebug_ = null;
 
 		private List<TriggerInfo> triggerCache_ = new List<TriggerInfo>();
 		private TriggerInfo[] triggers_ = null;
@@ -182,21 +230,7 @@ namespace Cue.Sys.Vam
 				}
 				else
 				{
-					if (renderers_ != null)
-					{
-						foreach (var r in renderers_)
-							Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
-
-						renderers_.Clear();
-					}
-
-					if (distanceRenderers_ != null)
-					{
-						foreach (var r in distanceRenderers_)
-							Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
-
-						distanceRenderers_.Clear();
-					}
+					ClearDebugRenderers();
 				}
 			}
 		}
@@ -259,6 +293,36 @@ namespace Cue.Sys.Vam
 						AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddRender(cc.Collider));
 				}
 			}
+
+			if (Type == BP.Penis && Exists)
+			{
+				extremityDebug_ = Cue.Instance.VamSys.DebugRenderer
+					.AddRender(Vector3.Zero) as VamDebugRenderer.PointRender;
+
+				extremityDebug_.Color = Color.Red;
+				AddDebugRenderer(extremityDebug_);
+			}
+		}
+
+		protected virtual void ClearDebugRenderers()
+		{
+			if (renderers_ != null)
+			{
+				foreach (var r in renderers_)
+					Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
+
+				renderers_.Clear();
+			}
+
+			if (distanceRenderers_ != null)
+			{
+				foreach (var r in distanceRenderers_)
+					Cue.Instance.VamSys.DebugRenderer.RemoveRender(r);
+
+				distanceRenderers_.Clear();
+			}
+
+			extremityDebug_ = null;
 		}
 
 		protected void AddDebugRenderer(VamDebugRenderer.IDebugRender r)
@@ -443,6 +507,12 @@ namespace Cue.Sys.Vam
 			Instrumentation.End();
 
 			return r;
+		}
+
+		public virtual void LateUpdate(float s)
+		{
+			if (extremityDebug_ != null)
+				extremityDebug_.Position = Extremity;
 		}
 
 		private TriggerInfo[] DoGetTriggers()

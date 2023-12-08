@@ -1,6 +1,5 @@
 ﻿using SimpleJSON;
 using System;
-using System.Collections.Generic;
 
 namespace Cue
 {
@@ -37,6 +36,11 @@ namespace Cue
 		public static ISmoke CreateSmoke(string id, bool existsOnly = false)
 		{
 			return VamSmoke.Create(id, existsOnly);
+		}
+
+		public static IMaleFluid CreateMaleFluid(string id, bool existsOnly = false)
+		{
+			return VamMaleFluid.Create(id, existsOnly);
 		}
 
 		public static IVoice CreateVoice(string provider, JSONClass options)
@@ -126,6 +130,15 @@ namespace Cue
 		Vector3 Position { get; set; }
 		Quaternion Rotation { get; set; }
 		float Opacity { get; set; }
+		void Destroy();
+	}
+
+	public interface IMaleFluid
+	{
+		bool Visible { get; set; }
+		Vector3 Position { get; set; }
+		Quaternion Rotation { get; set; }
+		void Fire(float time);
 		void Destroy();
 	}
 

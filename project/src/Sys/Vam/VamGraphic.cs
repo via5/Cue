@@ -388,7 +388,7 @@ namespace Cue.Sys.Vam
 		}
 
 
-		abstract class BoxRender : IDebugRender
+		public abstract class BoxRender : IDebugRender
 		{
 			private IGraphic g_;
 
@@ -498,9 +498,10 @@ namespace Cue.Sys.Vam
 		}
 
 
-		class PointRender : BoxRender
+		public class PointRender : BoxRender
 		{
 			private Vector3 p_;
+			private Color c_ = Color.White;
 
 			public PointRender(Vector3 p, Vector3 scale)
 				: base("point", scale)
@@ -508,9 +509,20 @@ namespace Cue.Sys.Vam
 				p_ = p;
 			}
 
+			public Vector3 Position
+			{
+				set { p_ = value; }
+			}
+
+			public Color Color
+			{
+				set { c_ = value; }
+			}
+
 			protected override void DoUpdate(IGraphic g)
 			{
 				g.Position = p_;
+				g.Color = c_;
 			}
 		}
 

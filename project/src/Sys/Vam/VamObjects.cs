@@ -1,4 +1,5 @@
-﻿using SimpleJSON;
+﻿using MeshVR;
+using SimpleJSON;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -28,7 +29,7 @@ namespace Cue.Sys.Vam
 			get { return log_; }
 		}
 
-		public abstract void Create(IAtom user, string id, Action<IObject> callback);
+		public abstract void Create(IAtom user, string id, Action<IObject, bool> callback);
 		public abstract void Destroy(IAtom user, string id);
 	}
 
@@ -72,15 +73,15 @@ namespace Cue.Sys.Vam
 			preset_ = opts["preset"].Value;
 		}
 
-		public override void Create(IAtom user, string id, Action<IObject> callback)
+		public override void Create(IAtom user, string id, Action<IObject, bool> callback)
 		{
 			Log.Verbose($"creating for {user}, id={id}");
 
 			sc_.StartCoroutine(CreateObjectRoutine(
-				id, (o) =>
+				id, (o, e) =>
 				{
 					creating_ = false;
-					callback(o);
+					callback(o, e);
 				}));
 		}
 
@@ -90,7 +91,7 @@ namespace Cue.Sys.Vam
 			throw new NotImplementedException();
 		}
 
-		private IEnumerator CreateObjectRoutine(string id, Action<IObject> f)
+		private IEnumerator CreateObjectRoutine(string id, Action<IObject, bool> f)
 		{
 			while (creating_)
 				yield return new WaitForSeconds(0.25f);
@@ -98,10 +99,12 @@ namespace Cue.Sys.Vam
 			creating_ = true;
 
 			var atom = sc_.GetAtomByUid(id);
+			bool existing = false;
 
 			if (atom != null)
 			{
 				Log.Info($"atom {id} already exists, taking it");
+				existing = true;
 			}
 			else
 			{
@@ -113,7 +116,7 @@ namespace Cue.Sys.Vam
 				if (atom == null)
 				{
 					Log.Error($"failed to create atom '{id}'");
-					f(null);
+					f(null, false);
 					yield break;
 				}
 
@@ -123,7 +126,21 @@ namespace Cue.Sys.Vam
 				{
 					var path = Cue.Instance.Sys.GetResourcePath(preset_);
 					Log.Info($"atom {id} loading preset {path}");
-					atom.LoadPreset(path);
+
+					var json = SuperController.singleton.LoadJSON(path);
+
+					//var pmc = atom.GetStorableByID("Preset");
+					//var presetName = pmc.GetStringJSONParam("presetName");
+					//presetName.valNoCallback = path;
+					//load.actionCallback(path);
+
+					var pm = atom.GetComponentInChildren<PresetManager>();
+					//pm.LoadPresetPre();
+					pm.LoadPresetFromJSON(json as JSONClass);
+					atom.SetLastRestoredData(json as JSONClass);
+					//pm.LoadPresetPost();
+
+					//atom.LoadPreset(path);
 				}
 			}
 
@@ -135,7 +152,15 @@ namespace Cue.Sys.Vam
 
 			try
 			{
-				f(new BasicObject(-1, a, ps_));
+				f(new BasicObject(-1, a, ps_), existing);
+				Log.Info($"atom {id} loaded");
+
+				var o = atom.transform.Find("reParentObject");
+				o.gameObject.SetActive(true);
+
+				o = o.Find("object");
+				o.gameObject.SetActive(true);
+
 			}
 			catch (Exception e)
 			{
@@ -144,7 +169,7 @@ namespace Cue.Sys.Vam
 			}
 		}
 
-		protected virtual IEnumerator Setup(VamAtom a, Action<IObject> f)
+		protected virtual IEnumerator Setup(VamAtom a, Action<IObject, bool> f)
 		{
 			if (scale_ >= 0)
 				a.Scale = scale_;
@@ -177,19 +202,19 @@ namespace Cue.Sys.Vam
 			assetName_ = opts["name"].Value;
 		}
 
-		protected override IEnumerator Setup(VamAtom a, Action<IObject> f)
+		protected override IEnumerator Setup(VamAtom a, Action<IObject, bool> f)
 		{
 			yield return base.Setup(a, f);
 
 			var atom = a.Atom;
 
-			Log.Info($"getting components");
+			Log.Verbose($"getting components");
 
 			var cua = atom.GetComponentInChildren<CustomUnityAssetLoader>();
 			if (cua == null)
 			{
 				Log.Error($"object '{atom.uid}' has no CustomUnityAssetLoader component");
-				f(null);
+				f(null, false);
 				yield break;
 			}
 
@@ -197,7 +222,7 @@ namespace Cue.Sys.Vam
 			if (asset == null)
 			{
 				Log.Error($"object '{atom.uid}' has no asset storable");
-				f(null);
+				f(null, false);
 				yield break;
 			}
 
@@ -205,7 +230,7 @@ namespace Cue.Sys.Vam
 			if (asset == null)
 			{
 				Log.Error($"object '{atom.uid}' asset has no assetUrl param");
-				f(null);
+				f(null, false);
 				yield break;
 			}
 
@@ -213,7 +238,7 @@ namespace Cue.Sys.Vam
 			if (asset == null)
 			{
 				Log.Error($"object '{atom.uid}' asset has no assetName param");
-				f(null);
+				f(null, false);
 				yield break;
 			}
 
@@ -265,7 +290,7 @@ namespace Cue.Sys.Vam
 			id_ = opts["id"].Value;
 		}
 
-		public override void Create(IAtom user, string unusedId, Action<IObject> callback)
+		public override void Create(IAtom user, string unusedId, Action<IObject, bool> callback)
 		{
 			SetActive(user, true);
 		}

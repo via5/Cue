@@ -105,7 +105,7 @@ namespace Cue.Sys
 	public interface IObjectCreator
 	{
 		string Name { get; }
-		void Create(Sys.IAtom user, string id, Action<IObject> callback);
+		void Create(Sys.IAtom user, string id, Action<IObject, bool> callback);
 		void Destroy(Sys.IAtom user, string id);
 	}
 
@@ -406,6 +406,7 @@ namespace Cue.Sys
 		BodyPartType Type { get; }
 		bool Exists { get; }
 		bool IsPhysical { get; }
+		bool IsAvailable { get; }
 		bool Render { get; set; }
 		TriggerInfo[] GetTriggers();
 		GrabInfo[] GetGrabs();
@@ -417,6 +418,7 @@ namespace Cue.Sys
 		Vector3 Center { get; }
 		Quaternion Rotation { get; }
 		Quaternion CenterRotation { get; }
+		Vector3 Extremity { get; }
 
 		IBodyPartRegion Link { get; }
 		bool IsLinked { get; }

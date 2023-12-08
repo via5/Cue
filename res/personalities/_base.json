@@ -404,12 +404,26 @@
 
 		{
 			"name": "eyesClosed",
-			"moods": "excited tired",
+			"moods": "excited",
 			"bodyParts": "eyes",
 			"morphs":
 			[
 				{
 					"id": "Eyes Closed"
+				}
+			]
+		},
+
+		{
+			"name": "eyesClosedSleeping",
+			"moods": "tired",
+			"bodyParts": "eyes",
+			"morphs":
+			[
+				{
+					"id": "Eyes Closed",
+					"min": 0.5,
+					"max": 1.0
 				}
 			]
 		},
@@ -454,6 +468,34 @@
 				{
 					"id": "Eyeball Rotate Vertical R",
 					"max": -2.7
+				}
+			]
+		},
+
+		{
+			"name": "rollupTired",
+			"moods": "tired",
+			"sex": "female",
+			"morphs":
+			[
+				{
+					"id": "Eyeball Depth L",
+					"max": 0.3
+				},
+
+				{
+					"id": "Eyeball Rotate Vertical L",
+					"max": -0.8
+				},
+
+				{
+					"id": "Eyeball Depth R",
+					"max": 0.3
+				},
+
+				{
+					"id": "Eyeball Rotate Vertical R",
+					"max": -0.8
 				}
 			]
 		}
@@ -921,6 +963,7 @@
 	"excitementPostOrgasm": 0.3,
 	"orgasmTime": 8,
 	"postOrgasmTime": 10,
+	"orgasmFluidTime": 8,
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 	"minCollisionMag": 0.1,

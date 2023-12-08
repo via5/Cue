@@ -123,23 +123,6 @@
 		"chokedState": { "enabled": false }
 	},
 
-	"expressions":
-	[
-		{
-			"name": "eyesClosedSleeping",
-			"moods": "tired",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Closed",
-					"min": 0.8,
-					"max": 1.0
-				}
-			]
-		},
-	],
-
 	"pose":
 	{
 		"type": "keyJoints",

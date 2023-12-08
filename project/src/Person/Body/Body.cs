@@ -108,6 +108,7 @@ namespace Cue
 		public const int CloseDelay = 2;
 		private const float MaxMorphs = 1.2f;
 		private const float MaxEyeMorphs = 1.0f;
+		private const float CheckFluidInterval = 1.0f;
 
 		private Person person_;
 		private Logger log_;
@@ -120,6 +121,8 @@ namespace Cue
 		private ForceableBool breathing_ = new ForceableBool(true);
 		private DampedFloat air_ = new DampedFloat();
 		private int damping_ = BodyDamping.Normal;
+		private IMaleFluid fluid_ = null;
+		private float checkFluidElapsed_ = CheckFluidInterval;
 
 		public Body(Person p)
 		{
@@ -156,6 +159,50 @@ namespace Cue
 		public void Init()
 		{
 			zones_.Init();
+		}
+
+		private void CheckMaleFluid(float s)
+		{
+			checkFluidElapsed_ += s;
+			if (checkFluidElapsed_ >= CheckFluidInterval)
+			{
+				checkFluidElapsed_ = 0;
+
+				if (PenisSensitive)
+				{
+					if (fluid_ == null)
+					{
+						fluid_ = Integration.CreateMaleFluid($"cue!{person_.ID}_male_fluid");
+						fluid_.Visible = false;
+					}
+				}
+				else
+				{
+					if (fluid_ != null)
+						fluid_.Visible = false;
+				}
+			}
+		}
+
+		private void RepositionMaleFluid()
+		{
+			if (person_.Mood.State == Mood.OrgasmState)
+			{
+				if (fluid_ != null)
+				{
+					fluid_.Position = Get(BP.Penis).Extremity;
+					fluid_.Rotation = Get(BP.Penis).Rotation;
+				}
+			}
+		}
+
+		public void DoOrgasm()
+		{
+			if (PenisSensitive)
+			{
+				if (fluid_ != null)
+					fluid_.Fire(person_.Personality.Get(PS.OrgasmFluidTime));
+			}
 		}
 
 		public BodyPart[] Parts
@@ -401,6 +448,8 @@ namespace Cue
 			{
 				for (int i = 0; i < all_.Length; ++i)
 					all_[i].Update(s);
+
+				CheckMaleFluid(s);
 			}
 			Instrumentation.End();
 
@@ -421,6 +470,11 @@ namespace Cue
 				UpdateTemperature(s);
 			}
 			Instrumentation.End();
+		}
+
+		public void LateUpdate(float s)
+		{
+			RepositionMaleFluid();
 		}
 
 		private void UpdateAir(float s)
