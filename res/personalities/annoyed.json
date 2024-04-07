@@ -3,7 +3,7 @@
 	"inherit": "base",
 	"defaultHappiness": 0,
 	"defaultPlayfulness": 0,
-	"defaultAnger": 0.4,
+	"defaultAnger": 0.5,
 	"lookAtPlayerTimeAfterGrab": 0,
 
 	"zappedByPlayerBreastsExcitement": 0,

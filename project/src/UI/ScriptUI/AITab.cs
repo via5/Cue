@@ -505,7 +505,9 @@ namespace Cue
 
 			p = new VUI.Panel(new VUI.VerticalFlow(5));
 
-			p.Add(new VUI.CheckBox(
+			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
+
+            p.Add(new VUI.CheckBox(
 				"Render frustums",
 				(b) => person_.Gaze.Render.Frustums = b,
 				person_.Gaze.Render.Frustums));
@@ -515,7 +517,6 @@ namespace Cue
 				(b) => person_.Gaze.Render.FrontPlane = b,
 				person_.Gaze.Render.FrontPlane));
 
-			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
 			p.Add(new VUI.CheckBox("Manage blink", OnAutoBlink, true));
 
 			Add(p);

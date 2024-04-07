@@ -326,6 +326,12 @@ namespace Cue.Proc
 			set { backforce_ = value; }
 		}
 
+		public IEasing WindowEasing
+		{
+			get { return windowEasing_; }
+			set { windowEasing_ = value; }
+		}
+
 		public void SetRangeWithDirection(
 			float min, float max, float win, Vector3 dir)
 		{

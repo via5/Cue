@@ -97,7 +97,7 @@ namespace Cue
 
 			var ep = new VUI.Panel(new VUI.HorizontalFlow(10));
 			ep.Add(new VUI.Label("Global excitement speed"));
-			excitement_ = ep.Add(new VUI.FloatTextSlider(0, 10, OnExcitementChanged));
+			excitement_ = ep.Add(new VUI.FloatTextSlider(0, 2, OnExcitementChanged));
 
 			p.Add(ep);
 			p.Add(new VUI.Spacer(20));

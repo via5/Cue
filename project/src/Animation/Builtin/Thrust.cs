@@ -22,6 +22,7 @@ namespace Cue.Proc
 			public Vector3 hipTorqueMin;
 			public Vector3 hipTorqueMax;
 			public Vector3 hipTorqueWin;
+			public IEasing hipWinEasing;
 		}
 
 		private struct Render
@@ -222,8 +223,11 @@ namespace Cue.Proc
 					fconfig_.hipTorqueMin,
 					fconfig_.hipTorqueMax,
 					fconfig_.hipTorqueWin);
+
+				hipTorque_.WindowEasing = fconfig_.hipWinEasing;
 			}
 
+				hipForce_.WindowEasing = fconfig_.hipWinEasing;
 
 			var list = new List<Force>();
 			foreach (var t in RootGroup.Targets)
@@ -513,9 +517,10 @@ namespace Cue.Proc
 		{
 			var c = new ForceConfig();
 
-			c.hipForceMin = 300;
+			c.hipForceMin = 150;
 			c.hipForceMax = 1250;
 			c.hipForceWin = 300;
+			c.hipWinEasing = new SineInEasing();
 
 			if (self.Body.HasPenis)
 			{
@@ -572,9 +577,10 @@ namespace Cue.Proc
 		{
 			var c = new ForceConfig();
 
-			c.hipForceMin = 200;
+			c.hipForceMin = 125;
 			c.hipForceMax = 400;
 			c.hipForceWin = 50;
+			c.hipWinEasing = new SineInEasing();
 
 			c.hipTorqueMin = new Vector3(-20, 0, 0);
 			c.hipTorqueMax = new Vector3(-150, 0, 0);
