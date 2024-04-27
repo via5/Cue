@@ -129,18 +129,9 @@ namespace Cue.Sys.Vam
 
 					var json = SuperController.singleton.LoadJSON(path);
 
-					//var pmc = atom.GetStorableByID("Preset");
-					//var presetName = pmc.GetStringJSONParam("presetName");
-					//presetName.valNoCallback = path;
-					//load.actionCallback(path);
-
 					var pm = atom.GetComponentInChildren<PresetManager>();
-					//pm.LoadPresetPre();
 					pm.LoadPresetFromJSON(json as JSONClass);
-					atom.SetLastRestoredData(json as JSONClass);
-					//pm.LoadPresetPost();
-
-					//atom.LoadPreset(path);
+					atom.Restore(json as JSONClass);
 				}
 			}
 
