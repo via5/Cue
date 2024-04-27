@@ -8,6 +8,7 @@
 			public float time;
 			public float start;
 			public float elapsed;
+			public bool reset;
 			public bool valid;
 			public bool stopAfter;
 			public bool auto;
@@ -49,6 +50,7 @@
 
 
 		private string name_;
+		private readonly Logger log_;
 		private MoodType mood_ = MoodType.None;
 		private MorphGroup g_;
 		private Config config_;
@@ -68,6 +70,7 @@
 		private Expression(string name, MoodType mood)
 		{
 			name_ = name;
+			log_ = new Logger(Logger.AI, "expression " + name);
 			mood_ = mood;
 			target_.valid = false;
 		}
@@ -77,6 +80,11 @@
 			var e = new Expression(name_, mood_);
 			e.CopyFrom(this);
 			return e;
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		private void CopyFrom(Expression e)
@@ -102,7 +110,7 @@
 			return
 				$"{name_} {MoodString()} " +
 				$"{g_.Value:0.00}=>{target_:0.00} +{add_:0.00} " +
-				$"{target_.elapsed:0.00}/{target_.time:0.00}";
+				$"{target_.elapsed:0.00}/{target_.time:0.00} {target_.valid}";
 		}
 
 		public MorphGroup MorphGroup
@@ -195,19 +203,26 @@
 
 		public void SetTarget(float t, float time)
 		{
+			DoSetTarget(t, time, false, false);
+			Log.Verbose($"set target {this} {t} {time}");
+		}
+
+		public void Deactivate(float time)
+		{
+			DoSetTarget(0, time, true, true);
+			Log.Verbose($"deactivating {this} in {target_.time}");
+		}
+
+		private void DoSetTarget(float t, float time, bool reset, bool stopAfter)
+		{
 			target_.start = g_.Value;
 			target_.value = t;
 			target_.time = time;
+			target_.reset = reset;
 			target_.elapsed = 0;
 			target_.valid = true;
 			target_.auto = false;
-			target_.stopAfter = false;
-		}
-
-		public void SetTargetAndStop(float t, float time)
-		{
-			SetTarget(t, time);
-			target_.stopAfter = true;
+			target_.stopAfter = stopAfter;
 		}
 
 		public void Reset()
@@ -221,20 +236,33 @@
 			{
 				target_.elapsed += s;
 
-				float targetValue = target_.value;
-				if (targetValue > 0)
-					targetValue += add_;
-
 				float p = U.Clamp(target_.elapsed / target_.time, 0, 1);
 				float t = easing_.Magnitude(p);
-				float v = U.Lerp(target_.start, targetValue, t);
 
-				g_.Value = v ;
+				bool finished = false;
 
-				if (!target_.auto)
-					value_ = v;
+				if (target_.reset)
+				{
+					if (g_.MoveTowardsReset())
+						finished = true;
+				}
+				else
+				{
+					float targetValue = target_.value;
+					if (targetValue > 0)
+						targetValue += add_;
 
-				if (p >= 1)
+					float v = U.Lerp(target_.start, targetValue, t);
+					g_.MoveTowards(target_.start, targetValue, t);
+
+					if (!target_.auto)
+						value_ = v;
+
+					if (p >= 1)
+						finished = true;
+				}
+
+				if (finished)
 				{
 					if (target_.stopAfter)
 						target_.valid = false;

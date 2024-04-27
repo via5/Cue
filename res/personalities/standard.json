@@ -1,4 +1,4 @@
 {
-	"name": "Standard",
-	"inherit": "base",
+    "name": "Standard",
+    "inherit": "base"
 }

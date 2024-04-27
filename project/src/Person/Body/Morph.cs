@@ -100,6 +100,8 @@ namespace Cue
 
 	public class MorphGroup
 	{
+		private const float NoValue = -9999;
+
 		public class MorphInfo
 		{
 			private string id_;
@@ -147,6 +149,58 @@ namespace Cue
 				}
 			}
 
+			public void MoveTowards(float start, float end, float t)
+			{
+				if (m_.Sys == null)
+					return;
+
+				float range = max_ - min_;
+				float realStart, realEnd;
+
+				if (start == NoValue)
+					realStart = m_.Sys.DefaultValue;
+				else
+					realStart = min_ + start * range;
+
+				if (end == NoValue)
+					realEnd = m_.Sys.DefaultValue;
+				else
+					realEnd = min_ + end * range;
+
+				float v = U.Lerp(realStart, realEnd, t);
+				m_.Sys.Value = v;
+			}
+
+			public bool MoveTowardsReset()
+			{
+				const float MaxMove = 0.02f;
+				const float Tolerance = 0.01f;
+
+				if (m_.Sys == null)
+					return true;
+
+				float def = m_.DefaultValue;
+				float val = m_.Sys.Value;
+
+				if (val > def)
+				{
+					float m = Math.Min(val - def, MaxMove);
+					val -= m;
+				}
+				else if (val < def)
+				{
+					float m = Math.Min(def - val, MaxMove);
+					val += m;
+				}
+
+				m_.Sys.Value = val;
+
+				float d = Math.Abs(m_.Sys.Value - m_.Sys.DefaultValue);
+
+				return (d <= Tolerance);
+
+			}
+
 			public void Reset()
 			{
 				m_?.Reset();
@@ -166,7 +220,7 @@ namespace Cue
 		private string name_;
 		private MorphInfo[] morphs_;
 		private BodyPartType[] bodyParts_ = null;
-		private float value_ = 0;
+		private float value_ = NoValue;
 
 		public MorphGroup(string name, BodyPartType bodyPart, MorphInfo[] morphs)
 			: this(name, new BodyPartType[] { bodyPart }, morphs)
@@ -236,31 +290,73 @@ namespace Cue
 
 		public float Value
 		{
-			get { return value_; }
-			set { SetValue(value); }
+			get
+			{
+				return value_;
+			}
+
+			set
+			{
+				SetValue(value);
+			}
+		}
+
+		public void MoveTowards(float start, float end, float t)
+		{
+			// todo: assumes default of 0
+			float estimated;
+			if (start == NoValue && end == NoValue)
+				estimated = 0;
+			else if (start == NoValue)
+				estimated = end;
+			else if (end == NoValue)
+				estimated = 0;
+			else
+				estimated = U.Lerp(start, end, t);
+
+			value_ = UseValue(estimated);
+
+			for (int i = 0; i < morphs_.Length; ++i)
+				morphs_[i].MoveTowards(start, value_, t);
+		}
+
+		public bool MoveTowardsReset()
+		{
+			value_ = NoValue;
+
+			bool finished = true;
+			for (int i = 0; i < morphs_.Length; ++i)
+			{
+				if (!morphs_[i].MoveTowardsReset())
+					finished = false;
+			}
+
+			return finished;
+		}
+
+		private void SetValue(float requestedValue)
+		{
+			value_ = UseValue(requestedValue);
+
+			for (int i = 0; i < morphs_.Length; ++i)
+				morphs_[i].Set(value_);
+		}
+
+		private float UseValue(float requestedValue)
+		{
+			// todo: assumes default of 0
+			float use = Math.Abs(requestedValue);
+			float available = person_.Body.UseMorphs(bodyParts_, use);
+
+			if (requestedValue < 0)
+				return -available;
+			else
+				return available;
 		}
 
 		public BodyPartType[] BodyParts
 		{
 			get { return bodyParts_; }
-		}
-
-		private void SetValue(float requestedValue)
-		{
-			// assume default of 0
-			float use = Math.Abs(requestedValue);
-			float available = person_.Body.UseMorphs(bodyParts_, use);
-
-			float allowedValue;
-			if (requestedValue < 0)
-				allowedValue = -available;
-			else
-				allowedValue = available;
-
-			value_ = allowedValue;
-
-			for (int i = 0; i < morphs_.Length; ++i)
-				morphs_[i].Set(value_);
 		}
 
 		public void Reset()

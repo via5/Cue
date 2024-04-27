@@ -1,326 +1,323 @@
 {
-	"name": "None",
-	"inherit": "standard",
+    "name": "None",
+    "inherit": "standard",
 
-	"voice":
-	{
-		"provider":
-		{
-			"name": "none",
-			"options": {}
-		},
-		"normalState": { "enabled": false },
-		"kissState": { "enabled": false },
-		"orgasmState": { "enabled": false },
-		"bjState": { "enabled": false },
-		"chokedState": { "enabled": false },
-	},
+    "voice":
+    {
+        "provider":
+        {
+            "name": "none",
+            "options": {}
+        },
+        "normalState": { "enabled": false },
+        "kissState": { "enabled": false },
+        "orgasmState": { "enabled": false },
+        "bjState": { "enabled": false },
+        "chokedState": { "enabled": false }
+    },
 
-	"expressionsInherit": false,
-	"expressions":
-	[
-	],
-
-
-	"events":
-	[
-		{
-			"type": "grab",
-			"enabled": false
-		},
-
-		{
-			"type": "hand",
-			"enabled": false
-		},
-
-		{
-			"type": "handLinker",
-			"enabled": false
-		},
-
-		{
-			"type": "holdbreath",
-			"enabled": false
-		},
-
-		{
-			"type": "kiss",
-			"enabled": true,
-			"canInitiate": false,
-			"startLipsDistance": 0.1,
-			"startLipsDistanceWithPlayer": 0.12,
-			"stopLipsDistance": 0.1,
-			"stopLipsDistanceWithPlayer": 0.15,
-			"stopHeadDistanceFromStart": 0.15,
-			"duration":
-			{
-				"range":
-				{
-					"min": 10,
-					"max": 100
-				},
-				"rng": "normal"
-			},
-			"interval":
-			{
-				"range":
-				{
-					"min": 30,
-					"max": 120
-				},
-				"rng": "normal"
-			}
-		},
-
-		{
-			"type": "head",
-			"enabled": false
-		},
-
-		{
-			"type": "smoke",
-			"enabled": false
-		},
-
-		{
-			"type": "suckFinger",
-			"enabled": false
-		},
-
-		{
-			"type": "thrust",
-			"enabled": false
-		},
-
-		{
-			"type": "trib",
-			"enabled": false
-		},
-
-		{
-			"type": "zap",
-			"enabled": false
-		},
-	],
+    "expressionsInherit": false,
+    "expressions":
+    [
+    ],
 
 
-	"animations":
-	[
-		{
-			"animation": "idle",
-			"type": "none"
-		},
+    "events":
+    [
+        {
+            "type": "grab",
+            "enabled": false
+        },
 
-		{
-			"animation": "excited",
-			"type": "none"
-		},
+        {
+            "type": "hand",
+            "enabled": false
+        },
 
-		{
-			"animation": "thrust",
-			"type": "none"
-		},
+        {
+            "type": "handLinker",
+            "enabled": false
+        },
 
-		{
-			"animation": "trib",
-			"type": "none"
-		},
+        {
+            "type": "holdbreath",
+            "enabled": false
+        },
 
-		{
-			"animation": "orgasm",
-			"type": "none"
-		},
+        {
+            "type": "kiss",
+            "enabled": true,
+            "canInitiate": false,
+            "startLipsDistance": 0.1,
+            "startLipsDistanceWithPlayer": 0.12,
+            "stopLipsDistance": 0.1,
+            "stopLipsDistanceWithPlayer": 0.15,
+            "stopHeadDistanceFromStart": 0.15,
+            "duration":
+            {
+                "range":
+                {
+                    "min": 10,
+                    "max": 100
+                },
+                "rng": "normal"
+            },
+            "interval":
+            {
+                "range":
+                {
+                    "min": 30,
+                    "max": 120
+                },
+                "rng": "normal"
+            }
+        },
 
-		{
-			"animation": "smoke",
-			"type": "none"
-		},
+        {
+            "type": "head",
+            "enabled": false
+        },
 
-		{
-			"animation": "suckFinger",
-			"type": "none"
-		},
+        {
+            "type": "smoke",
+            "enabled": false
+        },
 
-		{
-			"animation": "rightFinger",
-			"type": "none"
-		},
+        {
+            "type": "suckFinger",
+            "enabled": false
+        },
 
-		{
-			"animation": "leftFinger",
-			"type": "none"
-		},
+        {
+            "type": "thrust",
+            "enabled": false
+        },
 
-		{
-			"animation": "kiss",
-			"type": "none"
-		},
+        {
+            "type": "trib",
+            "enabled": false
+        },
 
-		{
-			"animation": "handjobBoth",
-			"type": "none"
-		},
-
-		{
-			"animation": "handjobLeft",
-			"type": "none"
-		},
-
-		{
-			"animation": "handjobRight",
-			"type": "none"
-		},
-
-		{
-			"animation": "blowjob",
-			"type": "none"
-		},
-
-		{
-			"animation": "leftHandOnBreast",
-			"type": "none"
-		},
-
-		{
-			"animation": "rightHandOnBreast",
-			"type": "none"
-		},
-
-		{
-			"animation": "leftHandOnChest",
-			"type": "none"
-		},
-
-		{
-			"animation": "rightHandOnChest",
-			"type": "none"
-		}
-	],
+        {
+            "type": "zap",
+            "enabled": false
+        }
+    ],
 
 
-	"gazeDuration":
-	{
-		"range":
-		{
-			"min": 5,
-			"max": 2
-		}
-	},
+    "animations":
+    [
+        {
+            "animation": "idle",
+            "type": "none"
+        },
 
-	"gazeRandomInterval":
-	{
-		"range":
-		{
-			"min": 5,
-			"max": 10
-		}
-	},
+        {
+            "animation": "excited",
+            "type": "none"
+        },
 
-	"defaultHappiness": 0,
-	"defaultPlayfulness": 0,
-	"defaultAnger": 0,
-	"maxExcitedExpression": 0,
-	"maxTiredExpression": 0,
-	"minTiredness": 0,
-	"maxEmotionalRate": 0,
+        {
+            "animation": "thrust",
+            "type": "none"
+        },
 
-	"gazeEnabled": false,
-	"gazeSaccade": false,
-	"gazeBlink": false,
-	"gazeEyeTargetMovementSpeed": 0,
+        {
+            "animation": "trib",
+            "type": "none"
+        },
 
-	"lookAboveMaxWeight": 0,
-	"lookAboveMinExcitement": 0,
-	"lookAboveMinPhysicalRate": 0,
-	"lookAboveUseGazeEnergy": false,
-	"lookFrontWeight": 0,
+        {
+            "animation": "orgasm",
+            "type": "none"
+        },
 
-	"idleNaturalRandomWeight": 0,
-	"idleEmptyRandomWeight": 0,
-	"naturalRandomWeight": 0,
-	"naturalOtherEyesWeight": 0,
-	"naturalPlayerEyesWeight": 0,
-	"busyOtherEyesWeight": 0,
-	"naturalPlayerEyesWeight": 0,
-	"busyPlayerEyesWeight": 0,
-	"otherEyesExcitementWeight": 0,
-	"maxTirednessForRandomGaze": 1,
-	"otherEyesOrgasmWeight": 0,
+        {
+            "animation": "smoke",
+            "type": "none"
+        },
 
-	"blowjobEyesWeight": 0,
-	"blowjobGenitalsWeight": 0,
-	"handjobEyesWeight": 0,
-	"handjobGenitalsWeight": 0,
-	"penetratedEyesWeight": 0,
-	"penetratedGenitalsWeight": 0,
-	"penetratingEyesWeight": 0,
-	"penetratingGenitalsWeight": 0,
-	"gropedEyesWeight": 0,
-	"gropedTargetWeight": 0,
-	"gropingEyesWeight": 0,
-	"gropingTargetWeight": 0,
+        {
+            "animation": "suckFinger",
+            "type": "none"
+        },
 
-	"otherEyesOrgasmWeight": 0,
-	"otherEyesExcitementWeight": 0,
-	"otherBlowjobEyesWeight": 0,
-	"otherBlowjobTargetEyesWeight": 0,
-	"otherBlowjobTargetGenitalsWeight": 0,
-	"otherHandjobEyesWeight": 0,
-	"otherHandjobTargetEyesWeight": 0,
-	"otherHandjobTargetGenitalsWeight": 0,
-	"otherPenetrationEyesWeight": 0,
-	"otherPenetrationSourceEyesWeight": 0,
-	"otherPenetrationSourceGenitalsWeight": 0,
-	"otherGropedEyesWeight": 0,
-	"otherGropedSourceEyesWeight": 0,
-	"otherGropedTargetWeight": 0,
+        {
+            "animation": "rightFinger",
+            "type": "none"
+        },
 
-	"zappedEnabled": false,
+        {
+            "animation": "leftFinger",
+            "type": "none"
+        },
 
-	"finishLookAtPlayer": "never",
-	"finishOrgasm": "never",
-	"finishMood": "never",
+        {
+            "animation": "kiss",
+            "type": "none"
+        },
 
-	"sensitivities":
-	[
-		{
-			"type": "penetration",
-			"physicalRate": 0,
-			"physicalMax": 0,
-			"nonPhysicalRate": 0,
-			"nonPhysicalMax": 0,
-		},
+        {
+            "animation": "handjobBoth",
+            "type": "none"
+        },
 
-		{
-			"type": "mouth",
-			"rate": 0,
-			"max": 0
-		}
+        {
+            "animation": "handjobLeft",
+            "type": "none"
+        },
 
-		{
-			"type": "breasts",
-			"rate": 0,
-			"max": 0,
-		},
+        {
+            "animation": "handjobRight",
+            "type": "none"
+        },
 
-		{
-			"type": "genitals",
-			"physicalRate": 0,
-			"physicalMax": 0,
-			"nonPhysicalRate": 0,
-			"nonPhysicalMax": 0,
-		},
+        {
+            "animation": "blowjob",
+            "type": "none"
+        },
 
-		{
-			"type": "othersExcitement",
-			"rate": 0,
-			"max": 0
-		}
-	],
+        {
+            "animation": "leftHandOnBreast",
+            "type": "none"
+        },
 
-	"pose":
-	{
-		"type": "none"
-	}
+        {
+            "animation": "rightHandOnBreast",
+            "type": "none"
+        },
+
+        {
+            "animation": "leftHandOnChest",
+            "type": "none"
+        },
+
+        {
+            "animation": "rightHandOnChest",
+            "type": "none"
+        }
+    ],
+
+
+    "gazeDuration":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 2
+        }
+    },
+
+    "gazeRandomInterval":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 10
+        }
+    },
+
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultAnger": 0,
+    "maxExcitedExpression": 0,
+    "maxTiredExpression": 0,
+    "minTiredness": 0,
+    "maxEmotionalRate": 0,
+
+    "gazeEnabled": false,
+    "gazeSaccade": false,
+    "gazeBlink": false,
+    "gazeEyeTargetMovementSpeed": 0,
+
+    "lookAboveMaxWeight": 0,
+    "lookAboveMinExcitement": 0,
+    "lookAboveMinPhysicalRate": 0,
+    "lookAboveUseGazeEnergy": false,
+    "lookFrontWeight": 0,
+
+    "idleNaturalRandomWeight": 0,
+    "idleEmptyRandomWeight": 0,
+    "naturalRandomWeight": 0,
+    "naturalOtherEyesWeight": 0,
+    "busyOtherEyesWeight": 0,
+    "naturalPlayerEyesWeight": 0,
+    "busyPlayerEyesWeight": 0,
+    "otherEyesExcitementWeight": 0,
+    "maxTirednessForRandomGaze": 1,
+    "otherEyesOrgasmWeight": 0,
+
+    "blowjobEyesWeight": 0,
+    "blowjobGenitalsWeight": 0,
+    "handjobEyesWeight": 0,
+    "handjobGenitalsWeight": 0,
+    "penetratedEyesWeight": 0,
+    "penetratedGenitalsWeight": 0,
+    "penetratingEyesWeight": 0,
+    "penetratingGenitalsWeight": 0,
+    "gropedEyesWeight": 0,
+    "gropedTargetWeight": 0,
+    "gropingEyesWeight": 0,
+    "gropingTargetWeight": 0,
+
+    "otherBlowjobEyesWeight": 0,
+    "otherBlowjobTargetEyesWeight": 0,
+    "otherBlowjobTargetGenitalsWeight": 0,
+    "otherHandjobEyesWeight": 0,
+    "otherHandjobTargetEyesWeight": 0,
+    "otherHandjobTargetGenitalsWeight": 0,
+    "otherPenetrationEyesWeight": 0,
+    "otherPenetrationSourceEyesWeight": 0,
+    "otherPenetrationSourceGenitalsWeight": 0,
+    "otherGropedEyesWeight": 0,
+    "otherGropedSourceEyesWeight": 0,
+    "otherGropedTargetWeight": 0,
+
+    "zappedEnabled": false,
+
+    "finishLookAtPlayer": "never",
+    "finishOrgasm": "never",
+    "finishMood": "never",
+
+    "sensitivities":
+    [
+        {
+            "type": "penetration",
+            "physicalRate": 0,
+            "physicalMax": 0,
+            "nonPhysicalRate": 0,
+            "nonPhysicalMax": 0
+        },
+
+        {
+            "type": "mouth",
+            "rate": 0,
+            "max": 0
+        },
+
+        {
+            "type": "breasts",
+            "rate": 0,
+            "max": 0
+        },
+
+        {
+            "type": "genitals",
+            "physicalRate": 0,
+            "physicalMax": 0,
+            "nonPhysicalRate": 0,
+            "nonPhysicalMax": 0
+        },
+
+        {
+            "type": "othersExcitement",
+            "rate": 0,
+            "max": 0
+        }
+    ],
+
+    "pose":
+    {
+        "type": "none"
+    }
 }

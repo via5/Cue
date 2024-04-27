@@ -1,59 +1,59 @@
 {
-	"objects":
-	[
-		{
-			"name": "cigarette",
-			"type": "cua",
-			"options":
-			{
-				"url": "Custom/Assets/cigarette.assetbundle",
-				"name": "Assets/New Folder/Cigarette.unity"
-			}
-		},
+    "objects":
+    [
+        {
+            "name": "cigarette",
+            "type": "cua",
+            "options":
+            {
+                "url": "Custom/Assets/cigarette.assetbundle",
+                "name": "Assets/New Folder/Cigarette.unity"
+            }
+        },
 
-		{
-			"name": "cigaretteSmoke",
-			"type": "cua",
-			"options":
-			{
-				"preset": "objects/cigaretteSmoke.json"
-			}
-		},
+        {
+            "name": "cigaretteSmoke",
+            "type": "cua",
+            "options":
+            {
+                "preset": "objects/cigaretteSmoke.json"
+            }
+        },
 
-		{
-			"name": "maleFluid",
-			"type": "cua",
-			"options":
-			{
-				"preset": "objects/maleFluid.json"
-			}
-		},
+        {
+            "name": "maleFluid",
+            "type": "cua",
+            "options":
+            {
+                "preset": "objects/maleFluid.json"
+            }
+        },
 
-		{
-			"name": "dildo",
-			"type": "atom",
-			"options":
-			{
-				"type": "Dildo",
-				"preset": "objects/dildo.json",
-			},
-			"parameters":
-			{
-				"colliders": ["b2/2", "b3/1", "b1/1"],
-				"anchor": "pelvisF4/pelvisF4Joint",
-				"extremity": "b3/3",
-				"positionOffset": [0, 0.0, 0.02],
-				"rotationOffset": [0, 140, 90]
-			}
-		},
+        {
+            "name": "dildo",
+            "type": "atom",
+            "options":
+            {
+                "type": "Dildo",
+                "preset": "objects/dildo.json"
+            },
+            "parameters":
+            {
+                "colliders": ["b2/2", "b3/1", "b1/1"],
+                "anchor": "pelvisF4/pelvisF4Joint",
+                "extremity": "b3/3",
+                "positionOffset": [0, 0.0, 0.02],
+                "rotationOffset": [0, 140, 90]
+            }
+        },
 
-		{
-			"name": "strapon",
-			"type": "clothing",
-			"options":
-			{
-				"id": "AmineKunai:Amine Belt Strapon"
-			}
-		}
-	]
+        {
+            "name": "strapon",
+            "type": "clothing",
+            "options":
+            {
+                "id": "AmineKunai:Amine Belt Strapon"
+            }
+        }
+    ]
 }

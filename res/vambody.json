@@ -1,52 +1,56 @@
 {
-	"vars":
-	{
-		"genitalsIgnore":
-		[
-			"belly", "hips", "leftThigh", "rightThigh", "leftGlute", "rightGlute"
-		]
-	},
+    "vars":
+    {
+        "genitalsIgnore":
+        [
+            "belly", "hips", "leftThigh", "rightThigh", "leftGlute", "rightGlute"
+        ]
+    },
 
     "parts":
-	[
+    [
         {
             "part": "head",
             "type": "rigidbody",
             "name": "head",
             "controller": "headControl",
-			"ignore": "lips",
+            "ignore": "lips",
             "colliders":
-			[
+            [
                 "HeadHard1Hard",
-				"HeadHard3Hard",
-				"HeadHard5Hard",
-				"HeadHard7Hard",
-				"HeadHard8Hard",
+                "HeadHard3Hard",
+                "HeadHard5Hard",
+                "HeadHard7Hard",
+                "HeadHard8Hard",
                 "HeadHard10Hard",
                 "FaceCentral1Hard",
                 "TongueColliders/_Collider1",
                 "lowerJawStandardColliders/_ColliderL1b",
-				"lowerJawStandardColliders/_ColliderL1r",
-				"lowerJawStandardColliders/_ColliderL1l",
+                "lowerJawStandardColliders/_ColliderL1r",
+                "lowerJawStandardColliders/_ColliderL1l",
                 "HeadBack1Hard",
                 "FaceHardLeft2Hard",
                 "FaceHardLeft4Hard",
+                "FaceHardLeft9Hard",
+                "FaceHardLeft14Hard",
                 "FaceHardRight2Hard",
                 "FaceHardRight4Hard",
+                "FaceHardRight9Hard",
+                "FaceHardRight14Hard",
                 "HeadLeftEarHard",
                 "HeadRightEarHard",
-				"HeadBack5Hard",
-				"HeadBack10Hard",
+                "HeadBack5Hard",
+                "HeadBack10Hard"
             ]
         },
 
-         {
+        {
             "part": "neck",
             "type": "rigidbody",
             "name": "neck",
             "controller": "neckControl",
             "colliders":
-			[
+            [
                 "neck/StandardColliders/_Collider1l",
                 "neck/StandardColliders/_Collider1r",
                 "neck/StandardColliders/_ColliderB2",
@@ -58,14 +62,14 @@
        {
             "part": "lips",
             "type": "collider",
-			"ignore": "head",
+            "ignore": "head",
             "colliders":
-			[
-				"FaceCentral2/FaceCentral2",
-				"lowerJaw/ColliderLipM",
-				"lowerJaw/ColliderLipL",
-				"lowerJaw/ColliderLipR",
-			]
+            [
+                "FaceCentral2/FaceCentral2",
+                "lowerJaw/ColliderLipM",
+                "lowerJaw/ColliderLipL",
+                "lowerJaw/ColliderLipR"
+            ]
         },
 
         {
@@ -78,533 +82,533 @@
             "part": "leftBreast",
             "type": "collider",
             "sex": "female",
-			"colliders": ["lPectoral1", "lPectoral2", "lPectoral3"],
+            "colliders": ["lPectoral1", "lPectoral2", "lPectoral3"],
             "ignore": ["leftShoulder", "leftArm", "leftElbow"]
         },
 
-		{
-			"part": "rightBreast",
-			"type": "collider",
-			"sex": "female",
-			"colliders": ["rPectoral1", "rPectoral2", "rPectoral3"],
-			"ignore": ["rightShoulder", "rightArm", "rightElbow"]
-		},
+        {
+            "part": "rightBreast",
+            "type": "collider",
+            "sex": "female",
+            "colliders": ["rPectoral1", "rPectoral2", "rPectoral3"],
+            "ignore": ["rightShoulder", "rightArm", "rightElbow"]
+        },
 
-		{
-			"part": "vagina",
-			"type": "collider",
-			"sex": "female",
-			"colliders":
-			[
-				"pelvisF1/pelvisF1",
-				"pelvis/JointB",
-				"pelvis/JointGl",
-				"pelvis/JointGr"
-			],
-			"ignore": "$genitalsIgnore",
-			"triggers": ["DeeperVaginaTrigger"]
-		},
+        {
+            "part": "vagina",
+            "type": "collider",
+            "sex": "female",
+            "colliders":
+            [
+                "pelvisF1/pelvisF1",
+                "pelvis/JointB",
+                "pelvis/JointGl",
+                "pelvis/JointGr"
+            ],
+            "ignore": "$genitalsIgnore",
+            "triggers": ["DeeperVaginaTrigger"]
+        },
 
-		{
-			"part": "anus",
-			"type": "collider",
-			"sex": "female",
-			"colliders":
-			[
-				"pelvis/JointAl",
-				"pelvis/JointAr"
-			],
-			"ignore": "$genitalsIgnore"
-		},
+        {
+            "part": "anus",
+            "type": "collider",
+            "sex": "female",
+            "colliders":
+            [
+                "pelvis/JointAl",
+                "pelvis/JointAr"
+            ],
+            "ignore": "$genitalsIgnore"
+        },
 
-		{
-			"part": "anus",
-			"type": "collider",
-			"sex": "male",
-			"colliders":
-			[
-				"pelvis/JointAlMale",
-				"pelvis/JointArMale"
-			],
-			"ignore": "$genitalsIgnore"
-		},
+        {
+            "part": "anus",
+            "type": "collider",
+            "sex": "male",
+            "colliders":
+            [
+                "pelvis/JointAlMale",
+                "pelvis/JointArMale"
+            ],
+            "ignore": "$genitalsIgnore"
+        },
 
-		{
-			"part": "chest",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": "chest",
-			"controller": "chestControl",
-			"colliders":
-			[
-				"chest1/chest1",
-				"chest4/chest4",
-				"chest6 (1)/chest6 (1)",
-				"chest6 (2)/chest6 (2)",
-			]
-		},
+        {
+            "part": "chest",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": "chest",
+            "controller": "chestControl",
+            "colliders":
+            [
+                "chest1/chest1",
+                "chest4/chest4",
+                "chest6 (1)/chest6 (1)",
+                "chest6 (2)/chest6 (2)"
+            ]
+        },
 
-		{
-			"part": "chest",
-			"type": "rigidbody",
-			"sex": "female",
-			"name": "chest",
-			"controller": "chestControl",
-			"colliders":
-			[
-				"chest2/chest2",
-				"chest4/chest4",
-				"chest6/chest6",
-				"chest6 (3)/chest6 (3)",
-				"chest6 (4)/chest6 (4)"
-			]
-		},
+        {
+            "part": "chest",
+            "type": "rigidbody",
+            "sex": "female",
+            "name": "chest",
+            "controller": "chestControl",
+            "colliders":
+            [
+                "chest2/chest2",
+                "chest4/chest4",
+                "chest6/chest6",
+                "chest6 (3)/chest6 (3)",
+                "chest6 (4)/chest6 (4)"
+            ]
+        },
 
-		{
-			"part": "belly",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": "abdomen2",
-			"colliders":
-			[
-				"abdomen2/_ColliderL1",
-				"abdomen/_ColliderL1b",
-				"abdomen/_ColliderL1f",
-				"abdomen/_ColliderL1l",
-				"abdomen/_ColliderL1r",
-				"abdomen/_ColliderL2b"
-			]
-		},
+        {
+            "part": "belly",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": "abdomen2",
+            "colliders":
+            [
+                "abdomen2/_ColliderL1",
+                "abdomen/_ColliderL1b",
+                "abdomen/_ColliderL1f",
+                "abdomen/_ColliderL1l",
+                "abdomen/_ColliderL1r",
+                "abdomen/_ColliderL2b"
+            ]
+        },
 
-		{
-			"part": "belly",
-			"type": "rigidbody",
-			"sex": "female",
-			"name": "abdomen2",
-			"colliders":
-			[
-				"abdomen2_3/abdomen2_3Joint",
-				"abdomen3/abdomen3Joint",
-				"abdomen7/abdomen7Joint",
-				"abdomen12/abdomen12Joint",
-				"abdomen17/abdomen17Joint",
-				"abdomen20/abdomen20Joint"
-			]
-		},
+        {
+            "part": "belly",
+            "type": "rigidbody",
+            "sex": "female",
+            "name": "abdomen2",
+            "colliders":
+            [
+                "abdomen2_3/abdomen2_3Joint",
+                "abdomen3/abdomen3Joint",
+                "abdomen7/abdomen7Joint",
+                "abdomen12/abdomen12Joint",
+                "abdomen17/abdomen17Joint",
+                "abdomen20/abdomen20Joint"
+            ]
+        },
 
-		{
-			"part": "hips",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": ["abdomen", "pelvis"],
-			"controller": "hipControl",
-			"forceReceiver": "hip",
-			"colliders":
-			[
-				"pelvisB3/pelvisB3Joint",
-				"pelvisF5/pelvisF5Joint",
-				"pelvisF8/pelvisF8Joint",
-				"pelvisL1/pelvisL1Joint",
-				"pelvisR1/pelvisR1Joint"
-			]
-		},
+        {
+            "part": "hips",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": ["abdomen", "pelvis"],
+            "controller": "hipControl",
+            "forceReceiver": "hip",
+            "colliders":
+            [
+                "pelvisB3/pelvisB3Joint",
+                "pelvisF5/pelvisF5Joint",
+                "pelvisF8/pelvisF8Joint",
+                "pelvisL1/pelvisL1Joint",
+                "pelvisR1/pelvisR1Joint"
+            ]
+        },
 
-		{
-			"part": "hips",
-			"type": "rigidbody",
-			"sex": "female",
-			"name": ["abdomen", "pelvis"],
-			"controller": "hipControl",
-			"forceReceiver": "hip",
-			"colliders":
-			[
-				"pelvisF7/pelvisF7Joint",
-				"pelvisFL8/pelvisFL8Joint",
-				"pelvisFR8/pelvisFR8Joint",
-				"pelvisL1/pelvisL1Joint",
-				"pelvisR1/pelvisR1Joint",
-				"pelvisB1/pelvisB1Joint"
-			]
-		},
+        {
+            "part": "hips",
+            "type": "rigidbody",
+            "sex": "female",
+            "name": ["abdomen", "pelvis"],
+            "controller": "hipControl",
+            "forceReceiver": "hip",
+            "colliders":
+            [
+                "pelvisF7/pelvisF7Joint",
+                "pelvisFL8/pelvisFL8Joint",
+                "pelvisFR8/pelvisFR8Joint",
+                "pelvisL1/pelvisL1Joint",
+                "pelvisR1/pelvisR1Joint",
+                "pelvisB1/pelvisB1Joint"
+            ]
+        },
 
-		{
-			"part": "leftGlute",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "LGlute",
-			"colliders": ["LGlute1Joint"],
-		},
+        {
+            "part": "leftGlute",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "LGlute",
+            "colliders": ["LGlute1Joint"]
+        },
 
-		{
-			"part": "leftGlute",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "LGlute",
-			"colliders": ["pelvisBR7/pelvisBR7Joint"],
-		},
+        {
+            "part": "leftGlute",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "LGlute",
+            "colliders": ["pelvisBR7/pelvisBR7Joint"]
+        },
 
-		{
-			"part": "rightGlute",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "RGlute",
-			"colliders": ["RGlute1Joint"],
-		},
+        {
+            "part": "rightGlute",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "RGlute",
+            "colliders": ["RGlute1Joint"]
+        },
 
-		{
-			"part": "rightGlute",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "LGlute",
-			"colliders": ["pelvisBL7/pelvisBL6Joint"],
-		},
+        {
+            "part": "rightGlute",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "LGlute",
+            "colliders": ["pelvisBL7/pelvisBL6Joint"]
+        },
 
-		{
-			"part": "leftShoulder",
-			"type": "rigidbody",
-			"name": "lShldr",
-			"colliders": ["lShldr", "chest6 (6)/chest6 (6)"],
-			"controller": "lArmControl"
-		},
+        {
+            "part": "leftShoulder",
+            "type": "rigidbody",
+            "name": "lShldr",
+            "colliders": ["lShldr", "chest6 (6)/chest6 (6)"],
+            "controller": "lArmControl"
+        },
 
-		{
-			"part": "leftArm",
-			"type": "collider",
-			"colliders": ["lShldr/Collider1", "lShldr/Collider2"],
-		},
+        {
+            "part": "leftArm",
+            "type": "collider",
+            "colliders": ["lShldr/Collider1", "lShldr/Collider2"]
+        },
 
-		{
-			"part": "leftElbow",
-			"type": "rigidbody",
-			"name": "lForeArm",
-			"colliders": ["lForeArm"],
-			"controller": "lElbowControl"
-		},
+        {
+            "part": "leftElbow",
+            "type": "rigidbody",
+            "name": "lForeArm",
+            "colliders": ["lForeArm"],
+            "controller": "lElbowControl"
+        },
 
-		{
-			"part": "leftForearm",
-			"type": "collider",
-			"colliders": ["lForeArm/Collider1", "lForeArm/Collider2", "lForeArm/Collider3"],
-		},
+        {
+            "part": "leftForearm",
+            "type": "collider",
+            "colliders": ["lForeArm/Collider1", "lForeArm/Collider2", "lForeArm/Collider3"]
+        },
 
-		{
-			"part": "leftHand",
-			"type": "rigidbody",
-			"name": "lHand",
-			"controller": "lHandControl",
-			"positionCollider": "lHand/lCarpal1/Collider3",
-			"colliders":
-			[
-				"lHand/_Collider",
-				"lHand/lCarpal1/Collider3",
+        {
+            "part": "leftHand",
+            "type": "rigidbody",
+            "name": "lHand",
+            "controller": "lHandControl",
+            "positionCollider": "lHand/lCarpal1/Collider3",
+            "colliders":
+            [
+                "lHand/_Collider",
+                "lHand/lCarpal1/Collider3",
 
-				"lHand/lCarpal1/lIndex1/lIndex2/lIndex3/Collider",
-				"lHand/lCarpal1/lMid1/lMid2/lMid3/Collider",
-				"lHand/lCarpal2/lPinky1/lPinky2/lPinky3/Collider",
-				"lHand/lCarpal2/lRing1/lRing2/lRing3/Collider",
-				"lThumb1/lThumb2/lThumb3/Collider",
-				"lHand/lCarpal2/Collider3",
-				"lThumb1/Collider"
-			]
-		},
+                "lHand/lCarpal1/lIndex1/lIndex2/lIndex3/Collider",
+                "lHand/lCarpal1/lMid1/lMid2/lMid3/Collider",
+                "lHand/lCarpal2/lPinky1/lPinky2/lPinky3/Collider",
+                "lHand/lCarpal2/lRing1/lRing2/lRing3/Collider",
+                "lThumb1/lThumb2/lThumb3/Collider",
+                "lHand/lCarpal2/Collider3",
+                "lThumb1/Collider"
+            ]
+        },
 
-		{
-			"part": "rightShoulder",
-			"type": "rigidbody",
-			"name": "rShldr",
-			"colliders": ["rShldr", "chest6 (5)/chest6 (5)"],
-			"controller": "rArmControl"
-		},
+        {
+            "part": "rightShoulder",
+            "type": "rigidbody",
+            "name": "rShldr",
+            "colliders": ["rShldr", "chest6 (5)/chest6 (5)"],
+            "controller": "rArmControl"
+        },
 
-		{
-			"part": "rightArm",
-			"type": "collider",
-			"colliders": ["rShldr/Collider1", "rShldr/Collider2"],
-		},
+        {
+            "part": "rightArm",
+            "type": "collider",
+            "colliders": ["rShldr/Collider1", "rShldr/Collider2"]
+        },
 
-		{
-			"part": "rightElbow",
-			"type": "rigidbody",
-			"name": "rForeArm",
-			"colliders": ["rForeArm"],
-			"controller": "rElbowControl"
-		},
+        {
+            "part": "rightElbow",
+            "type": "rigidbody",
+            "name": "rForeArm",
+            "colliders": ["rForeArm"],
+            "controller": "rElbowControl"
+        },
 
-		{
-			"part": "rightForearm",
-			"type": "collider",
-			"colliders": ["rForeArm/Collider1", "rForeArm/Collider2", "rForeArm/Collider3"],
-		},
+        {
+            "part": "rightForearm",
+            "type": "collider",
+            "colliders": ["rForeArm/Collider1", "rForeArm/Collider2", "rForeArm/Collider3"]
+        },
 
-		{
-			"part": "rightHand",
-			"type": "rigidbody",
-			"name": "rHand",
-			"controller": "rHandControl",
-			"centerCollider": "rHand/rCarpal1/Collider3",
-			"colliders":
-			[
-				"rHand/_Collider",
-				"rHand/rCarpal1/Collider3",
+        {
+            "part": "rightHand",
+            "type": "rigidbody",
+            "name": "rHand",
+            "controller": "rHandControl",
+            "centerCollider": "rHand/rCarpal1/Collider3",
+            "colliders":
+            [
+                "rHand/_Collider",
+                "rHand/rCarpal1/Collider3",
 
-				"rHand/rCarpal1/rIndex1/rIndex2/rIndex3/Collider",
-				"rHand/rCarpal1/rMid1/rMid2/rMid3/Collider",
-				"rHand/rCarpal2/rPinky1/rPinky2/rPinky3/Collider",
-				"rHand/rCarpal2/rRing1/rRing2/rRing3/Collider",
-				"rThumb1/rThumb2/rThumb3/Collider",
-				"rHand/rCarpal2/Collider3",
-				"rThumb1/Collider"
-			]
-		},
+                "rHand/rCarpal1/rIndex1/rIndex2/rIndex3/Collider",
+                "rHand/rCarpal1/rMid1/rMid2/rMid3/Collider",
+                "rHand/rCarpal2/rPinky1/rPinky2/rPinky3/Collider",
+                "rHand/rCarpal2/rRing1/rRing2/rRing3/Collider",
+                "rThumb1/rThumb2/rThumb3/Collider",
+                "rHand/rCarpal2/Collider3",
+                "rThumb1/Collider"
+            ]
+        },
 
-		{
-			"part": "leftThigh",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "lThigh",
-			"colliders": ["lThigh/Collider2", "lThigh/Collider6"],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftThigh",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "lThigh",
+            "colliders": ["lThigh/Collider2", "lThigh/Collider6"],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftThigh",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "lThigh",
-			"colliders":
-			[
-				"lThigh1Joint",
-				"lThigh10Joint",
-				"lThigh13Joint",
-				"lThigh16Joint"
-			],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftThigh",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "lThigh",
+            "colliders":
+            [
+                "lThigh1Joint",
+                "lThigh10Joint",
+                "lThigh13Joint",
+                "lThigh16Joint"
+            ],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftKnee",
-			"type": "rigidbody",
-			"sex": "female",
-			"name": "lShin",
-			"colliders": ["lThigh23"],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftKnee",
+            "type": "rigidbody",
+            "sex": "female",
+            "name": "lShin",
+            "colliders": ["lThigh23"],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftKnee",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": "lShin",
-			"colliders": ["lShin/Collider1"],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftKnee",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": "lShin",
+            "colliders": ["lShin/Collider1"],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftShin",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "lShin",
-			"colliders": ["lShin/Collider2", "lShin/Collider3", "lShin/Collider4"],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftShin",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "lShin",
+            "colliders": ["lShin/Collider2", "lShin/Collider3", "lShin/Collider4"],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftShin",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "lShin",
-			"colliders":
-			[
-				"lShin2",
-				"lShin5",
-				"lShin8",
-				"lShin10",
-				"lShin12",
-				"lShin15",
-			],
-			"controller": "lKneeControl"
-		},
+        {
+            "part": "leftShin",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "lShin",
+            "colliders":
+            [
+                "lShin2",
+                "lShin5",
+                "lShin8",
+                "lShin10",
+                "lShin12",
+                "lShin15"
+            ],
+            "controller": "lKneeControl"
+        },
 
-		{
-			"part": "leftFoot",
-			"type": "rigidbody",
-			"name": "lFoot",
-			"controller": "lFootControl",
-			"colliders": ["lFoot/Collider4", "lToe/Collider"],
-		},
+        {
+            "part": "leftFoot",
+            "type": "rigidbody",
+            "name": "lFoot",
+            "controller": "lFootControl",
+            "colliders": ["lFoot/Collider4", "lToe/Collider"]
+        },
 
-		{
-			"part": "rightThigh",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "rThigh",
-			"colliders": ["rThigh/Collider2", "rThigh/Collider6"],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightThigh",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "rThigh",
+            "colliders": ["rThigh/Collider2", "rThigh/Collider6"],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightThigh",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "rThigh",
-			"colliders":
-			[
-				"rThigh1Joint",
-				"rThigh10Joint",
-				"rThigh13Joint",
-				"rThigh16Joint"
-			],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightThigh",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "rThigh",
+            "colliders":
+            [
+                "rThigh1Joint",
+                "rThigh10Joint",
+                "rThigh13Joint",
+                "rThigh16Joint"
+            ],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightKnee",
-			"type": "rigidbody",
-			"sex": "female",
-			"name": "rShin",
-			"colliders": ["rThigh23"],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightKnee",
+            "type": "rigidbody",
+            "sex": "female",
+            "name": "rShin",
+            "colliders": ["rThigh23"],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightKnee",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": "rShin",
-			"colliders": ["rShin/Collider1"],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightKnee",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": "rShin",
+            "colliders": ["rShin/Collider1"],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightShin",
-			"type": "collider",
-			"sex": "male",
-			"rigidbody": "rShin",
-			"colliders": ["rShin/Collider2", "rShin/Collider3", "rShin/Collider4"],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightShin",
+            "type": "collider",
+            "sex": "male",
+            "rigidbody": "rShin",
+            "colliders": ["rShin/Collider2", "rShin/Collider3", "rShin/Collider4"],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightShin",
-			"type": "collider",
-			"sex": "female",
-			"rigidbody": "rShin",
-			"colliders":
-			[
-				"rShin2",
-				"rShin5",
-				"rShin8",
-				"rShin10",
-				"rShin12",
-				"rShin15",
-			],
-			"controller": "rKneeControl"
-		},
+        {
+            "part": "rightShin",
+            "type": "collider",
+            "sex": "female",
+            "rigidbody": "rShin",
+            "colliders":
+            [
+                "rShin2",
+                "rShin5",
+                "rShin8",
+                "rShin10",
+                "rShin12",
+                "rShin15"
+            ],
+            "controller": "rKneeControl"
+        },
 
-		{
-			"part": "rightFoot",
-			"type": "rigidbody",
-			"name": "rFoot",
-			"controller": "rFootControl",
-			"colliders": ["rFoot/Collider4", "rToe/Collider"]
-		},
+        {
+            "part": "rightFoot",
+            "type": "rigidbody",
+            "name": "rFoot",
+            "controller": "rFootControl",
+            "colliders": ["rFoot/Collider4", "rToe/Collider"]
+        },
 
-		{
-			"part": "eyes",
-			"type": "internal"
-		},
+        {
+            "part": "eyes",
+            "type": "internal"
+        },
 
-		{
-			"part": "penis",
-			"type": "rigidbody",
-			"sex": "male",
-			"name": "Gen1",
-			"controller": "penisBaseControl",
-			"colliders": ["Gen1Hard", "Gen3aHard"],
-			"extremity": "Gen3bHard"
-		},
+        {
+            "part": "penis",
+            "type": "rigidbody",
+            "sex": "male",
+            "name": "Gen1",
+            "controller": "penisBaseControl",
+            "colliders": ["Gen1Hard", "Gen3aHard"],
+            "extremity": "Gen3bHard"
+        },
 
-		{
-			"part": "penis",
-			"type": "strapon",
-			"sex": "female"
-		}
-	],
+        {
+            "part": "penis",
+            "type": "strapon",
+            "sex": "female"
+        }
+    ],
 
 
-	"hands":
-	[
-		{
-			"type": "left",
-			"fistMorph": "Left Fingers Fist",
-			"fingersInOutMorph": "Left Fingers In-Out",
-			"rigidbody": "lHand",
+    "hands":
+    [
+        {
+            "type": "left",
+            "fistMorph": "Left Fingers Fist",
+            "fingersInOutMorph": "Left Fingers In-Out",
+            "rigidbody": "lHand",
 
-			"bones":
-			{
-				"thumb":  ["lThumb1",          "lThumb1/lThumb2",          "lThumb1/lThumb2/lThumb3"],
-				"index":  ["lCarpal1/lIndex1", "lCarpal1/lIndex1/lIndex2", "lCarpal1/lIndex1/lIndex2/lIndex3"],
-				"middle": ["lCarpal1/lMid1",   "lCarpal1/lMid1/lMid2",     "lCarpal1/lMid1/lMid2/lMid3"],
-				"ring":   ["lCarpal2/lRing1",  "lCarpal2/lRing1/lRing2",   "lCarpal2/lRing1/lRing2/lRing3"],
-				"little": ["lCarpal2/lPinky1", "lCarpal2/lPinky1/lPinky2", "lCarpal2/lPinky1/lPinky2/lPinky3"]
-			}
-		},
+            "bones":
+            {
+                "thumb":  ["lThumb1",          "lThumb1/lThumb2",          "lThumb1/lThumb2/lThumb3"],
+                "index":  ["lCarpal1/lIndex1", "lCarpal1/lIndex1/lIndex2", "lCarpal1/lIndex1/lIndex2/lIndex3"],
+                "middle": ["lCarpal1/lMid1",   "lCarpal1/lMid1/lMid2",     "lCarpal1/lMid1/lMid2/lMid3"],
+                "ring":   ["lCarpal2/lRing1",  "lCarpal2/lRing1/lRing2",   "lCarpal2/lRing1/lRing2/lRing3"],
+                "little": ["lCarpal2/lPinky1", "lCarpal2/lPinky1/lPinky2", "lCarpal2/lPinky1/lPinky2/lPinky3"]
+            }
+        },
 
-		{
-			"type": "right",
-			"fistMorph": "Right Fingers Fist",
-			"fingersInOutMorph": "Right Fingers In-Out",
-			"rigidbody": "rHand",
+        {
+            "type": "right",
+            "fistMorph": "Right Fingers Fist",
+            "fingersInOutMorph": "Right Fingers In-Out",
+            "rigidbody": "rHand",
 
-			"bones":
-			{
-				"thumb":  ["rThumb1",          "rThumb1/rThumb2",          "rThumb1/rThumb2/rThumb3"],
-				"index":  ["rCarpal1/rIndex1", "rCarpal1/rIndex1/rIndex2", "rCarpal1/rIndex1/rIndex2/rIndex3"],
-				"middle": ["rCarpal1/rMid1",   "rCarpal1/rMid1/rMid2",     "rCarpal1/rMid1/rMid2/rMid3"],
-				"ring":   ["rCarpal2/rRing1",  "rCarpal2/rRing1/rRing2",   "rCarpal2/rRing1/rRing2/rRing3"],
-				"little": ["rCarpal2/rPinky1", "rCarpal2/rPinky1/rPinky2", "rCarpal2/rPinky1/rPinky2/rPinky3"]
-			}
-		}
-	],
+            "bones":
+            {
+                "thumb":  ["rThumb1",          "rThumb1/rThumb2",          "rThumb1/rThumb2/rThumb3"],
+                "index":  ["rCarpal1/rIndex1", "rCarpal1/rIndex1/rIndex2", "rCarpal1/rIndex1/rIndex2/rIndex3"],
+                "middle": ["rCarpal1/rMid1",   "rCarpal1/rMid1/rMid2",     "rCarpal1/rMid1/rMid2/rMid3"],
+                "ring":   ["rCarpal2/rRing1",  "rCarpal2/rRing1/rRing2",   "rCarpal2/rRing1/rRing2/rRing3"],
+                "little": ["rCarpal2/rPinky1", "rCarpal2/rPinky1/rPinky2", "rCarpal2/rPinky1/rPinky2/rPinky3"]
+            }
+        }
+    ],
 
-	"kiss":
-	{
-		"mouthColliders":
-		[
-			"FaceCentral/FaceCentral1/FaceCentral1",
-			"FaceCentral/FaceCentral2/FaceCentral2",
-			"TongueUpperLip/FaceCentral2/FaceCentral2",
-			"FaceHardLeft16", "FaceHardLeft17",
-			"FaceHardRight16", "FaceHardRight17",
-			"lowerJaw/LipL", "lowerJaw/LipM", "lowerJaw/LipR",
-			"TongueColliders/LipM", "TongueColliders/LipM2",
-			"lowerJaw/L2r", "lowerJaw/L2l",
-			"lowerJaw/L3r", "lowerJaw/L3l",
-		],
+    "kiss":
+    {
+        "mouthColliders":
+        [
+            "FaceCentral/FaceCentral1/FaceCentral1",
+            "FaceCentral/FaceCentral2/FaceCentral2",
+            "TongueUpperLip/FaceCentral2/FaceCentral2",
+            "FaceHardLeft16", "FaceHardLeft17",
+            "FaceHardRight16", "FaceHardRight17",
+            "lowerJaw/LipL", "lowerJaw/LipM", "lowerJaw/LipR",
+            "TongueColliders/LipM", "TongueColliders/LipM2",
+            "lowerJaw/L2r", "lowerJaw/L2l",
+            "lowerJaw/L3r", "lowerJaw/L3l"
+        ],
 
-		"tongueColliders":
-		[
-			"TongueTip/_Collider1",
-			"TongueTip/_Collider2",
-			"TongueTip/_Collider3",
-			"TongueTip/_Collider4",
-			"TongueTip/_Collider5",
+        "tongueColliders":
+        [
+            "TongueTip/_Collider1",
+            "TongueTip/_Collider2",
+            "TongueTip/_Collider3",
+            "TongueTip/_Collider4",
+            "TongueTip/_Collider5",
 
-			"Tongue05/_Collider1",
-			"Tongue05/_Collider2",
-			"Tongue05/_Collider3",
-			"Tongue05/_Collider4",
-			"Tongue05/_Collider5",
+            "Tongue05/_Collider1",
+            "Tongue05/_Collider2",
+            "Tongue05/_Collider3",
+            "Tongue05/_Collider4",
+            "Tongue05/_Collider5",
 
-			"Tongue04/_Collider1",
-			"Tongue04/_Collider2",
-			"Tongue04/_Collider3",
-			"Tongue04/_Collider4",
-			"Tongue04/_Collider5",
+            "Tongue04/_Collider1",
+            "Tongue04/_Collider2",
+            "Tongue04/_Collider3",
+            "Tongue04/_Collider4",
+            "Tongue04/_Collider5",
 
-			"Tongue03/_Collider1",
-			"Tongue03/_Collider2",
-			"Tongue03/_Collider3",
-		]
-	}
+            "Tongue03/_Collider1",
+            "Tongue03/_Collider2",
+            "Tongue03/_Collider3"
+        ]
+    }
 }

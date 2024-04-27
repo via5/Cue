@@ -39,6 +39,7 @@
 				e.MinHoldTime < 0 ? ps.Get(PS.ExpressionMinHoldTime) : e.MinHoldTime,
 				e.MaxHoldTime < 0 ? ps.Get(PS.ExpressionMaxHoldTime) : e.MaxHoldTime);
 
+			Reset();
 			Deactivate();
 		}
 
@@ -123,7 +124,7 @@
 		public void Deactivate()
 		{
 			e_.SetAuto(0, 0, 0);
-			e_.SetTargetAndStop(0, RandomResetTime());
+			e_.Deactivate(RandomResetTime());
 			state_ = InactiveState;
 		}
 
@@ -184,7 +185,7 @@
 
 		public override string ToString()
 		{
-			return $"{e_.Name} ({e_.MoodString()}) w={weight_:0.00}";
+			return $"{e_.Name} ({e_.MoodString()}) w={weight_:0.00} {state_}";
 		}
 
 		private float RandomTarget()

@@ -172,8 +172,7 @@ namespace Cue.Sys.Vam
 
 		private static void SetEyes(Atom a)
 		{
-			var v = Parameters.GetFloat(
-				a, "Eyes", "maxLeft");
+			var v = Parameters.GetFloat(a, "Eyes", "maxLeft");
 
 			if (v != null)
 				v.val = 35.0f;

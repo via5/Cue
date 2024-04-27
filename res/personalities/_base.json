@@ -1,1088 +1,1089 @@
 {
-	"name": "base",
-	"abstract": true,
-
-	"voice":
-	{
-		"provider":
-		{
-			"name": "vammoan",
-			"options": {}
-		},
-		"normalState":
-		{
-			"enabled": true,
-			"breathingRange": 0.1,
-			"breathingIntensityCutoff": 0.6,
-			"intensityWait":
-			{
-				"range": [0, 5],
-			},
-			"intensityTarget":
-			{
-				"rng":
-				{
-					"type": "normal",
-					"centerMin": 0,
-					"centerMax": 0.8,
-					"width": 3
-				}
-			},
-			"intensityTime":
-			{
-				"range": [0, 2]
-			}
-		}
-		"kissState":
-		{
-			"enabled": true,
-			"voiceChance": 0.2,
-			"voiceChanceMinExcitement": 0.2,
-			"voiceTime": 2
-		},
-		"orgasmState":
-		{
-			"enabled": true,
-			"voice": "orgasm"
-		},
-		"bjState":
-		{
-			"enabled": true,
-			"voiceChance": 0.2,
-			"voiceChanceMinExcitement": 0.2,
-			"voiceTime": 2
-		},
-		"chokedState":
-		{
-			"enabled": true,
-			"minTimeForMoaning": 3,
-			"moaningAfter": 1.0,
-			"moaningTime": 3.0
-		}
-	},
-
-
-	"expressions":
-	[
-		{
-			"name": "smile1",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Smile Open Full Face",
-					"max": 0.7
-				}
-			]
-		},
-
-		{
-			"name": "smile2",
-			"moods": "happy",
-			"bodyParts": "mouth",
-			"sex": "female",
-			"morphs":
-			[
-				{
-					"id": "Elise Smile (REN)"
-				}
-			]
-		},
-
-
-		{
-			"name": "cornerSmile",
-			"moods": "playful",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Smile Open Full Face",
-					"max": 0.3
-				},
-
-				{
-					"id": "Mouth Smile Simple Left",
-					"max": 1.2
-				},
-
-				{
-					"id": "Eyes Squint",
-					"max": 0.15
-				},
-			]
-		},
-
-		{
-			"name": "curious",
-			"moods": "playful",
-			"bodyParts": "mouth",
-			"sex": "female",
-			"morphs":
-			[
-				{
-					"id": "Curious1",
-					"max": 0.5
-				}
-			]
-		},
-
-		{
-			"name": "desire",
-			"moods": "playful",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Desire",
-					"max": 0.2
-				}
-			]
-		},
-
-		{
-			"name": "flirting",
-			"moods": "playful",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Flirting",
-					"max": 0.5
-				}
-			]
-		},
-
-		{
-			"name": "pleasure",
-			"moods": "excited orgasm",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "CTRLBrowInnerUp",
-					"max": 0.70
-				},
-				{
-					"id": "PHMMouthSmile",
-					"max": 0.46
-				},
-				{
-					"id": "PHMMouthOpen",
-					"max": 1.7
-				},
-				{
-					"id": "Mouth corner up",
-					"max": -0.8
-				},
-				{
-					"id": "CTRLEyesClosed",
-					"max": 0.66
-				}
-			]
-		},
-
-		{
-			"name": "pain",
-			"moods": "excited",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "Pain",
-					"max": 0.3
-				}
-			]
-		},
-
-		{
-			"name": "shock",
-			"moods": "excited",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Shock",
-					"max": 0.9
-				}
-			]
-		},
-
-		{
-			"name": "scream",
-			"moods": "excited",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Scream",
-					"max": 0.8
-				}
-			]
-		},
-
-		{
-			"name": "stifled",
-			"moods": "excited",
-			"bodyParts": "mouth",
-			"sex": "female",
-			"exclusive": true,
-			"minExcitement": 0.7,
-			"minHoldTime": 2,
-			"maxHoldTime": 3,
-			"maxOnly": true,
-			"morphs":
-			[
-				{
-					"id": "Stifled1",
-					"max": 0.5
-				}
-			]
-		},
-
-		{
-			"name": "angryExcited",
-			"moods": "excited",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Angry",
-					"max": 0.3
-				}
-			]
-		},
-
-		{
-			"name": "AAsex_browhiAA6",
-			"moods": "excited",
-			"bodyParts": "mouth eyes",
-			"sex": "female",
-			"weight": 0.5,
-			"morphs":
-			[
-				{
-					"id": "AAsex_browhiAA6",
-					"max": 0.7,
-					"eyesClosed": 1,
-				}
-			]
-		},
-
-		{
-			"name": "AAsex_closedAA1",
-			"moods": "excited",
-			"sex": "female",
-			"bodyParts": "mouth eyes",
-			"weight": 0.5,
-			"morphs":
-			[
-				{
-					"id": "AAsex_closedAA1",
-					"max": 0.8,
-					"eyesClosed": 0.8,
-				}
-			]
-		},
-
-		{
-			"name": "embarassed",
-			"moods": "excited",
-			"bodyParts": "mouth eyes",
-			"sex": "female",
-			"morphs":
-			[
-				{
-					"id": "Embarassed_1",
-					"max": 0.5
-				}
-			]
-		},
-
-
-
-		{
-			"name": "angryMouth",
-			"moods": "angry",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "Angry",
-					"max": 0.3
-				}
-			]
-		},
-
-		{
-			"name": "angryFrown",
-			"moods": "angry",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Brow Down"
-				}
-			]
-		},
-
-		{
-			"name": "angrySquint",
-			"moods": "angry",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Squint"
-				},
-
-				{
-					"id": "Nose Wrinkle"
-				}
-			]
-		},
-
-		{
-			"name": "angryMouthFrown",
-			"moods": "angry",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Mouth corner up",
-					"max": -1
-				},
-
-				{
-					"id": "Lip Top Up",
-					"max": 0.3
-				}
-			]
-		},
-
-		{
-			"name": "angrySnarl",
-			"moods": "angry",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Snarl Left",
-					"max": 0.3
-				}
-			]
-		},
-
-
-		{
-			"name": "surprise",
-			"moods": "surprised",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "Surprise",
-					"max": 0.8
-				}
-			]
-		},
-
-		{
-			"name": "surprise2",
-			"moods": "surprised",
-			"bodyParts": "mouth eyes",
-			"morphs":
-			[
-				{
-					"id": "Surprise2",
-					"max": 0.8
-				}
-			]
-		},
-
-
-		{
-			"name": "eyesClosed",
-			"moods": "excited",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Closed"
-				}
-			]
-		},
-
-		{
-			"name": "eyesClosedSleeping",
-			"moods": "tired",
-			"bodyParts": "eyes",
-			"morphs":
-			[
-				{
-					"id": "Eyes Closed",
-					"min": 0.5,
-					"max": 1.0
-				}
-			]
-		},
-
-		{
-			"name": "drooling",
-			"moods": "tired",
-			"bodyParts": "mouth",
-			"morphs":
-			[
-				{
-					"id": "Mouth Open"
-				}
-			]
-		},
-
-		{
-			"name": "rollup",
-			"moods": "excited",
-			"sex": "female",
-			"minExcitement": 0.8,
-			"minHoldTime": 2,
-			"maxOnly": true,
-			"weight": 0.3,
-			"morphs":
-			[
-				{
-					"id": "Eyeball Depth L",
-					"max": 1.0
-				},
-
-				{
-					"id": "Eyeball Rotate Vertical L",
-					"max": -2.7
-				},
-
-				{
-					"id": "Eyeball Depth R",
-					"max": 1.0
-				},
-
-				{
-					"id": "Eyeball Rotate Vertical R",
-					"max": -2.7
-				}
-			]
-		},
-
-		{
-			"name": "rollupTired",
-			"moods": "tired",
-			"sex": "female",
-			"morphs":
-			[
-				{
-					"id": "Eyeball Depth L",
-					"max": 0.3
-				},
-
-				{
-					"id": "Eyeball Rotate Vertical L",
-					"max": -0.8
-				},
-
-				{
-					"id": "Eyeball Depth R",
-					"max": 0.3
-				},
-
-				{
-					"id": "Eyeball Rotate Vertical R",
-					"max": -0.8
-				}
-			]
-		}
-	],
-
-	"events":
-	[
-		{
-			"type": "kiss",
-			"canInitiate": true,
-			"startLipsDistance": 0.1,
-			"startLipsDistanceWithPlayer": 0.12,
-			"stopLipsDistance": 0.1,
-			"stopLipsDistanceWithPlayer": 0.15,
-			"stopHeadDistanceFromStart": 0.15,
-			"duration":
-			{
-				"range":
-				{
-					"min": 10,
-					"max": 100
-				},
-				"rng": "normal"
-			},
-			"interval":
-			{
-				"range":
-				{
-					"min": 30,
-					"max": 120
-				},
-				"rng": "normal"
-			}
-		},
-
-		{
-			"type": "holdbreath",
-			"minExcitement": 0.7,
-			"cooldown": 30,
-			"holdTime":
-			{
-				"range": [3, 5],
-				"comment": "min must be >= voice.chokedState.minTimeForMoaning to get the moan"
-			},
-			"chance": 0.1,
-			"chanceRng": "uniform"
-		},
-	],
-
-
-	"animations":
-	[
-		{
-			"animation": "idle",
-			"type": "proc",
-			"options":
-			{
-				"file": "animations/standIdle.json"
-			}
-		},
-
-		{
-			"animation": "excited",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueExcited"
-			}
-		},
-
-		{
-			"animation": "thrust",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueThrust"
-			}
-		},
-
-		{
-			"animation": "trib",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueTrib"
-			}
-		},
-
-		{
-			"animation": "orgasm",
-			"type": "proc",
-			"options":
-			{
-				"file": "animations/orgasm.json"
-			}
-		},
-
-		{
-			"animation": "smoke",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueSmoke"
-			}
-		},
-
-		{
-			"animation": "suckFinger",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueSuckFinger"
-			}
-		},
-
-		{
-			"animation": "rightFinger",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueRightFinger"
-			}
-		},
-
-		{
-			"animation": "leftFinger",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueLeftFinger"
-			}
-		},
-
-		{
-			"animation": "kiss",
-			"type": "internal",
-			"options":
-			{
-				"name": "cwKiss"
-			}
-		},
-
-		{
-			"animation": "handjobBoth",
-			"type": "internal",
-			"options":
-			{
-				"name": "cwHJboth"
-			}
-		},
-
-		{
-			"animation": "handjobLeft",
-			"type": "internal",
-			"options":
-			{
-				"name": "cwHJleft"
-			}
-		},
-
-		{
-			"animation": "handjobRight",
-			"type": "internal",
-			"options":
-			{
-				"name": "cwHJright"
-			}
-		},
-
-		{
-			"animation": "blowjob",
-			"type": "internal",
-			"options":
-			{
-				"name": "cwBJ"
-			}
-		},
-
-		{
-			"animation": "leftHandOnBreast",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueLeftHandOnBreast"
-			}
-		},
-
-		{
-			"animation": "rightHandOnBreast",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueRightHandOnBreast"
-			}
-		},
-
-		{
-			"animation": "leftHandOnChest",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueLeftHandOnChest"
-			}
-		},
-
-		{
-			"animation": "rightHandOnChest",
-			"type": "internal",
-			"options":
-			{
-				"name": "cueRightHandOnChest"
-			}
-		}
-	],
-
-
-	"gazeDuration":
-	{
-		"range":
-		{
-			"min": 0.8,
-			"max": 0.2,
-			"window": 0.3,
-			"windowEasing": "cubicin"
-		}
-	},
-
-	"gazeRandomInterval":
-	{
-		"range":
-		{
-			"min": 0.5,
-			"max": 15,
-			"rng":
-			{
-				"type": "normal",
-				"centerMin": 0.5,
-				"centerMax": 0.4,
-				"widthMin": 1.0,
-				"widthMax": 0.75
-			}
-		}
-	},
-
-	"gazeEnabled": true,
-	"gazeSaccade": true,
-	"gazeBlink": true,
-	"gazeEyeTargetMovementSpeed": 10.0,
-
-	"gazeSaccadeInterval":
-	{
-		"range":
-		{
-			"min": 3,
-			"max": 0.2,
-			"window": 2
-		}
-	},
-
-	"gazeSaccadeMovementRange": 4,
-
-	"emergencyGazeDuration": 0.2,
-
-	"maxExcitementForAvoid": 0,
-	"avoidDelayAfterOrgasm": 0,
-
-	"lookAboveMaxWeight": 1,
-	"lookAboveMaxWeightOrgasm": 2,
-	"lookAboveMinExcitement": 0.35,
-	"lookAboveMinPhysicalRate": 0.001,
-	"lookAboveUseGazeEnergy": true,
-
-	"lookAtPlayerOnGrabWeight": -1,
-	"lookAtPlayerTimeAfterGrab": 3,
-
-	"lookFrontWeight": 0,
-	"lookDownWeight": 0,
-
-	"idleNaturalRandomWeight": 0.05,
-	"idleEmptyRandomWeight": 0.02,
-	"naturalRandomWeight": 0.0001,
-	"naturalOtherEyesWeight": 0.4,
-	"busyOtherEyesWeight": 0.5,
-	"naturalPlayerEyesWeight": 1.5,
-	"busyPlayerEyesWeight": 1,
-	"otherEyesExcitementWeight": 1.0,
-	"maxTirednessForRandomGaze": 0.5,
-	"otherEyesOrgasmWeight": 50,
-
-	"blowjobEyesWeight": 0.5,
-	"blowjobGenitalsWeight": 5,
-	"handjobEyesWeight": 5,
-	"handjobGenitalsWeight": 2,
-	"penetratedEyesWeight": 8,
-	"penetratedGenitalsWeight": 1,
-	"penetratingEyesWeight": 5,
-	"penetratingGenitalsWeight": 2,
-	"gropedEyesWeight": 2,
-	"gropedTargetWeight": 0.5,
-	"gropingEyesWeight": 2,
-	"gropingTargetWeight": 0.5,
-
-	"otherBlowjobEyesWeight": 2,
-	"otherBlowjobTargetEyesWeight": 1,
-	"otherBlowjobTargetGenitalsWeight": 1,
-	"otherHandjobEyesWeight": 2,
-	"otherHandjobTargetEyesWeight": 1,
-	"otherHandjobTargetGenitalsWeight": 1,
-	"otherPenetrationEyesWeight": 2,
-	"otherPenetrationSourceEyesWeight": 1,
-	"otherPenetrationSourceGenitalsWeight": 1,
-	"otherGropedEyesWeight": 1.5,
-	"otherGropedSourceEyesWeight": 1,
-	"otherGropedTargetWeight": 1,
-
-
-	"zappedEnabled": true,
-	"zappedTentativeTime": 1.5,
-	"zappedCooldown": 30,
-	"zappedTime": 3,
-
-	"zappedGazeMinIntensity": 0.3,
-
-	"zappedByPlayerBreastsEyesWeight": 50,
-	"zappedByPlayerBreastsTargetWeight": 10,
-	"zappedByPlayerBreastsExcitement": 0.0,
-	"zappedByPlayerGenitalsEyesWeight": 50,
-	"zappedByPlayerGenitalsTargetWeight": 10,
-	"zappedByPlayerGenitalsExcitement": 0.5,
-	"zappedByPlayerPenetrationEyesWeight": 50,
-	"zappedByPlayerPenetrationTargetWeight": 10,
-	"zappedByPlayerPenetrationExcitement": 0.7,
-	"zappedByPlayerMouthEyesWeight": 20,
-	"zappedByPlayerMouthExcitement": 0,
-	"zappedByPlayerLookUpWeight": 5,
-	"zappedByPlayerLookAwayMaxExcitement": 0,
-	"zappedByPlayerGazeDuration": [0.4, 0.2],
-
-	"zappedByOtherBreastsEyesWeight": 20,
-	"zappedByOtherBreastsTargetWeight": 5,
-	"zappedByOtherBreastsExcitement": 0.0,
-	"zappedByOtherGenitalsEyesWeight": 20,
-	"zappedByOtherGenitalsTargetWeight": 5,
-	"zappedByOtherGenitalsExcitement": 0.5,
-	"zappedByOtherPenetrationEyesWeight": 20,
-	"zappedByOtherPenetrationTargetWeight": 5,
-	"zappedByOtherPenetrationExcitement": 0.7,
-	"zappedByOtherMouthEyesWeight": 5,
-	"zappedByOtherMouthExcitement": 0,
-	"zappedByOtherLookUpWeight": 5,
-	"zappedByOtherLookAwayMaxExcitement": 0,
-	"zappedByOtherGazeDuration": [0.6, 0.4],
-
-	"otherZappedEyesWeight": 20,
-	"otherZappedTargetWeight": 10,
-	"otherZappedSourceWeight": 10,
-	"otherZappedGazeDuration": [0.6, 0.4],
-
-
-	"kissSpeedEnergyFactor": 1,
-	"tirednessExcitementRateFactor": 0.6,
-
-	"gazeEnergyTirednessFactor": 1,
-	"gazeTirednessFactor": 1,
-	"movementEnergyTirednessFactor": 0,
-	"movementTirednessFactor": 0,
-	"expressionExcitementFactor": 1,
-	"expressionTirednessFactor": 1,
-
-	"avoidGazePlayerMinExcitement": 0,
-	"avoidGazePlayerMaxExcitement": 0,
-	"avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
-	"avoidGazePlayerInsidePersonalSpaceMaxExcitement": 0,
-	"avoidGazePlayerDuringSexMinExcitement": 0,
-	"avoidGazePlayerDuringSexMaxExcitement": 0,
-	"avoidGazePlayerDelayAfterOrgasm": 0,
-	"avoidGazePlayerWeight": 0,
-
-	"avoidGazeOthersMinExcitement": 0,
-	"avoidGazeOthersMaxExcitement": 0,
-	"avoidGazeOthersInsidePersonalSpaceMinExcitement": 0,
-	"avoidGazeOthersInsidePersonalSpaceMaxExcitement": 0,
-	"avoidGazeOthersDuringSexMinExcitement": 0,
-	"avoidGazeOthersDuringSexMaxExcitement": 0,
-	"avoidGazeOthersDelayAfterOrgasm": 0,
-	"avoidGazeOthersWeight": 0,
-
-	"avoidGazeUninvolvedHavingSexMinExcitement": 0,
-	"avoidGazeUninvolvedHavingSexMaxExcitement": 0,
-
-	"avoidGazeAnger": 0,
-	"angerWhenPlayerInteracts": 0,
-	"angerMaxExcitementForAnger": 0,
-	"angerMaxExcitementForHappiness": 0,
-	"angerExcitementFactorForAnger": 0,
-	"angerExcitementFactorForHappiness": 0,
-
-	"defaultHappiness": 1,
-	"defaultPlayfulness": 0,
-	"defaultSurprise": 0,
-	"defaultAnger": 0,
-	"maxHappyExpression": 1,
-	"maxExcitedExpression": 1,
-	"maxPlayfulExpression": 1,
-	"maxAngryExpression": 1,
-	"maxSurprisedExpression": 1,
-	"maxTiredExpression": 1,
-	"minTiredness": 0,
-	"maxEmotionalRate": 1,
-
-	"minHappyChoked": 0,
-	"maxHappyChoked": 0.2,
-	"minPlayfulChoked": 0,
-	"maxPlayfulChoked": 0,
-	"minExcitedChoked": 0,
-	"maxExcitedChoked": 1,
-	"minAngryChoked": 0,
-	"maxAngryChoked": 1,
-	"minSurprisedChoked": 1,
-	"maxSurprisedChoked": 1,
-	"minTiredChoked": 0,
-	"maxTiredChoked": 1,
-
-	"expressionMinHoldTime": 0,
-	"expressionMaxHoldTime": 3,
-	"excitedExpressionWeightModifier": 2,
-	"exclusiveExpressionWeightModifier": 0.1,
-	"orgasmExpressionRangeMin": 0.8,
-	"orgasmExpressionRangeMax": 1,
-	"orgasmFirstExpressionTime": 0.2,
-	"orgasmSyncMinExcitement": 0.9,
-
-	"maxSweat": 1,
-	"maxFlush": 0.5,
-	"maxChokedFlush": 1,
-	"chokedAirDownTime": 15,
-	"chokedAirUpTime": 5,
-
-	"flushBaseColorRed": 1,
-	"flushBaseColorGreen": 0,
-	"flushBaseColorBlue": 0,
-	"flushMultiplier": 0.15,
-
-	"temperatureExcitementRate": 0.015,
-	"temperatureDecayRate": 0.005,
-	"temperatureExcitementMax": 0.8,
-
-	"tirednessBaseDecayRate": 0.005,
-	"tirednessBackToBaseRate": 0.02,
-	"tirednessMaxExcitementForBaseDecay": 0.5,
-
-	"neutralVoicePitch": 0.5,
-	"voicePitch": -1,
-
-	"idleMaxExcitement": 0,
-
-	"excitementDecayRate": -0.01,
-
-	"orgasmHighTime": 4,
-	"orgasmLowTime": 4,
-	"postOrgasmTime": 10,
-	"orgasmFluidTime": 8,
-	"movementEnergyRampUpAfterOrgasm": 30,
-	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
-	"tirednessRateDuringPostOrgasm": 0.3,
-	"delayAfterOrgasmUntilTirednessDecay": 10,
-	"orgasmBaseTirednessIncrease": 0.2,
-	"excitementPostOrgasm": 0.3,
-
-	"rateAdjustment": 1,
-	"penetrationDamper": 0.5,
-	"minCollisionMag": 0.1,
-	"minCollisionMagPenetration": 0.2,
-
-	"slapMinExpressionChange": 0,
-	"slapMaxExpressionChange": 0.5,
-	"slapMinTime": 0.15,
-	"slapMaxTime": 0.45,
-	"slapUpdateInterval":
-	{
-		"range":
-		{
-			"min": 3,
-			"max": 8,
-		}
-	},
-
-	"finishLookAtPlayer": "involved",
-	"finishLookAtPlayerAction": "gaze",
-	"finishOrgasm": "involved",
-	"finishOrgasmMinExcitement": 0,
-	"finishMood": "involved",
-	"finishMoodHappy": -1,
-	"finishMoodPlayful": -1,
-	"finishMoodAngry": -1,
-	"finishMoodSurprised": -1,
-	"finishMoodTired": -1,
-
-
-	"sensitivities":
-	[
-		{
-			"type": "penetration",
-			"physicalRate": 0.0025,
-			"physicalMax": 1.0,
-			"nonPhysicalRate": 0.0012,
-			"nonPhysicalMax": 1.0,
-
-			"modifiers":
-			[
-				{
-					"source": "external",
-					"modifier": 4
-				},
-			]
-		},
-
-		{
-			"type": "mouth",
-			"rate": 0.001,
-			"max": 0.3
-		}
-
-		{
-			"type": "breasts",
-			"rate": 0.002,
-			"max": 0.2,
-
-			"modifiers":
-			[
-				{
-					"source": "player",
-					"modifier": 2
-				},
-				{
-					"source": "self",
-					"modifier": 0.5
-				}
-			]
-		},
-
-		{
-			"type": "genitals",
-			"physicalRate": 0.006,
-			"physicalMax": 1.0,
-			"nonPhysicalRate": 0.0015,
-			"nonPhysicalMax": 0.6,
-
-			"modifiers":
-			[
-				{
-					"source": "player",
-					"modifier": 2
-				},
-				{
-					"source": "self",
-					"modifier": 0.8
-				},
-				{
-					"source": "any",
-					"sourcePart": "mouth",
-					"modifier": 1.5
-				}
-			]
-		},
-
-		{
-			"type": "othersExcitement",
-			"rate": 0.3,
-			"max": 0.10
-		}
-	],
-
-	"pose":
-	{
-		"type": "keyJoints",
-		"controllers":
-		[
-			{
-				"receiver": "all",
-				"parameters":
-				[
-					{
-						"name": "jointDriveMaxForce",
-						"value": "default"
-					}
-				]
-			},
-	}
+    "name": "base",
+    "abstract": true,
+
+    "voice":
+    {
+        "provider":
+        {
+            "name": "vammoan",
+            "options": {}
+        },
+        "normalState":
+        {
+            "enabled": true,
+            "breathingRange": 0.1,
+            "breathingIntensityCutoff": 0.6,
+            "intensityWait":
+            {
+                "range": [0, 5]
+            },
+            "intensityTarget":
+            {
+                "rng":
+                {
+                    "type": "normal",
+                    "centerMin": 0,
+                    "centerMax": 0.8,
+                    "width": 3
+                }
+            },
+            "intensityTime":
+            {
+                "range": [0, 2]
+            }
+        },
+        "kissState":
+        {
+            "enabled": true,
+            "voiceChance": 0.2,
+            "voiceChanceMinExcitement": 0.2,
+            "voiceTime": 2
+        },
+        "orgasmState":
+        {
+            "enabled": true,
+            "voice": "orgasm"
+        },
+        "bjState":
+        {
+            "enabled": true,
+            "voiceChance": 0.2,
+            "voiceChanceMinExcitement": 0.2,
+            "voiceTime": 2
+        },
+        "chokedState":
+        {
+            "enabled": true,
+            "minTimeForMoaning": 3,
+            "moaningAfter": 1.0,
+            "moaningTime": 3.0
+        }
+    },
+
+
+    "expressions":
+    [
+        {
+            "name": "smile1",
+            "moods": "happy",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Smile Open Full Face",
+                    "max": 0.7
+                }
+            ]
+        },
+
+        {
+            "name": "smile2",
+            "moods": "happy",
+            "bodyParts": "mouth",
+            "sex": "female",
+            "morphs":
+            [
+                {
+                    "id": "Elise Smile (REN)"
+                }
+            ]
+        },
+
+
+        {
+            "name": "cornerSmile",
+            "moods": "playful",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Smile Open Full Face",
+                    "max": 0.3
+                },
+
+                {
+                    "id": "Mouth Smile Simple Left",
+                    "max": 1.2
+                },
+
+                {
+                    "id": "Eyes Squint",
+                    "max": 0.15
+                }
+            ]
+        },
+
+        {
+            "name": "curious",
+            "moods": "playful",
+            "bodyParts": "mouth",
+            "sex": "female",
+            "morphs":
+            [
+                {
+                    "id": "Curious1",
+                    "max": 0.5
+                }
+            ]
+        },
+
+        {
+            "name": "desire",
+            "moods": "playful",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Desire",
+                    "max": 0.2
+                }
+            ]
+        },
+
+        {
+            "name": "flirting",
+            "moods": "playful",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Flirting",
+                    "max": 0.5
+                }
+            ]
+        },
+
+        {
+            "name": "pleasure",
+            "moods": "excited orgasm",
+            "bodyParts": "mouth eyes",
+            "morphs":
+            [
+                {
+                    "id": "CTRLBrowInnerUp",
+                    "max": 0.70
+                },
+                {
+                    "id": "PHMMouthSmile",
+                    "max": 0.46
+                },
+                {
+                    "id": "PHMMouthOpen",
+                    "max": 1.7
+                },
+                {
+                    "id": "Mouth corner up",
+                    "max": -0.8
+                },
+                {
+                    "id": "CTRLEyesClosed",
+                    "max": 0.66
+                }
+            ]
+        },
+
+        {
+            "name": "pain",
+            "moods": "excited",
+            "bodyParts": "mouth eyes",
+            "morphs":
+            [
+                {
+                    "id": "Pain",
+                    "max": 0.3
+                }
+            ]
+        },
+
+        {
+            "name": "shock",
+            "moods": "excited",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Shock",
+                    "max": 0.9
+                }
+            ]
+        },
+
+        {
+            "name": "scream",
+            "moods": "excited",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Scream",
+                    "max": 0.8
+                }
+            ]
+        },
+
+        {
+            "name": "stifled",
+            "moods": "excited",
+            "bodyParts": "mouth",
+            "sex": "female",
+            "exclusive": true,
+            "minExcitement": 0.7,
+            "minHoldTime": 2,
+            "maxHoldTime": 3,
+            "maxOnly": true,
+            "morphs":
+            [
+                {
+                    "id": "Stifled1",
+                    "max": 0.5
+                }
+            ]
+        },
+
+        {
+            "name": "angryExcited",
+            "moods": "excited",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Angry",
+                    "max": 0.3
+                }
+            ]
+        },
+
+        {
+            "name": "AAsex_browhiAA6",
+            "moods": "excited",
+            "bodyParts": "mouth eyes",
+            "sex": "female",
+            "weight": 0.5,
+            "morphs":
+            [
+                {
+                    "id": "AAsex_browhiAA6",
+                    "max": 0.7,
+                    "eyesClosed": 1
+                }
+            ]
+        },
+
+        {
+            "name": "AAsex_closedAA1",
+            "moods": "excited",
+            "sex": "female",
+            "bodyParts": "mouth eyes",
+            "weight": 0.5,
+            "morphs":
+            [
+                {
+                    "id": "AAsex_closedAA1",
+                    "max": 0.8,
+                    "eyesClosed": 0.8
+                }
+            ]
+        },
+
+        {
+            "name": "embarassed",
+            "moods": "excited",
+            "bodyParts": "mouth eyes",
+            "sex": "female",
+            "morphs":
+            [
+                {
+                    "id": "Embarassed_1",
+                    "max": 0.5
+                }
+            ]
+        },
+
+
+
+        {
+            "name": "angryMouth",
+            "moods": "angry",
+            "bodyParts": "mouth eyes",
+            "morphs":
+            [
+                {
+                    "id": "Angry",
+                    "max": 0.3
+                }
+            ]
+        },
+
+        {
+            "name": "angryFrown",
+            "moods": "angry",
+            "bodyParts": "eyes",
+            "morphs":
+            [
+                {
+                    "id": "Brow Down"
+                }
+            ]
+        },
+
+        {
+            "name": "angrySquint",
+            "moods": "angry",
+            "bodyParts": "eyes",
+            "morphs":
+            [
+                {
+                    "id": "Eyes Squint"
+                },
+
+                {
+                    "id": "Nose Wrinkle"
+                }
+            ]
+        },
+
+        {
+            "name": "angryMouthFrown",
+            "moods": "angry",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Mouth corner up",
+                    "max": -1
+                },
+
+                {
+                    "id": "Lip Top Up",
+                    "max": 0.3
+                }
+            ]
+        },
+
+        {
+            "name": "angrySnarl",
+            "moods": "angry",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Snarl Left",
+                    "max": 0.3
+                }
+            ]
+        },
+
+
+        {
+            "name": "surprise",
+            "moods": "surprised",
+            "bodyParts": "mouth eyes",
+            "morphs":
+            [
+                {
+                    "id": "Surprise",
+                    "max": 0.8
+                }
+            ]
+        },
+
+        {
+            "name": "surprise2",
+            "moods": "surprised",
+            "bodyParts": "mouth eyes",
+            "morphs":
+            [
+                {
+                    "id": "Surprise2",
+                    "max": 0.8
+                }
+            ]
+        },
+
+
+        {
+            "name": "eyesClosed",
+            "moods": "excited",
+            "bodyParts": "eyes",
+            "morphs":
+            [
+                {
+                    "id": "Eyes Closed"
+                }
+            ]
+        },
+
+        {
+            "name": "eyesClosedSleeping",
+            "moods": "tired",
+            "bodyParts": "eyes",
+            "morphs":
+            [
+                {
+                    "id": "Eyes Closed",
+                    "min": 0.5,
+                    "max": 1.0
+                }
+            ]
+        },
+
+        {
+            "name": "drooling",
+            "moods": "tired",
+            "bodyParts": "mouth",
+            "morphs":
+            [
+                {
+                    "id": "Mouth Open"
+                }
+            ]
+        },
+
+        {
+            "name": "rollup",
+            "moods": "excited",
+            "sex": "female",
+            "minExcitement": 0.8,
+            "minHoldTime": 2,
+            "maxOnly": true,
+            "weight": 0.3,
+            "morphs":
+            [
+                {
+                    "id": "Eyeball Depth L",
+                    "max": 1.0
+                },
+
+                {
+                    "id": "Eyeball Rotate Vertical L",
+                    "max": -2.7
+                },
+
+                {
+                    "id": "Eyeball Depth R",
+                    "max": 1.0
+                },
+
+                {
+                    "id": "Eyeball Rotate Vertical R",
+                    "max": -2.7
+                }
+            ]
+        },
+
+        {
+            "name": "rollupTired",
+            "moods": "tired",
+            "sex": "female",
+            "morphs":
+            [
+                {
+                    "id": "Eyeball Depth L",
+                    "max": 0.3
+                },
+
+                {
+                    "id": "Eyeball Rotate Vertical L",
+                    "max": -0.8
+                },
+
+                {
+                    "id": "Eyeball Depth R",
+                    "max": 0.3
+                },
+
+                {
+                    "id": "Eyeball Rotate Vertical R",
+                    "max": -0.8
+                }
+            ]
+        }
+    ],
+
+    "events":
+    [
+        {
+            "type": "kiss",
+            "canInitiate": true,
+            "startLipsDistance": 0.1,
+            "startLipsDistanceWithPlayer": 0.12,
+            "stopLipsDistance": 0.1,
+            "stopLipsDistanceWithPlayer": 0.15,
+            "stopHeadDistanceFromStart": 0.15,
+            "duration":
+            {
+                "range":
+                {
+                    "min": 10,
+                    "max": 100
+                },
+                "rng": "normal"
+            },
+            "interval":
+            {
+                "range":
+                {
+                    "min": 30,
+                    "max": 120
+                },
+                "rng": "normal"
+            }
+        },
+
+        {
+            "type": "holdbreath",
+            "minExcitement": 0.7,
+            "cooldown": 30,
+            "holdTime":
+            {
+                "range": [3, 5],
+                "comment": "min must be >= voice.chokedState.minTimeForMoaning to get the moan"
+            },
+            "chance": 0.1,
+            "chanceRng": "uniform"
+        }
+    ],
+
+
+    "animations":
+    [
+        {
+            "animation": "idle",
+            "type": "proc",
+            "options":
+            {
+                "file": "animations/standIdle.json"
+            }
+        },
+
+        {
+            "animation": "excited",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueExcited"
+            }
+        },
+
+        {
+            "animation": "thrust",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueThrust"
+            }
+        },
+
+        {
+            "animation": "trib",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueTrib"
+            }
+        },
+
+        {
+            "animation": "orgasm",
+            "type": "proc",
+            "options":
+            {
+                "file": "animations/orgasm.json"
+            }
+        },
+
+        {
+            "animation": "smoke",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueSmoke"
+            }
+        },
+
+        {
+            "animation": "suckFinger",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueSuckFinger"
+            }
+        },
+
+        {
+            "animation": "rightFinger",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueRightFinger"
+            }
+        },
+
+        {
+            "animation": "leftFinger",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueLeftFinger"
+            }
+        },
+
+        {
+            "animation": "kiss",
+            "type": "internal",
+            "options":
+            {
+                "name": "cwKiss"
+            }
+        },
+
+        {
+            "animation": "handjobBoth",
+            "type": "internal",
+            "options":
+            {
+                "name": "cwHJboth"
+            }
+        },
+
+        {
+            "animation": "handjobLeft",
+            "type": "internal",
+            "options":
+            {
+                "name": "cwHJleft"
+            }
+        },
+
+        {
+            "animation": "handjobRight",
+            "type": "internal",
+            "options":
+            {
+                "name": "cwHJright"
+            }
+        },
+
+        {
+            "animation": "blowjob",
+            "type": "internal",
+            "options":
+            {
+                "name": "cwBJ"
+            }
+        },
+
+        {
+            "animation": "leftHandOnBreast",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueLeftHandOnBreast"
+            }
+        },
+
+        {
+            "animation": "rightHandOnBreast",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueRightHandOnBreast"
+            }
+        },
+
+        {
+            "animation": "leftHandOnChest",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueLeftHandOnChest"
+            }
+        },
+
+        {
+            "animation": "rightHandOnChest",
+            "type": "internal",
+            "options":
+            {
+                "name": "cueRightHandOnChest"
+            }
+        }
+    ],
+
+
+    "gazeDuration":
+    {
+        "range":
+        {
+            "min": 0.8,
+            "max": 0.2,
+            "window": 0.3,
+            "windowEasing": "cubicin"
+        }
+    },
+
+    "gazeRandomInterval":
+    {
+        "range":
+        {
+            "min": 0.5,
+            "max": 15,
+            "rng":
+            {
+                "type": "normal",
+                "centerMin": 0.5,
+                "centerMax": 0.4,
+                "widthMin": 1.0,
+                "widthMax": 0.75
+            }
+        }
+    },
+
+    "gazeEnabled": true,
+    "gazeSaccade": true,
+    "gazeBlink": true,
+    "gazeEyeTargetMovementSpeed": 10.0,
+
+    "gazeSaccadeInterval":
+    {
+        "range":
+        {
+            "min": 3,
+            "max": 0.2,
+            "window": 2
+        }
+    },
+
+    "gazeSaccadeMovementRange": 4,
+
+    "emergencyGazeDuration": 0.2,
+
+    "maxExcitementForAvoid": 0,
+    "avoidDelayAfterOrgasm": 0,
+
+    "lookAboveMaxWeight": 1,
+    "lookAboveMaxWeightOrgasm": 2,
+    "lookAboveMinExcitement": 0.35,
+    "lookAboveMinPhysicalRate": 0.001,
+    "lookAboveUseGazeEnergy": true,
+
+    "lookAtPlayerOnGrabWeight": -1,
+    "lookAtPlayerTimeAfterGrab": 3,
+
+    "lookFrontWeight": 0,
+    "lookDownWeight": 0,
+
+    "idleNaturalRandomWeight": 0.05,
+    "idleEmptyRandomWeight": 0.02,
+    "naturalRandomWeight": 0.0001,
+    "naturalOtherEyesWeight": 0.4,
+    "busyOtherEyesWeight": 0.5,
+    "naturalPlayerEyesWeight": 1.5,
+    "busyPlayerEyesWeight": 1,
+    "otherEyesExcitementWeight": 1.0,
+    "maxTirednessForRandomGaze": 0.5,
+    "otherEyesOrgasmWeight": 50,
+
+    "blowjobEyesWeight": 0.5,
+    "blowjobGenitalsWeight": 5,
+    "handjobEyesWeight": 5,
+    "handjobGenitalsWeight": 2,
+    "penetratedEyesWeight": 8,
+    "penetratedGenitalsWeight": 1,
+    "penetratingEyesWeight": 5,
+    "penetratingGenitalsWeight": 2,
+    "gropedEyesWeight": 2,
+    "gropedTargetWeight": 0.5,
+    "gropingEyesWeight": 2,
+    "gropingTargetWeight": 0.5,
+
+    "otherBlowjobEyesWeight": 2,
+    "otherBlowjobTargetEyesWeight": 1,
+    "otherBlowjobTargetGenitalsWeight": 1,
+    "otherHandjobEyesWeight": 2,
+    "otherHandjobTargetEyesWeight": 1,
+    "otherHandjobTargetGenitalsWeight": 1,
+    "otherPenetrationEyesWeight": 2,
+    "otherPenetrationSourceEyesWeight": 1,
+    "otherPenetrationSourceGenitalsWeight": 1,
+    "otherGropedEyesWeight": 1.5,
+    "otherGropedSourceEyesWeight": 1,
+    "otherGropedTargetWeight": 1,
+
+
+    "zappedEnabled": true,
+    "zappedTentativeTime": 1.5,
+    "zappedCooldown": 30,
+    "zappedTime": 3,
+
+    "zappedGazeMinIntensity": 0.3,
+
+    "zappedByPlayerBreastsEyesWeight": 50,
+    "zappedByPlayerBreastsTargetWeight": 10,
+    "zappedByPlayerBreastsExcitement": 0.0,
+    "zappedByPlayerGenitalsEyesWeight": 50,
+    "zappedByPlayerGenitalsTargetWeight": 10,
+    "zappedByPlayerGenitalsExcitement": 0.5,
+    "zappedByPlayerPenetrationEyesWeight": 50,
+    "zappedByPlayerPenetrationTargetWeight": 10,
+    "zappedByPlayerPenetrationExcitement": 0.7,
+    "zappedByPlayerMouthEyesWeight": 20,
+    "zappedByPlayerMouthExcitement": 0,
+    "zappedByPlayerLookUpWeight": 5,
+    "zappedByPlayerLookAwayMaxExcitement": 0,
+    "zappedByPlayerGazeDuration": [0.4, 0.2],
+
+    "zappedByOtherBreastsEyesWeight": 20,
+    "zappedByOtherBreastsTargetWeight": 5,
+    "zappedByOtherBreastsExcitement": 0.0,
+    "zappedByOtherGenitalsEyesWeight": 20,
+    "zappedByOtherGenitalsTargetWeight": 5,
+    "zappedByOtherGenitalsExcitement": 0.5,
+    "zappedByOtherPenetrationEyesWeight": 20,
+    "zappedByOtherPenetrationTargetWeight": 5,
+    "zappedByOtherPenetrationExcitement": 0.7,
+    "zappedByOtherMouthEyesWeight": 5,
+    "zappedByOtherMouthExcitement": 0,
+    "zappedByOtherLookUpWeight": 5,
+    "zappedByOtherLookAwayMaxExcitement": 0,
+    "zappedByOtherGazeDuration": [0.6, 0.4],
+
+    "otherZappedEyesWeight": 20,
+    "otherZappedTargetWeight": 10,
+    "otherZappedSourceWeight": 10,
+    "otherZappedGazeDuration": [0.6, 0.4],
+
+
+    "kissSpeedEnergyFactor": 1,
+    "tirednessExcitementRateFactor": 0.6,
+
+    "gazeEnergyTirednessFactor": 1,
+    "gazeTirednessFactor": 1,
+    "movementEnergyTirednessFactor": 0,
+    "movementTirednessFactor": 0,
+    "expressionExcitementFactor": 1,
+    "expressionTirednessFactor": 1,
+
+    "avoidGazePlayerMinExcitement": 0,
+    "avoidGazePlayerMaxExcitement": 0,
+    "avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
+    "avoidGazePlayerInsidePersonalSpaceMaxExcitement": 0,
+    "avoidGazePlayerDuringSexMinExcitement": 0,
+    "avoidGazePlayerDuringSexMaxExcitement": 0,
+    "avoidGazePlayerDelayAfterOrgasm": 0,
+    "avoidGazePlayerWeight": 0,
+
+    "avoidGazeOthersMinExcitement": 0,
+    "avoidGazeOthersMaxExcitement": 0,
+    "avoidGazeOthersInsidePersonalSpaceMinExcitement": 0,
+    "avoidGazeOthersInsidePersonalSpaceMaxExcitement": 0,
+    "avoidGazeOthersDuringSexMinExcitement": 0,
+    "avoidGazeOthersDuringSexMaxExcitement": 0,
+    "avoidGazeOthersDelayAfterOrgasm": 0,
+    "avoidGazeOthersWeight": 0,
+
+    "avoidGazeUninvolvedHavingSexMinExcitement": 0,
+    "avoidGazeUninvolvedHavingSexMaxExcitement": 0,
+
+    "avoidGazeAnger": 0,
+    "angerWhenPlayerInteracts": 0,
+    "angerMaxExcitementForAnger": 0,
+    "angerMaxExcitementForHappiness": 0,
+    "angerExcitementFactorForAnger": 0,
+    "angerExcitementFactorForHappiness": 0,
+
+    "defaultHappiness": 1,
+    "defaultPlayfulness": 0,
+    "defaultSurprise": 0,
+    "defaultAnger": 0,
+    "maxHappyExpression": 1,
+    "maxExcitedExpression": 1,
+    "maxPlayfulExpression": 1,
+    "maxAngryExpression": 1,
+    "maxSurprisedExpression": 1,
+    "maxTiredExpression": 1,
+    "minTiredness": 0,
+    "maxEmotionalRate": 1,
+
+    "minHappyChoked": 0,
+    "maxHappyChoked": 0.2,
+    "minPlayfulChoked": 0,
+    "maxPlayfulChoked": 0,
+    "minExcitedChoked": 0,
+    "maxExcitedChoked": 1,
+    "minAngryChoked": 0,
+    "maxAngryChoked": 1,
+    "minSurprisedChoked": 1,
+    "maxSurprisedChoked": 1,
+    "minTiredChoked": 0,
+    "maxTiredChoked": 1,
+
+    "expressionMinHoldTime": 0,
+    "expressionMaxHoldTime": 3,
+    "excitedExpressionWeightModifier": 2,
+    "exclusiveExpressionWeightModifier": 0.1,
+    "orgasmExpressionRangeMin": 0.8,
+    "orgasmExpressionRangeMax": 1,
+    "orgasmFirstExpressionTime": 0.2,
+    "orgasmSyncMinExcitement": 0.9,
+
+    "maxSweat": 1,
+    "maxFlush": 0.5,
+    "maxChokedFlush": 1,
+    "chokedAirDownTime": 15,
+    "chokedAirUpTime": 5,
+
+    "flushBaseColorRed": 1,
+    "flushBaseColorGreen": 0,
+    "flushBaseColorBlue": 0,
+    "flushMultiplier": 0.15,
+
+    "temperatureExcitementRate": 0.015,
+    "temperatureDecayRate": 0.005,
+    "temperatureExcitementMax": 0.8,
+
+    "tirednessBaseDecayRate": 0.005,
+    "tirednessBackToBaseRate": 0.02,
+    "tirednessMaxExcitementForBaseDecay": 0.5,
+
+    "neutralVoicePitch": 0.5,
+    "voicePitch": -1,
+
+    "idleMaxExcitement": 0,
+
+    "excitementDecayRate": -0.01,
+
+    "orgasmHighTime": 4,
+    "orgasmLowTime": 4,
+    "postOrgasmTime": 10,
+    "orgasmFluidTime": 8,
+    "movementEnergyRampUpAfterOrgasm": 30,
+    "movementEnergyRampUpAfterOrgasmEasing": "quadin",
+    "tirednessRateDuringPostOrgasm": 0.3,
+    "delayAfterOrgasmUntilTirednessDecay": 10,
+    "orgasmBaseTirednessIncrease": 0.2,
+    "excitementPostOrgasm": 0.3,
+
+    "rateAdjustment": 1,
+    "penetrationDamper": 0.5,
+    "minCollisionMag": 0.1,
+    "minCollisionMagPenetration": 0.2,
+
+    "slapMinExpressionChange": 0,
+    "slapMaxExpressionChange": 0.5,
+    "slapMinTime": 0.15,
+    "slapMaxTime": 0.45,
+    "slapUpdateInterval":
+    {
+        "range":
+        {
+            "min": 3,
+            "max": 8
+        }
+    },
+
+    "finishLookAtPlayer": "involved",
+    "finishLookAtPlayerAction": "gaze",
+    "finishOrgasm": "involved",
+    "finishOrgasmMinExcitement": 0,
+    "finishMood": "involved",
+    "finishMoodHappy": -1,
+    "finishMoodPlayful": -1,
+    "finishMoodAngry": -1,
+    "finishMoodSurprised": -1,
+    "finishMoodTired": -1,
+
+
+    "sensitivities":
+    [
+        {
+            "type": "penetration",
+            "physicalRate": 0.0025,
+            "physicalMax": 1.0,
+            "nonPhysicalRate": 0.0012,
+            "nonPhysicalMax": 1.0,
+
+            "modifiers":
+            [
+                {
+                    "source": "external",
+                    "modifier": 4
+                }
+            ]
+        },
+
+        {
+            "type": "mouth",
+            "rate": 0.001,
+            "max": 0.3
+        },
+
+        {
+            "type": "breasts",
+            "rate": 0.002,
+            "max": 0.2,
+
+            "modifiers":
+            [
+                {
+                    "source": "player",
+                    "modifier": 2
+                },
+                {
+                    "source": "self",
+                    "modifier": 0.5
+                }
+            ]
+        },
+
+        {
+            "type": "genitals",
+            "physicalRate": 0.006,
+            "physicalMax": 1.0,
+            "nonPhysicalRate": 0.0015,
+            "nonPhysicalMax": 0.6,
+
+            "modifiers":
+            [
+                {
+                    "source": "player",
+                    "modifier": 2
+                },
+                {
+                    "source": "self",
+                    "modifier": 0.8
+                },
+                {
+                    "source": "any",
+                    "sourcePart": "mouth",
+                    "modifier": 1.5
+                }
+            ]
+        },
+
+        {
+            "type": "othersExcitement",
+            "rate": 0.3,
+            "max": 0.10
+        }
+    ],
+
+    "pose":
+    {
+        "type": "keyJoints",
+        "controllers":
+        [
+            {
+                "receiver": "all",
+                "parameters":
+                [
+                    {
+                        "name": "jointDriveMaxForce",
+                        "value": "default"
+                    }
+                ]
+            }
+        ]
+    }
 }

@@ -295,12 +295,6 @@ namespace Cue.Sys.Vam
 			if (m_ == null)
 				return;
 
-			if (subMorphs_.Count > 0)
-			{
-				SetSubMorphs(f, maxDelta);
-				return;
-			}
-
 			bool doSet;
 
 			if (lastSetFrame_ == Cue.Instance.Frame)
@@ -330,12 +324,27 @@ namespace Cue.Sys.Vam
 				SetMorphValue(v);
 				lastSetFrame_ = Cue.Instance.Frame;
 			}
+
+			SetSubMorphs(f, maxDelta);
 		}
 
 		public void Reset()
 		{
 			if (m_ != null)
+			{
+				try
+				{
+					setFromCue_ = true;
+					m_.morphValue = m_.startValue + 1;
+				}
+				finally
+				{
+					setFromCue_ = false;
+				}
+
 				SetMorphValue(m_.startValue);
+				ResetSubMorphs();
+			}
 		}
 
 		public override string ToString()
@@ -403,6 +412,12 @@ namespace Cue.Sys.Vam
 				float smf = f * subMorphs_[i].multiplier_;
 				subMorphs_[i].DoSet(smf, maxDelta);
 			}
+		}
+
+		private void ResetSubMorphs()
+		{
+			for (int i = 0; i < subMorphs_.Count; ++i)
+				subMorphs_[i].Reset();
 		}
 	}
 

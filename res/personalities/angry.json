@@ -1,24 +1,24 @@
 {
-	"name": "Angry",
-	"inherit": "base",
-	"defaultHappiness": 0,
-	"defaultPlayfulness": 0,
-	"defaultAnger": 1,
-	"lookAtPlayerTimeAfterGrab": 0,
+    "name": "Angry",
+    "inherit": "base",
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultAnger": 1,
+    "lookAtPlayerTimeAfterGrab": 0,
 
-	"zappedByPlayerBreastsExcitement": 0,
-	"zappedByPlayerGenitalsExcitement": 0,
-	"zappedByPlayerPenetrationExcitement": 0,
-	"zappedByPlayerMouthExcitement": 0,
+    "zappedByPlayerBreastsExcitement": 0,
+    "zappedByPlayerGenitalsExcitement": 0,
+    "zappedByPlayerPenetrationExcitement": 0,
+    "zappedByPlayerMouthExcitement": 0,
 
-	"finishMoodAngry": 1,
-	"finishMoodSurprised": 1,
+    "finishMoodAngry": 1,
+    "finishMoodSurprised": 1,
 
-	"voice":
-	{
-		"normalState":
-		{
-			"breathingRange": 0.35
-		}
-	}
+    "voice":
+    {
+        "normalState":
+        {
+            "breathingRange": 0.35
+        }
+    }
 }

@@ -1,288 +1,288 @@
 {
-	"name": "procStandIdle",
-	"hasMovement": false,
-	"multiplier": "scale",
-	"targets":
-	[
-		{
-			"type": "con",
-			"name": "sway",
-			"loop": true,
-			"sync":
-			{
-				"type": "nosync"
-			},
-			"targets":
-			[
-				{
-					"type": "rforce",
-					"bodyPart": "hips",
-					"movement":
-					{
-						"min": [-120, 0, -120],
-						"max": [120, 0, 120]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rforce",
-					"bodyPart": "chest",
-					"movement":
-					{
-						"min": [-120, 0, -120],
-						"max": [120, 0, 120]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rforce",
-					"bodyPart": "leftHand",
-					"movement":
-					{
-						"min": [-60, 0, -60],
-						"max": [60, 0, 60]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rforce",
-					"bodyPart": "rightHand",
-					"movement":
-					{
-						"min": [-60, 0, -60],
-						"max": [60, 0, 60]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
+    "name": "procStandIdle",
+    "hasMovement": false,
+    "multiplier": "scale",
+    "targets":
+    [
+        {
+            "type": "con",
+            "name": "sway",
+            "loop": true,
+            "sync":
+            {
+                "type": "nosync"
+            },
+            "targets":
+            [
+                {
+                    "type": "rforce",
+                    "bodyPart": "hips",
+                    "movement":
+                    {
+                        "min": [-120, 0, -120],
+                        "max": [120, 0, 120]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rforce",
+                    "bodyPart": "chest",
+                    "movement":
+                    {
+                        "min": [-120, 0, -120],
+                        "max": [120, 0, 120]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rforce",
+                    "bodyPart": "leftHand",
+                    "movement":
+                    {
+                        "min": [-60, 0, -60],
+                        "max": [60, 0, 60]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rforce",
+                    "bodyPart": "rightHand",
+                    "movement":
+                    {
+                        "min": [-60, 0, -60],
+                        "max": [60, 0, 60]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
 
 
-				{
-					"type": "rtorque",
-					"bodyPart": "hips",
-					"movement":
-					{
-						"min": [-30, -30, -30],
-						"max": [30, 30, 30]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rtorque",
-					"bodyPart": "chest",
-					"movement":
-					{
-						"min": [-30, -30, -30],
-						"max": [30, 30, 30]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rtorque",
-					"bodyPart": "leftHand",
-					"movement":
-					{
-						"min": [-10, -10, -10],
-						"max": [10, 10, 10]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rtorque",
-					"bodyPart": "rightHand",
-					"movement":
-					{
-						"min": [-10, -10, -10],
-						"max": [10, 10, 10]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
+                {
+                    "type": "rtorque",
+                    "bodyPart": "hips",
+                    "movement":
+                    {
+                        "min": [-30, -30, -30],
+                        "max": [30, 30, 30]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rtorque",
+                    "bodyPart": "chest",
+                    "movement":
+                    {
+                        "min": [-30, -30, -30],
+                        "max": [30, 30, 30]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rtorque",
+                    "bodyPart": "leftHand",
+                    "movement":
+                    {
+                        "min": [-10, -10, -10],
+                        "max": [10, 10, 10]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rtorque",
+                    "bodyPart": "rightHand",
+                    "movement":
+                    {
+                        "min": [-10, -10, -10],
+                        "max": [10, 10, 10]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
 
 
-				{
-					"type": "rforce",
-					"bodyPart": "head",
-					"movement":
-					{
-						"min": [-120, -120, -120],
-						"max": [ 120, 120, 120]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
+                {
+                    "type": "rforce",
+                    "bodyPart": "head",
+                    "movement":
+                    {
+                        "min": [-120, -120, -120],
+                        "max": [ 120, 120, 120]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
 
 
 
-				{
-					"type": "rtorque",
-					"bodyPart": "head",
-					"movement":
-					{
-						"min": [-30, -30, -30],
-						"max": [ 30, 30, 30]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
+                {
+                    "type": "rtorque",
+                    "bodyPart": "head",
+                    "movement":
+                    {
+                        "min": [-30, -30, -30],
+                        "max": [ 30, 30, 30]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
 
 
-				{
-					"type": "rtorque",
-					"bodyPart": "leftFoot",
-					"movement":
-					{
-						"min": [-20, -20, -20],
-						"max": [ 20,  20,  20]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "rtorque",
-					"bodyPart": "rightFoot",
-					"movement":
-					{
-						"min": [-20, -20, -20],
-						"max": [ 20,  20,  20]
-					},
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"bwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"bwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
+                {
+                    "type": "rtorque",
+                    "bodyPart": "leftFoot",
+                    "movement":
+                    {
+                        "min": [-20, -20, -20],
+                        "max": [ 20,  20,  20]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "rtorque",
+                    "bodyPart": "rightFoot",
+                    "movement":
+                    {
+                        "min": [-20, -20, -20],
+                        "max": [ 20,  20,  20]
+                    },
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "bwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "bwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
 
-				{
-					"type": "morph",
-					"bodyPart": "rightHand",
-					"morph": "Right Fingers Fist",
-					"min": 0.0,
-					"max": 0.2,
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				},
-				{
-					"type": "morph",
-					"bodyPart": "leftHand",
-					"morph": "Left Fingers Fist",
-					"min": 0.0,
-					"max": 0.2,
-					"sync":
-					{
-						"type": "duration",
-						"fwdDuration": [1, 6],
-						"fwdDelay": [0, 6],
-						"loop": true,
-						"resetBetween": false
-					}
-				}
-			]
-		}
-	]
+                {
+                    "type": "morph",
+                    "bodyPart": "rightHand",
+                    "morph": "Right Fingers Fist",
+                    "min": 0.0,
+                    "max": 0.2,
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                },
+                {
+                    "type": "morph",
+                    "bodyPart": "leftHand",
+                    "morph": "Left Fingers Fist",
+                    "min": 0.0,
+                    "max": 0.2,
+                    "sync":
+                    {
+                        "type": "duration",
+                        "fwdDuration": [1, 6],
+                        "fwdDelay": [0, 6],
+                        "loop": true,
+                        "resetBetween": false
+                    }
+                }
+            ]
+        }
+    ]
 }

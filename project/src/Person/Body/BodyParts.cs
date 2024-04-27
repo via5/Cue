@@ -68,6 +68,5 @@
 		{
 			get { return groping_; }
 		}
-
 	}
 }
