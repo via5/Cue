@@ -17,6 +17,7 @@ namespace Cue
 		public const int Clothing = 0x200;
 		public const int Resources = 0x400;
 		public const int Main = 0x800;
+		public const int UI = 0x1000;
 
 		public const int All = int.MaxValue;
 
@@ -140,7 +141,9 @@ namespace Cue
 					"slots",
 					"sys",
 					"clothing",
-					"resources"
+					"resources",
+					"main",
+					"ui"
 				};
 			}
 		}

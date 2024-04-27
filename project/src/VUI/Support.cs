@@ -672,7 +672,6 @@ namespace VUI
 			canvas_ = fullscreenPanel_.AddComponent<Canvas>();
 			var cr = fullscreenPanel_.AddComponent<CanvasRenderer>();
 			var cs = fullscreenPanel_.AddComponent<CanvasScaler>();
-			fullscreenPanel_.AddComponent<RectTransform>();
 
 			canvas_.renderMode = RenderMode.WorldSpace;
 			canvas_.worldCamera = Camera.main;
@@ -723,9 +722,9 @@ namespace VUI
 			hudPanel_.transform.SetParent(fullscreenPanel_.transform, false);
 
 			var bg = hudPanel_.AddComponent<UnityEngine.UI.Image>();
-			var rt = hudPanel_.AddComponent<RectTransform>();
+			var rt = hudPanel_.GetComponent<RectTransform>();
 			if (rt == null)
-				rt = hudPanel_.GetComponent<RectTransform>();
+				rt = hudPanel_.AddComponent<RectTransform>();
 
 			bg.color = new Color(0, 0, 0, 0.8f);
 			bg.raycastTarget = true;

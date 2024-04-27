@@ -12,6 +12,7 @@ namespace Cue
 		private const int Left = 1;
 		private const int Right = 2;
 
+		private readonly Logger log_;
 		private readonly Sys.ISys sys_;
 		private float minHeight_;
 		private VUI.Label name_ = null;
@@ -23,7 +24,10 @@ namespace Cue
 
 		public VRMenu(bool debugDesktop)
 		{
+			log_ = new Logger(Logger.UI, "vr");
 			sys_ = Cue.Instance.Sys;
+
+			Log.Info("creating");
 
 			VUI.Root root;
 
@@ -85,10 +89,14 @@ namespace Cue
 			Rebuild();
 
 			UpdateVisibility();
-			SetWidget(widgetSel_.Index);
 			PersonChanged();
 
 			Cue.Instance.Options.CustomMenuItems.Changed += Rebuild;
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public override void Destroy()
@@ -99,9 +107,11 @@ namespace Cue
 
 		private void Rebuild()
 		{
-			widgetSel_ = new CircularIndex<UIActions.IItem>(Items);
-			buttons_.RemoveAllChildren();
+			Log.Info("rebuilding");
 
+			widgetSel_ = new CircularIndex<UIActions.IItem>(Items);
+
+			buttons_.RemoveAllChildren();
 			foreach (var i in Items)
 				buttons_.Add(i.Panel);
 
@@ -112,6 +122,8 @@ namespace Cue
 
 			Root.RootSupport.SetSize(new UnityEngine.Vector3(Width, height));
 			Root.SupportBoundsChanged();
+
+			SetWidget(widgetSel_.Index);
 		}
 
 		private bool CheckMenuDelay(float s)
@@ -191,6 +203,8 @@ namespace Cue
 
 		public void SetWidget(int index)
 		{
+			Log.Info($"set widget {index}");
+
 			for (int i = 0; i < Items.Count; ++i)
 				Items[i].Selected = (i == index);
 		}
