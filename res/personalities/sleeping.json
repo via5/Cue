@@ -2,64 +2,67 @@
     "name": "Sleeping",
     "inherit": "standard",
 
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0,
-    "maxTiredExpression": 1,
-    "minTiredness": 1,
-    "maxEmotionalRate": 0,
+    "gazeDuration":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 2
+        }
+    },
+
+    "gazeRandomInterval":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 10
+        }
+    },
 
     "gazeEnabled": false,
     "gazeSaccade": false,
     "gazeBlink": false,
-    "gazeEyeTargetMovementSpeed": 0.3,
-
-    "lookAboveMaxWeight": 0.2,
-    "lookAboveMinExcitement": 0,
-    "lookAboveMinPhysicalRate": 0,
-    "lookAboveUseGazeEnergy": false,
-    "lookFrontWeight": 1,
-
-    "idleNaturalRandomWeight": 0,
-    "naturalRandomWeight": 0,
-    "naturalOtherEyesWeight": 0,
-    "naturalPlayerEyesWeight": 0,
-    "busyOtherEyesWeight": 0,
-
-    "blowjobEyesWeight": 0,
-    "blowjobGenitalsWeight": 0,
-    "handjobEyesWeight": 0,
-    "handjobGenitalsWeight": 0,
-    "penetratedEyesWeight": 0,
-    "penetratedGenitalsWeight": 0,
-    "penetratingEyesWeight": 0,
-    "penetratingGenitalsWeight": 0,
-    "gropedEyesWeight": 0,
-    "gropedTargetWeight": 0,
-    "gropingEyesWeight": 0,
-    "gropingTargetWeight": 0,
-
-    "otherEyesOrgasmWeight": 0,
-    "otherEyesExcitementWeight": 0,
-    "otherBlowjobEyesWeight": 0,
-    "otherBlowjobTargetEyesWeight": 0,
-    "otherBlowjobTargetGenitalsWeight": 0,
-    "otherHandjobEyesWeight": 0,
-    "otherHandjobTargetEyesWeight": 0,
-    "otherHandjobTargetGenitalsWeight": 0,
-    "otherPenetrationEyesWeight": 0,
-    "otherPenetrationSourceEyesWeight": 0,
-    "otherPenetrationSourceGenitalsWeight": 0,
-    "otherGropedEyesWeight": 0,
-    "otherGropedSourceEyesWeight": 0,
-    "otherGropedTargetWeight": 0,
 
     "zappedEnabled": false,
+
+    "kissSpeedEnergyFactor": 1,
+    "avoidGazeAnger": 0,
+
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultSurprise": 0,
+    "defaultAnger": 0,
+    "maxHappyExpression": 0.2,
+    "maxExcitedExpression": 0.2,
+    "maxPlayfulExpression": 0.2,
+    "maxAngryExpression": 0.2,
+    "maxSurprisedExpression": 0.2,
+    "maxTiredExpression": 1,
+    "minTiredness": 1,
+    "maxEmotionalRate": 0,
 
     "finishLookAtPlayer": "never",
     "finishOrgasm": "never",
     "finishMood": "never",
+
+    "voice":
+    {
+        "normalState":
+        {
+            "enabled": true,
+            "breathingRange": 1
+        },
+        "orgasmState":
+        {
+            "enabled": true,
+            "voice": "moaning",
+            "moaningIntensity": 0.3
+        },
+        "kissState": { "enabled": false },
+        "bjState": { "enabled": false },
+        "chokedState": { "enabled": false }
+    },
 
     "animations":
     [
@@ -86,42 +89,6 @@
             }
         }
     ],
-
-    "gazeDuration":
-    {
-        "range":
-        {
-            "min": 5,
-            "max": 2
-        }
-    },
-
-    "gazeRandomInterval":
-    {
-        "range":
-        {
-            "min": 5,
-            "max": 10
-        }
-    },
-
-    "voice":
-    {
-        "normalState":
-        {
-            "enabled": true,
-            "breathingRange": 1
-        },
-        "orgasmState":
-        {
-            "enabled": true,
-            "voice": "moaning",
-            "moaningIntensity": 0.3
-        },
-        "kissState": { "enabled": false },
-        "bjState": { "enabled": false },
-        "chokedState": { "enabled": false }
-    },
 
     "pose":
     {

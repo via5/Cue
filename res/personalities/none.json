@@ -2,6 +2,92 @@
     "name": "None",
     "inherit": "standard",
 
+    "gazeDuration":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 2
+        }
+    },
+
+    "gazeRandomInterval":
+    {
+        "range":
+        {
+            "min": 5,
+            "max": 10
+        }
+    },
+
+    "gazeEnabled": false,
+    "gazeSaccade": false,
+    "gazeBlink": false,
+    "gazeEyeTargetMovementSpeed": 0,
+
+    "zappedEnabled": false,
+
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultAnger": 0,
+    "maxExcitedExpression": 0,
+    "maxTiredExpression": 0,
+    "minTiredness": 0,
+    "maxEmotionalRate": 0,
+
+    "maxSweat": 0,
+    "maxFlush": 0,
+    "maxChokedFlush": 0,
+    "temperatureExcitementRate": 0,
+    "temperatureExcitementMax": 0,
+
+    "finishLookAtPlayer": "never",
+    "finishOrgasm": "never",
+    "finishMood": "never",
+
+    "sensitivities":
+    [
+        {
+            "type": "penetration",
+            "physicalRate": 0,
+            "physicalMax": 0,
+            "nonPhysicalRate": 0,
+            "nonPhysicalMax": 0
+        },
+
+        {
+            "type": "mouth",
+            "rate": 0,
+            "max": 0
+        },
+
+        {
+            "type": "breasts",
+            "rate": 0,
+            "max": 0
+        },
+
+        {
+            "type": "genitals",
+            "physicalRate": 0,
+            "physicalMax": 0,
+            "nonPhysicalRate": 0,
+            "nonPhysicalMax": 0
+        },
+
+        {
+            "type": "othersExcitement",
+            "rate": 0,
+            "max": 0
+        }
+    ],
+
+    "pose":
+    {
+        "type": "none"
+    },
+
+
     "voice":
     {
         "provider":
@@ -196,128 +282,5 @@
             "animation": "rightHandOnChest",
             "type": "none"
         }
-    ],
-
-
-    "gazeDuration":
-    {
-        "range":
-        {
-            "min": 5,
-            "max": 2
-        }
-    },
-
-    "gazeRandomInterval":
-    {
-        "range":
-        {
-            "min": 5,
-            "max": 10
-        }
-    },
-
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0,
-    "maxTiredExpression": 0,
-    "minTiredness": 0,
-    "maxEmotionalRate": 0,
-
-    "gazeEnabled": false,
-    "gazeSaccade": false,
-    "gazeBlink": false,
-    "gazeEyeTargetMovementSpeed": 0,
-
-    "lookAboveMaxWeight": 0,
-    "lookAboveMinExcitement": 0,
-    "lookAboveMinPhysicalRate": 0,
-    "lookAboveUseGazeEnergy": false,
-    "lookFrontWeight": 0,
-
-    "idleNaturalRandomWeight": 0,
-    "idleEmptyRandomWeight": 0,
-    "naturalRandomWeight": 0,
-    "naturalOtherEyesWeight": 0,
-    "busyOtherEyesWeight": 0,
-    "naturalPlayerEyesWeight": 0,
-    "busyPlayerEyesWeight": 0,
-    "otherEyesExcitementWeight": 0,
-    "maxTirednessForRandomGaze": 1,
-    "otherEyesOrgasmWeight": 0,
-
-    "blowjobEyesWeight": 0,
-    "blowjobGenitalsWeight": 0,
-    "handjobEyesWeight": 0,
-    "handjobGenitalsWeight": 0,
-    "penetratedEyesWeight": 0,
-    "penetratedGenitalsWeight": 0,
-    "penetratingEyesWeight": 0,
-    "penetratingGenitalsWeight": 0,
-    "gropedEyesWeight": 0,
-    "gropedTargetWeight": 0,
-    "gropingEyesWeight": 0,
-    "gropingTargetWeight": 0,
-
-    "otherBlowjobEyesWeight": 0,
-    "otherBlowjobTargetEyesWeight": 0,
-    "otherBlowjobTargetGenitalsWeight": 0,
-    "otherHandjobEyesWeight": 0,
-    "otherHandjobTargetEyesWeight": 0,
-    "otherHandjobTargetGenitalsWeight": 0,
-    "otherPenetrationEyesWeight": 0,
-    "otherPenetrationSourceEyesWeight": 0,
-    "otherPenetrationSourceGenitalsWeight": 0,
-    "otherGropedEyesWeight": 0,
-    "otherGropedSourceEyesWeight": 0,
-    "otherGropedTargetWeight": 0,
-
-    "zappedEnabled": false,
-
-    "finishLookAtPlayer": "never",
-    "finishOrgasm": "never",
-    "finishMood": "never",
-
-    "sensitivities":
-    [
-        {
-            "type": "penetration",
-            "physicalRate": 0,
-            "physicalMax": 0,
-            "nonPhysicalRate": 0,
-            "nonPhysicalMax": 0
-        },
-
-        {
-            "type": "mouth",
-            "rate": 0,
-            "max": 0
-        },
-
-        {
-            "type": "breasts",
-            "rate": 0,
-            "max": 0
-        },
-
-        {
-            "type": "genitals",
-            "physicalRate": 0,
-            "physicalMax": 0,
-            "nonPhysicalRate": 0,
-            "nonPhysicalMax": 0
-        },
-
-        {
-            "type": "othersExcitement",
-            "rate": 0,
-            "max": 0
-        }
-    ],
-
-    "pose":
-    {
-        "type": "none"
-    }
+    ]
 }

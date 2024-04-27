@@ -2,64 +2,6 @@
     "name": "Bored",
     "inherit": "standard",
 
-    "lookAboveMaxWeight": 0,
-    "lookAboveMaxWeightOrgasm": 0,
-
-    "idleNaturalRandomWeight": 1,
-    "naturalRandomWeight": 1,
-    "naturalOtherEyesWeight": 0,
-    "naturalPlayerEyesWeight": 0,
-    "busyOtherEyesWeight": 0,
-
-    "blowjobEyesWeight": 0.05,
-    "blowjobGenitalsWeight": 1,
-    "handjobEyesWeight": 0,
-    "handjobGenitalsWeight": 1,
-    "penetratedEyesWeight": 0.05,
-    "penetratedGenitalsWeight": 1,
-    "penetratingEyesWeight": 0.05,
-    "penetratingGenitalsWeight": 1,
-    "gropedEyesWeight": 0.05,
-    "gropedTargetWeight": 0.05,
-    "gropingEyesWeight": 0.05,
-    "gropingTargetWeight": 0.05,
-
-    "otherEyesOrgasmWeight": 0,
-    "otherEyesExcitementWeight": 0,
-    "otherBlowjobEyesWeight": 0,
-    "otherBlowjobTargetEyesWeight": 0,
-    "otherBlowjobTargetGenitalsWeight": 0,
-    "otherHandjobEyesWeight": 0,
-    "otherHandjobTargetEyesWeight": 0,
-    "otherHandjobTargetGenitalsWeight": 0,
-    "otherPenetrationEyesWeight": 0,
-    "otherPenetrationSourceEyesWeight": 0,
-    "otherPenetrationSourceGenitalsWeight": 0,
-    "otherGropedEyesWeight": 0,
-    "otherGropedSourceEyesWeight": 0,
-    "otherGropedTargetWeight": 0,
-
-    "zappedEnabled": false,
-
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0.1,
-
-    "finishLookAtPlayer": "involved",
-    "finishOrgasm": "never",
-    "finishMood": "involved",
-    "finishMoodAngry": 0.4,
-    "finishMoodSurprised": 0.4,
-
-    "animations":
-    [
-        {
-            "animation": "excited",
-            "type": "none"
-        }
-    ],
-
     "gazeDuration":
     {
         "range":
@@ -78,6 +20,78 @@
         }
     },
 
+    "gazeEnabled": true,
+    "avoidDelayAfterOrgasm": 0,
+
+    "lookAboveMaxWeight": 0,
+    "lookAboveMaxWeightOrgasm": 0,
+    "lookFrontWeight": 0,
+    "lookDownWeight": 0,
+
+    "idleNaturalRandomWeight": 1,
+    "idleEmptyRandomWeight": 1,
+    "naturalRandomWeight": 1,
+    "naturalOtherEyesWeight": 0,
+    "busyOtherEyesWeight": 0,
+    "naturalPlayerEyesWeight": 0,
+    "busyPlayerEyesWeight": 0,
+    "otherEyesExcitementWeight": 0,
+    "maxTirednessForRandomGaze": 1,
+    "otherEyesOrgasmWeight": 0.3,
+    "blowjobEyesWeight": 0.05,
+    "blowjobGenitalsWeight": 1,
+    "handjobEyesWeight": 0,
+    "handjobGenitalsWeight": 1,
+    "penetratedEyesWeight": 0.05,
+    "penetratedGenitalsWeight": 0.05,
+    "penetratingEyesWeight": 0.05,
+    "penetratingGenitalsWeight": 1,
+    "gropedEyesWeight": 0.05,
+    "gropedTargetWeight": 0.05,
+    "gropingEyesWeight": 0.05,
+    "gropingTargetWeight": 0.05,
+
+    "headTouchedByPlayerEyesWeight": 1,
+    "touchingPlayerHeadEyesWeight": 0.5,
+    "touchingOtherHeadEyesWeight": 0.5,
+    "playerHeadTouchedByOtherEyesWeight": 0,
+    "headTouchedByOtherEyesWeight": 0,
+    "otherHeadTouchedByPlayerEyesWeight": 0,
+    "otherHeadTouchedByOtherEyesWeight": 0,
+
+    "otherBlowjobEyesWeight": 0,
+    "otherBlowjobTargetEyesWeight": 0,
+    "otherBlowjobTargetGenitalsWeight": 0,
+    "otherHandjobEyesWeight": 0,
+    "otherHandjobTargetEyesWeight": 0,
+    "otherHandjobTargetGenitalsWeight": 0,
+    "otherPenetrationEyesWeight": 0,
+    "otherPenetrationSourceEyesWeight": 0,
+    "otherPenetrationSourceGenitalsWeight": 0,
+    "otherGropedEyesWeight": 0,
+    "otherGropedSourceEyesWeight": 0,
+    "otherGropedTargetWeight": 0,
+
+    "zappedEnabled": false,
+
+    "kissSpeedEnergyFactor": 1,
+    "angerExcitementFactorForHappiness": 0,
+
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultSurprise": 0,
+    "defaultAnger": 0,
+    "maxExcitedExpression": 0.1,
+
+    "maxSweat": 1,
+
+    "finishLookAtPlayer": "involved",
+    "finishOrgasm": "never",
+    "finishMood": "involved",
+    "finishMoodAngry": 0.4,
+    "finishMoodSurprised": 0.4,
+
+
     "voice":
     {
         "normalState":
@@ -89,5 +103,13 @@
             "voice": "moaning",
             "moaningIntensity": 0.3
         }
-    }
+    },
+
+    "animations":
+    [
+        {
+            "animation": "excited",
+            "type": "none"
+        }
+    ]
 }

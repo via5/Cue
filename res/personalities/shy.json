@@ -6,7 +6,15 @@
     "defaultSurprise": 0.1,
     "defaultAnger": 0,
     "lookAtPlayerTimeAfterGrab": 0,
-    "lookDownWeight": 1,
+    "lookDownWeight": 2,
+
+    "headTouchedByPlayerEyesWeight": 30,
+    "touchingPlayerHeadEyesWeight": 10,
+    "touchingOtherHeadEyesWeight": 5,
+    "playerHeadTouchedByOtherEyesWeight": 2,
+    "headTouchedByOtherEyesWeight": 5,
+    "otherHeadTouchedByPlayerEyesWeight": 1,
+    "otherHeadTouchedByOtherEyesWeight": 0.5,
 
     "avoidGazePlayerMinExcitement": 0.2,
     "avoidGazePlayerMaxExcitement": 0.5,
