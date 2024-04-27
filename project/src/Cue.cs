@@ -8,6 +8,8 @@ namespace Cue
 
 	class Cue
 	{
+		private const float UpdateActivePersonsInterval = 5.0f;
+
 		private static Cue instance_ = null;
 
 		public delegate void PlayerChangedCallback(Person oldPerson, Person newPerson);
@@ -22,6 +24,7 @@ namespace Cue
 		private readonly List<Person> persons_ = new List<Person>();
 		private readonly List<Person> activePersons_ = new List<Person>();
 		private Person[] activePersonsArray_ = new Person[0];
+		private float updateActivePersonsElapsed_ = 0;
 
 		private readonly List<IObject> objects_ = new List<IObject>();
 		private readonly List<IObject> activeObjects_ = new List<IObject>();
@@ -497,6 +500,8 @@ namespace Cue
 				}
 			}
 
+			UpdateActivePersons(s);
+
 			Instrumentation.Start(I.Update);
 			{
 				DoUpdate(s);
@@ -603,6 +608,41 @@ namespace Cue
 				{
 					if (everythingActive_[i].Visible)
 						everythingActive_[i].Update(s);
+				}
+			}
+		}
+
+		private void UpdateActivePersons(float s)
+		{
+			updateActivePersonsElapsed_ += s;
+
+			if (updateActivePersonsElapsed_ >= UpdateActivePersonsInterval)
+			{
+				updateActivePersonsElapsed_ = 0;
+				bool needsUpdate = false;
+
+				foreach (var p in persons_)
+				{
+					if (p.Visible != activePersons_.Contains(p))
+					{
+						needsUpdate = true;
+						break;
+					}
+				}
+
+				if (needsUpdate)
+				{
+					Log.Info("active persons changed");
+
+					activePersons_.Clear();
+
+					foreach (var o in everything_)
+					{
+						if (o is Person && o.Visible)
+							activePersons_.Add(o as Person);
+					}
+
+					activePersonsArray_ = activePersons_.ToArray();
 				}
 			}
 		}

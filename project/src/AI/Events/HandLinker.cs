@@ -7,9 +7,12 @@
 
 		class HandInfo
 		{
+			private const float MaxAtomMoveDistance = 1.0f;
+
 			private BodyPart hand_;
 			private BodyPartLock lk_ = null;
 			private BodyPart target_ = null;
+			private Vector3 lastAtomPos_;
 			private bool grabbed_ = false;
 			private AnimationType anim_ = AnimationType.None;
 
@@ -61,8 +64,14 @@
 				target_ = Body.ResolveBodyPart(region);
 				lk_ = lk;
 
-				if (target_ != null)
+				if (target_ == null)
 				{
+					lastAtomPos_ = Vector3.Zero;
+				}
+				else
+				{
+					lastAtomPos_ = target_.Person.Position;
+
 					if (hand_.Type == BP.LeftHand)
 					{
 						if (region.BodyPart.Type == BP.LeftBreast ||
@@ -105,7 +114,7 @@
 			{
 				if (lk_ != null)
 				{
-					Log.Verbose("unlinking");
+					Log.Info("unlinking");
 
 					lk_.Unlock();
 					lk_ = null;
@@ -127,6 +136,28 @@
 
 			public void Update(float s)
 			{
+				if (target_ != null)
+				{
+					// try to catch large movements like resetting pose
+
+					var d = Vector3.Distance(target_.Person.Position, lastAtomPos_);
+
+					if (d >= MaxAtomMoveDistance)
+					{
+						Log.Info(
+							$"target moved too far, unlinking: " +
+							$"was at {lastAtomPos_}, " +
+							$"now at {target_.Person.Position}, " +
+							$"distance is {d}, max is {MaxAtomMoveDistance}");
+
+						Unlink();
+						return;
+					}
+
+					lastAtomPos_ = target_.Person.Position;
+				}
+
+
 				if (anim_ != AnimationType.None)
 				{
 					bool play = Person.Options.GetAnimationOption(anim_)?.Play ?? true;
