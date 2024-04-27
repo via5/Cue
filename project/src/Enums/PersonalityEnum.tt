@@ -132,7 +132,6 @@ V.Float("GazeTirednessFactor"),
 V.Float("MovementEnergyTirednessFactor"),
 V.Float("ExpressionTirednessFactor"),
 
-V.Float("MovementEnergyRampUpDelayAfterOrgasm"),
 V.Float("MovementEnergyRampUpAfterOrgasm"),
 V.String("MovementEnergyRampUpAfterOrgasmEasing"),
 
@@ -208,7 +207,8 @@ V.Float("OrgasmBaseTirednessIncrease"),
 
 V.Float("ExcitementDecayRate"),
 V.Float("ExcitementPostOrgasm"),
-V.Float("OrgasmTime"),
+V.Float("OrgasmHighTime"),
+V.Float("OrgasmLowTime"),
 V.Float("PostOrgasmTime"),
 V.Float("OrgasmFluidTime"),
 V.Float("RateAdjustment"),

@@ -12,10 +12,7 @@ namespace Cue.Proc
 			public float durationInterval;
 			public bool checkDirection;
 			public float hipBackForceMaxDuration;
-		}
 
-		protected struct ForceConfig
-		{
 			public float hipForceMin;
 			public float hipForceMax;
 			public float hipForceWin;
@@ -74,7 +71,6 @@ namespace Cue.Proc
 		private Vector3 lastDir_ = Vector3.Zero;
 		private Person receiver_ = null;
 		private Config config_;
-		private ForceConfig fconfig_;
 		private Force[] forces_ = new Force[0];
 
 		private Render render_ = new Render();
@@ -100,11 +96,13 @@ namespace Cue.Proc
 		}
 
 
-		protected BasicThrustProcAnimation(string name, Config c)
+		protected BasicThrustProcAnimation(string name)
 			: base(name, false, ScaleMultiplier)
 		{
-			config_ = c;
+		}
 
+		private void CreateAnimation(Person self, Person receiver)
+		{
 			RootGroup.Sync = new DurationSync(
 				new Duration(
 					config_.durationMin, config_.durationMax,
@@ -193,7 +191,9 @@ namespace Cue.Proc
 		public override bool Start(Person p, AnimationContext cx)
 		{
 			receiver_ = cx.ps as Person;
+			config_ = GetConfig(p, receiver_);
 
+			CreateAnimation(p, receiver_);
 			SetEnergySource(receiver_);
 			RootGroup.Sync.SlapTargets = new Person[] { p, receiver_ };
 
@@ -217,17 +217,15 @@ namespace Cue.Proc
 			}
 			else
 			{
-				fconfig_ = GetForceConfig(p, receiver_);
-
 				hipTorque_.SetRange(
-					fconfig_.hipTorqueMin,
-					fconfig_.hipTorqueMax,
-					fconfig_.hipTorqueWin);
+					config_.hipTorqueMin,
+					config_.hipTorqueMax,
+					config_.hipTorqueWin);
 
-				hipTorque_.WindowEasing = fconfig_.hipWinEasing;
+				hipTorque_.WindowEasing = config_.hipWinEasing;
 			}
 
-				hipForce_.WindowEasing = fconfig_.hipWinEasing;
+			hipForce_.WindowEasing = config_.hipWinEasing;
 
 			var list = new List<Force>();
 			foreach (var t in RootGroup.Targets)
@@ -254,6 +252,21 @@ namespace Cue.Proc
 			base.Update(s);
 			CheckEasings(s);
 			CheckDebug();
+
+			if (Person.Body.HasPenis)
+			{
+				bool o = Person.Mood.IsOrgasmingHigh();
+
+				RootGroup.Sync.ForceMagnitudeHigh(o);
+
+				if (hipForce_ != null)
+				{
+					if (o)
+						hipForce_.ForceTargetPercent(0.5f);
+					else
+						hipForce_.ForceTargetPercent(-1);
+				}
+			}
 		}
 
 		private void CheckEasings(float s)
@@ -340,7 +353,7 @@ namespace Cue.Proc
 			}
 		}
 
-		protected abstract ForceConfig GetForceConfig(Person self, Person receiver);
+		protected abstract Config GetConfig(Person self, Person receiver);
 		protected abstract bool DoStart();
 
 		private void UpdateForces(bool alwaysUpdate = false)
@@ -453,10 +466,10 @@ namespace Cue.Proc
 			var p = GetForceFactor();
 			var dir = GetDirection();
 
-			float fmin = fconfig_.hipForceMin * p;
-			float fmax = fconfig_.hipForceMax * p;
+			float fmin = config_.hipForceMin * p;
+			float fmax = config_.hipForceMax * p;
 
-			f.SetRangeWithDirection(fmin, fmax, fconfig_.hipForceWin, dir);
+			f.SetRangeWithDirection(fmin, fmax, config_.hipForceWin, dir);
 			hipForce_.Backforce = HipBackForce;
 		}
 
@@ -491,7 +504,7 @@ namespace Cue.Proc
 	class ThrustProcAnimation : BasicThrustProcAnimation
 	{
 		public ThrustProcAnimation()
-			: base("cueThrust", GetConfig())
+			: base("cueThrust")
 		{
 		}
 
@@ -513,12 +526,12 @@ namespace Cue.Proc
 			return true;
 		}
 
-		protected override ForceConfig GetForceConfig(Person self, Person receiver)
+		protected override Config GetConfig(Person self, Person receiver)
 		{
-			var c = new ForceConfig();
+			var c = new Config();
 
 			c.hipForceMin = 150;
-			c.hipForceMax = 1250;
+			c.hipForceMax = 1000;
 			c.hipForceWin = 300;
 			c.hipWinEasing = new SineInEasing();
 
@@ -527,27 +540,26 @@ namespace Cue.Proc
 				c.hipTorqueMin = new Vector3(-50, 0, 0);
 				c.hipTorqueMax = new Vector3(-150, 0, 0);
 				c.hipTorqueWin = new Vector3(50, 0, 0);
+
+				c.durationMin = 1.0f;
+				c.durationMax = 0.09f;
+				c.durationWin = 0.06f;
 			}
 			else
 			{
 				c.hipTorqueMin = new Vector3(0, 0, 0);
 				c.hipTorqueMax = new Vector3(-30, 0, 0);
 				c.hipTorqueWin = new Vector3(10, 0, 0);
+
+				// slightly slower max for females
+				c.durationMin = 1.0f;
+				c.durationMax = 0.11f;
+				c.durationWin = 0.06f;
 			}
 
-			return c;
-		}
-
-		private static Config GetConfig()
-		{
-			var c = new Config();
-
-			c.durationMin = 1.0f;
-			c.durationMax = 0.09f;
-			c.durationWin = 0.06f;
 			c.durationInterval = 10;
 			c.checkDirection = true;
-			c.hipBackForceMaxDuration = 0;
+			c.hipBackForceMaxDuration = 0.15f;
 
 			return c;
 		}
@@ -557,7 +569,7 @@ namespace Cue.Proc
 	class TribProcAnimation : BasicThrustProcAnimation
 	{
 		public TribProcAnimation()
-			: base("cueTrib", GetConfig())
+			: base("cueTrib")
 		{
 		}
 
@@ -573,9 +585,9 @@ namespace Cue.Proc
 			return true;
 		}
 
-		protected override ForceConfig GetForceConfig(Person self, Person receiver)
+		protected override Config GetConfig(Person self, Person receiver)
 		{
-			var c = new ForceConfig();
+			var c = new Config();
 
 			c.hipForceMin = 125;
 			c.hipForceMax = 400;
@@ -585,13 +597,6 @@ namespace Cue.Proc
 			c.hipTorqueMin = new Vector3(-20, 0, 0);
 			c.hipTorqueMax = new Vector3(-150, 0, 0);
 			c.hipTorqueWin = new Vector3(20, 0, 0);
-
-			return c;
-		}
-
-		private static Config GetConfig()
-		{
-			var c = new Config();
 
 			c.durationMin = 1.0f;
 			c.durationMax = 0.12f;

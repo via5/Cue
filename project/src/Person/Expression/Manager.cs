@@ -193,7 +193,7 @@ namespace Cue
 
 			var ps = person_.Personality;
 
-			if (!isOrgasming_ && person_.Mood.State == Mood.OrgasmState)
+			if (!isOrgasming_ && person_.Mood.IsOrgasming())
 			{
 				isOrgasming_ = true;
 
@@ -203,7 +203,7 @@ namespace Cue
 					ps.Get(PS.OrgasmExpressionRangeMax),
 					ps.Get(PS.OrgasmFirstExpressionTime));
 			}
-			else if (isOrgasming_ && person_.Mood.State != Mood.OrgasmState)
+			else if (isOrgasming_ && !person_.Mood.IsOrgasming())
 			{
 				isOrgasming_ = false;
 			}

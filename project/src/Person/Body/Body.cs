@@ -186,7 +186,7 @@ namespace Cue
 
 		private void RepositionMaleFluid()
 		{
-			if (person_.Mood.State == Mood.OrgasmState)
+			if (person_.Mood.IsOrgasmingHigh())
 			{
 				if (fluid_ != null)
 				{

@@ -26,7 +26,7 @@ namespace Cue
 					targets_.SetWeightIfZero(
 						p, BP.Eyes, 0, "random person, but tired");
 				}
-				else if (p.Mood.State == Mood.OrgasmState)
+				else if (p.Mood.IsOrgasming())
 				{
 					person_.Gaze.Clear();
 
@@ -76,7 +76,7 @@ namespace Cue
 
 				if (!g_.ShouldAvoid(p) &&
 					person_.Mood.GazeTiredness >= ps.Get(PS.MaxTirednessForRandomGaze) &&
-					p.Mood.State == Mood.OrgasmState)
+					p.Mood.IsOrgasming())
 				{
 					return true;
 				}

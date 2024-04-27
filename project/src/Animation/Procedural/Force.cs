@@ -380,6 +380,16 @@ namespace Cue.Proc
 			return true;
 		}
 
+		private float forcePercent_ = -1;
+
+		public void ForceTargetPercent(float p)
+		{
+			forcePercent_ = p;
+
+			if (goingUp_ && forcePercent_ >= 0)
+				NextTarget();
+		}
+
 		protected override void DoFixedUpdate(float s)
 		{
 			oneFrameFinished_ = false;
@@ -534,7 +544,7 @@ namespace Cue.Proc
 			float target = dtarget_.target;
 
 			if (Backforce && !goingUp_)
-				target = -dtarget_.last;
+				target = -dtarget_.last / 2;
 
 			float mag = GetEasing().Magnitude(Sync.Magnitude);
 			float f = U.Lerp(dtarget_.last, target, mag);
@@ -623,7 +633,14 @@ namespace Cue.Proc
 
 				CalculateWindow(dtarget_.min, dtarget_.max, dtarget_.window, out min, out max);
 
-				dtarget_.target = U.RandomFloat(min, max);
+				float v;
+
+				if (forcePercent_ >= 0)
+					v = U.Lerp(min, max, forcePercent_);
+				else
+					v = U.RandomFloat(min, max);
+
+				dtarget_.target = v;
 			}
 			else
 			{
@@ -633,10 +650,22 @@ namespace Cue.Proc
 				CalculateWindow(vtarget_.min.Y, vtarget_.max.Y, vtarget_.window.Y, out min.Y, out max.Y);
 				CalculateWindow(vtarget_.min.Z, vtarget_.max.Z, vtarget_.window.Z, out min.Z, out max.Z);
 
-				vtarget_.target = new Vector3(
-					U.RandomFloat(min.X, max.X),
-					U.RandomFloat(min.Y, max.Y),
-					U.RandomFloat(min.Z, max.Z));
+				float x, y, z;
+
+				if (forcePercent_ >= 0)
+				{
+					x = U.Lerp(min.X, max.X, forcePercent_);
+					y = U.Lerp(min.Y, max.Y, forcePercent_);
+					z = U.Lerp(min.Z, max.Z, forcePercent_);
+				}
+				else
+				{
+					x = U.RandomFloat(min.X, max.X);
+					y = U.RandomFloat(min.Y, max.Y);
+					z = U.RandomFloat(min.Z, max.Z);
+				}
+
+				vtarget_.target = new Vector3(x, y, z);
 			}
 		}
 

@@ -121,14 +121,15 @@ namespace Cue
 
 		public const float NoOrgasm = 10000;
 
-		public const int NormalState = 1;
-		public const int OrgasmState = 2;
-		public const int PostOrgasmState = 3;
+		private const int NormalState = 1;
+		private const int OrgasmHighState = 2;
+		private const int OrgasmLowState = 3;
+		private const int PostOrgasmState = 4;
 
 		private readonly Person person_;
 		private bool wasPlayer_ = false;
 		private int state_ = NormalState;
-		private float elapsed_ = 0;
+		private float elapsedThisState_ = 0;
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 		private IEasing energyRampUpEasing_ = new LinearEasing();
 
@@ -305,9 +306,30 @@ namespace Cue
 				return current;
 		}
 
-		public int State
+		private int State
 		{
 			get { return state_; }
+		}
+
+		public bool IsOrgasmingHigh()
+		{
+			return (state_ == OrgasmHighState);
+		}
+
+		// either high or low
+		public bool IsOrgasming()
+		{
+			switch (state_)
+			{
+				case OrgasmHighState:  // fall-through
+				case OrgasmLowState:
+					return true;
+
+				case PostOrgasmState: // fall-through
+				case NormalState:
+				default:
+					return false;
+			}
 		}
 
 		public string StateString
@@ -319,11 +341,14 @@ namespace Cue
 					case NormalState:
 						return "normal";
 
-					case OrgasmState:
-						return "orgasm";
+					case OrgasmHighState:
+						return "orgasmHigh";
+
+					case OrgasmLowState:
+						return "orgasmLow";
 
 					case PostOrgasmState:
-						return "post orgasm";
+						return "postorgasm";
 
 					default:
 						return $"?{state_}";
@@ -438,7 +463,7 @@ namespace Cue
 			var ps = person_.Personality;
 			float max = float.MaxValue;
 
-			if (state_ != OrgasmState || elapsed_ >= ps.Get(PS.MovementEnergyRampUpDelayAfterOrgasm))
+			if (state_ != OrgasmHighState)
 			{
 				var rampUpTime = ps.Get(PS.MovementEnergyRampUpAfterOrgasm);
 				if (rampUpTime > 0)
@@ -465,13 +490,12 @@ namespace Cue
 
 		public void ForceOrgasm()
 		{
-			if (state_ == NormalState)
-				DoOrgasm(false);
+			DoOrgasm(false);
 		}
 
 		public void Update(float s)
 		{
-			elapsed_ += s;
+			elapsedThisState_ += s;
 
 			for (int i = 0; i < moods_.Length; ++i)
 				moods_[i].Update(s);
@@ -512,11 +536,23 @@ namespace Cue
 					break;
 				}
 
-				case OrgasmState:
+				case OrgasmHighState:
 				{
 					var ps = person_.Personality;
 
-					if (elapsed_ >= ps.Get(PS.OrgasmTime))
+					if (elapsedThisState_ >= ps.Get(PS.OrgasmHighTime))
+					{
+						SetState(OrgasmLowState);
+					}
+
+					break;
+				}
+
+				case OrgasmLowState:
+				{
+					var ps = person_.Personality;
+
+					if (elapsedThisState_ >= ps.Get(PS.OrgasmLowTime))
 					{
 						person_.Animator.StopType(AnimationType.Orgasm);
 
@@ -535,7 +571,7 @@ namespace Cue
 				{
 					var ps = person_.Personality;
 
-					if (elapsed_ > ps.Get(PS.PostOrgasmTime))
+					if (elapsedThisState_ > ps.Get(PS.PostOrgasmTime))
 					{
 						SetState(NormalState);
 						baseExcitement_.Value = ps.Get(PS.ExcitementPostOrgasm);
@@ -623,7 +659,7 @@ namespace Cue
 				tiredness_.DownRate = ps.Get(PS.TirednessBackToBaseRate);
 				tiredness_.Target = baseTiredness_;
 			}
-			else if (state_ == OrgasmState)
+			else if (IsOrgasming())
 			{
 				tiredness_.DownRate = 0;
 			}
@@ -686,6 +722,12 @@ namespace Cue
 			return rate - (rate * tirednessFactor);
 		}
 
+		public void DoOrgasmFromSync()
+		{
+			if (state_ == NormalState)
+				DoOrgasm(false);
+		}
+
 		private void DoOrgasm(bool syncOthers = true)
 		{
 			person_.Log.Verbose("orgasm");
@@ -699,7 +741,7 @@ namespace Cue
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);
 
-			SetState(OrgasmState);
+			SetState(OrgasmHighState);
 			timeSinceLastOrgasm_ = 0;
 
 			SyncOrgasms();
@@ -722,7 +764,7 @@ namespace Cue
 						if (p.Mood.TimeSinceLastOrgasm >= 5)
 						{
 							person_.Log.Verbose($"{p} is at {e}, min is {min}, syncing orgasm");
-							p.Mood.ForceOrgasm();
+							p.Mood.DoOrgasmFromSync();
 						}
 					}
 				}
@@ -732,7 +774,7 @@ namespace Cue
 		private void SetState(int s)
 		{
 			state_ = s;
-			elapsed_ = 0;
+			elapsedThisState_ = 0;
 		}
 
 		private void SetBaseTiredness(float f)

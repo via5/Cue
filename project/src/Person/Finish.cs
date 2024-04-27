@@ -419,7 +419,8 @@ namespace Cue
 		{
 			return
 				Options.OrgasmsTime +
-				p.Personality.Get(PS.OrgasmTime) +
+				p.Personality.Get(PS.OrgasmLowTime) +
+				p.Personality.Get(PS.OrgasmHighTime) +
 				p.Personality.Get(PS.PostOrgasmTime);
 		}
 

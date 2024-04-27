@@ -865,10 +865,6 @@
 	"expressionExcitementFactor": 1,
 	"expressionTirednessFactor": 1,
 
-	"movementEnergyRampUpDelayAfterOrgasm": 3,
-	"movementEnergyRampUpAfterOrgasm": 30,
-	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
-
 	"avoidGazePlayerMinExcitement": 0,
 	"avoidGazePlayerMaxExcitement": 0,
 	"avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
@@ -947,12 +943,9 @@
 	"temperatureDecayRate": 0.005,
 	"temperatureExcitementMax": 0.8,
 
-	"tirednessRateDuringPostOrgasm": 0.3,
 	"tirednessBaseDecayRate": 0.005,
 	"tirednessBackToBaseRate": 0.02,
-	"delayAfterOrgasmUntilTirednessDecay": 10,
 	"tirednessMaxExcitementForBaseDecay": 0.5,
-	"orgasmBaseTirednessIncrease": 0.2,
 
 	"neutralVoicePitch": 0.5,
 	"voicePitch": -1,
@@ -960,10 +953,18 @@
 	"idleMaxExcitement": 0,
 
 	"excitementDecayRate": -0.01,
-	"excitementPostOrgasm": 0.3,
-	"orgasmTime": 8,
+
+	"orgasmHighTime": 4,
+	"orgasmLowTime": 4,
 	"postOrgasmTime": 10,
 	"orgasmFluidTime": 8,
+	"movementEnergyRampUpAfterOrgasm": 30,
+	"movementEnergyRampUpAfterOrgasmEasing": "quadin",
+	"tirednessRateDuringPostOrgasm": 0.3,
+	"delayAfterOrgasmUntilTirednessDecay": 10,
+	"orgasmBaseTirednessIncrease": 0.2,
+	"excitementPostOrgasm": 0.3,
+
 	"rateAdjustment": 1,
 	"penetrationDamper": 0.5,
 	"minCollisionMag": 0.1,

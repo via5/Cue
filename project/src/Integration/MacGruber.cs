@@ -420,9 +420,7 @@ namespace Cue.MacGruber
 			var f = p_.intensity.Value;
 			var ds = GetDatasetForIntensity(f);
 
-			// taken over by MacGruberOrgasmer during orgasm
-			if (person_.Mood.State != Mood.OrgasmState)
-				p_.breathDataset.Value = ds.Name;
+			p_.breathDataset.Value = ds.Name;
 
 			if (mouthEnabled_)
 			{

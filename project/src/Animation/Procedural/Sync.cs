@@ -1,4 +1,5 @@
 ﻿using SimpleJSON;
+using System;
 
 namespace Cue.Proc
 {
@@ -22,6 +23,8 @@ namespace Cue.Proc
 
 		void RequestStop();
 		void Reset();
+		void ForceMagnitudeHigh(bool b);
+
 		int FixedUpdate(float s);
 		string ToDetailedString();
 	}
@@ -114,6 +117,11 @@ namespace Cue.Proc
 		public abstract bool Finished { get; }
 		public abstract float CurrentDurationTime { get; }
 
+		public virtual void ForceMagnitudeHigh(bool b)
+		{
+			// no-op
+		}
+
 		public bool Slaps
 		{
 			get { return slaps_; }
@@ -155,6 +163,11 @@ namespace Cue.Proc
 		protected virtual string DoToDetailedString()
 		{
 			return "";
+		}
+
+		public virtual float GetMagnitudeForOtherInternal()
+		{
+			return Magnitude;
 		}
 
 		public int FixedUpdate(float s)
@@ -336,7 +349,7 @@ namespace Cue.Proc
 			}
 			else
 			{
-				mag_ = other_.Magnitude;
+				mag_ = other_.GetMagnitudeForOtherInternal();
 				return other_.UpdateResult;
 			}
 		}
@@ -465,6 +478,7 @@ namespace Cue.Proc
 		private float stoppingElapsed_ = 0;
 		private float energy_ = 0;
 		private bool needsRestart_ = false;
+		public bool forceMagHigh_ = false;
 
 		private float slapOffset_ = 0;
 		private bool slapped_ = false;
@@ -510,7 +524,7 @@ namespace Cue.Proc
 			return new DurationSync(fwd, bwd, fwdD, bwdD, flags);
 		}
 
-		public override string Name { get { return "sliding"; } }
+		public override string Name { get { return "duration"; } }
 
 		public override ISync Clone()
 		{
@@ -538,12 +552,20 @@ namespace Cue.Proc
 			set { energy_ = value; }
 		}
 
+		public override void ForceMagnitudeHigh(bool b)
+		{
+			forceMagHigh_ = b;
+		}
+
 		public override float Magnitude
 		{
 			get
 			{
 				if (stopping_)
 					return U.Clamp(stoppingElapsed_ / StopTime, 0, 1);
+
+				if (forceMagHigh_)
+					return 1.0f;
 
 				var p = CurrentDuration().Progress;
 
@@ -552,6 +574,14 @@ namespace Cue.Proc
 
 				return CurrentEasing()?.Magnitude(p) ?? 0;
 			}
+		}
+
+		public override float GetMagnitudeForOtherInternal()
+		{
+			if (forceMagHigh_)
+				return 0;
+			else
+				return Magnitude;
 		}
 
 		public override float CurrentDurationTime
@@ -623,6 +653,40 @@ namespace Cue.Proc
 					return SyncFinished;
 				else
 					return Working;
+			}
+
+			if (forceMagHigh_)
+			{
+				// quickly cycle the state to make sure it's ForwardsState
+
+				switch (State)
+				{
+					case ForwardsState:
+					{
+						return Working;
+					}
+
+					case ForwardsDelayState:
+					{
+						SetState(ForwardsState);
+						return DelayFinished;
+					}
+
+					case BackwardsState:
+					{
+						SetState(ForwardsState);
+						return Looping;
+					}
+
+					case BackwardsDelayState:
+					{
+						SetState(ForwardsState);
+						return Looping;
+					}
+
+					default:
+						return Working;
+				}
 			}
 
 			switch (State)

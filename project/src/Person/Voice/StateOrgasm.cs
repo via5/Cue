@@ -70,13 +70,13 @@ namespace Cue
 
 		protected override void DoUpdate(float s)
 		{
-			if (v_.Person.Mood.State != Mood.OrgasmState)
+			if (!v_.Person.Mood.IsOrgasming())
 				SetDone();
 		}
 
 		protected override int DoCanRun()
 		{
-			if (v_.Person.Mood.State == Mood.OrgasmState)
+			if (v_.Person.Mood.IsOrgasming())
 			{
 				SetLastState("ok");
 				return Emergency;

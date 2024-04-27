@@ -11,7 +11,7 @@ namespace Cue
 		{
 			var ps = person_.Personality;
 
-			if (person_.Mood.State == Mood.OrgasmState)
+			if (person_.Mood.IsOrgasming())
 			{
 				targets_.SetAboveWeight(
 					person_.Mood.GazeEnergy * ps.Get(PS.LookAboveMaxWeightOrgasm),
