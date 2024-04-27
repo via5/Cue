@@ -798,6 +798,14 @@
     "gropingEyesWeight": 2,
     "gropingTargetWeight": 0.5,
 
+    "headTouchedByPlayerEyesWeight": 30,
+    "touchingPlayerHeadEyesWeight": 20,
+    "touchingOtherHeadEyesWeight": 10,
+    "playerHeadTouchedByOtherEyesWeight": 5,
+    "headTouchedByOtherEyesWeight": 10,
+    "otherHeadTouchedByPlayerEyesWeight": 5,
+    "otherHeadTouchedByOtherEyesWeight": 3,
+
     "otherBlowjobEyesWeight": 2,
     "otherBlowjobTargetEyesWeight": 1,
     "otherBlowjobTargetGenitalsWeight": 1,

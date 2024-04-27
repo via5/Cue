@@ -1,10 +1,6 @@
 {
     "name": "Bored",
     "inherit": "standard",
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0.1,
 
     "lookAboveMaxWeight": 0,
     "lookAboveMaxWeightOrgasm": 0,
@@ -44,6 +40,11 @@
     "otherGropedTargetWeight": 0,
 
     "zappedEnabled": false,
+
+    "defaultHappiness": 0,
+    "defaultPlayfulness": 0,
+    "defaultAnger": 0,
+    "maxExcitedExpression": 0.1,
 
     "finishLookAtPlayer": "involved",
     "finishOrgasm": "never",

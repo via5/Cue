@@ -78,140 +78,147 @@ namespace Cue
 		public static readonly FloatIndex GropedTargetWeight = new FloatIndex(45);
 		public static readonly FloatIndex GropingEyesWeight = new FloatIndex(46);
 		public static readonly FloatIndex GropingTargetWeight = new FloatIndex(47);
-		public static readonly FloatIndex OtherBlowjobEyesWeight = new FloatIndex(48);
-		public static readonly FloatIndex OtherBlowjobTargetEyesWeight = new FloatIndex(49);
-		public static readonly FloatIndex OtherBlowjobTargetGenitalsWeight = new FloatIndex(50);
-		public static readonly FloatIndex OtherHandjobEyesWeight = new FloatIndex(51);
-		public static readonly FloatIndex OtherHandjobTargetEyesWeight = new FloatIndex(52);
-		public static readonly FloatIndex OtherHandjobTargetGenitalsWeight = new FloatIndex(53);
-		public static readonly FloatIndex OtherPenetrationEyesWeight = new FloatIndex(54);
-		public static readonly FloatIndex OtherPenetrationSourceEyesWeight = new FloatIndex(55);
-		public static readonly FloatIndex OtherPenetrationSourceGenitalsWeight = new FloatIndex(56);
-		public static readonly FloatIndex OtherGropedEyesWeight = new FloatIndex(57);
-		public static readonly FloatIndex OtherGropedSourceEyesWeight = new FloatIndex(58);
-		public static readonly FloatIndex OtherGropedTargetWeight = new FloatIndex(59);
-		public static readonly FloatIndex ZappedTentativeTime = new FloatIndex(60);
-		public static readonly FloatIndex ZappedCooldown = new FloatIndex(61);
-		public static readonly FloatIndex ZappedTime = new FloatIndex(62);
-		public static readonly FloatIndex ZappedGazeMinIntensity = new FloatIndex(63);
-		public static readonly FloatIndex ZappedByPlayerBreastsEyesWeight = new FloatIndex(64);
-		public static readonly FloatIndex ZappedByPlayerBreastsTargetWeight = new FloatIndex(65);
-		public static readonly FloatIndex ZappedByPlayerBreastsExcitement = new FloatIndex(66);
-		public static readonly FloatIndex ZappedByPlayerGenitalsEyesWeight = new FloatIndex(67);
-		public static readonly FloatIndex ZappedByPlayerGenitalsTargetWeight = new FloatIndex(68);
-		public static readonly FloatIndex ZappedByPlayerGenitalsExcitement = new FloatIndex(69);
-		public static readonly FloatIndex ZappedByPlayerPenetrationEyesWeight = new FloatIndex(70);
-		public static readonly FloatIndex ZappedByPlayerPenetrationTargetWeight = new FloatIndex(71);
-		public static readonly FloatIndex ZappedByPlayerPenetrationExcitement = new FloatIndex(72);
-		public static readonly FloatIndex ZappedByPlayerMouthEyesWeight = new FloatIndex(73);
-		public static readonly FloatIndex ZappedByPlayerMouthExcitement = new FloatIndex(74);
-		public static readonly FloatIndex ZappedByPlayerLookUpWeight = new FloatIndex(75);
-		public static readonly FloatIndex ZappedByPlayerLookAwayMaxExcitement = new FloatIndex(76);
-		public static readonly FloatIndex ZappedByOtherBreastsEyesWeight = new FloatIndex(77);
-		public static readonly FloatIndex ZappedByOtherBreastsTargetWeight = new FloatIndex(78);
-		public static readonly FloatIndex ZappedByOtherBreastsExcitement = new FloatIndex(79);
-		public static readonly FloatIndex ZappedByOtherGenitalsEyesWeight = new FloatIndex(80);
-		public static readonly FloatIndex ZappedByOtherGenitalsTargetWeight = new FloatIndex(81);
-		public static readonly FloatIndex ZappedByOtherGenitalsExcitement = new FloatIndex(82);
-		public static readonly FloatIndex ZappedByOtherPenetrationEyesWeight = new FloatIndex(83);
-		public static readonly FloatIndex ZappedByOtherPenetrationTargetWeight = new FloatIndex(84);
-		public static readonly FloatIndex ZappedByOtherPenetrationExcitement = new FloatIndex(85);
-		public static readonly FloatIndex ZappedByOtherMouthEyesWeight = new FloatIndex(86);
-		public static readonly FloatIndex ZappedByOtherMouthExcitement = new FloatIndex(87);
-		public static readonly FloatIndex ZappedByOtherLookUpWeight = new FloatIndex(88);
-		public static readonly FloatIndex ZappedByOtherLookAwayMaxExcitement = new FloatIndex(89);
-		public static readonly FloatIndex OtherZappedEyesWeight = new FloatIndex(90);
-		public static readonly FloatIndex OtherZappedTargetWeight = new FloatIndex(91);
-		public static readonly FloatIndex OtherZappedSourceWeight = new FloatIndex(92);
-		public static readonly FloatIndex LookAtPlayerOnGrabWeight = new FloatIndex(93);
-		public static readonly FloatIndex LookAtPlayerTimeAfterGrab = new FloatIndex(94);
-		public static readonly FloatIndex KissSpeedEnergyFactor = new FloatIndex(95);
-		public static readonly FloatIndex IdleMaxExcitement = new FloatIndex(96);
-		public static readonly FloatIndex TirednessExcitementRateFactor = new FloatIndex(97);
-		public static readonly FloatIndex GazeEnergyTirednessFactor = new FloatIndex(98);
-		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(99);
-		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(100);
-		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(101);
-		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(102);
-		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(103);
-		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(104);
-		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(105);
-		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(106);
-		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(107);
-		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(108);
-		public static readonly FloatIndex DefaultHappiness = new FloatIndex(109);
-		public static readonly FloatIndex DefaultAnger = new FloatIndex(110);
-		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(111);
-		public static readonly FloatIndex DefaultSurprise = new FloatIndex(112);
-		public static readonly FloatIndex MaxHappyExpression = new FloatIndex(113);
-		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(114);
-		public static readonly FloatIndex MaxPlayfulExpression = new FloatIndex(115);
-		public static readonly FloatIndex MaxAngryExpression = new FloatIndex(116);
-		public static readonly FloatIndex MaxSurprisedExpression = new FloatIndex(117);
-		public static readonly FloatIndex MaxTiredExpression = new FloatIndex(118);
-		public static readonly FloatIndex MinTiredness = new FloatIndex(119);
-		public static readonly FloatIndex MaxEmotionalRate = new FloatIndex(120);
-		public static readonly FloatIndex MinHappyChoked = new FloatIndex(121);
-		public static readonly FloatIndex MaxHappyChoked = new FloatIndex(122);
-		public static readonly FloatIndex MinPlayfulChoked = new FloatIndex(123);
-		public static readonly FloatIndex MaxPlayfulChoked = new FloatIndex(124);
-		public static readonly FloatIndex MinExcitedChoked = new FloatIndex(125);
-		public static readonly FloatIndex MaxExcitedChoked = new FloatIndex(126);
-		public static readonly FloatIndex MinAngryChoked = new FloatIndex(127);
-		public static readonly FloatIndex MaxAngryChoked = new FloatIndex(128);
-		public static readonly FloatIndex MinSurprisedChoked = new FloatIndex(129);
-		public static readonly FloatIndex MaxSurprisedChoked = new FloatIndex(130);
-		public static readonly FloatIndex MinTiredChoked = new FloatIndex(131);
-		public static readonly FloatIndex MaxTiredChoked = new FloatIndex(132);
-		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(133);
-		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(134);
-		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(135);
-		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(136);
-		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(137);
-		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(138);
-		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(139);
-		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(140);
-		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(141);
-		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(142);
-		public static readonly FloatIndex SlapMinTime = new FloatIndex(143);
-		public static readonly FloatIndex SlapMaxTime = new FloatIndex(144);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(145);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(146);
-		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(147);
-		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(148);
-		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(149);
-		public static readonly FloatIndex FlushBaseColorRed = new FloatIndex(150);
-		public static readonly FloatIndex FlushBaseColorGreen = new FloatIndex(151);
-		public static readonly FloatIndex FlushBaseColorBlue = new FloatIndex(152);
-		public static readonly FloatIndex FlushMultiplier = new FloatIndex(153);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(154);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(155);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(156);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(157);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(158);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(159);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(160);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(161);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(162);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(163);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(164);
-		public static readonly FloatIndex OrgasmHighTime = new FloatIndex(165);
-		public static readonly FloatIndex OrgasmLowTime = new FloatIndex(166);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(167);
-		public static readonly FloatIndex OrgasmFluidTime = new FloatIndex(168);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(169);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(170);
-		public static readonly FloatIndex MinCollisionMag = new FloatIndex(171);
-		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(172);
-		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(173);
-		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(174);
-		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(175);
-		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(176);
-		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(177);
-		public static readonly FloatIndex FinishMoodTired = new FloatIndex(178);
+		public static readonly FloatIndex TouchingPlayerHeadEyesWeight = new FloatIndex(48);
+		public static readonly FloatIndex TouchingOtherHeadEyesWeight = new FloatIndex(49);
+		public static readonly FloatIndex PlayerHeadTouchedByOtherEyesWeight = new FloatIndex(50);
+		public static readonly FloatIndex HeadTouchedByPlayerEyesWeight = new FloatIndex(51);
+		public static readonly FloatIndex HeadTouchedByOtherEyesWeight = new FloatIndex(52);
+		public static readonly FloatIndex OtherHeadTouchedByPlayerEyesWeight = new FloatIndex(53);
+		public static readonly FloatIndex OtherHeadTouchedByOtherEyesWeight = new FloatIndex(54);
+		public static readonly FloatIndex OtherBlowjobEyesWeight = new FloatIndex(55);
+		public static readonly FloatIndex OtherBlowjobTargetEyesWeight = new FloatIndex(56);
+		public static readonly FloatIndex OtherBlowjobTargetGenitalsWeight = new FloatIndex(57);
+		public static readonly FloatIndex OtherHandjobEyesWeight = new FloatIndex(58);
+		public static readonly FloatIndex OtherHandjobTargetEyesWeight = new FloatIndex(59);
+		public static readonly FloatIndex OtherHandjobTargetGenitalsWeight = new FloatIndex(60);
+		public static readonly FloatIndex OtherPenetrationEyesWeight = new FloatIndex(61);
+		public static readonly FloatIndex OtherPenetrationSourceEyesWeight = new FloatIndex(62);
+		public static readonly FloatIndex OtherPenetrationSourceGenitalsWeight = new FloatIndex(63);
+		public static readonly FloatIndex OtherGropedEyesWeight = new FloatIndex(64);
+		public static readonly FloatIndex OtherGropedSourceEyesWeight = new FloatIndex(65);
+		public static readonly FloatIndex OtherGropedTargetWeight = new FloatIndex(66);
+		public static readonly FloatIndex ZappedTentativeTime = new FloatIndex(67);
+		public static readonly FloatIndex ZappedCooldown = new FloatIndex(68);
+		public static readonly FloatIndex ZappedTime = new FloatIndex(69);
+		public static readonly FloatIndex ZappedGazeMinIntensity = new FloatIndex(70);
+		public static readonly FloatIndex ZappedByPlayerBreastsEyesWeight = new FloatIndex(71);
+		public static readonly FloatIndex ZappedByPlayerBreastsTargetWeight = new FloatIndex(72);
+		public static readonly FloatIndex ZappedByPlayerBreastsExcitement = new FloatIndex(73);
+		public static readonly FloatIndex ZappedByPlayerGenitalsEyesWeight = new FloatIndex(74);
+		public static readonly FloatIndex ZappedByPlayerGenitalsTargetWeight = new FloatIndex(75);
+		public static readonly FloatIndex ZappedByPlayerGenitalsExcitement = new FloatIndex(76);
+		public static readonly FloatIndex ZappedByPlayerPenetrationEyesWeight = new FloatIndex(77);
+		public static readonly FloatIndex ZappedByPlayerPenetrationTargetWeight = new FloatIndex(78);
+		public static readonly FloatIndex ZappedByPlayerPenetrationExcitement = new FloatIndex(79);
+		public static readonly FloatIndex ZappedByPlayerMouthEyesWeight = new FloatIndex(80);
+		public static readonly FloatIndex ZappedByPlayerMouthExcitement = new FloatIndex(81);
+		public static readonly FloatIndex ZappedByPlayerLookUpWeight = new FloatIndex(82);
+		public static readonly FloatIndex ZappedByPlayerLookAwayMaxExcitement = new FloatIndex(83);
+		public static readonly FloatIndex ZappedByOtherBreastsEyesWeight = new FloatIndex(84);
+		public static readonly FloatIndex ZappedByOtherBreastsTargetWeight = new FloatIndex(85);
+		public static readonly FloatIndex ZappedByOtherBreastsExcitement = new FloatIndex(86);
+		public static readonly FloatIndex ZappedByOtherGenitalsEyesWeight = new FloatIndex(87);
+		public static readonly FloatIndex ZappedByOtherGenitalsTargetWeight = new FloatIndex(88);
+		public static readonly FloatIndex ZappedByOtherGenitalsExcitement = new FloatIndex(89);
+		public static readonly FloatIndex ZappedByOtherPenetrationEyesWeight = new FloatIndex(90);
+		public static readonly FloatIndex ZappedByOtherPenetrationTargetWeight = new FloatIndex(91);
+		public static readonly FloatIndex ZappedByOtherPenetrationExcitement = new FloatIndex(92);
+		public static readonly FloatIndex ZappedByOtherMouthEyesWeight = new FloatIndex(93);
+		public static readonly FloatIndex ZappedByOtherMouthExcitement = new FloatIndex(94);
+		public static readonly FloatIndex ZappedByOtherLookUpWeight = new FloatIndex(95);
+		public static readonly FloatIndex ZappedByOtherLookAwayMaxExcitement = new FloatIndex(96);
+		public static readonly FloatIndex OtherZappedEyesWeight = new FloatIndex(97);
+		public static readonly FloatIndex OtherZappedTargetWeight = new FloatIndex(98);
+		public static readonly FloatIndex OtherZappedSourceWeight = new FloatIndex(99);
+		public static readonly FloatIndex LookAtPlayerOnGrabWeight = new FloatIndex(100);
+		public static readonly FloatIndex LookAtPlayerTimeAfterGrab = new FloatIndex(101);
+		public static readonly FloatIndex KissSpeedEnergyFactor = new FloatIndex(102);
+		public static readonly FloatIndex IdleMaxExcitement = new FloatIndex(103);
+		public static readonly FloatIndex TirednessExcitementRateFactor = new FloatIndex(104);
+		public static readonly FloatIndex GazeEnergyTirednessFactor = new FloatIndex(105);
+		public static readonly FloatIndex GazeTirednessFactor = new FloatIndex(106);
+		public static readonly FloatIndex MovementEnergyTirednessFactor = new FloatIndex(107);
+		public static readonly FloatIndex ExpressionTirednessFactor = new FloatIndex(108);
+		public static readonly FloatIndex MovementEnergyRampUpAfterOrgasm = new FloatIndex(109);
+		public static readonly FloatIndex AvoidGazeAnger = new FloatIndex(110);
+		public static readonly FloatIndex AngerWhenPlayerInteracts = new FloatIndex(111);
+		public static readonly FloatIndex AngerMaxExcitementForAnger = new FloatIndex(112);
+		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(113);
+		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(114);
+		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(115);
+		public static readonly FloatIndex DefaultHappiness = new FloatIndex(116);
+		public static readonly FloatIndex DefaultAnger = new FloatIndex(117);
+		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(118);
+		public static readonly FloatIndex DefaultSurprise = new FloatIndex(119);
+		public static readonly FloatIndex MaxHappyExpression = new FloatIndex(120);
+		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(121);
+		public static readonly FloatIndex MaxPlayfulExpression = new FloatIndex(122);
+		public static readonly FloatIndex MaxAngryExpression = new FloatIndex(123);
+		public static readonly FloatIndex MaxSurprisedExpression = new FloatIndex(124);
+		public static readonly FloatIndex MaxTiredExpression = new FloatIndex(125);
+		public static readonly FloatIndex MinTiredness = new FloatIndex(126);
+		public static readonly FloatIndex MaxEmotionalRate = new FloatIndex(127);
+		public static readonly FloatIndex MinHappyChoked = new FloatIndex(128);
+		public static readonly FloatIndex MaxHappyChoked = new FloatIndex(129);
+		public static readonly FloatIndex MinPlayfulChoked = new FloatIndex(130);
+		public static readonly FloatIndex MaxPlayfulChoked = new FloatIndex(131);
+		public static readonly FloatIndex MinExcitedChoked = new FloatIndex(132);
+		public static readonly FloatIndex MaxExcitedChoked = new FloatIndex(133);
+		public static readonly FloatIndex MinAngryChoked = new FloatIndex(134);
+		public static readonly FloatIndex MaxAngryChoked = new FloatIndex(135);
+		public static readonly FloatIndex MinSurprisedChoked = new FloatIndex(136);
+		public static readonly FloatIndex MaxSurprisedChoked = new FloatIndex(137);
+		public static readonly FloatIndex MinTiredChoked = new FloatIndex(138);
+		public static readonly FloatIndex MaxTiredChoked = new FloatIndex(139);
+		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(140);
+		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(141);
+		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(142);
+		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(143);
+		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(144);
+		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(145);
+		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(146);
+		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(147);
+		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(148);
+		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(149);
+		public static readonly FloatIndex SlapMinTime = new FloatIndex(150);
+		public static readonly FloatIndex SlapMaxTime = new FloatIndex(151);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(152);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(153);
+		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(154);
+		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(155);
+		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(156);
+		public static readonly FloatIndex FlushBaseColorRed = new FloatIndex(157);
+		public static readonly FloatIndex FlushBaseColorGreen = new FloatIndex(158);
+		public static readonly FloatIndex FlushBaseColorBlue = new FloatIndex(159);
+		public static readonly FloatIndex FlushMultiplier = new FloatIndex(160);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(161);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(162);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(163);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(164);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(165);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(166);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(167);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(168);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(169);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(170);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(171);
+		public static readonly FloatIndex OrgasmHighTime = new FloatIndex(172);
+		public static readonly FloatIndex OrgasmLowTime = new FloatIndex(173);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(174);
+		public static readonly FloatIndex OrgasmFluidTime = new FloatIndex(175);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(176);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(177);
+		public static readonly FloatIndex MinCollisionMag = new FloatIndex(178);
+		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(179);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(180);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(181);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(182);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(183);
+		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(184);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(185);
 
-		public const int FloatCount = 179;
-		public override int GetFloatCount() { return 179; }
+		public const int FloatCount = 186;
+		public override int GetFloatCount() { return 186; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -393,6 +400,13 @@ namespace Cue
 			"gropedTargetWeight",
 			"gropingEyesWeight",
 			"gropingTargetWeight",
+			"touchingPlayerHeadEyesWeight",
+			"touchingOtherHeadEyesWeight",
+			"playerHeadTouchedByOtherEyesWeight",
+			"headTouchedByPlayerEyesWeight",
+			"headTouchedByOtherEyesWeight",
+			"otherHeadTouchedByPlayerEyesWeight",
+			"otherHeadTouchedByOtherEyesWeight",
 			"otherBlowjobEyesWeight",
 			"otherBlowjobTargetEyesWeight",
 			"otherBlowjobTargetGenitalsWeight",
@@ -695,6 +709,13 @@ namespace Cue
 			"gropedTargetWeight",
 			"gropingEyesWeight",
 			"gropingTargetWeight",
+			"touchingPlayerHeadEyesWeight",
+			"touchingOtherHeadEyesWeight",
+			"playerHeadTouchedByOtherEyesWeight",
+			"headTouchedByPlayerEyesWeight",
+			"headTouchedByOtherEyesWeight",
+			"otherHeadTouchedByPlayerEyesWeight",
+			"otherHeadTouchedByOtherEyesWeight",
 			"otherBlowjobEyesWeight",
 			"otherBlowjobTargetEyesWeight",
 			"otherBlowjobTargetGenitalsWeight",

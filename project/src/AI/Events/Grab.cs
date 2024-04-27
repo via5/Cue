@@ -73,8 +73,8 @@
 			// but is rare
 			//
 			// the second check is for a head grab, but it also checks if the
-			// head is being triggered by the same hand; this is perfect, just
-			// barely touching the neck with the tips of the fingers will
+			// head is being triggered by the same hand; this isn't perfect,
+			// just barely touching the neck with the tips of the fingers will
 			// trigger it, but it's good enough for now
 
 			CheckNeck();

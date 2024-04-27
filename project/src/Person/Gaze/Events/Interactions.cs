@@ -17,6 +17,11 @@ namespace Cue
 		}
 
 
+		private bool headEmergencyStarted_ = false;
+		private bool headReleased_ = false;
+		private float timeSinceHeadReleased_ = 0;
+
+
 		public GazeInteractions(Person p)
 			: base(p, I.GazeInteractions)
 		{
@@ -37,6 +42,66 @@ namespace Cue
 			SetLastResult("unknown");
 
 			return r;
+		}
+
+		protected override bool DoHasEmergency(float s)
+		{
+			if (headEmergencyStarted_)
+			{
+				if (headReleased_)
+				{
+					timeSinceHeadReleased_ += s;
+					if (timeSinceHeadReleased_ >= 5)
+					{
+						headEmergencyStarted_ = false;
+						SetLastResult("head released, done");
+					}
+					else
+					{
+						SetLastResult("head released, waiting");
+					}
+				}
+				else if (!CheckHead())
+				{
+					headReleased_ = true;
+					timeSinceHeadReleased_ = 0;
+					SetLastResult("head just released");
+				}
+				else
+				{
+					SetLastResult("head touching");
+				}
+			}
+			else
+			{
+				if (CheckHead())
+				{
+					headEmergencyStarted_ = true;
+					headReleased_ = false;
+					timeSinceHeadReleased_ = 0;
+					Logger.Global.Info("head touched by player, emergency started");
+					SetLastResult("head touched by player, emergency started");
+					return true;
+				}
+				else
+				{
+					SetLastResult("head not touching");
+				}
+			}
+
+			return false;
+		}
+
+		private bool CheckHead()
+		{
+			var player = Cue.Instance.Player;
+			if (player == person_)
+				return false;
+
+			if (person_.Status.HeadTouchedBy(player) || player.Status.HeadTouchedBy(person_))
+				return true;
+
+			return false;
 		}
 
 		private int CheckPerson(Person t)
@@ -65,6 +130,62 @@ namespace Cue
 			CheckNotInteracting(t);
 
 			return Continue;
+		}
+
+		private float GetHeadTouchedWeight(Person touched, Person touching, bool lookingAtTouched)
+		{
+			var ps = person_.Personality;
+
+			if (lookingAtTouched)
+			{
+				if (touched == person_)
+				{
+					// shouldn't happen, can't look at yourself
+					return 0;
+				}
+				else
+				{
+					if (touching == person_)
+					{
+						if (touched.IsPlayer)
+							return ps.Get(PS.TouchingPlayerHeadEyesWeight);
+						else
+							return ps.Get(PS.TouchingOtherHeadEyesWeight);
+					}
+					else
+					{
+						if (touched.IsPlayer)
+							return ps.Get(PS.PlayerHeadTouchedByOtherEyesWeight);
+						else
+							return ps.Get(PS.OtherHeadTouchedByOtherEyesWeight);
+					}
+				}
+			}
+			else
+			{
+				if (touching == person_)
+				{
+					// shouldn't happen, can't look at yourself
+					return 0;
+				}
+				else
+				{
+					if (touched == person_)
+					{
+						if (touching.IsPlayer)
+							return ps.Get(PS.HeadTouchedByPlayerEyesWeight);
+						else
+							return ps.Get(PS.HeadTouchedByOtherEyesWeight);
+					}
+					else
+					{
+						if (touching.IsPlayer)
+							return ps.Get(PS.OtherHeadTouchedByPlayerEyesWeight);
+						else
+							return ps.Get(PS.OtherHeadTouchedByOtherEyesWeight);
+					}
+				}
+			}
 		}
 
 		private bool CheckInsidePS(Person t)
@@ -122,11 +243,11 @@ namespace Cue
 				// check if head being groped
 				if (person_.Status.HeadTouchedBy(t))
 				{
-					eyes.Set(ps.Get(PS.GropedEyesWeight), $"head groped");
+					eyes.Set(GetHeadTouchedWeight(person_, t, false), $"head groped");
 				}
 				else if (t.Status.HeadTouchedBy(person_))
 				{
-					eyes.Set(ps.Get(PS.GropedEyesWeight), $"groping head");
+					eyes.Set(GetHeadTouchedWeight(t, person_, true), $"groping head");
 				}
 
 				// check if breasts being groped
@@ -250,12 +371,12 @@ namespace Cue
 				if (target.Status.HeadTouchedBy(source))
 				{
 					targetEyes.Set(
-						ps.Get(PS.OtherGropedEyesWeight),
+						GetHeadTouchedWeight(target, source, true),
 						$"head groped by {source.ID}");
 
 					sourceEyes.Set(
-						ps.Get(PS.OtherGropedSourceEyesWeight),
-						$"head groped by {source.ID}");
+						GetHeadTouchedWeight(target, source, false),
+						$"groping head {target.ID}");
 				}
 
 				// check if breasts being groped
