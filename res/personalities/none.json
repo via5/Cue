@@ -27,14 +27,15 @@
 
     "zappedEnabled": false,
 
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0,
-    "maxTiredExpression": 0,
-    "minTiredness": 0,
-    "maxEmotionalRate": 0,
+    "maxHappy": 0,
+    "maxPlayful": 0,
+    "maxExcited": 0,
+    "maxSurprised": 0,
+    "maxAngry": 0,
+    "maxTired": 0,
+    "maxOrgasm": 0,
 
+    "maxEmotionalRate": 0,
     "maxSweat": 0,
     "maxFlush": 0,
     "maxChokedFlush": 0,

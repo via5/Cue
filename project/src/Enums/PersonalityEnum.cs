@@ -146,79 +146,98 @@ namespace Cue
 		public static readonly FloatIndex AngerMaxExcitementForHappiness = new FloatIndex(113);
 		public static readonly FloatIndex AngerExcitementFactorForAnger = new FloatIndex(114);
 		public static readonly FloatIndex AngerExcitementFactorForHappiness = new FloatIndex(115);
-		public static readonly FloatIndex DefaultHappiness = new FloatIndex(116);
-		public static readonly FloatIndex DefaultAnger = new FloatIndex(117);
-		public static readonly FloatIndex DefaultPlayfulness = new FloatIndex(118);
-		public static readonly FloatIndex DefaultSurprise = new FloatIndex(119);
-		public static readonly FloatIndex MaxHappyExpression = new FloatIndex(120);
-		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(121);
-		public static readonly FloatIndex MaxPlayfulExpression = new FloatIndex(122);
-		public static readonly FloatIndex MaxAngryExpression = new FloatIndex(123);
-		public static readonly FloatIndex MaxSurprisedExpression = new FloatIndex(124);
-		public static readonly FloatIndex MaxTiredExpression = new FloatIndex(125);
-		public static readonly FloatIndex MinTiredness = new FloatIndex(126);
-		public static readonly FloatIndex MaxEmotionalRate = new FloatIndex(127);
-		public static readonly FloatIndex MinHappyChoked = new FloatIndex(128);
-		public static readonly FloatIndex MaxHappyChoked = new FloatIndex(129);
-		public static readonly FloatIndex MinPlayfulChoked = new FloatIndex(130);
-		public static readonly FloatIndex MaxPlayfulChoked = new FloatIndex(131);
-		public static readonly FloatIndex MinExcitedChoked = new FloatIndex(132);
-		public static readonly FloatIndex MaxExcitedChoked = new FloatIndex(133);
-		public static readonly FloatIndex MinAngryChoked = new FloatIndex(134);
-		public static readonly FloatIndex MaxAngryChoked = new FloatIndex(135);
-		public static readonly FloatIndex MinSurprisedChoked = new FloatIndex(136);
-		public static readonly FloatIndex MaxSurprisedChoked = new FloatIndex(137);
-		public static readonly FloatIndex MinTiredChoked = new FloatIndex(138);
-		public static readonly FloatIndex MaxTiredChoked = new FloatIndex(139);
-		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(140);
-		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(141);
-		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(142);
-		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(143);
-		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(144);
-		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(145);
-		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(146);
-		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(147);
-		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(148);
-		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(149);
-		public static readonly FloatIndex SlapMinTime = new FloatIndex(150);
-		public static readonly FloatIndex SlapMaxTime = new FloatIndex(151);
-		public static readonly FloatIndex MaxSweat = new FloatIndex(152);
-		public static readonly FloatIndex MaxFlush = new FloatIndex(153);
-		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(154);
-		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(155);
-		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(156);
-		public static readonly FloatIndex FlushBaseColorRed = new FloatIndex(157);
-		public static readonly FloatIndex FlushBaseColorGreen = new FloatIndex(158);
-		public static readonly FloatIndex FlushBaseColorBlue = new FloatIndex(159);
-		public static readonly FloatIndex FlushMultiplier = new FloatIndex(160);
-		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(161);
-		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(162);
-		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(163);
-		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(164);
-		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(165);
-		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(166);
-		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(167);
-		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(168);
-		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(169);
-		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(170);
-		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(171);
-		public static readonly FloatIndex OrgasmHighTime = new FloatIndex(172);
-		public static readonly FloatIndex OrgasmLowTime = new FloatIndex(173);
-		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(174);
-		public static readonly FloatIndex OrgasmFluidTime = new FloatIndex(175);
-		public static readonly FloatIndex RateAdjustment = new FloatIndex(176);
-		public static readonly FloatIndex PenetrationDamper = new FloatIndex(177);
-		public static readonly FloatIndex MinCollisionMag = new FloatIndex(178);
-		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(179);
-		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(180);
-		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(181);
-		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(182);
-		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(183);
-		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(184);
-		public static readonly FloatIndex FinishMoodTired = new FloatIndex(185);
+		public static readonly FloatIndex MinHappy = new FloatIndex(116);
+		public static readonly FloatIndex MaxHappy = new FloatIndex(117);
+		public static readonly FloatIndex MinHappyExpression = new FloatIndex(118);
+		public static readonly FloatIndex MaxHappyExpression = new FloatIndex(119);
+		public static readonly FloatIndex MinHappyExpressionChoked = new FloatIndex(120);
+		public static readonly FloatIndex MaxHappyExpressionChoked = new FloatIndex(121);
+		public static readonly FloatIndex MinPlayful = new FloatIndex(122);
+		public static readonly FloatIndex MaxPlayful = new FloatIndex(123);
+		public static readonly FloatIndex MinPlayfulExpression = new FloatIndex(124);
+		public static readonly FloatIndex MaxPlayfulExpression = new FloatIndex(125);
+		public static readonly FloatIndex MinPlayfulExpressionChoked = new FloatIndex(126);
+		public static readonly FloatIndex MaxPlayfulExpressionChoked = new FloatIndex(127);
+		public static readonly FloatIndex MinExcited = new FloatIndex(128);
+		public static readonly FloatIndex MaxExcited = new FloatIndex(129);
+		public static readonly FloatIndex MinExcitedExpression = new FloatIndex(130);
+		public static readonly FloatIndex MaxExcitedExpression = new FloatIndex(131);
+		public static readonly FloatIndex MinExcitedExpressionChoked = new FloatIndex(132);
+		public static readonly FloatIndex MaxExcitedExpressionChoked = new FloatIndex(133);
+		public static readonly FloatIndex MinAngry = new FloatIndex(134);
+		public static readonly FloatIndex MaxAngry = new FloatIndex(135);
+		public static readonly FloatIndex MinAngryExpression = new FloatIndex(136);
+		public static readonly FloatIndex MaxAngryExpression = new FloatIndex(137);
+		public static readonly FloatIndex MinAngryExpressionChoked = new FloatIndex(138);
+		public static readonly FloatIndex MaxAngryExpressionChoked = new FloatIndex(139);
+		public static readonly FloatIndex MinSurprised = new FloatIndex(140);
+		public static readonly FloatIndex MaxSurprised = new FloatIndex(141);
+		public static readonly FloatIndex MinSurprisedExpression = new FloatIndex(142);
+		public static readonly FloatIndex MaxSurprisedExpression = new FloatIndex(143);
+		public static readonly FloatIndex MinSurprisedExpressionChoked = new FloatIndex(144);
+		public static readonly FloatIndex MaxSurprisedExpressionChoked = new FloatIndex(145);
+		public static readonly FloatIndex MinTired = new FloatIndex(146);
+		public static readonly FloatIndex MaxTired = new FloatIndex(147);
+		public static readonly FloatIndex MinTiredExpression = new FloatIndex(148);
+		public static readonly FloatIndex MaxTiredExpression = new FloatIndex(149);
+		public static readonly FloatIndex MinTiredExpressionChoked = new FloatIndex(150);
+		public static readonly FloatIndex MaxTiredExpressionChoked = new FloatIndex(151);
+		public static readonly FloatIndex MinOrgasm = new FloatIndex(152);
+		public static readonly FloatIndex MaxOrgasm = new FloatIndex(153);
+		public static readonly FloatIndex MinOrgasmExpression = new FloatIndex(154);
+		public static readonly FloatIndex MaxOrgasmExpression = new FloatIndex(155);
+		public static readonly FloatIndex MinOrgasmExpressionChoked = new FloatIndex(156);
+		public static readonly FloatIndex MaxOrgasmExpressionChoked = new FloatIndex(157);
+		public static readonly FloatIndex MaxEmotionalRate = new FloatIndex(158);
+		public static readonly FloatIndex ExpressionMinHoldTime = new FloatIndex(159);
+		public static readonly FloatIndex ExpressionMaxHoldTime = new FloatIndex(160);
+		public static readonly FloatIndex ExcitedExpressionWeightModifier = new FloatIndex(161);
+		public static readonly FloatIndex ExclusiveExpressionWeightModifier = new FloatIndex(162);
+		public static readonly FloatIndex OrgasmExpressionRangeMin = new FloatIndex(163);
+		public static readonly FloatIndex OrgasmExpressionRangeMax = new FloatIndex(164);
+		public static readonly FloatIndex OrgasmFirstExpressionTime = new FloatIndex(165);
+		public static readonly FloatIndex OrgasmSyncMinExcitement = new FloatIndex(166);
+		public static readonly FloatIndex SlapMinExpressionChange = new FloatIndex(167);
+		public static readonly FloatIndex SlapMaxExpressionChange = new FloatIndex(168);
+		public static readonly FloatIndex SlapMinTime = new FloatIndex(169);
+		public static readonly FloatIndex SlapMaxTime = new FloatIndex(170);
+		public static readonly FloatIndex MaxSweat = new FloatIndex(171);
+		public static readonly FloatIndex MaxFlush = new FloatIndex(172);
+		public static readonly FloatIndex MaxChokedFlush = new FloatIndex(173);
+		public static readonly FloatIndex ChokedAirDownTime = new FloatIndex(174);
+		public static readonly FloatIndex ChokedAirUpTime = new FloatIndex(175);
+		public static readonly FloatIndex FlushBaseColorRed = new FloatIndex(176);
+		public static readonly FloatIndex FlushBaseColorGreen = new FloatIndex(177);
+		public static readonly FloatIndex FlushBaseColorBlue = new FloatIndex(178);
+		public static readonly FloatIndex FlushMultiplier = new FloatIndex(179);
+		public static readonly FloatIndex TemperatureExcitementMax = new FloatIndex(180);
+		public static readonly FloatIndex TemperatureExcitementRate = new FloatIndex(181);
+		public static readonly FloatIndex TemperatureDecayRate = new FloatIndex(182);
+		public static readonly FloatIndex TirednessRateDuringPostOrgasm = new FloatIndex(183);
+		public static readonly FloatIndex TirednessBaseDecayRate = new FloatIndex(184);
+		public static readonly FloatIndex TirednessBackToBaseRate = new FloatIndex(185);
+		public static readonly FloatIndex DelayAfterOrgasmUntilTirednessDecay = new FloatIndex(186);
+		public static readonly FloatIndex TirednessMaxExcitementForBaseDecay = new FloatIndex(187);
+		public static readonly FloatIndex OrgasmBaseTirednessIncrease = new FloatIndex(188);
+		public static readonly FloatIndex ExcitementDecayRate = new FloatIndex(189);
+		public static readonly FloatIndex ExcitementPostOrgasm = new FloatIndex(190);
+		public static readonly FloatIndex OrgasmHighTime = new FloatIndex(191);
+		public static readonly FloatIndex OrgasmLowTime = new FloatIndex(192);
+		public static readonly FloatIndex PostOrgasmTime = new FloatIndex(193);
+		public static readonly FloatIndex OrgasmFluidTime = new FloatIndex(194);
+		public static readonly FloatIndex RateAdjustment = new FloatIndex(195);
+		public static readonly FloatIndex PenetrationDamper = new FloatIndex(196);
+		public static readonly FloatIndex MinCollisionMag = new FloatIndex(197);
+		public static readonly FloatIndex MinCollisionMagPenetration = new FloatIndex(198);
+		public static readonly FloatIndex FinishOrgasmMinExcitement = new FloatIndex(199);
+		public static readonly FloatIndex FinishMoodHappy = new FloatIndex(200);
+		public static readonly FloatIndex FinishMoodPlayful = new FloatIndex(201);
+		public static readonly FloatIndex FinishMoodAngry = new FloatIndex(202);
+		public static readonly FloatIndex FinishMoodSurprised = new FloatIndex(203);
+		public static readonly FloatIndex FinishMoodTired = new FloatIndex(204);
 
-		public const int FloatCount = 186;
-		public override int GetFloatCount() { return 186; }
+		public const int FloatCount = 205;
+		public override int GetFloatCount() { return 205; }
 
 		// strings
 		public static readonly StringIndex MovementEnergyRampUpAfterOrgasmEasing = new StringIndex(0);
@@ -468,30 +487,49 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
-			"defaultHappiness",
-			"defaultAnger",
-			"defaultPlayfulness",
-			"defaultSurprise",
+			"minHappy",
+			"maxHappy",
+			"minHappyExpression",
 			"maxHappyExpression",
-			"maxExcitedExpression",
+			"minHappyExpressionChoked",
+			"maxHappyExpressionChoked",
+			"minPlayful",
+			"maxPlayful",
+			"minPlayfulExpression",
 			"maxPlayfulExpression",
+			"minPlayfulExpressionChoked",
+			"maxPlayfulExpressionChoked",
+			"minExcited",
+			"maxExcited",
+			"minExcitedExpression",
+			"maxExcitedExpression",
+			"minExcitedExpressionChoked",
+			"maxExcitedExpressionChoked",
+			"minAngry",
+			"maxAngry",
+			"minAngryExpression",
 			"maxAngryExpression",
+			"minAngryExpressionChoked",
+			"maxAngryExpressionChoked",
+			"minSurprised",
+			"maxSurprised",
+			"minSurprisedExpression",
 			"maxSurprisedExpression",
+			"minSurprisedExpressionChoked",
+			"maxSurprisedExpressionChoked",
+			"minTired",
+			"maxTired",
+			"minTiredExpression",
 			"maxTiredExpression",
-			"minTiredness",
+			"minTiredExpressionChoked",
+			"maxTiredExpressionChoked",
+			"minOrgasm",
+			"maxOrgasm",
+			"minOrgasmExpression",
+			"maxOrgasmExpression",
+			"minOrgasmExpressionChoked",
+			"maxOrgasmExpressionChoked",
 			"maxEmotionalRate",
-			"minHappyChoked",
-			"maxHappyChoked",
-			"minPlayfulChoked",
-			"maxPlayfulChoked",
-			"minExcitedChoked",
-			"maxExcitedChoked",
-			"minAngryChoked",
-			"maxAngryChoked",
-			"minSurprisedChoked",
-			"maxSurprisedChoked",
-			"minTiredChoked",
-			"maxTiredChoked",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
 			"excitedExpressionWeightModifier",
@@ -777,30 +815,49 @@ namespace Cue
 			"angerMaxExcitementForHappiness",
 			"angerExcitementFactorForAnger",
 			"angerExcitementFactorForHappiness",
-			"defaultHappiness",
-			"defaultAnger",
-			"defaultPlayfulness",
-			"defaultSurprise",
+			"minHappy",
+			"maxHappy",
+			"minHappyExpression",
 			"maxHappyExpression",
-			"maxExcitedExpression",
+			"minHappyExpressionChoked",
+			"maxHappyExpressionChoked",
+			"minPlayful",
+			"maxPlayful",
+			"minPlayfulExpression",
 			"maxPlayfulExpression",
+			"minPlayfulExpressionChoked",
+			"maxPlayfulExpressionChoked",
+			"minExcited",
+			"maxExcited",
+			"minExcitedExpression",
+			"maxExcitedExpression",
+			"minExcitedExpressionChoked",
+			"maxExcitedExpressionChoked",
+			"minAngry",
+			"maxAngry",
+			"minAngryExpression",
 			"maxAngryExpression",
+			"minAngryExpressionChoked",
+			"maxAngryExpressionChoked",
+			"minSurprised",
+			"maxSurprised",
+			"minSurprisedExpression",
 			"maxSurprisedExpression",
+			"minSurprisedExpressionChoked",
+			"maxSurprisedExpressionChoked",
+			"minTired",
+			"maxTired",
+			"minTiredExpression",
 			"maxTiredExpression",
-			"minTiredness",
+			"minTiredExpressionChoked",
+			"maxTiredExpressionChoked",
+			"minOrgasm",
+			"maxOrgasm",
+			"minOrgasmExpression",
+			"maxOrgasmExpression",
+			"minOrgasmExpressionChoked",
+			"maxOrgasmExpressionChoked",
 			"maxEmotionalRate",
-			"minHappyChoked",
-			"maxHappyChoked",
-			"minPlayfulChoked",
-			"maxPlayfulChoked",
-			"minExcitedChoked",
-			"maxExcitedChoked",
-			"minAngryChoked",
-			"maxAngryChoked",
-			"minSurprisedChoked",
-			"maxSurprisedChoked",
-			"minTiredChoked",
-			"maxTiredChoked",
 			"expressionMinHoldTime",
 			"expressionMaxHoldTime",
 			"excitedExpressionWeightModifier",

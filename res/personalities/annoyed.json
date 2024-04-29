@@ -1,9 +1,13 @@
 {
     "name": "Annoyed",
     "inherit": "base",
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 0.5,
+
+    "maxHappy": 0,
+    "maxPlayful": 0,
+    "maxSurprised": 0.5,
+    "minAngry": 0.1,
+    "maxAngry": 0.5,
+
     "lookAtPlayerTimeAfterGrab": 0,
 
     "zappedByPlayerBreastsExcitement": 0,

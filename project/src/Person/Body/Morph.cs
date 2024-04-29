@@ -33,7 +33,13 @@ namespace Cue
 
 		public bool Init()
 		{
-			return (m_ != null) && m_.Valid;
+			if (m_ == null)
+				return false;
+
+			if (!m_.Valid)
+				return false;
+
+			return true;
 		}
 
 		public string Name
@@ -246,6 +252,19 @@ namespace Cue
 			return g;
 		}
 
+		public override string ToString()
+		{
+			return name_;
+		}
+
+		public string DebugValueString()
+		{
+			if (value_ == NoValue)
+				return $"R";
+			else
+				return $"{value_:0.00}";
+		}
+
 		private void CopyFrom(MorphGroup g)
 		{
 			morphs_ = new MorphInfo[g.morphs_.Length];
@@ -363,11 +382,6 @@ namespace Cue
 		{
 			for (int i = 0; i < morphs_.Length; ++i)
 				morphs_[i].Reset();
-		}
-
-		public override string ToString()
-		{
-			return name_;
 		}
 
 		public void Debug(DebugLines debug)

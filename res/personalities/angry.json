@@ -1,9 +1,13 @@
 {
     "name": "Angry",
     "inherit": "base",
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultAnger": 1,
+
+    "maxHappy": 0,
+    "maxPlayful": 0,
+    "maxSurprised": 0.5,
+    "minAngry": 0.2,
+    "maxAngry": 1,
+
     "lookAtPlayerTimeAfterGrab": 0,
 
     "zappedByPlayerBreastsExcitement": 0,

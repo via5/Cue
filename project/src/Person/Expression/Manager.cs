@@ -11,6 +11,7 @@ namespace Cue
 		private const float MoreCheckInterval = 1;
 
 		private Person person_;
+		private Logger log_;
 		private WeightedExpression[] exps_ = new WeightedExpression[0];
 		private bool needsMore_ = false;
 		private float moreElapsed_ = 0;
@@ -28,9 +29,16 @@ namespace Cue
 		private bool slapUpdate_ = true;
 		private bool slapping_ = false;
 
+
 		public ExpressionManager(Person p)
 		{
 			person_ = p;
+			log_ = new Logger(Logger.AI, "expression manager " + p.ID);
+		}
+
+		public Logger Log
+		{
+			get { return log_; }
 		}
 
 		public WeightedExpression[] GetAllExpressions()
@@ -44,7 +52,7 @@ namespace Cue
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
-				if (exps_[i].Expression.IsMood(mood))
+				if (exps_[i].Expression.Mood == mood)
 					list.Add(exps_[i].Expression);
 			}
 
@@ -79,6 +87,8 @@ namespace Cue
 			{
 				if (all[i].Init(person_))
 					exps.Add(new WeightedExpression(person_, all[i]));
+				else
+					Log.Error($"not using {all[i]}, couldn't init");
 			}
 
 			exps_ = exps.ToArray();
@@ -155,7 +165,7 @@ namespace Cue
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
-				if (!foundActive && exps_[i].Active && exps_[i].Expression.IsMood(mood))
+				if (!foundActive && exps_[i].Active && exps_[i].Expression.Mood == mood)
 				{
 					foundActive = true;
 					ActivateForEmergency(exps_[i], intensity, min, max, time);
@@ -170,7 +180,7 @@ namespace Cue
 			{
 				for (int i = 0; i < exps_.Length; ++i)
 				{
-					if (exps_[i].Expression.IsMood(mood))
+					if (exps_[i].Expression.Mood == mood)
 					{
 						ActivateForEmergency(exps_[i], intensity, min, max, time);
 						break;
@@ -385,10 +395,6 @@ namespace Cue
 				m.Get(MoodType.Tired) * ps.Get(PS.ExpressionTirednessFactor),
 				0, 1);
 
-			// todo: this needs a rewrite, it was made when expressions had
-			// multiple moods, but can only have one mood now, and they're
-			// duplicated instead
-
 			int[] countPerMood = new int[MoodType.Count];
 			for (int i = 0; i < countPerMood.Length; ++i)
 				countPerMood[i] = 0;
@@ -399,135 +405,30 @@ namespace Cue
 					++countPerMood[exps_[i].Expression.Mood.Int];
 			}
 
-
 			for (int i = 0; i < exps_.Length; ++i)
 			{
 				var we = exps_[i];
 				var e = we.Expression;
+				var mv = m.GetMoodValue(e.Mood);
 
-				float weight = 0;
-				float intensity = 0;
-				float min = 0, max = 1;
+				float weight = e.DefaultWeight * mv.Value;
+				float intensity = U.Clamp(mv.Value, mv.MinimumExpression, mv.MaximumExpression);
 
-				MoodType highestMood = MoodType.None;
-				float highestMoodValue = 0;
+				if (m.Get(MoodType.Excited) < e.MinExcitement)
+					weight = 0;
 
-				if (isOrgasming_)
-				{
-					if (e.IsMood(MoodType.Orgasm))
-					{
-						if (m.Get(MoodType.Orgasm) > highestMoodValue)
-						{
-							highestMood = MoodType.Orgasm;
-							highestMoodValue = m.Get(MoodType.Orgasm);
-						}
+				if (e.Exclusive)
+					weight *= ps.Get(PS.ExclusiveExpressionWeightModifier);
 
-						weight += e.DefaultWeight;
-						intensity = 1;
-						min = ps.Get(PS.OrgasmExpressionRangeMin);
-						max = ps.Get(PS.OrgasmExpressionRangeMax);
-					}
-				}
-				else
-				{
-					if (e.IsMood(MoodType.Happy))
-					{
-						if (m.Get(MoodType.Happy) > highestMoodValue)
-						{
-							highestMood = MoodType.Happy;
-							highestMoodValue = m.Get(MoodType.Happy);
-						}
-
-						weight += e.DefaultWeight * m.Get(MoodType.Happy);
-						intensity = Math.Max(intensity, m.Get(MoodType.Happy));
-						intensity = Math.Min(intensity, ps.Get(PS.MaxHappyExpression));
-					}
-
-					if (e.IsMood(MoodType.Excited))
-					{
-						if (m.Get(MoodType.Excited) > highestMoodValue)
-						{
-							highestMood = MoodType.Excited;
-							highestMoodValue = m.Get(MoodType.Excited);
-						}
-
-						weight += e.DefaultWeight * m.Get(MoodType.Excited) * ps.Get(PS.ExcitedExpressionWeightModifier);
-						intensity = Math.Max(intensity, m.Get(MoodType.Excited));
-						intensity = Math.Min(intensity, ps.Get(PS.MaxExcitedExpression));
-					}
-
-					if (e.IsMood(MoodType.Playful))
-					{
-						if (m.Get(MoodType.Playful) > highestMoodValue)
-						{
-							highestMood = MoodType.Playful;
-							highestMoodValue = m.Get(MoodType.Playful);
-						}
-
-						weight += e.DefaultWeight * m.Get(MoodType.Playful);
-						intensity = Math.Max(intensity, m.Get(MoodType.Playful));
-						intensity = Math.Min(intensity, ps.Get(PS.MaxPlayfulExpression));
-					}
-
-					if (e.IsMood(MoodType.Angry))
-					{
-						if (m.Get(MoodType.Angry) > highestMoodValue)
-						{
-							highestMood = MoodType.Angry;
-							highestMoodValue = m.Get(MoodType.Angry);
-						}
-
-						weight += e.DefaultWeight * m.Get(MoodType.Angry);
-						intensity = Math.Max(intensity, m.Get(MoodType.Angry));
-						intensity = Math.Min(intensity, ps.Get(PS.MaxAngryExpression));
-					}
-
-					if (e.IsMood(MoodType.Surprised))
-					{
-						if (m.Get(MoodType.Surprised) > highestMoodValue)
-						{
-							highestMood = MoodType.Surprised;
-							highestMoodValue = m.Get(MoodType.Surprised);
-						}
-
-						weight += e.DefaultWeight * m.Get(MoodType.Surprised);
-						intensity = Math.Max(intensity, m.Get(MoodType.Surprised));
-						intensity = Math.Min(intensity, ps.Get(PS.MaxSurprisedExpression));
-					}
-
-					if (e.IsMood(MoodType.Tired))
-					{
-						if (m.Get(MoodType.Tired) > highestMoodValue)
-						{
-							highestMood = MoodType.Tired;
-							highestMoodValue = m.Get(MoodType.Tired);
-						}
-
-						weight += e.DefaultWeight * expressionTiredness;
-						intensity = Math.Max(intensity, expressionTiredness);
-						intensity = Math.Min(intensity, ps.Get(PS.MaxTiredExpression));
-					}
-
-					if (m.Get(MoodType.Excited) < e.MinExcitement)
-						weight = 0;
-
-					if (e.Exclusive)
-						weight *= ps.Get(PS.ExclusiveExpressionWeightModifier);
-				}
-
-
-				if (!e.IsMood(MoodType.Tired))
-				{
+				if (e.Mood != MoodType.Tired)
 					weight *= Math.Max(1 - expressionTiredness, 0.05f);
-				}
-
 
 				if (countPerMood[e.Mood.Int] >= MaxActivePerMood)
 					weight = 0;
 
 				float speed = 1 - expressionTiredness;
 
-				we.Set(weight, intensity, speed, min, max);
+				we.Set(weight, intensity, speed, mv.MinimumExpression, mv.MaximumExpression);
 			}
 		}
 

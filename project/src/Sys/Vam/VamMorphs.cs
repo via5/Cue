@@ -575,6 +575,8 @@ namespace Cue.Sys.Vam
 			morph_ = VamMorphManager.Instance.Get(atom_, name_, eyesClosed_);
 			if (morph_ == null)
 				atom_.Log.Error($"no morph '{name_}'");
+			else if (morph_.DAZMorph == null)
+				atom_.Log.Error($"morph '{name_}' has no dazmorph");
 
 			inited_ = true;
 		}

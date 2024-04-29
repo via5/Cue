@@ -28,7 +28,7 @@ namespace Cue
 
 		private static int sEnabledTypes =
 			Action | Event | AI | Command |
-			Object | Sys | Main;
+			Object | Sys | Main | Resources;
 
 		private static int sLevel = ErrorLevel;
 

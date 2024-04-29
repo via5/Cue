@@ -21,7 +21,7 @@
     },
 
     "gazeEnabled": true,
-    "avoidDelayAfterOrgasm": 0,
+    "avoidGazePlayerDelayAfterOrgasm": 0,
 
     "lookAboveMaxWeight": 0,
     "lookAboveMaxWeightOrgasm": 0,
@@ -77,11 +77,11 @@
     "kissSpeedEnergyFactor": 1,
     "angerExcitementFactorForHappiness": 0,
 
-    "defaultHappiness": 0,
-    "defaultPlayfulness": 0,
-    "defaultSurprise": 0,
-    "defaultAnger": 0,
-    "maxExcitedExpression": 0.1,
+    "maxHappy": 0,
+    "maxPlayful": 0,
+    "maxExcited": 0.1,
+    "maxSurprised": 0,
+    "maxAngry": 0,
 
     "maxSweat": 1,
 

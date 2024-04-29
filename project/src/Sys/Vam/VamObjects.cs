@@ -29,6 +29,11 @@ namespace Cue.Sys.Vam
 			get { return log_; }
 		}
 
+		public override string ToString()
+		{
+			return $"VamObjectCreator[{name_}]";
+		}
+
 		public abstract void Create(IAtom user, string id, Action<IObject, bool> callback);
 		public abstract void Destroy(IAtom user, string id);
 	}

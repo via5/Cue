@@ -72,7 +72,7 @@
 			float weight, float intensity, float speed, float min, float max)
 		{
 			weight_ = weight;
-			intensity_ = intensity;
+			intensity_ = U.Clamp(intensity, 0, 1);
 			speed_ = speed;
 			min_ = min;
 			max_ = max;
@@ -194,12 +194,16 @@
 			{
 				return 1.0f;
 			}
+			else if (e_.Mood == MoodType.Excited)
+			{
+				return rng_.RandomFloat(min_, intensity_, intensity_);
+			}
 			else
 			{
-				if (e_.IsMood(MoodType.Excited))
-					return rng_.RandomFloat(min_, intensity_, intensity_);
-				else
-					return U.RandomFloat(min_, max_) * U.Clamp(intensity_, 0, 1);
+				float r = max_ - min_;
+				float v = U.RandomFloat(0, r);
+
+				return min_ + r * intensity_;
 			}
 		}
 

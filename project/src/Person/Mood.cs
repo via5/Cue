@@ -1,124 +1,203 @@
-﻿using SimpleJSON;
-using System;
+﻿using System;
 
 namespace Cue
 {
+	using FloatIndex = BasicEnumValues.FloatIndex;
+
+	public class MoodValue
+	{
+		private readonly Person person_;
+		private readonly MoodType mood_;
+
+		private readonly FloatIndex min_, max_;
+		private readonly FloatIndex minExpr_, maxExpr_;
+		private readonly FloatIndex minChoked_, maxChoked_;
+
+		private DampedFloat v_ = new DampedFloat();
+		private float temp_ = -1;
+		private float tempTime_ = 0;
+		private float tempElapsed_ = 0;
+
+		private Sys.IFloatParameter param_;
+		private Sys.IBoolParameter forceParam_;
+
+		public MoodValue(
+			Person p, MoodType type,
+			FloatIndex min, FloatIndex max,
+			FloatIndex minExpr, FloatIndex maxExpr,
+			FloatIndex minChoked, FloatIndex maxChoked)
+		{
+			person_ = p;
+			mood_ = type;
+
+			min_ = min;
+			max_ = max;
+			minExpr_ = minExpr;
+			maxExpr_ = maxExpr;
+			minChoked_ = minChoked;
+			maxChoked_ = maxChoked;
+
+			if (p.IsInteresting)
+			{
+				param_ = Cue.Instance.Sys.RegisterFloatParameter(
+					$"{p.ID}.Mood.{MoodType.ToString(type)}.Value",
+					OnValue, 0, 0, 1);
+
+				forceParam_ = Cue.Instance.Sys.RegisterBoolParameter(
+					$"{p.ID}.Mood.{MoodType.ToString(type)}.ForceValue",
+					b => OnForced(b),
+					v_.IsForced);
+			}
+
+			Reset();
+		}
+
+		public void Reset()
+		{
+			Set(person_.Personality.Get(min_), true);
+		}
+
+		public DampedFloat Damped
+		{
+			get { return v_; }
+		}
+
+		public float Value
+		{
+			get
+			{
+				if (temp_ < 0)
+					return v_.Value;
+				else
+					return temp_;
+			}
+		}
+
+		public float Minimum
+		{
+			get
+			{
+				return Math.Min(
+					person_.Personality.Get(min_),
+					person_.Personality.Get(max_));
+			}
+		}
+
+		public float Maximum
+		{
+			get
+			{
+				return Math.Max(
+					person_.Personality.Get(min_),
+					person_.Personality.Get(max_));
+			}
+		}
+
+		public float MinimumExpression
+		{
+			get
+			{
+				return Math.Min(
+					person_.Personality.Get(minExpr_),
+					person_.Personality.Get(maxExpr_));
+			}
+		}
+
+		public float MaximumExpression
+		{
+			get
+			{
+				return Math.Max(
+					person_.Personality.Get(minExpr_),
+					person_.Personality.Get(maxExpr_));
+			}
+		}
+
+		public float MinimumWhenChoked
+		{
+			get
+			{
+				return Math.Min(
+					person_.Personality.Get(minChoked_),
+					person_.Personality.Get(maxChoked_));
+			}
+		}
+
+		public float MaximumWhenChoked
+		{
+			get
+			{
+				return Math.Max(
+					person_.Personality.Get(minChoked_),
+					person_.Personality.Get(maxChoked_));
+			}
+		}
+
+		public bool IsForced
+		{
+			get { return v_.IsForced; }
+		}
+
+		public void Set(float v, bool fast = false)
+		{
+			var ps = person_.Personality;
+			v = U.Clamp(v, ps.Get(min_), ps.Get(max_));
+
+			v_.Target = v;
+
+			if (fast)
+				v_.SetValue(v);
+		}
+
+		public void SetTemporary(float v, float time)
+		{
+			temp_ = v;
+			tempTime_ = time;
+			tempElapsed_ = 0;
+		}
+
+		public void Update(float s)
+		{
+			v_.Update(s);
+
+			if (temp_ >= 0)
+			{
+				tempElapsed_ += s;
+				if (tempElapsed_ >= tempTime_)
+				{
+					temp_ = -1;
+					tempTime_ = 0;
+					tempElapsed_ = 0;
+				}
+			}
+
+			if (param_ != null)
+				param_.Value = Value;
+
+			if (forceParam_ != null)
+				forceParam_.Value = v_.IsForced;
+		}
+
+		private void OnValue(float f)
+		{
+			if (v_.IsForced)
+				v_.SetForced(f);
+			else
+				Set(f);
+		}
+
+		private void OnForced(bool b)
+		{
+			if (b)
+				v_.SetForced(param_.Value);
+			else
+				v_.UnsetForced();
+		}
+	}
+
+
 	public class Mood
 	{
-		class MoodValue
-		{
-			private MoodType mood_;
-			private DampedFloat v_ = new DampedFloat();
-			private float temp_ = -1;
-			private float tempTime_ = 0;
-			private float tempElapsed_ = 0;
-
-			private Sys.IFloatParameter param_;
-			private Sys.IBoolParameter forceParam_;
-
-			public MoodValue(Person p, MoodType type)
-			{
-				mood_ = type;
-
-				if (p.IsInteresting)
-				{
-					param_ = Cue.Instance.Sys.RegisterFloatParameter(
-						$"{p.ID}.Mood.{MoodType.ToString(type)}.Value",
-						OnValue, 0, 0, 1);
-
-					forceParam_ = Cue.Instance.Sys.RegisterBoolParameter(
-						$"{p.ID}.Mood.{MoodType.ToString(type)}.ForceValue",
-						b => OnForced(b),
-						v_.IsForced);
-				}
-			}
-
-			public DampedFloat Damped
-			{
-				get { return v_; }
-			}
-
-			public float Value
-			{
-				get
-				{
-					if (temp_ < 0)
-						return v_.Value;
-					else
-						return temp_;
-				}
-			}
-
-			public bool IsForced
-			{
-				get { return v_.IsForced; }
-			}
-
-			public void Set(float v, bool fast=false)
-			{
-				v_.Target = v;
-
-				if (fast)
-					v_.SetValue(v);
-			}
-
-			public void SetTemporary(float v, float time)
-			{
-				temp_ = v;
-				tempTime_ = time;
-				tempElapsed_ = 0;
-			}
-
-			public void Update(float s)
-			{
-				v_.Update(s);
-
-				if (temp_ >= 0)
-				{
-					tempElapsed_ += s;
-					if (tempElapsed_ >= tempTime_)
-					{
-						temp_ = -1;
-						tempTime_ = 0;
-						tempElapsed_ = 0;
-					}
-				}
-
-				if (param_ != null)
-					param_.Value = Value;
-
-				if (forceParam_ != null)
-					forceParam_.Value = v_.IsForced;
-			}
-
-			private void OnValue(float f)
-			{
-				if (v_.IsForced)
-					v_.SetForced(f);
-				else
-					Set(f);
-			}
-
-			private void OnForced(bool b)
-			{
-				if (b)
-					v_.SetForced(param_.Value);
-				else
-					v_.UnsetForced();
-			}
-		}
-
-		struct Choked
-		{
-			public float minMood, maxMood;
-
-			public Choked(float min, float max)
-			{
-				minMood = min;
-				maxMood = max;
-			}
-		}
-
 		public const float NoOrgasm = 10000;
 
 		private const int NormalState = 1;
@@ -133,20 +212,58 @@ namespace Cue
 		private float timeSinceLastOrgasm_ = NoOrgasm;
 		private IEasing energyRampUpEasing_ = new LinearEasing();
 
-		private DampedFloat tiredness_ = new DampedFloat();
 		private float baseTiredness_ = 0;
 		private ForceableFloat baseExcitement_ = new ForceableFloat();
 		private MoodValue[] moods_ = new MoodValue[MoodType.Count];
-
-		private Choked[] choked_ = new Choked[MoodType.Count];
 
 
 		public Mood(Person p)
 		{
 			person_ = p;
 
-			foreach (var m in MoodType.Values)
-				moods_[m.Int] = new MoodValue(p, m);
+			var ps = person_.Personality;
+
+			moods_[MoodType.Happy.Int] = new MoodValue(
+				person_, MoodType.Happy,
+				PS.MinHappy, PS.MaxHappy,
+				PS.MinHappyExpression, PS.MaxHappyExpression,
+				PS.MinHappyExpressionChoked, PS.MaxHappyExpressionChoked);
+
+			moods_[MoodType.Playful.Int] = new MoodValue(
+				person_, MoodType.Playful,
+				PS.MinPlayful, PS.MaxPlayful,
+				PS.MinPlayfulExpression, PS.MaxPlayfulExpression,
+				PS.MinPlayfulExpressionChoked, PS.MaxPlayfulExpressionChoked);
+
+			moods_[MoodType.Excited.Int] = new MoodValue(
+				person_, MoodType.Excited,
+				PS.MinExcited, PS.MaxExcited,
+				PS.MinExcitedExpression, PS.MaxExcitedExpression,
+				PS.MinExcitedExpressionChoked, PS.MaxExcitedExpressionChoked);
+
+			moods_[MoodType.Angry.Int] = new MoodValue(
+				person_, MoodType.Angry,
+				PS.MinAngry, PS.MaxAngry,
+				PS.MinAngryExpression, PS.MaxAngryExpression,
+				PS.MinAngryExpressionChoked, PS.MaxAngryExpressionChoked);
+
+			moods_[MoodType.Surprised.Int] = new MoodValue(
+				person_, MoodType.Surprised,
+				PS.MinSurprised, PS.MaxSurprised,
+				PS.MinSurprisedExpression, PS.MaxSurprisedExpression,
+				PS.MinSurprisedExpressionChoked, PS.MaxSurprisedExpressionChoked);
+
+			moods_[MoodType.Tired.Int] = new MoodValue(
+				person_, MoodType.Tired,
+				PS.MinTired, PS.MaxTired,
+				PS.MinTiredExpression, PS.MaxTiredExpression,
+				PS.MinTiredExpressionChoked, PS.MaxTiredExpressionChoked);
+
+			moods_[MoodType.Orgasm.Int] = new MoodValue(
+				person_, MoodType.Orgasm,
+				PS.MinOrgasm, PS.MaxOrgasm,
+				PS.MinOrgasmExpression, PS.MaxOrgasmExpression,
+				PS.MinOrgasmExpressionChoked, PS.MaxOrgasmExpressionChoked);
 
 			OnPersonalityChanged();
 			p.PersonalityChanged += OnPersonalityChanged;
@@ -171,48 +288,10 @@ namespace Cue
 
 			energyRampUpEasing_ = e;
 
-			foreach (var m in MoodType.Values)
-				choked_[m.Int] = new Choked(0, 1);
+			foreach (var m in moods_)
+				m.Reset();
 
-			SetChoked(
-				MoodType.Happy,
-				PS.MinHappyChoked, PS.MaxHappyChoked);
-
-			SetChoked(
-				MoodType.Playful,
-				PS.MinPlayfulChoked, PS.MaxPlayfulChoked);
-
-			SetChoked(
-				MoodType.Excited,
-				PS.MinExcitedChoked, PS.MaxExcitedChoked);
-
-			SetChoked(
-				MoodType.Angry,
-				PS.MinAngryChoked, PS.MaxAngryChoked);
-
-			SetChoked(
-				MoodType.Surprised,
-				PS.MinSurprisedChoked, PS.MaxSurprisedChoked);
-
-			SetChoked(
-				MoodType.Tired,
-				PS.MinTiredChoked, PS.MaxTiredChoked);
-
-			moods_[MoodType.Happy.Int].Set(ps.Get(PS.DefaultHappiness), true);
-			moods_[MoodType.Angry.Int].Set(ps.Get(PS.DefaultAnger), true);
-			moods_[MoodType.Playful.Int].Set(ps.Get(PS.DefaultPlayfulness), true);
-			moods_[MoodType.Surprised.Int].Set(ps.Get(PS.DefaultSurprise), true);
-
-			tiredness_.SetValue(ps.Get(PS.MinTiredness));
-			SetBaseTiredness(ps.Get(PS.MinTiredness));
-		}
-
-		private void SetChoked(
-			MoodType m,
-			BasicEnumValues.FloatIndex min, BasicEnumValues.FloatIndex max)
-		{
-			var ps = person_.Personality;
-			choked_[m.Int] = new Choked(ps.Get(min), ps.Get(max));
+			SetBaseTiredness(ps.Get(PS.MinTired));
 		}
 
 		public static bool ShouldStopSexAnimation(
@@ -382,6 +461,11 @@ namespace Cue
 			return moods_[i.Int].Value;
 		}
 
+		public MoodValue GetMoodValue(MoodType i)
+		{
+			return moods_[i.Int];
+		}
+
 		public bool IsExcitementForced
 		{
 			get { return moods_[MoodType.Excited.Int].IsForced; }
@@ -394,17 +478,20 @@ namespace Cue
 
 		private void Set(MoodType i, float value, bool fast=false)
 		{
+			var m = moods_[i.Int];
+
 			if (!person_.Body.Breathing)
 			{
-				value = U.Clamp(
-					value, choked_[i.Int].minMood, choked_[i.Int].maxMood);
+				value = U.Clamp(value, m.MinimumWhenChoked, m.MaximumWhenChoked);
+				fast = true;
+			}
 
-				moods_[i.Int].Set(U.Clamp(value, 0, 1), true);
-			}
-			else
-			{
-				moods_[i.Int].Set(U.Clamp(value, 0, 1), fast);
-			}
+			m.Set(value, fast);
+		}
+
+		private void SetDefault(MoodType i, bool fast=false)
+		{
+			Set(i, moods_[i.Int].Minimum, fast);
 		}
 
 		public DampedFloat GetDamped(MoodType i)
@@ -422,14 +509,16 @@ namespace Cue
 			return baseExcitement_;
 		}
 
-		public DampedFloat TirednessValue
-		{
-			get { return tiredness_; }
-		}
-
 		public float BaseTiredness
 		{
 			get { return baseTiredness_; }
+		}
+
+		private void SetBaseTiredness(float f)
+		{
+			baseTiredness_ = U.Clamp(f,
+				person_.Personality.Get(PS.MinTired),
+				person_.Personality.Get(PS.MaxTired));
 		}
 
 		public float GazeEnergy
@@ -490,7 +579,8 @@ namespace Cue
 
 		public void ForceOrgasm()
 		{
-			DoOrgasm(false);
+			if (State != OrgasmHighState && State != OrgasmLowState)
+				DoOrgasm(false);
 		}
 
 		public void Update(float s)
@@ -556,11 +646,13 @@ namespace Cue
 					{
 						person_.Animator.StopType(AnimationType.Orgasm);
 
-						tiredness_.UpRate = ps.Get(PS.TirednessRateDuringPostOrgasm);
-						tiredness_.Target = 1;
-
+						GetMoodValue(MoodType.Tired).Damped.UpRate = ps.Get(PS.TirednessRateDuringPostOrgasm);
+						GetMoodValue(MoodType.Tired).Damped.Target = 1;
 						SetBaseTiredness(baseTiredness_ + ps.Get(PS.OrgasmBaseTirednessIncrease));
+
+						Set(MoodType.Orgasm, 0, true);
 						SetState(PostOrgasmState);
+
 						person_.Options.GetAnimationOption(AnimationType.Orgasm).Trigger(false);
 					}
 
@@ -621,8 +713,8 @@ namespace Cue
 					var exInRange = (ex - happyMaxEx) / happyMaxEx;
 					var v = (exInRange * ps.Get(PS.AngerExcitementFactorForHappiness));
 
-					Set(MoodType.Happy, U.Clamp(v, 0, ps.Get(PS.DefaultHappiness)));
-					Set(MoodType.Playful, U.Clamp(v, 0, ps.Get(PS.DefaultPlayfulness)));
+					Set(MoodType.Happy, v);
+					Set(MoodType.Playful, v);
 				}
 			}
 			else
@@ -635,13 +727,13 @@ namespace Cue
 				}
 				else
 				{
-					Set(MoodType.Happy, ps.Get(PS.DefaultHappiness));
-					Set(MoodType.Playful, ps.Get(PS.DefaultPlayfulness));
-					Set(MoodType.Angry, ps.Get(PS.DefaultAnger));
+					SetDefault(MoodType.Happy);
+					SetDefault(MoodType.Playful);
+					SetDefault(MoodType.Angry);
 				}
 			}
 
-			Set(MoodType.Surprised, ps.Get(PS.DefaultSurprise));
+			SetDefault(MoodType.Surprised);
 		}
 
 		private void UpdateTiredness(float s)
@@ -656,16 +748,15 @@ namespace Cue
 						SetBaseTiredness(baseTiredness_ - s * ps.Get(PS.TirednessBaseDecayRate));
 				}
 
-				tiredness_.DownRate = ps.Get(PS.TirednessBackToBaseRate);
-				tiredness_.Target = baseTiredness_;
+				GetMoodValue(MoodType.Tired).Damped.DownRate = ps.Get(PS.TirednessBackToBaseRate);
+				GetMoodValue(MoodType.Tired).Damped.Target = baseTiredness_;
 			}
 			else if (IsOrgasming())
 			{
-				tiredness_.DownRate = 0;
+				GetMoodValue(MoodType.Tired).Damped.DownRate = 0;
 			}
 
-			tiredness_.Update(s);
-			Set(MoodType.Tired, tiredness_.Value);
+			GetMoodValue(MoodType.Tired).Damped.Update(s);
 		}
 
 		private void UpdateExcitement(float s)
@@ -740,6 +831,7 @@ namespace Cue
 
 			baseExcitement_.Value = 1;
 			Set(MoodType.Excited, baseExcitement_.Value);
+			Set(MoodType.Orgasm, 1, true);
 
 			SetState(OrgasmHighState);
 			timeSinceLastOrgasm_ = 0;
@@ -775,11 +867,6 @@ namespace Cue
 		{
 			state_ = s;
 			elapsedThisState_ = 0;
-		}
-
-		private void SetBaseTiredness(float f)
-		{
-			baseTiredness_ = U.Clamp(f, person_.Personality.Get(PS.MinTiredness), 1);
 		}
 	}
 }

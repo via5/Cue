@@ -101,6 +101,7 @@ namespace Cue
 					if (ps.Name.ToLower() == o["inherit"].Value.ToLower())
 					{
 						p = ps.Clone(J.ReqString(o, "name"), null);
+						break;
 					}
 				}
 
@@ -126,7 +127,30 @@ namespace Cue
 			ParseAnimations(p, o, inherited);
 			ParseExpressions(p, o, inherited);
 
+			CheckUnused(p, o);
+
 			return p;
+		}
+
+		private void CheckUnused(Personality p, JSONClass o)
+		{
+			var others = new List<string>
+			{
+				"name", "abstract", "inherit", "voice", "expressions", "events",
+				"animations", "sensitivities", "pose", "expressionsInherit"
+			};
+
+			foreach (var k in o.Keys)
+			{
+				if (PS.BoolFromString(k) == -1 &&
+					PS.DurationFromString(k) == -1 &&
+					PS.FloatFromString(k) == -1 &&
+					PS.StringFromString(k) == -1)
+				{
+					if (!others.Contains(k))
+						Log.Warning($"{p.Name}: unused key '{k}'");
+				}
+			}
 		}
 
 		private void ParseExpressions(Personality p, JSONClass o, bool inherited)
@@ -135,7 +159,9 @@ namespace Cue
 			{
 				var es = new List<Expression>();
 
-				bool inh = o["expressionsInherit"]?.AsBool ?? true;
+				bool inh = true;
+				if (o.HasKey("expressionsInherit"))
+					inh = o["expressionsInherit"]?.AsBool ?? true;
 
 				if (inherited && inh)
 					es.AddRange(p.GetExpressions());

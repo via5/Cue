@@ -1,10 +1,12 @@
 {
     "name": "Shy",
     "inherit": "standard",
-    "defaultHappiness": 0.3,
-    "defaultPlayfulness": 0,
-    "defaultSurprise": 0.1,
-    "defaultAnger": 0,
+
+    "maxHappy": 0.3,
+    "maxPlayful": 0,
+    "maxSurprised": 0.1,
+    "maxExcitedExpression": 0.5,
+
     "lookAtPlayerTimeAfterGrab": 0,
     "lookDownWeight": 2,
 
@@ -18,8 +20,7 @@
 
     "avoidGazePlayerMinExcitement": 0.2,
     "avoidGazePlayerMaxExcitement": 0.5,
-    "avoidGazePlayerInsidePersonalSpaceMinExcitement": 0,
-    "avoidGazePlayerInsidePersonalSpace": 0.4,
+    "avoidGazePlayerInsidePersonalSpaceMinExcitement": 0.4,
     "avoidGazePlayerDuringSexMinExcitement": 0,
     "avoidGazePlayerDuringSexMaxExcitement": 0.4,
     "avoidGazePlayerDelayAfterOrgasm": 15,

@@ -16,7 +16,7 @@
 			public override string ToString()
 			{
 				if (!valid)
-					return "NA";
+					return "R";
 
 				return $"{value:0.00}";
 			}
@@ -97,10 +97,16 @@
 		public bool Init(Person p)
 		{
 			if (!config_.forFemale && !p.Atom.IsMale)
+			{
+				Log.Info($"init failed: not for female and atom {p} is not male");
 				return false;
+			}
 
 			if (!config_.forMale && p.Atom.IsMale)
+			{
+				Log.Info($"init failed: not for male and atom {p} is male");
 				return false;
+			}
 
 			return g_.Init(p);
 		}
@@ -109,8 +115,8 @@
 		{
 			return
 				$"{name_} {MoodString()} " +
-				$"{g_.Value:0.00}=>{target_:0.00} +{add_:0.00} " +
-				$"{target_.elapsed:0.00}/{target_.time:0.00} {target_.valid}";
+				$"{g_.DebugValueString()}=>{target_:0.00} " +
+				$"{target_.elapsed:0.0}/{target_.time:0.0}";
 		}
 
 		public MorphGroup MorphGroup
@@ -191,11 +197,6 @@
 			return MoodType.ToString(mood_);
 		}
 
-		public bool IsMood(MoodType t)
-		{
-			return (mood_ == t);
-		}
-
 		public bool AffectsAnyBodyPart(BodyPartType[] bodyParts)
 		{
 			return g_.AffectsAnyBodyPart(bodyParts);
@@ -204,13 +205,13 @@
 		public void SetTarget(float t, float time)
 		{
 			DoSetTarget(t, time, false, false);
-			Log.Verbose($"set target {this} {t} {time}");
+			Log.Info($"set target {this} start={target_.start} value={target_.value} time={time}");
 		}
 
 		public void Deactivate(float time)
 		{
 			DoSetTarget(0, time, true, true);
-			Log.Verbose($"deactivating {this} in {target_.time}");
+			Log.Info($"deactivating {this} in {target_.time}");
 		}
 
 		private void DoSetTarget(float t, float time, bool reset, bool stopAfter)
