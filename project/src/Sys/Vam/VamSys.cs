@@ -141,7 +141,7 @@ namespace Cue.Sys.Vam
 				Atom ca = null;
 
 #if !MOCK
-				ca = CueMain.Instance.Impl.MVRPluginManager?.containingAtom;
+				ca = CueImpl.Instance.Main.MVRPluginManager?.containingAtom;
 #endif
 
 				if (ca == null)
@@ -564,7 +564,7 @@ namespace Cue.Sys.Vam
 		{
 			yield return new WaitForEndOfFrame();
 
-			var pui = GetPluginUI(CueMain.PluginCslist);
+			var pui = GetPluginUI(CueImpl.PluginCslist);
 			if (pui != null)
 			{
 				ClearLog();
@@ -575,7 +575,7 @@ namespace Cue.Sys.Vam
 
 		public void OpenScriptUI()
 		{
-			var pui = GetPluginUI(CueMain.PluginCslist);
+			var pui = GetPluginUI(CueImpl.PluginCslist);
 			if (pui == null)
 				return;
 
@@ -632,7 +632,7 @@ namespace Cue.Sys.Vam
 			Transform uit = null;
 
 #if !MOCK
-			uit = CueMain.Instance.Impl.UITransform;
+			uit = CueImpl.Instance.Main.UITransform;
 #endif
 
 			if (uit?.parent == null)
@@ -644,7 +644,7 @@ namespace Cue.Sys.Vam
 					script_.containingAtom.mainController);
 
 #if !MOCK
-				uit = CueMain.Instance.Impl.UITransform;
+				uit = CueImpl.Instance.Main.UITransform;
 #endif
 
 				if (uit?.parent == null)
@@ -680,7 +680,7 @@ namespace Cue.Sys.Vam
 		public string GetResourcePath(string path)
 		{
 			if (pluginPath_ == "")
-				pluginPath_ = CueMain.Instance.PluginPath;
+				pluginPath_ = CueImpl.Instance.PluginPath;
 
 			if (path.StartsWith("/"))
 				return pluginPath_ + "/res" + path;
@@ -691,7 +691,7 @@ namespace Cue.Sys.Vam
 		public List<FileInfo> GetFiles(string path, string pattern)
 		{
 			if (PluginPathRoot == null)
-				PluginPathRoot = CueMain.Instance.PluginPath.Replace('\\', '/');
+				PluginPathRoot = CueImpl.Instance.PluginPath.Replace('\\', '/');
 
 			var list = new List<SysFileInfo>();
 
@@ -1086,7 +1086,7 @@ namespace Cue.Sys.Vam
 			Transform parent = null;
 
 #if !MOCK
-			parent = CueMain.Instance.Impl.UITransform;
+			parent = CueImpl.Instance.Main.UITransform;
 #endif
 
 			triggerActionsParent = parent;

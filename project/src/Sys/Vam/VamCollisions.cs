@@ -130,8 +130,8 @@ namespace Cue.Sys.Vam
 			{
 				if (!active_ ||
 					bp_ == null ||
-					CueMain.Instance.Sys.Paused ||
-					!CueMain.Instance.PluginEnabled)
+					CueImpl.Instance.Sys.Paused ||
+					!CueImpl.Instance.PluginEnabled)
 				{
 					return;
 				}
@@ -182,7 +182,7 @@ namespace Cue.Sys.Vam
 			}
 			catch (Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 

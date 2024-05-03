@@ -53,7 +53,7 @@ namespace Cue.Sys.Vam
 			if (!Enabled)
 				return;
 
-			Log.Verbose($"{m.ID}: installing (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.ID}: installing (tk={CueImpl.Instance.Token})");
 
 			bool hadOld = DoUninstall(m);
 			DoInstall(m);
@@ -89,7 +89,7 @@ namespace Cue.Sys.Vam
 			var old = st.setCallbackFunction;
 			st.setCallbackFunction = (v) => Callback(m, v, st, old);
 
-			Log.Verbose($"{m.ID}: installed (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.ID}: installed (tk={CueImpl.Instance.Token})");
 		}
 
 		private static bool DoUninstall(MorphInfo mi)
@@ -103,9 +103,9 @@ namespace Cue.Sys.Vam
 
 			var oldValue = m.jsonFloat.val;
 
-			Log.Verbose($"{m.uid}: trying to uninstall, old value {oldValue} (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.uid}: trying to uninstall, old value {oldValue} (tk={CueImpl.Instance.Token})");
 
-			Log.Verbose($"{m.uid}: pinging (tk={CueMain.Instance.Token})");
+			Log.Verbose($"{m.uid}: pinging (tk={CueImpl.Instance.Token})");
 
 			bool hadOld = false;
 			m.jsonFloat.val = ValuePing(m);
@@ -114,18 +114,18 @@ namespace Cue.Sys.Vam
 			{
 				if (m.jsonFloat.val == ValuePong(m))
 				{
-					Log.Verbose($"{m.uid}: pong received, uninstalling (tk={CueMain.Instance.Token})");
+					Log.Verbose($"{m.uid}: pong received, uninstalling (tk={CueImpl.Instance.Token})");
 					hadOld = true;
 					m.jsonFloat.val = ValueUninstall(m);
 				}
 				else
 				{
-					Log.Verbose($"{m.uid}: no answer ({m.jsonFloat.val}), not installed (tk={CueMain.Instance.Token})");
+					Log.Verbose($"{m.uid}: no answer ({m.jsonFloat.val}), not installed (tk={CueImpl.Instance.Token})");
 				}
 			}
 			finally
 			{
-				Log.Verbose($"{m.uid}: restoring old value {oldValue} (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: restoring old value {oldValue} (tk={CueImpl.Instance.Token})");
 				m.jsonFloat.val = oldValue;
 			}
 
@@ -138,15 +138,15 @@ namespace Cue.Sys.Vam
 
 			if (f == ValuePing(m))
 			{
-				Log.Verbose($"{m.uid}: ping received, sending pong (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: ping received, sending pong (tk={CueImpl.Instance.Token})");
 				st.valNoCallback = ValuePong(m);
 				return;
 			}
 			else if (f == ValueUninstall(m))
 			{
-				Log.Verbose($"{m.uid}: uninstall received, uninstalling (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: uninstall received, uninstalling (tk={CueImpl.Instance.Token})");
 				st.setCallbackFunction = old;
-				Log.Verbose($"{m.uid}: uninstalled (tk={CueMain.Instance.Token})");
+				Log.Verbose($"{m.uid}: uninstalled (tk={CueImpl.Instance.Token})");
 			}
 			else
 			{

@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Threading;
 
 namespace Cue
 {
-	public class CueMain
+	public class CueImpl
 	{
 		const float MaxDeltaTime = 0.1f;
 
-		static private CueMain instance_ = null;
+		static private CueImpl instance_ = null;
 
 		private readonly CueToken token_ = new CueToken();
-		private CueMainImpl impl_;
+		private CueMain main_;
 		private string pluginId_;
 		private string pluginPath_;
 		private Cue cue_ = null;
@@ -26,11 +25,11 @@ namespace Cue
 		private static int errorCount_ = 0;
 		private const int MaxErrors = 3;
 
-		public CueMain(CueMainImpl i, string pluginId, string pluginPath)
+		public CueImpl(CueMain m, string pluginId, string pluginPath)
 		{
 			instance_ = this;
 
-			impl_ = i;
+			main_ = m;
 			pluginId_ = pluginId;
 			pluginPath_ = pluginPath;
 			cue_ = new Cue();
@@ -43,12 +42,12 @@ namespace Cue
 			inited_ = true;
 			sys_ = sys;
 			cue_.Init();
-			lastUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
-			lastFixedUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
-			lastLateUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
+			lastUpdateTime_ = CueMain.RealtimeSinceStartup;
+			lastFixedUpdateTime_ = CueMain.RealtimeSinceStartup;
+			lastLateUpdateTime_ = CueMain.RealtimeSinceStartup;
 		}
 
-		static public CueMain Instance
+		static public CueImpl Instance
 		{
 			get { return instance_; }
 		}
@@ -73,9 +72,9 @@ namespace Cue
 			get { return sys_; }
 		}
 
-		public CueMainImpl Impl
+		public CueMain Main
 		{
-			get { return impl_; }
+			get { return main_; }
 		}
 
 		public string PluginID
@@ -95,7 +94,7 @@ namespace Cue
 
 		public void DisablePlugin()
 		{
-			impl_.DisablePlugin();
+			main_.DisablePlugin();
 		}
 
 		public void PluginStateChanged(bool b)
@@ -154,7 +153,7 @@ namespace Cue
 						$"more than {MaxErrors} errors in the last " +
 						"second, disabling plugin");
 
-					Instance.impl_.DisablePlugin();
+					Instance.Main.DisablePlugin();
 				}
 			}
 			else
@@ -181,16 +180,16 @@ namespace Cue
 
 			if (lastUpdateTime_ == 0)
 			{
-				lastUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
+				lastUpdateTime_ = CueMain.RealtimeSinceStartup;
 				return 0;
 			}
 
-			float now = CueMainImpl.RealtimeSinceStartup;
+			float now = CueMain.RealtimeSinceStartup;
 			float d = Math.Min(now - lastUpdateTime_, MaxDeltaTime);
 
 			lastUpdateTime_ = now;
 
-			return d * CueMainImpl.TimeScale;
+			return d * CueMain.TimeScale;
 		}
 
 		private float GetFixedUpdateTime()
@@ -199,16 +198,16 @@ namespace Cue
 
 			if (lastFixedUpdateTime_ == 0)
 			{
-				lastFixedUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
+				lastFixedUpdateTime_ = CueMain.RealtimeSinceStartup;
 				return 0;
 			}
 
-			float now = CueMainImpl.RealtimeSinceStartup;
+			float now = CueMain.RealtimeSinceStartup;
 			float d = Math.Min(now - lastFixedUpdateTime_, MaxDeltaTime);
 
 			lastFixedUpdateTime_ = now;
 
-			return d * CueMainImpl.TimeScale;
+			return d * CueMain.TimeScale;
 		}
 
 		private float GetLateUpdateTime()
@@ -217,16 +216,16 @@ namespace Cue
 
 			if (lastLateUpdateTime_ == 0)
 			{
-				lastLateUpdateTime_ = CueMainImpl.RealtimeSinceStartup;
+				lastLateUpdateTime_ = CueMain.RealtimeSinceStartup;
 				return 0;
 			}
 
-			float now = CueMainImpl.RealtimeSinceStartup;
+			float now = CueMain.RealtimeSinceStartup;
 			float d = Math.Min(now - lastLateUpdateTime_, MaxDeltaTime);
 
 			lastLateUpdateTime_ = now;
 
-			return d * CueMainImpl.TimeScale;
+			return d * CueMain.TimeScale;
 		}
 	}
 
@@ -236,7 +235,7 @@ namespace Cue
 
 		public CueToken()
 		{
-			time_ = CueMainImpl.RealtimeSinceStartup;
+			time_ = CueMain.RealtimeSinceStartup;
 		}
 
 		public bool Same(CueToken other)
@@ -252,33 +251,33 @@ namespace Cue
 
 
 #if MOCK
-	public class CueMainImpl
+	public class CueMain
 	{
-		private CueMain main_;
+		private CueImpl impl_;
 		private Sys.Mock.MockSys sys_ = null;
 
-		public CueMainImpl()
+		public CueMain()
 		{
-			main_ = new CueMain(this, "", "");
+			impl_ = new CueImpl(this, "", "");
 		}
 
 		public static void Main()
 		{
-			new CueMainImpl().Run();
+			new CueMain().Run();
 		}
 
 		public void Run()
 		{
 			sys_ = new Sys.Mock.MockSys();
-			main_.Init(sys_);
+			impl_.Init(sys_);
 
 			for (; ; )
 			{
-				main_.FixedUpdate();
-				main_.Update();
-				main_.LateUpdate();
+				impl_.FixedUpdate();
+				impl_.Update();
+				impl_.LateUpdate();
 
-				Thread.Sleep(1);
+				System.Threading.Thread.Sleep(1);
 				sys_.Tick();
 			}
 		}
@@ -301,13 +300,13 @@ namespace Cue
 		}
 	}
 #else
-	public class CueMainImpl : MVRScript
+	public class CueMain : MVRScript
 	{
-		private CueMain main_ = null;
+		private CueImpl impl_ = null;
 		private Sys.Vam.VamSys sys_ = null;
 		private MVRScriptUI scriptUI_ = null;
 
-		public CueMainImpl()
+		public CueMain()
 		{
 		}
 
@@ -318,12 +317,12 @@ namespace Cue
 
 		public static float RealtimeSinceStartup
 		{
-			get { return Time.realtimeSinceStartup; }
+			get { return UnityEngine.Time.realtimeSinceStartup; }
 		}
 
 		public static float TimeScale
 		{
-			get { return Time.timeScale; }
+			get { return UnityEngine.Time.timeScale; }
 		}
 
 
@@ -333,7 +332,7 @@ namespace Cue
 
 			try
 			{
-				main_ = new CueMain(this, name, GetPluginPath());
+				impl_ = new CueImpl(this, name, GetPluginPath());
 
 				sys_ = new Sys.Vam.VamSys(this);
 				sys_.OnReady(OnSysReady);
@@ -354,7 +353,7 @@ namespace Cue
 		{
 			try
 			{
-				main_.Init(sys_);
+				impl_.Init(sys_);
 			}
 			catch (PluginGone)
 			{
@@ -372,7 +371,7 @@ namespace Cue
 		{
 			try
 			{
-				main_.FixedUpdate();
+				impl_.FixedUpdate();
 			}
 			catch(PluginGone)
 			{
@@ -380,7 +379,7 @@ namespace Cue
 			}
 			catch(Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 
@@ -388,7 +387,7 @@ namespace Cue
 		{
 			try
 			{
-				main_.Update();
+				impl_.Update();
 			}
 			catch(PluginGone)
 			{
@@ -396,7 +395,7 @@ namespace Cue
 			}
 			catch(Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 
@@ -404,7 +403,7 @@ namespace Cue
 		{
 			try
 			{
-				main_.LateUpdate();
+				impl_.LateUpdate();
 			}
 			catch(PluginGone)
 			{
@@ -412,7 +411,7 @@ namespace Cue
 			}
 			catch(Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 
@@ -420,7 +419,7 @@ namespace Cue
 		{
 			try
 			{
-				main_?.PluginStateChanged(true);
+				impl_?.PluginStateChanged(true);
 			}
 			catch(PluginGone)
 			{
@@ -428,7 +427,7 @@ namespace Cue
 			}
 			catch(Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 
@@ -436,7 +435,7 @@ namespace Cue
 		{
 			try
 			{
-				main_.PluginStateChanged(false);
+				impl_.PluginStateChanged(false);
 			}
 			catch(PluginGone)
 			{
@@ -444,7 +443,7 @@ namespace Cue
 			}
 			catch(Exception e)
 			{
-				CueMain.OnException(e);
+				CueImpl.OnException(e);
 			}
 		}
 

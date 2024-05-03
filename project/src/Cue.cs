@@ -59,7 +59,7 @@ namespace Cue
 
 		public Logger Log { get { return log_; } }
 
-		public Sys.ISys Sys { get { return CueMain.Instance.Sys; } }
+		public Sys.ISys Sys { get { return CueImpl.Instance.Sys; } }
 		public Sys.Vam.VamSys VamSys { get { return Sys as Sys.Vam.VamSys; } }
 
 		public List<Person> AllPersons
@@ -195,7 +195,7 @@ namespace Cue
 		public void Init()
 		{
 			var start = Sys.RealtimeSinceStartup;
-			Log.Verbose($"cue: init (token {CueMain.Instance.Token})");
+			Log.Verbose($"cue: init (token {CueImpl.Instance.Token})");
 
 			options_ = new Options();
 			saver_ = Sys.CreateLiveSaver();
@@ -205,7 +205,7 @@ namespace Cue
 #if !MOCK
 			VUI.Root.Init(
 				"Cue",
-				() => CueMain.Instance.Impl.MVRPluginManager,
+				() => CueImpl.Instance.Main.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => vuiLog_.Verbose(s),
 				(s) => vuiLog_.Info(s),
@@ -452,7 +452,7 @@ namespace Cue
 
 		public void DisablePlugin()
 		{
-			CueMain.Instance.DisablePlugin();
+			CueImpl.Instance.DisablePlugin();
 		}
 
 		public void FixedUpdate(float s)
