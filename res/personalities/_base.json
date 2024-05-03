@@ -48,6 +48,25 @@
     "gazeSaccadeMovementRange": 4,
     "emergencyGazeDuration": 0.2,
 
+    "quickGlance": true,
+    "quickGlanceDuration":
+    {
+        "range":
+        {
+            "min": 0,
+            "max": 3
+        }
+    },
+
+    "quickGlanceInterval":
+    {
+        "range":
+        {
+            "min": 30,
+            "max": 60
+        }
+    },
+
     "lookAboveMaxWeight": 1,
     "lookAboveMaxWeightOrgasm": 2,
     "lookAboveMinExcitement": 0.35,

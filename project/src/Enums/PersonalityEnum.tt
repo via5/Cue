@@ -14,6 +14,10 @@ V.Duration("GazeSaccadeInterval"),
 V.Float("GazeSaccadeMovementRange"),
 V.Float("GazeEyeTargetMovementSpeed"),
 
+V.Bool("QuickGlance"),
+V.Duration("QuickGlanceDuration"),
+V.Duration("QuickGlanceInterval"),
+
 V.Float("AvoidGazePlayerMinExcitement"),
 V.Float("AvoidGazePlayerMaxExcitement"),
 V.Float("AvoidGazePlayerInsidePersonalSpaceMinExcitement"),

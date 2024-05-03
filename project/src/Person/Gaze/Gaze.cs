@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Cue
@@ -15,6 +16,101 @@ namespace Cue
 		public static string[] Names
 		{
 			get { return new string[] { "Free", "Camera", "Up", "Freeze" }; }
+		}
+	}
+
+
+	public class QuickGlance
+	{
+		private bool enabled_ = true;
+		private Duration duration_ = new Duration(0, 3);
+		private Duration interval_ = new Duration(30, 60);
+		private bool ready_ = false;
+		private bool active_ = false;
+
+
+		public void Reload(Person p)
+		{
+			var ps = p.Personality;
+
+			enabled_ = ps.GetBool(PS.QuickGlance);
+			duration_ = ps.GetDuration(PS.QuickGlanceDuration);
+			interval_ = ps.GetDuration(PS.QuickGlanceInterval);
+
+			if (!enabled_)
+			{
+				ready_ = false;
+				active_ = false;
+			}
+		}
+
+		public bool Ready
+		{
+			get { return ready_; }
+		}
+
+		public bool Active
+		{
+			get { return active_; }
+		}
+
+		public void Activate()
+		{
+			ready_ = false;
+			active_ = true;
+			duration_.Reset(1);
+		}
+
+		public void Deactivate()
+		{
+			ready_ = false;
+			active_ = false;
+			interval_.Reset(1);
+		}
+
+		public void Reset()
+		{
+			ready_ = false;
+			active_ = false;
+			interval_.Reset(1);
+		}
+
+		public void MakeReady()
+		{
+			ready_ = true;
+		}
+
+		public void Update(float s)
+		{
+			if (!enabled_)
+				return;
+
+			if (active_)
+			{
+				duration_.Update(s, 1);
+
+				if (duration_.Finished)
+					Deactivate();
+			}
+			else if (!ready_)
+			{
+				interval_.Update(s, 1);
+
+				if (interval_.Finished)
+					MakeReady();
+			}
+		}
+
+		public string DebugString()
+		{
+			if (!enabled_)
+				return "disabled";
+			else if (active_)
+				return $"active {duration_.ToLiveString()}";
+			else if (ready_)
+				return $"ready";
+			else
+				return $"next in {interval_.ToLiveString()}";
 		}
 	}
 
@@ -41,10 +137,14 @@ namespace Cue
 		// chooses a random target, handles avoidance
 		private GazeTargetPicker picker_;
 
-		// whether the gazer is enabled; overriden if the head becomes busy
+		// whether the gazer is enabled; overridden if the head becomes busy
 		private bool gazerEnabled_ = false;
-
 		private Duration gazeDuration_ = new Duration();
+
+		// disables the gazer for a short period when picking a new target;
+		// makes the character glance at something before turning the head,
+		// and sometimes won't turn the head at all if the timing is right
+		private QuickGlance quickGlance_ = new QuickGlance();
 
 		// index of last emergency event, if any
 		private int lastEmergency_ = -1;
@@ -136,6 +236,11 @@ namespace Cue
 			set { person_.Atom.AutoBlink = value; }
 		}
 
+		public QuickGlance QuickGlance
+		{
+			get { return quickGlance_; }
+		}
+
 		public void SetTemporaryTarget(IGazeLookat target, float time)
 		{
 			picker_.SetTemporaryTarget(target, time);
@@ -163,6 +268,7 @@ namespace Cue
 			wasEnabled_ = true;
 
 			gazeDuration_.Update(s, person_.Mood.GazeEnergy);
+			quickGlance_.Update(s);
 			Targets.Update(s);
 
 			if (forceLook_ != ForceLooks.None)
@@ -209,6 +315,7 @@ namespace Cue
 						gazer_.Duration = gazeDuration_.Current;
 
 						picker_.EmergencyEnded();
+						quickGlance_.Reset();
 
 						lastEmergency_ = -1;
 					}
@@ -217,6 +324,10 @@ namespace Cue
 					{
 						CheckEvents();
 						picker_.NextTarget();
+
+						if (quickGlance_.Ready)
+							quickGlance_.Activate();
+
 						gazer_.Duration = gazeDuration_.Current;
 					}
 				}
@@ -299,6 +410,9 @@ namespace Cue
 			if (!head.CanApplyForce())
 				return true;
 
+			if (quickGlance_.Active)
+				return true;
+
 			return false;
 		}
 
@@ -318,6 +432,7 @@ namespace Cue
 		private void OnPersonalityChanged()
 		{
 			gazeDuration_ = person_.Personality.GetDuration(PS.GazeDuration).Clone();
+			quickGlance_.Reload(person_);
 		}
 
 		public void Clear()

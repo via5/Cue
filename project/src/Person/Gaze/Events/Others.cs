@@ -60,7 +60,7 @@ namespace Cue
 				}
 			}
 
-			SetLastResult("unknown");
+			SetLastResult("nobody");
 
 			return Continue;
 		}

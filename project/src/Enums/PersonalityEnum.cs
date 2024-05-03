@@ -11,23 +11,26 @@ namespace Cue
 		public static readonly DurationIndex GazeRandomInterval = new DurationIndex(1);
 		public static readonly DurationIndex EmergencyGazeDuration = new DurationIndex(2);
 		public static readonly DurationIndex GazeSaccadeInterval = new DurationIndex(3);
-		public static readonly DurationIndex ZappedByPlayerGazeDuration = new DurationIndex(4);
-		public static readonly DurationIndex ZappedByOtherGazeDuration = new DurationIndex(5);
-		public static readonly DurationIndex OtherZappedGazeDuration = new DurationIndex(6);
-		public static readonly DurationIndex SlapUpdateInterval = new DurationIndex(7);
+		public static readonly DurationIndex QuickGlanceDuration = new DurationIndex(4);
+		public static readonly DurationIndex QuickGlanceInterval = new DurationIndex(5);
+		public static readonly DurationIndex ZappedByPlayerGazeDuration = new DurationIndex(6);
+		public static readonly DurationIndex ZappedByOtherGazeDuration = new DurationIndex(7);
+		public static readonly DurationIndex OtherZappedGazeDuration = new DurationIndex(8);
+		public static readonly DurationIndex SlapUpdateInterval = new DurationIndex(9);
 
-		public const int DurationCount = 8;
-		public override int GetDurationCount() { return 8; }
+		public const int DurationCount = 10;
+		public override int GetDurationCount() { return 10; }
 
 		// bools
 		public static readonly BoolIndex GazeEnabled = new BoolIndex(0);
 		public static readonly BoolIndex GazeSaccade = new BoolIndex(1);
 		public static readonly BoolIndex GazeBlink = new BoolIndex(2);
-		public static readonly BoolIndex LookAboveUseGazeEnergy = new BoolIndex(3);
-		public static readonly BoolIndex ZappedEnabled = new BoolIndex(4);
+		public static readonly BoolIndex QuickGlance = new BoolIndex(3);
+		public static readonly BoolIndex LookAboveUseGazeEnergy = new BoolIndex(4);
+		public static readonly BoolIndex ZappedEnabled = new BoolIndex(5);
 
-		public const int BoolCount = 5;
-		public override int GetBoolCount() { return 5; }
+		public const int BoolCount = 6;
+		public override int GetBoolCount() { return 6; }
 
 		// floats
 		public static readonly FloatIndex GazeSaccadeMovementRange = new FloatIndex(0);
@@ -258,6 +261,8 @@ namespace Cue
 			"gazeRandomInterval",
 			"emergencyGazeDuration",
 			"gazeSaccadeInterval",
+			"quickGlanceDuration",
+			"quickGlanceInterval",
 			"zappedByPlayerGazeDuration",
 			"zappedByOtherGazeDuration",
 			"otherZappedGazeDuration",
@@ -317,6 +322,7 @@ namespace Cue
 			"gazeEnabled",
 			"gazeSaccade",
 			"gazeBlink",
+			"quickGlance",
 			"lookAboveUseGazeEnergy",
 			"zappedEnabled",
 		};
@@ -690,6 +696,8 @@ namespace Cue
 			"gazeRandomInterval",
 			"emergencyGazeDuration",
 			"gazeSaccadeInterval",
+			"quickGlanceDuration",
+			"quickGlanceInterval",
 			"zappedByPlayerGazeDuration",
 			"zappedByOtherGazeDuration",
 			"otherZappedGazeDuration",
@@ -697,6 +705,7 @@ namespace Cue
 			"gazeEnabled",
 			"gazeSaccade",
 			"gazeBlink",
+			"quickGlance",
 			"lookAboveUseGazeEnergy",
 			"zappedEnabled",
 			"gazeSaccadeMovementRange",

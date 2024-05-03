@@ -573,6 +573,7 @@ namespace Cue
 		private VUI.Label gazerEnabled_ = new VUI.Label();
 		private VUI.Label gazerDuration_ = new VUI.Label();
 		private VUI.Label gazerVariance_ = new VUI.Label();
+		private VUI.Label glance_ = new VUI.Label();
 		private VUI.Label debug_ = new VUI.Label();
 		private VUI.Label targetType_ = new VUI.Label();
 		private VUI.Label targetTemporary_ = new VUI.Label();
@@ -602,7 +603,7 @@ namespace Cue
 			p.Add(new VUI.Spacer());
 			p.Add(new VUI.Spacer());
 
-			p.Add(new VUI.Label("Eyes",	UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Label("Eyes", UnityEngine.FontStyle.Bold));
 			p.Add(new VUI.Spacer());
 
 			p.Add(new VUI.Label("Blink"));
@@ -630,6 +631,9 @@ namespace Cue
 
 			p.Add(new VUI.Label("Variance"));
 			p.Add(gazerVariance_);
+
+			p.Add(new VUI.Label("Quick Glance"));
+			p.Add(glance_);
 
 			p.Add(new VUI.Label("Debug"));
 			p.Add(debug_);
@@ -663,14 +667,20 @@ namespace Cue
 			p.Add(new VUI.Spacer(20));
 			p.Add(new VUI.Spacer(20));
 
+			p.Add(new VUI.Label("Debug", UnityEngine.FontStyle.Bold));
+			p.Add(new VUI.Spacer());
+
+			p.Add(new VUI.Spacer(0));
+			p.Add(new VUI.Spacer(0));
+
 			Add(p);
 
 
-			p = new VUI.Panel(new VUI.VerticalFlow(5));
+			p = new VUI.Panel(new VUI.VerticalFlow(10, false));
 
 			p.Add(new VUI.ComboBox<string>(ForceLooks.Names, OnForceLook));
 
-            p.Add(new VUI.CheckBox(
+			p.Add(new VUI.CheckBox(
 				"Render frustums",
 				(b) => person_.Gaze.Render.Frustums = b,
 				person_.Gaze.Render.Frustums));
@@ -681,6 +691,11 @@ namespace Cue
 				person_.Gaze.Render.FrontPlane));
 
 			p.Add(new VUI.CheckBox("Manage blink", OnAutoBlink, true));
+
+			p.Add(new VUI.Button("Ready quick glance", () =>
+			{
+				person_.Gaze.QuickGlance.MakeReady();
+			}));
 
 			Add(p);
 		}
@@ -698,6 +713,7 @@ namespace Cue
 			gazerEnabled_.Text = $"{(g.Gazer.Enabled ? "yes" : "no")}";
 			gazerDuration_.Text = $"{g.Gazer.Duration:0.00}s";
 			gazerVariance_.Text = $"{g.Gazer.Variance:0.00}";
+			glance_.Text = g.QuickGlance.DebugString();
 			debug_.Text = g.DebugString();
 
 			if (g.Picker.HasTarget)
@@ -740,11 +756,7 @@ namespace Cue
 			}
 
 			avoid_.Text = avoidString;
-
-			next_.Text =
-				$"{g.Picker.NextInterval.Remaining:0.0} " +
-				$"({g.Picker.NextInterval.Minimum:0.0}-{g.Picker.NextInterval.Maximum:0.0})";
-
+			next_.Text = g.Picker.NextInterval.ToLiveString();
 		}
 
 		private void OnForceLook(int s)
