@@ -87,6 +87,42 @@ namespace Cue.Sys.Vam
 			get { return linker_; }
 		}
 
+		public MVRPluginManager MVRPluginManager
+		{
+			get
+			{
+#if MOCK
+				return null;
+#else
+				return CueImpl.Instance.Main.MVRPluginManager;
+#endif
+			}
+		}
+
+		public MVRScriptUI MVRScriptUI
+		{
+			get
+			{
+#if MOCK
+				return null;
+#else
+				return CueImpl.Instance.Main.MVRScriptUI;
+#endif
+			}
+		}
+
+		public Transform UITransform
+		{
+			get
+			{
+#if MOCK
+				return null;
+#else
+				return CueImpl.Instance.Main.UITransform;
+#endif
+			}
+		}
+
 		static public VamSys Instance
 		{
 			get { return instance_; }
@@ -138,12 +174,7 @@ namespace Cue.Sys.Vam
 		{
 			get
 			{
-				Atom ca = null;
-
-#if !MOCK
-				ca = CueImpl.Instance.Main.MVRPluginManager?.containingAtom;
-#endif
-
+				Atom ca = MVRPluginManager?.containingAtom;
 				if (ca == null)
 					return null;
 
@@ -629,11 +660,7 @@ namespace Cue.Sys.Vam
 			// don't use cue for logging in case something went wrong when
 			// loading
 
-			Transform uit = null;
-
-#if !MOCK
-			uit = CueImpl.Instance.Main.UITransform;
-#endif
+			Transform uit = UITransform;
 
 			if (uit?.parent == null)
 			{
@@ -643,10 +670,7 @@ namespace Cue.Sys.Vam
 				SuperController.singleton.SelectController(
 					script_.containingAtom.mainController);
 
-#if !MOCK
-				uit = CueImpl.Instance.Main.UITransform;
-#endif
-
+				uit = UITransform;
 				if (uit?.parent == null)
 				{
 					Logger.SafeLogError("sill no main ui, can't reload, open main UI once");
@@ -1083,12 +1107,7 @@ namespace Cue.Sys.Vam
 
 		private void OnPrefabsReady()
 		{
-			Transform parent = null;
-
-#if !MOCK
-			parent = CueImpl.Instance.Main.UITransform;
-#endif
-
+			Transform parent = Cue.Instance.VamSys.UITransform;
 			triggerActionsParent = parent;
 			InitTriggerUI();
 			OpenTriggerActionsPanel();

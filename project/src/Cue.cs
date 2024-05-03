@@ -202,17 +202,14 @@ namespace Cue
 
 			Sys.Init();
 
-#if !MOCK
 			VUI.Root.Init(
 				"Cue",
-				() => CueImpl.Instance.Main.MVRPluginManager,
+				() => VamSys?.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => vuiLog_.Verbose(s),
 				(s) => vuiLog_.Info(s),
 				(s) => vuiLog_.Warning(s),
 				(s) => vuiLog_.Error(s));
-#endif
-
 
 			Log.Verbose("cue: loading resources");
 			Resources.LoadAll();
