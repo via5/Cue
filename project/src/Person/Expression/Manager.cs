@@ -15,7 +15,6 @@ namespace Cue
 		private WeightedExpression[] exps_ = new WeightedExpression[0];
 		private bool needsMore_ = false;
 		private float moreElapsed_ = 0;
-		private Personality lastPersonality_ = null;
 		private bool enabled_ = true;
 		private bool isOrgasming_ = false;
 		private bool isZapped_ = false;
@@ -34,6 +33,8 @@ namespace Cue
 		{
 			person_ = p;
 			log_ = new Logger(Logger.AI, "expression manager " + p.ID);
+
+			person_.PersonalityChanged += Init;
 		}
 
 		public Logger Log
@@ -78,7 +79,7 @@ namespace Cue
 			enabled_ = false;
 		}
 
-		private void Init()
+		public void Init()
 		{
 			var all = person_.Personality.GetExpressions();
 			var exps = new List<WeightedExpression>();
@@ -93,10 +94,19 @@ namespace Cue
 
 			exps_ = exps.ToArray();
 
+			foreach (var e in exps_)
+			{
+				if (e.Expression.Permanent)
+				{
+					e.Set(0, 1, 0, 1, 1);
+					e.Activate(e.Expression.PermanentValue, 1.0f);
+					e.Expression.SetAuto(0, 0, 0);
+				}
+			}
+
 			for (int i = 0; i < MaxActive; ++i)
 				NextActive();
 
-			lastPersonality_ = person_.Personality;
 			slapUpdateInterval_ = person_.Personality.GetDuration(PS.SlapUpdateInterval);
 		}
 
@@ -165,6 +175,9 @@ namespace Cue
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
+				if (exps_[i].Expression.Permanent)
+					continue;
+
 				if (!foundActive && exps_[i].Active && exps_[i].Expression.Mood == mood)
 				{
 					foundActive = true;
@@ -180,6 +193,9 @@ namespace Cue
 			{
 				for (int i = 0; i < exps_.Length; ++i)
 				{
+					if (exps_[i].Expression.Permanent)
+						continue;
+
 					if (exps_[i].Expression.Mood == mood)
 					{
 						ActivateForEmergency(exps_[i], intensity, min, max, time);
@@ -187,6 +203,12 @@ namespace Cue
 					}
 				}
 			}
+		}
+
+		public void DebugSet(WeightedExpression e, float v)
+		{
+			U.BringToTop(exps_, e);
+			e.Expression.SetTarget(v, 0);
 		}
 
 		public void FixedUpdate(float s)
@@ -197,9 +219,6 @@ namespace Cue
 
 			if (slapping_)
 				slapElapsed_ += s;
-
-			if (lastPersonality_ != person_.Personality)
-				Init();
 
 			var ps = person_.Personality;
 
@@ -309,6 +328,9 @@ namespace Cue
 			float totalWeight = 0;
 			for (int i = 0; i < exps_.Length; ++i)
 			{
+				if (exps_[i].Expression.Permanent)
+					continue;
+
 				if (exps_[i].Active)
 					continue;
 
@@ -321,6 +343,9 @@ namespace Cue
 
 				for (int i = 0; i < exps_.Length; ++i)
 				{
+					if (exps_[i].Expression.Permanent)
+						continue;
+
 					if (exps_[i].Active)
 						continue;
 
@@ -346,6 +371,9 @@ namespace Cue
 					if (exps_[i] == e)
 						continue;
 
+					if (exps_[i].Expression.Permanent)
+						continue;
+
 					if (exps_[i].Active)
 					{
 						if (exps_[i].Expression.AffectsAnyBodyPart(e.Expression.BodyParts))
@@ -362,7 +390,7 @@ namespace Cue
 					if (exps_[i] == e)
 						continue;
 
-					if (exps_[i].Active && exps_[i].Expression.Exclusive)
+					if (exps_[i].Active && (exps_[i].Expression.Exclusive || exps_[i].Expression.Permanent))
 					{
 						if (exps_[i].Expression.AffectsAnyBodyPart(e.Expression.BodyParts))
 							return false;
@@ -401,12 +429,15 @@ namespace Cue
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
-				if (exps_[i].Active)
+				if (exps_[i].Active && !exps_[i].Expression.Permanent)
 					++countPerMood[exps_[i].Expression.Mood.Int];
 			}
 
 			for (int i = 0; i < exps_.Length; ++i)
 			{
+				if (exps_[i].Expression.Permanent)
+					continue;
+
 				var we = exps_[i];
 				var e = we.Expression;
 				var mv = m.GetMoodValue(e.Mood);

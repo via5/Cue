@@ -51,6 +51,11 @@ namespace VUI
 				while (cells_.Count < cols)
 					cells_.Add(value);
 			}
+
+			public void Clear()
+			{
+				cells_.Clear();
+			}
 		}
 
 
@@ -109,6 +114,11 @@ namespace VUI
 				foreach (var row in data_)
 					row.Extend(cols);
 			}
+
+			public void Clear()
+			{
+				data_.Clear();
+			}
 		}
 
 		struct SizesData
@@ -130,9 +140,8 @@ namespace VUI
 		}
 
 
-		private readonly CellData<List<Widget>> widgets_ =
-			new CellData<List<Widget>>();
-
+		private int cols_;
+		private readonly CellData<List<Widget>> widgets_ = new CellData<List<Widget>>();
 		private readonly RowData<bool> horStretch_ = new RowData<bool>();
 		private readonly RowData<bool> verStretch_ = new RowData<bool>();
 
@@ -146,6 +155,7 @@ namespace VUI
 		private int nextRow_ = 0;
 
 		public GridLayout()
+			: this(0)
 		{
 		}
 
@@ -156,10 +166,25 @@ namespace VUI
 
 		public GridLayout(int cols, int horSpacing, int verSpacing)
 		{
-			widgets_.Extend(cols, 1);
-			horStretch_.Extend(cols, true);
+			ResetColumns(cols);
 			HorizontalSpacing = horSpacing;
 			VerticalSpacing = verSpacing;
+		}
+
+		private void ResetColumns(int cols)
+		{
+			cols_ = cols;
+			nextCol_ = 0;
+			nextRow_ = 0;
+
+			widgets_.Clear();
+			widgets_.Extend(cols_, 1);
+
+			horStretch_.Clear();
+			horStretch_.Extend(cols_, true);
+
+			verStretch_.Clear();
+			verStretch_.Extend(1, true);
 		}
 
 		public static Data P(int col, int row)
@@ -252,7 +277,7 @@ namespace VUI
 			}
 		}
 
-		protected override void AddImpl(Widget w, LayoutData data)
+		protected override void DoAdded(Widget w, LayoutData data)
 		{
 			var d = data as Data;
 			if (d == null)
@@ -283,6 +308,16 @@ namespace VUI
 			widgets_.Cell(d.col, d.row).Add(w);
 			horStretch_.Extend(d.col + 1, true);
 			verStretch_.Extend(d.row + 1, true);
+		}
+
+		protected override void DoRemoved(Widget w)
+		{
+			throw new NotImplementedException();
+		}
+
+		protected override void RemoveAllChildrenImpl()
+		{
+			ResetColumns(cols_);
 		}
 
 		protected override void LayoutImpl()
@@ -323,6 +358,7 @@ namespace VUI
 			}
 
 			var extraHeight = new List<float>();
+
 
 			{
 				int stretchRows = 0;
@@ -365,11 +401,11 @@ namespace VUI
 			{
 				for (int colIndex = 0; colIndex < widgets_.ColumnCount; ++colIndex)
 				{
-					var ws = widgets_.Cell(colIndex, rowIndex);
 					var ps = d.sizes.Cell(colIndex, rowIndex);
 					var uniformWidth = d.widths[colIndex];
 
 					float ww = 0;
+
 					if (uniformWidth_)
 						ww = uniformWidth + extraWidth[colIndex];
 					else
@@ -397,6 +433,7 @@ namespace VUI
 					var uniformWidth = d.widths[colIndex];
 
 					float ww = 0;
+
 					if (uniformWidth_)
 						ww = uniformWidth + extraWidth[colIndex];
 					else if (hfill_)
@@ -426,9 +463,6 @@ namespace VUI
 						// a widget's size can never change again when uniform,
 						// unless the grid itself changes size
 						w.SetBounds(wr, uniformWidth_ && uniformHeight_);
-
-						if (Parent.Name == "bleh")
-							Log.Info($"row={rowIndex} col={colIndex} {w} {wr}");
 					}
 
 					x += uniformWidth + extraWidth[colIndex];

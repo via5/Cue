@@ -57,7 +57,7 @@ namespace VUI
 			if (r.Bottom > box.Bottom)
 				r.MoveTo(r.Left, box.Bottom - r.Height);
 
-			SetBounds(r);
+ 			SetBounds(r);
 			UpdateBounds();
 
 			Moved?.Invoke();
@@ -173,7 +173,7 @@ namespace VUI
 		{
 			var r = AbsoluteClientBounds;
 			var hr = handle_.RelativeBounds;
-			var top = hr.Top - Borders.Top;
+			var top = hr.Top - Insets.Top;
 			var h = r.Height - hr.Height;
 			var p = (top / h);
 
@@ -360,6 +360,171 @@ namespace VUI
 				sb_.Value = sb_.Range;
 			else
 				sb_.Value = top_ * rowSize_;
+		}
+	}
+
+
+	class ScrolledPanelLayout : Layout
+	{
+		private readonly ScrolledPanel parent_;
+
+		public override string TypeName { get { return "scroll"; } }
+
+		public ScrolledPanelLayout(ScrolledPanel p)
+		{
+			parent_ = p;
+		}
+
+		protected override void LayoutImpl()
+		{
+			parent_.LayoutScrolledPanel();
+		}
+	}
+
+
+	class ScrolledPanel : Panel
+	{
+		public delegate void Handler(int v);
+		public event Handler Scrolled;
+
+		private readonly ScrollBar sb_;
+		private readonly Panel scrolledPanel_;
+		private readonly Panel panel_;
+		private UnityEngine.UI.RectMask2D mask_ = null;
+		private float outside_ = 0;
+		private int top_ = 0;
+		private Size ps_ = Size.Zero;
+
+		public ScrolledPanel()
+		{
+			sb_ = new ScrollBar();
+			sb_.MinimumSize = new Size(Style.Metrics.ScrollBarWidth, 0);
+			sb_.ValueChanged += OnScrollbar;
+			sb_.DragEnded += OnScrollbarDragEnded;
+
+			scrolledPanel_ = new Panel();
+			scrolledPanel_.Layout = new ScrolledPanelLayout(this);
+
+			panel_ = new Panel();
+			scrolledPanel_.Add(panel_);
+
+			Layout = new BorderLayout();
+			MinimumSize = new Size(300, Widget.DontCare);
+			Margins = new Insets(0);
+			Padding = new Insets(5, 0, 0, 0);
+			Borders = new Insets(1);
+			//BorderColor = UnityEngine.Color.green;
+
+			scrolledPanel_.Clickthrough = false;
+			scrolledPanel_.Events.Wheel += OnWheel;
+
+			Add(scrolledPanel_, BorderLayout.Center);
+			Add(sb_, BorderLayout.Right);
+		}
+
+		public int Top
+		{
+			get { return top_; }
+		}
+
+		public Panel ContentPanel
+		{
+			get { return panel_; }
+		}
+
+		public ScrollBar VerticalScrollbar
+		{
+			get { return sb_; }
+		}
+
+		protected override void DoPostCreate()
+		{
+			base.DoPostCreate();
+
+			mask_ = scrolledPanel_.MainObject
+				.AddComponent<UnityEngine.UI.RectMask2D>();
+		}
+
+		protected override void AfterUpdateBounds()
+		{
+			UpdateScrollBar();
+
+			// this changes the Z of the mask; there seems to be z-fighting
+			// between the mask and the child elements, the children flicker
+			// for a frame when they get out of the mask
+			//
+			// moving the mask slightly forwards eliminates the flicker
+			var t = mask_.rectTransform.anchoredPosition3D;
+			t.z = -2;
+			mask_.rectTransform.anchoredPosition3D = t;
+		}
+
+		public void LayoutScrolledPanel()
+		{
+			ps_ = panel_.GetRealPreferredSize(ClientBounds.Width, DontCare);
+			UpdateScrolledPanelBounds();
+		}
+
+		private void UpdateScrollBar()
+		{
+			var thisHeight = AbsoluteClientBounds.Height;
+			var childHeight = panel_.AbsoluteClientBounds.Height;
+
+			if (childHeight <= thisHeight)
+			{
+				outside_ = 0;
+				top_ = 0;
+				sb_.Enabled = false;
+			}
+			else
+			{
+				outside_ = childHeight - thisHeight;
+				top_ = 0;
+
+				sb_.Range = outside_;
+				sb_.Value = top_;
+				sb_.Enabled = true;
+			}
+		}
+
+		private void OnWheel(WheelEvent e)
+		{
+			float v = Utilities.Clamp(top_ + -e.Delta.Y * 30, 0, outside_);
+
+			sb_.Value = v;
+			GetRoot()?.Tooltips.Hide();
+
+			e.Bubble = false;
+		}
+
+		private void OnScrollbar(float v)
+		{
+			int vi = (int)Math.Round(v);
+
+			if (top_ != vi)
+			{
+				top_ = vi;
+				UpdateScrolledPanelBounds();
+			}
+		}
+
+		public void UpdateScrolledPanelBounds()
+		{
+			var r = scrolledPanel_.AbsoluteClientBounds;
+			var br = Rectangle.FromSize(r.Left, r.Top - top_, r.Width, ps_.Height);
+
+			panel_.SetBounds(br);
+			panel_.DoLayout();
+
+			Scrolled?.Invoke(top_);
+		}
+
+		private void OnScrollbarDragEnded()
+		{
+			if (top_ >= outside_)
+				sb_.Value = sb_.Range;
+			else
+				sb_.Value = top_;
 		}
 	}
 }

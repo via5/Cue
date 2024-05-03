@@ -172,10 +172,6 @@ namespace Cue
 
 					foreach (JSONClass mn in en["morphs"].AsArray)
 					{
-						bool closesEyes = false;
-						if (en.HasKey("closesEyes"))
-							closesEyes = mn["closesEyes"].AsBool;
-
 						morphs.Add(new MorphGroup.MorphInfo(
 							mn["id"].Value,
 							J.OptFloat(mn, "min", 0),
@@ -192,6 +188,7 @@ namespace Cue
 					c.exclusive = en["exclusive"].AsBool;
 					c.minExcitement = en["minExcitement"].AsFloat;
 					c.maxOnly = en["maxOnly"].AsBool;
+					c.permanent = J.OptFloat(en, "permanent", -1);
 					c.minHoldTime = J.OptFloat(en, "minHoldTime", -1);
 					c.maxHoldTime = J.OptFloat(en, "maxHoldTime", -1);
 					c.forMale = true;
@@ -224,14 +221,26 @@ namespace Cue
 						}
 					}
 
-					foreach (var m in MoodType.FromStringMany(en["moods"].Value))
+					if (c.permanent >= 0)
 					{
 						es.Add(new Expression(
-							name, m, c,
+							name, MoodType.None, c,
 							new MorphGroup(
 								name,
 								BodyPartType.FromStringMany(en["bodyParts"].Value),
 								morphs.ToArray())));
+					}
+					else
+					{
+						foreach (var m in MoodType.FromStringMany(en["moods"].Value))
+						{
+							es.Add(new Expression(
+								name, m, c,
+								new MorphGroup(
+									name,
+									BodyPartType.FromStringMany(en["bodyParts"].Value),
+									morphs.ToArray())));
+						}
 					}
 				}
 
@@ -523,7 +532,7 @@ namespace Cue
 
 		private void Add(Personality p, bool abst)
 		{
-			Log.Info(p.ToString());
+			Log.Info($"adding {p}");
 			all_.Add(p);
 
 			if (!abst)

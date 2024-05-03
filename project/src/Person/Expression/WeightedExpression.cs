@@ -48,6 +48,11 @@
 			get { return e_; }
 		}
 
+		public string Name
+		{
+			get { return e_.Name; }
+		}
+
 		public float Weight
 		{
 			get { return weight_; }
@@ -150,9 +155,12 @@
 
 				case HoldState:
 				{
-					holdTime_.Update(s, 0);
-					if (holdTime_.Finished)
-						state_ = FinishedState;
+					if (!e_.Permanent)
+					{
+						holdTime_.Update(s, 0);
+						if (holdTime_.Finished)
+							state_ = FinishedState;
+					}
 
 					break;
 				}
@@ -203,7 +211,7 @@
 				float r = max_ - min_;
 				float v = U.RandomFloat(0, r);
 
-				return min_ + r * intensity_;
+				return min_ + v * intensity_;
 			}
 		}
 

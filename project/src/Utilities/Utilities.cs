@@ -338,6 +338,19 @@ namespace Cue
 			}
 		}
 
+		public static void BringToTop<T>(T[] array, T element)
+		{
+			if (array.Length == 0)
+				return;
+
+			var i = Array.IndexOf(array, element);
+			if (i == -1)
+				return;
+
+			Array.Copy(array, 0, array, 1, i);
+			array[0] = element;
+		}
+
 		private static Stopwatch w_ = new Stopwatch();
 
 		public static void DebugTimeThis(string what, Action a)

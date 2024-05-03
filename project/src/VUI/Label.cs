@@ -45,6 +45,11 @@ namespace VUI
 		{
 		}
 
+		public Text TextComponent
+		{
+			get { return textObject_; }
+		}
+
 		public string Text
 		{
 			get

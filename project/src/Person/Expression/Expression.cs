@@ -46,6 +46,7 @@
 			public float maxHoldTime;
 			public bool forMale;
 			public bool forFemale;
+			public float permanent;
 		}
 
 
@@ -133,6 +134,16 @@
 		public float Target
 		{
 			get { return target_.value; }
+		}
+
+		public bool Permanent
+		{
+			get { return (config_.permanent >= 0); }
+		}
+
+		public float PermanentValue
+		{
+			get { return config_.permanent; }
 		}
 
 		public bool Exclusive

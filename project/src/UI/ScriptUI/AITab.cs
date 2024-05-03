@@ -15,6 +15,7 @@ namespace Cue
 			AddSubTab(new PersonAIStateTab(person_));
 			AddSubTab(new PersonAIMoodTab(person_));
 			AddSubTab(new PersonAIExcitementTab(person_));
+			AddSubTab(new PersonAIExpressionsTab(person_));
 			AddSubTab(new PersonAIPersonalityTab(person_));
 			AddSubTab(new PersonAIGazeTab(person_));
 			AddSubTab(new PersonAIEventsTab(person_));
@@ -285,6 +286,168 @@ namespace Cue
 		protected override void DoUpdate(float s)
 		{
 			list_.SetItems(person_.Excitement.Debug());
+		}
+	}
+
+
+	class PersonAIExpressionsTab : Tab
+	{
+		private class ExpressionInfo
+		{
+			public WeightedExpression e;
+			public VUI.Label label;
+			public VUI.FloatTextSlider slider;
+			public VUI.Label clamp;
+		}
+
+		private Person person_;
+		private VUI.ScrolledPanel scroll_ = new VUI.ScrolledPanel();
+		private VUI.CheckBox manual_;
+		private VUI.ComboBox<string> mood_;
+		private readonly List<ExpressionInfo> infos_ = new List<ExpressionInfo>();
+		private bool ignore_ = false;
+
+		public PersonAIExpressionsTab(Person p)
+			: base("Expressions", false)
+		{
+			person_ = p;
+
+			Layout = new VUI.BorderLayout(5);
+
+			scroll_.ContentPanel.Layout = new VUI.GridLayout(3, 5);
+
+			manual_ = new VUI.CheckBox("Manual", (b) => OnManual());
+			mood_ = new VUI.ComboBox<string>((int i) => RebuildExpressions());
+
+			var top = new VUI.Panel(new VUI.HorizontalFlow(5));
+			top.Add(manual_);
+			top.Add(mood_);
+
+			Add(top, VUI.BorderLayout.Top);
+			Add(scroll_, VUI.BorderLayout.Center);
+
+
+			mood_.AddItem("All moods");
+			foreach (var m in MoodType.Values)
+			{
+				if (m != MoodType.None)
+					mood_.AddItem(MoodType.ToString(m));
+			}
+
+			mood_.Select(0);
+
+			RebuildExpressions();
+			person_.PersonalityChanged += RebuildExpressions;
+		}
+
+		protected override void DoUpdate(float s)
+		{
+			try
+			{
+				ignore_ = true;
+
+				for (int i = 0; i < infos_.Count; ++i)
+				{
+					var ei = infos_[i];
+					if (ei.e == null)
+						continue;
+
+					float v = ei.e.Expression.MorphGroup.Value;
+					float uv = ei.e.Expression.MorphGroup.UnclampedValue;
+
+					ei.slider.Value = v;
+
+					if (Math.Abs(v - uv) < 0.01)
+						ei.clamp.Text = "";
+					else
+						ei.clamp.Text = $"[{uv:0.##}]";
+				}
+			}
+			finally
+			{
+				ignore_ = false;
+			}
+		}
+
+		private MoodType GetMood()
+		{
+			int i = mood_.SelectedIndex;
+
+			if (i <= 0)
+				return MoodType.None;
+			else
+				return MoodType.CreateInternal(i - 1);
+		}
+
+		private void RebuildExpressions()
+		{
+			var exps = person_.Expression.GetAllExpressions();
+			var mood = GetMood();
+			int goodCount = 0;
+
+			for (int expi = 0; expi < exps.Length; ++expi)
+			{
+				var exp = exps[expi];
+				if (mood != MoodType.None && exp.Expression.Mood != mood)
+					continue;
+
+				ExpressionInfo ei;
+
+				if (goodCount < infos_.Count)
+				{
+					ei = infos_[goodCount];
+				}
+				else
+				{
+					ei = new ExpressionInfo();
+
+					ei.label = scroll_.ContentPanel.Add(new VUI.Label());
+					ei.slider = scroll_.ContentPanel.Add(new VUI.FloatTextSlider(0, 1));
+					ei.clamp = scroll_.ContentPanel.Add(new VUI.Label());
+
+					ei.slider.ValueChanged += (v) => OnSlider(ei, v);
+
+					infos_.Add(ei);
+				}
+
+				ei.e = exp;
+
+				ei.label.Text = ei.e.Name;
+				ei.label.Visible = true;
+
+				ei.slider.Value = 0;
+				ei.slider.Visible = true;
+
+				++goodCount;
+			}
+
+			for (int i = goodCount; i < infos_.Count; ++i)
+			{
+				var ei = infos_[i];
+
+				ei.e = null;
+				ei.label.Visible = false;
+				ei.slider.Visible = false;
+			}
+		}
+
+		private void OnSlider(ExpressionInfo ei, float v)
+		{
+			if (ignore_)
+				return;
+
+			if (!manual_.Checked)
+				return;
+
+			person_.Expression.DebugSet(ei.e, v);
+		}
+
+		private void OnManual()
+		{
+			if (manual_.Checked)
+				person_.Expression.Disable();
+			else
+				person_.Expression.Enable();
 		}
 	}
 

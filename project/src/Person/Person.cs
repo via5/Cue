@@ -60,6 +60,7 @@ namespace Cue
 			Body.Init();
 			Voice.Init(this);
 			Gaze.Init();
+			Expression.Init();
 			Homing.Init();
 
 			hasBody_ = body_.Exists;

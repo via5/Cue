@@ -711,7 +711,7 @@
 
 
         {
-            "name": "eyesClosed",
+            "name": "eyesClosedExcited",
             "moods": "excited",
             "bodyParts": "eyes",
             "morphs":
@@ -723,32 +723,25 @@
         },
 
         {
-            "name": "eyesClosedSleeping",
+            "name": "eyesClosedTired",
             "moods": "tired",
             "bodyParts": "eyes",
             "morphs":
             [
                 {
-                    "id": "Eyes Closed",
-                    "min": 0.5,
-                    "max": 1.0
+                    "id": "Eyes Closed"
                 }
             ]
         },
 
         {
-            "name": "drooling",
+            "name": "droolingTired",
             "moods": "tired",
             "bodyParts": "mouth",
             "morphs":
             [
                 {
                     "id": "Mouth Open"
-                },
-                {
-                    "id": "Eyes Closed",
-                    "min": 0.5,
-                    "max": 1.0
                 }
             ]
         },

@@ -168,6 +168,10 @@ namespace Cue.Sys.Vam
 			var b = Parameters.GetBool(a, "AutoExpressions", "enabled");
 			if (b != null)
 				b.val = false;
+
+			b = Parameters.GetBool(a, "EyelidControl", "eyelidLookMorphsEnabled");
+			if (b != null)
+				b.val = false;
 		}
 
 		private static void SetEyes(Atom a)

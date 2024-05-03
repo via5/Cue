@@ -367,8 +367,16 @@ namespace VUI
 		}
 
 		public ComboBox(ItemType[] items, IndexCallback selectionChanged)
-			: this(new List<ItemType>(items), null, selectionChanged)
+			: this(MakeList(items), null, selectionChanged)
 		{
+		}
+
+		private static List<ItemType> MakeList(ItemType[] items)
+		{
+			if (items == null)
+				return new List<ItemType>();
+			else
+				return new List<ItemType>(items);
 		}
 
 		public ComboBox(

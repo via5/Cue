@@ -227,6 +227,7 @@ namespace Cue
 		private MorphInfo[] morphs_;
 		private BodyPartType[] bodyParts_ = null;
 		private float value_ = NoValue;
+		private float valueBeforeClamp_ = NoValue;
 
 		public MorphGroup(string name, BodyPartType bodyPart, MorphInfo[] morphs)
 			: this(name, new BodyPartType[] { bodyPart }, morphs)
@@ -309,15 +310,13 @@ namespace Cue
 
 		public float Value
 		{
-			get
-			{
-				return value_;
-			}
+			get { return value_; }
+			set { SetValue(value); }
+		}
 
-			set
-			{
-				SetValue(value);
-			}
+		public float UnclampedValue
+		{
+			get { return valueBeforeClamp_; }
 		}
 
 		public void MoveTowards(float start, float end, float t)
@@ -333,7 +332,7 @@ namespace Cue
 			else
 				estimated = U.Lerp(start, end, t);
 
-			value_ = UseValue(estimated);
+			DoSetValue(estimated);
 
 			for (int i = 0; i < morphs_.Length; ++i)
 				morphs_[i].MoveTowards(start, value_, t);
@@ -341,7 +340,7 @@ namespace Cue
 
 		public bool MoveTowardsReset()
 		{
-			value_ = NoValue;
+			DoSetValue(NoValue);
 
 			bool finished = true;
 			for (int i = 0; i < morphs_.Length; ++i)
@@ -355,10 +354,24 @@ namespace Cue
 
 		private void SetValue(float requestedValue)
 		{
-			value_ = UseValue(requestedValue);
+			DoSetValue(requestedValue);
 
 			for (int i = 0; i < morphs_.Length; ++i)
 				morphs_[i].Set(value_);
+		}
+
+		private void DoSetValue(float v)
+		{
+			if (v == NoValue)
+			{
+				valueBeforeClamp_ = NoValue;
+				value_ = NoValue;
+			}
+			else
+			{
+				valueBeforeClamp_ = v;
+				value_ = UseValue(v);
+			}
 		}
 
 		private float UseValue(float requestedValue)

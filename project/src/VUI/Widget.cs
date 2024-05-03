@@ -388,9 +388,7 @@ namespace VUI
 				{
 					visible_ = value;
 					UpdateActiveState();
-
-					if (!visible_)
-						NeedsLayout("visibility changed to hidden", true);
+					NeedsLayout("visibility changed", true);
 				}
 			}
 		}
@@ -1006,9 +1004,11 @@ namespace VUI
 				return;
 			}
 
+			// vvv
+			// if this changes, RemoveAllChildren() probably needs a fix too
 			layout_?.Remove(w);
-			w.parent_ = null;
-			w.UpdateActiveState();
+			DoRemoveChild(w);
+			// ^^^
 
 			NeedsLayout("widget removed (" + w.TypeName + ")");
 		}
@@ -1030,27 +1030,34 @@ namespace VUI
 		{
 			CheckDestroyed();
 
-			if (children_ != null)
-			{
-				while (children_.Count > 0)
-				{
-					var w = children_[0];
+			if (children_ == null)
+				return;
 
-					Remove(w);
-					w.Destroy();
-				}
-			}
+			var list = children_.ToArray();
+
+			RemoveAllChildren();
+
+			foreach (var w in list)
+				w.Destroy();
 		}
 
 		public void RemoveAllChildren()
 		{
 			CheckDestroyed();
 
-			if (children_ != null)
-			{
-				while (children_.Count > 0)
-					Remove(children_[0]);
-			}
+			if (children_ == null)
+				return;
+
+			for (int i = 0; i < children_.Count; ++i)
+				DoRemoveChild(children_[i]);
+
+			layout_.RemoveAllChildren();
+		}
+
+		private void DoRemoveChild(Widget w)
+		{
+			w.parent_ = null;
+			w.UpdateActiveState();
 		}
 
 		public void BringToTop()

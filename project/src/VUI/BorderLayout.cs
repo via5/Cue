@@ -63,7 +63,7 @@ namespace VUI
 			corners_[corner] = side;
 		}
 
-		protected override void AddImpl(Widget w, LayoutData data = null)
+		protected override void DoAdded(Widget w, LayoutData data = null)
 		{
 			var d = data as Data;
 			if (d == null)
@@ -84,7 +84,7 @@ namespace VUI
 			s.Add(w);
 		}
 
-		protected override void RemoveImpl(Widget w)
+		protected override void DoRemoved(Widget w)
 		{
 			foreach (var side in sides_)
 			{

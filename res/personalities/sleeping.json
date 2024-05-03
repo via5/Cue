@@ -35,7 +35,6 @@
     "maxAngryExpression": 0.2,
     "maxSurprisedExpression": 0.2,
     "minTired": 1,
-    "minTiredExpression": 1,
     "maxEmotionalRate": 0,
 
     "finishLookAtPlayer": "never",
@@ -83,6 +82,26 @@
             {
                 "name": "cwKissSleeping"
             }
+        }
+    ],
+
+    "expressions":
+    [
+        {
+            "name": "eyesClosedSleeping",
+            "bodyParts": "eyes",
+            "permanent": 1.0,
+            "morphs":
+            [
+                {
+                    "id": "Eyes Closed"
+                },
+                {
+                    "id": "Eyes Closed",
+                    "min": 1.0,
+                    "max": 1.0
+                }
+            ]
         }
     ],
 

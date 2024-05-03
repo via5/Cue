@@ -491,7 +491,7 @@ namespace Cue
 
 		private void SetDefault(MoodType i, bool fast=false)
 		{
-			Set(i, moods_[i.Int].Minimum, fast);
+			Set(i, moods_[i.Int].Maximum, fast);
 		}
 
 		public DampedFloat GetDamped(MoodType i)

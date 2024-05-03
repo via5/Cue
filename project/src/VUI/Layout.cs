@@ -46,6 +46,11 @@ namespace VUI
 
 		public void Add(Widget w, LayoutData data = null)
 		{
+			AddImpl(w, data);
+		}
+
+		protected virtual void AddImpl(Widget w, LayoutData data)
+		{
 			if (Contains(w))
 			{
 				Log.Error("layout already has widget " + w.Name);
@@ -53,10 +58,15 @@ namespace VUI
 			}
 
 			children_.Add(w);
-			AddImpl(w, data);
+			DoAdded(w, data);
 		}
 
 		public void Remove(Widget w)
+		{
+			RemoveImpl(w);
+		}
+
+		protected virtual void RemoveImpl(Widget w)
 		{
 			if (!children_.Remove(w))
 			{
@@ -66,7 +76,19 @@ namespace VUI
 				return;
 			}
 
-			RemoveImpl(w);
+			DoRemoved(w);
+		}
+
+		public void RemoveAllChildren()
+		{
+			RemoveAllChildrenImpl();
+		}
+
+		protected virtual void RemoveAllChildrenImpl()
+		{
+			var copy = children_.ToArray();
+			for (int i=0; i<copy.Length; ++i)
+				Remove(copy[i]);
 		}
 
 		public Size GetPreferredSize(float maxWidth, float maxHeight)
@@ -89,12 +111,12 @@ namespace VUI
 			return children_.Contains(w);
 		}
 
-		protected virtual void AddImpl(Widget w, LayoutData data)
+		protected virtual void DoAdded(Widget w, LayoutData data)
 		{
 			// no-op
 		}
 
-		protected virtual void RemoveImpl(Widget w)
+		protected virtual void DoRemoved(Widget w)
 		{
 			// no-op
 		}
