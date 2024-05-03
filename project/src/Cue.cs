@@ -6,7 +6,7 @@ namespace Cue
 {
 	class PluginGone : Exception { }
 
-	class Cue
+	public class Cue
 	{
 		private const float UpdateActivePersonsInterval = 5.0f;
 
@@ -53,9 +53,6 @@ namespace Cue
 			vuiLog_ = new Logger(Logger.Main, "vui");
 
 			Log.Verbose("cue: ctor");
-
-			options_ = new Options();
-			saver_ = Sys.CreateLiveSaver();
 		}
 
 		public static Cue Instance { get { return instance_; } }
@@ -200,16 +197,21 @@ namespace Cue
 			var start = Sys.RealtimeSinceStartup;
 			Log.Verbose($"cue: init (token {CueMain.Instance.Token})");
 
+			options_ = new Options();
+			saver_ = Sys.CreateLiveSaver();
+
 			Sys.Init();
 
+#if !MOCK
 			VUI.Root.Init(
 				"Cue",
-				() => CueMain.Instance.MVRPluginManager,
+				() => CueMain.Instance.Impl.MVRPluginManager,
 				(s, ps) => Strings.Get(s, ps),
 				(s) => vuiLog_.Verbose(s),
 				(s) => vuiLog_.Info(s),
 				(s) => vuiLog_.Warning(s),
 				(s) => vuiLog_.Error(s));
+#endif
 
 
 			Log.Verbose("cue: loading resources");
@@ -246,7 +248,7 @@ namespace Cue
 			finish_.Init();
 
 			var end = Cue.Instance.Sys.RealtimeSinceStartup;
-			Log.Info($"cue: running, version {Version.String}, init {(end - start):0.00}s");
+			Log.Info($"running, version {Version.String}, init {(end - start):0.00}s");
 		}
 
 		public bool IsSceneIdle()

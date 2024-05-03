@@ -2,7 +2,7 @@
 
 namespace Cue
 {
-	class UI
+	public class UI
 	{
 		public static readonly bool VRMenuDebug = false;
 		public static readonly bool VRMenuAlwaysVisible = false;

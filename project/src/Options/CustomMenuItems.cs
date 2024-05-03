@@ -185,7 +185,7 @@ namespace Cue
 		{
 			o["type"] = "button";
 			o["caption"] = caption_;
-			o["trigger"] = trigger_.ToJSON();
+			o["trigger"] = trigger_?.ToJSON() ?? "";
 		}
 
 		private void OnEditTrigger()

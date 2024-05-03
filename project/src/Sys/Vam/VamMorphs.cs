@@ -576,7 +576,7 @@ namespace Cue.Sys.Vam
 			if (morph_ == null)
 				atom_.Log.Error($"no morph '{name_}'");
 			else if (morph_.DAZMorph == null)
-				atom_.Log.Error($"morph '{name_}' has no dazmorph");
+				atom_.Log.Verbose($"morph '{name_}' has no dazmorph");
 
 			inited_ = true;
 		}

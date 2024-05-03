@@ -148,7 +148,7 @@ namespace Cue
 	}
 
 
-	interface IFinishMood
+	public interface IFinishMood
 	{
 		void Set();
 	}
@@ -244,7 +244,7 @@ namespace Cue
 	}
 
 
-	interface IFinishEvents
+	public interface IFinishEvents
 	{
 		void Set();
 	}
@@ -361,7 +361,7 @@ namespace Cue
 	}
 
 
-	class Finish
+	public class Finish
 	{
 		public const int LookAtNothing = 0;
 		public const int LookAtPlayerInvolved = 1;

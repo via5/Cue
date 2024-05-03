@@ -60,7 +60,7 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class Linker
+	public class Linker
 	{
 		class Link
 		{

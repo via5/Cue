@@ -28,7 +28,7 @@ namespace Cue
 
 		private static int sEnabledTypes =
 			Action | Event | AI | Command |
-			Object | Sys | Main | Resources;
+			Object | Sys | Main;
 
 		private static int sLevel = ErrorLevel;
 
@@ -182,7 +182,7 @@ namespace Cue
 		{
 			if (IsEnabled(level))
 			{
-				if (Cue.Instance == null)
+				if (Cue.Instance?.Sys == null)
 				{
 					if (level == ErrorLevel || level == WarningLevel)
 						SafeLogError($"{Prefix}: {s}");
@@ -198,12 +198,20 @@ namespace Cue
 
 		public static void SafeLogError(string s)
 		{
+#if MOCK
+			Console.WriteLine(s);
+#else
 			SuperController.LogMessage(s);
+#endif
 		}
 
 		public static void SafeLogInfo(string s)
 		{
+#if MOCK
+			Console.WriteLine(s);
+#else
 			SuperController.LogMessage(s);
+#endif
 		}
 
 		private bool IsEnabled(int level)

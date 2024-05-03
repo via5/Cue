@@ -101,6 +101,11 @@ namespace Cue.Sys.Mock
 			get { return Vector3.Zero; }
 		}
 
+		public IAtom DefaultAtom
+		{
+			get { return null; }
+		}
+
 		public IAtom GetAtom(string id)
 		{
 			return new MockAtom(id);

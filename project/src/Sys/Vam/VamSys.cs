@@ -9,7 +9,7 @@ using AssetBundles;
 
 namespace Cue.Sys.Vam
 {
-	sealed class VamSys : ISys
+	sealed public class VamSys : ISys
 	{
 		private const int PluginDataSource = 0;
 		private const int PluginPathSource = 1;
@@ -132,6 +132,23 @@ namespace Cue.Sys.Vam
 			var va = new VamAtom(a);
 			atomsCache_.Add(va);
 			return va;
+		}
+
+		public IAtom DefaultAtom
+		{
+			get
+			{
+				Atom ca = null;
+
+#if !MOCK
+				ca = CueMain.Instance.Impl.MVRPluginManager?.containingAtom;
+#endif
+
+				if (ca == null)
+					return null;
+
+				return GetAtom(ca);
+			}
 		}
 
 		public VamAtom GetAtom(Atom a)
@@ -612,7 +629,12 @@ namespace Cue.Sys.Vam
 			// don't use cue for logging in case something went wrong when
 			// loading
 
-			Transform uit = CueMain.Instance.UITransform;
+			Transform uit = null;
+
+#if !MOCK
+			uit = CueMain.Instance.Impl.UITransform;
+#endif
+
 			if (uit?.parent == null)
 			{
 				Logger.SafeLogInfo("no main ui, selecting atom");
@@ -621,7 +643,10 @@ namespace Cue.Sys.Vam
 				SuperController.singleton.SelectController(
 					script_.containingAtom.mainController);
 
-				uit = CueMain.Instance.UITransform;
+#if !MOCK
+				uit = CueMain.Instance.Impl.UITransform;
+#endif
+
 				if (uit?.parent == null)
 				{
 					Logger.SafeLogError("sill no main ui, can't reload, open main UI once");
@@ -1058,7 +1083,11 @@ namespace Cue.Sys.Vam
 
 		private void OnPrefabsReady()
 		{
-			Transform parent = CueMain.Instance.UITransform;
+			Transform parent = null;
+
+#if !MOCK
+			parent = CueMain.Instance.Impl.UITransform;
+#endif
 
 			triggerActionsParent = parent;
 			InitTriggerUI();

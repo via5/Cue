@@ -99,13 +99,13 @@
 		{
 			if (!config_.forFemale && !p.Atom.IsMale)
 			{
-				Log.Info($"init failed: not for female and atom {p} is not male");
+				Log.Verbose($"init failed: not for female and atom {p} is not male");
 				return false;
 			}
 
 			if (!config_.forMale && p.Atom.IsMale)
 			{
-				Log.Info($"init failed: not for male and atom {p} is male");
+				Log.Verbose($"init failed: not for male and atom {p} is male");
 				return false;
 			}
 
@@ -216,13 +216,11 @@
 		public void SetTarget(float t, float time)
 		{
 			DoSetTarget(t, time, false, false);
-			Log.Info($"set target {this} start={target_.start} value={target_.value} time={time}");
 		}
 
 		public void Deactivate(float time)
 		{
 			DoSetTarget(0, time, true, true);
-			Log.Info($"deactivating {this} in {target_.time}");
 		}
 
 		private void DoSetTarget(float t, float time, bool reset, bool stopAfter)

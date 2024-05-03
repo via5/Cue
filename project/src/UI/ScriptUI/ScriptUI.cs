@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Cue
 {
-	class ScriptUI
+	public class ScriptUI
 	{
 		private VUI.Root root_ = null;
 
@@ -28,9 +28,11 @@ namespace Cue
 
 			Cue.Instance.Options.Changed += () => { tabs_.CheckDebugTabs(); };
 
-			root_ = new VUI.Root(CueMain.Instance.MVRScriptUI, "cue.scriptui");
+#if !MOCK
+			root_ = new VUI.Root(CueMain.Instance.Impl.MVRScriptUI, "cue.scriptui");
 			root_.ContentPanel.Layout = new VUI.BorderLayout();
 			root_.ContentPanel.Add(panel_, VUI.BorderLayout.Center);
+#endif
 
 			panel_.Layout = new VUI.BorderLayout();
 			panel_.Add(tabs_.TabsWidget, VUI.BorderLayout.Center);

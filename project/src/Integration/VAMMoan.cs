@@ -105,7 +105,7 @@ namespace Cue.VamMoan
 
 		private void SetOptimalJaw()
 		{
-			var atom = CueMain.Instance.MVRPluginManager?.containingAtom;
+			var atom = (Cue.Instance.Sys.DefaultAtom as Sys.Vam.VamAtom)?.Atom;
 			var atomUI = atom?.UITransform?.GetComponentInChildren<AtomUI>();
 			var bs = atomUI?.GetComponentsInChildren<UIDynamicButton>(true);
 

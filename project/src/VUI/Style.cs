@@ -196,14 +196,6 @@ namespace VUI
 
 		private Font GetFont(string name)
 		{
-			var f = Resources.GetBuiltinResource<Font>(name);
-			if (f != null)
-				return f;
-
-			f = Resources.GetBuiltinResource<Font>(name + ".ttf");
-			if (f != null)
-				return f;
-
 			return Font.CreateDynamicFontFromOSFont(name, 24);
 		}
 

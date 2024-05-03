@@ -310,7 +310,7 @@ namespace Cue.Sys.Vam
 	}
 
 
-	class VamCameraAtom : VamBasicAtom
+	public class VamCameraAtom : VamBasicAtom
 	{
 		private VamCameraBody body_;
 		private VamHair hair_;

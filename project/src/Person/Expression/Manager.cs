@@ -89,7 +89,7 @@ namespace Cue
 				if (all[i].Init(person_))
 					exps.Add(new WeightedExpression(person_, all[i]));
 				else
-					Log.Error($"not using {all[i]}, couldn't init");
+					Log.Verbose($"not using {all[i]}, couldn't init");
 			}
 
 			exps_ = exps.ToArray();

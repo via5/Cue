@@ -41,6 +41,7 @@ namespace Cue.Sys
 		void ClearLog();
 		void LogLines(string s, int level);
 		IAtom GetAtom(string id);
+		IAtom DefaultAtom { get; }
 		List<IAtom> GetAtoms(bool alsoOff=false);
 		IAtom ContainingAtom { get; }
 		IInput Input { get; }

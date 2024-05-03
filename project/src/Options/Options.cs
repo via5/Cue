@@ -233,7 +233,7 @@ namespace Cue
 	}
 
 
-	class FinishOptions
+	public class FinishOptions
 	{
 		private float initialDelay_ = 5;
 		private int lookAt_ = Finish.LookAtPersonality;
@@ -301,7 +301,7 @@ namespace Cue
 	}
 
 
-	class Options
+	public class Options
 	{
 		public const string DefaultExtension = "json";
 		public const string DefaultFile = "Default.json";
