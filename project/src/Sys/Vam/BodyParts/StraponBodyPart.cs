@@ -64,7 +64,7 @@ namespace Cue.Sys.Vam
 
 		public override bool Exists
 		{
-			get { return (base.Exists && enabled_); }
+			get { return (base.Exists && enabled_ && dildo_ != null); }
 		}
 
 		public override Vector3 ControlPosition
@@ -269,10 +269,10 @@ namespace Cue.Sys.Vam
 					}
 				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				// dildo can get deleted at any time
-				Log.Error($"looks like dildo got deleted");
+				Log.Error($"looks like dildo got deleted: {e}");
 				SetDildo(null, false);
 			}
 		}

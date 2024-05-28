@@ -292,14 +292,14 @@ namespace Cue
 
 		protected bool StartCommon(Person target, string hand)
 		{
-			if (target.Atom.IsMale)
-			{
-				male_.Value = target.ID;
-			}
-			else if (target.Body.HasPenis)
+			if (target.Body.Strapon)
 			{
 				var s = target.Body.Get(BP.Penis).Sys as Sys.Vam.StraponBodyPart;
 				male_.Value = s.Dildo.ID;
+			}
+			else if (target.Body.HasPenis)
+			{
+				male_.Value = target.ID;
 			}
 			else
 			{

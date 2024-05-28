@@ -41,7 +41,7 @@ namespace Cue
 		private VUI.TextBox traits_ = new VUI.TextBox("", "Unused for now");
 		private VUI.CheckBox strapon_ = new VUI.CheckBox("");
 		private VUI.CheckBox canLookAt_ = new VUI.CheckBox("");
-		private VUI.Label straponWarning_ = new VUI.Label("Only available for female characters");
+		private VUI.Label straponWarning_ = new VUI.Label("Already has a penis");
 		private bool ignore_ = false;
 		private bool firstUpdate_ = true;
 
@@ -141,7 +141,7 @@ namespace Cue
 				strapon_.Checked = person_.Body.Strapon;
 				canLookAt_.Checked = person_.CanLookAt;
 
-				if (person_.Atom.IsMale)
+				if (person_.Body.HasPenis && !person_.Body.Strapon)
 				{
 					strapon_.Enabled = false;
 					straponWarning_.Visible = true;

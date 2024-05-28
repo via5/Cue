@@ -252,8 +252,13 @@ namespace Cue.Sys.Vam
 			{
 				if (char_ == null)
 				{
-					log_.Error($"VamAtom.Sex: atom {ID} is not a person");
-					return true;
+					char_ = atom_.GetComponentInChildren<DAZCharacter>();
+
+					if (char_ == null)
+					{
+						log_.Error($"VamAtom.Sex: atom {ID} is not a person");
+						return true;
+					}
 				}
 
 				return char_.isMale;

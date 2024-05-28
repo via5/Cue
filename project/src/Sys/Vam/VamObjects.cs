@@ -151,12 +151,15 @@ namespace Cue.Sys.Vam
 				f(new BasicObject(-1, a, ps_), existing);
 				Log.Info($"atom {id} loaded");
 
-				var o = atom.transform.Find("reParentObject");
-				o.gameObject.SetActive(true);
 
-				o = o.Find("object");
-				o.gameObject.SetActive(true);
+				if (atom.on)
+				{
+					var o = atom.transform.Find("reParentObject");
+					o.gameObject.SetActive(true);
 
+					o = o.Find("object");
+					o.gameObject.SetActive(true);
+				}
 			}
 			catch (Exception e)
 			{

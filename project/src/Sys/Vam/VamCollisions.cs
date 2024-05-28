@@ -64,10 +64,18 @@ namespace Cue.Sys.Vam
 
 		public static void RemoveFromCollider(Collider c)
 		{
-			foreach (var cm in c.GetComponentsInChildren<Component>())
+			try
 			{
-				if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
-					UnityEngine.Object.Destroy(cm);
+				foreach (var cm in c.GetComponentsInChildren<Component>())
+				{
+					if (cm != null && cm.ToString().Contains("CueCollisionHandler"))
+						UnityEngine.Object.Destroy(cm);
+				}
+			}
+			catch (Exception)
+			{
+				// GetComponentsInChildren() can throw an NRE if the collider
+				// is dead, which happens if a strapon is destroyed, for example
 			}
 		}
 

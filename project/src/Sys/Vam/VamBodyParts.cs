@@ -279,6 +279,9 @@ namespace Cue.Sys.Vam
 
 		protected virtual void AddDebugRenderers()
 		{
+			if (!Exists)
+				return;
+
 			AddDebugRenderer(Cue.Instance.VamSys.DebugRenderer.AddPositionRender(this));
 
 			if (Position != Center)

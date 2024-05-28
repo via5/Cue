@@ -521,17 +521,11 @@
         {
             "part": "penis",
             "type": "rigidbody",
-            "sex": "male",
             "name": "Gen1",
+            "optional": true,
             "controller": "penisBaseControl",
             "colliders": ["Gen1Hard", "Gen3aHard"],
             "extremity": "Gen3bHard"
-        },
-
-        {
-            "part": "penis",
-            "type": "strapon",
-            "sex": "female"
         }
     ],
 

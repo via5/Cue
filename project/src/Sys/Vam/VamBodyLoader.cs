@@ -102,6 +102,9 @@ namespace Cue.Sys.Vam
 					map[bp.Type] = bp;
 			}
 
+			if (!map.ContainsKey(BP.Penis) || map[BP.Penis] == null)
+				map[BP.Penis] = new StraponBodyPart(atom_);
+
 			var list = new List<IBodyPart>();
 
 			foreach (BodyPartType i in BodyPartType.Values)
@@ -181,6 +184,7 @@ namespace Cue.Sys.Vam
 			public string closestRigidbody;
 			public string centerCollider;
 			public string extremity;
+			public bool optional;
 		}
 
 		private IBodyPart LoadPart(bool male, JSONClass o, Func<string, JSONNode> getVar)
@@ -231,6 +235,7 @@ namespace Cue.Sys.Vam
 			}
 
 			ps.extremity = J.OptString(o, "extremity");
+			ps.optional = J.OptBool(o, "optional", false);
 
 			if (o.HasKey("ignore"))
 			{
@@ -258,6 +263,8 @@ namespace Cue.Sys.Vam
 			ps.centerCollider = J.OptString(o, "centerCollider");
 
 			var type = J.ReqString(o, "type");
+
+			Log.Info($"{ps.bodyPart}");
 
 			if (type == "rigidbody")
 			{
@@ -378,6 +385,28 @@ namespace Cue.Sys.Vam
 		private IBodyPart CreateRigidbody(PartSettings ps)
 		{
 			var rbs = new List<Rigidbody>();
+
+			if (ps.optional)
+			{
+				bool ok = false;
+
+				foreach (var cn in ps.colliders)
+				{
+					var c = atom_.FindCollider(cn);
+					if (c != null)
+					{
+						ok = true;
+						break;
+					}
+				}
+
+				if (!ok)
+				{
+					Log.Verbose($"optional part {ps.bodyPart}: no colliders found");
+					return null;
+				}
+			}
+
 
 			for (int i = 0; i < ps.names.Count; ++i)
 			{
